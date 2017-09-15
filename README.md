@@ -13,3 +13,4 @@ Hakemistot:
 * `nap` sisältää NAP CKAN-portaalin laajennukset ja konfiguraatiot
 * `ote` sisältää OTE-sovelluksen koodin
 * `aws` sisältää järjestelmän pilviympäristöjen konfiguraatiot (pl. salaisuudet, kuten avaimet)
+* `tietokanta` sisältää tietokannan migraatiot sekä paikallisen testitietokannan pystyttämisen Dockeriin
