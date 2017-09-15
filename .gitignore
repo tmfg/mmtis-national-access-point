@@ -1,2 +1,4 @@
 ote/target
 ote/.nrepl-port
+ote/resources/public/js
+ote/figwheel_server.log
