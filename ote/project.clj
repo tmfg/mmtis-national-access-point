@@ -47,10 +47,10 @@
               [;; Paikallinen kehitys build
                {:id "dev"
                 :source-paths ["src/cljs" "src/cljc"]
-                :figwheel {:on-jsload "widgetshop.main/reload-hook"}
+                :figwheel {:on-jsload "ote.main/reload-hook"}
                 :compiler {:optimizations :none
                            :source-map true
-                           :output-to "resources/public/js/widgetshop.js"
+                           :output-to "resources/public/js/ote.js"
                            :output-dir "resources/public/js/out"}}
 
                ;; Tuotantobuild advanced compilation
