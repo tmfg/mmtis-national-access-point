@@ -33,6 +33,10 @@
                  [cljs-react-material-ui "0.2.48"]
                  [figwheel "0.5.10"]
 
+                 ;; Aika
+                 [com.andrewmcveigh/cljs-time "0.5.0"]
+
+
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
 

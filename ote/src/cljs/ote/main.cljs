@@ -6,7 +6,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [tuck.core :as tuck]
-            [ote.app.tila :as tila]))
+            [ote.app.tila :as tila]
+            [ote.views.olennaiset-tiedot :as ot]))
 
 (defn ote-sovellus
   "OTE-sovelluksen käyttöliittymän pääkomponentti"
@@ -16,7 +17,8 @@
    [:div.ote-sovellus
     [ui/app-bar {:title "OTE"}]
     [ui/paper
-     "Ei täällä vielä mitään ole"]]])
+     ;"Ei täällä vielä mitään ole"
+     [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]]]])
 
 (defn ^:export main []
   (r/render-component [tuck/tuck tila/app ote-sovellus]

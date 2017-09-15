@@ -4,4 +4,5 @@
   (:require [reagent.core :as r]))
 
 (defonce app
-  (r/atom {}))
+  (r/atom {:muokattava-palvelu {:ot/nimi "Tatun ajopalvelu"
+                                :ot/ytunnus "412341231"}}))
