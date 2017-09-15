@@ -1,4 +1,4 @@
 {:db {:url "jdbc:postgresql://localhost:5432/napote"
-      :user "napote"
+      :username "napote"
       :password ""}
  :http {:port 3000}}
