@@ -34,4 +34,6 @@
   Palauttaa 0 arity funktion, jolla julkaistun käsittelijän voi poistaa."
   [{kasittelijat :kasittelijat} kasittelija]
   (swap! kasittelijat conj kasittelija)
-  #(swap! kasittelijat filterv not= kasittelija))
+  #(swap! kasittelijat
+          (fn [kasittelijat]
+            (filterv (partial not= kasittelija) kasittelijat))))
