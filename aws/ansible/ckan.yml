@@ -1,0 +1,6 @@
+---
+
+- name: Asenna CKAN
+  hosts: ckan
+  tasks:
+    - include: tasks/ckan_paketit.yml
