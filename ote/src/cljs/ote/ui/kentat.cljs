@@ -59,12 +59,16 @@
 
 
 (defmethod kentta :valinta [{:keys [muokkaa! otsikko nimi valinta-nayta valinnat lomake? virhe] :as   kentta} data]
-  [ui/select-field {:floating-label-text otsikko
-                    :value               data
-                    :on-change           #(muokkaa! %3)}
-            (for [valinta valinnat]
-                 ^{:key valinta}
-                 [ui/menu-item {:value valinta :primary-text (valinta-nayta valinta)}])])
+  ;; Koska material-ui valinta ei voi olla mielivaltainen objekti, muutetaan valinta indeksiksi
+  (let [valinta-idx (zipmap valinnat (range))]
+    [ui/select-field {:floating-label-text otsikko
+                      :value               (valinta-idx data)
+                      :on-change           #(muokkaa! (nth valinnat %2))}
+     (map-indexed
+      (fn [i valinta]
+        ^{:key i}
+        [ui/menu-item {:value i :primary-text (valinta-nayta valinta)}])
+      valinnat)]))
 
 
 (defmethod kentta :puhelin [{:keys [on-focus pituus lomake? placeholder] :as kentta} data]
