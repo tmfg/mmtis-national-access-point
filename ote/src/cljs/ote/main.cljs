@@ -8,8 +8,10 @@
             [tuck.core :as tuck]
             [ote.app.tila :as tila]
             [ote.views.olennaiset-tiedot :as ot]
-            [ote.views.satama :as satama]
-            [ote.views.vuokraus :as vuokraus]))
+            [ote.views.vuokraus :as vuokraus]
+            [ote.views.alueet :as pysakointialueet]
+            [ote.views.liikennevalineet :as liikennevalineet]
+            ))
 
 (enable-console-print!)
 
@@ -20,16 +22,29 @@
    {:mui-theme (get-mui-theme {:palette {:text-color (color :green600)}})}
    [:div.ote-sovellus.container
     [ui/app-bar {:title "OTE"}]
+    [ui/tabs
+     [ui/tab {:label "Olennaiset tiedot" :value "a"}
+      [ui/paper {:class "paper-siirto"}
+        [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]
+       ]
+      ]
+     [ui/tab {:label "Pysäköintialueet" :value "b"}
+      [ui/paper {:class "paper-siirto"}
+        [pysakointialueet/pysakointialueet e! (:muokattava-palvelu app)]
+      ]
+      ]
+     [ui/tab {:label "Liikennevälineet" :value "b"}
+      [ui/paper {:class "paper-siirto"}
+       [liikennevalineet/liikennevalineet e! (:muokattava-palvelu app)]
+       ]
+      ]
+     ]
+
     [ui/paper {:class "paper-siirto"}
-      [:div.container.row
+
+     [:div.container.row
         ;"Ei täällä vielä mitään ole"
-       [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]
-       (println "tyyppi on " (tila/organisaatio-tyyppi))
-       (cond
-         (= (tila/organisaatio-tyyppi) "satama") [satama/sataman-jatkotiedot e! (:muokattava-palvelu app)]
-         (= (tila/organisaatio-tyyppi) "vuokraus") [vuokraus/vuokrauspalvelu-jatkotiedot e! (:muokattava-palvelu app)]
-         :else [satama/sataman-jatkotiedot e! (:muokattava-palvelu app)]
-         )
+       ;[ot/olennaiset-tiedot e! (:muokattava-palvelu app)]
        ]]]])
 
 (defn ^:export main []
