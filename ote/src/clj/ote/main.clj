@@ -3,7 +3,8 @@
   Järjestelmän käynnistys."
   (:require [com.stuartsierra.component :as component]
             [ote.komponentit.http :as http]
-            [ote.komponentit.db :as db]))
+            [ote.komponentit.db :as db]
+            [ote.palvelut.lokalisaatio :as lokalisaatio-palvelu]))
 
 (def ^{:doc "Ajossa olevan OTE-järjestelmän kahva"}
   ote nil)
@@ -14,7 +15,10 @@
    :db (db/tietokanta (:db asetukset))
    :http (http/http-palvelin (:http asetukset))
 
-   ))
+   ;; Frontille tarjottavat palvelut
+
+   ;; Käännöstiedostojen haku
+   :lokalisaatio (component/using (lokalisaatio-palvelu/->Lokalisaatio) [:http])))
 
 (defn kaynnista []
   (alter-var-root

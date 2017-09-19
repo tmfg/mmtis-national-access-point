@@ -22,11 +22,15 @@
                                     io/resource slurp read-string)]
               (swap! ladatut-kielet assoc kieli kaannostiedot)
               (kun-ladattu kieli kaannostiedot))
-       :cljs (k/get! (str "/kielet/" (name kieli) ".edn")
+       :cljs (k/get! (str "/kieli/" (name kieli))
                      {:on-success (fn [kaannostiedot]
-                                    (swap! *ladatut-kielet* assoc kieli kaannostiedot)
+                                    (swap! ladatut-kielet assoc kieli kaannostiedot)
                                     (kun-ladattu kieli kaannostiedot))}))))
-
+(defn kaannostiedot
+  "Lataa kielen ja palauttaa kaikki sen käännöstiedot."
+  [kieli]
+  (lataa-kieli! kieli (constantly nil))
+  (get @ladatut-kielet kieli))
 
 #?(:cljs
    ;; Frontilla on atomi `valittu-kieli`
