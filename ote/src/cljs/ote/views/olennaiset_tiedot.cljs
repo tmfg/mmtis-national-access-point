@@ -4,7 +4,8 @@
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as liikkumispalvelu]))
+            [ote.domain.liikkumispalvelu :as liikkumispalvelu]
+            [ote.lokalisaatio :refer [tr tr-avain]]))
 
 
 (defn olennaiset-tiedot [e! tila]
@@ -12,62 +13,33 @@
   [:div {:class "col-lg-4"}
    [lomake/lomake
     {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
+     :nimi->otsikko #(tr [:olennaiset-tiedot :otsikot %])
      :footer-fn (fn [data]
-                  [napit/tallenna {:on-click #(e! :FIXME)
+                   [napit/tallenna {:on-click #(e! :FIXME)
                                    :disabled (not (lomake/voi-tallentaa-ja-muokattu? data))}
-                   "Tallenna"])}
+                    "Tallenna"])}
 
-    [{:otsikko "Palveluntarjoajan nimi"
-      :nimi :ot/nimi
+    [{:nimi :ot/nimi
       :tyyppi :string
-      :validoi [[:ei-tyhja "Anna nimi"]]
-      }
+      :validoi [[:ei-tyhja "Anna nimi"]]}
 
-     {:otsikko "Y-tunnus"
-      :nimi :ot/ytunnus
+     {:nimi :ot/y-tunnus
       :tyyppi :string
       :validoi [[:ytunnus]]}
 
-     {:otsikko "Palveluntarjoajan tyyppi"
-      :nimi :ot/tyyppi
+     {:nimi :ot/tyyppi
       :tyyppi :valinta
-      :valinta-nayta liikkumispalvelu/palvelutyypin-nimi
+      :valinta-nayta (tr-avain [::liikkumispalvelu/palvelutyypin-nimi])
       :valinnat liikkumispalvelu/palvelutyypit }
 
-     ;;(fn [evt idx value] (products/select-category-by-id! value))
-
-     {:otsikko "Puhelin"
-      :nimi :ot/puhelin
-      :tyyppi :string}
-
-     {:otsikko "GSM"
-      :nimi :ot/gsm
-      :tyyppi :string}
-
-     {:otsikko "Sähköpostiosoite"
-      :nimi :ot/email
-      :tyyppi :string}
-
-     {:otsikko "Osoite"
-      :nimi :ot/osoite
-      :tyyppi :string}
-
-     {:otsikko "Postinumero"
-      :nimi :ot/postinumero
-      :tyyppi :string}
-
-     {:otsikko "Postitoimipaikka"
-      :nimi :ot/postitoimipaikka
-      :tyyppi :string}
-
-     {:otsikko "www-osoite"
-      :nimi :ot/www-osoite
-      :tyyppi :string}
-
-     ]
+     {:nimi :ot/puhelin :tyyppi :string}
+     {:nimi :ot/gsm :tyyppi :string}
+     {:nimi :ot/email :tyyppi :string}
+     {:nimi :ot/osoite :tyyppi :string}
+     {:nimi :ot/postinumero :tyyppi :string}
+     {:nimi :ot/postitoimipaikka :tyyppi :string}
+     {:nimi :ot/www-osoite :tyyppi :string}]
 
     tila]
 
-   [debug/debug tila]
-   ]
-    )
+   [debug/debug tila]])

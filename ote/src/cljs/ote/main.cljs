@@ -9,7 +9,8 @@
             [ote.app.tila :as tila]
             [ote.views.olennaiset-tiedot :as ot]
             [ote.views.satama :as satama]
-            [ote.views.vuokraus :as vuokraus]))
+            [ote.views.vuokraus :as vuokraus]
+            [ote.lokalisaatio :as lokalisaatio]))
 
 (enable-console-print!)
 
@@ -33,8 +34,12 @@
        ]]]])
 
 (defn ^:export main []
-  (r/render-component [tuck/tuck tila/app ote-sovellus]
-                      (.getElementById js/document "oteapp")))
+  (lokalisaatio/lataa-kieli!
+   :fi
+   (fn [kieli _]
+     (reset! lokalisaatio/valittu-kieli kieli)
+     (r/render-component [tuck/tuck tila/app ote-sovellus]
+                         (.getElementById js/document "oteapp")))))
 
 (defn ^:export reload-hook []
   (r/force-update-all))
