@@ -1,0 +1,4 @@
+{:liikkumispalvelutyyppi {:valitys "Välitys"
+                          :satama "Satama"}
+ :y-tunnus "Y-tunnus"
+ :tervehdys ["Moro vaan " :nimi "!"]}

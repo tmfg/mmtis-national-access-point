@@ -37,3 +37,12 @@
   #(swap! kasittelijat
           (fn [kasittelijat]
             (filterv (partial not= kasittelija) kasittelijat))))
+
+(defn transit-vastaus
+  "Palauta annettu Clojure `data` Transit vastauksena."
+  [data]
+  {:status 200
+   :headers {"Content-Type" "application/json+transit"}
+   :body (with-open [out (java.io.ByteArrayOutputStream.)]
+           (transit/write (transit/writer out :json) data)
+           (str out))})

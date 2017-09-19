@@ -1,0 +1,3 @@
+- group: name=napote gid=10001 state=present
+
+- user: name=napote uid=10001 groups=napote append=yes state=present

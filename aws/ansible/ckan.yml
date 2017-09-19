@@ -1,0 +1,9 @@
+---
+
+- name: Asenna CKAN
+  hosts: ckan
+  become: true
+  tasks:
+    - include: tasks/napote_group_ja_user.yml
+    - include: tasks/ckan_paketit.yml
+    - include: tasks/ckan_konfigurointi.yml
