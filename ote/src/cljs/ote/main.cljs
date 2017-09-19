@@ -11,6 +11,8 @@
             [ote.views.satama :as satama]
             [ote.views.vuokraus :as vuokraus]))
 
+(enable-console-print!)
+
 (defn ote-sovellus
   "OTE-sovelluksen käyttöliittymän pääkomponentti"
   [e! app]
@@ -36,4 +38,3 @@
 
 (defn ^:export reload-hook []
   (r/force-update-all))
-
