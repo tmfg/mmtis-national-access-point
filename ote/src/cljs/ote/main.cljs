@@ -23,15 +23,7 @@
     [ui/app-bar {:title "OTE"}]
     [ui/paper {:class "paper-siirto"}
       [:div.container.row
-        ;"Ei täällä vielä mitään ole"
-       [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]
-       (println "tyyppi on " (tila/organisaatio-tyyppi))
-       (cond
-         (= (tila/organisaatio-tyyppi) "satama") [satama/sataman-jatkotiedot e! (:muokattava-palvelu app)]
-         (= (tila/organisaatio-tyyppi) "vuokraus") [vuokraus/vuokrauspalvelu-jatkotiedot e! (:muokattava-palvelu app)]
-         :else [satama/sataman-jatkotiedot e! (:muokattava-palvelu app)]
-         )
-       ]]]])
+       [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]]]]])
 
 (defn ^:export main []
   (lokalisaatio/lataa-kieli!

@@ -39,9 +39,3 @@
       (swap! app
              (fn [current-app-state]
                  (apply update-fn current-app-state args))))
-
-
-(defn organisaatio-tyyppi []
-      (let [palvelu (get app :muokattava-palvelu)]
-           (println "palvelu -> " palvelu app)
-           (get palvelu :ot/tyyppi)))
