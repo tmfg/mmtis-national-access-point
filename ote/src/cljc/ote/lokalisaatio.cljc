@@ -52,7 +52,7 @@
 (defn- viestin-osa [osa parametrit]
   (cond
     (keyword? osa)
-    (viestin-osa (get parametrit osa))
+    (viestin-osa (get parametrit osa) parametrit)
 
     ;; PENDING: tässä voitaisiin tehdä Date formatointi yms tyypin mukaista
     :default
