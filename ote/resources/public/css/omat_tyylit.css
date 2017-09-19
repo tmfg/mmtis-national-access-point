@@ -1,0 +1,10 @@
+/* Tänne kaikki Material UI:ta muuttavat css muutokset - hox korvataan varmaan jossain vaiheessa less/sass tiedostoilla */
+
+
+.row-siirto {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+.paper-siirto {
+    padding-left 5px;
+}
