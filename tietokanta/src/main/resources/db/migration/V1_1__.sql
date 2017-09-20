@@ -116,7 +116,7 @@ CREATE TYPE vuokraustiedot AS (
   kelpoisuusvaatimukset TEXT, -- tekstikuvaus vuokraajan kelpoisuusvaatimuksista
   varauspalvelu palvelutietolinkki,
   "vuokrauksen-lisapalvelut" vuokrauksenlisapalvelu[],
-  noutopaikat noutopaikka
+  noutopaikat noutopaikka[]
 );
 
 
