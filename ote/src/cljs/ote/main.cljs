@@ -13,7 +13,6 @@
             [ote.views.liikennevalineet :as liikennevalineet]
             [ote.views.valituspalvelut :as valityspalvelut]
             [ote.lokalisaatio :as lokalisaatio]))
-            ))
 
 (enable-console-print!)
 
