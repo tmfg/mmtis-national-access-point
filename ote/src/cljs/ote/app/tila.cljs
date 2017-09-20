@@ -4,7 +4,8 @@
   (:require [reagent.core :as r]))
 
 (defonce app
-  (r/atom {:muokattava-palvelu {:ot/nimi "Tatun ajopalvelu"
+  (r/atom {:valittu-sivu "Perustiedot" ;; Voi olla vaikka mitä esim Perustiedot, Välityspalvelut, Liikennevälineet
+           :muokattava-palvelu {:ot/nimi "Tatun ajopalvelu"
                                 :ot/ytunnus "4123412-1"
                                 :ot/tyyppi :satama
                                 :ot/puhelin "0500 123456"
