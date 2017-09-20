@@ -1,6 +1,7 @@
 (ns ote.domain.liikkumispalvelu
   "Liikkumispalvelun tietojen määritys"
-  (:require #?(:clj [ote.tietokanta.specql-db :refer [define-tables]]))
+  (:require [clojure.spec.alpha :as s]
+            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]]))
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
