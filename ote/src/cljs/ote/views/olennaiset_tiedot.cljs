@@ -4,7 +4,8 @@
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as liikkumispalvelu]))
+            [ote.domain.liikkumispalvelu :as liikkumispalvelu]
+            [ote.lokalisaatio :refer [tr tr-avain]]))
 
 (defn vuokrauspalveluiden-lisatiedot[tila]
       (when (= :vuokraus (:ot/tyyppi tila))
@@ -109,29 +110,24 @@
     ]
    [lomake/lomake
     {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
+     :nimi->otsikko #(tr [:olennaiset-tiedot :otsikot %])
      :footer-fn (fn [data]
-                  [napit/tallenna {:on-click #(e! :FIXME)
+                   [napit/tallenna {:on-click #(e! :FIXME)
                                    :disabled (not (lomake/voi-tallentaa-ja-muokattu? data))}
-                   "Tallenna"])}
+                    "Tallenna"])}
 
-    [{:otsikko "Palveluntarjoajan nimi"
-      :nimi :ot/nimi
+    [{:nimi :ot/nimi
       :tyyppi :string
-      :validoi [[:ei-tyhja "Anna nimi"]]
-      }
+      :validoi [[:ei-tyhja "Anna nimi"]]}
 
-     {:otsikko "Y-tunnus"
-      :nimi :ot/ytunnus
+     {:nimi :ot/y-tunnus
       :tyyppi :string
       :validoi [[:ytunnus]]}
 
-     {:otsikko "Palveluntarjoajan tyyppi"
-      :nimi :ot/tyyppi
+     {:nimi :ot/tyyppi
       :tyyppi :valinta
-      :valinta-nayta liikkumispalvelu/palvelutyypin-nimi
+      :valinta-nayta (tr-avain [::liikkumispalvelu/palvelutyypin-nimi])
       :valinnat liikkumispalvelu/palvelutyypit }
-
-     ;;(fn [evt idx value] (products/select-category-by-id! value))
 
      {:otsikko "Puhelin"
       :nimi :ot/puhelin

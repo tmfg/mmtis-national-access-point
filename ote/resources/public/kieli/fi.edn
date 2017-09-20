@@ -1,4 +1,25 @@
-{:liikkumispalvelutyyppi {:valitys "Välitys"
-                          :satama "Satama"}
+{:olennaiset-tiedot
+
+ {;; Kenttien otsikot (FIXME: oikea ns)
+  :otsikot {:ot/nimi "Palveluntarjoajan nimi"
+            :ot/y-tunnus "Y-tunnus"
+            :ot/tyyppi "Palvelun tyyppi"
+            :ot/puhelin "Puhelin (toimisto)"
+            :ot/gsm "Puhelin (GSM)"
+            :ot/email "Sähköpostiosoite"
+            :ot/osoite "Osoite"
+            :ot/postinumero "Postinumero"
+            :ot/postitoimipaikka "Postitoimipaikka"
+            :ot/www-osoite "WWW-osoite"}}
+
+ ;; Liikkumispalvelutyyppi enumin arvojen selkokieliset nimet
+ :ote.domain.liikkumispalvelu/palvelutyypin-nimi
+ {:satama "Satama, Asema, Terminaali"
+  :kuljetus "Henkilökuljetuspalvelu"
+  :vuokraus "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"
+  :pysakointi "Yhteiskäyttö-/Pysäköintipalvelu"
+  :valityspalvelu "Välityspalvelu"}
+
+
  :y-tunnus "Y-tunnus"
  :tervehdys ["Moro vaan " :nimi "!"]}
