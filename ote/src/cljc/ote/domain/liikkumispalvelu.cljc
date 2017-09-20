@@ -1,15 +1,43 @@
 (ns ote.domain.liikkumispalvelu
   "Liikkumispalvelun tietojen määritys"
   (:require [clojure.spec.alpha :as s]
-            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]]))
+            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            [specql.rel :as rel]
+            [specql.transform :as xf])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
 (define-tables
-  ["osoite" ::osoite]
-  ["palveluntuottaja" ::palveluntuottaja]
+  ;; Määritellään enumit
+  ["viikonpaiva" ::viikonpaiva (xf/transform (xf/to-keyword))]
+  ["maksutapa" ::maksutapa (xf/transform (xf/to-keyword))]
   ["liikkumispalvelutyyppi" ::liikkumispalvelutyyppi]
-  ["liikkumispalvelu" ::liikkumispalvelu])
+  ["esteettomyystuki" ::esteettomyystuki (xf/transform (xf/to-keyword))]
+  ["erityispalvelu" ::erityispalvelu]
+  ["liikennevalinetyyppi" ::liikennevalinetyyppi (xf/transform (xf/to-keyword))]
+  ["vuokrauksenlisapalvelu" ::vuokraus-lisapalvelu]
+  ["noutopaikantyyppi" ::noutopaikantyyppi]
+  ["valityspalvelutyyppi" ::valityspalvelutyyppi]
+
+  ;; UDT tyypit
+  ["osoite" ::osoite]
+  ["palvelutietolinkki" ::linkki
+   {"osoite" ::url}]
+  ["aukioloaika" ::aukioloaika]
+  ["terminaalitiedot" ::terminaalitiedot]
+  ["toimintaalue" ::toiminta-alue]
+  ["henkilokuljetustiedot" ::henkilokuljetustiedot]
+  ["noutopaikka" ::noutopaikka]
+  ["vuokraustiedot" ::vuokraustiedot]
+  ["pysakointialue" ::pysakointialue]
+  ["pysakointitiedot" ::pysakointitiedot]
+  ["valitettavapalvelu" ::valitettava-palvelu]
+  ["valitystiedot" ::valitystiedot]
+
+  ;; Taulut
+  ["palveluntuottaja" ::palveluntuottaja]
+  ["liikkumispalvelu" ::liikkumispalvelu
+   {::tuottaja (rel/has-one ::palveluntuottaja-id ::palveluntuottaja ::id)}])
 
 ;; Määrätään listan järjestys
 (def palvelutyypit [:satama :kuljetus :vuokraus :pysakointi :valityspalvelu])

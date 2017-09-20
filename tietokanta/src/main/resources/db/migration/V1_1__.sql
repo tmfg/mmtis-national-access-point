@@ -122,7 +122,7 @@ CREATE TYPE vuokraustiedot AS (
 
 
 CREATE TYPE pysakointialue AS (
-  sijainti toimintaalue,
+  alue toimintaalue,
   aukioloajat aukioloaika[],
   maksutavat maksutapa[],
   esteettomyys esteettomyystuki[],
