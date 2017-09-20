@@ -14,11 +14,11 @@
 
  ;; Liikkumispalvelutyyppi enumin arvojen selkokieliset nimet
  :ote.domain.liikkumispalvelu/palvelutyypin-nimi
- {:satama "Satama, Asema, Terminaali"
-  :kuljetus "Henkilökuljetuspalvelu"
+ {:terminaali "Satama, Asema, Terminaali"
+  :henkilokuljetus "Henkilökuljetuspalvelu"
   :vuokraus "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"
   :pysakointi "Yhteiskäyttö-/Pysäköintipalvelu"
-  :valityspalvelu "Välityspalvelu"}
+  :valitys "Välityspalvelu"}
 
 
  :y-tunnus "Y-tunnus"
