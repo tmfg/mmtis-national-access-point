@@ -12,7 +12,6 @@
             [ote.views.vuokraus :as vuokraus]
             [ote.lokalisaatio :as lokalisaatio]))
 
-(enable-console-print!)
 
 (defn ote-sovellus
   "OTE-sovelluksen käyttöliittymän pääkomponentti"
