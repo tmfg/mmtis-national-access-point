@@ -99,6 +99,40 @@
             )
       )
 
+(defn henkilokuljetus-lisatiedot [tila]
+
+      (when (= :kuljetus (:ot/tyyppi tila))
+
+            (lomake/ryhma "Henkilöstökuljetuspalveluiden lisätiedot"
+                          {:otsikko "Reaaliaikapalveluiden www osoite"
+                           :nimi    :kuljetus/www-reaaliaikatiedot
+                           :tyyppi  :string
+                           }
+
+                          {:otsikko "Matkatavaroita koskevat rajoitukset"
+                           :nimi    :kuljetus/matkatavara_rajoitukset
+                           :tyyppi  :tekstialue
+                           :rivit   5
+                           }
+
+                          {:otsikko "Pääasiallinen toiminta-alue"
+                           :nimi    :kuljetus/paa_toiminta-alue
+                           :tyyppi  :string
+                           }
+
+                          {:otsikko "Toissijainen toiminta-alue"
+                           :nimi    :kuljetus/toissijainen_toiminta-alue
+                           :tyyppi  :string
+                           }
+                          {:otsikko "Anna varauspalvelun www osoite, mikäli sellainen on"
+                           :nimi    :kuljetus/www-varauspalvelu
+                           :tyyppi  :string
+                           }
+                          )
+            )
+      )
+
+
 (defn olennaiset-tiedot [e! tila]
 
       [:div.row
@@ -159,6 +193,7 @@
 
      (satamapalvelun-lisatiedot tila)
      (vuokrauspalveluiden-lisatiedot tila)
+     (henkilokuljetus-lisatiedot tila)
      ]
 
     tila]

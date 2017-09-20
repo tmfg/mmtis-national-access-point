@@ -12,7 +12,10 @@
             [ote.views.alueet :as pysakointialueet]
             [ote.views.liikennevalineet :as liikennevalineet]
             [ote.views.valituspalvelut :as valityspalvelut]
-            [ote.lokalisaatio :as lokalisaatio]))
+            [ote.lokalisaatio :as lokalisaatio]
+            #_[ote.views.kuljetus :as kuljetus]
+            [ote.views.kuljetus :as kuljetus]
+            ))
 
 (enable-console-print!)
 
@@ -36,6 +39,9 @@
      [ui/tab {:label "Välityspalvelut" :value "d"}
       [ui/paper {:class "paper-siirto"}
        [valityspalvelut/valityspalvelu e! (:muokattava-palvelu app)]]]
+     [ui/tab {:label "Reitit" :value "d"}
+      [ui/paper {:class "paper-siirto"}
+       [kuljetus/reitti e! (:muokattava-palvelu app)]]]
      ]
     ]])
 

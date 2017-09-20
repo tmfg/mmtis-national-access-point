@@ -3,7 +3,9 @@
   (:require [ote.ui.lomake :as lomake]
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
-            [ote.ui.debug :as debug]))
+            [ote.ui.debug :as debug]
+            [ote.domain.liikkumispalvelu :as liikkumispalvelu]
+            [ote.lokalisaatio :refer [tr tr-avain]]))
 
 (defn valityspalvelu [e! tila]
 
@@ -28,27 +30,29 @@
            :rivit 5
            :validoi [[:ei-tyhja]]}
 
-          {:otsikko "Maksutavat"
-           :nimi :alueet/maksutavat
-           :tyyppi :tekstialue
-           :rivit 5
-           :validoi [[:ei-tyhja]]}
+          {:otsikko "Välityspalvelun tyyppi"
+           :nimi :valityspalvelu/tyyppi
+           :tyyppi :valinta
+           :valinta-nayta (tr-avain [::liikkumispalvelu/palvelutyypin-nimi])
+           :valinnat liikkumispalvelu/palvelutyypit }
 
-          {:otsikko "Erityisryhmät"
-           :nimi :alueet/erityisryhma
+          {:otsikko "Pääasiallinen toiminta-alue"
+           :nimi :valityspalvelu/paa-alue
            :tyyppi :tekstialue
-           :rivit 5
+           :rivit 2
            }
 
-          {:otsikko "Latauspisteet"
-           :nimi :alueet/latauspisteet
+          {:otsikko "Toissijainen toiminta-alue"
+           :nimi :valityspalvelu/toissijainen-alue
            :tyyppi :tekstialue
-           :rivit 5
+           :rivit 2
            }
 
-          {:otsikko "Mahdolliset varauspalvelun osoite"
-           :nimi :alueet/www-varauspalvelu
-           :tyyppi :string}
+          {:otsikko "Hinnasto"
+           :nimi :valityspalvelu/hinnasto
+           :tyyppi :tekstialue
+           :rivit 3
+           }
           ]
 
          tila]
