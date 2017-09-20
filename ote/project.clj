@@ -1,17 +1,19 @@
-(defproject cljs-kurssi "0.1-SNAPSHOT"
+(defproject ote "0.1-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.660"]
 
-                 ;; Component library
+                 ;; Komponenttikirjasto
                  [com.stuartsierra/component "0.3.2"]
 
-                 ;; Logging library
+                 ;; Logitus (clj + cljs)
                  [com.taoensso/timbre "4.10.0"]
 
-                 ;; PostgreSQL JDBC driver and connection pooling
+                 ;; PostgreSQL JDBC ajuri, yhteyspooli ja muut apukirjastot
                  [org.postgresql/postgresql "42.1.4"]
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
+                 [webjure/jeesql "0.4.6"]
+                 [specql "0.7.0-alpha1"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]

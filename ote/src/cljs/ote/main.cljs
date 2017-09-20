@@ -17,7 +17,6 @@
             [ote.views.kuljetus :as kuljetus]
             ))
 
-(enable-console-print!)
 
 (defn ote-sovellus
   "OTE-sovelluksen käyttöliittymän pääkomponentti"
