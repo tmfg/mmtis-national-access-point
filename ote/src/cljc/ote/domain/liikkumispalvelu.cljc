@@ -11,7 +11,7 @@
   ;; Määritellään enumit
   ["viikonpaiva" ::viikonpaiva (xf/transform (xf/to-keyword))]
   ["maksutapa" ::maksutapa (xf/transform (xf/to-keyword))]
-  ["liikkumispalvelutyyppi" ::liikkumispalvelutyyppi]
+  ["liikkumispalvelutyyppi" ::liikkumispalvelutyyppi (xf/transform (xf/to-keyword))]
   ["esteettomyystuki" ::esteettomyystuki (xf/transform (xf/to-keyword))]
   ["erityispalvelu" ::erityispalvelu]
   ["liikennevalinetyyppi" ::liikennevalinetyyppi (xf/transform (xf/to-keyword))]

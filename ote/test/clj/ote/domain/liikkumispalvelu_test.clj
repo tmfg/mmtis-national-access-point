@@ -6,7 +6,7 @@
   (:import (java.time LocalTime)))
 
 (def kallioparkki
-  {::lp/id 1
+  {::lp/tyyppi :pysakointi
    ::lp/palveluntuottaja-id 1
    ::lp/pysakointi {::lp/pysakointitiedot
                     {::lp/pysakointialueet
