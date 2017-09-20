@@ -19,7 +19,7 @@
          [{:otsikko "Nimi"
            :nimi :valityspalvelu/nimi
            :tyyppi :string
-           :validoi [[:ei-tyhja "Anna sijainti"]]
+           :validoi [[:ei-tyhja "Anna välityspalvelun nimi"]]
            }
 
           {:otsikko "Palvelun kuvaus"

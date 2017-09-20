@@ -11,6 +11,7 @@
             [ote.views.vuokraus :as vuokraus]
             [ote.views.alueet :as pysakointialueet]
             [ote.views.liikennevalineet :as liikennevalineet]
+            [ote.views.valituspalvelut :as valityspalvelut]
             ))
 
 (enable-console-print!)
@@ -25,27 +26,18 @@
     [ui/tabs
      [ui/tab {:label "Olennaiset tiedot" :value "a"}
       [ui/paper {:class "paper-siirto"}
-        [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]
-       ]
-      ]
+        [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]]]
      [ui/tab {:label "Pysäköintialueet" :value "b"}
       [ui/paper {:class "paper-siirto"}
-        [pysakointialueet/pysakointialueet e! (:muokattava-palvelu app)]
-      ]
-      ]
-     [ui/tab {:label "Liikennevälineet" :value "b"}
+        [pysakointialueet/pysakointialueet e! (:muokattava-palvelu app)]]]
+     [ui/tab {:label "Liikennevälineet" :value "c"}
       [ui/paper {:class "paper-siirto"}
-       [liikennevalineet/liikennevalineet e! (:muokattava-palvelu app)]
-       ]
-      ]
+       [liikennevalineet/liikennevalineet e! (:muokattava-palvelu app)]]]
+     [ui/tab {:label "Välityspalvelut" :value "d"}
+      [ui/paper {:class "paper-siirto"}
+       [valityspalvelut/valityspalvelu e! (:muokattava-palvelu app)]]]
      ]
-
-    [ui/paper {:class "paper-siirto"}
-
-     [:div.container.row
-        ;"Ei täällä vielä mitään ole"
-       ;[ot/olennaiset-tiedot e! (:muokattava-palvelu app)]
-       ]]]])
+    ]])
 
 (defn ^:export main []
   (r/render-component [tuck/tuck tila/app ote-sovellus]
