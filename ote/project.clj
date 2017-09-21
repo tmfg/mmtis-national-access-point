@@ -1,6 +1,6 @@
 (defproject ote "0.1-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
-                 [org.clojure/clojurescript "1.9.660"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+                 [org.clojure/clojurescript "1.9.908"]
 
                  ;; Komponenttikirjasto
                  [com.stuartsierra/component "0.3.2"]
@@ -33,7 +33,7 @@
                  [cljsjs/react "15.6.1-1"]
                  [cljsjs/react-dom "15.6.1-1"]
                  [cljs-react-material-ui "0.2.48"]
-                 [figwheel "0.5.10"]
+                 [figwheel "0.5.13"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
@@ -43,7 +43,7 @@
                  [com.google.guava/guava "21.0"]]
 
   :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-figwheel "0.5.10"]]
+            [lein-figwheel "0.5.13"]]
 
   ;; Backend lähdekoodit: clj ja frontin kanssa jaettu cljc
   :source-paths ["src/clj" "src/cljc"]
