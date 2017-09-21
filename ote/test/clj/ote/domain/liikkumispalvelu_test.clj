@@ -1,8 +1,7 @@
 (ns ote.domain.liikkumispalvelu-test
   (:require [clojure.test :refer [deftest testing is]]
             [clojure.spec.alpha :as s]
-            [ote.domain.liikkumispalvelu :as lp]
-            [ote.domain.yleiset :as yleiset])
+            [ote.domain.liikkumispalvelu :as lp])
   (:import (java.time LocalTime)))
 
 (def kallioparkki
@@ -10,7 +9,7 @@
    ::lp/palveluntuottaja-id 1
    ::lp/pysakointi {::lp/pysakointitiedot
                     {::lp/pysakointialueet
-                     [{::lp/alue {::lp/sijainti "FIXME: kallioparkin polygon"
+                     [{::lp/alue {;;::lp/sijainti "FIXME: kallioparkin polygon"
                                   ::lp/alueen-kuvaus "Oulun keskustan alla"}
                        ::lp/aukioloajat [{::lp/viikonpaivat [:MA :TI :KE :TO :PE]
                                           ::lp/avaamisaika (LocalTime/of 7 0)
