@@ -14,4 +14,16 @@ job('build') {
       task('uberjar')
     }
   }
+  publishers {
+    slackNotifier {
+      notifyAborted(false)
+      notifyBackToNormal(true)
+      notifyFailure(true)
+      notifyNotBuilt(false)
+      notifyRegression(true)
+      notifyRepeatedFailure(false)
+      notifySuccess(true)
+      notifyUnstable(true)
+    }
+  }
 }

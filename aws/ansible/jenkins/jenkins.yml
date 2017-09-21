@@ -13,6 +13,7 @@
       - timestamper
       - git
       - leiningen-plugin
+      - slack
     solita_jenkins_security_realm: jenkins
     solita_jenkins_users:
       - tatut
