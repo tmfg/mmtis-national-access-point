@@ -206,19 +206,10 @@ Ryhmien otsikot lisätään väliin Otsikko record tyyppinä."
        [:div.form-control-static
         (if fmt
           (fmt ((or hae #(get % nimi)) data))
-          (nayta-arvo s arvo))]))
+          (kentat/nayta-arvo s data))]))])
 
-   #_(when (and muokattu?
-              (not (empty? virheet)))
-     [virheen-ohje virheet :virhe])
-   (when (and muokattu?
-              (not (empty? varoitukset)))
-     [virheen-ohje varoitukset :varoitus])
-   (when (and muokattu?
-              (not (empty? huomautukset)))
-     [virheen-ohje huomautukset :huomautus])
-
-   #_[kentan-vihje s]])
+;; FIXME: different column class by the amount of fields
+(def col-luokat {1 "col-md-8"})
 
 (defn nayta-rivi
   "UI yhdelle riville"
@@ -275,7 +266,7 @@ Ryhmien otsikot lisätään väliin Otsikko record tyyppinä."
   [_ _ _]
   (let [fokus (atom nil)]
     ;; FIXME: tee material-ui v1 gridillä
-    (fn [{:keys [muokkaa! luokka footer-fn virheet varoitukset huomautukset voi-muokata? ] :as opts}
+    (fn [{:keys [muokkaa! luokka footer-fn virheet varoitukset huomautukset voi-muokata? otsikko] :as opts}
          skeema
          {muokatut ::muokatut
           :as data}]
@@ -295,8 +286,7 @@ Ryhmien otsikot lisätään väliin Otsikko record tyyppinä."
                                                                    #{}) nimi))
                                        muokkaa!)))]
         [:div
-         {:class (str "lomake " (when ei-borderia? "lomake-ilman-borderia")
-                      luokka)}
+         {:class (str "lomake " luokka)}
          (when otsikko
            [:h3.lomake-otsikko otsikko])
          (doall
