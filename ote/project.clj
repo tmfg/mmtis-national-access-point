@@ -55,6 +55,7 @@
                 :source-paths ["src/cljs" "src/cljc"]
                 :figwheel {:on-jsload "ote.main/reload-hook"}
                 :compiler {:optimizations :none
+                           ;;:verbose true
                            :source-map true
                            :output-to "resources/public/js/ote.js"
                            :output-dir "resources/public/js/out"}}
