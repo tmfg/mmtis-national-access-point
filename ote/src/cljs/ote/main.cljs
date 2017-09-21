@@ -11,8 +11,6 @@
             [ote.lokalisaatio :as lokalisaatio]))
 
 
-
-
 (defn ^:export main []
   (lokalisaatio/lataa-kieli!
    :fi

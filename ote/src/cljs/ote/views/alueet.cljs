@@ -38,22 +38,16 @@
           {:otsikko "Erityisryhmät"
            :nimi :alueet/erityisryhma
            :tyyppi :tekstialue
-           :rivit 5
-           }
+           :rivit 5}
 
           {:otsikko "Latauspisteet"
            :nimi :alueet/latauspisteet
            :tyyppi :tekstialue
-           :rivit 5
-           }
+           :rivit 5}
 
           {:otsikko "Mahdolliset varauspalvelun osoite"
            :nimi :alueet/www-varauspalvelu
-           :tyyppi :string}
-          ]
+           :tyyppi :string}]
 
          tila]
-        [debug/debug tila]
-        ]
-       ]
-      )
+        [debug/debug tila]]])

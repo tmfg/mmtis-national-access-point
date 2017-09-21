@@ -32,11 +32,4 @@
                                 :satama/lisätietoja-kuvaus "Lue lisää pysäköinnistä ja matkatavaroiden käsittelystä"
                                 :vuokraus/kelpoisuus "Ajokortti vaaditaan"
                                 :vuokraus/pyoratuoli "Ei pyörätuolipaikkoja"
-                                }
-           }
-           ))
-
-(defn update-state! [update-fn & args]
-      (swap! app
-             (fn [current-app-state]
-                 (apply update-fn current-app-state args))))
+                                }}))

@@ -9,12 +9,12 @@
 
 (define-tables
   ;; Määritellään enumit
-  ["viikonpaiva" ::viikonpaiva (xf/transform (xf/to-keyword))]
-  ["maksutapa" ::maksutapa (xf/transform (xf/to-keyword))]
-  ["liikkumispalvelutyyppi" ::liikkumispalvelutyyppi (xf/transform (xf/to-keyword))]
-  ["esteettomyystuki" ::esteettomyystuki (xf/transform (xf/to-keyword))]
+  ["viikonpaiva" ::viikonpaiva (specql.transform/transform (specql.transform/to-keyword))]
+  ["maksutapa" ::maksutapa (specql.transform/transform (specql.transform/to-keyword))]
+  ["liikkumispalvelutyyppi" ::liikkumispalvelutyyppi (specql.transform/transform (specql.transform/to-keyword))]
+  ["esteettomyystuki" ::esteettomyystuki (specql.transform/transform (specql.transform/to-keyword))]
   ["erityispalvelu" ::erityispalvelu]
-  ["liikennevalinetyyppi" ::liikennevalinetyyppi (xf/transform (xf/to-keyword))]
+  ["liikennevalinetyyppi" ::liikennevalinetyyppi (specql.transform/transform (specql.transform/to-keyword))]
   ["vuokrauksenlisapalvelu" ::vuokraus-lisapalvelu]
   ["noutopaikantyyppi" ::noutopaikantyyppi]
   ["valityspalvelutyyppi" ::valityspalvelutyyppi]
@@ -37,7 +37,7 @@
   ;; Taulut
   ["palveluntuottaja" ::palveluntuottaja]
   ["liikkumispalvelu" ::liikkumispalvelu
-   {::tuottaja (rel/has-one ::palveluntuottaja-id ::palveluntuottaja ::id)}])
+   {::tuottaja (specql.rel/has-one ::palveluntuottaja-id ::palveluntuottaja ::id)}])
 
 ;; Määrätään listan järjestys
 (def palvelutyypit [:satama :kuljetus :vuokraus :pysakointi :valityspalvelu])

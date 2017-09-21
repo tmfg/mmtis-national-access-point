@@ -5,7 +5,6 @@
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]))
 
-(.log js/console "FOO")
 (defn reitti [e! tila]
       [:div {:class "row"}
        [:div {:class "col-lg-4"}
@@ -22,7 +21,4 @@
           ]
 
          tila]
-        [debug/debug tila]
-        ]
-       ]
-      )
+        [debug/debug tila]]])

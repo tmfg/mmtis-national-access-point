@@ -34,6 +34,4 @@
        [valityspalvelut/valityspalvelu e! (:muokattava-palvelu app)]]]
      [ui/tab {:label "Reitit" :value "d"}
       [ui/paper {:class "paper-siirto"}
-       [kuljetus/reitti e! (:muokattava-palvelu app)]]]
-     ]
-    ]])
+       [kuljetus/reitti e! (:muokattava-palvelu app)]]]]]])
