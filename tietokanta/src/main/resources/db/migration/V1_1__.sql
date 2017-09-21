@@ -15,7 +15,8 @@ CREATE TABLE palveluntuottaja (
   kayntiosoite osoite,
   postiosoite osoite,
   puhelin VARCHAR(16),
-  gsm VARCHAR(16)
+  gsm VARCHAR(16),
+  sahkoposti VARCHAR(200)
 );
 
 CREATE TYPE viikonpaiva AS ENUM ('MA','TI','KE','TO','PE','LA','SU');

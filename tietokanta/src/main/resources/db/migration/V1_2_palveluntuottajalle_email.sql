@@ -1,1 +1,0 @@
-ALTER TABLE palveluntuottaja ADD COLUMN sahkoposti VARCHAR(200) DEFAULT '';
