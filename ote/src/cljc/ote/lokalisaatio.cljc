@@ -27,8 +27,9 @@
                                     (swap! ladatut-kielet assoc kieli kaannostiedot)
                                     (kun-ladattu kieli kaannostiedot))}))))
 (defn kaannostiedot
-  "Lataa kielen ja palauttaa kaikki sen käännöstiedot."
+  "Lataa kielen (uudelleen) ja palauttaa kaikki sen käännöstiedot."
   [kieli]
+  (swap! ladatut-kielet dissoc kieli)
   (lataa-kieli! kieli (constantly nil))
   (get @ladatut-kielet kieli))
 
@@ -39,7 +40,7 @@
      ;; vai jostain muualta? CKAN cookiesta?
      (defonce valittu-kieli (r/atom :fi))
      (defn aseta-kieli! [kieli]
-       (lataa-kieli! kieli #(swap! valittu-kieli %1))))
+       (lataa-kieli! kieli #(reset! valittu-kieli %1))))
 
    :clj
    ;; Backend puolella dynaaminen muuttuja `*kieli*`
@@ -80,9 +81,9 @@
   Optionaaliset `parametrit` antavat arvot viestin korvattaville osille."
   ([viestin-polku]
    (tr #?(:clj *kieli* :cljs @valittu-kieli)
-       viestin-polku))
-  ([kieli viestin-polku]
-   (tr kieli viestin-polku {}))
+       viestin-polku {}))
+  ([viestin-polku parametrit]
+   (tr #?(:clj *kieli* :cljs @valittu-kieli) viestin-polku {}))
   ([kieli viestin-polku parametrit]
    (let [kieli (get @ladatut-kielet kieli)]
      (assert kieli (str "Kieltä " kieli " ei ole ladattu."))

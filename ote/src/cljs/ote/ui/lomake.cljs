@@ -246,6 +246,18 @@ Ryhmien otsikot lisätään väliin Otsikko record tyyppinä."
           (get varoitukset nimi)
           (get huomautukset nimi)]))]))
 
+(defn- kentan-otsikoilla
+  "Lisää kentän otsikon nimi->otsikko funktiolla.
+  Jos skeemalla on annettu otsikko, sitä ei ylikirjoiteta."
+  [nimi->otsikko skeemat]
+  (.log js/console "OTSIKOI: " nimi->otsikko)
+  (if-not nimi->otsikko
+    skeemat
+    (mapv (fn [{:keys [nimi otsikko] :as s}]
+            (assoc s :otsikko (or otsikko
+                                  (nimi->otsikko nimi))))
+          skeemat)))
+
 (defn lomake
   "Yleiskäyttöinen lomakekomponentti, joka ottaa asetukset, lomakkeen kenttien
   määritykset sekä lomakkeen tämänhetkisen tilan.
@@ -256,6 +268,9 @@ Ryhmien otsikot lisätään väliin Otsikko record tyyppinä."
   :footer-fn  Funktio, jota kutsutaan muodostamaan lomakkeen alle tuleva footer komponentti.
               Parametrina annetaan nykyinen lomakedata validointitietojen kanssa.
   :luokka     Ylimääräinen CSS-luokka lomakkeelle
+  :nimi->otsikko  Funktio, joka muuntaa kentän `:nimi` arvon sen otsikoksi.
+                  Tämä on hyödyllinen, jos ei haluta antaa otsikoita lomake kentissä
+                  vaan muodostaa ne automaattisesti käännösfunktiolla nimen perusteella.
   "
   [_ _ _]
   (let [fokus (atom nil)]
@@ -289,9 +304,10 @@ Ryhmien otsikot lisätään väliin Otsikko record tyyppinä."
            (fn [i skeemat]
              (let [otsikko (when (otsikko? (first skeemat))
                              (first skeemat))
-                   skeemat (if otsikko
-                             (rest skeemat)
-                             skeemat)
+                   skeemat (kentan-otsikoilla (:nimi->otsikko opts)
+                                              (if otsikko
+                                                (rest skeemat)
+                                                skeemat))
                    rivi-ui [nayta-rivi skeemat
                             validoitu-data
                             muokkaa-kenttaa-fn
