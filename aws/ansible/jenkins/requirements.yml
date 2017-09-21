@@ -1,0 +1,5 @@
+# requirements.yml
+---
+- src: https://github.com/solita/ansible-role-solita.jenkins.git
+  version: v1.3.2
+  name: solita.jenkins
