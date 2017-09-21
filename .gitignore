@@ -46,3 +46,5 @@ atlassian-ide-plugin.xml
 
 ## Ansible
 *.retry
+aws/ansible/jenkins/roles
+aws/ansible/jenkins/solita_jenkins_default_password
