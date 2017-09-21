@@ -43,3 +43,6 @@ atlassian-ide-plugin.xml
 # *.ipr
 
 .idea/
+
+## Ansible
+*.retry
