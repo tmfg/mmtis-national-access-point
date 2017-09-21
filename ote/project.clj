@@ -42,7 +42,7 @@
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
 
-  :plugins [[lein-cljsbuild "1.1.5"]
+  :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.13"]]
 
   ;; Backend lähdekoodit: clj ja frontin kanssa jaettu cljc
