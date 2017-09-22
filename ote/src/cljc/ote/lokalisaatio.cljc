@@ -5,7 +5,7 @@
   Frontend puolella on yleinen globaali kielitieto.
   Backend puolella kielen voi asettaa dynaamisella muuttujalla."
   (:require #?@(:cljs [[reagent.core :as r]
-                       [ote.kommunikaatio :as k]]
+                       [ote.communication :as k]]
                 :clj [[clojure.java.io :as io]])
             [clojure.spec.alpha :as s]))
 
