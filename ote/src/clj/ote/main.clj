@@ -4,9 +4,9 @@
   (:require [com.stuartsierra.component :as component]
             [ote.komponentit.http :as http]
             [ote.komponentit.db :as db]
-            [ote.palvelut.lokalisaatio :as lokalisaatio-palvelu]))
+            [ote.services.localization :as localization-service]))
 
-(def ^{:doc "Ajossa olevan OTE-järjestelmän kahva"}
+(def ^{:doc "Handle for OTE-system"}
   ote nil)
 
 (defn ote-system [asetukset]
@@ -17,8 +17,9 @@
 
    ;; Frontille tarjottavat palvelut
 
-   ;; Käännöstiedostojen haku
-   :lokalisaatio (component/using (lokalisaatio-palvelu/->Lokalisaatio) [:http])))
+   ;; Return localization information to frontend
+   :localization (component/using
+                  (localization-service/->Localization) [:http])))
 
 (defn kaynnista []
   (alter-var-root

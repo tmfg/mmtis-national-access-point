@@ -5,7 +5,7 @@
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]
             [ote.domain.liikkumispalvelu :as liikkumispalvelu]
-            [ote.lokalisaatio :refer [tr tr-avain]]))
+            [ote.localization :refer [tr tr-key]]))
 
 (defn valityspalvelu [e! tila]
 
@@ -33,7 +33,7 @@
           {:otsikko "Välityspalvelun tyyppi"
            :nimi :valityspalvelu/tyyppi
            :tyyppi :valinta
-           :valinta-nayta (tr-avain [::liikkumispalvelu/palvelutyypin-nimi])
+           :valinta-nayta (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
            :valinnat liikkumispalvelu/palvelutyypit }
 
           {:otsikko "Pääasiallinen toiminta-alue"
