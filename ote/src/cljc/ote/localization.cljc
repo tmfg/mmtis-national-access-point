@@ -28,7 +28,7 @@
                                     (swap! loaded-languages assoc language translations)
                                     (on-load language translations))}))))
 (defn translations
-  "(Re)loads the given language translation file and retuns the translations."
+  "(Re)loads the given language translation file and returns the translations."
   [language]
   (swap! loaded-languages dissoc language)
   (load-language! language (constantly nil))
