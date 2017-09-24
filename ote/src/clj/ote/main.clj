@@ -3,7 +3,7 @@
   Järjestelmän käynnistys."
   (:require [com.stuartsierra.component :as component]
             [ote.komponentit.http :as http]
-            [ote.komponentit.db :as db]
+            [ote.components.db :as db]
             [ote.services.localization :as localization-service]))
 
 (def ^{:doc "Handle for OTE-system"}
@@ -11,8 +11,8 @@
 
 (defn ote-system [asetukset]
   (component/system-map
-   ;; Peruskomponentit
-   :db (db/tietokanta (:db asetukset))
+   ;; Basic components
+   :db (db/database (:db asetukset))
    :http (http/http-palvelin (:http asetukset))
 
    ;; Frontille tarjottavat palvelut

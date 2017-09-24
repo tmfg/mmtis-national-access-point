@@ -1,12 +1,12 @@
-(ns ote.komponentit.db
-  "Tietokannan yhteyspool komponentti"
+(ns ote.components.db
+  "Database connection pool component"
   (:import (com.zaxxer.hikari HikariConfig HikariDataSource)
            (org.postgresql.Driver))
   (:require [com.stuartsierra.component :as component]
             [clojure.java.jdbc :as jdbc]
             [clojure.string :as str]))
 
-(defn- hikari-datasource [{:keys [url username password] :as asetukset}]
+(defn- hikari-datasource [{:keys [url username password] :as config}]
   (HikariDataSource.
    (doto (HikariConfig.)
      (.setJdbcUrl url)
@@ -16,15 +16,15 @@
      (.addDataSourceProperty "prepStmtCacheSize" "250")
      (.addDataSourceProperty "prepStmtCacheSqlLimit" "2048"))))
 
-(defrecord Tietokanta [datasource asetukset]
+(defrecord Database [datasource config]
   component/Lifecycle
   (start [this]
-    (assoc this :datasource (hikari-datasource asetukset)))
+    (assoc this :datasource (hikari-datasource config)))
   (stop [{ds :datasource :as this}]
     (.close ds)
     (assoc this :datasource nil)))
 
-(defn tietokanta
-  "Luo tietokantakomponentin annetuilla asetuksilla"
-  [asetukset]
-  (->Tietokanta nil asetukset))
+(defn database
+  "Create a database component with the given `config`."
+  [config]
+  (->Database nil config))
