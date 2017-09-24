@@ -8,7 +8,7 @@
 (defn- fetch-language [language-name]
   (http/transit-vastaus (localization/translations (keyword language-name))))
 
-(defrecord Lokalisaatio []
+(defrecord Localization []
   component/Lifecycle
   (start [{http :http :as this}]
     (assoc
