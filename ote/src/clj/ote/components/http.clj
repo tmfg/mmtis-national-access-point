@@ -1,45 +1,48 @@
-(ns ote.komponentit.http
-  "HTTP-kit palvelin"
+(ns ote.components.http
+  "HTTP-kit server"
   (:require [org.httpkit.server :as server]
             [com.stuartsierra.component :as component]
             [compojure.route :as route]
             [cognitect.transit :as transit]))
 
-(defn- palvele-pyynto [kasittelijat req]
-  ((apply some-fn kasittelijat) req))
+(defn- serve-request [handlers req]
+  ((apply some-fn handlers) req))
 
-(defrecord HttpPalvelin [http-kit-asetukset kasittelijat]
+(defrecord HttpServer [http-kit-config handlers]
   component/Lifecycle
   (start [this]
-    (let [resurssit (route/resources "/")]
+    (let [resources (route/resources "/")]
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (palvele-pyynto (conj @kasittelijat resurssit) req))
-              http-kit-asetukset))))
+                (serve-request (conj @handlers resources) req))
+              http-kit-config))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
 
-(defn http-palvelin
-  "Luo HTTP-palvelinkomponentin annetuilla asetuksilla"
-  [asetukset]
-  (->HttpPalvelin asetukset (atom [])))
+(defn http-server
+  "Create an HTTP server component with the given http-kit `config`."
+  [config]
+  (->HttpServer config (atom [])))
 
-(defn julkaise!
-  "Julkaisee HTTP-palvelinkomponenttiin uuden käsittelijän.
-  Pyyntöä käsiteltäessä kutsutaan käsittelijöitä julkaisujärjestyksessä,
-  kunnes joku niistä palauttaa truthy arvon.
+(defn publish!
+  "Publish a new Ring `handler` to the HTTP-server.
+  Requests are handled by trying each published handler in the order they are published until
+  one of the handlers returns a response.
 
-  Palauttaa 0 arity funktion, jolla julkaistun käsittelijän voi poistaa."
-  [{kasittelijat :kasittelijat} kasittelija]
-  (swap! kasittelijat conj kasittelija)
-  #(swap! kasittelijat
-          (fn [kasittelijat]
-            (filterv (partial not= kasittelija) kasittelijat))))
+  Handlers must return `nil` for requests they aren't prepared to handle.
 
-(defn transit-vastaus
-  "Palauta annettu Clojure `data` Transit vastauksena."
+
+  Returns a 0-arity function that will remove this `handler` when called."
+  [{handlers :handlers} handler]
+  (swap! handlers conj handler)
+  #(swap! handlers
+          (fn [handlers]
+            (filterv (partial not= handler) handlers))))
+
+(defn transit-response
+  "Return the given Clojure `data` as a Transit response with status code 200."
   [data]
   {:status 200
    :headers {"Content-Type" "application/json+transit"}

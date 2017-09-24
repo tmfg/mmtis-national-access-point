@@ -6,16 +6,16 @@
             [compojure.core :refer [routes GET]]))
 
 (defn- fetch-language [language-name]
-  (http/transit-vastaus (localization/translations (keyword language-name))))
+  (http/transit-response (localization/translations (keyword language-name))))
 
 (defrecord Localization []
   component/Lifecycle
   (start [{http :http :as this}]
     (assoc
      this ::stop
-     (http/julkaise! http (routes
-                           (GET "/language/:lang" [lang]
-                                (fetch-language lang))))))
+     (http/publish! http (routes
+                          (GET "/language/:lang" [lang]
+                               (fetch-language lang))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
