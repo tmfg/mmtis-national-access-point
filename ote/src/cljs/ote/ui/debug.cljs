@@ -1,8 +1,8 @@
 (ns ote.ui.debug
-  "UI komponentti datan inspectointiin"
+  "UI component for inspecting Clojure data for debug purposes"
   (:require [reagent.core :as r]))
 
-(defn voi-avata? [item]
+(defn can-open? [item]
   (some #(% item) [map? coll?]))
 
 (defmulti debug-show (fn [item path open-paths toggle!]
@@ -18,7 +18,7 @@
       (let [cls (when (> (- (now) @flash) 1000)
                   (js/setTimeout #(reset! flash (now)) 600)
                   "debug-animate")]
-        (if (voi-avata? value)
+        (if (can-open? value)
           [:span {:class cls}
            (if (open-paths p)
              (debug-show value p open-paths toggle!)
@@ -28,8 +28,8 @@
                  printed)))]
           [:span {:class cls} (pr-str value)])))))
 
-(defn- avaus-solu [value p open-paths toggle!]
-  (if (voi-avata? value)
+(defn- open-cell [value p open-paths toggle!]
+  (if (can-open? value)
     [:td {:on-click #(toggle! p)}
      (if (open-paths p)
        "\u25bc"
@@ -46,7 +46,7 @@
         ^{:key i}
         [:tr
          [:td i " "]
-         (avaus-solu value (conj path i) open-paths toggle!)
+         (open-cell value (conj path i) open-paths toggle!)
          [:td [show-value value (conj path i) open-paths toggle!]]])
       data))]])
 
@@ -60,7 +60,7 @@
       ^{:key key}
       [:tr
        [:td (pr-str key)]
-       (avaus-solu value p open-paths toggle!)
+       (open-cell value p open-paths toggle!)
        [:td
         [show-value value p open-paths toggle!]]])]])
 
