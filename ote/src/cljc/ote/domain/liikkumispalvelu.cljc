@@ -19,16 +19,16 @@
   ["passenger_information_facility" ::passenger_information_facility]
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
-  ["additional_rental_services" ::additional_rental_services]
+  ["additional_services" ::additional_services]
   ["pick_up_type" ::pick_up_type]
   ["brokerage_service_type" ::brokerage_service_type]
 
   ;; UDT tyypit
   ["address" ::address]
   ["localized_text" ::localized_text]
-  ["service_link" ::link
-   {"address" ::url}]
-  ["opening_hours" ::opening_hours]
+  ["service_link" ::service_link]
+  ["service_hours" ::service_hours]
+  ["price_class" ::price_class]
   ["terminal_information" ::terminal_information]
   ["operation_area" ::operation_area]
   ["passenger_transportation_info" ::passenger_transportation_info]
