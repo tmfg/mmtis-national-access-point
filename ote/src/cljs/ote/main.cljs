@@ -6,7 +6,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [tuck.core :as tuck]
-            [ote.app.tila :as tila]
+            [ote.app.state :as state]
             [ote.views.main :as main]
             [ote.localization :as localization]))
 
@@ -16,7 +16,7 @@
    :fi
    (fn [lang _]
      (reset! localization/selected-language lang)
-     (r/render-component [tuck/tuck tila/app main/ote-sovellus]
+     (r/render-component [tuck/tuck state/app main/ote-sovellus]
                          (.getElementById js/document "oteapp")))))
 
 (defn ^:export reload-hook []

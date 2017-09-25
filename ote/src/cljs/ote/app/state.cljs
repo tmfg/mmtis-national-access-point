@@ -1,6 +1,6 @@
-(ns ote.app.tila
-  "Tämä nimiavaruus sisältää sovelluksen app db:n eli
-  atomin, jossa on koko sovelluksen tila."
+(ns ote.app.state
+  "Contains the frontend application `app` database. 
+  Everything that is in the current state of the frontend is in the app atom."
   (:require [reagent.core :as r]))
 
 (defonce app
