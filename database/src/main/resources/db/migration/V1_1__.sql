@@ -25,10 +25,10 @@ CREATE TABLE "transport-operator" (
 
 CREATE TYPE week_day AS ENUM ('MON','TUE','WED','THU','FRI','SAT','SUN');
 
-CREATE TYPE opening_hours AS (
+CREATE TYPE service_hours AS (
   "week-days" week_day[],
-  "opening-time" TIME,
-  "closing-time" TIME,
+  "from" TIME,
+  "to" TIME,
   description localized_text[]
 );
 
@@ -77,7 +77,14 @@ CREATE TYPE payment_method AS ENUM (
   'cash', 'debit-card', 'credit-card', 'mobilepay', 'contactless-payment', 'invoice', 'other'
 );
 
-CREATE TYPE additional_rental_services AS ENUM (
+CREATE TYPE price_class AS (
+   name VARCHAR(200),
+   "price-per-unit" NUMERIC,
+   unit VARCHAR(128), -- name of unit, like "km" or "mi"
+   currency VARCHAR(3)
+);
+
+CREATE TYPE additional_services AS ENUM (
   'child-seat','animal-transport', 'other'
   -- FIXME: This list is incomplete
 );
@@ -97,9 +104,10 @@ CREATE TYPE service_link AS (
 
 CREATE TYPE terminal_information AS (
   location geometry,
-  "opening-hours" opening_hours[],
+  "service-hours" service_hours[],
   "indoor-map" service_link, -- URL-address to image or page
   "information-service-accessibility" accessibility_info_facility[],
+  "accessibility-tool" accessibility_tool[],
   accessibility accessibility_facility[],
   mobility mobility_facility[],
   "accessibility-description" localized_text[], -- Free text of accessibility
@@ -107,7 +115,7 @@ CREATE TYPE terminal_information AS (
 );
 
 CREATE TYPE operation_area AS (
-  area_description localized_text[], -- Free text about the operation area, e.g. commune
+  description localized_text[], -- Free text about the operation area, e.g. commune
   location GEOMETRY -- possible more accurate geometry data
 );
 
@@ -116,8 +124,13 @@ CREATE TYPE passenger_transportation_info AS (
   "real-time-information" service_link, -- URL to real time information
   "main-operation-area" operation_area[],
   "secondary-operation-area" operation_area[],
-  "booking-service" service_link -- link and description of online booking service
-
+  "booking-service" service_link, -- link and description of online booking service
+  "payment-methods" payment_method[],
+  "price-classes" price_class[],
+  "additional-services" additional_services[],
+  "service-hours" service_hours[],
+  "accessibility-tool" accessibility_tool[],
+  "accessibility-description" localized_text[] -- Free text of accessibility
   -- TODO:
   -- passenger_transportation additional info:
   -- route, means of transport, parking services, schedule, delays, annulment, additional services, price information
@@ -127,7 +140,7 @@ CREATE TYPE passenger_transportation_info AS (
 CREATE TYPE pick_up_location AS (
   name VARCHAR(100),
   "pick-up-type" pick_up_type,
-  "pick-up-times" opening_hours[]
+  "pick-up-times" service_hours[]
 );
 
 
@@ -135,7 +148,7 @@ CREATE TYPE rental_provider_informaton AS (
   "mobility-facilities" mobility_facility[],
   "eligibility-requirements" TEXT, -- Free text of eligibility requirements
   "booking-service" service_link,
-  "additional-services" additional_rental_services[],
+  "additional-services" additional_services[],
   "pick-up-locations" pick_up_location[]
 );
 
@@ -143,8 +156,8 @@ CREATE TYPE rental_provider_informaton AS (
 
 CREATE TYPE parking_area AS (
   area operation_area,
-  "office-hours" opening_hours[],
-  "opening-hours" opening_hours[],
+  "office-hours" service_hours[],
+  "service-hours" service_hours[],
   "payment-methods" payment_method[],
   "information-service-accessibility" accessibility_info_facility[],
   accessibility accessibility_facility[],
