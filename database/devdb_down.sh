@@ -1,4 +1,4 @@
 #!/bin/sh
 
-echo "Tuhotaan napotedb Docker-kontti"
+echo "Remove napotedb Docker container"
 docker rm -f napotedb 1> /dev/null
