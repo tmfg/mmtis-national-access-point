@@ -69,6 +69,14 @@
   [data]
   (valid? data))
 
+(defn disable-save?
+  "Check if form save button should be disabled.
+  Form save should be disabled if there are validation errors,
+  some required fields are missing values or the form hasn't been
+  modified at all."
+  [data]
+  (not (can-save-and-modified? data)))
+
 (defn without-form-metadata
   "Returns form data map without form metadata keys"
   [data]
@@ -127,7 +135,7 @@
           (recur (vec (concat (if (empty? row)
                                 rows
                                 (conj rows row))
-                              [[(->Otsikko (:otsikko s))]
+                              [[(->Otsikko (:label s))]
                                (with-meta
                                  (remove nil? (:schemas s))
                                  {:row? true})]))

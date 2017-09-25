@@ -10,44 +10,44 @@
 (defn vuokrauspalveluiden-lisatiedot[tila]
   (when (= :vuokraus (:ot/tyyppi tila))
     (lomake/ryhma "Ajoneuvojen vuokrauspalveluiden ja kaupallisten yhteiskäyttöpalveluiden lisätiedot"
-                  {:otsikko "Onko käytössä pyörätuolien kuljetukseen soveltuvaa kalustoa"
-                   :nimi    :vuokraus/pyoratuoli
-                   :tyyppi  :string
+                  {:label "Onko käytössä pyörätuolien kuljetukseen soveltuvaa kalustoa"
+                   :name    :vuokraus/pyoratuoli
+                   :type  :string
                    :validoi [[:ei-tyhja "Onko pyörätuoleja käytössä"]]
                    }
 
-                  {:otsikko "Kelpoisuusvaatimukset"
-                   :nimi    :vuokraus/kelpoisuus
-                   :tyyppi  :tekstialue
-                   :rivit   5
+                  {:label "Kelpoisuusvaatimukset"
+                   :name    :vuokraus/kelpoisuus
+                   :type  :text-area
+                   :rows   5
                    :validoi [[:ei-tyhja]]}
 
-                  {:otsikko "Sisätilakartta"
-                   :nimi    :satama/sisätilakarttakuva
-                   :tyyppi  :string}
+                  {:label "Sisätilakartta"
+                   :name    :satama/sisätilakarttakuva
+                   :type  :string}
 
-                  {:otsikko "Sisätilakartan osoite"
-                   :nimi    :satama/www-kartakuva
-                   :tyyppi  :string}
+                  {:label "Sisätilakartan osoite"
+                   :name    :satama/www-kartakuva
+                   :type  :string}
 
-                  {:otsikko "Avustuspalvelut"
-                   :nimi    :satama/avustuspalvelut
-                   :tyyppi  :tekstialue
-                   :rivit   5}
+                  {:label "Avustuspalvelut"
+                   :name    :satama/avustuspalvelut
+                   :type  :text-area
+                   :rows   5}
 
-                  {:otsikko "Erityispalvelut"
-                   :nimi    :satama/erityispalvelut
-                   :tyyppi  :tekstialue
-                   :rivit   5}
+                  {:label "Erityispalvelut"
+                   :name    :satama/erityispalvelut
+                   :type  :text-area
+                   :rows   5}
 
-                  {:otsikko "Lisätietoihin viittaava www osoite"
-                   :nimi    :satama/lisätietoja-www
-                   :tyyppi  :string}
+                  {:label "Lisätietoihin viittaava www osoite"
+                   :name    :satama/lisätietoja-www
+                   :type  :string}
 
-                  {:otsikko "Lisätieto www-osoitteen kuvaus"
-                   :nimi    :satama/lisätietoja-kuvaus
-                   :tyyppi  :tekstialue
-                   :rivit   5}
+                  {:label "Lisätieto www-osoitteen kuvaus"
+                   :name    :satama/lisätietoja-kuvaus
+                   :type  :text-area
+                   :rows   5}
                   )))
 
 
@@ -55,66 +55,66 @@
   (when (= :satama (:ot/tyyppi tila))
 
     (lomake/ryhma "Satamien, Asemien ja Terminaalien lisätiedot"
-                  {:otsikko "Sijainti"
-                   :nimi    :satama/sijainti
-                   :tyyppi  :string
+                  {:label "Sijainti"
+                   :name    :satama/sijainti
+                   :type  :string
                    :validoi [[:ei-tyhja "Anna sijainti"]]}
 
-                  {:otsikko "Aukioloajat"
-                   :nimi    :satama/aukioloajat
-                   :tyyppi  :tekstialue
-                   :rivit   5
+                  {:label "Aukioloajat"
+                   :name    :satama/aukioloajat
+                   :type  :text-area
+                   :rows   5
                    :validoi [[:ei-tyhja]]}
 
-                  {:otsikko "Sisätilakartta"
-                   :nimi    :satama/sisätilakarttakuva
-                   :tyyppi  :string}
+                  {:label "Sisätilakartta"
+                   :name    :satama/sisätilakarttakuva
+                   :type  :string}
 
-                  {:otsikko "Sisätilakartan osoite"
-                   :nimi    :satama/www-kartakuva
-                   :tyyppi  :string}
+                  {:label "Sisätilakartan osoite"
+                   :name    :satama/www-kartakuva
+                   :type  :string}
 
-                  {:otsikko "Avustuspalvelut"
-                   :nimi    :satama/avustuspalvelut
-                   :tyyppi  :tekstialue
-                   :rivit   5}
+                  {:label "Avustuspalvelut"
+                   :name    :satama/avustuspalvelut
+                   :type  :text-area
+                   :rows   5}
 
-                  {:otsikko "Erityispalvelut"
-                   :nimi    :satama/erityispalvelut
-                   :tyyppi  :tekstialue
-                   :rivit   5}
+                  {:label "Erityispalvelut"
+                   :name    :satama/erityispalvelut
+                   :type  :text-area
+                   :rows   5}
 
-                  {:otsikko "Lisätietoihin viittaava www osoite"
-                   :nimi    :satama/lisätietoja-www
-                   :tyyppi  :string}
+                  {:label "Lisätietoihin viittaava www osoite"
+                   :name    :satama/lisätietoja-www
+                   :type  :string}
 
-                  {:otsikko "Lisätieto www-osoitteen kuvaus"
-                   :nimi    :satama/lisätietoja-kuvaus
-                   :tyyppi  :tekstialue
-                   :rivit   5})))
+                  {:label "Lisätieto www-osoitteen kuvaus"
+                   :name    :satama/lisätietoja-kuvaus
+                   :type  :text-area
+                   :rows   5})))
 
 (defn henkilokuljetus-lisatiedot [tila]
   (when (= :kuljetus (:ot/tyyppi tila))
     (lomake/ryhma "Henkilöstökuljetuspalveluiden lisätiedot"
-                  {:otsikko "Reaaliaikapalveluiden www osoite"
-                   :nimi    :kuljetus/www-reaaliaikatiedot
-                   :tyyppi  :string}
+                  {:label "Reaaliaikapalveluiden www osoite"
+                   :name    :kuljetus/www-reaaliaikatiedot
+                   :type  :string}
 
-                  {:otsikko "Matkatavaroita koskevat rajoitukset"
-                   :nimi    :kuljetus/matkatavara_rajoitukset
-                   :tyyppi  :tekstialue
-                   :rivit   5}
+                  {:label "Matkatavaroita koskevat rajoitukset"
+                   :name    :kuljetus/matkatavara_rajoitukset
+                   :type  :text-area
+                   :rows   5}
 
-                  {:otsikko "Pääasiallinen toiminta-alue"
-                   :nimi    :kuljetus/paa_toiminta-alue
-                   :tyyppi  :string}
+                  {:label "Pääasiallinen toiminta-alue"
+                   :name    :kuljetus/paa_toiminta-alue
+                   :type  :string}
 
-                  {:otsikko "Toissijainen toiminta-alue"
-                   :nimi    :kuljetus/toissijainen_toiminta-alue
-                   :tyyppi  :string}
-                  {:otsikko "Anna varauspalvelun www osoite, mikäli sellainen on"
-                   :nimi    :kuljetus/www-varauspalvelu
-                   :tyyppi  :string})))
+                  {:label "Toissijainen toiminta-alue"
+                   :name    :kuljetus/toissijainen_toiminta-alue
+                   :type  :string}
+                  {:label "Anna varauspalvelun www osoite, mikäli sellainen on"
+                   :name    :kuljetus/www-varauspalvelu
+                   :type  :string})))
 
 
 (defn olennaiset-tiedot [e! tila]
@@ -122,54 +122,54 @@
    [:div {:class "col-lg-4"}
     [:div
      [:h3 "Olennaiset tiedot"]]
-    [lomake/lomake
-     {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
-      :nimi->otsikko #(tr [:olennaiset-tiedot :otsikot %])
+    [form/form
+     {:update! #(e! (p/->MuokkaaPalvelua %))
+      :name #(tr [:olennaiset-tiedot :otsikot %])
       :footer-fn (fn [data]
                    [napit/tallenna {:on-click #(e! :FIXME)
-                                    :disabled (not (lomake/voi-tallentaa-ja-muokattu? data))}
+                                    :disabled (form/disable-save? tila)}
                     "Tallenna"])}
 
-     [{:nimi :ot/nimi
-       :tyyppi :string
+     [{:name :ot/nimi
+       :type :string
        :validoi [[:ei-tyhja "Anna nimi"]]}
 
-      {:nimi :ot/y-tunnus
-       :tyyppi :string
+      {:name :ot/y-tunnus
+       :type :string
        :validoi [[:ytunnus]]}
 
-      {:nimi :ot/tyyppi
-       :tyyppi :valinta
+      {:name :ot/tyyppi
+       :type :valinta
        :valinta-nayta (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
        :valinnat liikkumispalvelu/palvelutyypit }
 
-      {:otsikko "Puhelin"
-       :nimi :ot/puhelin
-       :tyyppi :string}
+      {:label "Puhelin"
+       :name :ot/puhelin
+       :type :string}
 
-      {:otsikko "GSM"
-       :nimi :ot/gsm
-       :tyyppi :string}
+      {:label "GSM"
+       :name :ot/gsm
+       :type :string}
 
-      {:otsikko "Sähköpostiosoite"
-       :nimi :ot/email
-       :tyyppi :string}
+      {:label "Sähköpostiosoite"
+       :name :ot/email
+       :type :string}
 
-      {:otsikko "Osoite"
-       :nimi :ot/osoite
-       :tyyppi :string}
+      {:label "Osoite"
+       :name :ot/osoite
+       :type :string}
 
-      {:otsikko "Postinumero"
-       :nimi :ot/postinumero
-       :tyyppi :string}
+      {:label "Postinumero"
+       :name :ot/postinumero
+       :type :string}
 
-      {:otsikko "Postitoimipaikka"
-       :nimi :ot/postitoimipaikka
-       :tyyppi :string}
+      {:label "Postitoimipaikka"
+       :name :ot/postitoimipaikka
+       :type :string}
 
-      {:otsikko "www-osoite"
-       :nimi :ot/www-osoite
-       :tyyppi :string}
+      {:label "www-osoite"
+       :name :ot/www-osoite
+       :type :string}
 
       (satamapalvelun-lisatiedot tila)
       (vuokrauspalveluiden-lisatiedot tila)

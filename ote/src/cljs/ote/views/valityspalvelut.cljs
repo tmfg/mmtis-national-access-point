@@ -1,6 +1,6 @@
 (ns ote.views.valituspalvelut
   "Välityspalvelut listaavat tiedot välitettävästä palvelusta palvelutyypeittäin"
-  (:require [ote.ui.lomake :as lomake]
+  (:require [ote.ui.form :as form]
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]
@@ -11,47 +11,47 @@
 
       [:div {:class "row"}
        [:div {:class "col-lg-4"}
-        [lomake/lomake
-         {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
+        [form/form
+         {:update! #(e! (p/->MuokkaaPalvelua %))
           :footer-fn (fn [data]
-                         [napit/tallenna {:on-click #(e! :FIXME)
-                                          :disabled (not (lomake/voi-tallentaa-ja-muokattu? data))}
-                          "Tallenna"])}
+                       [napit/tallenna {:on-click #(e! :FIXME)
+                                        :disabled (form/disable-save? tila)}
+                        "Tallenna"])}
 
-         [{:otsikko "Nimi"
-           :nimi :valityspalvelu/nimi
-           :tyyppi :string
+         [{:label "Nimi"
+           :name :valityspalvelu/nimi
+           :type :string
            :validoi [[:ei-tyhja "Anna välityspalvelun nimi"]]
            }
 
-          {:otsikko "Palvelun kuvaus"
-           :nimi :valityspalvelu/kuvaus
-           :tyyppi :tekstialue
-           :rivit 5
+          {:label "Palvelun kuvaus"
+           :name :valityspalvelu/kuvaus
+           :type :text-area
+           :rows 5
            :validoi [[:ei-tyhja]]}
 
-          {:otsikko "Välityspalvelun tyyppi"
-           :nimi :valityspalvelu/tyyppi
-           :tyyppi :valinta
+          {:label "Välityspalvelun tyyppi"
+           :name :valityspalvelu/tyyppi
+           :type :valinta
            :valinta-nayta (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
            :valinnat liikkumispalvelu/palvelutyypit }
 
-          {:otsikko "Pääasiallinen toiminta-alue"
-           :nimi :valityspalvelu/paa-alue
-           :tyyppi :tekstialue
-           :rivit 2
+          {:label "Pääasiallinen toiminta-alue"
+           :name :valityspalvelu/paa-alue
+           :type :text-area
+           :rows 2
            }
 
-          {:otsikko "Toissijainen toiminta-alue"
-           :nimi :valityspalvelu/toissijainen-alue
-           :tyyppi :tekstialue
-           :rivit 2
+          {:label "Toissijainen toiminta-alue"
+           :name :valityspalvelu/toissijainen-alue
+           :type :text-area
+           :rows 2
            }
 
-          {:otsikko "Hinnasto"
-           :nimi :valityspalvelu/hinnasto
-           :tyyppi :tekstialue
-           :rivit 3
+          {:label "Hinnasto"
+           :name :valityspalvelu/hinnasto
+           :type :text-area
+           :rows 3
            }
           ]
 

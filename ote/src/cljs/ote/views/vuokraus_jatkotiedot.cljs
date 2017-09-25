@@ -1,66 +1,65 @@
 (ns ote.views.vuokraus
   "Vuokrauspalvelujen jatkotietojen lomakenäkymä - Laajentaa perustietonäkymää vain
   Vuokraus- ja yhteiskäyttöpalveluille"
-  (:require [ote.ui.lomake :as lomake]
+  (:require [ote.ui.form :as form]
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]))
 
 (defn vuokrauspalvelu-jatkotiedot [e! tila]
+  [:div {:class "row"}
+   [:div {:class "col-lg-4"}
+    [form/form
+     {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
+      :footer-fn (fn [data]
+                   [napit/tallenna {:on-click #(e! :FIXME)
+                                    :disabled (form/disable-save? tila)}
+                    "Tallenna"])}
 
-      [:div {:class "row"}
-       [:div {:class "col-lg-4"}
-        [lomake/lomake
-         {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
-          :footer-fn (fn [data]
-                         [napit/tallenna {:on-click #(e! :FIXME)
-                                          :disabled (not (lomake/voi-tallentaa-ja-muokattu? data))}
-                          "Tallenna"])}
+     [{:label "Onko käytössä pyörätuolien kuljetukseen soveltuvaa kalustoa"
+       :name :vuokraus/pyoratuoli
+       :type :string
+       :validoi [[:ei-tyhja "Onko pyörätuoleja käytössä"]]
+       }
 
-         [{:otsikko "Onko käytössä pyörätuolien kuljetukseen soveltuvaa kalustoa"
-           :nimi :vuokraus/pyoratuoli
-           :tyyppi :string
-           :validoi [[:ei-tyhja "Onko pyörätuoleja käytössä"]]
-           }
+      {:label "Kelpoisuusvaaitumkset"
+       :name :vuokraus/kelpoisuus
+       :type :text-area
+       :rows 5
+       :validoi [[:ei-tyhja]]}
 
-          {:otsikko "Kelpoisuusvaaitumkset"
-           :nimi :vuokraus/kelpoisuus
-           :tyyppi :tekstialue
-           :rivit 5
-           :validoi [[:ei-tyhja]]}
+      {:label "Sisätilakartta"
+       :name :satama/sisätilakarttakuva
+       :type :string}
 
-          {:otsikko "Sisätilakartta"
-           :nimi :satama/sisätilakarttakuva
-           :tyyppi :string}
+      {:label "Sisätilakartan osoite"
+       :name :satama/www-kartakuva
+       :type :string}
 
-          {:otsikko "Sisätilakartan osoite"
-           :nimi :satama/www-kartakuva
-           :tyyppi :string}
+      {:label "Avustuspalvelut"
+       :name :satama/avustuspalvelut
+       :type :text-area
+       :rows 5}
 
-          {:otsikko "Avustuspalvelut"
-           :nimi :satama/avustuspalvelut
-           :tyyppi :tekstialue
-           :rivit 5}
+      {:label "Erityispalvelut"
+       :name :satama/erityispalvelut
+       :type :text-area
+       :rows 5}
 
-          {:otsikko "Erityispalvelut"
-           :nimi :satama/erityispalvelut
-           :tyyppi :tekstialue
-           :rivit 5}
+      {:label "Lisätietoihin viittaava www osoite"
+       :name :satama/lisätietoja-www
+       :type :string}
 
-          {:otsikko "Lisätietoihin viittaava www osoite"
-           :nimi :satama/lisätietoja-www
-           :tyyppi :string}
-
-          {:otsikko "Lisätieto www-osoitteen kuvaus"
-           :nimi :satama/lisätietoja-kuvaus
-           :tyyppi :tekstialue
-           :rivit 5}
+      {:label "Lisätieto www-osoitteen kuvaus"
+       :name :satama/lisätietoja-kuvaus
+       :type :text-area
+       :rows 5}
 
 
-          ]
+      ]
 
-         tila]
-        [debug/debug tila]
-        ]
-       ]
-      )
+     tila]
+    [debug/debug tila]
+    ]
+   ]
+  )

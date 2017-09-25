@@ -22,4 +22,4 @@
 
 
  :y-tunnus "Y-tunnus"
- :tervehdys ["Moro vaan " :nimi "!"]}
+ :tervehdys ["Moro vaan " :name "!"]}

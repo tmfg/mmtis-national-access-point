@@ -16,11 +16,11 @@
                                 :ot/postitoimipaikka "Juupasjärvi"
                                 :ot/www-osoite "www.esimerkkijuupasjarvi.fi"
                                 :operaattorityyppi [
-                                                    {:id "satama" :nimi "Satama, Asema, Terminaali"}
-                                                    {:id "kuljetus" :nimi "Henkilökuljetuspalvelu"}
-                                                    {:id "vuokraus" :nimi "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"}
-                                                    {:id "pysäköinti" :nimi "Yhteiskäyttö-/Pysäköintipalvelu"}
-                                                    {:id "välityspalvelu" :nimi "Välityspalvelu"}
+                                                    {:id "satama" :name "Satama, Asema, Terminaali"}
+                                                    {:id "kuljetus" :name "Henkilökuljetuspalvelu"}
+                                                    {:id "vuokraus" :name "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"}
+                                                    {:id "pysäköinti" :name "Yhteiskäyttö-/Pysäköintipalvelu"}
+                                                    {:id "välityspalvelu" :name "Välityspalvelu"}
                                                     ]
                                 :satama/sijainti ["lat ""60.169856" "lon" "24.938379"]
                                 :satama/aukioloajat "Maanantaisin 08.00 - 16.00 \n Tiistaisin 08.00 - 16.00"
