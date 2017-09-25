@@ -26,9 +26,9 @@
   ;; UDT tyypit
   ["address" ::address]
   ["localized_text" ::localized_text]
-  ["service_link" ::link
-   {"address" ::url}]
+  ["service_link" ::service_link]
   ["opening_hours" ::opening_hours]
+  ["price_class" ::price_class]
   ["terminal_information" ::terminal_information]
   ["operation_area" ::operation_area]
   ["passenger_transportation_info" ::passenger_transportation_info]
