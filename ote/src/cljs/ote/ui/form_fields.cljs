@@ -1,86 +1,80 @@
-(ns ote.ui.kentat
-  "Erilaisten kenttätyyppien komponentit"
+(ns ote.ui.form-fields
+  "UI components for different form fields."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]))
 
 
-(defn vain-luku-atomina [arvo]
-      (r/wrap arvo
-              #(assert false (str "Ei voi kirjoittaa vain luku atomia arvolle: " (pr-str arvo)))))
+(defn read-only-atom [value]
+  (r/wrap value
+          #(assert false (str "Can't write to a read-only atom: " (pr-str value)))))
 
-(defmulti kentta
-          "Tekee muokattavan kentän komponentin tyypin perusteella.
-          Kentällä on aina oltava :muokkaa! optio, jolla muutokset välitetään takaisin."
-          (fn [t _] (:tyyppi t)))
+(defmulti field
+  "Create an editable form field UI component. Dispatches on `:type` keyword.
+  A field must always have an `:update!` callback the component calls to update a new value."
+  (fn [t _] (:type t)))
 
-(defmulti nayta-arvo
-          "Tekee vain-luku näyttömuodon kentän arvosta tyypin perusteella.
-           Tämän tarkoituksena ei ole tuottaa 'disabled' tai 'read-only' elementtejä
-           vaan tekstimuotoinen kuvaus arvosta. Oletustoteutus muuntaa datan vain merkkijonoksi."
-          (fn [t _] (:tyyppi t)))
+(defmulti show-value
+  "Create a read-only display for a value. Dispatches on `:type` keyword.
+  This is not meant to be a 'disabled' input field, but for showing a readable value.
+  Default implementation just converts input value to string."
+  (fn [t _] (:type t)))
 
-(defmethod nayta-arvo :default [_ data]
-           [:span (str data)])
+(defmethod show-value :default [_ data]
+  [:span (str data)])
 
-(defmethod nayta-arvo :komponentti [skeema data]
-           (let [komponentti (:komponentti skeema)]
-                [komponentti data]))
-
-
-(defn placeholder [{:keys [placeholder placeholder-fn rivi] :as kentta} data]
-      (or placeholder
-          (and placeholder-fn (placeholder-fn rivi))))
-
-(defmethod kentta :string [{:keys [muokkaa! otsikko nimi pituus-max pituus-min regex
-                                   focus on-focus lomake?
-                                   virhe]
-                            :as   kentta} data]
-           [ui/text-field
-            {:floatingLabelText otsikko
-             :hintText          (placeholder kentta data)
-             :on-change         #(muokkaa! %2)
-             :value             data
-             :error-text        virhe}])
+(defmethod show-value :component [skeema data]
+  (let [komponentti (:component skeema)]
+    [komponentti data]))
 
 
-(defmethod kentta :tekstialue [{:keys [muokkaa! otsikko nimi rivit
-                                       virhe]
-                                :as   kentta} data]
-           [ui/text-field
-            {:floatingLabelText otsikko
-             :hintText          (placeholder kentta data)
-             :on-change         #(muokkaa! %2)
-             :value             data
-             :multiLine         true
-             :rows              rivit
-             :error-text        virhe}])
+(defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
+  (or placeholder
+      (and placeholder-fn (placeholder-fn row))))
+
+(defmethod field :string [{:keys [update! label name max-length min-length regex
+                                   focus on-focus form? error]
+                            :as   field} data]
+  [ui/text-field
+   {:floatingLabelText label
+    :hintText          (placeholder field data)
+    :on-change         #(update! %2)
+    :value             data
+    :error-text        error}])
+
+
+(defmethod field :text-area [{:keys [update! label name rows error]
+                              :as   field} data]
+  [ui/text-field
+   {:floatingLabelText label
+    :hintText          (placeholder field data)
+    :on-change         #(update! %2)
+    :value             data
+    :multiLine         true
+    :rows              rows
+    :error-text        error}])
 
 
 
 
-(defmethod kentta :valinta [{:keys [muokkaa! otsikko nimi valinta-nayta valinnat lomake? virhe] :as   kentta} data]
-  ;; Koska material-ui valinta ei voi olla mielivaltainen objekti, muutetaan valinta indeksiksi
-  (let [valinta-idx (zipmap valinnat (range))]
-    [ui/select-field {:floating-label-text otsikko
-                      :value               (valinta-idx data)
-                      :on-change           #(muokkaa! (nth valinnat %2))}
+(defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}
+                             data]
+  ;; Because material-ui selection value can't be an arbitrary JS object, use index
+  (let [option-idx (zipmap options (range))]
+    [ui/select-field {:floating-label-text label
+                      :value (option-idx data)
+                      :on-change #(update! (nth options %2))}
      (map-indexed
-      (fn [i valinta]
+      (fn [i option]
         ^{:key i}
-        [ui/menu-item {:value i :primary-text (valinta-nayta valinta)}])
-      valinnat)]))
+        [ui/menu-item {:value i :primary-text (show-option option)}])
+      options)]))
 
+(def phone-regex #"\+?\d+")
 
-(defmethod kentta :puhelin [{:keys [on-focus pituus lomake? placeholder] :as kentta} data]
-           [:input {:class       (when lomake? "form-control")
-                    :type        "tel"
-                    :value       @data
-                    :max-length  pituus
-                    :on-focus    on-focus
-                    :placeholder placeholder
-                    :on-change   #(let [uusi (-> % .-target .-value)]
-                                       (when (re-matches #"\+?(\s|\d)*" uusi)
-                                             (reset! data uusi)))}])
+(defmethod field :phone [field data]
+  [field (assoc field
+                :type :string
+                :regex phone-regex)])
 
-(defmethod kentta :default [opts data]
-           [:div.error "Ei kenttätyyppiä: " (:tyyppi opts)])
+(defmethod field :default [opts data]
+  [:div.error "Missing field type: " (:type opts)])
