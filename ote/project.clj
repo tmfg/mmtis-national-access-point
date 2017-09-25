@@ -13,7 +13,7 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.6"]
-                 [specql "0.7.0-alpha3"]
+                 [specql "0.7.0-alpha4"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
