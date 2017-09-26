@@ -19,20 +19,20 @@
      [{:label "Sijainti"
        :name :alueet/sijainti
        :type :string
-       :validoi [[:ei-tyhja "Anna sijainti"]]
+       :validate [[:non-empty "Anna sijainti"]]
        }
 
       {:label "Pysäköintirajaukset"
        :name :alueet/pysakointirajaukset
        :type :text-area
        :rows 5
-       :validoi [[:ei-tyhja]]}
+       :validate [[:non-empty]]}
 
       {:label "Maksutavat"
        :name :alueet/maksutavat
        :type :text-area
        :rows 5
-       :validoi [[:ei-tyhja]]}
+       :validate [[:non-empty]]}
 
       {:label "Erityisryhmät"
        :name :alueet/erityisryhma

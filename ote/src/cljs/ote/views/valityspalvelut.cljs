@@ -21,20 +21,20 @@
          [{:label "Nimi"
            :name :valityspalvelu/nimi
            :type :string
-           :validoi [[:ei-tyhja "Anna välityspalvelun nimi"]]
+           :validate [[:non-empty "Anna välityspalvelun nimi"]]
            }
 
           {:label "Palvelun kuvaus"
            :name :valityspalvelu/kuvaus
            :type :text-area
            :rows 5
-           :validoi [[:ei-tyhja]]}
+           :validate [[:non-empty]]}
 
           {:label "Välityspalvelun tyyppi"
            :name :valityspalvelu/tyyppi
            :type :valinta
            :valinta-nayta (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
-           :valinnat liikkumispalvelu/palvelutyypit }
+           :valinnat liikkumispalvelu/transport-service-types }
 
           {:label "Pääasiallinen toiminta-alue"
            :name :valityspalvelu/paa-alue

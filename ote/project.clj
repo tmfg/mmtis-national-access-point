@@ -67,4 +67,7 @@
                            :output-to "resources/public/js/ote.js"
                            :source-map "resources/public/js/ote.js.map"}}]}
 
+  :clean-targets ^{:protect false}
+  ["resources/public/js/ote.js" "resources/public/js/out"]
+
   :main ote.main)

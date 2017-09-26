@@ -16,7 +16,7 @@
    :fi
    (fn [lang _]
      (reset! localization/selected-language lang)
-     (r/render-component [tuck/tuck state/app main/ote-sovellus]
+     (r/render-component [tuck/tuck state/app main/ote-application]
                          (.getElementById js/document "oteapp")))))
 
 (defn ^:export reload-hook []

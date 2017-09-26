@@ -8,12 +8,12 @@
             [ote.views.alueet :as pysakointialueet]
             [ote.views.liikennevalineet :as liikennevalineet]
             [ote.views.valituspalvelut :as valityspalvelut]
-            [ote.lokalisaatio :as lokalisaatio]
+            [ote.localization :as localization]
             [ote.views.kuljetus :as kuljetus]))
 
 
-(defn ote-sovellus
-  "OTE-sovelluksen käyttöliittymän pääkomponentti"
+(defn ote-application
+  "OTE application main view"
   [e! app]
   [ui/mui-theme-provider
    {:mui-theme (get-mui-theme {:palette {:text-color (color :green600)}})}

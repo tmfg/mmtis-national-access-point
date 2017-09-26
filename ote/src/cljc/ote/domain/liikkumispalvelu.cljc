@@ -3,7 +3,8 @@
   (:require [clojure.spec.alpha :as s]
             #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
             [specql.rel :as rel]
-            [specql.transform :as xf])
+            [specql.transform :as xf]
+            [specql.impl.registry])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -45,4 +46,4 @@
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}])
 
 ;; Create order for transport_type
-(def transport-provider-types [:terminal :passenger-transportation :rentals :parking :brokerage])
+(def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])

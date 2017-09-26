@@ -1,5 +1,12 @@
-(ns ote.ui.validointi
-  "OTE kenttien validointi"
+(ns ote.ui.validation
+  "OTE field validation.
+  A field schema can define a vector of validation rules to apply.
+  A validation rule is either a function which takes the value to validate
+  and the whole form data and returns either `nil` (no errors) or a human
+  readable string description of the validation errors.
+
+  A validation can also be a vector where the first element is the name
+  of a builtin validation rule and the rest are its arguments, if any."
   (:require [reagent.core :refer [atom] :as r]
             [clojure.string :as str]
             [cljs-time.core :as t]
@@ -7,170 +14,151 @@
 
 
 
-;; Validointi
-;; Rivin skeema voi määritellä validointisääntöjä.
-;; validoi-saanto multimetodi toteuttaa tarkastuksen säännön keyword tyypin mukaan
-;; nimi = Kentän nimi
-;; data = Riville syötettävä data
-;; rivi = Rivillä olevat tiedot
-;; taulukko = Koko grid-taulukko
-(defmulti validoi-saanto (fn [saanto nimi data rivi taulukko & optiot] saanto))
+;; validate-rule multimethod implements validation rule checking by keyword name
+;; Parameters:
+;; name = the keyword name of the field
+;; data = the field value
+;; row = the whole form/row (so that rules can be relations between fields)
+;; table = when used in a grid, the whole grid data containing all rows
+(defmulti validate-rule (fn [rule name data row table & options] rule))
 
-(defmethod validoi-saanto :vakiohuomautus [_ _ data _ _ & [viesti]]
-  viesti)
+(defmethod validate-rule :constant-notice [_ _ data _ _ & [message]]
+  message)
 
 
-(defmethod validoi-saanto :ei-tyhja [_ _ data _ _ & [viesti]]
+(defmethod validate-rule :non-empty [_ _ data _ _ & [message]]
   (when (str/blank? data)
-    (or viesti "Anna arvo")))
+    (or message "Anna arvo")))
 
-(defmethod validoi-saanto :ei-negatiivinen-jos-avaimen-arvo [_ _ data rivi _ & [avain arvo viesti]]
-  (when (and (= (avain rivi) arvo)
+(defmethod validate-rule :non-negative-if-key [_ _ data row _ & [key value message]]
+  (when (and (= (key row) value)
              (< data 0))
-    (or viesti "Arvon pitää olla yli nolla")))
+    (or message "Value must not be negative")))
 
-(defmethod validoi-saanto :ei-tyhja-jos-toinen-avain-nil
-  [_ _ data rivi _ & [toinen-avain viesti]]
+(defmethod validate-rule :non-empty-if-other-key-nil
+  [_ _ data row _ & [other-key message]]
   (when (and (str/blank? data)
-             (not (toinen-avain rivi)))
-    (or viesti "Anna arvo")))
+             (not (other-key row)))
+    (or message "Value missing")))
 
-(defmethod validoi-saanto :ei-tulevaisuudessa [_ _ data _ _ & [viesti]]
+(defmethod validate-rule :non-in-the-future [_ _ data _ _ & [message]]
   (when (and data (t/after? data (js/Date.)))
-    (or viesti "Päivämäärä ei voi olla tulevaisuudessa")))
+    (or message "Date cannot be in the future")))
 
-(defmethod validoi-saanto :ei-avoimia-korjaavia-toimenpiteitä [_ _ data rivi _ & [viesti]]
-  (when (and (or (= data :suljettu) (= data :kasitelty))
-             (not (every? #(= (:tila %) :toteutettu) (:korjaavattoimenpiteet rivi))))
-    (or viesti "Avoimia korjaavia toimenpiteitä")))
+(defmethod validate-rule :one-of [_ _ _ row _ & keys-and-message]
+  (let [keys (if (string? (last keys-and-message))
+               (butlast keys-and-message)
+               keys-and-message)
+        message (if (string? (last keys-and-message))
+                 (last keys-and-message)
 
-(defmethod validoi-saanto :joku-naista [_ _ _ rivi _ & avaimet-ja-viesti]
-  (let [avaimet (if (string? (last avaimet-ja-viesti)) (butlast avaimet-ja-viesti) avaimet-ja-viesti)
-        viesti (if (string? (last avaimet-ja-viesti))
-                 (last avaimet-ja-viesti)
-
-                 (str "Anna joku näistä: "
+                 (str "Must be one of: "
                       (clojure.string/join ", "
-                                           (map (comp clojure.string/capitalize name) avaimet))))]
-    (when-not (some #(not (str/blank? (% rivi))) avaimet) viesti)))
+                                           (map (comp clojure.string/capitalize name) keys))))]
+    (when-not (some #(not (str/blank? (% row))) keys)
+      message)))
 
-(defmethod validoi-saanto :uniikki [_ nimi data _ taulukko & [viesti]]
-  (let [rivit-arvoittain (group-by nimi (vals taulukko))]
-    ;; Data on uniikkia jos sama arvo esiintyy taulukossa vain kerran
+(defmethod validate-rule :unique [_ name data _ table & [message]]
+  (let [rows-by-value (group-by name (vals table))]
     (when (and (not (nil? data))
-               (> (count (get rivit-arvoittain data)) 1))
-      (or viesti "Arvon pitää olla uniikki"))))
+               (> (count (get rows-by-value data)) 1))
+      (or message "Value must be unique"))))
 
-(defmethod validoi-saanto :pvm-kentan-jalkeen [_ _ data rivi _ & [avain viesti]]
+(defmethod validate-rule :date-after-field [_ _ data row _ & [key message]]
   (when (and
-          (avain rivi)
-          (t/before? data (avain rivi)))
-    (or viesti (str "Päivämäärän pitää olla " (fmt/pvm (avain rivi)) " jälkeen"))))
+          (key row)
+          (t/before? data (key row)))
+    (or message (str "Date must be after " (fmt/pvm (key row))))))
 
-(defmethod validoi-saanto :pvm-toisen-pvmn-jalkeen [_ _ data _ _ & [vertailtava-pvm viesti]]
+(defmethod validate-rule :date-after [_ _ data _ _ & [comparison-date message]]
   (when (and
-          vertailtava-pvm
-          (t/before? data vertailtava-pvm))
-    (or viesti (str "Päivämäärän pitää olla " (fmt/pvm vertailtava-pvm) " jälkeen"))))
+          comparison-date
+          (t/before? data comparison-date))
+    (or message (str "Date must be after  " (fmt/pvm comparison-date)))))
 
-(defmethod validoi-saanto :pvm-ennen [_ _ data _ _ & [vertailtava-pvm viesti]]
-  (when (and data vertailtava-pvm
-             (not (t/before? data vertailtava-pvm)))
-    (or viesti (str "Päivämäärän pitää olla " (fmt/pvm vertailtava-pvm) " ennen"))))
+(defmethod validate-rule :date-before [_ _ data _ _ & [comparison-date message]]
+  (when (and data comparison-date
+             (not (t/before? data comparison-date)))
+    (or message (str "Date must be before " (fmt/pvm comparison-date)))))
 
-(def vuosi-kk-ja-paiva (juxt t/year t/month t/day))
+(def year-month-and-day (juxt t/year t/month t/day))
 
-(defmethod validoi-saanto :pvm-sama [_ _ data _ _ & [vertailtava-pvm viesti]]
-  (when (and data vertailtava-pvm
-             (not= (vuosi-kk-ja-paiva data)
-                   (vuosi-kk-ja-paiva vertailtava-pvm)))
-    (or viesti (str "Päivämäärän pitää olla sama kuin " (fmt/pvm vertailtava-pvm)))))
+(defmethod validate-rule :same-date [_ _ data _ _ & [comparison-date message]]
+  (when (and data comparison-date
+             (not= (year-month-and-day data)
+                   (year-month-and-day comparison-date)))
+    (or message (str "Date must " (fmt/pvm comparison-date)))))
 
-(defmethod validoi-saanto :toinen-arvo-annettu-ensin [_ _ data rivi _ & [avain viesti]]
-  (when (and
-          data
-          (nil? (avain rivi)))
-    (or viesti "Molempia arvoja ei voi syöttää")))
+(defmethod validate-rule :number-range [_ _ data _ _ & [min-value max-value message]]
+  (when-not (<= min-value data max-value)
+    (or message (str "Number must be between " min-value " and " max-value))))
 
-(defmethod validoi-saanto :ei-tyhja-jos-toinen-arvo-annettu [_ _ data rivi _ & [avain viesti]]
-  (when (and
-          (nil? data)
-          (some? (avain rivi)))
-    (or viesti "Syötä molemmat arvot")))
-
-(defmethod validoi-saanto :ainakin-toinen-annettu [_ _ _ rivi _ & [[avain1 avain2] viesti]]
-  (when-not (or (avain1 rivi)
-                (avain2 rivi))
-    (or viesti "Syötä ainakin toinen arvo")))
-
-(defmethod validoi-saanto :rajattu-numero [_ _ data _ _ & [min-arvo max-arvo viesti]]
-  (when-not (<= min-arvo data max-arvo)
-    (or viesti (str "Anna arvo välillä " min-arvo " - " max-arvo ""))))
-
-(defmethod validoi-saanto :rajattu-numero-tai-tyhja [_ _ data _ _ & [min-arvo max-arvo viesti]]
+;; Valid Finnish Business ID (Y-tunnus)
+(defmethod validate-rule :business-id [_ _ data _ _ & [message]]
   (and
     data
-    (when-not (<= min-arvo data max-arvo)
-      (or viesti (str "Anna arvo välillä " min-arvo " - " max-arvo "")))))
-
-(defmethod validoi-saanto :ytunnus [_ _ data _ _ & [viesti]]
-  (and
-    data
-    (let [ ;; Halkaistaan tunnus välimerkin kohdalta
-          [tunnus tarkastusmerkki :as halkaistu] (str/split data #"-")
-          ;; Kun pudotetaan pois numerot, pitäisi tulos olla ["" "-" nil]
-          [etuosa valimerkki loppuosa] (str/split data #"\d+")]
+    (let [ ;; Split by separator
+          [id check :as split] (str/split data #"-")
+          ;; When numbers are removed, it sholud be ["" "-" nil]
+          [id-part separator check-part] (str/split data #"\d+")]
       (when-not (and (= 9 (count data))
-                     (= 2 (count halkaistu))
-                     (= 7 (count tunnus))
-                     (= 1 (count tarkastusmerkki))
-                     (empty? etuosa)
-                     (= "-" valimerkki)
-                     (nil? loppuosa))
-       (or viesti "Y-tunnuksen pitää olla 7 numeroa, väliviiva, ja tarkastusnumero.")))))
+                     (= 2 (count split))
+                     (= 7 (count id))
+                     (= 1 (count check))
+                     (empty? id-part)
+                     (= "-" separator)
+                     (nil? check-part))
+        (or message
+            ;; FIXME: use tr to translate
+            "Y-tunnuksen pitää olla 7 numeroa, väliviiva, ja tarkastusnumero.")))))
 
-(defn validoi-saannot
-  "Palauttaa kaikki validointivirheet kentälle, jos tyhjä niin validointi meni läpi."
-  [nimi data rivi taulukko saannot]
-  (keep (fn [saanto]
-          (if (fn? saanto)
-            (saanto data rivi)
-            (let [[saanto & optiot] saanto]
-              (apply validoi-saanto saanto nimi data rivi taulukko optiot))))
-        saannot))
+(defn validate-rules
+  "Returns all validation errors for a field as a sequence. If the sequence is empty,
+  validation passed without errors."
+  [name data row table rules]
+  (keep (fn [rule]
+          (if (fn? rule)
+            (rule data row)
+            (let [[rule & options] rule]
+              (apply validate-rule rule name data row table options))))
+        rules))
 
-(defn validoi-rivi
-  "Tekee validoinnin yhden rivin / lomakkeen kaikille kentille. Palauttaa mäpin kentän nimi -> virheet vektori.
-  Tyyppi on joko :validoi (default) tai :varoita"
-  ([taulukko rivi skeema] (validoi-rivi taulukko rivi skeema :validoi))
-  ([taulukko rivi skeema tyyppi]
+(defn validate-row
+  "Validate all fields of a single row/form of data.
+  Returns a map of {field-name [errors]}.
+  Type selects the validations to use and must be one of: `#{:validate :warn :notice}`.
+  The default type is `:validate`."
+  ([table row schemas] (validate-row table row schemas :validate))
+  ([table row schemas type]
    (loop [v {}
-          [s & skeema] skeema]
+          [s & schemas] schemas]
      (if-not s
        v
-       (let [{:keys [nimi hae]} s
-             validoi (tyyppi s)]
+       (let [{:keys [name read]} s
+             validoi (type s)]
          (if (empty? validoi)
-           (recur v skeema)
-           (let [virheet (validoi-saannot nimi (if hae
-                                                 (hae rivi)
-                                                 (get rivi nimi))
-                                          rivi taulukko
+           (recur v schemas)
+           (let [errors (validate-rules name (if read
+                                                 (read row)
+                                                 (get row name))
+                                          row table
                                           validoi)]
-             (recur (if (empty? virheet) v (assoc v nimi virheet))
-                    skeema))))))))
+             (recur (if (empty? errors)
+                      v
+                      (assoc v name errors))
+                    schemas))))))))
 
-(defn tyhja-arvo? [arvo]
+(defn empty-value? [arvo]
   (or (nil? arvo)
       (str/blank? arvo)))
 
-(defn puuttuvat-pakolliset-kentat
-  "Palauttaa pakolliset kenttäskeemat, joiden arvo puuttuu"
-  [rivi skeema]
-  (keep (fn [{:keys [pakollinen? hae nimi tyyppi] :as s}]
-          (when (and pakollinen?
-                     (tyhja-arvo? (if hae
-                                    (hae rivi)
-                                    (get rivi nimi))))
+(defn missing-required-fields
+  "Returns a sequence of schemas that are marked as required and are missing a value."
+  [row skeema]
+  (keep (fn [{:keys [required? read name type] :as s}]
+          (when (and required?
+                     (empty-value? (if read
+                                     (read row)
+                                    (get row name))))
             s))
         skeema))

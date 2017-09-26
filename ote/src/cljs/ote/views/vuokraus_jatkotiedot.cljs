@@ -19,14 +19,14 @@
      [{:label "Onko käytössä pyörätuolien kuljetukseen soveltuvaa kalustoa"
        :name :vuokraus/pyoratuoli
        :type :string
-       :validoi [[:ei-tyhja "Onko pyörätuoleja käytössä"]]
+       :validate [[:non-empty "Onko pyörätuoleja käytössä"]]
        }
 
-      {:label "Kelpoisuusvaaitumkset"
+      {:label "Kelpoisuusvaatimukset"
        :name :vuokraus/kelpoisuus
        :type :text-area
        :rows 5
-       :validoi [[:ei-tyhja]]}
+       :validate [[:non-empty]]}
 
       {:label "Sisätilakartta"
        :name :satama/sisätilakarttakuva

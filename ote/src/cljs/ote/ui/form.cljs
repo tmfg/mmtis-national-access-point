@@ -26,7 +26,7 @@
 (defn row
   "Creates an unlabeled group with all fields side-by-side in a row."
   [& schemas]
-  (->Ryhma nil {:row? true} schemas))
+  (->Group nil {:row? true} schemas))
 
 (defn group? [x]
   (instance? Group x))
@@ -103,10 +103,10 @@
     (if-not s
       acc
       (cond
-        (otsikko? s)
+        (label? s)
         (recur acc schemas)
 
-        (ryhma? s)
+        (group? s)
         (recur acc
                (concat (remove nil? (:schemas s)) schemas))
 
@@ -135,7 +135,7 @@
           (recur (vec (concat (if (empty? row)
                                 rows
                                 (conj rows row))
-                              [[(->Otsikko (:label s))]
+                              [[(->Label (:label s))]
                                (with-meta
                                  (remove nil? (:schemas s))
                                  {:row? true})]))
@@ -168,13 +168,13 @@
 
 (defn validate [data schemas]
   (let [all-schemas (unpack-groups schemas)
-        all-errors (validointi/validoi-rivi nil tiedot all-schemas :validoi)
-        all-warnings (validointi/validoi-rivi nil tiedot all-schemas :varoita)
-        all-notices (validointi/validoi-rivi nil tiedot all-schemas :huomauta)
+        all-errors (validointi/validoi-rivi nil data all-schemas :validate)
+        all-warnings (validointi/validoi-rivi nil data all-schemas :warn)
+        all-notices (validointi/validoi-rivi nil data all-schemas :notice)
         missing-required-fields (into #{}
                                       (map :name)
-                                      (validointi/missing-required-fields tiedot all-schemas))]
-    (assoc tiedot
+                                      (validointi/missing-required-fields data all-schemas))]
+    (assoc data
       ::errors all-errors
       ::warnings all-warnings
       ::notices all-notices
@@ -189,7 +189,7 @@
 
 (defn field-ui
   "UI for a single form field"
-  [{:keys [columns name label type get fmt col-class required?
+  [{:keys [columns name label type read fmt col-class required?
            component] :as s}
    data update-fn editable? update-form
    modified? errors warnings notices]
@@ -217,11 +217,11 @@
        [form-fields/field (assoc s
                                  :form? true
                                  :update! update-fn
-                                 :error (when (not (empty? virheet))
-                                          (str/join " " virheet))) data]
+                                 :error (when (not (empty? errors))
+                                          (str/join " " errors))) data]
        [:div.form-control-static
         (if fmt
-          (fmt ((or hae #(get % nimi)) data))
+          (fmt ((or read #(get % name)) data))
           (form-fields/show-value s data))]))])
 
 ;; FIXME: different column class by the amount of fields
@@ -236,7 +236,7 @@
                     (col-classes (count schemas)))]
     [:div.row.lomakerivi
      (doall
-       (for [{:keys [name editable? hae] :as s} schemas
+       (for [{:keys [name editable? read] :as s} schemas
              :let [editable? (and can-edit?
                                   (or (nil? editable?)
                                       (editable? data)))]]
@@ -245,7 +245,7 @@
                           :col-class col-class
                           :focus (= name current-focus)
                           :on-focus #(set-focus! name))
-          ((or get name) data)
+          ((or read name) data)
           #(update-fn name %)
           editable? update-form
           (get modified name)
@@ -262,7 +262,7 @@
     (mapv (fn [{:keys [name label] :as s}]
             (assoc s :label (or label
                                 (name->label name))))
-          skeemat)))
+          schemas)))
 
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the
@@ -283,20 +283,22 @@
     ;; FIXME: change layout to material-ui grid when upgrading to material-ui v1
     (fn [{:keys [update! class footer-fn can-edit? label] :as options}
          schemas
-         {muokatut ::muokatut
+         {modified ::muokatut
           :as data}]
       (let [{::keys [errors warnings notices] :as validated-data} (validate data schemas)
             can-edit? (if (some? can-edit?)
                         can-edit?
                         true)
+            update-form (fn [new-data]
+                          (assert update! (str ":update! missing, options:" (pr-str options)))
+                          (-> new-data
+                              modification-time
+                              (validate schemas)
+                              (assoc ::modified (conj (or (::modified new-data) #{}) name))
+                              update!))
             update-field-fn (fn [name value]
                               (let [new-data (assoc data name value)]
-                                (assert update! (str ":update! missing, options:" (pr-str options)))
-                                (-> new-data
-                                    modification-time
-                                    (validate schemas)
-                                    (assoc ::modified (conj (or (::modified new-data) #{}) name))
-                                    update!)))]
+                                (update-form new-data)))]
         [:div.form
          {:class class}
          (when label
@@ -317,10 +319,8 @@
                                   @focus
                                   #(reset! focus %)
                                   modified
-                                  errors
-                                  warnings
-                                  notices
-                                  #(update-field-fn (:name %))]]
+                                  errors warnings notices
+                                  update-form]]
                (if label
                  ^{:key i}
                  [:span
@@ -329,9 +329,8 @@
                  (with-meta row-component {:key i}))))
            (wrap-rows schemas)))
 
-         (when-let [footer (if footer-fn
+         (when-let [footer (when footer-fn
                              (footer-fn (assoc validated-data
-                                               ::schema schemas))
-                             footer)]
+                                               ::schema schemas)))]
            [:div.form-footer.row
             [:div.col-md-12 footer]])]))))
