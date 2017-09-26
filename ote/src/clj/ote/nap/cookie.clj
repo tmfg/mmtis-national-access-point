@@ -95,7 +95,6 @@
   [{:keys [digest-algorithm shared-secret max-age-in-seconds] :as options} handler]
   (cookies/wrap-cookies
    (fn [{cookies :cookies headers :headers :as req}]
-     (println "HEADERS: " (pr-str headers))
      (let [auth-ticket (:value (get cookies "auth_tkt"))
            ip (get headers "x-forwarded-for")
            cookie (and auth-ticket ip
