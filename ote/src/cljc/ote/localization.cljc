@@ -6,7 +6,7 @@
   On the frontend a global `selected-language` atom is used.
   On the backend the language can be dynamically bound with `*language*`."
   (:require #?@(:cljs [[reagent.core :as r]
-                       [ote.communication :as k]]
+                       [ote.communication :as comm]]
                 :clj [[clojure.java.io :as io]])
             [clojure.spec.alpha :as s]))
 
@@ -23,10 +23,10 @@
                                    io/resource slurp read-string)]
               (swap! loaded-languages assoc language translations)
               (on-load language translations))
-       :cljs (k/get! (str "/language/" (name language))
-                     {:on-success (fn [translations]
-                                    (swap! loaded-languages assoc language translations)
-                                    (on-load language translations))}))))
+       :cljs (comm/get! (str "/language/" (name language))
+                        {:on-success (fn [translations]
+                                       (swap! loaded-languages assoc language translations)
+                                       (on-load language translations))}))))
 (defn translations
   "(Re)loads the given language translation file and returns the translations."
   [language]
