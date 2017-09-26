@@ -33,7 +33,7 @@
 
 - name: Stop SOLR
   service: name=solr state=stopped
-  
+
 - name: Copy CKAN schema to SOLR
   shell: cp /opt/ckan-download/ckan/config/solr/schema.xml /opt/solr/server/solr/configsets/_default/conf/managed-schema
 
