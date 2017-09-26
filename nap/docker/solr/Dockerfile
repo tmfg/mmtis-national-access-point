@@ -1,5 +1,5 @@
-# docker build . -t napote-solr
-# docker run -it -p8983:8983 napote-solr
+# docker build -t solita/napote-solr:latest .
+# docker run -it -p8983:8983 solita/napote-solr
 
 FROM ubuntu:artful
 
