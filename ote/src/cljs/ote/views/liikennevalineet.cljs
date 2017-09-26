@@ -1,6 +1,6 @@
 (ns ote.views.liikennevalineet
   "Pysäköintialueen käyttämät liikennevälineet"
-  (:require [ote.ui.lomake :as lomake]
+  (:require [ote.ui.form :as form]
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]))
@@ -9,20 +9,20 @@
 
   [:div {:class "row"}
    [:div {:class "col-lg-4"}
-    [lomake/lomake
+    [form/form
      {:muokkaa! #(e! (p/->MuokkaaPalvelua %))
       :footer-fn (fn [data]
                    [napit/tallenna {:on-click #(e! :FIXME)
-                                    :disabled (not (lomake/voi-tallentaa-ja-muokattu? data))}
+                                    :disabled (form/disable-save? tila)}
                     "Tallenna"])}
 
-     [{:otsikko "Liikennevälineen nimi"
-       :nimi :liikennevalineet/nimi
-       :tyyppi :string}
+     [{:label "Liikennevälineen nimi"
+       :name :liikennevalineet/nimi
+       :type :string}
 
-      {:otsikko "Liikennevälineen tyyppi"
-       :nimi :liikennevalineet/tyyppi
-       :tyyppi :string}]
+      {:label "Liikennevälineen tyyppi"
+       :name :liikennevalineet/tyyppi
+       :type :string}]
 
      tila]
     [debug/debug tila]]])
