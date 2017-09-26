@@ -11,9 +11,5 @@ RUN yum -y --setopt=tsflags=nodocs update && \
 # Explose redis default port
 EXPOSE 6379
 
-# By default will run as random user on openshift and the redis user (997)
-# everywhere else
-USER 997
-
 #Start redis server
-CMD [ "redis-server" ]
+CMD redis-server --protected-mode no
