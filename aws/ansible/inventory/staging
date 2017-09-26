@@ -1,5 +1,8 @@
 [ckan]
-napote-ckan-dev
+napote-ckan-stg
+
+[solr]
+napote-solr-stg
 
 [ckan:vars]
 db_url=postgresql://ckan_default:pass@localhost/ckan_default

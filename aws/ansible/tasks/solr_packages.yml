@@ -1,0 +1,41 @@
+- name: Install required SOLR packages
+  yum: name={{item}} state=installed
+  with_items:
+    - java-1.8.0-openjdk
+    - git-core
+
+
+- name: Create SOLR distribution download directory
+  file: path=/opt/solr-download state=directory owner=napote group=napote
+
+- name: Download SOLR distribution
+  get_url:
+    url: http://apache.org/dist/lucene/solr/7.0.0/solr-7.0.0.tgz
+    dest: /opt/solr-download/solr-7.0.0.tgz
+
+- name: Unpack SOLR distribution
+  unarchive:
+    remote_src: yes
+    src: /opt/solr-download/solr-7.0.0.tgz
+    dest: /opt/solr-download
+
+- name: Run SOLR installer
+  shell: sh /opt/solr-download/solr-7.0.0/bin/install_solr_service.sh /opt/solr-download/solr-7.0.0.tgz
+  args:
+    creates: /opt/solr-7.0.0
+
+- name: Download CKAN distribution to get schema
+  git:
+    clone: yes
+    repo: 'https://github.com/ckan/ckan.git'
+    version: ckan-2.7.0
+    dest: /opt/ckan-download
+
+- name: Stop SOLR
+  service: name=solr state=stopped
+
+- name: Copy CKAN schema to SOLR
+  shell: cp /opt/ckan-download/ckan/config/solr/schema.xml /opt/solr/server/solr/configsets/_default/conf/managed-schema
+
+- name: Start SOLR
+  service: name=solr state=started

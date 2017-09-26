@@ -1,4 +1,4 @@
-- name: Asenna tarvittavat paketit
+- name: Install required packages
   yum: name={{item}} state=installed
   with_items:
     - gcc
@@ -8,39 +8,39 @@
     - python-virtualenv
     - git-core
 
-- name: Luo CKAN hakemisto
+- name: Create CKAN directory
   file:
     path: /usr/lib/ckan/default
     state: directory
     owner: napote
     group: napote
 
-- name: Alusta virtualenv
+- name: Initialize virtualenv
   command: virtualenv /usr/lib/ckan/default -p python2.7 creates="/usr/lib/ckan/default"
 
-- name: Asenna setuptools
+- name: Install setuptools
   pip:
     name: setuptools
     version: 20.4
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
 
-- name: Asenna CKAN stable lähdekoodit
+- name: Install CKAN stable sources
   pip:
     editable: true
     name: 'git+https://github.com/ckan/ckan.git@ckan-2.7.0#egg=ckan'
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
 
-- name: Asenna pytz
+- name: Install pytz
   pip:
     editable: true
     name: pytz
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
 
-# tämä voi tarvita vielä "pip" päivityksen uusimpaan
-- name: Asenna CKAN riippuuvuudet
+# PENDING: this may still need "pip" upgrade to latest
+- name: Install CKAN dependencies
   pip:
     requirements: /usr/lib/ckan/default/src/ckan/requirements.txt
     virtualenv: /usr/lib/ckan/default
