@@ -2,7 +2,7 @@
   "Generic form component.
   Forms are automatically generated from schemas that describe the fields.
   Fields can be grouped with a label to give the form more structure."
-  (:require [ote.ui.validointi :as validointi]
+  (:require [ote.ui.validation :as validation]
             [ote.ui.form-fields :as form-fields]
             [cljs-time.core :as t]
             [clojure.string :as str]))
@@ -168,12 +168,12 @@
 
 (defn validate [data schemas]
   (let [all-schemas (unpack-groups schemas)
-        all-errors (validointi/validoi-rivi nil data all-schemas :validate)
-        all-warnings (validointi/validoi-rivi nil data all-schemas :warn)
-        all-notices (validointi/validoi-rivi nil data all-schemas :notice)
+        all-errors (validation/validate-row nil data all-schemas :validate)
+        all-warnings (validation/validate-row nil data all-schemas :warn)
+        all-notices (validation/validate-row nil data all-schemas :notice)
         missing-required-fields (into #{}
                                       (map :name)
-                                      (validointi/missing-required-fields data all-schemas))]
+                                      (validation/missing-required-fields data all-schemas))]
     (assoc data
       ::errors all-errors
       ::warnings all-warnings
