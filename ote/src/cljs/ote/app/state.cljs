@@ -1,6 +1,6 @@
-(ns ote.app.tila
-  "Tämä nimiavaruus sisältää sovelluksen app db:n eli
-  atomin, jossa on koko sovelluksen tila."
+(ns ote.app.state
+  "Contains the frontend application `app` database. 
+  Everything that is in the current state of the frontend is in the app atom."
   (:require [reagent.core :as r]))
 
 (defonce app
@@ -16,11 +16,11 @@
                                 :ot/postitoimipaikka "Juupasjärvi"
                                 :ot/www-osoite "www.esimerkkijuupasjarvi.fi"
                                 :operaattorityyppi [
-                                                    {:id "satama" :nimi "Satama, Asema, Terminaali"}
-                                                    {:id "kuljetus" :nimi "Henkilökuljetuspalvelu"}
-                                                    {:id "vuokraus" :nimi "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"}
-                                                    {:id "pysäköinti" :nimi "Yhteiskäyttö-/Pysäköintipalvelu"}
-                                                    {:id "välityspalvelu" :nimi "Välityspalvelu"}
+                                                    {:id "satama" :name "Satama, Asema, Terminaali"}
+                                                    {:id "kuljetus" :name "Henkilökuljetuspalvelu"}
+                                                    {:id "vuokraus" :name "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"}
+                                                    {:id "pysäköinti" :name "Yhteiskäyttö-/Pysäköintipalvelu"}
+                                                    {:id "välityspalvelu" :name "Välityspalvelu"}
                                                     ]
                                 :satama/sijainti ["lat ""60.169856" "lon" "24.938379"]
                                 :satama/aukioloajat "Maanantaisin 08.00 - 16.00 \n Tiistaisin 08.00 - 16.00"
