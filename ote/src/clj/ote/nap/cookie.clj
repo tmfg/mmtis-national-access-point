@@ -79,7 +79,6 @@
                         (:user-data cookie))
                 shared-secret)]
     (assoc cookie
-           :d calculated-digest
            :valid-digest? (= calculated-digest cookie-digest))))
 
 (defn verify-timestamp
