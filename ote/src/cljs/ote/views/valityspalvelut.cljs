@@ -32,9 +32,9 @@
 
           {:label "Välityspalvelun tyyppi"
            :name :valityspalvelu/tyyppi
-           :type :valinta
-           :valinta-nayta (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
-           :valinnat liikkumispalvelu/transport-service-types }
+           :type :selection
+           :show-option (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
+           :options liikkumispalvelu/transport-service-types }
 
           {:label "Pääasiallinen toiminta-alue"
            :name :valityspalvelu/paa-alue

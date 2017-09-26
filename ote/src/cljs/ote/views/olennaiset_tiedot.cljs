@@ -139,12 +139,12 @@
 
       {:name :ot/y-tunnus
        :type :string
-       :validate [[:ytunnus]]}
+       :validate [[:business-id]]}
 
       {:name :ot/tyyppi
-       :type :valinta
-       :valinta-nayta (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
-       :valinnat liikkumispalvelu/transport-service-types }
+       :type :selection
+       :show-option (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
+       :options liikkumispalvelu/transport-service-types }
 
       {:label "Puhelin"
        :name :ot/puhelin
