@@ -25,7 +25,7 @@
   (alter-var-root
    #'ote
    (constantly
-    (-> "config.edn" slurp read-strinconfig
+    (-> "config.edn" slurp read-string
         ote-system ; luo järjestelmä
         component/start-system))))
 
