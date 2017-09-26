@@ -4,7 +4,9 @@
   (:require [com.stuartsierra.component :as component]
             [ote.komponentit.http :as http]
             [ote.komponentit.db :as db]
-            [ote.palvelut.lokalisaatio :as lokalisaatio-palvelu]))
+            [ote.palvelut.lokalisaatio :as lokalisaatio-palvelu]
+            [ote.palvelut.transport :as transport-service]
+            ))
 
 (def ^{:doc "Ajossa olevan OTE-järjestelmän kahva"}
   ote nil)
@@ -16,6 +18,7 @@
    :http (http/http-palvelin (:http asetukset))
 
    ;; Frontille tarjottavat palvelut
+   :transport (component/using (transport-service/->Transport) [:http :db])
 
    ;; Käännöstiedostojen haku
    :lokalisaatio (component/using (lokalisaatio-palvelu/->Lokalisaatio) [:http])))
