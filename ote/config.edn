@@ -1,4 +1,7 @@
 {:db {:url "jdbc:postgresql://localhost:5432/napote"
       :username "napote"
       :password ""}
- :http {:port 3000}}
+ :http {:port 3000
+        :auth-tkt nil #_{:shared-secret "local dev"
+                         :max-age-in-seconds 36000
+                         :digest-algorithm "MD5"}}}
