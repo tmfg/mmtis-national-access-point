@@ -4,5 +4,5 @@
   hosts: solr
   become: true
   tasks:
-    - include: tasks/napote_group_ja_user.yml
+    - include: tasks/napote_group_and_user.yml
     - include: tasks/solr_packages.yml
