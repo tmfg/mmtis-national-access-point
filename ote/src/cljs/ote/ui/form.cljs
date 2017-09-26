@@ -211,7 +211,7 @@
                                 (when-not (empty? notices)
                                   " has-notice"))}
    (if (= type :component)
-     [:div.component (component {:muokkaa-lomaketta (update-form s)
+     [:div.component (component {:update-form! (update-form s)
                                  :data data})]
      (if editable?
        [form-fields/field (assoc s
