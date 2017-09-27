@@ -27,5 +27,5 @@
   (process-event [{places :places} app]
     (update app :place-search
             #(assoc %
-                    :searc-in-progress? false
+                    :search-in-progress? false
                     :results places))))
