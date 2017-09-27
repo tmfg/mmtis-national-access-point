@@ -38,6 +38,10 @@
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
 
+                 ;; HTML/XML generation from Clojure data
+                 [hiccup "1.0.5"]
+                 ;; XML zippers
+                 [org.clojure/data.zip "0.1.2"]
 
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]

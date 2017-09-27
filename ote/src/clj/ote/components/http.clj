@@ -49,3 +49,8 @@
    :body (with-open [out (java.io.ByteArrayOutputStream.)]
            (transit/write (transit/writer out :json) data)
            (str out))})
+
+(defn transit-request
+  "Parse HTTP POST body as Transit data."
+  [in]
+  (transit/read (transit/reader in :json)))

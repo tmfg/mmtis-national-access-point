@@ -4,7 +4,8 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [ote.components.db :as db]
-            [ote.services.localization :as localization-service]))
+            [ote.services.localization :as localization-service]
+            [ote.services.openstreetmap :as osm]))
 
 (def ^{:doc "Handle for OTE-system"}
   ote nil)
@@ -19,7 +20,10 @@
 
    ;; Return localization information to frontend
    :localization (component/using
-                  (localization-service/->Localization) [:http])))
+                  (localization-service/->Localization) [:http])
+
+   ;; OpenStreetMap Overpass API queries
+   :osm (component/using (osm/->OpenStreetMap (:openstreetmap-api-url config)) [:http])))
 
 (defn start []
   (alter-var-root
