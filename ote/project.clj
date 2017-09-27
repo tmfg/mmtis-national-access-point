@@ -34,6 +34,7 @@
                  [cljsjs/react-dom "15.6.1-1"]
                  [cljs-react-material-ui "0.2.48"]
                  [figwheel "0.5.13"]
+                 [cljsjs/react-leaflet "1.6.5-0"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]

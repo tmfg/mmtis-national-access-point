@@ -9,17 +9,47 @@
             [ote.views.liikennevalineet :as liikennevalineet]
             [ote.views.valituspalvelut :as valityspalvelut]
             [ote.localization :as localization]
-            [ote.views.kuljetus :as kuljetus]))
+            [ote.views.kuljetus :as kuljetus]
+
+            [reagent.core :as r]
+            [ote.app.place-search :as ps]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.napit :as napit]
+            [ote.ui.debug :as debug]
+            [ote.ui.leaflet :as leaflet]))
 
 
 (defn ote-application
   "OTE application main view"
   [e! app]
+
   [ui/mui-theme-provider
    {:mui-theme (get-mui-theme {:palette {:text-color (color :green600)}})}
    [:div.ote-sovellus.container
     [ui/app-bar {:title "OTE"}]
-    [ui/tabs
+
+
+    [leaflet/Map {:center #js [65 25]
+                  :zoom 10}
+     [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                         :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+
+     (for [{location :location
+            tags :tags} (get-in app [:place-search :results])]
+       ^{:key (:name tags)}
+       [leaflet/Marker {:position (clj->js location)}
+        [leaflet/Popup [:div (pr-str tags)]]])]
+
+    [form-fields/field {:type :string :label "Paikan nimi"
+                        :update! #(e! (ps/->SetPlaceName %))}
+     (get-in app [:place-search :name])]
+
+    [napit/tallenna {:on-click #(e! (ps/->SearchPlaces))} "Hae paikkoja"]
+
+    [debug/debug (:place-search app)]
+
+
+    #_[ui/tabs
      [ui/tab {:label "Olennaiset tiedot" :value "a"}
       [ui/paper {:class "paper-siirto"}
         [ot/olennaiset-tiedot e! (:muokattava-palvelu app)]]]
