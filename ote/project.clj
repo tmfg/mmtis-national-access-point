@@ -13,7 +13,7 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.6"]
-                 [specql "0.7.0-alpha3"]
+                 [specql "0.7.0-alpha4"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
@@ -66,5 +66,8 @@
                 :compiler {:optimizations :advanced
                            :output-to "resources/public/js/ote.js"
                            :source-map "resources/public/js/ote.js.map"}}]}
+
+  :clean-targets ^{:protect false}
+  ["resources/public/js/ote.js" "resources/public/js/out"]
 
   :main ote.main)

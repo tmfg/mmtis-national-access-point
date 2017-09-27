@@ -1,41 +1,42 @@
 (ns ote.main
-  "Liikenneviraston OTE: Olennaisten Tietojen Editori -sovellus.
-  Järjestelmän käynnistys."
+  "Finnish Transport Agency: OTE digitalization tool for transportation service information.
+  Main entrypoint for the backend system."
   (:require [com.stuartsierra.component :as component]
-            [ote.komponentit.http :as http]
-            [ote.komponentit.db :as db]
-            [ote.palvelut.lokalisaatio :as lokalisaatio-palvelu]))
+            [ote.components.http :as http]
+            [ote.components.db :as db]
+            [ote.services.localization :as localization-service]))
 
-(def ^{:doc "Ajossa olevan OTE-järjestelmän kahva"}
+(def ^{:doc "Handle for OTE-system"}
   ote nil)
 
-(defn ote-system [asetukset]
+(defn ote-system [config]
   (component/system-map
-   ;; Peruskomponentit
-   :db (db/tietokanta (:db asetukset))
-   :http (http/http-palvelin (:http asetukset))
+   ;; Basic components
+   :db (db/database (:db config))
+   :http (http/http-server (:http config))
 
-   ;; Frontille tarjottavat palvelut
+   ;; Services for the frontend
 
-   ;; Käännöstiedostojen haku
-   :lokalisaatio (component/using (lokalisaatio-palvelu/->Lokalisaatio) [:http])))
+   ;; Return localization information to frontend
+   :localization (component/using
+                  (localization-service/->Localization) [:http])))
 
-(defn kaynnista []
+(defn start []
   (alter-var-root
    #'ote
    (constantly
-    (-> "asetukset.edn" slurp read-string ; lue asetukset
+    (-> "config.edn" slurp read-string
         ote-system ; luo järjestelmä
         component/start-system))))
 
-(defn sammuta []
+(defn stop []
   (component/stop-system ote)
   (alter-var-root #'ote (constantly nil)))
 
 (defn restart []
   (when ote
-    (sammuta))
-  (kaynnista))
+    (stop))
+  (start))
 
 (defn -main [& args]
-  (kaynnista))
+  (start))

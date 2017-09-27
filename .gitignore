@@ -2,7 +2,7 @@
 
 ote/resources/public/js
 
-pom.xml
+#pom.xml
 pom.xml.asc
 *jar
 *.class
@@ -43,3 +43,8 @@ atlassian-ide-plugin.xml
 # *.ipr
 
 .idea/
+
+## Ansible
+*.retry
+aws/ansible/jenkins/roles
+aws/ansible/jenkins/solita_jenkins_default_password

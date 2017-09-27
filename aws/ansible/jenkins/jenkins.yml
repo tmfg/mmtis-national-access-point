@@ -1,0 +1,21 @@
+---
+- hosts: jenkins
+  become: yes
+  tasks:
+    - include: tasks/java8.yml
+    - include: tasks/leiningen.yml
+
+
+- hosts: jenkins
+  vars:
+    solita_jenkins_jobs_dir: jobs
+    solita_jenkins_plugins:
+      - timestamper
+      - git
+      - leiningen-plugin
+      - slack
+    solita_jenkins_security_realm: jenkins
+    solita_jenkins_users:
+      - tatut
+  roles:
+    - solita.jenkins
