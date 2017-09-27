@@ -1,10 +1,11 @@
 (ns ote.app.state
-  "Contains the frontend application `app` database. 
+  "Contains the frontend application `app` database.
   Everything that is in the current state of the frontend is in the app atom."
   (:require [reagent.core :as r]))
 
 (defonce app
-  (r/atom {:valittu-sivu "Perustiedot" ;; Voi olla vaikka mitä esim Perustiedot, Välityspalvelut, Liikennevälineet
+  (r/atom {:place-search {}
+           :valittu-sivu "Perustiedot" ;; Voi olla vaikka mitä esim Perustiedot, Välityspalvelut, Liikennevälineet
            :muokattava-palvelu {:ot/nimi "Tatun ajopalvelu"
                                 :ot/ytunnus "4123412-1"
                                 :ot/tyyppi :satama
