@@ -1,11 +1,11 @@
 (ns ote.palvelut.transport
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
-            [ote.komponentit.http :as http]
+            [ote.components.http :as http]
             [specql.core :refer [fetch update! insert! upsert!]]
             [specql.op :as op]
             [ote.domain.liikkumispalvelu :as t]
-            [compojure.core :refer [routes GET]]))
+            [compojure.core :refer [routes GET POST]]))
 
 (defn db-get-transport-operator [db business-id]
   (println "Jee. tuli perille")
@@ -14,17 +14,31 @@
 
 (defn- get-transport-operator [db business-id]
   (println "tuleeko tänne")
-  (http/transit-vastaus (db-get-transport-operator db business-id)))
+  (http/transit-response (db-get-transport-operator db business-id)))
 
+(defn- save-transport-operator [db data]
+  (println " Ja data tuli perille " data)
+  (upsert! db ::t/transport-operator data)
+  )
+
+(defn- save-passengert-transportation-info [db data]
+  (println " save-passengert-transportation-info data -> " data)
+  (upsert! db ::t/transport-service data)
+  )
 
 (defrecord Transport []
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
       this ::lopeta
-           (http/julkaise! http (routes
+           (http/publish! http (routes
                                   (GET "/transport-operator/:business-id" [business-id]
-                                    (get-transport-operator db business-id))))))
+                                    (get-transport-operator db business-id))
+                                  (POST "/transport-operator" {form-data :body}
+                                    (http/transit-response (save-transport-operator db (http/transit-request form-data))))
+                                  (POST "/passenger-transportation-info" {form-data :body}
+                                    (http/transit-response (save-passengert-transportation-info db (http/transit-request form-data))))
+                                  ))))
   (stop [{lopeta ::lopeta :as this}]
     (lopeta)
     (dissoc this ::lopeta)))

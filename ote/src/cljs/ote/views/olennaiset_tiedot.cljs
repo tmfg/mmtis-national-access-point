@@ -2,13 +2,13 @@
   "Olennaisten tietojen lomakenäkymä"
   (:require [ote.ui.form :as form]
             [ote.ui.napit :as napit]
-            [ote.tiedot.palvelu :as p]
+            [ote.tiedot.palvelu :as service]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as liikkumispalvelu]
+            [ote.domain.liikkumispalvelu :as t]
             [ote.localization :refer [tr tr-key]]))
 
-(defn vuokrauspalveluiden-lisatiedot[tila]
-  (when (= :vuokraus (:ot/tyyppi tila))
+(defn vuokrauspalveluiden-lisatiedot[status]
+  (when (= :vuokraus (:ot/tyyppi status))
     (form/group
      "Ajoneuvojen vuokrauspalveluiden ja kaupallisten yhteiskäyttöpalveluiden lisätiedot"
      {:label "Onko käytössä pyörätuolien kuljetukseen soveltuvaa kalustoa"
@@ -52,8 +52,8 @@
      )))
 
 
-(defn satamapalvelun-lisatiedot [tila]
-  (when (= :satama (:ot/tyyppi tila))
+(defn satamapalvelun-lisatiedot [status]
+  (when (= :satama (:ot/tyyppi status))
 
     (form/group
      "Satamien, Asemien ja Terminaalien lisätiedot"
@@ -95,89 +95,78 @@
       :type  :text-area
       :rows   5})))
 
-(defn henkilokuljetus-lisatiedot [tila]
-  (when (= :kuljetus (:ot/tyyppi tila))
+(defn henkilokuljetus-lisatiedot [status]
+
+  (when (= :passenger-transportation (:to/service-type status))
     (form/group
      "Henkilöstökuljetuspalveluiden lisätiedot"
-     {:label "Reaaliaikapalveluiden www osoite"
-      :name    :kuljetus/www-reaaliaikatiedot
+    #_ {:label "Reaaliaikapalveluiden www osoite"
+      :name    :passenger_transportation_info/www-reaaliaikatiedot
       :type  :string}
 
      {:label "Matkatavaroita koskevat rajoitukset"
-      :name    :kuljetus/matkatavara_rajoitukset
+      :name    :passenger_transportation_info/luggage-restrictions
       :type  :text-area
       :rows   5}
 
-     {:label "Pääasiallinen toiminta-alue"
+   #_  {:label "Pääasiallinen toiminta-alue"
       :name    :kuljetus/paa_toiminta-alue
       :type  :string}
 
-     {:label "Toissijainen toiminta-alue"
+    #_ {:label "Toissijainen toiminta-alue"
       :name    :kuljetus/toissijainen_toiminta-alue
       :type  :string}
-     {:label "Anna varauspalvelun www osoite, mikäli sellainen on"
+
+    #_ {:label "Anna varauspalvelun www osoite, mikäli sellainen on"
       :name    :kuljetus/www-varauspalvelu
       :type  :string})))
 
 
-(defn olennaiset-tiedot [e! tila]
+(defn olennaiset-tiedot [e! status]
   [:div.row
    [:div {:class "col-lg-4"}
     [:div
-     [:h3 "Olennaiset tiedot"]]
+     [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
     [form/form
-     {:update! #(e! (p/->MuokkaaPalvelua %))
+     {:name->label (tr-key [:olennaiset-tiedot :otsikot])
+      :update! #(e! (service/->EditTransportOperator %))
       :name #(tr [:olennaiset-tiedot :otsikot %])
       :footer-fn (fn [data]
-                   [napit/tallenna {:on-click #(e! :FIXME)
-                                    :disabled (form/disable-save? tila)}
+                   [napit/tallenna {:on-click #(e! (service/->SaveTransportOperator))
+                                    :disabled (form/disable-save? data)}
                     "Tallenna"])}
 
-     [{:name :ot/nimi
+     [{:name ::t/name
        :type :string
        :validate [[:non-empty "Anna nimi"]]}
 
-      {:name :ot/y-tunnus
+      #_{:name :to/service-type
+       :type :selection
+       :show-option (tr-key [::t/service-type])
+       :options t/transport-service-types }
+
+      {:name ::t/business-id
        :type :string
        :validate [[:business-id]]}
 
-      {:name :ot/tyyppi
-       :type :selection
-       :show-option (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
-       :options liikkumispalvelu/transport-service-types }
-
-      {:label "Puhelin"
-       :name :ot/puhelin
+      {:name ::t/phone
        :type :string}
 
-      {:label "GSM"
-       :name :ot/gsm
+      {:name ::t/gsm
        :type :string}
 
-      {:label "Sähköpostiosoite"
-       :name :ot/email
+      {:name ::t/email
        :type :string}
 
-      {:label "Osoite"
-       :name :ot/osoite
+      {:name ::t/homepage
        :type :string}
 
-      {:label "Postinumero"
-       :name :ot/postinumero
-       :type :string}
+      ;
+      ;(satamapalvelun-lisatiedot status)
+      ;(vuokrauspalveluiden-lisatiedot status)
+      (henkilokuljetus-lisatiedot status)
+      ]
 
-      {:label "Postitoimipaikka"
-       :name :ot/postitoimipaikka
-       :type :string}
+     status]
 
-      {:label "www-osoite"
-       :name :ot/www-osoite
-       :type :string}
-
-      (satamapalvelun-lisatiedot tila)
-      (vuokrauspalveluiden-lisatiedot tila)
-      (henkilokuljetus-lisatiedot tila)]
-
-     tila]
-
-    [debug/debug tila]]])
+    [debug/debug status]]])

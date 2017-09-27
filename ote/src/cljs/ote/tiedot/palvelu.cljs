@@ -7,4 +7,4 @@
 
   MuokkaaPalvelua
   (process-event [{tiedot :tiedot} app]
-    (update app :muokattava-palvelu merge tiedot)))
+    (update app :operator merge tiedot)))

@@ -15,7 +15,7 @@
    ;; Basic components
    :db (db/database (:db config))
    :http (http/http-server (:http config))
-   
+
    ;; Services for the frontend
    :transport (component/using (transport-service/->Transport) [:http :db])
 
