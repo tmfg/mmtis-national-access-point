@@ -1,10 +1,15 @@
 (ns ote.shapefile.reader
   "Read ESRI Shapefile with GeoTools"
   (:import (org.geotools.data Query)
+           (org.geotools.data.crs ReprojectFeatureResults)
            (org.geotools.filter.text.cql2 CQL)
-           (org.geotools.data.shapefile ShapefileDataStore))
+           (org.geotools.data.shapefile ShapefileDataStore)
+           (java.io OutputStream)
+           (org.opengis.feature FeatureVisitor)
+           (org.opengis.util ProgressListener))
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.geo :as geo]))
 
 
 (defn shapefile-datastore [url]
@@ -52,5 +57,38 @@
         (map (juxt #(-> % .getName .getLocalPart str/lower-case keyword) #(.getValue %)))
         (.getProperties feature)))
 
-(defn query [shp cql]
-  (let [q (Query.)] ))
+(def null-progress-listener
+  (reify ProgressListener
+    (complete [_])
+    (dispose [_])
+    (exceptionOccurred [_ t])
+    (getDescription [_] "null-progress-listener")
+    (getTask [_] nil)
+    (isCanceled [_] false)
+    (progress [_ pct])
+    (setCanceled [_ c])
+    (setDescription [_ d])
+    (setTask [_ t])
+    (started [_])
+    (warningOccurred [_ source location warning])))
+
+(defn feature-visitor [feature-fn]
+  (reify org.opengis.feature.FeatureVisitor
+    (visit [_ feature] (feature-fn feature))))
+
+(defn features-to-geojson [^ShapefileDataStore shp
+                           ^String cql-query-string
+                           feature-fn
+                           ^OutputStream to]
+  (let [f (->filter cql-query-string)
+        feature-source (.getFeatureSource shp)
+        feature-collection (.getFeatures feature-source f)
+        feature-collection-wgs84 (ReprojectFeatureResults.
+                                  feature-collection geo/wgs84)
+        json (org.geotools.geojson.feature.FeatureJSON.)]
+    ;;(.accept feature-collection (feature-visitor feature-fn))
+
+    #_(println "TÄÄLLÄ")
+    #_(.writeFeatureCollection json feature-collection to)
+
+    (.toString json feature-collection-wgs84)))

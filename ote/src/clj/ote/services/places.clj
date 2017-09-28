@@ -1,55 +1,66 @@
-(ns ote.services.openstreetmap
-  "Provides a service for the frontend to do OSM Overpass API
-  queries. Takes a Hiccup-style XML description and turns it into
-  an Overpass API call. Returns data as transit."
+(ns ote.services.places
+  "Provides a service for the frontend to search for geographical places.
+  Returns data as transit in as Clojure data (see `ote.geo` namespace for
+  a definition of the geographical data)."
   (:require [ote.components.http :as http]
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET]]
-            [org.httpkit.client :as http-client]
-            [clojure.zip :refer [xml-zip]]
-            [clojure.data.zip.xml :as z]
-            [clojure.xml :as xml]
             [clojure.string :as str]
-            [taoensso.timbre :as log])
+            [taoensso.timbre :as log]
+            [ote.shapefile.reader :as shp]
+            [ote.geo :as geo]
+            [ote.util.functor :refer [fmap]])
   (:import (java.net URLEncoder)))
 
-(def place-types #{"city" "county" "town" "hamlet" "suburb" "village" "municipality"})
+(defprotocol PlaceSource
+  (initialize [this]
+    "Initialize this source. Called before first search is done.
+    Returns updated version of the source.")
+  (search-places-by-name [this name-prefix]
+    "Search for places by a given name prefix."))
 
-(defn- osm-query [api-endpoint osm-query]
-  (with-open [in (-> api-endpoint
-                     (str (URLEncoder/encode osm-query))
-                     (http-client/get {:as :stream})
-                     deref :body)]
-    (xml-zip (xml/parse in))))
+(defrecord ShapefilePlaceSource [url name-field shp]
+  PlaceSource
+  (initialize [this]
+    ;; PENDING: we could do a search here to force loading
+    (assoc this :shp (shp/shapefile-datastore (java.net.URL. url))))
+  
+  (search-places-by-name [{shp :shp} name-prefix]
+    (let [;; FIXME: no way to bind parameters? we need to escape
+          ;; or rather include only safe characters (alpha)
+          cql (str name-field " LIKE '" name-prefix "%'")
+          cql-filter (shp/->filter cql)]
+      (into []
+            (comp
+             (map shp/feature-properties)
+             (map #(select-keys % #{:the_geom :namefin :nameswe}))
+             (map #(assoc % :geometry (geo/to-clj (geo/euref->wgs84 (:the_geom %)))))
+             (map #(dissoc % :the_geom)))
+            (shp/features shp cql-filter)))))
 
-(defn- parse-osm-node [node]
-  {:location {:lat (z/xml1-> node (z/attr :lat) #(Double/parseDouble %))
-              :lon (z/xml1-> node (z/attr :lon) #(Double/parseDouble %))}
-   :tags (into {}
-               (zipmap (z/xml-> node :tag (z/attr :k) keyword)
-                       (z/xml-> node :tag (z/attr :v))))})
+(defmulti create-source "Create place source by :type keyword" :type)
 
-(defn- parse-osm-response [root]
-  (z/xml-> root :node parse-osm-node))
+(defmethod create-source :shapefile [config]
+  (map->ShapefilePlaceSource config))
 
-(defn search-places [api-endpoint name-prefix]
-  (let [name (str "[name~\"" (str/escape name-prefix {\" "\\\""}) ".*\"]")
-        query (str "node" name "[is_in=\"Finland\"]" ";out;")]
-    (log/info "Running OpenStreetMap Overpass QL: " query)
-    (parse-osm-response
-     (osm-query api-endpoint query))))
+(defn search [sources name-prefix]
+  (fmap #(search-places-by-name % name-prefix) sources))
 
 
-(defrecord OpenStreetMap [api-endpoint]
+(defrecord Places [sources]
   component/Lifecycle
   (start [{http :http :as this}]
-    (assoc this ::stop
-           (http/publish!
-            http
-            (routes
-             (GET "/openstreetmap-places/:name" [name]
-                  (http/transit-response
-                   (search-places api-endpoint name)))))))
+    ;; Create and initialize all place sources
+    (let [sources (fmap (comp initialize create-source) sources)]
+      (println "SOURCES: " (pr-str sources))
+      (assoc this ::stop
+             (http/publish!
+              http
+              (routes
+               (GET "/places/:name" [name]
+                    (http/transit-response
+                     (search sources name))))))))
+  
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

@@ -5,7 +5,7 @@
             [ote.components.http :as http]
             [ote.components.db :as db]
             [ote.services.localization :as localization-service]
-            [ote.services.openstreetmap :as osm]))
+            [ote.services.places :as places]))
 
 (def ^{:doc "Handle for OTE-system"}
   ote nil)
@@ -23,7 +23,7 @@
                   (localization-service/->Localization) [:http])
 
    ;; OpenStreetMap Overpass API queries
-   :osm (component/using (osm/->OpenStreetMap (:openstreetmap-api-url config)) [:http])))
+   :places (component/using (places/->Places (:places config)) [:http])))
 
 (defn start []
   (alter-var-root

@@ -2,4 +2,8 @@
       :username "napote"
       :password ""}
  :http {:port 3000}
+ :places {:finnish-municipalities
+          {:type :shapefile
+           :name-field "NAMEFIN"
+           :url "https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish-municipalities/SuomenKuntajako_2017_10k.shp"}}
  :openstreetmap-api-url "http://overpass-api.de/api/interpreter?data="}

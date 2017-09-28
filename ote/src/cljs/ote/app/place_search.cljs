@@ -16,7 +16,7 @@
 
   SearchPlaces
   (process-event [_ app]
-    (comm/get! (str "/openstreetmap-places/" (get-in app [:place-search :name]))
+    (comm/get! (str "/places/" (get-in app [:place-search :name]))
                {:on-success (tuck/send-async! ->SearchPlacesResponse)})
     (update app :place-search
             #(assoc %

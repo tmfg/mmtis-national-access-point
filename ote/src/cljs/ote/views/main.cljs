@@ -34,11 +34,11 @@
      [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                          :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-     (for [{location :location
-            tags :tags} (get-in app [:place-search :results])]
-       ^{:key (:name tags)}
-       [leaflet/Marker {:position (clj->js location)}
-        [leaflet/Popup [:div (pr-str tags)]]])]
+     (for [{:keys [namefin geometry]} (get-in app [:place-search :results :finnish-municipalities])]
+       ^{:key namefin}
+       [leaflet/FeatureGroup
+        [leaflet/geometry {:color "red"} geometry]
+        [leaflet/Popup [:div namefin]]])]
 
     [form-fields/field {:type :string :label "Paikan nimi"
                         :update! #(e! (ps/->SetPlaceName %))}

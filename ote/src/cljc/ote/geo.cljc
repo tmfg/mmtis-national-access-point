@@ -106,8 +106,6 @@
 
 
 
-
-
 ;;; Conversion between WGS84 and Finnish EUREF-FIN systems
 
 #?(:clj
@@ -116,16 +114,22 @@
 #?(:clj (def wgs84 org.geotools.referencing.crs.DefaultGeographicCRS/WGS84))
 #?(:clj (def euref (org.geotools.referencing.CRS/parseWKT euref-wkt)))
 #?(:clj (def euref->wgs84-transform (org.geotools.referencing.CRS/findMathTransform euref wgs84 true)))
+#?(:clj (def swap-coordinates
+          (reify com.vividsolutions.jts.geom.CoordinateFilter
+            (filter [_ c]
+              (let [x (.-x c)
+                    y (.-y c)]
+                (set! (.-x c) y)
+                (set! (.-y c) x))))))
 
-#?(:clj (defn euref->wgs84
-          "Transform a coordinate from EUREF-FIN to WGS84 (GPS)."
-          [coordinate]
-          (if (vector? coordinate)
-            (let [c (org.geotools.geometry.jts.JTS/transform
-                     (com.vividsolutions.jts.geom.Coordinate. (first coordinate) (second coordinate))
-                     nil euref->wgs84-transform)]
-              [(.y c) (.x c)])
-            (org.geotools.geometry.jts.JTS/transform coordinate nil euref->wgs84-transform))))
+#?(:clj
+   (defn euref->wgs84
+     "Transform a coordinate from EUREF-FIN to WGS84 (GPS)."
+     [geometry]
+     (let [new-geometry
+           (org.geotools.geometry.jts.JTS/transform geometry euref->wgs84-transform)]
+       (.apply new-geometry swap-coordinates)
+       new-geometry)))
 
 (def ETRS-TM35FIN "EPSG:3067")
 (def WGS84 "EPSG:4326")
