@@ -1,0 +1,55 @@
+# docker-compose build && docker-compose up
+# If you experience problems with the CKAN container not being
+# able to connect to the DB, then most likely the DB has not
+# started up quickly enough. Just do "docker-compose up ckan"
+# again to retry
+
+# If you want to rebuild each container using local dockerfiles, remove comments from the "build" lines.
+
+version: "3"
+
+services:
+  napote-ckan:
+    container_name: napote-ckan
+    build: ./ckan
+    #image: solita/napote-ckan:latest
+    links:
+      - napotedb
+      - napote-solr
+      - napote-redis
+    ports:
+      - "80:80"
+      - "5555:5555"
+    environment:
+      - CKAN_SQLALCHEMY_URL=postgresql://ckan:@napotedb:5432/ckan
+      - CKAN_SOLR_URL=http://napote-solr:8983/solr/ckan
+      - CKAN_REDIS_URL=redis://napote-redis:6379/1
+      - CKAN_SITE_ID=default
+      - CKAN_SITE_URL=http://localhost:5555
+
+  napotedb:
+    restart: always
+    container_name: napotedb
+    build: ../../database/
+    #image: solita/napotedb:latest
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  napote-solr:
+    container_name: napote-solr
+    build: ./solr
+    #image: solita/napote-solr:latest
+    ports:
+      - "8983:8983"
+
+  napote-redis:
+    container_name: napote-redis
+    build: ./redis
+    #image: solita/napote-redis:latest
+    ports:
+      - "6379:6379"
