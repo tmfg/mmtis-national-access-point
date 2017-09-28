@@ -48,7 +48,7 @@ fi
 # Set environment variables
 if [ -z "$CKAN_SQLALCHEMY_URL" ]; then
     abort "ERROR: No CKAN_SQLALCHEMY_URL specified."
-
+else
     # Wait for postgres to be available. This can take a while.
     for tries in $(seq 30); do
       psql -c 'SELECT 1;' 2> /dev/null && break

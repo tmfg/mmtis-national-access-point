@@ -43,6 +43,8 @@ RUN ckan-pip install setuptools==20.4
 
 ## Install latest stable CKAN in $CKAN_HOME/src/ckan directory ##
 RUN ckan-pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.7.0#egg=ckan'
+
+COPY ./who.ini /
 RUN ln -s /who.ini $CKAN_CONFIG/who.ini
 
 ## Install pytz. ##
@@ -81,4 +83,4 @@ USER ckan
 EXPOSE 5555
 
 
-CMD ["ckan-paster","serve","/etc/ckan/default/ckan.ini"]
+CMD ["ckan-paster","serve","/etc/ckan/ckan.ini"]
