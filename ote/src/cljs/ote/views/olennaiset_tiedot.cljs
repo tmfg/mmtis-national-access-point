@@ -1,6 +1,7 @@
 (ns ote.views.olennaiset-tiedot
   "Olennaisten tietojen lomakenäkymä"
   (:require [ote.ui.form :as form]
+            [ote.ui.form-groups :as form-groups]
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as service]
             [ote.ui.debug :as debug]
@@ -95,33 +96,6 @@
       :type  :text-area
       :rows   5})))
 
-(defn henkilokuljetus-lisatiedot [status]
-
-  (when (= :passenger-transportation (:to/service-type status))
-    (form/group
-     "Henkilöstökuljetuspalveluiden lisätiedot"
-    #_ {:label "Reaaliaikapalveluiden www osoite"
-      :name    :passenger_transportation_info/www-reaaliaikatiedot
-      :type  :string}
-
-     {:label "Matkatavaroita koskevat rajoitukset"
-      :name    :passenger_transportation_info/luggage-restrictions
-      :type  :text-area
-      :rows   5}
-
-   #_  {:label "Pääasiallinen toiminta-alue"
-      :name    :kuljetus/paa_toiminta-alue
-      :type  :string}
-
-    #_ {:label "Toissijainen toiminta-alue"
-      :name    :kuljetus/toissijainen_toiminta-alue
-      :type  :string}
-
-    #_ {:label "Anna varauspalvelun www osoite, mikäli sellainen on"
-      :name    :kuljetus/www-varauspalvelu
-      :type  :string})))
-
-
 (defn olennaiset-tiedot [e! status]
   [:div.row
    [:div {:class "col-lg-4"}
@@ -149,6 +123,9 @@
        :type :string
        :validate [[:business-id]]}
 
+      (form-groups/address "Käyntiosoite" ::t/visiting-address)
+      (form-groups/address "Laskutusosoite" ::t/billing-address)
+
       {:name ::t/phone
        :type :string}
 
@@ -164,7 +141,6 @@
       ;
       ;(satamapalvelun-lisatiedot status)
       ;(vuokrauspalveluiden-lisatiedot status)
-      (henkilokuljetus-lisatiedot status)
       ]
 
      status]

@@ -7,34 +7,6 @@
             [ote.domain.liikkumispalvelu :as t]
             [ote.localization :refer [tr tr-key]]))
 
-
-(defn henkilokuljetus-lisatiedot1 [status]
-
-  (when (= :passenger-transportation (:to/service-type status))
-    (form/group
-      "Henkilöstökuljetuspalveluiden lisätiedot"
-      #_ {:label "Reaaliaikapalveluiden www osoite"
-          :name    :passenger_transportation_info/www-reaaliaikatiedot
-          :type  :string}
-
-      {:label "Matkatavaroita koskevat rajoitukset"
-       :name    :passenger_transportation_info/luggage-restrictions
-       :type  :text-area
-       :rows   5}
-
-      #_  {:label "Pääasiallinen toiminta-alue"
-           :name    :kuljetus/paa_toiminta-alue
-           :type  :string}
-
-      #_ {:label "Toissijainen toiminta-alue"
-          :name    :kuljetus/toissijainen_toiminta-alue
-          :type  :string}
-
-      #_ {:label "Anna varauspalvelun www osoite, mikäli sellainen on"
-          :name    :kuljetus/www-varauspalvelu
-          :type  :string})))
-
-
 (defn passenger-transportation-info [e! status]
   [:div.row
    [:div {:class "col-lg-4"}
@@ -50,11 +22,37 @@
                     "Tallenna"])}
 
      [{
-       ;:label "Matkatavaroita koskevat rajoitukset"
        :name    ::t/luggage-restrictions
        :type  :localized-text
        :rows   5}
+      
+      {
+       :name ::t/url
+       :type :string
+       :read (comp ::t/url ::t/real-time-information)
+       :write (fn [data url]
+                (assoc-in data [::t/real-time-information ::t/url] url))}
+      {
+       :name ::t/description
+       :type  :localized-text
+       :rows   3
+       :read (comp ::t/description ::t/real-time-information)
+       :write (fn [data desc]
+                (assoc-in data [::t/real-time-information ::t/description] desc))}
 
+      {
+       :name ::t/url
+       :type :string
+       :read (comp ::t/url ::t/booking-service)
+       :write (fn [data url]
+                (assoc-in data [::t/booking-service ::t/url] url))}
+      {
+       :name ::t/description
+       :type  :localized-text
+       :rows   3
+       :read (comp ::t/description ::t/booking-service)
+       :write (fn [data desc]
+                (assoc-in data [::t/booking-service ::t/description] desc))}
       ]
 
      status]

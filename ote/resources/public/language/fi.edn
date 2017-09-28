@@ -5,6 +5,9 @@
   #:ote.domain.liikkumispalvelu {:name "Palveluntarjoajan nimi"
                                  :business-id "Y-tunnus"
                                  ;:tyyppi "Palvelun tyyppi"
+                                 :street "Osoite"
+                                 :post-office "Postitoimipaikka"
+                                 :post-code "Postinumero"
                                  :phone "Puhelin (toimisto)"
                                  :gsm "Puhelin (GSM)"
                                  :email "Sähköpostiosoite"
@@ -13,6 +16,8 @@
                                  :visiting-address/post_office "Postitoimipaikka"
                                  :homepage "WWW-osoite"
                                  :luggage-restrictions "Matkatavaroita koskevat rajoitukset"
+                                 :url "Palvelun osoite"
+                                 :description "Palvelun kuvaus"
                                  }
 
   }
