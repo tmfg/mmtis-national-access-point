@@ -8,21 +8,17 @@
             [compojure.core :refer [routes GET POST]]))
 
 (defn db-get-transport-operator [db business-id]
-  (println "Jee. tuli perille")
   (fetch db ::t/transport-operator #{ ::t/id } {::t/business-id business-id})
   )
 
 (defn- get-transport-operator [db business-id]
-  (println "tuleeko tänne")
   (http/transit-response (db-get-transport-operator db business-id)))
 
 (defn- save-transport-operator [db data]
-  (println " Ja data tuli perille " data)
   (upsert! db ::t/transport-operator data)
   )
 
 (defn- save-passengert-transportation-info [db data]
-  (println " save-passengert-transportation-info data -> " data)
   (upsert! db ::t/transport-service data)
   )
 

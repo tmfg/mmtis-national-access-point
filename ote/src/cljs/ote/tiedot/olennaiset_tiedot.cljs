@@ -20,7 +20,6 @@
 
   SaveTransportOperator
   (process-event [_ app]
-    (.log js/console "Tallennetaan tuli" (pr-str app))
     (let [operator-data (-> app
                             :transport-operator
                             form/without-form-metadata)]
@@ -29,30 +28,24 @@
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
-    (.log js/console "TALLENNETTU " (pr-str data))
     (assoc app :transport-operator data
                :page :passenger-transportation))
 
   EditTransportService
   (process-event [{data :data} app]
-    (.log js/console "EditTransportService" data)
     (update app :transport-service merge data))
 
 
   SavePassengerTransportData
   (process-event [_ {operator :transport-operator service :transport-service :as app}]
-    (.log js/console "OPERATOR: " (pr-str operator))
     (let [service-data {:ote.domain.liikkumispalvelu/type :passenger-tranportation ;;FIXME: fix enum tranSportation
                         :ote.domain.liikkumispalvelu/transport-operator-id (:ote.domain.liikkumispalvelu/id operator)
                         :ote.domain.liikkumispalvelu/passenger-transportation
                         (form/without-form-metadata service)}]
-      (.log js/console "POST data" (pr-str service-data)
       (comm/post! "/passenger-transportation-info" service-data {:on-success (t/send-async! SavePassengerTransportResponse)})
-    app)))
+    app))
 
   SavePassengerTransportResponse
   (process-event [{passenger-transportation-data :passenger-transportation-data} app]
-    (.log js/console "SavePassengerTransportResponse data ->" passenger-transportation-data)
     (assoc app :service-provider passenger-transportation-data))
-
   )
