@@ -49,3 +49,8 @@
    :body (with-open [out (java.io.ByteArrayOutputStream.)]
            (transit/write (transit/writer out :json) data)
            (str out))})
+
+(defn transit-request
+  "Parse input stream request to clojure data"
+  [data]
+  (transit/read (transit/reader data :json)))

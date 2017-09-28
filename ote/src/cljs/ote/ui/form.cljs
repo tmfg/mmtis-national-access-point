@@ -116,7 +116,7 @@
 
 (defn- wrap-rows
   "Wraps fields into rows so that all columns are filled.
-  A new row is added when all columns are filled, the next field has `:new-row?` set to true or a 
+  A new row is added when all columns are filled, the next field has `:new-row?` set to true or a
   group label is encountered."
   [schemas]
   (loop [rows []
@@ -236,7 +236,7 @@
                     (col-classes (count schemas)))]
     [:div.row.lomakerivi
      (doall
-       (for [{:keys [name editable? read] :as s} schemas
+       (for [{:keys [name editable? read write] :as s} schemas
              :let [editable? (and can-edit?
                                   (or (nil? editable?)
                                       (editable? data)))]]
@@ -246,7 +246,7 @@
                           :focus (= name current-focus)
                           :on-focus #(set-focus! name))
           ((or read name) data)
-          #(update-fn name %)
+          #(update-fn (or write name) %)
           editable? update-form
           (get modified name)
           (get errors name)
@@ -296,8 +296,10 @@
                               (validate schemas)
                               (assoc ::modified (conj (or (::modified new-data) #{}) name))
                               update!))
-            update-field-fn (fn [name value]
-                              (let [new-data (assoc data name value)]
+            update-field-fn (fn [name-or-write value]
+                              (let [new-data (if (keyword? name-or-write)
+                                               (assoc data name-or-write value)
+                                               (name-or-write data value))]
                                 (update-form new-data)))]
         [:div.form
          {:class class}

@@ -12,7 +12,7 @@
       [:div {:class "row"}
        [:div {:class "col-lg-4"}
         [form/form
-         {:update! #(e! (p/->MuokkaaPalvelua %))
+         {:update! #(e! (p/->EditTransportOperator %))
           :footer-fn (fn [data]
                        [napit/tallenna {:on-click #(e! :FIXME)
                                         :disabled (form/disable-save? tila)}
