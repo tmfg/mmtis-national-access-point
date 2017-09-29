@@ -45,7 +45,6 @@ RUN cd /tmp && tar zxf solr-$SOLR_VERSION.tgz
 
 RUN bash /tmp/solr-$SOLR_VERSION/bin/install_solr_service.sh /tmp/solr-$SOLR_VERSION.tgz
 
-
 # Create Directories
 RUN mkdir -p /opt/solr/server/solr/$SOLR_CORE/conf
 RUN mkdir -p /opt/solr/server/solr/$SOLR_CORE/data
@@ -66,21 +65,17 @@ RUN cp /solrconfig.xml \
 # Create Core.properties
 RUN echo name=$SOLR_CORE > /opt/solr/server/solr/$SOLR_CORE/core.properties
 
+# Setup solr home directory
+RUN cp -R /opt/solr/server/solr/* $SOLR_HOME
+
 # Giving ownership to Solr
 RUN chmod +x /etc/init.d/solr
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/solr/
-RUN cp -R /opt/solr/server/solr/* $SOLR_HOME
+RUN chown -R $SOLR_USER:$SOLR_GROUP /var/solr/
 
-
-## SetUp EntryPoint ##
-COPY ./entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-
-WORKDIR /opt/solr
-ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 8983
 
 USER solr
 
-CMD tail -F /var/solr/logs/solr.log
+CMD /opt/solr/bin/solr start -f && tail -F /var/solr/logs/solr.log
