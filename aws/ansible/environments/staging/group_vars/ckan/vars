@@ -1,0 +1,6 @@
+ckan_url=https://test.finap.fi/
+db_url=postgresql://ckan:pass@localhost/ckan_default
+beaker_session_secret=FIXME generoi BEAKER_SESSION_SECRET
+solr_url=http://solr-kone:8983/solr
+redis_url=redis://redis-kone:6379/0
+storage_path=/var/lib/ckan
