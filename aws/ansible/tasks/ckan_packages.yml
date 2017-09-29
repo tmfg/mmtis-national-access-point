@@ -21,7 +21,14 @@
 - name: Install setuptools
   pip:
     name: setuptools
-    version: 20.4
+    version: 36.5.0
+    virtualenv: /usr/lib/ckan/default
+    virtualenv_python: python2.7
+
+- name: Upgrade PIP
+  pip:
+    version: 9.0.1
+    name: pip
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
 
@@ -32,14 +39,15 @@
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
 
+
 - name: Install pytz
   pip:
     editable: true
+    version: 2016.7
     name: pytz
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
 
-# PENDING: this may still need "pip" upgrade to latest
 - name: Install CKAN dependencies
   pip:
     requirements: /usr/lib/ckan/default/src/ckan/requirements.txt
