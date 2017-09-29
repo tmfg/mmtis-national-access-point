@@ -8,10 +8,10 @@ ENV CKAN_HOME /usr/lib/ckan
 ENV CKAN_VIRTUAL_ENV $CKAN_HOME/virtualenv
 ENV CKAN_CONFIG /etc/ckan
 ENV CKAN_STORAGE_PATH /var/lib/ckan
-ENV CKAN_SITE_URL http://localhost:5000
 
 # These build-time vars are specified by docker-compose.yml
-ARG CKAN_SITE_URL
+ARG CKAN_PORT=5555
+ARG CKAN_SITE_URL=http://localhost:$CKAN_PORT
 
 ## Install required packages ##
 RUN yum -y update && yum -y upgrade && yum -y install \
@@ -80,7 +80,7 @@ VOLUME ["/usr/lib/ckan"]
 VOLUME ["/var/lib/ckan"]
 
 USER ckan
-EXPOSE 5555
+EXPOSE $CKAN_PORT
 
 
 CMD ["ckan-paster","serve","/etc/ckan/ckan.ini"]

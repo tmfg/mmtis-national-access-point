@@ -11,21 +11,24 @@ version: "3"
 services:
   napote-ckan:
     container_name: napote-ckan
-    build: ./ckan
+    build:
+      context: ./ckan
+      args:
+      - CKAN_SITE_URL=${CKAN_SITE_URL}
+      - CKAN_PORT=${CKAN_PORT}
     #image: solita/napote-ckan:latest
     links:
       - napotedb
       - napote-solr
       - napote-redis
     ports:
-      - "80:80"
-      - "5555:5555"
+      - "${CKAN_PORT}:5000"
     environment:
       - CKAN_SQLALCHEMY_URL=postgresql://ckan:@napotedb:5432/ckan
       - CKAN_SOLR_URL=http://napote-solr:8983/solr/ckan
       - CKAN_REDIS_URL=redis://napote-redis:6379/1
-      - CKAN_SITE_ID=default
-      - CKAN_SITE_URL=http://localhost:5555
+      - CKAN_SITE_ID=${CKAN_SITE_ID}
+      - CKAN_SITE_URL=${CKAN_SITE_URL}
 
   napotedb:
     restart: always

@@ -24,3 +24,7 @@ If you encounter weird errors with docker containers or the images are taking to
 
 If you want to take a look inside a docker container run e.g.
 `docker exec -it napote-ckan /bin/bash`
+
+## ENV variables
+
+Some env variables, such as ckan site url, can be easily configured through .env file.
