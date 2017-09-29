@@ -12,6 +12,8 @@ The instances are pushed to dockerhub and can be run without building locally.
 To start all the ckan nap containers, run:
 `docker-compose up -d`
 
+Note, that you might have to wait a while before CKAN is available at: http://localhost:5555,
+
 Give the db service time to initialize the db cluster on first run:  
 `docker-compose restart napote-ckan`
 
