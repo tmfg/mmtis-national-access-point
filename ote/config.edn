@@ -2,6 +2,6 @@
       :username "napote"
       :password ""}
  :http {:port 3000
-        :auth-tkt nil #_{:shared-secret "local dev"
+        :auth-tkt nil #_{:shared-secret "localdev"
                          :max-age-in-seconds 36000
                          :digest-algorithm "MD5"}}}
