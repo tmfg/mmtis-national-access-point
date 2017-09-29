@@ -1,6 +1,7 @@
 (ns ote.views.passenger-transportation
   "Required datas for passenger transportation provider"
   (:require [ote.ui.form :as form]
+            [ote.ui.form-groups :as form-groups]
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as service]
             [ote.ui.debug :as debug]
@@ -46,35 +47,15 @@
                 (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionslocation] location))}
 
 
-      (form/group "Real time information"
-      {
-       :name ::transport-service/url
-       :type :string
-       :read (comp ::transport-service/url ::transport-service/real-time-information)
-       :write (fn [data url]
-                (assoc-in data [::transport-service/real-time-information ::transport-service/url] url))}
-      {
-       :name ::transport-service/description
-       :type  :localized-text
-       :rows   3
-       :read (comp ::transport-service/description ::transport-service/real-time-information)
-       :write (fn [data desc]
-                (assoc-in data [::transport-service/real-time-information ::transport-service/description] desc))})
+      (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
+      (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
 
-      (form/group "Varauspalvelun tiedot"
-      {
-       :name ::transport-service/url
-       :type :string
-       :read (comp ::transport-service/url ::transport-service/booking-service)
-       :write (fn [data url]
-                (assoc-in data [::transport-service/booking-service ::transport-service/url] url))}
-      {
-       :name ::transport-service/description
-       :type  :localized-text
-       :rows   3
-       :read (comp ::transport-service/description ::transport-service/booking-service)
-       :write (fn [data desc]
-                (assoc-in data [::transport-service/booking-service ::transport-service/description] desc))})
+      ;; Payment method is a list in database so we need to enable multible choises
+      {:label "Valitseppa maksutapa"
+       :name ::transport-service/payment-methods
+       :type :multiselect-selection
+       :show-option (tr-key [:enums ::transport-service/payment-methods])
+       :options transport-service/payment-methods }
       ]
 
      status]

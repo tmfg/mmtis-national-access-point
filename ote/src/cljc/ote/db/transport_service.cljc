@@ -46,3 +46,6 @@
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
+
+;; Create order for payment_method
+(def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other ])

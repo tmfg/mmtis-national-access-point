@@ -1,7 +1,8 @@
 (ns ote.ui.form-groups
   "Contains reusable form elements."
   (:require [ote.ui.form :as form]
-            [ote.db.common :as common]))
+            [ote.db.common :as common]
+            [ote.db.transport-service :as transport-service]))
 
 
 (defn address
@@ -25,3 +26,23 @@
                :read (comp ::common/postal_code address-field)
                :write (fn [data postal-code]
                         (assoc-in data [address-field ::common/postal-code] postal-code))}))
+
+
+(defn service-url
+  "Creates a form group for service url hat creates two form elements url and localized text area"
+  [label service-url-field]
+  (form/group label
+              {
+               :name ::transport-service/url
+               :type :string
+               :read (comp ::transport-service/url service-url-field)
+               :write (fn [data url]
+                        (assoc-in data [service-url-field ::transport-service/url] url))}
+              {
+               :name ::transport-service/description
+               :type  :localized-text
+               :rows   3
+               :read (comp ::transport-service/description service-url-field)
+               :write (fn [data desc]
+                        (assoc-in data [service-url-field ::transport-service/description] desc))}
+              ))

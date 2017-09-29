@@ -1,7 +1,8 @@
 (ns ote.ui.form-fields
   "UI components for different form fields."
   (:require [reagent.core :as r]
-            [cljs-react-material-ui.reagent :as ui]))
+            [cljs-react-material-ui.reagent :as ui]
+            [clojure.string :as str]))
 
 
 (defn read-only-atom [value]
@@ -79,6 +80,32 @@
         ^{:key i}
         [ui/menu-item {:value i :primary-text (show-option option)}])
       options)]))
+
+
+(defmethod field :multiselect-selection [{:keys [update! label name show-option options form? error] :as field} data]
+  ;; Because material-ui selection value can't be an arbitrary JS object, use index
+  (let [selected-set (or data #{})
+        option-idx (zipmap options (range))]
+    [ui/select-field {:floating-label-text label
+                      :multiple true
+                      :value (clj->js (map option-idx selected-set))
+                      :selection-renderer (fn [values]
+                                            (str/join ", " (map (comp show-option (partial nth options)) values)))
+                      :on-change (fn [event index values]
+                                   (update! (into #{}
+                                                  (map (partial nth options))
+                                                  values)))} ;; Add selected value to vector
+     (map-indexed
+       (fn [i option]
+         ^{:key i}
+         [ui/menu-item {
+                        :value i
+                        :primary-text (show-option option)
+                        :inset-children true
+                        :checked (boolean (selected-set option))
+                        }])
+       options)]))
+
 
 (def phone-regex #"\+?\d+")
 
