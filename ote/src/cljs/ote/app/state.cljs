@@ -7,10 +7,10 @@
   (r/atom {:page :operator ;; :operator = Transport Operator, :passenger-transportation = Passenger transport info
 
            ;; Currently selected / edited transport operator (company basic info)
-           :transport-operator #:ote.domain.liikkumispalvelu {:name "Foo"
+           :transport-operator #:ote.db.transport-operator {:name "Foo"
                                                               :business-id "1234567-8"
                                                               :visiting-address
-                                                              #:ote.domain.liikkumispalvelu {:street "Street 1"
+                                                              #:ote.db.common {:street "Street 1"
                                                                                              :postal-code "90100"
                                                                                              :post-office "Oulu"}}
 

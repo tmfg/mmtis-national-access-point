@@ -4,7 +4,7 @@
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as p]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as liikkumispalvelu]
+            [ote.db.transport-service :as transport-service]
             [ote.localization :refer [tr tr-key]]))
 
 (defn valityspalvelu [e! tila]
@@ -33,8 +33,8 @@
           {:label "Välityspalvelun tyyppi"
            :name :valityspalvelu/tyyppi
            :type :selection
-           :show-option (tr-key [::liikkumispalvelu/palvelutyypin-nimi])
-           :options liikkumispalvelu/transport-service-types }
+           :show-option (tr-key [::transport-service/palvelutyypin-nimi])
+           :options transport-service/transport-service-types }
 
           {:label "Pääasiallinen toiminta-alue"
            :name :valityspalvelu/paa-alue

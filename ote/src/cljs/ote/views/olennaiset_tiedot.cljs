@@ -5,7 +5,8 @@
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as service]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as t]
+            [ote.db.transport-operator :as to-definitions]
+            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
 (defn vuokrauspalveluiden-lisatiedot[status]
@@ -102,7 +103,7 @@
     [:div
      [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
     [form/form
-     {:name->label (tr-key [:olennaiset-tiedot :otsikot])
+     {:name->label (tr-key [:field-labels])
       :update! #(e! (service/->EditTransportOperator %))
       :name #(tr [:olennaiset-tiedot :otsikot %])
       :footer-fn (fn [data]
@@ -110,32 +111,32 @@
                                     :disabled (form/disable-save? data)}
                     "Tallenna"])}
 
-     [{:name ::t/name
+     [{:name ::to-definitions/name
        :type :string
        :validate [[:non-empty "Anna nimi"]]}
 
-      #_{:name :to/service-type
+      #_{:name :to-definitions/service-type
        :type :selection
-       :show-option (tr-key [::t/service-type])
-       :options t/transport-service-types }
+       :show-option (tr-key [::to-definitions/service-type])
+       :options to-definitions/transport-service-types }
 
-      {:name ::t/business-id
+      {:name ::to-definitions/business-id
        :type :string
        :validate [[:business-id]]}
 
-      (form-groups/address "Käyntiosoite" ::t/visiting-address)
-      (form-groups/address "Laskutusosoite" ::t/billing-address)
+      (form-groups/address (tr [:field-labels ::to-definitions/visiting-address]) ::to-definitions/visiting-address)
+      (form-groups/address (tr [:field-labels ::to-definitions/billing-address]) ::to-definitions/billing-address)
 
-      {:name ::t/phone
+      {:name ::to-definitions/phone
        :type :string}
 
-      {:name ::t/gsm
+      {:name ::to-definitions/gsm
        :type :string}
 
-      {:name ::t/email
+      {:name ::to-definitions/email
        :type :string}
 
-      {:name ::t/homepage
+      {:name ::to-definitions/homepage
        :type :string}
 
       ;

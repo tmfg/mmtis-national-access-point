@@ -1,5 +1,5 @@
-(ns ote.domain.liikkumispalvelu
-  "Liikkumispalvelun tietojen määritys"
+(ns ote.db.transport-service
+  "Database configurations for Transport Services"
   (:require [clojure.spec.alpha :as s]
             #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
             [specql.rel :as rel]
@@ -26,7 +26,6 @@
   ["brokerage_service_type" ::brokerage_service_type]
 
   ;; UDT tyypit
-  ["address" ::address]
   ["localized_text" ::localized_text]
   ["service_link" ::service_link]
   ["service_hours" ::service_hours]
@@ -42,7 +41,6 @@
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
 
   ;; Tables
-  ["transport-operator" ::transport-operator]
   ["transport-service" ::transport-service
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}])
 

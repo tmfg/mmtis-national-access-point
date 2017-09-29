@@ -4,7 +4,8 @@
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as service]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as t]
+            [ote.db.transport-service :as transport-service]
+            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
 (defn passenger-transportation-info [e! status]
@@ -13,7 +14,7 @@
     [:div
      [:h3 "Vaihe 2: Täydennä henkilökuljetukseen liittyvät tiedot."]]
     [form/form
-     {:name->label (tr-key [:olennaiset-tiedot :otsikot])
+     {:name->label (tr-key [:field-labels])
       :update! #(e! (service/->EditTransportService %))
       :name #(tr [:olennaiset-tiedot :otsikot %])
       :footer-fn (fn [data]
@@ -22,37 +23,58 @@
                     "Tallenna"])}
 
      [{
-       :name    ::t/luggage-restrictions
+       :name    ::transport-service/luggage-restrictions
        :type  :localized-text
        :rows   5}
-      
-      {
-       :name ::t/url
-       :type :string
-       :read (comp ::t/url ::t/real-time-information)
-       :write (fn [data url]
-                (assoc-in data [::t/real-time-information ::t/url] url))}
-      {
-       :name ::t/description
-       :type  :localized-text
-       :rows   3
-       :read (comp ::t/description ::t/real-time-information)
-       :write (fn [data desc]
-                (assoc-in data [::t/real-time-information ::t/description] desc))}
 
-      {
-       :name ::t/url
-       :type :string
-       :read (comp ::t/url ::t/booking-service)
-       :write (fn [data url]
-                (assoc-in data [::t/booking-service ::t/url] url))}
-      {
-       :name ::t/description
+
+     #_ {
+       :label "Alue"
+       :name ::transport-service/description
        :type  :localized-text
        :rows   3
-       :read (comp ::t/description ::t/booking-service)
+       :read (comp ::transport-service/description ::transport-service/main-operation-area)
        :write (fn [data desc]
-                (assoc-in data [::t/booking-service ::t/description] desc))}
+                (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionsdescription] desc))}
+
+      #_ {
+       :label "Lokaatio"
+       :name ::transport-service/location
+       :type  :string
+       :read (comp ::transport-service/location ::ts-definitionsmain-operation-area)
+       :write (fn [data location]
+                (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionslocation] location))}
+
+
+      (form/group "Real time information"
+      {
+       :name ::transport-service/url
+       :type :string
+       :read (comp ::transport-service/url ::transport-service/real-time-information)
+       :write (fn [data url]
+                (assoc-in data [::transport-service/real-time-information ::transport-service/url] url))}
+      {
+       :name ::transport-service/description
+       :type  :localized-text
+       :rows   3
+       :read (comp ::transport-service/description ::transport-service/real-time-information)
+       :write (fn [data desc]
+                (assoc-in data [::transport-service/real-time-information ::transport-service/description] desc))})
+
+      (form/group "Varauspalvelun tiedot"
+      {
+       :name ::transport-service/url
+       :type :string
+       :read (comp ::transport-service/url ::transport-service/booking-service)
+       :write (fn [data url]
+                (assoc-in data [::transport-service/booking-service ::transport-service/url] url))}
+      {
+       :name ::transport-service/description
+       :type  :localized-text
+       :rows   3
+       :read (comp ::transport-service/description ::transport-service/booking-service)
+       :write (fn [data desc]
+                (assoc-in data [::transport-service/booking-service ::transport-service/description] desc))})
       ]
 
      status]

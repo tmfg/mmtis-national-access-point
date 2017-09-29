@@ -34,7 +34,7 @@ CREATE TYPE service_hours AS (
 
 CREATE TYPE transport_provider_type AS ENUM (
   'terminal', -- Ports, stations and terminals
-  'passenger-tranportation', -- passenger transportation services
+  'passenger-transportation', -- passenger transportation services
   'rentals', -- Renting and community use
   'parking', -- Parking services
   'brokerage' -- Brokerage services
