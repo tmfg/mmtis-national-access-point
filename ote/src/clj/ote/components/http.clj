@@ -57,6 +57,6 @@
            (str out))})
 
 (defn transit-request
-  "Parse input stream request to clojure data"
-  [data]
-  (transit/read (transit/reader data :json)))
+  "Parse HTTP POST body as Transit data."
+  [in]
+  (transit/read (transit/reader in :json)))

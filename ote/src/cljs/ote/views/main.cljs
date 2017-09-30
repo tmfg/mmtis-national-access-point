@@ -10,18 +10,31 @@
             [ote.views.valituspalvelut :as valityspalvelut]
             [ote.views.passenger_transportation :as pt]
             [ote.localization :as localization]
-            [ote.views.kuljetus :as kuljetus]))
+            [ote.views.kuljetus :as kuljetus]
+            [ote.views.place-search :as place-search]
+            ))
 
 
 (defn ote-application
   "OTE application main view"
   [e! app]
+
   [ui/mui-theme-provider
    {:mui-theme (get-mui-theme {:palette {:text-color (color :green600)}})}
    [:div.ote-sovellus.container
     [ui/app-bar {:title "OTE"}]
+<<<<<<< HEAD
+
+
+    [place-search/place-search e! (:place-search app)]
+
+
+    #_[ui/tabs
+     [ui/tab {:label "Olennaiset tiedot" :value "a"}
+=======
     [ui/tabs {:value (:page app)}
      [ui/tab {:label "1. Tuottajan tiedot" :value :operator}
+>>>>>>> 54603ee5d9933187ad3949d4dc36ea3fd15bed9d
       [ui/paper {:class "paper-siirto"}
         [ot/olennaiset-tiedot e! (:transport-operator app)]]]
 

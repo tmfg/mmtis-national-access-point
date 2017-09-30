@@ -2,27 +2,30 @@
   yum: name={{item}} state=installed
   with_items:
     - java-1.8.0-openjdk
-    - git-core
-
+    - git
+    - curl
+    - lsof
+    - initscripts
+    - wget
 
 - name: Create SOLR distribution download directory
   file: path=/opt/solr-download state=directory owner=napote group=napote
 
 - name: Download SOLR distribution
   get_url:
-    url: http://apache.org/dist/lucene/solr/7.0.0/solr-7.0.0.tgz
-    dest: /opt/solr-download/solr-7.0.0.tgz
+    url: http://archive.apache.org/dist/lucene/solr/6.2.0/solr-6.2.0.tgz
+    dest: /opt/solr-download/solr-6.2.0.tgz
 
 - name: Unpack SOLR distribution
   unarchive:
     remote_src: yes
-    src: /opt/solr-download/solr-7.0.0.tgz
+    src: /opt/solr-download/solr-6.2.0.tgz
     dest: /opt/solr-download
 
 - name: Run SOLR installer
-  shell: sh /opt/solr-download/solr-7.0.0/bin/install_solr_service.sh /opt/solr-download/solr-7.0.0.tgz
+  shell: sh /opt/solr-download/solr-6.2.0/bin/install_solr_service.sh /opt/solr-download/solr-6.2.0.tgz
   args:
-    creates: /opt/solr-7.0.0
+    creates: /opt/solr-6.2.0
 
 - name: Download CKAN distribution to get schema
   git:
@@ -34,8 +37,35 @@
 - name: Stop SOLR
   service: name=solr state=stopped
 
-- name: Copy CKAN schema to SOLR
-  shell: cp /opt/ckan-download/ckan/config/solr/schema.xml /opt/solr/server/solr/configsets/_default/conf/managed-schema
+- name: Make directories
+  file: path=/var/solr/data/ckan/{{item}} state=directory
+  with_items:
+    - conf
+    - data
+
+- name: Create solrconfig.ml from template
+  template: src=templates/solrconfig.xml.j2 dest=/var/solr/data/ckan/conf/solrconfig.xml
+
+- name: Copy other config files
+  shell: cp /opt/solr-download/solr-6.2.0/server/solr/configsets/{{item}} /var/solr/data/ckan/conf/
+  with_items:
+    - basic_configs/conf/currency.xml
+    - basic_configs/conf/synonyms.txt
+    - basic_configs/conf/stopwords.txt
+    - basic_configs/conf/protwords.txt
+    - data_driven_schema_configs/conf/elevate.xml
+
+- name: Copy CKAN schema
+  shell: cp /opt/ckan-download/ckan/config/solr/schema.xml /var/solr/data/ckan/conf/
+
+- name: Create core.properties
+  template: src=templates/core.properties.j2 dest=/var/solr/data/ckan/core.properties
+
+- name: Give permissions to solr user
+  shell: chown -R solr {{item}}
+  with_items:
+    - /opt/solr/
+    - /var/solr
 
 - name: Start SOLR
-  service: name=solr state=started
+  service: name=solr state=restarted

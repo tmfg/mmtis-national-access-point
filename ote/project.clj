@@ -34,14 +34,28 @@
                  [cljsjs/react-dom "15.6.1-1"]
                  [cljs-react-material-ui "0.2.48"]
                  [figwheel "0.5.13"]
+                 [cljsjs/react-leaflet "1.6.5-0"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
 
+                 ;; HTML/XML generation from Clojure data
+                 [hiccup "1.0.5"]
+                 ;; XML zippers
+                 [org.clojure/data.zip "0.1.2"]
+
+                 ;; GeoTools
+                 [org.geotools/gt-shapefile "16.1"]
+                 [org.geotools/gt-process-raster "16.1"]
+                 [org.geotools/gt-epsg-wkt "16.1"]
+                 [org.geotools/gt-geometry "16.1"]
+                 [org.geotools/gt-xml "16.1"]
+                 [org.geotools/gt-geojson "16.1"]
 
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
 
+  :repositories [["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.13"]]
 
