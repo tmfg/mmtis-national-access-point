@@ -3,12 +3,24 @@
   (:require [ajax.core :as ajax :refer [GET POST]]))
 
 (defn get!
-  "Make a GET  request to the given URL.
+  "Make a GET request to the given URL.
   URL parameters can be given with the `:params` key.
   Callbacks for successfull and failure are provided with `:on-success` and `:on-failure`
   keys respectively"
   [url {:keys [params on-success on-failure response-format]}]
   (GET url {:params params
             :handler on-success
+            :error-handler on-failure
+            :response-format (or response-format :transit)}))
+
+(defn post!
+  "Make a POST request to the given URL.
+  URL parameters can be given with the `:body` key.
+  Callbacks for successfull and failure are provided with `:on-success` and `:on-failure`
+  keys respectively"
+  [url body {:keys [on-success on-failure response-format]}]
+  (POST url {:params body
+            :handler on-success
+            :format :transit
             :error-handler on-failure
             :response-format (or response-format :transit)}))

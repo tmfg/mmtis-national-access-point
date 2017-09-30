@@ -53,7 +53,18 @@
     :rows              rows
     :error-text        error}])
 
+(defmethod field :localized-text [{:keys [update! label name rows error]
+                                   :as   field} data]
+  [ui/text-field
+   {:floatingLabelText label
+    :hintText          (placeholder field data)
+    :on-change         #(update! [{:ote.domain.liikkumispalvelu/lang "FI" :ote.domain.liikkumispalvelu/text %2}])
+    :value             (get-in data [0 :text])
+    :multiLine         true
+    :rows              rows
+    :error-text        error}]
 
+  )
 
 
 (defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}

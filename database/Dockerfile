@@ -21,10 +21,14 @@ RUN service postgresql restart && \
     psql -c "ALTER USER napotetest WITH SUPERUSER;" -U postgres && \
     psql -c "CREATE USER napote;" -U postgres && \
     psql -c "ALTER USER napote WITH SUPERUSER;" -U postgres && \
+    psql -c "CREATE USER ckan WITH CREATEDB;" -U postgres && \
+    psql -c "ALTER USER ckan WITH SUPERUSER;" -U postgres && \
     psql -c "CREATE DATABASE napote OWNER napote;" -U postgres && \
     psql -c "CREATE DATABASE temp OWNER napotetest;" -U postgres && \
+    psql -c "CREATE DATABASE ckan OWNER ckan;" -U postgres && \
     psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO napotetest;" -U postgres && \
     psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO napote;" -U postgres  && \
+    psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ckan;" -U postgres && \
     psql -c "CREATE EXTENSION postgis" -U postgres napote && \
     psql -c "CREATE EXTENSION postgis_topology" -U postgres napote
 
@@ -40,5 +44,21 @@ RUN apt-get -y autoremove;
 RUN rm /tmp/pom.xml
 RUN rm -R /tmp/src
 
-# Start up command
-CMD service postgresql start && /bin/bash
+
+# Add VOLUMEs to allow backup of config, logs and databases
+VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
+
+
+## SetUp EntryPoint ##
+# COPY ./entrypoint.sh /
+
+# CHMOD
+# RUN chmod +x /entrypoint.sh
+
+
+# ENTRYPOINT ["./entrypoint.sh"]
+
+
+EXPOSE 5432
+
+CMD service postgresql start && tail -F /var/log/postgresql/postgresql-9.6-main.log
