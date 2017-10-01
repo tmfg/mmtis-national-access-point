@@ -1,5 +1,5 @@
 (defproject ote "0.1-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
 
                  ;; Komponenttikirjasto
@@ -54,6 +54,8 @@
 
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
+
+  :profiles {:uberjar {:aot :all}}
 
   :repositories [["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
   :plugins [[lein-cljsbuild "1.1.7"]
