@@ -79,9 +79,14 @@
                 :source-paths ["src/cljs" "src/cljc"]
                 :compiler {:optimizations :advanced
                            :output-to "resources/public/js/ote.js"
+                           :output-dir "resources/public/js/"
                            :source-map "resources/public/js/ote.js.map"}}]}
 
   :clean-targets ^{:protect false}
   ["resources/public/js/ote.js" "resources/public/js/out"]
 
+  :aliases {;; Alias for doing a full production build
+            "production" ["do" "clean," "deps," "compile,"
+                          "cljsbuild" "once" "prod,"
+                          "uberjar"]}
   :main ote.main)

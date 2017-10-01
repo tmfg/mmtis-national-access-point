@@ -22,8 +22,8 @@
 
    [form-fields/field {:type :string :label "Paikan nimi"
                         :update! #(e! (ps/->SetPlaceName %))}
-    (get-in app [:place-search :name])]
+    (get place-search :name)]
 
    [napit/tallenna {:on-click #(e! (ps/->SearchPlaces))} "Hae paikkoja"]
 
-   [debug/debug (:place-search app)]])
+   [debug/debug place-search]])
