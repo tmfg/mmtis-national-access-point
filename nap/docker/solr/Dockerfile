@@ -1,11 +1,6 @@
 # docker build -t solita/napote-solr:latest .
 # docker run -it -p8983:8983 solita/napote-solr
 
-# TODO: Still trying to figure out problems with creating a ckan core definition for solr
-#   I have attempted multiple approaches. It seems that one has to create a core manually after/before moving
-#   solrconfig.xml and schema.xml + other configs into correct path under /opt/solr/server/solr/$SOLR_CORE/conf/
-#   I am attempting to do this in solr/entrypoint.sh by calling /opt/solr/bin/solr create -p 8983 -c ckan
-
 FROM centos:7
 
 # Enviroment
@@ -27,7 +22,6 @@ RUN yum -y update && yum -y upgrade && yum -y install \
     git \
     curl \
     lsof \
-    initscripts \
     wget \
   && yum clean all
 
@@ -37,19 +31,19 @@ RUN groupadd -r -g $SOLR_GID $SOLR_GROUP && \
 # Clone ckan to access required ckan shemas.
 RUN git clone -b 'ckan-2.7.0' --single-branch --depth 1 "https://github.com/ckan/ckan.git" /tmp/ckan
 
-# RUN cp /tmp/ckan/ckan/config/solr/schema.xml /opt/solr/server/solr/configsets/_default/conf/managed-schema # Solr v7 path
-
 # Download and install SORL
 RUN curl -o /tmp/solr-$SOLR_VERSION.tgz http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 RUN cd /tmp && tar zxf solr-$SOLR_VERSION.tgz
 
-RUN bash /tmp/solr-$SOLR_VERSION/bin/install_solr_service.sh /tmp/solr-$SOLR_VERSION.tgz
+RUN mkdir -p /opt/solr/
+RUN mkdir -p /var/solr/
+RUN cp -R /tmp/solr-$SOLR_VERSION/* /opt/solr/
 
-# Create Directories
+# Create Core directories
 RUN mkdir -p /opt/solr/server/solr/$SOLR_CORE/conf
 RUN mkdir -p /opt/solr/server/solr/$SOLR_CORE/data
 
-# Copy config files
+## Copy config files
 COPY ./solrconfig.xml /
 
 RUN cp /solrconfig.xml \
@@ -69,13 +63,15 @@ RUN echo name=$SOLR_CORE > /opt/solr/server/solr/$SOLR_CORE/core.properties
 RUN cp -R /opt/solr/server/solr/* $SOLR_HOME
 
 # Giving ownership to Solr
-RUN chmod +x /etc/init.d/solr
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/solr/
 RUN chown -R $SOLR_USER:$SOLR_GROUP /var/solr/
 
 
+USER solr
+
 EXPOSE 8983
 
-USER solr
+VOLUME ["/opt/solr/"]
+VOLUME ["/var/solr/"]
 
 CMD /opt/solr/bin/solr start -f && tail -F /var/solr/logs/solr.log
