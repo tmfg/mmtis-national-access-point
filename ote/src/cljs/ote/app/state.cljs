@@ -15,7 +15,7 @@
                                                                                              :post-office "Oulu"}}
 
            ;; Currently selected / edited transport service
-           :transport-service {:price-class-open false ;; State of price class dialog (true = open)
+           :transport-service {:add-price-class false ;; State of price class adding list (true = open)
                                }
 
 

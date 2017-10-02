@@ -2,29 +2,37 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                 "Palveluntarjoajan nimi"
-  :ote.db.transport-operator/business-id          "Y-tunnus"
-  :ote.db.transport-operator/phone                "Puhelin (toimisto)"
-  :ote.db.transport-operator/gsm                  "Puhelin (GSM)"
-  :ote.db.transport-operator/email                "Sähköpostiosoite"
-  :ote.db.transport-operator/homepage             "WWW-osoite"
-  :ote.db.transport-operator/visiting-address     "Käyntiosoite"
-  :ote.db.transport-operator/billing-address      "Laskutusosoite"
+  :ote.db.transport-operator/name                     "Palveluntarjoajan nimi"
+  :ote.db.transport-operator/business-id              "Y-tunnus"
+  :ote.db.transport-operator/phone                    "Puhelin (toimisto)"
+  :ote.db.transport-operator/gsm                      "Puhelin (GSM)"
+  :ote.db.transport-operator/email                    "Sähköpostiosoite"
+  :ote.db.transport-operator/homepage                 "WWW-osoite"
+  :ote.db.transport-operator/visiting-address         "Käyntiosoite"
+  :ote.db.transport-operator/billing-address          "Laskutusosoite"
 
   ;; Transport service fields
-  :ote.db.transport-service/luggage-restrictions  "Matkatavaroita koskevat rajoitukset"
-  :ote.db.transport-service/url                   "Palvelun osoite"
-  :ote.db.transport-service/description           "Palvelun kuvaus"
-  :ote.db.transport-service/real-time-information "Reaaliaikapalvelun osoitetiedot"
-  :ote.db.transport-service/booking-service       "Varauspalvelun osoitetiedot"
-  :ote.db.transport-service/payment-methods       "Valitse maksutavat"
-  :ote.db.transport-service/additional-services   "Muut palvelut"
-  :ote.db.transport-service/accessibility-tool    "Esteettömyysvälineet"
+  :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+  :ote.db.transport-service/url                       "Palvelun osoite"
+  :ote.db.transport-service/description               "Palvelun kuvaus"
+  :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun osoitetiedot"
+  :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+  :ote.db.transport-service/payment-methods           "Valitse maksutavat"
+  :ote.db.transport-service/additional-services       "Muut palvelut"
+  :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+  :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
+  :ote.db.transport-service/price-class               "Hinnoittelu"
+
+  ;; Price Class fields
+  :ote.db.transport-service/name                      "Hintaryhmä"
+  :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+  :ote.db.transport-service/unit                      "Yksikkö"
+  :ote.db.transport-service/currency                  "Valuutta"
 
   ;; Common fields
-  :ote.db.common/street                           "Osoite"
-  :ote.db.common/post-office                      "Postitoimipaikka"
-  :ote.db.common/postal-code                      "Postinumero"}
+  :ote.db.common/street                               "Osoite"
+  :ote.db.common/post-office                          "Postitoimipaikka"
+  :ote.db.common/postal-code                          "Postinumero"}
 
  ;; Action buttons
  :buttons
@@ -66,5 +74,5 @@
    :umbrella         "Sateenvarjo"
    :buggy            "Buggy"
    :other            "Muu"}
+  }
  }
-}

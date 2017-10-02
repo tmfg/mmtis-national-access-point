@@ -1,16 +1,16 @@
 (ns ote.services.transport-service-services
   (:require [tuck.core :as t]))
 
-(defrecord OpenPriceClassDialog [])
-(defrecord ClosePriceClassDialog [])
+(defrecord AddPriceClassRow [])
+(defrecord RemovePriceClassRow [])
 
 (extend-protocol t/Event
 
-  OpenPriceClassDialog
+  AddPriceClassRow
   (process-event [_ app]
-    (assoc-in app [:transport-service :price-class-open] true))
+    (assoc-in app [:transport-service :add-price-class] true))
 
-  OpenPriceClassDialog
+  RemovePriceClassRow
   (process-event [_ app]
     (assoc-in app [:transport-service :price-class-open] false)))
 
