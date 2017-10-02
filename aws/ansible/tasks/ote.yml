@@ -1,0 +1,33 @@
+- name: Install required packages
+  yum: name={{item}} state=installed
+  with_items:
+    - java-1.8.0-openjdk
+
+- name: Create OTE app folder
+  file: path=/opt/ote state=directory owner=napote group=napote
+
+- name: Create OTE config
+  template: src=templates/ote/config.edn.j2 dest=/opt/ote/config.edn
+  tags: configuration
+
+- name: Write OTE startup script
+  template: src=templates/ote/ote.sh.j2 dest=/opt/ote/ote.sh mode=755
+  tags: configuration
+
+- name: Write OTE service
+  template: src=templates/centos7-service-template.j2 dest=/etc/systemd/system/ote.service mode=755
+  with_items:
+    - description: "OTE"
+      start_file: /opt/ote/ote.sh
+      user_name: napote
+      user_group: napote
+      workingdir: /opt/ote
+  tags: configuration
+
+- name: Upload OTE build
+  copy: src={{ote_build_artifact}} dest=/opt/ote/ote.jar owner=napote
+  tags: deploy
+
+- name: Restart OTE service
+  service: name=ote state=restarted
+  tags: configuration,deploy

@@ -16,6 +16,10 @@
 
 }
 */
+.leaflet-container {
+    height: 400px;
+    width: 100%;
+}
 
 .set-bottom {
     display : table-row;

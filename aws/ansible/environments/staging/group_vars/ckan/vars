@@ -1,0 +1,6 @@
+ckan_url: https://testi.finap.fi/
+db_url: "postgresql://{{vault_db_ckan_user}}:{{vault_db_ckan_password}}@{{vault_db_host}}/napote"
+beaker_session_secret: "{{vault_beaker_session_secret}}"
+solr_url: http://{{vault_solr_host}}:8983/solr/ckan
+redis_url: redis://{{vault_redis_host}}:6379/0
+storage_path: /var/lib/ckan
