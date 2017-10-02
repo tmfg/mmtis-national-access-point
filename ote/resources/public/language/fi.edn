@@ -17,6 +17,9 @@
   :ote.db.transport-service/description           "Palvelun kuvaus"
   :ote.db.transport-service/real-time-information "Reaaliaikapalvelun osoitetiedot"
   :ote.db.transport-service/booking-service       "Varauspalvelun osoitetiedot"
+  :ote.db.transport-service/payment-methods       "Valitse maksutavat"
+  :ote.db.transport-service/additional-services   "Muut palvelut"
+  :ote.db.transport-service/accessibility-tool    "Esteettömyysvälineet"
 
   ;; Common fields
   :ote.db.common/street                           "Osoite"
@@ -46,5 +49,22 @@
    :contactless-payment "Lähimaksu"
    :invoice             "Lasku"
    :other               "Muu"}
-  }
+
+  :ote.db.transport-service/additional-services
+  {:child-seat       "Lastenistuin"
+   :animal-transport "Eläinkuljetus"
+   :other            "Muu"}
+
+
+  :ote.db.transport-service/accessibility-tool
+  {:wheelchair       "Rullatuoli"
+   :walkingstick     "Kävelykeppi"
+   :audio-navigator  "Audio Navigator"
+   :visual-navigator "Visual Navigator"
+   :passenger-cart   "Passenger Cart"
+   :pushchair        "Pushchair"
+   :umbrella         "Sateenvarjo"
+   :buggy            "Buggy"
+   :other            "Muu"}
  }
+}

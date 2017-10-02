@@ -17,8 +17,12 @@
   "OTE application main view"
   [e! app]
   [ui/mui-theme-provider
-   {:mui-theme (get-mui-theme {:palette {:text-color (color :green600)}})}
-   [:div.ote-sovellus.container
+   {:mui-theme (get-mui-theme {:palette {:primary1-color (color :lightBlue300) ;; primary nav color - Also Focus color in text fields
+                                         :disabledColor (color :grey900) ;; Hint color in text fields
+                                         ;:canvas-color  (color :lightBlue50) ;; canvas color
+                                         :text-color (color :grey900) ;; Main text color
+                                         }})}
+   [:div.ote-sovellus.container-fluid
     [ui/app-bar {:title "OTE"}]
     [ui/tabs {:value (:page app)}
      [ui/tab {:label "1. Tuottajan tiedot" :value :operator}

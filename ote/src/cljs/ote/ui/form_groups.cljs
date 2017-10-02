@@ -32,7 +32,7 @@
   "Creates a form group for service url hat creates two form elements url and localized text area"
   [label service-url-field]
   (form/group label
-              {
+              {:class "set-bottom"
                :name ::transport-service/url
                :type :string
                :read (comp ::transport-service/url service-url-field)

@@ -60,7 +60,7 @@
    {:floatingLabelText label
     :hintText          (placeholder field data)
     :on-change         #(update! [{:ote.db.transport-service/lang "FI" :ote.db.transport-service/text %2}])
-    :value             (get-in data [0 :text])
+    :value             (get-in data [0 :ote.db.transport-service/text])
     :multiLine         true
     :rows              rows
     :error-text        error}]
