@@ -1,0 +1,8 @@
+---
+
+- name: Install OTE
+  hosts: ote
+  become: true
+  tasks:
+    - include: tasks/napote_group_and_user.yml
+    - include: tasks/ote.yml
