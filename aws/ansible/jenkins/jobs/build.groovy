@@ -6,12 +6,12 @@ job('OTE build from master') {
     scm('H/15 * * * *')
   }
   steps {
+
+    maven('flyway:migrate', 'database/pom.xml')
+
     leiningenBuilder {
       subdirPath('ote')
-      task('clean')
-      task('compile')
-      task('cljsbuild')
-      task('uberjar')
+      task('production')
     }
   }
   publishers {
