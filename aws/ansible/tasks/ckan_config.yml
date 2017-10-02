@@ -1,9 +1,9 @@
-- name: Create CKAN config directory
-  file:
-    path: /etc/ckan/default
-    state: directory
-    owner: napote
-    group: napote
+- name: Create CKAN config and storage directory
+  file: path={{item}} state=directory owner=napote group=napote
+  with_items:
+    - /etc/ckan/default
+    - /var/lib/ckan/storage
+  tags: configuration
 
 - name: Write CKAN config from template
   template: src=../templates/ckan.ini.j2 dest=/etc/ckan/default/ckan.ini
