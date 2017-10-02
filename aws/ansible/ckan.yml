@@ -7,3 +7,4 @@
     - include: tasks/napote_group_and_user.yml
     - include: tasks/ckan_packages.yml
     - include: tasks/ckan_config.yml
+    - include: tasks/nginx.yml

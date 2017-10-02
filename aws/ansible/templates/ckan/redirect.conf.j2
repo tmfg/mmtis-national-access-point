@@ -1,0 +1,4 @@
+server {
+  listen 8080;
+  rewrite ^/(.*)$ {{ckan_url}}$1 permanent;
+}
