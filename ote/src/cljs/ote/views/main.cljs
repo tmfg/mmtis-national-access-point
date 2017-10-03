@@ -29,7 +29,7 @@
                 :disabledColor (color :grey900)
 
                 ;; canvas color
-                :canvas-color  (color :lightBlue50)
+                ;;:canvas-color  (color :lightBlue50)
 
                 ;; Main text color
                 :text-color (color :grey900)}})}
