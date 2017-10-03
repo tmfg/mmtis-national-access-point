@@ -99,7 +99,7 @@
 
 (defn olennaiset-tiedot [e! status]
   [:div.row
-   [:div {:class "col-lg-4"}
+   [:div 
     [:div
      [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
     [form/form
