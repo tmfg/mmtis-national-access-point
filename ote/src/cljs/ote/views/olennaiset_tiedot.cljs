@@ -110,23 +110,40 @@
                                    :disabled (form/disable-save? data)}
                    "Tallenna"])}
 
-    [
-     (form/group {:label "Perustiedot"
-                  :columns 1}
-                 {:name ::to-definitions/name
-                  :type :string
-                  :validate [[:non-empty "Anna nimi"]]}
+    [(form/group
+      {:label "Perustiedot"
+       :columns 1}
+      {:name ::to-definitions/name
+       :type :string
+       :validate [[:non-empty "Anna nimi"]]}
 
-                 #_{:name :to-definitions/service-type
-                    :type :selection
-                    :show-option (tr-key [::to-definitions/service-type])
-                    :options to-definitions/transport-service-types }
+      {:name ::to-definitions/business-id
+       :type :string
+       :validate [[:business-id]]}
 
-                 {:name ::to-definitions/business-id
-                  :type :string
-                  :validate [[:business-id]]})
+      {:name ::common/street
+       :type :string
+       :read (comp ::common/street ::to-definitions/visiting-address)
+       :write (fn [data street]
+                (assoc-in data [::to-definitions/visiting-address ::common/street] street))}
 
-     (form-groups/address (tr [:field-labels ::to-definitions/visiting-address]) ::to-definitions/visiting-address)
+      {:name ::common/postal-code
+       :type :string
+       :read (comp ::common/postal_code ::to-definitions/visiting-address)
+       :write (fn [data postal-code]
+                (assoc-in data [::to-definitions/visiting-address ::common/postal-code] postal-code))}
+
+      {:name ::common/post-office
+       :type :string
+       :read (comp ::common/postal_office ::to-definitions/visiting-address)
+       :write (fn [data post-office]
+                (assoc-in data [::to-definitions/visiting-address ::common/post-office] post-office))}
+
+      {:name ::to-definitions/homepage
+       :type :string}
+      )
+
+     #_(form-groups/address (tr [:field-labels ::to-definitions/visiting-address]) )
      (form-groups/address (tr [:field-labels ::to-definitions/billing-address]) ::to-definitions/billing-address)
 
      (form/group {:label "Yhteystiedot"
@@ -140,8 +157,7 @@
                  {:name ::to-definitions/email
                   :type :string}
 
-                 {:name ::to-definitions/homepage
-                  :type :string})
+                 )
 
                                         ;
                                         ;(satamapalvelun-lisatiedot status)
