@@ -25,28 +25,13 @@
                                          ;:canvas-color  (color :lightBlue50) ;; canvas color
                                          :text-color (color :grey900) ;; Main text color
                                          }})}
-   [:div.ote-sovellus.container-fluid
+   [:div.ote-sovellus
     [ui/app-bar {:title "OTE"}]
+    [:div.container-fluid
+     (when (= :operator (:page app))
+               [ot/olennaiset-tiedot e! (:transport-operator app)])
 
-    [ui/tabs {:value (:page app)}
-     [ui/tab {:label "1. Tuottajan tiedot" :value :operator}
-
-      [ui/paper {:class "paper-siirto"}
-        [ot/olennaiset-tiedot e! (:transport-operator app)]]]
-
-     [ui/tab {:label "2. Kuljetus" :value :passenger-transportation}
-      [ui/paper {:class "paper-siirto"}
-       [pt/passenger-transportation-info e! (:transport-service app)]]]
-
-     [ui/tab {:label "Pysäköintialueet" :value :parking}
-      [ui/paper {:class "paper-siirto"}
-        [pysakointialueet/pysakointialueet e! (:data app)]]]
-     [ui/tab {:label "Liikennevälineet" :value "c"}
-      [ui/paper {:class "paper-siirto"}
-       [liikennevalineet/liikennevalineet e! (:data app)]]]
-     [ui/tab {:label "Välityspalvelut" :value "d"}
-      [ui/paper {:class "paper-siirto"}
-       [valityspalvelut/valityspalvelu e! (:data app)]]]
-     [ui/tab {:label "Reitit" :value "d"}
-      [ui/paper {:class "paper-siirto"}
-       [kuljetus/reitti e! (:data app)]]]]]])
+     (when (= :passenger-transportation (:page app))
+        [pt/passenger-transportation-info e! (:transport-service app)]
+       )
+     ]]])
