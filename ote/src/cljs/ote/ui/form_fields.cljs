@@ -33,12 +33,16 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                   focus on-focus form? error]
-                            :as   field} data]
+                                  focus on-focus form? error table?]
+                           :as   field} data]
   [ui/text-field
-   {:floatingLabelText label
+   {:floatingLabelText (when-not table?  label)
     :hintText          (placeholder field data)
-    :on-change         #(update! %2)
+    :on-change         #(let [v %2]
+                          (if regex
+                            (when (re-matches regex v)
+                              (update! v))
+                            (update! v)))
     :value             (or data "")
     :error-text        error}])
 
@@ -105,32 +109,59 @@
 
 (def phone-regex #"\+?\d+")
 
-(defmethod field :phone [field data]
-  [field (assoc field
+(defmethod field :phone [opts data]
+  [field (assoc opts
                 :type :string
                 :regex phone-regex)])
+
+(def number-regex #"\d*([\.,]\d*)?")
+
+(defmethod field :number [_  data]
+  ;; Number field contains internal state that has the current
+  ;; typed in text (which may be an incompletely typed number).
+  ;;
+  ;; The value updated to the app model is always a parsed number.
+  (let [txt (r/atom (if data (.toFixed data 2) ""))]
+    (fn [{:keys [update!] :as opts} data]
+      [field (assoc opts
+                    :type :string
+                    :parse js/parseFloat
+                    :regex number-regex
+                    :update! #(do
+                                (reset! txt %)
+                                (update!
+                                   (if (str/blank? %)
+                                     nil
+                                     (-> %
+                                         (str/replace #"," ".")
+                                         (js/parseFloat %))))))
+       @txt])))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields] :as opts} data]
-  [ui/table
-   [ui/table-header
+(defmethod field :table [{:keys [table-fields update!] :as opts} data]
+  [ui/table {:selectable false}
+   [ui/table-header {:adjust-for-checkbox false
+                     :display-select-all false}
     [ui/table-row
      (doall
       (for [{:keys [name label] :as tf} table-fields]
         ^{:key name}
         [ui/table-header-column label]))]]
 
-   [ui/table-body
+   [ui/table-body {:display-row-checkbox false}
     (map-indexed
      (fn [i row]
        ^{:key i}
        [ui/table-row
         (doall
-         (for [tf table-fields]
-           ^{:key (:name tf)}
+         (for [{:keys [name read write] :as tf} table-fields]
+           ^{:key name}
            [ui/table-row-column
-            [field tf row]]))])
+            [field (assoc tf
+                          :table? true
+                          :update! #(update! (assoc-in data [i name] %)))
+             ((or read name) row)]]))])
      data)]])
