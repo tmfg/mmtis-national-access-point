@@ -26,12 +26,18 @@ set_environment () {
 }
 
 write_config () {
+  # http://docs.ckan.org/en/latest/maintaining/configuration.html
   # Note that this only gets called if there is no config, see below!
   ckan-paster make-config --no-interactive ckan "$CONFIG"
 
-  # The variables above will be used by CKAN, but
-  # in case want to use the config from ckan.ini use this
-  #ckan-paster --plugin=ckan config-tool "$CONFIG" -e \
+  # The environment variables above will be used by CKAN, but
+  # you can create a custon ckan.ini like this also:
+  ckan-paster --plugin=ckan config-tool "$CONFIG" -e \
+    "ckan.plugins = stats text_view image_view recline_view napote_theme" \
+    "ckan.locale_default = fi" \
+    "ckan.locale_order = fi en sv" \
+    "ckan.locales_offered = fi en sv" \
+    "ckan.locales_filtered_out = en_GB"
   #    "sqlalchemy.url = ${CKAN_SQLALCHEMY_URL}" \
   #    "solr_url = ${CKAN_SOLR_URL}" \
   #    "ckan.redis.url = ${CKAN_REDIS_URL}" \

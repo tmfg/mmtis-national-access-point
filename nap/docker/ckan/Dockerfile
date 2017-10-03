@@ -44,6 +44,11 @@ RUN ckan-pip install setuptools==20.4
 ## Install latest stable CKAN in $CKAN_HOME/src/ckan directory ##
 RUN ckan-pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.7.0#egg=ckan'
 
+# Install ckan plugins
+ADD ./ckan-plugins $CKAN_HOME/src/
+RUN ckan-pip install -e $CKAN_HOME/src/ckanext-napote_theme
+
+# Copy config files
 COPY ./who.ini /
 RUN ln -s /who.ini $CKAN_CONFIG/who.ini
 

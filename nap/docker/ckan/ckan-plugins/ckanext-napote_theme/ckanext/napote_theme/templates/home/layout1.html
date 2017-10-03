@@ -1,0 +1,13 @@
+{% ckan_extends %}
+
+{% block featured_group %}
+
+<p>Custom wrappäys alkaa --></p>
+
+{# Insert the contents of the original featured_group block: #}
+{{ super() }}
+
+<p><-- Custom wrappäys loppuu</p>
+
+
+{% endblock %}

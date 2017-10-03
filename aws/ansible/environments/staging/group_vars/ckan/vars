@@ -4,3 +4,7 @@ beaker_session_secret: "{{vault_beaker_session_secret}}"
 solr_url: http://{{vault_solr_host}}:8983/solr/ckan
 redis_url: redis://{{vault_redis_host}}:6379/0
 storage_path: /var/lib/ckan
+email_from: noreply@testi.finap.fi
+email_smtp_server: email-smtp.eu-west-1.amazonaws.com
+email_user: "{{vault_email_user}}"
+email_password: "{{vault_email_password}}"
