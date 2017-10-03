@@ -172,11 +172,11 @@ ckan.hide_activity_from_users = %(ckan.site_id)s
 
 #email_to = errors@example.com
 #error_email_from = ckan-errors@example.com
-#smtp.server = localhost
-#smtp.starttls = False
-#smtp.user = username@example.com
-#smtp.password = your_password
-#smtp.mail_from =
+smtp.server = {{email_smtp_server}}
+smtp.starttls = True
+smtp.user = {{email_user}}
+smtp.password = {{email_password}}
+smtp.mail_from = {{email_from}}
 
 
 ## Logging configuration

@@ -1,0 +1,11 @@
+- name: Install nginx
+  yum: name=nginx state=installed
+  tags: nginx
+
+- name: Configure SSL redirecting listener
+  template: src=templates/ckan/redirect.conf.j2 dest=/etc/nginx/conf.d/redirect.conf
+  tags: nginx
+
+- name: Restart nginx
+  service: name=nginx state=restarted
+  tags: nginx

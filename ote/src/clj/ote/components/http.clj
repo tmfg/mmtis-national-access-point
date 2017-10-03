@@ -3,26 +3,32 @@
   (:require [org.httpkit.server :as server]
             [com.stuartsierra.component :as component]
             [compojure.route :as route]
-            [cognitect.transit :as transit]))
+            [cognitect.transit :as transit]
+            [ote.nap.cookie :as nap-cookie]))
 
 (defn- serve-request [handlers req]
   ((apply some-fn handlers) req))
 
-(defrecord HttpServer [http-kit-config handlers]
+(defrecord HttpServer [config handlers]
   component/Lifecycle
   (start [this]
-    (let [resources (route/resources "/")]
+    (let [resources (route/resources "/")
+          handler #(serve-request @handlers %)
+          handler (if-let [auth-tkt (:auth-tkt config)]
+                    (nap-cookie/wrap-check-cookie auth-tkt handler)
+                    handler)]
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (serve-request (conj @handlers resources) req))
-              http-kit-config))))
+                (or (resources req)
+                    (handler req)))
+              config))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
 
 (defn http-server
-  "Create an HTTP server component with the given http-kit `config`."
+  "Create an HTTP server component with the given `config`."
   [config]
   (->HttpServer config (atom [])))
 
@@ -51,6 +57,6 @@
            (str out))})
 
 (defn transit-request
-  "Parse input stream request to clojure data"
-  [data]
-  (transit/read (transit/reader data :json)))
+  "Parse HTTP POST body as Transit data."
+  [in]
+  (transit/read (transit/reader in :json)))

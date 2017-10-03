@@ -12,10 +12,18 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
+(defn get-my-list [X]
+  (conj [] (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+        ;(form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+    #_ (repeat X (.log js/console " jee ")
+            (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class))
+              )
+  )
+
 (defn passenger-transportation-info [e! status]
   (.log js/console " Avataanko dialog " (boolean (get status :price-class-open)))
   [:div.row
-   [:div {:class "col-lg-4"}
+   [:div {:class "col-lg-12"}
     [:div
      [:h3 "Vaihe 2: Täydennä henkilökuljetukseen liittyvät tiedot."]]
     [form/form
@@ -75,37 +83,47 @@
        :show-option (tr-key [:enums ::transport-service/accessibility-tool])
        :options     transport-service/accessibility-tool}
 
+      {
+       :name ::transport-service/accessibility-description
+       :type :localized-text
+       :rows 5
+       }
+
+
       ]
 
      status]
+    [:div.row
+     [:h3 "Lisää uusi hintatieto"]
+     (reagent/as-element [ui/raised-button
+                          {:label    "Lisää rivi"
+                           ;:icon     (ic/social-group)
+                           :on-click #(e! (transport-service-services/->AddPriceClassRow))
+                           }]
+                         )
+     (.log js/console " lisätäänkö  " (:transport-service :add-price-class status))
+     (when (:transport-service :add-price-class status)
+       (.log js/console " lisää!!  ")
+
+       [form/form
+        {:name->label (tr-key [:field-labels])
+         :update!     #(e! (service/->EditTransportService %))
+         :name        #(tr [:olennaiset-tiedot :otsikot %])
+         :footer-fn   (fn [data]
+                        [napit/tallenna {:on-click #(e! (service/->SavePassengerTransportData))
+                                         :disabled (form/disable-save? data)}
+                         "Tallenna"])}
+
+        ;(get-my-list 5)
+        [
+         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+         ]
+        status
+        ]
+       )
+     ]
 
     [debug/debug status]
-    ]
-   [:div {:class "col-lg-4"}
-    [:div
-     [ui/raised-button {:label    "Lisää hinnoittelutiedot"
-                        :on-click #(e! (transport-service-services/->OpenPriceClassDialog))
-                        }]
-     [ui/dialog
-      {:title   "Joku title"
-       :modal   "false"
-       :open    (boolean (get status :price-class-open))
-       :actions [(reagent/as-element [ui/raised-button
-                                      {:label    "Cancel"
-                                       ;:icon     (ic/social-group)
-                                       :on-click #(e! (transport-service-services/->ClosePriceClassDialog))
-                                       }]
-                                     )
-                 (reagent/as-element [ui/raised-button
-                                      {:label    "OK"
-                                       ;:icon     (ic/social-group)
-                                       :on-click #(e! (transport-service-services/->ClosePriceClassDialog))
-                                       }]
-                                     )
-                 ]
-
-       }
-      ]
-     ]
     ]
    ])

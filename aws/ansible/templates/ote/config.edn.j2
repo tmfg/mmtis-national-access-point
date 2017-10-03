@@ -1,0 +1,11 @@
+{:db {:url "jdbc:postgresql://{{db_url}}:5432/napote"
+      :username "{{db_username}}"
+      :password "{{db_password}}"}
+ :http {:port 3000
+        :auth-tkt {:shared-secret "{{auth_shared_secret}}"
+                   :max-age-in-seconds 36000
+                   :digest-algorithm "MD5"}}
+ :places {:finnish-municipalities
+          {:type :shapefile
+           :name-field "NAMEFIN"
+           :url "https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish-municipalities/SuomenKuntajako_2017_10k.shp"}}}

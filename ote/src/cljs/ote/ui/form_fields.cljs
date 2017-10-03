@@ -39,7 +39,7 @@
    {:floatingLabelText label
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
-    :value             data
+    :value             (or data "")
     :error-text        error}])
 
 
@@ -49,7 +49,7 @@
    {:floatingLabelText label
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
-    :value             data
+    :value             (or data "")
     :multiLine         true
     :rows              rows
     :error-text        error}])
