@@ -70,4 +70,6 @@
   :clean-targets ^{:protect false}
   ["resources/public/js/ote.js" "resources/public/js/out"]
 
+  :repl-options {:init-ns ote.main
+                 :init (ote.main/start)}
   :main ote.main)
