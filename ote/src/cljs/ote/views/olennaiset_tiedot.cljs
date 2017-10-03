@@ -98,52 +98,56 @@
       :rows   5})))
 
 (defn olennaiset-tiedot [e! status]
-  [:div.row
-   [:div 
-    [:div
-     [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
-    [form/form
-     {:name->label (tr-key [:field-labels])
-      :update! #(e! (service/->EditTransportOperator %))
-      :name #(tr [:olennaiset-tiedot :otsikot %])
-      :footer-fn (fn [data]
-                   [napit/tallenna {:on-click #(e! (service/->SaveTransportOperator))
-                                    :disabled (form/disable-save? data)}
-                    "Tallenna"])}
+  [:span
+   [:div
+    [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
+   [form/form
+    {:name->label (tr-key [:field-labels])
+     :update! #(e! (service/->EditTransportOperator %))
+     :name #(tr [:olennaiset-tiedot :otsikot %])
+     :footer-fn (fn [data]
+                  [napit/tallenna {:on-click #(e! (service/->SaveTransportOperator))
+                                   :disabled (form/disable-save? data)}
+                   "Tallenna"])}
 
-     [{:name ::to-definitions/name
-       :type :string
-       :validate [[:non-empty "Anna nimi"]]}
+    [
+     (form/group {:label "Perustiedot"
+                  :columns 1}
+                 {:name ::to-definitions/name
+                  :type :string
+                  :validate [[:non-empty "Anna nimi"]]}
 
-      #_{:name :to-definitions/service-type
-       :type :selection
-       :show-option (tr-key [::to-definitions/service-type])
-       :options to-definitions/transport-service-types }
+                 #_{:name :to-definitions/service-type
+                    :type :selection
+                    :show-option (tr-key [::to-definitions/service-type])
+                    :options to-definitions/transport-service-types }
 
-      {:name ::to-definitions/business-id
-       :type :string
-       :validate [[:business-id]]}
+                 {:name ::to-definitions/business-id
+                  :type :string
+                  :validate [[:business-id]]})
 
-      (form-groups/address (tr [:field-labels ::to-definitions/visiting-address]) ::to-definitions/visiting-address)
-      (form-groups/address (tr [:field-labels ::to-definitions/billing-address]) ::to-definitions/billing-address)
+     (form-groups/address (tr [:field-labels ::to-definitions/visiting-address]) ::to-definitions/visiting-address)
+     (form-groups/address (tr [:field-labels ::to-definitions/billing-address]) ::to-definitions/billing-address)
 
-      {:name ::to-definitions/phone
-       :type :string}
+     (form/group {:label "Yhteystiedot"
+                  :columns 1}
+                 {:name ::to-definitions/phone
+                  :type :string}
 
-      {:name ::to-definitions/gsm
-       :type :string}
+                 {:name ::to-definitions/gsm
+                  :type :string}
 
-      {:name ::to-definitions/email
-       :type :string}
+                 {:name ::to-definitions/email
+                  :type :string}
 
-      {:name ::to-definitions/homepage
-       :type :string}
+                 {:name ::to-definitions/homepage
+                  :type :string})
 
-      ;
-      ;(satamapalvelun-lisatiedot status)
-      ;(vuokrauspalveluiden-lisatiedot status)
-      ]
+                                        ;
+                                        ;(satamapalvelun-lisatiedot status)
+                                        ;(vuokrauspalveluiden-lisatiedot status)
+     ]
 
-     status]
+    status]
 
-    [debug/debug status]]])
+   [debug/debug status]])

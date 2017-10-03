@@ -30,7 +30,6 @@
     [:div.container-fluid
      (when (= :operator (:page app))
                [ot/olennaiset-tiedot e! (:transport-operator app)])
-
      (when (= :passenger-transportation (:page app))
         [pt/passenger-transportation-info e! (:transport-service app)]
        )
