@@ -8,6 +8,9 @@
 
 version: "3"
 
+networks:
+  napote:
+
 services:
   napote-ckan:
     container_name: napote-ckan
@@ -17,6 +20,8 @@ services:
       - CKAN_SITE_URL=${CKAN_SITE_URL}
       - CKAN_PORT=${CKAN_PORT}
     #image: solita/napote-ckan:latest
+    networks:
+      - napote
     links:
       - napotedb
       - napote-solr
@@ -35,6 +40,8 @@ services:
     container_name: napotedb
     build: ../../database/
     #image: solita/napotedb:latest
+    networks:
+      - napote
     ports:
       - "5432:5432"
     healthcheck:
@@ -47,6 +54,8 @@ services:
     container_name: napote-solr
     build: ./solr
     #image: solita/napote-solr:latest
+    networks:
+      - napote
     ports:
       - "8983:8983"
 
@@ -54,5 +63,7 @@ services:
     container_name: napote-redis
     build: ./redis
     #image: solita/napote-redis:latest
+    networks:
+      - napote
     ports:
       - "6379:6379"
