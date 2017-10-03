@@ -63,9 +63,7 @@
     :value             (get-in data [0 :ote.db.transport-service/text])
     :multiLine         true
     :rows              rows
-    :error-text        error}]
-
-  )
+    :error-text        error}])
 
 
 (defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}
@@ -98,12 +96,10 @@
      (map-indexed
        (fn [i option]
          ^{:key i}
-         [ui/menu-item {
-                        :value i
+         [ui/menu-item {:value i
                         :primary-text (show-option option)
                         :inset-children true
-                        :checked (boolean (selected-set option))
-                        }])
+                        :checked (boolean (selected-set option))}])
        options)]))
 
 
@@ -116,3 +112,25 @@
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
+
+
+(defmethod field :table [{:keys [table-fields] :as opts} data]
+  [ui/table
+   [ui/table-header
+    [ui/table-row
+     (doall
+      (for [{:keys [name label] :as tf} table-fields]
+        ^{:key name}
+        [ui/table-header-column label]))]]
+
+   [ui/table-body
+    (map-indexed
+     (fn [i row]
+       ^{:key i}
+       [ui/table-row
+        (doall
+         (for [tf table-fields]
+           ^{:key (:name tf)}
+           [ui/table-row-column
+            [field tf row]]))])
+     data)]])
