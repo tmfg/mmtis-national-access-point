@@ -12,6 +12,14 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
+(defn get-my-list [X]
+  (conj [] (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+        ;(form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+    #_ (repeat X (.log js/console " jee ")
+            (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class))
+              )
+  )
+
 (defn passenger-transportation-info [e! status]
   (.log js/console " Avataanko dialog " (boolean (get status :price-class-open)))
   [:div.row
@@ -81,6 +89,7 @@
        :rows 5
        }
 
+
       ]
 
      status]
@@ -105,7 +114,10 @@
                                          :disabled (form/disable-save? data)}
                          "Tallenna"])}
 
-        [(form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+        ;(get-my-list 5)
+        [
+         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
          ]
         status
         ]

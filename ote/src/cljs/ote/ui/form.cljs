@@ -194,7 +194,6 @@
    data update-fn editable? update-form
    modified? errors warnings notices]
   ;;[:pre (pr-str s) " => " (pr-str data)]
-  (.log js/console "field-ui columns " columns " col-class " col-class " name " name " s " s)
   [:div.form-group {:class (str (or
                                  ;; allow schema to override with namespaced key
                                  (::col-class s)

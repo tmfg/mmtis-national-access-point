@@ -3,6 +3,6 @@
 
 
 (defn tallenna [opts teksti]
-  [ui/raised-button
+  [ui/raised-button ;{:style {:labelColor "#fff" :margin "12"} :primary true}
    (merge {:primary true} opts)
    teksti])

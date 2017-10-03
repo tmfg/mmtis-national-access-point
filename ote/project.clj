@@ -91,4 +91,6 @@
             "production" ["do" "clean," "deps," "compile,"
                           "cljsbuild" "once" "prod,"
                           "uberjar"]}
+  :repl-options {:init-ns ote.main
+                 :init (ote.main/start)}
   :main ote.main)
