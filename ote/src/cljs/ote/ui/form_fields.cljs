@@ -64,7 +64,7 @@
    {:floatingLabelText label
     :hintText          (placeholder field data)
     :on-change         #(update! [{:ote.db.transport-service/lang "FI" :ote.db.transport-service/text %2}])
-    :value             (get-in data [0 :ote.db.transport-service/text])
+    :value             (or (get-in data [0 :ote.db.transport-service/text]) "")
     :multiLine         true
     :rows              rows
     :error-text        error}])
@@ -77,11 +77,12 @@
     [ui/select-field {:floating-label-text label
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))}
-     (map-indexed
-      (fn [i option]
-        ^{:key i}
-        [ui/menu-item {:value i :primary-text (show-option option)}])
-      options)]))
+     (doall
+      (map-indexed
+       (fn [i option]
+         ^{:key i}
+         [ui/menu-item {:value i :primary-text (show-option option)}])
+       options))]))
 
 
 (defmethod field :multiselect-selection [{:keys [update! label name show-option options form? error] :as field} data]
@@ -97,14 +98,15 @@
                                    (update! (into #{}
                                                   (map (partial nth options))
                                                   values)))} ;; Add selected value to vector
-     (map-indexed
+     (doall
+      (map-indexed
        (fn [i option]
          ^{:key i}
          [ui/menu-item {:value i
                         :primary-text (show-option option)
                         :inset-children true
                         :checked (boolean (selected-set option))}])
-       options)]))
+       options))]))
 
 
 (def phone-regex #"\+?\d+")
