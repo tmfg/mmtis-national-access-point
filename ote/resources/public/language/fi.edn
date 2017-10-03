@@ -11,6 +11,10 @@
   :ote.db.transport-operator/visiting-address         "Käyntiosoite"
   :ote.db.transport-operator/billing-address          "Laskutusosoite"
 
+  :ote.db.transport-operator/facebook "Facebook"
+  :ote.db.transport-operator/twitter "Twitter"
+  :ote.db.transport-operator/instant-message "Pikaviestin"
+
   ;; Transport service fields
   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
   :ote.db.transport-service/url                       "Palvelun osoite"
