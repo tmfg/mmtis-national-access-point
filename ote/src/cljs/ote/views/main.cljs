@@ -20,11 +20,19 @@
   [e! app]
 
   [ui/mui-theme-provider
-   {:mui-theme (get-mui-theme {:palette {:primary1-color (color :lightBlue300) ;; primary nav color - Also Focus color in text fields
-                                         :disabledColor (color :grey900) ;; Hint color in text fields
-                                         ;:canvas-color  (color :lightBlue50) ;; canvas color
-                                         :text-color (color :grey900) ;; Main text color
-                                         }})}
+   {:mui-theme
+    (get-mui-theme
+     {:palette {;; primary nav color - Also Focus color in text fields
+                :primary1-color (color :lightBlue300)
+
+                ;; Hint color in text fields
+                :disabledColor (color :grey900)
+
+                ;; canvas color
+                :canvas-color  (color :lightBlue50)
+
+                ;; Main text color
+                :text-color (color :grey900)}})}
    [:div.ote-sovellus.container-fluid
     [ui/app-bar {:title "OTE"}]
 
