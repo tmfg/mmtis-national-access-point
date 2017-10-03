@@ -21,7 +21,7 @@
   ["passenger_information_facility" ::passenger_information_facility]
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
-  ["additional_services" ::additional_services]
+  ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
   ["pick_up_type" ::pick_up_type]
   ["brokerage_service_type" ::brokerage_service_type]
 
@@ -48,4 +48,11 @@
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
 
 ;; Create order for payment_method
-(def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other ])
+(def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])
+
+;; Create order for additional_services
+(def additional-services [:child-seat :animal-transport :other])
+
+;; Create order for accessibility_tool
+(def accessibility-tool [:wheelchair :walkingstick :audio-navigator :visual-navigator :passenger-cart
+                          :pushchair :umbrella :buggy :other])

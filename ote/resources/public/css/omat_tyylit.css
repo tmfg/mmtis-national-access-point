@@ -1,6 +1,9 @@
 /* Tänne kaikki Material UI:ta muuttavat css muutokset - hox korvataan varmaan jossain vaiheessa less/sass tiedostoilla */
 
-
+.background-color {
+    background: #3db7e4
+}
+/*
 .row-siirto {
     margin-right: 0px;
     margin-left: 0px;
@@ -11,4 +14,15 @@
 .row {
     padding-left: 5px;
 
+}
+*/
+
+.set-bottom {
+    display : table-row;
+    vertical-align : bottom;
+    height : 1px;
+}
+
+.debug {
+    font-size: 12px;
 }

@@ -225,7 +225,10 @@
           (form-fields/show-value s data))]))])
 
 ;; FIXME: different column class by the amount of fields
-(def col-classes {1 "col-md-8"})
+(def col-classes {1 "col-md-12"
+                  2 "col-md-6"
+                  3 "col-md-4"
+                  4 "col-md-3"})
 
 (defn row-ui
   "UI for a row of fields in the form"
