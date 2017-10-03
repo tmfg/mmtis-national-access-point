@@ -13,8 +13,6 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
-
-
 (defn passenger-transportation-info [e! status]
   (.log js/console " Avataanko dialog " (boolean (get status :price-class-open)))
   [:div.row

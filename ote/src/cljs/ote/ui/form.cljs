@@ -265,12 +265,10 @@
                ^{:key i}
                [:div.form-group {:class classes}
                 [ui/card {:z-depth 1}
-
                  (when label
                    [ui/card-header {:title label
                                     :style {:padding-bottom "0px"}
                                     :title-style {:font-weight "bold"}}])
-
                  [ui/card-text {:style {:padding-top "0px"}}
                   group-component]
                  (when-let [actions (:actions options)]
