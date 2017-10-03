@@ -261,8 +261,10 @@
                 (if label
                   ^{:key i}
                   [ui/card
-                   [ui/card-header {:title label}]
-                   [ui/card-text
+                   [ui/card-header {:title label
+                                    :style {:padding-bottom "0px"}
+                                    :title-style {:font-weight "bold"}}]
+                   [ui/card-text {:style {:padding-top "0px"}}
                     group-component]]
                   group-component)]))
            schemas))
