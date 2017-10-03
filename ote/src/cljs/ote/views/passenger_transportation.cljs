@@ -97,7 +97,7 @@
        {:name ::transport-service/price-classes
         :type :table
         :table-fields [{:name ::transport-service/name :type :string}
-                       {:name ::transport-service/price-per-unit :type :number};;NUMBER
+                       {:name ::transport-service/price-per-unit :type :number}
                        {:name ::transport-service/unit :type :string}
                        {:name ::transport-service/currency :type :string}]})]
 
