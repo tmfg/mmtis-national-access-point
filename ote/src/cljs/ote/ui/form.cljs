@@ -115,57 +115,6 @@
         (recur (conj acc s)
                schemas)))))
 
-#_(defn- wrap-rows
-  "Wraps fields into rows so that all columns are filled.
-  A new row is added when all columns are filled, the next field has `:new-row?` set to true or a
-  group label is encountered."
-  [schemas]
-  (loop [rows []
-         row []
-         columns 0
-         [s & schemas] (remove nil? schemas)]
-    (if-not s
-      (if-not (empty? row)
-        (conj rows row)
-        rows)
-      (let [field-columns (or (:columns s) 1)]
-        (cond
-          (and (group? s) (:row? (:optiot s)))
-          ;; Encountered a group that wants all fields on the same row side-by-side
-          ;; Add the group as its own row
-          (recur (vec (concat (if (empty? row)
-                                rows
-                                (conj rows row))
-                              [[(->Label (:label s))]
-                               (with-meta
-                                 (remove nil? (:schemas s))
-                                 {:row? true})]))
-                 []
-                 0
-                 schemas)
-
-          (group? s)
-          ;; Add group label and the group schemas to the input list
-          (recur rows row columns
-                 (concat [(->Label (:label s))] (remove nil? (:schemas s)) schemas))
-
-          :default
-          ;; Try to fit this field to the current row
-          (if (or (label? s)
-                  (:new-row? s)
-                  (> (+ columns field-columns) 2))
-            (recur (if (empty? row)
-                     rows
-                     (conj rows row))
-                   [s]
-                   (if (label? s) 0 field-columns)
-                   schemas)
-            ;; Fits on current row
-            (recur rows
-                   (conj row s)
-                   (+ columns field-columns)
-                   schemas)))))))
-
 
 (defn validate [data schemas]
   (let [all-schemas (unpack-groups schemas)
@@ -269,7 +218,7 @@
   [_ _ _]
   (let [focus (atom nil)]
     ;; FIXME: change layout to material-ui grid when upgrading to material-ui v1
-    (fn [{:keys [update! class footer-fn can-edit? label] :as options}
+    (fn [{:keys [update! class footer-fn can-edit? label name->label] :as options}
          schemas
          {modified ::muokatut
           :as data}]
@@ -298,7 +247,7 @@
            (fn [i {:keys [label schemas options] :as group}]
              (let [columns (or (:columns options) 1)
                    classes (get col-classes columns)
-                   schemas (with-automatic-labels (:name->label options) schemas)
+                   schemas (with-automatic-labels name->label schemas)
                    group-component [group-ui schemas
                                     validated-data
                                     update-field-fn
