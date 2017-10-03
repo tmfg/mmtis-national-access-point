@@ -6,7 +6,8 @@
             [ote.ui.form-fields :as form-fields]
             [cljs-time.core :as t]
             [clojure.string :as str]
-            [cljs-react-material-ui.reagent :as ui]))
+            [cljs-react-material-ui.reagent :as ui]
+            [reagent.core :as r]))
 
 (defrecord Group [label options schemas])
 
@@ -196,9 +197,13 @@
   [name->label schemas]
   (if-not name->label
     schemas
-    (mapv (fn [{:keys [name label] :as s}]
-            (assoc s :label (or label
-                                (name->label name))))
+    (mapv (fn [{:keys [name label type] :as s}]
+            (let [schema (assoc s :label (or label
+                                             (name->label name)))]
+              (if (= type :table)
+                ;; Also translate all the table fields for tables
+                (update schema :table-fields (partial with-automatic-labels name->label))
+                schema)))
           schemas)))
 
 (defn form
@@ -260,12 +265,17 @@
                ^{:key i}
                [:div.form-group {:class classes}
                 [ui/card {:z-depth 1}
+
                  (when label
                    [ui/card-header {:title label
                                     :style {:padding-bottom "0px"}
                                     :title-style {:font-weight "bold"}}])
+
                  [ui/card-text {:style {:padding-top "0px"}}
-                  group-component]]]))
+                  group-component]
+                 (when-let [actions (:actions options)]
+                   [ui/card-actions
+                    (r/as-element actions)])]]))
            schemas))
 
          (when-let [footer (when footer-fn
