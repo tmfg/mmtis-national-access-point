@@ -1,5 +1,6 @@
 (ns ote.services.transport-service-services
-  (:require [tuck.core :as t]))
+  (:require [tuck.core :as t]
+            [ote.db.transport-service :as transport-service]))
 
 (defrecord AddPriceClassRow [])
 (defrecord RemovePriceClassRow [])
@@ -8,7 +9,8 @@
 
   AddPriceClassRow
   (process-event [_ app]
-    (assoc-in app [:transport-service :add-price-class] true))
+    (update-in app [:transport-service ::transport-service/price-classes]
+               #(conj (or % []) {::transport-service/currency "EUR"})))
 
   RemovePriceClassRow
   (process-event [_ app]
