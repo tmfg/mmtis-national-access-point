@@ -116,3 +116,35 @@
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
+
+(defmethod field :table [{:keys [update! label name show-option options form? error] :as field}
+                         data]
+  
+  [ui/table {:striped-rows true}
+   [ui/table-header {:display-select-all false
+                     :selectable false
+                     :show-checkboxes true
+                     :adjust-for-checkbox false}
+    [ui/table-row
+     [ui/table-header-column "Hintaryhmä"]
+     [ui/table-header-column "Hinta per yksikkö"]
+     [ui/table-header-column "Yksikkö"]
+     [ui/table-header-column "Valuutta"]
+     ]
+    ]
+   [ui/table-body {:display-row-checkbox false}
+    [ui/table-row
+     [ui/table-row-column "Perushinta 1"]
+     [ui/table-row-column "5.99"]
+     [ui/table-row-column "kpl"]
+     [ui/table-row-column "Euro"]
+     ]
+    [ui/table-row
+     [ui/table-row-column "Perushinta 2"]
+     [ui/table-row-column "9.99"]
+     [ui/table-row-column "kpl"]
+     [ui/table-row-column "Euro"]
+     ]
+    ]
+   ]
+  )

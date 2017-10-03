@@ -260,7 +260,7 @@
                [:div.form-group {:class classes}
                 (if label
                   ^{:key i}
-                  [ui/card
+                  [ui/card {:z-depth 0}
                    [ui/card-header {:title label
                                     :style {:padding-bottom "0px"}
                                     :title-style {:font-weight "bold"}}]

@@ -32,7 +32,11 @@
                 ;;:canvas-color  (color :lightBlue50)
 
                 ;; Main text color
-                :text-color (color :grey900)}})}
+                :text-color (color :grey900)}
+
+      :button {:labelColor "#fff"}
+
+      })}
    [:div.ote-sovellus.container-fluid
     [ui/app-bar {:title "OTE"}]
     [:div.container-fluid

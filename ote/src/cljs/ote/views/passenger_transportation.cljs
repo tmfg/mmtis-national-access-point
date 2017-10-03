@@ -15,9 +15,9 @@
 (defn get-my-list [X]
   (conj [] (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
         ;(form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
-    #_ (repeat X (.log js/console " jee ")
-            (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class))
-              )
+        #_(repeat X (.log js/console " jee ")
+                  (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class))
+        )
   )
 
 (defn passenger-transportation-info [e! status]
@@ -35,18 +35,43 @@
                                       :disabled (form/disable-save? data)}
                       "Tallenna"])}
 
-     [{
-       :name ::transport-service/luggage-restrictions
-       :type :localized-text
-       :rows 5
-       }
+     [
 
-      ;; Payment method is a list in database so we need to enable multible choises
-      {:label       "Valitseppa maksutapa"
-       :name        ::transport-service/payment-methods
-       :type        :multiselect-selection
-       :show-option (tr-key [:enums ::transport-service/payment-methods])
-       :options     transport-service/payment-methods}
+
+
+      (form/group {:label   "Perustiedot"
+                   :columns 1
+                   :z-depth 0}
+                  {
+                   :name ::transport-service/luggage-restrictions
+                   :type :localized-text
+                   :rows 5
+                   }
+
+                  ;; Payment method is a list in database so we need to enable multible choises
+                  {:name        ::transport-service/payment-methods
+                   :type        :multiselect-selection
+                   :show-option (tr-key [:enums ::transport-service/payment-methods])
+                   :options     transport-service/payment-methods}
+
+                  {
+                   :name        ::transport-service/additional-services
+                   :type        :multiselect-selection
+                   :show-option (tr-key [:enums ::transport-service/additional-services])
+                   :options     transport-service/additional-services}
+
+                  {
+                   :name        ::transport-service/accessibility-tool
+                   :type        :multiselect-selection
+                   :show-option (tr-key [:enums ::transport-service/accessibility-tool])
+                   :options     transport-service/accessibility-tool}
+
+                  {
+                   :name ::transport-service/accessibility-description
+                   :type :localized-text
+                   :rows 5
+                   }
+                  )
 
 
       #_{
@@ -67,28 +92,11 @@
                   (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionslocation] location))}
 
 
-
-      (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
-      (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
-
-      {
-       :name        ::transport-service/additional-services
-       :type        :multiselect-selection
-       :show-option (tr-key [:enums ::transport-service/additional-services])
-       :options     transport-service/additional-services}
-
-      {
-       :name        ::transport-service/accessibility-tool
-       :type        :multiselect-selection
-       :show-option (tr-key [:enums ::transport-service/accessibility-tool])
-       :options     transport-service/accessibility-tool}
-
-      {
-       :name ::transport-service/accessibility-description
-       :type :localized-text
-       :rows 5
-       }
-
+      ;(form/group {:label   "Erilliset palvelutiedot"
+      ;             :columns 1}
+                  (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
+                  (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
+      ;)
 
       ]
 
@@ -116,8 +124,14 @@
 
         ;(get-my-list 5)
         [
-         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
-         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
+         (form/group {:label   "Hintaryhmät"
+                      :columns 3
+                      :z-depth 0}
+                     {
+                      :name ::transport-service/luggage-restrictions
+                      :type :table
+
+                      })
          ]
         status
         ]
