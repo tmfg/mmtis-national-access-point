@@ -26,8 +26,7 @@
     [ui/app-bar {:title "OTE"}]
     [ui/tabs {:value (:page app)}
      [ui/tab {:label "1. Tuottajan tiedot" :value :operator}
-      [ui/paper {:class "paper-siirto"}
-        [ot/olennaiset-tiedot e! (:transport-operator app)]]]
+      [ot/olennaiset-tiedot e! (:transport-operator app)]]
 
      [ui/tab {:label "2. Kuljetus" :value :passenger-transportation}
       [ui/paper {:class "paper-siirto"}

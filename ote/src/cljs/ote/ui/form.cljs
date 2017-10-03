@@ -5,7 +5,8 @@
   (:require [ote.ui.validation :as validation]
             [ote.ui.form-fields :as form-fields]
             [cljs-time.core :as t]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [cljs-react-material-ui.reagent :as ui]))
 
 (defrecord Group [label options schemas])
 
@@ -114,7 +115,7 @@
         (recur (conj acc s)
                schemas)))))
 
-(defn- wrap-rows
+#_(defn- wrap-rows
   "Wraps fields into rows so that all columns are filled.
   A new row is added when all columns are filled, the next field has `:new-row?` set to true or a
   group label is encountered."
@@ -194,22 +195,7 @@
    data update-fn editable? update-form
    modified? errors warnings notices]
   ;;[:pre (pr-str s) " => " (pr-str data)]
-  [:div.form-group {:class (str (or
-                                 ;; allow schema to override with namespaced key
-                                 (::col-class s)
-                                 col-class
-                                 (case (or columns 1)
-                                   1 "col-xs-12 col-sm-6 col-md-5 col-lg-4"
-                                   2 "col-xs-12 col-sm-12 col-md-10 col-lg-8"
-                                   3 "col-xs-12 col-sm-12 col-md-12 col-lg-12"))
-                                (when required?
-                                  " required")
-                                (when-not (empty? errors)
-                                  " has-error")
-                                (when-not (empty? warnings)
-                                  " has-warning")
-                                (when-not (empty? notices)
-                                  " has-notice"))}
+  [:div.form-field
    (if (= type :component)
      [:div.component (component {:update-form! (update-form s)
                                  :data data})]
@@ -224,37 +210,36 @@
           (fmt ((or read #(get % name)) data))
           (form-fields/show-value s data))]))])
 
-;; FIXME: different column class by the amount of fields
-(def col-classes {1 "col-md-12"
-                  2 "col-md-6"
-                  3 "col-md-4"
-                  4 "col-md-3"})
+;; Grid column classes for columns spanned
+(def col-classes {1 "col-xs-12 col-md-4 col-lg4-"
+                  2 "col-xs-12 col-md-6 col-lg-6"
+                  3 "col-xs-12 col-md-12 col-lg-12"})
 
-(defn row-ui
-  "UI for a row of fields in the form"
+(defn group-ui
+  "UI for a group of fields in the form"
   [schemas data update-fn can-edit? current-focus set-focus!
    modified errors warnings notices update-form]
   (let [row? (-> schemas meta :row?)
         col-class (when row?
                     (col-classes (count schemas)))]
-    [:div.row.lomakerivi
+    [:span
      (doall
-       (for [{:keys [name editable? read write] :as s} schemas
-             :let [editable? (and can-edit?
-                                  (or (nil? editable?)
-                                      (editable? data)))]]
-         ^{:key name}
-         [field-ui (assoc s
-                          :col-class col-class
-                          :focus (= name current-focus)
-                          :on-focus #(set-focus! name))
-          ((or read name) data)
-          #(update-fn (or write name) %)
-          editable? update-form
-          (get modified name)
-          (get errors name)
-          (get warnings name)
-          (get notices name)]))]))
+      (for [{:keys [name editable? read write] :as s} schemas
+            :let [editable? (and can-edit?
+                                 (or (nil? editable?)
+                                     (editable? data)))]]
+        ^{:key name}
+        [field-ui (assoc s
+                         :col-class col-class
+                         :focus (= name current-focus)
+                         :on-focus #(set-focus! name))
+         ((or read name) data)
+         #(update-fn (or write name) %)
+         editable? update-form
+         (get modified name)
+         (get errors name)
+         (get warnings name)
+         (get notices name)]))]))
 
 (defn- with-automatic-labels
   "Add an automatically generated `:label` to fields with the given `:name->label` function.
@@ -310,29 +295,28 @@
            [:h3.form-label label])
          (doall
           (map-indexed
-           (fn [i schemas]
-             (let [label (when (label? (first schemas))
-                           (first schemas))
-                   schemas (with-automatic-labels (:name->label options)
-                             (if label
-                               (rest schemas)
-                               schemas))
-                   row-component [row-ui schemas
-                                  validated-data
-                                  update-field-fn
-                                  can-edit?
-                                  @focus
-                                  #(reset! focus %)
-                                  modified
-                                  errors warnings notices
-                                  update-form]]
-               (if label
-                 ^{:key i}
-                 [:span
-                  [:h3.form-group-label (:label label)]
-                  row-component]
-                 (with-meta row-component {:key i}))))
-           (wrap-rows schemas)))
+           (fn [i {:keys [label schemas options] :as group}]
+             (let [columns (or (:columns options) 1)
+                   classes (get col-classes columns)
+                   schemas (with-automatic-labels (:name->label options) schemas)
+                   group-component [group-ui schemas
+                                    validated-data
+                                    update-field-fn
+                                    can-edit?
+                                    @focus
+                                    #(reset! focus %)
+                                    modified
+                                    errors warnings notices
+                                    update-form]]
+               [:div.form-group {:class classes}
+                (if label
+                  ^{:key i}
+                  [ui/card
+                   [ui/card-header {:title label}]
+                   [ui/card-text
+                    group-component]]
+                  group-component)]))
+           schemas))
 
          (when-let [footer (when footer-fn
                              (footer-fn (assoc validated-data
