@@ -2,6 +2,7 @@
   "Required datas for passenger transportation provider"
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.napit :as napit]
@@ -69,7 +70,7 @@
       (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
 
       (form/group
-       {:label nil
+       {:label "Muut palvelut ja esteettömyys"
         :columns 1}
 
        {:name        ::transport-service/additional-services
@@ -89,50 +90,20 @@
 
       (form/group
        {:label "Hintatiedot"
-        :columns 3}
+        :columns 3
+        :actions [ui/raised-button
+                  {:label    "Lisää hintarivi"
+                   :icon     (ic/action-note-add)
+                   :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
 
        {:name ::transport-service/price-classes
         :type :table
-        ;; FIXME: valuta translate tänne
-        :table-fields [{:name ::transport-service/name :type :string :label "nimi"}
-                       {:name ::transport-service/price-per-unit :type :string :label "hinta/yksikkö"};;NUMBER
-                       {:name ::transport-service/currency :type :string :label "rahayksikkö"}
-                       {:name ::transport-service/unit :type :string :label "yksikkö"}]}
-       )
-      ]
+        :table-fields [{:name ::transport-service/name :type :string}
+                       {:name ::transport-service/price-per-unit :type :number};;NUMBER
+                       {:name ::transport-service/unit :type :string}
+                       {:name ::transport-service/currency :type :string}]})]
 
      status]
-    [:div.row
-     [:h3 "Lisää uusi hintatieto"]
-     (reagent/as-element [ui/raised-button
-                          {:label    "Lisää rivi"
-                           ;:icon     (ic/social-group)
-                           :on-click #(e! (transport-service-services/->AddPriceClassRow))
-                           }]
-                         )
-     (.log js/console " lisätäänkö  " (:transport-service :add-price-class status))
-     (when (:transport-service :add-price-class status)
-       (.log js/console " lisää!!  ")
-
-       [form/form
-        {:name->label (tr-key [:field-labels])
-         :update!     #(e! (service/->EditTransportService %))
-         :name        #(tr [:olennaiset-tiedot :otsikot %])
-         :footer-fn   (fn [data]
-                        [napit/tallenna {:on-click #(e! (service/->SavePassengerTransportData))
-                                         :disabled (form/disable-save? data)}
-                         "Tallenna"])}
 
 
-        [
-         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
-         (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
-         ]
-        status
-        ]
-       )
-     ]
-
-    [debug/debug status]
-    ]
-   ])
+    [debug/debug status]]])
