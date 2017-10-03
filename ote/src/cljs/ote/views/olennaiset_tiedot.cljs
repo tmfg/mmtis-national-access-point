@@ -100,7 +100,7 @@
 (defn olennaiset-tiedot [e! status]
   [:span
    [:div
-    [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
+    [:h3 "Organisaation tiedot"]]
    [form/form
     {:name->label (tr-key [:field-labels])
      :update! #(e! (service/->EditTransportOperator %))
@@ -140,29 +140,18 @@
                 (assoc-in data [::to-definitions/visiting-address ::common/post-office] post-office))}
 
       {:name ::to-definitions/homepage
-       :type :string}
-      )
+       :type :string})
 
-     #_(form-groups/address (tr [:field-labels ::to-definitions/visiting-address]) )
-     (form-groups/address (tr [:field-labels ::to-definitions/billing-address]) ::to-definitions/billing-address)
+     (form/group
+      {:label "Yhteystavat" ;;FIXME: translate
+       :columns 1}
 
-     (form/group {:label "Yhteystiedot"
-                  :columns 1}
-                 {:name ::to-definitions/phone
-                  :type :string}
-
-                 {:name ::to-definitions/gsm
-                  :type :string}
-
-                 {:name ::to-definitions/email
-                  :type :string}
-
-                 )
-
-                                        ;
-                                        ;(satamapalvelun-lisatiedot status)
-                                        ;(vuokrauspalveluiden-lisatiedot status)
-     ]
+      {:name ::to-definitions/phone :type :string}
+      {:name ::to-definitions/gsm :type :string}
+      {:name ::to-definitions/email :type :string}
+      {:name ::to-definitions/facebook :type :string}
+      {:name ::to-definitions/twitter :type :string}
+      {:name ::to-definitions/instant-message :type :string})]
 
     status]
 

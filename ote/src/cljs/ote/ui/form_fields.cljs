@@ -119,7 +119,7 @@
 
 (defmethod field :table [{:keys [update! label name show-option options form? error] :as field}
                          data]
-  
+
   [ui/table {:striped-rows true}
    [ui/table-header {:display-select-all false
                      :selectable false
