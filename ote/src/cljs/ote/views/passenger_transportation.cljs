@@ -12,13 +12,7 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
-(defn get-my-list [X]
-  (conj [] (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
-        ;(form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
-    #_ (repeat X (.log js/console " jee ")
-            (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class))
-              )
-  )
+
 
 (defn passenger-transportation-info [e! status]
   (.log js/console " Avataanko dialog " (boolean (get status :price-class-open)))
@@ -35,61 +29,76 @@
                                       :disabled (form/disable-save? data)}
                       "Tallenna"])}
 
-     [{
-       :name ::transport-service/luggage-restrictions
-       :type :localized-text
-       :rows 5
-       }
+     [
 
-      ;; Payment method is a list in database so we need to enable multible choises
-      {:label       "Valitseppa maksutapa"
-       :name        ::transport-service/payment-methods
-       :type        :multiselect-selection
-       :show-option (tr-key [:enums ::transport-service/payment-methods])
-       :options     transport-service/payment-methods}
+      (form/group
+       {:label nil
+        :columns 1}
+
+       {:name ::transport-service/luggage-restrictions
+        :type :localized-text
+        :rows 5}
+
+       ;; Payment method is a list in database so we need to enable multible choises
+       {:label       "Valitseppa maksutapa"
+        :name        ::transport-service/payment-methods
+        :type        :multiselect-selection
+        :show-option (tr-key [:enums ::transport-service/payment-methods])
+        :options     transport-service/payment-methods}
 
 
-      #_{
-         :label "Alue"
-         :name  ::transport-service/description
-         :type  :localized-text
-         :rows  3
-         :read  (comp ::transport-service/description ::transport-service/main-operation-area)
-         :write (fn [data desc]
-                  (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionsdescription] desc))}
+       #_{
+          :label "Alue"
+          :name  ::transport-service/description
+          :type  :localized-text
+          :rows  3
+          :read  (comp ::transport-service/description ::transport-service/main-operation-area)
+          :write (fn [data desc]
+                   (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionsdescription] desc))}
 
-      #_{
-         :label "Lokaatio"
-         :name  ::transport-service/location
-         :type  :string
-         :read  (comp ::transport-service/location ::ts-definitionsmain-operation-area)
-         :write (fn [data location]
-                  (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionslocation] location))}
-
+       #_{
+          :label "Lokaatio"
+          :name  ::transport-service/location
+          :type  :string
+          :read  (comp ::transport-service/location ::ts-definitionsmain-operation-area)
+          :write (fn [data location]
+                   (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionslocation] location))})
 
 
       (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
       (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
 
-      {
-       :name        ::transport-service/additional-services
-       :type        :multiselect-selection
-       :show-option (tr-key [:enums ::transport-service/additional-services])
-       :options     transport-service/additional-services}
+      (form/group
+       {:label nil
+        :columns 1}
 
-      {
-       :name        ::transport-service/accessibility-tool
-       :type        :multiselect-selection
-       :show-option (tr-key [:enums ::transport-service/accessibility-tool])
-       :options     transport-service/accessibility-tool}
+       {:name        ::transport-service/additional-services
+        :type        :multiselect-selection
+        :show-option (tr-key [:enums ::transport-service/additional-services])
+        :options     transport-service/additional-services}
 
-      {
-       :name ::transport-service/accessibility-description
-       :type :localized-text
-       :rows 5
-       }
+       {:name        ::transport-service/accessibility-tool
+        :type        :multiselect-selection
+        :show-option (tr-key [:enums ::transport-service/accessibility-tool])
+        :options     transport-service/accessibility-tool}
+
+       {:name ::transport-service/accessibility-description
+        :type :localized-text
+        :rows 5})
 
 
+      (form/group
+       {:label "Hintatiedot"
+        :columns 3}
+
+       {:name ::transport-service/price-classes
+        :type :table
+        ;; FIXME: valuta translate tänne
+        :table-fields [{:name ::transport-service/name :type :string :label "nimi"}
+                       {:name ::transport-service/price-per-unit :type :string :label "hinta/yksikkö"};;NUMBER
+                       {:name ::transport-service/currency :type :string :label "rahayksikkö"}
+                       {:name ::transport-service/unit :type :string :label "yksikkö"}]}
+       )
       ]
 
      status]
@@ -114,7 +123,7 @@
                                          :disabled (form/disable-save? data)}
                          "Tallenna"])}
 
-        ;(get-my-list 5)
+
         [
          (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
          (form-groups/price-class (tr [:field-labels ::transport-service/price-class]) ::transport-service/price-class)
