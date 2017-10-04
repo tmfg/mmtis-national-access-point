@@ -14,7 +14,7 @@
             [ote.localization :refer [tr tr-key]]))
 
 (defn passenger-transportation-info [e! status]
-  (.log js/console " Avataanko dialog " (boolean (get status :price-class-open)))
+
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
@@ -31,77 +31,56 @@
      [
 
       (form/group
-       {:label nil
-        :columns 1}
+        {:label   nil
+         :columns 1}
 
-       {:name ::transport-service/luggage-restrictions
-        :type :localized-text
-        :rows 5}
+        {:name ::transport-service/luggage-restrictions
+         :type :localized-text
+         :rows 5}
 
-       ;; Payment method is a list in database so we need to enable multible choises
-       {:label       "Valitseppa maksutapa"
-        :name        ::transport-service/payment-methods
-        :type        :multiselect-selection
-        :show-option (tr-key [:enums ::transport-service/payment-methods])
-        :options     transport-service/payment-methods}
+        ;; Payment method is a list in database so we need to enable multible choises
+        {:label       "Valitseppa maksutapa"
+         :name        ::transport-service/payment-methods
+         :type        :multiselect-selection
+         :show-option (tr-key [:enums ::transport-service/payment-methods])
+         :options     transport-service/payment-methods})
 
+        (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
+        (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
 
-       #_{
-          :label "Alue"
-          :name  ::transport-service/description
-          :type  :localized-text
-          :rows  3
-          :read  (comp ::transport-service/description ::transport-service/main-operation-area)
-          :write (fn [data desc]
-                   (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionsdescription] desc))}
+        (form/group
+          {:label   "Muut palvelut ja esteettömyys"
+           :columns 1}
 
-       #_{
-          :label "Lokaatio"
-          :name  ::transport-service/location
-          :type  :string
-          :read  (comp ::transport-service/location ::ts-definitionsmain-operation-area)
-          :write (fn [data location]
-                   (assoc-in data [::ts-definitionsmain-operation-area ::ts-definitionslocation] location))})
+          {:name        ::transport-service/additional-services
+           :type        :multiselect-selection
+           :show-option (tr-key [:enums ::transport-service/additional-services])
+           :options     transport-service/additional-services}
 
+          {:name        ::transport-service/accessibility-tool
+           :type        :multiselect-selection
+           :show-option (tr-key [:enums ::transport-service/accessibility-tool])
+           :options     transport-service/accessibility-tool}
 
-      (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
-      (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
+          {:name ::transport-service/accessibility-description
+           :type :localized-text
+           :rows 5})
 
-      (form/group
-       {:label "Muut palvelut ja esteettömyys"
-        :columns 1}
+        (form/group
+          {:label   "Hintatiedot"
+           :columns 3
+           :actions [ui/raised-button
+                     {:label    "Lisää hintarivi"
+                      :icon     (ic/action-note-add)
+                      :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
 
-       {:name        ::transport-service/additional-services
-        :type        :multiselect-selection
-        :show-option (tr-key [:enums ::transport-service/additional-services])
-        :options     transport-service/additional-services}
-
-       {:name        ::transport-service/accessibility-tool
-        :type        :multiselect-selection
-        :show-option (tr-key [:enums ::transport-service/accessibility-tool])
-        :options     transport-service/accessibility-tool}
-
-       {:name ::transport-service/accessibility-description
-        :type :localized-text
-        :rows 5})
-
-
-      (form/group
-       {:label "Hintatiedot"
-        :columns 3
-        :actions [ui/raised-button
-                  {:label    "Lisää hintarivi"
-                   :icon     (ic/action-note-add)
-                   :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
-
-       {:name ::transport-service/price-classes
-        :type :table
-        :table-fields [{:name ::transport-service/name :type :string}
-                       {:name ::transport-service/price-per-unit :type :number}
-                       {:name ::transport-service/unit :type :string}
-                       {:name ::transport-service/currency :type :string}]})]
+          {:name         ::transport-service/price-classes
+           :type         :table
+           :table-fields [{:name ::transport-service/name :type :string}
+                          {:name ::transport-service/price-per-unit :type :number}
+                          {:name ::transport-service/unit :type :string}
+                          {:name ::transport-service/currency :type :string}]})]
 
      status]
-
 
     [debug/debug status]]])
