@@ -51,10 +51,17 @@ write_config () {
 }
 
 
-# If we don't already have a config file, bootstrap
-if [ ! -e "$CONFIG" ]; then
-  write_config
+# Write config
+# NOTE: Currently we are re-creating the config each time to make sure that we have a proper config file
+#   after changing settings.
+if [ -e "$CONFIG" ]; then
+  echo "Removing old ckan.ini..."
+
+  rm $CONFIG
 fi
+
+write_config
+
 
 # Set environment variables
 if [ -z "$CKAN_SQLALCHEMY_URL" ]; then
