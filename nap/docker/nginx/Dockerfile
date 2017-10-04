@@ -1,7 +1,7 @@
 # centos 7 image for Redis database
 # Is used from ckan image.
 
-FROM centos:centos7
+FROM centos:7
 
 RUN yum -y --setopt=tsflags=nodocs update && \
     yum -y --setopt=tsflags=nodocs install epel-release && \
