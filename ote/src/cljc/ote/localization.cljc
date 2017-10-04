@@ -23,7 +23,7 @@
                                    io/resource slurp read-string)]
               (swap! loaded-languages assoc language translations)
               (on-load language translations))
-       :cljs (comm/get! (str "/language/" (name language))
+       :cljs (comm/get! (str "language/" (name language))
                         {:on-success (fn [translations]
                                        (swap! loaded-languages assoc language translations)
                                        (on-load language translations))}))))

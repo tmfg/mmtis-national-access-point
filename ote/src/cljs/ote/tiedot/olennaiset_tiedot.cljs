@@ -23,7 +23,7 @@
     (let [operator-data (-> app
                             :transport-operator
                             form/without-form-metadata)]
-      (comm/post! "/transport-operator" operator-data {:on-success (t/send-async! ->SaveTransportOperatorResponse)})
+      (comm/post! "transport-operator" operator-data {:on-success (t/send-async! ->SaveTransportOperatorResponse)})
     app))
 
   SaveTransportOperatorResponse
@@ -42,7 +42,7 @@
                         :ote.db.transport-service/transport-operator-id (:ote.db.transport-operator/id operator)
                         :ote.db.transport-service/passenger-transportation
                         (form/without-form-metadata service)}]
-      (comm/post! "/passenger-transportation-info" service-data {:on-success (t/send-async! ->SavePassengerTransportResponse)})
+      (comm/post! "passenger-transportation-info" service-data {:on-success (t/send-async! ->SavePassengerTransportResponse)})
     app))
 
   SavePassengerTransportResponse
