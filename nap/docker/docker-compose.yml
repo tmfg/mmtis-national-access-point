@@ -67,3 +67,10 @@ services:
       - napote
     ports:
       - "6379:6379"
+
+  napote-nginx:
+    restart: always
+    container_name: napote-nginx
+    build: ./nginx
+    #image: solita/napote-nginx:latest
+    network_mode: "host"
