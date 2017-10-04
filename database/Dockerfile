@@ -61,4 +61,6 @@ VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
 EXPOSE 5432
 
+USER postgres
+
 CMD service postgresql start && tail -F /var/log/postgresql/postgresql-9.6-main.log
