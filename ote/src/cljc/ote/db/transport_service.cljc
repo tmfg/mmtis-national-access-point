@@ -1,5 +1,5 @@
-(ns ote.domain.liikkumispalvelu
-  "Liikkumispalvelun tietojen määritys"
+(ns ote.db.transport-service
+  "Database configurations for Transport Services"
   (:require [clojure.spec.alpha :as s]
             #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
             [specql.rel :as rel]
@@ -21,12 +21,11 @@
   ["passenger_information_facility" ::passenger_information_facility]
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
-  ["additional_services" ::additional_services]
+  ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
   ["pick_up_type" ::pick_up_type]
   ["brokerage_service_type" ::brokerage_service_type]
 
   ;; UDT tyypit
-  ["address" ::address]
   ["localized_text" ::localized_text]
   ["service_link" ::service_link]
   ["service_hours" ::service_hours]
@@ -42,9 +41,18 @@
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
 
   ;; Tables
-  ["transport-operator" ::transport-operator]
   ["transport-service" ::transport-service
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
+
+;; Create order for payment_method
+(def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])
+
+;; Create order for additional_services
+(def additional-services [:child-seat :animal-transport :other])
+
+;; Create order for accessibility_tool
+(def accessibility-tool [:wheelchair :walkingstick :audio-navigator :visual-navigator :passenger-cart
+                          :pushchair :umbrella :buggy :other])

@@ -20,29 +20,29 @@
   [e! app]
 
   [ui/mui-theme-provider
-   {:mui-theme (get-mui-theme {:palette {:text-color (color :green600)}})}
-   [:div.ote-sovellus.container
+   {:mui-theme
+    (get-mui-theme
+     {:palette {;; primary nav color - Also Focus color in text fields
+                :primary1-color (color :lightBlue300)
+
+                ;; Hint color in text fields
+                :disabledColor (color :grey900)
+
+                ;; canvas color
+                ;;:canvas-color  (color :lightBlue50)
+
+                ;; Main text color
+                :text-color (color :grey900)}
+
+      :button {:labelColor "#fff"}
+
+      })}
+   [:div.ote-sovellus.container-fluid
     [ui/app-bar {:title "OTE"}]
-
-    [ui/tabs {:value (:page app)}
-     [ui/tab {:label "1. Tuottajan tiedot" :value :operator}
-
-      [ui/paper {:class "paper-siirto"}
-        [ot/olennaiset-tiedot e! (:transport-operator app)]]]
-
-     [ui/tab {:label "2. Kuljetus" :value :passenger-transportation}
-      [ui/paper {:class "paper-siirto"}
-       [pt/passenger-transportation-info e! (:transport-service app)]]]
-
-     [ui/tab {:label "Pysäköintialueet" :value :parking}
-      [ui/paper {:class "paper-siirto"}
-        [pysakointialueet/pysakointialueet e! (:data app)]]]
-     [ui/tab {:label "Liikennevälineet" :value "c"}
-      [ui/paper {:class "paper-siirto"}
-       [liikennevalineet/liikennevalineet e! (:data app)]]]
-     [ui/tab {:label "Välityspalvelut" :value "d"}
-      [ui/paper {:class "paper-siirto"}
-       [valityspalvelut/valityspalvelu e! (:data app)]]]
-     [ui/tab {:label "Reitit" :value "d"}
-      [ui/paper {:class "paper-siirto"}
-       [kuljetus/reitti e! (:data app)]]]]]])
+    [:div.container-fluid
+     (when (= :operator (:page app))
+               [ot/olennaiset-tiedot e! (:transport-operator app)])
+     (when (= :passenger-transportation (:page app))
+        [pt/passenger-transportation-info e! (:transport-service app)]
+       )
+     ]]])

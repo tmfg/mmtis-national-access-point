@@ -1,7 +1,8 @@
 (ns ote.ui.form-fields
   "UI components for different form fields."
   (:require [reagent.core :as r]
-            [cljs-react-material-ui.reagent :as ui]))
+            [cljs-react-material-ui.reagent :as ui]
+            [clojure.string :as str]))
 
 
 (defn read-only-atom [value]
@@ -32,12 +33,16 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                   focus on-focus form? error]
-                            :as   field} data]
+                                  focus on-focus form? error table?]
+                           :as   field} data]
   [ui/text-field
-   {:floatingLabelText label
+   {:floatingLabelText (when-not table?  label)
     :hintText          (placeholder field data)
-    :on-change         #(update! %2)
+    :on-change         #(let [v %2]
+                          (if regex
+                            (when (re-matches regex v)
+                              (update! v))
+                            (update! v)))
     :value             (or data "")
     :error-text        error}])
 
@@ -58,13 +63,11 @@
   [ui/text-field
    {:floatingLabelText label
     :hintText          (placeholder field data)
-    :on-change         #(update! [{:ote.domain.liikkumispalvelu/lang "FI" :ote.domain.liikkumispalvelu/text %2}])
-    :value             (get-in data [0 :text])
+    :on-change         #(update! [{:ote.db.transport-service/lang "FI" :ote.db.transport-service/text %2}])
+    :value             (or (get-in data [0 :ote.db.transport-service/text]) "")
     :multiLine         true
     :rows              rows
-    :error-text        error}]
-
-  )
+    :error-text        error}])
 
 
 (defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}
@@ -74,18 +77,93 @@
     [ui/select-field {:floating-label-text label
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))}
-     (map-indexed
-      (fn [i option]
-        ^{:key i}
-        [ui/menu-item {:value i :primary-text (show-option option)}])
-      options)]))
+     (doall
+      (map-indexed
+       (fn [i option]
+         ^{:key i}
+         [ui/menu-item {:value i :primary-text (show-option option)}])
+       options))]))
+
+
+(defmethod field :multiselect-selection [{:keys [update! label name show-option options form? error] :as field} data]
+  ;; Because material-ui selection value can't be an arbitrary JS object, use index
+  (let [selected-set (or data #{})
+        option-idx (zipmap options (range))]
+    [ui/select-field {:floating-label-text label
+                      :multiple true
+                      :value (clj->js (map option-idx selected-set))
+                      :selection-renderer (fn [values]
+                                            (str/join ", " (map (comp show-option (partial nth options)) values)))
+                      :on-change (fn [event index values]
+                                   (update! (into #{}
+                                                  (map (partial nth options))
+                                                  values)))} ;; Add selected value to vector
+     (doall
+      (map-indexed
+       (fn [i option]
+         ^{:key i}
+         [ui/menu-item {:value i
+                        :primary-text (show-option option)
+                        :inset-children true
+                        :checked (boolean (selected-set option))}])
+       options))]))
+
 
 (def phone-regex #"\+?\d+")
 
-(defmethod field :phone [field data]
-  [field (assoc field
+(defmethod field :phone [opts data]
+  [field (assoc opts
                 :type :string
                 :regex phone-regex)])
 
+(def number-regex #"\d*([\.,]\d*)?")
+
+(defmethod field :number [_  data]
+  ;; Number field contains internal state that has the current
+  ;; typed in text (which may be an incompletely typed number).
+  ;;
+  ;; The value updated to the app model is always a parsed number.
+  (let [txt (r/atom (if data (.toFixed data 2) ""))]
+    (fn [{:keys [update!] :as opts} data]
+      [field (assoc opts
+                    :type :string
+                    :parse js/parseFloat
+                    :regex number-regex
+                    :update! #(do
+                                (reset! txt %)
+                                (update!
+                                   (if (str/blank? %)
+                                     nil
+                                     (-> %
+                                         (str/replace #"," ".")
+                                         (js/parseFloat %))))))
+       @txt])))
+
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
+
+
+(defmethod field :table [{:keys [table-fields update!] :as opts} data]
+  [ui/table {:selectable false}
+   [ui/table-header {:adjust-for-checkbox false
+                     :display-select-all false}
+    [ui/table-row
+     (doall
+      (for [{:keys [name label] :as tf} table-fields]
+        ^{:key name}
+        [ui/table-header-column label]))]]
+
+   [ui/table-body {:display-row-checkbox false}
+    (map-indexed
+     (fn [i row]
+       ^{:key i}
+       [ui/table-row
+        (doall
+         (for [{:keys [name read write] :as tf} table-fields]
+           ^{:key name}
+           [ui/table-row-column
+            [field (assoc tf
+                          :table? true
+                          :update! #(update! (assoc-in data [i name] %)))
+             ((or read name) row)]]))])
+     data)]])

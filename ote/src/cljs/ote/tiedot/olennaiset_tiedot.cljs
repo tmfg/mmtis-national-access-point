@@ -38,9 +38,9 @@
 
   SavePassengerTransportData
   (process-event [_ {operator :transport-operator service :transport-service :as app}]
-    (let [service-data {:ote.domain.liikkumispalvelu/type :passenger-tranportation ;;FIXME: fix enum tranSportation
-                        :ote.domain.liikkumispalvelu/transport-operator-id (:ote.domain.liikkumispalvelu/id operator)
-                        :ote.domain.liikkumispalvelu/passenger-transportation
+    (let [service-data {:ote.db.transport-service/type :passenger-transportation
+                        :ote.db.transport-service/transport-operator-id (:ote.db.transport-operator/id operator)
+                        :ote.db.transport-service/passenger-transportation
                         (form/without-form-metadata service)}]
       (comm/post! "/passenger-transportation-info" service-data {:on-success (t/send-async! ->SavePassengerTransportResponse)})
     app))

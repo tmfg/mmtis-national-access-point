@@ -5,7 +5,8 @@
             [ote.ui.napit :as napit]
             [ote.tiedot.palvelu :as service]
             [ote.ui.debug :as debug]
-            [ote.domain.liikkumispalvelu :as t]
+            [ote.db.transport-operator :as to-definitions]
+            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
 (defn vuokrauspalveluiden-lisatiedot[status]
@@ -97,52 +98,61 @@
       :rows   5})))
 
 (defn olennaiset-tiedot [e! status]
-  [:div.row
-   [:div {:class "col-lg-4"}
-    [:div
-     [:h3 "Vaihe 1: Lisää liikkumispalveluita tuottava organisaatio."]]
-    [form/form
-     {:name->label (tr-key [:olennaiset-tiedot :otsikot])
-      :update! #(e! (service/->EditTransportOperator %))
-      :name #(tr [:olennaiset-tiedot :otsikot %])
-      :footer-fn (fn [data]
-                   [napit/tallenna {:on-click #(e! (service/->SaveTransportOperator))
-                                    :disabled (form/disable-save? data)}
-                    "Tallenna"])}
+  [:span
+   [:div
+    [:h3 "Organisaation tiedot"]]
+   [form/form
+    {:name->label (tr-key [:field-labels])
+     :update! #(e! (service/->EditTransportOperator %))
+     :name #(tr [:olennaiset-tiedot :otsikot %])
+     :footer-fn (fn [data]
+                  [napit/tallenna {:on-click #(e! (service/->SaveTransportOperator))
+                                   :disabled (form/disable-save? data)}
+                   "Tallenna"])}
 
-     [{:name ::t/name
+    [(form/group
+      {:label "Perustiedot"
+       :columns 1}
+      {:name ::to-definitions/name
        :type :string
        :validate [[:non-empty "Anna nimi"]]}
 
-      #_{:name :to/service-type
-       :type :selection
-       :show-option (tr-key [::t/service-type])
-       :options t/transport-service-types }
-
-      {:name ::t/business-id
+      {:name ::to-definitions/business-id
        :type :string
        :validate [[:business-id]]}
 
-      (form-groups/address "Käyntiosoite" ::t/visiting-address)
-      (form-groups/address "Laskutusosoite" ::t/billing-address)
+      {:name ::common/street
+       :type :string
+       :read (comp ::common/street ::to-definitions/visiting-address)
+       :write (fn [data street]
+                (assoc-in data [::to-definitions/visiting-address ::common/street] street))}
 
-      {:name ::t/phone
-       :type :string}
+      {:name ::common/postal-code
+       :type :string
+       :read (comp ::common/postal_code ::to-definitions/visiting-address)
+       :write (fn [data postal-code]
+                (assoc-in data [::to-definitions/visiting-address ::common/postal-code] postal-code))}
 
-      {:name ::t/gsm
-       :type :string}
+      {:name ::common/post-office
+       :type :string
+       :read (comp ::common/postal_office ::to-definitions/visiting-address)
+       :write (fn [data post-office]
+                (assoc-in data [::to-definitions/visiting-address ::common/post-office] post-office))}
 
-      {:name ::t/email
-       :type :string}
+      {:name ::to-definitions/homepage
+       :type :string})
 
-      {:name ::t/homepage
-       :type :string}
+     (form/group
+      {:label "Yhteystavat" ;;FIXME: translate
+       :columns 1}
 
-      ;
-      ;(satamapalvelun-lisatiedot status)
-      ;(vuokrauspalveluiden-lisatiedot status)
-      ]
+      {:name ::to-definitions/phone :type :string}
+      {:name ::to-definitions/gsm :type :string}
+      {:name ::to-definitions/email :type :string}
+      {:name ::to-definitions/facebook :type :string}
+      {:name ::to-definitions/twitter :type :string}
+      {:name ::to-definitions/instant-message :type :string})]
 
-     status]
+    status]
 
-    [debug/debug status]]])
+   [debug/debug status]])
