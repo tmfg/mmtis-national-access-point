@@ -6,7 +6,8 @@
             [ote.components.http :as http]
             [ote.components.db :as db]
             [ote.services.localization :as localization-service]
-            [ote.services.places :as places]))
+            [ote.services.places :as places])
+  (:gen-class))
 
 (def ^{:doc "Handle for OTE-system"}
   ote nil)
