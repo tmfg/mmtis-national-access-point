@@ -7,5 +7,5 @@
 
 (defmacro define-tables [& tables]
   `(specql/define-tables
-     {:connection-uri "jdbc:postgresql://localhost/napotetest?user=napotetest"}
+     {:connection-uri "jdbc:postgresql://localhost/napotetest_template?user=napotetest"}
      ~@tables))
