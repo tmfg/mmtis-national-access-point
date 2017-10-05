@@ -23,6 +23,10 @@ job('OTE build from master') {
     }
   }
   publishers {
+    archiveArtifacts {
+      pattern('ote/target/*-standalone.jar')
+      onlyIfSuccessful()
+    }
     slackNotifier {
       notifyAborted(false)
       notifyBackToNormal(true)
