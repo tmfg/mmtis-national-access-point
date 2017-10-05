@@ -7,7 +7,11 @@ job('OTE build from master') {
   }
   steps {
 
-    maven('flyway:migrate', 'database/pom.xml')
+    shell(readFileFromWorkspace('database/testdb.sh'))
+
+    maven('flyway:migrate', 'database/pom.xml') {
+      mavenInstallation('Maven 3.5.0')
+    }
 
     leiningenBuilder {
       subdirPath('ote')
