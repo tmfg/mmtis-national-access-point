@@ -7,7 +7,7 @@ job('OTE build from master') {
   }
   steps {
 
-    shell(readFileFromWorkspace('database/testdb.sh'))
+    shell('sh database/testdb.sh')
 
     maven('flyway:migrate', 'database/pom.xml') {
       mavenInstallation('Maven 3.5.0')

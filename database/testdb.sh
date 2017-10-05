@@ -1,8 +1,8 @@
-#!bin/sh
+#!bin/bash
 
 echo "Creating local PostgreSQL database for CI build"
 
-p = "psql -h localhost -U napote -c "
+P="psql -h localhost -U napote -c "
 
-$p "DROP DATABASE IF EXISTS napotetest_template;"
-$p "CREATE DATABASE napotetest_template;"
+$P "DROP DATABASE IF EXISTS napotetest_template;"
+$P "CREATE DATABASE napotetest_template;"
