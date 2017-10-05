@@ -18,5 +18,8 @@
     solita_jenkins_security_realm: jenkins
     solita_jenkins_users:
       - tatut
+      - markusva
+      - markussak
+      - tonida
   roles:
     - solita.jenkins
