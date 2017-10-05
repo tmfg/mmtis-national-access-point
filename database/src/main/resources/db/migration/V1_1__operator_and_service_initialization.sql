@@ -114,16 +114,9 @@ CREATE TYPE terminal_information AS (
   services service_link[]
 );
 
-CREATE TYPE operation_area AS (
-  description localized_text[], -- Free text about the operation area, e.g. commune
-  location GEOMETRY -- possible more accurate geometry data
-);
-
 CREATE TYPE passenger_transportation_info AS (
   "luggage-restrictions" localized_text[],
   "real-time-information" service_link, -- URL to real time information
-  "main-operation-area" operation_area[],
-  "secondary-operation-area" operation_area[],
   "booking-service" service_link, -- link and description of online booking service
   "payment-methods" payment_method[],
   "price-classes" price_class[],
@@ -155,7 +148,6 @@ CREATE TYPE rental_provider_informaton AS (
 
 
 CREATE TYPE parking_area AS (
-  area operation_area,
   "office-hours" service_hours[],
   "service-hours" service_hours[],
   "payment-methods" payment_method[],
@@ -177,8 +169,6 @@ CREATE TYPE brokerage_service AS (
   name VARCHAR(100),
   description localized_text[],
   "brokerage-service-type" brokerage_service_type,
-  "main-operation-area" operation_area[],
-  "secondary-operation-area" operation_area[],
   pricing service_link -- URL to price information
 );
 
@@ -195,4 +185,12 @@ CREATE TABLE "transport-service" (
   rental rental_provider_informaton,
   parking parking_provider_information, -- FIXME: currently nothing to store here
   brokerage brokerage_provider_informaton -- FIXME: currently nothing to store here
+);
+
+CREATE TABLE operation_area (
+  id SERIAL PRIMARY KEY,
+  "transport-service-id" INTEGER REFERENCES "transport-service" (id) NOT NULL,
+  description localized_text[], -- Free text about the operation area, e.g. commune
+  location GEOMETRY, -- possible more accurate geometry data
+  "primary?" boolean
 );
