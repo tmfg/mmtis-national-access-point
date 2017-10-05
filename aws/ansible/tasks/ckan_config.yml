@@ -3,6 +3,7 @@
   with_items:
     - /etc/ckan/default
     - /var/lib/ckan/storage
+    - /var/lib/ckan/resources
   tags: configuration
 
 - name: Write CKAN config from template

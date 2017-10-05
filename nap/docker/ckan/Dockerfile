@@ -1,4 +1,3 @@
-
 # BUILD: docker build . -t solita/napote-ckan
 # docker build . -t ckan && docker run -d -p 80:5000 --link db:db --link redis:redis --link solr:solr ckan
 
@@ -11,7 +10,7 @@ ENV CKAN_STORAGE_PATH /var/lib/ckan
 
 # These build-time vars are specified by docker-compose.yml
 ARG CKAN_PORT=5555
-ARG CKAN_SITE_URL=http://localhost:$CKAN_PORT
+ARG CKAN_SITE_URL=http://localhost:8080
 
 ## Install required packages ##
 RUN yum -y update && yum -y upgrade && yum -y install \
@@ -88,4 +87,4 @@ USER ckan
 EXPOSE $CKAN_PORT
 
 
-CMD ["ckan-paster","serve","/etc/ckan/ckan.ini"]
+CMD ["ckan-paster","serve","--reload","/etc/ckan/ckan.ini"]

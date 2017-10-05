@@ -67,3 +67,17 @@ services:
       - napote
     ports:
       - "6379:6379"
+
+  napote-nginx:
+    restart: always
+    container_name: napote-nginx
+    build: ./nginx
+    #image: solita/napote-nginx:latest
+    networks:
+      - napote
+    links:
+      - napote-ckan
+    extra_hosts:
+      - "dockerhost:${DOCKER_HOST_IP}"
+    ports:
+      - "8080:8080"

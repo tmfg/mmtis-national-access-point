@@ -7,7 +7,15 @@ job('OTE build from master') {
   }
   steps {
 
-    maven('flyway:migrate', 'database/pom.xml')
+    shell('sh database/testdb.sh')
+
+    maven {
+      goals('flyway:migrate')
+      rootPOM('database/pom.xml')
+      mavenInstallation('Maven 3.5.0')
+      property('databaseUrl', 'jdbc:postgresql://localhost/napotetest_template')
+      property('databaseUser', 'napotetest')
+    }
 
     leiningenBuilder {
       subdirPath('ote')
@@ -15,6 +23,10 @@ job('OTE build from master') {
     }
   }
   publishers {
+    archiveArtifacts {
+      pattern('ote/target/*-standalone.jar')
+      onlyIfSuccessful()
+    }
     slackNotifier {
       notifyAborted(false)
       notifyBackToNormal(true)

@@ -57,7 +57,8 @@
 
   :profiles {:uberjar {:aot :all}}
 
-  :repositories [["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
+  :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]
+                 ["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.13"]]
 

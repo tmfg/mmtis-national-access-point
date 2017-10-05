@@ -32,7 +32,12 @@ write_config () {
 
   # The environment variables above will be used by CKAN, but
   # you can create a custon ckan.ini like this also:
-  ckan-paster --plugin=ckan config-tool "$CONFIG" -e \
+  # Default host: 0.0.0.0, default port: 5000
+  ckan-paster --plugin=ckan config-tool "$CONFIG" -s server:main -e \
+    "host = 0.0.0.0" \
+    "port = 5000"
+
+  ckan-paster --plugin=ckan config-tool "$CONFIG" -s app:main -e \
     "ckan.plugins = stats text_view image_view recline_view napote_theme" \
     "ckan.locale_default = fi" \
     "ckan.locale_order = fi en sv" \
@@ -46,10 +51,17 @@ write_config () {
 }
 
 
-# If we don't already have a config file, bootstrap
-if [ ! -e "$CONFIG" ]; then
-  write_config
+# Write config
+# NOTE: Currently we are re-creating the config each time to make sure that we have a proper config file
+#   after changing settings.
+if [ -e "$CONFIG" ]; then
+  echo "Removing old ckan.ini..."
+
+  rm $CONFIG
 fi
+
+write_config
+
 
 # Set environment variables
 if [ -z "$CKAN_SQLALCHEMY_URL" ]; then

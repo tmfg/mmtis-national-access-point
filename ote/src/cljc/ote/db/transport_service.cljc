@@ -31,7 +31,6 @@
   ["service_hours" ::service_hours]
   ["price_class" ::price_class]
   ["terminal_information" ::terminal_information]
-  ["operation_area" ::operation_area]
   ["passenger_transportation_info" ::passenger_transportation_info]
   ["pick_up_location" ::pick_up_location]
   ["rental_provider_informaton" ::rental_provider_informaton]
@@ -42,7 +41,9 @@
 
   ;; Tables
   ["transport-service" ::transport-service
-   {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}])
+   {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}]
+  ["operation_area" ::operation_area]
+  )
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
