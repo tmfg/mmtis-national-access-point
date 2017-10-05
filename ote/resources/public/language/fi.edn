@@ -41,6 +41,7 @@
  ;; Action buttons
  :buttons
  {:save "Tallenna"}
+ {:delete "Poista"}
 
 
 

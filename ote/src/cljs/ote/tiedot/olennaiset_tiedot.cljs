@@ -38,7 +38,7 @@
 
   SavePassengerTransportData
   (process-event [_ {operator :transport-operator service :transport-service :as app}]
-    (let [service-data {:ote.db.transport-service/type :passenger-transportation
+    (let [service-data {:ote.db.transport-service/type :passenger-tranportation
                         :ote.db.transport-service/transport-operator-id (:ote.db.transport-operator/id operator)
                         :ote.db.transport-service/passenger-transportation
                         (form/without-form-metadata service)}]

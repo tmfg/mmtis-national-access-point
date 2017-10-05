@@ -39,7 +39,7 @@
          :rows 5}
 
         ;; Payment method is a list in database so we need to enable multible choises
-        {:label       "Valitseppa maksutapa"
+        {
          :name        ::transport-service/payment-methods
          :type        :multiselect-selection
          :show-option (tr-key [:enums ::transport-service/payment-methods])
@@ -79,7 +79,13 @@
            :table-fields [{:name ::transport-service/name :type :string}
                           {:name ::transport-service/price-per-unit :type :number}
                           {:name ::transport-service/unit :type :string}
-                          {:name ::transport-service/currency :type :string}]})]
+                          {:name ::transport-service/currency :type :string}
+                          {:name (tr [:buttons :delete]) :type :button}]
+           :delete-button [ui/flat-button
+                           {:label    "Remove"
+                            :icon     (ic/action-delete)
+                            :on-click #(e! (transport-service-services/->RemovePriceClassRow))}]
+           })]
 
      status]
 

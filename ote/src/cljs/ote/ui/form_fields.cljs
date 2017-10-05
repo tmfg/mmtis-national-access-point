@@ -143,11 +143,11 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields update!] :as opts} data]
-  [ui/table {:selectable false}
+(defmethod field :table [{:keys [table-fields delete-buttons update!] :as opts} data]
+  [ui/table
    [ui/table-header {:adjust-for-checkbox false
                      :display-select-all false}
-    [ui/table-row
+    [ui/table-row {:selectable false}
      (doall
       (for [{:keys [name label] :as tf} table-fields]
         ^{:key name}
@@ -157,7 +157,8 @@
     (map-indexed
      (fn [i row]
        ^{:key i}
-       [ui/table-row
+       [ui/table-row {:selectable false
+                      :style {:border "0px"}}
         (doall
          (for [{:keys [name read write] :as tf} table-fields]
            ^{:key name}

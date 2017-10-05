@@ -46,31 +46,3 @@
                :write (fn [data desc]
                         (assoc-in data [service-url-field ::transport-service/description] desc))}
               ))
-
-(defn price-class
-  "Creates a form group for price-class that creates four form elements name, price-per-unit, unit and currency."
-  [label price-class]
-  (form/group label
-              {:name ::transport-service/name
-               :type :string
-               :read (comp ::transport-service/name price-class)
-               :write (fn [data name]
-                        (assoc-in data [price-class ::transport-service/name] name))}
-
-              {:name ::transport-service/price-per-unit
-              :type :string
-              :read (comp ::transport-service/price-per-unit price-class)
-              :write (fn [data price-per-unit]
-                       (assoc-in data [price-class ::transport-service/price-per-unit] price-per-unit))}
-
-              {:name ::transport-service/unit
-               :type :string
-               :read (comp ::transport-service/unit price-class)
-               :write (fn [data unit]
-                        (assoc-in data [price-class ::transport-service/unit] unit))}
-
-              {:name ::transport-service/currency
-               :type :string
-               :read (comp ::transport-service/currency price-class)
-               :write (fn [data currency]
-                        (assoc-in data [price-class ::transport-service/currency] currency))}))

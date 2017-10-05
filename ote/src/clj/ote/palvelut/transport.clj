@@ -21,10 +21,16 @@
   (upsert! db ::transport-operator/transport-operator data)
   )
 
+(defn- fix-price-classes
+  "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
+  [price-classes-float]
+  (mapv #(update % ::transport-service/price-per-unit bigdec) price-classes-float))
+
 (defn- save-passenger-transportation-info [db data]
-  (println "save-passenger-transportation-info " data)
-  (upsert! db ::transport-service/transport-service data)
-  )
+  "UPSERT! given data to database. And convert possible float point values to bigdecimal"
+  (let [value (update-in data [::transport-service/passenger-transportation ::transport-service/price-classes] fix-price-classes)]
+    (upsert! db ::transport-service/transport-service value)))
+
 
 (defrecord Transport []
   component/Lifecycle
