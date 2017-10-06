@@ -22,15 +22,17 @@
 (defrecord HttpServer [config handlers]
   component/Lifecycle
   (start [{db :db :as this}]
-    (let [resources (route/resources "/")
+    (let [strip-prefix (or (:strip-prefix config) "")
+          resources (wrap-strip-prefix
+                     strip-prefix
+                     (route/resources "/"))
           handler #(serve-request @handlers %)
           handler (if-let [auth-tkt (:auth-tkt config)]
                     (nap-cookie/wrap-check-cookie
                      auth-tkt
                      (nap-users/wrap-user-info
                       db
-                      (wrap-strip-prefix (or (:strip-prefix config) "")
-                                         handler)))
+                      (wrap-strip-prefix strip-prefix handler)))
                     handler)]
       (assoc this ::stop
              (server/run-server
