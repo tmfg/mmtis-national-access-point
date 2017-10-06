@@ -1,7 +1,8 @@
 (ns ote.nap.users
   "Integrate into CKAN user and group information via database queries."
   (:require [jeesql.core :refer [defqueries]]
-            [ote.db.utils :as db-utils]))
+            [ote.db.utils :as db-utils]
+            [taoensso.timbre :as log]))
 
 ;; FIXME:
 ;; CKAN tables are owned by the ckan user and access needs to be granted to them
@@ -26,6 +27,8 @@
   (fn [{username :user-id :as req}]
     (if-let [user (and username
                        (find-user db username))]
-      (handler (assoc req :user user))
-      {:status 401
-       :body "Unknown user"})))
+      (do (log/info "User found: " (pr-str user))
+          (handler (assoc req :user user)))
+      (do (log/info "No user info, return 401")
+          {:status 401
+           :body "Unknown user"}))))
