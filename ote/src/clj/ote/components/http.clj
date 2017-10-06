@@ -4,7 +4,8 @@
             [com.stuartsierra.component :as component]
             [compojure.route :as route]
             [cognitect.transit :as transit]
-            [ote.nap.cookie :as nap-cookie]))
+            [ote.nap.cookie :as nap-cookie]
+            [ote.nap.users :as nap-users]))
 
 (defn- serve-request [handlers req]
   ((apply some-fn handlers) req))
@@ -15,7 +16,9 @@
     (let [resources (route/resources "/")
           handler #(serve-request @handlers %)
           handler (if-let [auth-tkt (:auth-tkt config)]
-                    (nap-cookie/wrap-check-cookie auth-tkt handler)
+                    (nap-cookie/wrap-check-cookie
+                     auth-tkt
+                     (nap-users/wrap-user-info handler))
                     handler)]
       (assoc this ::stop
              (server/run-server

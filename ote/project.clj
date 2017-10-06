@@ -12,7 +12,7 @@
                  [org.postgresql/postgresql "42.1.4"]
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
-                 [webjure/jeesql "0.4.6"]
+                 [webjure/jeesql "0.4.7"]
                  [specql "0.7.0-alpha4"]
 
                  ;; http-kit HTTP server (and client)
