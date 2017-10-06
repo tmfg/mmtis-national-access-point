@@ -6,11 +6,18 @@
             [cognitect.transit :as transit]
             [ote.nap.cookie :as nap-cookie]
             [ote.nap.users :as nap-users]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.string :as str]))
 
 (defn- serve-request [handlers req]
   (log/info "REQUEST: " (pr-str req))
   ((apply some-fn handlers) req))
+
+(defn wrap-strip-prefix [strip-prefix handler]
+  (fn [{uri :uri :as req}]
+    (handler (if (str/starts-with? uri strip-prefix)
+                (assoc req :uri (subs uri (count strip-prefix)))
+                req))))
 
 (defrecord HttpServer [config handlers]
   component/Lifecycle
@@ -20,7 +27,10 @@
           handler (if-let [auth-tkt (:auth-tkt config)]
                     (nap-cookie/wrap-check-cookie
                      auth-tkt
-                     (nap-users/wrap-user-info db handler))
+                     (nap-users/wrap-user-info
+                      db
+                      (wrap-strip-prefix (or (:strip-prefix config) "")
+                                         handler)))
                     handler)]
       (assoc this ::stop
              (server/run-server
