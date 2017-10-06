@@ -2,7 +2,9 @@
   "UI components for different form fields."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.localization :refer [tr]]
+            [cljs-react-material-ui.icons :as ic]))
 
 
 (defn read-only-atom [value]
@@ -143,28 +145,36 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields delete-buttons update!] :as opts} data]
+(defmethod field :table [{:keys [table-fields delete-button update! delete?] :as opts} data]
   [ui/table
    [ui/table-header {:adjust-for-checkbox false
                      :display-select-all false}
     [ui/table-row {:selectable false}
      (doall
-      (for [{:keys [name label] :as tf} table-fields]
+      (for [{:keys [name label width] :as tf} table-fields]
         ^{:key name}
-        [ui/table-header-column label]))]]
+        [ui/table-header-column {:style {:width width}} label]))
+     (when delete?
+       [ui/table-header-column {:style {:width "70px"}}
+        (tr [:buttons :delete])])]]
 
    [ui/table-body {:display-row-checkbox false}
     (map-indexed
      (fn [i row]
        ^{:key i}
-       [ui/table-row {:selectable false
-                      :style {:border "0px"}}
+       [ui/table-row {:selectable false :display-border false}
         (doall
-         (for [{:keys [name read write] :as tf} table-fields]
+         (for [{:keys [name read write width] :as tf} table-fields]
            ^{:key name}
-           [ui/table-row-column
+           [ui/table-row-column {:style {:width width}}
             [field (assoc tf
                           :table? true
                           :update! #(update! (assoc-in data [i name] %)))
-             ((or read name) row)]]))])
+             ((or read name) row)]]))
+        (when delete?
+          [ui/table-row-column {:style {:width "70px"}}
+           [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                               (take i data))
+                                                             (drop (inc i) data))))}
+            [ic/action-delete]]])])
      data)]])

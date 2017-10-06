@@ -26,7 +26,7 @@
       :footer-fn   (fn [data]
                      [napit/tallenna {:on-click #(e! (service/->SavePassengerTransportData))
                                       :disabled (form/disable-save? data)}
-                      "Tallenna"])}
+                      (tr [:buttons :save])])}
 
      [
 
@@ -79,12 +79,9 @@
            :table-fields [{:name ::transport-service/name :type :string}
                           {:name ::transport-service/price-per-unit :type :number}
                           {:name ::transport-service/unit :type :string}
-                          {:name ::transport-service/currency :type :string}
-                          {:name (tr [:buttons :delete]) :type :button}]
-           :delete-button [ui/flat-button
-                           {:label    "Remove"
-                            :icon     (ic/action-delete)
-                            :on-click #(e! (transport-service-services/->RemovePriceClassRow))}]
+                          {:name ::transport-service/currency :type :string :width "100px"}
+                          ]
+           :delete? true
            })]
 
      status]
