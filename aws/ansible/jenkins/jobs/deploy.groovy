@@ -30,7 +30,7 @@ job('Deploy OTE') {
             goals('flyway:migrate')
             rootPOM('database/pom.xml')
             mavenInstallation('Maven 3.5.0')
-            property('databaseUrl', 'jdbc:postgresql:${vault_db_host}/napote')
+            property('databaseUrl', 'jdbc:postgresql://${vault_db_host}/napote')
             property('databaseUser', '${vault_db_flyway_user}')
             property('databasePassword', '${vault_db_flyway_password}')
         }
