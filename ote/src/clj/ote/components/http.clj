@@ -12,13 +12,13 @@
 
 (defrecord HttpServer [config handlers]
   component/Lifecycle
-  (start [this]
+  (start [{db :db :as this}]
     (let [resources (route/resources "/")
           handler #(serve-request @handlers %)
           handler (if-let [auth-tkt (:auth-tkt config)]
                     (nap-cookie/wrap-check-cookie
                      auth-tkt
-                     (nap-users/wrap-user-info handler))
+                     (nap-users/wrap-user-info db handler))
                     handler)]
       (assoc this ::stop
              (server/run-server
