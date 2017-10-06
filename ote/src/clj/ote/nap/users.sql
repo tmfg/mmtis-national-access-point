@@ -9,4 +9,4 @@ SELECT u.id as user_id,
   FROM "user" u
   JOIN "member" m ON (m.table_name='user' AND m.state='active' AND m.table_id=u.id)
   JOIN "group" g ON g.id = m.group_id
- WHERE u.name = ?;
+ WHERE u.name = :username;

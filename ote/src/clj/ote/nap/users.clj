@@ -15,7 +15,7 @@
 
 (defn find-user [db username]
   (let [rows (map db-utils/underscore->structure
-                  (fetch-user-by-username db username))]
+                  (fetch-user-by-username db {:username username}))]
     (when-not (empty? rows)
       (assoc (first rows)
              :groups (map :group rows)))))
