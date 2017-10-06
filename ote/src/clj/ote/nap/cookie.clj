@@ -52,7 +52,7 @@
      :tokens ""}))
 
 (defn- ip-bytes [ip]
-  (byte-array (map (comp byte #(Integer/parseInt %))
+  (byte-array (map (comp unchecked-byte #(Integer/parseInt %))
                    (str/split ip #"\."))))
 
 (defn- ts-bytes [ts]
