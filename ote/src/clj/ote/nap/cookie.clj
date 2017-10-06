@@ -79,6 +79,7 @@
                         (:user-data cookie))
                 shared-secret)]
     (assoc cookie
+           :calculated-digest calculated-digest
            :valid-digest? (= calculated-digest cookie-digest))))
 
 (defn verify-timestamp
@@ -102,7 +103,7 @@
   (cookies/wrap-cookies
    (fn [{cookies :cookies headers :headers :as req}]
      (let [auth-ticket (:value (get cookies "auth_tkt"))
-           ip (client-ip req)
+           ip "0.0.0.0" ;; (client-ip req)  FIXME: ckan seems to always get 0.0.0.0 as IP
            cookie (and auth-ticket ip
                        (some->> auth-ticket
                                 (parse (or digest-algorithm "MD5"))
@@ -115,6 +116,6 @@
 
          ;; Ticket is invalid, log this attempt and return
          (do
-           (log/warn "Access denied to " (:uri req) " with invalid cookie:" auth-ticket ", ip:" ip)
+           (log/warn "Access denied to " (:uri req) " with invalid cookie:" auth-ticket ", ip:" ip ", COOKIE: " (pr-str cookie))
            {:status 401
             :body "Invalid cookie"}))))))
