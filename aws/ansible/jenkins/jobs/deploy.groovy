@@ -19,13 +19,20 @@ job('Deploy OTE') {
 
     steps {
 
+        shell('ansible-vault view --vault-password-file=~/.vault_pass.txt aws/ansible/environments/${ENV}/group_vars/all/vault > build.properties')
+
+        envInjectBuilder {
+            propertiesContent('')
+            propertiesFilePath('build.properties')
+        }
+        
         maven {
             goals('flyway:migrate')
             rootPOM('database/pom.xml')
             mavenInstallation('Maven 3.5.0')
-            property('databaseUrl', 'jdbc:postgresql:{{vault_db_host}}/napote')
-            property('databaseUser', '{{vault_db_flyway_user}}')
-            property('databasePassword', '{{vault_db_flyway_password}}')
+            property('databaseUrl', 'jdbc:postgresql:${vault_db_host}/napote')
+            property('databaseUser', '${vault_db_flyway_user}')
+            property('databasePassword', '${vault_db_flyway_password}')
         }
 
 
