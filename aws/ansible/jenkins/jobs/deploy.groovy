@@ -17,7 +17,16 @@ job('Deploy OTE') {
     }
     steps {
 
-        // PENDING: run database migration for as a step
+        maven {
+            goals('flyway:migrate')
+            rootPOM('database/pom.xml')
+            mavenInstallation('Maven 3.5.0')
+            property('databaseUrl', 'jdbc:postgresql:{{vault_db_host}}/napote')
+            property('databaseUser', '{{vault_db_flyway_user}}')
+            property('databasePassword', '{{vault_db_flyway_password}}')
+        }
+
+
         ansiblePlaybookBuilder {
             additionalParameters('--vault-password-file=~/.vault_pass.txt')
             playbook('aws/ansible/ote.yml')
