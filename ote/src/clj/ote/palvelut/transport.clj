@@ -7,7 +7,8 @@
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
-            [compojure.core :refer [routes GET POST]]))
+            [compojure.core :refer [routes GET POST]]
+            [taoensso.timbre :as log]))
 
 (defn db-get-transport-operator [db business-id]
   (fetch db ::transport-operator/transport-operator #{ ::transport-operator/id } {::transport-operator/business-id business-id})
@@ -34,10 +35,12 @@
            (http/publish! http (routes
                                   (GET "/transport-operator/:business-id" [business-id]
                                     (get-transport-operator db business-id))
-                                  (POST "/transport-operator" {form-data :body}
-                                    (http/transit-response (save-transport-operator db (http/transit-request form-data))))
+                                  (POST "/transport-operator" {form-data :body
+                                                               user :user}
+                                        (log/info "USER: " user)
+                                        (http/transit-response (save-transport-operator db (http/transit-request form-data))))
                                   (POST "/passenger-transportation-info" {form-data :body}
-                                    (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
+                                        (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
                                   ))))
   (stop [{lopeta ::lopeta :as this}]
     (lopeta)
