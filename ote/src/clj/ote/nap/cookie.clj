@@ -89,13 +89,20 @@
     (assoc cookie
            :valid-timestamp? (.before ts expires))))
 
+(defn client-ip [{headers :headers}]
+  (-> headers
+      (get "x-forwarded-for")
+      (str/split #",")
+      last
+      str/trim))
+
 (defn wrap-check-cookie
   "Ring middleware to check auth_tkt cookie."
   [{:keys [digest-algorithm shared-secret max-age-in-seconds] :as options} handler]
   (cookies/wrap-cookies
    (fn [{cookies :cookies headers :headers :as req}]
      (let [auth-ticket (:value (get cookies "auth_tkt"))
-           ip (get headers "x-forwarded-for")
+           ip (client-ip req)
            cookie (and auth-ticket ip
                        (some->> auth-ticket
                                 (parse (or digest-algorithm "MD5"))
