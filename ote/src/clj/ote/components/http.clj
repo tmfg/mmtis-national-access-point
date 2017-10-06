@@ -5,9 +5,11 @@
             [compojure.route :as route]
             [cognitect.transit :as transit]
             [ote.nap.cookie :as nap-cookie]
-            [ote.nap.users :as nap-users]))
+            [ote.nap.users :as nap-users]
+            [taoensso.timbre :as log]))
 
 (defn- serve-request [handlers req]
+  (log/info "REQUEST: " (pr-str req))
   ((apply some-fn handlers) req))
 
 (defrecord HttpServer [config handlers]
