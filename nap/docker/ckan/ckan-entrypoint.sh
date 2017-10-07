@@ -50,6 +50,31 @@ write_config () {
   #    "ckan.site_url = ${CKAN_SITE_URL}"
 }
 
+watch_plugin_changes () {
+  echo "Watching plugin source file changes at: $CKAN_CUSTOM_PLUGINS_PATH ..."
+
+  inotifywait -q -m -r -e close_write,delete,move \
+    --exclude \___jb_ --format '%w%f' $CKAN_CUSTOM_PLUGINS_PATH | \
+    while read FILE_PATH
+     do
+      echo "Plugins source file changed: $FILE_PATH. Updating plugin..."
+
+      # Remove the custom plugins volume path from the beginning of the file path
+      # and append the result to ckan home src path.
+      TARGET_PATH="$CKAN_HOME/src/${FILE_PATH/#"$CKAN_CUSTOM_PLUGINS_PATH"\/}"
+      cp --verbose $FILE_PATH $TARGET_PATH
+
+      # Remove everything from the target path starting from /ckanext/ to
+      # to get the main path of the plugin that has changed files.
+      PLUGIN_MAIN_PATH=${TARGET_PATH%%/ckanext/*}
+
+      # Update the plugin by reinstalling it. The setup.py file of the plugin is located
+      # in the plugin main path.
+      # NOTE: We'll see if this is required at all. Some changes might require reinstalling the plugin.
+      #   Enable this if required.
+      # ckan-pip install -e $PLUGIN_MAIN_PATH
+    done &
+}
 
 # Write config
 # NOTE: Currently we are re-creating the config each time to make sure that we have a proper config file
@@ -86,5 +111,8 @@ set_environment
 
 # Initializes the Database
 ckan-paster --plugin=ckan db init -c "${CKAN_CONFIG}/ckan.ini"
+
+# Start watching custom plugin changes in /ckan-plugins volume
+watch_plugin_changes
 
 exec "$@"
