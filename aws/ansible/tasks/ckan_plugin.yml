@@ -2,7 +2,7 @@
   file: name=/usr/lib/ckan/default/src/ckanext state=directory owner=napote group=napote
 
 - name: Copy NAPOTE theme CKAN plugin files
-  copy: src=nap/docker/ckan/ckan-plugins/ckanext-napote_theme dest=/usr/lib/ckan/default/src/ckanext owner=napote group=napote
+  copy: src=../../nap/docker/ckan/ckan-plugins/ckanext-napote_theme dest=/usr/lib/ckan/default/src/ckanext owner=napote group=napote
 
 - name: Restart CKAN service
   service: name=ckan state=restarted
