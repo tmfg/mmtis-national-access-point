@@ -6,6 +6,7 @@ ote/resources/public/js
 pom.xml.asc
 *jar
 *.class
+*.pyc
 lib/
 classes/
 target/
