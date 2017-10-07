@@ -7,29 +7,40 @@ ENV CKAN_HOME /usr/lib/ckan
 ENV CKAN_VIRTUAL_ENV $CKAN_HOME/virtualenv
 ENV CKAN_CONFIG /etc/ckan
 ENV CKAN_STORAGE_PATH /var/lib/ckan
+ENV CKAN_CUSTOM_PLUGINS_PATH /ckan-plugins
 
 # These build-time vars are specified by docker-compose.yml
 ARG CKAN_PORT=5555
 ARG CKAN_SITE_URL=http://localhost:8080
 
 ## Install required packages ##
-RUN yum -y update && yum -y upgrade && yum -y install \
+# NOTE: lipgq-dev (debian) = postgresql-libs (centos)
+# NOTE: build-essential (debian) = gcc gcc-c++ make openssl-devel (centos)
+
+# Perform updates and install EPEL for inotify-tools
+RUN yum -y update && yum -y upgrade && yum -y install epel-release
+
+# Install packages
+RUN yum -y update && yum --enablerepo=epel -y install \
 		python-devel \
 		postgresql-devel \
+		postgresql-libs \
         python-virtualenv \
-        libpq-dev \
         git-core \
-        build-essential \
-        libssl-dev \
-        libffi-dev \
         gcc \
+        gcc-c++ \
+        make \
+        openssl-devel \
+        libffi-devel \
+        gcc \
+        inotify-tools \
 	&& yum clean all
 
 # Create ckan user
 RUN useradd -r -u 900 -m -c "ckan account" -d $CKAN_HOME -s /bin/false ckan
 
 ## SetUp Virtual Environment for CKAN ##
-RUN mkdir -p $CKAN_VIRTUAL_ENV $CKAN_CONFIG $CKAN_STORAGE_PATH
+RUN mkdir -p $CKAN_VIRTUAL_ENV $CKAN_CONFIG $CKAN_STORAGE_PATH $CKAN_CUSTOM_PLUGINS_PATH
 
 RUN virtualenv $CKAN_VIRTUAL_ENV
 RUN ln -s $CKAN_VIRTUAL_ENV/bin/pip /usr/local/bin/ckan-pip
@@ -78,10 +89,15 @@ ENTRYPOINT ["/ckan-entrypoint.sh"]
 
 # Config
 VOLUME ["/etc/ckan"]
+
 # Home
 VOLUME ["/usr/lib/ckan"]
+
 # Storage
 VOLUME ["/var/lib/ckan"]
+
+# Volume for custom ckan plugins
+VOLUME ["/ckan-plugins"]
 
 USER ckan
 EXPOSE $CKAN_PORT
