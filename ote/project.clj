@@ -52,6 +52,9 @@
                  [org.geotools/gt-xml "16.1"]
                  [org.geotools/gt-geojson "16.1"]
 
+                 ;; JSON
+                 [cheshire "5.8.0"]
+
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
 

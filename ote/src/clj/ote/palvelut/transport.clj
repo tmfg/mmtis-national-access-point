@@ -23,7 +23,7 @@
   )
 
 (defn- save-passenger-transportation-info [db data]
-  (println "save-passenger-transportation-info " data)
+  (println "save-passenger-transportation-info " (pr-str data))
   (upsert! db ::transport-service/transport-service data)
   )
 
