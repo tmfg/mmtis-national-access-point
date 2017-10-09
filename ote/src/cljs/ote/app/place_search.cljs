@@ -2,11 +2,13 @@
   "Controller for searching places on a map.
   Uses the backend openstreetmap-places service."
   (:require [tuck.core :as tuck]
-            [ote.communication :as comm]))
+            [ote.communication :as comm]
+            [ote.db.places :as places]))
 
 (defrecord SetPlaceName [name])
 (defrecord SearchPlaces [])
 (defrecord SearchPlacesResponse [places])
+(defrecord RemovePlaceById [id])
 
 (extend-protocol tuck/Event
 
@@ -20,12 +22,19 @@
                {:on-success (tuck/send-async! ->SearchPlacesResponse)})
     (update app :place-search
             #(assoc %
-                    :search-in-progress? true
-                    :results nil)))
+                    :search-in-progress? true)))
 
   SearchPlacesResponse
   (process-event [{places :places} app]
     (update app :place-search
-            #(assoc %
-                    :search-in-progress? false
-                    :results places))))
+            #(-> %
+                 (assoc %
+                        :search-in-progress? false
+                        :name "")
+                 (update :results concat places))))
+
+  RemovePlaceById
+  (process-event [{id :id} app]
+    (update-in app [:place-search :results]
+               (fn [results]
+                 (filterv  (comp (partial not= id) ::places/id) results)))))
