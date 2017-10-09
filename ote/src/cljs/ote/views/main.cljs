@@ -39,11 +39,12 @@
       })}
    [:div.ote-sovellus.container-fluid
     [ui/app-bar {:title "OTE"}]
+    [debug/debug app]
     [:div.container-fluid
      (when (= :operator (:page app))
                [to/olennaiset-tiedot e! (:transport-operator app)])
      (when (= :passenger-transportation (:page app))
         [pt/passenger-transportation-info e! (:transport-service app)]
        )
-     [debug/debug app]
+
      ]]])
