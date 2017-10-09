@@ -30,6 +30,13 @@
                       #{::places/namefin ::places/location ::places/natcode}
                       {::places/namefin (op/ilike (str name-prefix "%"))})))
 
+(defn place-names [db]
+  (into []
+        (map ::places/namefin)
+        (specql/fetch db ::places/finnish-municipalities
+                      #{::places/namefin}
+                      {}
+                      {::specql/order-by ::places/namefin})))
 
 (defrecord Places [sources]
   component/Lifecycle
@@ -38,6 +45,9 @@
            (http/publish!
             http
             (routes
+             (GET "/place-names" []
+                  (http/transit-response
+                   (place-names db)))
              (GET "/places/:name" [name]
                   (http/transit-response
                    (search db name)))))))
