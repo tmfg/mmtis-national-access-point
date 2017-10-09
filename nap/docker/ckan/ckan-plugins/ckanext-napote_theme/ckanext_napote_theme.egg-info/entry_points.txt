@@ -1,0 +1,4 @@
+
+    [ckan.plugins]
+    napote_theme=ckanext.napote_theme.plugin:NapoteThemePlugin
+    

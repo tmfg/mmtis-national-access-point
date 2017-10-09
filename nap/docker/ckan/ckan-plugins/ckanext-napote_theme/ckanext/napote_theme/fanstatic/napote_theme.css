@@ -1,86 +1,42 @@
-/* =====================================================
-The "account masthead" bar across the top of the site
-===================================================== */
+/*
+*
+* Custom added classes
+*
+*/
 
-.account-masthead {
-    background-color: rgb(0, 70, 0);
+/** HEADER **/
+.masthead .section-right {
+    float: right !important;
+    margin-right: -15px;
 }
 
-/* The "bubble" containing the number of new notifications. */
-.account-masthead .account .notifications a span {
-    background-color: black;
-}
 
-/* The text and icons in the user account info. */
-.account-masthead .account ul li a {
-    color: rgba(255, 255, 255, 0.6);
-}
 
-/* The user account info text and icons, when the user's pointer is hovering
-   over them. */
-.account-masthead .account ul li a:hover {
-    color: rgba(255, 255, 255, 0.7);
-    background-color: black;
-}
+/*
+*
+* Customizations
+*
+*/
 
-/* ========================================================================
-   The main masthead bar that contains the site logo, nav links, and search
-   ======================================================================== */
-
-.masthead {
-    background-color: #3d3d3d;
-}
-
-/* The "navigation pills" in the masthead (the links to Datasets,
-   Organizations, etc) when the user's pointer hovers over them. */
-.masthead .navigation .nav-pills li a:hover {
-    background-color: rgb(48, 48, 48);
+/** HEADER **/
+.masthead .navbar .brand {
+    text-shadow: none;
+    font-size: 30px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
     color: white;
+    padding: 10px 30px 10px;
 }
 
-/* The "active" navigation pill (for example, when you're on the /dataset page
-   the "Datasets" link is active). */
-.masthead .navigation .nav-pills li.active a {
-    background-color: rgb(74, 74, 74);
+.navbar-form .select2-container {
+    margin-top: 5px;
 }
 
-/* ===========================================
-   The content in the middle of the front page
-   =========================================== */
-
-/* Change the colors of the "Search Your Data" box. */
-.homepage .module-search .module-content {
-    color: rgb(68, 68, 68);
-    background-color: white;
+.masthead .nav-collapse {
+    float: none;
 }
 
-/* Change the background color of the "Popular Tags" box. */
-.homepage .module-search .tags {
-    background-color: rgb(61, 61, 61);
-}
-
-/* Add a border line between the top and bottom halves of the front page. */
-.homepage [role="main"] {
-    border-top: 1px solid rgb(204, 204, 204);
-}
-
-/* ====================================
-   The footer at the bottom of the site
-   ==================================== */
-
-.site-footer,
-body {
-    background-color: rgb(40, 40, 40);
-}
-
-/* The text in the footer. */
-.site-footer,
-.site-footer label,
-.site-footer small {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* The link texts in the footer. */
-.site-footer a {
-    color: rgba(255, 255, 255, 0.6);
+.masthead .nav-collapse.in .section-right {
+    float: left !important;
+    clear: both;
 }
