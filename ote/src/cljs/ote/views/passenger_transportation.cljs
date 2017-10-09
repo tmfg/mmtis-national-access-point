@@ -6,30 +6,31 @@
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.napit :as napit]
-            [ote.tiedot.palvelu :as service]
+            [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.passenger-transportation :as pt]
             [ote.services.transport-service-services :as transport-service-services]
             [ote.ui.debug :as debug]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
-(defn passenger-transportation-info [e! status]
+(defn transportation-form-options [e!]
+  {:name->label (tr-key [:field-labels :passenger-transportation])
+   :update!     #(e! (pt/->EditPassengerTransportationState %))
+   :name        #(tr [:olennaiset-tiedot :otsikot %])
+   :footer-fn   (fn [data]
+                  [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb))
+                                   :disabled (form/disable-save? data)}
+                   (tr [:buttons :save])])})
 
+(defn passenger-transportation-info [e! status]
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
      [:h3 "Vaihe 2: Täydennä henkilökuljetukseen liittyvät tiedot."]]
-    [form/form
-     {:name->label (tr-key [:field-labels])
-      :update!     #(e! (service/->EditTransportService %))
-      :name        #(tr [:olennaiset-tiedot :otsikot %])
-      :footer-fn   (fn [data]
-                     [napit/tallenna {:on-click #(e! (service/->SavePassengerTransportData))
-                                      :disabled (form/disable-save? data)}
-                      (tr [:buttons :save])])}
+    [form/form (transportation-form-options e!)
 
      [
-
       (form/group
         {:label   nil
          :columns 1}
@@ -45,45 +46,45 @@
          :show-option (tr-key [:enums ::transport-service/payment-methods])
          :options     transport-service/payment-methods})
 
-        (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
-        (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
+      (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
+      (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
 
-        (form/group
-          {:label   "Muut palvelut ja esteettömyys"
-           :columns 1}
+      (form/group
+        {:label   "Muut palvelut ja esteettömyys"
+         :columns 1}
 
-          {:name        ::transport-service/additional-services
-           :type        :multiselect-selection
-           :show-option (tr-key [:enums ::transport-service/additional-services])
-           :options     transport-service/additional-services}
+        {:name        ::transport-service/additional-services
+         :type        :multiselect-selection
+         :show-option (tr-key [:enums ::transport-service/additional-services])
+         :options     transport-service/additional-services}
 
-          {:name        ::transport-service/accessibility-tool
-           :type        :multiselect-selection
-           :show-option (tr-key [:enums ::transport-service/accessibility-tool])
-           :options     transport-service/accessibility-tool}
+        {:name        ::transport-service/accessibility-tool
+         :type        :multiselect-selection
+         :show-option (tr-key [:enums ::transport-service/accessibility-tool])
+         :options     transport-service/accessibility-tool}
 
-          {:name ::transport-service/accessibility-description
-           :type :localized-text
-           :rows 5})
+        {:name ::transport-service/accessibility-description
+         :type :localized-text
+         :rows 5})
 
-        (form/group
-          {:label   "Hintatiedot"
-           :columns 3
-           :actions [ui/raised-button
-                     {:label    "Lisää hintarivi"
-                      :icon     (ic/action-note-add)
-                      :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
+      (form/group
+        {:label   "Hintatiedot"
+         :columns 3
+         :actions [ui/raised-button
+                   {:label    "Lisää hintarivi"
+                    :icon     (ic/action-note-add)
+                    :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
 
-          {:name         ::transport-service/price-classes
-           :type         :table
-           :table-fields [{:name ::transport-service/name :type :string}
-                          {:name ::transport-service/price-per-unit :type :number}
-                          {:name ::transport-service/unit :type :string}
-                          {:name ::transport-service/currency :type :string :width "100px"}
-                          ]
-           :delete? true
-           })]
+        {:name         ::transport-service/price-classes
+         :type         :table
+         :table-fields [{:name ::transport-service/name :type :string}
+                        {:name ::transport-service/price-per-unit :type :number}
+                        {:name ::transport-service/unit :type :string}
+                        {:name ::transport-service/currency :type :string :width "100px"}
+                        ]
+         :delete?      true
+         })]
 
-     status]
+     (get status :ote.db.transport-service/passenger-transportation)]
 
-    [debug/debug status]]])
+    ]])

@@ -16,6 +16,7 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
+  :passenger-transportation {
   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
   :ote.db.transport-service/url                       "Palvelun osoite"
   :ote.db.transport-service/description               "Palvelun kuvaus"
@@ -31,7 +32,7 @@
   :ote.db.transport-service/name                      "Hintaryhmä"
   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
   :ote.db.transport-service/unit                      "Yksikkö"
-  :ote.db.transport-service/currency                  "Valuutta"
+  :ote.db.transport-service/currency                  "Valuutta" }
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"

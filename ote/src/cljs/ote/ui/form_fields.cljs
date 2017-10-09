@@ -145,7 +145,7 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields delete-button update! delete?] :as opts} data]
+(defmethod field :table [{:keys [table-fields update! delete?] :as opts} data]
   [ui/table
    [ui/table-header {:adjust-for-checkbox false
                      :display-select-all false}

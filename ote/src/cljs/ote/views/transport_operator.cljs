@@ -1,9 +1,9 @@
-(ns ote.views.olennaiset-tiedot
+(ns ote.views.transport-operator
   "Olennaisten tietojen lomakenäkymä"
   (:require [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.napit :as napit]
-            [ote.tiedot.palvelu :as service]
+            [ote.app.controller.transport-operator :as to]
             [ote.ui.debug :as debug]
             [ote.db.transport-operator :as to-definitions]
             [ote.db.common :as common]
@@ -103,10 +103,10 @@
     [:h3 "Organisaation tiedot"]]
    [form/form
     {:name->label (tr-key [:field-labels])
-     :update! #(e! (service/->EditTransportOperator %))
+     :update! #(e! (to/->EditTransportOperatorState %))
      :name #(tr [:olennaiset-tiedot :otsikot %])
      :footer-fn (fn [data]
-                  [napit/tallenna {:on-click #(e! (service/->SaveTransportOperator))
+                  [napit/tallenna {:on-click #(e! (to/->SaveTransportOperatorToDb))
                                    :disabled (form/disable-save? data)}
                    "Tallenna"])}
 
@@ -154,5 +154,4 @@
       {:name ::to-definitions/instant-message :type :string})]
 
     status]
-
-   [debug/debug status]])
+   ])
