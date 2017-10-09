@@ -10,7 +10,7 @@
             [ote.integration.export.geojson :as export-geojson])
   (:gen-class))
 
-(def ^{:doc "Handle for OTE-system"}
+(defonce ^{:doc "Handle for OTE-system"}
   ote nil)
 
 (defn ote-system [config]
