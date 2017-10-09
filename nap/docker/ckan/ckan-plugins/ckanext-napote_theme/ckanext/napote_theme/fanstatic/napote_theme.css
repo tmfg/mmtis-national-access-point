@@ -40,3 +40,10 @@
     float: left !important;
     clear: both;
 }
+
+/** HOME **/
+
+.hero {
+    background: none;
+    background-color: white;
+}
