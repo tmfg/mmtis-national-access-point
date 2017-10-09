@@ -17,6 +17,6 @@
 
 (defmulti geometry (fn [opts geometry] (:type geometry)))
 
-(defmethod geometry :multipolygon [{color :color} {polygons :polygons}]
-  [Polygon {:positions (clj->js (mapcat :coordinates polygons))
-            :color color}])
+(defmethod geometry :multipolygon [style-options {polygons :polygons}]
+  [Polygon (merge {:positions (clj->js (mapcat :coordinates polygons))}
+                  style-options)])
