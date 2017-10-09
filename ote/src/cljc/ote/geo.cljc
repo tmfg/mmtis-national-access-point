@@ -6,7 +6,8 @@
 
   (:require [clojure.spec.alpha :as s])
   #?(:clj
-     (:import (com.vividsolutions.jts.geom MultiPolygon Polygon Point LineString))))
+     (:import (com.vividsolutions.jts.geom MultiPolygon Polygon Point LineString)
+              (org.postgis PGgeometry))))
 
 
 ;;; clojure.spec definitions for geometry data
@@ -72,6 +73,8 @@
                         (geometry-collection-seq gc len (inc idx))))))))
 
 #?(:clj
+
+   ;; Extend to-clj to JTS geometry types
    (extend-protocol
        GeometryToClojure
 
@@ -103,6 +106,70 @@
      (to-clj [^com.vividsolutions.jts.geom.MultiPolygon mp]
        {:type :multipolygon
         :polygons (mapv to-clj (geometry-collection-seq mp))})))
+
+
+#?(:clj
+   (defn point-coordinates [p]
+     [(.x p) (.y p)]))
+
+#?(:clj
+   ;; Extend to-clj to work with Postgis geometry types
+
+   (extend-protocol
+       GeometryToClojure
+
+     PGgeometry
+     (to-clj [^PGgeometry g]
+       (to-clj (.getGeometry g)))
+
+     org.postgis.GeometryCollection
+     (to-clj [^org.postgis.GeometryCollection gc]
+       {:type :geometry-collection
+        :geometries (into []
+                          (map to-clj)
+                          (.getGeometries gc))})
+
+     org.postgis.MultiPolygon
+     (to-clj [^org.postgis.MultiPolygon mp]
+       {:type :multipolygon
+        :polygons (mapv to-clj (seq (.getPolygons mp)))})
+
+     org.postgis.Polygon
+     (to-clj [^org.postgis.Polygon p]
+       {:type :polygon
+        :coordinates (mapv point-coordinates
+                           (loop [acc []
+                                  i 0]
+                             (if (= i (.numPoints p))
+                               acc
+                               (recur (conj acc (.getPoint p i))
+                                      (inc i)))))})
+
+     org.postgis.Point
+     (to-clj [^Point p]
+       {:type :point
+        :coordinates (point-coordinates p)})
+
+     org.postgis.MultiPoint
+     (to-clj [^org.postgis.MultiPoint mp]
+       {:type :multipoint
+        :coordinates (mapv to-clj (.getPoints mp))})
+
+
+     org.postgis.LineString
+     (to-clj [^org.postgis.LineString line]
+       {:type :line
+        :points (mapv point-coordinates (.getPoints line))})
+
+     org.postgis.MultiLineString
+     (to-clj [^org.postgis.MultiLineString mls]
+       {:type :multiline
+        :lines (mapv to-clj (.getLines mls))})
+
+
+     ;; NULL database geometry is nil in Clojure
+     nil
+     (to-clj [_] nil)))
 
 
 
