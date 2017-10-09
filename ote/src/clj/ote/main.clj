@@ -27,7 +27,7 @@
                   (localization-service/->Localization) [:http])
 
    ;; OpenStreetMap Overpass API queries
-   :places (component/using (places/->Places (:places config)) [:http])
+   :places (component/using (places/->Places (:places config)) [:http :db])
 
 
    ;; Integration: export GeoJSON
