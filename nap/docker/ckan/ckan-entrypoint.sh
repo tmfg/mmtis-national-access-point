@@ -55,7 +55,8 @@ watch_plugin_changes () {
 
   # Listen file change events
   # Settings: quiiet, monitor, recursive. Excludes events on some editor temp files, such as:  ___jb_*, ~ or .tmp
-  inotifywait -q -m -r -e close_write,delete,move \
+  # Note: MacOs host requires different set of events than linux host to work.
+  inotifywait -q -m -r -e modify,attrib,move,close_write,create,delete,delete_self \
     --exclude '(\___jb_|\~|/\..+)' --format '%w%f' $CKAN_CUSTOM_PLUGINS_PATH | \
     while read FILE_PATH
      do
