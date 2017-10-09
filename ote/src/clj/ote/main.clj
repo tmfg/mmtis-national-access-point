@@ -16,7 +16,7 @@
   (component/system-map
    ;; Basic components
    :db (db/database (:db config))
-   :http (http/http-server (:http config))
+   :http (component/using (http/http-server (:http config)) [:db])
 
    ;; Services for the frontend
    :transport (component/using (transport-service/->Transport) [:http :db])

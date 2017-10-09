@@ -12,7 +12,7 @@
                  [org.postgresql/postgresql "42.1.4"]
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
-                 [webjure/jeesql "0.4.6"]
+                 [webjure/jeesql "0.4.7"]
                  [specql "0.7.0-alpha4"]
 
                  ;; http-kit HTTP server (and client)
@@ -55,7 +55,10 @@
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
 
-  :profiles {:uberjar {:aot :all}}
+  :profiles {:uberjar {:aot :all
+
+                       ;; Prevent uberjar from cleaning cljs generated files
+                       :auto-clean false}}
 
   :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]
                  ["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
@@ -82,11 +85,11 @@
                 :source-paths ["src/cljs" "src/cljc"]
                 :compiler {:optimizations :advanced
                            :output-to "resources/public/js/ote.js"
-                           :output-dir "resources/public/js/"
+                           :output-dir "resources/public/js/prod-out"
                            :source-map "resources/public/js/ote.js.map"}}]}
 
   :clean-targets ^{:protect false}
-  ["resources/public/js/ote.js" "resources/public/js/out"]
+  ["resources/public/js/ote.js" "resources/public/js"]
 
   :aliases {;; Alias for doing a full production build
             "production" ["do" "clean," "deps," "compile,"

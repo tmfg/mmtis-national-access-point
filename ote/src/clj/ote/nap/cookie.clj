@@ -52,7 +52,7 @@
      :tokens ""}))
 
 (defn- ip-bytes [ip]
-  (byte-array (map (comp byte #(Integer/parseInt %))
+  (byte-array (map (comp unchecked-byte #(Integer/parseInt %))
                    (str/split ip #"\."))))
 
 (defn- ts-bytes [ts]
@@ -79,6 +79,7 @@
                         (:user-data cookie))
                 shared-secret)]
     (assoc cookie
+           :calculated-digest calculated-digest
            :valid-digest? (= calculated-digest cookie-digest))))
 
 (defn verify-timestamp
@@ -89,13 +90,20 @@
     (assoc cookie
            :valid-timestamp? (.before ts expires))))
 
+(defn client-ip [{headers :headers}]
+  (-> headers
+      (get "x-forwarded-for")
+      (str/split #",")
+      last
+      str/trim))
+
 (defn wrap-check-cookie
   "Ring middleware to check auth_tkt cookie."
   [{:keys [digest-algorithm shared-secret max-age-in-seconds] :as options} handler]
   (cookies/wrap-cookies
    (fn [{cookies :cookies headers :headers :as req}]
      (let [auth-ticket (:value (get cookies "auth_tkt"))
-           ip (get headers "x-forwarded-for")
+           ip "0.0.0.0" ;; (client-ip req)  FIXME: ckan seems to always get 0.0.0.0 as IP
            cookie (and auth-ticket ip
                        (some->> auth-ticket
                                 (parse (or digest-algorithm "MD5"))
@@ -108,6 +116,6 @@
 
          ;; Ticket is invalid, log this attempt and return
          (do
-           (log/warn "Access denied to " (:uri req) " with invalid cookie:" auth-ticket ", ip:" ip)
+           (log/warn "Access denied to " (:uri req) " with invalid cookie:" auth-ticket ", ip:" ip ", COOKIE: " (pr-str cookie))
            {:status 401
             :body "Invalid cookie"}))))))

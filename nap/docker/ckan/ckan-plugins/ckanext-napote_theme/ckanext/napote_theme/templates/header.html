@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+{% block header_site_navigation_tabs %}
+  {{ super() }}
+  {% if c.userobj %}
+    <li><a href="/ote/index.html">OTE</a></li>
+  {% endif %}
+{% endblock %}

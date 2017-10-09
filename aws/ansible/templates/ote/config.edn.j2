@@ -1,7 +1,8 @@
-{:db {:url "jdbc:postgresql://{{db_url}}:5432/napote"
+{:db {:url "{{db_url}}"
       :username "{{db_username}}"
       :password "{{db_password}}"}
  :http {:port 3000
+        :strip-prefix "/ote"
         :auth-tkt {:shared-secret "{{auth_shared_secret}}"
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}}

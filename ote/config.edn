@@ -2,9 +2,9 @@
       :username "napote"
       :password ""}
  :http {:port 3000
-        :auth-tkt nil #_{:shared-secret "localdev"
-                         :max-age-in-seconds 36000
-                         :digest-algorithm "MD5"}}
+        :auth-tkt {:shared-secret "localdev"
+                   :max-age-in-seconds 36000
+                   :digest-algorithm "MD5"}}
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"
