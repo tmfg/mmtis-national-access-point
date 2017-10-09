@@ -9,13 +9,10 @@
 
   AddPriceClassRow
   (process-event [_ app]
-    (update-in app [:transport-service ::transport-service/price-classes]
+    (update-in app [:transport-service ::transport-service/passenger-transportation ::transport-service/price-classes]
                #(conj (or % []) {::transport-service/currency "EUR"})))
 
   RemovePriceClassRow
   (process-event [_ app]
     (assoc-in app [:transport-service :price-class-open] false)))
 
-
-;ote.app.transport-service.events == määrittelee transport-servicen mahdolliset UI evneti
-;ote.app.transport-service == määrittelee transport-servicen eventtie process-event implementaatiot

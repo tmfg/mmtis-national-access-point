@@ -16,14 +16,14 @@
                                                                                                  :post-office "Oulu"}}
 
                   ;; Currently selected / edited transport service
-                  :transport-service  {:add-price-class false ;; State of price class adding list (true = open)
-                                       }
+                  :transport-service  #:ote.db.transport-service
+                                          {:passenger-transportation
+                                           {
+                                            :ote.db.transport-service/real-time-information
+                                            #:ote.db.transport-service {:url "www.example.com/url"}
+                                            }
+                                           }
+                  }
 
-                  :data               {:operator         {}
-                                       :service-provider {:transport-operator-id    0
-                                                          :type                     "passenger-transportation" ;;:terminal :passenger-transportation :rentals :parking :brokerage
-                                                          :terminal                 {}
-                                                          :passenger-transportation {}
-                                                          :rental                   {}
-                                                          :parking                  {}
-                                                          :brokerage                {}}}}))
+                 )
+         )

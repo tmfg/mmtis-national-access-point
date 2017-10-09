@@ -3,7 +3,7 @@
   (:require [cljs-react-material-ui.core :refer [get-mui-theme color]]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
-            [ote.views.olennaiset-tiedot :as ot]
+            [ote.views.transport-operator :as to]
             [ote.views.vuokraus :as vuokraus]
             [ote.views.alueet :as pysakointialueet]
             [ote.views.liikennevalineet :as liikennevalineet]
@@ -12,7 +12,7 @@
             [ote.localization :as localization]
             [ote.views.kuljetus :as kuljetus]
             [ote.views.place-search :as place-search]
-            ))
+            [ote.ui.debug :as debug]))
 
 
 (defn ote-application
@@ -41,8 +41,9 @@
     [ui/app-bar {:title "OTE"}]
     [:div.container-fluid
      (when (= :operator (:page app))
-               [ot/olennaiset-tiedot e! (:transport-operator app)])
+               [to/olennaiset-tiedot e! (:transport-operator app)])
      (when (= :passenger-transportation (:page app))
         [pt/passenger-transportation-info e! (:transport-service app)]
        )
+     [debug/debug app]
      ]]])
