@@ -50,6 +50,39 @@ write_config () {
   #    "ckan.site_url = ${CKAN_SITE_URL}"
 }
 
+watch_plugin_changes () {
+  echo "Watching plugin source file changes at: $CKAN_CUSTOM_PLUGINS_PATH ..."
+
+  # Listen file change events
+  # Settings: quiiet, monitor, recursive. Excludes events on some editor temp files, such as:  ___jb_*, ~ or .tmp
+  inotifywait -q -m -r -e close_write,delete,move \
+    --exclude '(\___jb_|\~|/\..+)' --format '%w%f' $CKAN_CUSTOM_PLUGINS_PATH | \
+    while read FILE_PATH
+     do
+      echo "Plugins source file changed: $FILE_PATH. Updating plugin..."
+
+      # Remove everything from the target path starting from /ckanext/ to
+      # to get the main path of the plugin in ckan src directory. This contains the setup.py file.
+      PLUGIN_MAIN_PATH=${FILE_PATH%%/ckanext/*}
+
+      # Remove the custom plugins volume path from the beginning of the file path
+      # and append the result to ckan home src path. The setup.py file of the plugin is located here.
+      PLUGIN_INSTALL_PATH="$CKAN_HOME/src/${PLUGIN_MAIN_PATH/#"$CKAN_CUSTOM_PLUGINS_PATH"\/}"
+
+      TARGET_PATH="$CKAN_HOME/src/"
+
+      # Note that we are not syncing with -a, because we do not want to copy groups and permissions from local plugins
+      # directory.
+      rsync -rltvzh --delete \
+        --exclude '*egg-*' --exclude '*.pyc' --exclude '~*' --exclude '.[!.]*' \
+         $PLUGIN_MAIN_PATH $TARGET_PATH
+
+      # Update the plugin by reinstalling it.
+      # NOTE: We'll see if this is required at all. Some changes might require reinstalling the plugin.
+      #   Enable this if required.
+      # ckan-pip install -e $PLUGIN_INSTALL_PATH
+    done &
+}
 
 # Write config
 # NOTE: Currently we are re-creating the config each time to make sure that we have a proper config file
@@ -86,5 +119,8 @@ set_environment
 
 # Initializes the Database
 ckan-paster --plugin=ckan db init -c "${CKAN_CONFIG}/ckan.ini"
+
+# Start watching custom plugin changes in /ckan-plugins volume
+watch_plugin_changes
 
 exec "$@"
