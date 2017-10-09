@@ -12,7 +12,9 @@
             [ote.ui.debug :as debug]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [ote.views.place-search :as place-search]
+            [tuck.core :as tuck]))
 
 (defn transportation-form-options [e!]
   {:name->label (tr-key [:field-labels :passenger-transportation])
@@ -31,60 +33,65 @@
     [form/form (transportation-form-options e!)
 
      [
+      (place-search/place-search-form-group
+       (tuck/wrap-path e! :transport-service ::transport-service/passenger-transportation ::transport-service/operation-area)
+       (tr [:field-labels :passenger-transportation ::transport-service/operation-area])
+       ::transport-service/operation-area)
+
       (form/group
-        {:label   nil
-         :columns 1}
+       {:label   nil
+        :columns 1}
 
-        {:name ::transport-service/luggage-restrictions
-         :type :localized-text
-         :rows 5}
+       {:name ::transport-service/luggage-restrictions
+        :type :localized-text
+        :rows 5}
 
-        ;; Payment method is a list in database so we need to enable multible choises
-        {
-         :name        ::transport-service/payment-methods
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::transport-service/payment-methods])
-         :options     transport-service/payment-methods})
+       ;; Payment method is a list in database so we need to enable multible choises
+       {
+        :name        ::transport-service/payment-methods
+        :type        :multiselect-selection
+        :show-option (tr-key [:enums ::transport-service/payment-methods])
+        :options     transport-service/payment-methods})
 
       (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
       (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
 
       (form/group
-        {:label   "Muut palvelut ja esteettömyys"
-         :columns 1}
+       {:label   "Muut palvelut ja esteettömyys"
+        :columns 1}
 
-        {:name        ::transport-service/additional-services
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::transport-service/additional-services])
-         :options     transport-service/additional-services}
+       {:name        ::transport-service/additional-services
+        :type        :multiselect-selection
+        :show-option (tr-key [:enums ::transport-service/additional-services])
+        :options     transport-service/additional-services}
 
-        {:name        ::transport-service/accessibility-tool
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::transport-service/accessibility-tool])
-         :options     transport-service/accessibility-tool}
+       {:name        ::transport-service/accessibility-tool
+        :type        :multiselect-selection
+        :show-option (tr-key [:enums ::transport-service/accessibility-tool])
+        :options     transport-service/accessibility-tool}
 
-        {:name ::transport-service/accessibility-description
-         :type :localized-text
-         :rows 5})
+       {:name ::transport-service/accessibility-description
+        :type :localized-text
+        :rows 5})
 
       (form/group
-        {:label   "Hintatiedot"
-         :columns 3
-         :actions [ui/raised-button
-                   {:label    "Lisää hintarivi"
-                    :icon     (ic/action-note-add)
-                    :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
+       {:label   "Hintatiedot"
+        :columns 3
+        :actions [ui/raised-button
+                  {:label    "Lisää hintarivi"
+                   :icon     (ic/action-note-add)
+                   :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
 
-        {:name         ::transport-service/price-classes
-         :type         :table
-         :table-fields [{:name ::transport-service/name :type :string}
-                        {:name ::transport-service/price-per-unit :type :number}
-                        {:name ::transport-service/unit :type :string}
-                        {:name ::transport-service/currency :type :string :width "100px"}
-                        ]
-         :delete?      true
-         })]
+       {:name         ::transport-service/price-classes
+        :type         :table
+        :table-fields [{:name ::transport-service/name :type :string}
+                       {:name ::transport-service/price-per-unit :type :number}
+                       {:name ::transport-service/unit :type :string}
+                       {:name ::transport-service/currency :type :string :width "100px"}
+                       ]
+        :delete?      true
+        })]
 
-     (get status :ote.db.transport-service/passenger-transportation)]
+     (get status ::transport-service/passenger-transportation)]
 
     ]])
