@@ -85,5 +85,5 @@
 
  ;; Per feature/page localization keys
  :place-search {:name "Paikan nimi"
-                :search-button "Hae nimellä"}
+                :place-auto-complete "Hae paikka nimellä"}
  }
