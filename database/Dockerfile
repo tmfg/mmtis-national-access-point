@@ -25,7 +25,6 @@ RUN service postgresql restart && \
     psql -c "ALTER USER ckan WITH SUPERUSER;" -U postgres && \
     psql -c "CREATE DATABASE napote OWNER napote;" -U postgres && \
     psql -c "CREATE DATABASE temp OWNER napotetest;" -U postgres && \
-    psql -c "CREATE DATABASE ckan OWNER ckan;" -U postgres && \
     psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO napotetest;" -U postgres && \
     psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO napote;" -U postgres  && \
     psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ckan;" -U postgres && \

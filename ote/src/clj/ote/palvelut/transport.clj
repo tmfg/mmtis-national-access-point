@@ -22,13 +22,13 @@
   (upsert! db ::transport-operator/transport-operator data)
   )
 
+
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   [price-classes-float]
   (try
     (mapv #(update % ::transport-service/price-per-unit bigdec) price-classes-float)
-    (catch Exception e (println "price-per-unit is probably missing")))
-  )
+    (catch Exception e (println "price-per-unit is probably missing"))))
 
 (defn- save-passenger-transportation-info [db data]
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"

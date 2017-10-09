@@ -6,7 +6,8 @@
             [ote.components.http :as http]
             [ote.components.db :as db]
             [ote.services.localization :as localization-service]
-            [ote.services.places :as places])
+            [ote.services.places :as places]
+            [ote.integration.export.geojson :as export-geojson])
   (:gen-class))
 
 (def ^{:doc "Handle for OTE-system"}
@@ -26,7 +27,11 @@
                   (localization-service/->Localization) [:http])
 
    ;; OpenStreetMap Overpass API queries
-   :places (component/using (places/->Places (:places config)) [:http])))
+   :places (component/using (places/->Places (:places config)) [:http])
+
+
+   ;; Integration: export GeoJSON
+   :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])))
 
 (defn start []
   (alter-var-root
