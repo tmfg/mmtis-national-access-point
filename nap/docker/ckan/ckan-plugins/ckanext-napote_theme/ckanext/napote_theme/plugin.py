@@ -24,3 +24,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin):
         # that we'll use to refer to this fanstatic directory from CKAN
         # templates.
         toolkit.add_resource('fanstatic', 'napote_theme')
+
+        # Public directory for static images
+        toolkit.add_public_directory(config, 'public')
