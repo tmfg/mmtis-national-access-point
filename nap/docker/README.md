@@ -30,3 +30,32 @@ If you want to take a look inside a docker container run e.g.
 ## ENV variables
 
 Some env variables, such as ckan site url, can be easily configured through .env file.
+
+# Setup environment
+Open console and go to mmtis-national-access-point/nap/docker
+
+First time run 'docker-compose build'
+
+Start all dockers
+'docker-compose up'
+
+If napotedb gives error remove 'old' version
+'docker rm napotedb'
+
+If db migrate is needed stop napotedb (not sure if this is really needed?)
+'docker-compose rm -s napotedb'
+
+Restart napotedb
+'docker-compose up'
+
+Migrate latest db changes in mmtis-national-access-point/database
+'sh devdb_migrate.sh'
+
+Go to mmtis-national-access-point/ote
+Start leiningen'lein run'
+In another console start figwheel 'lein figwheel'
+
+In browser go to ckan http://localhost:3000
+Sign in using 'admin/admin'
+After signing in you can go to OTE http://localhost:3000/index.html
+   
