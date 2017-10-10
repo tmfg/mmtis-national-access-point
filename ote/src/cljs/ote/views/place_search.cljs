@@ -1,7 +1,7 @@
 (ns ote.views.place-search
   "View for searching for places and showing them on the map."
   (:require [reagent.core :as r]
-            [ote.app.place-search :as ps]
+            [ote.app.controller.place-search :as ps]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.napit :as napit]
             [ote.ui.debug :as debug]

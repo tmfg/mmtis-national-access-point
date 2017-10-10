@@ -1,4 +1,4 @@
-(ns ote.app.place-search
+(ns ote.app.controller.place-search
   "Controller for searching places on a map.
   Uses the backend openstreetmap-places service."
   (:require [tuck.core :as tuck]
