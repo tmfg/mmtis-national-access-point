@@ -2,10 +2,10 @@
 
 echo "Creating local PostgreSQL database for CI build"
 
-P="psql -h localhost -U napote -c "
+P="psql -h localhost -U napote "
 
 
-$P "DROP DATABASE IF EXISTS napotetest_template;"
-$P "CREATE DATABASE napotetest_template;"
+$P -c "DROP DATABASE IF EXISTS napotetest_template;"
+$P -c "CREATE DATABASE napotetest_template;"
 
-pg_restore -h localhost -U napote -d napotetest_template nap/ckan-initial-db.sql
+$P -f nap/ckan-initial-db.sql
