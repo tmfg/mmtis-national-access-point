@@ -21,8 +21,7 @@
          [{:label "Nimi"
            :name :valityspalvelu/nimi
            :type :string
-           :validate [[:non-empty "Anna välityspalvelun nimi"]]
-           }
+           :validate [[:non-empty "Anna välityspalvelun nimi"]]}
 
           {:label "Palvelun kuvaus"
            :name :valityspalvelu/kuvaus
@@ -39,24 +38,16 @@
           {:label "Pääasiallinen toiminta-alue"
            :name :valityspalvelu/paa-alue
            :type :text-area
-           :rows 2
-           }
+           :rows 2}
 
           {:label "Toissijainen toiminta-alue"
            :name :valityspalvelu/toissijainen-alue
            :type :text-area
-           :rows 2
-           }
+           :rows 2}
 
           {:label "Hinnasto"
            :name :valityspalvelu/hinnasto
            :type :text-area
-           :rows 3
-           }
-          ]
+           :rows 3}]
 
-         tila]
-        [debug/debug tila]
-        ]
-       ]
-      )
+         tila]]])

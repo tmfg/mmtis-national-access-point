@@ -17,8 +17,6 @@
 
      [{:label "Muodosta reitti"
        :name :liikennevalineet/nimi
-       :type :string}
-      ]
+       :type :string}]
 
-     tila]
-    [debug/debug tila]]])
+     tila]]])

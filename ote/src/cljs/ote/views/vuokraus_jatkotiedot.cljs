@@ -53,13 +53,6 @@
       {:label "Lisätieto www-osoitteen kuvaus"
        :name :satama/lisätietoja-kuvaus
        :type :text-area
-       :rows 5}
+       :rows 5}]
 
-
-      ]
-
-     tila]
-    [debug/debug tila]
-    ]
-   ]
-  )
+     tila]]])

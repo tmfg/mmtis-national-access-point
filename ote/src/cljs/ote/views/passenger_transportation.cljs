@@ -8,7 +8,6 @@
             [ote.ui.napit :as napit]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.passenger-transportation :as pt]
-            [ote.ui.debug :as debug]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]

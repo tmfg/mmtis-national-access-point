@@ -48,5 +48,4 @@
        :name :alueet/www-varauspalvelu
        :type :string}]
 
-     tila]
-    [debug/debug tila]]])
+     tila]]])

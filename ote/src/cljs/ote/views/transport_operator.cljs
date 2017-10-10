@@ -4,7 +4,6 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.napit :as napit]
             [ote.app.controller.transport-operator :as to]
-            [ote.ui.debug :as debug]
             [ote.db.transport-operator :as to-definitions]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))

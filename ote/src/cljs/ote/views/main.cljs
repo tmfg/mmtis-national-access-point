@@ -53,6 +53,8 @@
                  :icon-element-left (reagent/as-element (main-menu e!))
                  :icon-element-right (reagent/as-element (main-menu e!))
                  }]
+    ;; NOTE: debug state is VERY slow if app state is HUGE
+    ;; (it tries to pr-str it)
     [debug/debug app]
     [:div.container-fluid
      (when (= :front-page (:page app))
@@ -62,7 +64,4 @@
      (when (= :transport-operator (:page app))
                [to/olennaiset-tiedot e! (:transport-operator app)])
      (when (= :passenger-transportation (:page app))
-        [pt/passenger-transportation-info e! (:transport-service app)]
-       )
-
-     ]]])
+        [pt/passenger-transportation-info e! (:transport-service app)])]]])

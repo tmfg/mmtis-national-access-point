@@ -24,5 +24,4 @@
        :name :liikennevalineet/tyyppi
        :type :string}]
 
-     tila]
-    [debug/debug tila]]])
+     tila]]])

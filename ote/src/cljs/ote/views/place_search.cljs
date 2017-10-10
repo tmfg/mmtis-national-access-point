@@ -4,7 +4,6 @@
             [ote.app.controller.place-search :as ps]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.napit :as napit]
-            [ote.ui.debug :as debug]
             [ote.ui.leaflet :as leaflet]
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]
@@ -34,7 +33,8 @@
     :reagent-render
     (fn [e! results]
       (.log js/console "places map rendering")
-      [leaflet/Map {:center #js [65 25]
+      [leaflet/Map {;;:prefer-canvas true
+                    :center #js [65 25]
                     :zoom 5}
        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
