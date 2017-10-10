@@ -17,10 +17,10 @@
  (defn main-menu [e!]
    [ui/icon-menu
     {:icon-button-element (reagent/as-element [ui/icon-button [ic/action-view-headline {:color :white}]])}
-    [ui/menu-item {:primary-text "Olennaiset tiedot"
-                   :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
     [ui/menu-item {:primary-text "Etusivu"
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
+    [ui/menu-item {:primary-text "Organisaation perustiedot"
+                   :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
     ]
   )
 
@@ -55,7 +55,7 @@
                  }]
     [:div.container-fluid
      (when (= :front-page (:page app))
-       [fp/front-page e! (:front-page app)])
+       [fp/front-page e! app])
      (when (= :transport-service (:page app))
        [t-service/select-service-type e! (:transport-service app)])
      (when (= :transport-operator (:page app))
