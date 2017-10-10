@@ -10,6 +10,7 @@
 
                  ;; PostgreSQL JDBC ajuri, yhteyspooli ja muut apukirjastot
                  [org.postgresql/postgresql "42.1.4"]
+                 [net.postgis/postgis-jdbc "2.1.7.2"]
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
@@ -29,7 +30,7 @@
 
                  ;; Frontin UI-kirjastot
                  [reagent "0.7.0"]
-                 [webjure/tuck "0.4.1"]
+                 [webjure/tuck "0.4.2"]
                  [cljsjs/react "15.6.1-1"]
                  [cljsjs/react-dom "15.6.1-1"]
                  [cljs-react-material-ui "0.2.48"]

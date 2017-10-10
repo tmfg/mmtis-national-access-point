@@ -81,4 +81,9 @@
    :buggy            "Buggy"
    :other            "Muu"}
   }
+
+
+ ;; Per feature/page localization keys
+ :place-search {:name "Paikan nimi"
+                :place-auto-complete "Hae paikka nimellä"}
  }

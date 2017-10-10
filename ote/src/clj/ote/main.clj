@@ -10,7 +10,7 @@
             [ote.integration.export.geojson :as export-geojson])
   (:gen-class))
 
-(def ^{:doc "Handle for OTE-system"}
+(defonce ^{:doc "Handle for OTE-system"}
   ote nil)
 
 (defn ote-system [config]
@@ -27,7 +27,7 @@
                   (localization-service/->Localization) [:http])
 
    ;; OpenStreetMap Overpass API queries
-   :places (component/using (places/->Places (:places config)) [:http])
+   :places (component/using (places/->Places (:places config)) [:http :db])
 
 
    ;; Integration: export GeoJSON

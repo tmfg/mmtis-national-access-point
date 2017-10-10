@@ -1,29 +1,70 @@
 (ns ote.views.place-search
   "View for searching for places and showing them on the map."
   (:require [reagent.core :as r]
-            [ote.app.place-search :as ps]
+            [ote.app.controller.place-search :as ps]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.napit :as napit]
             [ote.ui.debug :as debug]
-            [ote.ui.leaflet :as leaflet]))
+            [ote.ui.leaflet :as leaflet]
+            [ote.ui.form :as form]
+            [ote.localization :refer [tr]]
+            [cljs-react-material-ui.reagent :as ui]
+            [ote.db.transport-service :as t-service]
+            [ote.db.places :as places]))
+
+(defn result-chips [e! results]
+  [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
+   (for [{::places/keys [name id] :as result} (map :place results)]
+     ^{:key id}
+     [ui/chip {:style {:margin 4}
+               :on-request-delete #(e! (ps/->RemovePlaceById id))} name])])
+
+(defn result-geometry [{::places/keys [name location]}]
+  [leaflet/FeatureGroup
+   [leaflet/geometry {:color "green"
+                      :dashArray "5,5"} location]
+   [leaflet/Popup [:div name]]])
+
+(defn places-map [e! results]
+  (r/create-class
+   {:should-component-update
+    ;; Do NOT rerender unless the geometries have changed
+    (fn [_ [_ _ old-results] [_ _ new-results]]
+      (not (identical? old-results new-results)))
+    :reagent-render
+    (fn [e! results]
+      (.log js/console "places map rendering")
+      [leaflet/Map {:center #js [65 25]
+                    :zoom 5}
+       [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                           :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+
+       (for [{:keys [place geojson]} results]
+         ^{:key (::places/id place)}
+         [leaflet/GeoJSON {:data geojson
+                           :style {:color "green"}}])])}))
 
 (defn place-search [e! place-search]
-  [:div.place-search
-   [leaflet/Map {:center #js [65 25]
-                 :zoom 10}
-    [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                        :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+  (e! (ps/->LoadPlaces))
+  (fn [e! place-search]
+    (let [results (:results place-search)]
+      [:div.place-search
 
-    (for [{:keys [namefin geometry]} (get-in place-search [:results :finnish-municipalities])]
-      ^{:key namefin}
-      [leaflet/FeatureGroup
-       [leaflet/geometry {:color "red"} geometry]
-       [leaflet/Popup [:div namefin]]])]
+       [result-chips e! results]
 
-   [form-fields/field {:type :string :label "Paikan nimi"
-                        :update! #(e! (ps/->SetPlaceName %))}
-    (get place-search :name)]
+       [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+                          :dataSource (clj->js (or (:place-names place-search) []))
+                          :on-update-input #(e! (ps/->SetPlaceName %))
+                          :search-text (or (:name place-search) "")
+                          :on-new-request #(e! (ps/->AddPlace %))}]
 
-   [napit/tallenna {:on-click #(e! (ps/->SearchPlaces))} "Hae paikkoja"]
+       [places-map e! results]])))
 
-   [debug/debug place-search]])
+(defn place-search-form-group [e! label name]
+  (form/group
+   {:label label
+    :columns 3}
+   {:type :component
+    :name name
+    :component (fn [{data :data}]
+                 [place-search e! (:place-search data)])}))
