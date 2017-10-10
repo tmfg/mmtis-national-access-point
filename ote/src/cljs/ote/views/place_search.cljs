@@ -12,9 +12,9 @@
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]))
 
-(defn result-chips [e! results search-component]
+(defn result-chips [e! results]
   [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-   (for [{::places/keys [name id] :as result} results]
+   (for [{::places/keys [name id] :as result} (map :place results)]
      ^{:key id}
      [ui/chip {:style {:margin 4}
                :on-request-delete #(e! (ps/->RemovePlaceById id))} name])])
@@ -35,16 +35,17 @@
     (fn [e! results]
       (.log js/console "places map rendering")
       [leaflet/Map {:center #js [65 25]
-                    :zoom 10}
+                    :zoom 5}
        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-       (for [{id ::places/id :as result} results]
-         ^{:key id}
-         [result-geometry result])])}))
+       (for [{:keys [place geojson]} results]
+         ^{:key (::places/id place)}
+         [leaflet/GeoJSON {:data geojson
+                           :style {:color "green"}}])])}))
 
 (defn place-search [e! place-search]
-  (e! (ps/->LoadPlaceNames))
+  (e! (ps/->LoadPlaces))
   (fn [e! place-search]
     (let [results (:results place-search)]
       [:div.place-search
@@ -52,7 +53,7 @@
        [result-chips e! results]
 
        [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
-                          :dataSource (clj->js (or (:names place-search) []))
+                          :dataSource (clj->js (or (:place-names place-search) []))
                           :on-update-input #(e! (ps/->SetPlaceName %))
                           :search-text (or (:name place-search) "")
                           :on-new-request #(e! (ps/->AddPlace %))}]

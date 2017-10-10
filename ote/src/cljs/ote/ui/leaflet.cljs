@@ -19,7 +19,7 @@
 
 (defmethod geometry :multipolygon [style-options {polygons :polygons}]
   ;; FIXME: positions should be array where first is outer ring and rest are holes
-  [Polygon (merge {:positions (clj->js (mapcat :coordinates polygons))}
+  [Polygon (merge {:positions (clj->js (map :coordinates polygons))}
                   style-options)])
 
 (defmethod geometry :polygon [style-options {coordinates :coordinates}]
