@@ -1,0 +1,110 @@
+# Translations template for ckanext-napote_theme.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the ckanext-napote_theme
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-napote_theme 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-10-09 17:34+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ckanext/napote_theme/templates/header.html:38
+msgid "Home"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:38
+msgid "Datasets"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:38
+msgid "Organizations"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:52
+#: ckanext/napote_theme/templates/header.html:61
+#: ckanext/napote_theme/templates/header.html:62
+msgid "View profile"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:68
+msgid "Sysadmin settings"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:70
+msgid "Admin"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:76
+#, python-format
+msgid "Dashboard (%(num)d new item)"
+msgid_plural "Dashboard (%(num)d new items)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ckanext/napote_theme/templates/header.html:80
+msgid "Dashboard"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:87
+msgid "Edit settings"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:89
+msgid "Settings"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:96
+#: ckanext/napote_theme/templates/header.html:98
+msgid "Log out"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:108
+#: ckanext/napote_theme/templates/home/layout1.html:19
+msgid "Log in"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:117
+#: ckanext/napote_theme/templates/home/layout1.html:25
+msgid "Register"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/layout1.html:24
+msgid "New user?"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/header.html:5
+msgid "FINAP"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/header.html:8
+msgid "Liikkumispalveluiden katalogi"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:6
+msgid "Welcome to CKAN"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:8
+msgid ""
+"This is a nice introductory paragraph about CKAN or the site in general. We "
+"don't have any copy to go here yet but soon we will "
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:17
+msgid "This is a featured section"
+msgstr ""
+
+#: ckanext/napote_theme/templates/snippets/navbar_language_selector.html:14
+msgid "Go"
+msgstr ""
+

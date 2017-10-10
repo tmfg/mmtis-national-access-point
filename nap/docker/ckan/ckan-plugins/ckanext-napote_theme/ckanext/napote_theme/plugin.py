@@ -2,13 +2,13 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.lib.plugins import DefaultTranslation
 
 
 class NapoteThemePlugin(plugins.SingletonPlugin):
-    '''An example theme plugin.
-
-    '''
-    # Declare that this class implements IConfigurer.
+    # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
+    # Enable after translations have been generated
+    #plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
 
     def update_config(self, config):
@@ -24,3 +24,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin):
         # that we'll use to refer to this fanstatic directory from CKAN
         # templates.
         toolkit.add_resource('fanstatic', 'napote_theme')
+
+        # Public directory for static images
+        toolkit.add_public_directory(config, 'public')
