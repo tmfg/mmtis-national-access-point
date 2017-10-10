@@ -12,6 +12,11 @@ psql -h napotedb -U napote napote -X -q -a -v ON_ERROR_STOP=1 --pset pager=off -
 echo "Insert CKAN test data"
 psql -h napotedb -U ckan napote -X -q -a -v ON_ERROR_STOP=1 --pset pager=off -f testdata-ckan.sql > /dev/null || true
 
+
+echo "Insert Finnish municipalities"
+psql -h napotedb -U napote napote -c "TRUNCATE finnish_municipalities;" || true
+psql -h napotedb -U napote napote -c "\COPY finnish_municipalities FROM /static-data/finnish_municipalities.csv CSV HEADER;" || true
+
 echo "Clean up and free connections"
 psql -h napotedb -U napote napote -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'napote' AND pid <> pg_backend_pid();"
 
