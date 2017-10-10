@@ -147,7 +147,7 @@
   ;;[:pre (pr-str s) " => " (pr-str data)]
   [:div.form-field
    (if (= type :component)
-     [:div.component (component {:update-form! (update-form s)
+     [:div.component (component {:update-form! #(update-form s)
                                  :data data})]
      (if editable?
        [form-fields/field (assoc s

@@ -9,58 +9,67 @@
             [taoensso.timbre :as log]
             [ote.shapefile.reader :as shp]
             [ote.geo :as geo]
-            [ote.util.functor :refer [fmap]])
+            [ote.util.functor :refer [fmap]]
+            [specql.core :as specql]
+            [ote.db.places :as places]
+            [specql.op :as op]
+            [jeesql.core :refer [defqueries]])
   (:import (java.net URLEncoder)))
 
-(defprotocol PlaceSource
-  (initialize [this]
-    "Initialize this source. Called before first search is done.
-    Returns updated version of the source.")
-  (search-places-by-name [this name-prefix]
-    "Search for places by a given name prefix."))
+(defqueries "ote/services/places.sql")
 
-(defrecord ShapefilePlaceSource [url name-field shp]
-  PlaceSource
-  (initialize [this]
-    ;; PENDING: we could do a search here to force loading
-    (assoc this :shp (shp/shapefile-datastore (java.net.URL. url))))
-  
-  (search-places-by-name [{shp :shp} name-prefix]
-    (let [;; FIXME: no way to bind parameters? we need to escape
-          ;; or rather include only safe characters (alpha)
-          cql (str name-field " LIKE '" name-prefix "%'")
-          cql-filter (shp/->filter cql)]
-      (into []
-            (comp
-             (map shp/feature-properties)
-             (map #(select-keys % #{:the_geom :namefin :nameswe}))
-             (map #(assoc % :geometry (geo/to-clj (geo/euref->wgs84 (:the_geom %)))))
-             (map #(dissoc % :the_geom)))
-            (shp/features shp cql-filter)))))
 
-(defmulti create-source "Create place source by :type keyword" :type)
+(defn search [db name-prefix]
+  (into []
+        (comp
+         ;; PENDING: we don't have other sources for now.
+         ;; When we do, create a VIEW in the database at makes them
+         ;; look the same.
+         (map #(-> %
+                   (assoc ::places/name (::places/namefin %)
+                          ::places/id (::places/natcode %))
+                   (dissoc ::places/namefin ::places/natcode)))
+         (map #(update % ::places/location geo/to-clj)))
+        (specql/fetch db ::places/finnish-municipalities
+                      #{::places/namefin ::places/location ::places/natcode}
+                      {::places/namefin (op/ilike (str name-prefix "%"))})))
 
-(defmethod create-source :shapefile [config]
-  (map->ShapefilePlaceSource config))
+(defn list-places [db]
+  (into []
+        (map #(-> %
+                  (assoc ::places/name (::places/namefin %)
+                         ::places/id (::places/natcode %))
+                  (dissoc :places/namefin ::places/natcode)))
+        (specql/fetch db ::places/finnish-municipalities
+                      #{::places/namefin ::places/natcode}
+                      {}
+                      {::specql/order-by ::places/namefin})))
 
-(defn search [sources name-prefix]
-  (fmap #(search-places-by-name % name-prefix) sources))
-
+(defn link-places-to-transport-service!
+  "Clear old place links and insert new links for the given transport service.
+  Should be called within a transaction."
+  [db transport-service-id place-references]
+  (clear-transport-service-places! db {:transport-service-id transport-service-id})
+  (doseq [{::places/keys [id name]} place-references]
+    (link-transport-service-place! db {:transport-service-id transport-service-id
+                                       :place-id id
+                                       :name name})))
 
 (defrecord Places [sources]
   component/Lifecycle
-  (start [{http :http :as this}]
-    ;; Create and initialize all place sources
-    (let [sources (fmap (comp initialize create-source) sources)]
-      (println "SOURCES: " (pr-str sources))
-      (assoc this ::stop
-             (http/publish!
-              http
-              (routes
-               (GET "/places/:name" [name]
-                    (http/transit-response
-                     (search sources name))))))))
-  
+  (start [{db :db http :http :as this}]
+    (assoc this ::stop
+           (http/publish!
+            http
+            (routes
+             (GET "/place-list" []
+                  (http/transit-response
+                   (list-places db)))
+             (GET "/places/:name" [name]
+                  {:status 200
+                   :headers {"Content-Type" "application/json"}
+                   :body (fetch-place-geojson-by-name db {:name name})})))))
+
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

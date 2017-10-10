@@ -17,6 +17,11 @@
 
 (defmulti geometry (fn [opts geometry] (:type geometry)))
 
-(defmethod geometry :multipolygon [{color :color} {polygons :polygons}]
-  [Polygon {:positions (clj->js (mapcat :coordinates polygons))
-            :color color}])
+(defmethod geometry :multipolygon [style-options {polygons :polygons}]
+  ;; FIXME: positions should be array where first is outer ring and rest are holes
+  [Polygon (merge {:positions (clj->js (map :coordinates polygons))}
+                  style-options)])
+
+(defmethod geometry :polygon [style-options {coordinates :coordinates}]
+  [Polygon (merge {:positions (clj->js coordinates)}
+                  style-options)])

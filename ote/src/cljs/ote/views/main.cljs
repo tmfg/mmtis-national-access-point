@@ -53,6 +53,7 @@
                  :icon-element-left (reagent/as-element (main-menu e!))
                  :icon-element-right (reagent/as-element (main-menu e!))
                  }]
+    [debug/debug app]
     [:div.container-fluid
      (when (= :front-page (:page app))
        [fp/front-page e! app])
@@ -63,5 +64,5 @@
      (when (= :passenger-transportation (:page app))
         [pt/passenger-transportation-info e! (:transport-service app)]
        )
-     [debug/debug app]
+
      ]]])
