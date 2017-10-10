@@ -2,20 +2,36 @@
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
-            [specql.core :refer [fetch update! insert! upsert!]]
+            [specql.core :refer [fetch update! insert! upsert!] :as specql]
             [specql.op :as op]
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
             [compojure.core :refer [routes GET POST]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.java.jdbc :as jdbc]))
 
-(defn db-get-transport-operator [db business-id]
-  (fetch db ::transport-operator/transport-operator #{ ::transport-operator/id } {::transport-operator/business-id business-id})
+(def transport-operator-columns
+  #{::transport-operator/id ::transport-operator/business-id ::transport-operator/email
+    ::transport-operator/name})
+
+(defn db-get-transport-operator [db where]
+  (first (fetch db ::transport-operator/transport-operator
+                transport-operator-columns
+                where {::specql/limit 1}))
   )
+;;{::transport-operator/business-id business-id}
 
-(defn- get-transport-operator [db business-id]
-  (http/transit-response (db-get-transport-operator db business-id)))
+(defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
+  (jdbc/with-db-transaction [db db]
+     (let [operator (db-get-transport-operator db {::transport-operator/ckan-group-id id})]
+       (http/transit-response
+         (or operator
+             ;; FIXME: what if name changed in CKAN, we should update?
+             (insert! db ::transport-operator/transport-operator
+                      {::transport-operator/name title
+                       ::transport-operator/ckan-group-id id}))))))
+
 
 (defn- save-transport-operator [db data]
   (println "save-transport-operator data " data)
@@ -41,9 +57,9 @@
   (start [{:keys [db http] :as this}]
     (assoc
       this ::lopeta
-           (http/publish! http (routes
-                                  (GET "/transport-operator/:business-id" [business-id]
-                                    (get-transport-operator db business-id))
+           (http/publish! http (routes                                  
+                                  (POST "/transport-operator/group" {user :user}
+                                    (ensure-transport-operator-for-group db (-> user :groups first)))
                                   (POST "/transport-operator" {form-data :body
                                                                user :user}
                                         (log/info "USER: " user)

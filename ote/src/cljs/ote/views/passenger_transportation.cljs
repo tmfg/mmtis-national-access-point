@@ -8,7 +8,6 @@
             [ote.ui.napit :as napit]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.passenger-transportation :as pt]
-            [ote.services.transport-service-services :as transport-service-services]
             [ote.ui.debug :as debug]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
@@ -73,7 +72,7 @@
          :actions [ui/raised-button
                    {:label    "Lisää hintarivi"
                     :icon     (ic/action-note-add)
-                    :on-click #(e! (transport-service-services/->AddPriceClassRow))}]}
+                    :on-click #(e! (ts/->AddPriceClassRow))}]}
 
         {:name         ::transport-service/price-classes
          :type         :table

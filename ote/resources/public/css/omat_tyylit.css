@@ -24,6 +24,18 @@ html {
     height : 1px;
 }
 
+.main-notification-panel {
+    margin-top: 20px;
+    background-color: #E0E0E0;
+    color: #757575;
+    margin-bottom: 20px;
+}
+
+.main-notification-panel > div:first-of-type {
+    padding-top: 22px;
+    padding-left: 35px;
+}
+
 .debug {
     font-size: 12px;
 }
