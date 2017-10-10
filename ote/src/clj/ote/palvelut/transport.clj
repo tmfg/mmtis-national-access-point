@@ -2,7 +2,7 @@
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
-            [specql.core :refer [fetch update! insert! upsert!]]
+            [specql.core :refer [fetch update! insert! upsert!] :as specql]
             [specql.op :as op]
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as transport-service]
@@ -10,14 +10,52 @@
             [compojure.core :refer [routes GET POST]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
+            [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]))
 
-(defn db-get-transport-operator [db business-id]
-  (fetch db ::transport-operator/transport-operator #{ ::transport-operator/id } {::transport-operator/business-id business-id})
+;; FIXME: monkey patch specql composite reading (For now)
+(defmethod specql-composite/parse-value "bpchar" [_ string] string)
+
+(def transport-operator-columns
+  #{::transport-operator/id ::transport-operator/business-id ::transport-operator/email
+    ::transport-operator/name})
+
+(defn db-get-transport-operator [db where]
+  (first (fetch db ::transport-operator/transport-operator
+                transport-operator-columns
+                where {::specql/limit 1}))
   )
 
-(defn- get-transport-operator [db business-id]
-  (http/transit-response (db-get-transport-operator db business-id)))
+(def transport-services-passenger-columns
+  #{::transport-service/id ::transport-service/type :ote.db.transport-service/passenger-transportation})
+
+(defn db-get-transport-services [db where]
+  "Return Vector of transport-services"
+  (fetch db ::transport-service/transport-service
+                transport-services-passenger-columns
+                where))
+
+
+
+(defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
+  (jdbc/with-db-transaction [db db]
+     (let [operator (db-get-transport-operator db {::transport-operator/ckan-group-id id})]
+         (or operator
+             ;; FIXME: what if name changed in CKAN, we should update?
+             (insert! db ::transport-operator/transport-operator
+                      {::transport-operator/name title
+                       ::transport-operator/ckan-group-id id})))))
+
+
+(defn- get-transport-operator-data [db {:keys [title id] :as ckan-group}]
+  (println " get-transport-operator-data " ckan-group)
+  (let [
+        transport-operator (ensure-transport-operator-for-group db ckan-group)
+        transport-services-vector (db-get-transport-services db {::transport-service/transport-operator-id (::transport-operator/id transport-operator)})
+        ]
+    {:transport-operator transport-operator
+     :transport-service-vector transport-services-vector}))
+
 
 (defn- save-transport-operator [db data]
   (upsert! db ::transport-operator/transport-operator data))
@@ -52,8 +90,12 @@
     (assoc
       this ::lopeta
            (http/publish! http (routes
-                                  (GET "/transport-operator/:business-id" [business-id]
-                                    (get-transport-operator db business-id))
+                                  (POST "/transport-operator/group" {user :user}
+                                    (ensure-transport-operator-for-group db (-> user :groups first)))
+
+                                  (POST "/transport-operator/data" {user :user}
+                                    (http/transit-response (get-transport-operator-data db (-> user :groups first))))
+
                                   (POST "/transport-operator" {form-data :body
                                                                user :user}
                                         (log/info "USER: " user)

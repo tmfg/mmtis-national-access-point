@@ -9,6 +9,9 @@
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
+;; FIXME: specql doesn't define timestamp with time zone type
+(s/def :specql.data-types/timestamptz any?)
+
 (define-tables
   ;; Define ENUMs
   ["week_day" ::week_day (specql.transform/transform (specql.transform/to-keyword))]

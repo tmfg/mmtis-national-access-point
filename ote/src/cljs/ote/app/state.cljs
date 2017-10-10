@@ -5,7 +5,7 @@
 
 (defonce app
          (r/atom {:place-search       {}
-                  :page               :operator             ;; :operator = Transport Operator, :passenger-transportation = Passenger transport info
+                  :page               :front-page             ;; :operator = Transport Operator, :passenger-transportation = Passenger transport info
 
                   ;; Currently selected / edited transport operator (company basic info)
                   :transport-operator #:ote.db.transport-operator {:name        "Foo"

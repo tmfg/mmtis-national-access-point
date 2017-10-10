@@ -2,29 +2,29 @@
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as t]
             [ote.communication :as comm]
-            [ote.ui.form :as form]))
+            [ote.db.transport-service :as transport-service]
+            [ote.ui.form :as form]
+            [ote.app.controller.passenger-transportation :as pt]))
 
-(defrecord EditTransportServiceState [data])
-(defrecord SaveTransportServiceToDb [])
-(defrecord HandleTransportServiceResponse [passenger-transportation-data])
+(defrecord AddPriceClassRow [])
+(defrecord RemovePriceClassRow [])
+(defrecord SelectTransportServiceType [data])
+
+
 
 (extend-protocol t/Event
 
-  EditTransportServiceState
+  AddPriceClassRow
+  (process-event [_ app]
+    (update-in app [:transport-service ::transport-service/passenger-transportation ::transport-service/price-classes]
+               #(conj (or % []) {::transport-service/currency "EUR"})))
+
+  RemovePriceClassRow
+  (process-event [_ app]
+    (assoc-in app [:transport-service :price-class-open] false))
+
+  SelectTransportServiceType
   (process-event [{data :data} app]
-    (update-in app :transport-service merge data))
+    (assoc app :page (get data ::transport-service/service-type)))
 
-
-  SaveTransportServiceToDb
-  (process-event [_ {operator :transport-operator service :transport-service :as app}]
-    (let [service-data {:ote.db.transport-service/type                  :passenger-transportation
-                        :ote.db.transport-service/transport-operator-id (:ote.db.transport-operator/id operator)
-                        :ote.db.transport-service/passenger-transportation
-                                                                        (form/without-form-metadata service)}]
-      (comm/post! "passenger-transportation-info" service-data {:on-success (t/send-async! ->HandleTransportServiceResponse)})
-      app))
-
-  HandleTransportServiceResponse
-  (process-event [{passenger-transportation-data :passenger-transportation-data} app]
-    (.log js/console " Ja sitte käsitellään reponse täällä pitäis olla jo id " (clj->js app))
-    (assoc-in app [:transport-service] passenger-transportation-data)))
+)

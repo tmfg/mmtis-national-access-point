@@ -24,9 +24,5 @@
 
   HandleTransportOperatorResponse
   (process-event [{data :data} app]
-    ;(let [transport-service (get app :transport-service)
-          ;new-transport-service (assoc transport-service :ote.db.transport-service/transport-operator-id (:ote.db.transport-operator/id data))]
     (assoc app :transport-operator data
-               :page :passenger-transportation
-               ;:transport-service new-transport-service
-                )))
+               :page :passenger-transportation)))

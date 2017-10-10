@@ -35,7 +35,7 @@ RUN service postgresql restart && \
 # Run migraations
 COPY pom.xml /tmp
 COPY src /tmp/src
-RUN service postgresql start && cd /tmp && sleep 20 && mvn flyway:migrate && service postgresql stop
+#RUN service postgresql start && cd /tmp && sleep 20 && mvn flyway:migrate && service postgresql stop
 
 # Clean up and minify image
 RUN apt-get -y remove maven;

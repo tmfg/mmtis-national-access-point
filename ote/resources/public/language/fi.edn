@@ -16,6 +16,9 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
+  :ote.db.transport-service/service-type "Valitse välityspavelun tyyppi"
+
+  ;; Passenger transportation fields
   :passenger-transportation {
   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
   :ote.db.transport-service/url                       "Palvelun osoite"
