@@ -43,7 +43,11 @@
 
 /** HOME **/
 
-.hero {
+.homepage .hero {
     background: none;
     background-color: white;
+}
+
+.homepage [role=main] {
+    padding-top: 0;
 }
