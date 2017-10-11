@@ -93,7 +93,7 @@
                            :source-map "resources/public/js/ote.js.map"}}]}
 
   :clean-targets ^{:protect false}
-  ["resources/public/js/ote.js" "resources/public/js"]
+  ["resources/public/js/ote.js" "resources/public/js" "target/classes"]
 
   :aliases {;; Alias for doing a full production build
             "production" ["do" "clean," "deps," "compile,"
