@@ -90,7 +90,8 @@
                 :compiler {:optimizations :advanced
                            :output-to "resources/public/js/ote.js"
                            :output-dir "resources/public/js/prod-out"
-                           :source-map "resources/public/js/ote.js.map"}}]}
+                           :source-map "resources/public/js/ote.js.map"
+                           :closure-output-charset "US-ASCII"}}]}
 
   :clean-targets ^{:protect false}
   ["resources/public/js/ote.js" "resources/public/js" "target/classes"]
