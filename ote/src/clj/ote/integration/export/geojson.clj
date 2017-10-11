@@ -64,7 +64,8 @@
         service (first (specql/fetch db ::t-service/transport-service
                                      transport-service-properties-columns
                                      {::t-service/transport-operator-id transport-operator-id
-                                      ::t-service/id transport-service-id}))]
+                                      ::t-service/id transport-service-id
+                                      ::t-service/published? true}))]
     (if (and geojson operator service)
       (-> (cheshire/decode geojson keyword)
           simplify-collection
