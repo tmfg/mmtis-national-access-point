@@ -1,13 +1,13 @@
 <div role="main" class="hero">
     <div class="container">
         <div class="row row1">
-            <div class="col-12">
+            <div class="span12">
                 {% snippet 'home/snippets/header.html' %}
             </div>
         </div>
 
         <div class="row row3">
-            <div class="col-12">
+            <div class="span8 offset2">
                 {% block promoted %}
                     {% snippet 'home/snippets/promoted.html' %}
                 {% endblock %}
@@ -15,11 +15,11 @@
         </div>
 
         <div class="row row3 text-center">
-            <div class="col-12">
+            <div class="span12">
                 <p>{% link_for _('Log in'), controller='user', action='login', class_='btn btn-primary' %}</p>
             </div>
 
-            <div class="col-12">
+            <div class="span12">
                 {# Add localization for this string! #}
                 <p><span>{% trans %}New user?{% endtrans %}</span></p>
                 <p>{% link_for _('Register'), controller='user', action='register', class_='sub' %}</p>
