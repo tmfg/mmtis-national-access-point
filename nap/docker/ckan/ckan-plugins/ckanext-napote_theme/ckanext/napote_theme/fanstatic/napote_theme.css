@@ -10,13 +10,17 @@
     margin-right: -15px;
 }
 
-
-
 /*
 *
 * Customizations
 *
 */
+
+/** BASE **/
+
+body {
+    background: #444444; /** LIVI pääväri, harmaat 5. **/
+}
 
 /** HEADER **/
 .masthead .navbar .brand {
@@ -50,4 +54,17 @@
 
 .homepage [role=main] {
     padding-top: 0;
+}
+
+/** Footer **/
+.site-footer {
+    background: #444444; /** LIVI lisäväri, harmaat 5. **/
+}
+
+
+/** Container **/
+@media (min-width: 1200px) {
+    .container {
+        width: 1190px !important;
+    }
 }
