@@ -33,6 +33,7 @@
         (doall
          (map-indexed
           (fn [i {::t-service/keys [id type published?] :as row}]
+            ^{:key i}
             [ui/table-row {:selectable false :display-border false}
              [ui/table-row-column (get row :ote.db.transport-service/id)]
              [ui/table-row-column
