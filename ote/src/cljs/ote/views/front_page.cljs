@@ -9,7 +9,9 @@
             [ote.app.controller.front-page :as fp]
             [ote.app.controller.transport-service :as ts]
             [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]))
 
 (defn front-page [e! status]
 
@@ -84,24 +86,20 @@
           (.log js/console " (:transport-services status) " (clj->js (get status :transport-services)))
           (doall
             (map-indexed
-              (fn [i row]
-                [ui/table-row {:selectable false :display-border false}
-                 [ui/table-row-column (get row :ote.db.transport-service/id)]
-                 [ui/table-row-column
-                  [:a
-                   {:href "#"
-                    :on-click #(e! (ts/->ModifyTransportService (get row :ote.db.transport-service/id)))
-                    }
-                    (get row :ote.db.transport-service/type)]]
-                 [ui/table-row-column (get row :ote.db.transport-service/id)]
-                 [ui/table-row-column (get row :ote.db.transport-service/published?)]
-                 [ui/table-row-column (str " " (get row :ote.db.transport-service/published?))]
-                ]
-              )
-              (get status :transport-services)))
-             ]
-         ]
-        ]
-        ]
-       )
-     ]))
+             (fn [i {::t-service/keys [id type published?] :as row}]
+               [ui/table-row {:selectable false :display-border false}
+                [ui/table-row-column (get row :ote.db.transport-service/id)]
+                [ui/table-row-column
+                 [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))} type]]
+                [ui/table-row-column
+                 (if published?
+                   (let [url (str "/ote/export/geojson/" (get-in status [:transport-operator ::t-operator/id]) "/" id)]
+                     [:a {:href url :target "_blank"} url])
+                   [:span.publish
+                    (tr [:field-labels :transport-service ::t-service/published?-values false])
+                    [ui/flat-button {:primary true
+                                     :on-click #(e! (ts/->PublishTransportService id))}
+                       (tr [:buttons :publish])]])]
+                [ui/table-row-column "FIXME"]
+                 [ui/table-row-column (tr [:field-labels :transport-service ::t-service/published?-values published?])]])
+             (get status :transport-services)))]]]])]))

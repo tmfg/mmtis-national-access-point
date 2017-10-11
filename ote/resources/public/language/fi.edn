@@ -37,7 +37,14 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
-   :ote.db.transport-service/operation-area "Toiminta-alue"}
+   :ote.db.transport-service/operation-area "Toiminta-alue"
+
+   }
+
+  :transport-service
+  {:ote.db.transport-service/published? "FINAP-tila"
+   :ote.db.transport-service/published?-values {true "Julkaistu"
+                                                false "Ei julkaistu"}}
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
@@ -47,7 +54,8 @@
  ;; Action buttons
  :buttons
  {:save "Tallenna"
-  :delete "Poista"}
+  :delete "Poista"
+  :publish "Julkaise"}
 
 
 
