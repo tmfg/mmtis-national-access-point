@@ -18,7 +18,6 @@
   (e! (fp/->GetTransportOperatorData))
 
   (fn [e! status]
-    (.log js/console " status heti alussa " (clj->js status))
     [:div
      (when (nil? (get status :transport-services))
        [:div.row {:class "main-notification-panel"}
@@ -66,7 +65,8 @@
      ;; Table for transport services
      (when (not= nil (get status :transport-services))
        [:div.row
-        [:h2 " Henkilöiden kuljetuspalvelut"]
+        [:div {:class "col-xs-12  col-md-12"}
+        [:h3 " Henkilöiden kuljetuspalvelut"]
 
         [ui/table
          [ui/table-header {:adjust-for-checkbox false
@@ -90,17 +90,18 @@
                  [ui/table-row-column
                   [:a
                    {:href "#"
-                    ;:on-click #(e! (ts/->ModifyTransportService (get row :ote.db.transport-service/id)))
+                    :on-click #(e! (ts/->ModifyTransportService (get row :ote.db.transport-service/id)))
                     }
                     (get row :ote.db.transport-service/type)]]
                  [ui/table-row-column (get row :ote.db.transport-service/id)]
-                 [ui/table-row-column (get row :ote.db.transport-service/id)]
-                 [ui/table-row-column (get row :ote.db.transport-service/id)]
+                 [ui/table-row-column (get row :ote.db.transport-service/published?)]
+                 [ui/table-row-column (str " " (get row :ote.db.transport-service/published?))]
                 ]
               )
               (get status :transport-services)))
              ]
          ]
+        ]
         ]
        )
      ]))

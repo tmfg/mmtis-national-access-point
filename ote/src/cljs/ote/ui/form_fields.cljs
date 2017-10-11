@@ -89,7 +89,7 @@
 
 (defmethod field :multiselect-selection [{:keys [update! label name show-option options form? error] :as field} data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
-  (let [selected-set (or data #{})
+  (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
     [ui/select-field {:floating-label-text label
                       :multiple true

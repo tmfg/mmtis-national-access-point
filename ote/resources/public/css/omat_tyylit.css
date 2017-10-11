@@ -1,5 +1,16 @@
 /* Tänne kaikki Material UI:ta muuttavat css muutokset - hox korvataan varmaan jossain vaiheessa less/sass tiedostoilla */
-
+body {
+    margin: 0;
+    padding: 0;
+}
+#oteapp {
+    padding: 0px;
+}
+/* Remove padding from container fluid*/
+.container-fluid {
+    padding-left: 0px;
+    padding-right: 0px;
+}
 html {
     font-family: 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -23,7 +34,7 @@ html {
     vertical-align : bottom;
     height : 1px;
 }
-
+/* Front page notification panel */
 .main-notification-panel {
     margin-top: 20px;
     background-color: #E0E0E0;
@@ -35,7 +46,69 @@ html {
     padding-top: 22px;
     padding-left: 35px;
 }
-
+/* Debug container */
 .debug {
     font-size: 12px;
+    /*position:absolute;
+    bottom: 0px;*/
 }
+
+/* Testing nav bar*/
+
+.topnav {
+  overflow: hidden;
+  background-color: #000000;
+  color: #f2f2f2;
+}
+
+.topnav > a:nth-of-type(2)  {
+    font-size: 22px;
+    padding: 20px 16px 11px 0px;
+}
+
+.topnav a {
+  bottom: 0;
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 25px 16px 11px 0px;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 700;
+}
+.topnav > a:nth-of-type(1)  {
+    padding: 15px 10px 0px 15px;
+}
+
+.topnav a:hover {
+  /*background-color: #ddd;
+  color: black;*/
+  border-bottom: 4px solid #1976D2;
+}
+
+.topnav a.active {
+    /*background-color: #4CAF50;
+    color: white;*/
+    border-bottom: 4px solid #1976D2;
+}
+.main-icon:hover {
+    /*background-color: #4CAF50;
+    color: white;*/
+    border-bottom: 0px solid #1976D2;
+}
+.topnav > div.user-menu {
+    padding-top: 5px;
+    float: right;
+}
+.topnav > div.user-data {
+    padding-top: 12px;
+    float: right;
+}
+div.user-data > div.user-name {
+    font-size: 15px;
+}
+div.user-data > div.user-organization {
+    font-size: 12px;
+}
+/* Top Navigation ends*/
