@@ -6,7 +6,11 @@
             [compojure.core :refer [GET]]
             [specql.core :as specql]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.transport-service :as t-service]))
+            [ote.db.transport-service :as t-service]
+            [jeesql.core :refer [defqueries]]
+            [cheshire.core :as cheshire]))
+
+(defqueries "ote/integration/export/geojson.sql")
 
 (declare export-geojson)
 
@@ -25,13 +29,50 @@
     (stop)
     (dissoc this ::stop)))
 
+(defn- json-response [data]
+  {:status 200
+   :headers {"Content-Type" "application/vnd.geo+json"}
+   :body data})
+
+(defn- simplify-collection
+  "If collection has a single geometry, use that instead."
+  [{geoms :geometries :as geometry-collection}]
+  (if (= 1 (count geoms))
+    (first geoms)
+    geometry-collection))
+
+(defn- feature-collection [geometry properties]
+  {:type "FeatureCollection"
+   :features [{:type "Feature"
+               :properties properties
+               :geometry geometry}]})
+
+(def ^{:doc "Transport operator columns to set as properties in GeoJSON export"}
+  transport-operator-properties-columns
+  #{::t-operator/id ::t-operator/name ::t-operator/business-id
+    ::t-operator/phone ::t-operator/homepage ::t-operator/email})
+
+(def ^{:doc "Transport service columns to set as properties in GeoJSON export"}
+  transport-service-properties-columns
+  (specql/columns ::t-service/transport-service))
+
 (defn- export-geojson [db transport-operator-id transport-service-id]
-  (let [service (first (specql/fetch db ::t-service/transport-service
-                                     (specql/columns ::t-service/transport-service)
+  (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
+        operator (first (specql/fetch db ::t-operator/transport-operator
+                                      transport-operator-properties-columns
+                                      {::t-operator/id transport-operator-id}))
+        service (first (specql/fetch db ::t-service/transport-service
+                                     transport-service-properties-columns
                                      {::t-service/transport-operator-id transport-operator-id
-                                      ::t-service/id transport-service-id}))]
-    (if service
-      (str service)
+                                      ::t-service/id transport-service-id
+                                      ::t-service/published? true}))]
+    (if (and geojson operator service)
+      (-> (cheshire/decode geojson keyword)
+          simplify-collection
+          (feature-collection {:transport-operator operator
+                               :transport-service service})
+          (cheshire/encode {:key-fn name})
+          json-response)
       {:status 404
        :body "GeoJSON for service not found."})))
 
