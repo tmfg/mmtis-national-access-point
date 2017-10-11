@@ -94,8 +94,8 @@
                     }
                     (get row :ote.db.transport-service/type)]]
                  [ui/table-row-column (get row :ote.db.transport-service/id)]
-                 [ui/table-row-column (get row :ote.db.transport-service/id)]
-                 [ui/table-row-column (get row :ote.db.transport-service/id)]
+                 [ui/table-row-column (get row :ote.db.transport-service/published?)]
+                 [ui/table-row-column (str " " (get row :ote.db.transport-service/published?))]
                 ]
               )
               (get status :transport-services)))

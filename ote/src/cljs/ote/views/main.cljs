@@ -13,6 +13,10 @@
             [ote.views.place-search :as place-search]
             [ote.ui.debug :as debug]))
 
+(defn- is-topnav-active [give-page nav-page]
+  (when (= give-page nav-page)
+    "active")
+  )
 
  (defn main-menu [e!]
    [ui/icon-menu
@@ -55,9 +59,22 @@
 
     [:div {:class "topnav"}
      [:a.main-icon {:href "#home"} [:img {:src "/img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
-     [:a {:class "active" :href "#home"} "FINAP"]
-     [:a {:href "#news" } "Palvelukatalogi" ]
-     [:a {:href "#contact"} "Omat palvelutiedot" ]
+     [:a
+        {
+         :href "#front-page"
+         :on-click #(e! (fp-controller/->ChangePage :front-page))
+         }
+      "FINAP"]
+     [:a
+      {:class (is-topnav-active :front-page (:page app))
+       :href "#service-list"
+       :on-click #(e! (fp-controller/->ChangePage :front-page))
+       } "Palvelukatalogi" ]
+     [:a
+      {:class (is-topnav-active :transport-operator (:page app))
+       :href "#service-operator"
+       :on-click #(e! (fp-controller/->ChangePage :transport-operator))
+       } "Omat palvelutiedot" ]
      [:div.user-menu
       (reagent/as-element (main-menu e!))
       ]

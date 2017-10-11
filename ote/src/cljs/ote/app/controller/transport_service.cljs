@@ -38,9 +38,8 @@
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
     (.log js/console " dada " (clj->js response) (clj->js app) (get response ::transport-service/type))
-    (assoc app
-      :page (get response ::transport-service/type)
+     (assoc app
+      :page :passenger-transportation
       :transport-service response)
-
     )
 )

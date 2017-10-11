@@ -34,4 +34,6 @@
 
   HandlePassengerTransportationResponse
   (process-event [{service :service} app]
-    (update-in app [:transport-service] merge service)))
+    (assoc app
+      :transport-service service
+      :page :front-page)))

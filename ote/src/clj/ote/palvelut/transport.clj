@@ -27,7 +27,8 @@
   )
 
 (def transport-services-passenger-columns
-  #{::transport-service/id ::transport-service/type :ote.db.transport-service/passenger-transportation})
+  #{::transport-service/id ::transport-service/type :ote.db.transport-service/passenger-transportation
+    ::transport-service/published?})
 
 (defn db-get-transport-services [db where]
   "Return Vector of transport-services"
