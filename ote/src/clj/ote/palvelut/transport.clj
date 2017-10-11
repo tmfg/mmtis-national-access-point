@@ -5,13 +5,14 @@
             [specql.core :refer [fetch update! insert! upsert!] :as specql]
             [specql.op :as op]
             [ote.db.transport-operator :as transport-operator]
-            [ote.db.transport-service :as transport-service]
+            [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [compojure.core :refer [routes GET POST]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
-            [ote.services.places :as places]))
+            [ote.services.places :as places]
+            [ote.authorization :as authorization]))
 
 ;; FIXME: monkey patch specql composite reading (For now)
 (defmethod specql-composite/parse-value "bpchar" [_ string] string)
@@ -23,16 +24,15 @@
 (defn db-get-transport-operator [db where]
   (first (fetch db ::transport-operator/transport-operator
                 transport-operator-columns
-                where {::specql/limit 1}))
-  )
+                where {::specql/limit 1})))
 
 (def transport-services-passenger-columns
-  #{::transport-service/id ::transport-service/type :ote.db.transport-service/passenger-transportation
-    ::transport-service/published?})
+  #{::t-service/id ::t-service/type :ote.db.transport-service/passenger-transportation
+    ::t-service/published?})
 
 (defn db-get-transport-services [db where]
   "Return Vector of transport-services"
-  (fetch db ::transport-service/transport-service
+  (fetch db ::t-service/transport-service
                 transport-services-passenger-columns
                 where))
 
@@ -40,11 +40,10 @@
   "Get single transport service by id"
   [db id]
   (first (fetch db
-                ::transport-service/transport-service
-                (specql/columns ::transport-service/transport-service)
-                {::transport-service/id id}
-                {::specql/limit 1}))
-  )
+                ::t-service/transport-service
+                (specql/columns ::t-service/transport-service)
+                {::t-service/id id}
+                {::specql/limit 1})))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -61,7 +60,7 @@
   (println " get-transport-operator-data " ckan-group)
   (let [
         transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (db-get-transport-services db {::transport-service/transport-operator-id (::transport-operator/id transport-operator)})
+        transport-services-vector (db-get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
         ]
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector}))
@@ -75,7 +74,7 @@
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   [price-classes-float]
   (try
-    (mapv #(update % ::transport-service/price-per-unit bigdec) price-classes-float)
+    (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)
     (catch Exception e (println "price-per-unit is probably missing"))))
 
 
@@ -83,42 +82,60 @@
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
   (println "DATA: " (pr-str data))
-  (let [places (get-in data [::transport-service/passenger-transportation ::transport-service/operation-area])
+  (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
-                  (update ::transport-service/passenger-transportation dissoc ::transport-service/operation_area)
-                  (update-in [::transport-service/passenger-transportation ::transport-service/price-classes] fix-price-classes))]
+                  (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
+                  (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
     (jdbc/with-db-transaction [db db]
       (let [transport-service
-            (upsert! db ::transport-service/transport-service value)]
+            (upsert! db ::t-service/transport-service value)]
         (places/link-places-to-transport-service!
-         db (::transport-service/id transport-service) places)))))
+         db (::t-service/id transport-service) places)))))
 
 
+(defn- publish-transport-service [db user {:keys [transport-service-id]}]
+  (let [transport-operator-ids (authorization/user-transport-operators db user)]
+    (= 1
+       (specql/update! db ::t-service/transport-service
+                       {::t-service/published? true}
 
+                       {::t-service/transport-operator-id (op/in transport-operator-ids)
+                        ::t-service/id transport-service-id}))))
+
+
+(defn- transport-routes
+  [db]
+  (routes
+
+   (GET "/transport-service/:id" [id]
+        (db-get-transport-service db (Long/parseLong id)))
+
+   (POST "/transport-operator/group" {user :user}
+         (ensure-transport-operator-for-group db (-> user :groups first)))
+
+   (POST "/transport-operator/data" {user :user}
+         (http/transit-response (get-transport-operator-data db (-> user :groups first))))
+
+   (POST "/transport-operator" {form-data :body
+                                user :user}
+         (log/info "USER: " user)
+         (http/transit-response (save-transport-operator db (http/transit-request form-data))))
+   (POST "/passenger-transportation-info" {form-data :body}
+         (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
+
+   (POST "/transport-service/publish" {payload :body
+                                       user :user}
+         (->> payload
+              http/transit-request
+              (publish-transport-service db user)
+              http/transit-response))))
 
 (defrecord Transport []
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
       this ::lopeta
-           (http/publish! http (routes
-
-                                 (GET "/transport-service/:id" [id]
-                                    (db-get-transport-service db (Long/parseLong id)))
-
-                                 (POST "/transport-operator/group" {user :user}
-                                    (ensure-transport-operator-for-group db (-> user :groups first)))
-
-                                  (POST "/transport-operator/data" {user :user}
-                                    (http/transit-response (get-transport-operator-data db (-> user :groups first))))
-
-                                  (POST "/transport-operator" {form-data :body
-                                                               user :user}
-                                        (log/info "USER: " user)
-                                        (http/transit-response (save-transport-operator db (http/transit-request form-data))))
-                                  (POST "/passenger-transportation-info" {form-data :body}
-                                        (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
-                                  ))))
+           (http/publish! http (transport-routes db))))
   (stop [{lopeta ::lopeta :as this}]
     (lopeta)
     (dissoc this ::lopeta)))
