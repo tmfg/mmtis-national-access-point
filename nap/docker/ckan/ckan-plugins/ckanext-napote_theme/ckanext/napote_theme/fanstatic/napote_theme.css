@@ -11,7 +11,14 @@
 /** HEADER **/
 .masthead .section-right {
     float: right !important;
-    margin-right: -15px;
+}
+
+/** HOMEPAGE HEADER **/
+
+.homepage .home-header img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 /*
