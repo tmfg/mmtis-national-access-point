@@ -35,6 +35,15 @@
                 transport-services-passenger-columns
                 where))
 
+(defn- db-get-transport-service
+  "Get single transport service by id"
+  [db id]
+  (first (fetch db
+                ::transport-service/transport-service
+                (specql/columns ::transport-service/transport-service)
+                {::transport-service/id id}
+                {::specql/limit 1}))
+  )
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -84,13 +93,19 @@
          db (::transport-service/id transport-service) places)))))
 
 
+
+
 (defrecord Transport []
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
       this ::lopeta
            (http/publish! http (routes
-                                  (POST "/transport-operator/group" {user :user}
+
+                                 (GET "/transport-service/:id" [id]
+                                    (db-get-transport-service db (Long/parseLong id)))
+
+                                 (POST "/transport-operator/group" {user :user}
                                     (ensure-transport-operator-for-group db (-> user :groups first)))
 
                                   (POST "/transport-operator/data" {user :user}

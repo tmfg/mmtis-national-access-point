@@ -80,8 +80,9 @@
      (when (= :passenger-transportation (:page app))
         [pt/passenger-transportation-info e! (:transport-service app)])]
 
-
-    [debug/debug app]
+    [:div.row
+      [debug/debug app]
+    ]
     ]])
 
 
