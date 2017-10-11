@@ -1,6 +1,7 @@
 (ns ote.app.controller.front-page
   (:require [tuck.core :as tuck]
-            [ote.communication :as comm]))
+            [ote.communication :as comm]
+            [ote.app.routes :as routes]))
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
@@ -16,7 +17,8 @@
 
   ChangePage
   (process-event [{given-page :given-page} app]
-    (assoc app :page given-page))
+    (routes/navigate! given-page)
+    app)
 
   GetTransportOperator
   (process-event [_ app]
@@ -38,6 +40,3 @@
     (assoc app
       :transport-operator (get response :transport-operator)
       :transport-services (get response :transport-service-vector ))))
-
-
-

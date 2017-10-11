@@ -9,7 +9,8 @@
             [tuck.core :as tuck]
             [ote.app.state :as state]
             [ote.views.main :as main]
-            [ote.localization :as localization]))
+            [ote.localization :as localization]
+            [ote.app.routes :as routes]))
 
 
 (defn ^:export main []
@@ -17,6 +18,7 @@
    :fi
    (fn [lang _]
      (reset! localization/selected-language lang)
+     (routes/start!)
      (r/render-component [tuck/tuck state/app main/ote-application]
                          (.getElementById js/document "oteapp")))))
 

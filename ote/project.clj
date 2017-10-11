@@ -28,7 +28,7 @@
 
                  [cljs-ajax "0.7.2"]
 
-                 ;; Frontin UI-kirjastot
+                 ;; Frontend UI libraries
                  [reagent "0.7.0"]
                  [webjure/tuck "0.4.2"]
                  [cljsjs/react "15.6.1-1"]
@@ -36,6 +36,7 @@
                  [cljs-react-material-ui "0.2.48"]
                  [figwheel "0.5.13"]
                  [cljsjs/react-leaflet "1.6.5-0"]
+                 [funcool/bide "1.5.1"] ; URL router
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
