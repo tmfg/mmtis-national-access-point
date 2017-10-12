@@ -100,13 +100,12 @@
 
        {:name         ::transport-service/service-hours
         :type         :table
-        :table-fields [;;{:name ::transport-service/week-days :type
-                       ;;:multiselect-selection :options
-                       ;;transport-service/additional-services}
-                       {:name ::transport-service/week-days :type :string}
+        :table-fields [{:name ::transport-service/week-days
+                        :type :multiselect-selection
+                        :options transport-service/additional-services}
                        {:name ::transport-service/from :type :string}
                        {:name ::transport-service/to :type :string}
-                       ]
+                      ]
         :delete?      true
         })]
 
