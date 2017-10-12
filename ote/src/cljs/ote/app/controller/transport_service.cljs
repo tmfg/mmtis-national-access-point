@@ -26,12 +26,12 @@
 
   AddServiceHourRow
   (process-event [_ app]
-    (update-in app [:transport-service ::transport-service/passenger-transportation ::transport-service/service-hours]
-               #(conj (or % []) {::transport-service/from "08:00"})))             
+    (update-in app [:transport-service ::t-service/passenger-transportation ::t-service/service-hours]
+               #(conj (or % []) {::t-service/from "08:00"})))
 
   RemovePriceClassRow
   (process-event [_ app]
-    (assoc-in app [:transport-service :price-class-open] false))
+    (assoc-in app [:t-service :price-class-open] false))
 
   SelectTransportServiceType
   (process-event [{data :data} app]
@@ -49,7 +49,7 @@
     (.log js/console " dada " (clj->js response) (clj->js app) (get response ::t-service/type))
      (assoc app
       :page :passenger-transportation
-      :transport-service response))
+      :t-service response))
 
   PublishTransportService
   (process-event [{:keys [transport-service-id]} app]
