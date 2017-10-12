@@ -64,10 +64,7 @@
         [:div {:class "col-xs-1"}
          [ic/action-info-outline]]
         [:div {:class "col-xs-11"}
-         [:p (tr [:common-texts :front-page-help-text])
-          ]
-         ]
-
+         [:p (tr [:common-texts :front-page-help-text])]]
         ]
 
        [:div.row
