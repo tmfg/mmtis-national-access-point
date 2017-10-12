@@ -40,9 +40,9 @@
   "Get single transport service by id"
   [db id]
   (first (fetch db
-                ::transport-service/transport-service
+                ::t-service/transport-service
                 (specql/columns ::transport-service/transport-service)
-                {::transport-service/id id}
+                {::t-service/id id}
                 {::specql/limit 1}))
   )
 
