@@ -1,0 +1,313 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+
+    "DBEC2SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Open database for access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5432",
+            "ToPort": "5432",
+            "CidrIp": "10.55.0.0/16"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "AllowConnsFromInstances"
+          }
+        ],
+        "VpcId": {
+          "Ref": "AppVPC"
+        }
+      }
+    },
+
+
+    "AllowConnsFromAppELBSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Open access from App ELB to instances",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8080",
+            "ToPort": "8080",
+            "SourceSecurityGroupId" : {"Ref" : "AllowConnsToAppELB"},
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "AllowConnsFromAppELBSG"
+          }
+        ],
+        "VpcId": {
+          "Ref": "AppVPC"
+        }
+      }
+    },
+
+  "DBInstance" : {
+    "Type": "AWS::RDS::DBInstance",
+    "Properties": {
+    "DBInstanceIdentifier" : {"Fn::Join" : [ "", [ "napote-db-",  { "Ref" : "environmentName"} ] ] },
+    "AllocatedStorage" : "15",
+    "DBInstanceClass" : "db.t2.small",
+    "Engine" : "postgres",
+    "MasterUsername" : "napotedbrootdev",
+    "MasterUserPassword" : "omitted",
+    "VPCSecurityGroups" : [  {"Ref" : "DBEC2SecurityGroup"} ],
+    "DBSubnetGroupName" : { "Ref": "DBsubnetgroupdev" },
+    "StorageType" : "gp2",
+    "BackupRetentionPeriod" : "7"
+    }
+  },
+
+  "DBsubnetgroupdev" : {
+     "Type" : "AWS::RDS::DBSubnetGroup",
+     "Properties" : {
+        "DBSubnetGroupDescription" : "db subnet group for dev",
+        "SubnetIds" : [ "subnet-5c43b137", "subnet-78caf002" ],
+     }
+  },
+
+
+
+
+    "ckan": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": {
+          "Ref": "ImageID"
+        },
+        "IamInstanceProfile" : { "Ref": "CkanInstanceProfile" },
+        "InstanceType": "t2.small",
+        "KeyName": {
+          "Ref": "sshKeyName"
+        },
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "ckan-1-",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "SubnetId": {
+          "Ref": "AppPrivateASubnet"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "AllowConnsFromJenkinsSG"
+          },
+          {
+            "Ref": "AllowConnsFromAppELBSG"
+          }
+        ]
+      }
+    },
+
+
+    "ote": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": {
+          "Ref": "ImageID"
+        },
+        "IamInstanceProfile" : { "Ref": "CkanInstanceProfile" },
+        "InstanceType": "t2.small",
+        "KeyName": {
+          "Ref": "sshKeyName"
+        },
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "ote-1-",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "SubnetId": {
+          "Ref": "AppPrivateASubnet"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "AllowConnsFromJenkinsSG"
+          },
+          {
+            "Ref": "AllowConnsFromAppELBSG"
+          }
+        ]
+      }
+    },
+
+
+"ElasticacheSecurityGroup": {
+  "Type": "AWS::EC2::SecurityGroup",
+  "Properties": {
+    "GroupDescription": "Elasticache Security Group",
+    "SecurityGroupIngress": [ {
+      "IpProtocol": "tcp",
+      "FromPort": "6379",
+      "ToPort": "6379",
+      "CidrIp": "10.44.0.0/16"
+    } ],
+    "VpcId": {
+      "Ref": "AppVPC"
+    }
+  }
+},
+"ElasticacheCluster": {
+  "Type": "AWS::ElastiCache::CacheCluster",
+  "Properties": {
+    "AutoMinorVersionUpgrade": "true",
+    "Engine": "redis",
+    "CacheNodeType": "cache.t2.micro",
+    "NumCacheNodes": "1",
+    "VpcSecurityGroupIds": [{"Fn::GetAtt": [ "ElasticacheSecurityGroup", "GroupId"]}],
+    "CacheSubnetGroupName" : { "Ref": "Cachesubnetgroupdev" },
+  }
+},
+
+  "Cachesubnetgroupdev" : {
+  "Type" : "AWS::ElastiCache::SubnetGroup",
+  "Properties" : {
+
+    "Description" : "subnet group for elasticache",
+    "SubnetIds" : [ "subnet-5c43b137", "subnet-78caf002" ],
+  }
+},
+
+
+
+    "solr": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": {
+          "Ref": "ImageID"
+        },
+        "IamInstanceProfile" : { "Ref": "SolrInstanceProfile" },
+        "InstanceType": "t2.small",
+        "KeyName": {
+          "Ref": "sshKeyName"
+        },
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "solr-1-",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "SubnetId": {
+          "Ref": "AppPrivateASubnet"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "AllowConnsFromJenkinsSG"
+          },
+          {
+            "Ref": "AllowConnsFromAppELBSG"
+          }
+        ]
+      }
+    },
+
+
+  },
+    "Parameters": {
+      "projectTag": {
+        "Description": "Project Name for Tagging Purposes",
+        "Type": "String",
+        "Default": "napote-dev"
+    },
+    "ImageID": {
+      "Description": "Image ID",
+      "Type": "String",
+      "Default": "omitted"
+    },
+    "sshKeyName": {
+      "Description": "SSH key name to use on new instances",
+      "Type": "String",
+      "Default": "napote-dev"
+    },
+    "environmentName": {
+      "Description": "Name of AppEnvironment e.g. DEV, PROD or similar",
+      "Type": "String",
+      "Default": "dev"
+    },
+    "AllowConnsFromJenkinsSG": {
+      "Description": "securitygroup-id",
+      "Type": "String",
+      "Default": "sg-c48f7aae"
+    },
+    "AllowConnsToAppELB": {
+      "Description": "securitygroup-id",
+      "Type": "String",
+      "Default": "sg-535ba639"
+    },
+    "AppPrivateASubnet": {
+      "Description": "private-subnet-a-id",
+      "Type": "String",
+      "Default": "subnet-5c43b137"
+    },
+    "CkanInstanceProfile": {
+      "Description": "CkanInstanceProfile",
+      "Type": "String",
+      "Default": "ckan-ec2-role"
+    },
+    "SolrInstanceProfile": {
+      "Description": "SolrInstanceProfile",
+      "Type": "String",
+      "Default": "solr-ec2-role"
+    },
+    "AppVPC": {
+      "Description": "VPC id for dev-app-vpc",
+      "Type": "String",
+      "Default": "vpc-78270e10"
+    }
+  },
+  "Outputs": {
+    "vpcId": {
+      "Value": { "Ref": "AppVPC" }
+    }
+  },
+  "Description": "Application instance stack."
+}
