@@ -95,8 +95,27 @@
    :other            "Muu"}
   }
 
-
  ;; Per feature/page localization keys
- :place-search {:name "Paikan nimi"
+ :place-search {:name                "Paikan nimi"
                 :place-auto-complete "Hae paikka nimellä"}
+
+ :common-texts {
+                :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja FINAP-palveluun.
+        Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
+        Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
+                :link-add-new-api                           "Lisää rajapinta"
+                :own-api-list                               "Omat palvelutiedot (Lisätty OTE:lla)"
+                :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
+                :api-name                                   "Rajapinnan nimi"
+                :api-url                                    "Rajapinnan verkko-osoite"
+                :finap-status                               "FINAP tila"
+                :header-nap-official-name                   "Palvelukatalogi"
+                :header-own-service-list                    "Omat palvelutiedot"
+                :header-front-page                          "Etusivu"
+
+                :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
+                :transport-service-type-selection-help-text "Voit kirjata eri liikkumispalveluiden olennaisia tietoja valitsemalla ensin liikkumispalvelun
+     tyypin ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen."
+                }
+
  }

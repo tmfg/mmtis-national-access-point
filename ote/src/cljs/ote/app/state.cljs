@@ -10,6 +10,9 @@
            :params nil ; parameters from url route
            :query nil ; query parameters from url (like "?foo=bar")
 
+            :user {} ;; No user data by default
+            :ote-service-flags {:user-menu-open true }
+
            ;; Currently selected / edited transport operator (company basic info)
            :transport-operator
            #:ote.db.transport-operator

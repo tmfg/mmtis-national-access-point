@@ -64,14 +64,13 @@
         [:div {:class "col-xs-1"}
          [ic/action-info-outline]]
         [:div {:class "col-xs-11"}
-         [:p "Et ole vielä kirjannut liikkumispalvelutietoja FINAP-palveluun.
-        Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
-        Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."]]]
+         [:p (tr [:common-texts :front-page-help-text])]]
+        ]
 
        [:div.row
         [:div {:class "col-xs-12 col-md-offset-2 col-md-4"}
-         [ui/raised-button {:label    "Lisää rajanpinta"
-                            :icon     (ic/social-group)
+         [ui/raised-button {:label    (tr [:common-texts :link-add-new-api])
+                            :icon     (ic/content-add)
                             :on-click #(e! (fp/->ChangePage :transport-service))
                             :primary  true
                             }]]
@@ -85,10 +84,11 @@
      (when (not= nil (get status :transport-services))
        [:div.row
         [:div {:class "col-xs-12  col-md-8"}
-          [:h3 "Omat palvelutiedot (Lisätty OTE:lla)"]]
+          [:h3 (tr [:common-texts :own-api-list])]
+         ]
         [:div {:class "col-xs-12 col-md-4"}
-         [ui/raised-button {:label    "Lisää rajanpinta"
-                            :icon     (ic/social-group)
+         [ui/raised-button {:label    (tr [:common-texts :link-add-new-api])
+                            :icon     (ic/content-add)
                             :on-click #(e! (fp/->ChangePage :transport-service))
                             :primary  true}]]])
 

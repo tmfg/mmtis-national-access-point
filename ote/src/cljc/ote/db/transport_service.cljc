@@ -15,6 +15,8 @@
 (define-tables
   ;; Define ENUMs
   ["week_day" ::week_day (specql.transform/transform (specql.transform/to-keyword))]
+
+
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_provider_type" ::transport_provider_type (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_tool" ::accessibility_tool (specql.transform/transform (specql.transform/to-keyword))]

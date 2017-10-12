@@ -9,7 +9,7 @@
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
             [ote.views.passenger_transportation :as pt]
-            [ote.localization :as localization]
+            [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
             [ote.ui.debug :as debug]))
 
@@ -18,14 +18,20 @@
     "active")
   )
 
+(defn- is-user-menu-active [app]
+  (when (= true (get-in app [:ote-service-flags :user-menu-open]))
+    "active")
+  )
+
  (defn main-menu [e!]
    [ui/icon-menu
     {
+     :on-click #(e! (fp-controller/->OpenUserMenu))
      :icon-button-element (reagent/as-element [ui/icon-button [ic/action-view-headline {:color :white}]])
      :anchor-origin {:horizontal "right" :vertical "bottom"}
      :target-origin {:horizontal "right" :vertical "top"}
      }
-    [ui/menu-item {:primary-text "Etusivu"
+    [ui/menu-item {:primary-text (tr [:common-texts :header-front-page])
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     [ui/menu-item {:primary-text "Organisaation perustiedot"
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
@@ -40,7 +46,7 @@
    {:mui-theme
     (get-mui-theme
       {:palette {;; primary nav color - Also Focus color in text fields
-                 :primary1-color (color :lightBlue300)
+                 :primary1-color (color :lightBlue600)
 
                  ;; Hint color in text fields
                  :disabledColor  (color :grey900)
@@ -54,34 +60,26 @@
        :button  {:labelColor "#fff"}
 
       })}
-   ;:icon-element-right [(reagent/as-element [ui/flat-button {:label "jee"}])]
-   [:div.ote-sovellus.container-fluid
 
+   [:div.ote-sovellus.container-fluid
     [:div {:class "topnav"}
-     [:a.main-icon {:href "#home"} [:img {:src "/img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
-     [:a
-        {
-         :href "#front-page"
-         :on-click #(e! (fp-controller/->ChangePage :front-page))
-         }
-      "FINAP"]
-     [:a
+     [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
+     [:a.ote-nav { :href "/nap/" }  "FINAP"]
+     [:a.ote-nav { :href "/nap/" } (tr [:common-texts :header-nap-official-name]) ]
+     [:a.ote-nav
       {:class (is-topnav-active :front-page (:page app))
-       :href "#service-list"
-       :on-click #(e! (fp-controller/->ChangePage :front-page))
-       } "Palvelukatalogi" ]
-     [:a
-      {:class (is-topnav-active :transport-operator (:page app))
        :href "#service-operator"
-       :on-click #(e! (fp-controller/->ChangePage :transport-operator))
-       } "Omat palvelutiedot" ]
-     [:div.user-menu
-      (reagent/as-element (main-menu e!))
-      ]
-     [:div.user-data
-      [:div.user-name "ERkki Esimerkki"]
-      [:div.user-organization "Erkin MAtkat Oy"]
-      ]
+       :on-click #(e! (fp-controller/->ChangePage :front-page))
+       } (tr [:common-texts :header-own-service-list]) ]
+    ; [:div.user-menu-container {:class (is-user-menu-active app)}
+      [:div.user-menu {:class (is-user-menu-active app) }
+        (reagent/as-element (main-menu e!))
+        ]
+      [:div.user-data {:class (is-user-menu-active app) }
+        [:div.user-name (get-in app [:user :name])]
+        [:div.user-organization (get-in app [:transport-operator :ote.db.transport-operator/name])]
+        ]
+      ;]
 
      ]
     ;; NOTE: debug state is VERY slow if app state is HUGE

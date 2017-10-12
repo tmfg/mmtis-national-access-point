@@ -6,6 +6,7 @@
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
+(defrecord OpenUserMenu [])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -19,6 +20,10 @@
   (process-event [{given-page :given-page} app]
     (routes/navigate! given-page)
     app)
+
+  OpenUserMenu
+  (process-event [_ app]
+    (update-in app [:ote-service-flags :user-menu-open] true))
 
   GetTransportOperator
   (process-event [_ app]
@@ -39,4 +44,8 @@
     ;(.log js/console " Mitäkähän dataa serveriltä tulee " (clj->js response) (clj->js (get response :transport-operator)))
     (assoc app
       :transport-operator (get response :transport-operator)
-      :transport-services (get response :transport-service-vector ))))
+      :transport-services (get response :transport-service-vector )
+      :user (get response :user ))))
+
+
+

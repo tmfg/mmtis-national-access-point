@@ -78,32 +78,36 @@ html {
   font-weight: 700;
 }
 .topnav > a:nth-of-type(1)  {
-    padding: 15px 10px 0px 15px;
+    padding: 10px 10px 0px 15px;
 }
 
-.topnav a:hover {
-  /*background-color: #ddd;
-  color: black;*/
+.topnav a.ote-nav:hover {
   border-bottom: 4px solid #1976D2;
 }
 
 .topnav a.active {
-    /*background-color: #4CAF50;
-    color: white;*/
     border-bottom: 4px solid #1976D2;
 }
-.main-icon:hover {
+.main-icon a:hover {
     /*background-color: #4CAF50;
     color: white;*/
     border-bottom: 0px solid #1976D2;
 }
+
+/* User menu */
+
 .topnav > div.user-menu {
-    padding-top: 5px;
+    padding-top: 6px;
+    padding-bottom: 5px;
     float: right;
+    display: inline-block;
 }
 .topnav > div.user-data {
     padding-top: 12px;
+    padding-bottom: 16px;
+    padding-left: 20px;
     float: right;
+    display: inline-block;
 }
 div.user-data > div.user-name {
     font-size: 15px;

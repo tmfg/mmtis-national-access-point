@@ -16,21 +16,20 @@
    })
 
 (defn select-service-type [e! status]
-  [:div
-   [:div.row
+  [:div.row
+   [:div {:class "col-sx-6 col-md-6"}
     [:div
-     [:h3 "Olennaisten tietojen kirjaaminen OTE:lla"]
+     [:h3 (tr [:common-texts :title-required-data-with-OTE])]
      ]
     [:div.row
-     [:p "Voit kirjata eri liikkumispalveluiden olennaisia tietoja valitsemalla ensin liikkumispalvelun
-     tyypin ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen."]
+     [:p (tr [:common-texts :transport-service-type-selection-help-text])]
      ]
     [:div.row
      [form/form (service-form-options e!)
       [
        (form/group
          {:label   nil
-          :columns 1}
+          :columns 3}
          {
          :name        ::transport-service/service-type
          :type        :selection

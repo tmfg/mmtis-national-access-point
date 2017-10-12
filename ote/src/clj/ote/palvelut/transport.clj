@@ -41,9 +41,10 @@
   [db id]
   (first (fetch db
                 ::t-service/transport-service
-                (specql/columns ::t-service/transport-service)
+                (specql/columns ::transport-service/transport-service)
                 {::t-service/id id}
-                {::specql/limit 1})))
+                {::specql/limit 1}))
+  )
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -56,14 +57,14 @@
                        ::transport-operator/ckan-group-id id})))))
 
 
-(defn- get-transport-operator-data [db {:keys [title id] :as ckan-group}]
-  (println " get-transport-operator-data " ckan-group)
+(defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [
         transport-operator (ensure-transport-operator-for-group db ckan-group)
         transport-services-vector (db-get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
         ]
     {:transport-operator transport-operator
-     :transport-service-vector transport-services-vector}))
+     :transport-service-vector transport-services-vector
+     :user user}))
 
 
 (defn- save-transport-operator [db data]
@@ -108,13 +109,13 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-        (db-get-transport-service db (Long/parseLong id)))
+     (http/transit-response (db-get-transport-service db (Long/parseLong id))))
 
    (POST "/transport-operator/group" {user :user}
          (ensure-transport-operator-for-group db (-> user :groups first)))
 
    (POST "/transport-operator/data" {user :user}
-         (http/transit-response (get-transport-operator-data db (-> user :groups first))))
+        (http/transit-response (get-transport-operator-data db (-> user :groups first) (:user user))))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
