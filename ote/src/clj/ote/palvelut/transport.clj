@@ -57,14 +57,15 @@
                        ::transport-operator/ckan-group-id id})))))
 
 
-(defn- get-transport-operator-data [db {:keys [title id] :as ckan-group}]
-  (println " get-transport-operator-data " ckan-group)
+(defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
+  (println " get-transport-operator-data " ckan-group " user " user)
   (let [
         transport-operator (ensure-transport-operator-for-group db ckan-group)
         transport-services-vector (db-get-transport-services db {::transport-service/transport-operator-id (::transport-operator/id transport-operator)})
         ]
     {:transport-operator transport-operator
-     :transport-service-vector transport-services-vector}))
+     :transport-service-vector transport-services-vector
+     :user user}))
 
 
 (defn- save-transport-operator [db data]
@@ -110,7 +111,7 @@
                                     (ensure-transport-operator-for-group db (-> user :groups first)))
 
                                   (POST "/transport-operator/data" {user :user}
-                                    (http/transit-response (get-transport-operator-data db (-> user :groups first))))
+                                    (http/transit-response (get-transport-operator-data db (-> user :groups first) (:user user))))
 
                                   (POST "/transport-operator" {form-data :body
                                                                user :user}

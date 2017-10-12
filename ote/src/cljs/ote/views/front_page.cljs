@@ -25,36 +25,30 @@
          [ic/action-info-outline]
          ]
         [:div {:class "col-xs-11"}
-         [:p "Et ole vielä kirjannut liikkumispalvelutietoja FINAP-palveluun.
-        Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
-        Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."]
+         [:p (tr [:common-texts :front-page-help-text])
+          ]
          ]
 
         ]
 
        [:div.row
         [:div {:class "col-xs-12 col-md-offset-2 col-md-4"}
-         [ui/raised-button {:label    "Lisää rajanpinta"
-                            :icon     (ic/social-group)
+         [ui/raised-button {:label    (tr [:common-texts :link-add-new-api])
+                            :icon     (ic/content-add)
                             :on-click #(e! (fp/->ChangePage :transport-service))
                             :primary  true
                             }]
          ]
-        [:div {:class "col-xs-12 col-md-6"}
-         [ui/raised-button {:label    "Kirjaa olennaiset tiedot"
-                            :icon     (ic/social-group)
-                            :on-click #(e! (fp/->ChangePage :transport-operator))
-                            :primary  true
-                            }]]]
+       ]
        )
      (when (not= nil (get status :transport-services))
        [:div.row
         [:div {:class "col-xs-12  col-md-8"}
-          [:h3 "Omat palvelutiedot (Lisätty OTE:lla)"]
+          [:h3 (tr [:common-texts :own-api-list])]
          ]
         [:div {:class "col-xs-12 col-md-4"}
-         [ui/raised-button {:label    "Lisää rajanpinta"
-                            :icon     (ic/social-group)
+         [ui/raised-button {:label    (tr [:common-texts :link-add-new-api])
+                            :icon     (ic/content-add)
                             :on-click #(e! (fp/->ChangePage :transport-service))
                             :primary  true
                             }]
@@ -66,22 +60,21 @@
      (when (not= nil (get status :transport-services))
        [:div.row
         [:div {:class "col-xs-12  col-md-12"}
-        [:h3 " Henkilöiden kuljetuspalvelut"]
+        [:h3  (tr [:common-texts :passenger-transportation-service-text])]
 
         [ui/table
          [ui/table-header {:adjust-for-checkbox false
                            :display-select-all false}
           [ui/table-row {:selectable false}
            [ui/table-header-column "Id"]
-           [ui/table-header-column "Rajapinnan nimi"]
-           [ui/table-header-column "Rajapinnan verkko-osoite"]
+           [ui/table-header-column (tr [:common-texts :api-name])]
+           [ui/table-header-column (tr [:common-texts :api-url])]
            [ui/table-header-column "Muut tietoaineistot"]
-           [ui/table-header-column "FINAP-tila"]
+           [ui/table-header-column (tr [:common-texts :finap-status])]
            ]
           ]
 
          [ui/table-body {:display-row-checkbox false}
-          (.log js/console " (:transport-services status) " (clj->js (get status :transport-services)))
           (doall
             (map-indexed
               (fn [i row]
@@ -95,7 +88,7 @@
                     (get row :ote.db.transport-service/type)]]
                  [ui/table-row-column (get row :ote.db.transport-service/id)]
                  [ui/table-row-column (get row :ote.db.transport-service/published?)]
-                 [ui/table-row-column (str " " (get row :ote.db.transport-service/published?))]
+                 [ui/table-row-column (str (get row :ote.db.transport-service/published?))]
                 ]
               )
               (get status :transport-services)))

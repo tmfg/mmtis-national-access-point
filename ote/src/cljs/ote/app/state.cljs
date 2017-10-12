@@ -7,6 +7,8 @@
          (r/atom {:place-search       {}
                   :page               :front-page             ;; :operator = Transport Operator, :passenger-transportation = Passenger transport info
 
+                  :user {} ;; No user data by default
+                  :ote-service-flags {:user-menu-open true }
                   ;; Currently selected / edited transport operator (company basic info)
                   :transport-operator #:ote.db.transport-operator {:name        "Foo"
                                                                    :business-id "1234567-8"
