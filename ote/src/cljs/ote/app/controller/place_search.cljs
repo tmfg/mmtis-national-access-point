@@ -3,63 +3,55 @@
   Uses the backend openstreetmap-places service."
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
-            [ote.db.places :as places]))
+            [ote.db.places :as places]
+            [clojure.string :as str]))
 
-(defrecord LoadPlaces [])
-(defrecord LoadPlacesResponse [places])
 (defrecord SetPlaceName [name])
-(defrecord AddPlace [name])
-(defrecord AddPlaceResponse [geojson place])
+(defrecord AddPlace [id])
+(defrecord FetchPlaceResponse [response place])
 (defrecord RemovePlaceById [id])
-
+(defrecord PlaceCompletionsResponse [completions name])
 
 (extend-protocol tuck/Event
 
-  LoadPlaces
-  (process-event [_ app]
-    (comm/get! "place-list"
-               {:on-success (tuck/send-async! ->LoadPlacesResponse)})
-    app)
-
-  LoadPlacesResponse
-  (process-event [{places :places} app]
-    (update app :place-search assoc
-            :place-names (into [] (map ::places/name) places)
-            :places (into {}
-                          (map (juxt ::places/name identity) places))))
-
   SetPlaceName
   (process-event [{name :name} app]
-    (assoc-in app [:place-search :name] name))
+    (let [app (assoc-in app [:place-search :name] name)]
+      (when (>= (count name) 2)
+        (comm/get! (str "place-completions/" name)
+                   {:on-success (tuck/send-async! ->PlaceCompletionsResponse name)}))
+      app))
+
+  PlaceCompletionsResponse
+  (process-event [{:keys [completions name]} app]
+    (if-not (= name (get-in app [:place-search :name]))
+      ;; Received stale completions (name is not what was searched for), ignore
+      app
+      (assoc-in app [:place-search :completions] completions)))
 
   AddPlace
-  (process-event [{name :name} app]
-    (if (some #(= name (::places/name (:place %)))
+  (process-event [{id :id} app]
+    (.log js/console "ADD PLACE:" id)
+    (if (some #(= id (::places/id (:place %)))
               (get-in app [:place-search :results]))
       ;; This name has already been added, don't do it again
       app
-      (if-let [place (get-in app [:place-search :places name])]
+      (if-let [place (some #(when (= id (::places/id %)) %)
+                           (get-in app [:place-search :completions]))]
         (do
-          (comm/get! (str "places/" name)
-                     {:on-success (tuck/send-async! ->AddPlaceResponse place)})
-          (update app :place-search
-                  #(assoc %
-                          :name ""
-                          :search-in-progress? true)))
+          (comm/get! (str "place/" id)
+                     {:on-success (tuck/send-async! ->FetchPlaceResponse place)})
+          (-> app
+              (assoc-in [:place-search :name] "")
+              (assoc-in [:place-search :completions] nil)))
         app)))
 
-  AddPlaceResponse
-  (process-event [{:keys [place geojson]} app]
-    (update app :place-search
-            #(-> %
-                 (assoc %
-                        :search-in-progress? false
-                        :name "")
-                 (update :results
-                         (fn [results]
-                           (conj (or results [])
-                                 {:place place :geojson geojson}))))))
-
+  FetchPlaceResponse
+  (process-event [{:keys [response place]} app]
+    (update-in app [:place-search :results]
+               #(conj (or % [])
+                      {:place place
+                       :geojson response})))
   RemovePlaceById
   (process-event [{id :id} app]
     (update-in app [:place-search :results]

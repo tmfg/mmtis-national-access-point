@@ -13,10 +13,10 @@
 
 (defn result-chips [e! results]
   [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-   (for [{::places/keys [name id] :as result} (map :place results)]
+   (for [{::places/keys [namefin id] :as result} (map :place results)]
      ^{:key id}
      [ui/chip {:style {:margin 4}
-               :on-request-delete #(e! (ps/->RemovePlaceById id))} name])])
+               :on-request-delete #(e! (ps/->RemovePlaceById id))} namefin])])
 
 (defn result-geometry [{::places/keys [name location]}]
   [leaflet/FeatureGroup
@@ -44,21 +44,29 @@
          [leaflet/GeoJSON {:data geojson
                            :style {:color "green"}}])])}))
 
+(defn- completions [completions]
+  (apply array
+         (map (fn [{::places/keys [id namefin type]}]
+                #js {:text namefin
+                     :id id
+                     :value (r/as-element
+                             [ui/menu-item {:primary-text namefin
+                                            :secondary-text type}])})
+              completions)))
+
 (defn place-search [e! place-search]
-  (e! (ps/->LoadPlaces))
-  (fn [e! place-search]
-    (let [results (:results place-search)]
-      [:div.place-search
+  (let [results (:results place-search)]
+    [:div.place-search
 
-       [result-chips e! results]
+     [result-chips e! results]
 
-       [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
-                          :dataSource (clj->js (or (:place-names place-search) []))
-                          :on-update-input #(e! (ps/->SetPlaceName %))
-                          :search-text (or (:name place-search) "")
-                          :on-new-request #(e! (ps/->AddPlace %))}]
+     [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+                        :dataSource (completions (:completions place-search))
+                        :on-update-input #(e! (ps/->SetPlaceName %))
+                        :search-text (or (:name place-search) "")
+                        :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]
 
-       [places-map e! results]])))
+     [places-map e! results]]))
 
 (defn place-search-form-group [e! label name]
   (form/group
