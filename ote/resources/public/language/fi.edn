@@ -19,23 +19,30 @@
   :ote.db.transport-service/service-type "Valitse välityspavelun tyyppi"
 
   ;; Passenger transportation fields
-  :passenger-transportation {
-  :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-  :ote.db.transport-service/url                       "Palvelun osoite"
-  :ote.db.transport-service/description               "Palvelun kuvaus"
-  :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun osoitetiedot"
-  :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-  :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-  :ote.db.transport-service/additional-services       "Muut palvelut"
-  :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
-  :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
-  :ote.db.transport-service/price-class               "Hinnoittelu"
+  :passenger-transportation
+  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/url                       "Palvelun osoite"
+   :ote.db.transport-service/description               "Palvelun kuvaus"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun osoitetiedot"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
+   :ote.db.transport-service/additional-services       "Muut palvelut"
+   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+   :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
+   :ote.db.transport-service/price-class               "Hinnoittelu"
+   :ote.db.transport-service/service-hours               "Palveluajat"
 
-  ;; Price Class fields
-  :ote.db.transport-service/name                      "Hintaryhmä"
-  :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
-  :ote.db.transport-service/unit                      "Yksikkö"
-  :ote.db.transport-service/currency                  "Valuutta" }
+   ;; Price Class fields
+   :ote.db.transport-service/name                      "Hintaryhmä"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/currency                  "Valuutta"
+
+   ;; Service hour fields
+   :ote.db.transport-service/week-days                 "Viikonpäivät"
+   :ote.db.transport-service/from                      "Aukeamisaika"
+   :ote.db.transport-service/to                        "Kiinnimenoaika"
+   }
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"

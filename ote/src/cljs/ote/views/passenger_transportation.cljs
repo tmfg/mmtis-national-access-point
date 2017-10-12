@@ -29,7 +29,6 @@
     [:div
      [:h3 "Vaihe 2: Täydennä henkilökuljetukseen liittyvät tiedot."]]
     [form/form (transportation-form-options e!)
-
      [
       (place-search/place-search-form-group
        (tuck/wrap-path e! :transport-service ::transport-service/passenger-transportation ::transport-service/operation-area)
@@ -73,12 +72,12 @@
         :rows 5})
 
       (form/group
-        {:label   "Hintatiedot"
-         :columns 3
-         :actions [ui/raised-button
-                   {:label    "Lisää hintarivi"
-                    :icon     (ic/action-note-add)
-                    :on-click #(e! (ts/->AddPriceClassRow))}]}
+       {:label   "Hintatiedot"
+        :columns 3
+        :actions [ui/raised-button
+                  {:label    "Lisää hintarivi"
+                   :icon     (ic/action-note-add)
+                   :on-click #(e! (ts/->AddPriceClassRow))}]}
 
        {:name         ::transport-service/price-classes
         :type         :table
@@ -86,6 +85,27 @@
                        {:name ::transport-service/price-per-unit :type :number}
                        {:name ::transport-service/unit :type :string}
                        {:name ::transport-service/currency :type :string :width "100px"}
+                       ]
+        :delete?      true
+        })
+
+      
+      (form/group
+       {:label   "Palveluajaat"
+        :columns 3
+        :actions [ui/raised-button
+                  {:label    "LISÄÄ UUSI RIVI"
+                   :icon     (ic/action-note-add)
+                   :on-click #(e! (ts/->AddServiceHourRow))}]}
+
+       {:name         ::transport-service/service-hours
+        :type         :table
+        :table-fields [;;{:name ::transport-service/week-days :type
+                       ;;:multiselect-selection :options
+                       ;;transport-service/additional-services}
+                       {:name ::transport-service/week-days :type :string}
+                       {:name ::transport-service/from :type :string}
+                       {:name ::transport-service/to :type :string}
                        ]
         :delete?      true
         })]

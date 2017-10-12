@@ -7,6 +7,7 @@
             [ote.app.controller.passenger-transportation :as pt]))
 
 (defrecord AddPriceClassRow [])
+(defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
 (defrecord SelectTransportServiceType [data])
 
@@ -18,6 +19,11 @@
   (process-event [_ app]
     (update-in app [:transport-service ::transport-service/passenger-transportation ::transport-service/price-classes]
                #(conj (or % []) {::transport-service/currency "EUR"})))
+
+  AddServiceHourRow
+  (process-event [_ app]
+    (update-in app [:transport-service ::transport-service/passenger-transportation ::transport-service/service-hours]
+               #(conj (or % []) {::transport-service/from "08:00"})))             
 
   RemovePriceClassRow
   (process-event [_ app]
