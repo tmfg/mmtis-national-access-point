@@ -39,10 +39,10 @@
   Should be called within a transaction."
   [db transport-service-id place-references]
   (clear-transport-service-places! db {:transport-service-id transport-service-id})
-  (doseq [{::places/keys [id name]} place-references]
+  (doseq [{::places/keys [id namefin]} place-references]
     (link-transport-service-place! db {:transport-service-id transport-service-id
                                        :place-id id
-                                       :name name})))
+                                       :name namefin})))
 
 (defrecord Places [sources]
   component/Lifecycle

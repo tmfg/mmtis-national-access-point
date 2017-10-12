@@ -14,6 +14,6 @@ INSERT INTO operation_area
 VALUES (:transport-service-id,
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
         (SELECT "location"
-           FROM finnish_municipalities
-          WHERE natcode = :place-id),
+           FROM places
+          WHERE id = :place-id),
         true);
