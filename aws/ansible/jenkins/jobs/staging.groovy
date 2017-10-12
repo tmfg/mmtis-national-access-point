@@ -1,0 +1,20 @@
+job('Daily staging env deploy') {
+    triggers {
+        // Run every day at six in the morning
+        cron('0 6 * * *')
+    }
+    steps {
+        downstreamParameterized {
+            trigger('Deploy CKAN plugin') {
+                parameters {
+                    predefinedProp('ENV','staging')
+                }
+            }
+            trigger('Deploy OTE') {
+                parameters {
+                    predefinedProp('ENV','staging')
+                }
+            }
+        }
+    }
+}

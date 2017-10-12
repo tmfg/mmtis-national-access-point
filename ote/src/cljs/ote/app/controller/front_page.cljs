@@ -1,43 +1,51 @@
 (ns ote.app.controller.front-page
-  (:require [tuck.core :as t]
-            [ote.communication :as comm]))
+  (:require [tuck.core :as tuck]
+            [ote.communication :as comm]
+            [ote.app.routes :as routes]))
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
+(defrecord OpenUserMenu [])
 
 (defrecord GetTransportOperator [])
-(defrecord HandleTransportOperatorResponse [response])
+(defrecord TransportOperatorResponse [response])
 
 (defrecord GetTransportOperatorData [])
-(defrecord HandleTransportOperatorDataResponse [response])
+(defrecord TransportOperatorDataResponse [response])
 
-(extend-protocol t/Event
+(extend-protocol tuck/Event
 
   ChangePage
   (process-event [{given-page :given-page} app]
-    (assoc app :page given-page))
+    (routes/navigate! given-page)
+    app)
+
+  OpenUserMenu
+  (process-event [_ app]
+    (update-in app [:ote-service-flags :user-menu-open] true))
 
   GetTransportOperator
   (process-event [_ app]
-      (comm/post! "transport-operator/group" {} {:on-success (t/send-async! ->HandleTransportOperatorResponse)})
+      (comm/post! "transport-operator/group" {} {:on-success (tuck/send-async! ->TransportOperatorResponse)})
       app)
 
-  HandleTransportOperatorResponse
+  TransportOperatorResponse
   (process-event [{response :response} app]
     (assoc app :transport-operator response))
 
   GetTransportOperatorData
   (process-event [_ app]
-    (comm/post! "transport-operator/data" {} {:on-success (t/send-async! ->HandleTransportOperatorDataResponse)})
+    (comm/post! "transport-operator/data" {} {:on-success (tuck/send-async! ->TransportOperatorDataResponse)})
     app)
 
-  HandleTransportOperatorDataResponse
+  TransportOperatorDataResponse
   (process-event [{response :response} app]
-    (.log js/console " Mitäkähän dataa serveriltä tulee " (clj->js response) (clj->js (get response :transport-operator)))
+    ;(.log js/console " Mitäkähän dataa serveriltä tulee " (clj->js response) (clj->js (get response :transport-operator)))
     (assoc app
       :transport-operator (get response :transport-operator)
-      :transport-services (get response :transport-service-vector ))))
+      :transport-services (get response :transport-service-vector )
+      :user (get response :user ))))
 
 
 

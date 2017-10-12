@@ -23,7 +23,8 @@
                             {% block header_logo %}
                                 {% if g.site_logos %}
                                     <a class="logo" href="{{ h.url_for('home') }}"><img
-                                            src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}"
+                                            src="{{ h.url_for_static_or_external(g.site_logo) }}"
+                                            alt="{{ g.site_title }}"
                                             title="{{ g.site_title }}" /></a>
                                 {% else %}
                                     <a class="brand" href="{{ h.url_for('home') }}">{{ g.site_title }}</a>
@@ -37,7 +38,10 @@
                                 {% block header_site_navigation_tabs %}
                                     {{ h.build_nav_main(('home', _('Home')),('search', _('Datasets')),('organizations_index', _('Organizations')) ) }}
                                 {% endblock %}
-                                <li><a href="/ote/index.html">OTE</a></li>
+
+                                {% if c.userobj %}
+                                    <li><a href="/ote/index.html">OTE</a></li>
+                                {% endif %}
                             </ul>
                         {% endblock %}
                     </nav>
