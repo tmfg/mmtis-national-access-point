@@ -53,6 +53,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             'transport_service_type': [tk.get_converter('convert_from_extras'),
                                        tk.get_validator('ignore_missing')],
             'operation_area': [tk.get_converter('convert_from_extras'),
-                               tk.get_converter('ignore_missing')]
+                               tk.get_validator('ignore_missing')]
         })
         return schema
+
+    def is_fallback(self):
+        return True
+
+    def package_types(self):
+        return []
