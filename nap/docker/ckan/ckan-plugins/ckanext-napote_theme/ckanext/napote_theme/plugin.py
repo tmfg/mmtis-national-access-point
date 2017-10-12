@@ -101,10 +101,8 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # Public directory for static images
         tk.add_public_directory(config, 'public')
 
-    def nap_package_schema(self):
-        # Take default schema
-        schema = super(NapoteThemePlugin, self).create_package_schema()
 
+    def _modify_package_schema(self, schema):
         # add custom fields
         schema.update({
             'transport_service_type': [tk.get_validator('ignore_missing'),
@@ -118,11 +116,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         return schema
 
-    def create_package_schema(self):
-        return self.nap_package_schema()
-
-    def update_package_schema(self):
-        return self.nap_package_schema()
 
     def show_package_schema(self):
         schema = super(NapoteThemePlugin, self).show_package_schema()
@@ -139,6 +132,18 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
             'operation_area': [tk.get_converter('convert_from_tags')('operation_areas'),
                                tk.get_validator('ignore_missing')]
         })
+
+        return schema
+
+    def create_package_schema(self):
+        schema = super(NapoteThemePlugin, self).create_package_schema()
+        schema = self._modify_package_schema(schema)
+
+        return schema
+
+    def update_package_schema(self):
+        schema = super(NapoteThemePlugin, self).update_package_schema()
+        schema = self._modify_package_schema(schema)
 
         return schema
 
