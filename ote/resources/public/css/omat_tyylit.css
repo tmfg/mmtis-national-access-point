@@ -82,14 +82,10 @@ html {
 }
 
 .topnav a.ote-nav:hover {
-  /*background-color: #ddd;
-  color: black;*/
   border-bottom: 4px solid #1976D2;
 }
 
 .topnav a.active {
-    /*background-color: #4CAF50;
-    color: white;*/
     border-bottom: 4px solid #1976D2;
 }
 .main-icon a:hover {
@@ -105,9 +101,6 @@ html {
     padding-bottom: 5px;
     float: right;
     display: inline-block;
-}
-.user-menu.active, .user-data.active {
-    background-color: green;
 }
 .topnav > div.user-data {
     padding-top: 12px;

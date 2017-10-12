@@ -31,7 +31,7 @@
      :anchor-origin {:horizontal "right" :vertical "bottom"}
      :target-origin {:horizontal "right" :vertical "top"}
      }
-    [ui/menu-item {:primary-text "Etusivu"
+    [ui/menu-item {:primary-text (tr [:common-texts :header-front-page])
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     [ui/menu-item {:primary-text "Organisaation perustiedot"
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
