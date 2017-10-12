@@ -64,8 +64,8 @@
    [:div.ote-sovellus.container-fluid
     [:div {:class "topnav"}
      [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
-     [:a.ote-nav { :href "/nap/" }  "FINAP"]
-     [:a.ote-nav { :href "/nap/" } (tr [:common-texts :header-nap-official-name]) ]
+     [:a.ote-nav { :href "/" }  "NAP"]
+     [:a.ote-nav { :href "/" } (tr [:common-texts :header-nap-official-name]) ]
      [:a.ote-nav
       {:class (is-topnav-active :front-page (:page app))
        :href "#service-operator"
@@ -99,5 +99,3 @@
       [debug/debug app]
     ]
     ]])
-
-

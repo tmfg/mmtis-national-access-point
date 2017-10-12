@@ -42,7 +42,7 @@
    }
 
   :transport-service
-  {:ote.db.transport-service/published? "FINAP-tila"
+  {:ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
                                                 false "Ei julkaistu"}}
 
@@ -100,7 +100,7 @@
                 :place-auto-complete "Hae paikka nimellä"}
 
  :common-texts {
-                :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja FINAP-palveluun.
+                :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
                 :link-add-new-api                           "Lisää rajapinta"
@@ -108,7 +108,7 @@
                 :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
                 :api-name                                   "Rajapinnan nimi"
                 :api-url                                    "Rajapinnan verkko-osoite"
-                :finap-status                               "FINAP tila"
+                :finap-status                               "NAP tila"
                 :header-nap-official-name                   "Palvelukatalogi"
                 :header-own-service-list                    "Omat palvelutiedot"
                 :header-front-page                          "Etusivu"

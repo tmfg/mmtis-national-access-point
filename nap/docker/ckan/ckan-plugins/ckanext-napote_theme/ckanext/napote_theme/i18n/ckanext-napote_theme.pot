@@ -83,7 +83,7 @@ msgid "New user?"
 msgstr ""
 
 #: ckanext/napote_theme/templates/home/snippets/header.html:5
-msgid "FINAP"
+msgid "NAP"
 msgstr ""
 
 #: ckanext/napote_theme/templates/home/snippets/header.html:8
@@ -107,4 +107,3 @@ msgstr ""
 #: ckanext/napote_theme/templates/snippets/navbar_language_selector.html:14
 msgid "Go"
 msgstr ""
-
