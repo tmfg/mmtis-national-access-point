@@ -15,7 +15,7 @@ E'Data loaded from Tilastokeskus open data. Contains all postal codes with their
 CREATE VIEW places AS
  SELECT CONCAT('finnish-municipality-', natcode) AS id,
         'finnish-municipality' as type,
-        namefin, nameswe, location
+        namefin, nameswe, ST_FlipCoordinates(location) as location
    FROM finnish_municipalities
 UNION ALL
  SELECT CONCAT('finnish-postal-',posti_alue) as id,

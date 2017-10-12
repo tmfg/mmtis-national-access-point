@@ -1,8 +1,8 @@
--- name: fetch-place-geojson-by-name
+-- name: fetch-place-geojson-by-id
 -- single?: true
-SELECT ST_AsGeoJSON(ST_FlipCoordinates(location))
-  FROM finnish_municipalities
- WHERE namefin = :name
+SELECT ST_AsGeoJSON(location)
+  FROM places
+ WHERE id = :id
 
 
 -- name: clear-transport-service-places!
