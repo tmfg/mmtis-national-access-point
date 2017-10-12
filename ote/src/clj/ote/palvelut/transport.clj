@@ -41,7 +41,7 @@
   [db id]
   (first (fetch db
                 ::t-service/transport-service
-                (specql/columns ::transport-service/transport-service)
+                (specql/columns ::t-service/transport-service)
                 {::t-service/id id}
                 {::specql/limit 1}))
   )
