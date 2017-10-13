@@ -37,6 +37,7 @@
                  [figwheel "0.5.13"]
                  [cljsjs/react-leaflet "1.6.5-0"]
                  [funcool/bide "1.5.1"] ; URL router
+                 [stylefy "1.0.1"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
