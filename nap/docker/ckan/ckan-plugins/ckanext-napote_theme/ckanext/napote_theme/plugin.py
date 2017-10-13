@@ -77,6 +77,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IFacets)
 
     def get_helpers(self):
         return {
@@ -101,6 +102,17 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # Public directory for static images
         tk.add_public_directory(config, 'public')
 
+    def dataset_facets(self, facets_dict, package_type):
+        facets_dict.clear()
+
+        facets_dict['organization'] = tk._('Organizations')
+        facets_dict['vocab_transport_service_types'] = tk._('Transport Service Type')
+        facets_dict['vocab_operation_areas'] = tk._('Operation Area')
+        facets_dict['tags'] = tk._('Tags')
+        facets_dict['res_format'] = tk._('Formats')
+        facets_dict['license'] = tk._('License')
+
+        return facets_dict
 
     def _modify_package_schema(self, schema):
         # add custom fields
@@ -115,7 +127,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         })
 
         return schema
-
 
     def show_package_schema(self):
         schema = super(NapoteThemePlugin, self).show_package_schema()
