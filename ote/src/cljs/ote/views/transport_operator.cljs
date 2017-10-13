@@ -96,7 +96,7 @@
       :type  :text-area
       :rows   5})))
 
-(defn olennaiset-tiedot [e! status]
+(defn operator [e! status]
   [:span
    [:div
     [:h3 "Organisaation tiedot"]]
@@ -134,7 +134,7 @@
 
       {:name ::common/post-office
        :type :string
-       :read (comp ::common/postal_office ::to-definitions/visiting-address)
+       :read (comp ::common/post_office ::to-definitions/visiting-address)
        :write (fn [data post-office]
                 (assoc-in data [::to-definitions/visiting-address ::common/post-office] post-office))}
 

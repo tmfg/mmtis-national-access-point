@@ -1,0 +1,720 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "CIVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "CIVPC-",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "CidrBlock": {
+          "Ref": "vpcCIDR"
+        }
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {}
+    },
+    "InternetGatewayAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "DependsOn": "InternetGateway",
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        },
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "CiPublicASubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "publicNetAAvailabilityZone"
+        },
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "CiPublicASubnet ",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "CidrBlock": {
+          "Ref": "publicNetACIDR"
+        },
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "CiPublicBSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "publicNetBAvailabilityZone"
+        },
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "CiPublicBSubnet ",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "CidrBlock": {
+          "Ref": "publicNetBCIDR"
+        },
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "CiPublicCSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "publicNetCAvailabilityZone"
+        },
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "CiPublicCSubnet ",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "CidrBlock": {
+          "Ref": "publicNetCCIDR"
+        },
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "CiPrivateSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "privateNetAAvailabilityZone"
+        },
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "CiPrivateSubnetA ",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "CidrBlock": {
+          "Ref": "privateNetACIDR"
+        },
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "PublicNetRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "DependsOn": "InternetGatewayAttachment",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "PublicNetRouteTable"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "PrivateNetRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "DependsOn": "InternetGatewayAttachment",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "PrivateNetRouteTable"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "NATGateway": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId" : {
+          "Ref": "natgweipalloc"
+        },
+        "SubnetId": {
+          "Ref": "CiPublicASubnet"
+        }
+      }
+    },
+    "Jenkins": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": {
+          "Ref": "ImageID"
+        },
+        "IamInstanceProfile" : { "Ref": "JenkinsInstanceProfile" },
+        "InstanceType": "t2.small",
+        "KeyName": {
+          "Ref": "sshKeyName"
+        },
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : [ "", [ "jenkins-",  { "Ref" : "environmentName"} ] ] }
+          }
+        ],
+        "SubnetId": {
+          "Ref": "CiPublicASubnet"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "SolitaInternalNetworksSG"
+          },
+          {
+            "Ref": "AllowConnsFromJenkinsSG"
+          },
+          {
+            "Ref": "AllowConnsFromJenkinsELBSG"
+          }
+        ]
+      }
+    },
+    "ElasticLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties" : {
+        "Instances" : [ { "Ref" : "Jenkins" } ],
+        "Listeners" : [ {
+          "LoadBalancerPort" : "443",
+          "InstancePort" : { "Ref" : "JenkinsWebServerPort" },
+          "SSLCertificateId" : { "Ref" : "JenkinsCertARN" },
+          "Protocol" : "HTTPS"
+        } ],
+        "Subnets" : [ { "Ref": "CiPublicASubnet" }, { "Ref": "CiPublicBSubnet" }, { "Ref": "CiPublicCSubnet" } ],
+        "SecurityGroups" : [ { "Ref": "JenkinsELBSecuritygroup" } ],
+        "HealthCheck" : {
+          "Target" : {
+            "Fn::Join" : [ "", [ "HTTP:", { "Ref" : "JenkinsWebServerPort" }, "/login?from=%2F" ] ]
+          },
+          "HealthyThreshold" : "3",
+          "UnhealthyThreshold" : "5",
+          "Interval" : "30",
+          "Timeout" : "5"
+        }
+      }
+    },
+    "IpAccociate": {
+    "Type": "AWS::EC2::EIPAssociation",
+       "Properties" : {
+          "InstanceId" : { "Ref" : "Jenkins" },
+          "EIP" : {
+            "Ref": "jenkinseipalloc"
+          }
+       }
+    },
+    "PrivateSubnetARouteTable": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateNetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "CiPrivateSubnetA"
+        }
+      }
+    },
+     "PublicSubnetARouteTable": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicNetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "CiPublicASubnet"
+        }
+      }
+    },
+    "PublicSubnetBRouteTable": {
+     "Type": "AWS::EC2::SubnetRouteTableAssociation",
+     "Properties": {
+       "RouteTableId": {
+         "Ref": "PublicNetRouteTable"
+       },
+       "SubnetId": {
+         "Ref": "CiPublicBSubnet"
+       }
+     }
+   },
+   "PublicSubnetCRouteTable": {
+    "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    "Properties": {
+      "RouteTableId": {
+        "Ref": "PublicNetRouteTable"
+      },
+      "SubnetId": {
+        "Ref": "CiPublicCSubnet"
+      }
+     }
+    },
+    "PublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "InternetGatewayAttachment",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "PublicNetRouteTable"
+        },
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PrivateRoute": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "InternetGatewayAttachment",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "PrivateNetRouteTable"
+        },
+        "NatGatewayId": {
+          "Ref": "NATGateway"
+        }
+      }
+    },
+    "SolitaInternalNetworksSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Allowed connections from Solita Office",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "109.204.231.2/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "109.204.231.126/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "194.157.155.98/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "109.204.231.11/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "202.176.217.36/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "194.111.136.1/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "194.111.137.0/24"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "139.74.0.0/16"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "12.12.253.130/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "93.174.195.58/32"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "SolitaInternalNetworksSG"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "AllowConnsFromJenkinsELBSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "AllowConnsFromJenkinsELBSG",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8080",
+            "ToPort": "8080",
+             "SourceSecurityGroupId" : { "Ref": "JenkinsELBSecuritygroup" }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "AllowConnsFromJenkinsELBSG"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "JenkinsELBSecuritygroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Allowed connections from Solita Office",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "109.204.231.2/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "109.204.231.126/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "194.157.155.98/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "109.204.231.11/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "202.176.217.36/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "194.111.136.1/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "194.111.137.0/24"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "139.74.0.0/16"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "12.12.253.130/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "93.174.195.58/32"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "JenkinsELBSecuritygroup"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    },
+    "AllowConnsFromJenkinsSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Group for Private Subnet Hosts",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "10.55.0.0/16"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "project",
+            "Value": {
+              "Ref": "projectTag"
+            }
+          },
+          {
+            "Key": "Name",
+            "Value": "AllowConnsFromJenkinsSG"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CIVPC"
+        }
+      }
+    }
+  },
+    "Parameters": {
+      "projectTag": {
+        "Description": "Project Name for Tagging Purposes",
+        "Type": "String",
+        "Default": "napote-ci"
+    },
+    "vpcName": {
+      "Description": "VPC Name",
+      "Type": "String",
+      "Default": "napote-ci-vpc"
+    },
+    "vpcCIDR": {
+      "Description": "VPC CIDR",
+      "Type": "String",
+      "Default": "10.55.0.0/16"
+    },
+    "publicNetACIDR": {
+      "Description": "Public Subnet A CIDR",
+      "Type": "String",
+      "Default": "10.55.1.0/24"
+    },
+    "publicNetAAvailabilityZone": {
+      "Description": "Public Subnet A Availability Zone",
+      "Type": "String",
+      "Default": "eu-central-1a"
+    },
+    "publicNetBCIDR": {
+      "Description": "Public Subnet B CIDR",
+      "Type": "String",
+      "Default": "10.55.2.0/24"
+    },
+    "publicNetBAvailabilityZone": {
+      "Description": "Public Subnet B Availability Zone",
+      "Type": "String",
+      "Default": "eu-central-1b"
+    },
+    "publicNetCCIDR": {
+      "Description": "Public Subnet C CIDR",
+      "Type": "String",
+      "Default": "10.55.3.0/24"
+    },
+    "publicNetCAvailabilityZone": {
+      "Description": "Public Subnet C Availability Zone",
+      "Type": "String",
+      "Default": "eu-central-1c"
+    },
+    "privateNetACIDR": {
+      "Description": "Private Subnet A CIDR",
+      "Type": "String",
+      "Default": "10.55.4.0/24"
+    },
+    "privateNetAAvailabilityZone": {
+      "Description": "Private Subnet A Availability Zone",
+      "Type": "String",
+      "Default": "eu-central-1a"
+    },
+    "privateNetBCIDR": {
+      "Description": "Private Subnet B CIDR",
+      "Type": "String",
+      "Default": "10.55.5.0/24"
+    },
+    "privateNetBAvailabilityZone": {
+      "Description": "Private Subnet B Availability Zone",
+      "Type": "String",
+      "Default": "eu-central-1b"
+    },
+    "privateNetCCIDR": {
+      "Description": "Private Subnet C CIDR",
+      "Type": "String",
+      "Default": "10.55.6.0/24"
+    },
+    "privateNetCAvailabilityZone": {
+      "Description": "Private Subnet C Availability Zone",
+      "Type": "String",
+      "Default": "eu-central-1c"
+    },
+    "ImageID": {
+      "Description": "Image ID",
+      "Type": "String",
+      "Default": "omitted"
+    },
+    "sshKeyName": {
+      "Description": "SSH key name to use on new instances",
+      "Type": "String",
+      "Default": "napote-ci"
+    },
+    "environmentName": {
+      "Description": "Name of Environment e.g. dev, prod or ci",
+      "Type": "String",
+      "Default": "ci"
+    },
+    "natgweipalloc": {
+      "Description": "Elastic ip allocation id for nat gw",
+      "Type": "String",
+      "Default": "no default entry"
+    },
+    "ProdVPCIDCIDRRange": {
+      "Description": "Prod VPC CIDR",
+      "Type": "String",
+      "Default": "10.33.0.0/16"
+    },
+    "DevVPCIDCIDRRange": {
+      "Description": "Prod VPC CIDR",
+      "Type": "String",
+      "Default": "10.44.0.0/16"
+    },
+    "ProdVPCId": {
+      "Description": "Prod VPC Id",
+      "Type": "String",
+      "Default": "no default entry"
+    },
+    "DevVPCId": {
+      "Description": "Dev VPC Id",
+      "Type": "String",
+      "Default": "no default entry"
+    },
+    "JenkinsWebServerPort": {
+      "Description": "JenkinsWebServerPort",
+      "Type": "String",
+      "Default": "8080"
+    },
+    "JenkinsCertARN": {
+      "Description": "JenkinsCertARN",
+      "Type": "String",
+      "Default": "omitted"
+    },
+    "JenkinsInstanceProfile": {
+      "Description": "JenkinsInstanceProfile",
+      "Type": "String",
+      "Default": "jenkins-ec2-role"
+    },
+    "jenkinseipalloc": {
+      "Description": "Elastic ip for jenkins",
+      "Type": "String",
+      "Default": "no default entry"
+    }
+  },
+  "Outputs": {
+    "vpcId": {
+      "Value": { "Ref": "CIVPC" }
+    },
+    "solitaInternalSGId": {
+        "Value": { "Ref": "SolitaInternalNetworksSG" }
+    },
+    "privateSubnetA": {
+        "Value": { "Ref": "CiPrivateSubnetA" }
+    },
+    "JenkinsAllowedFromSGId": {
+        "Description": "Security group defining connections allowed from jenkins",
+        "Value": { "Ref": "AllowConnsFromJenkinsSG" }
+    }
+
+  },
+  "Description": "Ci network stack, creates CI VPC with subnets. Creates jenkins host."
+}
