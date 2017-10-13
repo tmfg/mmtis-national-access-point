@@ -27,7 +27,7 @@
          [ui/table-header-column "Rajapinnan nimi"]
          [ui/table-header-column "Rajapinnan verkko-osoite"]
          [ui/table-header-column "Muut tietoaineistot"]
-         [ui/table-header-column "FINAP-tila"]]]
+         [ui/table-header-column "NAP-tila"]]]
 
        [ui/table-body {:display-row-checkbox false}
         (doall

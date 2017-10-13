@@ -73,6 +73,8 @@
      [:a.ote-nav {
                   :href "#home"
                   :on-click #(e! (fp-controller/->ChangePage :front-page))}  "OTE"]
+     [:a.ote-nav { :href "/" }  "NAP"]
+     [:a.ote-nav { :href "/" } (tr [:common-texts :header-nap-official-name]) ]
      [:a.ote-nav
       {:class (is-topnav-active :front-page (:page app))
        :href "#service-operator"
@@ -115,5 +117,3 @@
       [debug/debug app]
     ]
     ]])
-
-
