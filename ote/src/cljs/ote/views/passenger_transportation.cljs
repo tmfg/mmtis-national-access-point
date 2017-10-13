@@ -36,7 +36,7 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :rows 5 }
+    :rows 1 :max-rows 5}
 
    {:name        ::t-service/payment-methods
     :type        :multiselect-selection
@@ -94,7 +94,7 @@
 
    {:name ::t-service/accessibility-description
     :type :localized-text
-    :rows 5}))
+    :rows 1 :max-rows 5}))
 
 (defn pricing-group [e!]
   (form/group
