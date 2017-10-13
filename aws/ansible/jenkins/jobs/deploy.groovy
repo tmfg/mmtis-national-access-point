@@ -5,7 +5,9 @@ job('Deploy OTE') {
         choiceParam('ENV', ['staging','production']);
     }
     scm {
-        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git')
+        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git') {
+            branch('master')
+        }
     }
 
     environmentVariables {
@@ -25,7 +27,7 @@ job('Deploy OTE') {
             propertiesContent('')
             propertiesFilePath('build.properties')
         }
-        
+
         maven {
             goals('flyway:migrate')
             rootPOM('database/pom.xml')
