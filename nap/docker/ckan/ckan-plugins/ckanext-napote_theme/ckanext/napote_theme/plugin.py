@@ -110,7 +110,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         facets_dict['vocab_operation_areas'] = tk._('Operation Area')
         facets_dict['tags'] = tk._('Tags')
         facets_dict['res_format'] = tk._('Formats')
-        facets_dict['license'] = tk._('License')
+        facets_dict['license_id'] = tk._('Licenses')
 
         return facets_dict
 
