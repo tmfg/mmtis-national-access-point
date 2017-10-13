@@ -17,7 +17,7 @@
 
               {:name ::common/post-office
                :type :string
-               :read (comp ::common/postal_office address-field)
+               :read (comp ::common/post_office address-field)
                :write (fn [data post-office]
                         (assoc-in data [address-field ::common/post-office] post-office))}
 

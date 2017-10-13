@@ -9,6 +9,10 @@
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
             [ote.views.passenger_transportation :as pt]
+            [ote.views.terminal :as terminal]
+            [ote.views.rental :as rental]
+            [ote.views.parking :as parking]
+            [ote.views.brokerage :as brokerage]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
             [ote.ui.debug :as debug]))
@@ -35,6 +39,8 @@
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     [ui/menu-item {:primary-text "Organisaation perustiedot"
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
+    [ui/menu-item {:primary-text "Kirjaudu ulos"
+                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     ]
   )
 
@@ -64,6 +70,9 @@
    [:div.ote-sovellus.container-fluid
     [:div {:class "topnav"}
      [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
+     [:a.ote-nav {
+                  :href "#home"
+                  :on-click #(e! (fp-controller/->ChangePage :front-page))}  "OTE"]
      [:a.ote-nav { :href "/" }  "NAP"]
      [:a.ote-nav { :href "/" } (tr [:common-texts :header-nap-official-name]) ]
      [:a.ote-nav
@@ -91,9 +100,18 @@
      (when (= :transport-service (:page app))
        [t-service/select-service-type e! (:transport-service app)])
      (when (= :transport-operator (:page app))
-               [to/olennaiset-tiedot e! (:transport-operator app)])
+       [to/operator e! (:transport-operator app)])
      (when (= :passenger-transportation (:page app))
-        [pt/passenger-transportation-info e! (:transport-service app)])]
+       [pt/passenger-transportation-info e! (:transport-service app)])
+     (when (= :terminal (:page app))
+       [terminal/terminal e! (:transport-service app)])
+     (when (= :rentals (:page app))
+       [rental/rental e! (:transport-service app)])
+     (when (= :parking (:page app))
+       [parking/parking e! (:transport-service app)])
+     (when (= :brokerage (:page app))
+       [brokerage/brokerage e! (:transport-service app)])
+     ]
 
     [:div.row
       [debug/debug app]
