@@ -20,7 +20,7 @@
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb))
-                                   :disabled (form/disable-save? data)}
+                                   :disabled (not (form/can-save? data))}
                    (tr [:buttons :save])])})
 
 (defn passenger-transportation-info [e! status]
@@ -53,6 +53,38 @@
 
       (form-groups/service-url (tr [:field-labels ::transport-service/real-time-information]) ::transport-service/real-time-information)
       (form-groups/service-url (tr [:field-labels ::transport-service/booking-service]) ::transport-service/booking-service)
+
+      (form/group
+        {:label   "Palvelun yhteystiedot"
+         :columns 3
+         :col-class "row-form-field"
+         :class " hjee "}
+        {:name        ::transport-service/contact-phone
+         :type        :string
+         :col-class       "row-form-field"}
+        {:name        ::common/street
+         :type        :string
+         :col-class       "row-form-field"
+         :read (comp ::common/street ::transport-service/contact-address)
+         :write (fn [data street]
+                  (assoc-in data [::transport-service/contact-address ::common/street] street))}
+        {:name        ::transport-service/contact-email
+         :type        :string}
+        {:name        ::common/post-office
+         :type        :string
+         :read (comp ::common/post_office ::transport-service/contact-address)
+         :write (fn [data post-office]
+                  (assoc-in data [::transport-service/contact-address ::common/post-office] post-office))}
+        {:name        ::transport-service/homepage
+         :type        :string}
+        {:name        ::common/postal-code
+         :type        :string
+         :read (comp ::common/postal_code ::transport-service/contact-address)
+         :write (fn [data postal-code]
+                  (assoc-in data [::transport-service/contact-address ::common/postal-code] postal-code))}
+
+
+        )
 
       (form/group
        {:label   "Muut palvelut ja esteettömyys"

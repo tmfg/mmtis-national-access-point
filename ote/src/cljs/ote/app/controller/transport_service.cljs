@@ -4,7 +4,8 @@
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
-            [ote.app.controller.passenger-transportation :as pt]))
+            [ote.app.controller.passenger-transportation :as pt]
+            [ote.app.routes :as routes]))
 
 (defrecord AddPriceClassRow [])
 (defrecord RemovePriceClassRow [])
@@ -29,21 +30,21 @@
 
   SelectTransportServiceType
   (process-event [{data :data} app]
-    (assoc app :page (get data ::t-service/service-type)))
+    (routes/navigate! (get data ::t-service/service-type))
+    app)
 
   ModifyTransportService
   (process-event [{id :id} app]
-    (.log js/console " ModifyTransportService id " id (clj->js app))
     (comm/get! (str "transport-service/" id)
                {:on-success (tuck/send-async! ->ModifyTransportServiceResponse)})
     app)
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
-    (.log js/console " dada " (clj->js response) (clj->js app) (get response ::t-service/type))
-     (assoc app
-      :page :passenger-transportation
+    (assoc app
+      :page (get response ::t-service/type)
       :transport-service response))
+
 
   PublishTransportService
   (process-event [{:keys [transport-service-id]} app]

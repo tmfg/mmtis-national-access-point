@@ -8,6 +8,10 @@
    [["/" :front-page]
     ["/transport-operator" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
+    ["/terminal" :terminal]
+    ["/rentals" :rentals]
+    ["/brokerage" :brokerage]
+    ["/parking" :parking]
     ["/new-service" :transport-service]]))
 
 (defn- on-navigate [name params query]
