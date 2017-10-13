@@ -4,75 +4,11 @@
 
 /*
 *
-* Custom added classes
+* ######## BOOTSTRAP customizations ########
+*
+* Include Bootstrap 2.3.2 media queries (copied from bootstrap 2.3.2 css).
 *
 */
-
-/** HEADER **/
-.masthead .section-right {
-    float: right !important;
-}
-
-/** HOMEPAGE HEADER **/
-
-.homepage .home-header img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-/*
-*
-* Customizations
-*
-*/
-
-/** BASE **/
-
-body {
-    background: #444444; /** LIVI pääväri, harmaat 5. **/
-}
-
-/** HEADER **/
-.masthead .navbar .brand {
-    text-shadow: none;
-    font-size: 30px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 700;
-    color: white;
-    padding: 10px 30px 10px;
-}
-
-.navbar-form .select2-container {
-    margin-top: 5px;
-}
-
-.masthead .nav-collapse {
-    float: none;
-}
-
-.masthead .nav-collapse.in .section-right {
-    float: left !important;
-    clear: both;
-}
-
-/** HOME **/
-
-.homepage .hero {
-    background: none;
-    background-color: white;
-}
-
-.homepage [role=main] {
-    padding-top: 0;
-}
-
-/** Footer **/
-.site-footer {
-    background: #444444; /** LIVI lisäväri, harmaat 5. **/
-}
-
-/** Include Bootstrap 2.3.2 media queries (copied from bootstrap 2.3.2 css) **/
 
 @media (min-width: 1200px) {
     .row {
@@ -509,4 +445,131 @@ body {
     .row-fluid .thumbnails {
         margin-left: 0;
     }
+}
+
+/*
+* ##### CKAN #####
+*
+* Custom media queries for CKAN classes
+*
+*/
+
+
+@media (min-width: 1200px) {
+    .nav-collapse.collapse {
+        height: auto !important;
+        overflow: visible !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .form-horizontal .info-block {
+        padding: 6px 0 6px 0;
+    }
+
+    .form-horizontal .info-inline {
+        float: right;
+        width: 265px;
+        margin-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+@media (min-width: 1200px) {
+    .search-form .control-order-by {
+        float: right;
+        margin-left: 15px;
+    }
+
+    .tertiary .search-form .control-order-by {
+        float: none;
+        margin: 0;
+    }
+}
+
+@media (min-width: 1200px) {
+    .wrapper {
+        background-position: 50px 0;
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 1200px) {
+    .masthead .nav-collapse {
+        float: right;
+    }
+}
+
+/*
+* #############################################################
+*/
+
+/*
+*
+* Custom added classes
+*
+*/
+
+/** HEADER **/
+.masthead .section-right {
+    float: right !important;
+}
+
+/** HOMEPAGE HEADER **/
+
+.homepage .home-header img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/*
+*
+* Customizations
+*
+*/
+
+/** BASE **/
+
+body {
+    background: #444444; /** LIVI pääväri, harmaat 5. **/
+}
+
+/** HEADER **/
+.masthead .navbar .brand {
+    text-shadow: none;
+    font-size: 30px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: white;
+    padding: 10px 30px 10px;
+}
+
+.navbar-form .select2-container {
+    margin-top: 5px;
+}
+
+.masthead .nav-collapse {
+    float: none;
+}
+
+.masthead .nav-collapse.in .section-right {
+    float: left !important;
+    clear: both;
+}
+
+/** HOME **/
+
+.homepage .hero {
+    background: none;
+    background-color: white;
+}
+
+.homepage [role=main] {
+    padding-top: 0;
+}
+
+/** Footer **/
+.site-footer {
+    background: #444444; /** LIVI lisäväri, harmaat 5. **/
 }

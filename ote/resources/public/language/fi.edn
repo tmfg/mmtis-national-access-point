@@ -37,9 +37,32 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
+   ;; Contact details
+   :ote.db.transport-operator/contact-address          "Osoitetiedot"
+   :ote.db.transport-service/contact-phone             "Puhelin"
+   :ote.db.transport-service/contact-email             "Sähköposti"
+   :ote.db.transport-service/homepage                  "Kotisivu"
+
    :ote.db.transport-service/operation-area "Toiminta-alue"
 
    }
+
+  ;; Terminal fields
+  :terminal
+  {:ote.db.transport-service/indoor-map "Sisätilojen kartta"
+   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+  }
+
+  ;; Rental fields
+  :rentals
+  {:eligibility-requirements  "Kelpoisuusvaatimukset"
+   }
+
+  ;; Parking fields
+  :parking
+  {:parking-areas  "Parkkipaikkojen sijainnit"
+   }
+
 
   :transport-service
   {:ote.db.transport-service/published? "NAP-tila"
