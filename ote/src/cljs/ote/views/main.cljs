@@ -15,7 +15,9 @@
             [ote.views.brokerage :as brokerage]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
-            [ote.ui.debug :as debug]))
+            [ote.ui.debug :as debug]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
@@ -48,9 +50,10 @@
   "OTE application main view"
   [e! app]
 
-  [ui/mui-theme-provider
-   {:mui-theme
-    (get-mui-theme
+  [:div {:style (stylefy/use-style style-base/body)}
+   [ui/mui-theme-provider
+    {:mui-theme
+     (get-mui-theme
       {:palette {;; primary nav color - Also Focus color in text fields
                  :primary1-color (color :lightBlue600)
 
@@ -65,55 +68,55 @@
 
        :button  {:labelColor "#fff"}
 
-      })}
+       })}
 
-   [:div.ote-sovellus.container-fluid
-    [:div {:class "topnav"}
-     [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
-     [:a.ote-nav {
-                  :href "#home"
-                  :on-click #(e! (fp-controller/->ChangePage :front-page))}  "OTE"]
-     [:a.ote-nav { :href "/" }  "NAP"]
-     [:a.ote-nav { :href "/" } (tr [:common-texts :header-nap-official-name]) ]
-     [:a.ote-nav
-      {:class (is-topnav-active :front-page (:page app))
-       :href "#service-operator"
-       :on-click #(e! (fp-controller/->ChangePage :front-page))
-       } (tr [:common-texts :header-own-service-list]) ]
-    ; [:div.user-menu-container {:class (is-user-menu-active app)}
+    [:div.ote-sovellus.container-fluid
+     [:div {:class "topnav"}
+      [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
+      [:a.ote-nav {
+                   :href "#home"
+                   :on-click #(e! (fp-controller/->ChangePage :front-page))}  "OTE"]
+      [:a.ote-nav { :href "/" }  "NAP"]
+      [:a.ote-nav { :href "/" } (tr [:common-texts :header-nap-official-name]) ]
+      [:a.ote-nav
+       {:class (is-topnav-active :front-page (:page app))
+        :href "#service-operator"
+        :on-click #(e! (fp-controller/->ChangePage :front-page))
+        } (tr [:common-texts :header-own-service-list]) ]
+                                        ; [:div.user-menu-container {:class (is-user-menu-active app)}
       [:div.user-menu {:class (is-user-menu-active app) }
-        (reagent/as-element (main-menu e!))
-        ]
+       (reagent/as-element (main-menu e!))
+       ]
       [:div.user-data {:class (is-user-menu-active app) }
-        [:div.user-name (get-in app [:user :name])]
-        [:div.user-organization (get-in app [:transport-operator :ote.db.transport-operator/name])]
-        ]
-      ;]
+       [:div.user-name (get-in app [:user :name])]
+       [:div.user-organization (get-in app [:transport-operator :ote.db.transport-operator/name])]
+       ]
+                                        ;]
 
-     ]
-    ;; NOTE: debug state is VERY slow if app state is HUGE
-    ;; (it tries to pr-str it)
+      ]
+     ;; NOTE: debug state is VERY slow if app state is HUGE
+     ;; (it tries to pr-str it)
 
-    [:div
-     (when (= :front-page (:page app))
-       [fp/front-page e! app])
-     (when (= :transport-service (:page app))
-       [t-service/select-service-type e! (:transport-service app)])
-     (when (= :transport-operator (:page app))
-       [to/operator e! (:transport-operator app)])
-     (when (= :passenger-transportation (:page app))
-       [pt/passenger-transportation-info e! (:transport-service app)])
-     (when (= :terminal (:page app))
-       [terminal/terminal e! (:transport-service app)])
-     (when (= :rentals (:page app))
-       [rental/rental e! (:transport-service app)])
-     (when (= :parking (:page app))
-       [parking/parking e! (:transport-service app)])
-     (when (= :brokerage (:page app))
-       [brokerage/brokerage e! (:transport-service app)])
-     ]
+     [:div
+      (when (= :front-page (:page app))
+        [fp/front-page e! app])
+      (when (= :transport-service (:page app))
+        [t-service/select-service-type e! (:transport-service app)])
+      (when (= :transport-operator (:page app))
+        [to/operator e! (:transport-operator app)])
+      (when (= :passenger-transportation (:page app))
+        [pt/passenger-transportation-info e! (:transport-service app)])
+      (when (= :terminal (:page app))
+        [terminal/terminal e! (:transport-service app)])
+      (when (= :rentals (:page app))
+        [rental/rental e! (:transport-service app)])
+      (when (= :parking (:page app))
+        [parking/parking e! (:transport-service app)])
+      (when (= :brokerage (:page app))
+        [brokerage/brokerage e! (:transport-service app)])
+      ]
 
-    [:div.row
+     [:div.row
       [debug/debug app]
-    ]
-    ]])
+      ]
+     ]]])
