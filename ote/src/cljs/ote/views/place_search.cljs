@@ -51,7 +51,8 @@
                      :id id
                      :value (r/as-element
                              [ui/menu-item {:primary-text namefin
-                                            :secondary-text type}])})
+                                        ;:secondary-text type
+                                            }])})
               completions)))
 
 (defn place-search [e! place-search]
