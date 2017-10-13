@@ -50,13 +50,25 @@ write_config () {
   #    "ckan.site_url = ${CKAN_SITE_URL}"
 }
 
+sync_plugin_changes () {
+  plugin_main_path=$1
+  target_path=$2
+
+  rsync -rltvzh --delete \
+        --exclude '*egg-*' --exclude '*.pyc' --exclude '~*' --exclude '.[!.]*' \
+        $plugin_main_path $target_path
+}
+
 watch_plugin_changes () {
   echo "Watching plugin source file changes at: $CKAN_CUSTOM_PLUGINS_PATH ..."
+
+  # Sync first to override possibly outdated plugin on startup
+  sync_plugin_changes $CKAN_CUSTOM_PLUGINS_PATH "$CKAN_HOME/src/"
 
   # Listen file change events
   # Settings: quiiet, monitor, recursive. Excludes events on some editor temp files, such as:  ___jb_*, ~ or .tmp
   # Note: MacOs host requires different set of events than linux host to work.
-  inotifywait -q -m -r -e modify,attrib,move,close_write,create,delete,delete_self \
+  inotifywait -q -m -r -e modify,move,close_write,create,delete,delete_self \
     --exclude '(\___jb_|\~|/\..+)' --format '%w%f' $CKAN_CUSTOM_PLUGINS_PATH | \
     while read FILE_PATH
      do
@@ -74,9 +86,7 @@ watch_plugin_changes () {
 
       # Note that we are not syncing with -a, because we do not want to copy groups and permissions from local plugins
       # directory.
-      rsync -rltvzh --delete \
-        --exclude '*egg-*' --exclude '*.pyc' --exclude '~*' --exclude '.[!.]*' \
-         $PLUGIN_MAIN_PATH $TARGET_PATH
+      sync_plugin_changes $PLUGIN_MAIN_PATH $TARGET_PATH
 
       # Update the plugin by reinstalling it.
       # NOTE: We'll see if this is required at all. Some changes might require reinstalling the plugin.
