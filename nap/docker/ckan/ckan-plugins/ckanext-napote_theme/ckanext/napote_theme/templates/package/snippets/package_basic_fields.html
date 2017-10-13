@@ -3,9 +3,9 @@
 {% block package_basic_fields_custom %}
     {{ form.select('transport_service_type', label=_('Service Type'),
         options=h.tags_to_select_options(h.transport_service_types()),
-        selected=data.transport_service_type[0], is_required=True) }}
+        selected=data.get('transport_service_type', [])[0], is_required=True) }}
 
     {{ form.select('operation_area', label=_('Operation Area'),
         options=h.tags_to_select_options(h.operation_areas()),
-        selected=data.operation_area[0] , is_required=True) }}
+        selected=data.get('operation_area', [])[0] , is_required=True) }}
 {% endblock %}
