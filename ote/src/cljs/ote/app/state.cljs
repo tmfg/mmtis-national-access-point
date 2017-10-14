@@ -14,14 +14,7 @@
             :ote-service-flags {:user-menu-open true }
 
            ;; Currently selected / edited transport operator (company basic info)
-           :transport-operator
-           #:ote.db.transport-operator
-           {:name        "Foo"
-            :business-id "1234567-8"
-            :visiting-address
-            #:ote.db.common {:street      "Street 1"
-                             :postal-code "90100"
-                             :post-office "Oulu"}}
+           :transport-operator {}
 
            ;; Currently selected / edited transport service
            :transport-service

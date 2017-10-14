@@ -23,7 +23,7 @@
 
   OpenUserMenu
   (process-event [_ app]
-    (update-in app [:ote-service-flags :user-menu-open] true))
+    (assoc-in app [:ote-service-flags :user-menu-open] true) app)
 
   GetTransportOperator
   (process-event [_ app]

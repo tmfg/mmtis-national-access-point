@@ -5,8 +5,8 @@
             [ote.ui.form :as form]))
 
 (defrecord EditTransportOperatorState [data])
-(defrecord SaveTransportOperatorToDb [])
-(defrecord HandleTransportOperatorResponse [data])
+(defrecord SaveTransportOperator   [])
+(defrecord SaveTransportOperatorResponse [data])
 
 (extend-protocol t/Event
 
@@ -14,15 +14,15 @@
   (process-event [{data :data} app]
     (update app :transport-operator merge data))
 
-  SaveTransportOperatorToDb
+  SaveTransportOperator
   (process-event [_ app]
     (let [operator-data (-> app
                             :transport-operator
                             form/without-form-metadata)]
-      (comm/post! "transport-operator" operator-data {:on-success (t/send-async! ->HandleTransportOperatorResponse)})
+      (comm/post! "transport-operator" operator-data {:on-success (t/send-async! ->SaveTransportOperatorResponse)})
       app))
 
-  HandleTransportOperatorResponse
+  SaveTransportOperatorResponse
   (process-event [{data :data} app]
     (assoc app :transport-operator data
-               :page :passenger-transportation)))
+               :page :front-page)))
