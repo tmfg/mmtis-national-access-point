@@ -11,17 +11,12 @@
            :query nil ; query parameters from url (like "?foo=bar")
 
             :user {} ;; No user data by default
-            :ote-service-flags {:user-menu-open true }
+            :ote-service-flags {:user-menu-open true
+                                :show-debug true ; By default debug section is not in use. You can set it visible from user menu
+                                }
 
            ;; Currently selected / edited transport operator (company basic info)
-           :transport-operator
-           #:ote.db.transport-operator
-           {:name        "Foo"
-            :business-id "1234567-8"
-            :visiting-address
-            #:ote.db.common {:street      "Street 1"
-                             :postal-code "90100"
-                             :post-office "Oulu"}}
+           :transport-operator {}
 
            ;; Currently selected / edited transport service
            :transport-service

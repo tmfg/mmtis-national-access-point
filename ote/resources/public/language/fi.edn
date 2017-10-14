@@ -71,8 +71,8 @@
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
-  :ote.db.common/post-office                          "Postitoimipaikka"
-  :ote.db.common/postal-code                          "Postinumero"}
+  :ote.db.common/post_office                          "Postitoimipaikka"
+  :ote.db.common/postal_code                          "Postinumero"}
 
  ;; Action buttons
  :buttons
@@ -139,6 +139,7 @@
                 :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
                 :transport-service-type-selection-help-text "Voit kirjata eri liikkumispalveluiden olennaisia tietoja valitsemalla ensin liikkumispalvelun
      tyypin ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen."
+                :title-operator-basic-details               "Perustiedot"
                 }
 
  }
