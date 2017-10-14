@@ -59,19 +59,19 @@
    {:name        ::t-service/contact-email
     :type        :string}
 
-   {:name        ::common/postal-code
+   {:name        ::common/postal_code
     :type        :string
-    :read (comp ::common/postal-code ::t-service/contact-address)
+    :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
-             (assoc-in data [::t-service/contact-address ::common/postal-code] postal-code))
-    :label (tr [:field-labels ::common/postal-code])}
+             (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
+    :label (tr [:field-labels ::common/postal_code])}
 
-   {:name        ::common/post-office
+   {:name        ::common/post_office
     :type        :string
-    :read (comp ::common/post-office ::t-service/contact-address)
+    :read (comp ::common/post_office ::t-service/contact-address)
     :write (fn [data post-office]
-             (assoc-in data [::t-service/contact-address ::common/post-office] post-office))
-    :label (tr [:field-labels ::common/post-office])}
+             (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
+    :label (tr [:field-labels ::common/post_office])}
 
    {:name        ::t-service/homepage
     :type        :string}))
