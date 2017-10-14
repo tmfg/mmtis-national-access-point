@@ -38,17 +38,17 @@
        :write (fn [data street]
                 (assoc-in data [::to-definitions/visiting-address ::common/street] street))}
 
-      {:name ::common/postal-code
+      {:name ::common/postal_code
        :type :string
        :read (comp ::common/postal_code ::to-definitions/visiting-address)
        :write (fn [data postal-code]
-                (assoc-in data [::to-definitions/visiting-address ::common/postal-code] postal-code))}
+                (assoc-in data [::to-definitions/visiting-address ::common/postal_code] postal-code))}
 
-      {:name :ote.db.common/post-office
+      {:name :ote.db.common/post_office
        :type :string
-       :read (comp :ote.db.common/post-office :ote.db.transport-operator/visiting-address)
+       :read (comp :ote.db.common/post_office :ote.db.transport-operator/visiting-address)
        :write (fn [data post-office]
-                (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post-office] post-office))}
+                (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
 
       {:name ::to-definitions/homepage
        :type :string})

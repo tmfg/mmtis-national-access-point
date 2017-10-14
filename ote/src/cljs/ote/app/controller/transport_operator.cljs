@@ -2,7 +2,9 @@
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as t]
             [ote.communication :as comm]
-            [ote.ui.form :as form]))
+            [ote.ui.form :as form]
+            [ote.app.routes :as routes]
+            ))
 
 (defrecord EditTransportOperatorState [data])
 (defrecord SaveTransportOperator   [])
@@ -24,5 +26,7 @@
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
-    (assoc app :transport-operator data
-               :page :front-page)))
+    (assoc app :transport-operator data)
+    ;           :page :front-page)
+               ;(routes/navigate! given-page)
+    ))

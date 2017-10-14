@@ -71,8 +71,8 @@
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
-  :ote.db.common/post-office                          "Postitoimipaikka"
-  :ote.db.common/postal-code                          "Postinumero"}
+  :ote.db.common/post_office                          "Postitoimipaikka"
+  :ote.db.common/postal_code                          "Postinumero"}
 
  ;; Action buttons
  :buttons
