@@ -1,8 +1,8 @@
--- name: fetch-place-geojson-by-name
+-- name: fetch-place-geojson-by-id
 -- single?: true
-SELECT ST_AsGeoJSON(ST_FlipCoordinates(location))
-  FROM finnish_municipalities
- WHERE namefin = :name
+SELECT ST_AsGeoJSON(location)
+  FROM places
+ WHERE id = :id
 
 
 -- name: clear-transport-service-places!
@@ -14,6 +14,6 @@ INSERT INTO operation_area
 VALUES (:transport-service-id,
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
         (SELECT "location"
-           FROM finnish_municipalities
-          WHERE natcode = :place-id),
+           FROM places
+          WHERE id = :place-id),
         true);

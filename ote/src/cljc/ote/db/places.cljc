@@ -6,4 +6,4 @@
   #?(:cljs (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
 (define-tables
-  ["finnish_municipalities" ::finnish-municipalities])
+  ["places" ::places])

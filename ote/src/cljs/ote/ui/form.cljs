@@ -7,7 +7,9 @@
             [cljs-time.core :as t]
             [clojure.string :as str]
             [cljs-react-material-ui.reagent :as ui]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [stylefy.core :as stylefy]
+            [ote.style.form :as style-form]))
 
 (defrecord Group [label options schemas])
 
@@ -144,52 +146,48 @@
            component] :as s}
    data update-fn editable? update-form
    modified? errors warnings notices]
-  ;;[:pre (pr-str s) " => " (pr-str data)]
-  [:div.form-field
-   (if (= type :component)
-     [:div.component (component {:update-form! #(update-form s)
-                                 :data data})]
-     (if editable?
-       [form-fields/field (assoc s
-                                 :form? true
-                                 :update! update-fn
-                                 :error (when (not (empty? errors))
-                                          (str/join " " errors))) data]
-       [:div.form-control-static
-        (if fmt
-          (fmt ((or read #(get % name)) data))
-          (form-fields/show-value s data))]))])
+  (if (= type :component)
+    [:div.component (component {:update-form! #(update-form s)
+                                :data data})]
+    (if editable?
+      [form-fields/field (assoc s
+                                :form? true
+                                :update! update-fn
+                                :error (when (not (empty? errors))
+                                         (str/join " " errors))) data]
+      [:div.form-control-static
+       (if fmt
+         (fmt ((or read #(get % name)) data))
+         (form-fields/show-value s data))])))
 
 ;; Grid column classes for columns spanned
-(def col-classes {1 "col-xs-12 col-md-4 col-lg4-"
-                  2 "col-xs-12 col-md-6 col-lg-6"
-                  3 "col-xs-12 col-md-12 col-lg-12"})
+(def col-classes {1 ["col-xs-12" "col-md-4" "col-lg4-"]
+                  2 ["col-xs-12" "col-md-6" "col-lg-6"]
+                  3 ["col-xs-12" "col-md-12" "col-lg-12"]})
 
 (defn group-ui
   "UI for a group of fields in the form"
-  [schemas data update-fn can-edit? current-focus set-focus!
+  [style schemas data update-fn can-edit? current-focus set-focus!
    modified errors warnings notices update-form]
-  (let [row? (-> schemas meta :row?)
-        col-class (when row?
-                    (col-classes (count schemas)))]
-    [:span
-     (doall
-      (for [{:keys [name editable? read write] :as s} schemas
-            :let [editable? (and can-edit?
-                                 (or (nil? editable?)
-                                     (editable? data)))]]
-        ^{:key name}
-        [field-ui (assoc s
-                         :col-class col-class
-                         :focus (= name current-focus)
-                         :on-focus #(set-focus! name))
-         ((or read name) data)
-         #(update-fn (or write name) %)
-         editable? update-form
-         (get modified name)
-         (get errors name)
-         (get warnings name)
-         (get notices name)]))]))
+  [:div.form-group (stylefy/use-style style)
+   (doall
+    (for [{:keys [name editable? read write] :as s} schemas
+          :let [editable? (and can-edit?
+                               (or (nil? editable?)
+                                   (editable? data)))]]
+      ^{:key name}
+      [:div.form-field (stylefy/use-sub-style style :form-field)
+       [field-ui (assoc s
+                                        ;:col-class col-class
+                        :focus (= name current-focus)
+                        :on-focus #(set-focus! name))
+        ((or read name) data)
+        #(update-fn (or write name) %)
+        editable? update-form
+        (get modified name)
+        (get errors name)
+        (get warnings name)
+        (get notices name)]]))])
 
 (defn- with-automatic-labels
   "Add an automatically generated `:label` to fields with the given `:name->label` function.
@@ -253,7 +251,12 @@
              (let [columns (or (:columns options) 1)
                    classes (get col-classes columns)
                    schemas (with-automatic-labels name->label schemas)
-                   group-component [group-ui schemas
+                   style (if (= :row (:layout options))
+                           style-form/form-group-row
+                           style-form/form-group-column)
+                   group-component [group-ui
+                                    style
+                                    schemas
                                     validated-data
                                     update-field-fn
                                     can-edit?
@@ -263,7 +266,8 @@
                                     errors warnings notices
                                     update-form]]
                ^{:key i}
-               [:div.form-group {:class classes}
+               [:div.form-group-container (stylefy/use-style style-form/form-group-container
+                                           {::stylefy/with-classes classes})
                 [ui/card {:z-depth 1}
                  (when label
                    [ui/card-header {:title label

@@ -1,8 +1,6 @@
 job('OTE build from master') {
   scm {
-        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git') {
-            branch('master')
-        }
+        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git', '*/master')
   }
   triggers {
     scm('H/15 * * * *')
