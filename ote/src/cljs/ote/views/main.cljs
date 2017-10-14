@@ -41,6 +41,8 @@
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     [ui/menu-item {:primary-text "Organisaation perustiedot"
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
+    [ui/menu-item {:primary-text " Näytä debug state"
+                   :on-click #(e! (fp-controller/->ToggleDebugState))} ]
     [ui/menu-item {:primary-text "Kirjaudu ulos"
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     ]
@@ -116,7 +118,9 @@
         [brokerage/brokerage e! (:transport-service app)])
       ]
 
-     [:div.row
-      [debug/debug app]
-      ]
+     (when (= true (get-in app [:ote-service-flags :show-debug]))
+       [:div.row
+        [debug/debug app]
+        ]
+       )
      ]]])

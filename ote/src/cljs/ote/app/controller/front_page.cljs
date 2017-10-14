@@ -7,6 +7,7 @@
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
 (defrecord OpenUserMenu [])
+(defrecord ToggleDebugState [])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -20,6 +21,13 @@
   (process-event [{given-page :given-page} app]
     (routes/navigate! given-page)
     app)
+
+  ToggleDebugState
+  (process-event [_ app]
+    (cond
+      (get-in app [:ote-service-flags :show-debug]) (assoc-in app [:ote-service-flags :show-debug] false)
+      :default (assoc-in app [:ote-service-flags :show-debug] true)
+      ))
 
   OpenUserMenu
   (process-event [_ app]
