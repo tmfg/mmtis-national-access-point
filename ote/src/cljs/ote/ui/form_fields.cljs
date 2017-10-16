@@ -6,7 +6,8 @@
             [ote.localization :refer [tr]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.form-fields :as style-form-fields]))
+            [ote.style.form-fields :as style-form-fields]
+            [ote.style.base :as style-base]))
 
 
 (defn read-only-atom [value]
@@ -175,6 +176,15 @@
                                          (str/replace #"," ".")
                                          (js/parseFloat %))))))
        @txt])))
+
+(def time-regex #"\d{0,2}(:\d{0,2})?")
+
+(defmethod field :time [opts data]
+  ;; FIXME: material-ui timepicker doesn't allow simply writing a time
+  ;; best would be both, writing plus an icon to open selector dialog
+  [field (assoc opts
+                :type :string
+                :regex time-regex) data])
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
