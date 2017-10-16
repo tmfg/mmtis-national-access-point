@@ -122,7 +122,7 @@
        options))]))
 
 
-(defmethod field :multiselect-selection [{:keys [update! label name show-option options form? error] :as field} data]
+(defmethod field :multiselect-selection [{:keys [update! label name show-option show-option-short options form? error] :as field} data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
@@ -130,7 +130,7 @@
                       :multiple true
                       :value (clj->js (map option-idx selected-set))
                       :selection-renderer (fn [values]
-                                            (str/join ", " (map (comp show-option (partial nth options)) values)))
+                                            (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
                       :on-change (fn [event index values]
                                    (update! (into #{}
                                                   (map (partial nth options))
