@@ -123,15 +123,14 @@
                :icon     (ic/action-note-add)
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
-   {:name         ::transport-service/service-hours
+   {:name         ::t-service/service-hours
     :type         :table
-    :table-fields [{:name ::transport-service/week-days
+    :table-fields [{:name ::t-service/week-days
                     :type :multiselect-selection
-                    :options transport-service/additional-services}
-                   {:name ::transport-service/from :type :string}
-                   {:name ::transport-service/to :type :string}
-                   ]
-    :delete?      true}))]
+                    :options t-service/additional-services}
+                   {:name ::t-service/from :type :string}
+                   {:name ::t-service/to :type :string}]
+    :delete?      true}))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   [:div.row
