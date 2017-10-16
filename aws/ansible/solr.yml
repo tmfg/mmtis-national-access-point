@@ -6,3 +6,5 @@
   tasks:
     - include: tasks/napote_group_and_user.yml
     - include: tasks/solr_packages.yml
+  vars:
+    solr_version: 6.6.0
