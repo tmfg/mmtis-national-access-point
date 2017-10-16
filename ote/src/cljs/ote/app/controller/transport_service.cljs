@@ -5,7 +5,8 @@
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.controller.passenger-transportation :as pt]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.time :as time]))
 
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
@@ -28,7 +29,7 @@
   AddServiceHourRow
   (process-event [_ app]
     (update-in app [:transport-service ::t-service/passenger-transportation ::t-service/service-hours]
-               #(conj (or % []) {::t-service/from "08:00"})))
+               #(conj (or % []) {::t-service/from (time/parse-time "08:00")})))
 
   RemovePriceClassRow
   (process-event [_ app]

@@ -6,7 +6,8 @@
             [specql.transform :as xf]
             [specql.impl.registry]
             [ote.db.common]
-            [specql.data-types])
+            [specql.data-types]
+            [ote.time])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
