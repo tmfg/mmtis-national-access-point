@@ -21,9 +21,9 @@
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_provider_type" ::transport_provider_type (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_tool" ::accessibility_tool (specql.transform/transform (specql.transform/to-keyword))]
-  ["accessibility_info_facility" ::accessibility_info_facility]
-  ["accessibility_facility" ::accessibility_facility]
-  ["mobility_facility" ::mobility_facility]
+  ["accessibility_info_facility" ::accessibility_info_facility (specql.transform/transform (specql.transform/to-keyword))]
+  ["accessibility_facility" ::accessibility_facility (specql.transform/transform (specql.transform/to-keyword))]
+  ["mobility_facility" ::mobility_facility (specql.transform/transform (specql.transform/to-keyword))]
   ["passenger_information_facility" ::passenger_information_facility]
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
@@ -63,3 +63,16 @@
 ;; Create order for accessibility_tool
 (def accessibility-tool [:wheelchair :walkingstick :audio-navigator :visual-navigator :passenger-cart
                           :pushchair :umbrella :buggy :other])
+
+;; Create order for accessibility-info-facility
+(def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
+                                  :displays-for-visually-impaired :large-print-timetables])
+
+;; Create order for accessibility-facility
+(def accessibility [:unknown :lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
+                             :pallet-access-low-floor :validator :other])
+
+;; Create order for mobility-facility-facility
+(def mobility [:unknown :low-floor :step-free-access :suitable-for-wheelchairs
+                       :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
+                       :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])

@@ -93,6 +93,11 @@
         (places/link-places-to-transport-service!
          db (::t-service/id transport-service) places)))))
 
+(defn- save-terminal-info
+  "UPSERT! given data to database. "
+  [db data]
+  (println "Terminal DATA: " (pr-str data))
+  (upsert! db ::t-service/transport-service data))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]
@@ -121,8 +126,12 @@
                                 user :user}
          (log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
+
    (POST "/passenger-transportation-info" {form-data :body}
          (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
+
+   (POST "/terminal" {form-data :body}
+     (http/transit-response (save-terminal-info db (http/transit-request form-data))))
 
    (POST "/transport-service/publish" {payload :body
                                        user :user}

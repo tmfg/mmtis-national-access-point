@@ -54,7 +54,6 @@
 (defn front-page [e! status]
 
   ;; init
-  ;(e! (fp/->GetTransportOperator))
   (e! (fp/->GetTransportOperatorData))
 
   (fn [e! {services :transport-services :as status}]
