@@ -95,15 +95,16 @@
          :error-text        error}]]]
      [:tr
       [:td (stylefy/use-style style-form-fields/localized-text-language-links)
-       (for [lang languages]
-         ^{:key lang}
-         [:a (merge
-              (stylefy/use-style
-               (if (= lang selected-language)
-                 style-form-fields/localized-text-language-selected
-                 style-form-fields/localized-text-language))
-              {:on-click #(update! (with-meta data {:selected-language lang}))})
-          lang])]]]))
+       (doall
+        (for [lang languages]
+          ^{:key lang}
+          [:a (merge
+               (stylefy/use-style
+                (if (= lang selected-language)
+                  style-form-fields/localized-text-language-selected
+                  style-form-fields/localized-text-language))
+               {:on-click #(update! (with-meta data {:selected-language lang}))})
+           lang]))]]]))
 
 
 (defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}
