@@ -5,3 +5,5 @@
            :padding 0})
 
 (def font {:font-family "'Roboto', sans-serif"})
+
+(def inline-block {:display "inline-block"})
