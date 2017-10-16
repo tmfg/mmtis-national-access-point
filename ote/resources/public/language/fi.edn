@@ -51,8 +51,6 @@
    :ote.db.transport-service/contact-email             "Sähköposti"
    :ote.db.transport-service/homepage                  "Kotisivu"
 
-   :ote.db.transport-service/operation-area "Toiminta-alue"
-
    }
 
   ;; Terminal fields
