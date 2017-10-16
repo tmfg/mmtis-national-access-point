@@ -127,9 +127,11 @@
     :type         :table
     :table-fields [{:name ::t-service/week-days
                     :type :multiselect-selection
-                    :options t-service/additional-services}
-                   {:name ::t-service/from :type :string}
-                   {:name ::t-service/to :type :string}]
+                    :options t-service/days
+                    :show-option (tr-key [:enums ::t-service/day :full])
+                    :show-option-short (tr-key [:enums ::t-service/day :short])}
+                   {:name ::t-service/from :type :time}
+                   {:name ::t-service/to :type :time}]
     :delete?      true}))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
@@ -148,5 +150,6 @@
        ::t-service/booking-service)
       (contact-info-group)
       (accessibility-group)
-      (pricing-group e!)]
+      (pricing-group e!)
+      (service-hours-group e!)]
      form-data]]])
