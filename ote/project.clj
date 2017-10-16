@@ -14,7 +14,7 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
-                 [specql "0.7.0-alpha4"]
+                 [specql "0.7.0-alpha5"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
@@ -37,6 +37,7 @@
                  [figwheel "0.5.13"]
                  [cljsjs/react-leaflet "1.6.5-0"]
                  [funcool/bide "1.5.1"] ; URL router
+                 [stylefy "1.0.1"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]

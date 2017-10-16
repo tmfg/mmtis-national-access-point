@@ -4,7 +4,9 @@
             [cljs-react-material-ui.reagent :as ui]
             [clojure.string :as str]
             [ote.localization :refer [tr]]
-            [cljs-react-material-ui.icons :as ic]))
+            [cljs-react-material-ui.icons :as ic]
+            [stylefy.core :as stylefy]
+            [ote.style.form-fields :as style-form-fields]))
 
 
 (defn read-only-atom [value]
@@ -60,16 +62,48 @@
     :rows              rows
     :error-text        error}])
 
-(defmethod field :localized-text [{:keys [update! label name rows error]
+(def languages ["FI" "SV" "EN"])
+
+(defmethod field :localized-text [{:keys [update! label name rows rows-max error]
                                    :as   field} data]
-  [ui/text-field
-   {:floatingLabelText label
-    :hintText          (placeholder field data)
-    :on-change         #(update! [{:ote.db.transport-service/lang "FI" :ote.db.transport-service/text %2}])
-    :value             (or (get-in data [0 :ote.db.transport-service/text]) "")
-    :multiLine         true
-    :rows              rows
-    :error-text        error}])
+  (let [data (or data [])
+        languages (or (:languages field) languages)
+        selected-language (or (-> data meta :selected-language) (first languages))
+        language-data (some #(when (= selected-language (:ote.db.transport-service/lang %)) %) data)]
+    [:table
+     [:tr
+      [:td
+       [ui/text-field
+        {:floatingLabelText label
+         :hintText          (placeholder field data)
+         :on-change         #(let [updated-language-data
+                                   {:ote.db.transport-service/lang selected-language
+                                    :ote.db.transport-service/text %2}]
+                               (update!
+                                (with-meta
+                                  (if language-data
+                                    (mapv (fn [lang]
+                                            (if (= (:ote.db.transport-service/lang lang) selected-language)
+                                              updated-language-data
+                                              lang)) data)
+                                    (conj data updated-language-data))
+                                  {:selected-language selected-language})))
+         :value             (or (:ote.db.transport-service/text language-data) "")
+         :multiLine         true
+         :rows rows
+         :rows-max (or rows-max rows)
+         :error-text        error}]]]
+     [:tr
+      [:td (stylefy/use-style style-form-fields/localized-text-language-links)
+       (for [lang languages]
+         ^{:key lang}
+         [:a (merge
+              (stylefy/use-style
+               (if (= lang selected-language)
+                 style-form-fields/localized-text-language-selected
+                 style-form-fields/localized-text-language))
+              {:on-click #(update! (with-meta data {:selected-language lang}))})
+          lang])]]]))
 
 
 (defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}

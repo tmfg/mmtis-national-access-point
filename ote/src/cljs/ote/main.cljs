@@ -10,7 +10,8 @@
             [ote.app.state :as state]
             [ote.views.main :as main]
             [ote.localization :as localization]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [stylefy.core :as stylefy]))
 
 
 (defn ^:export main []
@@ -18,6 +19,7 @@
    :fi
    (fn [lang _]
      (reset! localization/selected-language lang)
+     (stylefy/init)
      (routes/start!)
      (r/render-component [tuck/tuck state/app main/ote-application]
                          (.getElementById js/document "oteapp")))))

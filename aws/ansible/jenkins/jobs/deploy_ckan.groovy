@@ -5,7 +5,7 @@ job('Deploy CKAN plugin') {
         choiceParam('ENV', ['staging','production']);
     }
     scm {
-        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git')
+        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git', '*/master')
     }
 
     steps {

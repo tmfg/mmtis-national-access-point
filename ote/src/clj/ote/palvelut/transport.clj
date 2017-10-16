@@ -21,22 +21,22 @@
   #{::transport-operator/id ::transport-operator/business-id ::transport-operator/email
     ::transport-operator/name})
 
-(defn db-get-transport-operator [db where]
+(defn get-transport-operator [db where]
   (first (fetch db ::transport-operator/transport-operator
-                transport-operator-columns
+                (specql/columns ::transport-operator/transport-operator)
                 where {::specql/limit 1})))
 
 (def transport-services-passenger-columns
   #{::t-service/id ::t-service/type :ote.db.transport-service/passenger-transportation
     ::t-service/published?})
 
-(defn db-get-transport-services [db where]
+(defn get-transport-services [db where]
   "Return Vector of transport-services"
   (fetch db ::t-service/transport-service
                 transport-services-passenger-columns
                 where))
 
-(defn- db-get-transport-service
+(defn- get-transport-service
   "Get single transport service by id"
   [db id]
   (first (fetch db
@@ -49,7 +49,7 @@
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
   (jdbc/with-db-transaction [db db]
-     (let [operator (db-get-transport-operator db {::transport-operator/ckan-group-id id})]
+     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
          (or operator
              ;; FIXME: what if name changed in CKAN, we should update?
              (insert! db ::transport-operator/transport-operator
@@ -60,7 +60,7 @@
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [
         transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (db-get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
+        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
         ]
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
@@ -109,7 +109,7 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-     (http/transit-response (db-get-transport-service db (Long/parseLong id))))
+     (http/transit-response (get-transport-service db (Long/parseLong id))))
 
    (POST "/transport-operator/group" {user :user}
          (ensure-transport-operator-for-group db (-> user :groups first)))

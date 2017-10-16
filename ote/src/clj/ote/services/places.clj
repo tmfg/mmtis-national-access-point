@@ -19,41 +19,30 @@
 (defqueries "ote/services/places.sql")
 
 
-(defn search [db name-prefix]
+(defn place-completions
+  "Return a list of completions that match the given search term."
+  [db term]
   (into []
-        (comp
-         ;; PENDING: we don't have other sources for now.
-         ;; When we do, create a VIEW in the database at makes them
-         ;; look the same.
-         (map #(-> %
-                   (assoc ::places/name (::places/namefin %)
-                          ::places/id (::places/natcode %))
-                   (dissoc ::places/namefin ::places/natcode)))
-         (map #(update % ::places/location geo/to-clj)))
-        (specql/fetch db ::places/finnish-municipalities
-                      #{::places/namefin ::places/location ::places/natcode}
-                      {::places/namefin (op/ilike (str name-prefix "%"))})))
-
-(defn list-places [db]
-  (into []
-        (map #(-> %
-                  (assoc ::places/name (::places/namefin %)
-                         ::places/id (::places/natcode %))
-                  (dissoc :places/namefin ::places/natcode)))
-        (specql/fetch db ::places/finnish-municipalities
-                      #{::places/namefin ::places/natcode}
-                      {}
+        (specql/fetch db ::places/places
+                      #{::places/namefin ::places/id ::places/type}
+                      {::places/namefin (op/ilike (str "%" term "%"))}
                       {::specql/order-by ::places/namefin})))
+
+(defn place-by-id [db id]
+  (first
+   (specql/fetch db ::places/places
+                 #{::places/namefin ::places/id ::places/type ::places/location}
+                 {::places/id id})))
 
 (defn link-places-to-transport-service!
   "Clear old place links and insert new links for the given transport service.
   Should be called within a transaction."
   [db transport-service-id place-references]
   (clear-transport-service-places! db {:transport-service-id transport-service-id})
-  (doseq [{::places/keys [id name]} place-references]
+  (doseq [{::places/keys [id namefin]} place-references]
     (link-transport-service-place! db {:transport-service-id transport-service-id
                                        :place-id id
-                                       :name name})))
+                                       :name namefin})))
 
 (defrecord Places [sources]
   component/Lifecycle
@@ -62,13 +51,13 @@
            (http/publish!
             http
             (routes
-             (GET "/place-list" []
+             (GET "/place-completions/:term" [term]
                   (http/transit-response
-                   (list-places db)))
-             (GET "/places/:name" [name]
+                   (place-completions db term)))
+             (GET "/place/:id" [id]
                   {:status 200
                    :headers {"Content-Type" "application/json"}
-                   :body (fetch-place-geojson-by-name db {:name name})})))))
+                   :body (fetch-place-geojson-by-id db {:id id})})))))
 
   (stop [{stop ::stop :as this}]
     (stop)

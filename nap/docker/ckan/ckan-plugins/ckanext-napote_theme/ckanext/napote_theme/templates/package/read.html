@@ -1,0 +1,19 @@
+{% ckan_extends %}
+
+{% block package_description %}
+    {{ super() }}
+
+    {# Add custom fields to the dataset read page #}
+    {% if pkg.get('transport_service_type') %}
+        <section id="dataset-transport_service_type" class="resources module-content">
+            <p><strong>Transport Service Type</strong>: {{ pkg.transport_service_type[0] }}</p>
+        </section>
+    {% endif %}
+
+    {% if pkg.get('operation_area') %}
+        <section id="dataset-operation_area" class="resources module-content">
+            <p><strong>Operation Area</strong>: {{ pkg.operation_area[0] }}</p>
+        </section>
+    {% endif %}
+
+{% endblock %}
