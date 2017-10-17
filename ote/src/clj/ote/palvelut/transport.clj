@@ -12,7 +12,8 @@
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
-            [ote.authorization :as authorization]))
+            [ote.authorization :as authorization])
+  (:import (java.time LocalTime)))
 
 ;; FIXME: monkey patch specql composite reading (For now)
 (defmethod specql-composite/parse-value "bpchar" [_ string] string)
@@ -77,7 +78,6 @@
   (try
     (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)
     (catch Exception e (println "price-per-unit is probably missing"))))
-
 
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"

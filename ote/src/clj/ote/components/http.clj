@@ -3,7 +3,7 @@
   (:require [org.httpkit.server :as server]
             [com.stuartsierra.component :as component]
             [compojure.route :as route]
-            [cognitect.transit :as transit]
+            [ote.transit :as transit]
             [ote.nap.cookie :as nap-cookie]
             [ote.nap.users :as nap-users]
             [taoensso.timbre :as log]
@@ -90,11 +90,9 @@
   [data]
   {:status 200
    :headers {"Content-Type" "application/json+transit"}
-   :body (with-open [out (java.io.ByteArrayOutputStream.)]
-           (transit/write (transit/writer out :json) data)
-           (str out))})
+   :body (transit/clj->transit data)})
 
 (defn transit-request
   "Parse HTTP POST body as Transit data."
   [in]
-  (transit/read (transit/reader in :json)))
+  (transit/transit->clj in))

@@ -30,6 +30,8 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
    :ote.db.transport-service/price-class               "Hinnoittelu"
+   :ote.db.transport-service/service-hours             "Palveluajat"
+   :ote.db.transport-service/operation-area            "Toiminta-alue"
 
    ;; Price Class fields
    :ote.db.transport-service/name                      "Hintaryhmä"
@@ -37,13 +39,17 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
+
+   ;; Service hour fields
+   :ote.db.transport-service/week-days                 "Viikonpäivät"
+   :ote.db.transport-service/from                      "Aukeamisaika"
+   :ote.db.transport-service/to                        "Kiinnimenoaika"
+
    ;; Contact details
    :ote.db.transport-operator/contact-address          "Osoitetiedot"
    :ote.db.transport-service/contact-phone             "Puhelin"
    :ote.db.transport-service/contact-email             "Sähköposti"
    :ote.db.transport-service/homepage                  "Kotisivu"
-
-   :ote.db.transport-service/operation-area "Toiminta-alue"
 
    }
 
@@ -116,6 +122,11 @@
    :umbrella         "Sateenvarjo"
    :buggy            "Buggy"
    :other            "Muu"}
+
+  :ote.db.transport-service/day
+  {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
+   :full {:MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
+          :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
   }
 
  ;; Per feature/page localization keys

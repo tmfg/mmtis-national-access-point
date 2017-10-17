@@ -6,7 +6,9 @@
             [ote.localization :refer [tr]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.form-fields :as style-form-fields]))
+            [ote.style.form-fields :as style-form-fields]
+            [ote.style.base :as style-base]
+            [ote.time :as time]))
 
 
 (defn read-only-atom [value]
@@ -95,15 +97,16 @@
          :error-text        error}]]]
      [:tr
       [:td (stylefy/use-style style-form-fields/localized-text-language-links)
-       (for [lang languages]
-         ^{:key lang}
-         [:a (merge
-              (stylefy/use-style
-               (if (= lang selected-language)
-                 style-form-fields/localized-text-language-selected
-                 style-form-fields/localized-text-language))
-              {:on-click #(update! (with-meta data {:selected-language lang}))})
-          lang])]]]))
+       (doall
+        (for [lang languages]
+          ^{:key lang}
+          [:a (merge
+               (stylefy/use-style
+                (if (= lang selected-language)
+                  style-form-fields/localized-text-language-selected
+                  style-form-fields/localized-text-language))
+               {:on-click #(update! (with-meta data {:selected-language lang}))})
+           lang]))]]]))
 
 
 (defmethod field :selection [{:keys [update! label name show-option options form? error] :as field}
@@ -121,7 +124,7 @@
        options))]))
 
 
-(defmethod field :multiselect-selection [{:keys [update! label name show-option options form? error] :as field} data]
+(defmethod field :multiselect-selection [{:keys [update! label name show-option show-option-short options form? error] :as field} data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
@@ -129,7 +132,7 @@
                       :multiple true
                       :value (clj->js (map option-idx selected-set))
                       :selection-renderer (fn [values]
-                                            (str/join ", " (map (comp show-option (partial nth options)) values)))
+                                            (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
                       :on-change (fn [event index values]
                                    (update! (into #{}
                                                   (map (partial nth options))
@@ -174,6 +177,21 @@
                                          (str/replace #"," ".")
                                          (js/parseFloat %))))))
        @txt])))
+
+(def time-regex #"\d{0,2}(:\d{0,2})?")
+
+(defmethod field :time [{:keys [update!] :as opts} data]
+  ;; FIXME: material-ui timepicker doesn't allow simply writing a time
+  ;; best would be both, writing plus an icon to open selector dialog
+  (let [data (or (some-> data meta ::incomplete)
+                 (and data (time/format-time data))
+                 "")]
+    [field (assoc opts
+                  :update! (fn [string]
+                             (update! (with-meta (time/parse-time string)
+                                        {::incomplete string})))
+                  :type :string
+                  :regex time-regex) data]))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
