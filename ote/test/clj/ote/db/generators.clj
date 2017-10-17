@@ -30,7 +30,7 @@
    ::t-service/text gen/string-alphanumeric))
 
 (def gen-localized-text-array
-  (gen/vector gen-localized-text))
+  (gen/vector gen-localized-text 1 4))
 
 (def gen-time
   (gen/let [hour (gen/scale #(* 10 %) (s/gen (s/int-in 0 23)))
@@ -39,13 +39,13 @@
 
 (def gen-service-hours
   (gen/hash-map
-   ::t-service/week-days (gen/vector (gen/elements t-service/days))
+   ::t-service/week-days (gen/vector (gen/elements t-service/days) 1 7)
    ::t-service/from gen-time
    ::t-service/to gen-time
    ::t-service/description gen-localized-text-array))
 
 (def gen-service-hours-array
-  (gen/vector gen-service-hours))
+  (gen/vector gen-service-hours 0 4))
 
 (def host-parts ["service" "my" "www" "transport" "ride" "car" "share"
                  "taxi" "online" "fast" "courier"])
@@ -73,7 +73,7 @@
    ::t-service/name (string-of-max-length 100  gen/string-alphanumeric)))
 
 (def gen-price-class-array
-  (gen/vector gen-price-class))
+  (gen/vector gen-price-class 0 5))
 
 (def gen-postal-code
   (gen/let [digits (gen/vector (gen/elements "0123456789") 5)]
