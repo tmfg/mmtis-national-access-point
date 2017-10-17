@@ -20,8 +20,8 @@ setup(
     # You can specify the packages manually here if your project is simple. Or you can use find_packages().
     packages=find_packages(exclude=['']),
     namespace_packages=['ckanext'],
+    package_data={'ckanext.napote_theme': ['data/*']},
     include_package_data=True,
-    package_data={},
     zip_safe=False,
 
     # Run time dependencies.
