@@ -2,7 +2,8 @@
   "Integrate into CKAN user and group information via database queries."
   (:require [jeesql.core :refer [defqueries]]
             [ote.db.utils :as db-utils]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.core.cache :as cache]))
 
 ;; FIXME:
 ;; CKAN tables are owned by the ckan user and access needs to be granted to them
@@ -21,14 +22,21 @@
       (assoc (first rows)
              :groups (map :group rows)))))
 
+
+
 (defn wrap-user-info
   "Ring middleware to fetch user info based on :user-id (username)."
   [db handler]
-  (fn [{username :user-id :as req}]
-    (if-let [user (and username
-                       (find-user db username))]
-      (do (log/debug "User found: " (pr-str user))
-          (handler (assoc req :user user)))
-      (do (log/info "No user info, return 401")
-          {:status 401
-           :body "Unknown user"}))))
+  ;; Cache fetched user info for 15 minutes
+  (let [cached-user-info (atom (cache/ttl-cache-factory {} :ttl (* 15 60 1000)))
+        find-user (partial find-user db)]
+    (fn [{username :user-id :as req}]
+      (if-let [user (when username
+                      (get (swap! cached-user-info
+                                  #(cache/through find-user % username))
+                           username))]
+        (do (log/debug "User found: " (pr-str user))
+            (handler (assoc req :user user)))
+        (do (log/info "No user info, return 401")
+            {:status 401
+             :body "Unknown user"})))))

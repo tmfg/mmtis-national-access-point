@@ -22,9 +22,13 @@
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
 
+                 ;; Cache libraries
+                 [org.clojure/core.cache "0.6.5"]
+
                  ;; Transit tietomuoto
                  [com.cognitect/transit-clj "0.8.300"]
                  [com.cognitect/transit-cljs "0.8.239"]
+
 
                  [cljs-ajax "0.7.2"]
 
