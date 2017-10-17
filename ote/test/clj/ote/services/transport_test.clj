@@ -16,7 +16,8 @@
              [clojure.spec.gen.alpha :as sgen]
              [clojure.spec.test.alpha :as stest]
              [clojure.spec.alpha :as s]
-             [ote.db.generators :as generators]))
+             [ote.db.generators :as generators]
+             [clojure.string :as str]))
 
 
 (t/use-fixtures :once
@@ -68,13 +69,73 @@
     (is (= (::t-service/homepage ps) "www.solita.fi"))
     (is (= (::t-service/contact-phone ps) "123456"))))
 
+(defn- non-nil-keys [m]
+  (into #{}
+        (keep (fn [[k v]]
+                (when (and (not (nil? v))
+                           (or (not (string? v))
+                               (not (str/blank? v))))
+                  k)))
+        m))
+
+(defn effectively-same-deep
+  "Compare that nested structures are effectively the same (insertion vs specql fetch).
+  Maps and vectors are compared in a nested way.
+  Ignores keys with nil values and empty strings (for composites)."
+  [v1 v2]
+
+  (cond
+    ;; Both values are maps, check that they have the same non-nil keys
+    (and (map? v1) (map? v2))
+    (let [keys-v1 (non-nil-keys v1)
+          keys-v2 (non-nil-keys v2)]
+      (and (= keys-v1 keys-v2)
+           (every? #(let [result (effectively-same-deep (get v1 %)
+                                                        (get v2 %))]
+                      (when-not result
+                        (println "Values for key" % "are not the same!"
+                                 "\nV1:" (pr-str v1)
+                                 "\nV2:" (pr-str v2)))
+                      result)
+                   keys-v1)))
+
+    ;; Both values are vectors, check that values at every index are the same
+    (and (vector? v1) (vector? v2))
+    (if-not (= (count v1) (count v2))
+      (do
+        (println "Vector lengths differ:" (count v1) "!=" (count v2)
+                 "\nV1:" (pr-str v1)
+                 "\nV2:" (pr-str v2))
+        false)
+      (every? true?
+              (map (fn [left right]
+                     (let [result (effectively-same-deep left right)]
+                       (when-not result
+                         (println "Vector values are not the same!"
+                                  "\nV1:" (pr-str v1)
+                                  "\nV2:" (pr-str v2)))
+                       result))
+                   v1 v2)))
+
+    ;; Other values, just compare
+    :default
+    (= v1 v2)))
 
 (defspec save-and-fetch-generated-passenger-transport-service
-  200
+  100
   (prop/for-all
    [transport-service gen-passenger-transportation-service]
 
-   (let [inserted (http-post "admin" "passenger-transportation-info"
-                             transport-service)]
-     (and (= (:status inserted) 200)
-          (contains? (:transit inserted) ::t-service/id)))))
+   (let [response (http-post "admin" "passenger-transportation-info"
+                             transport-service)
+         service (:transit response)
+         _ (println "ID: " (::t-service/id service))
+         fetch-response (http-get "admin"
+                                  (str "transport-service/" (::t-service/id service)))
+
+         fetched (:transit fetch-response)]
+
+     (and (= (:status response) (:status fetch-response) 200)
+          (effectively-same-deep
+           (::t-service/passenger-transportation service)
+           (::t-service/passenger-transportation fetched))))))

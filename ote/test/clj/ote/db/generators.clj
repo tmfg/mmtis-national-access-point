@@ -35,13 +35,14 @@
 (def gen-time
   (gen/let [hour (gen/scale #(* 10 %) (s/gen (s/int-in 0 23)))
             minute (gen/scale #(* 10 %) (s/gen (s/int-in 0 59)))]
-    (time/->Time hour minute nil)))
+    (time/->Time hour minute 0)))
 
 (def gen-service-hours
   (gen/hash-map
-   ::t-service/week-days (gen/set (gen/elements t-service/days))
+   ::t-service/week-days (gen/vector (gen/elements t-service/days))
    ::t-service/from gen-time
-   ::t-service/to gen-time))
+   ::t-service/to gen-time
+   ::t-service/description gen-localized-text-array))
 
 (def gen-service-hours-array
   (gen/vector gen-service-hours))

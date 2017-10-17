@@ -2,16 +2,9 @@
   "Helper for transactions"
   (:require [clojure.java.jdbc :as jdbc]))
 
-;; Bound to `true` when in a transaction.
-(def ^:dynamic *in-transaction?* false)
-
 (defmacro with-transaction
-  "Start or join current db transaction. If no db transaction is in progress,
-  starts a new one and runs `body` with `db-sym` bound to a connection.
-  If a transaction is already in progress, runs `body` with same `db-sym`."
+  "Start or join current db transaction.
+  Runs `body` with `db-sym` bound to a connection that is in transaction."
   [db-sym & body]
-  `(if ote.db.tx/*in-transaction?*
-     (do ~@body)
-     (binding [ote.db.tx/*in-transaction?* true]
-       (jdbc/with-db-transaction [~db-sym ~db-sym]
-         ~@body))))
+  `(jdbc/with-db-transaction [~db-sym ~db-sym]
+     ~@body))

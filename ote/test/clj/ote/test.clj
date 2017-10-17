@@ -27,10 +27,11 @@
 
 (defmacro with-test-db [& body]
   `(let [db# ote-db-url]
-     (tx/with-transaction db#
+     (jdbc/with-db-connection [db# ote-db-url]
        (jdbc/db-set-rollback-only! db#)
-       (binding [*db* db#]
-         ~@body))))
+       (tx/with-transaction db#
+         (binding [*db* db#]
+           ~@body)))))
 
 (defn db-fixture []
   (fn [tests]
