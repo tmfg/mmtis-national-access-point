@@ -12,7 +12,8 @@
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
-            [ote.authorization :as authorization])
+            [ote.authorization :as authorization]
+            [ote.db.tx :as tx])
   (:import (java.time LocalTime)))
 
 ;; FIXME: monkey patch specql composite reading (For now)
@@ -44,18 +45,17 @@
                 ::t-service/transport-service
                 (specql/columns ::t-service/transport-service)
                 {::t-service/id id}
-                {::specql/limit 1}))
-  )
+                {::specql/limit 1})))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
-  (jdbc/with-db-transaction [db db]
-     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
-         (or operator
-             ;; FIXME: what if name changed in CKAN, we should update?
-             (insert! db ::transport-operator/transport-operator
-                      {::transport-operator/name title
-                       ::transport-operator/ckan-group-id id})))))
+  (tx/with-transaction db
+    (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
+      (or operator
+          ;; FIXME: what if name changed in CKAN, we should update?
+          (insert! db ::transport-operator/transport-operator
+                   {::transport-operator/name title
+                    ::transport-operator/ckan-group-id id})))))
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
