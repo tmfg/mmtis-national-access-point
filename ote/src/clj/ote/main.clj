@@ -7,7 +7,8 @@
             [ote.components.db :as db]
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
-            [ote.integration.export.geojson :as export-geojson])
+            [ote.integration.export.geojson :as export-geojson]
+            [taoensso.timbre :as log])
   (:gen-class))
 
 (defonce ^{:doc "Handle for OTE-system"}
@@ -52,3 +53,7 @@
 
 (defn -main [& args]
   (start))
+
+(defn log-level-info! []
+  (log/merge-config!
+    {:appenders {:println {:min-level :info}}}))
