@@ -15,7 +15,7 @@
             [tuck.core :as tuck]))
 
 (defn transportation-form-options [e!]
-  {:name->label (tr-key [:field-labels :passenger-transportation])
+  {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common])
    :update!     #(e! (pt/->EditPassengerTransportationState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]

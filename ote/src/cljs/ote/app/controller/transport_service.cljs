@@ -30,8 +30,10 @@
 
   SelectTransportServiceType
   (process-event [{data :data} app]
-    (routes/navigate! (get data ::t-service/service-type))
-    app)
+    ;; Clear selected transport type section from app state
+    ;; Navigate to selected transport type form
+    (routes/navigate! (get data ::t-service/type))
+    (assoc app :transport-service {::t-service/type (::t-service/type data)}))
 
   ModifyTransportService
   (process-event [{id :id} app]

@@ -24,9 +24,7 @@
 
     (let [service-data
           (-> service
-              (dissoc ::t-service/passenger-transportation)
-              (assoc ::t-service/type :terminal
-                     ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
+              (assoc ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/terminal form/without-form-metadata)
               (update-in [::t-service/terminal ::t-service/operation-area]
                          place-search/place-references))]

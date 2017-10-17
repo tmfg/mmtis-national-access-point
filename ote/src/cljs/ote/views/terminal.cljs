@@ -14,13 +14,19 @@
             [tuck.core :as tuck]))
 
 (defn terminal-form-options [e!]
-  {:name->label (tr-key [:field-labels :terminal])
+  {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
    :update!     #(e! (terminal/->EditTerminalState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [napit/tallenna {:on-click #(e! (terminal/->SaveTerminalToDb))
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])})
+
+(defn place-marker-group [e!]
+  (place-search/place-marker-form-group
+    (tuck/wrap-path e! :transport-service ::t-service/terminal ::t-service/operation-area)
+    (tr [:field-labels :transport-service-common ::t-service/location])
+    ::t-service/operation-area))
 
 (defn contact-info-group []
   (form/group
@@ -64,7 +70,7 @@
     [form/form (terminal-form-options e!)
 
      [
-
+      (place-marker-group e!)
       (form-groups/service-url
         (tr [:field-labels :terminal ::t-service/indoor-map])
         ::t-service/indoor-map)

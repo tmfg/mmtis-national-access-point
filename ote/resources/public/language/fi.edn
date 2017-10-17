@@ -16,7 +16,22 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
-  :ote.db.transport-service/service-type "Valitse välityspavelun tyyppi"
+  :ote.db.transport-service/type "Valitse välityspavelun tyyppi"
+
+  :transport-service-common
+  {:ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+   :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
+
+   ;; Contact details
+   :ote.db.transport-service/contact-address          "Osoitetiedot"
+   :ote.db.transport-service/contact-phone             "Puhelin"
+   :ote.db.transport-service/contact-email             "Sähköposti"
+   :ote.db.transport-service/homepage                  "Kotisivu"
+
+   :ote.db.transport-service/operation-area            "Toiminta-alue"
+   :ote.db.transport-service/location                  "Sijainti"
+
+   }
 
   ;; Passenger transportation fields
   :passenger-transportation
@@ -27,8 +42,6 @@
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/additional-services       "Muut palvelut"
-   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
-   :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
    :ote.db.transport-service/price-class               "Hinnoittelu"
 
    ;; Price Class fields
@@ -37,13 +50,6 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
-   ;; Contact details
-   :ote.db.transport-operator/contact-address          "Osoitetiedot"
-   :ote.db.transport-service/contact-phone             "Puhelin"
-   :ote.db.transport-service/contact-email             "Sähköposti"
-   :ote.db.transport-service/homepage                  "Kotisivu"
-
-   :ote.db.transport-service/operation-area "Toiminta-alue"
 
    }
 
@@ -89,7 +95,7 @@
 
  ;; Database enumeration values
  :enums
- {:ote.db.transport-service/service-type
+ {:ote.db.transport-service/type
   {:terminal                 "Satama, Asema, Terminaali"
    :passenger-transportation "Henkilökuljetuspalvelu"
    :rentals                  "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"

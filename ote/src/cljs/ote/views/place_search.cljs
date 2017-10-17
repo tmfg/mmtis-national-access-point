@@ -25,6 +25,7 @@
    [leaflet/Popup [:div name]]])
 
 (defn places-map [e! results]
+  (.log js/console "rendering map")
   (r/create-class
    {:should-component-update
     ;; Do NOT rerender unless the geometries have changed
@@ -43,6 +44,31 @@
          ^{:key (::places/id place)}
          [leaflet/GeoJSON {:data geojson
                            :style {:color "green"}}])])}))
+
+(defn marker-map [e! coordinate]
+  (.log js/console "rendering marker map coordinate->"coordinate)
+  (r/create-class
+    {:should-component-update
+     ;; Do NOT rerender unless the geometries have changed
+     (fn [_ [_ _ old-results] [_ _ new-results]]
+       (not (identical? old-results new-results)))
+     :reagent-render
+     (fn [e! coordinate]
+       (.log js/console "marker map rendering" coordinate)
+       [leaflet/Map {;;:prefer-canvas true
+                     :center #js [65 25]
+                     :zoom 5
+                     :on-click  #(e! (ps/->SetMarker %))
+                     }
+        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+
+        (for [{:keys [place marker_position]} coordinate]
+          ^{:key (::places/id place)}
+          [leaflet/Marker {:data marker_position
+                            :style {:color "green"}}
+           (.log js/console " drawing marker ")
+           ])])}))
 
 (defn- completions [completions]
   (apply array
@@ -77,3 +103,20 @@
     :name name
     :component (fn [{data :data}]
                  [place-search e! (:place-search data)])}))
+
+
+(defn place-marker [e! place]
+  (let [coordinate (:coordinate place)]
+    [:div
+
+     [marker-map e! coordinate]]))
+
+
+(defn place-marker-form-group [e! label name]
+  (form/group
+    {:label label
+     :columns 3}
+    {:type :component
+     :name name
+     :component (fn [{data :data}]
+                  [place-marker e! (:place-marker data)])}))
