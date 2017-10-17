@@ -77,12 +77,13 @@
   [price-classes-float]
   (try
     (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)
-    (catch Exception e (println "price-per-unit is probably missing"))))
+    (catch Exception e
+      (log/info "Can't fix price classes: " price-classes-float e))))
 
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
-  (println "DATA: " (pr-str data))
+  #_(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
@@ -91,7 +92,8 @@
       (let [transport-service
             (upsert! db ::t-service/transport-service value)]
         (places/link-places-to-transport-service!
-         db (::t-service/id transport-service) places)))))
+         db (::t-service/id transport-service) places)
+        transport-service))))
 
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
