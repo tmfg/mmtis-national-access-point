@@ -8,7 +8,8 @@
              [ote.components.http :as http]
              [clj-http.client :as http-client]
              [taoensso.timbre :as log]
-             [ote.nap.cookie :as nap-cookie])
+             [ote.nap.cookie :as nap-cookie]
+             [ote.transit :as transit])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
@@ -82,6 +83,19 @@
          (getComment [_] nil)
          (getCommentURL [_] nil))])))
 
+(defn- read-transit-response [res]
+  (if (= (:status res) 200)
+    (assoc res :transit (transit/transit->clj (:body res)))
+    res))
+
 (defn http-get [user path]
-  (http-client/get (url-for-path path)
-                   {:cookie-store (cookie-store-for-user user)}))
+  (-> path
+      url-for-path
+      (http-client/get {:cookie-store (cookie-store-for-user user)})
+      read-transit-response))
+
+(defn http-post [user path payload]
+  (-> path url-for-path
+      (http-client/post {:body (transit/clj->transit payload)
+                         :cookie-store (cookie-store-for-user user)})
+      read-transit-response))
