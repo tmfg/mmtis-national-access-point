@@ -6,8 +6,11 @@
              [com.stuartsierra.component :as component]
              [ote.components.db :as db]
              [ote.components.http :as http]
-             [org.httpkit.client :as http-client]
-             [taoensso.timbre :as log]))
+             [clj-http.client :as http-client]
+             [taoensso.timbre :as log]
+             [ote.nap.cookie :as nap-cookie])
+  (:import (org.apache.http.client CookieStore)
+           (org.apache.http.cookie Cookie)))
 
 ;; Current db for tests
 (defonce ^:dynamic *db* nil)
@@ -52,11 +55,33 @@
                                                         :auth-tkt auth-tkt-config})
                                      [:db])
                               system-map-entries))]
-        (println "*OTE*: " (keys  *ote*))
         (tests)
         (component/stop *ote*)))))
 
-(defn http-get [path payload]
-  (let [url (str "http://localhost:" (get-in *ote* [:http :config :port]) "/" path)]
-    (log/info "Fetching URL: " url)
-    @(http-client/get url)))
+(defn- url-for-path [path]
+  (str "http://localhost:" (get-in *ote* [:http :config :port]) "/" path))
+
+(defn- cookie-store-for-user [user]
+  (reify CookieStore
+    (getCookies [_]
+      [(reify Cookie
+         (getName [_] "auth_tkt")
+         (getValue [_]
+           (nap-cookie/unparse "0.0.0.0" "test"
+                               {:digest-algorithm "MD5"
+                                :timestamp (java.util.Date.)
+                                :user-id user
+                                :user-data ""}))
+         (getDomain [_] "localhost")
+         (isExpired [_ _] false)
+         (getPath [_] "/")
+         (getPorts [_] (int-array [(get-in *ote* [:http :config :port])]))
+         (getVersion [_] 2)
+         (isPersistent [_] true)
+         (isSecure [_] false)
+         (getComment [_] nil)
+         (getCommentURL [_] nil))])))
+
+(defn http-get [user path]
+  (http-client/get (url-for-path path)
+                   {:cookie-store (cookie-store-for-user user)}))
