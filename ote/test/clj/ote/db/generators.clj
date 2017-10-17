@@ -59,7 +59,7 @@
    ::t-service/url gen-url
    ::t-service/description gen-localized-text-array))
 
-(def price-units ["km" "mile" "trip" "day" "week"])
+(def price-units ["km" "mile" "trip" "hour" "day" "week"])
 (def price-currency ["EUR" "SEK" "USD" "RMB"])
 
 (def gen-price-class
