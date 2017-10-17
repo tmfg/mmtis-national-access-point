@@ -13,6 +13,10 @@
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
+;; Don't log debugs to tests
+(log/merge-config!
+ {:appenders {:println {:min-level :info}}})
+
 ;; Current db for tests
 (defonce ^:dynamic *db* nil)
 
@@ -27,9 +31,10 @@
 
 (defmacro with-test-db [& body]
   `(let [db# ote-db-url]
+     ;; FIXME: doesn't cleanup db, use template copy trick
      (jdbc/with-db-connection [db# ote-db-url]
-       (jdbc/db-set-rollback-only! db#)
        (tx/with-transaction db#
+         (jdbc/db-set-rollback-only! db#)
          (binding [*db* db#]
            ~@body)))))
 
