@@ -122,14 +122,13 @@
     (= v1 v2)))
 
 (defspec save-and-fetch-generated-passenger-transport-service
-  100
+  50
   (prop/for-all
    [transport-service gen-passenger-transportation-service]
 
    (let [response (http-post "admin" "passenger-transportation-info"
                              transport-service)
          service (:transit response)
-         _ (println "ID: " (::t-service/id service))
          fetch-response (http-get "admin"
                                   (str "transport-service/" (::t-service/id service)))
 
