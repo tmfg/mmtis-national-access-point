@@ -64,7 +64,9 @@
   :profiles {:uberjar {:aot :all
 
                        ;; Prevent uberjar from cleaning cljs generated files
-                       :auto-clean false}}
+                       :auto-clean false}
+             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]]
+                   :test-paths ["test/clj"]}}
 
   :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]
                  ["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
