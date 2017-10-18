@@ -1,20 +1,77 @@
 <div role="main" class="hero">
-    <div class="container">
-        <div class="row row1">
-            <div class="span12">
-                {% snippet 'home/snippets/header.html' %}
+    {% if c.userobj %}
+        <div class="container">
+            <div class="row row1 module">
+                <div class="span12">
+                    <p>Hei {{ c.userobj.display_name }}!</p>
+                    <b>Palvelukatalogi</b>-sivulla voit tarkastella ja hakea palvelussa julkaistuja
+                    rajapintoja.<br />
+                    <b>Organisaatiot</b>-sivulla on listattuna palveluun rekisteröityneet organisaatiot.
+                </div>
+            </div>
+
+            <div class="row row2 module">
+                <div class="span12">
+                    <h2>Liikkumispalveluiden julkaisu</h2>
+                </div>
+                <div class="span12">
+                    <div class="module-content box box--gradient text-center">
+                        <p>{% trans %}Haluatko julkaista uusia tai päivittää aiemmin julkaisemiasi rajapintoja
+                            palvelukatalogiin?
+                            Rajapinnat ovat joko itse ylläpidettyjä, Liikenneviraston OTE-palvelussa ylläpidettyjä tai
+                            RAE-palvelussa ylläpidettyjä.{% endtrans %}</p>
+
+                        <p>{% link_for _('Siirry palvelukatalogiin'), controller='user', action='login', class_='btn btn-primary' %}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row3">
+                <div class="span12">
+                    <h2>Liikkumispalveluiden digitointi</h2>
+                </div>
+                <div class="span4">
+                    <div class="box box--gradient text-center">
+                        <p>{% trans %}Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka
+                            kuvailutietoja haluat julkaista.{% endtrans %}</p>
+                        <p>{% link_for _('Siirry palvelukatalogiin'), controller='user', action='login', class_='btn btn-primary' %}</p>
+                    </div>
+                </div>
+                <div class="span4">
+                    <div class="box box--gradient text-center">
+                        <p>{% trans %}Sinulla ei ole omaa itse ylläpidettyä rajapintaa ja haluat digitoida tai päivittää
+                            liikkumispalvelusi tietoja Liikenneviraston olennaisten tietojen editorilla
+                            (OTE)?{% endtrans %}</p>
+                        <p>{% link_for _('Avaa OTE-palvelu'), controller='user', action='login', class_='btn btn-primary' %}</p>
+                    </div>
+                </div>
+                <div class="span4">
+                    <div class="box box--gradient text-center">
+                        <p>{% trans %}Haluatko tallentaa tai päivittää linja-autoreittejä ja aikataulu-tietoja
+                            RAE-palvelussa?{% endtrans %}</p>
+                        <p>{% link_for _('Avaa RAE-palvelu'), controller='user', action='login', class_='btn btn-primary' %}</p>
+                    </div>
+                </div>
             </div>
         </div>
+    {% endif %}
 
-        <div class="row row2">
-            <div class="span8 offset2">
-                {% block promoted %}
-                    {% snippet 'home/snippets/promoted.html' %}
-                {% endblock %}
+    {% if not c.userobj %}
+        <div class="container">
+            <div class="row row1">
+                <div class="span12">
+                    {% snippet 'home/snippets/header.html' %}
+                </div>
             </div>
-        </div>
 
-        {% if not c.userobj %}
+            <div class="row row2">
+                <div class="span8 offset2">
+                    {% block promoted %}
+                        {% snippet 'home/snippets/promoted.html' %}
+                    {% endblock %}
+                </div>
+            </div>
+
             <div class="row row3 text-center">
                 <div class="span12">
                     <p>{% link_for _('Log in'), controller='user', action='login', class_='btn btn-primary' %}</p>
@@ -27,6 +84,7 @@
 
                 </div>
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
+
 </div>
