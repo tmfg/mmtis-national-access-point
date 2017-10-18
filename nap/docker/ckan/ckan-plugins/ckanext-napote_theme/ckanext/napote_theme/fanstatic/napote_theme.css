@@ -618,6 +618,12 @@ body {
 
 /** HOMEPAGE HEADER **/
 
+.homepage .home-header.hero-unit {
+    color: #ffffff;
+    background: url('/home_header.jpg');
+    border-radius: 0;
+}
+
 .homepage .home-header img {
     display: block;
     width: 100%;

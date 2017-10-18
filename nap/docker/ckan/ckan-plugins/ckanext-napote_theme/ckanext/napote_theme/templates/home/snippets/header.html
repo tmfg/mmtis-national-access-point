@@ -1,9 +1,4 @@
-<header class="home-header text-center">
-    {#
-        <h1 class="page-heading">{{ _("NAP") }}</h1>
-        <p>
-            {% trans %}Liikkumispalveluiden katalogi{% endtrans %}.
-        </p>
-        #}
-    <img src="/home_header.png" alt="Liikennevirasto Logo" />
+<header class="home-header text-center hero-unit">
+    <h1 class="page-heading">{{ g.site_title }}</h1>
+    <p class="lead">{{ _("Liikkumispalveluiden katalogi") }}.</p>
 </header>
