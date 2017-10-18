@@ -1,13 +1,36 @@
 # encoding: utf-8
 
+from logging import getLogger
+from pkg_resources import resource_stream
+import csv
+import sys
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.plugins import DefaultTranslation
+
+csv.field_size_limit(sys.maxsize)
+
+log = getLogger(__name__)
 
 # TODO: We should get these from the database
 municipalitys = (
     u'Helsinki', u'Ii', u'Joensuu', u'Kempele', u'Muhos', u'Oulu', u'Pieksämäki', u'Salo', u'Seinäjoki', u'Vantaa')
 transport_services = (u'Terminal', u'Passenger Transportation', u'Rental', u'Parking', u'Brokerage')
+
+
+def read_csv(file):
+    # Read the file into a dictionary for each row ({header : value})
+    reader = csv.DictReader(file, delimiter=',')
+    data = {}
+
+    for row in reader:
+        for header, value in row.items():
+            unicodeVal = unicode(value, 'utf-8')
+            try:
+                data[header].append(unicodeVal)
+            except KeyError:
+                data[header] = [unicodeVal]
+    return data
 
 
 def create_transport_service_types():
@@ -37,7 +60,15 @@ def transport_service_types():
         return None
 
 
-def create_mock_operation_areas():
+def create_operation_areas():
+    try:
+        csv_data = read_csv(resource_stream(__name__, 'data/finnish_municipalities.csv'))
+        municipalities = csv_data.get('namefin', [])
+    except IOError as err:
+        log.error('Failed to load operation areas from file: %s', err)
+
+        return None
+
     user = tk.get_action('get_site_user')({'ignore_auth': True}, {})
     context = {'user': user['name']}
 
@@ -48,13 +79,13 @@ def create_mock_operation_areas():
         data = {'name': 'operation_areas'}
         vocab = tk.get_action('vocabulary_create')(context, data)
 
-        for tag in municipalitys:
+        for tag in municipalities:
             data = {'name': tag, 'vocabulary_id': vocab['id']}
             tk.get_action('tag_create')(context, data)
 
 
 def operation_areas():
-    create_mock_operation_areas()
+    create_operation_areas()
 
     try:
         tag_list = tk.get_action('tag_list')
