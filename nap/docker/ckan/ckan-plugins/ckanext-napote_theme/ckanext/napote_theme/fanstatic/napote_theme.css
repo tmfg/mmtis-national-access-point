@@ -454,7 +454,6 @@
 *
 */
 
-
 @media (min-width: 1200px) {
     .nav-collapse.collapse {
         height: auto !important;
@@ -506,25 +505,6 @@
 
 /*
 *
-* Custom added classes
-*
-*/
-
-/** HEADER **/
-.masthead .section-right {
-    float: right !important;
-}
-
-/** HOMEPAGE HEADER **/
-
-.homepage .home-header img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-/*
-*
 * Customizations
 *
 */
@@ -533,9 +513,24 @@
 
 body {
     background: #444444; /** LIVI pääväri, harmaat 5. **/
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
 }
 
 /** HEADER **/
+
+.masthead {
+    background: #2D75B4;
+}
+
+.masthead .navigation .nav-pills li.active a {
+    background: rgba(0, 0, 0, .3);
+}
+
+.masthead .navigation .nav-pills li a:hover {
+    background: rgba(0, 0, 0, .1);
+}
+
 .masthead .navbar .brand {
     text-shadow: none;
     font-size: 30px;
@@ -566,10 +561,65 @@ body {
 }
 
 .homepage [role=main] {
+    color: #000000;
     padding-top: 0;
+}
+
+/** NOTE: Some btn style rules are from materializecss.com **/
+.homepage .btn {
+    border: none;
+    color: #ffffff;
+    padding: 0 2rem;
+    border-radius: 2px;
+    overflow: hidden;
+    border-width: 0;
+    line-height: 36px;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: .5px;
+    height: 36px;
+    font-size: 1rem;
+    font-weight: normal;
+    outline: 0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
+    transition: background-color .3s;
+}
+
+.homepage .btn:hover {
+    background: #2f97dd;
+}
+
+.homepage .btn.btn-primary {
+    background: #2D75B4;
+}
+
+.homepage .btn.btn-primary:hover {
+    background: #2f97dd;
 }
 
 /** Footer **/
 .site-footer {
     background: #444444; /** LIVI lisäväri, harmaat 5. **/
+    color: #ffffff;
+}
+
+/*
+*
+* Custom added classes
+*
+*/
+
+/** HEADER **/
+
+.masthead .section-right {
+    float: right !important;
+}
+
+/** HOMEPAGE HEADER **/
+
+.homepage .home-header img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
