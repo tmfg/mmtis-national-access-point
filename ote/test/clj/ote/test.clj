@@ -23,20 +23,35 @@
 ;; Current OTE system
 (defonce ^:dynamic *ote* nil)
 
-(def ote-db-url {:user "napote"
-                 :dbtype "postgresql"
-                 :dbname "napotetest"
-                 :host "localhost"
-                 :port 5432})
+
+(def db-url {:user "napote"
+             :dbtype "postgresql"
+             :dbname "napote"
+             :host "localhost"
+             :port 5432})
+
+(def test-db-config {:url "jdbc:postgresql://localhost:5432/napotetest"
+                     :username "napote"
+                     :password ""})
+
+
+(defn- kill-db-connections! [db database-name]
+  (jdbc/query db (str "SELECT pg_terminate_backend(pg_stat_activity.pid)"
+                      "  FROM pg_stat_activity"
+                      " WHERE pg_stat_activity.datname = '" database-name "' AND pid <> pg_backend_pid()")))
+
+(defn- create-test-db! []
+  (kill-db-connections! db-url "napotetest")
+  (kill-db-connections! db-url "napotetest_template")
+  (with-open [c (jdbc/get-connection db-url)]
+    (let [s (.createStatement c)]
+      (.executeUpdate s "DROP DATABASE IF EXISTS napotetest")
+      (.executeUpdate s "CREATE DATABASE napotetest TEMPLATE napotetest_template"))))
 
 (defmacro with-test-db [& body]
-  `(let [db# ote-db-url]
-     ;; FIXME: doesn't cleanup db, use template copy trick
-     (jdbc/with-db-connection [db# ote-db-url]
-       (tx/with-transaction db#
-         (jdbc/db-set-rollback-only! db#)
-         (binding [*db* db#]
-           ~@body)))))
+  `(do
+     (create-test-db!)
+     ~@body))
 
 (defn db-fixture []
   (fn [tests]
@@ -56,7 +71,7 @@
     (with-test-db
       (binding [*ote* (component/start
                        (apply component/system-map
-                              :db (db/->TestDatabase (:connection *db*))
+                              :db (db/database test-db-config)
                               :http (component/using
                                      (http/http-server {:port (port)
                                                         :auth-tkt auth-tkt-config})
