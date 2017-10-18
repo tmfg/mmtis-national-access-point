@@ -24,6 +24,11 @@
     (.close ds)
     (assoc this :datasource nil)))
 
+(defrecord TestDatabase [connection]
+  component/Lifecycle
+  (start [this] this)
+  (stop [this] this))
+
 (defn database
   "Create a database component with the given `config`."
   [config]

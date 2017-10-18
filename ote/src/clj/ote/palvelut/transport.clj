@@ -12,7 +12,8 @@
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
-            [ote.authorization :as authorization])
+            [ote.authorization :as authorization]
+            [ote.db.tx :as tx])
   (:import (java.time LocalTime)))
 
 ;; FIXME: monkey patch specql composite reading (For now)
@@ -44,18 +45,17 @@
                 ::t-service/transport-service
                 (specql/columns ::t-service/transport-service)
                 {::t-service/id id}
-                {::specql/limit 1}))
-  )
+                {::specql/limit 1})))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
-  (jdbc/with-db-transaction [db db]
-     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
-         (or operator
-             ;; FIXME: what if name changed in CKAN, we should update?
-             (insert! db ::transport-operator/transport-operator
-                      {::transport-operator/name title
-                       ::transport-operator/ckan-group-id id})))))
+  (tx/with-transaction db
+    (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
+      (or operator
+          ;; FIXME: what if name changed in CKAN, we should update?
+          (insert! db ::transport-operator/transport-operator
+                   {::transport-operator/name title
+                    ::transport-operator/ckan-group-id id})))))
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
@@ -77,12 +77,13 @@
   [price-classes-float]
   (try
     (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)
-    (catch Exception e (println "price-per-unit is probably missing"))))
+    (catch Exception e
+      (log/info "Can't fix price classes: " price-classes-float e))))
 
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
-  (println "DATA: " (pr-str data))
+  #_(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
@@ -91,7 +92,8 @@
       (let [transport-service
             (upsert! db ::t-service/transport-service value)]
         (places/link-places-to-transport-service!
-         db (::t-service/id transport-service) places)))))
+         db (::t-service/id transport-service) places)
+        transport-service))))
 
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]

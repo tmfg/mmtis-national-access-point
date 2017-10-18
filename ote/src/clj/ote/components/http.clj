@@ -10,7 +10,7 @@
             [clojure.string :as str]))
 
 (defn- serve-request [handlers req]
-  ((apply some-fn handlers) req))
+  (some #(% req) handlers))
 
 (defn wrap-strip-prefix [strip-prefix handler]
   (fn [{uri :uri :as req}]
