@@ -43,6 +43,8 @@
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/additional-services       "Muut palvelut"
    :ote.db.transport-service/price-class               "Hinnoittelu"
+   :ote.db.transport-service/service-hours             "Palveluajat"
+   :ote.db.transport-service/operation-area            "Toiminta-alue"
 
    ;; Price Class fields
    :ote.db.transport-service/name                      "Hintaryhmä"
@@ -50,6 +52,11 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
+
+   ;; Service hour fields
+   :ote.db.transport-service/week-days                 "Viikonpäivät"
+   :ote.db.transport-service/from                      "Aukeamisaika"
+   :ote.db.transport-service/to                        "Kiinnimenoaika"
 
    }
 
@@ -128,6 +135,11 @@
    :buggy            "Buggy"
    :other            "Muu"}
 
+  :ote.db.transport-service/day
+  {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
+   :full {:MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
+          :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
+
   :ote.db.transport-service/information-service-accessibility
   {:audio-for-hearing-impaired "Audio for hearing impaired"
    :audio-information "Äänelliset informaatiot"
@@ -164,8 +176,6 @@
    :tactile-guiding-strips ":tactile-guiding-strips"
    :other "Muu"}
   }
-
-
 
  ;; Per feature/page localization keys
  :place-search {:name                "Paikan nimi"

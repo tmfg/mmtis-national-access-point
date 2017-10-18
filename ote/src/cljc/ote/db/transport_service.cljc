@@ -6,7 +6,8 @@
             [specql.transform :as xf]
             [specql.impl.registry]
             [ote.db.common]
-            [specql.data-types])
+            [specql.data-types]
+            [ote.time])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -15,7 +16,7 @@
 
 (define-tables
   ;; Define ENUMs
-  ["week_day" ::week_day (specql.transform/transform (specql.transform/to-keyword))]
+  ["week_day" ::day (specql.transform/transform (specql.transform/to-keyword))]
 
 
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
@@ -63,6 +64,8 @@
 ;; Create order for accessibility_tool
 (def accessibility-tool [:wheelchair :walkingstick :audio-navigator :visual-navigator :passenger-cart
                           :pushchair :umbrella :buggy :other])
+
+(def days [:MON :TUE :WED :THU :FRI :SAT :SUN])
 
 ;; Create order for accessibility-info-facility
 (def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays

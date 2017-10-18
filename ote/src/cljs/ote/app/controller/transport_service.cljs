@@ -5,9 +5,11 @@
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.controller.passenger-transportation :as pt]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.time :as time]))
 
 (defrecord AddPriceClassRow [])
+(defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
 (defrecord SelectTransportServiceType [data])
 
@@ -24,9 +26,14 @@
     (update-in app [:transport-service ::t-service/passenger-transportation ::t-service/price-classes]
                #(conj (or % []) {::t-service/currency "EUR"})))
 
+  AddServiceHourRow
+  (process-event [_ app]
+    (update-in app [:transport-service ::t-service/passenger-transportation ::t-service/service-hours]
+               #(conj (or % []) {::t-service/from (time/parse-time "08:00")})))
+
   RemovePriceClassRow
   (process-event [_ app]
-    (assoc-in app [:transport-service :price-class-open] false))
+    (assoc-in app [:t-service :price-class-open] false))
 
   SelectTransportServiceType
   (process-event [{data :data} app]

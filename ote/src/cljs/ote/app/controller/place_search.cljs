@@ -65,14 +65,11 @@
   (process-event [{event :event} app]
     (let [lat (-> event .-latlng .-lat)
           lng (-> event .-latlng .-lng)]
-    (.log js/console "SetMarker function " app  (-> event .-latlng .-lat) )
-    (.log js/console "SetMarker function "  (-> event .-latlng .-lng) )
+    ;(.log js/console "SetMarker function " (-> event .-latlng .-lat) )
+    ;(.log js/console "SetMarker function " (-> event .-latlng .-lng) )
 
-    (assoc-in app [:place-marker :coordinate :lat] lat)
-    (assoc-in app [:place-marker :coordinate :lng] lng)
-    (.log js/console " appia " app)
-    ) app)
-  )
+    (assoc app :coordinates [ lat lng ] ))))
+
 
 (defn place-references
   "Gets a place search app model and returns place references from it.

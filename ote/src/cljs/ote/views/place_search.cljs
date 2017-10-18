@@ -9,7 +9,10 @@
             [ote.localization :refer [tr]]
             [cljs-react-material-ui.reagent :as ui]
             [ote.db.transport-service :as t-service]
-            [ote.db.places :as places]))
+            [ote.db.places :as places]
+
+            )
+  )
 
 (defn result-chips [e! results]
   [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
@@ -33,10 +36,7 @@
       (not (identical? old-results new-results)))
     :reagent-render
     (fn [e! results]
-      (.log js/console "places map rendering")
-      [leaflet/Map {;;:prefer-canvas true
-                    :center #js [65 25]
-                    :zoom 5}
+      [leaflet/Map {:center #js [65 25]  :zoom 5}
        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
@@ -54,21 +54,18 @@
        (not (identical? old-results new-results)))
      :reagent-render
      (fn [e! coordinate]
-       (.log js/console "marker map rendering" coordinate)
-       [leaflet/Map {;;:prefer-canvas true
-                     :center #js [65 25]
-                     :zoom 5
+       [leaflet/Map {
+                     :center #js [65.01212149716532 25.47065377235413]
+                     :zoom 16
                      :on-click  #(e! (ps/->SetMarker %))
                      }
         [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                             :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-        (for [{:keys [place marker_position]} coordinate]
-          ^{:key (::places/id place)}
-          [leaflet/Marker {:data marker_position
-                            :style {:color "green"}}
-           (.log js/console " drawing marker ")
-           ])])}))
+        [leaflet/Marker
+         {:position [(first (get-in coordinate  [:coordinates  :coordinates]))
+                     (second (get-in coordinate  [:coordinates  :coordinates]))]} ]
+        ])}))
 
 (defn- completions [completions]
   (apply array
@@ -105,12 +102,10 @@
                  [place-search e! (:place-search data)])}))
 
 
-(defn place-marker [e! place]
-  (let [coordinate (:coordinate place)]
+(defn place-marker [e! coordinates]
+  (let [coordinate  coordinates]
     [:div
-
-     [marker-map e! coordinate]]))
-
+     [marker-map e! coordinates]]))
 
 (defn place-marker-form-group [e! label name]
   (form/group
@@ -118,5 +113,4 @@
      :columns 3}
     {:type :component
      :name name
-     :component (fn [{data :data}]
-                  [place-marker e! (:place-marker data)])}))
+     :component (fn [{data :data}] [place-marker e! {:coordinates data}])}))

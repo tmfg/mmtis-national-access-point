@@ -13,19 +13,19 @@
 
 - name: Download SOLR distribution
   get_url:
-    url: http://archive.apache.org/dist/lucene/solr/6.2.0/solr-6.2.0.tgz
-    dest: /opt/solr-download/solr-6.2.0.tgz
+    url: http://archive.apache.org/dist/lucene/solr/{{solr_version}}/solr-{{solr_version}}.tgz
+    dest: /opt/solr-download/solr-{{solr_version}}.tgz
 
 - name: Unpack SOLR distribution
   unarchive:
     remote_src: yes
-    src: /opt/solr-download/solr-6.2.0.tgz
+    src: /opt/solr-download/solr-{{solr_version}}.tgz
     dest: /opt/solr-download
 
 - name: Run SOLR installer
-  shell: sh /opt/solr-download/solr-6.2.0/bin/install_solr_service.sh /opt/solr-download/solr-6.2.0.tgz
+  shell: sh /opt/solr-download/solr-{{solr_version}}/bin/install_solr_service.sh /opt/solr-download/solr-{{solr_version}}.tgz -f
   args:
-    creates: /opt/solr-6.2.0
+    creates: /opt/solr-{{solr_version}}
 
 - name: Download CKAN distribution to get schema
   git:
@@ -47,7 +47,7 @@
   template: src=templates/solrconfig.xml.j2 dest=/var/solr/data/ckan/conf/solrconfig.xml
 
 - name: Copy other config files
-  shell: cp /opt/solr-download/solr-6.2.0/server/solr/configsets/{{item}} /var/solr/data/ckan/conf/
+  shell: cp /opt/solr-download/solr-{{solr_version}}/server/solr/configsets/{{item}} /var/solr/data/ckan/conf/
   with_items:
     - basic_configs/conf/currency.xml
     - basic_configs/conf/synonyms.txt
