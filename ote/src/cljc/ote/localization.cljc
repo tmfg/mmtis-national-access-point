@@ -7,8 +7,10 @@
   On the backend the language can be dynamically bound with `*language*`."
   (:require #?@(:cljs [[reagent.core :as r]
                        [ote.communication :as comm]]
-                :clj [[clojure.java.io :as io]])
-            [clojure.spec.alpha :as s]))
+                :clj  [[clojure.java.io :as io]])
+                       [clojure.spec.alpha :as s]
+                       [clojure.string :as str]
+                       [taoensso.timbre :as log]))
 
 (defonce loaded-languages (atom {}))
 
@@ -91,8 +93,16 @@
         :ret fn?)
 
 (defn tr-key
-  "Returns a funktion that translates a keyword under the given `path`.
-  This is useful for creating a formatting function for keyword enumerations."
-  [path]
+  "Returns a function that translates a keyword under the given `path`.
+  This is useful for creating a formatting function for keyword enumerations.
+  Multiple paths may be provided and they are tried in the given order. First
+  path that has a translation for the requested key, is used."
+  [& paths]
   (fn [key]
-    (tr (conj path key))))
+    (or
+      (some #(let [message (tr (conj % key))]
+               #_(log/info "path: " (pr-str (conj % key)) " => " message ", blank? " (str/blank? message))
+               (when-not (str/blank? message)
+                 message))
+            paths)
+      "")))

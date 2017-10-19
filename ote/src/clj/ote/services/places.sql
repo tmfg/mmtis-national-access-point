@@ -17,3 +17,27 @@ VALUES (:transport-service-id,
            FROM places
           WHERE id = :place-id),
         true);
+
+-- name: save-point-for-transport-service!
+INSERT INTO operation_area
+       ("id", "transport-service-id", "location", "primary?")
+VALUES (
+        :id,
+        :transport-service-id,
+        ST_GeomFromText(:location),
+        true)
+ON CONFLICT ("id") DO UPDATE
+  SET location = ST_GeomFromText(:location);
+
+-- name: insert-point-for-transport-service!
+INSERT INTO operation_area
+       ("transport-service-id", "location", "primary?")
+VALUES (
+        :transport-service-id,
+        ST_GeomFromText(:location),
+        true);
+
+-- name: fetch-operation-area-geojson
+SELECT id, "transport-service-id", ST_AsGeoJSON(location)
+  FROM "operation_area"
+ WHERE "transport-service-id" = :transport-service-id

@@ -31,9 +31,9 @@
          {:label   nil
           :columns 3}
          {
-         :name        ::transport-service/service-type
+         :name        ::transport-service/type
          :type        :selection
-         :show-option (tr-key [:enums ::transport-service/service-type])
+         :show-option (tr-key [:enums ::transport-service/type])
          :options     transport-service/transport-service-types})
        ]
     nil]

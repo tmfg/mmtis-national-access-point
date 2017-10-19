@@ -18,6 +18,21 @@
   ;; Transport service fields
   :ote.db.transport-service/service-type "Valitse liikkumispalvelun tyyppi"
 
+  :transport-service-common
+  {:ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+   :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
+
+   ;; Contact details
+   :ote.db.transport-service/contact-address          "Osoitetiedot"
+   :ote.db.transport-service/contact-phone             "Puhelin"
+   :ote.db.transport-service/contact-email             "Sähköposti"
+   :ote.db.transport-service/homepage                  "Kotisivu"
+
+   :ote.db.transport-service/operation-area            "Toiminta-alue"
+   :ote.db.transport-service/location                  "Sijainti"
+
+   }
+
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
@@ -27,8 +42,6 @@
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/additional-services       "Muut palvelut"
-   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
-   :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
    :ote.db.transport-service/price-class               "Hinnoittelu"
    :ote.db.transport-service/service-hours             "Palveluajat"
    :ote.db.transport-service/operation-area            "Toiminta-alue"
@@ -45,18 +58,16 @@
    :ote.db.transport-service/from                      "Aukeamisaika"
    :ote.db.transport-service/to                        "Kiinnimenoaika"
 
-   ;; Contact details
-   :ote.db.transport-operator/contact-address          "Osoitetiedot"
-   :ote.db.transport-service/contact-phone             "Puhelin"
-   :ote.db.transport-service/contact-email             "Sähköposti"
-   :ote.db.transport-service/homepage                  "Kotisivu"
-
    }
 
   ;; Terminal fields
   :terminal
-  {:ote.db.transport-service/indoor-map "Sisätilojen kartta"
-   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+  {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
+   :ote.db.transport-service/url                       "Palvelun osoite"
+   :ote.db.transport-service/description               "Palvelun kuvaus"
+   :ote.db.transport-service/information-service-accessibility "Esteettömyys-info-välineet"
+   :ote.db.transport-service/accessibility     "Esteettömyys-laitteet"
+   :ote.db.transport-service/mobility          "mobility"
   }
 
   ;; Rental fields
@@ -90,7 +101,7 @@
 
  ;; Database enumeration values
  :enums
- {:ote.db.transport-service/service-type
+ {:ote.db.transport-service/type
   {:terminal                 "Satama, Asema, Terminaali"
    :passenger-transportation "Henkilökuljetuspalvelu"
    :rentals                  "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"
@@ -127,6 +138,42 @@
   {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
    :full {:MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
           :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
+
+  :ote.db.transport-service/information-service-accessibility
+  {:audio-for-hearing-impaired "Audio for hearing impaired"
+   :audio-information "Äänelliset informaatiot"
+   :visual-displays "Visuaaliset näytöt"
+   :displays-for-visually-impaired "Näkövammaisten näytöt"
+   :large-print-timetables "Suuret fontit aikatauluissa"
+   :other "Muu"
+   }
+
+  :ote.db.transport-service/accessibility
+  {:unknown "Määrittelemätön"
+   :lift "Hissi"
+   :escalator "Liukuportaat"
+   :travelator "Liikkuva kävelytie"
+   :ramp "Ramppi"
+   :stairs "Portaat"
+   :shuttle "Sukkulaliikenne"
+   :narrow-entrance "Narrow-Entrance"
+   :barrier "Puomi"
+   :pallet-access-low-floor "Pallet-Access-Low-Floor"
+   :validator "Validator"
+   :other  "Muu"}
+
+  :ote.db.transport-service/mobility
+  {:unknown "Määrittelemätön"
+   :low-floor "Matalalattia"
+   :step-free-access "Step free access"
+   :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :suitable-for-heavily-disabled  ":suitable-for-heavily-disabled"
+   :boarding-assistance  ":boarding-assistance"
+   :onboard-assistance ":onboard-assistance"
+   :unaccompanied-minor-assistance ":unaccompanied-minor-assistance"
+   :tactile-patform-edges  ":tactile-patform-edges"
+   :tactile-guiding-strips ":tactile-guiding-strips"
+   :other "Muu"}
   }
 
  ;; Per feature/page localization keys

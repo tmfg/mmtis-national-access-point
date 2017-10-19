@@ -52,6 +52,11 @@
   "OTE application main view"
   [e! app]
 
+  ;; init - Get operator and service data from DB when refresh or on usage start
+  (e! (fp-controller/->GetTransportOperatorData))
+
+  (fn [e! app]
+
   [:div {:style (stylefy/use-style style-base/body)}
    [ui/mui-theme-provider
     {:mui-theme
@@ -123,4 +128,4 @@
         [debug/debug app]
         ]
        )
-     ]]])
+     ]]]))
