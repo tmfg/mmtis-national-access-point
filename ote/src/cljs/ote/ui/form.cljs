@@ -92,7 +92,8 @@
           ::missing-required-fields
           ::first-modification
           ::latest-modification
-          ::schema))
+          ::schema
+          ::closed-groups))
 
 (defrecord ^:private Label [label])
 (defn- label? [x]
@@ -204,6 +205,12 @@
                 schema)))
           schemas)))
 
+(defn- toggle [set value]
+  (let [set (or set #{})]
+    (if (set value)
+      (disj set value)
+      (conj set value))))
+
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the
   current state of the form `data`.
@@ -240,7 +247,8 @@
                               (let [new-data (if (keyword? name-or-write)
                                                (assoc data name-or-write value)
                                                (name-or-write data value))]
-                                (update-form new-data)))]
+                                (update-form new-data)))
+            closed-groups (::closed-groups data #{})]
         [:div.form
          {:class class}
          (when label
@@ -268,12 +276,16 @@
                ^{:key i}
                [:div.form-group-container (stylefy/use-style style-form/form-group-container
                                            {::stylefy/with-classes classes})
-                [ui/card {:z-depth 1}
+                [ui/card {:z-depth 1
+                          :expanded (not (closed-groups label))
+                          :on-expand-change #(update! (update data ::closed-groups toggle label))}
                  (when label
                    [ui/card-header {:title label
                                     :style {:padding-bottom "0px"}
-                                    :title-style {:font-weight "bold"}}])
-                 [ui/card-text {:style {:padding-top "0px"}}
+                                    :title-style {:font-weight "bold"}
+                                    :acts-as-expander true
+                                    :show-expandable-button true}])
+                 [ui/card-text {:style {:padding-top "0px"} :expandable true}
                   group-component]
                  (when-let [actions (:actions options)]
                    [ui/card-actions
