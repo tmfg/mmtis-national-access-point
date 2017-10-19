@@ -16,7 +16,7 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
-  :ote.db.transport-service/service-type "Valitse välityspavelun tyyppi"
+  :ote.db.transport-service/service-type "Valitse liikkumispalvelun tyyppi"
 
   ;; Passenger transportation fields
   :passenger-transportation

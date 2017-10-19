@@ -32,7 +32,6 @@
       (not (identical? old-results new-results)))
     :reagent-render
     (fn [e! results]
-      (.log js/console "places map rendering")
       [leaflet/Map {;;:prefer-canvas true
                     :center #js [65 25]
                     :zoom 5}
