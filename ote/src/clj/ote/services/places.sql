@@ -22,10 +22,10 @@ VALUES (:transport-service-id,
 INSERT INTO operation_area
        ("id", "transport-service-id", "location", "primary?")
 VALUES (
-    :id,
-    :transport-service-id,
-    ST_GeomFromText(:location),
-    true)
+        :id,
+        :transport-service-id,
+        ST_GeomFromText(:location),
+        true)
 ON CONFLICT ("id") DO UPDATE
   SET location = ST_GeomFromText(:location);
 
@@ -33,9 +33,9 @@ ON CONFLICT ("id") DO UPDATE
 INSERT INTO operation_area
        ("transport-service-id", "location", "primary?")
 VALUES (
-    :transport-service-id,
-    ST_GeomFromText(:location),
-    true);
+        :transport-service-id,
+        ST_GeomFromText(:location),
+        true);
 
 -- name: fetch-operation-area-geojson
 SELECT id, "transport-service-id", ST_AsGeoJSON(location)

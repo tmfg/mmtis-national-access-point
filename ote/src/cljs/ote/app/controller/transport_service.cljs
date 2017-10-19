@@ -50,9 +50,13 @@
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
-    (assoc app
-      :page (get response ::t-service/type)
-      :transport-service response))
+    (-> app
+      (assoc-in [(keyword ::t-service/type) ::t-service/contact-address] (get response ::t-service/contact-address))
+      (assoc-in [(keyword ::t-service/type) ::t-service/contact-phone] (get response  ::t-service/contact-phone))
+      (assoc-in [(keyword ::t-service/type) ::t-service/contact-email] (get response  ::t-service/contact-email))
+      (assoc-in [(keyword ::t-service/type) ::t-service/homepage] (get response  ::t-service/homepage))
+      (assoc :page (get response ::t-service/type)
+             :transport-service response)))
 
 
   PublishTransportService
