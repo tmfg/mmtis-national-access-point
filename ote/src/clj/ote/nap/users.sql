@@ -2,6 +2,7 @@
 SELECT u.id as user_id,
        u.name as user_username,
        u.fullname as user_name,
+       u.apikey as user_apikey,
        u.email as user_email,
        g.id as group_id,
        g.name as group_name,
