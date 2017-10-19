@@ -13,6 +13,9 @@
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
             [ote.authorization :as authorization]
+            [jeesql.core :refer [defqueries]]
+            [cheshire.core :as cheshire]
+            [ote.authorization :as authorization]
             [ote.db.tx :as tx])
   (:import (java.time LocalTime)))
 
