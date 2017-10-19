@@ -9,10 +9,7 @@
             [ote.localization :refer [tr]]
             [cljs-react-material-ui.reagent :as ui]
             [ote.db.transport-service :as t-service]
-            [ote.db.places :as places]
-
-            )
-  )
+            [ote.db.places :as places]))
 
 (defn result-chips [e! results]
   [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
@@ -28,7 +25,6 @@
    [leaflet/Popup [:div name]]])
 
 (defn places-map [e! results]
-  (.log js/console "rendering map")
   (r/create-class
    {:should-component-update
     ;; Do NOT rerender unless the geometries have changed
@@ -36,7 +32,9 @@
       (not (identical? old-results new-results)))
     :reagent-render
     (fn [e! results]
-      [leaflet/Map {:center #js [65 25]  :zoom 5}
+      [leaflet/Map {;;:prefer-canvas true
+                    :center #js [65 25]
+                    :zoom 5}
        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 

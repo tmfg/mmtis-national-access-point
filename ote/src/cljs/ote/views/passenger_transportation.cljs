@@ -31,7 +31,8 @@
 
 (defn luggage-restrictions-group []
   (form/group
-   {:columns 3
+   {:label "Rajoitukset ja maksutavat"
+    :columns 3
     :layout :row}
 
    {:name ::t-service/luggage-restrictions
@@ -116,7 +117,7 @@
 
 (defn service-hours-group [e!]
   (form/group
-   {:label   "Palveluajaat"
+   {:label   "Palveluajat"
     :columns 3
     :actions [ui/raised-button
               {:label    "LISÄÄ UUSI RIVI"
@@ -138,9 +139,10 @@
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
-     [:h3 "Vaihe 2: Täydennä henkilökuljetukseen liittyvät tiedot."]]
+     [:h3 "Henkilöiden kuljetuspalvelun tiedot"]]
     [form/form (transportation-form-options e!)
-     [(place-search-group e!)
+     [(contact-info-group)
+      (place-search-group e!)
       (luggage-restrictions-group)
       (form-groups/service-url
        (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
@@ -148,7 +150,6 @@
       (form-groups/service-url
        (tr [:field-labels :passenger-transportation ::t-service/booking-service])
        ::t-service/booking-service)
-      (contact-info-group)
       (accessibility-group)
       (pricing-group e!)
       (service-hours-group e!)]
