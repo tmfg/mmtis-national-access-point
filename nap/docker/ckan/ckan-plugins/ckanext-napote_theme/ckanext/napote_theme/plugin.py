@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import mimetypes
 from logging import getLogger
 from pkg_resources import resource_stream
 import csv
@@ -117,6 +118,13 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
             'tags_to_select_options': tags_to_select_options}
 
     def update_config(self, config):
+        # CKAN uses the default Python library mimetypes to detect the media type of afile.
+        # If some particular format is not included in the ones guessed by the mimetypes library,
+        # a default application/octet-stream value will be returned.
+
+        # Add support for svg files in templates.
+        mimetypes.add_type('image/svg+xml', '.svg')
+
         # Add this plugin's templates dir to CKAN's extra_template_paths, so
         # that CKAN will use this plugin's custom templates.
         # 'templates' is the path to the templates dir, relative to this

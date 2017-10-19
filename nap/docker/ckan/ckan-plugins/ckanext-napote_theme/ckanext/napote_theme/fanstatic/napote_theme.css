@@ -537,7 +537,7 @@ body {
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
     color: white;
-    padding: 10px 30px 10px;
+    padding-top: 5px;
 }
 
 .navbar-form .select2-container {
