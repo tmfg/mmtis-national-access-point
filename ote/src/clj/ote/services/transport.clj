@@ -1,4 +1,4 @@
-(ns ote.palvelut.transport
+(ns ote.services.transport
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
