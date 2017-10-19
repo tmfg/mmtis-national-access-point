@@ -9,7 +9,7 @@
              [ote.components.db :as db]
              [com.stuartsierra.component :as component]
              [ote.components.http :as http]
-             [ote.palvelut.transport :as transport-service]
+             [ote.services.transport :as transport-service]
              [ote.db.transport-operator :as t-operator]
              [ote.db.transport-service :as t-service]
              [ote.db.common :as common]
