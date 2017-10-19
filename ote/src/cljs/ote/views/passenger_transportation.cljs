@@ -116,7 +116,7 @@
 
 (defn service-hours-group [e!]
   (form/group
-   {:label   "Palveluajaat"
+   {:label   "Palveluajat"
     :columns 3
     :actions [ui/raised-button
               {:label    "LISÄÄ UUSI RIVI"
