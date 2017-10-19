@@ -118,4 +118,5 @@
                      :ckan/notes "Tässäpä sitä lisättiin sitten hepehp"
                      :ckan/public true
                      :ckan/extras [{:ckan/key "foo" :ckan/value "barsky"}
-                                   {:ckan/key "howgood" :ckan/value "very"}]}))
+                                   {:ckan/key "howgood" :ckan/value "very"}]
+                     :ckan/operation-area "Oulu"}))
