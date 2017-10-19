@@ -12,6 +12,8 @@
 (defrecord RemovePlaceById [id])
 (defrecord PlaceCompletionsResponse [completions name])
 
+(defrecord SetMarker [event])
+
 (extend-protocol tuck/Event
 
   SetPlaceName
@@ -60,7 +62,18 @@
   (process-event [{id :id} app]
     (update-in app [:place-search :results]
                (fn [results]
-                 (filterv  (comp (partial not= id) ::places/id :place) results)))))
+                 (filterv  (comp (partial not= id) ::places/id :place) results))))
+
+
+  SetMarker
+  (process-event [{event :event} app]
+    (let [lat (-> event .-latlng .-lat)
+          lng (-> event .-latlng .-lng)]
+    ;(.log js/console "SetMarker function " (-> event .-latlng .-lat) )
+    ;(.log js/console "SetMarker function " (-> event .-latlng .-lng) )
+
+    (assoc app :coordinates [ lat lng ] ))))
+
 
 (defn place-references
   "Gets a place search app model and returns place references from it.

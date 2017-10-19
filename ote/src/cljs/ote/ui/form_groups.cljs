@@ -2,7 +2,7 @@
   "Contains reusable form elements."
   (:require [ote.ui.form :as form]
             [ote.db.common :as common]
-            [ote.db.transport-service :as transport-service]))
+            [ote.db.transport-service :as t-service]))
 
 
 (defn address
@@ -35,18 +35,18 @@
   "Creates a form group for service url hat creates two form elements url and localized text area"
   [label service-url-field]
   (form/group
-   {:label label
+    {:label label
     :layout :row
     :columns 3}
-   {:class "set-bottom"
-    :name ::transport-service/url
-    :type :string
-    :read (comp ::transport-service/url service-url-field)
-    :write (fn [data url]
-             (assoc-in data [service-url-field ::transport-service/url] url))}
-   {:name ::transport-service/description
+    {:class "set-bottom"
+    :name   ::t-service/url
+    :type   :string
+    :read   (comp ::t-service/url service-url-field)
+    :write  (fn [data url]
+             (assoc-in data [service-url-field ::t-service/url] url))}
+    {:name ::t-service/description
     :type  :localized-text
     :rows  1 :rows-max 3
-    :read (comp ::transport-service/description service-url-field)
+    :read  (comp ::t-service/description service-url-field)
     :write (fn [data desc]
-             (assoc-in data [service-url-field ::transport-service/description] desc))}))
+             (assoc-in data [service-url-field ::t-service/description] desc))}))

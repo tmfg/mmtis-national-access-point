@@ -25,6 +25,12 @@
               (assoc ::t-service/type :passenger-transportation
                      ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/passenger-transportation form/without-form-metadata)
+              ; Because contact details are handled inside terminal path, we need to move them to transport-service
+              ; before saving them to database
+              (assoc ::t-service/contact-address (get-in service [::t-service/passenger-transportation ::t-service/contact-address]))
+              (assoc ::t-service/contact-phone (get-in service [::t-service/passenger-transportation ::t-service/contact-phone]))
+              (assoc ::t-service/contact-email (get-in service [::t-service/passenger-transportation ::t-service/contact-email]))
+              (assoc ::t-service/homepage (get-in service [::t-service/passenger-transportation ::t-service/homepage]))
               (update-in [::t-service/passenger-transportation ::t-service/operation-area]
                          place-search/place-references))]
       (comm/post! "passenger-transportation-info"

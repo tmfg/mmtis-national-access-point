@@ -13,8 +13,13 @@
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
             [ote.authorization :as authorization]
+            [jeesql.core :refer [defqueries]]
+            [cheshire.core :as cheshire])
+            [ote.authorization :as authorization]
             [ote.db.tx :as tx])
   (:import (java.time LocalTime)))
+
+(defqueries "ote/services/places.sql")
 
 ;; FIXME: monkey patch specql composite reading (For now)
 (defmethod specql-composite/parse-value "bpchar" [_ string] string)
@@ -41,11 +46,21 @@
 (defn- get-transport-service
   "Get single transport service by id"
   [db id]
-  (first (fetch db
+  (let [service (first (fetch db
                 ::t-service/transport-service
                 (specql/columns ::t-service/transport-service)
                 {::t-service/id id}
-                {::specql/limit 1})))
+                {::specql/limit 1}))
+        operation-area (first (fetch-operation-area-geojson db {:transport-service-id (get service ::t-service/id)}))
+        op-area (-> operation-area
+                  (assoc :coordinates (get (cheshire/parse-string (get operation-area :st_asgeojson)) "coordinates"))
+                    (dissoc :st_asgeojson))
+        service-key :ote.db.transport-service/terminal
+        ]
+
+    (-> service
+        (assoc-in [service-key  ::t-service/operation-area] op-area)
+    )))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -89,12 +104,41 @@
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
     (jdbc/with-db-transaction [db db]
-      (let [transport-service
-            (upsert! db ::t-service/transport-service value)]
+         (let [new-value (dissoc value :transport-service)
+               transport-service (upsert! db ::t-service/transport-service new-value)]
         (places/link-places-to-transport-service!
          db (::t-service/id transport-service) places)
         transport-service))))
 
+(defn- save-terminal-info
+  "UPSERT! given data to database. "
+  [db data]
+  (println "Terminal DATA: " (pr-str data))
+  (let [places (get-in data [::t-service/terminal ::t-service/operation-area])
+        op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
+        coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
+        value (-> data
+                  (update ::t-service/terminal dissoc ::t-service/operation_area))]
+    (println "Terminal AREA: " (pr-str places))
+    (println "Terminal coordinates: " (pr-str coordinates))
+    (println "Terminal op-area-id: " op-area-id)
+    (jdbc/with-db-transaction [db db]
+       (let [new-value (dissoc value :transport-service)
+             transport-service (upsert! db ::t-service/transport-service new-value)
+             str-point (str "POINT("(first coordinates) " " (second coordinates)")")
+
+             ]
+         (cond
+           (nil? op-area-id)
+           (insert-point-for-transport-service! db
+                                              {:transport-service-id (get transport-service ::t-service/id)
+                                               :location str-point})
+           :else (save-point-for-transport-service! db
+                                                    {:id op-area-id
+                                                     :transport-service-id (get transport-service ::t-service/id)
+                                                     :location str-point})
+           )
+      ))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]
@@ -123,8 +167,12 @@
                                 user :user}
          (log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
+
    (POST "/passenger-transportation-info" {form-data :body}
          (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
+
+   (POST "/terminal" {form-data :body}
+     (http/transit-response (save-terminal-info db (http/transit-request form-data))))
 
    (POST "/transport-service/publish" {payload :body
                                        user :user}
