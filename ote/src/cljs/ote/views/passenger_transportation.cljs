@@ -31,7 +31,8 @@
 
 (defn luggage-restrictions-group []
   (form/group
-   {:columns 3
+   {:label "Rajoitukset ja maksutavat"
+    :columns 3
     :layout :row}
 
    {:name ::t-service/luggage-restrictions
