@@ -50,9 +50,7 @@
                 #js {:text namefin
                      :id id
                      :value (r/as-element
-                             [ui/menu-item {:primary-text namefin
-                                        ;:secondary-text type
-                                            }])})
+                             [ui/menu-item {:primary-text namefin}])})
               completions)))
 
 (defn place-search [e! place-search]
@@ -62,6 +60,7 @@
      [result-chips e! results]
 
      [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+                        :filter (constantly true) ;; no filter, backend returns what we want
                         :dataSource (completions (:completions place-search))
                         :on-update-input #(e! (ps/->SetPlaceName %))
                         :search-text (or (:name place-search) "")
