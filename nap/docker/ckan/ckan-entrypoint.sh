@@ -129,7 +129,7 @@ fi
 set_environment
 
 # Initializes the Database
-ckan-paster --plugin=ckan db init -c "${CKAN_CONFIG}/ckan.ini"
+#ckan-paster --plugin=ckan db init -c "${CKAN_CONFIG}/ckan.ini"
 
 # Start watching custom plugin changes in /ckan-plugins volume
 watch_plugin_changes

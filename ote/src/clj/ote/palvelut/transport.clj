@@ -15,6 +15,8 @@
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
             [cheshire.core :as cheshire])
+            [ote.authorization :as authorization]
+            [ote.db.tx :as tx])
   (:import (java.time LocalTime)))
 
 (defqueries "ote/services/places.sql")
@@ -62,13 +64,13 @@
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
-  (jdbc/with-db-transaction [db db]
-     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
-         (or operator
-             ;; FIXME: what if name changed in CKAN, we should update?
-             (insert! db ::transport-operator/transport-operator
-                      {::transport-operator/name title
-                       ::transport-operator/ckan-group-id id})))))
+  (tx/with-transaction db
+    (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
+      (or operator
+          ;; FIXME: what if name changed in CKAN, we should update?
+          (insert! db ::transport-operator/transport-operator
+                   {::transport-operator/name title
+                    ::transport-operator/ckan-group-id id})))))
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
@@ -85,18 +87,18 @@
   (upsert! db ::transport-operator/transport-operator data))
 
 
-
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   [price-classes-float]
   (try
     (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)
-    (catch Exception e (println "price-per-unit is probably missing"))))
+    (catch Exception e
+      (log/info "Can't fix price classes: " price-classes-float e))))
 
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
-  (println "DATA: " (pr-str data))
+  #_(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
@@ -105,7 +107,8 @@
          (let [new-value (dissoc value :transport-service)
                transport-service (upsert! db ::t-service/transport-service new-value)]
         (places/link-places-to-transport-service!
-         db (::t-service/id transport-service) places)))))
+         db (::t-service/id transport-service) places)
+        transport-service))))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "

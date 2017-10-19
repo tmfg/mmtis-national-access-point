@@ -56,28 +56,41 @@
                    (str/split ip #"\."))))
 
 (defn- ts-bytes [ts]
-  (let [seconds (/ (.getTime ts) 1000)]
+  (let [seconds (int (/ (.getTime ts) 1000))]
     (byte-array [(bit-shift-right (bit-and seconds 0xFF000000) 24)
                  (bit-shift-right (bit-and seconds 0xFF0000) 16)
                  (bit-shift-right (bit-and seconds 0xFF00) 8)
                  (bit-and seconds 0xFF)])))
 
+(defn- calculate-digest
+  [alg ip timestamp shared-secret user-id tokens user-data]
+  (digest alg
+          (digest alg
+                  (ip-bytes ip)
+                  (ts-bytes timestamp)
+                  shared-secret
+                  user-id
+                  "\0"
+                  tokens
+                  "\0"
+                  user-data)
+          shared-secret))
+
+(defn unparse
+  "Write a cookie ticket. The reverse of parse."
+  [ip shared-secret {:keys [digest-algorithm timestamp user-id user-data] :as cookie}]
+  (str
+   (calculate-digest digest-algorithm ip timestamp shared-secret user-id "" user-data)
+   (format "%08x" (int (/ (.getTime timestamp) 1000)))
+   user-id "!" user-data))
+
 (defn verify-digest
   "Verify a parsed cookie digest based on the shared secret and IP address.
   Returns the cookie with a `:valid-digest?` key added"
   [shared-secret ip {cookie-digest :digest alg :digest-algorithm :as cookie}]
-  (let [calculated-digest
-        (digest alg
-                (digest alg
-                        (ip-bytes ip)
-                        (ts-bytes (:timestamp cookie))
-                        shared-secret
-                        (:user-id cookie)
-                        "\0"
-                        (:tokens cookie)
-                        "\0"
-                        (:user-data cookie))
-                shared-secret)]
+  (let [calculated-digest (calculate-digest alg ip (:timestamp cookie)
+                                            shared-secret (:user-id cookie)
+                                            (:tokens cookie) (:user-data cookie))]
     (assoc cookie
            :calculated-digest calculated-digest
            :valid-digest? (= calculated-digest cookie-digest))))
