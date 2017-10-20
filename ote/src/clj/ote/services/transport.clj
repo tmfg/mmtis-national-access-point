@@ -1,4 +1,4 @@
-(ns ote.palvelut.transport
+(ns ote.services.transport
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
@@ -35,7 +35,7 @@
 
 (def transport-services-passenger-columns
   #{::t-service/id ::t-service/type :ote.db.transport-service/passenger-transportation
-    ::t-service/published?})
+    ::t-service/published? ::t-service/name})
 
 (defn get-transport-services [db where]
   "Return Vector of transport-services"
@@ -55,12 +55,10 @@
         op-area (-> operation-area
                   (assoc :coordinates (get (cheshire/parse-string (get operation-area :st_asgeojson)) "coordinates"))
                     (dissoc :st_asgeojson))
-        service-key :ote.db.transport-service/terminal
-        ]
+        service-key :ote.db.transport-service/terminal]
 
     (-> service
-        (assoc-in [service-key  ::t-service/operation-area] op-area)
-    )))
+        (assoc-in [service-key  ::t-service/operation-area] op-area))))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]

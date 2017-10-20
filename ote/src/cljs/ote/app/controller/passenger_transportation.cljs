@@ -5,11 +5,15 @@
             [ote.ui.form :as form]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.app.controller.place-search :as place-search]))
+            [ote.app.controller.place-search :as place-search]
+            [ote.app.controller.transport-service :as transport-service]
+            [ote.app.routes :as routes]))
 
 (defrecord EditPassengerTransportationState [data])
-(defrecord SavePassengerTransportationToDb [])
+(defrecord SavePassengerTransportationToDb [publish?])
 (defrecord HandlePassengerTransportationResponse [service])
+(defrecord CancelPassengerTransportationForm [])
+
 
 (extend-protocol t/Event
 
@@ -25,12 +29,7 @@
               (assoc ::t-service/type :passenger-transportation
                      ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/passenger-transportation form/without-form-metadata)
-              ; Because contact details are handled inside terminal path, we need to move them to transport-service
-              ; before saving them to database
-              (assoc ::t-service/contact-address (get-in service [::t-service/passenger-transportation ::t-service/contact-address]))
-              (assoc ::t-service/contact-phone (get-in service [::t-service/passenger-transportation ::t-service/contact-phone]))
-              (assoc ::t-service/contact-email (get-in service [::t-service/passenger-transportation ::t-service/contact-email]))
-              (assoc ::t-service/homepage (get-in service [::t-service/passenger-transportation ::t-service/homepage]))
+              (transport-service/move-service-level-keys ::t-service/passenger-transportation)
               (update-in [::t-service/passenger-transportation ::t-service/operation-area]
                          place-search/place-references))]
       (comm/post! "passenger-transportation-info"
@@ -42,4 +41,9 @@
   (process-event [{service :service} app]
     (assoc app
       :transport-service service
-      :page :front-page)))
+      :page :front-page))
+
+  CancelPassengerTransportationForm
+  (process-event [_ app]
+    (routes/navigate! :front-page)
+    app))

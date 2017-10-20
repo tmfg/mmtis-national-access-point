@@ -19,7 +19,8 @@
   :ote.db.transport-service/type "Valitse liikkumispalvelun tyyppi"
 
   :transport-service-common
-  {:ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+  {:ote.db.transport-service/name "Liikkumispalvelun nimi"
+   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
 
    ;; Contact details
@@ -47,7 +48,7 @@
    :ote.db.transport-service/operation-area            "Toiminta-alue"
 
    ;; Price Class fields
-   :ote.db.transport-service/name                      "Hintaryhmä"
+   :ote.db.transport-service/price-class-name "Hintaryhmä"
    :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
@@ -82,7 +83,8 @@
 
 
   :transport-service
-  {:ote.db.transport-service/published? "NAP-tila"
+  {:ote.db.transport-service/name "Palvelun mimi"
+   :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
                                                 false "Ei julkaistu"}}
 
@@ -95,7 +97,13 @@
  :buttons
  {:save "Tallenna"
   :delete "Poista"
-  :publish "Julkaise"}
+  :publish "Julkaise"
+
+  :save-and-publish "Tallenna ja julkaise"
+  :save-as-draft "Tallenna luonnoksena"
+  :save-updated "Tallenna päivitetyt tiedot"
+
+  :discard "Peruuta muutokset"}
 
 
 

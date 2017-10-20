@@ -211,6 +211,76 @@
       (disj set value)
       (conj set value))))
 
+(defn- form-group-should-update?
+  "Create a function to check if form group should be rerendered.
+  A group is rerendered if its open/close status changes or it is
+  open and its data has changed."
+  [{schemas :schemas opts :options :as group}]
+  (let [read-fn (apply juxt
+                       (map (fn [{:keys [name read]}]
+                              (or read name))
+                            schemas))]
+    (fn [_ old-argv new-argv]
+      (let [[_ {old-closed-groups :closed-groups old-data :data :as old-form-options} old-group]
+            old-argv
+
+            [_ {new-closed-groups :closed-groups new-data :data :as new-form-options} {:keys [label] :as new-groups}]
+            new-argv]
+        (let [old-closed (old-closed-groups label)
+              new-closed (new-closed-groups label)
+              old-group-data (read-fn old-data)
+              new-group-data (read-fn new-data)]
+          (or
+           ;; closed/open status has changed, update
+           (not= old-closed new-closed)
+
+           ;; group is not closed and its data has changed
+           (and (not new-closed)
+                (not= old-group-data new-group-data))))))))
+
+(defn form-group-ui [form-options group]
+  (r/create-class
+   {:should-component-update
+    (form-group-should-update? group)
+
+    :reagent-render
+    (fn [{:keys [name->label update-field-fn can-edit? focus update-form
+                 data closed-groups] :as form-options}
+         {:keys [label schemas options] :as group}]
+      (let [{::keys [modified errors warnings notices]} data
+            columns (or (:columns options) 1)
+            classes (get col-classes columns)
+            schemas (with-automatic-labels name->label schemas)
+            style (if (= :row (:layout options))
+                    style-form/form-group-row
+                    style-form/form-group-column)
+            group-component [group-ui
+                             style
+                             schemas
+                             data
+                             update-field-fn
+                             can-edit?
+                             @focus
+                             #(reset! focus %)
+                             modified
+                             errors warnings notices
+                             update-form]]
+        [:div.form-group-container (stylefy/use-style style-form/form-group-container
+                                                      {::stylefy/with-classes classes})
+         [ui/card {:z-depth 1
+                   :expanded (not (closed-groups label))
+                   :on-expand-change #(update-form (update data ::closed-groups toggle label))}
+          (when label
+            [ui/card-header {:title label
+                             :style {:padding-bottom "0px"}
+                             :title-style {:font-weight "bold"}
+                             :show-expandable-button true}])
+          [ui/card-text {:style {:padding-top "0px"} :expandable true}
+           group-component]
+          (when-let [actions (:actions options)]
+            [ui/card-actions
+             (r/as-element actions)])]]))}))
+
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the
   current state of the form `data`.
@@ -230,7 +300,7 @@
     ;; FIXME: change layout to material-ui grid when upgrading to material-ui v1
     (fn [{:keys [update! class footer-fn can-edit? label name->label] :as options}
          schemas
-         {modified ::muokatut
+         {modified ::modified
           :as data}]
       (let [{::keys [errors warnings notices] :as validated-data} (validate data schemas)
             can-edit? (if (some? can-edit?)
@@ -249,48 +319,25 @@
                                                (name-or-write data value))]
                                 (update-form new-data)))
             closed-groups (::closed-groups data #{})]
-        [:div.form
-         {:class class}
+        [:div.form {:class class}
          (when label
            [:h3.form-label label])
-         (doall
-          (map-indexed
-           (fn [i {:keys [label schemas options] :as group}]
-             (let [columns (or (:columns options) 1)
-                   classes (get col-classes columns)
-                   schemas (with-automatic-labels name->label schemas)
-                   style (if (= :row (:layout options))
-                           style-form/form-group-row
-                           style-form/form-group-column)
-                   group-component [group-ui
-                                    style
-                                    schemas
-                                    validated-data
-                                    update-field-fn
-                                    can-edit?
-                                    @focus
-                                    #(reset! focus %)
-                                    modified
-                                    errors warnings notices
-                                    update-form]]
-               ^{:key i}
-               [:div.form-group-container (stylefy/use-style style-form/form-group-container
-                                           {::stylefy/with-classes classes})
-                [ui/card {:z-depth 1
-                          :expanded (not (closed-groups label))
-                          :on-expand-change #(update! (update data ::closed-groups toggle label))}
-                 (when label
-                   [ui/card-header {:title label
-                                    :style {:padding-bottom "0px"}
-                                    :title-style {:font-weight "bold" :font-size "20px"}
-                                    :acts-as-expander true
-                                    :show-expandable-button true}])
-                 [ui/card-text {:style {:padding-top "0px"} :expandable true}
-                  group-component]
-                 (when-let [actions (:actions options)]
-                   [ui/card-actions
-                    (r/as-element actions)])]]))
-           schemas))
+         [:span.form-groups
+          (doall
+           (map-indexed
+            (fn [i form-group]
+              ^{:key i}
+              [form-group-ui
+               {:name->label name->label
+                :data validated-data
+                :update-field-fn update-field-fn
+                :can-edit? can-edit?
+                :focus focus
+                :update-form update-form
+                :closed-groups closed-groups}
+               form-group])
+
+            schemas))]
 
          (when-let [footer (when footer-fn
                              (footer-fn (assoc validated-data
