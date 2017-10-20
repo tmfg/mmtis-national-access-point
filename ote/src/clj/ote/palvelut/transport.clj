@@ -2,12 +2,12 @@
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
-            [specql.core :refer [fetch update! insert! upsert!] :as specql]
+            [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [specql.op :as op]
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
-            [compojure.core :refer [routes GET POST]]
+            [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
@@ -61,6 +61,12 @@
     (-> service
         (assoc-in [service-key  ::t-service/operation-area] op-area)
     )))
+
+(defn- delete-transport-service
+  "Delete single transport service by id"
+  [db id]
+  (delete! db ::t-service/transport-service {::t-service/id id})
+  )
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -179,7 +185,12 @@
          (->> payload
               http/transit-request
               (publish-transport-service db user)
-              http/transit-response))))
+              http/transit-response))
+
+   (GET "/transport-service/delete/:id" [id]
+     (http/transit-response (delete-transport-service db (Long/parseLong id))))
+
+   ))
 
 (defrecord Transport []
   component/Lifecycle

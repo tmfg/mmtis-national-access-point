@@ -79,7 +79,7 @@
 
     [:div.ote-sovellus.container-fluid
      [:div {:class "topnav"}
-      [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
+      [:a.main-icon {:href "#home"} [:img {:src "img/icons/nap-logo.svg" }]]
       [:a.ote-nav { :href "/index.html" } (tr [:common-texts :header-front-page]) ]
       [:a.ote-nav
        {:class (is-topnav-active :front-page (:page app))

@@ -16,6 +16,9 @@
 (defrecord ModifyTransportService [id])
 (defrecord ModifyTransportServiceResponse [response])
 
+(defrecord DeleteTransportService [id])
+(defrecord DeleteTransportServiceResponse [response])
+
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
 
@@ -77,4 +80,18 @@
                          (assoc service ::t-service/published? true)
                          service))
                      services)))
-      app)))
+      app))
+
+  DeleteTransportService
+  (process-event [{id :id} app]
+    (comm/get! (str "transport-service/delete/" id)
+               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)})
+    app)
+
+  DeleteTransportServiceResponse
+  (process-event [{response :response} app]
+    (.log js/console " deletoitiin ")
+    )
+
+
+  )

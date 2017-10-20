@@ -120,3 +120,6 @@ div.user-data > div.user-organization {
 div.front-page-add-service {
      border-right: 1px solid grey;
 }
+.front-page-service-table a, .front-page-service-table a:visited {
+    text-decoration: none;
+}
