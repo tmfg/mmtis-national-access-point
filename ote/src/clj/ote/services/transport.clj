@@ -55,12 +55,10 @@
         op-area (-> operation-area
                   (assoc :coordinates (get (cheshire/parse-string (get operation-area :st_asgeojson)) "coordinates"))
                     (dissoc :st_asgeojson))
-        service-key :ote.db.transport-service/terminal
-        ]
+        service-key :ote.db.transport-service/terminal]
 
     (-> service
-        (assoc-in [service-key  ::t-service/operation-area] op-area)
-    )))
+        (assoc-in [service-key  ::t-service/operation-area] op-area))))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
