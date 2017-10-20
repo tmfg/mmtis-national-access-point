@@ -5,11 +5,13 @@
             [ote.ui.form :as form]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.app.controller.place-search :as place-search]))
+            [ote.app.controller.place-search :as place-search]
+            [ote.app.routes :as routes]))
 
 (defrecord EditPassengerTransportationState [data])
-(defrecord SavePassengerTransportationToDb [])
+(defrecord SavePassengerTransportationToDb [publish?])
 (defrecord HandlePassengerTransportationResponse [service])
+(defrecord CancelPassengerTransportationForm [])
 
 (extend-protocol t/Event
 
@@ -42,4 +44,9 @@
   (process-event [{service :service} app]
     (assoc app
       :transport-service service
-      :page :front-page)))
+      :page :front-page))
+
+  CancelPassengerTransportationForm
+  (process-event [_ app]
+    (routes/navigate! :front-page)
+    app))
