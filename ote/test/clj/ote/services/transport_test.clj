@@ -42,14 +42,17 @@
   (gen/hash-map
    ::t-service/transport-operator-id (gen/return 1)
    ::t-service/type (gen/return :passenger-transportation)
-   ::t-service/passenger-transportation gen-passenger-transportation))
+   ::t-service/passenger-transportation gen-passenger-transportation
+   ::t-service/contact-address generators/gen-address
+   ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
 
 ;; We have a single transport service inserted in the test data,
 ;; check that its information is fetched ok
 (deftest fetch-test-data-transport-service
   (let [ts (http-get "admin" "transport-service/1")
-        ps (get-in ts [:transit ::t-service/passenger-transportation])]
-    (is (= (::t-service/contact-address ps)
+        service (:transit ts)
+        ps (::t-service/passenger-transportation service)]
+    (is (= (::t-service/contact-address service)
            #::common {:street "Street 1" :postal_code "90100" :post_office "Oulu"}))
     (is (= (::t-service/price-classes ps)
            [#:ote.db.transport-service{:name "starting",
@@ -61,8 +64,8 @@
                                        :unit "km",
                                        :currency "EUR"}]))
 
-    (is (= (::t-service/homepage ps) "www.solita.fi"))
-    (is (= (::t-service/contact-phone ps) "123456"))))
+    (is (= (::t-service/homepage service) "www.solita.fi"))
+    (is (= (::t-service/contact-phone service) "123456"))))
 
 (defn- non-nil-keys [m]
   (into #{}
