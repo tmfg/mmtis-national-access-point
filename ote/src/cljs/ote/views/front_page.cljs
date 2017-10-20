@@ -32,12 +32,13 @@
        [ui/table-body {:display-row-checkbox false}
         (doall
          (map-indexed
-          (fn [i {::t-service/keys [id type published?] :as row}]
+          (fn [i {::t-service/keys [id type published? name] :as row}]
             ^{:key i}
             [ui/table-row {:selectable false :display-border false}
              [ui/table-row-column (get row :ote.db.transport-service/id)]
              [ui/table-row-column
-              [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))} type]]
+              [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))}
+               name]]
              [ui/table-row-column
               (if published?
                 (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
