@@ -16,7 +16,6 @@
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn footer [e! {published? ::t-service/published? :as data}]
-  ;; ko napit “Tallenna ja julkaise” sekä “Tallenna luonnoksena” ja jos muokkaa jo julkaistua rajapintaa, niin “Tallenna päivitetyt tiedot”
   [:div.row
    (if published?
      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
