@@ -28,18 +28,13 @@
 
 (def gen-passenger-transportation
   (gen/hash-map
-   ::t-service/contact-email (s/gen ::t-service/contact-email)
    ::t-service/accessibility-tool (s/gen ::t-service/accessibility-tool)
    ::t-service/additional-services (s/gen ::t-service/additional-services)
    ::t-service/price-classes generators/gen-price-class-array
    ::t-service/booking-service generators/gen-service-link
-   ::t-service/contact-gsm (s/gen ::t-service/contact-gsm)
    ::t-service/payment-methods (s/gen ::t-service/payment-methods)
    ::t-service/real-time-information generators/gen-service-link
-   ::t-service/contact-address generators/gen-address
    ::t-service/accessibility-description generators/gen-localized-text-array
-   ::t-service/homepage (s/gen ::t-service/homepage)
-   ::t-service/contact-phone (s/gen ::t-service/contact-phone)
    ::t-service/service-hours generators/gen-service-hours-array
    ::t-service/luggage-restrictions generators/gen-localized-text-array))
 
