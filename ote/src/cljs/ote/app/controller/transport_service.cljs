@@ -78,3 +78,21 @@
                          service))
                      services)))
       app)))
+
+(def service-level-keys
+  #{::t-service/contact-address
+    ::t-service/contact-phone
+    ::t-service/contact-email
+    ::t-service/homepage
+    ::t-service/name})
+
+(defn move-service-level-keys
+  "The form only sees the type specific level, move keys that are stored in the
+  transport-service level there."
+  [service from]
+  (reduce (fn [service key]
+            (-> service
+                (assoc key (get-in service [from key]))
+                (update from dissoc key)))
+          service
+          service-level-keys))

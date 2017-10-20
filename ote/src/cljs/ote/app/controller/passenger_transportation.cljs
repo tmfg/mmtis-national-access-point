@@ -6,6 +6,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.app.controller.place-search :as place-search]
+            [ote.app.controller.transport-service :as transport-service]
             [ote.app.routes :as routes]))
 
 (defrecord EditPassengerTransportationState [data])
@@ -13,23 +14,7 @@
 (defrecord HandlePassengerTransportationResponse [service])
 (defrecord CancelPassengerTransportationForm [])
 
-(def service-level-keys
-  #{::t-service/contact-address
-    ::t-service/contact-phone
-    ::t-service/contact-email
-    ::t-service/homepage
-    ::t-service/name})
 
-(defn- move-service-level-keys
-  "The form only sees the type specific level, move keys that are stored in the
-  transport-service level there."
-  [service from]
-  (reduce (fn [service key]
-            (-> service
-                (assoc key (get-in service [from key]))
-                (update from dissoc key)))
-          service
-          service-level-keys))
 (extend-protocol t/Event
 
   EditPassengerTransportationState
@@ -44,7 +29,7 @@
               (assoc ::t-service/type :passenger-transportation
                      ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/passenger-transportation form/without-form-metadata)
-              (move-service-level-keys ::t-service/passenger-transportation)
+              (transport-service/move-service-level-keys ::t-service/passenger-transportation)
               (update-in [::t-service/passenger-transportation ::t-service/operation-area]
                          place-search/place-references))]
       (comm/post! "passenger-transportation-info"
