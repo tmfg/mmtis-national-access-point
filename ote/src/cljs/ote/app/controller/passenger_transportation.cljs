@@ -13,6 +13,23 @@
 (defrecord HandlePassengerTransportationResponse [service])
 (defrecord CancelPassengerTransportationForm [])
 
+(def service-level-keys
+  #{::t-service/contact-address
+    ::t-service/contact-phone
+    ::t-service/contact-email
+    ::t-service/homepage
+    ::t-service/name})
+
+(defn- move-service-level-keys
+  "The form only sees the type specific level, move keys that are stored in the
+  transport-service level there."
+  [service from]
+  (reduce (fn [service key]
+            (-> service
+                (assoc key (get-in service [from key]))
+                (update from dissoc key)))
+          service
+          service-level-keys))
 (extend-protocol t/Event
 
   EditPassengerTransportationState
@@ -27,12 +44,7 @@
               (assoc ::t-service/type :passenger-transportation
                      ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/passenger-transportation form/without-form-metadata)
-              ; Because contact details are handled inside terminal path, we need to move them to transport-service
-              ; before saving them to database
-              (assoc ::t-service/contact-address (get-in service [::t-service/passenger-transportation ::t-service/contact-address]))
-              (assoc ::t-service/contact-phone (get-in service [::t-service/passenger-transportation ::t-service/contact-phone]))
-              (assoc ::t-service/contact-email (get-in service [::t-service/passenger-transportation ::t-service/contact-email]))
-              (assoc ::t-service/homepage (get-in service [::t-service/passenger-transportation ::t-service/homepage]))
+              (move-service-level-keys ::t-service/passenger-transportation)
               (update-in [::t-service/passenger-transportation ::t-service/operation-area]
                          place-search/place-references))]
       (comm/post! "passenger-transportation-info"
