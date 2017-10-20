@@ -16,7 +16,7 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
-  :ote.db.transport-service/service-type "Valitse liikkumispalvelun tyyppi"
+  :ote.db.transport-service/type "Valitse liikkumispalvelun tyyppi"
 
   :transport-service-common
   {:ote.db.transport-service/name "Liikkumispalvelun nimi"
@@ -110,11 +110,11 @@
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/type
-  {:terminal                 "Satama, Asema, Terminaali"
-   :passenger-transportation "Henkilökuljetuspalvelu"
-   :rentals                  "Ajoneuvojen vuokrauspalvleut ja kaupalliset yhteisökäyttöpalvelut"
-   :parking                  "Yhteiskäyttö-/Pysäköintipalvelu"
-   :brokerage                "Välityspalvelu"}
+  {:terminal                 "Asemat, satamat ja muut terminaalit"
+   :passenger-transportation "Henkilöidenkuljetuspalvelut"
+   :rentals                  "Ajoneuvojen vuokrauspalveut ja kaupalliset yhteiskäyttöpalvelut"
+   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
+   :brokerage                "Välityspalvelut"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Käteinen"
@@ -134,12 +134,12 @@
   :ote.db.transport-service/accessibility-tool
   {:wheelchair       "Rullatuoli"
    :walkingstick     "Kävelykeppi"
-   :audio-navigator  "Audio Navigator"
-   :visual-navigator "Visual Navigator"
-   :passenger-cart   "Passenger Cart"
-   :pushchair        "Pushchair"
+   :audio-navigator  "Ääniopastus"
+   :visual-navigator "Visuaaliset opasteet"
+   :passenger-cart   "Henkilökuljetuskärryt"
+   :pushchair        "Lastenrattaat"
    :umbrella         "Sateenvarjo"
-   :buggy            "Buggy"
+   :buggy            "Lastenvounut"
    :other            "Muu"}
 
   :ote.db.transport-service/day
@@ -148,11 +148,11 @@
           :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
 
   :ote.db.transport-service/information-service-accessibility
-  {:audio-for-hearing-impaired "Audio for hearing impaired"
+  {:audio-for-hearing-impaired "Ääniopastus kuulovammaisille"
    :audio-information "Äänelliset informaatiot"
    :visual-displays "Visuaaliset näytöt"
-   :displays-for-visually-impaired "Näkövammaisten näytöt"
-   :large-print-timetables "Suuret fontit aikatauluissa"
+   :displays-for-visually-impaired "Näytöt näkövammaisille"
+   :large-print-timetables "Suuret kirjasimet aikatauluissa"
    :other "Muu"
    }
 
@@ -164,23 +164,23 @@
    :ramp "Ramppi"
    :stairs "Portaat"
    :shuttle "Sukkulaliikenne"
-   :narrow-entrance "Narrow-Entrance"
+   :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
-   :pallet-access-low-floor "Pallet-Access-Low-Floor"
+   :pallet-access-low-floor "Kuormalavalinjan matala lattia"
    :validator "Validator"
    :other  "Muu"}
 
   :ote.db.transport-service/mobility
   {:unknown "Määrittelemätön"
    :low-floor "Matalalattia"
-   :step-free-access "Step free access"
+   :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :suitable-for-heavily-disabled  ":suitable-for-heavily-disabled"
-   :boarding-assistance  ":boarding-assistance"
-   :onboard-assistance ":onboard-assistance"
-   :unaccompanied-minor-assistance ":unaccompanied-minor-assistance"
-   :tactile-patform-edges  ":tactile-patform-edges"
-   :tactile-guiding-strips ":tactile-guiding-strips"
+   :boarding-assistance  "Kyytiin nousun avustus"
+   :onboard-assistance "Kyydin aikainen avustus"
+   :unaccompanied-minor-assistance "Alaikäisten avustus"
+   :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
+   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
   }
 
@@ -192,8 +192,8 @@
                 :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
-                :link-add-new-api                           "Lisää rajapinta"
-                :own-api-list                               "Omat palvelutiedot (Lisätty OTE:lla)"
+                :link-add-new-api                           "Lisää uusi palvelu"
+                :own-api-list                               "Omat liikkumispalvelutiedot"
                 :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
                 :api-name                                   "Rajapinnan nimi"
                 :api-url                                    "Rajapinnan verkko-osoite"
@@ -203,8 +203,9 @@
                 :header-front-page                          "Etusivu"
 
                 :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
-                :transport-service-type-selection-help-text "Voit kirjata eri liikkumispalveluiden olennaisia tietoja valitsemalla ensin liikkumispalvelun
-     tyypin ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen."
+                :transport-service-type-selection-help-text "Voit digitoida liikkumispalveluidesi olennaisia tietoja valitsemalla
+                ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
+                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
                 :title-operator-basic-details               "Perustiedot"
                 }
 

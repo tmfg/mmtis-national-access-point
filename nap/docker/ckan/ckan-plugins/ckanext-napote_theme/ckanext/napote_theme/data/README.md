@@ -1,4 +1,2 @@
-We cannot distribute some of the data files with github. They have to be added manually:
-
-Add these files:
-* finnish_municipalities.csv
+Add static data files needed in the plugin code here.  
+Such files are e.g. .csv files that are needed for generating some specific values in the plugin etc.

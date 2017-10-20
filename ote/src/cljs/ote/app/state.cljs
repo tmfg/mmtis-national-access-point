@@ -12,7 +12,7 @@
 
             :user {} ;; No user data by default
             :ote-service-flags {:user-menu-open true
-                                :show-debug true ; By default debug section is not in use. You can set it visible from user menu
+                                :show-debug false ; By default debug section is not in use. You can set it visible from user menu
                                 }
 
            ;; Currently selected / edited transport operator (company basic info)

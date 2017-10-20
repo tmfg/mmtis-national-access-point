@@ -19,7 +19,9 @@ municipalitys = (
 transport_services = (u'Terminal', u'Passenger Transportation', u'Rental', u'Parking', u'Brokerage')
 
 
-def read_csv(file):
+def read_csv(file_path):
+    file = resource_stream(__name__, file_path)
+
     # Read the file into a dictionary for each row ({header : value})
     reader = csv.DictReader(file, delimiter=',')
     data = {}
@@ -31,69 +33,8 @@ def read_csv(file):
                 data[header].append(unicodeVal)
             except KeyError:
                 data[header] = [unicodeVal]
+
     return data
-
-
-def create_transport_service_types():
-    user = tk.get_action('get_site_user')({'ignore_auth': True}, {})
-    context = {'user': user['name']}
-
-    try:
-        data = {'id': 'transport_service_types'}
-        tk.get_action('vocabulary_show')(context, data)
-    except tk.ObjectNotFound:
-        data = {'name': 'transport_service_types'}
-        vocab = tk.get_action('vocabulary_create')(context, data)
-
-        for tag in transport_services:
-            data = {'name': tag, 'vocabulary_id': vocab['id']}
-            tk.get_action('tag_create')(context, data)
-
-
-def transport_service_types():
-    create_transport_service_types()
-
-    try:
-        tag_list = tk.get_action('tag_list')
-        service_types = tag_list(data_dict={'vocabulary_id': 'transport_service_types'})
-        return service_types
-    except tk.ObjectNotFound:
-        return None
-
-
-def create_operation_areas():
-    try:
-        csv_data = read_csv(resource_stream(__name__, 'data/finnish_municipalities.csv'))
-        municipalities = csv_data.get('namefin', [])
-    except IOError as err:
-        log.error('Failed to load operation areas from file: %s', err)
-
-        return None
-
-    user = tk.get_action('get_site_user')({'ignore_auth': True}, {})
-    context = {'user': user['name']}
-
-    try:
-        data = {'id': 'operation_areas'}
-        tk.get_action('vocabulary_show')(context, data)
-    except tk.ObjectNotFound:
-        data = {'name': 'operation_areas'}
-        vocab = tk.get_action('vocabulary_create')(context, data)
-
-        for tag in municipalities:
-            data = {'name': tag, 'vocabulary_id': vocab['id']}
-            tk.get_action('tag_create')(context, data)
-
-
-def operation_areas():
-    create_operation_areas()
-
-    try:
-        tag_list = tk.get_action('tag_list')
-        service_types = tag_list(data_dict={'vocabulary_id': 'operation_areas'})
-        return service_types
-    except tk.ObjectNotFound:
-        return None
 
 
 def tags_to_select_options(tags=None):
@@ -113,8 +54,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def get_helpers(self):
         return {
-            'transport_service_types': transport_service_types,
-            'operation_areas': operation_areas,
             'tags_to_select_options': tags_to_select_options}
 
     def update_config(self, config):
@@ -145,8 +84,8 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         facets_dict.clear()
 
         facets_dict['organization'] = tk._('Organizations')
-        facets_dict['vocab_transport_service_types'] = tk._('Transport Service Type')
-        facets_dict['vocab_operation_areas'] = tk._('Operation Area')
+        facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
+        facets_dict['extras_operation_area'] = tk._('Operation Area')
         facets_dict['tags'] = tk._('Tags')
         facets_dict['res_format'] = tk._('Formats')
         facets_dict['license_id'] = tk._('Licenses')
@@ -157,12 +96,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # add custom fields
         schema.update({
             'transport_service_type': [tk.get_validator('ignore_missing'),
-                                       tk.get_converter('convert_to_tags')('transport_service_types')]
+                                       tk.get_converter('convert_to_extras')]
         })
 
         schema.update({
             'operation_area': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_tags')('operation_areas')]
+                               tk.get_converter('convert_to_extras')]
         })
 
         return schema
@@ -174,12 +113,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         schema['tags']['__extras'].append(tk.get_converter('free_tags_only'))
 
         schema.update({
-            'transport_service_type': [tk.get_converter('convert_from_tags')('transport_service_types'),
+            'transport_service_type': [tk.get_converter('convert_from_extras'),
                                        tk.get_validator('ignore_missing')],
         })
 
         schema.update({
-            'operation_area': [tk.get_converter('convert_from_tags')('operation_areas'),
+            'operation_area': [tk.get_converter('convert_from_extras'),
                                tk.get_validator('ignore_missing')]
         })
 

@@ -24,8 +24,8 @@
                          :display-select-all false}
         [ui/table-row {:selectable false}
          [ui/table-header-column "Id"]
-         [ui/table-header-column "Rajapinnan nimi"]
-         [ui/table-header-column "Rajapinnan verkko-osoite"]
+         [ui/table-header-column "Palvelun nimi"]
+         [ui/table-header-column "Palvelun verkko-osoite"]
          [ui/table-header-column "Muut tietoaineistot"]
          [ui/table-header-column "NAP-tila"]]]
 
@@ -52,6 +52,59 @@
              [ui/table-row-column (tr [:field-labels :transport-service ::t-service/published?-values published?])]])
           services))]]]]))
 
+(defn empty-header-for-front-page [e!]
+  [:div
+  [:div.row
+    [:div {:class "col-xs-12"}
+     [:div {:class "main-notification-panel"}
+      [:div {:class "col-xs-1"}
+       [ic/action-info-outline]]
+      [:div {:class "col-xs-11"}
+       [:p (tr [:common-texts :front-page-help-text])]]]]]
+
+
+   [:div.row {:style {:margin-top "50px"}}
+    [:div.front-page-add-service {:class "col-xs-12 col-md-offset-1 col-md-5"}
+     [:div.row {:style {:height "100px"}}
+      [:p "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista"]
+      ]
+     [:div.row {:style {:text-align "center"}}
+     [ui/raised-button {:label    "Lisää itse ylläpitämäsi rajapinta"
+                        ;:icon     (ic/content-add)
+                        :on-click #(e! (fp/->ChangePage :transport-service))
+                        :primary  true
+                        }]]]
+    [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px;"} }
+     [:div.row {:style {:padding-left "40px" :height "100px"}}
+      [:p "Haluat digitoida liikkumispalvelusi olennaisia tietoja?"]
+      ]
+     [:div.row {:style {:text-align "center"}}
+     [ui/raised-button {:label    "Digitoi liikkumispalvelusi tiedot"
+                        ;:icon     (ic/social-group)
+                        :on-click #(e! (fp/->ChangePage :transport-service))
+                        :primary  true
+                        }]]]]]
+  )
+
+(defn table-container-for-front-page [e! services status]
+  [:div
+   [:div.row
+    [:div {:class "col-xs-12  col-md-8"}
+     [:h3 (tr [:common-texts :own-api-list])]
+     ]
+    [:div {:class "col-xs-12 col-md-4"}
+     [ui/raised-button {:style {:margin-top "20px"}
+                        :label    "Digitoi liikkumispalvelusi tiedot"
+                        ;:icon     (ic/content-add)
+                        :on-click #(e! (fp/->ChangePage :transport-service))
+                        :primary  true}]]]
+   [:div.row
+    [:div {:class "col-xs-12  col-md-12"}
+     ;; Table for transport services
+     [transport-services-listing e! (get-in status [:transport-operator ::t-operator/id]) services]]]]
+
+  )
+
 (defn front-page [e! status]
 
   ;; init
@@ -59,40 +112,8 @@
 
   (fn [e! {services :transport-services :as status}]
     [:div
-     (when (nil? services)
-       [:div.row {:class "main-notification-panel"}
-        [:div {:class "col-xs-1"}
-         [ic/action-info-outline]]
-        [:div {:class "col-xs-11"}
-         [:p (tr [:common-texts :front-page-help-text])]]
-        ]
 
-       [:div.row
-        [:div {:class "col-xs-12 col-md-offset-2 col-md-4"}
-         [ui/raised-button {:label    (tr [:common-texts :link-add-new-api])
-                            :icon     (ic/content-add)
-                            :on-click #(e! (fp/->ChangePage :transport-service))
-                            :primary  true
-                            }]]
-        [:div {:class "col-xs-12 col-md-6"}
-         [ui/raised-button {:label    "Kirjaa olennaiset tiedot"
-                            :icon     (ic/social-group)
-                            :on-click #(e! (fp/->ChangePage :transport-operator))
-                            :primary  true
-                            }]]])
-
-     (when (not= nil (get status :transport-services))
-       [:div.row
-        [:div {:class "col-xs-12  col-md-8"}
-          [:h3 (tr [:common-texts :own-api-list])]
-         ]
-        [:div {:class "col-xs-12 col-md-4"}
-         [ui/raised-button {:label    (tr [:common-texts :link-add-new-api])
-                            :icon     (ic/content-add)
-                            :on-click #(e! (fp/->ChangePage :transport-service))
-                            :primary  true}]]])
-
-     ;; Table for transport services
-     [transport-services-listing e!
-      (get-in status [:transport-operator ::t-operator/id])
-      services]]))
+     (if (empty? services)
+       (empty-header-for-front-page e!)
+       (table-container-for-front-page e! services status)
+       )]))

@@ -17,7 +17,7 @@
 
 (defn select-service-type [e! status]
   [:div.row
-   [:div {:class "col-sx-6 col-md-6"}
+   [:div {:class "col-sx-12 col-md-9"}
     [:div
      [:h3 (tr [:common-texts :title-required-data-with-OTE])]
      ]
@@ -31,7 +31,8 @@
          {:label   nil
           :columns 3}
          {
-         :name        ::transport-service/type
+          :style {:width "100%"}
+          :name        ::transport-service/type
          :type        :selection
          :show-option (tr-key [:enums ::transport-service/type])
          :options     transport-service/transport-service-types})

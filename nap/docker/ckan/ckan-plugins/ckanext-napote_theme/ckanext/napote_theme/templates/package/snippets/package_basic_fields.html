@@ -1,29 +1,17 @@
 {% ckan_extends %}
 
 {% block package_basic_fields_custom %}
-    {%- set extra_html = caller() if caller -%}
-    {% call form.input_block('transport_service_type', _('Service Type'), errors.transport_service_type, ['control-select'], extra_html=extra_html, is_required=True) %}
-        <select id="transport_service_type" name="transport_service_type" data-module="autocomplete">
-            {% set current_transport_service_type = data.get('transport_service_type', [])[0] %}
-            {% for transport_service_type in h.transport_service_types() %}
-                <option value="{{ transport_service_type }}"
-                        {% if current_transport_service_type == transport_service_type %}
-                        selected="selected"{% endif %}>
-                    {{ transport_service_type }}</option>
-            {% endfor %}
-        </select>
-    {% endcall %}
 
-    {%- set extra_html = caller() if caller -%}
-    {% call form.input_block('operation_area', _('Operation Area'), errors.operation_area, ['control-select'], extra_html=extra_html, is_required=True) %}
-        <select id="operation_area" name="operation_area" data-module="autocomplete">
-            {% set current_operation_area = data.get('operation_area', [])[0] %}
-            {% for operation_area in h.operation_areas() %}
-                <option value="{{ operation_area }}"
-                        {% if current_operation_area == operation_area %}
-                        selected="selected"{% endif %}>
-                    {{ operation_area }}</option>
-            {% endfor %}
-        </select>
-    {% endcall %}
+    {{ form.input('transport_service_type', label=_('Service Type'), id='field-transport_service_type',
+       placeholder=_('Service Type'),
+       value=data.transport_service_type,
+       error=errors.transport_service_type,
+       classes=['control-medium']) }}
+
+    {{ form.input('operation_area', label=_('Operation Area'), id='field-operation_area',
+       placeholder=_('Operation area'),
+       value=data.operation_area,
+       error=errors.operation_area,
+       classes=['control-medium']) }}
+
 {% endblock %}
