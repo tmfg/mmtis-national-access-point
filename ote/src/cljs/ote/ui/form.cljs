@@ -282,7 +282,7 @@
                  (when label
                    [ui/card-header {:title label
                                     :style {:padding-bottom "0px"}
-                                    :title-style {:font-weight "bold"}
+                                    :title-style {:font-weight "bold" :font-size "20px"}
                                     :acts-as-expander true
                                     :show-expandable-button true}])
                  [ui/card-text {:style {:padding-top "0px"} :expandable true}

@@ -62,7 +62,7 @@
     {:mui-theme
      (get-mui-theme
       {:palette {;; primary nav color - Also Focus color in text fields
-                 :primary1-color (color :lightBlue600)
+                 :primary1-color (color :blue700)
 
                  ;; Hint color in text fields
                  :disabledColor  (color :grey900)
@@ -80,11 +80,7 @@
     [:div.ote-sovellus.container-fluid
      [:div {:class "topnav"}
       [:a.main-icon {:href "#home"} [:img {:src "img/icons/liikennevirasto_logo_2x.png" :width "40px"}]]
-      [:a.ote-nav {
-                   :href "#home"
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))}  "OTE"]
-      [:a.ote-nav { :href "/" }  "NAP"]
-      [:a.ote-nav { :href "/" } (tr [:common-texts :header-nap-official-name]) ]
+      [:a.ote-nav { :href "/index.html" } (tr [:common-texts :header-front-page]) ]
       [:a.ote-nav
        {:class (is-topnav-active :front-page (:page app))
         :href "#service-operator"
