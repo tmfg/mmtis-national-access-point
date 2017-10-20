@@ -97,7 +97,13 @@
  :buttons
  {:save "Tallenna"
   :delete "Poista"
-  :publish "Julkaise"}
+  :publish "Julkaise"
+
+  :save-and-publish "Tallenna ja julkaise"
+  :save-as-draft "Tallenna luonnoksena"
+  :save-updated "Tallenna päivitetyt tiedot"
+
+  :discard "Peruuta muutokset"}
 
 
 
