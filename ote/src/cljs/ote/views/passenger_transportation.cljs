@@ -139,7 +139,7 @@
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
-     [:h3 "Henkilöiden kuljetuspalvelun tiedot"]]
+     [:h3 "Täydennä henkilökuljetukseen liittyvät tiedot"]]
     [form/form (transportation-form-options e!)
      [(contact-info-group)
       (place-search-group e!)
