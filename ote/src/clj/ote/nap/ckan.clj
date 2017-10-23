@@ -76,7 +76,7 @@
   (-> kw name (str/replace #"-" "_")))
 
 (defn ckan-key->keyword [key]
-  (keyword "ckan" key))
+  (keyword "ckan" (str/replace key #"_" "-")))
 
 
 (defn- ckan-post [{:keys [url api-key]} path payload]
@@ -109,7 +109,7 @@
 
 ;; Test locally
 
-#_(def c (->CKAN "http://localhost:8080/api/" "dc374d96-0baf-45c7-a331-7306519b00d6"))
+#_(def c (->CKAN "http://localhost:8080/api/" "d7c6dccf-6541-4443-a9b4-7ab7c36735bc"))
 
 #_(def create-dataset-response
   (create-dataset c {:ckan/name (str "uusia-tietoja-" (System/currentTimeMillis))
@@ -119,4 +119,5 @@
                      :ckan/public true
                      :ckan/extras [{:ckan/key "foo" :ckan/value "barsky"}
                                    {:ckan/key "howgood" :ckan/value "very"}]
-                     :ckan/operation-area "Oulu"}))
+                     :ckan/transport-service-type "Foo, dippadai, rentals"
+                     :ckan/operation-area "Oulu, Kempele, Hailuoto, 90100, Helsinki"}))

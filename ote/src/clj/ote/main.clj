@@ -21,7 +21,7 @@
    :http (component/using (http/http-server (:http config)) [:db])
 
    ;; Services for the frontend
-   :transport (component/using (transport-service/->Transport) [:http :db])
+   :transport (component/using (transport-service/->Transport (:nap config)) [:http :db])
 
    ;; Return localization information to frontend
    :localization (component/using

@@ -7,6 +7,7 @@
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
+            [ote.db.operation-area :as operation-area]
             [compojure.core :refer [routes GET POST]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
@@ -16,7 +17,9 @@
             [jeesql.core :refer [defqueries]]
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
-            [ote.db.tx :as tx])
+            [ote.db.tx :as tx]
+            [ote.nap.ckan :as ckan]
+            [clojure.string :as str])
   (:import (java.time LocalTime)))
 
 (defqueries "ote/services/places.sql")
@@ -93,6 +96,9 @@
     (catch Exception e
       (log/info "Can't fix price classes: " price-classes-float e))))
 
+
+
+
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
@@ -149,7 +155,7 @@
 
 
 (defn- transport-routes
-  [db]
+  [db nap-config]
   (routes
 
    (GET "/transport-service/:id" [id]
@@ -179,12 +185,12 @@
               (publish-transport-service db user)
               http/transit-response))))
 
-(defrecord Transport []
+(defrecord Transport [nap-config]
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
       this ::lopeta
-           (http/publish! http (transport-routes db))))
+           (http/publish! http (transport-routes db nap-config))))
   (stop [{lopeta ::lopeta :as this}]
     (lopeta)
     (dissoc this ::lopeta)))
