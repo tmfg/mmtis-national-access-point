@@ -10,4 +10,5 @@
            :name-field "NAMEFIN"
            :url "https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish-municipalities/SuomenKuntajako_2017_10k.shp"}}
 
- :nap {:api "http://localhost:8080/api/"}}
+ :nap {:api "http://localhost:8080/api/"
+       :export-base-url "http://localhost:8080"}}
