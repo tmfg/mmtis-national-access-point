@@ -37,7 +37,8 @@
   {:ckan/url (str "/ote/export/geojson/"
                   (::t-service/transport-operator-id ts) "/"
                   (::t-service/id ts))
-   :ckan/name (str (::t-service/name ts) " GeoJSON")})
+   :ckan/name (str (::t-service/name ts) " GeoJSON")
+   :ckan/format "GeoJSON"})
 
 (defn- ckan-resource-description
   "Create a CKAN resource description that can be used with the CKAN API to
@@ -101,6 +102,6 @@
                :name "taksiyritys-testinen-oy",
                :title "Taksiyritys Testinen Oy"}]})
 
-#_ (def publish-result
-     (publish-service-to-ckan! {:api "http://localhost:8080/api/"
-                                :export-base-url "http://localhost:8080"} db user 3))
+#_(def publish-result
+    (publish-service-to-ckan! {:api "http://localhost:8080/api/"
+                               :export-base-url "http://localhost:8080"} db user 3))
