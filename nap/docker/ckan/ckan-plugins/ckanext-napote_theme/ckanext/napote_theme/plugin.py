@@ -36,6 +36,8 @@ def read_csv(file_path):
 
     return data
 
+def log_debug(*args):
+    log.info(*args)
 
 def tags_to_select_options(tags=None):
     if tags is None:
@@ -54,7 +56,8 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def get_helpers(self):
         return {
-            'tags_to_select_options': tags_to_select_options}
+            'tags_to_select_options': tags_to_select_options,
+            'log_debug': log_debug}
 
     def update_config(self, config):
         # CKAN uses the default Python library mimetypes to detect the media type of afile.
