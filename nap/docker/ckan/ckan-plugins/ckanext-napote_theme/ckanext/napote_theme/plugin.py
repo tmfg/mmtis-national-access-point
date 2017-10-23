@@ -97,6 +97,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         map.redirect('/group/new', '/error/')
         map.redirect('/group/member_new/{id:.*}', '/error/')
         map.redirect('/group/edit/{id:.*}', '/error/')
+        map.redirect('/organization/bulk_process/{id:.*}/', '/error/')
 
         return map
 
@@ -104,6 +105,17 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         facets_dict.clear()
 
         facets_dict['organization'] = tk._('Organizations')
+        facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
+        facets_dict['extras_operation_area'] = tk._('Operation Area')
+        facets_dict['tags'] = tk._('Tags')
+        facets_dict['res_format'] = tk._('Formats')
+        facets_dict['license_id'] = tk._('Licenses')
+
+        return facets_dict
+
+    def organization_facets(self, facets_dict, organization_type, package_type):
+        facets_dict.clear()
+
         facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
         facets_dict['extras_operation_area'] = tk._('Operation Area')
         facets_dict['tags'] = tk._('Tags')
