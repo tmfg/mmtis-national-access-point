@@ -31,21 +31,22 @@
    :ckan/transport-service-type (name (::t-service/type ts))
    :ckan/operation-area (fetch-service-operation-area-description db service-id)})
 
-(defn- interface-url-for [ts]
-  ;; FIXME: return geojson URL or external?
-  "http://webjure.org/foo")
+(defmulti interface-description ::t-service/type)
+
+(defmethod interface-description :passenger-transportation [ts]
+  {:ckan/url (str "/ote/export/geojson/"
+                  (::t-service/transport-operator-id ts) "/"
+                  (::t-service/id ts))
+   :ckan/name (str (::t-service/name ts) " GeoJSON")})
 
 (defn- ckan-resource-description
   "Create a CKAN resource description that can be used with the CKAN API to
   create a resource."
-  [ts {:ckan/keys [id name] :as ckan-dataset}]
+  [export-base-url ts {:ckan/keys [id name] :as ckan-dataset}]
   (println "CKAN-DATASET: " (pr-str ckan-dataset))
-  {:ckan/package-id id
-   :ckan/name (str name "-resource")
-   :ckan/url (interface-url-for ts)
-   ;; FIXME: what other fields should we use?
-   ;; format at least
-   })
+  (merge {:ckan/package-id id}
+         (update (interface-description ts)
+                 :ckan/url #(str export-base-url %))))
 
 (defn- verify-ckan-response
   "Check that CKAN API call response was successful and return the result.
@@ -70,14 +71,14 @@
 
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
-  [{:keys [api] :as nap-config} db user transport-service-id]
+  [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
   (let [c (ckan/->CKAN api (get-in user [:user :apikey]))
         ts (fetch-transport-service db transport-service-id)]
     (->> ts
          (ckan-dataset-description db user)
          (ckan/create-dataset c)
          verify-ckan-response
-         (ckan-resource-description ts)
+         (ckan-resource-description export-base-url ts)
          (ckan/add-dataset-resource c))))
 
 
@@ -100,4 +101,6 @@
                :name "taksiyritys-testinen-oy",
                :title "Taksiyritys Testinen Oy"}]})
 
-#_(publish-service-to-ckan! {:api "http://localhost:8080/api/"} db user 3)
+#_ (def publish-result
+     (publish-service-to-ckan! {:api "http://localhost:8080/api/"
+                                :export-base-url "http://localhost:8080"} db user 3))
