@@ -74,13 +74,17 @@
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
   [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
   (let [c (ckan/->CKAN api (get-in user [:user :apikey]))
-        ts (fetch-transport-service db transport-service-id)]
-    (->> ts
-         (ckan-dataset-description db user)
-         (ckan/create-dataset c)
-         verify-ckan-response
-         (ckan-resource-description export-base-url ts)
-         (ckan/add-dataset-resource c))))
+        ts (fetch-transport-service db transport-service-id)
+        dataset (->> ts
+                     (ckan-dataset-description db user)
+                     (ckan/create-dataset c)
+                     verify-ckan-response)
+        resource (->> dataset
+                      (ckan-resource-description export-base-url ts)
+                      (ckan/add-dataset-resource c)
+                      verify-ckan-response)]
+    {:dataset dataset
+     :resource resource}))
 
 
 
