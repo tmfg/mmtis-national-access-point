@@ -45,9 +45,10 @@ RUN mkdir -p /opt/solr/server/solr/$SOLR_CORE/data
 
 ## Copy config files
 COPY ./solrconfig.xml /
+COPY ./schema.xml /
 
 RUN cp /solrconfig.xml \
-/tmp/ckan/ckan/config/solr/schema.xml \
+/schema.xml \
 /tmp/solr-$SOLR_VERSION/server/solr/configsets/basic_configs/conf/currency.xml \
 /tmp/solr-$SOLR_VERSION/server/solr/configsets/basic_configs/conf/synonyms.txt \
 /tmp/solr-$SOLR_VERSION/server/solr/configsets/basic_configs/conf/stopwords.txt \
