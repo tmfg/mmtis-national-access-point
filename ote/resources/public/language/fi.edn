@@ -209,4 +209,72 @@
                 :title-operator-basic-details               "Perustiedot"
                 }
 
+ ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
+ ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
+ ;; and we must show those as is.
+ :viewer {"transport-operator" "Palveluntuottaja"
+          "transport-service" "Liikkumispalvelun tiedot"
+          "contact-address" "Osoite"
+          "contact-email" "Sähköpostiosoite"
+          "homepage" "Kotisivu"
+          "post_office" "Postitoimipaikka"
+          "postal_code" "Postinumero"
+          "street" "Katuosoite"
+          "contact-phone" "Puhelinnumero"
+          "id" "Tunnistenumero"
+          "name" "Nimi"
+          "published?" "Julkaistu?"
+          "transport-operator-id" "Palveluntuottajan tunnistenumero"
+          "type" "Palvelun tyyppi"
+
+          "passenger-transportation" "Henilöiden kuljetuspalvelun tiedot"
+          "accessibility-description" "Kuvaus saavutettavuudesta"
+          "accessibility-tool" "Savutettavuusvälineet"
+          "additional-services" "Lisäpalvelut"
+          "payment-methods" "Maksuvälineet"
+          "price-classes" "Hintaluokat"
+          "currency" "Rahayksikkö"
+          "price-per-unit" "yksikköhinta"
+          "unit" "yksikkö"
+
+          "lang" "Kieli"
+          "text" "Teksti"
+
+          "description" "Kuvaus"
+          "real-time-information" "Reaaliaikaiset palvelutiedot"
+          "booking-service" "Varauspalvelu"
+          "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
+
+          "url" "WWW-osoite"
+
+          :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
+                   true "Kyllä"
+                   false "Ei"
+
+                   ;; accessibility tools
+                   "wheelchair" "Pyörätuoli"
+                   "walkingstick" "Kävelykeppi"
+                   "audio-navigator" "Ääniopastus"
+                   "visual-navigator" "Visuaaliset opasteet"
+                   "passenger-cart" "Henkilökuljetuskärryt"
+                   "pushchair" "Lastenrattaat"
+                   "umbrella" "Sateenvarjo"
+                   "buggy" "Lastenvounut"
+                   "other" "Muu"
+
+                   ;; additional services
+                   "animal-transport" "Eläinkuljetus"
+                   "child-seat"       "Lastenistuin"
+
+
+                   ;; payment methods
+                   "debit-card" "Pankkikortti"
+                   "credit-card" "Luottokortti"
+                   "cash" "Käteinen"
+                   "contactless-payment" "Lähimaksu"
+                   "mobilepay" "Mobiilimaksu"
+                   "invoice" "Lasku"
+                   }}
+
+
  }
