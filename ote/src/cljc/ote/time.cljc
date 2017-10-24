@@ -2,13 +2,13 @@
   "Common utilities for working with date and time information."
   (:require
    #?@(:clj [[specql.impl.composite :as specql-composite]]
-       :cljs [[goog.string :as gstr]])
+       :cljs [[goog.string :as gstr]
+              [cljs-time.core :as cljs-time]
+              [cljs-time.format :as format]
+              [cljs-time.coerce :as coerce]])
    [specql.data-types :as specql-data-types]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
-   [cljs-time.core :as cljs-time]
-   [cljs-time.format :as format]
-   [cljs-time.coerce :as coerce]
    ))
 
 ;; Record for wall clock time (hours, minutes and seconds)
@@ -16,13 +16,13 @@
 
 (s/def ::specql-data-types/time #(instance? Time %))
 
-
+#?(:cljs
 (defn format-timestamp-for-ui [time]
   (if  (nil? time)
     " " ;: if nil - print empty string
     (->> time
          cljs-time/to-default-time-zone
-         (format/unparse (format/formatter "dd.MM.yyyy hh:mm")))))
+         (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
 
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
