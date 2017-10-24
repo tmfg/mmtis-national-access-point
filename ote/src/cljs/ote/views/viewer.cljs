@@ -3,7 +3,85 @@
   Loads GeoJSON data from given URL (proxied by our backend) and
   displays a map and data from the geojson file."
   (:require [ote.app.controller.viewer :as v]
-            [ote.ui.leaflet :as leaflet]))
+            [ote.ui.leaflet :as leaflet]
+            [clojure.string :as str]
+            [ote.localization :refer [tr tr-or]]
+            [stylefy.core :as stylefy]
+            [ote.style.ckan :as style-ckan]))
+
+(defn linkify [url label]
+  (let [url (if (re-matches #"^\w+:.*" url)
+              url
+              (str "http://" url))]
+    [:a {:href url :target "_blank"} label]))
+
+(defmulti transform-value (fn [key value] key))
+
+(defmethod transform-value "url" [_ value] (linkify value value))
+(defmethod transform-value "homepage" [_ value] (linkify value value))
+(defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
+
+(defmethod transform-value :default [_ value]
+  (tr-or (tr [:viewer :values value]) (str value)))
+
+
+(defn effectively-empty? [value]
+  (or (nil? value)
+
+      ;; This is a map that is empty or only has effectively empty values
+      (and (map? value)
+           (or (empty? value)
+               (every? effectively-empty? (vals value))))
+
+      ;; This is an empty collection or only has effectively empty values
+      (and (coll? value)
+           (or (empty? value)
+               (every? effectively-empty? value)))
+
+      ;; This is a blank (empty or just whitespace) string
+      (and (string? value) (str/blank? value))))
+
+(declare properties-table)
+
+(defn show-value [key value]
+  (cond
+    (map? value)
+    [properties-table value]
+
+    (coll? value)
+    [:span
+     (map-indexed
+      (fn [i value]
+        ^{:key i}
+        [:div (stylefy/use-style style-ckan/info-block)
+         [show-value "" value]]) value)]
+
+    :default
+    [:span (transform-value key value)]))
+
+(defn properties-table [properties]
+   [:table.table.table-striped.table-bordered.table-condensed
+     [:tbody
+      (for [[key value] (sort-by first properties)
+            :when (not (effectively-empty? value))]
+        ^{:key key}
+        [:tr
+         [:th {:scope "row" :width "25%"}
+          (tr-or (tr [:viewer key]) key)]
+         [:td [show-value key value]]])]])
+
+(defn show-features [{:strs [features] :as resource}]
+  (let [{:strs [transport-operator transport-service] :as props}
+        (-> features first (get "properties"))]
+    [:div
+     (when transport-operator
+       [:div
+        [:h2 (tr [:viewer "transport-operator"])]
+        [properties-table transport-operator]])
+     (when transport-service
+       [:div
+        [:h2 (tr [:viewer "transport-service"])]
+        [properties-table transport-service]])]))
 
 (defn viewer [e! _]
   (e! (v/->StartViewer))
@@ -18,6 +96,7 @@
         [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                             :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-        [leaflet/GeoJSON {:data geojson
-                          :style {:color "green"}}]]
-       [:div "showing you the geojson for " (:url app)]])))
+        (when geojson
+          [leaflet/GeoJSON {:data geojson
+                            :style {:color "green"}}])]
+       [show-features resource]])))
