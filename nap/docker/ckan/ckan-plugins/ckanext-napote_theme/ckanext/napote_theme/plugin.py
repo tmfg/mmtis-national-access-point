@@ -36,6 +36,8 @@ def read_csv(file_path):
 
     return data
 
+def log_debug(*args):
+    log.info(*args)
 
 def tags_to_select_options(tags=None):
     if tags is None:
@@ -51,10 +53,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
+    plugins.implements(plugins.IRoutes, inherit=True)
 
     def get_helpers(self):
         return {
-            'tags_to_select_options': tags_to_select_options}
+            'tags_to_select_options': tags_to_select_options,
+            'log_debug': log_debug}
 
     def update_config(self, config):
         # CKAN uses the default Python library mimetypes to detect the media type of afile.
@@ -80,10 +84,38 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # Public directory for static images
         tk.add_public_directory(config, 'public')
 
+    def before_map(self, map):
+        map.redirect('/dataset/new', '/error/')
+        map.redirect('/dataset/edit/{id:.*}', '/error/')
+        map.redirect('/dataset/groups/{id:.*}', '/error/')
+        map.redirect('/dataset/delete/{id:.*}', '/error/')
+        map.redirect('/dataset/new_resource/{id:.*}', '/error/')
+        map.redirect('/dataset/{id:.*}/resource/{resource_id:.*}/new_view', '/error/')
+        map.redirect('/dataset/{id:.*}/resource_edit/{resource_id:.*}', '/error/')
+        map.redirect('/dataset/{id:.*}/resource/{resource_id:.*}/edit_view/{view_id:.*}', '/error/')
+        map.redirect('/dataset/{id:.*}/resource_delete/{resource_id:.*}', '/error/')
+        map.redirect('/group/new', '/error/')
+        map.redirect('/group/member_new/{id:.*}', '/error/')
+        map.redirect('/group/edit/{id:.*}', '/error/')
+        map.redirect('/organization/bulk_process/{id:.*}/', '/error/')
+
+        return map
+
     def dataset_facets(self, facets_dict, package_type):
         facets_dict.clear()
 
         facets_dict['organization'] = tk._('Organizations')
+        facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
+        facets_dict['extras_operation_area'] = tk._('Operation Area')
+        facets_dict['tags'] = tk._('Tags')
+        facets_dict['res_format'] = tk._('Formats')
+        facets_dict['license_id'] = tk._('Licenses')
+
+        return facets_dict
+
+    def organization_facets(self, facets_dict, organization_type, package_type):
+        facets_dict.clear()
+
         facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
         facets_dict['extras_operation_area'] = tk._('Operation Area')
         facets_dict['tags'] = tk._('Tags')
