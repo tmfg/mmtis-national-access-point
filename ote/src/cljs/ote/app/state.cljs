@@ -26,5 +26,6 @@
              #:ote.db.transport-service {:url "www.example.com/url"}}}}))
 
 ;; Separate app state for viewer mode
-(defonce viewer (r/atom {:url nil
+(defonce viewer (r/atom {:loading? true
+                         :url nil
                          :geojson nil}))
