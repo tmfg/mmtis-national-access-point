@@ -4,9 +4,9 @@
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
-            [ote.app.controller.passenger-transportation :as pt]
             [ote.app.routes :as routes]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [taoensso.timbre :as log]))
 
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
@@ -18,6 +18,9 @@
 
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
+
+(declare move-service-level-keys-from-form
+         move-service-level-keys-to-form)
 
 (extend-protocol tuck/Event
 
@@ -50,13 +53,14 @@
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
-    (-> app
-      (assoc-in [(keyword ::t-service/type) ::t-service/contact-address] (get response ::t-service/contact-address))
-      (assoc-in [(keyword ::t-service/type) ::t-service/contact-phone] (get response  ::t-service/contact-phone))
-      (assoc-in [(keyword ::t-service/type) ::t-service/contact-email] (get response  ::t-service/contact-email))
-      (assoc-in [(keyword ::t-service/type) ::t-service/homepage] (get response  ::t-service/homepage))
-      (assoc :page (get response ::t-service/type)
-             :transport-service response)))
+    (let [type (::t-service/type response)]
+      (routes/navigate! type)
+      (assoc app
+             :transport-service (move-service-level-keys-to-form
+                                 response
+                                 (case type
+                                   :passenger-transportation ::t-service/passenger-transportation
+                                   :terminal ::t-service/terminal)))))
 
 
   PublishTransportService
@@ -94,5 +98,15 @@
             (-> service
                 (assoc key (get-in service [from key]))
                 (update from dissoc key)))
+          service
+          service-level-keys))
+
+(defn move-service-level-keys-to-form
+  "Reverse of `move-service-level-keys-from-form`."
+  [service to]
+  (reduce (fn [service key]
+            (-> service
+                (assoc-in [to key] (get service key))
+                (dissoc key)))
           service
           service-level-keys))
