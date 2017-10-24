@@ -12,16 +12,40 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
-            [tuck.core :as tuck]))
+            [tuck.core :as tuck])
+  (:require-macros [reagent.core :refer [with-let]]))
+
+(defn footer [e! {published? ::t-service/published? :as data}]
+  [:div.row
+   (if published?
+     [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
+                      :disabled (not (form/can-save? data))}
+      (tr [:buttons :save-updated])]
+     [:span
+      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
+                       :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-and-publish])]
+      [napit/tallenna  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
+                        :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-as-draft])]])
+   [napit/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
+    (tr [:buttons :discard])]])
 
 (defn transportation-form-options [e!]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common])
    :update!     #(e! (pt/->EditPassengerTransportationState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb))
-                                   :disabled (not (form/can-save? data))}
-                   (tr [:buttons :save])])})
+                  [footer e! data])})
+
+(defn name-and-type-group [e!]
+  (form/group
+   {:label "Palvelun perustiedot"
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/name
+    :type :string}))
 
 (defn place-search-group [e!]
   (place-search/place-search-form-group
@@ -108,7 +132,8 @@
 
    {:name         ::t-service/price-classes
     :type         :table
-    :table-fields [{:name ::t-service/name :type :string}
+    :table-fields [{:name ::t-service/name :type :string
+                    :label (tr [:field-labels :passenger-transportation ::t-service/price-class-name])}
                    {:name ::t-service/price-per-unit :type :number}
                    {:name ::t-service/unit :type :string}
                    {:name ::t-service/currency :type :string :width "100px"}
@@ -136,21 +161,22 @@
     :delete?      true}))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
-  [:div.row
-   [:div {:class "col-lg-12"}
-    [:div
-     [:h3 "Täydennä henkilökuljetukseen liittyvät tiedot"]]
-    [form/form (transportation-form-options e!)
-     [(contact-info-group)
-      (place-search-group e!)
-      (luggage-restrictions-group)
-      (form-groups/service-url
-       (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
-       ::t-service/real-time-information)
-      (form-groups/service-url
-       (tr [:field-labels :passenger-transportation ::t-service/booking-service])
-       ::t-service/booking-service)
-      (accessibility-group)
-      (pricing-group e!)
-      (service-hours-group e!)]
-     form-data]]])
+  (with-let [form-options (transportation-form-options e!)
+             form-groups [(name-and-type-group e!)
+                          (contact-info-group)
+                          (place-search-group e!)
+                          (luggage-restrictions-group)
+                          (form-groups/service-url
+                           (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
+                           ::t-service/real-time-information)
+                          (form-groups/service-url
+                           (tr [:field-labels :passenger-transportation ::t-service/booking-service])
+                           ::t-service/booking-service)
+                          (accessibility-group)
+                          (pricing-group e!)
+                          (service-hours-group e!)]]
+    [:div.row
+     [:div {:class "col-lg-12"}
+      [:div
+       [:h3 "Henkilöiden kuljetuspalvelun tiedot"]]
+      [form/form form-options form-groups form-data]]]))

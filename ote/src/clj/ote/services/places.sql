@@ -24,17 +24,17 @@ INSERT INTO operation_area
 VALUES (
         :id,
         :transport-service-id,
-        ST_GeomFromText(:location),
+        ST_MakePoint(:x, :y),
         true)
 ON CONFLICT ("id") DO UPDATE
-  SET location = ST_GeomFromText(:location);
+  SET location = ST_MakePoint(:x, :y);
 
 -- name: insert-point-for-transport-service!
 INSERT INTO operation_area
        ("transport-service-id", "location", "primary?")
 VALUES (
         :transport-service-id,
-        ST_GeomFromText(:location),
+        ST_MakePoint(:x, :y),
         true);
 
 -- name: fetch-operation-area-geojson

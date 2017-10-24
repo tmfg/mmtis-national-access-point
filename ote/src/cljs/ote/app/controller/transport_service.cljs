@@ -4,9 +4,38 @@
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
-            [ote.app.controller.passenger-transportation :as pt]
             [ote.app.routes :as routes]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [clojure.string :as string]))
+
+(def service-level-keys
+  #{::t-service/contact-address
+    ::t-service/contact-phone
+    ::t-service/contact-email
+    ::t-service/homepage
+    ::t-service/name})
+
+(defn move-service-level-keys
+  "The form only sees the type specific level, move keys that are stored in the
+  transport-service level there."
+  [service from]
+  (reduce (fn [service key]
+            (-> service
+                (assoc key (get-in service [from key]))
+                (update from dissoc key)))
+          service
+          service-level-keys))
+
+(defn move-service-level-keys-to-form
+  "The form only sees the type specific level, move keys that are stored in the
+  transport-service level back to service level (e.g. passenger-transportation)."
+  [service to-key from]
+  (reduce (fn [service key]
+            (-> service
+                (assoc-in [:transport-service to-key key] (get from key))
+                ))
+          service
+          service-level-keys))
 
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
@@ -54,13 +83,13 @@
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
     (-> app
-      (assoc-in [(keyword ::t-service/type) ::t-service/contact-address] (get response ::t-service/contact-address))
-      (assoc-in [(keyword ::t-service/type) ::t-service/contact-phone] (get response  ::t-service/contact-phone))
-      (assoc-in [(keyword ::t-service/type) ::t-service/contact-email] (get response  ::t-service/contact-email))
-      (assoc-in [(keyword ::t-service/type) ::t-service/homepage] (get response  ::t-service/homepage))
       (assoc :page (get response ::t-service/type)
-             :transport-service response)))
-
+             :transport-service response)
+      (move-service-level-keys-to-form
+        (keyword (str "ote.db.transport-service/" (string/replace (str (get response ::t-service/type)) ":" "")))
+        response)
+        )
+  )
 
   PublishTransportService
   (process-event [{:keys [transport-service-id]} app]
@@ -91,7 +120,4 @@
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (.log js/console " deletoitiin ")
-    )
-
-
-  )
+    ))

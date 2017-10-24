@@ -13,11 +13,47 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]))
 
-(defn transport-services-listing [e! transport-operator-id services]
-  (when services
+(defn transport-services-table-rows [e! services transport-operator-id]
+
+  [ui/table-body {:display-row-checkbox false}
+   (doall
+     (map-indexed
+       (fn [i {::t-service/keys [id type published? name] :as row}]
+         ^{:key i}
+         [ui/table-row {:selectable false :display-border false}
+          [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
+          [ui/table-row-column
+           [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))} name]]
+          [ui/table-row-column
+           (if published?
+             (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
+               [:a {:href url :target "_blank"} url])
+             [:span.publish
+              (tr [:field-labels :transport-service ::t-service/published?-values false])
+              [ui/flat-button {:primary true
+                               :on-click #(e! (ts/->PublishTransportService id))}
+               (tr [:buttons :publish])]])]
+          [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} "12.08.2017"]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} "12.08.2017"]
+          [ui/table-row-column
+           [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
+            [ic/content-create]]
+
+           [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
+            [ic/action-delete]]
+           ]
+          ])
+       services))
+   ]
+
+  )
+
+(defn transport-services-listing [e! transport-operator-id services section-label]
+  (when (> (count services) 0)
     [:div.row
      [:div {:class "col-xs-12  col-md-12"}
-      [:h3 " Henkilöiden kuljetuspalvelut"]
+      [:h3 section-label]
 
       [ui/table {:class "front-page-service-table" }
        [ui/table-header {:adjust-for-checkbox false
@@ -31,36 +67,9 @@
          [ui/table-header-column {:class "hidden-xs hidden-sm "} "Luotu"]
          [ui/table-header-column "Toiminnot"]]]
 
-       [ui/table-body {:display-row-checkbox false}
-        (doall
-         (map-indexed
-          (fn [i {::t-service/keys [id type published?] :as row}]
-            ^{:key i}
-             [ui/table-row {:selectable false :display-border false}
-             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
-             [ui/table-row-column
-              [:a.front-page-link {:href "#" :on-click #(e! (ts/->ModifyTransportService id))} "Savon taksipalvelu"]]
-             [ui/table-row-column
-              (if published?
-                (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
-                  [:a {:href url :target "_blank"} url])
-                [:span.publish
-                 (tr [:field-labels :transport-service ::t-service/published?-values false])
-                 [ui/flat-button {:primary true
-                                  :on-click #(e! (ts/->PublishTransportService id))}
-                  (tr [:buttons :publish])]])]
-             [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
-              [ui/table-row-column {:class "hidden-xs hidden-sm "} "12.08.2017"]
-              [ui/table-row-column {:class "hidden-xs hidden-sm "} "12.08.2017"]
-              [ui/table-row-column
-              [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
-               [ic/content-create]]
+       (transport-services-table-rows e! services transport-operator-id)
 
-              [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
-               [ic/action-delete]]
-              ]
-             ])
-          services))]]]]))
+       ]]]))
 
 (defn empty-header-for-front-page [e!]
   [:div
@@ -111,9 +120,16 @@
    [:div.row
     [:div {:class "col-xs-12  col-md-12"}
      ;; Table for transport services
-     [transport-services-listing e! (get-in status [:transport-operator ::t-operator/id]) services]]]]
 
-  )
+     (for [type t-service/transport-service-types
+           :let [services (filter #(= (:ote.db.transport-service/type %) type) services)]
+           :when (not (empty? services))]
+       ^{:key type}
+       [transport-services-listing
+        e!
+        (get-in status [:transport-operator ::t-operator/id])
+        services
+        (tr [:titles type])])]]])
 
 (defn front-page [e! status]
 
@@ -125,5 +141,4 @@
 
      (if (empty? services)
        (empty-header-for-front-page e!)
-       (table-container-for-front-page e! services status)
-       )]))
+       (table-container-for-front-page e! services status))]))

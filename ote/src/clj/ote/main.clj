@@ -2,7 +2,7 @@
   "Finnish Transport Agency: OTE digitalization tool for transportation service information.
   Main entrypoint for the backend system."
   (:require [com.stuartsierra.component :as component]
-            [ote.palvelut.transport :as transport-service]
+            [ote.services.transport :as transport-service]
             [ote.components.http :as http]
             [ote.components.db :as db]
             [ote.services.localization :as localization-service]

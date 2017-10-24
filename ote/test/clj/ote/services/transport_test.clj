@@ -9,7 +9,7 @@
              [ote.components.db :as db]
              [com.stuartsierra.component :as component]
              [ote.components.http :as http]
-             [ote.palvelut.transport :as transport-service]
+             [ote.services.transport :as transport-service]
              [ote.db.transport-operator :as t-operator]
              [ote.db.transport-service :as t-service]
              [ote.db.common :as common]
@@ -28,18 +28,13 @@
 
 (def gen-passenger-transportation
   (gen/hash-map
-   ::t-service/contact-email (s/gen ::t-service/contact-email)
    ::t-service/accessibility-tool (s/gen ::t-service/accessibility-tool)
    ::t-service/additional-services (s/gen ::t-service/additional-services)
    ::t-service/price-classes generators/gen-price-class-array
    ::t-service/booking-service generators/gen-service-link
-   ::t-service/contact-gsm (s/gen ::t-service/contact-gsm)
    ::t-service/payment-methods (s/gen ::t-service/payment-methods)
    ::t-service/real-time-information generators/gen-service-link
-   ::t-service/contact-address generators/gen-address
    ::t-service/accessibility-description generators/gen-localized-text-array
-   ::t-service/homepage (s/gen ::t-service/homepage)
-   ::t-service/contact-phone (s/gen ::t-service/contact-phone)
    ::t-service/service-hours generators/gen-service-hours-array
    ::t-service/luggage-restrictions generators/gen-localized-text-array))
 
@@ -47,14 +42,17 @@
   (gen/hash-map
    ::t-service/transport-operator-id (gen/return 1)
    ::t-service/type (gen/return :passenger-transportation)
-   ::t-service/passenger-transportation gen-passenger-transportation))
+   ::t-service/passenger-transportation gen-passenger-transportation
+   ::t-service/contact-address generators/gen-address
+   ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
 
 ;; We have a single transport service inserted in the test data,
 ;; check that its information is fetched ok
 (deftest fetch-test-data-transport-service
   (let [ts (http-get "admin" "transport-service/1")
-        ps (get-in ts [:transit ::t-service/passenger-transportation])]
-    (is (= (::t-service/contact-address ps)
+        service (:transit ts)
+        ps (::t-service/passenger-transportation service)]
+    (is (= (::t-service/contact-address service)
            #::common {:street "Street 1" :postal_code "90100" :post_office "Oulu"}))
     (is (= (::t-service/price-classes ps)
            [#:ote.db.transport-service{:name "starting",
@@ -66,8 +64,8 @@
                                        :unit "km",
                                        :currency "EUR"}]))
 
-    (is (= (::t-service/homepage ps) "www.solita.fi"))
-    (is (= (::t-service/contact-phone ps) "123456"))))
+    (is (= (::t-service/homepage service) "www.solita.fi"))
+    (is (= (::t-service/contact-phone service) "123456"))))
 
 (defn- non-nil-keys [m]
   (into #{}

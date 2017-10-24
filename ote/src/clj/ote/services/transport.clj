@@ -1,8 +1,9 @@
-(ns ote.palvelut.transport
+(ns ote.services.transport
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
+            [clj-time.core :as time]
             [specql.op :as op]
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as t-service]
@@ -33,15 +34,25 @@
                 (specql/columns ::transport-operator/transport-operator)
                 where {::specql/limit 1})))
 
-(def transport-services-passenger-columns
-  #{::t-service/id ::t-service/type :ote.db.transport-service/passenger-transportation
-    ::t-service/published?})
+(def transport-services-columns
+  #{::t-service/id ::t-service/type
+    :ote.db.transport-service/passenger-transportation
+    :ote.db.transport-service/terminal
+    :ote.db.transport-service/rental
+    :ote.db.transport-service/brokerage
+    :ote.db.transport-service/parking
+    ::t-service/published?
+    ::t-service/name})
 
 (defn get-transport-services [db where]
   "Return Vector of transport-services"
   (fetch db ::t-service/transport-service
-                transport-services-passenger-columns
-                where))
+                transport-services-columns
+                where
+                {::specql/order-by ::t-service/type
+                 ::specql/order-direction :desc
+                 }
+         ))
 
 (defn- get-transport-service
   "Get single transport service by id"
@@ -55,12 +66,10 @@
         op-area (-> operation-area
                   (assoc :coordinates (get (cheshire/parse-string (get operation-area :st_asgeojson)) "coordinates"))
                     (dissoc :st_asgeojson))
-        service-key :ote.db.transport-service/terminal
-        ]
+        service-key :ote.db.transport-service/terminal]
 
     (-> service
-        (assoc-in [service-key  ::t-service/operation-area] op-area)
-    )))
+        (assoc-in [service-key  ::t-service/operation-area] op-area))))
 
 (defn- delete-transport-service
   "Delete single transport service by id"
@@ -84,6 +93,7 @@
         transport-operator (ensure-transport-operator-for-group db ckan-group)
         transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
         ]
+    (println " transport-services-vector " transport-services-vector)
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
      :user user}))
@@ -104,9 +114,11 @@
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
-  #_(println "DATA: " (pr-str data))
+  (println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
+                  ;(assoc ::t-service/modified (time/now))
+                  ;(assoc ::t-service/cr time/now)
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
     (jdbc/with-db-transaction [db db]
@@ -129,20 +141,18 @@
     (println "Terminal coordinates: " (pr-str coordinates))
     (println "Terminal op-area-id: " op-area-id)
     (jdbc/with-db-transaction [db db]
-       (let [new-value (dissoc value :transport-service)
-             transport-service (upsert! db ::t-service/transport-service new-value)
-             str-point (str "POINT("(first coordinates) " " (second coordinates)")")
-
-             ]
+       (let [transport-service (upsert! db ::t-service/transport-service value)]
          (cond
            (nil? op-area-id)
            (insert-point-for-transport-service! db
                                               {:transport-service-id (get transport-service ::t-service/id)
-                                               :location str-point})
+                                               :x (first coordinates)
+                                               :y (second coordinates)})
            :else (save-point-for-transport-service! db
                                                     {:id op-area-id
                                                      :transport-service-id (get transport-service ::t-service/id)
-                                                     :location str-point})
+                                                     :x (first coordinates)
+                                                     :y (second coordinates)})
            )
       ))))
 
