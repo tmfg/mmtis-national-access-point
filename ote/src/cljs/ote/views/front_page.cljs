@@ -11,14 +11,29 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [cljs-time.core :as time]
+            [cljs-time.format :as format]
+            [cljs-time.coerce :as coerce]
+            ))
+
+(def custom-formatter (format/formatter "dd.MM.yy H:i:s"))
+
+(defn format-my-time [my-time]
+  (if  (nil? my-time)
+    " " ;: if nil - print empty string
+    (->> my-time
+         time/to-default-time-zone
+         (format/unparse (format/formatter "dd.MM.yyyy hh:mm")))
+
+  ))
 
 (defn transport-services-table-rows [e! services transport-operator-id]
 
   [ui/table-body {:display-row-checkbox false}
    (doall
      (map-indexed
-       (fn [i {::t-service/keys [id type published? name] :as row}]
+       (fn [i {::t-service/keys [id type published? name created modified] :as row}]
          ^{:key i}
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
@@ -34,8 +49,8 @@
                                :on-click #(e! (ts/->PublishTransportService id))}
                (tr [:buttons :publish])]])]
           [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "} "12.08.2017"]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "} "12.08.2017"]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (format-my-time modified)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (format-my-time created)]
           [ui/table-row-column
            [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
             [ic/content-create]]

@@ -18,7 +18,8 @@
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.db.tx :as tx])
-  (:import (java.time LocalTime)))
+  (:import (java.time LocalTime)
+           (java.sql Timestamp)))
 
 (defqueries "ote/services/places.sql")
 
@@ -41,6 +42,8 @@
     :ote.db.transport-service/rental
     :ote.db.transport-service/brokerage
     :ote.db.transport-service/parking
+    :ote.db.transport-service/created
+    :ote.db.transport-service/modified
     ::t-service/published?
     ::t-service/name})
 
@@ -74,6 +77,9 @@
 (defn- delete-transport-service
   "Delete single transport service by id"
   [db id]
+  ;; Delete operation area first
+  (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
+  ;; Delete service
   (delete! db ::t-service/transport-service {::t-service/id id})
   )
 
@@ -117,13 +123,15 @@
   (println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
-                  ;(assoc ::t-service/modified (time/now))
-                  ;(assoc ::t-service/cr time/now)
+                  (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
     (jdbc/with-db-transaction [db db]
          (let [new-value (dissoc value :transport-service)
-               transport-service (upsert! db ::t-service/transport-service new-value)]
+               newer-value (if (nil? (get value ::t-service/id))
+                             (assoc new-value ::t-service/created (Timestamp. (.getMillis (time/now))))
+                             new-value)
+               transport-service (upsert! db ::t-service/transport-service newer-value)]
         (places/link-places-to-transport-service!
          db (::t-service/id transport-service) places)
         transport-service))))
@@ -136,24 +144,30 @@
         op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
         coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
         value (-> data
-                  (update ::t-service/terminal dissoc ::t-service/operation_area))]
+                  (update ::t-service/terminal dissoc ::t-service/operation_area)
+                  (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
+                  )]
     (println "Terminal AREA: " (pr-str places))
     (println "Terminal coordinates: " (pr-str coordinates))
     (println "Terminal op-area-id: " op-area-id)
     (jdbc/with-db-transaction [db db]
-       (let [transport-service (upsert! db ::t-service/transport-service value)]
-         (cond
-           (nil? op-area-id)
-           (insert-point-for-transport-service! db
-                                              {:transport-service-id (get transport-service ::t-service/id)
-                                               :x (first coordinates)
-                                               :y (second coordinates)})
-           :else (save-point-for-transport-service! db
-                                                    {:id op-area-id
-                                                     :transport-service-id (get transport-service ::t-service/id)
-                                                     :x (first coordinates)
-                                                     :y (second coordinates)})
-           )
+       (let [new-value (if (nil? (get value ::t-service/id))
+                           (assoc value ::t-service/created (Timestamp. (.getMillis (time/now))))
+                           value)
+             transport-service (upsert! db ::t-service/transport-service new-value)]
+         (when (not-empty coordinates)
+           (cond
+             (nil? op-area-id)
+             (insert-point-for-transport-service! db
+                                                {:transport-service-id (get transport-service ::t-service/id)
+                                                 :x (first coordinates)
+                                                 :y (second coordinates)})
+             :else (save-point-for-transport-service! db
+                                                      {:id op-area-id
+                                                       :transport-service-id (get transport-service ::t-service/id)
+                                                       :x (first coordinates)
+                                                       :y (second coordinates)})
+             ))
       ))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]

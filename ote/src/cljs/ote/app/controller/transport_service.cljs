@@ -120,4 +120,7 @@
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (.log js/console " deletoitiin ")
+
+    ;; Remove deleted service from the app state
+    ;; FIXME: todo
     ))
