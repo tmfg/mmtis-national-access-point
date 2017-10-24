@@ -41,13 +41,22 @@
       ;; This is a blank (empty or just whitespace) string
       (and (string? value) (str/blank? value))))
 
-(declare properties-table)
+(declare properties-table records-table)
 
 (defn show-value [key value]
   (cond
+    ;; This is an object, show key/value table
     (map? value)
     [properties-table value]
 
+    ;; This is a collection of maps, each having the same keys
+    ;; we can show this as a table
+    (and (coll? value)
+         (every? map? value)
+         (apply = (map keys value)))
+    [records-table value]
+
+    ;; Collection of values
     (coll? value)
     [:span
      (map-indexed
@@ -56,6 +65,7 @@
         [:div (stylefy/use-style style-ckan/info-block)
          [show-value "" value]]) value)]
 
+    ;; Other values, like strings and numbers
     :default
     [:span (transform-value key value)]))
 
@@ -69,6 +79,27 @@
          [:th {:scope "row" :width "25%"}
           (tr-or (tr [:viewer key]) key)]
          [:td [show-value key value]]])]])
+
+(defn records-table [rows]
+  (let [headers (keys (first rows))
+        labels (into {}
+                     (map (juxt identity #(tr [:viewer %])))
+                     headers)
+        sorted-headers (sort-by (comp str/lower-case labels) headers)]
+    [:table
+     [:thead
+      (for [h sorted-headers]
+        ^{:key h}
+        [:th {:scope "col"} (labels h)])]
+     [:tbody
+      (map-indexed
+       (fn [i row]
+         ^{:key i}
+         [:tr
+          (for [h sorted-headers]
+            ^{:key h}
+            [:td [show-value h (get row h)]])])
+       rows)]]))
 
 (defn show-features [{:strs [features] :as resource}]
   (let [{:strs [transport-operator transport-service] :as props}
