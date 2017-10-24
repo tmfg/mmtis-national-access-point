@@ -18,7 +18,7 @@
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.db.tx :as tx]
-            [ote.nap.ckan :as ckan]
+            [ote.nap.publish :as publish]
             [clojure.string :as str])
   (:import (java.time LocalTime)))
 
@@ -101,18 +101,27 @@
 
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
-  [db data]
+  [nap-config db user data]
   #_(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         value (-> data
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
-    (jdbc/with-db-transaction [db db]
-         (let [new-value (dissoc value :transport-service)
-               transport-service (upsert! db ::t-service/transport-service new-value)]
-        (places/link-places-to-transport-service!
-         db (::t-service/id transport-service) places)
-        transport-service))))
+
+    ;; Store to OTE database
+    (let [transport-service
+          (jdbc/with-db-transaction [db db]
+            (let [new-value (dissoc value :transport-service)
+                  transport-service (upsert! db ::t-service/transport-service new-value)]
+              (places/link-places-to-transport-service!
+               db (::t-service/id transport-service) places)
+              transport-service))]
+      ;; If published, use CKAN API to add dataset and resource
+      (when (::t-service/published? data)
+        (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
+
+      ;; Return the stored transport-service
+      transport-service)))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
@@ -159,7 +168,7 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-     (http/transit-response (get-transport-service db (Long/parseLong id))))
+        (http/transit-response (get-transport-service db (Long/parseLong id))))
 
    (POST "/transport-operator/group" {user :user}
          (ensure-transport-operator-for-group db (-> user :groups first)))
@@ -172,8 +181,11 @@
          (log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
 
-   (POST "/passenger-transportation-info" {form-data :body}
-         (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
+   (POST "/passenger-transportation-info" {form-data :body
+                                           user :user}
+         (http/transit-response
+          (save-passenger-transportation-info nap-config db user
+                                              (http/transit-request form-data))))
 
    (POST "/terminal" {form-data :body}
      (http/transit-response (save-terminal-info db (http/transit-request form-data))))
