@@ -8,10 +8,10 @@
             [taoensso.timbre :as log]))
 
 (defn- load-resource [{params :query-params :as req}]
+  ;; FIXME: we could check "referer" in headers so that we don't allow proxying from everywhere
   (with-channel req response-ch
     (client/get (params "url")
                 (fn [{:keys [status body headers] :as response}]
-                  (spit "response" (pr-str response))
                   (http-server/send! response-ch
                                      {:status status
                                       :body body
