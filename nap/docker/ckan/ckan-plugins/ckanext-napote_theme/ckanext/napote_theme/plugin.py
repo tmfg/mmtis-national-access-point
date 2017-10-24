@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import pprint
 import mimetypes
 from logging import getLogger
 from pkg_resources import resource_stream
@@ -54,6 +55,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_helpers(self):
         return {
@@ -90,10 +92,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         map.redirect('/dataset/groups/{id:.*}', '/error/')
         map.redirect('/dataset/delete/{id:.*}', '/error/')
         map.redirect('/dataset/new_resource/{id:.*}', '/error/')
-        map.redirect('/dataset/{id:.*}/resource/{resource_id:.*}/new_view', '/error/')
-        map.redirect('/dataset/{id:.*}/resource_edit/{resource_id:.*}', '/error/')
-        map.redirect('/dataset/{id:.*}/resource/{resource_id:.*}/edit_view/{view_id:.*}', '/error/')
-        map.redirect('/dataset/{id:.*}/resource_delete/{resource_id:.*}', '/error/')
+        #map.redirect('/dataset/{id:.*}/resource/{resource_id:.*}/new_view', '/error/')
+        #map.redirect('/dataset/{id:.*}/resource_edit/{resource_id:.*}', '/error/')
+        #map.redirect('/dataset/{id:.*}/resource/{resource_id:.*}/edit_view/{view_id:.*}', '/error/')
+        #map.redirect('/dataset/{id:.*}/resource_delete/{resource_id:.*}', '/error/')
         map.redirect('/group/new', '/error/')
         map.redirect('/group/member_new/{id:.*}', '/error/')
         map.redirect('/group/edit/{id:.*}', '/error/')
@@ -173,3 +175,28 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def package_types(self):
         return []
+
+
+    # Methods for IResourceView
+
+    def info(self):
+        return {'name': 'transport_service_view',
+                'title': tk._('Transport Service View'),
+                'iframed': False}
+
+    def can_view(self, data_dict):
+        log_debug('can_view %s', pprint.pformat(data_dict))
+        return data_dict['resource']['format'] == 'GeoJSON'
+
+    def setup_template_variables(self, context, data_dict):
+        log_debug('setup_template_variables ollaan!')
+        log_debug('setup_template_variables, ctx:\n %s, data:\n %s', pprint.pformat(context), pprint.pformat(data_dict))
+        url = data_dict['package']['resources'][0]['url']
+        log_debug('urlihan oli %s', url)
+        return {'transport_service_url': url}
+
+    def view_template(self, context, data_dict):
+        return "transport_service_view.html"
+
+    def form_template(self, context, data_dict):
+        return "transport_service_view.html"

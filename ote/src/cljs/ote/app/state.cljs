@@ -24,3 +24,7 @@
            {:passenger-transportation
             {:ote.db.transport-service/real-time-information
              #:ote.db.transport-service {:url "www.example.com/url"}}}}))
+
+;; Separate app state for viewer mode
+(defonce viewer (r/atom {:url nil
+                         :geojson nil}))
