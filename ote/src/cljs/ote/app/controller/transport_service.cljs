@@ -131,8 +131,5 @@
 
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
-    (.log js/console " deletoitiin ")
-
-    ;; Remove deleted service from the app state
-    ;; FIXME: todo
-    app))
+    (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-services))]
+      (assoc app :transport-services filtered-map))))

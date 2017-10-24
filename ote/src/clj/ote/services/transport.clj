@@ -80,7 +80,8 @@
   ;; Delete operation area first
   (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
   ;; Delete service
-  (delete! db ::t-service/transport-service {::t-service/id id})))
+  (delete! db ::t-service/transport-service {::t-service/id id})
+  id))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -94,11 +95,8 @@
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
-  (let [
-        transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
-        ]
-    (println " transport-services-vector " transport-services-vector)
+  (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
+        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})]
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
      :user user}))
