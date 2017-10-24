@@ -86,7 +86,7 @@
     ::t-service/homepage
     ::t-service/name})
 
-(defn move-service-level-keys
+(defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the
   transport-service level there."
   [service from]
