@@ -45,6 +45,13 @@ def tags_to_select_options(tags=None):
         tags = []
     return [{'name': tag, 'value': tag} for tag in tags]
 
+def get_in(data, *keys):
+    try:
+        for k in keys:
+            data = data[k]
+        return data
+    except (IndexError, KeyError) as e:
+        return None
 
 class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
@@ -185,14 +192,11 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
                 'iframed': False}
 
     def can_view(self, data_dict):
-        log_debug('can_view %s', pprint.pformat(data_dict))
         return data_dict['resource']['format'] == 'GeoJSON'
 
     def setup_template_variables(self, context, data_dict):
-        log_debug('setup_template_variables ollaan!')
-        log_debug('setup_template_variables, ctx:\n %s, data:\n %s', pprint.pformat(context), pprint.pformat(data_dict))
-        url = data_dict['package']['resources'][0]['url']
-        log_debug('urlihan oli %s', url)
+        #log_debug('setup_template_variables, ctx:\n %s, data:\n %s', pprint.pformat(context), pprint.pformat(data_dict))
+        url = get_in(data_dict, 'resource', 'url') or get_in(data_dict, 'package','resources',0,'url')
         return {'transport_service_url': url}
 
     def view_template(self, context, data_dict):
