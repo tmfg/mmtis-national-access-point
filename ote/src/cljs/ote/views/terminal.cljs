@@ -22,6 +22,15 @@
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])})
 
+(defn name-and-type-group [e!]
+  (form/group
+    {:label "Palvelun perustiedot"
+     :columns 3
+     :layout :row}
+
+    {:name ::t-service/name
+     :type :string}))
+
 (defn place-marker-group [e!]
   (place-search/place-marker-form-group
     (tuck/wrap-path e! :transport-service ::t-service/terminal ::t-service/operation-area)
@@ -70,6 +79,7 @@
     [form/form (terminal-form-options e!)
 
      [
+      (name-and-type-group e!)
       (place-marker-group e!)
       (form-groups/service-url
         (tr [:field-labels :terminal ::t-service/indoor-map])

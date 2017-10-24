@@ -2,12 +2,13 @@
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
-            [specql.core :refer [fetch update! insert! upsert!] :as specql]
+            [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
+            [clj-time.core :as time]
             [specql.op :as op]
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
-            [compojure.core :refer [routes GET POST]]
+            [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
@@ -17,7 +18,8 @@
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.db.tx :as tx])
-  (:import (java.time LocalTime)))
+  (:import (java.time LocalTime)
+           (java.sql Timestamp)))
 
 (defqueries "ote/services/places.sql")
 
@@ -33,15 +35,26 @@
                 (specql/columns ::transport-operator/transport-operator)
                 where {::specql/limit 1})))
 
-(def transport-services-passenger-columns
-  #{::t-service/id ::t-service/type :ote.db.transport-service/passenger-transportation
-    ::t-service/published? ::t-service/name})
+(def transport-services-columns
+  #{::t-service/id ::t-service/type
+    :ote.db.transport-service/passenger-transportation
+    :ote.db.transport-service/terminal
+    :ote.db.transport-service/rental
+    :ote.db.transport-service/brokerage
+    :ote.db.transport-service/parking
+    :ote.db.transport-service/created
+    :ote.db.transport-service/modified
+    ::t-service/published?
+    ::t-service/name})
 
 (defn get-transport-services [db where]
   "Return Vector of transport-services"
   (fetch db ::t-service/transport-service
-                transport-services-passenger-columns
-                where))
+                transport-services-columns
+                where
+                {::specql/order-by ::t-service/type
+                 ::specql/order-direction :desc
+                 }))
 
 (defn- get-transport-service
   "Get single transport service by id"
@@ -60,6 +73,16 @@
     (-> service
         (assoc-in [service-key  ::t-service/operation-area] op-area))))
 
+(defn- delete-transport-service
+  "Delete single transport service by id"
+  [db id]
+  (tx/with-transaction db
+  ;; Delete operation area first
+  (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
+  ;; Delete service
+  (delete! db ::t-service/transport-service {::t-service/id id})
+  id))
+
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
   (tx/with-transaction db
@@ -72,10 +95,8 @@
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
-  (let [
-        transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
-        ]
+  (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
+        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})]
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
      :user user}))
@@ -96,17 +117,21 @@
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
-  #_(println "DATA: " (pr-str data))
+  ;(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
-        value (-> data
+        passenger-info (-> data
+                  (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
     (jdbc/with-db-transaction [db db]
-         (let [new-value (dissoc value :transport-service)
-               transport-service (upsert! db ::t-service/transport-service new-value)]
+         (let [passenger-info (dissoc passenger-info :transport-service)
+               passenger-info (if (nil? (get passenger-info ::t-service/id))
+                                (assoc passenger-info ::t-service/created (Timestamp. (.getMillis (time/now))))
+                                passenger-info)
+               transport-service (upsert! db ::t-service/transport-service passenger-info)]
         (places/link-places-to-transport-service!
-         db (::t-service/id transport-service) places)
-        transport-service))))
+          db (::t-service/id transport-service) places)
+          transport-service))))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
@@ -116,27 +141,29 @@
         op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
         coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
         value (-> data
-                  (update ::t-service/terminal dissoc ::t-service/operation_area))]
-    (println "Terminal AREA: " (pr-str places))
-    (println "Terminal coordinates: " (pr-str coordinates))
-    (println "Terminal op-area-id: " op-area-id)
+                  (update ::t-service/terminal dissoc ::t-service/operation_area)
+                  (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
+                  )]
+    ;(println "Terminal AREA: " (pr-str places))
+    ;(println "Terminal coordinates: " (pr-str coordinates))
+    ;(println "Terminal op-area-id: " op-area-id)
     (jdbc/with-db-transaction [db db]
-       (let [new-value (dissoc value :transport-service)
-             transport-service (upsert! db ::t-service/transport-service new-value)
-             str-point (str "POINT("(first coordinates) " " (second coordinates)")")
-
-             ]
-         (cond
-           (nil? op-area-id)
-           (insert-point-for-transport-service! db
-                                              {:transport-service-id (get transport-service ::t-service/id)
-                                               :location str-point})
-           :else (save-point-for-transport-service! db
-                                                    {:id op-area-id
-                                                     :transport-service-id (get transport-service ::t-service/id)
-                                                     :location str-point})
-           )
-      ))))
+       (let [new-value (if (nil? (get value ::t-service/id))
+                           (assoc value ::t-service/created (Timestamp. (.getMillis (time/now))))
+                           value)
+             transport-service (upsert! db ::t-service/transport-service new-value)]
+         (when (not-empty coordinates)
+           (cond
+             (nil? op-area-id)
+             (insert-point-for-transport-service! db
+                                                {:transport-service-id (get transport-service ::t-service/id)
+                                                 :x (first coordinates)
+                                                 :y (second coordinates)})
+             :else (save-point-for-transport-service! db
+                                                      {:id op-area-id
+                                                       :transport-service-id (get transport-service ::t-service/id)
+                                                       :x (first coordinates)
+                                                       :y (second coordinates)})))))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]
@@ -177,7 +204,12 @@
          (->> payload
               http/transit-request
               (publish-transport-service db user)
-              http/transit-response))))
+              http/transit-response))
+
+   (GET "/transport-service/delete/:id" [id]
+     (http/transit-response (delete-transport-service db (Long/parseLong id))))
+
+   ))
 
 (defrecord Transport []
   component/Lifecycle

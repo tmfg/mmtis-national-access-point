@@ -19,7 +19,7 @@
   :ote.db.transport-service/type "Valitse liikkumispalvelun tyyppi"
 
   :transport-service-common
-  {:ote.db.transport-service/name "Liikkumispalvelun nimi"
+  {:ote.db.transport-service/name "Palvelun nimi"
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
 
@@ -112,7 +112,7 @@
  {:ote.db.transport-service/type
   {:terminal                 "Asemat, satamat ja muut terminaalit"
    :passenger-transportation "Henkilöidenkuljetuspalvelut"
-   :rentals                  "Ajoneuvojen vuokrauspalveut ja kaupalliset yhteiskäyttöpalvelut"
+   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
 
@@ -188,6 +188,11 @@
  :place-search {:name                "Paikan nimi"
                 :place-auto-complete "Hae paikka nimellä"}
 
+ :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
+          :passenger-transportation "Henkilöidenkuljetuspalvelut"
+          :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+          :parking                  "Yleiset kaupalliset pysäköintipalvelut"
+          :brokerage                "Välityspalvelut"}
  :common-texts {
                 :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
