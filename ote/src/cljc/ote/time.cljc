@@ -5,12 +5,24 @@
        :cljs [[goog.string :as gstr]])
    [specql.data-types :as specql-data-types]
    [clojure.spec.alpha :as s]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [cljs-time.core :as cljs-time]
+   [cljs-time.format :as format]
+   [cljs-time.coerce :as coerce]
+   ))
 
 ;; Record for wall clock time (hours, minutes and seconds)
 (defrecord Time [hours minutes seconds])
 
 (s/def ::specql-data-types/time #(instance? Time %))
+
+
+(defn format-timestamp-for-ui [time]
+  (if  (nil? time)
+    " " ;: if nil - print empty string
+    (->> time
+         cljs-time/to-default-time-zone
+         (format/unparse (format/formatter "dd.MM.yyyy hh:mm")))))
 
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format

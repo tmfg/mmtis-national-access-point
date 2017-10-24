@@ -54,8 +54,7 @@
                 where
                 {::specql/order-by ::t-service/type
                  ::specql/order-direction :desc
-                 }
-         ))
+                 }))
 
 (defn- get-transport-service
   "Get single transport service by id"
@@ -77,11 +76,11 @@
 (defn- delete-transport-service
   "Delete single transport service by id"
   [db id]
+  (tx/with-transaction db
   ;; Delete operation area first
   (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
   ;; Delete service
-  (delete! db ::t-service/transport-service {::t-service/id id})
-  )
+  (delete! db ::t-service/transport-service {::t-service/id id})))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -120,21 +119,21 @@
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db data]
-  (println "DATA: " (pr-str data))
+  ;(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
-        value (-> data
+        passenger-info (-> data
                   (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
     (jdbc/with-db-transaction [db db]
-         (let [new-value (dissoc value :transport-service)
-               newer-value (if (nil? (get value ::t-service/id))
-                             (assoc new-value ::t-service/created (Timestamp. (.getMillis (time/now))))
-                             new-value)
-               transport-service (upsert! db ::t-service/transport-service newer-value)]
+         (let [passenger-info (dissoc passenger-info :transport-service)
+               passenger-info (if (nil? (get passenger-info ::t-service/id))
+                                (assoc passenger-info ::t-service/created (Timestamp. (.getMillis (time/now))))
+                                passenger-info)
+               transport-service (upsert! db ::t-service/transport-service passenger-info)]
         (places/link-places-to-transport-service!
-         db (::t-service/id transport-service) places)
-        transport-service))))
+          db (::t-service/id transport-service) places)
+          transport-service))))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
@@ -147,9 +146,9 @@
                   (update ::t-service/terminal dissoc ::t-service/operation_area)
                   (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
                   )]
-    (println "Terminal AREA: " (pr-str places))
-    (println "Terminal coordinates: " (pr-str coordinates))
-    (println "Terminal op-area-id: " op-area-id)
+    ;(println "Terminal AREA: " (pr-str places))
+    ;(println "Terminal coordinates: " (pr-str coordinates))
+    ;(println "Terminal op-area-id: " op-area-id)
     (jdbc/with-db-transaction [db db]
        (let [new-value (if (nil? (get value ::t-service/id))
                            (assoc value ::t-service/created (Timestamp. (.getMillis (time/now))))
@@ -166,9 +165,7 @@
                                                       {:id op-area-id
                                                        :transport-service-id (get transport-service ::t-service/id)
                                                        :x (first coordinates)
-                                                       :y (second coordinates)})
-             ))
-      ))))
+                                                       :y (second coordinates)})))))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]

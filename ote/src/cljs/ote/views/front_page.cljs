@@ -12,21 +12,9 @@
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [cljs-time.core :as time]
-            [cljs-time.format :as format]
-            [cljs-time.coerce :as coerce]
-            ))
-
-(def custom-formatter (format/formatter "dd.MM.yy H:i:s"))
-
-(defn format-my-time [my-time]
-  (if  (nil? my-time)
-    " " ;: if nil - print empty string
-    (->> my-time
-         time/to-default-time-zone
-         (format/unparse (format/formatter "dd.MM.yyyy hh:mm")))
-
-  ))
+            [ote.time :as time]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
 (defn transport-services-table-rows [e! services transport-operator-id]
 
@@ -49,8 +37,8 @@
                                :on-click #(e! (ts/->PublishTransportService id))}
                (tr [:buttons :publish])]])]
           [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "} (format-my-time modified)]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "} (format-my-time created)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column
            [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
             [ic/content-create]]
@@ -59,10 +47,7 @@
             [ic/action-delete]]
            ]
           ])
-       services))
-   ]
-
-  )
+       services))])
 
 (defn transport-services-listing [e! transport-operator-id services section-label]
   (when (> (count services) 0)
@@ -70,7 +55,7 @@
      [:div {:class "col-xs-12  col-md-12"}
       [:h3 section-label]
 
-      [ui/table {:class "front-page-service-table" }
+      [ui/table (stylefy/use-style style-base/front-page-service-table)
        [ui/table-header {:adjust-for-checkbox false
                          :display-select-all false}
         [ui/table-row {:selectable false}
@@ -82,9 +67,7 @@
          [ui/table-header-column {:class "hidden-xs hidden-sm "} "Luotu"]
          [ui/table-header-column "Toiminnot"]]]
 
-       (transport-services-table-rows e! services transport-operator-id)
-
-       ]]]))
+       (transport-services-table-rows e! services transport-operator-id)]]]))
 
 (defn empty-header-for-front-page [e!]
   [:div
@@ -98,7 +81,7 @@
 
 
    [:div.row {:style {:margin-top "50px"}}
-    [:div.front-page-add-service {:class "col-xs-12 col-md-offset-1 col-md-5"}
+    [:div (stylefy/use-style style-base/front-page-add-service {::stylefy/with-classes [ "col-xs-12 col-md-offset-1 col-md-5"]})
      [:div.row {:style {:height "100px"}}
       [:p "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista"]
       ]
@@ -108,7 +91,7 @@
                         :on-click #(e! (fp/->ChangePage :transport-service))
                         :primary  true
                         }]]]
-    [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px;"} }
+    [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px"} }
      [:div.row {:style {:padding-left "40px" :height "100px"}}
       [:p "Haluat digitoida liikkumispalvelusi olennaisia tietoja?"]
       ]
@@ -116,9 +99,7 @@
      [ui/raised-button {:label    "Digitoi liikkumispalvelusi tiedot"
                         ;:icon     (ic/social-group)
                         :on-click #(e! (fp/->ChangePage :transport-service))
-                        :primary  true
-                        }]]]]]
-  )
+                        :primary  true}]]]]])
 
 (defn table-container-for-front-page [e! services status]
   [:div

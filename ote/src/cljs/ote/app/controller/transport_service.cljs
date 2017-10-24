@@ -8,6 +8,18 @@
             [ote.time :as time]
             [clojure.string :as string]))
 
+(defn get-service-key-by-type [type]
+  (.log js/console "tuli tyyppi " type)
+  (case type
+    :passenger-transportation ::t-service/passenger-transportation
+    :terminal ::t-service/terminal
+    :rentals ::t-service/rentals
+    :parking ::t-service/parking
+    :brokerage ::t-service/brokerage
+    )
+  ;(keyword (str "ote.db.transport-service/" (string/replace (str (get response ::t-service/type)) ":" "")))
+  )
+
 (def service-level-keys
   #{::t-service/contact-address
     ::t-service/contact-phone
@@ -86,7 +98,7 @@
       (assoc :page (get response ::t-service/type)
              :transport-service response)
       (move-service-level-keys-to-form
-        (keyword (str "ote.db.transport-service/" (string/replace (str (get response ::t-service/type)) ":" "")))
+        (get-service-key-by-type (get response ::t-service/type))
         response)
         )
   )
@@ -123,4 +135,4 @@
 
     ;; Remove deleted service from the app state
     ;; FIXME: todo
-    ))
+    app))
