@@ -43,8 +43,8 @@
     :ote.db.transport-service/rental
     :ote.db.transport-service/brokerage
     :ote.db.transport-service/parking
-    :ote.db.transport-service/created
-    :ote.db.transport-service/modified
+    ::modification/created
+    ::modification/modified
     ::t-service/published?
     ::t-service/name})
 
@@ -54,8 +54,7 @@
                 transport-services-columns
                 where
                 {::specql/order-by ::t-service/type
-                 ::specql/order-direction :desc
-                 }))
+                 ::specql/order-direction :desc}))
 
 (defn- get-transport-service
   "Get single transport service by id"
