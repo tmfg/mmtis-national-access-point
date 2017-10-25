@@ -7,7 +7,8 @@
             [specql.impl.registry]
             [ote.db.common]
             [specql.data-types]
-            [ote.time])
+            [ote.time]
+            [ote.db.modification])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -48,6 +49,7 @@
 
   ;; Tables
   ["transport-service" ::transport-service
+   ote.db.modification/modification-fields
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}]
   ["operation_area" ::operation_area]
   )
