@@ -20,14 +20,12 @@
             [ote.authorization :as authorization]
             [ote.db.tx :as tx]
             [ote.nap.publish :as publish]
+            [ote.db.modification :as modification]
             [clojure.string :as str])
   (:import (java.time LocalTime)
            (java.sql Timestamp)))
 
 (defqueries "ote/services/places.sql")
-
-;; FIXME: monkey patch specql composite reading (For now)
-(defmethod specql-composite/parse-value "bpchar" [_ string] string)
 
 (def transport-operator-columns
   #{::transport-operator/id ::transport-operator/business-id ::transport-operator/email
@@ -126,15 +124,14 @@
   #_(println "DATA: " (pr-str data))
   (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         passenger-info (-> data
-                  (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
-                  (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
-                  (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
+                           (modification/with-modification-fields ::t-service/id user)
+                           (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
+                           (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
 
     ;; Store to OTE database
     (let [transport-service
           (jdbc/with-db-transaction [db db]
-            (let [new-value (dissoc value :transport-service)
-                  transport-service (upsert! db ::t-service/transport-service new-value)]
+            (let [transport-service (upsert! db ::t-service/transport-service passenger-info)]
               (places/link-places-to-transport-service!
                db (::t-service/id transport-service) places)
               transport-service))]
@@ -149,23 +146,19 @@
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
-  [db data]
+  [db user data]
   (println "Terminal DATA: " (pr-str data))
   (let [places (get-in data [::t-service/terminal ::t-service/operation-area])
         op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
         coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
         value (-> data
-                  (update ::t-service/terminal dissoc ::t-service/operation_area)
-                  (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
-                  )]
+                  (modification/with-modification-fields ::t-service/id user)
+                  (update ::t-service/terminal dissoc ::t-service/operation_area))]
     ;(println "Terminal AREA: " (pr-str places))
     ;(println "Terminal coordinates: " (pr-str coordinates))
     ;(println "Terminal op-area-id: " op-area-id)
     (jdbc/with-db-transaction [db db]
-       (let [new-value (if (nil? (get value ::t-service/id))
-                           (assoc value ::t-service/created (Timestamp. (.getMillis (time/now))))
-                           value)
-             transport-service (upsert! db ::t-service/transport-service new-value)]
+      (let [transport-service (upsert! db ::t-service/transport-service value)]
          (when (not-empty coordinates)
            (cond
              (nil? op-area-id)
@@ -213,8 +206,9 @@
           (save-passenger-transportation-info nap-config db user
                                               (http/transit-request form-data))))
 
-   (POST "/terminal" {form-data :body}
-     (http/transit-response (save-terminal-info db (http/transit-request form-data))))
+   (POST "/terminal" {form-data :body
+                      user :user}
+     (http/transit-response (save-terminal-info db user (http/transit-request form-data))))
 
    (POST "/transport-service/publish" {payload :body
                                        user :user}
@@ -224,9 +218,7 @@
               http/transit-response))
 
    (GET "/transport-service/delete/:id" [id]
-     (http/transit-response (delete-transport-service db (Long/parseLong id))))
-
-   ))
+     (http/transit-response (delete-transport-service db (Long/parseLong id))))))
 
 (defrecord Transport [nap-config]
   component/Lifecycle
