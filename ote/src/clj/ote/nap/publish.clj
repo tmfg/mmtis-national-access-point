@@ -44,7 +44,6 @@
   "Create a CKAN resource description that can be used with the CKAN API to
   create a resource."
   [export-base-url ts {:ckan/keys [id name] :as ckan-dataset}]
-  (println "CKAN-DATASET: " (pr-str ckan-dataset))
   (merge {:ckan/package-id id}
          (update (interface-description ts)
                  :ckan/url #(str export-base-url %))))
