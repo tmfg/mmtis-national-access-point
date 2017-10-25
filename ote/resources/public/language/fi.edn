@@ -149,7 +149,7 @@
 
   :ote.db.transport-service/information-service-accessibility
   {:audio-for-hearing-impaired "Ääniopastus kuulovammaisille"
-   :audio-information "Äänelliset informaatiot"
+   :audio-information "Kuulutukset"
    :visual-displays "Visuaaliset näytöt"
    :displays-for-visually-impaired "Näytöt näkövammaisille"
    :large-print-timetables "Suuret kirjasimet aikatauluissa"
@@ -175,7 +175,7 @@
    :low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :suitable-for-heavily-disabled  ":suitable-for-heavily-disabled"
+   :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
    :boarding-assistance  "Kyytiin nousun avustus"
    :onboard-assistance "Kyydin aikainen avustus"
    :unaccompanied-minor-assistance "Alaikäisten avustus"
