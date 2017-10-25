@@ -76,7 +76,7 @@
   (-> kw name (str/replace #"-" "_")))
 
 (defn ckan-key->keyword [key]
-  (keyword "ckan" key))
+  (keyword "ckan" (str/replace key #"_" "-")))
 
 
 (defn- ckan-post [{:keys [url api-key]} path payload]
@@ -92,24 +92,50 @@
                        :payload payload})))
     (-> response :body (cheshire/decode ckan-key->keyword))))
 
-
-(defn create-dataset [ckan dataset]
+(defn- ckan-dataset-action! [ckan action dataset]
   (when-not (s/valid? :ckan/dataset dataset)
     (throw (ex-info "Invalid CKAN dataset map"
                     (s/explain-data :ckan/dataset dataset))))
-  (ckan-post ckan "action/package_create" dataset))
+  (ckan-post ckan action dataset))
 
-(defn add-dataset-resource [ckan resource]
+(defn create-dataset! [ckan dataset]
+  (ckan-dataset-action! ckan "action/package_create" dataset))
+
+(defn update-dataset! [ckan dataset]
+  (ckan-dataset-action! ckan "action/package_update" dataset))
+
+(defn create-or-update-dataset! [ckan dataset]
+  (let [action (if (:ckan/id dataset)
+                 update-dataset!
+                 create-dataset!)]
+    (action ckan dataset)))
+
+(defn- ckan-resource-action! [ckan action resource]
   (when-not (s/valid? :ckan/resource resource)
     (throw (ex-info "Invalid CKAN dataset resource map"
                     (s/explain-data :ckan/resource resource))))
-  (ckan-post ckan "action/resource_create" resource))
+  (ckan-post ckan action resource))
+
+(defn add-dataset-resource! [ckan resource]
+  (ckan-resource-action! ckan "action/resource_create" resource))
+
+(defn update-dataset-resource! [ckan resource]
+  (ckan-resource-action! ckan "action/resource_update" resource))
+
+(defn add-or-update-dataset-resource! [ckan resource]
+  (let [action (if (:ckan/id resource)
+                 update-dataset-resource!
+                 add-dataset-resource!)]
+    (action ckan resource)))
 
 
+
+
+(defn add-or-update-dataset-resource [ckan resource])
 
 ;; Test locally
 
-#_(def c (->CKAN "http://localhost:8080/api/" "dc374d96-0baf-45c7-a331-7306519b00d6"))
+#_(def c (->CKAN "http://localhost:8080/api/" "d7c6dccf-6541-4443-a9b4-7ab7c36735bc"))
 
 #_(def create-dataset-response
   (create-dataset c {:ckan/name (str "uusia-tietoja-" (System/currentTimeMillis))
@@ -119,4 +145,5 @@
                      :ckan/public true
                      :ckan/extras [{:ckan/key "foo" :ckan/value "barsky"}
                                    {:ckan/key "howgood" :ckan/value "very"}]
-                     :ckan/operation-area "Oulu"}))
+                     :ckan/transport-service-type "Foo, dippadai, rentals"
+                     :ckan/operation-area "Oulu, Kempele, Hailuoto, 90100, Helsinki"}))

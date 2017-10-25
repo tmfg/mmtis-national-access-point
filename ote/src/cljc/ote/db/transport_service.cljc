@@ -7,7 +7,8 @@
             [specql.impl.registry]
             [ote.db.common]
             [specql.data-types]
-            [ote.time])
+            [ote.time]
+            [ote.db.modification])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -48,6 +49,7 @@
 
   ;; Tables
   ["transport-service" ::transport-service
+   ote.db.modification/modification-fields
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}]
   ["operation_area" ::operation_area]
   )
@@ -77,5 +79,15 @@
 
 ;; Create order for mobility-facility-facility
 (def mobility [:unknown :low-floor :step-free-access :suitable-for-wheelchairs
-                       :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
-                       :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
+               :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
+               :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
+
+(defn service-key-by-type
+  "Returns the service column keyword for the given type enum value."
+  [type]
+  (case type
+    :passenger-transportation ::passenger-transportation
+    :terminal ::terminal
+    :rentals ::rentals
+    :parking ::parking
+    :brokerage ::brokerage))

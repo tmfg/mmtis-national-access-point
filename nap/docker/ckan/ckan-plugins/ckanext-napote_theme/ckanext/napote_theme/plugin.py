@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import pprint
 import mimetypes
 from logging import getLogger
 from pkg_resources import resource_stream
@@ -44,6 +45,13 @@ def tags_to_select_options(tags=None):
         tags = []
     return [{'name': tag, 'value': tag} for tag in tags]
 
+def get_in(data, *keys):
+    try:
+        for k in keys:
+            data = data[k]
+        return data
+    except (IndexError, KeyError) as e:
+        return None
 
 class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
@@ -54,6 +62,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_helpers(self):
         return {
@@ -173,3 +182,25 @@ class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def package_types(self):
         return []
+
+
+    # Methods for IResourceView
+
+    def info(self):
+        return {'name': 'transport_service_view',
+                'title': tk._('Transport Service View'),
+                'iframed': False}
+
+    def can_view(self, data_dict):
+        return data_dict['resource']['format'] == 'GeoJSON'
+
+    def setup_template_variables(self, context, data_dict):
+        #log_debug('setup_template_variables, ctx:\n %s, data:\n %s', pprint.pformat(context), pprint.pformat(data_dict))
+        url = get_in(data_dict, 'resource', 'url') or get_in(data_dict, 'package','resources',0,'url')
+        return {'transport_service_url': url}
+
+    def view_template(self, context, data_dict):
+        return "transport_service_view.html"
+
+    def form_template(self, context, data_dict):
+        return "transport_service_view.html"

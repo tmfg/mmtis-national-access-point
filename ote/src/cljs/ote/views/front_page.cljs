@@ -12,6 +12,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.modification :as modification]
             [ote.time :as time]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]))
@@ -21,7 +22,8 @@
   [ui/table-body {:display-row-checkbox false}
    (doall
      (map-indexed
-       (fn [i {::t-service/keys [id type published? name created modified] :as row}]
+      (fn [i {::t-service/keys [id type published? name]
+              ::modification/keys [created modified] :as row}]
          ^{:key i}
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]

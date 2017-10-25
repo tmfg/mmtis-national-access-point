@@ -56,8 +56,9 @@
     - data_driven_schema_configs/conf/elevate.xml
 
 - name: Copy CKAN schema
-  shell: cp /opt/ckan-download/ckan/config/solr/schema.xml /var/solr/data/ckan/conf/
+  copy: src=../../nap/docker/solr/schema.xml dest=/var/solr/data/ckan/conf/schema.xml
 
+- name:
 - name: Create core.properties
   template: src=templates/core.properties.j2 dest=/var/solr/data/ckan/core.properties
 
