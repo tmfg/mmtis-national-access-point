@@ -2,7 +2,8 @@
   "Specql DB määritys ajonaikaisia määrittelyjä varten."
   (:require [specql.core :as specql]
             [specql.transform :as xf]
-            [specql.rel :as rel]))
+            [specql.rel :as rel]
+            [ote.db.modification]))
 
 
 (defmacro define-tables [& tables]
