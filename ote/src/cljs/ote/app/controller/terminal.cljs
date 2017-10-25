@@ -26,8 +26,7 @@
               (assoc ::t-service/type :terminal
                 ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/terminal form/without-form-metadata)
-              (transport-service/move-service-level-keys ::t-service/terminal)
-             )]
+              (transport-service/move-service-level-keys-from-form ::t-service/terminal))]
       (comm/post! "terminal"
                   service-data
                   {:on-success (t/send-async! ->HandleTerminalResponse)})
