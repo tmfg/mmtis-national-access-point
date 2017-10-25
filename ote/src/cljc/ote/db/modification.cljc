@@ -9,6 +9,8 @@
    "modified" ::modified
    "modified-by" ::modified-by})
 
+(def modification-field-keys #{::created ::created-by ::modified ::modified-by})
+
 #?(:clj
    (defn with-modification-fields [data id-field user]
      (let [now (java.sql.Timestamp. (System/currentTimeMillis))
