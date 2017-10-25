@@ -92,20 +92,46 @@
                        :payload payload})))
     (-> response :body (cheshire/decode ckan-key->keyword))))
 
-
-(defn create-dataset [ckan dataset]
+(defn- ckan-dataset-action! [ckan action dataset]
   (when-not (s/valid? :ckan/dataset dataset)
     (throw (ex-info "Invalid CKAN dataset map"
                     (s/explain-data :ckan/dataset dataset))))
-  (ckan-post ckan "action/package_create" dataset))
+  (ckan-post ckan action dataset))
 
-(defn add-dataset-resource [ckan resource]
+(defn create-dataset! [ckan dataset]
+  (ckan-dataset-action! ckan "action/package_create" dataset))
+
+(defn update-dataset! [ckan dataset]
+  (ckan-dataset-action! ckan "action/package_update" dataset))
+
+(defn create-or-update-dataset! [ckan dataset]
+  (let [action (if (:ckan/id dataset)
+                 update-dataset!
+                 create-dataset!)]
+    (action ckan dataset)))
+
+(defn- ckan-resource-action! [ckan action resource]
   (when-not (s/valid? :ckan/resource resource)
     (throw (ex-info "Invalid CKAN dataset resource map"
                     (s/explain-data :ckan/resource resource))))
-  (ckan-post ckan "action/resource_create" resource))
+  (ckan-post ckan action resource))
+
+(defn add-dataset-resource! [ckan resource]
+  (ckan-resource-action! ckan "action/resource_create" resource))
+
+(defn update-dataset-resource! [ckan resource]
+  (ckan-resource-action! ckan "action/resource_update" resource))
+
+(defn add-or-update-dataset-resource! [ckan resource]
+  (let [action (if (:ckan/id resource)
+                 update-dataset-resource!
+                 add-dataset-resource!)]
+    (action ckan resource)))
 
 
+
+
+(defn add-or-update-dataset-resource [ckan resource])
 
 ;; Test locally
 

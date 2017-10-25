@@ -23,13 +23,18 @@
 (defn- ckan-dataset-description
   "Create a CKAN dataset description that can be used with the CKAN API to
   create a dataset. The owner organization is the user's organization."
-  [db user {service-id ::t-service/id :as ts}]
-  {:ckan/name (str "org-" (::t-service/transport-operator-id ts)
-                   "-service-" service-id)
-   :ckan/title (::t-service/name ts)
-   :ckan/owner-org (get-in user [:group :name])
-   :ckan/transport-service-type (name (::t-service/type ts))
-   :ckan/operation-area (fetch-service-operation-area-description db service-id)})
+  [db user {ds-id ::t-service/ckan-dataset-id service-id ::t-service/id :as ts}]
+  (merge
+   {:ckan/name (str "org-" (::t-service/transport-operator-id ts)
+                    "-service-" service-id)
+    :ckan/title (::t-service/name ts)
+    :ckan/owner-org (get-in user [:group :name])
+    :ckan/transport-service-type (name (::t-service/type ts))
+    :ckan/operation-area (fetch-service-operation-area-description db service-id)}
+
+   ;; If dataset has already been created, add its id
+   (when ds-id
+     {:ckan/id ds-id})))
 
 (defmulti interface-description ::t-service/type)
 
@@ -62,7 +67,8 @@
   "Columns we need to fetch for a transport service when creating the dataset
   descriptor."
   #{::t-service/id ::t-service/transport-operator-id
-    ::t-service/name ::t-service/type})
+    ::t-service/name ::t-service/type
+    ::t-service/ckan-dataset-id ::t-service/ckan-resource-id})
 
 (defn- fetch-transport-service [db id]
   (first
@@ -76,12 +82,16 @@
         ts (fetch-transport-service db transport-service-id)
         dataset (->> ts
                      (ckan-dataset-description db user)
-                     (ckan/create-dataset c)
+                     (ckan/create-or-update-dataset! c)
                      verify-ckan-response)
         resource (->> dataset
                       (ckan-resource-description export-base-url ts)
-                      (ckan/add-dataset-resource c)
+                      (ckan/add-or-update-dataset-resource! c)
                       verify-ckan-response)]
+    (specql/update! db ::t-service/transport-service
+                    {::t-service/ckan-dataset-id (:ckan/id dataset)
+                     ::t-service/ckan-resource-id (:ckan/id resource)}
+                    {::t-service/id transport-service-id})
     {:dataset dataset
      :resource resource}))
 
@@ -107,4 +117,4 @@
 
 #_(def publish-result
     (publish-service-to-ckan! {:api "http://localhost:8080/api/"
-                               :export-base-url "http://localhost:8080"} db user 3))
+                               :export-base-url "http://localhost:8080"} db user 4))
