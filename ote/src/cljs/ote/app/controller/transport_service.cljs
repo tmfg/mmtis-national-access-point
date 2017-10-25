@@ -8,6 +8,14 @@
             [ote.time :as time]
             [taoensso.timbre :as log]))
 
+
+(def service-level-keys
+  #{::t-service/contact-address
+    ::t-service/contact-phone
+    ::t-service/contact-email
+    ::t-service/homepage
+    ::t-service/name})
+
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
@@ -15,6 +23,9 @@
 
 (defrecord ModifyTransportService [id])
 (defrecord ModifyTransportServiceResponse [response])
+
+(defrecord DeleteTransportService [id])
+(defrecord DeleteTransportServiceResponse [response])
 
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
@@ -58,9 +69,7 @@
       (assoc app
              :transport-service (move-service-level-keys-to-form
                                  response
-                                 (case type
-                                   :passenger-transportation ::t-service/passenger-transportation
-                                   :terminal ::t-service/terminal)))))
+                                 (t-service/service-key-by-type type)))))
 
 
   PublishTransportService
@@ -81,14 +90,19 @@
                          (assoc service ::t-service/published? true)
                          service))
                      services)))
-      app)))
+      app))
 
-(def service-level-keys
-  #{::t-service/contact-address
-    ::t-service/contact-phone
-    ::t-service/contact-email
-    ::t-service/homepage
-    ::t-service/name})
+  DeleteTransportService
+  (process-event [{id :id} app]
+    (comm/get! (str "transport-service/delete/" id)
+               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)})
+    app)
+
+  DeleteTransportServiceResponse
+  (process-event [{response :response} app]
+    (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-services))]
+      (assoc app :transport-services filtered-map))))
+
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the

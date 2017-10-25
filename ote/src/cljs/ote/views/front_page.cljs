@@ -11,46 +11,63 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [ote.time :as time]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
-(defn transport-services-listing [e! transport-operator-id services]
-  (when services
+(defn transport-services-table-rows [e! services transport-operator-id]
+
+  [ui/table-body {:display-row-checkbox false}
+   (doall
+     (map-indexed
+       (fn [i {::t-service/keys [id type published? name created modified] :as row}]
+         ^{:key i}
+         [ui/table-row {:selectable false :display-border false}
+          [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
+          [ui/table-row-column
+           [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))} name]]
+          [ui/table-row-column
+           (if published?
+             (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
+               [:a {:href url :target "_blank"} url])
+             [:span.publish
+              (tr [:field-labels :transport-service ::t-service/published?-values false])
+              [ui/flat-button {:primary true
+                               :on-click #(e! (ts/->PublishTransportService id))}
+               (tr [:buttons :publish])]])]
+          [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
+          [ui/table-row-column
+           [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
+            [ic/content-create]]
+
+           [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
+            [ic/action-delete]]
+           ]
+          ])
+       services))])
+
+(defn transport-services-listing [e! transport-operator-id services section-label]
+  (when (> (count services) 0)
     [:div.row
      [:div {:class "col-xs-12  col-md-12"}
-      [:h3 " Henkilöiden kuljetuspalvelut"]
+      [:h3 section-label]
 
-      [ui/table
+      [ui/table (stylefy/use-style style-base/front-page-service-table)
        [ui/table-header {:adjust-for-checkbox false
                          :display-select-all false}
         [ui/table-row {:selectable false}
-         [ui/table-header-column "Id"]
+         [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "10px"}} "Id"]
          [ui/table-header-column "Palvelun nimi"]
          [ui/table-header-column "Palvelun verkko-osoite"]
-         [ui/table-header-column "Muut tietoaineistot"]
-         [ui/table-header-column "NAP-tila"]]]
+         [ui/table-header-column {:class "hidden-xs "} "NAP-tila"]
+         [ui/table-header-column {:class "hidden-xs hidden-sm "} "Muokattu"]
+         [ui/table-header-column {:class "hidden-xs hidden-sm "} "Luotu"]
+         [ui/table-header-column "Toiminnot"]]]
 
-       [ui/table-body {:display-row-checkbox false}
-        (doall
-         (map-indexed
-          (fn [i {::t-service/keys [id type published? name] :as row}]
-            ^{:key i}
-            [ui/table-row {:selectable false :display-border false}
-             [ui/table-row-column (get row :ote.db.transport-service/id)]
-             [ui/table-row-column
-              [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))}
-               name]]
-             [ui/table-row-column
-              (if published?
-                (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
-                  [:a {:href url :target "_blank"} url])
-                [:span.publish
-                 (tr [:field-labels :transport-service ::t-service/published?-values false])
-                 [ui/flat-button {:primary true
-                                  :on-click #(e! (ts/->PublishTransportService id))}
-                  (tr [:buttons :publish])]])]
-             [ui/table-row-column "FIXME"]
-             [ui/table-row-column (tr [:field-labels :transport-service ::t-service/published?-values published?])]])
-          services))]]]]))
+       (transport-services-table-rows e! services transport-operator-id)]]]))
 
 (defn empty-header-for-front-page [e!]
   [:div
@@ -64,7 +81,7 @@
 
 
    [:div.row {:style {:margin-top "50px"}}
-    [:div.front-page-add-service {:class "col-xs-12 col-md-offset-1 col-md-5"}
+    [:div (stylefy/use-style style-base/front-page-add-service {::stylefy/with-classes [ "col-xs-12 col-md-offset-1 col-md-5"]})
      [:div.row {:style {:height "100px"}}
       [:p "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista"]
       ]
@@ -74,7 +91,7 @@
                         :on-click #(e! (fp/->ChangePage :transport-service))
                         :primary  true
                         }]]]
-    [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px;"} }
+    [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px"} }
      [:div.row {:style {:padding-left "40px" :height "100px"}}
       [:p "Haluat digitoida liikkumispalvelusi olennaisia tietoja?"]
       ]
@@ -82,17 +99,15 @@
      [ui/raised-button {:label    "Digitoi liikkumispalvelusi tiedot"
                         ;:icon     (ic/social-group)
                         :on-click #(e! (fp/->ChangePage :transport-service))
-                        :primary  true
-                        }]]]]]
-  )
+                        :primary  true}]]]]])
 
 (defn table-container-for-front-page [e! services status]
   [:div
    [:div.row
-    [:div {:class "col-xs-12  col-md-8"}
+    [:div {:class "col-xs-12 col-sm-6 col-md-8"}
      [:h3 (tr [:common-texts :own-api-list])]
      ]
-    [:div {:class "col-xs-12 col-md-4"}
+    [:div {:class "col-xs-12 col-sm-6 col-md-4"}
      [ui/raised-button {:style {:margin-top "20px"}
                         :label    "Digitoi liikkumispalvelusi tiedot"
                         ;:icon     (ic/content-add)
@@ -101,9 +116,16 @@
    [:div.row
     [:div {:class "col-xs-12  col-md-12"}
      ;; Table for transport services
-     [transport-services-listing e! (get-in status [:transport-operator ::t-operator/id]) services]]]]
 
-  )
+     (for [type t-service/transport-service-types
+           :let [services (filter #(= (:ote.db.transport-service/type %) type) services)]
+           :when (not (empty? services))]
+       ^{:key type}
+       [transport-services-listing
+        e!
+        (get-in status [:transport-operator ::t-operator/id])
+        services
+        (tr [:titles type])])]]])
 
 (defn front-page [e! status]
 
@@ -115,5 +137,4 @@
 
      (if (empty? services)
        (empty-header-for-front-page e!)
-       (table-container-for-front-page e! services status)
-       )]))
+       (table-container-for-front-page e! services status))]))

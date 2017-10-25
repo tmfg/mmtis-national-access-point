@@ -77,5 +77,15 @@
 
 ;; Create order for mobility-facility-facility
 (def mobility [:unknown :low-floor :step-free-access :suitable-for-wheelchairs
-                       :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
-                       :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
+               :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
+               :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
+
+(defn service-key-by-type
+  "Returns the service column keyword for the given type enum value."
+  [type]
+  (case type
+    :passenger-transportation ::passenger-transportation
+    :terminal ::terminal
+    :rentals ::rentals
+    :parking ::parking
+    :brokerage ::brokerage))
