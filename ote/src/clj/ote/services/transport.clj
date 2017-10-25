@@ -31,9 +31,10 @@
     ::transport-operator/name})
 
 (defn get-transport-operator [db where]
-  (first (fetch db ::transport-operator/transport-operator
+  (let [operator (first (fetch db ::transport-operator/transport-operator
                 (specql/columns ::transport-operator/transport-operator)
-                where {::specql/limit 1})))
+                where {::specql/limit 1}))]
+    operator))
 
 (def transport-services-columns
   #{::t-service/id ::t-service/type
@@ -105,6 +106,9 @@
 (defn- save-transport-operator [db data]
   (upsert! db ::transport-operator/transport-operator data))
 
+(defn- user-has-rights-to-save-service [operator service]
+  "Check if user hase access rights to save service for the selected operator"
+  (if (= (get operator :ote.db.transport-operator/id) (get service :ote.db.transport-service/transport-operator-id)) true false))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
@@ -116,54 +120,58 @@
 
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
-  [db data]
-  ;(println "DATA: " (pr-str data))
-  (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
+  [db user data]
+  (let [ckan-group (-> user :groups first)
+        operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
+        places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         passenger-info (-> data
                   (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
                   (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                   (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
-    (jdbc/with-db-transaction [db db]
+    (when (user-has-rights-to-save-service operator passenger-info)
+      (jdbc/with-db-transaction [db db]
          (let [passenger-info (dissoc passenger-info :transport-service)
                passenger-info (if (nil? (get passenger-info ::t-service/id))
-                                (assoc passenger-info ::t-service/created (Timestamp. (.getMillis (time/now))))
-                                passenger-info)
+                                  (assoc passenger-info ::t-service/created (Timestamp. (.getMillis (time/now))))
+                                  passenger-info)
                transport-service (upsert! db ::t-service/transport-service passenger-info)]
-        (places/link-places-to-transport-service!
-          db (::t-service/id transport-service) places)
-          transport-service))))
+           (places/link-places-to-transport-service!
+            db (::t-service/id transport-service) places)
+            transport-service)))))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
-  [db data]
-  (println "Terminal DATA: " (pr-str data))
-  (let [places (get-in data [::t-service/terminal ::t-service/operation-area])
+  [db user data]
+  ;(println "Terminal DATA: " (pr-str data))
+  (let [ckan-group (-> user :groups first)
+        operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
+        places (get-in data [::t-service/terminal ::t-service/operation-area])
         op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
         coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
-        value (-> data
+        terminal (-> data
                   (update ::t-service/terminal dissoc ::t-service/operation_area)
                   (assoc ::t-service/modified (Timestamp. (.getMillis (time/now))))
                   )]
-    ;(println "Terminal AREA: " (pr-str places))
-    ;(println "Terminal coordinates: " (pr-str coordinates))
-    ;(println "Terminal op-area-id: " op-area-id)
-    (jdbc/with-db-transaction [db db]
-       (let [new-value (if (nil? (get value ::t-service/id))
-                           (assoc value ::t-service/created (Timestamp. (.getMillis (time/now))))
-                           value)
-             transport-service (upsert! db ::t-service/transport-service new-value)]
-         (when (not-empty coordinates)
-           (cond
-             (nil? op-area-id)
-             (insert-point-for-transport-service! db
+    (when (user-has-rights-to-save-service operator terminal)
+      (jdbc/with-db-transaction [db db]
+        (let [terminal (if (nil? (get terminal ::t-service/id))
+                          (assoc terminal ::t-service/created (Timestamp. (.getMillis (time/now))))
+                          terminal)
+             transport-service (upsert! db ::t-service/transport-service terminal)]
+          ;(println "*** Terminal after db save " transport-service)
+          (when (not-empty coordinates)
+            (cond
+              (nil? op-area-id)
+              (insert-point-for-transport-service! db
                                                 {:transport-service-id (get transport-service ::t-service/id)
                                                  :x (first coordinates)
                                                  :y (second coordinates)})
-             :else (save-point-for-transport-service! db
+               :else (save-point-for-transport-service! db
                                                       {:id op-area-id
                                                        :transport-service-id (get transport-service ::t-service/id)
                                                        :x (first coordinates)
-                                                       :y (second coordinates)})))))))
+                                                       :y (second coordinates)})))
+          transport-service)))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]
@@ -188,19 +196,19 @@
    (POST "/transport-operator/data" {user :user}
         (http/transit-response (get-transport-operator-data db (-> user :groups first) (:user user))))
 
-   (POST "/transport-operator" {form-data :body
-                                user :user}
+   (POST "/transport-operator" {form-data :body user :user}
          (log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
 
-   (POST "/passenger-transportation-info" {form-data :body}
-         (http/transit-response (save-passenger-transportation-info db (http/transit-request form-data))))
+   (POST "/passenger-transportation-info" {form-data :body user :user}
+         (http/transit-response
+           (save-passenger-transportation-info db user (http/transit-request form-data))))
 
-   (POST "/terminal" {form-data :body}
-     (http/transit-response (save-terminal-info db (http/transit-request form-data))))
+   (POST "/terminal-information" {form-data :body user :user}
+     (http/transit-response
+       (save-terminal-info db user (http/transit-request form-data))))
 
-   (POST "/transport-service/publish" {payload :body
-                                       user :user}
+   (POST "/transport-service/publish" {payload :body user :user}
          (->> payload
               http/transit-request
               (publish-transport-service db user)

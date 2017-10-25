@@ -46,6 +46,21 @@
    ::t-service/contact-address generators/gen-address
    ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
 
+
+(def gen-terminal_information
+  (gen/hash-map
+    ::t-service/service-hours generators/gen-service-hours-array
+    ::t-service/indoor-map generators/gen-service-link
+    ))
+
+(def gen-terminal-service
+  (gen/hash-map
+    ::t-service/transport-operator-id (gen/return 1)
+    ::t-service/type (gen/return :terminal)
+    ::t-service/terminal gen-terminal_information
+    ::t-service/contact-address generators/gen-address
+    ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
+
 ;; We have a single transport service inserted in the test data,
 ;; check that its information is fetched ok
 (deftest fetch-test-data-transport-service
@@ -136,3 +151,20 @@
           (effectively-same-deep
            (::t-service/passenger-transportation service)
            (::t-service/passenger-transportation fetched))))))
+
+(defspec save-terminal-to-wrong-operator
+  1
+  (prop/for-all
+    [terminal-service gen-terminal-service] ;; Generate new terminal service
+    (let [response (http-post "admin" "terminal-information"
+                              terminal-service) ;; Post generated data to server
+          service (:transit response) ;; Get response from transit
+          fetch-response (http-get "admin"
+                                   (str "transport-service/" (::t-service/id service))) ;; GET generated service from server
+          fetched (:transit fetch-response) ;; Get response from transit
+          modified-operator (assoc fetched ::t-service/transport-operator-id 2) ;; Change id from 1 -> 2
+          failed-response (http-post "admin" "terminal-information"
+                                    modified-operator) ;; Post modified service data to server
+          fetched-failed-service (:transit failed-response) ;; Get response from transit
+          ]
+          (is  (not= (:status fetched-failed-service) 200)))))

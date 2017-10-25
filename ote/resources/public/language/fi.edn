@@ -139,7 +139,7 @@
    :passenger-cart   "Henkilökuljetuskärryt"
    :pushchair        "Lastenrattaat"
    :umbrella         "Sateenvarjo"
-   :buggy            "Lastenvounut"
+   :buggy            "Lastenvaunut"
    :other            "Muu"}
 
   :ote.db.transport-service/day
