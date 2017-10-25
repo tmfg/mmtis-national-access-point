@@ -6,6 +6,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [cljsjs.react-leaflet]
+            [cljsjs.leaflet-draw]
             [tuck.core :as tuck]
             [ote.app.state :as state]
             [ote.views.main :as main]

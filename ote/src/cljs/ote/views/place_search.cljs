@@ -24,17 +24,37 @@
                       :dashArray "5,5"} location]
    [leaflet/Popup [:div name]]])
 
-(defn places-map [e! results]
-  [leaflet/Map {;;:prefer-canvas true
-                :center #js [65 25]
-                :zoom 5}
-   [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                       :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-   (for [{:keys [place geojson]} results]
-     ^{:key (::places/id place)}
-     [leaflet/GeoJSON {:data geojson
-                       :style {:color "green"}}])])
+(defn places-map [e! results]
+  (let [feature-group (atom nil)]
+    (r/create-class
+     {:component-did-mount
+      (fn [this]
+        (let [m  (aget this "refs" "leaflet" "leafletElement")
+              fg (new js/L.FeatureGroup)
+              dc (new js/L.Control.Draw #js {:edit #js {:featureGroup fg
+                                                        :remove false}})]
+          (reset! feature-group fg)
+          (.addLayer m fg)
+          (.addControl m dc)
+          (.on m (aget js/L "Draw" "Event" "CREATED")
+               #(.addLayer fg (aget % "layer")))))
+
+      :reagent-render
+      (fn [e! results]
+        [leaflet/Map {;;:prefer-canvas true
+                      :ref "leaflet"
+                      :center #js [65 25]
+                      :zoom 5}
+         [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                             :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+
+         [leaflet/FeatureGroup]
+
+         (for [{:keys [place geojson]} results]
+           ^{:key (::places/id place)}
+           [leaflet/GeoJSON {:data geojson
+                             :style {:color "green"}}])])})))
 
 (defn marker-map [e! coordinate]
   (.log js/console "rendering marker map coordinate->"coordinate)
