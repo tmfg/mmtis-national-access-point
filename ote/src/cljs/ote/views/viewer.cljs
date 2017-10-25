@@ -21,6 +21,14 @@
 (defmethod transform-value "homepage" [_ value] (linkify value value))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
+(defmethod transform-value "lang" [_ value]
+  ;; Show unicode country flags for supported languages, otherwise show language code
+  (case value
+    "FI" "\ud83c\uddeb\ud83c\uddee" ; finnish flag
+    "SV" "\ud83c\uddf8\ud83c\uddea" ; swedish flag
+    "EN" "\ud83c\uddec\ud83c\udde7" ; united kingdom flag
+    value))
+
 (defmethod transform-value :default [_ value]
   (tr-or (tr [:viewer :values value]) (str value)))
 
