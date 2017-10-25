@@ -106,3 +106,10 @@
                  message))
             paths)
       "")))
+
+(defn tr-or
+  "Utility for returning a default when a translation is not found."
+  [tr-result default-value]
+  (if (= "" tr-result)
+    default-value
+    tr-result))

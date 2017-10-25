@@ -23,13 +23,14 @@
 
 
   SavePassengerTransportationToDb
-  (process-event [_ {service :transport-service :as app}]
+  (process-event [{publish? :publish?} {service :transport-service :as app}]
     (let [service-data
           (-> service
               (assoc ::t-service/type :passenger-transportation
+                     ::t-service/published? publish?
                      ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
               (update ::t-service/passenger-transportation form/without-form-metadata)
-              (transport-service/move-service-level-keys ::t-service/passenger-transportation)
+              (transport-service/move-service-level-keys-from-form ::t-service/passenger-transportation)
               (update-in [::t-service/passenger-transportation ::t-service/operation-area]
                          place-search/place-references))]
       (comm/post! "passenger-transportation-info"

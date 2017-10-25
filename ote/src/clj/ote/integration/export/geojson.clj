@@ -8,7 +8,9 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [jeesql.core :refer [defqueries]]
-            [cheshire.core :as cheshire]))
+            [cheshire.core :as cheshire]
+            [ote.db.modification :as modification]
+            [clojure.set :as set]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
@@ -54,7 +56,8 @@
 
 (def ^{:doc "Transport service columns to set as properties in GeoJSON export"}
   transport-service-properties-columns
-  (specql/columns ::t-service/transport-service))
+  (set/difference (specql/columns ::t-service/transport-service)
+                  modification/modification-field-keys))
 
 (defn- export-geojson [db transport-operator-id transport-service-id]
   (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
@@ -66,6 +69,7 @@
                                      {::t-service/transport-operator-id transport-operator-id
                                       ::t-service/id transport-service-id
                                       ::t-service/published? true}))]
+
     (if (and geojson operator service)
       (-> (cheshire/decode geojson keyword)
           simplify-collection

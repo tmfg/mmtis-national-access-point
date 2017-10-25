@@ -295,52 +295,59 @@
                 is based on the `:name` of the field. This is useful to automatically take
                 a translation as the label.
   "
-  [_ _ _]
-  (let [focus (atom nil)]
-    ;; FIXME: change layout to material-ui grid when upgrading to material-ui v1
-    (fn [{:keys [update! class footer-fn can-edit? label name->label] :as options}
-         schemas
-         {modified ::modified
-          :as data}]
-      (let [{::keys [errors warnings notices] :as validated-data} (validate data schemas)
-            can-edit? (if (some? can-edit?)
-                        can-edit?
-                        true)
-            update-form (fn [new-data]
-                          (assert update! (str ":update! missing, options:" (pr-str options)))
-                          (-> new-data
-                              modification-time
-                              (validate schemas)
-                              (assoc ::modified (conj (or (::modified new-data) #{}) name))
-                              update!))
-            update-field-fn (fn [name-or-write value]
-                              (let [new-data (if (keyword? name-or-write)
-                                               (assoc data name-or-write value)
-                                               (name-or-write data value))]
-                                (update-form new-data)))
-            closed-groups (::closed-groups data #{})]
-        [:div.form {:class class}
-         (when label
-           [:h3.form-label label])
-         [:span.form-groups
-          (doall
-           (map-indexed
-            (fn [i form-group]
-              ^{:key i}
-              [form-group-ui
-               {:name->label name->label
-                :data validated-data
-                :update-field-fn update-field-fn
-                :can-edit? can-edit?
-                :focus focus
-                :update-form update-form
-                :closed-groups closed-groups}
-               form-group])
+  [_ _ data]
+  (let [focus (atom nil)
+        latest-data (atom data)]
+    (r/create-class
+     {:component-will-receive-props
+      (fn [_ [_ _ _ new-data]]
+        (reset! latest-data new-data))
 
-            schemas))]
+      :reagent-render
+      (fn [{:keys [update! class footer-fn can-edit? label name->label] :as options}
+           schemas
+           {modified ::modified
+            :as data}]
+        (let [{::keys [errors warnings notices] :as validated-data} (validate data schemas)
+              can-edit? (if (some? can-edit?)
+                          can-edit?
+                          true)
+              update-form (fn [new-data]
+                            (assert update! (str ":update! missing, options:" (pr-str options)))
+                            (-> new-data
+                                modification-time
+                                (validate schemas)
+                                (assoc ::modified (conj (or (::modified new-data) #{}) name))
+                                update!))
+              update-field-fn (fn [name-or-write value]
+                                (let [data @latest-data
+                                      new-data (if (keyword? name-or-write)
+                                                 (assoc data name-or-write value)
+                                                 (name-or-write data value))]
+                                  (update-form new-data)))
+              closed-groups (::closed-groups data #{})]
+          [:div.form {:class class}
+           (when label
+             [:h3.form-label label])
+           [:span.form-groups
+            (doall
+             (map-indexed
+              (fn [i form-group]
+                ^{:key i}
+                [form-group-ui
+                 {:name->label name->label
+                  :data validated-data
+                  :update-field-fn update-field-fn
+                  :can-edit? can-edit?
+                  :focus focus
+                  :update-form update-form
+                  :closed-groups closed-groups}
+                 form-group])
 
-         (when-let [footer (when footer-fn
-                             (footer-fn (assoc validated-data
-                                               ::schema schemas)))]
-           [:div.form-footer.row
-            [:div.col-md-12 footer]])]))))
+              schemas))]
+
+           (when-let [footer (when footer-fn
+                               (footer-fn (assoc validated-data
+                                                 ::schema schemas)))]
+             [:div.form-footer.row
+              [:div.col-md-12 footer]])]))})))

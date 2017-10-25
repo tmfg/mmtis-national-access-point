@@ -7,7 +7,8 @@
             [ote.nap.cookie :as nap-cookie]
             [ote.nap.users :as nap-users]
             [taoensso.timbre :as log]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ring.middleware.params :as params]))
 
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
@@ -25,13 +26,15 @@
 
           ;; Handler for static resources
           resources
-          (wrap-strip-prefix
-           strip-prefix
-           (route/resources "/"))
+          (params/wrap-params
+           (wrap-strip-prefix
+            strip-prefix
+            (route/resources "/")))
 
           ;; Handler for routes that don't require authenticated user
           public-handler
-          (wrap-strip-prefix strip-prefix #(serve-request @public-handlers %))
+          (params/wrap-params
+           (wrap-strip-prefix strip-prefix #(serve-request @public-handlers %)))
 
           ;; Handler for routes that require authentication
           handler #(serve-request @handlers %)

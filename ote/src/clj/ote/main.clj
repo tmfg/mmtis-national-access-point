@@ -5,8 +5,11 @@
             [ote.services.transport :as transport-service]
             [ote.components.http :as http]
             [ote.components.db :as db]
+
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
+            [ote.services.viewer :as viewer]
+
             [ote.integration.export.geojson :as export-geojson]
             [taoensso.timbre :as log])
   (:gen-class))
@@ -21,7 +24,8 @@
    :http (component/using (http/http-server (:http config)) [:db])
 
    ;; Services for the frontend
-   :transport (component/using (transport-service/->Transport) [:http :db])
+   :transport (component/using (transport-service/->Transport (:nap config)) [:http :db])
+   :viewer (component/using (viewer/->Viewer) [:http])
 
    ;; Return localization information to frontend
    :localization (component/using

@@ -6,19 +6,8 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.time :as time]
-            [clojure.string :as string]))
+            [taoensso.timbre :as log]))
 
-(defn get-service-key-by-type [type]
-  (.log js/console "tuli tyyppi " type)
-  (case type
-    :passenger-transportation ::t-service/passenger-transportation
-    :terminal ::t-service/terminal
-    :rentals ::t-service/rentals
-    :parking ::t-service/parking
-    :brokerage ::t-service/brokerage
-    )
-  ;(keyword (str "ote.db.transport-service/" (string/replace (str (get response ::t-service/type)) ":" "")))
-  )
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -26,28 +15,6 @@
     ::t-service/contact-email
     ::t-service/homepage
     ::t-service/name})
-
-(defn move-service-level-keys
-  "The form only sees the type specific level, move keys that are stored in the
-  transport-service level there."
-  [service from]
-  (reduce (fn [service key]
-            (-> service
-                (assoc key (get-in service [from key]))
-                (update from dissoc key)))
-          service
-          service-level-keys))
-
-(defn move-service-level-keys-to-form
-  "The form only sees the type specific level, move keys that are stored in the
-  transport-service level back to service level (e.g. passenger-transportation)."
-  [service to-key from]
-  (reduce (fn [service key]
-            (-> service
-                (assoc-in [:transport-service to-key key] (get from key))
-                ))
-          service
-          service-level-keys))
 
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
@@ -62,6 +29,9 @@
 
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
+
+(declare move-service-level-keys-from-form
+         move-service-level-keys-to-form)
 
 (extend-protocol tuck/Event
 
@@ -94,14 +64,13 @@
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
-    (-> app
-      (assoc :page (get response ::t-service/type)
-             :transport-service response)
-      (move-service-level-keys-to-form
-        (get-service-key-by-type (get response ::t-service/type))
-        response)
-        )
-  )
+    (let [type (::t-service/type response)]
+      (routes/navigate! type)
+      (assoc app
+             :transport-service (move-service-level-keys-to-form
+                                 response
+                                 (t-service/service-key-by-type type)))))
+
 
   PublishTransportService
   (process-event [{:keys [transport-service-id]} app]
@@ -133,3 +102,25 @@
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-services))]
       (assoc app :transport-services filtered-map))))
+
+
+(defn move-service-level-keys-from-form
+  "The form only sees the type specific level, move keys that are stored in the
+  transport-service level there."
+  [service from]
+  (reduce (fn [service key]
+            (-> service
+                (assoc key (get-in service [from key]))
+                (update from dissoc key)))
+          service
+          service-level-keys))
+
+(defn move-service-level-keys-to-form
+  "Reverse of `move-service-level-keys-from-form`."
+  [service to]
+  (reduce (fn [service key]
+            (-> service
+                (assoc-in [to key] (get service key))
+                (dissoc key)))
+          service
+          service-level-keys))

@@ -39,6 +39,7 @@ write_config () {
 
   ckan-paster --plugin=ckan config-tool "$CONFIG" -s app:main -e \
     "ckan.plugins = stats text_view image_view recline_view napote_theme" \
+    "ckan.views.default_views = transport_service_view image_view text_view recline_view" \
     "ckan.locale_default = fi" \
     "ckan.locale_order = fi en sv" \
     "ckan.locales_offered = fi en sv" \
