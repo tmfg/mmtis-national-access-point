@@ -139,7 +139,7 @@
    :passenger-cart   "Henkilökuljetuskärryt"
    :pushchair        "Lastenrattaat"
    :umbrella         "Sateenvarjo"
-   :buggy            "Lastenvounut"
+   :buggy            "Lastenvaunut"
    :other            "Muu"}
 
   :ote.db.transport-service/day
@@ -232,9 +232,9 @@
           "transport-operator-id" "Palveluntuottajan tunnistenumero"
           "type" "Palvelun tyyppi"
 
-          "passenger-transportation" "Henilöiden kuljetuspalvelun tiedot"
+          "passenger-transportation" "Henkilöiden kuljetuspalvelun tiedot"
           "accessibility-description" "Kuvaus saavutettavuudesta"
-          "accessibility-tool" "Savutettavuusvälineet"
+          "accessibility-tool" "Saavutettavuusvälineet"
           "additional-services" "Lisäpalvelut"
           "payment-methods" "Maksuvälineet"
           "price-classes" "Hintaluokat"
@@ -264,7 +264,7 @@
                    "passenger-cart" "Henkilökuljetuskärryt"
                    "pushchair" "Lastenrattaat"
                    "umbrella" "Sateenvarjo"
-                   "buggy" "Lastenvounut"
+                   "buggy" "Lastenvaunut"
                    "other" "Muu"
 
                    ;; additional services
