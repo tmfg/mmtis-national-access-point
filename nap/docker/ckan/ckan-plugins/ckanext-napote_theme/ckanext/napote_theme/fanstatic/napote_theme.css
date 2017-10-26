@@ -566,9 +566,8 @@ body {
 }
 
 /** NOTE: Some btn style rules are from materializecss.com **/
-.homepage .btn {
+.homepage [role=main] .btn {
     border: none;
-    color: #ffffff;
     padding: 0 2rem;
     border-radius: 2px;
     overflow: hidden;
@@ -587,15 +586,16 @@ body {
     word-wrap: break-word;
 }
 
-.homepage .btn:hover {
-    background: #2f97dd;
+.homepage [role=main] .btn:hover {
+    background: #d3d3d3;
 }
 
-.homepage .btn.btn-primary {
+.homepage [role=main] .btn.btn-primary {
     background: #2D75B4;
+    color: #ffffff;
 }
 
-.homepage .btn.btn-primary:hover {
+.homepage [role=main] .btn.btn-primary:hover {
     background: #2f97dd;
 }
 
@@ -603,6 +603,13 @@ body {
 .site-footer {
     background: #444444; /** LIVI lisäväri, harmaat 5. **/
     color: #ffffff;
+}
+
+/** Modules **/
+
+.module .module-heading {
+    color: #ffffff;
+    background-color: #2D75B4;
 }
 
 /*
