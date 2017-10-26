@@ -578,12 +578,13 @@ body {
     text-transform: uppercase;
     text-align: center;
     letter-spacing: .5px;
-    height: 36px;
+    min-height: 36px;
     font-size: 1rem;
     font-weight: normal;
     outline: 0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
     transition: background-color .3s;
+    word-wrap: break-word;
 }
 
 .homepage .btn:hover {
@@ -631,6 +632,15 @@ body {
 }
 
 /** HOME **/
+.homepage .box.box--spaced {
+    box-sizing: border-box;
+    display: flex;
+    min-height: 300px;
+    padding: 25px 25px 40px 25px;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .homepage .box.box--gradient {
     border: #d5d5d5 solid 1px;
     background: #ffffff; /* Old browsers */

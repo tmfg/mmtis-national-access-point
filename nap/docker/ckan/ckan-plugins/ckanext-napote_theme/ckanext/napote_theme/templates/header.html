@@ -33,12 +33,8 @@
                         {% block header_site_navigation %}
                             <ul class="nav nav-pills">
                                 {% block header_site_navigation_tabs %}
-                                    {{ h.build_nav_main(('home', _('Home')),('search', _('Datasets')),('organizations_index', _('Organizations')) ) }}
+                                    {{ h.build_nav_main(('home', _('Home')),('search', _('Palvelukatalogi')),('organizations_index', _('Organizations')) ) }}
                                 {% endblock %}
-
-                                {% if c.userobj %}
-                                    <li><a href="/ote/index.html">OTE</a></li>
-                                {% endif %}
                             </ul>
                         {% endblock %}
                     </nav>
@@ -89,6 +85,15 @@
                                                            title="{{ _('Edit settings') }}">
                                                             <i class="fa fa-cog" aria-hidden="true"></i>
                                                             <span class="text">{{ _('Settings') }}</span>
+                                                        </a>
+                                                    </li>
+                                                {% endblock %}
+                                                {% block header_account_nap_manager_link %}
+                                                    <li>
+                                                        <a href="/ote/index.html"
+                                                           title="{{ _('NAP-tietojen hallinta') }}">
+                                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                                            <span class="text">{{ _('NAP-tietojen hallinta') }}</span>
                                                         </a>
                                                     </li>
                                                 {% endblock %}

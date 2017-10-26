@@ -12,44 +12,45 @@
 
             <div class="row row2 module">
                 <div class="span12">
-                    <h2>Liikkumispalveluiden julkaisu</h2>
+                    <h2>Liikkumispalveluiden tallennus ja julkaisu</h2>
                 </div>
-                <div class="span12">
-                    <div class="module-content box box--gradient text-center">
-                        <p>{% trans %}Haluatko julkaista uusia tai päivittää aiemmin julkaisemiasi rajapintoja
-                            palvelukatalogiin?
-                            Rajapinnat ovat joko itse ylläpidettyjä, Liikenneviraston OTE-palvelussa ylläpidettyjä tai
-                            RAE-palvelussa ylläpidettyjä.{% endtrans %}</p>
+                <div class="span6">
+                    <div class="module-content box box--spaced box--gradient text-center">
+                        <p>{% trans %}Liikkumispalvelusi olennaisten tietojen kirjaaminen, muokkaaminen ja julkaisu
+                            hoituu kätevästi NAP-tietojen hallintapaneelissa.{% endtrans %}</p>
 
-                        <p>{% link_for _('Siirry palvelukatalogiin'), controller='user', action='login', class_='btn btn-primary' %}</p>
+                        <div>
+                            <p>
+                                <a class="btn btn-primary"
+                                   href="/ote/index.html">{{ _('Siirry tietojen hallintapalveluun') }}</a>
+                            </p>
+                            <p>
+                                <small>(Aukeaa uuteen välilehteen)</small>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="row row3">
-                <div class="span12">
-                    <h2>Liikkumispalveluiden digitointi</h2>
-                </div>
-                <div class="span4">
-                    <div class="box box--gradient text-center">
-                        <p>{% trans %}Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka
-                            kuvailutietoja haluat julkaista.{% endtrans %}</p>
-                        <p>{% link_for _('Siirry palvelukatalogiin'), controller='user', action='login', class_='btn btn-primary' %}</p>
-                    </div>
-                </div>
-                <div class="span4">
-                    <div class="box box--gradient text-center">
-                        <p>{% trans %}Sinulla ei ole omaa itse ylläpidettyä rajapintaa ja haluat digitoida tai päivittää
-                            liikkumispalvelusi tietoja Liikenneviraston olennaisten tietojen editorilla
-                            (OTE)?{% endtrans %}</p>
-                        <p>{% link_for _('Avaa OTE-palvelu'), controller='user', action='login', class_='btn btn-primary' %}</p>
-                    </div>
-                </div>
-                <div class="span4">
-                    <div class="box box--gradient text-center">
+                <div class="span6">
+                    <div class="module-content box box--spaced box--gradient text-center">
                         <p>{% trans %}Haluatko tallentaa tai päivittää linja-autoreittejä ja aikataulu-tietoja
                             RAE-palvelussa?{% endtrans %}</p>
-                        <p>{% link_for _('Avaa RAE-palvelu'), controller='user', action='login', class_='btn btn-primary' %}</p>
+
+                        <div>
+                            <p>
+                                {# NOTE: https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer. #}
+
+                                <a class="btn btn-primary"
+                                   href="https://extranet.liikennevirasto.fi/extranet/web/f/rae?kategoria=1955433"
+                                   target="_blank" rel="noopener noreferrer">{{ _('Avaa RAE-palvelu') }}</a>
+                            </p>
+                            <p>
+                                <small>(Aukeaa uuteen välilehteen ja vaatii erillisen <br /> kirjautumisen
+                                    Liikenneviraston
+                                    Extranetiin)
+                                </small>
+                            </p>
+                        </div>
+
                     </div>
                 </div>
             </div>
