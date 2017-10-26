@@ -74,6 +74,7 @@
                  :text-color     (color :grey900)}
 
        :button  {:labelColor "#fff"}
+       :menu-item {:selected-text-color (color :blue700)} ;; Change drop down list items selected color
 
        })}
 
