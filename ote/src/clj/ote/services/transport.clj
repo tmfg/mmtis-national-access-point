@@ -20,6 +20,7 @@
             [ote.db.tx :as tx]
             [ote.nap.publish :as publish]
             [ote.db.modification :as modification]
+            [ote.access-rights :as access]
             [clojure.string :as str])
   (:import (java.time LocalTime)
            (java.sql Timestamp)))
@@ -105,10 +106,6 @@
 (defn- save-transport-operator [db data]
   (upsert! db ::transport-operator/transport-operator data))
 
-(defn- user-has-rights-to-save-service [operator service]
-  "Check if user hase access rights to save service for the selected operator"
-  (if (= (get operator :ote.db.transport-operator/id) (get service :ote.db.transport-service/transport-operator-id)) true false))
-
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   [price-classes-float]
@@ -128,7 +125,7 @@
                            (modification/with-modification-fields ::t-service/id user)
                            (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                            (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
-    (when (user-has-rights-to-save-service operator passenger-info)
+    (when (access/user-has-rights-to-save-service? operator passenger-info)
       ;; Store to OTE database
       (let [transport-service
             (jdbc/with-db-transaction [db db]
@@ -160,7 +157,7 @@
     ;(println "Terminal AREA: " (pr-str places))
     ;(println "Terminal coordinates: " (pr-str coordinates))
     ;(println "Terminal op-area-id: " op-area-id)
-    (when (user-has-rights-to-save-service operator value)
+    (when (access/user-has-rights-to-save-service? operator value)
       (jdbc/with-db-transaction [db db]
        (let [transport-service (upsert! db ::t-service/transport-service value)]
          (when (not-empty coordinates)
