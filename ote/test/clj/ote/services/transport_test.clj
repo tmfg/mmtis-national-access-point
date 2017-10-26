@@ -23,8 +23,9 @@
 (t/use-fixtures :once
   (system-fixture
    :transport (component/using
-               (transport-service/->Transport)
-               [:http :db])))
+                (transport-service/->Transport
+                  (:nap nil))
+                [:http :db])))
 
 (def gen-passenger-transportation
   (gen/hash-map
