@@ -3,16 +3,17 @@
         <div class="container">
             <div class="row row1 module">
                 <div class="span12">
-                    <p>Hei {{ c.userobj.display_name }}!</p>
-                    <b>Palvelukatalogi</b>-sivulla voit tarkastella ja hakea palvelussa julkaistuja
-                    rajapintoja.<br />
-                    <b>Organisaatiot</b>-sivulla on listattuna palveluun rekisteröityneet organisaatiot.
+                    <p>{{ _('Hei') }} {{ c.userobj.display_name }}!</p>
+                    <b>{{ _('Datasets') }}</b>-{% trans %}sivulla voit tarkastella ja hakea palvelussa julkaistuja
+                    rajapintoja.{% endtrans %}<br />
+                    <b>{{ _('Organizations') }}</b>{% trans %}-sivulla on listattuna palveluun rekisteröityneet
+                    organisaatiot.{% endtrans %}
                 </div>
             </div>
 
             <div class="row row2 module">
                 <div class="span12">
-                    <h2>Liikkumispalveluiden tallennus ja julkaisu</h2>
+                    <h2>{% trans %}Liikkumispalveluiden tallennus ja julkaisu{% endtrans %}</h2>
                 </div>
                 <div class="span6">
                     <div class="module-content box box--spaced box--gradient text-center">
@@ -25,7 +26,7 @@
                                    href="/ote/index.html">{{ _('Siirry tietojen hallintapalveluun') }}</a>
                             </p>
                             <p>
-                                <small>(Aukeaa uuteen välilehteen)</small>
+                                <small>({% trans %}Aukeaa uuteen välilehteen{% endtrans %})</small>
                             </p>
                         </div>
                     </div>
@@ -44,9 +45,9 @@
                                    target="_blank" rel="noopener noreferrer">{{ _('Avaa RAE-palvelu') }}</a>
                             </p>
                             <p>
-                                <small>(Aukeaa uuteen välilehteen ja vaatii erillisen <br /> kirjautumisen
+                                <small>({% trans %}Aukeaa uuteen välilehteen ja vaatii erillisen <br /> kirjautumisen
                                     Liikenneviraston
-                                    Extranetiin)
+                                    Extranetiin{% endtrans %})
                                 </small>
                             </p>
                         </div>
