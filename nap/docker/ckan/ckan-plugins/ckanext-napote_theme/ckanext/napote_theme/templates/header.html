@@ -45,13 +45,14 @@
                                 {% if c.userobj %}
                                     <div class="dropdown account avatar authed" data-module="me"
                                          data-me="{{ c.userobj.id }}">
-                                        <button class="btn btn-primary dropdown-toggle" type="button"
+                                        <button class="btn btn-primary btn--transparent dropdown-toggle"
+                                                type="button"
                                                 data-toggle="dropdown">
                         <span class="image" title="{{ _('View profile') }}">
                                 {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22) }}
                                 <span class="username">{{ c.userobj.display_name }}</span>
                         </span>
-                                            <span class="caret"></span></button>
+                                            <i class="fa fa-caret-down" aria-hidden="true"></i></button>
                                         <ul class="dropdown-menu">
                                             {% block header_account_logged %}
                                                 <li>
