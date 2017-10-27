@@ -95,8 +95,7 @@ html {
 /* User menu */
 
 .topnav > div.user-menu {
-    padding-top: 6px;
-    padding-bottom: 5px;
+    padding-right: 20px;
     float: right;
     display: inline-block;
 }

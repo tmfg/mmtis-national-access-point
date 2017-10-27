@@ -40,6 +40,7 @@
 
   HandlePassengerTransportationResponse
   (process-event [{service :service} app]
+    (routes/navigate! :front-page)
     (assoc app
       :transport-service service
       :page :front-page))
