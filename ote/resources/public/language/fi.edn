@@ -104,7 +104,7 @@
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
 
-  :discard "Peruuta muutokset"
+  :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"}
 
@@ -225,7 +225,7 @@
                 :finap-status                               "NAP tila"
                 :header-nap-official-name                   "Palvelukatalogi"
                 :header-own-service-list                    "Omat palvelutiedot"
-                :header-front-page                          "Etusivu"
+                :user-menu-service-guide                    "Ohje"
 
                 :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
                 :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla

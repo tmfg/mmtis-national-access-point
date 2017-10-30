@@ -21,32 +21,48 @@
 
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
-    "active")
-  )
+    "active"))
 
 (defn- is-user-menu-active [app]
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
-    "active")
-  )
+    "active"))
 
- (defn main-menu [e!]
-   [ui/icon-menu
-    {
+ (defn user-menu [e! user-name]
+   [ui/select-field
+    {:value 0 ;; Force user-name to be selected at all times
+     :label-style {:color "#f2f2f2"}
      :on-click #(e! (fp-controller/->OpenUserMenu))
-     :icon-button-element (reagent/as-element [ui/icon-button [ic/action-view-headline {:color :white}]])
      :anchor-origin {:horizontal "right" :vertical "bottom"}
      :target-origin {:horizontal "right" :vertical "top"}
      }
-    [ui/menu-item {:primary-text (tr [:common-texts :header-front-page])
+    [ui/menu-item {:value 0 ;; First and only element that can be selected in this select field
+                   :primary-text user-name
+                   :selected-text-color (color :grey900)
+                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
+    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-guide])
+                   :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     [ui/menu-item {:primary-text "Organisaation perustiedot"
+                   :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
     [ui/menu-item {:primary-text " Näytä debug state"
+                   :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
     [ui/menu-item {:primary-text "Kirjaudu ulos"
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
-    ]
-  )
+                   :selected-text-color (color :grey900)
+                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]])
+
+(defn- top-nav [e! app]
+  [:div {:class "topnav"}
+   [:a.main-icon {:href "#home"} [:img {:src "img/icons/nap-logo.svg" }]]
+   [:a.ote-nav { :href "/index.html" } (tr [:common-texts :header-front-page]) ]
+   [:a.ote-nav
+    {:class (is-topnav-active :front-page (:page app))
+     :href "#service-operator"
+     :on-click #(e! (fp-controller/->ChangePage :front-page))
+     } (tr [:common-texts :header-own-service-list]) ]
+   [:div.user-menu {:class (is-user-menu-active app) }
+    (reagent/as-element (user-menu e! (get-in app [:user :name])))]])
 
 (defn ote-application
   "OTE application main view"
@@ -71,7 +87,8 @@
                  ;;:canvas-color  (color :lightBlue50)
 
                  ;; Main text color
-                 :text-color     (color :grey900)}
+                 :text-color     (color :grey900)
+                }
 
        :button  {:labelColor "#fff"}
        :menu-item {:selected-text-color (color :blue700)} ;; Change drop down list items selected color
@@ -79,25 +96,7 @@
        })}
 
     [:div.ote-sovellus.container-fluid
-     [:div {:class "topnav"}
-      [:a.main-icon {:href "#home"} [:img {:src "img/icons/nap-logo.svg" }]]
-      [:a.ote-nav { :href "/index.html" } (tr [:common-texts :header-front-page]) ]
-      [:a.ote-nav
-       {:class (is-topnav-active :front-page (:page app))
-        :href "#service-operator"
-        :on-click #(e! (fp-controller/->ChangePage :front-page))
-        } (tr [:common-texts :header-own-service-list]) ]
-                                        ; [:div.user-menu-container {:class (is-user-menu-active app)}
-      [:div.user-menu {:class (is-user-menu-active app) }
-       (reagent/as-element (main-menu e!))
-       ]
-      [:div.user-data {:class (is-user-menu-active app) }
-       [:div.user-name (get-in app [:user :name])]
-       [:div.user-organization (get-in app [:transport-operator :ote.db.transport-operator/name])]
-       ]
-                                        ;]
-
-      ]
+     (top-nav e! app)
      ;; NOTE: debug state is VERY slow if app state is HUGE
      ;; (it tries to pr-str it)
 
@@ -124,5 +123,4 @@
        [:div.row
         [debug/debug app]
         ]
-       )
-     ]]]))
+       )]]]))

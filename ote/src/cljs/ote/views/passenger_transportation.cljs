@@ -12,7 +12,9 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
-            [tuck.core :as tuck])
+            [tuck.core :as tuck]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn footer [e! {published? ::t-service/published? :as data}]
@@ -131,14 +133,15 @@
 
 (defn pricing-group [e!]
   (form/group
-   {:label   "Hintatiedot"
-    :columns 3
-    :actions [ui/raised-button
-              {:label    "Lisää hintarivi"
-               :icon     (ic/action-note-add)
-               :on-click #(e! (ts/->AddPriceClassRow))}]}
+    {:label   "Hintatiedot"
+     :columns 3
+     :actions [napit/tallenna
+               {:style    (stylefy/use-style style-base/base-button)
+                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
+                :label    "Lisää hintarivi"
+                :on-click #(e! (ts/->AddPriceClassRow))}]}
 
-   {:name         ::t-service/price-classes
+    {:name         ::t-service/price-classes
     :type         :table
     :table-fields [{:name ::t-service/name :type :string
                     :label (tr [:field-labels :passenger-transportation ::t-service/price-class-name])}
@@ -152,9 +155,10 @@
   (form/group
    {:label   "Palveluajat"
     :columns 3
-    :actions [ui/raised-button
-              {:label    "LISÄÄ UUSI RIVI"
-               :icon     (ic/action-note-add)
+    :actions [napit/tallenna
+              {:style    (stylefy/use-style style-base/base-button)
+               :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
+               :label    "Lisää uusi rivi"
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
    {:name         ::t-service/service-hours
