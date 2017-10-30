@@ -566,9 +566,8 @@ body {
 }
 
 /** NOTE: Some btn style rules are from materializecss.com **/
-.homepage .btn {
+.homepage [role=main] .btn {
     border: none;
-    color: #ffffff;
     padding: 0 2rem;
     border-radius: 2px;
     overflow: hidden;
@@ -578,23 +577,25 @@ body {
     text-transform: uppercase;
     text-align: center;
     letter-spacing: .5px;
-    height: 36px;
+    min-height: 36px;
     font-size: 1rem;
     font-weight: normal;
     outline: 0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
     transition: background-color .3s;
+    word-wrap: break-word;
 }
 
-.homepage .btn:hover {
-    background: #2f97dd;
+.homepage [role=main] .btn:hover {
+    background: #d3d3d3;
 }
 
-.homepage .btn.btn-primary {
+.homepage [role=main] .btn.btn-primary {
     background: #2D75B4;
+    color: #ffffff;
 }
 
-.homepage .btn.btn-primary:hover {
+.homepage [role=main] .btn.btn-primary:hover {
     background: #2f97dd;
 }
 
@@ -602,6 +603,13 @@ body {
 .site-footer {
     background: #444444; /** LIVI lisäväri, harmaat 5. **/
     color: #ffffff;
+}
+
+/** Modules **/
+
+.module .module-heading {
+    color: #ffffff;
+    background-color: #2D75B4;
 }
 
 /*
@@ -631,10 +639,27 @@ body {
 }
 
 /** HOME **/
+.homepage .box.box--spaced {
+    box-sizing: border-box;
+    display: flex;
+    min-height: 300px;
+    padding: 25px 25px 40px 25px;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .homepage .box.box--gradient {
     border: #d5d5d5 solid 1px;
     background: #ffffff; /* Old browsers */
     background: -moz-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
     background: -webkit-linear-gradient(top, #ffffff 0%,#f5f5f5 100%);
     background: linear-gradient(to bottom, #ffffff 0%,#f5f5f5 100%);
+}
+
+/**
+  Buttons
+ */
+
+.btn.btn--transparent {
+    background: transparent;
 }
