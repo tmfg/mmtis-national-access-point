@@ -9,40 +9,54 @@
             [ote.localization :refer [tr]]
             [cljs-react-material-ui.reagent :as ui]
             [ote.db.transport-service :as t-service]
-            [ote.db.places :as places]))
+            [ote.db.places :as places]
+            [goog.object :as gobj]))
+
+(defn- monkey-patch-chip-backspace
+  "Pre 1.0 fix for bug in MaterialUI Chip which unconditionally
+  cancels a backspace events (causing an embedded input field to
+  not be able to erase text."
+  [this]
+  (let [refs (aget this "refs")]
+    (gobj/forEach
+     refs
+     (fn [chip ref _]
+       (when-not (aget chip "__backspace_monkey_patch")
+         (let [old (aget chip "handleKeyDown")]
+           (aset chip "handleKeyDown"
+                 (fn [event]
+                   (when-not (= "Backspace" (.-key event))
+                     (old event))))
+           (aset chip "__backspace_monkey_patch" true)))))))
 
 (defn result-chips [e! results]
-  [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-   (for [{::places/keys [namefin type id] editing? :editing? :as result} (map :place results)]
-     ^{:key id}
-     [:span
-      [ui/chip (merge
-                {:style {:margin 4}
+  (r/create-class
+   {:component-did-mount monkey-patch-chip-backspace
+    :component-did-update monkey-patch-chip-backspace
+    :reagent-render
+    (fn [e! results]
+      [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
+       (for [{::places/keys [namefin type id] editing? :editing? :as result} (map :place results)]
+         ^{:key id}
+         [:span
+          [ui/chip {:ref id
+                    :style {:margin 4}
 
-                 ;; Toggle edit mode when clicking (for hand drawn geometries)
-                 :on-click
-                 (when (and (= "drawn" type) (not editing?))
-                   #(e! (ps/->EditDrawnGeometryName id)))
+                    ;; Toggle edit mode when clicking (for hand drawn geometries)
+                    :on-click
+                    (if (and (= "drawn" type) (not editing?))
+                      #(e! (ps/->EditDrawnGeometryName id))
+                      (constantly false))
 
-
-
-                 :on-request-delete #(e! (ps/->RemovePlaceById id))})
-       namefin]
-
-      ;; FIXME: current version of material-ui (0.19.4) has unconditional
-      ;; event cancel if a BACKSPACE key event is fired in a chip
-      ;; this breaks the editing input field (can't erase text)
-      ;; this has been fixed in latest 1.0 betas.
-      ;;
-      ;; This means that we can't move this text-field "inside"
-      ;; the chip as its content.
-      ;;
-      (when editing?
-        [ui/text-field {:value namefin
-                        :floating-label-text (tr [:place-search :rename-place])
-                        :on-key-press #(when (= "Enter" (.-key %1))
-                                         (e! (ps/->EditDrawnGeometryName id)))
-                        :on-change #(e! (ps/->SetDrawnGeometryName id %2))}])])])
+                    :on-request-delete #(e! (ps/->RemovePlaceById id))}
+          (if editing?
+            [ui/text-field
+             {:value namefin
+              :floating-label-text (tr [:place-search :rename-place])
+              :on-key-press #(when (= "Enter" (.-key %1))
+                               (e! (ps/->EditDrawnGeometryName id)))
+              :on-change #(e! (ps/->SetDrawnGeometryName id %2))}]
+            namefin)]])])}))
 
 (defn result-geometry [{::places/keys [name location]}]
   [leaflet/FeatureGroup
