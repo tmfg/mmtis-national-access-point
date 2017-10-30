@@ -5,6 +5,7 @@
        :cljs [[goog.string :as gstr]
               [cljs-time.core :as cljs-time]
               [cljs-time.format :as format]
+              [cljs-time.local :as local]
               [cljs-time.coerce :as coerce]])
    [specql.data-types :as specql-data-types]
    [clojure.spec.alpha :as s]
@@ -23,6 +24,24 @@
     (->> time
          cljs-time/to-default-time-zone
          (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
+
+#?(:cljs
+   (defn js-time-to-string [time]
+     (if  (nil? time)
+       " " ;: if nil - print empty string
+       (->> time
+            cljs-time/to-default-time-zone
+            (format/unparse (format/formatter "HH:mm:ss"))))))
+
+#?(:cljs
+   (defn js-time-from-db-time [db-time]
+     (let [hours (get db-time :hours)
+           minutes (get db-time :minutes)
+           seconds (get db-time :seconds)]
+       (js/Date.
+         (coerce/to-long (local/to-local-date-time
+                           (cljs-time/today-at hours minutes seconds)))))))
+
 
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
