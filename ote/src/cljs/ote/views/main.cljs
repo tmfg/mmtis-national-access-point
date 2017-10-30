@@ -21,13 +21,11 @@
 
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
-    "active")
-  )
+    "active"))
 
 (defn- is-user-menu-active [app]
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
-    "active")
-  )
+    "active"))
 
  (defn user-menu [e! user-name]
    [ui/select-field
@@ -52,12 +50,9 @@
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
     [ui/menu-item {:primary-text "Kirjaudu ulos"
                    :selected-text-color (color :grey900)
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
-    ]
-  )
+                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]])
 
-(defn- create-top-nav
-  [e! app]
+(defn- top-nav [e! app]
   [:div {:class "topnav"}
    [:a.main-icon {:href "#home"} [:img {:src "img/icons/nap-logo.svg" }]]
    [:a.ote-nav { :href "/index.html" } (tr [:common-texts :header-front-page]) ]
@@ -67,11 +62,7 @@
      :on-click #(e! (fp-controller/->ChangePage :front-page))
      } (tr [:common-texts :header-own-service-list]) ]
    [:div.user-menu {:class (is-user-menu-active app) }
-    (reagent/as-element (user-menu e! (get-in app [:user :name])))
-    ]
-   ]
-  )
-
+    (reagent/as-element (user-menu e! (get-in app [:user :name])))]])
 
 (defn ote-application
   "OTE application main view"
@@ -105,7 +96,7 @@
        })}
 
     [:div.ote-sovellus.container-fluid
-     (create-top-nav e! app)
+     (top-nav e! app)
      ;; NOTE: debug state is VERY slow if app state is HUGE
      ;; (it tries to pr-str it)
 
@@ -132,5 +123,4 @@
        [:div.row
         [debug/debug app]
         ]
-       )
-     ]]]))
+       )]]]))

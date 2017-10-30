@@ -128,7 +128,7 @@
     {:label   "Hintatiedot"
      :columns 3
      :actions [napit/tallenna
-               {:style    (stylefy/use-style style-base/action-button)
+               {:style    (stylefy/use-style style-base/base-button)
                 :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
                 :label    "Lisää hintarivi"
                 :on-click #(e! (ts/->AddPriceClassRow))}]}
@@ -148,7 +148,7 @@
    {:label   "Palveluajat"
     :columns 3
     :actions [napit/tallenna
-              {:style    (stylefy/use-style style-base/action-button)
+              {:style    (stylefy/use-style style-base/base-button)
                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
                :label    "Lisää uusi rivi"
                :on-click #(e! (ts/->AddServiceHourRow))}]}

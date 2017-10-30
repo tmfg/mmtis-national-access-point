@@ -12,13 +12,13 @@
 (defn tallenna [opts label]
   [button-container
    [ui/raised-button
-    (merge {:button-style style-base/action-button} opts)
+    (merge {:button-style style-base/base-button} opts)
     label]])
 
 (defn cancel [opts label]
   [button-container
    [ui/flat-button
-    (merge {:button-style style-base/cancel-button
+    (merge {:button-style style-base/base-button
             :style {:padding-left "1.1em"
                     :padding-right "1.1em"
                     :text-transform "uppercase"

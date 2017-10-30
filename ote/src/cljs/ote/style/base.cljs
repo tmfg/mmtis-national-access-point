@@ -13,22 +13,14 @@
 (def action-button-container (merge inline-block
                                     {:margin-right "1em"}))
 
-(def action-button {:padding-left "1.1em"
-                    :padding-right "1.1em"
-                    :text-transform "uppercase"
-                    :color "#FFFFFF"
-                    :background-color "#1565C0"
-                    :font-size "12px"
-                    :font-weight "bold"
-                    })
-
-(def cancel-button {:padding-left "1.1em"
-                    :padding-right "1.1em"
-                    :text-transform "uppercase"
-                    :color "#1565C0"
-                    :background-color "#FFFFFF"
-                    :font-size "12px"
-                    :font-weight "bold"})
+(def base-button {:padding-left "1.1em"
+                  :padding-right "1.1em"
+                  :text-transform "uppercase"
+                  :color "#FFFFFF"
+                  :background-color "#1565C0"
+                  :font-size "12px"
+                  :font-weight "bold"
+                  })
 
 (def button-label-style {:font-size "12px"
                          :font-weight "bold"
