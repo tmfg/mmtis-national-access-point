@@ -8,7 +8,6 @@
             [ote.db.transport-operator :as transport-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
-            [ote.db.operation-area :as operation-area]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
@@ -21,6 +20,7 @@
             [ote.db.tx :as tx]
             [ote.nap.publish :as publish]
             [ote.db.modification :as modification]
+            [ote.access-rights :as access]
             [clojure.string :as str])
   (:import (java.time LocalTime)
            (java.sql Timestamp)))
@@ -32,9 +32,10 @@
     ::transport-operator/name})
 
 (defn get-transport-operator [db where]
-  (first (fetch db ::transport-operator/transport-operator
+  (let [operator (first (fetch db ::transport-operator/transport-operator
                 (specql/columns ::transport-operator/transport-operator)
-                where {::specql/limit 1})))
+                where {::specql/limit 1}))]
+    operator))
 
 (def transport-services-columns
   #{::t-service/id ::t-service/type
@@ -105,7 +106,6 @@
 (defn- save-transport-operator [db data]
   (upsert! db ::transport-operator/transport-operator data))
 
-
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   [price-classes-float]
@@ -114,40 +114,41 @@
     (catch Exception e
       (log/info "Can't fix price classes: " price-classes-float e))))
 
-
-
-
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [nap-config db user data]
-  #_(println "DATA: " (pr-str data))
-  (let [places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
+  ;(println "DATA: " (pr-str data))
+  (let [ckan-group (-> user :groups first)
+        operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
+        places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
         passenger-info (-> data
                            (modification/with-modification-fields ::t-service/id user)
                            (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                            (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
+    (when (access/user-has-rights-to-save-service? operator passenger-info)
+      ;; Store to OTE database
+      (let [transport-service
+            (jdbc/with-db-transaction [db db]
+                                      (let [transport-service (upsert! db ::t-service/transport-service passenger-info)]
+                                        (places/link-places-to-transport-service!
+                                          db (::t-service/id transport-service) places)
+                                        transport-service))]
+        ;; FIXME: add modification/creation time
 
-    ;; Store to OTE database
-    (let [transport-service
-          (jdbc/with-db-transaction [db db]
-            (let [transport-service (upsert! db ::t-service/transport-service passenger-info)]
-              (places/link-places-to-transport-service!
-               db (::t-service/id transport-service) places)
-              transport-service))]
-      ;; FIXME: add modification/creation time
+        ;; If published, use CKAN API to add dataset and resource
+        (when (::t-service/published? data)
+          (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
 
-      ;; If published, use CKAN API to add dataset and resource
-      (when (::t-service/published? data)
-        (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
-
-      ;; Return the stored transport-service
-      transport-service)))
+        ;; Return the stored transport-service
+        transport-service))))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
   [db user data]
-  (println "Terminal DATA: " (pr-str data))
-  (let [places (get-in data [::t-service/terminal ::t-service/operation-area])
+  ;(println "Terminal DATA: " (pr-str data))
+  (let [ckan-group (-> user :groups first)
+        operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
+        places (get-in data [::t-service/terminal ::t-service/operation-area])
         op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
         coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
         value (-> data
@@ -156,8 +157,9 @@
     ;(println "Terminal AREA: " (pr-str places))
     ;(println "Terminal coordinates: " (pr-str coordinates))
     ;(println "Terminal op-area-id: " op-area-id)
-    (jdbc/with-db-transaction [db db]
-      (let [transport-service (upsert! db ::t-service/transport-service value)]
+    (when (access/user-has-rights-to-save-service? operator value)
+      (jdbc/with-db-transaction [db db]
+       (let [transport-service (upsert! db ::t-service/transport-service value)]
          (when (not-empty coordinates)
            (cond
              (nil? op-area-id)
@@ -169,7 +171,8 @@
                                                       {:id op-area-id
                                                        :transport-service-id (get transport-service ::t-service/id)
                                                        :x (first coordinates)
-                                                       :y (second coordinates)})))))))
+                                                       :y (second coordinates)})))
+         transport-service)))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]
