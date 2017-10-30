@@ -17,8 +17,8 @@
     ::t-service/name
     ::t-service/sub-type})
 
-(defn convert-subtype-type-to-service-type-key
-  "Returns the service column keyword for the given type enum value."
+(defn service-type-from-combined-service-type
+  "Returns service type keyword from combined type-subtype key."
   [type]
   (case type
     :passenger-transportation-taxi :passenger-transportation
@@ -29,8 +29,8 @@
     :parking :parking
     :brokerage :brokerage))
 
-(defn get-subtype-from-subtype-type
-  "Returns the service column keyword for the given type enum value."
+(defn subtype-from-combined-service-type
+  "Returns service subtype keyword from combined type-subtype key."
   [type]
   (case type
     :passenger-transportation-taxi :taxi
@@ -79,8 +79,8 @@
     ;; Clear selected transport type section from app state
     ;; Navigate to selected transport type form
     (let [service-type-subtype (get data :transport-service-type-subtype)
-          type (convert-subtype-type-to-service-type-key service-type-subtype)
-          sub-type (get-subtype-from-subtype-type service-type-subtype)]
+          type (service-type-from-combined-service-type service-type-subtype)
+          sub-type (subtype-from-combined-service-type service-type-subtype)]
             (routes/navigate! type)
             (-> app
                 (assoc :transport-service {::t-service/type type})

@@ -49,7 +49,7 @@
    {:name ::t-service/name
     :type :string}
 
-   {:style {:width "350px"}
+   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
     :name ::t-service/sub-type
     :type        :selection
     :show-option (tr-key [:enums :ote.db.transport-service/sub-type])

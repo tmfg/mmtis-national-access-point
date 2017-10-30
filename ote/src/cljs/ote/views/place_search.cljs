@@ -74,9 +74,8 @@
                         :search-text (or (:name place-search) "")
                         :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]
       ]
-    [:div.col-xs-12.col-md-8 ;{:style {:padding-left "10px"}}
-     [places-map e! results]
-     ]]))
+    [:div.col-xs-12.col-md-8
+     [places-map e! results]]]))
 
 (defn place-search-form-group [e! label name]
   (form/group
