@@ -26,6 +26,10 @@
                          :font-weight "bold"
                          :text-transform "uppercase"
                          :color "#FFFFFF"})
+
+;; Form elements
+(def long-drowpdown  {:width "350px"})
+
 ;; Front page
 
 (def front-page-add-service {:border-right "1px solid grey"})

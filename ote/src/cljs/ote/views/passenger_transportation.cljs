@@ -34,7 +34,7 @@
     (tr [:buttons :discard])]])
 
 (defn transportation-form-options [e!]
-  {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common])
+  {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (pt/->EditPassengerTransportationState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
@@ -47,7 +47,13 @@
     :layout :row}
 
    {:name ::t-service/name
-    :type :string}))
+    :type :string}
+
+   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
+    :name ::t-service/sub-type
+    :type        :selection
+    :show-option (tr-key [:enums :ote.db.transport-service/sub-type])
+    :options     t-service/passenger-transportation-sub-types}))
 
 (defn place-search-group [e!]
   (place-search/place-search-form-group
@@ -75,16 +81,12 @@
    {:label   "Palvelun yhteystiedot"
     :columns 3
     :layout :row}
-   {:name        ::t-service/contact-phone
-    :type        :string}
    {:name        ::common/street
     :type        :string
     :read (comp ::common/street ::t-service/contact-address)
     :write (fn [data street]
              (assoc-in data [::t-service/contact-address ::common/street] street))
     :label (tr [:field-labels ::common/street])}
-   {:name        ::t-service/contact-email
-    :type        :string}
 
    {:name        ::common/postal_code
     :type        :string
@@ -99,6 +101,12 @@
     :write (fn [data post-office]
              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
     :label (tr [:field-labels ::common/post_office])}
+
+   {:name        ::t-service/contact-phone
+    :type        :string}
+
+   {:name        ::t-service/contact-email
+    :type        :string}
 
    {:name        ::t-service/homepage
     :type        :string}))
