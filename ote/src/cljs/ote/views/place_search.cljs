@@ -13,10 +13,36 @@
 
 (defn result-chips [e! results]
   [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-   (for [{::places/keys [namefin id] :as result} (map :place results)]
+   (for [{::places/keys [namefin type id] editing? :editing? :as result} (map :place results)]
      ^{:key id}
-     [ui/chip {:style {:margin 4}
-               :on-request-delete #(e! (ps/->RemovePlaceById id))} namefin])])
+     [:span
+      [ui/chip (merge
+                {:style {:margin 4}
+
+                 ;; Toggle edit mode when clicking (for hand drawn geometries)
+                 :on-click
+                 (when (and (= "drawn" type) (not editing?))
+                   #(e! (ps/->EditDrawnGeometryName id)))
+
+
+
+                 :on-request-delete #(e! (ps/->RemovePlaceById id))})
+       namefin]
+
+      ;; FIXME: current version of material-ui (0.19.4) has unconditional
+      ;; event cancel if a BACKSPACE key event is fired in a chip
+      ;; this breaks the editing input field (can't erase text)
+      ;; this has been fixed in latest 1.0 betas.
+      ;;
+      ;; This means that we can't move this text-field "inside"
+      ;; the chip as its content.
+      ;;
+      (when editing?
+        [ui/text-field {:value namefin
+                        :floating-label-text (tr [:place-search :rename-place])
+                        :on-key-press #(when (= "Enter" (.-key %1))
+                                         (e! (ps/->EditDrawnGeometryName id)))
+                        :on-change #(e! (ps/->SetDrawnGeometryName id %2))}])])])
 
 (defn result-geometry [{::places/keys [name location]}]
   [leaflet/FeatureGroup
@@ -25,21 +51,25 @@
    [leaflet/Popup [:div name]]])
 
 
+(defn install-draw-control!
+  "Install Leaflet draw plugin to to places-map component."
+  [e! this]
+  (let [m  (aget this "refs" "leaflet" "leafletElement")
+        fg (new js/L.FeatureGroup)
+        dc (new js/L.Control.Draw #js {:edit #js {:featureGroup fg
+                                                  :remove false}})]
+    (.addLayer m fg)
+    (.addControl m dc)
+    (.on m (aget js/L "Draw" "Event" "CREATED")
+         #(let [layer (aget % "layer")
+                geojson (.toGeoJSON layer)]
+            ;;(aset js/window "the_geom" geojson)
+            (e! (ps/->AddDrawnGeometry geojson))))))
+
 (defn places-map [e! results]
   (let [feature-group (atom nil)]
     (r/create-class
-     {:component-did-mount
-      (fn [this]
-        (let [m  (aget this "refs" "leaflet" "leafletElement")
-              fg (new js/L.FeatureGroup)
-              dc (new js/L.Control.Draw #js {:edit #js {:featureGroup fg
-                                                        :remove false}})]
-          (reset! feature-group fg)
-          (.addLayer m fg)
-          (.addControl m dc)
-          (.on m (aget js/L "Draw" "Event" "CREATED")
-               #(.addLayer fg (aget % "layer")))))
-
+     {:component-did-mount (partial install-draw-control! e!)
       :reagent-render
       (fn [e! results]
         [leaflet/Map {;;:prefer-canvas true

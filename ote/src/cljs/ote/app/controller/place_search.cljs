@@ -4,7 +4,8 @@
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
             [ote.db.places :as places]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [taoensso.timbre :as log]))
 
 (defrecord SetPlaceName [name])
 (defrecord AddPlace [id])
@@ -13,6 +14,29 @@
 (defrecord PlaceCompletionsResponse [completions name])
 
 (defrecord SetMarker [event])
+
+;; Events for adding and editing hand drawn geometries
+(defrecord AddDrawnGeometry [geojson])
+(defrecord EditDrawnGeometryName [id])
+(defrecord SetDrawnGeometryName [id name])
+
+(defn- add-place
+  "Return app with a new place added."
+  [app place geojson]
+  (update-in app [:place-search :results]
+             #(conj (or % [])
+                    {:place place
+                     :geojson geojson})))
+
+(defn- update-place-by-id [app id update-fn & args]
+  (update-in app [:place-search :results]
+             (fn [results]
+               (mapv #(if (= (get-in % [:place ::places/id]) id)
+                        (update % :place
+                                (fn [p]
+                                  (apply update-fn p args)))
+                        %)
+                     results))))
 
 (extend-protocol tuck/Event
 
@@ -54,10 +78,8 @@
 
   FetchPlaceResponse
   (process-event [{:keys [response place]} app]
-    (update-in app [:place-search :results]
-               #(conj (or % [])
-                      {:place place
-                       :geojson response})))
+    (add-place app place response))
+
   RemovePlaceById
   (process-event [{id :id} app]
     (update-in app [:place-search :results]
@@ -72,7 +94,26 @@
     ;(.log js/console "SetMarker function " (-> event .-latlng .-lat) )
     ;(.log js/console "SetMarker function " (-> event .-latlng .-lng) )
 
-    (assoc app :coordinates [ lat lng ] ))))
+      (assoc app :coordinates [ lat lng ] )))
+
+  AddDrawnGeometry
+  (process-event [{geojson :geojson} {:keys [drawn-geometry-idx] :as app}]
+    (let [type (aget geojson "geometry" "type")]
+      (-> app
+          (update :drawn-geometry-idx (fnil inc 1))
+          (add-place {::places/namefin (str type " " (or drawn-geometry-idx 1))
+                      ::places/type "drawn"
+                      ::places/id (str "drawn" (or drawn-geometry-idx 1))}
+                     geojson))))
+
+  EditDrawnGeometryName
+  (process-event [{id :id} app]
+    (log/info "Edit name of " id)
+    (update-place-by-id app id update :editing? not))
+
+  SetDrawnGeometryName
+  (process-event [{id :id name :name} app]
+    (update-place-by-id app id assoc ::places/namefin name)))
 
 
 (defn place-references
