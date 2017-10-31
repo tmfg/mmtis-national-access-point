@@ -25,8 +25,6 @@
    [leaflet/Popup [:div name]]])
 
 (defn- update-bounds-from-layers [this]
-  (aset js/window "komp" this)
-  (.log js/console "päivityin")
   (let [leaflet (aget this "refs" "leaflet" "leafletElement")
         bounds (atom nil)]
     (.eachLayer
