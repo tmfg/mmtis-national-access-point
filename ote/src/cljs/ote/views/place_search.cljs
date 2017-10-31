@@ -24,17 +24,39 @@
                       :dashArray "5,5"} location]
    [leaflet/Popup [:div name]]])
 
-(defn places-map [e! results]
-  [leaflet/Map {;;:prefer-canvas true
-                :center #js [65 25]
-                :zoom 5}
-   [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                       :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+(defn- update-bounds-from-layers [this]
+  (let [leaflet (aget this "refs" "leaflet" "leafletElement")
+        bounds (atom nil)]
+    (.eachLayer
+     leaflet
+     (fn [layer]
+       (when (.-getBounds layer)
+         (let [layer-bounds (.getBounds layer)]
+           (if (nil? @bounds)
+             (reset! bounds (.latLngBounds js/L
+                                           (.getNorthWest layer-bounds)
+                                           (.getSouthEast layer-bounds)))
+             (.extend @bounds layer-bounds))))))
+    (when-let [bounds @bounds]
+      (.log js/console "koko bounds: " bounds)
+      (.fitBounds leaflet bounds))))
 
-   (for [{:keys [place geojson]} results]
-     ^{:key (::places/id place)}
-     [leaflet/GeoJSON {:data geojson
-                       :style {:color "green"}}])])
+(defn places-map [e! results]
+  (r/create-class
+   {:component-did-mount update-bounds-from-layers
+    :component-did-update update-bounds-from-layers
+    :reagent-render
+    (fn [e! results]
+      [leaflet/Map {:center #js [65 25]
+                    :zoom 5
+                    :ref "leaflet"}
+       [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                           :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+       (for [{:keys [place geojson]} results]
+         ^{:key (::places/id place)}
+         [leaflet/GeoJSON {:data geojson
+                           :style {:color "green"}}])])}))
+
 
 (defn marker-map [e! coordinate]
   (.log js/console "rendering marker map coordinate->"coordinate)
@@ -63,16 +85,19 @@
   (let [results (:results place-search)]
     [:div.place-search
 
+     [:div.col-xs-12.col-md-3
      [result-chips e! results]
 
      [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+
                         :filter (constantly true) ;; no filter, backend returns what we want
                         :dataSource (completions (:completions place-search))
                         :on-update-input #(e! (ps/->SetPlaceName %))
                         :search-text (or (:name place-search) "")
                         :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]
-
-     [places-map e! results]]))
+      ]
+    [:div.col-xs-12.col-md-8
+     [places-map e! results]]]))
 
 (defn place-search-form-group [e! label name]
   (form/group

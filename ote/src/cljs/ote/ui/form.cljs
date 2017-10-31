@@ -162,7 +162,7 @@
          (form-fields/show-value s data))])))
 
 ;; Grid column classes for columns spanned
-(def col-classes {1 ["col-xs-12" "col-md-4" "col-lg4-"]
+(def col-classes {1 ["col-xs-12" "col-md-4" "col-lg-4"]
                   2 ["col-xs-12" "col-md-6" "col-lg-6"]
                   3 ["col-xs-12" "col-md-12" "col-lg-12"]})
 

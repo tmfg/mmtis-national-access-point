@@ -16,7 +16,7 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
-  :ote.db.transport-service/type "Valitse liikkumispalvelun tyyppi"
+  :transport-service-type-subtype "Valitse liikkumispalvelun tyyppi"
 
   :transport-service-common
   {:ote.db.transport-service/name "Palvelun nimi"
@@ -84,6 +84,7 @@
 
   :transport-service
   {:ote.db.transport-service/name "Palvelun mimi"
+   :ote.db.transport-service/sub-type "Liikkumispavelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
                                                 false "Ei julkaistu"}}
@@ -104,7 +105,7 @@
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
 
-  :discard "Peruuta muutokset"
+  :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"}
 
@@ -118,6 +119,11 @@
    :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
+
+  :ote.db.transport-service/sub-type
+  {:taxi     "Taksiliikenne"
+   :request  "Muu kutsuun perustuva liikenne"
+   :schedule "Säännöllinen aikataulun mukainen liikenne"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Käteinen"
@@ -196,6 +202,17 @@
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
           :brokerage                "Välityspalvelut"}
+
+ :service-type-dropdown
+ {:terminal                 "Asemat, satamat ja muut terminaalit"
+  :passenger-transportation-taxi "Taksiliikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-request "Muu kutsuperusteinen liikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (Henkilöidenkuljetuspalvelut)"
+  :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+  :parking                  "Yleiset kaupalliset pysäköintipalvelut"
+  :brokerage                "Välityspalvelut"}
+
+
  :common-texts {
                 :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
@@ -209,7 +226,7 @@
                 :finap-status                               "NAP tila"
                 :header-nap-official-name                   "Palvelukatalogi"
                 :header-own-service-list                    "Omat palvelutiedot"
-                :header-front-page                          "Etusivu"
+                :user-menu-service-guide                    "Ohje"
 
                 :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
                 :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla

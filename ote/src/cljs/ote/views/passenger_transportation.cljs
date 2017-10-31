@@ -12,7 +12,9 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
-            [tuck.core :as tuck])
+            [tuck.core :as tuck]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn footer [e! {published? ::t-service/published? :as data}]
@@ -32,7 +34,7 @@
     (tr [:buttons :discard])]])
 
 (defn transportation-form-options [e!]
-  {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common])
+  {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (pt/->EditPassengerTransportationState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
@@ -45,7 +47,13 @@
     :layout :row}
 
    {:name ::t-service/name
-    :type :string}))
+    :type :string}
+
+   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
+    :name ::t-service/sub-type
+    :type        :selection
+    :show-option (tr-key [:enums :ote.db.transport-service/sub-type])
+    :options     t-service/passenger-transportation-sub-types}))
 
 (defn place-search-group [e!]
   (place-search/place-search-form-group
@@ -73,16 +81,12 @@
    {:label   "Palvelun yhteystiedot"
     :columns 3
     :layout :row}
-   {:name        ::t-service/contact-phone
-    :type        :string}
    {:name        ::common/street
     :type        :string
     :read (comp ::common/street ::t-service/contact-address)
     :write (fn [data street]
              (assoc-in data [::t-service/contact-address ::common/street] street))
     :label (tr [:field-labels ::common/street])}
-   {:name        ::t-service/contact-email
-    :type        :string}
 
    {:name        ::common/postal_code
     :type        :string
@@ -97,6 +101,12 @@
     :write (fn [data post-office]
              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
     :label (tr [:field-labels ::common/post_office])}
+
+   {:name        ::t-service/contact-phone
+    :type        :string}
+
+   {:name        ::t-service/contact-email
+    :type        :string}
 
    {:name        ::t-service/homepage
     :type        :string}))
@@ -123,14 +133,15 @@
 
 (defn pricing-group [e!]
   (form/group
-   {:label   "Hintatiedot"
-    :columns 3
-    :actions [ui/raised-button
-              {:label    "Lisää hintarivi"
-               :icon     (ic/action-note-add)
-               :on-click #(e! (ts/->AddPriceClassRow))}]}
+    {:label   "Hintatiedot"
+     :columns 3
+     :actions [napit/tallenna
+               {:style    (stylefy/use-style style-base/base-button)
+                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
+                :label    "Lisää hintarivi"
+                :on-click #(e! (ts/->AddPriceClassRow))}]}
 
-   {:name         ::t-service/price-classes
+    {:name         ::t-service/price-classes
     :type         :table
     :table-fields [{:name ::t-service/name :type :string
                     :label (tr [:field-labels :passenger-transportation ::t-service/price-class-name])}
@@ -144,9 +155,10 @@
   (form/group
    {:label   "Palveluajat"
     :columns 3
-    :actions [ui/raised-button
-              {:label    "LISÄÄ UUSI RIVI"
-               :icon     (ic/action-note-add)
+    :actions [napit/tallenna
+              {:style    (stylefy/use-style style-base/base-button)
+               :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
+               :label    "Lisää uusi rivi"
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
    {:name         ::t-service/service-hours
