@@ -118,6 +118,12 @@
 
 (defn place-references
   "Gets a place search app model and returns place references from it.
-  Place references are sent to the server instead of sending the geometries."
+  Place references are sent to the server instead of sending the geometries.
+  Hand drawn geometries are sent with their geometry."
   [app]
-  (mapv :place (get-in app [:place-search :results])))
+  (mapv (fn [{:keys [geojson place]}]
+          (if (= (::places/type place) "drawn")
+            ;; This is a hand drawn geometry, add GeoJSON geometry as string
+            (assoc place :geojson (js/JSON.stringify (aget geojson "geometry")))
+            place))
+        (get-in app [:place-search :results])))
