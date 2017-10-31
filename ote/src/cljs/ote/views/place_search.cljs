@@ -52,7 +52,6 @@
                     :ref "leaflet"}
        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
-       ;;Kun map on päivittynyt (component-did-update), kutsutaan koodia joka kyselee leaflet tasoilta bounds tiedot ja kutsuu map.fitBounds alueelle ,johon kaikki mahtuu
        (for [{:keys [place geojson]} results]
          ^{:key (::places/id place)}
          [leaflet/GeoJSON {:data geojson
