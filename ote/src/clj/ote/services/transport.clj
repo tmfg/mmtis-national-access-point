@@ -181,6 +181,7 @@
                         ::t-service/id transport-service-id}))))
 
 
+
 (defn- save-transport-service-request
   "Process transport service save POST request. Checks that the transport operator id
   in the service to be stored is in the set of allowed operators for the user.
@@ -192,7 +193,9 @@
       #(http/transit-response
         (save-fn nap-config db user request)))))
 
-(defn- transport-routes
+(defn- transport-routes-auth
+  "Routes that require authentication"
+
   [db nap-config]
   (routes
 
@@ -203,7 +206,8 @@
          (ensure-transport-operator-for-group db (-> user :groups first)))
 
    (POST "/transport-operator/data" {user :user}
-        (http/transit-response (get-transport-operator-data db (-> user :groups first) (:user user))))
+         (http/transit-response
+          (get-transport-operator-data db (-> user :groups first) (:user user))))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
@@ -230,12 +234,22 @@
    (GET "/transport-service/delete/:id" [id]
      (http/transit-response (delete-transport-service db (Long/parseLong id))))))
 
+(defn- transport-routes
+  "Unauthenticated routes"
+  [db nap-config]
+  (routes
+    (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
+         (http/transit-response
+          (get-transport-operator db {::transport-operator/ckan-group-id ckan-group-id})))))
+
 (defrecord Transport [nap-config]
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
-      this ::lopeta
-           (http/publish! http (transport-routes db nap-config))))
-  (stop [{lopeta ::lopeta :as this}]
-    (lopeta)
-    (dissoc this ::lopeta)))
+      this ::stop
+      [(http/publish! http (transport-routes-auth db nap-config))
+       (http/publish! http {:authenticated? false} (transport-routes db nap-config))]))
+  (stop [{stop ::stop :as this}]
+    (doseq [s stop]
+      (s))
+    (dissoc this ::stop)))
