@@ -10,8 +10,9 @@
             [ote.style.ckan :as style-ckan]
             [ote.localization :refer [tr tr-or]]))
 
-(defn transform-val [key value]
+(defn transform-val
   "Translate and transform value."
+  [key value]
   (tr-or (tr [key value]) (str value)))
 
 (defn basic-info [operator]
