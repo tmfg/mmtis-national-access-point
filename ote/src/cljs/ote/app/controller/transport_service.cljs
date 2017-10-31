@@ -14,7 +14,32 @@
     ::t-service/contact-phone
     ::t-service/contact-email
     ::t-service/homepage
-    ::t-service/name})
+    ::t-service/name
+    ::t-service/sub-type})
+
+(defn service-type-from-combined-service-type
+  "Returns service type keyword from combined type-subtype key."
+  [type]
+  (case type
+    :passenger-transportation-taxi :passenger-transportation
+    :passenger-transportation-request :passenger-transportation
+    :passenger-transportation-schedule :passenger-transportation
+    :terminal :terminal
+    :rentals :rentals
+    :parking :parking
+    :brokerage :brokerage))
+
+(defn subtype-from-combined-service-type
+  "Returns service subtype keyword from combined type-subtype key."
+  [type]
+  (case type
+    :passenger-transportation-taxi :taxi
+    :passenger-transportation-request :request
+    :passenger-transportation-schedule :schedule
+    :terminal :terminal ;; No subtype for terminals - but it is still saved to database
+    :rentals :rentals
+    :parking :parking
+    :brokerage :brokerage))
 
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
@@ -53,8 +78,13 @@
   (process-event [{data :data} app]
     ;; Clear selected transport type section from app state
     ;; Navigate to selected transport type form
-    (routes/navigate! (get data ::t-service/type))
-    (assoc app :transport-service {::t-service/type (::t-service/type data)}))
+    (let [service-type-subtype (get data :transport-service-type-subtype)
+          type (service-type-from-combined-service-type service-type-subtype)
+          sub-type (subtype-from-combined-service-type service-type-subtype)]
+            (routes/navigate! type)
+            (-> app
+                (assoc :transport-service {::t-service/type type})
+                (assoc-in [:transport-service (t-service/service-key-by-type type) ] {::t-service/sub-type sub-type}))))
 
   ModifyTransportService
   (process-event [{id :id} app]

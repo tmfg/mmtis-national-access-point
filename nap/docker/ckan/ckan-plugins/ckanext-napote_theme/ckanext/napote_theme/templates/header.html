@@ -35,10 +35,6 @@
                                 {% block header_site_navigation_tabs %}
                                     {{ h.build_nav_main(('home', _('Home')),('search', _('Datasets')),('organizations_index', _('Organizations')) ) }}
                                 {% endblock %}
-
-                                {% if c.userobj %}
-                                    <li><a href="/ote/index.html">OTE</a></li>
-                                {% endif %}
                             </ul>
                         {% endblock %}
                     </nav>
@@ -49,13 +45,14 @@
                                 {% if c.userobj %}
                                     <div class="dropdown account avatar authed" data-module="me"
                                          data-me="{{ c.userobj.id }}">
-                                        <button class="btn btn-primary dropdown-toggle" type="button"
+                                        <button class="btn btn-primary btn--transparent dropdown-toggle"
+                                                type="button"
                                                 data-toggle="dropdown">
                         <span class="image" title="{{ _('View profile') }}">
                                 {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22) }}
                                 <span class="username">{{ c.userobj.display_name }}</span>
                         </span>
-                                            <span class="caret"></span></button>
+                                            <i class="fa fa-caret-down" aria-hidden="true"></i></button>
                                         <ul class="dropdown-menu">
                                             {% block header_account_logged %}
                                                 <li>
@@ -89,6 +86,15 @@
                                                            title="{{ _('Edit settings') }}">
                                                             <i class="fa fa-cog" aria-hidden="true"></i>
                                                             <span class="text">{{ _('Settings') }}</span>
+                                                        </a>
+                                                    </li>
+                                                {% endblock %}
+                                                {% block header_account_nap_manager_link %}
+                                                    <li>
+                                                        <a href="/ote/index.html"
+                                                           title="{{ _('NAP-tietojen hallinta') }}">
+                                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                                            <span class="text">{{ _('NAP-tietojen hallinta') }}</span>
                                                         </a>
                                                     </li>
                                                 {% endblock %}

@@ -16,7 +16,7 @@
   :ote.db.transport-operator/instant-message "Pikaviestin"
 
   ;; Transport service fields
-  :ote.db.transport-service/type "Valitse liikkumispalvelun tyyppi"
+  :transport-service-type-subtype "Valitse liikkumispalvelun tyyppi"
 
   :transport-service-common
   {:ote.db.transport-service/name "Palvelun nimi"
@@ -84,6 +84,7 @@
 
   :transport-service
   {:ote.db.transport-service/name "Palvelun mimi"
+   :ote.db.transport-service/sub-type "Liikkumispavelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
                                                 false "Ei julkaistu"}}
@@ -103,7 +104,9 @@
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
 
-  :discard "Peruuta muutokset"}
+  :discard "Peruuta"
+
+  :add-transport-service   "Lisää liikkumispalvelusi tiedot"}
 
 
 
@@ -115,6 +118,11 @@
    :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
+
+  :ote.db.transport-service/sub-type
+  {:taxi     "Taksiliikenne"
+   :request  "Muu kutsuun perustuva liikenne"
+   :schedule "Säännöllinen aikataulun mukainen liikenne"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Käteinen"
@@ -132,7 +140,7 @@
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair       "Rullatuoli"
+  {:wheelchair       "Pyörätuoli"
    :walkingstick     "Kävelykeppi"
    :audio-navigator  "Ääniopastus"
    :visual-navigator "Visuaaliset opasteet"
@@ -149,7 +157,7 @@
 
   :ote.db.transport-service/information-service-accessibility
   {:audio-for-hearing-impaired "Ääniopastus kuulovammaisille"
-   :audio-information "Äänelliset informaatiot"
+   :audio-information "Kuulutukset"
    :visual-displays "Visuaaliset näytöt"
    :displays-for-visually-impaired "Näytöt näkövammaisille"
    :large-print-timetables "Suuret kirjasimet aikatauluissa"
@@ -175,7 +183,7 @@
    :low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :suitable-for-heavily-disabled  ":suitable-for-heavily-disabled"
+   :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
    :boarding-assistance  "Kyytiin nousun avustus"
    :onboard-assistance "Kyydin aikainen avustus"
    :unaccompanied-minor-assistance "Alaikäisten avustus"
@@ -194,10 +202,22 @@
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
           :brokerage                "Välityspalvelut"}
+
+ :service-type-dropdown
+ {:terminal                 "Asemat, satamat ja muut terminaalit"
+  :passenger-transportation-taxi "Taksiliikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-request "Muu kutsuperusteinen liikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (Henkilöidenkuljetuspalvelut)"
+  :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+  :parking                  "Yleiset kaupalliset pysäköintipalvelut"
+  :brokerage                "Välityspalvelut"}
+
+
  :common-texts {
                 :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
+                :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
                 :link-add-new-api                           "Lisää uusi palvelu"
                 :own-api-list                               "Omat liikkumispalvelutiedot"
                 :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
@@ -206,10 +226,10 @@
                 :finap-status                               "NAP tila"
                 :header-nap-official-name                   "Palvelukatalogi"
                 :header-own-service-list                    "Omat palvelutiedot"
-                :header-front-page                          "Etusivu"
+                :user-menu-service-guide                    "Ohje"
 
                 :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
-                :transport-service-type-selection-help-text "Voit digitoida liikkumispalveluidesi olennaisia tietoja valitsemalla
+                :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
                 Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
                 :title-operator-basic-details               "Perustiedot"

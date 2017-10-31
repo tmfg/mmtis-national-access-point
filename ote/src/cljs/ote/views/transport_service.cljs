@@ -10,6 +10,17 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
+(def modified-transport-service-types
+
+  ;; Create order for service type selection dropdown
+   [:passenger-transportation-taxi
+    :passenger-transportation-request
+    :passenger-transportation-schedule
+    :terminal
+    :rentals
+    :parking
+    :brokerage])
+
 (defn service-form-options [e!]
   {:name->label (tr-key [:field-labels])
    :update!     #(e! (ts/->SelectTransportServiceType %))
@@ -30,12 +41,12 @@
        (form/group
          {:label   nil
           :columns 3}
-         {
-          :style {:width "100%"}
-          :name        ::transport-service/type
-         :type        :selection
-         :show-option (tr-key [:enums ::transport-service/type])
-         :options     transport-service/transport-service-types})
+         {:style {:width "100%"}
+          :name        :transport-service-type-subtype
+          :type        :selection
+          :show-option  (tr-key [:service-type-dropdown])
+          ;:options     transport-service/transport-service-types}
+          :options modified-transport-service-types})
        ]
     nil]
      ]

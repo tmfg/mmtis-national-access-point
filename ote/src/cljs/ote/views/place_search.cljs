@@ -127,16 +127,19 @@
   (let [results (:results place-search)]
     [:div.place-search
 
+     [:div.col-xs-12.col-md-3
      [result-chips e! results]
 
      [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+
                         :filter (constantly true) ;; no filter, backend returns what we want
                         :dataSource (completions (:completions place-search))
                         :on-update-input #(e! (ps/->SetPlaceName %))
                         :search-text (or (:name place-search) "")
                         :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]
-
-     [places-map e! results]]))
+      ]
+    [:div.col-xs-12.col-md-8
+     [places-map e! results]]]))
 
 (defn place-search-form-group [e! label name]
   (form/group

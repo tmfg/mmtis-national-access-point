@@ -95,10 +95,10 @@
                         }]]]
     [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px"} }
      [:div.row {:style {:padding-left "40px" :height "100px"}}
-      [:p "Haluat digitoida liikkumispalvelusi olennaisia tietoja?"]
+      [:p (tr [:common-texts :front-page-start-ote-query-header])]
       ]
      [:div.row {:style {:text-align "center"}}
-     [ui/raised-button {:label    "Digitoi liikkumispalvelusi tiedot"
+     [ui/raised-button {:label    (tr [:buttons :add-transport-service])
                         ;:icon     (ic/social-group)
                         :on-click #(e! (fp/->ChangePage :transport-service))
                         :primary  true}]]]]])
@@ -111,7 +111,7 @@
      ]
     [:div {:class "col-xs-12 col-sm-6 col-md-4"}
      [ui/raised-button {:style {:margin-top "20px"}
-                        :label    "Digitoi liikkumispalvelusi tiedot"
+                        :label     (tr [:buttons :add-transport-service])
                         ;:icon     (ic/content-add)
                         :on-click #(e! (fp/->ChangePage :transport-service))
                         :primary  true}]]]
