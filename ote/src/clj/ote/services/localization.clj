@@ -12,10 +12,11 @@
   component/Lifecycle
   (start [{http :http :as this}]
     (assoc
-     this ::stop
-     (http/publish! http (routes
-                          (GET "/language/:lang" [lang]
-                               (fetch-language lang))))))
+      this ::stop
+           (http/publish! http {:authenticated? false}
+                          (routes
+                            (GET "/language/:lang" [lang]
+                              (fetch-language lang))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
