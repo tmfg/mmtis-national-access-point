@@ -21,14 +21,14 @@
   [:div.row
    (if published?
      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                      :disabled (not (form/can-save? data))}
+                      :disabled (form/disable-save? data)}
       (tr [:buttons :save-updated])]
      [:span
       [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                       :disabled (not (form/can-save? data))}
+                       :disabled (form/disable-save? data)}
        (tr [:buttons :save-and-publish])]
       [napit/tallenna  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
-                        :disabled (not (form/can-save? data))}
+                        :disabled (not (form/disable-save? data))}
        (tr [:buttons :save-as-draft])]])
    [napit/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
     (tr [:buttons :discard])]])
@@ -47,13 +47,15 @@
     :layout :row}
 
    {:name ::t-service/name
-    :type :string}
+    :type :string
+    :required? true}
 
    {:style style-base/long-drowpdown ;; Pass only style from stylefy base
     :name ::t-service/sub-type
     :type        :selection
     :show-option (tr-key [:enums :ote.db.transport-service/sub-type])
-    :options     t-service/passenger-transportation-sub-types}))
+    :options     t-service/passenger-transportation-sub-types
+    :required? true}))
 
 (defn place-search-group [e!]
   (place-search/place-search-form-group
@@ -86,21 +88,25 @@
     :read (comp ::common/street ::t-service/contact-address)
     :write (fn [data street]
              (assoc-in data [::t-service/contact-address ::common/street] street))
-    :label (tr [:field-labels ::common/street])}
+    :label (tr [:field-labels ::common/street])
+    :required? true}
 
    {:name        ::common/postal_code
     :type        :string
     :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-    :label (tr [:field-labels ::common/postal_code])}
+    :label (tr [:field-labels ::common/postal_code])
+    :required? true
+    :validate [[:postal-code]]}
 
    {:name        ::common/post_office
     :type        :string
     :read (comp ::common/post_office ::t-service/contact-address)
     :write (fn [data post-office]
              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-    :label (tr [:field-labels ::common/post_office])}
+    :label (tr [:field-labels ::common/post_office])
+    :required? true}
 
    {:name        ::t-service/contact-phone
     :type        :string}
@@ -138,7 +144,8 @@
      :actions [napit/tallenna
                {:style    (stylefy/use-style style-base/base-button)
                 :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-                :label    "Lisää hintarivi"
+                :label    (tr [:buttons :add-new-price-class])
+                :disabled false
                 :on-click #(e! (ts/->AddPriceClassRow))}]}
 
     {:name         ::t-service/price-classes
@@ -158,7 +165,8 @@
     :actions [napit/tallenna
               {:style    (stylefy/use-style style-base/base-button)
                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-               :label    "Lisää uusi rivi"
+               :label    (tr [:buttons :add-new-service-hour])
+               :disabled false
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
    {:name         ::t-service/service-hours

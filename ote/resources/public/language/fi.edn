@@ -103,6 +103,8 @@
   :save-and-publish "Tallenna ja julkaise"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
+  :add-new-price-class "Lisää hintarivi"
+  :add-new-service-hour "Lisää uusi rivi"
 
   :discard "Peruuta"
 

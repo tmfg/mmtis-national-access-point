@@ -40,7 +40,7 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? required?]
+                                  focus on-focus form? error warning table?]
                            :as   field} data]
   [ui/text-field
    {:floatingLabelText (when-not table?  label)
@@ -112,14 +112,19 @@
            lang]))]]]))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error] :as field}
+(defmethod field :selection [{:keys [update! label name style show-option options form? error warning] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
     [ui/select-field {:style style
                       :floating-label-text label
                       :value (option-idx data)
-                      :on-change #(update! (nth options %2))}
+                      :on-change #(update! (nth options %2))
+                      :error-text        (or error warning "") ;; Show error text or warning text or empty string
+                      :error-style       (if error             ;; Error is more critical than required - showing it first
+                                           style-base/error-element
+                                           style-base/required-element)
+                      }
      (doall
       (map-indexed
        (fn [i option]
