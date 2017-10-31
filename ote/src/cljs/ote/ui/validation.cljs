@@ -10,9 +10,13 @@
   (:require [reagent.core :refer [atom] :as r]
             [clojure.string :as str]
             [cljs-time.core :as t]
+            [ote.localization :refer [tr tr-key]]
             [ote.format :as fmt]))
 
 
+(defn empty-value? [arvo]
+  (or (nil? arvo)
+      (str/blank? arvo)))
 
 ;; validate-rule multimethod implements validation rule checking by keyword name
 ;; Parameters:
@@ -112,6 +116,13 @@
             ;; FIXME: use tr to translate
             "Y-tunnuksen pitää olla 7 numeroa, väliviiva, ja tarkastusnumero.")))))
 
+;; Valid Finnish postal-code
+(defmethod validate-rule :postal-code [_ _ data _ _ & [message]]
+  (when
+    (and (not (empty-value? data)) (not (re-matches #"^\d{5}$" data)))
+    (or message (tr [:common-texts :invalid-postal-code]))
+  ))
+
 (defn validate-rules
   "Returns all validation errors for a field as a sequence. If the sequence is empty,
   validation passed without errors."
@@ -147,10 +158,6 @@
                       v
                       (assoc v name errors))
                     schemas))))))))
-
-(defn empty-value? [arvo]
-  (or (nil? arvo)
-      (str/blank? arvo)))
 
 (defn missing-required-fields
   "Returns a sequence of schemas that are marked as required and are missing a value."

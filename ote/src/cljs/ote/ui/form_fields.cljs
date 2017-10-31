@@ -8,6 +8,7 @@
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
             [ote.style.base :as style-base]
+            [ote.ui.validation :as valid]
             [ote.time :as time]))
 
 
@@ -39,7 +40,7 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error table?]
+                                  focus on-focus form? error warning table? required?]
                            :as   field} data]
   [ui/text-field
    {:floatingLabelText (when-not table?  label)
@@ -50,8 +51,10 @@
                               (update! v))
                             (update! v)))
     :value             (or data "")
-    :error-text        error}])
-
+    :error-text        (or error warning "") ;; Show error text or warning text or empty string
+    :error-style       (if error             ;; Error is more critical than required - showing it first
+                        style-base/error-element
+                        style-base/required-element)}])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
@@ -125,11 +128,12 @@
        options))]))
 
 
-(defmethod field :multiselect-selection [{:keys [update! label name show-option show-option-short options form? error] :as field} data]
+(defmethod field :multiselect-selection [{:keys [update! label name style show-option show-option-short options form? error] :as field} data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field {:floating-label-text label
+    [ui/select-field {:style style
+                      :floating-label-text label
                       :multiple true
                       :value (clj->js (map option-idx selected-set))
                       :selection-renderer (fn [values]

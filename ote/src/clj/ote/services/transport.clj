@@ -145,7 +145,7 @@
 (defn- save-terminal-info
   "UPSERT! given data to database. "
   [db user data]
-  ;(println "Terminal DATA: " (pr-str data))
+  (println "Terminal DATA: " (pr-str data))
   (let [ckan-group (-> user :groups first)
         operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
         places (get-in data [::t-service/terminal ::t-service/operation-area])
@@ -208,7 +208,7 @@
           (save-passenger-transportation-info nap-config db user
                                               (http/transit-request form-data))))
 
-   (POST "/terminal" {form-data :body
+   (POST "/terminal-information" {form-data :body
                       user :user}
      (http/transit-response (save-terminal-info db user (http/transit-request form-data))))
 
