@@ -10,7 +10,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]
-            [goog.object :as gobj]))
+            [goog.object :as gobj]
+            [cljsjs.leaflet]))
 
 (defn- monkey-patch-chip-backspace
   "Pre 1.0 fix for bug in MaterialUI Chip which unconditionally
@@ -18,6 +19,7 @@
   not be able to erase text."
   [this]
   (let [refs (aget this "refs")]
+    (.log js/console "monkey patching chip bug")
     (gobj/forEach
      refs
      (fn [chip ref _]
@@ -67,6 +69,7 @@
 (defn install-draw-control!
   "Install Leaflet draw plugin to to places-map component."
   [e! this]
+  (.log js/console "install draw control")
   (let [m  (aget this "refs" "leaflet" "leafletElement")
         fg (new js/L.FeatureGroup)
         dc (new js/L.Control.Draw #js {:edit #js {:featureGroup fg
@@ -80,6 +83,7 @@
             (e! (ps/->AddDrawnGeometry geojson))))))
 
 (defn- update-bounds-from-layers [this]
+  (.log js/console "update-bounds-from-layers")
   (let [leaflet (aget this "refs" "leaflet" "leafletElement")
         bounds (atom nil)
         add-bounds! (fn [nw se]
