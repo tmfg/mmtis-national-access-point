@@ -81,17 +81,32 @@
 
 (defn- update-bounds-from-layers [this]
   (let [leaflet (aget this "refs" "leaflet" "leafletElement")
-        bounds (atom nil)]
+        bounds (atom nil)
+        add-bounds! (fn [nw se]
+                      (let [new-bounds (.latLngBounds js/L nw se)]
+                        (if (nil? @bounds)
+                          (reset! bounds new-bounds)
+                          (.extend @bounds new-bounds))))]
     (.eachLayer
      leaflet
      (fn [layer]
-       (when (instance? js/L.Path layer)
+
+       (cond
+         (instance? js/L.Path layer)
          (let [layer-bounds (.getBounds layer)]
-           (if (nil? @bounds)
-             (reset! bounds (.latLngBounds js/L
-                                           (.getNorthWest layer-bounds)
-                                           (.getSouthEast layer-bounds)))
-             (.extend @bounds layer-bounds))))))
+           (add-bounds! (.getNorthWest layer-bounds) (.getSouthEast layer-bounds)))
+
+         (instance? js/L.Marker layer)
+         (let [pos (.getLatLng layer)
+               d 0.01
+               lat (.-lat pos)
+               lng (.-lng pos)]
+           (add-bounds! (.latLng js/L (- lat d) (- lng d))
+                        (.latLng js/L (+ lat d) (+ lng d))))
+
+         ;; do nothing for other types
+         :default
+         nil)))
     (when-let [bounds @bounds]
       (.fitBounds leaflet bounds))))
 
