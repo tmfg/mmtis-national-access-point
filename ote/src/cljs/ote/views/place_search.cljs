@@ -11,7 +11,9 @@
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]
             [goog.object :as gobj]
-            [cljsjs.leaflet]))
+            cljsjs.leaflet))
+
+(set! *warn-on-infer* true)
 
 (defn- monkey-patch-chip-backspace
   "Pre 1.0 fix for bug in MaterialUI Chip which unconditionally
@@ -70,21 +72,25 @@
   "Install Leaflet draw plugin to to places-map component."
   [e! this]
   (.log js/console "install draw control")
-  (let [m  (aget this "refs" "leaflet" "leafletElement")
+  (let [^js/L.map
+        m (aget this "refs" "leaflet" "leafletElement")
+
         fg (new js/L.FeatureGroup)
         dc (new js/L.Control.Draw #js {:edit #js {:featureGroup fg
                                                   :remove false}})]
     (.addLayer m fg)
     (.addControl m dc)
     (.on m (aget js/L "Draw" "Event" "CREATED")
-         #(let [layer (aget % "layer")
+         #(let [^js/L.Path
+                layer (aget % "layer")
                 geojson (.toGeoJSON layer)]
             ;;(aset js/window "the_geom" geojson)
             (e! (ps/->AddDrawnGeometry geojson))))))
 
 (defn- update-bounds-from-layers [this]
   (.log js/console "update-bounds-from-layers")
-  (let [leaflet (aget this "refs" "leaflet" "leafletElement")
+  (let [^js/L.map
+        leaflet (aget this "refs" "leaflet" "leafletElement")
         bounds (atom nil)
         add-bounds! (fn [nw se]
                       (let [new-bounds (.latLngBounds js/L nw se)]
@@ -94,14 +100,18 @@
     (.eachLayer
      leaflet
      (fn [layer]
-
        (cond
          (instance? js/L.Path layer)
-         (let [layer-bounds (.getBounds layer)]
-           (add-bounds! (.getNorthWest layer-bounds) (.getSouthEast layer-bounds)))
+         (let [^js/L.path
+               path layer
+               layer-bounds (.getBounds path)]
+           (add-bounds! (.getNorthWest layer-bounds)
+                        (.getSouthEast layer-bounds)))
 
          (instance? js/L.Marker layer)
-         (let [pos (.getLatLng layer)
+         (let [^js/L.Marker
+               marker layer
+               pos (.getLatLng marker)
                d 0.01
                lat (.-lat pos)
                lng (.-lng pos)]
