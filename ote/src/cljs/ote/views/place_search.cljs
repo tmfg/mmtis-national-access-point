@@ -24,17 +24,42 @@
                       :dashArray "5,5"} location]
    [leaflet/Popup [:div name]]])
 
-(defn places-map [e! results]
-  [leaflet/Map {;;:prefer-canvas true
-                :center #js [65 25]
-                :zoom 5}
-   [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                       :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+(defn- update-bounds-from-layers [this]
+  (aset js/window "komp" this)
+  (.log js/console "päivityin")
+  (let [leaflet (aget this "refs" "leaflet" "leafletElement")
+        bounds (atom nil)]
+    (.eachLayer
+     leaflet
+     (fn [layer]
+       (when (.-getBounds layer)
+         (let [layer-bounds (.getBounds layer)]
+           (if (nil? @bounds)
+             (reset! bounds (.latLngBounds js/L
+                                           (.getNorthWest layer-bounds)
+                                           (.getSouthEast layer-bounds)))
+             (.extend @bounds layer-bounds))))))
+    (when-let [bounds @bounds]
+      (.log js/console "koko bounds: " bounds)
+      (.fitBounds leaflet bounds))))
 
-   (for [{:keys [place geojson]} results]
-     ^{:key (::places/id place)}
-     [leaflet/GeoJSON {:data geojson
-                       :style {:color "green"}}])])
+(defn places-map [e! results]
+  (r/create-class
+   {:component-did-mount update-bounds-from-layers
+    :component-did-update update-bounds-from-layers
+    :reagent-render
+    (fn [e! results]
+      [leaflet/Map {:center #js [65 25]
+                    :zoom 5
+                    :ref "leaflet"}
+       [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                           :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+       ;;Kun map on päivittynyt (component-did-update), kutsutaan koodia joka kyselee leaflet tasoilta bounds tiedot ja kutsuu map.fitBounds alueelle ,johon kaikki mahtuu
+       (for [{:keys [place geojson]} results]
+         ^{:key (::places/id place)}
+         [leaflet/GeoJSON {:data geojson
+                           :style {:color "green"}}])])}))
+
 
 (defn marker-map [e! coordinate]
   (.log js/console "rendering marker map coordinate->"coordinate)
