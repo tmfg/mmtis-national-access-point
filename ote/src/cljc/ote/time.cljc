@@ -26,15 +26,15 @@
          (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
 
 #?(:cljs
-   (defn js-time-to-string [time]
+   (defn format-js-time [time]
      (if  (nil? time)
-       " " ;: if nil - print empty string
+       "" ;: if nil - print empty string
        (->> time
             cljs-time/to-default-time-zone
             (format/unparse (format/formatter "HH:mm:ss"))))))
 
 #?(:cljs
-   (defn js-time-from-db-time [db-time]
+   (defn to-js-time [db-time]
      (let [hours (get db-time :hours)
            minutes (get db-time :minutes)
            seconds (get db-time :seconds)]

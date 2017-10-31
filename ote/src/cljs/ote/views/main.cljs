@@ -43,6 +43,9 @@
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
     [ui/menu-item {:primary-text " Näytä debug state"
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
+    [ui/menu-item {:primary-text "Siirry NAP -palveluun"
+                  ; :on-click #(e! (fp-controller/->GoNAPService))
+                  :on-click (fn [_] (set! (.-location js/document) "http://localhost:8080"))} ] ;; TODO: Fixme
     [ui/menu-item {:primary-text "Kirjaudu ulos"
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
     ]

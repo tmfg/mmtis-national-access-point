@@ -201,10 +201,9 @@
     :cancel-label cancel-label
     :ok-label ok-label
     :minutes-step 5
-    :default-time (time/js-time-from-db-time time-picker-time)
+    :default-time (time/to-js-time time-picker-time)
     :on-change (fn [event value]
-                 (update! (with-meta (time/parse-time (time/js-time-to-string value))
-                                   {::incomplete (time/js-time-to-string value)})))}]))
+                 (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
