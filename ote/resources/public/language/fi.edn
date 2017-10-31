@@ -194,7 +194,8 @@
 
  ;; Per feature/page localization keys
  :place-search {:name                "Paikan nimi"
-                :place-auto-complete "Hae paikka nimellä"}
+                :place-auto-complete "Hae paikka nimellä"
+                :rename-place "Anna uusi nimi (Enter hyväksyy)"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
           :passenger-transportation "Henkilöidenkuljetuspalvelut"
