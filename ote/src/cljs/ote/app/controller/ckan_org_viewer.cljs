@@ -3,17 +3,29 @@
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
             [taoensso.timbre :as log]
-            [ote.app.controller.front-page :as fp-ctrl]))
-
+            [ote.app.routes :as routes]))
 
 
 (defrecord StartViewer [])
+(defrecord GetTransportOperatorData [ckan-group-id])
+(defrecord TransportOperatorResponse [response])
 
 (extend-protocol tuck/Event
 
   StartViewer
   (process-event [_ app]
-    ; Trigger transport operator data fetch action
-    (tuck/action!
-      (fn [e!]
-        (e! (fp-ctrl/->GetTransportOperatorData))))))
+    (let [ckan-group-id (.getAttribute (.getElementById js/document "nap_viewer") "data-group-id")]
+      (tuck/action!
+        (fn [e!]
+          (e! (->GetTransportOperatorData ckan-group-id))))))
+
+  GetTransportOperatorData
+  (process-event [{id :ckan-group-id} app]
+    (comm/get! (str "transport-operator/" id) {:on-success (tuck/send-async! ->TransportOperatorResponse)})
+    app)
+
+  TransportOperatorResponse
+  (process-event [{response :response} app]
+    ;(.log js/console " Transport operator response" (clj->js response) (clj->js (get response :transport-operator)))
+    (assoc app
+      :transport-operator response)))

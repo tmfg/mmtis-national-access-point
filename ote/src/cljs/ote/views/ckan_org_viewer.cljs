@@ -52,6 +52,7 @@
   ;; init
   (e! (org-viewer/->StartViewer))
   (fn [e! {:keys [transport-operator] :as app}]
-    [:div.container
-     [basic-info transport-operator]
-     [contact-info transport-operator]]))
+    (when transport-operator
+      [:div.container
+       [basic-info transport-operator]
+       [contact-info transport-operator]])))
