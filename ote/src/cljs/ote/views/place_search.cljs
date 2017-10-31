@@ -64,7 +64,6 @@
                       :dashArray "5,5"} location]
    [leaflet/Popup [:div name]]])
 
-
 (defn install-draw-control!
   "Install Leaflet draw plugin to to places-map component."
   [e! this]
@@ -80,10 +79,29 @@
             ;;(aset js/window "the_geom" geojson)
             (e! (ps/->AddDrawnGeometry geojson))))))
 
+(defn- update-bounds-from-layers [this]
+  (let [leaflet (aget this "refs" "leaflet" "leafletElement")
+        bounds (atom nil)]
+    (.eachLayer
+     leaflet
+     (fn [layer]
+       (when (instance? js/L.Path layer)
+         (let [layer-bounds (.getBounds layer)]
+           (if (nil? @bounds)
+             (reset! bounds (.latLngBounds js/L
+                                           (.getNorthWest layer-bounds)
+                                           (.getSouthEast layer-bounds)))
+             (.extend @bounds layer-bounds))))))
+    (when-let [bounds @bounds]
+      (.fitBounds leaflet bounds))))
+
 (defn places-map [e! results]
   (let [feature-group (atom nil)]
     (r/create-class
-     {:component-did-mount (partial install-draw-control! e!)
+     {:component-did-mount #(do
+                              (install-draw-control! e! %)
+                              (update-bounds-from-layers %))
+      :component-did-update update-bounds-from-layers
       :reagent-render
       (fn [e! results]
         [leaflet/Map {;;:prefer-canvas true
@@ -99,6 +117,7 @@
            ^{:key (::places/id place)}
            [leaflet/GeoJSON {:data geojson
                              :style {:color "green"}}])])})))
+
 
 (defn marker-map [e! coordinate]
   (.log js/console "rendering marker map coordinate->"coordinate)
