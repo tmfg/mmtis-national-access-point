@@ -8,6 +8,7 @@
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
             [ote.style.base :as style-base]
+            [ote.ui.validation :as valid]
             [ote.time :as time]))
 
 
@@ -39,7 +40,7 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error table?]
+                                  focus on-focus form? error warning table?]
                            :as   field} data]
   [ui/text-field
    {:floatingLabelText (when-not table?  label)
@@ -50,8 +51,10 @@
                               (update! v))
                             (update! v)))
     :value             (or data "")
-    :error-text        error}])
-
+    :error-text        (or error warning "") ;; Show error text or warning text or empty string
+    :error-style       (if error             ;; Error is more critical than required - showing it first
+                        style-base/error-element
+                        style-base/required-element)}])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
@@ -108,14 +111,19 @@
              lang]))]]])))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error] :as field}
+(defmethod field :selection [{:keys [update! label name style show-option options form? error warning] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
     [ui/select-field {:style style
                       :floating-label-text label
                       :value (option-idx data)
-                      :on-change #(update! (nth options %2))}
+                      :on-change #(update! (nth options %2))
+                      :error-text        (or error warning "") ;; Show error text or warning text or empty string
+                      :error-style       (if error             ;; Error is more critical than required - showing it first
+                                           style-base/error-element
+                                           style-base/required-element)
+                      }
      (doall
       (map-indexed
        (fn [i option]
@@ -124,11 +132,12 @@
        options))]))
 
 
-(defmethod field :multiselect-selection [{:keys [update! label name show-option show-option-short options form? error] :as field} data]
+(defmethod field :multiselect-selection [{:keys [update! label name style show-option show-option-short options form? error] :as field} data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field {:floating-label-text label
+    [ui/select-field {:style style
+                      :floating-label-text label
                       :multiple true
                       :value (clj->js (map option-idx selected-set))
                       :selection-renderer (fn [values]
@@ -192,6 +201,17 @@
                                         {::incomplete string})))
                   :type :string
                   :regex time-regex) data]))
+
+(defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
+  (let [time-picker-time (if (= nil? data) default-time data)]
+  [ui/time-picker
+   {:format "24hr"
+    :cancel-label cancel-label
+    :ok-label ok-label
+    :minutes-step 5
+    :default-time (time/to-js-time time-picker-time)
+    :on-change (fn [event value]
+                 (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])

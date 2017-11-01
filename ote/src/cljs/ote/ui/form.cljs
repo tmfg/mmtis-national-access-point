@@ -8,6 +8,7 @@
             [clojure.string :as str]
             [cljs-react-material-ui.reagent :as ui]
             [reagent.core :as r]
+            [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]))
 
@@ -155,7 +156,11 @@
                                 :form? true
                                 :update! update-fn
                                 :error (when (not (empty? errors))
-                                         (str/join " " errors))) data]
+                                         (str/join " " errors))
+                                :warning (when
+                                           (and required? (validation/empty-value? data) )
+                                           (tr [:common-texts :required-field])))
+                                data]
       [:div.form-control-static
        (if fmt
          (fmt ((or read #(get % name)) data))

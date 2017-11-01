@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.brokerage :as brokerage]
             [ote.db.transport-service :as transport-service]
@@ -19,7 +19,7 @@
    :update!     #(e! (brokerage/->EditBrokerageState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [napit/tallenna {:on-click #(e! (brokerage/->SaveBrokerageToDb))
+                  [buttons/save {:on-click #(e! (brokerage/->SaveBrokerageToDb))
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])})
 

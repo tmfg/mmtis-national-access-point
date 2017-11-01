@@ -36,4 +36,4 @@
   (process-event [{service :service} app]
     (assoc app
       :transport-service service
-      :page :front-page)))
+      :page :own-services)))

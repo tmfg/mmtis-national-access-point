@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.passenger-transportation :as pt]
             [ote.db.transport-service :as t-service]
@@ -20,17 +20,17 @@
 (defn footer [e! {published? ::t-service/published? :as data}]
   [:div.row
    (if published?
-     [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                      :disabled (not (form/can-save? data))}
+     [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
+                      :disabled (form/disable-save? data)}
       (tr [:buttons :save-updated])]
      [:span
-      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                       :disabled (not (form/can-save? data))}
+      [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
+                       :disabled (form/disable-save? data)}
        (tr [:buttons :save-and-publish])]
-      [napit/tallenna  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
-                        :disabled (not (form/can-save? data))}
+      [buttons/save  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
+                        :disabled  (form/disable-save? data)}
        (tr [:buttons :save-as-draft])]])
-   [napit/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
+   [buttons/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
     (tr [:buttons :discard])]])
 
 (defn transportation-form-options [e!]
@@ -42,18 +42,20 @@
 
 (defn name-and-type-group [e!]
   (form/group
-   {:label "Palvelun perustiedot"
+   {:label (tr [:passenger-transportation-page :header-service-info])
     :columns 3
     :layout :row}
 
    {:name ::t-service/name
-    :type :string}
+    :type :string
+    :required? true}
 
    {:style style-base/long-drowpdown ;; Pass only style from stylefy base
     :name ::t-service/sub-type
     :type        :selection
     :show-option (tr-key [:enums :ote.db.transport-service/sub-type])
-    :options     t-service/passenger-transportation-sub-types}))
+    :options     t-service/passenger-transportation-sub-types
+    :required? true}))
 
 (defn place-search-group [e!]
   (place-search/place-search-form-group
@@ -63,7 +65,7 @@
 
 (defn luggage-restrictions-group []
   (form/group
-   {:label "Rajoitukset ja maksutavat"
+   {:label (tr [:passenger-transportation-page :header-restrictions-payments])
     :columns 3
     :layout :row}
 
@@ -78,7 +80,7 @@
 
 (defn contact-info-group []
   (form/group
-   {:label   "Palvelun yhteystiedot"
+   {:label  (tr [:passenger-transportation-page :header-contact-details])
     :columns 3
     :layout :row}
    {:name        ::common/street
@@ -86,21 +88,25 @@
     :read (comp ::common/street ::t-service/contact-address)
     :write (fn [data street]
              (assoc-in data [::t-service/contact-address ::common/street] street))
-    :label (tr [:field-labels ::common/street])}
+    :label (tr [:field-labels ::common/street])
+    :required? true}
 
    {:name        ::common/postal_code
     :type        :string
     :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-    :label (tr [:field-labels ::common/postal_code])}
+    :label (tr [:field-labels ::common/postal_code])
+    :required? true
+    :validate [[:postal-code]]}
 
    {:name        ::common/post_office
     :type        :string
     :read (comp ::common/post_office ::t-service/contact-address)
     :write (fn [data post-office]
              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-    :label (tr [:field-labels ::common/post_office])}
+    :label (tr [:field-labels ::common/post_office])
+    :required? true}
 
    {:name        ::t-service/contact-phone
     :type        :string}
@@ -113,7 +119,7 @@
 
 (defn accessibility-group []
   (form/group
-   {:label   "Muut palvelut ja esteettömyys"
+   {:label (tr [:passenger-transportation-page :header-other-services-and-accessibility])
     :columns 3
     :layout :row}
 
@@ -133,12 +139,13 @@
 
 (defn pricing-group [e!]
   (form/group
-    {:label   "Hintatiedot"
+    {:label (tr [:passenger-transportation-page :header-price-information])
      :columns 3
-     :actions [napit/tallenna
+     :actions [buttons/save
                {:style    (stylefy/use-style style-base/base-button)
                 :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-                :label    "Lisää hintarivi"
+                :label    (tr [:buttons :add-new-price-class])
+                :disabled false
                 :on-click #(e! (ts/->AddPriceClassRow))}]}
 
     {:name         ::t-service/price-classes
@@ -153,12 +160,13 @@
 
 (defn service-hours-group [e!]
   (form/group
-   {:label   "Palveluajat"
+   {:label (tr [:passenger-transportation-page :header-service-hours])
     :columns 3
-    :actions [napit/tallenna
-              {:style    (stylefy/use-style style-base/base-button)
+    :actions [buttons/save
+              {:style (stylefy/use-style style-base/base-button)
                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-               :label    "Lisää uusi rivi"
+               :label (tr [:buttons :add-add-new-row])
+               :disabled false
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
    {:name         ::t-service/service-hours
@@ -168,8 +176,17 @@
                     :options t-service/days
                     :show-option (tr-key [:enums ::t-service/day :full])
                     :show-option-short (tr-key [:enums ::t-service/day :short])}
-                   {:name ::t-service/from :type :time}
-                   {:name ::t-service/to :type :time}]
+                   {:name ::t-service/from
+                    :type :time-picker
+                    :cancel-label (tr [:buttons :cancel])
+                    :ok-label (tr [:buttons :save])
+                    :default-time {:hours "08" :minutes "00"}
+                    }
+                   {:name ::t-service/to
+                    :type :time-picker
+                    :cancel-label (tr [:buttons :cancel])
+                    :ok-label (tr [:buttons :save])
+                    :default-time {:hours "19" :minutes "00"}}]
     :delete?      true}))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
@@ -190,5 +207,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 "Henkilöiden kuljetuspalvelun tiedot"]]
+       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])(tr [:passenger-transportation-page :header-passenger-transportation-service]) ]]
       [form/form form-options form-groups form-data]]]))
