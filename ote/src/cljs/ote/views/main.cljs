@@ -42,7 +42,7 @@
     [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-guide])
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
-    [ui/menu-item {:primary-text "Organisaation perustiedot"
+    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-operator])
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
     [ui/menu-item {:primary-text " Näytä debug state"
@@ -55,12 +55,15 @@
 (defn- top-nav [e! app]
   [:div {:class "topnav"}
    [:a.main-icon {:href "#home"} [:img {:src "img/icons/nap-logo.svg" }]]
-   [:a.ote-nav { :href "/index.html" } (tr [:common-texts :header-front-page]) ]
    [:a.ote-nav
     {:class (is-topnav-active :front-page (:page app))
-     :href "#service-operator"
-     :on-click #(e! (fp-controller/->ChangePage :front-page))
-     } (tr [:common-texts :header-own-service-list]) ]
+     :href "#"
+     :on-click #(e! (fp-controller/->ChangePage :front-page))}
+    (tr [:common-texts :navigation-front-page]) ]
+   [:a.ote-nav
+    {:class (is-topnav-active :own-services (:page app))
+     :on-click #(e! (fp-controller/->ChangePage :own-services))}
+    (tr [:common-texts :navigation-own-service-list]) ]
    [:div.user-menu {:class (is-user-menu-active app) }
     (reagent/as-element (user-menu e! (get-in app [:user :name])))]])
 
@@ -103,6 +106,8 @@
      [:div
       (when (= :front-page (:page app))
         [fp/front-page e! app])
+      (when (= :own-services (:page app))
+        [fp/own-services e! app])
       (when (= :transport-service (:page app))
         [t-service/select-service-type e! (:transport-service app)])
       (when (= :transport-operator (:page app))

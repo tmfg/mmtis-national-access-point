@@ -36,3 +36,6 @@
 (def front-page-service-table {:a
                                {:text-decoration "none"
                                 ::stylefy/mode {:visited {:text-decoration "none"}}}})
+(def header-font {:font-size "18px"
+                  :padding-top "20px"
+                  :font-weight "600"})

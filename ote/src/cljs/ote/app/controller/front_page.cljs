@@ -20,7 +20,7 @@
   ChangePage
   (process-event [{given-page :given-page} app]
     (routes/navigate! given-page)
-    app)
+    (assoc app :page given-page))
 
   ToggleDebugState
   (process-event [_ app]
