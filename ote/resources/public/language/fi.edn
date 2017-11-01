@@ -97,6 +97,7 @@
  ;; Action buttons
  :buttons
  {:save "Tallenna"
+  :cancel "Peruuta"
   :delete "Poista"
   :publish "Julkaise"
 

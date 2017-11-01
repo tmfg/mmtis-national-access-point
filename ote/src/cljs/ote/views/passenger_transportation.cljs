@@ -176,8 +176,17 @@
                     :options t-service/days
                     :show-option (tr-key [:enums ::t-service/day :full])
                     :show-option-short (tr-key [:enums ::t-service/day :short])}
-                   {:name ::t-service/from :type :time}
-                   {:name ::t-service/to :type :time}]
+                   {:name ::t-service/from
+                    :type :time-picker
+                    :cancel-label (tr [:buttons :cancel])
+                    :ok-label (tr [:buttons :save])
+                    :default-time {:hours "08" :minutes "00"}
+                    }
+                   {:name ::t-service/to
+                    :type :time-picker
+                    :cancel-label (tr [:buttons :cancel])
+                    :ok-label (tr [:buttons :save])
+                    :default-time {:hours "19" :minutes "00"}}]
     :delete?      true}))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]

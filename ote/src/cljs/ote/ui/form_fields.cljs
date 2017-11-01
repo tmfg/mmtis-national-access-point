@@ -203,6 +203,17 @@
                   :type :string
                   :regex time-regex) data]))
 
+(defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
+  (let [time-picker-time (if (= nil? data) default-time data)]
+  [ui/time-picker
+   {:format "24hr"
+    :cancel-label cancel-label
+    :ok-label ok-label
+    :minutes-step 5
+    :default-time (time/to-js-time time-picker-time)
+    :on-change (fn [event value]
+                 (update! (time/parse-time (time/format-js-time value))))}]))
+
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
 
