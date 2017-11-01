@@ -48,6 +48,9 @@
     [ui/menu-item {:primary-text " Näytä debug state"
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
+    [ui/menu-item {:primary-text "Siirry NAP -palveluun"
+                  ; :on-click #(e! (fp-controller/->GoNAPService))
+                  :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
     [ui/menu-item {:primary-text "Kirjaudu ulos"
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]])
