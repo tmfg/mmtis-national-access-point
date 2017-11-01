@@ -1,4 +1,4 @@
-(ns ote.ui.napit
+(ns ote.ui.buttons
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [stylefy.core :as stylefy]
@@ -9,7 +9,7 @@
   [:div (stylefy/use-style style-base/action-button-container)
    button])
 
-(defn tallenna [opts label]
+(defn save [opts label]
   [button-container
    [ui/raised-button
     (merge {:button-style style-base/base-button} opts)

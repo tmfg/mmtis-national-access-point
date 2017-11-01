@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.passenger-transportation :as pt]
             [ote.db.transport-service :as t-service]
@@ -20,17 +20,17 @@
 (defn footer [e! {published? ::t-service/published? :as data}]
   [:div.row
    (if published?
-     [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
+     [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
                       :disabled (not (form/can-save? data))}
       (tr [:buttons :save-updated])]
      [:span
-      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
+      [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
                        :disabled (not (form/can-save? data))}
        (tr [:buttons :save-and-publish])]
-      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
+      [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
                         :disabled (not (form/can-save? data))}
        (tr [:buttons :save-as-draft])]])
-   [napit/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
+   [buttons/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
     (tr [:buttons :discard])]])
 
 (defn transportation-form-options [e!]
@@ -135,7 +135,7 @@
   (form/group
     {:label (tr [:passenger-transportation-page :header-price-information])
      :columns 3
-     :actions [napit/tallenna
+     :actions [buttons/save
                {:style (stylefy/use-style style-base/base-button)
                 :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
                 :label "Lisää hintarivi"
@@ -155,7 +155,7 @@
   (form/group
    {:label (tr [:passenger-transportation-page :header-service-hours])
     :columns 3
-    :actions [napit/tallenna
+    :actions [buttons/save
               {:style (stylefy/use-style style-base/base-button)
                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
                :label (tr [:buttons :add-add-new-row])

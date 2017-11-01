@@ -54,7 +54,9 @@
 
 (defn- top-nav [e! app]
   [:div {:class "topnav"}
-   [:a.main-icon {:href "#home"} [:img {:src "img/icons/nap-logo.svg" }]]
+   [:a.main-icon {:href "#"
+                  :on-click #(e! (fp-controller/->ChangePage :front-page))}
+    [:img {:src "img/icons/nap-logo.svg" }]]
    [:a.ote-nav
     {:class (is-topnav-active :front-page (:page app))
      :href "#"

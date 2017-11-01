@@ -26,7 +26,6 @@
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
-    (assoc app :transport-operator data)
-    ;           :page :front-page)
-               ;(routes/navigate! given-page)
-    ))
+    (routes/navigate! :own-services)
+    (assoc app :transport-operator data
+               :page :own-services)))

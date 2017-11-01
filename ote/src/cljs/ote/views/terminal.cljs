@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.terminal :as terminal]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
@@ -18,7 +18,7 @@
    :update!     #(e! (terminal/->EditTerminalState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [napit/tallenna {:on-click #(e! (terminal/->SaveTerminalToDb))
+                  [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb))
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])})
 
