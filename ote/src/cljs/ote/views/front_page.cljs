@@ -161,12 +161,7 @@
       [ui/raised-button {:style {:margin-top "20px"}
                          :label    (tr [:front-page :move-to-services-page])
                          :on-click #(e! (fp/->ChangePage :own-services))
-                         :primary  true}]
-      ]
-     ]
-
-
-     ))
+                         :primary  true}]]]))
 
 (defn own-services [e! status]
   ;; init
