@@ -1,0 +1,13 @@
+# Documentation of technical debt
+
+This file contains things that are considered technical debt and should be fixed in the medium term.
+Do not add functional requirements here.
+
+### Upgrading MaterialUI to 1.0
+
+Currently (Oct 2017) material UI is at version 0.19.x and the 1.0 branch is in beta.
+The 0.19.x branch contains some bugs that need to be worked around.
+
+Upgrade to 1.0 branch when it is released and remove any ugly workarounds.
+
+* `ote.views.place-search/monkey-patch-chip-backspace`
