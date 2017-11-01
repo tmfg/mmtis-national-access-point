@@ -1,5 +1,5 @@
 (ns ote.views.ckan-org-viewer
-  "OTE organization edit form for CKAN organization edit page. (CKAN embedded view)
+  "OTE organization data viewerfor CKAN organization info page. (CKAN embedded view)
   Note that this view uses CKAN css classes, mainly bootstrap 2.x."
   (:require [ote.app.controller.ckan-org-viewer :as org-viewer]
             [clojure.string :as str]
