@@ -40,12 +40,12 @@
 
   HandlePassengerTransportationResponse
   (process-event [{service :service} app]
-    (routes/navigate! :front-page)
+    (routes/navigate! :own-services)
     (assoc app
       :transport-service service
-      :page :front-page))
+      :page :own-services))
 
   CancelPassengerTransportationForm
   (process-event [_ app]
-    (routes/navigate! :front-page)
+    (routes/navigate! :own-services)
     app))

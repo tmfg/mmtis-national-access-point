@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.parking :as parking]
             [ote.db.transport-service :as transport-service]
@@ -19,7 +19,7 @@
    :update!     #(e! (parking/->EditParkingState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [napit/tallenna {:on-click #(e! (parking/->SaveParkingToDb))
+                  [buttons/save {:on-click #(e! (parking/->SaveParkingToDb))
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])})
 

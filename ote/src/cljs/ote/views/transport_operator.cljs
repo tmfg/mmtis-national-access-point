@@ -2,7 +2,7 @@
   "Olennaisten tietojen lomakenäkymä"
   (:require [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-operator :as to]
             [ote.db.transport-operator :as to-definitions]
             [ote.db.common :as common]
@@ -17,7 +17,7 @@
      :update! #(e! (to/->EditTransportOperatorState %))
      :name #(tr [:olennaiset-tiedot :otsikot %])
      :footer-fn (fn [data]
-                  [napit/tallenna {:on-click #(e! (to/->SaveTransportOperator))
+                  [buttons/save {:on-click #(e! (to/->SaveTransportOperator))
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])}
 
