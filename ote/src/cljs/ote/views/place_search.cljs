@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [ote.app.controller.place-search :as ps]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.ui.leaflet :as leaflet]
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]

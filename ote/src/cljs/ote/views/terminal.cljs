@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.terminal :as terminal]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
@@ -19,13 +19,13 @@
    :update!     #(e! (terminal/->EditTerminalState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [napit/tallenna {:on-click #(e! (terminal/->SaveTerminalToDb))
+                  [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb))
                                    :disabled (form/disable-save? data)}
                    (tr [:buttons :save])])})
 
 (defn name-and-type-group [e!]
   (form/group
-    {:label "Palvelun perustiedot"
+    {:label (tr [:terminal-page :header-service-info])
      :columns 3
      :layout :row}
 
@@ -41,7 +41,7 @@
 
 (defn contact-info-group []
   (form/group
-    {:label   "Palvelun yhteystiedot"
+    {:label (tr [:terminal-page :header-contact-details])
      :columns 3
      :layout :row}
 
@@ -86,7 +86,7 @@
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
-     [:h3 "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."]]
+     [:h3 (tr [:terminal-page :header-add-new-terminal])]]
     [form/form (terminal-form-options e!)
 
      [
@@ -97,7 +97,7 @@
         ::t-service/indoor-map)
 
       (form/group
-        {:label   "Muut palvelut ja esteettömyys"
+        {:label (tr [:terminal-page :header-other-services-and-accessibility])
          :columns 3
          :layout :row}
 
@@ -127,9 +127,9 @@
         )
 
       (form/group
-        {:label   "Kuvaus esteettömyyspalveluista"
+        {:label (tr [:terminal-page :header-accessibility-description])
          :columns 3
-         :layout  :row}
+         :layout :row}
 
         {:name ::t-service/accessibility-description
          :type :localized-text
@@ -139,6 +139,4 @@
       (contact-info-group)
      ]
 
-     (get status ::t-service/terminal)]
-
-    ]])
+     (get status ::t-service/terminal)]]])
