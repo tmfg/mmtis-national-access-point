@@ -219,7 +219,7 @@
          (save-transport-service-request nap-config db user form-data
                                          save-passenger-transportation-info))
 
-   (POST "/terminal" {form-data :body
+   (POST "/terminal-information" {form-data :body
                       user :user}
          (save-transport-service-request nap-config db user form-data
                                          save-terminal-info))

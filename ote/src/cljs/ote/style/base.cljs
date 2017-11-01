@@ -22,13 +22,18 @@
                   :font-weight "bold"
                   })
 
+(def disabled-button (merge base-button {:background-color "#CCCCCC"}))
+
 (def button-label-style {:font-size "12px"
                          :font-weight "bold"
                          :text-transform "uppercase"
                          :color "#FFFFFF"})
 
 ;; Form elements
-(def long-drowpdown  {:width "350px"})
+(def required-element { :color "#FF9800"})
+(def error-element { :color "#B71C1C"
+                    :font-weight "600"})
+(def long-drowpdown  {:width "350px" })
 
 ;; Front page
 
