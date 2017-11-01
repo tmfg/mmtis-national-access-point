@@ -35,13 +35,15 @@
                  ;; Frontend UI libraries
                  [reagent "0.7.0"]
                  [webjure/tuck "0.4.3"]
-                 [cljsjs/react "15.6.1-1"]
-                 [cljsjs/react-dom "15.6.1-1"]
+                 [cljsjs/react "15.6.1-2"]
+                 [cljsjs/react-dom "15.6.1-2"]
                  [cljs-react-material-ui "0.2.48"]
                  [figwheel "0.5.13"]
-                 [cljsjs/react-leaflet "1.6.5-0"]
+                 [cljsjs/react-leaflet "1.6.5-0" :exclusions [cljsjs/leaflet]]
+                 [cljsjs/leaflet "1.2.0-0"]
                  [funcool/bide "1.5.1"] ; URL router
                  [stylefy "1.0.1"]
+                 [cljsjs/leaflet-draw "0.4.12-0"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
@@ -96,11 +98,13 @@
                ;; Tuotantobuild advanced compilation
                {:id "prod"
                 :source-paths ["src/cljs" "src/cljc"]
-                :compiler {:optimizations :advanced
+                :compiler {;;:pseudo-names true ; enable for debugging externs
+                           :optimizations :advanced
                            :output-to "resources/public/js/ote.js"
                            :output-dir "resources/public/js/prod-out"
                            :source-map "resources/public/js/ote.js.map"
-                           :closure-output-charset "US-ASCII"}}]}
+                           :closure-output-charset "US-ASCII"
+                           :infer-externs true}}]}
 
   :clean-targets ^{:protect false}
   ["resources/public/js/ote.js" "resources/public/js" "target/classes"]

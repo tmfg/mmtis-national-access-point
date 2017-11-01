@@ -16,7 +16,6 @@
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
             [cheshire.core :as cheshire]
-            [ote.authorization :as authorization]
             [ote.db.tx :as tx]
             [ote.nap.publish :as publish]
             [ote.db.modification :as modification]
@@ -78,11 +77,11 @@
   "Delete single transport service by id"
   [db id]
   (tx/with-transaction db
-  ;; Delete operation area first
-  (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
-  ;; Delete service
-  (delete! db ::t-service/transport-service {::t-service/id id})
-  id))
+    ;; Delete operation area first
+    (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
+    ;; Delete service
+    (delete! db ::t-service/transport-service {::t-service/id id})
+    id))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -125,27 +124,26 @@
                            (modification/with-modification-fields ::t-service/id user)
                            (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
                            (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
-    (when (access/user-has-rights-to-save-service? operator passenger-info)
-      ;; Store to OTE database
-      (let [transport-service
-            (jdbc/with-db-transaction [db db]
-                                      (let [transport-service (upsert! db ::t-service/transport-service passenger-info)]
-                                        (places/link-places-to-transport-service!
-                                          db (::t-service/id transport-service) places)
-                                        transport-service))]
-        ;; FIXME: add modification/creation time
+    ;; Store to OTE database
+    (let [transport-service
+          (jdbc/with-db-transaction [db db]
+            (let [transport-service (upsert! db ::t-service/transport-service passenger-info)]
+              (places/link-places-to-transport-service!
+               db (::t-service/id transport-service) places)
+              transport-service))]
+      ;; FIXME: add modification/creation time
 
-        ;; If published, use CKAN API to add dataset and resource
-        (when (::t-service/published? data)
-          (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
+      ;; If published, use CKAN API to add dataset and resource
+      (when (::t-service/published? data)
+        (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
 
-        ;; Return the stored transport-service
-        transport-service))))
+      ;; Return the stored transport-service
+      transport-service)))
 
 (defn- save-terminal-info
   "UPSERT! given data to database. "
-  [db user data]
-  (println "Terminal DATA: " (pr-str data))
+  [nap-config db user data]
+  ;(println "Terminal DATA: " (pr-str data))
   (let [ckan-group (-> user :groups first)
         operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
         places (get-in data [::t-service/terminal ::t-service/operation-area])
@@ -157,22 +155,21 @@
     ;(println "Terminal AREA: " (pr-str places))
     ;(println "Terminal coordinates: " (pr-str coordinates))
     ;(println "Terminal op-area-id: " op-area-id)
-    (when (access/user-has-rights-to-save-service? operator value)
-      (jdbc/with-db-transaction [db db]
-       (let [transport-service (upsert! db ::t-service/transport-service value)]
-         (when (not-empty coordinates)
-           (cond
-             (nil? op-area-id)
-             (insert-point-for-transport-service! db
-                                                {:transport-service-id (get transport-service ::t-service/id)
-                                                 :x (first coordinates)
-                                                 :y (second coordinates)})
-             :else (save-point-for-transport-service! db
-                                                      {:id op-area-id
-                                                       :transport-service-id (get transport-service ::t-service/id)
-                                                       :x (first coordinates)
-                                                       :y (second coordinates)})))
-         transport-service)))))
+    (jdbc/with-db-transaction [db db]
+      (let [transport-service (upsert! db ::t-service/transport-service value)]
+        (when (not-empty coordinates)
+          (cond
+            (nil? op-area-id)
+            (insert-point-for-transport-service! db
+                                                 {:transport-service-id (get transport-service ::t-service/id)
+                                                  :x (first coordinates)
+                                                  :y (second coordinates)})
+            :else (save-point-for-transport-service! db
+                                                     {:id op-area-id
+                                                      :transport-service-id (get transport-service ::t-service/id)
+                                                      :x (first coordinates)
+                                                      :y (second coordinates)})))
+        transport-service))))
 
 (defn- publish-transport-service [db user {:keys [transport-service-id]}]
   (let [transport-operator-ids (authorization/user-transport-operators db user)]
@@ -184,8 +181,21 @@
                         ::t-service/id transport-service-id}))))
 
 
+
+(defn- save-transport-service-request
+  "Process transport service save POST request. Checks that the transport operator id
+  in the service to be stored is in the set of allowed operators for the user.
+  If authorization check succeeds, the given `save-fn` is called."
+  [nap-config db user form-data save-fn]
+  (let [request (http/transit-request form-data)]
+    (authorization/with-transport-operator-check
+      db user (::t-service/transport-operator-id request)
+      #(http/transit-response
+        (save-fn nap-config db user request)))))
+
 (defn- transport-routes-auth
   "Routes that require authentication"
+
   [db nap-config]
   (routes
 
@@ -196,7 +206,8 @@
          (ensure-transport-operator-for-group db (-> user :groups first)))
 
    (POST "/transport-operator/data" {user :user}
-        (http/transit-response (get-transport-operator-data db (-> user :groups first) (:user user))))
+         (http/transit-response
+          (get-transport-operator-data db (-> user :groups first) (:user user))))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
@@ -205,13 +216,13 @@
 
    (POST "/passenger-transportation-info" {form-data :body
                                            user :user}
-         (http/transit-response
-          (save-passenger-transportation-info nap-config db user
-                                              (http/transit-request form-data))))
+         (save-transport-service-request nap-config db user form-data
+                                         save-passenger-transportation-info))
 
    (POST "/terminal-information" {form-data :body
                       user :user}
-     (http/transit-response (save-terminal-info db user (http/transit-request form-data))))
+         (save-transport-service-request nap-config db user form-data
+                                         save-terminal-info))
 
    (POST "/transport-service/publish" {payload :body
                                        user :user}
@@ -228,15 +239,17 @@
   [db nap-config]
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
-      (http/transit-response (get-transport-operator db {::transport-operator/ckan-group-id ckan-group-id})))))
+         (http/transit-response
+          (get-transport-operator db {::transport-operator/ckan-group-id ckan-group-id})))))
 
 (defrecord Transport [nap-config]
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
-      this ::lopeta
-           (http/publish! http (transport-routes-auth db nap-config))
-           (http/publish! http {:authenticated? false} (transport-routes db nap-config))))
-  (stop [{lopeta ::lopeta :as this}]
-    (lopeta)
-    (dissoc this ::lopeta)))
+      this ::stop
+      [(http/publish! http (transport-routes-auth db nap-config))
+       (http/publish! http {:authenticated? false} (transport-routes db nap-config))]))
+  (stop [{stop ::stop :as this}]
+    (doseq [s stop]
+      (s))
+    (dissoc this ::stop)))
