@@ -14,5 +14,5 @@
   StartEditor
   (process-event [_ app]
     (let [ckan-group-id (.getAttribute (.getElementById js/document "nap_viewer") "data-group-id")]
-      (to/get-transport-operator-data))
+      (to/transport-operator-data))
     app))

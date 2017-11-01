@@ -14,5 +14,5 @@
   StartViewer
   (process-event [_ app]
     (let [ckan-group-id (.getAttribute (.getElementById js/document "nap_viewer") "data-group-id")]
-      (to/get-transport-operator-by-ckan-group-id ckan-group-id))
+      (to/transport-operator-by-ckan-group-id ckan-group-id))
     app))

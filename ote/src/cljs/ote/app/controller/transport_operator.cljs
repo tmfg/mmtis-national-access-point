@@ -12,10 +12,10 @@
 (defrecord TransportOperatorResponse [response])
 (defrecord TransportOperatorDataResponse [response])
 
-(defn get-transport-operator-by-ckan-group-id[id]
+(defn transport-operator-by-ckan-group-id[id]
   (comm/get! (str "transport-operator/" id) {:on-success (t/send-async! ->TransportOperatorResponse)}))
 
-(defn get-transport-operator-data []
+(defn transport-operator-data []
   (comm/post! "transport-operator/data" {} {:on-success (t/send-async! ->TransportOperatorDataResponse)}))
 
 (extend-protocol t/Event
