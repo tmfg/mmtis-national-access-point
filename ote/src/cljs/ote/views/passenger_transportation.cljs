@@ -5,7 +5,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
-            [ote.ui.napit :as napit]
+            [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.passenger-transportation :as pt]
             [ote.db.transport-service :as t-service]
@@ -21,14 +21,14 @@
   [:div.row
    (if published?
      [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                      :disabled (not (form/disable-save? data))}
+                      :disabled (form/disable-save? data)}
       (tr [:buttons :save-updated])]
      [:span
       [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                       :disabled (not (form/disable-save? data))}
+                       :disabled (form/disable-save? data)}
        (tr [:buttons :save-and-publish])]
-      [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
-                        :disabled (not (form/disable-save? data))}
+      [buttons/save  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
+                        :disabled  (form/disable-save? data)}
        (tr [:buttons :save-as-draft])]])
    [buttons/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
     (tr [:buttons :discard])]])
@@ -141,7 +141,7 @@
   (form/group
     {:label (tr [:passenger-transportation-page :header-price-information])
      :columns 3
-     :actions [napit/tallenna
+     :actions [buttons/save
                {:style    (stylefy/use-style style-base/base-button)
                 :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
                 :label    (tr [:buttons :add-new-price-class])
@@ -166,6 +166,7 @@
               {:style (stylefy/use-style style-base/base-button)
                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
                :label (tr [:buttons :add-add-new-row])
+               :disabled false
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
    {:name         ::t-service/service-hours
