@@ -1,13 +1,13 @@
-{% set organization=c.group_dict %}
-
+<link rel="stylesheet" type="text/css" href="/ote/css/bootstrap_style_grid.css">
+<link rel="stylesheet" type="text/css" href="/ote/css/omat_tyylit.css">
 <style id="_stylefy-constant-styles_"></style>
 <style id="_stylefy-styles_"></style>
 
-<div id="nap_viewer" data-group-id={{ organization.id }}></div>
+<div id="nap_viewer"></div>
 
 <script src="/ote/js/out/goog/base.js"></script>
 <script src="/ote/js/ote.js"></script>
 <script>goog.require("ote.main")</script>
 <script>
-    ote.main.ckan_org_view();
+    ote.main.ckan_org_edit();
 </script>

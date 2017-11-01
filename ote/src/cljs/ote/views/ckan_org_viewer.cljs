@@ -1,5 +1,5 @@
 (ns ote.views.ckan-org-viewer
-  "OTE organization edit form for CKAN organization edit page. (CKAN embedded view)
+  "OTE organization data viewerfor CKAN organization info page. (CKAN embedded view)
   Note that this view uses CKAN css classes, mainly bootstrap 2.x."
   (:require [ote.app.controller.ckan-org-viewer :as org-viewer]
             [clojure.string :as str]
@@ -30,7 +30,11 @@
      [:div.span10
       (if address
         (interpose ", " (vals (select-keys address [::common/street, ::common/postal_code, ::common/post_office])))
-        "N/A")])])
+        "N/A")])
+
+   [:div.span2 [:b (transform-val :field-labels ::to-definitions/homepage)]]
+   [:div.span10 (operator ::to-definitions/homepage "N/A")]])
+
 
 (def contact-methods [::to-definitions/phone
                       ::to-definitions/gsm

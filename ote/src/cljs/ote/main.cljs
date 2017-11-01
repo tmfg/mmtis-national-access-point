@@ -12,6 +12,7 @@
             [ote.views.main :as main]
             [ote.views.viewer :as viewer]
             [ote.views.ckan-org-viewer :as ckan-org-viewer]
+            [ote.views.ckan-org-editor :as ckan-org-edit]
             [ote.localization :as localization]
             [ote.app.routes :as routes]
             [stylefy.core :as stylefy]
@@ -40,7 +41,7 @@
      (r/render-component [tuck/tuck state/viewer viewer/viewer]
                          (.getElementById js/document "nap_viewer")))))
 
-(defn ^:export org_view []
+(defn ^:export ckan_org_view []
   (comm/set-base-url! "/ote/")
   (localization/load-language!
     :fi
@@ -48,4 +49,15 @@
       (reset! localization/selected-language lang)
       (stylefy/init)
       (r/render-component [tuck/tuck state/app ckan-org-viewer/viewer]
+                          (.getElementById js/document "nap_viewer")))))
+
+
+(defn ^:export ckan_org_edit []
+  (comm/set-base-url! "/ote/")
+  (localization/load-language!
+    :fi
+    (fn [lang _]
+      (reset! localization/selected-language lang)
+      (stylefy/init)
+      (r/render-component [tuck/tuck state/app ckan-org-edit/editor]
                           (.getElementById js/document "nap_viewer")))))
