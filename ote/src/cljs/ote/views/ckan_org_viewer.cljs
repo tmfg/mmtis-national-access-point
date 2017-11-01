@@ -30,7 +30,11 @@
      [:div.span10
       (if address
         (interpose ", " (vals (select-keys address [::common/street, ::common/postal_code, ::common/post_office])))
-        "N/A")])])
+        "N/A")])
+
+   [:div.span2 [:b (transform-val :field-labels ::to-definitions/homepage)]]
+   [:div.span10 (operator ::to-definitions/homepage "N/A")]])
+
 
 (def contact-methods [::to-definitions/phone
                       ::to-definitions/gsm
