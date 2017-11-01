@@ -27,7 +27,7 @@
       [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
                        :disabled (not (form/can-save? data))}
        (tr [:buttons :save-and-publish])]
-      [napit/tallenna  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
+      [napit/tallenna {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
                         :disabled (not (form/can-save? data))}
        (tr [:buttons :save-as-draft])]])
    [napit/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
@@ -42,7 +42,7 @@
 
 (defn name-and-type-group [e!]
   (form/group
-   {:label "Palvelun perustiedot"
+   {:label (tr [:passenger-transportation-page :header-service-info])
     :columns 3
     :layout :row}
 
@@ -63,7 +63,7 @@
 
 (defn luggage-restrictions-group []
   (form/group
-   {:label "Rajoitukset ja maksutavat"
+   {:label (tr [:passenger-transportation-page :header-restrictions-payments])
     :columns 3
     :layout :row}
 
@@ -78,7 +78,7 @@
 
 (defn contact-info-group []
   (form/group
-   {:label   "Palvelun yhteystiedot"
+   {:label  (tr [:passenger-transportation-page :header-contact-details])
     :columns 3
     :layout :row}
    {:name        ::common/street
@@ -113,7 +113,7 @@
 
 (defn accessibility-group []
   (form/group
-   {:label   "Muut palvelut ja esteettömyys"
+   {:label (tr [:passenger-transportation-page :header-other-services-and-accessibility])
     :columns 3
     :layout :row}
 
@@ -133,12 +133,12 @@
 
 (defn pricing-group [e!]
   (form/group
-    {:label   "Hintatiedot"
+    {:label (tr [:passenger-transportation-page :header-price-information])
      :columns 3
      :actions [napit/tallenna
-               {:style    (stylefy/use-style style-base/base-button)
+               {:style (stylefy/use-style style-base/base-button)
                 :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-                :label    "Lisää hintarivi"
+                :label "Lisää hintarivi"
                 :on-click #(e! (ts/->AddPriceClassRow))}]}
 
     {:name         ::t-service/price-classes
@@ -153,12 +153,12 @@
 
 (defn service-hours-group [e!]
   (form/group
-   {:label   "Palveluajat"
+   {:label (tr [:passenger-transportation-page :header-service-hours])
     :columns 3
     :actions [napit/tallenna
-              {:style    (stylefy/use-style style-base/base-button)
+              {:style (stylefy/use-style style-base/base-button)
                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-               :label    "Lisää uusi rivi"
+               :label (tr [:buttons :add-add-new-row])
                :on-click #(e! (ts/->AddServiceHourRow))}]}
 
    {:name         ::t-service/service-hours
@@ -190,5 +190,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 "Henkilöiden kuljetuspalvelun tiedot"]]
+       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])(tr [:passenger-transportation-page :header-passenger-transportation-service]) ]]
       [form/form form-options form-groups form-data]]]))

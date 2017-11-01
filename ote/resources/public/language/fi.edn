@@ -107,7 +107,8 @@
   :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
-  :add-hosted-service      "Lisää itse ylläpitämäsi rajapinta"}
+  :add-hosted-service      "Lisää itse ylläpitämäsi rajapinta"
+  :add-add-new-row         "Lisää uusi rivi"}
 
 
 
@@ -215,31 +216,50 @@
 
 
  :front-page
- {:table-header-service-name "Palvelun nimi"
-  :table-header-service-url  "Palvelun verkko-osoite"
-  :table-header-NAP-status   "NAP tila"
-  :table-header-modified "Muokattu"
-  :table-header-created "Luotu"
-  :table-header-actions "Toiminnot"
+ {:table-header-service-name      "Palvelun nimi"
+  :table-header-service-url       "Palvelun verkko-osoite"
+  :table-header-NAP-status        "NAP tila"
+  :table-header-modified          "Muokattu"
+  :table-header-created           "Luotu"
+  :table-header-actions           "Toiminnot"
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
-  :header-explain-more "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page "Siirry omat palvelutiedot -näkymään"
-  :hello  "Hei "
-  :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
+  :header-explain-more            "Nyt en ymmärrä, selittäisitkö tarkemmin?"
+  :move-to-services-page          "Siirry omat palvelutiedot -näkymään"
+  :hello                          "Hei "
+  :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
   :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
-  :right-corner-description "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
+  :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
   :service-operator-short-description " -näkymään, jossa voit täydentää oman organisaatiosi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
-  :publish-new-service "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
-  :help-more-explanation1 "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
+  :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
+  :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
    joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
-  :help-more-explanation2 "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
+  :help-more-explanation2         "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
+  }
+
+ :passenger-transportation-page
+ {:header-passenger-transportation-service "Henkilöiden kuljetuspalvelun tiedot"
+  :header-service-info                     "Palvelun perustiedot"
+  :header-restrictions-payments            "Rajoitukset ja maksutavat"
+  :header-contact-details                  "Palvelun yhteystiedot"
+  :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
+  :header-price-information                "Hintatiedot"
+  :header-service-hours                    "Palveluajat"
+
+  }
+
+ :terminal-page
+ {:header-service-info  "Palvelun perustiedot"
+  :header-contact-details "Palvelun yhteystiedot"
+  :header-add-new-terminal  "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
+  :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
+  :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   }
 
  :common-texts {

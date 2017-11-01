@@ -24,7 +24,7 @@
 
 (defn name-and-type-group [e!]
   (form/group
-    {:label "Palvelun perustiedot"
+    {:label (tr [:terminal-page :header-service-info])
      :columns 3
      :layout :row}
 
@@ -39,7 +39,7 @@
 
 (defn contact-info-group []
   (form/group
-    {:label   "Palvelun yhteystiedot"
+    {:label (tr [:terminal-page :header-contact-details])
      :columns 3
      :layout :row}
     {:name        ::t-service/contact-phone
@@ -75,7 +75,7 @@
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
-     [:h3 "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."]]
+     [:h3 (tr [:terminal-page :header-add-new-terminal])]]
     [form/form (terminal-form-options e!)
 
      [
@@ -86,7 +86,7 @@
         ::t-service/indoor-map)
 
       (form/group
-        {:label   "Muut palvelut ja esteettömyys"
+        {:label (tr [:terminal-page :header-other-services-and-accessibility])
          :columns 3
          :layout :row}
 
@@ -112,9 +112,9 @@
         )
 
       (form/group
-        {:label   "Kuvaus esteettömyyspalveluista"
+        {:label (tr [:terminal-page :header-accessibility-description])
          :columns 3
-         :layout  :row}
+         :layout :row}
 
         {:name ::t-service/accessibility-description
          :type :localized-text
@@ -124,6 +124,4 @@
       (contact-info-group)
      ]
 
-     (get status ::t-service/terminal)]
-
-    ]])
+     (get status ::t-service/terminal)]]])

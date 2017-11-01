@@ -54,7 +54,7 @@
 (defn transport-services-listing [e! transport-operator-id services section-label]
   (when (> (count services) 0)
     [:div.row
-     [:div {:class "col-xs-12  col-md-12"}
+     [:div {:class "col-xs-12 col-md-12"}
       [:h3 section-label]
 
       [ui/table (stylefy/use-style style-base/front-page-service-table)
@@ -115,11 +115,11 @@
      ]
     [:div {:class "col-xs-12 col-sm-6 col-md-4"}
      [ui/raised-button {:style {:margin-top "20px"}
-                        :label     (tr [:buttons :add-transport-service])
+                        :label    (tr [:buttons :add-transport-service])
                         :on-click #(e! (fp/->ChangePage :transport-service))
                         :primary  true}]]]
    [:div.row
-    [:div {:class "col-xs-12  col-md-12"}
+    [:div {:class "col-xs-12 col-md-12"}
      ;; Table for transport services
 
      (for [type t-service/transport-service-types
@@ -159,8 +159,7 @@
       ]
      [:div.row.col-xs-12 {:style {:text-align "center"}}
       [ui/raised-button {:style {:margin-top "20px"}
-                         :label     (tr [:front-page :move-to-services-page])
-                         ;:icon     (ic/content-add)
+                         :label    (tr [:front-page :move-to-services-page])
                          :on-click #(e! (fp/->ChangePage :own-services))
                          :primary  true}]
       ]
