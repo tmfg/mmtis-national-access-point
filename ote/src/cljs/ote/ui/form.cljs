@@ -10,7 +10,19 @@
             [reagent.core :as r]
             [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [cljs-react-material-ui.icons :as ic]))
+
+(defn info
+  "Create a new info form element that doesn't have any interaction, just shows a help text."
+  [text]
+  {:name ::info
+   :type :component
+   :component (fn [_]
+                [:div
+                 [ic/action-info-outline]
+                 [:div (stylefy/use-style style-form/form-info-text)
+                  text]])})
 
 (defrecord Group [label options schemas])
 
@@ -282,7 +294,7 @@
                              :show-expandable-button true}])
           [ui/card-text {:style {:padding-top "0px"} :expandable true}
            group-component]
-          (when-let [actions (:actions options)]
+          (when-let [actions (and (not (closed-groups label)) (:actions options))]
             [ui/card-actions
              (r/as-element actions)])]]))}))
 
