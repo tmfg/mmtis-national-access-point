@@ -9,7 +9,8 @@
             [ote.style.form-fields :as style-form-fields]
             [ote.style.base :as style-base]
             [ote.ui.validation :as valid]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.ui.buttons :as buttons]))
 
 
 (defn read-only-atom [value]
@@ -217,36 +218,42 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields update! delete?] :as opts} data]
-  [ui/table
-   [ui/table-header {:adjust-for-checkbox false
-                     :display-select-all false}
-    [ui/table-row {:selectable false}
-     (doall
-      (for [{:keys [name label width] :as tf} table-fields]
-        ^{:key name}
-        [ui/table-header-column {:style {:width width}} label]))
-     (when delete?
-       [ui/table-header-column {:style {:width "70px"}}
-        (tr [:buttons :delete])])]]
+(defmethod field :table [{:keys [table-fields update! delete? add-label] :as opts} data]
+  [:div
+   [ui/table
+    [ui/table-header {:adjust-for-checkbox false
+                      :display-select-all false}
+     [ui/table-row {:selectable false}
+      (doall
+       (for [{:keys [name label width] :as tf} table-fields]
+         ^{:key name}
+         [ui/table-header-column {:style {:width width}} label]))
+      (when delete?
+        [ui/table-header-column {:style {:width "70px"}}
+         (tr [:buttons :delete])])]]
 
-   [ui/table-body {:display-row-checkbox false}
-    (map-indexed
-     (fn [i row]
-       ^{:key i}
-       [ui/table-row {:selectable false :display-border false}
-        (doall
-         (for [{:keys [name read write width] :as tf} table-fields]
-           ^{:key name}
-           [ui/table-row-column {:style {:width width}}
-            [field (assoc tf
-                          :table? true
-                          :update! #(update! (assoc-in data [i name] %)))
-             ((or read name) row)]]))
-        (when delete?
-          [ui/table-row-column {:style {:width "70px"}}
-           [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
-                                                               (take i data))
-                                                             (drop (inc i) data))))}
-            [ic/action-delete]]])])
-     data)]])
+    [ui/table-body {:display-row-checkbox false}
+     (map-indexed
+      (fn [i row]
+        ^{:key i}
+        [ui/table-row {:selectable false :display-border false}
+         (doall
+          (for [{:keys [name read write width] :as tf} table-fields]
+            ^{:key name}
+            [ui/table-row-column {:style {:width width}}
+             [field (assoc tf
+                           :table? true
+                           :update! #(update! (assoc-in data [i name] %)))
+              ((or read name) row)]]))
+         (when delete?
+           [ui/table-row-column {:style {:width "70px"}}
+            [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                                (take i data))
+                                                              (drop (inc i) data))))}
+             [ic/action-delete]]])])
+      data)]]
+   (when add-label
+     [buttons/save {:on-click #(update! (conj data {}))
+                    :label add-label
+                    :label-style style-base/button-label-style
+                    :disabled false}])])

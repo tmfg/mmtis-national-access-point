@@ -60,17 +60,13 @@
   []
   (form/group
    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
-    :columns 3
-    :actions [buttons/save
-              {:style (stylefy/use-style style-base/base-button)
-               :on-click #(js/alert "lisätään joo")
-               :label (tr [:buttons :add-external-interface])
-               :label-style style-base/button-label-style
-               :disabled false}]}
+    :columns 3}
 
    (form/info (tr [:form-help :external-interfaces]))
    {:name ::t-service/external-interfaces
     :type :table
     :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "40%"}
                    {:name ::t-service/external-service-url :type :string :width "40%"}
-                   {:name ::t-service/format :type :string :width "20%"}]}))
+                   {:name ::t-service/format :type :string :width "20%"}]
+    :delete? true
+    :add-label (tr [:buttons :add-external-interface])}))
