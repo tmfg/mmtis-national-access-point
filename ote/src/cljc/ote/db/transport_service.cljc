@@ -49,11 +49,11 @@
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
 
   ;; Tables
+  ["external-interface-description" ::external-interface-description]
   ["transport-service" ::transport-service
    ote.db.modification/modification-fields
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}]
-  ["operation_area" ::operation_area]
-  )
+  ["operation_area" ::operation_area])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
