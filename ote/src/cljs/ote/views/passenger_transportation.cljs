@@ -207,5 +207,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])(tr [:passenger-transportation-page :header-passenger-transportation-service]) ]]
+       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])]]
       [form/form form-options form-groups form-data]]]))

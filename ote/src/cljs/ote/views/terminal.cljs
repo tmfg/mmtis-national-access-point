@@ -14,14 +14,29 @@
             [tuck.core :as tuck]
             [ote.style.base :as style-base]))
 
+(defn footer [e! {published? ::t-service/published? :as data}]
+  [:div.row
+   (if published?
+     [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb true))
+                    :disabled (form/disable-save? data)}
+      (tr [:buttons :save-updated])]
+     [:span
+     [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb true))
+                   :disabled (form/disable-save? data)}
+     (tr [:buttons :save-and-publish])]
+      [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb false))
+                     :disabled false} ;; The draft does not have to be complete
+       (tr [:buttons :save-as-draft])]])
+    [buttons/cancel {:on-click #(e! (terminal/->CancelTerminalForm))}
+     (tr [:buttons :discard])]])
+
+
 (defn terminal-form-options [e!]
   {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
    :update!     #(e! (terminal/->EditTerminalState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb))
-                                   :disabled (form/disable-save? data)}
-                   (tr [:buttons :save])])})
+                  [footer e! data])})
 
 (defn name-and-type-group [e!]
   (form/group
