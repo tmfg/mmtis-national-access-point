@@ -15,7 +15,8 @@
     ::t-service/contact-email
     ::t-service/homepage
     ::t-service/name
-    ::t-service/sub-type})
+    ::t-service/sub-type
+    ::t-service/external-interfaces})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
