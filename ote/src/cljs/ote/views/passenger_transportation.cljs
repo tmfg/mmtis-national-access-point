@@ -193,6 +193,7 @@
   (with-let [form-options (transportation-form-options e!)
              form-groups [(name-and-type-group e!)
                           (contact-info-group)
+                          (form-groups/external-interfaces)
                           (place-search-group e!)
                           (luggage-restrictions-group)
                           (form-groups/service-url
@@ -207,5 +208,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])(tr [:passenger-transportation-page :header-passenger-transportation-service]) ]]
+       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])]]
       [form/form form-options form-groups form-data]]]))

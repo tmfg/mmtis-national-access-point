@@ -74,12 +74,12 @@
 (defn empty-header-for-front-page [e!]
   [:div
   [:div.row
-    [:div {:class "col-xs-12"}
-     [:div {:class "main-notification-panel"}
-      [:div {:class "col-xs-1"}
-       [ic/action-info-outline]]
-      [:div {:class "col-xs-11"}
-       [:p (tr [:common-texts :front-page-help-text])]]]]]
+   [:div {:class "col-xs-12"}
+    [:div {:class "main-notification-panel"}
+     [:div {:class "col-xs-1"}
+      [ic/action-info-outline]]
+     [:div {:class "col-xs-11"}
+      [:p (tr [:common-texts :front-page-help-text])]]]]]
 
 
    [:div.row {:style {:margin-top "50px"}}

@@ -32,6 +32,12 @@
    :ote.db.transport-service/operation-area            "Toiminta-alue"
    :ote.db.transport-service/location                  "Sijainti"
 
+   ;; External interfaces
+   :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
+   :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
+   :ote.db.transport-service/external-service-url "Rajapinnan URL-osoite"
+   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+
    }
 
   ;; Passenger transportation fields
@@ -94,6 +100,12 @@
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"}
 
+
+ ;; Add form info elements here, these are textual help texts in the form
+ :form-help
+ {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."}
+
+
  ;; Action buttons
  :buttons
  {:save "Tallenna"
@@ -110,7 +122,7 @@
   :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
-  :add-hosted-service      "Lisää itse ylläpitämäsi rajapinta"
+  :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-add-new-row         "Lisää uusi rivi"}
 
 

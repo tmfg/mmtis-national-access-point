@@ -2,7 +2,11 @@
   "Contains reusable form elements."
   (:require [ote.ui.form :as form]
             [ote.db.common :as common]
-            [ote.db.transport-service :as t-service]))
+            [ote.db.transport-service :as t-service]
+            [ote.ui.buttons :as buttons]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]
+            [ote.localization :refer [tr tr-key]]))
 
 
 (defn address
@@ -50,3 +54,23 @@
     :read  (comp ::t-service/description service-url-field)
     :write (fn [data desc]
              (assoc-in data [service-url-field ::t-service/description] desc))}))
+
+(defn external-interfaces
+  "Creates a form group for external services."
+  []
+  (form/group
+   {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
+    :columns 3
+    :actions [buttons/save
+              {:style (stylefy/use-style style-base/base-button)
+               :on-click #(js/alert "lisätään joo")
+               :label (tr [:buttons :add-external-interface])
+               :label-style style-base/button-label-style
+               :disabled false}]}
+
+   (form/info (tr [:form-help :external-interfaces]))
+   {:name ::t-service/external-interfaces
+    :type :table
+    :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "40%"}
+                   {:name ::t-service/external-service-url :type :string :width "40%"}
+                   {:name ::t-service/format :type :string :width "20%"}]}))
