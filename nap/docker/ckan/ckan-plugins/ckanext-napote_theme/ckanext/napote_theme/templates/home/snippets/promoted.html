@@ -5,12 +5,8 @@
         {% if intro %}
             {{ h.render_markdown(intro) }}
         {% else %}
-            <h1 class="page-heading">{{ _("Welcome to CKAN") }}</h1>
-            <p>
-                {% trans %}This is a nice introductory paragraph about CKAN or the site
-                    in general. We don't have any copy to go here yet but soon we will
-                {% endtrans %}
-            </p>
+            <h1 class="page-heading">{{ _("Heading/NAP home page intro heading") }}</h1>
+            <p>{{ _('NAP home page info text') }}</p>
         {% endif %}
     </header>
 </div>
