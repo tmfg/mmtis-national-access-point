@@ -1,6 +1,7 @@
 -- Allow multiple external interfaces to be defined
 
 CREATE TABLE "external-interface-description" (
+  id SERIAL PRIMARY KEY,
   "transport-service-id" INTEGER REFERENCES "transport-service" (id),
   "external-interface" service_link,
   "format" TEXT,
