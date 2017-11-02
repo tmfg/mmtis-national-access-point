@@ -76,14 +76,10 @@
           {::t-service/id id})))
 
 (defn- fetch-transport-service-external-interfaces [db id]
-  (map
-   (fn [{ei ::t-service/external-interface fmt ::t-service/format}]
-     {:ckan/name (-> ei ::t-service/description first ::t-service/text)
-      :ckan/url (::t-service/url ei)
-      :ckan/format fmt})
-   (fetch db ::t-service/external-interface-description
-          #{::t-service/external-interface ::t-service/format}
-          {::t-service/transport-service-id id})))
+  (fetch db ::t-service/external-interface-description
+         #{::t-service/external-interface ::t-service/format
+           ::t-service/ckan-resource-id ::t-service/id}
+         {::t-service/transport-service-id id}))
 
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
@@ -99,18 +95,34 @@
                       (ckan/add-or-update-dataset-resource! c)
                       verify-ckan-response)
 
+        external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
         external-resources
-        (mapv #(as-> % it
-                    (assoc it :ckan/package-id (:ckan/id dataset))
-                    (ckan/add-or-update-dataset-resource! c it)
-                    (verify-ckan-response it))
-              (fetch-transport-service-external-interfaces db transport-service-id))]
+        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format id ::t-service/ckan-resource-id}]
+                (verify-ckan-response
+                 (ckan/add-or-update-dataset-resource!
+                  c (merge
+                     {:ckan/package-id (:ckan/id dataset)
+                      :ckan/name (-> ei ::t-service/description first ::t-service/text)
+                      :ckan/url (::t-service/url ei)
+                      :ckan/format fmt}
+                     (when id
+                       {:ckan/id id})))))
+              external-interfaces)]
 
+    ;; Update CKAN resource ids for all external interfaces
+    (doall
+     (map (fn [{id ::t-service/id} {ckan-resource-id :ckan/id}]
+            (specql/update! db ::t-service/external-interface-description
+                            {::t-service/ckan-resource-id ckan-resource-id}
+                            {::t-service/id id}))
+          external-interfaces external-resources))
 
+    ;; Update CKAN dataset and resource ids
     (specql/update! db ::t-service/transport-service
                     {::t-service/ckan-dataset-id (:ckan/id dataset)
                      ::t-service/ckan-resource-id (:ckan/id resource)}
                     {::t-service/id transport-service-id})
+
     {:dataset dataset
      :resource resource
      :external-resources external-resources}))
