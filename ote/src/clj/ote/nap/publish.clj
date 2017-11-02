@@ -75,6 +75,16 @@
    (fetch db ::t-service/transport-service transport-operator-descriptor-columns
           {::t-service/id id})))
 
+(defn- fetch-transport-service-external-interfaces [db id]
+  (map
+   (fn [{ei ::t-service/external-interface fmt ::t-service/format}]
+     {:ckan/name (-> ei ::t-service/description first ::t-service/text)
+      :ckan/url (::t-service/url ei)
+      :ckan/format fmt})
+   (fetch db ::t-service/external-interface-description
+          #{::t-service/external-interface ::t-service/format}
+          {::t-service/transport-service-id id})))
+
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
   [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
@@ -87,13 +97,23 @@
         resource (->> dataset
                       (ckan-resource-description export-base-url ts)
                       (ckan/add-or-update-dataset-resource! c)
-                      verify-ckan-response)]
+                      verify-ckan-response)
+
+        external-resources
+        (mapv #(as-> % it
+                    (assoc it :ckan/package-id (:ckan/id dataset))
+                    (ckan/add-or-update-dataset-resource! c it)
+                    (verify-ckan-response it))
+              (fetch-transport-service-external-interfaces db transport-service-id))]
+
+
     (specql/update! db ::t-service/transport-service
                     {::t-service/ckan-dataset-id (:ckan/id dataset)
                      ::t-service/ckan-resource-id (:ckan/id resource)}
                     {::t-service/id transport-service-id})
     {:dataset dataset
-     :resource resource}))
+     :resource resource
+     :external-resources external-resources}))
 
 
 
