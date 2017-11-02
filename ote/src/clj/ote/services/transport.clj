@@ -113,6 +113,26 @@
     (catch Exception e
       (log/info "Can't fix price classes: " price-classes-float e))))
 
+(defn- save-external-interfaces
+  "Save external interfaces for a transport service"
+  [db transport-service-id external-interfaces]
+
+  ;; Delete services that have not been published yet
+  (specql/delete! db ::t-service/external-interface-description
+                  {::t-service/transport-service-id transport-service-id
+                   ::t-service/ckan-resource-id op/null?})
+
+  ;; Update or insert new external interfaces
+  (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if} external-interfaces]
+    (if ckan-resource-id
+      (specql/update! db ::t-service/external-interface-description
+                      ext-if
+                      {::t-service/transport-service-id transport-service-id
+                       ::t-service/ckan-resource-id ckan-resource-id})
+
+      (specql/insert! db ::t-service/external-interface-description
+                      (assoc ext-if ::t-service/transport-service-id transport-service-id)))))
+
 (defn- save-passenger-transportation-info
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [nap-config db user data]
@@ -120,18 +140,27 @@
   (let [ckan-group (-> user :groups first)
         operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
         places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
+        external-interfaces (::t-service/external-interfaces data)
         passenger-info (-> data
                            (modification/with-modification-fields ::t-service/id user)
                            (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
-                           (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes))]
+                           (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes)
+                           (dissoc ::t-service/external-interfaces))]
     ;; Store to OTE database
     (let [transport-service
           (jdbc/with-db-transaction [db db]
-            (let [transport-service (upsert! db ::t-service/transport-service passenger-info)]
-              (places/link-places-to-transport-service!
-               db (::t-service/id transport-service) places)
+            (let [transport-service (upsert! db ::t-service/transport-service passenger-info)
+                  transport-service-id (::t-service/id transport-service)]
+
+              ;; Save possible external interfaces
+              (save-external-interfaces db transport-service-id external-interfaces)
+
+              ;; Save operation areas
+              (places/link-places-to-transport-service! db transport-service-id places)
+
               transport-service))]
-      ;; FIXME: add modification/creation time
+
+
 
       ;; If published, use CKAN API to add dataset and resource
       (when (::t-service/published? data)
