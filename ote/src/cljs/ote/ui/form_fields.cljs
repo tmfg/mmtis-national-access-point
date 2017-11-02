@@ -70,7 +70,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! label name rows rows-max error]
+(defmethod field :localized-text [{:keys [update! table? label name rows rows-max error]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -81,7 +81,7 @@
        [:tr
         [:td
          [ui/text-field
-          {:floatingLabelText label
+          {:floatingLabelText (when-not table? label)
            :hintText          (placeholder field data)
            :on-change         #(let [updated-language-data
                                      {:ote.db.transport-service/lang language
@@ -238,12 +238,15 @@
         ^{:key i}
         [ui/table-row {:selectable false :display-border false}
          (doall
-          (for [{:keys [name read write width] :as tf} table-fields]
+          (for [{:keys [name read write width] :as tf} table-fields
+                :let [update-fn (if write
+                                  #(update data i write %)
+                                  #(assoc-in data [i name] %))]]
             ^{:key name}
             [ui/table-row-column {:style {:width width}}
              [field (assoc tf
                            :table? true
-                           :update! #(update! (assoc-in data [i name] %)))
+                           :update! #(update! (update-fn %)))
               ((or read name) row)]]))
          (when delete?
            [ui/table-row-column {:style {:width "70px"}}
@@ -253,7 +256,7 @@
              [ic/action-delete]]])])
       data)]]
    (when add-label
-     [buttons/save {:on-click #(update! (conj data {}))
+     [buttons/save {:on-click #(update! (conj (or data []) {}))
                     :label add-label
                     :label-style style-base/button-label-style
                     :disabled false}])])
