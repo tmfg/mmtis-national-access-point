@@ -88,6 +88,7 @@
   (r/with-let [options (terminal-form-options e!)
                groups [(name-and-type-group e!)
                        (form-groups/contact-info-group)
+                       (form-groups/external-interfaces)
                        (place-marker-group e!)
                        (indoor-map-group)
                        (accessibility-and-other-services-group)
