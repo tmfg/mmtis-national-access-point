@@ -6,7 +6,10 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.time :as time]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.db.transport-operator :as t-operator]
+            [ote.localization :refer [tr tr-key]]
+            [ote.app.controller.place-search :as place-search]))
 
 
 (def service-level-keys
@@ -16,7 +19,8 @@
     ::t-service/homepage
     ::t-service/name
     ::t-service/sub-type
-    ::t-service/external-interfaces})
+    ::t-service/external-interfaces
+    ::t-service/operation_area})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
@@ -55,6 +59,10 @@
 
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
+
+(defrecord SaveTransportService [publish?])
+(defrecord SaveTransportServiceResponse [response])
+
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -132,7 +140,27 @@
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-services))]
-      (assoc app :transport-services filtered-map))))
+      (assoc app :transport-services filtered-map)))
+
+  SaveTransportService
+  (process-event [{publish? :publish?} {service :transport-service
+                                        operator :transport-operator :as app}]
+    (let [key (t-service/service-key-by-type (::t-service/type service))
+          service-data
+          (-> service
+              (assoc ::t-service/published? publish?
+                     ::t-service/transport-operator-id (::t-operator/id operator))
+              (update ::t-service/passenger-transportation form/without-form-metadata)
+              (move-service-level-keys-from-form key)
+              (update-in [key ::t-service/operation-area] place-search/place-references))]
+      (comm/post! "transport-service" service-data
+                  {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
+      app))
+
+  SaveTransportServiceResponse
+  (process-event [{response :response} app]
+    (routes/navigate! :front-page)
+    (assoc app :flash-message (tr [:common-texts :transport-service-saved]))))
 
 
 (defn move-service-level-keys-from-form
