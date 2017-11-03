@@ -78,44 +78,7 @@
     :show-option (tr-key [:enums ::t-service/payment-methods])
     :options     t-service/payment-methods}))
 
-(defn contact-info-group []
-  (form/group
-   {:label  (tr [:passenger-transportation-page :header-contact-details])
-    :columns 3
-    :layout :row}
-   {:name        ::common/street
-    :type        :string
-    :read (comp ::common/street ::t-service/contact-address)
-    :write (fn [data street]
-             (assoc-in data [::t-service/contact-address ::common/street] street))
-    :label (tr [:field-labels ::common/street])
-    :required? true}
 
-   {:name        ::common/postal_code
-    :type        :string
-    :read (comp ::common/postal_code ::t-service/contact-address)
-    :write (fn [data postal-code]
-             (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-    :label (tr [:field-labels ::common/postal_code])
-    :required? true
-    :validate [[:postal-code]]}
-
-   {:name        ::common/post_office
-    :type        :string
-    :read (comp ::common/post_office ::t-service/contact-address)
-    :write (fn [data post-office]
-             (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-    :label (tr [:field-labels ::common/post_office])
-    :required? true}
-
-   {:name        ::t-service/contact-phone
-    :type        :string}
-
-   {:name        ::t-service/contact-email
-    :type        :string}
-
-   {:name        ::t-service/homepage
-    :type        :string}))
 
 (defn accessibility-group []
   (form/group
@@ -192,7 +155,7 @@
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-options (transportation-form-options e!)
              form-groups [(name-and-type-group e!)
-                          (contact-info-group)
+                          (form-groups/contact-info-group)
                           (form-groups/external-interfaces)
                           (place-search-group e!)
                           (luggage-restrictions-group)

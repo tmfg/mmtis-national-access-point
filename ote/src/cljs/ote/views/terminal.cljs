@@ -1,6 +1,6 @@
 (ns ote.views.terminal
   "Required datas for port, station and terminal service"
-  (:require [reagent.core :as reagent]
+  (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.form :as form]
@@ -39,104 +39,61 @@
     (tr [:field-labels :transport-service-common ::t-service/location])
     ::t-service/operation-area))
 
-(defn contact-info-group []
+(defn- indoor-map-group []
+  (form-groups/service-url
+   (tr [:field-labels :terminal ::t-service/indoor-map])
+   ::t-service/indoor-map))
+
+(defn- accessibility-and-other-services-group []
   (form/group
-    {:label (tr [:terminal-page :header-contact-details])
-     :columns 3
-     :layout :row}
+   {:label (tr [:terminal-page :header-other-services-and-accessibility])
+    :columns 3
+    :layout :row}
 
+   {:style       style-base/long-drowpdown ;; Pass only style from stylefy base
+    :name        ::t-service/information-service-accessibility
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
+    :options     t-service/information-service-accessibility}
 
-    {:name        ::common/street
-     :type        :string
-     :read (comp ::common/street ::t-service/contact-address)
-     :write (fn [data street]
-              (assoc-in data [::t-service/contact-address ::common/street] street))
-     :label (tr [:field-labels ::common/street])
-     :required? true}
+   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
+    :name        ::t-service/accessibility-tool
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool}
 
-    {:name        ::common/postal_code
-     :type        :string
-     :read (comp ::common/postal_code ::t-service/contact-address)
-     :write (fn [data postal-code]
-              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-     :label (tr [:field-labels ::common/postal_code])
-     :required? true
-     :validate [[:postal-code]]}
+   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
+    :name        ::t-service/accessibility
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/accessibility])
+    :options     t-service/accessibility}
 
-    {:name        ::common/post_office
-     :type        :string
-     :read (comp ::common/post_office ::t-service/contact-address)
-     :write (fn [data post-office]
-              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-     :label (tr [:field-labels ::common/post_office])
-     :required? true}
+   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
+    :name        ::t-service/mobility
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/mobility])
+    :options     t-service/mobility}))
 
-    {:name        ::t-service/contact-email
-     :type        :string}
+(defn- accessibility-description-group []
+  (form/group
+   {:label (tr [:terminal-page :header-accessibility-description])
+    :columns 3
+    :layout :row}
 
-    {:name        ::t-service/contact-phone
-     :type        :string}
+   {:name ::t-service/accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5}))
 
-    {:name        ::t-service/homepage
-     :type        :string}
-    ))
-
-
-(defn terminal [e! status]
-  [:div.row
-   [:div {:class "col-lg-12"}
-    [:div
-     [:h3 (tr [:terminal-page :header-add-new-terminal])]]
-    [form/form (terminal-form-options e!)
-
-     [
-      (name-and-type-group e!)
-      (place-marker-group e!)
-      (form-groups/service-url
-        (tr [:field-labels :terminal ::t-service/indoor-map])
-        ::t-service/indoor-map)
-
-      (form/group
-        {:label (tr [:terminal-page :header-other-services-and-accessibility])
-         :columns 3
-         :layout :row}
-
-        {:style       style-base/long-drowpdown ;; Pass only style from stylefy base
-         :name        ::t-service/information-service-accessibility
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::t-service/information-service-accessibility])
-         :options     t-service/information-service-accessibility}
-
-        {:style style-base/long-drowpdown ;; Pass only style from stylefy base
-         :name        ::t-service/accessibility-tool
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::t-service/accessibility-tool])
-         :options     t-service/accessibility-tool}
-
-        {:style style-base/long-drowpdown ;; Pass only style from stylefy base
-         :name        ::t-service/accessibility
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::t-service/accessibility])
-         :options     t-service/accessibility}
-
-        {:style style-base/long-drowpdown ;; Pass only style from stylefy base
-         :name        ::t-service/mobility
-         :type        :multiselect-selection
-         :show-option (tr-key [:enums ::t-service/mobility])
-         :options     t-service/mobility}
-        )
-
-      (form/group
-        {:label (tr [:terminal-page :header-accessibility-description])
-         :columns 3
-         :layout :row}
-
-        {:name ::t-service/accessibility-description
-         :type :localized-text
-         :rows 1 :max-rows 5}
-        )
-
-      (contact-info-group)
-     ]
-
-     (get status ::t-service/terminal)]]])
+(defn terminal [e! {form-data ::t-service/terminal}]
+  (r/with-let [options (terminal-form-options e!)
+               groups [(name-and-type-group e!)
+                       (form-groups/contact-info-group)
+                       (place-marker-group e!)
+                       (indoor-map-group)
+                       (accessibility-and-other-services-group)
+                       (accessibility-description-group)]]
+    [:div.row
+     [:div {:class "col-lg-12"}
+      [:div
+       [:h3 (tr [:terminal-page :header-add-new-terminal])]]
+      [form/form options groups form-data]]]))
