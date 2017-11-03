@@ -41,11 +41,9 @@
   (clear-transport-service-places! db {:transport-service-id transport-service-id})
   (doseq [{::places/keys [id namefin type] :as place} places]
     (if (= type "drawn")
-      (do
-        (println "GEOJSON: " (:geojson place))
-        (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id
-                                                   :name namefin
-                                                   :geojson (:geojson place)}))
+      (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id
+                                                 :name namefin
+                                                 :geojson (:geojson place)})
       (link-transport-service-place! db {:transport-service-id transport-service-id
                                          :place-id id
                                          :name namefin}))))
