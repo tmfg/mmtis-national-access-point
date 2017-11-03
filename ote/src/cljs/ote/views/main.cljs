@@ -58,6 +58,7 @@
 (defn- flash-message [msg]
   [ui/snackbar {:open (boolean msg)
                 :message msg
+                :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
 (defn- top-nav [e! app]
