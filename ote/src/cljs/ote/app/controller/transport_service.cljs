@@ -159,7 +159,7 @@
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
-    (routes/navigate! :front-page)
+    (routes/navigate! :own-services)
     (assoc app :flash-message (tr [:common-texts :transport-service-saved]))))
 
 
