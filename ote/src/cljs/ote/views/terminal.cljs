@@ -12,16 +12,16 @@
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
             [tuck.core :as tuck]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.app.controller.transport-service :as ts]
+            [ote.views.transport-service-common :as ts-common]))
 
 (defn terminal-form-options [e!]
   {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
    :update!     #(e! (terminal/->EditTerminalState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [buttons/save {:on-click #(e! (terminal/->SaveTerminalToDb))
-                                   :disabled (form/disable-save? data)}
-                   (tr [:buttons :save])])})
+                  [ts-common/footer e! data])})
 
 (defn name-and-type-group [e!]
   (form/group
@@ -32,12 +32,6 @@
     {:name ::t-service/name
      :type :string
      :required? true}))
-
-(defn place-marker-group [e!]
-  (place-search/place-marker-form-group
-    (tuck/wrap-path e! :transport-service ::t-service/terminal ::t-service/operation-area)
-    (tr [:field-labels :transport-service-common ::t-service/location])
-    ::t-service/operation-area))
 
 (defn- indoor-map-group []
   (form-groups/service-url
@@ -87,9 +81,9 @@
 (defn terminal [e! {form-data ::t-service/terminal}]
   (r/with-let [options (terminal-form-options e!)
                groups [(name-and-type-group e!)
-                       (form-groups/contact-info-group)
-                       (form-groups/external-interfaces)
-                       (place-marker-group e!)
+                       (ts-common/contact-info-group)
+                       (ts-common/external-interfaces)
+                       (ts-common/place-search-group e! ::t-service/terminal)
                        (indoor-map-group)
                        (accessibility-and-other-services-group)
                        (accessibility-description-group)]]
