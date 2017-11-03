@@ -1,36 +1,40 @@
-# Translations template for ckanext-napote_theme.
+# Finnish translations for ckanext-napote_theme.
 # Copyright (C) 2017 ORGANIZATION
-# This file is distributed under the same license as the ckanext-napote_theme
+# This file is distributed under the same license as the
+# ckanext-napote_theme
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-03 12:49+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2017-11-03 16:14+0200\n"
+"Language: fi\n"
+"Language-Team: fi <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 1.8.7.1\n"
 
-#: ckanext/napote_theme/plugin.py:116 ckanext/napote_theme/templates/header.html:36
+#: ckanext/napote_theme/plugin.py:116
+#: ckanext/napote_theme/templates/header.html:36
 msgid "Organizations"
-msgstr ""
+msgstr "Palveluntuottajat"
 
 #: ckanext/napote_theme/plugin.py:117 ckanext/napote_theme/plugin.py:128
 #: ckanext/napote_theme/templates/package/read.html:9
 msgid "Transport Service Type"
-msgstr ""
+msgstr "Liikkumispalvelun tyyppi"
 
 #: ckanext/napote_theme/plugin.py:118 ckanext/napote_theme/plugin.py:129
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:11
 msgid "Operation Area"
-msgstr ""
+msgstr "Toiminta-alue"
 
 #: ckanext/napote_theme/plugin.py:119 ckanext/napote_theme/plugin.py:130
 msgid "Tags"
@@ -46,11 +50,11 @@ msgstr ""
 
 #: ckanext/napote_theme/plugin.py:191
 msgid "Transport Service View"
-msgstr ""
+msgstr "Liikkumispalvelunäkymä"
 
 #: ckanext/napote_theme/templates/base.html:3
 msgid "Data and Resources"
-msgstr ""
+msgstr "Rajapinnat"
 
 #: ckanext/napote_theme/templates/footer.html:19
 msgid "CKAN API"
@@ -68,11 +72,11 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/header.html:36
 msgid "Home"
-msgstr ""
+msgstr "Etusivu"
 
 #: ckanext/napote_theme/templates/header.html:36
 msgid "Datasets"
-msgstr ""
+msgstr "Palvelukatalogi"
 
 #: ckanext/napote_theme/templates/header.html:51
 #: ckanext/napote_theme/templates/header.html:60
@@ -110,7 +114,7 @@ msgstr ""
 #: ckanext/napote_theme/templates/header.html:95
 #: ckanext/napote_theme/templates/header.html:97
 msgid "NAP-data management"
-msgstr ""
+msgstr "NAP-tietojen hallinta"
 
 #: ckanext/napote_theme/templates/header.html:104
 #: ckanext/napote_theme/templates/header.html:106
@@ -134,55 +138,88 @@ msgstr ""
 #: ckanext/napote_theme/templates/home/layout1.html:6
 #, python-format
 msgid "User greeting %(user)s"
-msgstr ""
+msgstr "Hei %(user)s"
 
 #: ckanext/napote_theme/templates/home/layout1.html:7
 msgid "Datasets-page short info"
 msgstr ""
+"<b>Tietoaineistot</b>-sivulla voit tarkastella ja hakea palvelussa "
+"julkaistuja rajapintoja."
 
 #: ckanext/napote_theme/templates/home/layout1.html:8
 msgid "Organizations-page short info"
 msgstr ""
+"<b>Organisaatiot</b>-sivulla on listattuna palveluun rekisteröityneet "
+"organisaatiot."
 
 #: ckanext/napote_theme/templates/home/layout1.html:14
 msgid "Heading/NAP home page logged in main heading"
-msgstr ""
+msgstr "Liikkumispalveluiden tallennus ja julkaisu"
 
 #: ckanext/napote_theme/templates/home/layout1.html:18
 msgid "Transport service short description"
 msgstr ""
+"Liikkumispalvelusi olennaisten tietojen kirjaaminen, muokkaaminen ja "
+"julkaisu hoituu kätevästi NAP-tietojen hallintapaneelissa."
 
 #: ckanext/napote_theme/templates/home/layout1.html:23
 msgid "Go to data management"
-msgstr ""
+msgstr "Siirry tietojen hallintapalveluun"
 
 #: ckanext/napote_theme/templates/home/layout1.html:30
 msgid "RAE service short description"
 msgstr ""
+"Haluatko tallentaa tai päivittää linja-autoreittejä ja "
+"aikataulutietoja RAE-palvelussa?"
 
 #: ckanext/napote_theme/templates/home/layout1.html:38
 msgid "Open RAE-service"
-msgstr ""
+msgstr "Avaa RAE-palvelu"
 
 #: ckanext/napote_theme/templates/home/layout1.html:41
 msgid "RAE service link description"
 msgstr ""
+"Aukeaa uuteen välilehteen ja vaatii erillisen \n"
+"kirjautumisen Liikenneviraston Extranetiin"
 
 #: ckanext/napote_theme/templates/home/layout1.html:73
 msgid "New user"
-msgstr ""
+msgstr "Uusi käyttäjä"
 
 #: ckanext/napote_theme/templates/home/snippets/header.html:3
 msgid "NAP home page hero text"
-msgstr ""
+msgstr "Liikkumispalveluiden katalogi."
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:8
 msgid "Heading/NAP home page intro heading"
-msgstr ""
+msgstr "Mikä on NAP?"
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:9
 msgid "NAP home page info text"
 msgstr ""
+"NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste "
+"(National Access Point, NAP), johon liikkumispalvelun tarjoajien on "
+"toimitettava tietoja digitaalisista olennaisten tietojen "
+"koneluettavista rajapinnoistaan. Olennaisia tietoja ovat esimerkiksi "
+"palvelualue, reitit, aikataulut, hinnat ja esteettömyystiedot. <b>NAP "
+"ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on "
+"tarkoitettu liikkumispalveluiden tarjoajille ja kehittäjille.</b>\n"
+"\n"
+"NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on "
+"aikaansaada mahdollisimman helppokäyttöisiä uusia yhdistettyjä "
+"liikkumispalveluja ja infopalveluita.\n"
+"\n"
+"<b>Palvelukatalogi</b>-sivulla voit tarkastella ja hakea palvelussa "
+"julkaistuja rajapintoja.\n"
+"<b>Organisaatiot</b>-sivulla on listattuna palveluun rekisteröityneet "
+"organisaatiot.\n"
+"\n"
+"<h2>Liikkumispalveluiden julkaiseminen ja digitointi</h2>\n"
+"Liikkumispalveluiden julkaiseminen NAP-palvelussa vaatii "
+"kirjautumisen palveluun. Julkaisemisen lisäksi kirjautuneet käyttäjät "
+"voivat digitoida tietojaan erillisten työkalujen (OTE ja RAE) avulla. "
+"Digitointipalvelut on tarkoitettu erityisesti pienille "
+"liikkumispalvelun tarjoajille."
 
 #: ckanext/napote_theme/templates/organization/edit_base.html:5
 msgid "Edit"
@@ -194,11 +231,11 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/package/read.html:15
 msgid "Operation Areas"
-msgstr ""
+msgstr "Toiminta-alueet"
 
 #: ckanext/napote_theme/templates/package/read_base.html:9
 msgid "Dataset"
-msgstr ""
+msgstr "Palvelu"
 
 #: ckanext/napote_theme/templates/package/read_base.html:11
 msgid "Activity Stream"
@@ -223,11 +260,11 @@ msgstr ""
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:5
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:6
 msgid "Service Type"
-msgstr ""
+msgstr "Palvelun tyyppi"
 
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:12
 msgid "Operation area"
-msgstr ""
+msgstr "Toiminta-alue"
 
 #: ckanext/napote_theme/templates/package/snippets/package_metadata_fields.html:6
 msgid "Source"
@@ -274,4 +311,3 @@ msgstr ""
 #: ckanext/napote_theme/templates/snippets/navbar_language_selector.html:14
 msgid "Go"
 msgstr ""
-
