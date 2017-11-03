@@ -126,27 +126,3 @@
     {:dataset dataset
      :resource resource
      :external-resources external-resources}))
-
-
-
-
-;; defs for repl experimenting (PENDING: remove)
-#_(def db (:db ote.main/ote))
-#_(def user {:user
-             {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6",
-              :username "admin",
-              :name "Admin Adminson",
-              :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc",
-              :email "admin@napoteadmin123.com"},
-             :group
-             {:id "79046442-ad25-4865-a174-ec199a4b39c4",
-              :name "taksiyritys-testinen-oy",
-              :title "Taksiyritys Testinen Oy"},
-             :groups
-             [{:id "79046442-ad25-4865-a174-ec199a4b39c4",
-               :name "taksiyritys-testinen-oy",
-               :title "Taksiyritys Testinen Oy"}]})
-
-#_(def publish-result
-    (publish-service-to-ckan! {:api "http://localhost:8080/api/"
-                               :export-base-url "http://localhost:8080"} db user 4))
