@@ -62,7 +62,7 @@
 
 (defrecord SaveTransportService [publish?])
 (defrecord SaveTransportServiceResponse [response])
-
+(defrecord CancelTransportServiceForm [])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -160,7 +160,12 @@
   SaveTransportServiceResponse
   (process-event [{response :response} app]
     (routes/navigate! :own-services)
-    (assoc app :flash-message (tr [:common-texts :transport-service-saved]))))
+    (assoc app :flash-message (tr [:common-texts :transport-service-saved])))
+
+  CancelTransportServiceForm
+  (process-event [_ app]
+    (routes/navigate! :own-services)
+    (dissoc app :transport-service)))
 
 
 (defn move-service-level-keys-from-form
