@@ -108,11 +108,12 @@
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
-  [price-classes-float]
-  (try
-    (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)
-    (catch Exception e
-      (log/info "Can't fix price classes: " price-classes-float e))))
+  [service]
+  (if (= :passenger-transportation (::t-service/type service))
+    (update-in service [::t-service/passenger-transportation ::t-service/price-classes]
+               (fn [price-classes-float]
+                 (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)))
+    service))
 
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
@@ -134,94 +135,51 @@
       (specql/insert! db ::t-service/external-interface-description
                       (assoc ext-if ::t-service/transport-service-id transport-service-id)))))
 
-(defn- save-passenger-transportation-info
+
+
+(defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
-  [nap-config db user data]
+  [nap-config db user {places ::t-service/operation-area
+                       external-interfaces ::t-service/external-interfaces
+                       :as data}]
   ;(println "DATA: " (pr-str data))
-  (let [ckan-group (-> user :groups first)
-        operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
-        places (get-in data [::t-service/passenger-transportation ::t-service/operation-area])
-        external-interfaces (::t-service/external-interfaces data)
-        passenger-info (-> data
-                           (modification/with-modification-fields ::t-service/id user)
-                           (update ::t-service/passenger-transportation dissoc ::t-service/operation_area)
-                           (update-in [::t-service/passenger-transportation ::t-service/price-classes] fix-price-classes)
-                           (dissoc ::t-service/external-interfaces))]
-    ;; Store to OTE database
-    (let [transport-service
-          (jdbc/with-db-transaction [db db]
-            (let [transport-service (upsert! db ::t-service/transport-service passenger-info)
-                  transport-service-id (::t-service/id transport-service)]
+  (let [service-info (-> data
+                         (modification/with-modification-fields ::t-service/id user)
+                         (dissoc ::t-service/operation_area)
+                         fix-price-classes
+                         (dissoc ::t-service/external-interfaces))
+        ;; Store to OTE database
+        transport-service
+        (jdbc/with-db-transaction [db db]
+          (let [transport-service (upsert! db ::t-service/transport-service service-info)
+                transport-service-id (::t-service/id transport-service)]
 
-              ;; Save possible external interfaces
-              (save-external-interfaces db transport-service-id external-interfaces)
+            ;; Save possible external interfaces
+            (save-external-interfaces db transport-service-id external-interfaces)
 
-              ;; Save operation areas
-              (places/link-places-to-transport-service! db transport-service-id places)
+            ;; Save operation areas
+            (places/link-places-to-transport-service! db transport-service-id places)
 
-              transport-service))]
+            transport-service))]
 
+    ;; If published, use CKAN API to add dataset and resource
+    (when (::t-service/published? data)
+      (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
 
+    ;; Return the stored transport-service
+    transport-service))
 
-      ;; If published, use CKAN API to add dataset and resource
-      (when (::t-service/published? data)
-        (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
-
-      ;; Return the stored transport-service
-      transport-service)))
-
-(defn- save-terminal-info
-  "UPSERT! given data to database. "
-  [nap-config db user data]
-  ;(println "Terminal DATA: " (pr-str data))
-  (let [ckan-group (-> user :groups first)
-        operator (get-transport-operator db {::transport-operator/ckan-group-id (ckan-group :id)})
-        places (get-in data [::t-service/terminal ::t-service/operation-area])
-        op-area-id (get-in data [::t-service/terminal ::t-service/operation-area :id])
-        coordinates (get-in data [::t-service/terminal ::t-service/operation-area :coordinates])
-        value (-> data
-                  (modification/with-modification-fields ::t-service/id user)
-                  (update ::t-service/terminal dissoc ::t-service/operation_area))]
-    ;(println "Terminal AREA: " (pr-str places))
-    ;(println "Terminal coordinates: " (pr-str coordinates))
-    ;(println "Terminal op-area-id: " op-area-id)
-    (jdbc/with-db-transaction [db db]
-      (let [transport-service (upsert! db ::t-service/transport-service value)]
-        (when (not-empty coordinates)
-          (cond
-            (nil? op-area-id)
-            (insert-point-for-transport-service! db
-                                                 {:transport-service-id (get transport-service ::t-service/id)
-                                                  :x (first coordinates)
-                                                  :y (second coordinates)})
-            :else (save-point-for-transport-service! db
-                                                     {:id op-area-id
-                                                      :transport-service-id (get transport-service ::t-service/id)
-                                                      :x (first coordinates)
-                                                      :y (second coordinates)})))
-        transport-service))))
-
-(defn- publish-transport-service [db user {:keys [transport-service-id]}]
-  (let [transport-operator-ids (authorization/user-transport-operators db user)]
-    (= 1
-       (specql/update! db ::t-service/transport-service
-                       {::t-service/published? true}
-
-                       {::t-service/transport-operator-id (op/in transport-operator-ids)
-                        ::t-service/id transport-service-id}))))
-
-
-
-(defn- save-transport-service-request
+(defn- save-transport-service-handler
   "Process transport service save POST request. Checks that the transport operator id
   in the service to be stored is in the set of allowed operators for the user.
-  If authorization check succeeds, the given `save-fn` is called."
-  [nap-config db user form-data save-fn]
+  If authorization check succeeds, the transport service is saved to the database and optionally
+  published to CKAN."
+  [nap-config db user form-data]
   (let [request (http/transit-request form-data)]
     (authorization/with-transport-operator-check
       db user (::t-service/transport-operator-id request)
       #(http/transit-response
-        (save-fn nap-config db user request)))))
+        (save-transport-service nap-config db user request)))))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -244,22 +202,9 @@
          (log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
 
-   (POST "/passenger-transportation-info" {form-data :body
-                                           user :user}
-         (save-transport-service-request nap-config db user form-data
-                                         save-passenger-transportation-info))
-
-   (POST "/terminal-information" {form-data :body
-                      user :user}
-         (save-transport-service-request nap-config db user form-data
-                                         save-terminal-info))
-
-   (POST "/transport-service/publish" {payload :body
-                                       user :user}
-         (->> payload
-              http/transit-request
-              (publish-transport-service db user)
-              http/transit-response))
+   (POST "/transport-service" {form-data :body
+                               user :user}
+         (save-transport-service-handler nap-config db user form-data))
 
    (GET "/transport-service/delete/:id" [id]
      (http/transit-response (delete-transport-service db (Long/parseLong id))))))
