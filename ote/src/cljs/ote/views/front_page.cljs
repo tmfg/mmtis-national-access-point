@@ -74,12 +74,12 @@
 (defn empty-header-for-front-page [e!]
   [:div
   [:div.row
-    [:div {:class "col-xs-12"}
-     [:div {:class "main-notification-panel"}
-      [:div {:class "col-xs-1"}
-       [ic/action-info-outline]]
-      [:div {:class "col-xs-11"}
-       [:p (tr [:common-texts :front-page-help-text])]]]]]
+   [:div {:class "col-xs-12"}
+    [:div {:class "main-notification-panel"}
+     [:div {:class "col-xs-1"}
+      [ic/action-info-outline]]
+     [:div {:class "col-xs-11"}
+      [:p (tr [:common-texts :front-page-help-text])]]]]]
 
 
    [:div.row {:style {:margin-top "50px"}}
@@ -139,24 +139,19 @@
   (fn [e! {services :transport-services :as app}]
     [:div
      [:div.row.col-xs-12
-      [:h2 (str (tr [:front-page :hello]) (get-in app [:user :name]) " !")]
-      ]
+      [:h2 (str (tr [:front-page :hello]) (get-in app [:user :name]) " !")]]
      [:diw.row.col-xs-12
-      [:p (tr [:front-page :NAP-service-short-description])]
-      ]
+      [:p (tr [:front-page :NAP-service-short-description])]]
      [:diw.row.col-xs-12
-      [:p [:strong (tr [:common-texts :navigation-own-service-list]) ]
-       (tr [:front-page :own-services-short-description]) ]
-      ]
+      [:p [:strong (tr [:common-texts :navigation-own-service-list])]
+       (tr [:front-page :own-services-short-description])]]
      [:diw.row.col-xs-12
       [:p (tr [:front-page :right-corner-description])
-       [:strong (tr [:common-texts :user-menu-service-operator]) ]
-       (tr [:front-page :service-operator-short-description])]
-      ]
+       [:strong (tr [:common-texts :user-menu-service-operator])]
+       (tr [:front-page :service-operator-short-description])]]
 
      [:div.row.col-xs-12 {:style {:text-align "center" :padding-top "40px"}}
-      [:p (tr [:front-page :publish-new-service])]
-      ]
+      [:p (tr [:front-page :publish-new-service])]]
      [:div.row.col-xs-12 {:style {:text-align "center"}}
       [ui/raised-button {:style {:margin-top "20px"}
                          :label    (tr [:front-page :move-to-services-page])

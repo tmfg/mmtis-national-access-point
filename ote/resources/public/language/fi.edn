@@ -32,6 +32,12 @@
    :ote.db.transport-service/operation-area            "Toiminta-alue"
    :ote.db.transport-service/location                  "Sijainti"
 
+   ;; External interfaces
+   :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
+   :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
+   :ote.db.transport-service/external-service-url "Rajapinnan URL-osoite"
+   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+
    }
 
   ;; Passenger transportation fields
@@ -94,6 +100,12 @@
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"}
 
+
+ ;; Add form info elements here, these are textual help texts in the form
+ :form-help
+ {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."}
+
+
  ;; Action buttons
  :buttons
  {:save "Tallenna"
@@ -110,7 +122,7 @@
   :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
-  :add-hosted-service      "Lisää itse ylläpitämäsi rajapinta"
+  :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-add-new-row         "Lisää uusi rivi"}
 
 
@@ -265,31 +277,32 @@
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   }
 
- :common-texts {
-                :front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
+ :common-texts
+ {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
-                :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
-                :link-add-new-api                           "Lisää uusi palvelu"
-                :own-api-list                               "Omat liikkumispalvelutiedot"
-                :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
-                :api-name                                   "Rajapinnan nimi"
-                :api-url                                    "Rajapinnan verkko-osoite"
-                :finap-status                               "NAP tila"
-                :header-nap-official-name                   "Palvelukatalogi"
-                :navigation-own-service-list                "Omat palvelutiedot"
-                :navigation-front-page                      "Etusivu"
-                :user-menu-service-guide                    "Ohje"
-                :user-menu-service-operator                 "Organisaation perustiedot"
+  :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
+  :link-add-new-api                           "Lisää uusi palvelu"
+  :own-api-list                               "Omat liikkumispalvelutiedot"
+  :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
+  :api-name                                   "Rajapinnan nimi"
+  :api-url                                    "Rajapinnan verkko-osoite"
+  :finap-status                               "NAP tila"
+  :header-nap-official-name                   "Palvelukatalogi"
+  :navigation-own-service-list                "Omat palvelutiedot"
+  :navigation-front-page                      "Etusivu"
+  :user-menu-service-guide                    "Ohje"
+  :user-menu-service-operator                 "Organisaation perustiedot"
 
-                :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
-                :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
+  :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
+  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
                 Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
-                :title-operator-basic-details               "Perustiedot"
-                :required-field                             "Tieto vaaditaan"
-                :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
-                }
+  :title-operator-basic-details               "Perustiedot"
+  :required-field                             "Tieto vaaditaan"
+  :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
+  :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
+  }
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)

@@ -12,7 +12,8 @@
     ["/rentals" :rentals]
     ["/brokerage" :brokerage]
     ["/parking" :parking]
-    ["/new-service" :transport-service]]))
+    ["/new-service" :transport-service]
+    ["/own-services" :own-services]]))
 
 (defn- on-navigate [name params query]
   (swap! state/app merge {:page name
