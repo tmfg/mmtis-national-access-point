@@ -145,7 +145,7 @@
   ;(println "DATA: " (pr-str data))
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
-                         (dissoc ::t-service/operation_area)
+                         (dissoc ::t-service/operation-area)
                          fix-price-classes
                          (dissoc ::t-service/external-interfaces))
         ;; Store to OTE database

@@ -20,7 +20,7 @@
     ::t-service/name
     ::t-service/sub-type
     ::t-service/external-interfaces
-    ::t-service/operation_area})
+    ::t-service/operation-area})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
@@ -150,9 +150,9 @@
           (-> service
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id (::t-operator/id operator))
-              (update ::t-service/passenger-transportation form/without-form-metadata)
+              (update key form/without-form-metadata)
               (move-service-level-keys-from-form key)
-              (update-in [key ::t-service/operation-area] place-search/place-references))]
+              (update ::t-service/operation-area place-search/place-references))]
       (comm/post! "transport-service" service-data
                   {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
       app))

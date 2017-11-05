@@ -34,7 +34,7 @@
      :required? true}))
 
 (defn- indoor-map-group []
-  (form-groups/service-url
+  (ts-common/service-url
    (tr [:field-labels :terminal ::t-service/indoor-map])
    ::t-service/indoor-map))
 
