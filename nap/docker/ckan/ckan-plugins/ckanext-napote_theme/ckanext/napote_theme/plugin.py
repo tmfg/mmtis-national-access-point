@@ -53,10 +53,10 @@ def get_in(data, *keys):
     except (IndexError, KeyError) as e:
         return None
 
-class NapoteThemePlugin(plugins.SingletonPlugin, tk.DefaultDatasetForm):
+class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultDatasetForm):
     # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
     # Enable after translations have been generated
-    # plugins.implements(plugins.ITranslation)
+    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)

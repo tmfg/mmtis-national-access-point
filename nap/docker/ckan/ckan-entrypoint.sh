@@ -56,7 +56,7 @@ sync_plugin_changes () {
   target_path=$2
 
   rsync -rltvzh --delete \
-        --exclude '*egg-*' --exclude '*.pyc' --exclude '~*' --exclude '.[!.]*' \
+        --exclude '*egg-*' --exclude '*.pyc' --exclude '~*' --exclude '*.temp*' --exclude '.[!.]*' \
         $plugin_main_path $target_path
 }
 
@@ -70,7 +70,7 @@ watch_plugin_changes () {
   # Settings: quiiet, monitor, recursive. Excludes events on some editor temp files, such as:  ___jb_*, ~ or .tmp
   # Note: MacOs host requires different set of events than linux host to work.
   inotifywait -q -m -r -e modify,move,close_write,create,delete,delete_self \
-    --exclude '(\___jb_|\~|/\..+)' --format '%w%f' $CKAN_CUSTOM_PLUGINS_PATH | \
+    --exclude '(\___jb_|\~|/\..+|\.temp.*)' --format '%w%f' $CKAN_CUSTOM_PLUGINS_PATH | \
     while read FILE_PATH
      do
       echo "Plugins source file changed: $FILE_PATH. Updating plugin..."
