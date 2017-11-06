@@ -18,7 +18,6 @@
             [ote.style.base :as style-base]))
 
 (defn transport-services-table-rows [e! services transport-operator-id]
-
   [ui/table-body {:display-row-checkbox false}
    (doall
      (map-indexed
@@ -33,11 +32,8 @@
            (if published?
              (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
                [:a {:href url :target "_blank"} url])
-             [:span.publish
-              (tr [:field-labels :transport-service ::t-service/published?-values false])
-              [ui/flat-button {:primary true
-                               :on-click #(e! (ts/->PublishTransportService id))}
-               (tr [:buttons :publish])]])]
+             [:span.draft
+              (tr [:field-labels :transport-service ::t-service/published?-values false])])]
           [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
@@ -46,9 +42,7 @@
             [ic/content-create]]
 
            [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
-            [ic/action-delete]]
-           ]
-          ])
+            [ic/action-delete]]]])
        services))])
 
 (defn transport-services-listing [e! transport-operator-id services section-label]

@@ -105,10 +105,10 @@
   (process-event [{response :response} app]
     (let [type (::t-service/type response)]
       (routes/navigate! type)
-      (assoc app
-             :transport-service (move-service-level-keys-to-form
-                                 response
-                                 (t-service/service-key-by-type type)))))
+      (assoc app :transport-service
+             (-> response
+                 (update ::t-service/operation-area place-search/operation-area-to-places)
+                 (move-service-level-keys-to-form (t-service/service-key-by-type type))))))
 
 
   PublishTransportService

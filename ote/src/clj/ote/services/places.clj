@@ -13,7 +13,8 @@
             [specql.core :as specql]
             [ote.db.places :as places]
             [specql.op :as op]
-            [jeesql.core :refer [defqueries]])
+            [jeesql.core :refer [defqueries]]
+            [ote.db.transport-service :as t-service])
   (:import (java.net URLEncoder)))
 
 (defqueries "ote/services/places.sql")
@@ -34,19 +35,48 @@
                  #{::places/namefin ::places/id ::places/type ::places/location}
                  {::places/id id})))
 
-(defn link-places-to-transport-service!
+(defn save-transport-service-operation-area!
   "Clear old place links and insert new links for the given transport service.
   Should be called within a transaction."
   [db transport-service-id places]
-  (clear-transport-service-places! db {:transport-service-id transport-service-id})
+
+  (let [stored (into #{}
+                     (comp (filter #(= (::places/type %) "stored"))
+                           (map ::places/id))
+                     places)]
+    ;; Remove linked geometries, except drawn geometries that were not removed
+    (specql/delete! db ::t-service/operation_area
+                    {::t-service/transport-service-id transport-service-id
+                     ::t-service/id (op/not (op/in stored))}))
+
   (doseq [{::places/keys [id namefin type] :as place} places]
-    (if (= type "drawn")
+    (println "id:" id "; namefin: " namefin "; type: " type)
+    (case type
+      "drawn"
       (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id
                                                  :name namefin
                                                  :geojson (:geojson place)})
+
+
+      ;; Stored geometry, update name
+      "stored"
+      (specql/update! db ::t-service/operation_area
+                      {::t-service/description [{::t-service/lang "FI" ::t-service/text namefin}]}
+                      {::t-service/id id
+                       ::t-service/transport-service-id transport-service-id})
+
+      ;; default, link new geometry by reference
       (link-transport-service-place! db {:transport-service-id transport-service-id
                                          :place-id id
                                          :name namefin}))))
+
+(defn fetch-transport-service-operation-area
+  "Fetch operation area for the given transport service id."
+  [db transport-service-id]
+  (specql/fetch db ::t-service/operation_area_geojson
+                #{::t-service/id ::t-service/description ::t-service/location-geojson
+                  ::t-service/primary?}
+                {::t-service/transport-service-id transport-service-id}))
 
 (defrecord Places [sources]
   component/Lifecycle

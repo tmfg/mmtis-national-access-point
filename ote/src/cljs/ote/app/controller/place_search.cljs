@@ -5,7 +5,8 @@
             [ote.communication :as comm]
             [ote.db.places :as places]
             [clojure.string :as str]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.db.transport-service :as t-service]))
 
 (defrecord SetPlaceName [name])
 (defrecord AddPlace [id])
@@ -122,8 +123,29 @@
   Hand drawn geometries are sent with their geometry."
   [app]
   (mapv (fn [{:keys [geojson place]}]
-          (if (= (::places/type place) "drawn")
+          (case (::places/type place)
             ;; This is a hand drawn geometry, add GeoJSON geometry as string
+            "drawn"
             (assoc place :geojson (js/JSON.stringify (aget geojson "geometry")))
+
+            ;; This is a stored place (geometry already in database, but name may have changed)
+            "stored"
+            (dissoc place :geojson)
+
+            ;; by default just return place
             place))
         (get-in app [:place-search :results])))
+
+(defn operation-area-to-places
+  "Turn an operation area from the backend to a format required by the UI."
+  [operation-areas]
+  {:place-search
+   {:results
+    (mapv (fn [{::t-service/keys [description id primary? location-geojson] :as operation-area}]
+            {:place {::places/namefin (some #(when (= "FI" (::t-service/lang %))
+                                               (::t-service/text %))
+                                            description)
+                     ::places/id id ;; FIXME: this needs to be a reference
+                     ::places/type "stored"}
+             :geojson (js/JSON.parse location-geojson)})
+          operation-areas)}})
