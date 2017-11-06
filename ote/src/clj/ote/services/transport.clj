@@ -59,19 +59,17 @@
 (defn- get-transport-service
   "Get single transport service by id"
   [db id]
-  (let [service (first (fetch db
-                ::t-service/transport-service
-                (specql/columns ::t-service/transport-service)
-                {::t-service/id id}
-                {::specql/limit 1}))
-        operation-area (first (fetch-operation-area-geojson db {:transport-service-id (get service ::t-service/id)}))
-        op-area (-> operation-area
-                  (assoc :coordinates (get (cheshire/parse-string (get operation-area :st_asgeojson)) "coordinates"))
-                    (dissoc :st_asgeojson))
-        service-key :ote.db.transport-service/terminal]
-
-    (-> service
-        (assoc-in [service-key  ::t-service/operation-area] op-area))))
+  (-> db
+      (fetch ::t-service/transport-service
+             (conj (specql/columns ::t-service/transport-service)
+                   ;; join external interfaces
+                   [::t-service/external-interfaces
+                    (specql/columns ::t-service/external-interface-description)])
+             {::t-service/id id}
+             {::specql/limit 1})
+      first
+      (assoc ::t-service/operation-area
+             (places/fetch-transport-service-operation-area db id))))
 
 (defn- delete-transport-service
   "Delete single transport service by id"
@@ -158,7 +156,7 @@
             (save-external-interfaces db transport-service-id external-interfaces)
 
             ;; Save operation areas
-            (places/link-places-to-transport-service! db transport-service-id places)
+            (places/save-transport-service-operation-area! db transport-service-id places)
 
             transport-service))]
 

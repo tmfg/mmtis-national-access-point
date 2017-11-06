@@ -52,8 +52,12 @@
   ["external-interface-description" ::external-interface-description]
   ["transport-service" ::transport-service
    ote.db.modification/modification-fields
-   {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)}]
-  ["operation_area" ::operation_area])
+   {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)
+    ::external-interfaces (specql.rel/has-many ::id
+                                               ::external-interface-description
+                                               ::transport-service-id)}]
+  ["operation_area" ::operation_area]
+  ["operation_area_geojson" ::operation_area_geojson])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
