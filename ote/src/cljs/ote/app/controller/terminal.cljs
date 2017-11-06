@@ -6,8 +6,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.app.controller.place-search :as place-search]
-            [ote.app.controller.transport-service :as transport-service]
-            [ote.app.routes :as routes]))
+            [ote.app.controller.transport-service :as transport-service]))
 
 (defrecord EditTerminalState [data])
 
