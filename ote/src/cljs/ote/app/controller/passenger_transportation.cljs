@@ -10,7 +10,7 @@
             [ote.app.routes :as routes]))
 
 (defrecord EditPassengerTransportationState [data])
-(defrecord SavePassengerTransportationToDb [publish?])
+
 (defrecord HandlePassengerTransportationResponse [service])
 (defrecord CancelPassengerTransportationForm [])
 
@@ -20,23 +20,6 @@
   EditPassengerTransportationState
   (process-event [{data :data} app]
     (update-in app [:transport-service ::t-service/passenger-transportation] merge data))
-
-
-  SavePassengerTransportationToDb
-  (process-event [{publish? :publish?} {service :transport-service :as app}]
-    (let [service-data
-          (-> service
-              (assoc ::t-service/type :passenger-transportation
-                     ::t-service/published? publish?
-                     ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
-              (update ::t-service/passenger-transportation form/without-form-metadata)
-              (transport-service/move-service-level-keys-from-form ::t-service/passenger-transportation)
-              (update-in [::t-service/passenger-transportation ::t-service/operation-area]
-                         place-search/place-references))]
-      (comm/post! "passenger-transportation-info"
-                  service-data
-                  {:on-success (t/send-async! ->HandlePassengerTransportationResponse)})
-      app))
 
   HandlePassengerTransportationResponse
   (process-event [{service :service} app]

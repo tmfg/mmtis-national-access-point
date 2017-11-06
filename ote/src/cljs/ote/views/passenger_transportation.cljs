@@ -14,31 +14,18 @@
             [ote.views.place-search :as place-search]
             [tuck.core :as tuck]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base])
+            [ote.style.base :as style-base]
+            [ote.views.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
-(defn footer [e! {published? ::t-service/published? :as data}]
-  [:div.row
-   (if published?
-     [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                      :disabled (form/disable-save? data)}
-      (tr [:buttons :save-updated])]
-     [:span
-      [buttons/save {:on-click #(e! (pt/->SavePassengerTransportationToDb true))
-                       :disabled (form/disable-save? data)}
-       (tr [:buttons :save-and-publish])]
-      [buttons/save  {:on-click #(e! (pt/->SavePassengerTransportationToDb false))
-                        :disabled  (form/disable-save? data)}
-       (tr [:buttons :save-as-draft])]])
-   [buttons/cancel {:on-click #(e! (pt/->CancelPassengerTransportationForm))}
-    (tr [:buttons :discard])]])
+
 
 (defn transportation-form-options [e!]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (pt/->EditPassengerTransportationState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [footer e! data])})
+                  [ts-common/footer e! data])})
 
 (defn name-and-type-group [e!]
   (form/group
@@ -57,11 +44,7 @@
     :options     t-service/passenger-transportation-sub-types
     :required? true}))
 
-(defn place-search-group [e!]
-  (place-search/place-search-form-group
-   (tuck/wrap-path e! :transport-service ::t-service/passenger-transportation ::t-service/operation-area)
-   (tr [:field-labels :passenger-transportation ::t-service/operation-area])
-   ::t-service/operation-area))
+
 
 (defn luggage-restrictions-group []
   (form/group
@@ -78,44 +61,7 @@
     :show-option (tr-key [:enums ::t-service/payment-methods])
     :options     t-service/payment-methods}))
 
-(defn contact-info-group []
-  (form/group
-   {:label  (tr [:passenger-transportation-page :header-contact-details])
-    :columns 3
-    :layout :row}
-   {:name        ::common/street
-    :type        :string
-    :read (comp ::common/street ::t-service/contact-address)
-    :write (fn [data street]
-             (assoc-in data [::t-service/contact-address ::common/street] street))
-    :label (tr [:field-labels ::common/street])
-    :required? true}
 
-   {:name        ::common/postal_code
-    :type        :string
-    :read (comp ::common/postal_code ::t-service/contact-address)
-    :write (fn [data postal-code]
-             (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-    :label (tr [:field-labels ::common/postal_code])
-    :required? true
-    :validate [[:postal-code]]}
-
-   {:name        ::common/post_office
-    :type        :string
-    :read (comp ::common/post_office ::t-service/contact-address)
-    :write (fn [data post-office]
-             (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-    :label (tr [:field-labels ::common/post_office])
-    :required? true}
-
-   {:name        ::t-service/contact-phone
-    :type        :string}
-
-   {:name        ::t-service/contact-email
-    :type        :string}
-
-   {:name        ::t-service/homepage
-    :type        :string}))
 
 (defn accessibility-group []
   (form/group
@@ -192,13 +138,14 @@
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-options (transportation-form-options e!)
              form-groups [(name-and-type-group e!)
-                          (contact-info-group)
-                          (place-search-group e!)
+                          (ts-common/contact-info-group)
+                          (ts-common/external-interfaces)
+                          (ts-common/place-search-group e! ::t-service/passenger-transportation)
                           (luggage-restrictions-group)
-                          (form-groups/service-url
+                          (ts-common/service-url
                            (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
                            ::t-service/real-time-information)
-                          (form-groups/service-url
+                          (ts-common/service-url
                            (tr [:field-labels :passenger-transportation ::t-service/booking-service])
                            ::t-service/booking-service)
                           (accessibility-group)
