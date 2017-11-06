@@ -6,7 +6,8 @@
             {{ h.render_markdown(intro) }}
         {% else %}
             <h1 class="page-heading">{{ _("Heading/NAP home page intro heading") }}</h1>
-            <p>{{ _('NAP home page info text') }}</p>
+            {# Note: Use trans-tag to allow rendering of HTML tags in the translation string. #}
+            <p>{% trans %}NAP home page info text{% endtrans %}</p>
         {% endif %}
     </header>
 </div>
