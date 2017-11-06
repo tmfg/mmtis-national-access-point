@@ -75,6 +75,12 @@
    (fetch db ::t-service/transport-service transport-operator-descriptor-columns
           {::t-service/id id})))
 
+(defn- fetch-transport-service-external-interfaces [db id]
+  (fetch db ::t-service/external-interface-description
+         #{::t-service/external-interface ::t-service/format
+           ::t-service/ckan-resource-id ::t-service/id}
+         {::t-service/transport-service-id id}))
+
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
   [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
@@ -87,34 +93,36 @@
         resource (->> dataset
                       (ckan-resource-description export-base-url ts)
                       (ckan/add-or-update-dataset-resource! c)
-                      verify-ckan-response)]
+                      verify-ckan-response)
+
+        external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
+        external-resources
+        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format id ::t-service/ckan-resource-id}]
+                (verify-ckan-response
+                 (ckan/add-or-update-dataset-resource!
+                  c (merge
+                     {:ckan/package-id (:ckan/id dataset)
+                      :ckan/name (-> ei ::t-service/description first ::t-service/text)
+                      :ckan/url (::t-service/url ei)
+                      :ckan/format fmt}
+                     (when id
+                       {:ckan/id id})))))
+              external-interfaces)]
+
+    ;; Update CKAN resource ids for all external interfaces
+    (doall
+     (map (fn [{id ::t-service/id} {ckan-resource-id :ckan/id}]
+            (specql/update! db ::t-service/external-interface-description
+                            {::t-service/ckan-resource-id ckan-resource-id}
+                            {::t-service/id id}))
+          external-interfaces external-resources))
+
+    ;; Update CKAN dataset and resource ids
     (specql/update! db ::t-service/transport-service
                     {::t-service/ckan-dataset-id (:ckan/id dataset)
                      ::t-service/ckan-resource-id (:ckan/id resource)}
                     {::t-service/id transport-service-id})
+
     {:dataset dataset
-     :resource resource}))
-
-
-
-
-;; defs for repl experimenting (PENDING: remove)
-#_(def db (:db ote.main/ote))
-#_(def user {:user
-             {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6",
-              :username "admin",
-              :name "Admin Adminson",
-              :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc",
-              :email "admin@napoteadmin123.com"},
-             :group
-             {:id "79046442-ad25-4865-a174-ec199a4b39c4",
-              :name "taksiyritys-testinen-oy",
-              :title "Taksiyritys Testinen Oy"},
-             :groups
-             [{:id "79046442-ad25-4865-a174-ec199a4b39c4",
-               :name "taksiyritys-testinen-oy",
-               :title "Taksiyritys Testinen Oy"}]})
-
-#_(def publish-result
-    (publish-service-to-ckan! {:api "http://localhost:8080/api/"
-                               :export-base-url "http://localhost:8080"} db user 4))
+     :resource resource
+     :external-resources external-resources}))

@@ -1,5 +1,5 @@
 (ns ote.views.transport-service
-  "Transport service related stuff"
+  "Transport service related functionality"
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
@@ -31,18 +31,15 @@
 
 (defn service-form-options [e!]
   {:name->label (tr-key [:field-labels])
-   :update!     #(e! (ts/->SelectTransportServiceType %))
-   })
+   :update!     #(e! (ts/->SelectTransportServiceType %))})
 
 (defn select-service-type [e! status]
   [:div.row
    [:div {:class "col-sx-12 col-md-9"}
     [:div
-     [:h3 (tr [:common-texts :title-required-data-with-OTE])]
-     ]
+     [:h3 (tr [:common-texts :title-required-data-with-OTE])]]
     [:div.row
-     [:p (tr [:common-texts :transport-service-type-selection-help-text])]
-     ]
+     [:p (tr [:common-texts :transport-service-type-selection-help-text])]]
     [:div.row
      [form/form (service-form-options e!)
       [
@@ -53,9 +50,7 @@
           :name        :transport-service-type-subtype
           :type        :selection
           :show-option  (tr-key [:service-type-dropdown])
-          ;:options     transport-service/transport-service-types}
-          :options modified-transport-service-types})
-       ]
+          :options modified-transport-service-types})]
     nil]]]])
 
 (defn edit-service [e! app]

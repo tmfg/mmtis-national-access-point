@@ -18,3 +18,7 @@
                            {:flex-wrap "wrap"}))
 
 (def form-group-container {:padding-bottom "0.33em"})
+
+(def form-info-text {:display "inline-block"
+                     :position "relative"
+                     :top "-0.5em"})

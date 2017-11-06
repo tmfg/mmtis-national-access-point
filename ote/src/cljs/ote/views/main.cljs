@@ -1,6 +1,6 @@
 (ns ote.views.main
   "OTE-sovelluksen päänäkymä"
-  (:require [reagent.core :as reagent]
+  (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
@@ -56,6 +56,12 @@
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]])
 
+(defn- flash-message [msg]
+  [ui/snackbar {:open (boolean msg)
+                :message msg
+                :style style-base/flash-message
+                :auto-hide-duration 5000}])
+
 (defn- top-nav [e! app]
   [:div {:class "topnav"}
    [:a.main-icon {:href "#"
@@ -71,7 +77,7 @@
      :on-click #(e! (fp-controller/->ChangePage :own-services))}
     (tr [:common-texts :navigation-own-service-list]) ]
    [:div.user-menu {:class (is-user-menu-active app) }
-    (reagent/as-element (user-menu e! (get-in app [:user :name])))]])
+    (r/as-element (user-menu e! (get-in app [:user :name])))]])
 
 (defn ote-application
   "OTE application main view"
@@ -102,8 +108,10 @@
         :edit-service [t-service/edit-service e! app]
         [:div "ERROR: no such page " (pr-str (:page app))])
       ]
+
+     (when (not (nil? (:flash-message app)))
+       [flash-message (:flash-message app)])
+
      (when (= true (get-in app [:ote-service-flags :show-debug]))
        [:div.row
-        [debug/debug app]
-        ]
-       )]]]))
+        [debug/debug app]])]]]))
