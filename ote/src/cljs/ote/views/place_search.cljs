@@ -87,50 +87,14 @@
             ;;(aset js/window "the_geom" geojson)
             (e! (ps/->AddDrawnGeometry geojson))))))
 
-(defn- update-bounds-from-layers [this]
-  (.log js/console "update-bounds-from-layers")
-  (let [^js/L.map
-        leaflet (aget this "refs" "leaflet" "leafletElement")
-        bounds (atom nil)
-        add-bounds! (fn [nw se]
-                      (let [new-bounds (.latLngBounds js/L nw se)]
-                        (if (nil? @bounds)
-                          (reset! bounds new-bounds)
-                          (.extend @bounds new-bounds))))]
-    (.eachLayer
-     leaflet
-     (fn [layer]
-       (cond
-         (instance? js/L.Path layer)
-         (let [^js/L.path
-               path layer
-               layer-bounds (.getBounds path)]
-           (add-bounds! (.getNorthWest layer-bounds)
-                        (.getSouthEast layer-bounds)))
-
-         (instance? js/L.Marker layer)
-         (let [^js/L.Marker
-               marker layer
-               pos (.getLatLng marker)
-               d 0.01
-               lat (.-lat pos)
-               lng (.-lng pos)]
-           (add-bounds! (.latLng js/L (- lat d) (- lng d))
-                        (.latLng js/L (+ lat d) (+ lng d))))
-
-         ;; do nothing for other types
-         :default
-         nil)))
-    (when-let [bounds @bounds]
-      (.fitBounds leaflet bounds))))
 
 (defn places-map [e! results]
   (let [feature-group (atom nil)]
     (r/create-class
      {:component-did-mount #(do
                               (install-draw-control! e! %)
-                              (update-bounds-from-layers %))
-      :component-did-update update-bounds-from-layers
+                              (leaflet/update-bounds-from-layers %))
+      :component-did-update leaflet/update-bounds-from-layers
       :reagent-render
       (fn [e! results]
         [leaflet/Map {;;:prefer-canvas true

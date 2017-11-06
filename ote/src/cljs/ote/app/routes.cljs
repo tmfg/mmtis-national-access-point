@@ -6,13 +6,15 @@
 (def ote-router
   (r/router
    [["/" :front-page]
+    ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
     ["/terminal" :terminal]
     ["/rentals" :rentals]
     ["/brokerage" :brokerage]
     ["/parking" :parking]
-    ["/new-service" :transport-service]]))
+    ["/new-service" :transport-service]
+    ["/edit-service/:id" :edit-service]]))
 
 (defn- on-navigate [name params query]
   (swap! state/app merge {:page name

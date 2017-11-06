@@ -100,6 +100,7 @@
   :cancel "Peruuta"
   :delete "Poista"
   :publish "Julkaise"
+  :edit-service "Muokkaa palvelun tietoja"
 
   :save-and-publish "Tallenna ja julkaise"
   :save-as-draft "Tallenna luonnoksena"

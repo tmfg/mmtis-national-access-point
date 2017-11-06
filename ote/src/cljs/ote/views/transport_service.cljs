@@ -1,5 +1,5 @@
 (ns ote.views.transport-service
-  "Select Transport service type"
+  "Transport service related stuff"
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
@@ -8,7 +8,15 @@
             [ote.app.controller.transport-service :as ts]
             [ote.db.transport-service :as transport-service]
             [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [tuck.core :as tuck]
+            [ote.communication :as comm]
+            [ote.views.passenger-transportation :as pt]
+            [ote.views.terminal :as terminal]
+            [ote.app.routes :as routes]
+            [ote.views.brokerage :as brokerage]
+            [ote.views.parking :as parking]
+            [ote.views.rental :as rental]))
 
 (def modified-transport-service-types
 
@@ -48,9 +56,16 @@
           ;:options     transport-service/transport-service-types}
           :options modified-transport-service-types})
        ]
-    nil]
-     ]
-    ]
+    nil]]]])
 
-   ]
-  )
+(defn edit-service [e! app]
+  (e! (ts/->ModifyTransportService (get-in app [:params :id])))
+  (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
+     (if-not loaded?
+       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+       (case (::transport-service/type service)
+         :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+         :terminal [terminal/terminal e! (:transport-service app)]
+         :rentals [rental/rental e! (:transport-service app)]
+         :parking [parking/parking e! (:transport-service app)]
+         :brokerage [brokerage/brokerage e! (:transport-service app)]))))

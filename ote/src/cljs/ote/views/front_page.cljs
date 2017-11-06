@@ -28,7 +28,7 @@
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
           [ui/table-row-column
-           [:a {:href "#" :on-click #(e! (ts/->ModifyTransportService id))} name]]
+           [:a {:href (str "/ote/index.html#/edit-service/" id) } name]]
           [ui/table-row-column
            (if published?
              (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
@@ -42,9 +42,8 @@
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column
-           [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
+           [ui/icon-button {:on-click  #(set! (.-location js/window) (str "/ote/index.html#/edit-service/" id))}
             [ic/content-create]]
-
            [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
             [ic/action-delete]]
            ]
