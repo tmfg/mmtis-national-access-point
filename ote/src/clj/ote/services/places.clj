@@ -46,8 +46,10 @@
                      places)]
     ;; Remove linked geometries, except drawn geometries that were not removed
     (specql/delete! db ::t-service/operation_area
-                    {::t-service/transport-service-id transport-service-id
-                     ::t-service/id (op/not (op/in stored))}))
+                    (merge
+                     {::t-service/transport-service-id transport-service-id}
+                     (when-not (empty? stored)
+                       {::t-service/id (op/not (op/in stored))}))))
 
   (doseq [{::places/keys [id namefin type] :as place} places]
     (println "id:" id "; namefin: " namefin "; type: " type)
