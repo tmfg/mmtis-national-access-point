@@ -57,7 +57,7 @@
 
 (defn- flash-message [msg]
   [ui/snackbar {:open (boolean msg)
-                :message msg
+                :message (or msg "")
                 :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
