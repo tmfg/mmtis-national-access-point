@@ -162,10 +162,11 @@
 (defn missing-required-fields
   "Returns a sequence of schemas that are marked as required and are missing a value."
   [row skeema]
-  (keep (fn [{:keys [required? read name type] :as s}]
+  (keep (fn [{:keys [required? read name type is-empty?] :as s}]
           (when (and required?
-                     (empty-value? (if read
-                                     (read row)
-                                    (get row name))))
+                     ((or is-empty? empty-value?)
+                      (if read
+                        (read row)
+                        (get row name))))
             s))
         skeema))
