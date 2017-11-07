@@ -131,11 +131,9 @@
         [properties-table transport-service]])]))
 
 (defn operation-area [e! {:keys [geojson] :as app}]
-  (.log js/console "app " (clj->js app) (clj->js geojson))
   (r/create-class
     {:display-name "operation-area-map"
-     :component-did-mount #(do
-                              (leaflet/update-bounds-on-load %))
+     :component-did-mount #(leaflet/update-bounds-on-load %)
      :component-did-update leaflet/update-bounds-from-layers
      :reagent-render
      (fn [e! {:keys [geojson] :as app}]
@@ -147,10 +145,7 @@
 
         (when geojson
           [leaflet/GeoJSON {:data geojson
-                            :style {:color "green"}}])]
-       )})
-
-  )
+                            :style {:color "green"}}])])}))
 
 (defn viewer [e! _]
   (e! (v/->StartViewer))
@@ -162,8 +157,8 @@
       [theme
         [:div.transport-service-view
        [:div.row.pull-right
-        [buttons/save {:on-click  #(set! (.-location js/window) (str "/ote/index.html#/edit-service/" (last (clojure.string/split (get app :url) "/"))))
-                        :disabled false}
+        [buttons/save {:on-click #(e! (ts/->OpenTransportServicePage (last (clojure.string/split (get app :url) "/"))))
+                       :disabled false}
          (tr [:buttons :edit-service])]]
 
          [operation-area e! app]

@@ -35,7 +35,6 @@
                         (if (nil? @bounds)
                           (reset! bounds new-bounds)
                           (.extend @bounds new-bounds))))]
-    (aset js/window "the_map" leaflet)
     (.eachLayer
       leaflet
       (fn [layer]
@@ -63,11 +62,9 @@
     (when-let [bounds @bounds]
       (.fitBounds leaflet bounds))))
 
-
 (defn update-bounds-from-layers [this]
   (let [^js/L.map
   leaflet (aget this "refs" "leaflet" "leafletElement")]
-    (aset js/window "the_map" leaflet)
     (update-map-bounds-from-layers leaflet)))
 
 (defn update-bounds-on-load [this]

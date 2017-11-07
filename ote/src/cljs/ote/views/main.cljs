@@ -74,6 +74,7 @@
     (tr [:common-texts :navigation-front-page]) ]
    [:a.ote-nav
     {:class (is-topnav-active :own-services (:page app))
+     :href "#"
      :on-click #(e! (fp-controller/->ChangePage :own-services))}
     (tr [:common-texts :navigation-own-service-list]) ]
    [:div.user-menu {:class (is-user-menu-active app) }
@@ -109,8 +110,7 @@
         [:div "ERROR: no such page " (pr-str (:page app))])
       ]
 
-     (when (not (nil? (:flash-message app)))
-       [flash-message (:flash-message app)])
+     (when-let [msg (:flash-message app)] [flash-message msg])
 
      (when (= true (get-in app [:ote-service-flags :show-debug]))
        [:div.row

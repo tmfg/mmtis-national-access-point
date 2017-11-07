@@ -42,7 +42,7 @@
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column
-           [ui/icon-button {:on-click  #(set! (.-location js/window) (str "/ote/index.html#/edit-service/" id))}
+           [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService id))}
             [ic/content-create]]
            [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
             [ic/action-delete]]
