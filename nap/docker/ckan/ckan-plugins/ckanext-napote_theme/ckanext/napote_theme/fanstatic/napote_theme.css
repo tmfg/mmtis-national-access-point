@@ -553,6 +553,10 @@ body {
     clear: both;
 }
 
+.nav .navbar-text {
+    color: #ffffff;
+}
+
 /** HOME **/
 
 .homepage .hero {
@@ -584,6 +588,7 @@ body {
     box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
     transition: background-color .3s;
     word-wrap: break-word;
+    background: white;
 }
 
 .homepage [role=main] .btn:hover {
@@ -598,11 +603,39 @@ body {
 .homepage [role=main] .btn.btn-primary:hover {
     background: #2f97dd;
 }
+/* Flat button*/
+.homepage [role=main] .btn.btn-flat {
+   border: none;
+   padding: 0 2rem;
+   border-radius: 2px;
+   overflow: hidden;
+   border-width: 0;
+   line-height: 36px;
+   text-decoration: none;
+   text-transform: uppercase;
+   text-align: center;
+   letter-spacing: .5px;
+   min-height: 36px;
+   font-size: 1rem;
+   font-weight: normal;
+   outline: 0;
+   box-shadow: none;
+   transition: background-color .3s;
+   word-wrap: break-word;
+   color: rgb(25, 118, 210);
+
+}
+.homepage [role=main] .btn-flat:hover {
+    background: #d3d3d3;
+}
 
 /** Footer **/
 .site-footer {
     background: #444444; /** LIVI lisäväri, harmaat 5. **/
     color: #ffffff;
+}
+.footer-links .logo > img {
+    height: 70px;
 }
 
 /** Modules **/
@@ -636,6 +669,13 @@ body {
     display: block;
     width: 100%;
     height: auto;
+}
+
+.homepage .home-header img.livi-logo {
+    width: 220px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 20px;
 }
 
 /** HOME **/
