@@ -1,4 +1,4 @@
-(ns ote.views.viewer
+(ns ote.views.ckan_service_viewer
   "NAP viewer view. Shows a resource embedded in CKAN resource page.
   Loads GeoJSON data from given URL (proxied by our backend) and
   displays a map and data from the geojson file."
@@ -7,7 +7,15 @@
             [clojure.string :as str]
             [ote.localization :refer [tr tr-or]]
             [stylefy.core :as stylefy]
-            [ote.style.ckan :as style-ckan]))
+            [ote.style.ckan :as style-ckan]
+            [ote.app.controller.transport-service :as ts]
+            [ote.ui.buttons :as buttons]
+            [cljs-react-material-ui.reagent :as ui]
+            [ote.ui.leaflet :as leaflet]
+            [ote.views.theme :refer [theme]]
+            [ote.views.place-search :as place-search]
+            [reagent.core :as r]
+            cljsjs.leaflet))
 
 (defn linkify [url label]
   (let [url (if (re-matches #"^\w+:.*" url)
@@ -122,20 +130,36 @@
         [:h2 (tr [:viewer "transport-service"])]
         [properties-table transport-service]])]))
 
-(defn viewer [e! _]
-  (e! (v/->StartViewer))
-  (fn [e! {:keys [loading? geojson resource] :as app}]
-    (if loading?
-      [:div.loading
-       [:img {:src "/base/images/loading-spinner.gif"}]]
-
-      [:div.transport-service-view
-       [leaflet/Map {:center #js [65 25]
+(defn operation-area [e! {:keys [geojson] :as app}]
+  (r/create-class
+    {:display-name "operation-area-map"
+     :component-did-mount #(leaflet/update-bounds-on-load %)
+     :component-did-update leaflet/update-bounds-from-layers
+     :reagent-render
+     (fn [e! {:keys [geojson] :as app}]
+       [leaflet/Map {:ref "leaflet"
+                     :center #js [65 25]
                      :zoom 5}
         [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                             :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
         (when geojson
           [leaflet/GeoJSON {:data geojson
-                            :style {:color "green"}}])]
-       [show-features resource]])))
+                            :style {:color "green"}}])])}))
+
+(defn viewer [e! _]
+  (e! (v/->StartViewer))
+  (fn [e! {:keys [loading? geojson resource] :as app}]
+    (if loading?
+
+      [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+
+      [theme
+        [:div.transport-service-view
+       [:div.row.pull-right
+        [buttons/save {:on-click #(e! (ts/->OpenTransportServicePage (last (clojure.string/split (get app :url) "/"))))
+                       :disabled false}
+         (tr [:buttons :edit-service])]]
+
+         [operation-area e! app]
+       [show-features resource]]])))

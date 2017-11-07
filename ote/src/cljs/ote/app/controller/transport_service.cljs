@@ -53,6 +53,7 @@
 
 (defrecord ModifyTransportService [id])
 (defrecord ModifyTransportServiceResponse [response])
+(defrecord OpenTransportServicePage [id])
 
 (defrecord DeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
@@ -99,17 +100,23 @@
   (process-event [{id :id} app]
     (comm/get! (str "transport-service/" id)
                {:on-success (tuck/send-async! ->ModifyTransportServiceResponse)})
-    app)
+     (assoc app :transport-service-loaded? false))
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
     (let [type (::t-service/type response)]
-      (routes/navigate! type)
-      (assoc app :transport-service
+      (assoc app
+        :transport-service-loaded? true
+        :transport-service
              (-> response
                  (update ::t-service/operation-area place-search/operation-area-to-places)
                  (move-service-level-keys-to-form (t-service/service-key-by-type type))))))
 
+  ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
+  OpenTransportServicePage
+  (process-event [{id :id} app]
+    (set! (.-location js/window) (str "/ote/index.html#/edit-service/" id))
+    app)
 
   PublishTransportService
   (process-event [{:keys [transport-service-id]} app]

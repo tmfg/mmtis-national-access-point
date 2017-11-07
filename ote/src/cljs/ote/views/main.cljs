@@ -1,14 +1,14 @@
 (ns ote.views.main
   "OTE-sovelluksen päänäkymä"
   (:require [reagent.core :as r]
-            [cljs-react-material-ui.core :refer [get-mui-theme color]]
             [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
-            [ote.views.passenger_transportation :as pt]
+            [ote.views.passenger-transportation :as pt]
             [ote.views.terminal :as terminal]
             [ote.views.rental :as rental]
             [ote.views.parking :as parking]
@@ -17,7 +17,9 @@
             [ote.views.place-search :as place-search]
             [ote.ui.debug :as debug]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.app.controller.transport-service :as ts]
+            [ote.views.theme :refer [theme]]))
 
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
@@ -49,7 +51,6 @@
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
     [ui/menu-item {:primary-text "Siirry NAP -palveluun"
-                  ; :on-click #(e! (fp-controller/->GoNAPService))
                   :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
     [ui/menu-item {:primary-text "Kirjaudu ulos"
                    :selected-text-color (color :grey900)
@@ -73,6 +74,7 @@
     (tr [:common-texts :navigation-front-page]) ]
    [:a.ote-nav
     {:class (is-topnav-active :own-services (:page app))
+     :href "#"
      :on-click #(e! (fp-controller/->ChangePage :own-services))}
     (tr [:common-texts :navigation-own-service-list]) ]
    [:div.user-menu {:class (is-user-menu-active app) }
@@ -86,56 +88,29 @@
   (e! (fp-controller/->GetTransportOperatorData))
 
   (fn [e! app]
-
   [:div {:style (stylefy/use-style style-base/body)}
-   [ui/mui-theme-provider
-    {:mui-theme
-     (get-mui-theme
-      {:palette {;; primary nav color - Also Focus color in text fields
-                 :primary1-color (color :blue700)
-
-                 ;; Hint color in text fields
-                 :disabledColor  (color :grey900)
-
-                 ;; canvas color
-                 ;;:canvas-color  (color :lightBlue50)
-
-                 ;; Main text color
-                 :text-color     (color :grey900)
-                }
-
-       :button  {:labelColor "#fff"}
-       :menu-item {:selected-text-color (color :blue700)} ;; Change drop down list items selected color
-
-       })}
-
+   [theme
     [:div.ote-sovellus.container-fluid
      (top-nav e! app)
      ;; NOTE: debug state is VERY slow if app state is HUGE
      ;; (it tries to pr-str it)
 
      [:div
-      (when (= :front-page (:page app))
-        [fp/front-page e! app])
-      (when (= :own-services (:page app))
-        [fp/own-services e! app])
-      (when (= :transport-service (:page app))
-        [t-service/select-service-type e! (:transport-service app)])
-      (when (= :transport-operator (:page app))
-        [to/operator e! (:transport-operator app)])
-      (when (= :passenger-transportation (:page app))
-        [pt/passenger-transportation-info e! (:transport-service app)])
-      (when (= :terminal (:page app))
-        [terminal/terminal e! (:transport-service app)])
-      (when (= :rentals (:page app))
-        [rental/rental e! (:transport-service app)])
-      (when (= :parking (:page app))
-        [parking/parking e! (:transport-service app)])
-      (when (= :brokerage (:page app))
-        [brokerage/brokerage e! (:transport-service app)])
+      (case (:page app)
+        :front-page [fp/front-page e! app]
+        :own-services [fp/own-services e! app]
+        :transport-service [t-service/select-service-type e! (:transport-service app)]
+        :transport-operator [to/operator e! (:transport-operator app)]
+        :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+        :terminal [terminal/terminal e! (:transport-service app)]
+        :rentals [rental/rental e! (:transport-service app)]
+        :parking [parking/parking e! (:transport-service app)]
+        :brokerage [brokerage/brokerage e! (:transport-service app)]
+        :edit-service [t-service/edit-service e! app]
+        [:div "ERROR: no such page " (pr-str (:page app))])
       ]
 
-     [flash-message (:flash-message app)]
+     (when-let [msg (:flash-message app)] [flash-message msg])
 
      (when (= true (get-in app [:ote-service-flags :show-debug]))
        [:div.row

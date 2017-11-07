@@ -25,3 +25,51 @@
 (defmethod geometry :polygon [style-options {coordinates :coordinates}]
   [Polygon (merge {:positions (clj->js coordinates)}
                   style-options)])
+
+
+
+(defn ^:export update-map-bounds-from-layers [^js/L.map leaflet]
+  (let [bounds (atom nil)
+        add-bounds! (fn [nw se]
+                      (let [new-bounds (.latLngBounds js/L nw se)]
+                        (if (nil? @bounds)
+                          (reset! bounds new-bounds)
+                          (.extend @bounds new-bounds))))]
+    (.eachLayer
+      leaflet
+      (fn [layer]
+        (cond
+          (instance? js/L.Path layer)
+          (let [^js/L.path
+          path layer
+                layer-bounds (.getBounds path)]
+            (add-bounds! (.getNorthWest layer-bounds)
+                         (.getSouthEast layer-bounds)))
+
+          (instance? js/L.Marker layer)
+          (let [^js/L.Marker
+          marker layer
+                pos (.getLatLng marker)
+                d 0.01
+                lat (.-lat pos)
+                lng (.-lng pos)]
+            (add-bounds! (.latLng js/L (- lat d) (- lng d))
+                         (.latLng js/L (+ lat d) (+ lng d))))
+
+          ;; do nothing for other types
+          :default
+          nil)))
+    (when-let [bounds @bounds]
+      (.fitBounds leaflet bounds))))
+
+(defn update-bounds-from-layers [this]
+  (let [^js/L.map
+  leaflet (aget this "refs" "leaflet" "leafletElement")]
+    (update-map-bounds-from-layers leaflet)))
+
+(defn update-bounds-on-load [this]
+  (let [^js/L.map
+  leaflet (aget this "refs" "leaflet" "leafletElement")]
+    (.on leaflet "layeradd"
+         (fn [m]
+           (update-map-bounds-from-layers leaflet)))))

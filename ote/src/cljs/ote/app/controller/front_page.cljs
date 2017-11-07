@@ -49,7 +49,6 @@
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
-    ;(.log js/console " Mitäkähän dataa serveriltä tulee " (clj->js response) (clj->js (get response :transport-operator)))
     (assoc app
       :transport-operator (get response :transport-operator)
       :transport-services (get response :transport-service-vector )
