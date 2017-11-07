@@ -9,8 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-03 12:49+0000\n"
-"PO-Revision-Date: 2017-11-07 13:52+0200\n"
+"POT-Creation-Date: 2017-11-07 16:02+0000\n"
+"PO-Revision-Date: 2017-11-07 19:37+0200\n"
+"Last-Translator: \n"
 "Language: fi\n"
 "Language-Team: fi <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -18,11 +19,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"Last-Translator: \n"
 "X-Generator: Poedit 1.8.7.1\n"
 
 #: ckanext/napote_theme/plugin.py:116
 #: ckanext/napote_theme/templates/header.html:36
+#: ckanext/napote_theme/templates/translation-keys.html:86
 msgid "Organizations"
 msgstr "Palveluntuottajat"
 
@@ -52,10 +53,6 @@ msgstr ""
 msgid "Transport Service View"
 msgstr "Liikkumispalvelunäkymä"
 
-#: ckanext/napote_theme/templates/base.html:3
-msgid "Data and Resources"
-msgstr "Rajapinnat"
-
 #: ckanext/napote_theme/templates/footer.html:19
 msgid "CKAN API"
 msgstr ""
@@ -66,8 +63,8 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/footer.html:30
 msgid ""
-"<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" "
-"href=\"http://ckan.org\">CKAN</a>"
+"<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" href="
+"\"http://ckan.org\">CKAN</a>"
 msgstr ""
 
 #: ckanext/napote_theme/templates/header.html:36
@@ -75,6 +72,7 @@ msgid "Home"
 msgstr "Etusivu"
 
 #: ckanext/napote_theme/templates/header.html:36
+#: ckanext/napote_theme/templates/translation-keys.html:17
 msgid "Datasets"
 msgstr "Palvelukatalogi"
 
@@ -131,9 +129,428 @@ msgstr ""
 msgid "Register"
 msgstr "Luo tunnus"
 
-#: ckanext/napote_theme/templates/translations.html:1
-msgid "Test"
+#: ckanext/napote_theme/templates/translation-keys.html:11
+msgid "Data and Resources"
+msgstr "Rajapinnat"
+
+#: ckanext/napote_theme/templates/translation-keys.html:12
+msgid "What are datasets?"
+msgstr "Mitä palvelut ovat?"
+
+#: ckanext/napote_theme/templates/translation-keys.html:13
+msgid "View dataset"
+msgstr "Tutki palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:14
+msgid "This dataset satisfies the Open Definition."
+msgstr "Tämä palvelu täyttää Open Definition-vaatimukset."
+
+#: ckanext/napote_theme/templates/translation-keys.html:15
+msgid "This dataset has no description"
+msgstr "Tällä palvelulla ei ole kuvausta."
+
+#: ckanext/napote_theme/templates/package/read_base.html:9
+#: ckanext/napote_theme/templates/translation-keys.html:16
+msgid "Dataset"
+msgstr "Palvelu"
+
+#: ckanext/napote_theme/templates/translation-keys.html:18
+msgid "dataset"
+msgstr "palvelu"
+
+#: ckanext/napote_theme/templates/translation-keys.html:19
+msgid "datasets"
+msgstr "palvelukatalogi"
+
+#: ckanext/napote_theme/templates/translation-keys.html:20
+msgid "{num} Dataset"
+msgid_plural "{num} Datasets"
+msgstr[0] "{num} palvelu"
+msgstr[1] "{num} palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:21
+msgid "0 Datasets"
+msgstr "0 palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:22
+msgid "Search Datasets"
+msgstr "Etsi palveluita"
+
+#: ckanext/napote_theme/templates/translation-keys.html:23
+msgid "Search datasets..."
+msgstr "Etsi palveluita..."
+
+#: ckanext/napote_theme/templates/translation-keys.html:24
+msgid "Dataset not found"
+msgstr "Palvelua ei löydy"
+
+#: ckanext/napote_theme/templates/translation-keys.html:25
+msgid "{number} dataset found for \"{query}\""
+msgid_plural "{number} datasets found for \"{query}\""
+msgstr[0] "Haulla \"{query}\" löytyi {number} palvelu"
+msgstr[1] "Haulla \"{query}\" löytyi {number} palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:26
+msgid "{number} dataset found"
+msgid_plural "{number} datasets found"
+msgstr[0] "Löytyi {number} palvelu"
+msgstr[1] "Löytyi {number} palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:27
+msgid "No datasets found"
+msgstr "Palveluita ei löytynyt"
+
+#: ckanext/napote_theme/templates/translation-keys.html:28
+msgid "Sorry no datasets found for \"{query}\""
+msgstr "Haulla \"{query}\" ei löytynyt palveluita"
+
+#: ckanext/napote_theme/templates/translation-keys.html:29
+#, python-format
+msgid "Unauthorized to read package %s"
+msgstr "Ei oikeuksia tutkia palvelua %s"
+
+#: ckanext/napote_theme/templates/translation-keys.html:30
+msgid "CKAN Dataset Revision History"
+msgstr "NAP-palveluiden muutoshistoria"
+
+#: ckanext/napote_theme/templates/translation-keys.html:31
+msgid "Recent changes to CKAN Dataset: "
+msgstr "Viimeisimmät muutokset palvelussa: "
+
+#: ckanext/napote_theme/templates/translation-keys.html:32
+msgid "Unauthorized to create a package"
+msgstr "Ei oikeuksia luoda palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:33
+msgid "Unauthorized to update dataset"
+msgstr "Ei oikeuksia päivittää palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:34
+msgid "The dataset {id} could not be found."
+msgstr "Palvelua {id} ei löytynyt."
+
+#: ckanext/napote_theme/templates/translation-keys.html:35
+msgid "Dataset has been deleted."
+msgstr "Palvelu on poistettu."
+
+#: ckanext/napote_theme/templates/translation-keys.html:36
+#, python-format
+msgid "Unauthorized to delete package %s"
+msgstr "Ei oikeuksia poistaa palvelua %s."
+
+#: ckanext/napote_theme/templates/translation-keys.html:37
+#, python-format
+msgid "Unauthorized to read dataset %s"
+msgstr "Ei oikeuksia tutkia palvelua %s"
+
+#: ckanext/napote_theme/templates/translation-keys.html:38
+#, python-format
+msgid "Datasets affected: %s. "
+msgstr "Muutetut palvelut: %s. "
+
+#: ckanext/napote_theme/templates/translation-keys.html:39
+#: ckanext/napote_theme/templates/translation-keys.html:47
+msgid "Datasets with no organization can't be private."
+msgstr "Ilman palveluntarjojaaa olevat palvelut eivät voi olla yksityisiä."
+
+#: ckanext/napote_theme/templates/translation-keys.html:40
+msgid "You must be logged in to follow a dataset."
+msgstr "Sinun täytyy kirjautua sisään seurataksesi palvelua."
+
+#: ckanext/napote_theme/templates/translation-keys.html:41
+msgid "Package was not found."
+msgstr "Palvelua ei löytynyt."
+
+#: ckanext/napote_theme/templates/translation-keys.html:42
+#, python-format
+msgid "User %s not authorized to read these packages"
+msgstr "Käyttäjällä %s ei ole oikeuksia tutkia näitä palveluita"
+
+#: ckanext/napote_theme/templates/translation-keys.html:43
+#, python-format
+msgid "User %s not authorized to read package %s"
+msgstr "Käyttäjällä %s ei ole oikeuksia tutkia palveluita %s"
+
+#: ckanext/napote_theme/templates/translation-keys.html:44
+msgid "Before you can create a dataset you need to create an organization."
 msgstr ""
+"Ennen kuin voit luoda palvelun, sinun täytyy luoda palveluntuottaja."
+
+#: ckanext/napote_theme/templates/translation-keys.html:45
+msgid "My Datasets"
+msgstr "Minun palveluni"
+
+#: ckanext/napote_theme/templates/translation-keys.html:46
+msgid "You haven't created any datasets."
+msgstr "Et ole vielä luonut yhtään palvelua"
+
+#: ckanext/napote_theme/templates/translation-keys.html:50
+msgid "Resource"
+msgstr "Rajapinta"
+
+#: ckanext/napote_theme/templates/translation-keys.html:51
+msgid "Edited resources."
+msgstr "Rajapintoja muokattu."
+
+#: ckanext/napote_theme/templates/translation-keys.html:52
+msgid "Package resource(s) invalid"
+msgstr "Virhe palvelun rajapinnassa."
+
+#: ckanext/napote_theme/templates/translation-keys.html:53
+msgid "Resource was not found."
+msgstr "Rajapintaa ei löytynyt."
+
+#: ckanext/napote_theme/templates/translation-keys.html:56
+msgid "{actor} added the tag {tag} to the dataset {dataset}"
+msgstr "{actor} lisäsi avainsanan {tag} palveluun {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:57
+msgid "{actor} updated the dataset {dataset}"
+msgstr "{actor} päivitti palvelua {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:58
+msgid "{actor} changed the extra {extra} of the dataset {dataset}"
+msgstr "{actor} muutti palvelun {dataset} lisäystä {extra}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:59
+msgid "{actor} updated the resource {resource} in the dataset {dataset}"
+msgstr "{actor} päivitti rajapintaa {resource} palvelussa {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:60
+msgid "{actor} deleted the dataset {dataset}"
+msgstr "{actor} poisti palvelun {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:61
+msgid "{actor} deleted the extra {extra} from the dataset {dataset}"
+msgstr "{actor} poisti lisäkentän {extra} palvelusta {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:62
+msgid "{actor} deleted the resource {resource} from the dataset {dataset}"
+msgstr "{actor} poisti rajapinnan {resource} palvelusta {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:63
+msgid "{actor} created the dataset {dataset}"
+msgstr "{actor} loi palvelun {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:64
+msgid "{actor} added the extra {extra} to the dataset {dataset}"
+msgstr "{actor} lisäsi lisäkentän {extra} palveluun {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:65
+msgid "{actor} added the resource {resource} to the dataset {dataset}"
+msgstr "{actor} lisäsi rajapinnan {resource} palveluun {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:66
+msgid "{actor} removed the tag {tag} from the dataset {dataset}"
+msgstr "{actor} poisti avainsanan {tag} palvelusta {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:67
+msgid "{actor} started following {dataset}"
+msgstr "{actor} alkoi seurata palvelua {dataset}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:68
+msgid "{actor} updated the organization {organization}"
+msgstr "{actor} päivitti palveluntuottajaa {organization}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:69
+msgid "{actor} deleted the organization {organization}"
+msgstr "{actor} poisti palveluntuottajan {organization}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:70
+msgid "{actor} created the organization {organization}"
+msgstr "{actor} loi uuden palveluntuottajan {organization}"
+
+#: ckanext/napote_theme/templates/translation-keys.html:73
+msgid "Organization"
+msgstr "Palveluntuottaja"
+
+#: ckanext/napote_theme/templates/translation-keys.html:74
+msgid "organization"
+msgstr "palveluntuottaja"
+
+#: ckanext/napote_theme/templates/translation-keys.html:75
+msgid "organizations"
+msgstr "palveluntuottajat"
+
+#: ckanext/napote_theme/templates/translation-keys.html:76
+msgid "No organization"
+msgstr "Ei palveluntuottajia"
+
+#: ckanext/napote_theme/templates/translation-keys.html:77
+msgid "My Organization"
+msgstr ""
+"Kirjoita tähän palveluntuottajan nimi (yritys, viranomainen, muu yhteisö)"
+
+#: ckanext/napote_theme/templates/translation-keys.html:78
+msgid "My Organizations"
+msgstr "My Organizations (translate me)"
+
+#: ckanext/napote_theme/templates/translation-keys.html:79
+msgid "my-organization"
+msgstr "my organization (translate me)"
+
+#: ckanext/napote_theme/templates/translation-keys.html:80
+msgid "There is no description for this organization"
+msgstr "Tälle palveluntuottajalle ei ole kuvausta"
+
+#: ckanext/napote_theme/templates/translation-keys.html:81
+msgid "Organization Form"
+msgstr "Palveluntuottajalomake"
+
+#: ckanext/napote_theme/templates/translation-keys.html:82
+msgid "This organization has no datasets associated to it"
+msgstr "Tällä palveluntuottajalla ei ole palveluita"
+
+#: ckanext/napote_theme/templates/translation-keys.html:83
+msgid "An organization must be provided"
+msgstr "Palveluntuottaja on annettava"
+
+#: ckanext/napote_theme/templates/translation-keys.html:84
+msgid "Organization does not exist"
+msgstr "Palveluntuottajaa ei ole"
+
+#: ckanext/napote_theme/templates/translation-keys.html:85
+msgid "Organization not found"
+msgstr "Palveluntuottajaa ei löydy"
+
+#: ckanext/napote_theme/templates/translation-keys.html:87
+msgid "Organization has been deleted."
+msgstr "Palveluntuottaja on poistettu"
+
+#: ckanext/napote_theme/templates/translation-keys.html:88
+msgid "You cannot add a dataset to this organization"
+msgstr "Et voi lisätä palvelua tähän palveluntuottajaan"
+
+#: ckanext/napote_theme/templates/translation-keys.html:89
+msgid "There are no organizations to which you can assign this dataset."
+msgstr ""
+"Ei ole palveluntuottajaa, jonka yhteyteen voisit sijoittaa tämän "
+"palvelun."
+
+#: ckanext/napote_theme/templates/translation-keys.html:90
+#, python-format
+msgid "User %s not authorized to add dataset to this organization"
+msgstr ""
+"Käyttäjällä %s ei ole oikeutta luoda palvelua tähän palveluntuottajaan"
+
+#: ckanext/napote_theme/templates/translation-keys.html:91
+msgid ""
+"Ask a system administrator to create an organization before you can "
+"continue."
+msgstr ""
+"Pyydä järjestelmän ylläpitäjää luomaan palveluntuottaja ennen kuin voit "
+"jatkaa."
+
+#: ckanext/napote_theme/templates/translation-keys.html:92
+#, python-format
+msgid "User %s not authorized to create organizations"
+msgstr "Käyttäjällä %s ei ole oikeuksia luoda palveluntuottajaa"
+
+#: ckanext/napote_theme/templates/translation-keys.html:93
+#, python-format
+msgid "User %s not authorized to delete organizations"
+msgstr "Käyttäjällä %s ei ole oikeuksia poistaa palveluntuottajaa"
+
+#: ckanext/napote_theme/templates/translation-keys.html:94
+#, python-format
+msgid "User %s not authorized to delete organization %s"
+msgstr "Käyttäjällä %s ei ole oikeuksia poistaa palveluntuottajaa %s"
+
+#: ckanext/napote_theme/templates/translation-keys.html:95
+#, python-format
+msgid "User %s not authorized to edit organization %s"
+msgstr "Käyttäjällä %s ei ole oikeuksia muokata palveluntuottajaa %s"
+
+#: ckanext/napote_theme/templates/translation-keys.html:96
+msgid "Organization was not found."
+msgstr "Palveluntuottajaa ei löytynyt"
+
+#: ckanext/napote_theme/templates/translation-keys.html:97
+msgid "Are you sure you want to delete organization - {name}?"
+msgstr "Haluatko varmasti poistaa palveluntuottajan - {name}?"
+
+#: ckanext/napote_theme/templates/translation-keys.html:98
+msgid "Edit Organization"
+msgstr "Muokkaa palveluntuottajaa"
+
+#: ckanext/napote_theme/templates/translation-keys.html:99
+msgid "Add Organization"
+msgstr "Lisää palveluntuottaja"
+
+#: ckanext/napote_theme/templates/translation-keys.html:100
+msgid "Search organizations..."
+msgstr "Etsi palveluntuottajia..."
+
+#: ckanext/napote_theme/templates/translation-keys.html:101
+msgid "There are currently no organizations for this site"
+msgstr "Sivustolla ei ole tällä hetkellä palveluntuottajia"
+
+#: ckanext/napote_theme/templates/translation-keys.html:102
+msgid "Update Organization"
+msgstr "Päivitä palveluntuottajaa"
+
+#: ckanext/napote_theme/templates/translation-keys.html:103
+msgid "Create Organization"
+msgstr "Luo uusi palveluntuottaja"
+
+#: ckanext/napote_theme/templates/translation-keys.html:104
+msgid "Save Organization"
+msgstr "Tallenna palveluntuottaja"
+
+#: ckanext/napote_theme/templates/translation-keys.html:105
+msgid "Create a new organization"
+msgstr "Luo uusi palveluntuottaja"
+
+#: ckanext/napote_theme/templates/translation-keys.html:106
+msgid "Datasets in organization: {group}"
+msgstr "Palveluntuottajan {group} palvelut:"
+
+#: ckanext/napote_theme/templates/translation-keys.html:107
+msgid "A little information about my organization..."
+msgstr "Kirjoita tähän kuvaus palveluntuottajasta..."
+
+#: ckanext/napote_theme/templates/translation-keys.html:108
+msgid ""
+"Are you sure you want to delete this Organization? This will delete all "
+"the public and private datasets belonging to this organization."
+msgstr ""
+"Haluatko varmasti poistaa tämän palveluntuottajan? Tämä poistaa kaikki "
+"julkiset ja yksityiset palvelut, jotka kuuluvat tälle "
+"palveluntuottajalle."
+
+#: ckanext/napote_theme/templates/translation-keys.html:110
+msgid "No organizations found for \"{query}\""
+msgstr "Haulla \"{query}\" ei löytynyt palveluntuottajia"
+
+#: ckanext/napote_theme/templates/translation-keys.html:111
+msgid "{number} organization found"
+msgid_plural "{number} organizations found"
+msgstr[0] "Löytyi {number} palveluntuottaja"
+msgstr[1] "Löytyi {number} palveluntuottajaa"
+
+#: ckanext/napote_theme/templates/translation-keys.html:112
+msgid "No organizations found"
+msgstr "Palveluntuottajia ei löytynyt"
+
+#: ckanext/napote_theme/templates/translation-keys.html:113
+msgid "You are not a member of any organizations."
+msgstr "Sinua ei ole lisätty jäseksi mihinkään palveluntuottajaan"
+
+#: ckanext/napote_theme/templates/translation-keys.html:117
+msgid ""
+" <p><strong>Admin:</strong> Can add/edit and delete datasets, as well as "
+"manage organization members.</p> <p><strong>Editor:</strong> Can add and "
+"edit datasets, but not manage organization members.</p> "
+"<p><strong>Member:</strong> Can view the organization's private "
+"datasets, but not add new datasets.</p> "
+msgstr ""
+"<p><strong>Ylläpitäjä:</strong> Voi lisätä, muokata ja poistaa \"\n"
+"\"palveluita sekä hallinnoida palveluntuottajan jäseniä.</p> \"\n"
+"\"<p><strong>Muokkaaja:</strong> Voi lisätä ja muokata palveluita.</p> "
+"\"\n"
+"\"<p><strong>Jäsen:</strong> Voi katsella oman ryhmänsä "
+"(palveluntuottaja) yksityisiä \"\n"
+"\"palveluita, mutta ei muokata niitä.</p>"
 
 #: ckanext/napote_theme/templates/home/layout1.html:6
 #, python-format
@@ -149,8 +566,8 @@ msgstr ""
 #: ckanext/napote_theme/templates/home/layout1.html:8
 msgid "Organizations-page short info"
 msgstr ""
-"<b>Organisaatiot</b>-sivulla on listattuna palveluun rekisteröityneet "
-"organisaatiot."
+"<b>Palveluntuottajat</b>-sivulla on listattuna NAP-palveluun "
+"rekisteröityneet palveluntuottajat."
 
 #: ckanext/napote_theme/templates/home/layout1.html:14
 msgid "Heading/NAP home page logged in main heading"
@@ -169,8 +586,8 @@ msgstr "Siirry tietojen hallintapalveluun"
 #: ckanext/napote_theme/templates/home/layout1.html:30
 msgid "RAE service short description"
 msgstr ""
-"Haluatko tallentaa tai päivittää linja-autoreittejä ja "
-"aikataulutietoja RAE-palvelussa?"
+"Haluatko tallentaa tai päivittää linja-autoreittejä ja aikataulutietoja "
+"RAE-palvelussa?"
 
 #: ckanext/napote_theme/templates/home/layout1.html:38
 msgid "Open RAE-service"
@@ -194,14 +611,14 @@ msgstr "Liikkumispalveluiden katalogi."
 msgid "Heading/NAP home page intro heading"
 msgstr "Mikä on NAP?"
 
-#: ckanext/napote_theme/templates/home/snippets/promoted.html:9
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:10
 msgid "NAP home page info text"
 msgstr ""
-"NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste "
-"(National Access Point, NAP), johon liikkumispalvelun tarjoajien on "
-"toimitettava tietoja digitaalisista olennaisten tietojen "
-"koneluettavista rajapinnoistaan. \n"
-"<b>Liikkumispalvelun tarjoajilla tarkoitetaan:</b><br />\n"
+"NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National "
+"Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava "
+"tietoja digitaalisista olennaisten tietojen koneluettavista "
+"rajapinnoistaan. \n"
+"<b>Liikkumispalvelun tuottajilla tarkoitetaan:</b><br />\n"
 "- henkilöiden kuljetuspalveluita (esim. taksi- ja linja-"
 "autoliikenne)<br />\n"
 "- asemia, satamia ja terminaaleja<br />\n"
@@ -213,7 +630,7 @@ msgstr ""
 "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, "
 "hinnat ja esteettömyystiedot. <b>NAP ei ole loppukäyttäjien ja "
 "matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden "
-"tarjoajille ja kehittäjille.</b>\n"
+"tuottajille ja kehittäjille.</b>\n"
 "<br /><br />\n"
 "NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on "
 "aikaansaada mahdollisimman helppokäyttöisiä uusia yhdistettyjä "
@@ -221,27 +638,63 @@ msgstr ""
 "<br /><br />\n"
 "<b>Palvelukatalogi</b>-sivulla voit tarkastella ja hakea palvelussa "
 "julkaistuja rajapintoja.<br />\n"
-"<b>Palveluntarjoajat</b>-sivulla on listattuna palveluun "
+"<b>Palveluntuottajat</b>-sivulla on listattuna palveluun "
 "rekisteröityneet organisaatiot.\n"
 "<br/><br />\n"
-"Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa "
-"vaatii kirjautumisen palveluun."
+"Liikkumispalveluiden tallennus ja julkaiseminen NAP-palvelussa vaatii "
+"kirjautumisen palveluun."
 
 #: ckanext/napote_theme/templates/organization/edit_base.html:5
 msgid "Edit"
-msgstr ""
+msgstr "Muokkaa"
 
 #: ckanext/napote_theme/templates/organization/edit_base.html:7
 msgid "Members"
+msgstr "Jäsenet"
+
+#: ckanext/napote_theme/templates/organization/read.html:10
+#: ckanext/napote_theme/templates/package/search.html:10
+msgid "HEADING/What are facets?"
+msgstr "Info"
+
+#: ckanext/napote_theme/templates/organization/read.html:13
+#: ckanext/napote_theme/templates/package/search.html:13
+msgid "Facets info text"
 msgstr ""
+"Voit rajata haettavia palveluita käyttämällä alla olevia "
+"pikahakulinkkejä.<br />\n"
+"Kun klikkaat hakulinkkiä, se siirtyy hakusanaksi hakualueelle. Voit "
+"kerralla aktivoida klikkaamalla useammankin hakulinkin."
+
+#: ckanext/napote_theme/templates/organization/snippets/help.html:4
+#: ckanext/napote_theme/templates/organization/snippets/helper.html:4
+msgid "HEADING/What are service providers?"
+msgstr "Mitä palveluntuottajat ovat?"
+
+#: ckanext/napote_theme/templates/organization/snippets/help.html:7
+msgid "Service providers info text"
+msgstr ""
+
+#: ckanext/napote_theme/templates/organization/snippets/helper.html:8
+msgid "Service providers short info text"
+msgstr ""
+"Palveluntuottajat voivat luoda, hallita ja julkistaa useita palveluita. "
+"Käyttäjillä voi olla palveluntuottajaryhmässä erilaisia rooleja  ja "
+"eritasoisia oikeuksia palveluiden luomiseen, muokkaamiseen ja "
+"julkaisemiseen.<br />\n"
+"<br />\n"
+"Palveluntuottajilla tarkoitetaan:<br />\n"
+"- henkilöiden kuljetuspalveluita (esim. taksi- ja linja-"
+"autoliikenne)<br />\n"
+"- asemia, satamia ja terminaaleja<br />\n"
+"- pysäköintilaitoksia<br />\n"
+"- liikennevälineiden vuokrauspalveluita ja kaupallisia "
+"yhteistyökäyttöpalveluita\n"
+"- välityspalveluita <br />"
 
 #: ckanext/napote_theme/templates/package/read.html:15
 msgid "Operation Areas"
 msgstr "Toiminta-alueet"
-
-#: ckanext/napote_theme/templates/package/read_base.html:9
-msgid "Dataset"
-msgstr "Palvelu"
 
 #: ckanext/napote_theme/templates/package/read_base.html:11
 msgid "Activity Stream"
@@ -257,7 +710,7 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/package/resource_read.html:12
 msgid "Go to resource"
-msgstr ""
+msgstr "Mene rajapintanäkymään"
 
 #: ckanext/napote_theme/templates/package/resource_read.html:14
 msgid "Download"
@@ -271,6 +724,10 @@ msgstr "Palvelun tyyppi"
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:12
 msgid "Operation area"
 msgstr "Toiminta-alue"
+
+#: ckanext/napote_theme/templates/package/snippets/package_form.html:5
+msgid "License disclaimer for service"
+msgstr ""
 
 #: ckanext/napote_theme/templates/package/snippets/package_metadata_fields.html:6
 msgid "Source"
