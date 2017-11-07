@@ -214,6 +214,17 @@
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
+(defmethod field :date-picker [{:keys [update! label ok-label cancel-label] :as opts} data]
+  [ui/date-picker {:hint-text label
+                   :value data
+                   :on-change (fn [_ date]
+                                (update! date))
+                   :format-date time/format-date
+                   :ok-label (or ok-label (tr [:buttons :save]))
+                   :cancel-label (or cancel-label (tr [:buttons :cancel]))
+                   :locale "fi-FI"
+                   :Date-time-format js/Intl.DateTimeFormat}])
+
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
 
