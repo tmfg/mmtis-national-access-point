@@ -10,7 +10,8 @@
             [jeesql.core :refer [defqueries]]
             [cheshire.core :as cheshire]
             [ote.db.modification :as modification]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.integration.export.transform :as transform]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
@@ -43,6 +44,7 @@
     (first geoms)
     geometry-collection))
 
+
 (defn- feature-collection [geometry properties]
   {:type "FeatureCollection"
    :features [{:type "Feature"
@@ -73,8 +75,9 @@
     (if (and geojson operator service)
       (-> (cheshire/decode geojson keyword)
           simplify-collection
-          (feature-collection {:transport-operator operator
-                               :transport-service service})
+          (feature-collection (transform/transform-deep
+                               {:transport-operator operator
+                                :transport-service service}))
           (cheshire/encode {:key-fn name})
           json-response)
       {:status 404
