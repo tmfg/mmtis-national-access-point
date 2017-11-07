@@ -9,7 +9,13 @@
 
 (def read-options
   {:handlers {"time" #?(:clj (t/read-handler time/parse-time)
-                        :cljs time/parse-time)}})
+                        :cljs time/parse-time)
+
+              ;; Transit "f" tag is an arbitrary precision decimal number that has no native
+              ;; JS equivalent, for now we simply map it to parseFloat in JS as we are not doing
+              ;; calculations with money
+              "f" #?(:clj (t/read-handler #(BigDecimal. %))
+                     :cljs js/parseFloat)}})
 
 (defn clj->transit
   "Convert given Clojure `data` to transit+json string."
