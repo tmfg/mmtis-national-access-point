@@ -1,7 +1,9 @@
 (ns ote.time
   "Common utilities for working with date and time information."
   (:require
-   #?@(:clj [[specql.impl.composite :as specql-composite]]
+   #?@(:clj [[specql.impl.composite :as specql-composite]
+             [clj-time.format :as format]
+             [clj-time.coerce :as coerce]]
        :cljs [[goog.string :as gstr]
               [cljs-time.core :as cljs-time]
               [cljs-time.format :as format]
@@ -9,8 +11,7 @@
               [cljs-time.coerce :as coerce]])
    [specql.data-types :as specql-data-types]
    [clojure.spec.alpha :as s]
-   [clojure.string :as str]
-   ))
+   [clojure.string :as str]))
 
 ;; Record for wall clock time (hours, minutes and seconds)
 (defrecord Time [hours minutes seconds])
@@ -60,6 +61,34 @@
                           :cljs js/parseInt) %)
                      (str/split string #":"))]
     (->Time h m s)))
+
+(defprotocol DateFields
+  (date-fields [this] "Return date fields as a map of data."))
+
+(extend-protocol DateFields
+   #?(:cljs js/Date :clj java.util.Date)
+   (date-fields [this]
+     {::date (.getDate this)
+      ::month (inc (.getMonth this))
+      ::year (+ 1900 (.getYear this))
+      ::hours (.getHours this)
+      ::minutes (.getMinutes this)
+      ::seconds (.getSeconds this)}))
+
+(defn format-date
+  "Format given date in human readable format."
+  [date]
+  (let [{::keys [date month year]} (date-fields date)]
+    (#?(:cljs gstr/format :clj format)
+     "%02d.%02d.%d" date month year)))
+
+(defn format-date-iso-8601
+  "Format given date in ISO-8601 format."
+  [date]
+  (let [{::keys [date month year]} (date-fields date)]
+    (#?(:cljs gstr/format :clj format)
+     "%d-%02d-%02d" year month date)))
+
 
 ;; Hook into specql to allow us to read/write the time
 #?(:clj
