@@ -117,7 +117,8 @@
 {% trans %}Create a new organization{% endtrans %}
 {% trans %}Datasets in organization: {group}{% endtrans %}
 {% trans %}A little information about my organization...{% endtrans %}
-{% trans %}Are you sure you want to delete this Organization? This will delete all the public and private datasets belonging to this organization.{% endtrans %}
+{% trans %}Are you sure you want to delete this Organization? This will delete all the public and private datasets
+    belonging to this organization.{% endtrans %}
 {% trans %}No organizations found for \"{query}\"{% endtrans %}
 {% trans %}
     {number} organization found
@@ -126,3 +127,14 @@
 {% endtrans %}
 {% trans %}No organizations found{% endtrans %}
 {% trans %}You are not a member of any organizations.{% endtrans %}
+
+{# This was too complicated to edit in organization/member_new.html template, so we'll reference the translation key
+    here. Be careful that you do not change anything in this block. #}
+{% trans %}
+    <p><strong>Admin:</strong> Can add/edit and delete datasets, as well as
+        manage organization members.</p>
+    <p><strong>Editor:</strong> Can add and edit datasets, but not manage
+        organization members.</p>
+    <p><strong>Member:</strong> Can view the organization's private
+        datasets, but not add new datasets.</p>
+{% endtrans %}
