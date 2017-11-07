@@ -148,8 +148,7 @@
                         :dataSource (completions (:completions place-search))
                         :on-update-input #(e! (ps/->SetPlaceName %))
                         :search-text (or (:name place-search) "")
-                        :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]
-      ]
+                        :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]]
     [:div.col-xs-12.col-md-8
      [places-map e! results]]]))
 
@@ -159,6 +158,8 @@
     :columns 3}
    {:type :component
     :name name
+    :required? true
+    :is-empty? (comp empty? :results :place-search)
     :component (fn [{data :data}]
                  [place-search e! (:place-search data)])}))
 
