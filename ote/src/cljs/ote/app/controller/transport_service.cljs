@@ -96,18 +96,21 @@
                 (assoc :transport-service {::t-service/type type})
                 (assoc-in [:transport-service (t-service/service-key-by-type type) ] {::t-service/sub-type sub-type}))))
 
-   ModifyTransportService
-   (process-event [{id :id} app]
+  ModifyTransportService
+  (process-event [{id :id} app]
     (comm/get! (str "transport-service/" id)
                {:on-success (tuck/send-async! ->ModifyTransportServiceResponse)})
      (assoc app :transport-service-loaded? false))
 
-   ModifyTransportServiceResponse
-   (process-event [{response :response} app]
+  ModifyTransportServiceResponse
+  (process-event [{response :response} app]
     (let [type (::t-service/type response)]
       (assoc app
-             :transport-service-loaded? true
-             :transport-service (move-service-level-keys-to-form response (t-service/service-key-by-type type)))))
+        :transport-service-loaded? true
+        :transport-service
+             (-> response
+                 (update ::t-service/operation-area place-search/operation-area-to-places)
+                 (move-service-level-keys-to-form (t-service/service-key-by-type type))))))
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage

@@ -224,7 +224,7 @@
  :service-type-dropdown
  {:terminal                 "Asemat, satamat ja muut terminaalit"
   :passenger-transportation-taxi "Taksiliikenne (Henkilöidenkuljetuspalvelut)"
-  :passenger-transportation-request "Muu kutsuperusteinen liikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
   :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (Henkilöidenkuljetuspalvelut)"
   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
