@@ -5,7 +5,7 @@
 {# Also note, that we are not actually using variable here. We are just referencing exactly the CKAN translation
     keys as they are defined in the CKAN core pot file. #}
 
-{# The pluralize tag will generate single and pluralize keys during message extraction phase #}
+{# The ungettext fn will generate single and pluralized keys during message extraction phase #}
 
 {# Datasets #}
 {% trans %}Data and Resources{% endtrans %}
@@ -17,27 +17,16 @@
 {% trans %}Datasets{% endtrans %}
 {% trans %}dataset{% endtrans %}
 {% trans %}datasets{% endtrans %}
-{% trans %}
-    {num} Dataset
-    {% pluralize %}
-    {num} Datasets
-{% endtrans %}
+{# NOTE: You'll have to define some mockup count here, to prevent crashing the babel message extractor. #}
+{{ ungettext('{num} Dataset', '{num} Datasets', 0) }}
 {% trans %}0 Datasets{% endtrans %}
 {% trans %}Search Datasets{% endtrans %}
 {% trans %}Search datasets...{% endtrans %}
 {% trans %}Dataset not found{% endtrans %}
-{% trans %}
-    {number} dataset found for \"{query}\"
-    {% pluralize %}
-    {number} datasets found for \"{query}\"
-{% endtrans %}
-{% trans %}
-    {number} dataset found
-    {% pluralize %}
-    {number} datasets found
-{% endtrans %}
+{{ ungettext('{number} dataset found for "{query}"', '{number} datasets found for "{query}"', 0) }}
+{{ ungettext('{number} dataset found', '{number} datasets found', 0) }}
 {% trans %}No datasets found{% endtrans %}
-{% trans %}Sorry no datasets found for \"{query}\"{% endtrans %}
+{% trans %}Sorry no datasets found for "{query}"{% endtrans %}
 {% trans %}Unauthorized to read package %s{% endtrans %}
 {% trans %}CKAN Dataset Revision History{% endtrans %}
 {% trans %}Recent changes to CKAN Dataset: {% endtrans %}
@@ -47,7 +36,7 @@
 {% trans %}Dataset has been deleted.{% endtrans %}
 {% trans %}Unauthorized to delete package %s{% endtrans %}
 {% trans %}Unauthorized to read dataset %s{% endtrans %}
-{% trans %}Datasets affected: %s.\n{% endtrans %}
+{{ _('Datasets affected: %s.\n') % 0 }}
 {% trans %}Datasets with no organization can't be private.{% endtrans %}
 {% trans %}You must be logged in to follow a dataset.{% endtrans %}
 {% trans %}Package was not found.{% endtrans %}
@@ -119,12 +108,8 @@
 {% trans %}A little information about my organization...{% endtrans %}
 {% trans %}Are you sure you want to delete this Organization? This will delete all the public and private datasets
     belonging to this organization.{% endtrans %}
-{% trans %}No organizations found for \"{query}\"{% endtrans %}
-{% trans %}
-    {number} organization found
-    {% pluralize %}
-    {number} organizations found
-{% endtrans %}
+{% trans %}No organizations found for "{query}"{% endtrans %}
+{{ ungettext('{number} organization found', '{number} organizations found', 0) }}
 {% trans %}No organizations found{% endtrans %}
 {% trans %}You are not a member of any organizations.{% endtrans %}
 
