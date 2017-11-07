@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-07 16:02+0000\n"
-"PO-Revision-Date: 2017-11-07 19:37+0200\n"
+"PO-Revision-Date: 2017-11-07 19:50+0200\n"
 "Last-Translator: \n"
 "Language: fi\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -383,11 +383,11 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/translation-keys.html:78
 msgid "My Organizations"
-msgstr "My Organizations (translate me)"
+msgstr "Edustamani palveluntuottajat"
 
 #: ckanext/napote_theme/templates/translation-keys.html:79
 msgid "my-organization"
-msgstr "my organization (translate me)"
+msgstr "edustamani palveluntuottajat"
 
 #: ckanext/napote_theme/templates/translation-keys.html:80
 msgid "There is no description for this organization"
