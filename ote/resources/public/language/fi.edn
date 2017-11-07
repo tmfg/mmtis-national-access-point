@@ -40,6 +40,12 @@
 
    }
 
+  ;; Service exception
+  :service-exception
+  {:description "Poikkeuksen kuvaus"
+   :from-date "Alkupvm"
+   :to-date "Loppupvm"}
+
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
@@ -117,7 +123,8 @@
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
   :add-new-price-class "Lisää hintarivi"
-  :add-new-service-hour "Lisää uusi rivi"
+  :add-new-service-hour "Lisää palveluaika"
+  :add-new-service-exception "Lisää poikkeus"
 
   :discard "Peruuta"
 
