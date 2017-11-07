@@ -82,8 +82,8 @@
   (r/with-let [options (terminal-form-options e!)
                groups [(name-and-type-group e!)
                        (ts-common/contact-info-group)
-                       (ts-common/external-interfaces)
                        (ts-common/place-search-group e! ::t-service/terminal)
+                       (ts-common/external-interfaces)
                        (indoor-map-group)
                        (accessibility-and-other-services-group)
                        (accessibility-description-group)]]

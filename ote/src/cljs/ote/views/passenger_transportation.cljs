@@ -148,8 +148,8 @@
   (with-let [form-options (transportation-form-options e!)
              form-groups [(name-and-type-group e!)
                           (ts-common/contact-info-group)
-                          (ts-common/external-interfaces)
                           (ts-common/place-search-group e! ::t-service/passenger-transportation)
+                          (ts-common/external-interfaces)
                           (luggage-restrictions-group)
                           (ts-common/service-url
                            (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
