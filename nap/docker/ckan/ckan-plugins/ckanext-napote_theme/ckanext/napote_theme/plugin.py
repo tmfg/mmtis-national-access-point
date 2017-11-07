@@ -113,12 +113,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     def dataset_facets(self, facets_dict, package_type):
         facets_dict.clear()
 
-        facets_dict['organization'] = tk._('Organizations')
+        #facets_dict['organization'] = tk._('Organizations')
         facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
-        facets_dict['extras_operation_area'] = tk._('Operation Area')
-        facets_dict['tags'] = tk._('Tags')
-        facets_dict['res_format'] = tk._('Formats')
-        facets_dict['license_id'] = tk._('Licenses')
+        #facets_dict['extras_operation_area'] = tk._('Operation Area')
+        #facets_dict['tags'] = tk._('Tags')
+        #facets_dict['res_format'] = tk._('Formats')
+        #facets_dict['license_id'] = tk._('Licenses')
 
         return facets_dict
 
@@ -126,10 +126,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         facets_dict.clear()
 
         facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
-        facets_dict['extras_operation_area'] = tk._('Operation Area')
-        facets_dict['tags'] = tk._('Tags')
-        facets_dict['res_format'] = tk._('Formats')
-        facets_dict['license_id'] = tk._('Licenses')
+        #facets_dict['extras_operation_area'] = tk._('Operation Area')
+        #facets_dict['tags'] = tk._('Tags')
+        #facets_dict['res_format'] = tk._('Formats')
+        #facets_dict['license_id'] = tk._('Licenses')
 
         return facets_dict
 
