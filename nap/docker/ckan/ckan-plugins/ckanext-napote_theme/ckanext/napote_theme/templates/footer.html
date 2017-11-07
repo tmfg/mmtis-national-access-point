@@ -3,8 +3,8 @@
 {% block footer_content %}
     <div class="row">
         <div class="span2 footer-links">
-            <a class="media-image" href="#">
-                <img src="/liikennevirasto_logo_2x.png" alt="Liikennevirasto Logo" />
+            <a class="logo" href="#">
+                <img src="/livi_logo_valkoinen.svg" alt="Liikennevirasto Logo" />
             </a>
         </div>
         <div class="span8 footer-links">
@@ -14,14 +14,7 @@
                         <li><a href="https://www.liikennevirasto.fi/">Liikennevirasto.fi</a></li>
                     {% endblock %}
                 </ul>
-                <ul class="unstyled">
-                    {% block footer_links_ckan %}
-                        <li><a href="{{ api_url }}">{{ _('CKAN API') }}</a></li>
-                        <li><a href="http://www.ckan.org/">{{ _('CKAN Association') }}</a></li>
-                        <li><a href="http://www.opendefinition.org/okd/"><img
-                                src="{{ h.url_for_static('/base/images/od_80x15_blue.png') }}"></a></li>
-                    {% endblock %}
-                </ul>
+
             {% endblock %}
         </div>
         <div class="span2 attribution">
