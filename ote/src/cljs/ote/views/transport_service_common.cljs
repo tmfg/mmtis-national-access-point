@@ -94,14 +94,14 @@
   [:div.row
    (if published?
      [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                      :disabled (form/disable-save? data)}
+                    :disabled (form/disable-save? data)}
       (tr [:buttons :save-updated])]
      [:span
       [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                       :disabled (form/disable-save? data)}
+                     :disabled (form/disable-save? data)}
        (tr [:buttons :save-and-publish])]
       [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
-                        :disabled  (form/disable-save? data)}
+                      :disabled false}
        (tr [:buttons :save-as-draft])]])
    [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
     (tr [:buttons :discard])]])
