@@ -36,3 +36,9 @@ ON "transport-service"
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE PROCEDURE transport_service_operation_area_array();
+
+
+--- Create index for subtype (also used as a search facet)
+CREATE INDEX transport_service_subtype_idx
+    ON "transport-service" ("sub-type")
+ WHERE "published?"=TRUE;
