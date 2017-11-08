@@ -14,7 +14,8 @@
     ["/brokerage" :brokerage]
     ["/parking" :parking]
     ["/new-service" :transport-service]
-    ["/edit-service/:id" :edit-service]]))
+    ["/edit-service/:id" :edit-service]
+    ["/services" :services]]))
 
 (defn- on-navigate [name params query]
   (swap! state/app merge {:page name
