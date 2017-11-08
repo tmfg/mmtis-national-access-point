@@ -46,3 +46,7 @@
                   :font-weight "600"})
 
 (def flash-message {:top "100px"})
+
+(def title {:font-weight "bold"})
+
+(def large-title (merge title {:font-size "150%"}))
