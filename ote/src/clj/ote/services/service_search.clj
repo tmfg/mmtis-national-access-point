@@ -65,11 +65,21 @@
                          #{::t-service/id}
                          {::t-service/name (op/ilike (str "%" text "%"))})))))
 
+(defn- sub-type-ids [db types]
+  (when-not (empty? types)
+    (ids ::t-service/id
+         (specql/fetch db ::t-service/transport-service
+                       #{::t-service/id}
+                       {::t-service/sub-type (op/in types)}))))
+
 (defn- search [db filters]
   (let [ids (apply set/intersection
                    (remove nil?
+                           ;; PENDING: we could (should) do this as a single query to INTERSECT all
+                           ;; search facet ids
                            [(operation-area-ids db (:operation-area filters))
-                            (text-search-ids db (:text params))]))]
+                            (sub-type-ids db (:sub-type filters))
+                            (text-search-ids db (:text filters))]))]
     (specql/fetch db ::t-service/transport-service
                   search-result-columns
                   {::t-service/id (op/in ids)})))
@@ -81,10 +91,13 @@
 
    (GET "/service-search" {params :query-params}
         (http/transit-response
-         (search {:operation-area (some-> (params "operation_area")
-                                                  (str/split #","))
-                  :text (params "text")})))
-   ))
+         (search db
+                 {:operation-area (some-> (params "operation_area")
+                                          (str/split #","))
+                  :text (params "text")
+                  :sub-type (when-let [st (some-> (params "sub_types")
+                                                  (str/split #","))]
+                              (into #{} (map keyword st)))})))))
 
 (defrecord ServiceSearch []
   component/Lifecycle
