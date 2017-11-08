@@ -37,6 +37,8 @@ write_config () {
     "host = 0.0.0.0" \
     "port = 5000"
 
+  # TODO: To translate CKAN terms and tags we need multilingual_dataset multilingual_resource multilingual_tag plugins
+  # However, in the plugins the languages supported are hardcoded, so we cannot use them as-is.
   ckan-paster --plugin=ckan config-tool "$CONFIG" -s app:main -e \
     "ckan.plugins = stats text_view image_view recline_view napote_theme" \
     "ckan.views.default_views = transport_service_view image_view text_view recline_view" \
