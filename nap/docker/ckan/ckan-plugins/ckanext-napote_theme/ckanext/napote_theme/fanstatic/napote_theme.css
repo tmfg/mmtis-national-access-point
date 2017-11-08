@@ -519,7 +519,7 @@ body {
 
 /* Change background color to white for every page*/
 div[role=main] {
-    background: white; /* Overwrite .main background color*/
+    background: white; /* Overwrite .main background color */
 }
 
 /* Clean up borders */
@@ -532,7 +532,7 @@ div[role=main] {
     box-shadow: 0 0 0 0px rgba(0,0,0,0.05);
     background-color: #fff;
 }
-/* Clean up organization container background color*/
+/* Clean up organization container background color */
 ul.media-grid {
     background: white;
 }
@@ -576,7 +576,11 @@ ul.media-grid {
     color: #ffffff;
 }
 
-/* When logged in - drowpdown changes*/
+/* When logged in - drowpdown changes */
+/*nav.section.navigation.*/
+nav.navigation.section-right .dropdown-menu {
+    background-color: #2D75B4;
+}
 nav.section.navigation.section-right ul a {
     color: #ffffff;
 }
