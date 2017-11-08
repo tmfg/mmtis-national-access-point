@@ -11,7 +11,9 @@
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]
             [goog.object :as gobj]
-            cljsjs.leaflet))
+            cljsjs.leaflet
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
 (set! *warn-on-infer* true)
 
@@ -148,19 +150,25 @@
                         :dataSource (completions (:completions place-search))
                         :on-update-input #(e! (ps/->SetPlaceName %))
                         :search-text (or (:name place-search) "")
-                        :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]
-      ]
+                        :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]]
     [:div.col-xs-12.col-md-8
      [places-map e! results]]]))
 
 (defn place-search-form-group [e! label name]
-  (form/group
-   {:label label
-    :columns 3}
-   {:type :component
-    :name name
-    :component (fn [{data :data}]
-                 [place-search e! (:place-search data)])}))
+  (let [empty-places? (comp empty? :results :place-search)]
+    (form/group
+     {:label label
+      :columns 3}
+     {:type :component
+      :name name
+      :required? true
+      :is-empty? empty-places?
+      :component (fn [{data :data}]
+                   [:span
+                    (when (empty-places? data)
+                      [:div (stylefy/use-style style-base/required-element)
+                       (tr [:common-texts :required-field])])
+                    [place-search e! (:place-search data)]])})))
 
 
 (defn place-marker [e! coordinates]
