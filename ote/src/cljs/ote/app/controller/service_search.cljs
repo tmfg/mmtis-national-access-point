@@ -2,7 +2,8 @@
   "Service search controller"
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
-            [ote.db.transport-service :as t-service]))
+            [ote.db.transport-service :as t-service]
+            [clojure.string :as str]))
 
 
 (defrecord UpdateSearchFilters [filters])
@@ -11,8 +12,17 @@
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
 
-(defn- search-params [filters]
-  {:foo "fixme"})
+(defn- search-params [{oa ::t-service/operation-area
+                       text :text-search
+                       st ::t-service/sub-type
+                       :as filters}]
+  (merge
+   (when-not (empty? oa)
+     {:operation_area (str/join "," (map :text oa))})
+   (when text
+     {:text text})
+   (when-not (empty? st)
+     {:sub_types (str/join "," (map (comp name :sub-type) st))})))
 
 (defn- search [{service-search :service-search :as app}]
   (let [on-success (tuck/send-async! ->SearchResponse)]
@@ -27,7 +37,7 @@
                   #(comm/get! "service-search"
                               {:params (search-params (:filters service-search))
                                :on-success on-success})
-                  100))))
+                  500))))
 
 (extend-protocol tuck/Event
 
@@ -35,21 +45,14 @@
   (process-event [_ app]
     (comm/get! "service-search/facets"
                {:on-success (tuck/send-async! ->FacetsResponse)})
-    app
-    #_(update app :service-search merge
-            ;; FIXME: fetch from server
-            {:facets
-             {::t-service/operation-area
-              [{:name "Oulu (5)" :value "Oulu"}
-               {:name "Helsinki (12)" :value "Helsinki"}]
-              ::t-service/type
-              [{:name "Henkilöstön kuljetus (69)" :value :passenger-transportation}
-               ]}
-             }))
+    app)
 
   FacetsResponse
   (process-event [{facets :facets} app]
-    (assoc-in app [:service-search :facets] facets))
+    (update app :service-search assoc
+            :facets facets
+            :filters {::t-service/operation-area []
+                      ::t-service/sub-type []}))
 
   UpdateSearchFilters
   (process-event [{filters :filters} app]
