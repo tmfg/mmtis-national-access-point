@@ -389,5 +389,8 @@
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
   :text-search "Haku"
-  :text-search-placeholder "Hae nimellä tai sen osalla"}
+  :text-search-placeholder "Hae nimellä tai sen osalla"
+  :no-results "Hae palveluita syöttämällä hakuehdot yllä"
+  :one-result "Hakuehdoilla löytyi yksi palvelu"
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]}
  }
