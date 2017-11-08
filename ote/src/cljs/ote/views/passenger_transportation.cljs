@@ -105,35 +105,44 @@
     :delete?      true}))
 
 (defn service-hours-group [e!]
-  (form/group
-   {:label (tr [:passenger-transportation-page :header-service-hours])
-    :columns 3
-    :actions [buttons/save
-              {:style (stylefy/use-style style-base/base-button)
-               :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-               :label (tr [:buttons :add-add-new-row])
-               :disabled false
-               :on-click #(e! (ts/->AddServiceHourRow))}]}
+  (let [tr* (tr-key [:field-labels :service-exception])]
+    (form/group
+     {:label (tr [:passenger-transportation-page :header-service-hours])
+      :columns 3}
 
-   {:name         ::t-service/service-hours
-    :type         :table
-    :table-fields [{:name ::t-service/week-days
-                    :type :multiselect-selection
-                    :options t-service/days
-                    :show-option (tr-key [:enums ::t-service/day :full])
-                    :show-option-short (tr-key [:enums ::t-service/day :short])}
-                   {:name ::t-service/from
-                    :type :time-picker
-                    :cancel-label (tr [:buttons :cancel])
-                    :ok-label (tr [:buttons :save])
-                    :default-time {:hours "08" :minutes "00"}
-                    }
-                   {:name ::t-service/to
-                    :type :time-picker
-                    :cancel-label (tr [:buttons :cancel])
-                    :ok-label (tr [:buttons :save])
-                    :default-time {:hours "19" :minutes "00"}}]
-    :delete?      true}))
+     {:name         ::t-service/service-hours
+      :type         :table
+      :table-fields [{:name ::t-service/week-days
+                      :type :multiselect-selection
+                      :options t-service/days
+                      :show-option (tr-key [:enums ::t-service/day :full])
+                      :show-option-short (tr-key [:enums ::t-service/day :short])}
+                     {:name ::t-service/from
+                      :type :time-picker
+                      :cancel-label (tr [:buttons :cancel])
+                      :ok-label (tr [:buttons :save])
+                      :default-time {:hours "08" :minutes "00"}}
+                     {:name ::t-service/to
+                      :type :time-picker
+                      :cancel-label (tr [:buttons :cancel])
+                      :ok-label (tr [:buttons :save])
+                      :default-time {:hours "19" :minutes "00"}}]
+      :delete?      true
+      :add-label (tr [:buttons :add-new-service-hour])}
+
+     {:name ::t-service/service-exceptions
+      :type :table
+      :table-fields [{:name ::t-service/description
+                      :label (tr* :description)
+                      :type :localized-text}
+                     {:name ::t-service/from-date
+                      :type :date-picker
+                      :label (tr* :from-date)}
+                     {:name ::t-service/to-date
+                      :type :date-picker
+                      :label (tr* :to-date)}]
+      :delete? true
+      :add-label (tr [:buttons :add-new-service-exception])})))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-options (transportation-form-options e!)

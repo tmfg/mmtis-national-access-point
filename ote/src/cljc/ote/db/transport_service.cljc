@@ -38,6 +38,7 @@
   ["localized_text" ::localized_text]
   ["service_link" ::service_link]
   ["service_hours" ::service_hours]
+  ["service_exception" ::service_exception]
   ["price_class" ::price_class]
   ["terminal_information" ::terminal_information]
   ["passenger_transportation_info" ::passenger_transportation_info]
