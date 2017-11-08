@@ -37,13 +37,16 @@ def read_csv(file_path):
 
     return data
 
+
 def log_debug(*args):
     log.info(*args)
+
 
 def tags_to_select_options(tags=None):
     if tags is None:
         tags = []
     return [{'name': tag, 'value': tag} for tag in tags]
+
 
 def get_in(data, *keys):
     try:
@@ -53,9 +56,42 @@ def get_in(data, *keys):
     except (IndexError, KeyError) as e:
         return None
 
+# TODO: This is an example, how to translate our dataset fields. ckan multilingual needs to be added into ckan.plugins for this to work.
+def update_term_translations():
+    return tk.get_action('term_translation_update_many')({'ignore_auth': True}, {
+        'data': [
+            {
+                'term': u'passenger-transportation',
+                'term_translation': u'Henkilöidenkuljetuspalvelut',
+                'lang_code': 'fi'
+            },
+            {
+                'term': 'terminal',
+                'term_translation': u'Asemat, satamat ja muut terminaalit',
+                'lang_code': 'fi'
+            },
+            {
+                'term': 'rentals',
+                'term_translation': u'Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut',
+                'lang_code': 'fi'
+            },
+            {
+                'term': 'parking',
+                'term_translation': u'Yleiset kaupalliset pysäköintipalvelut',
+                'lang_code': 'fi'
+            },
+            {
+                'term': 'brogerake',
+                'term_translation': u'Välityspalvelut',
+                'lang_code': 'fi'
+            }
+        ]})
+
+
 class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultDatasetForm):
     # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
     # Enable after translations have been generated
+    plugins.implements(plugins.IPluginObserver, inherit=True)
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
@@ -68,6 +104,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         return {
             'tags_to_select_options': tags_to_select_options,
             'log_debug': log_debug}
+
+    def after_load(self, service):
+        # update_term_translations()
+        return service
 
     def update_config(self, config):
         # CKAN uses the default Python library mimetypes to detect the media type of afile.
@@ -113,12 +153,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     def dataset_facets(self, facets_dict, package_type):
         facets_dict.clear()
 
-        #facets_dict['organization'] = tk._('Organizations')
+        # facets_dict['organization'] = tk._('Organizations')
         facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
-        #facets_dict['extras_operation_area'] = tk._('Operation Area')
-        #facets_dict['tags'] = tk._('Tags')
-        #facets_dict['res_format'] = tk._('Formats')
-        #facets_dict['license_id'] = tk._('Licenses')
+        # facets_dict['extras_operation_area'] = tk._('Operation Area')
+        # facets_dict['tags'] = tk._('Tags')
+        # facets_dict['res_format'] = tk._('Formats')
+        # facets_dict['license_id'] = tk._('Licenses')
 
         return facets_dict
 
@@ -126,10 +166,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         facets_dict.clear()
 
         facets_dict['extras_transport_service_type'] = tk._('Transport Service Type')
-        #facets_dict['extras_operation_area'] = tk._('Operation Area')
-        #facets_dict['tags'] = tk._('Tags')
-        #facets_dict['res_format'] = tk._('Formats')
-        #facets_dict['license_id'] = tk._('Licenses')
+        # facets_dict['extras_operation_area'] = tk._('Operation Area')
+        # facets_dict['tags'] = tk._('Tags')
+        # facets_dict['res_format'] = tk._('Formats')
+        # facets_dict['license_id'] = tk._('Licenses')
 
         return facets_dict
 
@@ -183,7 +223,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     def package_types(self):
         return []
 
-
     # Methods for IResourceView
 
     def info(self):
@@ -195,8 +234,8 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         return data_dict['resource']['format'] == 'GeoJSON'
 
     def setup_template_variables(self, context, data_dict):
-        #log_debug('setup_template_variables, ctx:\n %s, data:\n %s', pprint.pformat(context), pprint.pformat(data_dict))
-        url = get_in(data_dict, 'resource', 'url') or get_in(data_dict, 'package','resources',0,'url')
+        # log_debug('setup_template_variables, ctx:\n %s, data:\n %s', pprint.pformat(context), pprint.pformat(data_dict))
+        url = get_in(data_dict, 'resource', 'url') or get_in(data_dict, 'package', 'resources', 0, 'url')
         return {'transport_service_url': url}
 
     def view_template(self, context, data_dict):
