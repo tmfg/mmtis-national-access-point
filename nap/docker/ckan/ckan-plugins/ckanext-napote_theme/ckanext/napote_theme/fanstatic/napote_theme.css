@@ -517,6 +517,26 @@ body {
     font-weight: normal;
 }
 
+/* Change background color to white for every page*/
+div[role=main] {
+    background: white; /* Overwrite .main background color*/
+}
+
+/* Clean up borders */
+#content.container .wrapper {
+    background-color: black;
+    border: 1px solid #cccccc;
+    border-radius: 0px;
+    -webkit-box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 0px rgba(0,0,0,0.05);
+    background-color: #fff;
+}
+/* Clean up organization container background color*/
+ul.media-grid {
+    background: white;
+}
+
 /** HEADER **/
 
 .masthead {
@@ -527,7 +547,7 @@ body {
     background: rgba(0, 0, 0, .3);
 }
 
-.masthead .navigation .nav-pills li a:hover {
+.masthead .navigation .nav-pills li a:hover, nav.section.navigation.section-right ul a:hover  {
     background: rgba(0, 0, 0, .1);
 }
 
@@ -537,7 +557,6 @@ body {
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
     color: white;
-    padding-top: 0;
 }
 
 .navbar-form .select2-container {
@@ -557,6 +576,36 @@ body {
     color: #ffffff;
 }
 
+/* When logged in - drowpdown changes*/
+nav.section.navigation.section-right ul a {
+    color: #ffffff;
+}
+
+
+/* Header collapsible button */
+.container  button.collapsible-btn  {
+    background-color: #2D75B4;
+    border-color: #2D75B4;
+}
+.container  button.collapsible-btn:focus  {
+    background-color: #2D75B4;
+    border-color: #2D75B4;
+}
+.container  button.collapsible-btn:hover  {
+    background-color: #2D75B4;
+}
+
+
+
+
+form.navbar-form {
+    border: 0px;
+}
+nav.section.navigation.section-right > form {
+    border: 0px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
 /** HOME **/
 
 .homepage .hero {
@@ -702,4 +751,11 @@ body {
 
 .btn.btn--transparent {
     background: transparent;
+}
+
+/**
+Organization data
+**/
+.organization-info div {
+    margin-bottom: 4px;
 }
