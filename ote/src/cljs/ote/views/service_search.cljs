@@ -8,15 +8,32 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.form :as form]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.app.controller.service-search :as ss]))
+            [ote.app.controller.service-search :as ss]
+            [ote.style.base :as style-base]
+            [stylefy.core :as stylefy]))
 
 
 (defn results-listing [e! results]
-  [ui/grid-list
-   (doall
-    (for [{::t-service/keys [id name] :as service} results]
-      [ui/grid-tile {:key id}
-       [:div "resultti on " (pr-str service)]]))])
+  (let [sub-type-tr (tr-key [:enums ::t-service/sub-type]
+                            [:enums ::t-service/type])
+        result-count (count results)]
+    [:div.col-xs-12.col-md-12.col-lg-12
+     [:h2 (stylefy/use-style style-base/large-title)
+      (tr [:service-search (if (> result-count 1)
+                             :many-results
+                             :one-result)]
+          {:count result-count})]
+     (doall
+      (for [{::t-service/keys [id name sub-type] :as service} results]
+        ^{:key id}
+        [ui/card {:z-depth 1}
+         [ui/card-header {:title name :style style-base/title
+                          :subtitle (sub-type-tr sub-type)}]
+         [ui/card-text
+          [:div "resultti on " (pr-str service)]]
+         [ui/card-actions
+          (r/as-element
+           [ui/flat-button {:primary true} "Avaa rajapinta"])]]))]))
 
 (defn filters-form [e! {filters :filters
                         facets :facets
@@ -58,6 +75,7 @@
            :as service-search}]
     [:div.service-search
      [filters-form e! service-search]
+     [ui/divider]
      (if (empty? results)
-       [:div "tee vähän hakuja"]
+       [:div (tr [:service-search :no-results])]
        [results-listing e! results])]))
