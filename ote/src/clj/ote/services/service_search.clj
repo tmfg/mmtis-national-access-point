@@ -25,27 +25,32 @@
 
 ;; FIXME: define better result set
 (def search-result-columns
-  #{:ote.db.transport-service/contact-email
-    :ote.db.transport-service/sub-type
-    :ote.db.transport-service/parking
+  #{::t-service/contact-email
+    ::t-service/sub-type
+    ::t-service/parking
     :ote.db.modification/modified-by
-    :ote.db.transport-service/ckan-resource-id
-    :ote.db.transport-service/brokerage
-    :ote.db.transport-service/id
+    ::t-service/ckan-resource-id
+    ::t-service/brokerage
+    ::t-service/id
     :ote.db.modification/created
-    :ote.db.transport-service/contact-gsm
-    :ote.db.transport-service/ckan-dataset-id
-    :ote.db.transport-service/terminal
-    :ote.db.transport-service/contact-address
-    :ote.db.transport-service/rental
+    ::t-service/contact-gsm
+    ::t-service/ckan-dataset-id
+    ::t-service/terminal
+    ::t-service/contact-address
+    ::t-service/rental
     :ote.db.modification/modified
     :ote.db.modification/created-by
-    :ote.db.transport-service/homepage
-    :ote.db.transport-service/name
-    :ote.db.transport-service/type
-    :ote.db.transport-service/transport-operator-id ;; FIXME: join operator
-    :ote.db.transport-service/contact-phone
-    :ote.db.transport-service/passenger-transportation})
+    ::t-service/homepage
+    ::t-service/name
+    ::t-service/type
+    ::t-service/transport-operator-id ;; FIXME: join operator
+    ::t-service/contact-phone
+    ::t-service/passenger-transportation
+
+    ;; Information JOINed from other tables
+    ::t-service/operation-area-description
+    ::t-service/external-interface-links
+    ::t-service/operator-name})
 
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
@@ -80,7 +85,7 @@
                            [(operation-area-ids db (:operation-area filters))
                             (sub-type-ids db (:sub-type filters))
                             (text-search-ids db (:text filters))]))]
-    (specql/fetch db ::t-service/transport-service
+    (specql/fetch db ::t-service/transport-service-search-result
                   search-result-columns
                   {::t-service/id (op/in ids)})))
 
