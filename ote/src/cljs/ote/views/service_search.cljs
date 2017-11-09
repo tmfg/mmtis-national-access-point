@@ -79,8 +79,8 @@
               :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
              (str name " GeoJSON")]
             (doall
-             (for [{::t-service/keys [url description format
-                                      ckan-resource-id]} external-interface-links]
+             (for [{::t-service/keys [external-interface format ckan-resource-id]} external-interface-links
+                   :let [description (::t-service/description external-interface)]]
                [ui/flat-button
                 {:style {:margin-left "1em"}
                  :primary true
