@@ -6,6 +6,17 @@ CREATE TABLE "operation-area-facet" (
 CREATE INDEX operation_area_id_idx ON "operation-area-facet" ("transport-service-id");
 CREATE INDEX operation_area_text_idx ON "operation-area-facet" ("operation-area");
 
+-- insert initial data to facet
+INSERT
+  INTO "operation-area-facet"
+       ("transport-service-id", "operation-area")
+SELECT t.id, oad.text
+  FROM operation_area oa
+  JOIN "transport-service" t ON oa."transport-service-id" = t.id
+  JOIN LATERAL unnest(oa.description) AS oad ON TRUE
+ WHERE t."published?" = true;
+
+-- Create trigger function to update facet when service changes
 CREATE FUNCTION transport_service_operation_area_array () RETURNS TRIGGER AS $$
 BEGIN
 
@@ -29,14 +40,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
+-- Create trigger to update operation area at the end of transaction
 CREATE CONSTRAINT TRIGGER tg_transport_service_operation_area_array
 AFTER INSERT OR UPDATE
 ON "transport-service"
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE PROCEDURE transport_service_operation_area_array();
-
 
 --- Create index for subtype (also used as a search facet)
 CREATE INDEX transport_service_subtype_idx
