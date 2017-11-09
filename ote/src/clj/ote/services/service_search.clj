@@ -23,27 +23,22 @@
 
 
 
-;; FIXME: define better result set
 (def search-result-columns
   #{::t-service/contact-email
     ::t-service/sub-type
     ::t-service/parking
-    :ote.db.modification/modified-by
     ::t-service/ckan-resource-id
     ::t-service/brokerage
     ::t-service/id
-    :ote.db.modification/created
     ::t-service/contact-gsm
     ::t-service/ckan-dataset-id
     ::t-service/terminal
     ::t-service/contact-address
     ::t-service/rental
-    :ote.db.modification/modified
-    :ote.db.modification/created-by
     ::t-service/homepage
     ::t-service/name
     ::t-service/type
-    ::t-service/transport-operator-id ;; FIXME: join operator
+    ::t-service/transport-operator-id
     ::t-service/contact-phone
     ::t-service/passenger-transportation
 
