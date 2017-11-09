@@ -390,7 +390,10 @@
   :filters-label "Hakuehdot"
   :text-search "Haku"
   :text-search-placeholder "Hae nimellä tai sen osalla"
-  :no-results "Hae palveluita syöttämällä hakuehdot yllä"
+  :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+  :no-results "Hakuehdoilla ei löytynyt palveluita"
   :one-result "Hakuehdoilla löytyi yksi palvelu"
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]}
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :interfaces "Rajapinnat: "}
+
  }
