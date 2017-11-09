@@ -34,7 +34,7 @@
 
      [
       (form/group
-        {:label   "Kelpoiusuus"
+        {:label   "Kelpoisuus"
          :columns 1}
         {:name        ::transport-service/:eligibility-requirements
          :type        :localized-text
