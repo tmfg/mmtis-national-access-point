@@ -67,7 +67,7 @@
 
   OpenInterfaceInCKAN
   (process-event [{:keys [operator-id service-id ckan-resource-id]} app]
-    (let [url (str "dataset/org-" operator-id "-service-" service-id "/resource/" ckan-resource-id)
+    (let [url (str "/dataset/org-" operator-id "-service-" service-id "/resource/" ckan-resource-id)
           location (.-location js/window)]
       (set! (.-pathname location) url)
       (set! (.-hash location) "")
