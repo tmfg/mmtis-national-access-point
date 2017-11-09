@@ -189,7 +189,8 @@
         (http/transit-response (get-transport-service db (Long/parseLong id))))
 
    (POST "/transport-operator/group" {user :user}
-         (ensure-transport-operator-for-group db (-> user :groups first)))
+     (http/transit-response
+       (ensure-transport-operator-for-group db (-> user :groups first))))
 
    (POST "/transport-operator/data" {user :user}
          (http/transit-response

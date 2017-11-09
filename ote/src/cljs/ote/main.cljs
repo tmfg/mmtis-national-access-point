@@ -10,7 +10,7 @@
             [tuck.core :as tuck]
             [ote.app.state :as state]
             [ote.views.main :as main]
-            [ote.views.ckan_service_viewer :as ckan-service-viewer]
+            [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.views.ckan-org-viewer :as ckan-org-viewer]
             [ote.views.ckan-org-editor :as ckan-org-edit]
             [ote.localization :as localization]
