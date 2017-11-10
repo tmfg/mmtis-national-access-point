@@ -29,3 +29,17 @@
 (defonce viewer (r/atom {:loading? true
                          :url nil
                          :geojson nil}))
+
+
+(defn windowresize-handler
+  "When window size changes set width and height to app state"
+  [event]
+  (let [w (.-innerWidth js/window)
+        h (.-innerHeight js/window)]
+    (.log js/console "resize")
+    (do
+      (swap! app assoc :width w)
+      (swap! app assoc :height h)
+      )))
+
+(.addEventListener js/window "resize" windowresize-handler)

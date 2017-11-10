@@ -25,6 +25,7 @@
      (reset! localization/selected-language lang)
      (stylefy/init)
      (routes/start!)
+     (state/windowresize-handler nil) ;; Calculate window width
      (r/render-component [tuck/tuck state/app main/ote-application]
                          (.getElementById js/document "oteapp")))))
 
