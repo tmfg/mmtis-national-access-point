@@ -31,10 +31,57 @@
 (defn- format-address [{::common/keys [street postal_code post_office]}]
   (str street ", " postal_code " " post_office))
 
-(defn results-listing [e! results]
+(defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
+                                                       transport-operator-id ckan-resource-id]}]
+  [:div
+   (tr [:service-search :interfaces])
+   [ui/flat-button
+    {:style {:margin-left "1em"}
+     :primary true
+     :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
+    (str name " GeoJSON")]
+   (doall
+    (for [{::t-service/keys [external-interface format ckan-resource-id]} external-interface-links
+          :let [description (::t-service/description external-interface)]]
+      [ui/flat-button
+       {:style {:margin-left "1em"}
+        :primary true
+        :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
+       (str (t-service/localized-text-for "FI" description)
+            " (" format ")")]))])
+
+(defn- result-card [e! {::t-service/keys [id name sub-type contact-address
+                                          operation-area-description contact-phone contact-email
+                                          operator-name] :as service}]
+
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type]
-                            [:enums ::t-service/type])
-        result-count (count results)]
+                            [:enums ::t-service/type])]
+    [ui/card {:z-depth 1}
+     [ui/card-header {:title name :style style-base/title
+                      :subtitle (sub-type-tr sub-type)}]
+     [ui/card-text
+      [data-items
+
+       [ic/action-home]
+       (format-address contact-address)
+
+       [ic/maps-map]
+       (str/join ", " operation-area-description)
+
+       [ic/communication-phone]
+       contact-phone
+
+       [ic/communication-email]
+       contact-email
+
+       [ic/communication-business]
+       operator-name]]
+     [ui/card-actions
+      (r/as-element
+       [external-interface-links e! service])]]))
+
+(defn results-listing [e! results]
+  (let [result-count (count results)]
     [:div.col-xs-12.col-md-12.col-lg-12
      [:h2 (stylefy/use-style style-base/large-title)
       (tr [:service-search (case result-count
@@ -43,50 +90,9 @@
                              :many-results)]
           {:count result-count})]
      (doall
-      (for [{::t-service/keys [id name sub-type contact-address operation-area-description
-                               contact-phone contact-email external-interface-links operator-name
-                               transport-operator-id ckan-resource-id]
-             :as service}
-            results]
-        ^{:key id}
-        [ui/card {:z-depth 1}
-         [ui/card-header {:title name :style style-base/title
-                          :subtitle (sub-type-tr sub-type)}]
-         [ui/card-text
-          [data-items
-
-           [ic/action-home]
-           (format-address contact-address)
-
-           [ic/maps-map]
-           (str/join ", " operation-area-description)
-
-           [ic/communication-phone]
-           contact-phone
-
-           [ic/communication-email]
-           contact-email
-
-           [ic/communication-business]
-           operator-name]]
-         [ui/card-actions
-          (r/as-element
-           [:div
-            (tr [:service-search :interfaces])
-            [ui/flat-button
-             {:style {:margin-left "1em"}
-              :primary true
-              :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
-             (str name " GeoJSON")]
-            (doall
-             (for [{::t-service/keys [external-interface format ckan-resource-id]} external-interface-links
-                   :let [description (::t-service/description external-interface)]]
-               [ui/flat-button
-                {:style {:margin-left "1em"}
-                 :primary true
-                 :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
-                (str (t-service/localized-text-for "FI" description)
-                     " (" format ")")]))])]]))]))
+      (for [result results]
+        ^{:key (::t-service/id result)}
+        [result-card e! result]))]))
 
 (defn filters-form [e! {filters :filters
                         facets :facets
