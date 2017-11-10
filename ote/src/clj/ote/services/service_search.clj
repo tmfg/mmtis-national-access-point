@@ -14,7 +14,10 @@
 
 (defqueries "ote/services/service_search.sql")
 
-(defn search-facets [db]
+(defn search-facets
+  "Return facet information for the search page (selections and their counts)
+  using queries defined in `service_search.sql` file."
+  [db]
   {::t-service/operation-area (vec (operation-area-facet db))
    ::t-service/sub-type
    (into []
