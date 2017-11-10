@@ -95,7 +95,8 @@
 
 
   :transport-service
-  {:ote.db.transport-service/name "Palvelun mimi"
+  {:ote.db.transport-service/name "Palvelun nimi"
+   :ote.db.transport-service/type "Liikkumispalvelun tyyppi"
    :ote.db.transport-service/sub-type "Liikkumispavelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
@@ -104,7 +105,11 @@
   ;; Common fields
   :ote.db.common/street                               "Osoite"
   :ote.db.common/post_office                          "Postitoimipaikka"
-  :ote.db.common/postal_code                          "Postinumero"}
+  :ote.db.common/postal_code                          "Postinumero"
+
+
+
+  }
 
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -379,5 +384,16 @@
                    "invoice" "Lasku"
                    }}
 
+
+ :service-search
+ {:label "Liikkumispalvelukatalogi"
+  :filters-label "Hakuehdot"
+  :text-search "Haku"
+  :text-search-placeholder "Hae nimellä tai sen osalla"
+  :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+  :no-results "Hakuehdoilla ei löytynyt palveluita"
+  :one-result "Hakuehdoilla löytyi yksi palvelu"
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :interfaces "Rajapinnat: "}
 
  }

@@ -58,7 +58,11 @@
                                                ::external-interface-description
                                                ::transport-service-id)}]
   ["operation_area" ::operation_area]
-  ["operation_area_geojson" ::operation_area_geojson])
+  ["operation_area_geojson" ::operation_area_geojson]
+
+  ["external_interface_search_result" ::external-interface-search-result]
+  ["transport_service_search_result" ::transport-service-search-result
+   ote.db.modification/modification-fields])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
@@ -100,3 +104,6 @@
     :rentals ::rentals
     :parking ::parking
     :brokerage ::brokerage))
+
+(defn localized-text-for [language localized-text]
+  (some #(when (= (::lang %) language) (::text %)) localized-text))

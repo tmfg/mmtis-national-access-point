@@ -82,7 +82,7 @@
    (tr #?(:clj *language* :cljs @selected-language)
        message-path {}))
   ([message-path parameters]
-   (tr #?(:clj *language* :cljs @selected-language) message-path {}))
+   (tr #?(:clj *language* :cljs @selected-language) message-path parameters))
   ([language message-path parameters]
    (let [language (get @loaded-languages language)]
      (assert language (str "Language " language " has not been loaded."))
