@@ -108,13 +108,11 @@
          :type :string
          :placeholder (tr [:service-search :text-search-placeholder])}
 
-        ;; ekaksi tämä
         {:name ::t-service/operation-area
          :type :multiselect-selection
          :show-option #(str (:text %) " (" (:count %) ")")
          :options (::t-service/operation-area facets)}
 
-        ;; subtypet tässä listassa, jos niitä on
         {:name ::t-service/sub-type
          :type :multiselect-selection
          :show-option #(str (sub-type (:sub-type %)) " (" (:count %) ")")
