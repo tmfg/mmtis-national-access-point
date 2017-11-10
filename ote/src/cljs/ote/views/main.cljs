@@ -19,7 +19,8 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.app.controller.transport-service :as ts]
-            [ote.views.theme :refer [theme]]))
+            [ote.views.theme :refer [theme]]
+            [ote.views.service-search :as service-search]))
 
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
@@ -160,6 +161,7 @@
         :parking [parking/parking e! (:transport-service app)]
         :brokerage [brokerage/brokerage e! (:transport-service app)]
         :edit-service [t-service/edit-service e! app]
+        :services [service-search/service-search e! (:service-search app)]
         [:div "ERROR: no such page " (pr-str (:page app))])
       ]
 
