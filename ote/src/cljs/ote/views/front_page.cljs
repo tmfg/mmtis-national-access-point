@@ -81,7 +81,7 @@
       [:p (tr [:front-page :do-you-want-to-publish-service])]
       ]
      [:div.row {:style {:text-align "center"}}
-     [ui/raised-button {:label    (tr [:buttons :add-hosted-service])
+     [ui/raised-button {:label    (tr [:buttons :link-add-new-api])
                         :on-click #(e! (fp/->ChangePage :transport-service))
                         :primary  true
                         }]]

@@ -41,6 +41,8 @@
                    :primary-text user-name
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
+    [ui/menu-item {:primary-text "Näytä profiili"
+                   :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
     [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-guide])
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
@@ -54,7 +56,7 @@
                   :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
     [ui/menu-item {:primary-text "Kirjaudu ulos"
                    :selected-text-color (color :grey900)
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]])
+                   :on-click (fn [_] (set! (.-location js/document) "/user/_logout"))} ]])
 
 (defn- flash-message [msg]
   [ui/snackbar {:open (boolean msg)
@@ -62,23 +64,74 @@
                 :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
+(defn- top-nav-links [e! app]
+
+  ;(.log js/console " when " (get app :width))
+  [:div
+  [:ul
+   [:li
+    [:a.main-icon {:href     "#"
+                   :on-click (fn [_] (set! (.-location js/document) "/"))}
+     [:img {:src "img/icons/nap-logo.svg"}]]]
+  [:li
+   [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
+                :href     "#"
+                :on-click (fn [_] (set! (.-location js/document) "/"))}
+    (tr [:common-texts :navigation-front-page])]]
+  [:li
+   [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
+                :href     "#"
+                :on-click (fn [_] (set! (.-location js/document) "/dataset"))}
+    "Palvelukatalogi"]]
+  [:li
+   [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
+                :href     "#"
+                :on-click (fn [_] (set! (.-location js/document) "/organization"))}
+    "Palveluntuottajat"]]
+  [:li
+   [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
+                :href     "#"
+                :on-click #(e! (fp-controller/->ChangePage :own-services))}
+    (tr [:common-texts :navigation-own-service-list])]]
+   ]
+  [:div.user-menu {:class (is-user-menu-active app)}
+   (r/as-element (user-menu e! (get-in app [:user :name])))]
+   ]
+  )
+
+(defn- mobile-top-nav-links [e! app]
+  [:ul
+    [:li
+      [:a.main-icon {:href     "#"
+                     :on-click (fn [_] (set! (.-location js/document) "/"))}
+       [:img {:src "img/icons/nap-logo.svg"}]]
+     [:li {:style {:float "right"}}
+      [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService nil))
+                       :style {:padding 8
+                               :width 60
+                               :height 60}
+                       :icon-style {:height 40
+                                    :width 40}}
+       [ic/action-reorder {:style {:color "#fff"
+                                   :width 40
+                                   :height 40
+                                   }}]]]
+     ]]
+
+  )
+
+
 (defn- top-nav [e! app]
   [:div {:class "topnav"}
-   [:a.main-icon {:href "#"
-                  :on-click #(e! (fp-controller/->ChangePage :front-page))}
-    [:img {:src "img/icons/nap-logo.svg" }]]
-   [:a.ote-nav
-    {:class (is-topnav-active :front-page (:page app))
-     :href "#"
-     :on-click #(e! (fp-controller/->ChangePage :front-page))}
-    (tr [:common-texts :navigation-front-page]) ]
-   [:a.ote-nav
-    {:class (is-topnav-active :own-services (:page app))
-     :href "#"
-     :on-click #(e! (fp-controller/->ChangePage :own-services))}
-    (tr [:common-texts :navigation-own-service-list]) ]
-   [:div.user-menu {:class (is-user-menu-active app) }
-    (r/as-element (user-menu e! (get-in app [:user :name])))]])
+   [:div.container-fluid
+
+      (if (< 900 (get app :width))
+        (top-nav-links e! app)
+        (mobile-top-nav-links e! app)
+      )
+    ]])
+
+
 
 (defn ote-application
   "OTE application main view"
@@ -90,12 +143,12 @@
   (fn [e! app]
   [:div {:style (stylefy/use-style style-base/body)}
    [theme
-    [:div.ote-sovellus.container-fluid
+    [:div.ote-sovellus
      (top-nav e! app)
      ;; NOTE: debug state is VERY slow if app state is HUGE
      ;; (it tries to pr-str it)
 
-     [:div
+     [:div.container-fluid
       (case (:page app)
         :front-page [fp/front-page e! app]
         :own-services [fp/own-services e! app]
@@ -114,4 +167,28 @@
 
      (when (= true (get-in app [:ote-service-flags :show-debug]))
        [:div.row
-        [debug/debug app]])]]]))
+        [debug/debug app]])
+
+     [:footer.site-footer
+      [:div.container-fluid
+       [:div.row
+        [:div.col-md-2.footer-links
+          [:a.logo {:href "#" }
+            [:img {:src "/livi_logo_valkoinen.svg" :alt "Liikennevirasto Logo"}]]]
+        [:div.col-md-8.footer-links
+         [:ul.unstyled
+          [:li
+           [:a {:href "https://www.liikennevirasto.fi/"} "Liikennevirasto.fi"]]]]
+        [:div.col-md-2.attribution
+         [:p
+          [:strong "Toteutettu" ]
+          [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"} "CKAN-ohjelmistolla"]]
+
+         ]]]]
+
+     ]]]
+
+
+
+
+    ))

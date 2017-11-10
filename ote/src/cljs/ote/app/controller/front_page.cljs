@@ -8,6 +8,7 @@
 (defrecord ChangePage [given-page])
 (defrecord OpenUserMenu [])
 (defrecord ToggleDebugState [])
+(defrecord Logout [])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -32,6 +33,11 @@
   OpenUserMenu
   (process-event [_ app]
     (assoc-in app [:ote-service-flags :user-menu-open] true) app)
+
+  Logout
+  (process-event [_ app]
+    (assoc-in app [:ote-service-flags :user-menu-open] true)
+    app)
 
   GetTransportOperator
   (process-event [_ app]
