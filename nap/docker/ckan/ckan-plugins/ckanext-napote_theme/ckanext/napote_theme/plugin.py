@@ -9,6 +9,7 @@ import sys
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.plugins import DefaultTranslation
+from routes.mapper import SubMapper
 
 csv.field_size_limit(sys.maxsize)
 
@@ -149,6 +150,13 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         map.redirect('/organization/bulk_process/{id:.*}/', '/error/')
 
         return map
+
+    def after_map(self, map):
+        with SubMapper(map, controller='package') as m:
+            m.connect('search', '/ote/index.html#/services', action='search',
+                      highlight_actions='index search')
+        return map
+
 
     def dataset_facets(self, facets_dict, package_type):
         facets_dict.clear()

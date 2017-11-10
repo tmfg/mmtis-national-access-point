@@ -65,8 +65,6 @@ sync_plugin_changes () {
 watch_plugin_changes () {
   echo "Watching plugin source file changes at: $CKAN_CUSTOM_PLUGINS_PATH ..."
 
-  # Sync first to override possibly outdated plugin on startup
-  sync_plugin_changes $CKAN_CUSTOM_PLUGINS_PATH "$CKAN_HOME/src/"
 
   # Listen file change events
   # Settings: quiiet, monitor, recursive. Excludes events on some editor temp files, such as:  ___jb_*, ~ or .tmp
@@ -133,6 +131,9 @@ set_environment
 
 # Initializes the Database
 #ckan-paster --plugin=ckan db init -c "${CKAN_CONFIG}/ckan.ini"
+
+# Sync first to override possibly outdated plugin on startup
+sync_plugin_changes $CKAN_CUSTOM_PLUGINS_PATH "$CKAN_HOME/src/"
 
 # Start watching custom plugin changes in /ckan-plugins volume
 watch_plugin_changes
