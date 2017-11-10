@@ -8,7 +8,7 @@
 
 (defrecord UpdateSearchFilters [filters])
 (defrecord Search [])
-(defrecord SearchResponse [results])
+(defrecord SearchResponse [response])
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
 (defrecord OpenInterfaceInCKAN [operator-id service-id ckan-resource-id])
@@ -25,20 +25,22 @@
    (when-not (empty? st)
      {:sub_types (str/join "," (map (comp name :sub-type) st))})))
 
-(defn- search [{service-search :service-search :as app}]
-  (let [on-success (tuck/send-async! ->SearchResponse)]
-    ;; Clear old timeout, if any
-    (when-let [search-timeout (:search-timeout service-search)]
-      (.clearTimeout js/window search-timeout))
+(defn- search
+  ([app] (search app 500))
+  ([{service-search :service-search :as app} timeout-ms]
+   (let [on-success (tuck/send-async! ->SearchResponse)]
+     ;; Clear old timeout, if any
+     (when-let [search-timeout (:search-timeout service-search)]
+       (.clearTimeout js/window search-timeout))
 
-    (assoc-in
-     app
-     [:service-search :search-timeout]
-     (.setTimeout js/window
-                  #(comm/get! "service-search"
-                              {:params (search-params (:filters service-search))
-                               :on-success on-success})
-                  500))))
+     (assoc-in
+      app
+      [:service-search :search-timeout]
+      (.setTimeout js/window
+                   #(comm/get! "service-search"
+                               {:params (search-params (:filters service-search))
+                                :on-success on-success})
+                   timeout-ms)))))
 
 (extend-protocol tuck/Event
 
@@ -46,7 +48,8 @@
   (process-event [_ app]
     (comm/get! "service-search/facets"
                {:on-success (tuck/send-async! ->FacetsResponse)})
-    app)
+    ;; Immediately do a search without any parameters
+    (search app 0))
 
   FacetsResponse
   (process-event [{facets :facets} app]
@@ -62,8 +65,11 @@
         search))
 
   SearchResponse
-  (process-event [{results :results} app]
-    (assoc-in app [:service-search :results] results))
+  (process-event [{response :response} app]
+    (let [{:keys [empty-filters? results]} response]
+      (update app :service-search assoc
+              :results results
+              :empty-filters? empty-filters?)))
 
   OpenInterfaceInCKAN
   (process-event [{:keys [operator-id service-id ckan-resource-id]} app]

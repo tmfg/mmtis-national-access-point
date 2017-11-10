@@ -394,6 +394,8 @@
   :no-results "Hakuehdoilla ei löytynyt palveluita"
   :one-result "Hakuehdoilla löytyi yksi palvelu"
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
-  :interfaces "Rajapinnat: "}
+  :interfaces "Rajapinnat: "
+  :showing-latest-services "Näytetään uusimmat palvelut, suodata listaa hakuehdoilla"
+  }
 
  }

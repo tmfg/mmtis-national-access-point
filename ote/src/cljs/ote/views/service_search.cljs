@@ -80,14 +80,17 @@
       (r/as-element
        [external-interface-links e! service])]]))
 
-(defn results-listing [e! results]
+(defn results-listing [e! results empty-filters?]
   (let [result-count (count results)]
     [:div.col-xs-12.col-md-12.col-lg-12
+
      [:h2 (stylefy/use-style style-base/large-title)
-      (tr [:service-search (case result-count
-                             0 :no-results
-                             1 :one-result
-                             :many-results)]
+      (tr [:service-search (if empty-filters?
+                             :showing-latest-services
+                             (case result-count
+                               0 :no-results
+                               1 :one-result
+                               :many-results))]
           {:count result-count})]
      (doall
       (for [result results]
@@ -129,10 +132,11 @@
 (defn service-search [e! _]
   (e! (ss/->InitServiceSearch))
   (fn [e! {results :results
+           empty-filters? :empty-filters?
            :as service-search}]
     [:div.service-search
      [filters-form e! service-search]
      [ui/divider]
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
-       [results-listing e! results])]))
+       [results-listing e! results empty-filters?])]))
