@@ -304,8 +304,12 @@
   :header-nap-official-name                   "Palvelukatalogi"
   :navigation-own-service-list                "Omat palvelutiedot"
   :navigation-front-page                      "Etusivu"
+  :navigation-organizations                   "Palveluntuottajat"
+  :navigation-dataset                         "Palvelukatalogi"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Organisaation perustiedot"
+  :user-menu-log-out                          "Kirjaudu ulos"
+  :user-menu-profile                          "Näytä profiili"
 
   :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
@@ -314,7 +318,12 @@
   :title-operator-basic-details               "Perustiedot"
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
-  :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
+  :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
+  :footer-livi-logo                           "Liikennevirasto Logo"
+  :footer-livi-url                            "Liikennevirasto.fi"
+  :footer-ckan-software                       "CKAN-ohjelmistolla"
+  :footer-made-width                          "Toteutettu"
+
   }
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.

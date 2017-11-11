@@ -76,10 +76,14 @@ html {
     padding: 0;
 }
 
+.topnav-desktop li a {
+    float: left;
+    display: block;
+}
+
 .topnav li a {
   bottom: 0;
-  float: left;
-  display: block;
+
   color: #ffffff;
   text-align: center;
   padding: 10px 15px 0px 15px;
@@ -107,7 +111,7 @@ html {
 /* User menu */
 
 div.user-menu {
-    float: right;
+
     display: inline-block;
 }
 .topnav > div.user-data {

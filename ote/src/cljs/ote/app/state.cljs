@@ -36,10 +36,6 @@
   [event]
   (let [w (.-innerWidth js/window)
         h (.-innerHeight js/window)]
-    (.log js/console "resize")
-    (do
-      (swap! app assoc :width w)
-      (swap! app assoc :height h)
-      )))
+      (swap! app assoc :width w :height h)))
 
 (.addEventListener js/window "resize" windowresize-handler)

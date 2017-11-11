@@ -42,7 +42,7 @@
                    :primary-text user-name
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
-    [ui/menu-item {:primary-text "Näytä profiili"
+    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-profile])
                    :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
     [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-guide])
                    :selected-text-color (color :grey900)
@@ -53,9 +53,7 @@
     [ui/menu-item {:primary-text " Näytä debug state"
                    :selected-text-color (color :grey900)
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
-    [ui/menu-item {:primary-text "Siirry NAP -palveluun"
-                  :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
-    [ui/menu-item {:primary-text "Kirjaudu ulos"
+    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-log-out])
                    :selected-text-color (color :grey900)
                    :on-click (fn [_] (set! (.-location js/document) "/user/_logout"))} ]])
 
@@ -66,48 +64,52 @@
                 :auto-hide-duration 5000}])
 
 (defn- top-nav-links [e! app]
-
-  ;(.log js/console " when " (get app :width))
-  [:div
-  [:ul
-   [:li
-    [:a.main-icon {:href     "#"
-                   :on-click (fn [_] (set! (.-location js/document) "/"))}
-     [:img {:src "img/icons/nap-logo.svg"}]]]
-  [:li
-   [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                :href     "#"
-                :on-click (fn [_] (set! (.-location js/document) "/"))}
-    (tr [:common-texts :navigation-front-page])]]
-  [:li
-   [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                :href     "#"
-                :on-click (fn [_] (set! (.-location js/document) "/dataset"))}
-    "Palvelukatalogi"]]
-  [:li
-   [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                :href     "#"
-                :on-click (fn [_] (set! (.-location js/document) "/organization"))}
-    "Palveluntuottajat"]]
-  [:li
-   [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
-                :href     "#"
-                :on-click #(e! (fp-controller/->ChangePage :own-services))}
-    (tr [:common-texts :navigation-own-service-list])]]
+  [:div {:style {:clear "both"}}
+    [:ul
+     (when (> (:width app) style-base/mobile-width-px)
+     [:li
+      [:a.main-icon {:href     "#"
+                     :on-click (fn [_] (set! (.-location js/document) "/"))}
+       [:img {:src "img/icons/nap-logo.svg"}]]])
+    [:li
+     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
+                  :href     "#"
+                  :on-click (fn [_] (set! (.-location js/document) "/"))}
+      (tr [:common-texts :navigation-front-page])]]
+    [:li
+     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
+                  :href     "#"
+                  :on-click (fn [_] (set! (.-location js/document) "/dataset"))}
+      (tr [:common-texts :navigation-dataset])]]
+    [:li
+     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
+                  :href     "#"
+                  :on-click (fn [_] (set! (.-location js/document) "/organization"))}
+      (tr [:common-texts :navigation-organizations])]]
+    [:li
+     [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
+                  :href     "#"
+                  :on-click #(e! (fp-controller/->ChangePage :own-services))}
+      (tr [:common-texts :navigation-own-service-list])]]
    ]
-  [:div.user-menu {:class (is-user-menu-active app)}
+  [:div.user-menu {:class (is-user-menu-active app)
+                   :style  (when (> (:width app) style-base/mobile-width-px)
+                             {:float "right"})}
    (r/as-element (user-menu e! (get-in app [:user :name])))]
    ]
   )
 
 (defn- mobile-top-nav-links [e! app]
+  [:div
   [:ul
     [:li
-      [:a.main-icon {:href     "#"
+      [:a.main-icon {:style {:float "left"
+                             :display "block"}
+                     :href     "#"
                      :on-click (fn [_] (set! (.-location js/document) "/"))}
-       [:img {:src "img/icons/nap-logo.svg"}]]
+       [:img {:src "img/icons/nap-logo.svg"}]]]
      [:li {:style {:float "right"}}
-      [ui/icon-button {:on-click #(e! (ts/->ModifyTransportService nil))
+      [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
                        :style {:padding 8
                                :width 60
                                :height 60}
@@ -116,21 +118,23 @@
        [ic/action-reorder {:style {:color "#fff"
                                    :width 40
                                    :height 40
-                                   }}]]]
-     ]]
-
-  )
+                                   }}]]]]
+  (when (get-in app [:ote-service-flags :header-open])
+    (top-nav-links e! app)
+    )])
 
 
 (defn- top-nav [e! app]
-  [:div {:class "topnav"}
-   [:div.container-fluid
-
-      (if (< 900 (get app :width))
+  (let [desktop? (> (:width app) style-base/mobile-width-px)
+        nav-classes (if desktop?
+                      "topnav topnav-desktop"
+                      "topnav")]
+    [:div {:class nav-classes}
+     [:div.container-fluid
+      (if desktop?
         (top-nav-links e! app)
         (mobile-top-nav-links e! app)
-      )
-    ]])
+      )]]))
 
 
 
@@ -176,15 +180,15 @@
        [:div.row
         [:div.col-md-2.footer-links
           [:a.logo {:href "#" }
-            [:img {:src "/livi_logo_valkoinen.svg" :alt "Liikennevirasto Logo"}]]]
+            [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
         [:div.col-md-8.footer-links
          [:ul.unstyled
           [:li
-           [:a {:href "https://www.liikennevirasto.fi/"} "Liikennevirasto.fi"]]]]
+           [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]
         [:div.col-md-2.attribution
          [:p
-          [:strong "Toteutettu" ]
-          [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"} "CKAN-ohjelmistolla"]]
+          [:strong (tr [:common-texts :footer-made-width])]
+          [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"} (tr [:common-texts :footer-ckan-software])]]
 
          ]]]]
 
