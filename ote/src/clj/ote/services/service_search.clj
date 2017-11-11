@@ -8,6 +8,8 @@
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
             [ote.db.service-search :as search]
+            [ote.db.common :as common]
+            [ote.db.modification :as modification]
             [specql.op :as op]
             [clojure.set :as set]
             [clojure.string :as str]))
@@ -66,26 +68,41 @@
       (ids ::t-service/id
            (specql/fetch db ::t-service/transport-service
                          #{::t-service/id}
-                         {::t-service/name (op/ilike (str "%" text "%"))})))))
+                         {::t-service/published? true
+                          ::t-service/name (op/ilike (str "%" text "%"))})))))
 
 (defn- sub-type-ids [db types]
   (when-not (empty? types)
     (ids ::t-service/id
          (specql/fetch db ::t-service/transport-service
                        #{::t-service/id}
-                       {::t-service/sub-type (op/in types)}))))
+                       {::t-service/published? true
+                        ::t-service/sub-type (op/in types)}))))
+
+(defn- latest-service-ids [db]
+  (ids ::t-service/id
+       (specql/fetch db ::t-service/transport-service
+                     #{::t-service/id}
+                     {::t-service/published? true}
+                     {::specql/order-by ::modification/created
+                      ::specql/order-direction :desc
+                      ::specql/limit 20})))
 
 (defn- search [db filters]
-  (let [ids (apply set/intersection
-                   (remove nil?
-                           ;; PENDING: we could (should) do this as a single query to INTERSECT all
-                           ;; search facet ids
-                           [(operation-area-ids db (:operation-area filters))
-                            (sub-type-ids db (:sub-type filters))
-                            (text-search-ids db (:text filters))]))]
-    (specql/fetch db ::t-service/transport-service-search-result
-                  search-result-columns
-                  {::t-service/id (op/in ids)})))
+  (let [result-id-sets [(operation-area-ids db (:operation-area filters))
+                        (sub-type-ids db (:sub-type filters))
+                        (text-search-ids db (:text filters))]
+        empty-filters? (every? nil? result-id-sets)
+        ids (if empty-filters?
+              ;; No filters specified, show latest services
+              (latest-service-ids db)
+              ;; Combine with intersection (AND)
+              (apply set/intersection
+                     (remove nil? result-id-sets)))]
+    {:empty-filters? empty-filters?
+     :results (specql/fetch db ::t-service/transport-service-search-result
+                            search-result-columns
+                            {::t-service/id (op/in ids)})}))
 
 (defn- service-search-routes [db]
   (routes
