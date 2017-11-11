@@ -1,13 +1,14 @@
-(ns ote.views.ckan_service_viewer
+(ns ote.views.ckan-service-viewer
   "NAP viewer view. Shows a resource embedded in CKAN resource page.
   Loads GeoJSON data from given URL (proxied by our backend) and
   displays a map and data from the geojson file."
-  (:require [ote.app.controller.viewer :as v]
+  (:require [ote.app.controller.ckan-service-viewer :as v]
             [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-or]]
             [stylefy.core :as stylefy]
             [ote.style.ckan :as style-ckan]
+            [ote.style.base :as style-base]
             [ote.app.controller.transport-service :as ts]
             [ote.ui.buttons :as buttons]
             [cljs-react-material-ui.reagent :as ui]
@@ -149,17 +150,24 @@
 
 (defn viewer [e! _]
   (e! (v/->StartViewer))
-  (fn [e! {:keys [loading? geojson resource] :as app}]
+  (fn [e! {:keys [authorized? logged-in? loading? geojson resource] :as app}]
     (if loading?
 
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
       [theme
         [:div.transport-service-view
-       [:div.row.pull-right
-        [buttons/save {:on-click #(e! (ts/->OpenTransportServicePage (last (clojure.string/split (get app :url) "/"))))
-                       :disabled false}
-         (tr [:buttons :edit-service])]]
+          [:div.row.pull-right
+            (if (and logged-in? authorized?)
+              [:div {:style {
+                             :margin-right "-15px"  ;; Ugly hack to fix our buttons margins
+                             :margin-top "-25px" ;; Ugly hack to fix ckan styles
+                             :padding-bottom "10px"
+                             }}
+                [buttons/save {:on-click #(e! (ts/->OpenTransportServicePage (last (clojure.string/split (get app :url) "/"))))
+                             :disabled false
+                             :primary  true}
+                (tr [:buttons :edit-service])]])]
 
          [operation-area e! app]
        [show-features resource]]])))

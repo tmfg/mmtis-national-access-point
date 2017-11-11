@@ -13,6 +13,7 @@
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
+(defrecord TransportOperatorFailed [response])
 
 (defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
@@ -47,12 +48,20 @@
 
   GetTransportOperator
   (process-event [_ app]
-      (comm/post! "transport-operator/group" {} {:on-success (tuck/send-async! ->TransportOperatorResponse)})
+      (comm/post! "transport-operator/group" {} {:on-success (tuck/send-async! ->TransportOperatorResponse)
+                                                 :on-failure (tuck/send-async! ->TransportOperatorFailed)})
       app)
 
   TransportOperatorResponse
   (process-event [{response :response} app]
     (assoc app :transport-operator response))
+
+  TransportOperatorFailed
+  (process-event [{response :response} app]
+    ;; FIXME: figure out what the error is and add it to app state
+    ;; e.g. unauhtorized should shown unauthorized page and ask user to log in.
+    (.log js/console " Error: " (clj->js response))
+    app)
 
   GetTransportOperatorData
   (process-event [_ app]
