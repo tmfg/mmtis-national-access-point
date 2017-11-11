@@ -30,32 +30,34 @@
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
     "active"))
 
- (defn user-menu [e! user-name]
+ (defn user-menu [e! name username]
    [ui/select-field
-    {:value 0 ;; Force user-name to be selected at all times
-     :label-style {:color "#f2f2f2"}
+    {:label-style {:color "#FFFFFF"}
+     :list-style {:background-color "#2D75B4"}
      :on-click #(e! (fp-controller/->OpenUserMenu))
      :anchor-origin {:horizontal "right" :vertical "bottom"}
      :target-origin {:horizontal "right" :vertical "top"}
      }
-    [ui/menu-item {:value 0 ;; First and only element that can be selected in this select field
-                   :primary-text user-name
-                   :selected-text-color (color :grey900)
+
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-profile])
+                   :on-click #(e! (fp-controller/->GoToUrl (str "/user/edit/" username)))}]
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-service-guide])
                    :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
-    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-profile])
-                   :on-click (fn [_] (set! (.-location js/document) "/"))} ] ;; TODO: Fixme
-    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-guide])
-                   :selected-text-color (color :grey900)
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
-    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-service-operator])
-                   :selected-text-color (color :grey900)
-                   :on-click #(e! (fp-controller/->ChangePage :transport-operator))} ]
-    [ui/menu-item {:primary-text " Näytä debug state"
-                   :selected-text-color (color :grey900)
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-service-operator])
+                   :on-click #(e! (fp-controller/->ChangePage :transport-operator))}]
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text " Näytä debug state"
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
-    [ui/menu-item {:primary-text (tr [:common-texts :user-menu-log-out])
-                   :selected-text-color (color :grey900)
-                   :on-click (fn [_] (set! (.-location js/document) "/user/_logout"))} ]])
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-log-out])
+                   :on-click #(e! (fp-controller/->GoToUrl "/user/_logout"))} ]
+   [ui/menu-item {:primary-text name ;; This is here so the user name is appearing in the header
+                  :style {:color "#FFFFFF"}
+                  :on-click #(e! (fp-controller/->GoToUrl (str "/user/edit/" username))) }]
+                  ])
 
 (defn- flash-message [msg]
   [ui/snackbar {:open (boolean msg)
@@ -95,7 +97,7 @@
   [:div.user-menu {:class (is-user-menu-active app)
                    :style  (when (> (:width app) style-base/mobile-width-px)
                              {:float "right"})}
-   (r/as-element (user-menu e! (get-in app [:user :name])))]
+   (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
    ]
   )
 

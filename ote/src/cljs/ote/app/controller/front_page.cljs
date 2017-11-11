@@ -6,6 +6,7 @@
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
+(defrecord GoToUrl [url])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
 (defrecord ToggleDebugState [])
@@ -24,6 +25,11 @@
   (process-event [{given-page :given-page} app]
     (routes/navigate! given-page)
     (assoc app :page given-page))
+
+  GoToUrl
+  (process-event [{url :url} app]
+    (set! (.-location js/document) url )
+    app)
 
   ToggleDebugState
   (process-event [_ app]
