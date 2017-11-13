@@ -74,51 +74,6 @@ html {
     bottom: 0px;*/
 }
 
-/* Testing nav bar*/
-
-.topnav {
-  overflow: hidden;
-  background-color: #2D75B4;
-}
-
-.topnav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.topnav-desktop li a {
-    float: left;
-    display: block;
-}
-
-.topnav li a {
-  bottom: 0;
-  color: #ffffff;
-  text-align: center;
-  padding: 10px 15px 0px 15px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 38px;
-  cursor: pointer;
-}
-
-.topnav li a.main-icon  {
-    padding: 10px 15px 0px 0px;
-}
-
-.topnav a.ote-nav:hover {
-  border-bottom: 4px solid #1976D2;
-}
-
-.topnav a.active {
-    border-bottom: 4px solid #1976D2;
-}
-.main-icon a:hover {
-    border-bottom: 0px solid #1976D2;
-}
-
 /* User menu */
 
 div.user-menu {

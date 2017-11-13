@@ -244,7 +244,10 @@
       (doall
        (for [{:keys [name label width] :as tf} table-fields]
          ^{:key name}
-         [ui/table-header-column {:style {:width width}} label]))
+         [ui/table-header-column {:style
+                                  {:width width
+                                   :white-space "pre-wrap"}}
+          label]))
       (when delete?
         [ui/table-header-column {:style {:width "70px"}}
          (tr [:buttons :delete])])]]
