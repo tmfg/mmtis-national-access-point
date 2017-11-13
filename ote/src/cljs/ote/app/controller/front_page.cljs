@@ -6,8 +6,11 @@
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
+(defrecord GoToUrl [url])
 (defrecord OpenUserMenu [])
+(defrecord OpenHeader [])
 (defrecord ToggleDebugState [])
+(defrecord Logout [])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -23,6 +26,11 @@
     (routes/navigate! given-page)
     (assoc app :page given-page))
 
+  GoToUrl
+  (process-event [{url :url} app]
+    (set! (.-location js/document) url )
+    app)
+
   ToggleDebugState
   (process-event [_ app]
     (cond
@@ -33,6 +41,16 @@
   OpenUserMenu
   (process-event [_ app]
     (assoc-in app [:ote-service-flags :user-menu-open] true) app)
+
+  OpenHeader
+  (process-event [_ app]
+    (assoc-in app [:ote-service-flags :header-open]
+              (if (get-in app [:ote-service-flags :header-open]) false true)))
+
+  Logout
+  (process-event [_ app]
+    (assoc-in app [:ote-service-flags :user-menu-open] true)
+    app)
 
   GetTransportOperator
   (process-event [_ app]
