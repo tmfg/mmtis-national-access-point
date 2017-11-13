@@ -145,6 +145,29 @@
         (mobile-top-nav-links e! app))]]))
 
 
+(defn- footer []
+  [:footer.site-footer
+   [:div.container-fluid
+    [:div.row
+     [:div.col-md-2.footer-links
+      [:a.logo {:href "#" }
+       [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
+     [:div.col-md-8.footer-links
+      [:ul.unstyled
+       [:li
+        [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]
+     [:div.col-md-2.attribution
+      [:p
+       [:strong (tr [:common-texts :footer-made-width])]
+       [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"}
+        (tr [:common-texts :footer-ckan-software])]]]]]])
+
+(defn- debug-state [app]
+  ;; NOTE: debug state is VERY slow if app state is HUGE
+  ;; (it tries to pr-str it)
+  (when (= true (get-in app [:ote-service-flags :show-debug]))
+    [:div.row
+     [debug/debug app]]))
 
 (defn ote-application
   "OTE application main view"
@@ -158,8 +181,7 @@
    [theme
     [:div.ote-sovellus
      (top-nav e! app)
-     ;; NOTE: debug state is VERY slow if app state is HUGE
-     ;; (it tries to pr-str it)
+
 
      [:div.container-fluid.wrapper
       (case (:page app)
@@ -174,35 +196,8 @@
         :brokerage [brokerage/brokerage e! (:transport-service app)]
         :edit-service [t-service/edit-service e! app]
         :services [service-search/service-search e! (:service-search app)]
-        [:div "ERROR: no such page " (pr-str (:page app))])
-      ]
+        [:div "ERROR: no such page " (pr-str (:page app))])]
 
      (when-let [msg (:flash-message app)] [flash-message msg])
-
-     (when (= true (get-in app [:ote-service-flags :show-debug]))
-       [:div.row
-        [debug/debug app]])
-
-     [:footer.site-footer
-      [:div.container-fluid
-       [:div.row
-        [:div.col-md-2.footer-links
-          [:a.logo {:href "#" }
-            [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
-        [:div.col-md-8.footer-links
-         [:ul.unstyled
-          [:li
-           [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]
-        [:div.col-md-2.attribution
-         [:p
-          [:strong (tr [:common-texts :footer-made-width])]
-          [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"} (tr [:common-texts :footer-ckan-software])]]
-
-         ]]]]
-
-     ]]]
-
-
-
-
-    ))
+     [debug-state app]
+     [footer]]]]))
