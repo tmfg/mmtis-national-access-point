@@ -119,7 +119,7 @@
      [:a (merge
           (stylefy/use-style style-topnav/link)
           {:href     "#"
-           :on-click (fn [_] (set! (.-location js/document) "/"))})
+           :on-click #(e! (fp-controller/->GoToUrl "/"))})
        [:img {:src "img/icons/nap-logo.svg"}]]]
      [:li (stylefy/use-style style-topnav/right)
       [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
