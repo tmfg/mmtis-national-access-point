@@ -18,6 +18,7 @@
             [ote.ui.debug :as debug]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
+            [ote.style.topnav :as style-topnav]
             [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]))
@@ -65,52 +66,62 @@
                 :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
-(defn- top-nav-links [e! app]
-  [:div {:style {:clear "both"}}
-    [:ul
-     (when (> (:width app) style-base/mobile-width-px)
-     [:li
-      [:a.main-icon {:href     "#"
-                     :on-click (fn [_] (set! (.-location js/document) "/"))}
-       [:img {:src "img/icons/nap-logo.svg"}]]])
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/"))}
-      (tr [:common-texts :navigation-front-page])]]
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/dataset"))}
-      (tr [:common-texts :navigation-dataset])]]
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/organization"))}
-      (tr [:common-texts :navigation-organizations])]]
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
-                  :href     "#"
-                  :on-click #(e! (fp-controller/->ChangePage :own-services))}
-      (tr [:common-texts :navigation-own-service-list])]]
-   ]
-  [:div.user-menu {:class (is-user-menu-active app)
-                   :style  (when (> (:width app) style-base/mobile-width-px)
-                             {:float "right"})}
-   (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
-   ]
-  )
+(def header-links
+  [{:page :front-page
+    :label [:common-texts :navigation-front-page]
+    :url "/"}
+
+   {:page :services
+    :label [:common-texts :navigation-dataset]}
+
+   {:page :organizations
+    :label [:common-texts :navigation-organizations]
+    :url "/organization"}
+
+   {:page :own-services
+    :label [:common-texts :navigation-own-service-list]}])
+
+(defn- top-nav-links [e! {current-page :page :as app} desktop?]
+  [:div (stylefy/use-style style-topnav/clear)
+   [:ul
+    (when (> (:width app) style-base/mobile-width-px)
+      [:li (stylefy/use-style style-topnav/ul)
+       [:a
+        (merge (stylefy/use-style (if desktop?
+                                    style-topnav/desktop-link
+                                    style-topnav/link))
+               {:href     "#"
+                :on-click (fn [_] (set! (.-location js/document) "/"))})
+        [:img {:src "img/icons/nap-logo.svg"}]]])
+    (doall
+     (for [{:keys [page label url]} header-links]
+       ^{:key page}
+       [:li (stylefy/use-style style-topnav/ul)
+        [:a
+         (merge (stylefy/use-style
+                 (if (= page current-page)
+                   (if desktop? style-topnav/desktop-active style-topnav/active)
+                   (if desktop? style-topnav/desktop-link style-topnav/link)))
+                {:href     "#"
+                 :on-click (if url
+                             #(e! (fp-controller/->GoToUrl url))
+                             #(e! (fp-controller/->ChangePage page)))})
+         (tr label)]]))]
+   [:div.user-menu {:class (is-user-menu-active app)
+                    :style  (when (> (:width app) style-base/mobile-width-px)
+                              {:float "right"})}
+    (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
-  [:ul
-    [:li
-      [:a.main-icon {:style {:float "left"
-                             :display "block"}
-                     :href     "#"
-                     :on-click (fn [_] (set! (.-location js/document) "/"))}
+   [:ul (stylefy/use-style style-topnav/ul)
+    [:li (stylefy/use-style style-topnav/li)
+     [:a (merge
+          (stylefy/use-style style-topnav/link)
+          {:href     "#"
+           :on-click (fn [_] (set! (.-location js/document) "/"))})
        [:img {:src "img/icons/nap-logo.svg"}]]]
-     [:li {:style {:float "right"}}
+     [:li (stylefy/use-style style-topnav/right)
       [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
                        :style {:padding 8
                                :width 60
@@ -122,21 +133,16 @@
                                    :height 40
                                    }}]]]]
   (when (get-in app [:ote-service-flags :header-open])
-    (top-nav-links e! app)
-    )])
+    (top-nav-links e! app false))])
 
 
 (defn- top-nav [e! app]
-  (let [desktop? (> (:width app) style-base/mobile-width-px)
-        nav-classes (if desktop?
-                      "topnav topnav-desktop"
-                      "topnav")]
-    [:div {:class nav-classes}
+  (let [desktop? (> (:width app) style-base/mobile-width-px)]
+    [:div (stylefy/use-style style-topnav/topnav)
      [:div.container-fluid
       (if desktop?
-        (top-nav-links e! app)
-        (mobile-top-nav-links e! app)
-      )]]))
+        (top-nav-links e! app true)
+        (mobile-top-nav-links e! app))]]))
 
 
 
