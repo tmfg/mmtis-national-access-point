@@ -48,7 +48,7 @@
 
 (defn contact-info [operator]
   [:div.row
-   [:div.span12 (stylefy/use-style style-ckan/content-title)  [:h2 (tr [:organization-viewer-page :contact-types])]]                        ;FIXME: Translate
+   [:div.span12 (stylefy/use-style style-ckan/content-title)  [:h2 (tr [:organization-viewer-page :contact-types])]]
 
    (doall
      (map (fn [key]

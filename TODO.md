@@ -15,3 +15,7 @@ Upgrade to 1.0 branch when it is released and remove any ugly workarounds.
 
 #### Responsive header
 Currently listening window resize event. Change to css media query.
+
+#### Refactor OTE - front page
+Currently we do not have a front page in OTE. When we are sure that
+it is not needed, remove all front-page instances away from OTE.

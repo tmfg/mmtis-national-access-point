@@ -44,7 +44,7 @@
                    :on-click #(e! (fp-controller/->GoToUrl (str "/user/edit/" username)))}]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-service-guide])
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
+                   :on-click #(e! (fp-controller/->ChangePage :own-services))} ]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-service-operator])
                    :on-click #(e! (fp-controller/->ChangePage :transport-operator))}]
@@ -73,16 +73,13 @@
       [:a.main-icon {:on-click #(e! (fp-controller/->GoToUrl "/"))}
        [:img {:src "img/icons/nap-logo.svg"}]]])
     [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :on-click #(e! (fp-controller/->GoToUrl "/"))}
+     [:a.ote-nav {:on-click #(e! (fp-controller/->GoToUrl "/"))}
       (tr [:common-texts :navigation-front-page])]]
     [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :on-click #(e! (fp-controller/->GoToUrl "/dataset"))}
+     [:a.ote-nav {:on-click #(e! (fp-controller/->GoToUrl "/dataset"))}
       (tr [:common-texts :navigation-dataset])]]
     [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :on-click #(e! (fp-controller/->GoToUrl "/organization"))}
+     [:a.ote-nav {:on-click #(e! (fp-controller/->GoToUrl "/organization"))}
       (tr [:common-texts :navigation-organizations])]]
     [:li
      [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
