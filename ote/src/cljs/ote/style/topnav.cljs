@@ -36,5 +36,3 @@
 (def desktop-active (merge desktop-link active-style))
 
 (def right {:float "right"})
-
-;(def )
