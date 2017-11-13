@@ -15,29 +15,6 @@ csv.field_size_limit(sys.maxsize)
 
 log = getLogger(__name__)
 
-# TODO: We should get these from the database
-municipalitys = (
-    u'Helsinki', u'Ii', u'Joensuu', u'Kempele', u'Muhos', u'Oulu', u'Pieksämäki', u'Salo', u'Seinäjoki', u'Vantaa')
-transport_services = (u'Terminal', u'Passenger Transportation', u'Rental', u'Parking', u'Brokerage')
-
-
-def read_csv(file_path):
-    file = resource_stream(__name__, file_path)
-
-    # Read the file into a dictionary for each row ({header : value})
-    reader = csv.DictReader(file, delimiter=',')
-    data = {}
-
-    for row in reader:
-        for header, value in row.items():
-            unicodeVal = unicode(value, 'utf-8')
-            try:
-                data[header].append(unicodeVal)
-            except KeyError:
-                data[header] = [unicodeVal]
-
-    return data
-
 
 def log_debug(*args):
     log.info(*args)
@@ -93,12 +70,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
     # Enable after translations have been generated
     plugins.implements(plugins.IPluginObserver, inherit=True)
-    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
-    plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_helpers(self):
@@ -155,6 +132,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
                     controller='ckanext.napote_theme.controller:CustomUserController',
                     action='request_reset')
 
+        map.connect('/user/register',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='register')
+
         return map
 
     def after_map(self, map):
@@ -162,7 +143,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
             m.connect('search', '/ote/index.html#/services', action='search',
                       highlight_actions='index search')
         return map
-
 
     def dataset_facets(self, facets_dict, package_type):
         facets_dict.clear()

@@ -6,12 +6,16 @@ import ckan.lib.base as base
 import ckan.model as model
 import ckan.lib.helpers as h
 import ckan.logic as logic
+import ckan.logic.schema as schema
 import ckan.lib.mailer as mailer
+
 import ckan.lib.navl.dictization_functions as dictization_functions
 
 from ckan.common import _, c, request, response
 
 from ckan.controllers.user import UserController
+
+from validators import email_uniq_validator
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +34,29 @@ unflatten = dictization_functions.unflatten
 
 
 class CustomUserController(UserController):
+    def _new_form_to_db_schema(self):
+        user_new_form_schema = schema.user_new_form_schema()
+
+        # Add custom validators
+        user_new_form_schema['email'].append(email_uniq_validator)
+
+        return user_new_form_schema
+
+    def _db_to_new_form_schema(self):
+        '''This is an interface to manipulate data from the database
+        into a format suitable for the form (optional)'''
+
+    def _edit_form_to_db_schema(self):
+        user_edit_form_schema = schema.user_edit_form_schema()
+
+        # Add custom validators
+        user_edit_form_schema['email'].append(email_uniq_validator)
+
+        return user_edit_form_schema
+
+    def register(self, data=None, errors=None, error_summary=None):
+        return super(CustomUserController, self).register(data, errors, error_summary)
+
     def request_reset(self):
         context = {'model': model, 'session': model.Session, 'user': c.user,
                    'auth_user_obj': c.userobj}
