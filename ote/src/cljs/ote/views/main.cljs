@@ -185,7 +185,7 @@
 
      [:div.container-fluid.wrapper
       (case (:page app)
-        :front-page [fp/front-page e! app]
+        :front-page [fp/own-services e! app]
         :own-services [fp/own-services e! app]
         :transport-service [t-service/select-service-type e! (:transport-service app)]
         :transport-operator [to/operator e! (:transport-operator app)]
