@@ -11,3 +11,7 @@ The 0.19.x branch contains some bugs that need to be worked around.
 Upgrade to 1.0 branch when it is released and remove any ugly workarounds.
 
 * `ote.views.place-search/monkey-patch-chip-backspace`
+
+
+#### Responsive header
+Currently listening window resize event. Change to css media query.

@@ -8,6 +8,7 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.front-page :as fp]
             [ote.app.controller.transport-service :as ts]
+            [ote.views.transport-service :as transport-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
@@ -64,41 +65,7 @@
 
        (transport-services-table-rows e! services transport-operator-id)]]]))
 
-(defn empty-header-for-front-page [e!]
-  [:div
-  [:div.row
-   [:div {:class "col-xs-12"}
-    [:div {:class "main-notification-panel"}
-     [:div {:class "col-xs-1"}
-      [ic/action-info-outline]]
-     [:div {:class "col-xs-11"}
-      [:p (tr [:common-texts :front-page-help-text])]]]]]
 
-
-   [:div.row {:style {:margin-top "50px"}}
-    [:div (stylefy/use-style style-base/front-page-add-service {::stylefy/with-classes ["col-xs-12 col-md-offset-1 col-md-5"]})
-     [:div.row {:style {:height "100px"}}
-      [:p (tr [:front-page :do-you-want-to-publish-service])]
-      ]
-     [:div.row {:style {:text-align "center"}}
-     [ui/raised-button {:label    (tr [:buttons :link-add-new-api])
-                        :on-click #(e! (fp/->ChangePage :transport-service))
-                        :primary  true
-                        }]]
-     [:div (stylefy/use-style style-base/header-font {::stylefy/with-classes ["row"]})
-      (tr [:front-page :header-explain-more])]
-     [:div.row
-      [:p (tr [:front-page :help-more-explanation1])]
-     [:p (tr [:front-page :help-more-explanation2])]
-     ]]
-    [:div {:class "col-xs-12 col-md-6" :style {:padding-left "20px"} }
-     [:div.row {:style {:padding-left "40px" :height "100px"}}
-      [:p (tr [:common-texts :front-page-start-ote-query-header])]
-      ]
-     [:div.row {:style {:text-align "center"}}
-     [ui/raised-button {:label    (tr [:buttons :add-transport-service])
-                        :on-click #(e! (fp/->ChangePage :transport-service))
-                        :primary  true}]]]]])
 
 (defn table-container-for-front-page [e! services status]
   [:div
@@ -125,32 +92,6 @@
         services
         (tr [:titles type])])]]])
 
-(defn front-page [e! app]
-  ;; init
-  (e! (fp/->GetTransportOperatorData))
-
-  (fn [e! {services :transport-services :as app}]
-    [:div
-     [:div.row.col-xs-12
-      [:h2 (str (tr [:front-page :hello]) (get-in app [:user :name]) " !")]]
-     [:diw.row.col-xs-12
-      [:p (tr [:front-page :NAP-service-short-description])]]
-     [:diw.row.col-xs-12
-      [:p [:strong (tr [:common-texts :navigation-own-service-list])]
-       (tr [:front-page :own-services-short-description])]]
-     [:diw.row.col-xs-12
-      [:p (tr [:front-page :right-corner-description])
-       [:strong (tr [:common-texts :user-menu-service-operator])]
-       (tr [:front-page :service-operator-short-description])]]
-
-     [:div.row.col-xs-12 {:style {:text-align "center" :padding-top "40px"}}
-      [:p (tr [:front-page :publish-new-service])]]
-     [:div.row.col-xs-12 {:style {:text-align "center"}}
-      [ui/raised-button {:style {:margin-top "20px"}
-                         :label    (tr [:front-page :move-to-services-page])
-                         :on-click #(e! (fp/->ChangePage :own-services))
-                         :primary  true}]]]))
-
 (defn own-services [e! status]
   ;; init
   (e! (fp/->GetTransportOperatorData))
@@ -159,5 +100,5 @@
     [:div
 
      (if (empty? services)
-       (empty-header-for-front-page e!)
+       [transport-service/select-service-type e! (:transport-service status)] ;; Render service type selection page if no services added
        (table-container-for-front-page e! services status))]))

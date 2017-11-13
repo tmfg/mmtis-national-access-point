@@ -290,6 +290,12 @@
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   }
 
+ :select-service-type-page
+ {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
+  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
+                ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
+                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
+
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
@@ -310,11 +316,6 @@
   :user-menu-service-operator                 "Organisaation perustiedot"
   :user-menu-log-out                          "Kirjaudu ulos"
   :user-menu-profile                          "Näytä profiili"
-
-  :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
-  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
-                ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
   :title-operator-basic-details               "Perustiedot"
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"

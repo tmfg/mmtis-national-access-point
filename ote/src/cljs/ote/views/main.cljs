@@ -70,27 +70,22 @@
     [:ul
      (when (> (:width app) style-base/mobile-width-px)
      [:li
-      [:a.main-icon {:href     "#"
-                     :on-click (fn [_] (set! (.-location js/document) "/"))}
+      [:a.main-icon {:on-click #(e! (fp-controller/->GoToUrl "/"))}
        [:img {:src "img/icons/nap-logo.svg"}]]])
     [:li
      [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/"))}
+                  :on-click #(e! (fp-controller/->GoToUrl "/"))}
       (tr [:common-texts :navigation-front-page])]]
     [:li
      [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/dataset"))}
+                  :on-click #(e! (fp-controller/->GoToUrl "/dataset"))}
       (tr [:common-texts :navigation-dataset])]]
     [:li
      [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/organization"))}
+                  :on-click #(e! (fp-controller/->GoToUrl "/organization"))}
       (tr [:common-texts :navigation-organizations])]]
     [:li
      [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
-                  :href     "#"
                   :on-click #(e! (fp-controller/->ChangePage :own-services))}
       (tr [:common-texts :navigation-own-service-list])]]
    ]
@@ -157,7 +152,7 @@
 
      [:div.container-fluid.wrapper
       (case (:page app)
-        :front-page [fp/front-page e! app]
+        :front-page [fp/own-services e! app]
         :own-services [fp/own-services e! app]
         :transport-service [t-service/select-service-type e! (:transport-service app)]
         :transport-operator [to/operator e! (:transport-operator app)]
