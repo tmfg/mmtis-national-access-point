@@ -91,7 +91,7 @@
                                     style-topnav/desktop-link
                                     style-topnav/link))
                {:href     "#"
-                :on-click (fn [_] (set! (.-location js/document) "/"))})
+                :on-click #(e! (fp-controller/->GoToUrl "/"))})
         [:img {:src "img/icons/nap-logo.svg"}]]])
     (doall
      (for [{:keys [page label url]} header-links]
