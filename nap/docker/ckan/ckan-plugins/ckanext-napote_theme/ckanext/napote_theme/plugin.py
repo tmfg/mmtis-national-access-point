@@ -149,6 +149,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         map.redirect('/group/edit/{id:.*}', '/error/')
         map.redirect('/organization/bulk_process/{id:.*}/', '/error/')
 
+        # Hook user password reset route to our custom user controller
+
+        map.connect('/user/reset',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='request_reset')
+
         return map
 
     def after_map(self, map):
