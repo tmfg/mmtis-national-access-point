@@ -10,11 +10,49 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.plugins import DefaultTranslation
 from routes.mapper import SubMapper
+from ckan.lib import authenticator
+from ckan.model import User
 
 csv.field_size_limit(sys.maxsize)
 
 log = getLogger(__name__)
 
+### FIXME: MONKEY PATCH CKAN AUTHENTICATION START ###
+
+def authenticate_monkeypatch(self, environ, identity):
+    """Using our custom authentication method with Repoze auth
+    This allows us to use email address in login """
+    if not ('login' in identity and 'password' in identity):
+        return None
+
+    login = identity['login']
+
+    # Try login with email
+    users = User.by_email(login)
+
+    # If we get an user list as a result, use the first result. Otherwise, try to
+    # get user by username.
+    if users:
+        # Use the first result only. We'll have to assume that that we have one email per username
+        # in the ckan database. By default, CKAN allows using the same email for multiple users.
+        user = users[0]
+    else:
+        user = User.by_name(login)
+
+    if user is None:
+        log.debug('Login failed - username %r not found', login)
+    elif not user.is_active():
+        log.debug('Login as %r failed - user isn\'t active', login)
+    elif not user.validate_password(identity['password']):
+        log.debug('Login as %r failed - password not valid', login)
+    else:
+        return user.name
+
+    return None
+
+authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkeypatch
+
+### MONKEY PATCH CKAN AUTHENTICATION END ###
 
 def log_debug(*args):
     log.info(*args)
@@ -33,6 +71,7 @@ def get_in(data, *keys):
         return data
     except (IndexError, KeyError) as e:
         return None
+
 
 # TODO: This is an example, how to translate our dataset fields. ckan multilingual needs to be added into ckan.plugins for this to work.
 def update_term_translations():

@@ -75,7 +75,6 @@ class CustomUserController(UserController):
             if users:
                 # Use the first result only. We'll have to assume that that we have one email per username
                 # in the ckan database. By default, CKAN allows using the same email for multiple users.
-                # TODO: Allow only one unique email address per user!
                 id = users[0].name
             else:
                 id = request.params.get('user')
