@@ -21,6 +21,10 @@ echo "Insert Finnish postal codes"
 psql -h napotedb -U napote napote -c "TRUNCATE finnish_postal_codes;" || true
 psql -h napotedb -U napote napote -c "\COPY finnish_postal_codes FROM /static-data/finnish_postal_codes.csv CSV HEADER;" || true
 
+echo "Insert Finnish regions"
+psql -h napotedb -U napote napote -c "TRUNCATE finnish_regions;" || true
+psql -h napotedb -U napote napote -c "\COPY finnish_regions FROM /static-data/maakunnat.csv CSV HEADER;" || true
+
 echo "Clean up and free connections"
 psql -h napotedb -U napote napote -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'napote' AND pid <> pg_backend_pid();"
 
