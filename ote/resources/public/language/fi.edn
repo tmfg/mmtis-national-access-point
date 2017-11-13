@@ -317,6 +317,10 @@
   :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
   }
 
+ :organization-viewer-page
+ {:contact-types  "Yhteystavat"
+  }
+
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.

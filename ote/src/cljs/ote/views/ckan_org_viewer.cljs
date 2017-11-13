@@ -33,7 +33,7 @@
      [:div.span9
       (if address
         (interpose ", " (vals (select-keys address [::common/street, ::common/postal_code, ::common/post_office])))
-        "N/A")])
+        "-")])
 
    [:div.span3 [:b (transform-val :field-labels ::to-definitions/homepage)]]
    [:div.span9 (operator ::to-definitions/homepage " - ")]])
@@ -48,7 +48,7 @@
 
 (defn contact-info [operator]
   [:div.row
-   [:div.span12 (stylefy/use-style style-ckan/content-title)  [:h2 "Yhteystavat"]]                        ;FIXME: Translate
+   [:div.span12 (stylefy/use-style style-ckan/content-title)  [:h2 (tr [:organization-viewer-page :contact-types])]]                        ;FIXME: Translate
 
    (doall
      (map (fn [key]
