@@ -155,7 +155,7 @@
      ;; NOTE: debug state is VERY slow if app state is HUGE
      ;; (it tries to pr-str it)
 
-     [:div.container-fluid
+     [:div.container-fluid.wrapper
       (case (:page app)
         :front-page [fp/front-page e! app]
         :own-services [fp/own-services e! app]
