@@ -87,11 +87,11 @@
                                   :displays-for-visually-impaired :large-print-timetables])
 
 ;; Create order for accessibility-facility
-(def accessibility [:unknown :lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
-                             :pallet-access-low-floor :validator :other])
+(def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
+                             :pallet-access-low-floor :other])
 
 ;; Create order for mobility-facility-facility
-(def mobility [:unknown :low-floor :step-free-access :suitable-for-wheelchairs
+(def mobility [:low-floor :step-free-access :suitable-for-wheelchairs
                :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
                :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
 

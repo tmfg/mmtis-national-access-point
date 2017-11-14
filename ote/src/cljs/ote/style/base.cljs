@@ -35,7 +35,8 @@
 (def required-element { :color "#FF9800"})
 (def error-element { :color "#B71C1C"
                     :font-weight "600"})
-(def long-drowpdown  {:width "350px" })
+(def long-drowpdown {:width "350px" })
+(def extra-long-drowpdown {:width "425px" })
 
 ;; Front page
 

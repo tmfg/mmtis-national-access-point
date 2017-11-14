@@ -62,7 +62,7 @@
     :show-option (tr-key [:enums ::t-service/accessibility])
     :options     t-service/accessibility}
 
-   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
+   {:style style-base/extra-long-drowpdown ;; Pass only style from stylefy base
     :name        ::t-service/mobility
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/mobility])
