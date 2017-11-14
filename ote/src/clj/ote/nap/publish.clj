@@ -38,12 +38,13 @@
 
 (defmulti interface-description ::t-service/type)
 
-(defmethod interface-description :passenger-transportation [ts]
+(defmethod interface-description :default [ts]
   {:ckan/url (str "/ote/export/geojson/"
                   (::t-service/transport-operator-id ts) "/"
                   (::t-service/id ts))
    :ckan/name (str (::t-service/name ts) " GeoJSON")
    :ckan/format "GeoJSON"})
+
 
 (defn- ckan-resource-description
   "Create a CKAN resource description that can be used with the CKAN API to

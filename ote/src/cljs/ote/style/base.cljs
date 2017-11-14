@@ -6,6 +6,8 @@
 (def body {:margin 0
            :padding 0})
 
+(def mobile-width-px 950)
+
 (def font {:font-family "'Roboto', sans-serif"})
 
 (def inline-block {:display "inline-block"})
@@ -33,7 +35,8 @@
 (def required-element { :color "#FF9800"})
 (def error-element { :color "#B71C1C"
                     :font-weight "600"})
-(def long-drowpdown  {:width "350px" })
+(def long-drowpdown {:width "350px" })
+(def extra-long-drowpdown {:width "425px" })
 
 ;; Front page
 
@@ -46,3 +49,23 @@
                   :font-weight "600"})
 
 (def flash-message {:top "100px"})
+
+(def title {:font-weight "bold"})
+
+(def large-title (merge title {:font-size "150%"}))
+
+(defn flex-container [dir]
+  {:display "flex" :flex-direction dir})
+
+(def item-list-container
+  (merge (flex-container "row")
+         {:flex-wrap "wrap"}))
+
+(def item-list-row-margin
+  {:margin-right "1em"})
+
+(def item-list-item
+  (merge inline-block
+         {:position "relative"
+          :margin-left "0.2em"
+          :top "-0.5em"}))

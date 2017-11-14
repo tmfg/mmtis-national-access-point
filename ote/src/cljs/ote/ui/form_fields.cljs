@@ -133,20 +133,26 @@
        options))]))
 
 
-(defmethod field :multiselect-selection [{:keys [update! label name style show-option show-option-short options form? error] :as field} data]
+(defmethod field :multiselect-selection
+  [{:keys [update! label name style show-option show-option-short options form? error auto-width?]
+    :as field}
+   data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field {:style style
-                      :floating-label-text label
-                      :multiple true
-                      :value (clj->js (map option-idx selected-set))
-                      :selection-renderer (fn [values]
-                                            (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
-                      :on-change (fn [event index values]
-                                   (update! (into #{}
-                                                  (map (partial nth options))
-                                                  values)))} ;; Add selected value to vector
+    [ui/select-field
+     {:auto-width (boolean auto-width?)
+      :style style
+      :floating-label-text label
+      :multiple true
+      :value (clj->js (map option-idx selected-set))
+      :selection-renderer (fn [values]
+                            (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
+      :on-change (fn [event index values]
+                   (update! (into #{}
+                                  (map (partial nth options))
+                                  values)))}
+     ;; Add selected value to vector
      (doall
       (map-indexed
        (fn [i option]
@@ -238,7 +244,10 @@
       (doall
        (for [{:keys [name label width] :as tf} table-fields]
          ^{:key name}
-         [ui/table-header-column {:style {:width width}} label]))
+         [ui/table-header-column {:style
+                                  {:width width
+                                   :white-space "pre-wrap"}}
+          label]))
       (when delete?
         [ui/table-header-column {:style {:width "70px"}}
          (tr [:buttons :delete])])]]

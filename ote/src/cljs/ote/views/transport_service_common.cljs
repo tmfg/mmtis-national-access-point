@@ -7,7 +7,8 @@
             [ote.db.common :as common]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
-            [ote.views.place-search :as place-search]))
+            [ote.views.place-search :as place-search]
+            [clojure.string :as str]))
 
 (defn service-url
   "Creates a form group for service url hat creates two form elements url and localized text area"
@@ -91,20 +92,21 @@
     :type        :string}))
 
 (defn footer [e! {published? ::t-service/published? :as data}]
-  [:div.row
-   (if published?
-     [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                    :disabled (form/disable-save? data)}
-      (tr [:buttons :save-updated])]
-     [:span
-      [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                     :disabled (form/disable-save? data)}
-       (tr [:buttons :save-and-publish])]
-      [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
-                      :disabled false}
-       (tr [:buttons :save-as-draft])]])
-   [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
-    (tr [:buttons :discard])]])
+  (let [name-missing? (str/blank? (::t-service/name data))]
+    [:div.row
+     (if published?
+       [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
+                      :disabled (form/disable-save? data)}
+        (tr [:buttons :save-updated])]
+       [:span
+        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
+                       :disabled (form/disable-save? data)}
+         (tr [:buttons :save-and-publish])]
+        [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
+                        :disabled name-missing?}
+         (tr [:buttons :save-as-draft])]])
+     [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+      (tr [:buttons :discard])]]))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group
