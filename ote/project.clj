@@ -33,7 +33,7 @@
                  [cljs-ajax "0.7.2"]
 
                  ;; Frontend UI libraries
-                 [reagent "0.7.0"]
+                 [reagent "0.8.0-alpha2"]
                  [webjure/tuck "0.4.3"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
