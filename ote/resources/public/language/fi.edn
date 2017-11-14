@@ -96,7 +96,7 @@
 
   :transport-service
   {:ote.db.transport-service/name "Palvelun mimi"
-   :ote.db.transport-service/sub-type "Liikkumispavelun alatyyppi"
+   :ote.db.transport-service/sub-type "Liikkumispalvelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
                                                 false "Ei julkaistu"}}
@@ -274,7 +274,11 @@
   :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
+  }
 
+ :rentals-page
+ {:header-service-info                     "Palvelun perustiedot"
+  :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   }
 
  :terminal-page
