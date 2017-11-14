@@ -56,12 +56,11 @@
 (defn edit-service [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
   (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
-    (if-not loaded?
+    (if (or (nil? service) (not loaded?))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
       (case (::transport-service/type service)
         :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
         :terminal [terminal/terminal e! (:transport-service app)]
         :rentals [rental/rental e! (:transport-service app)]
         :parking [parking/parking e! (:transport-service app)]
-        :brokerage [brokerage/brokerage e! (:transport-service app)]
-        nil [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]))))
+        :brokerage [brokerage/brokerage e! (:transport-service app)]))))
