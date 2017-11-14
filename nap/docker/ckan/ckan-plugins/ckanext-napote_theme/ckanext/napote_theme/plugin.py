@@ -10,34 +10,49 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.plugins import DefaultTranslation
 from routes.mapper import SubMapper
+from ckan.lib import authenticator
+from ckan.model import User
 
 csv.field_size_limit(sys.maxsize)
 
 log = getLogger(__name__)
 
-# TODO: We should get these from the database
-municipalitys = (
-    u'Helsinki', u'Ii', u'Joensuu', u'Kempele', u'Muhos', u'Oulu', u'Pieksämäki', u'Salo', u'Seinäjoki', u'Vantaa')
-transport_services = (u'Terminal', u'Passenger Transportation', u'Rental', u'Parking', u'Brokerage')
+### FIXME: MONKEY PATCH CKAN AUTHENTICATION START ###
 
+def authenticate_monkey_patch(self, environ, identity):
+    """Using our custom authentication method with Repoze auth
+    This allows us to use email address in login """
+    if not ('login' in identity and 'password' in identity):
+        return None
 
-def read_csv(file_path):
-    file = resource_stream(__name__, file_path)
+    login = identity['login']
 
-    # Read the file into a dictionary for each row ({header : value})
-    reader = csv.DictReader(file, delimiter=',')
-    data = {}
+    # Try login with email
+    users = User.by_email(login)
 
-    for row in reader:
-        for header, value in row.items():
-            unicodeVal = unicode(value, 'utf-8')
-            try:
-                data[header].append(unicodeVal)
-            except KeyError:
-                data[header] = [unicodeVal]
+    # If we get an user list as a result, use the first result. Otherwise, try to
+    # get user by username.
+    if users:
+        # Use the first result only. We'll have to assume that that we have one email per username
+        # in the ckan database. By default, CKAN allows using the same email for multiple users.
+        user = users[0]
+    else:
+        user = User.by_name(login)
 
-    return data
+    if user is None:
+        log.debug('Login failed - username %r not found', login)
+    elif not user.is_active():
+        log.debug('Login as %r failed - user isn\'t active', login)
+    elif not user.validate_password(identity['password']):
+        log.debug('Login as %r failed - password not valid', login)
+    else:
+        return user.name
 
+    return None
+
+authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_patch
+
+### MONKEY PATCH CKAN AUTHENTICATION END ###
 
 def log_debug(*args):
     log.info(*args)
@@ -56,6 +71,7 @@ def get_in(data, *keys):
         return data
     except (IndexError, KeyError) as e:
         return None
+
 
 # TODO: This is an example, how to translate our dataset fields. ckan multilingual needs to be added into ckan.plugins for this to work.
 def update_term_translations():
@@ -93,12 +109,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
     # Enable after translations have been generated
     plugins.implements(plugins.IPluginObserver, inherit=True)
-    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
-    plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_helpers(self):
@@ -149,6 +165,16 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         map.redirect('/group/edit/{id:.*}', '/error/')
         map.redirect('/organization/bulk_process/{id:.*}/', '/error/')
 
+        # Hook user password reset route to our custom user controller
+
+        map.connect('/user/reset',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='request_reset')
+
+        map.connect('/user/register',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='register')
+
         return map
 
     def after_map(self, map):
@@ -156,7 +182,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
             m.connect('search', '/ote/index.html#/services', action='search',
                       highlight_actions='index search')
         return map
-
 
     def dataset_facets(self, facets_dict, package_type):
         facets_dict.clear()
