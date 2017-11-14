@@ -144,7 +144,7 @@
  :enums
  {:ote.db.transport-service/type
   {:terminal                 "Asemat, satamat ja muut terminaalit"
-   :passenger-transportation "Henkilöidenkuljetuspalvelut"
+   :passenger-transportation "Henkilöiden kuljetuspalvelut"
    :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
@@ -228,16 +228,16 @@
                 :rename-place "Anna uusi nimi (Enter hyväksyy)"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
-          :passenger-transportation "Henkilöidenkuljetuspalvelut"
+          :passenger-transportation "Henkilöiden kuljetuspalvelut"
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
           :brokerage                "Välityspalvelut"}
 
  :service-type-dropdown
  {:terminal                 "Asemat, satamat ja muut terminaalit"
-  :passenger-transportation-taxi "Taksiliikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-taxi "Taksiliikenne (henkilöiden kuljetuspalvelut)"
   :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
   :brokerage                "Välityspalvelut"}
