@@ -28,7 +28,7 @@
 
   GoToUrl
   (process-event [{url :url} app]
-    (set! (.-location js/document) url )
+    (set! (.-location js/window) url )
     app)
 
   ToggleDebugState
