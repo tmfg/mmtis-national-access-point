@@ -37,9 +37,9 @@
   [:div.row
    [:div {:class "col-sx-12 col-md-9"}
     [:div
-     [:h3 (tr [:common-texts :title-required-data-with-OTE])]]
+     [:h3 (tr [:select-service-type-page :title-required-data])]]
     [:div.row
-     [:p (tr [:common-texts :transport-service-type-selection-help-text])]]
+     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
     [:div.row
      [form/form (service-form-options e!)
       [

@@ -18,6 +18,7 @@
             [ote.ui.debug :as debug]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
+            [ote.style.topnav :as style-topnav]
             [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]))
@@ -65,52 +66,62 @@
                 :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
-(defn- top-nav-links [e! app]
-  [:div {:style {:clear "both"}}
-    [:ul
-     (when (> (:width app) style-base/mobile-width-px)
-     [:li
-      [:a.main-icon {:href     "#"
-                     :on-click (fn [_] (set! (.-location js/document) "/"))}
-       [:img {:src "img/icons/nap-logo.svg"}]]])
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/"))}
-      (tr [:common-texts :navigation-front-page])]]
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/dataset"))}
-      (tr [:common-texts :navigation-dataset])]]
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :front-page (:page app))
-                  :href     "#"
-                  :on-click (fn [_] (set! (.-location js/document) "/organization"))}
-      (tr [:common-texts :navigation-organizations])]]
-    [:li
-     [:a.ote-nav {:class    (is-topnav-active :own-services (:page app))
-                  :href     "#"
-                  :on-click #(e! (fp-controller/->ChangePage :own-services))}
-      (tr [:common-texts :navigation-own-service-list])]]
-   ]
-  [:div.user-menu {:class (is-user-menu-active app)
-                   :style  (when (> (:width app) style-base/mobile-width-px)
-                             {:float "right"})}
-   (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
-   ]
-  )
+(def header-links
+  [{:page :front-page
+    :label [:common-texts :navigation-front-page]
+    :url "/"}
+
+   {:page :services
+    :label [:common-texts :navigation-dataset]}
+
+   {:page :organizations
+    :label [:common-texts :navigation-organizations]
+    :url "/organization"}
+
+   {:page :own-services
+    :label [:common-texts :navigation-own-service-list]}])
+
+(defn- top-nav-links [e! {current-page :page :as app} desktop?]
+  [:div (stylefy/use-style style-topnav/clear)
+   [:ul
+    (when (> (:width app) style-base/mobile-width-px)
+      [:li (stylefy/use-style style-topnav/ul)
+       [:a
+        (merge (stylefy/use-style (if desktop?
+                                    style-topnav/desktop-link
+                                    style-topnav/link))
+               {:href     "#"
+                :on-click #(e! (fp-controller/->GoToUrl "/"))})
+        [:img {:src "img/icons/nap-logo.svg"}]]])
+    (doall
+     (for [{:keys [page label url]} header-links]
+       ^{:key page}
+       [:li (stylefy/use-style style-topnav/ul)
+        [:a
+         (merge (stylefy/use-style
+                 (if (= page current-page)
+                   (if desktop? style-topnav/desktop-active style-topnav/active)
+                   (if desktop? style-topnav/desktop-link style-topnav/link)))
+                {:href     "#"
+                 :on-click (if url
+                             #(e! (fp-controller/->GoToUrl url))
+                             #(e! (fp-controller/->ChangePage page)))})
+         (tr label)]]))]
+   [:div.user-menu {:class (is-user-menu-active app)
+                    :style  (when (> (:width app) style-base/mobile-width-px)
+                              {:float "right"})}
+    (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
-  [:ul
-    [:li
-      [:a.main-icon {:style {:float "left"
-                             :display "block"}
-                     :href     "#"
-                     :on-click (fn [_] (set! (.-location js/document) "/"))}
+   [:ul (stylefy/use-style style-topnav/ul)
+    [:li (stylefy/use-style style-topnav/li)
+     [:a (merge
+          (stylefy/use-style style-topnav/link)
+          {:href     "#"
+           :on-click #(e! (fp-controller/->GoToUrl "/"))})
        [:img {:src "img/icons/nap-logo.svg"}]]]
-     [:li {:style {:float "right"}}
+     [:li (stylefy/use-style style-topnav/right)
       [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
                        :style {:padding 8
                                :width 60
@@ -122,23 +133,41 @@
                                    :height 40
                                    }}]]]]
   (when (get-in app [:ote-service-flags :header-open])
-    (top-nav-links e! app)
-    )])
+    (top-nav-links e! app false))])
 
 
 (defn- top-nav [e! app]
-  (let [desktop? (> (:width app) style-base/mobile-width-px)
-        nav-classes (if desktop?
-                      "topnav topnav-desktop"
-                      "topnav")]
-    [:div {:class nav-classes}
+  (let [desktop? (> (:width app) style-base/mobile-width-px)]
+    [:div (stylefy/use-style style-topnav/topnav)
      [:div.container-fluid
       (if desktop?
-        (top-nav-links e! app)
-        (mobile-top-nav-links e! app)
-      )]]))
+        (top-nav-links e! app true)
+        (mobile-top-nav-links e! app))]]))
 
 
+(defn- footer []
+  [:footer.site-footer
+   [:div.container-fluid
+    [:div.row
+     [:div.col-md-2.footer-links
+      [:a.logo {:href "#" }
+       [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
+     [:div.col-md-8.footer-links
+      [:ul.unstyled
+       [:li
+        [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]
+     [:div.col-md-2.attribution
+      [:p
+       [:strong (tr [:common-texts :footer-made-width])]
+       [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"}
+        (tr [:common-texts :footer-ckan-software])]]]]]])
+
+(defn- debug-state [app]
+  ;; NOTE: debug state is VERY slow if app state is HUGE
+  ;; (it tries to pr-str it)
+  (when (= true (get-in app [:ote-service-flags :show-debug]))
+    [:div.row
+     [debug/debug app]]))
 
 (defn ote-application
   "OTE application main view"
@@ -152,12 +181,11 @@
    [theme
     [:div.ote-sovellus
      (top-nav e! app)
-     ;; NOTE: debug state is VERY slow if app state is HUGE
-     ;; (it tries to pr-str it)
+
 
      [:div.container-fluid.wrapper
       (case (:page app)
-        :front-page [fp/front-page e! app]
+        :front-page [fp/own-services e! app]
         :own-services [fp/own-services e! app]
         :transport-service [t-service/select-service-type e! (:transport-service app)]
         :transport-operator [to/operator e! (:transport-operator app)]
@@ -168,35 +196,8 @@
         :brokerage [brokerage/brokerage e! (:transport-service app)]
         :edit-service [t-service/edit-service e! app]
         :services [service-search/service-search e! (:service-search app)]
-        [:div "ERROR: no such page " (pr-str (:page app))])
-      ]
+        [:div "ERROR: no such page " (pr-str (:page app))])]
 
      (when-let [msg (:flash-message app)] [flash-message msg])
-
-     (when (= true (get-in app [:ote-service-flags :show-debug]))
-       [:div.row
-        [debug/debug app]])
-
-     [:footer.site-footer
-      [:div.container-fluid
-       [:div.row
-        [:div.col-md-2.footer-links
-          [:a.logo {:href "#" }
-            [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
-        [:div.col-md-8.footer-links
-         [:ul.unstyled
-          [:li
-           [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]
-        [:div.col-md-2.attribution
-         [:p
-          [:strong (tr [:common-texts :footer-made-width])]
-          [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"} (tr [:common-texts :footer-ckan-software])]]
-
-         ]]]]
-
-     ]]]
-
-
-
-
-    ))
+     [debug-state app]
+     [footer]]]]))

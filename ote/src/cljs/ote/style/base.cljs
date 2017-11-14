@@ -6,7 +6,7 @@
 (def body {:margin 0
            :padding 0})
 
-(def mobile-width-px 900)
+(def mobile-width-px 950)
 
 (def font {:font-family "'Roboto', sans-serif"})
 
