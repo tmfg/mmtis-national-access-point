@@ -1,16 +1,19 @@
 # !! WARNING DO NOT USE setup.py extract_messages to override this file! Add new changes manually !!
 # NOTE: We override some CKAN default translation keys here in addition to keys used in our templates.
 #
+
 # Translations template for ckanext-napote_theme.
 # Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the ckanext-napote_theme
 # project.
-
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-07 17:59+0000\n"
+"POT-Creation-Date: 2017-11-14 07:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,52 +22,68 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-###
+#: ckanext/napote_theme/controller.py:67
+msgid "Unauthorized to request reset password."
+msgstr ""
 
-#### TRANSLATION KEYS USED IN NAPOTE_THEME PLUGIN ####
-#### NOTE: You can use setup.py extract_messages in the docker container and copy the keys from the file
-####   in docker container and replace the plugin translation keys under here.
-####   !! Do not replace the CKAN core translation keys below the plugin translation keys !!
+#: ckanext/napote_theme/controller.py:106
+#, python-format
+msgid "\"%s\" matched several users"
+msgstr ""
 
+#: ckanext/napote_theme/controller.py:108 ckanext/napote_theme/controller.py:110
+#, python-format
+msgid "No such user: %s"
+msgstr ""
 
-#: ckanext/napote_theme/plugin.py:117 ckanext/napote_theme/plugin.py:128
+#: ckanext/napote_theme/controller.py:115
+msgid "Please check your inbox for a reset code."
+msgstr ""
+
+#: ckanext/napote_theme/controller.py:119
+#, python-format
+msgid "Could not send reset link: %s"
+msgstr ""
+
+#: ckanext/napote_theme/plugin.py:190 ckanext/napote_theme/plugin.py:201
 #: ckanext/napote_theme/templates/package/read.html:9
 msgid "Transport Service Type"
 msgstr ""
 
-#: ckanext/napote_theme/plugin.py:191
+#: ckanext/napote_theme/plugin.py:263
 msgid "Transport Service View"
 msgstr ""
 
-#: ckanext/napote_theme/templates/footer.html:19
-msgid "CKAN API"
+#: ckanext/napote_theme/validators.py:19
+msgid "Email already exists"
 msgstr ""
 
-#: ckanext/napote_theme/templates/footer.html:20
-msgid "CKAN Association"
-msgstr ""
-
-#: ckanext/napote_theme/templates/footer.html:30
+#: ckanext/napote_theme/templates/footer.html:23
 msgid ""
 "<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" "
 "href=\"http://ckan.org\">CKAN</a>"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:36
+#: ckanext/napote_theme/templates/header.html:38
 msgid "Home"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:36
+#: ckanext/napote_theme/templates/header.html:38
 msgid "Datasets"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:36
+#: ckanext/napote_theme/templates/header.html:38
 msgid "Organizations"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:51
-#: ckanext/napote_theme/templates/header.html:60
-#: ckanext/napote_theme/templates/header.html:61
+#: ckanext/napote_theme/templates/header.html:41
+#: ckanext/napote_theme/templates/header.html:42
+msgid "My services"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:58
+#: ckanext/napote_theme/templates/header.html:86
+#: ckanext/napote_theme/templates/header.html:88
 msgid "View profile"
 msgstr ""
 
@@ -87,30 +106,17 @@ msgstr[1] ""
 msgid "Dashboard"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:86
-msgid "Edit settings"
-msgstr ""
-
-#: ckanext/napote_theme/templates/header.html:88
-msgid "Settings"
-msgstr ""
-
 #: ckanext/napote_theme/templates/header.html:95
 #: ckanext/napote_theme/templates/header.html:97
-msgid "NAP-data management"
-msgstr ""
-
-#: ckanext/napote_theme/templates/header.html:104
-#: ckanext/napote_theme/templates/header.html:106
 msgid "Log out"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:116
+#: ckanext/napote_theme/templates/header.html:107
 #: ckanext/napote_theme/templates/home/layout1.html:68
 msgid "Log in"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:125
+#: ckanext/napote_theme/templates/header.html:116
 #: ckanext/napote_theme/templates/home/layout1.html:74
 msgid "Register"
 msgstr ""
@@ -156,7 +162,7 @@ msgstr ""
 msgid "New user"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/snippets/header.html:3
+#: ckanext/napote_theme/templates/home/snippets/header.html:7
 msgid "NAP home page hero text"
 msgstr ""
 
@@ -286,6 +292,44 @@ msgstr ""
 msgid "Maintainer Email"
 msgstr ""
 
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:17
+msgid "This resource view is not available at the moment."
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:19
+msgid "Click here for more information."
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:26
+msgid "Download resource"
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:49
+msgid "Your browser does not support iframes."
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:56
+msgid "Embed resource view"
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:59
+msgid ""
+"You can copy and paste the embed code into a CMS or blog software that "
+"supports raw HTML"
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:62
+msgid "Width"
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:65
+msgid "Height"
+msgstr ""
+
+#: ckanext/napote_theme/templates/package/snippets/resource_view.html:68
+msgid "Code"
+msgstr ""
+
 #: ckanext/napote_theme/templates/snippets/navbar_language_selector.html:14
 msgid "Go"
 msgstr ""
@@ -297,6 +341,32 @@ msgstr ""
 #: ckanext/napote_theme/templates/user/new.html:9
 msgid "why sign up info text"
 msgstr ""
+
+#: ckanext/napote_theme/templates/user/request_reset.html:7
+msgid "Reset your password"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/request_reset.html:10
+#: ckanext/napote_theme/templates/user/snippets/login_form.html:20
+msgid "Username or email"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/request_reset.html:13
+msgid "Request reset"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/snippets/login_form.html:22
+msgid "Password"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/snippets/login_form.html:24
+msgid "Remember me"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/snippets/login_form.html:28
+msgid "Login"
+msgstr ""
+
 
 
 
@@ -355,6 +425,11 @@ msgstr ""
 msgid "datasets"
 msgstr ""
 
+#: ckan/controllers/revision.py:110
+#, python-format
+msgid "Datasets affected: %s.\n"
+msgstr ""
+
 #: ckan/templates/group/snippets/group_item.html:32
 #: ckan/templates/organization/snippets/organization_item.html:31
 #: ckanext/example_theme_docs/v10_custom_snippet/templates/snippets/example_theme_most_popular_groups.html:23
@@ -411,6 +486,10 @@ msgstr ""
 
 #: ckan/templates/organization/bulk_process.html:18
 msgid "Sorry no datasets found for \"{query}\""
+msgstr ""
+
+#: ckan/templates/snippets/search_result_text.html:18
+msgid "No datasets found"
 msgstr ""
 
 #: ckan/controllers/package.py:435 ckan/controllers/package.py:817

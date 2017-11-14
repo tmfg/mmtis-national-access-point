@@ -19,7 +19,7 @@ log = getLogger(__name__)
 
 ### FIXME: MONKEY PATCH CKAN AUTHENTICATION START ###
 
-def authenticate_monkeypatch(self, environ, identity):
+def authenticate_monkey_patch(self, environ, identity):
     """Using our custom authentication method with Repoze auth
     This allows us to use email address in login """
     if not ('login' in identity and 'password' in identity):
@@ -50,7 +50,7 @@ def authenticate_monkeypatch(self, environ, identity):
 
     return None
 
-authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkeypatch
+authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_patch
 
 ### MONKEY PATCH CKAN AUTHENTICATION END ###
 
