@@ -78,9 +78,9 @@
   {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
    :ote.db.transport-service/url                       "Palvelun osoite"
    :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/information-service-accessibility "Esteettömyys-info-välineet"
-   :ote.db.transport-service/accessibility     "Esteettömyys-laitteet"
-   :ote.db.transport-service/mobility          "mobility"
+   :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
+   :ote.db.transport-service/accessibility     "Saavutettavuus"
+   :ote.db.transport-service/mobility          "Esteettömyys"
   }
 
   ;; Rental fields
@@ -195,8 +195,7 @@
    }
 
   :ote.db.transport-service/accessibility
-  {:unknown "Määrittelemätön"
-   :lift "Hissi"
+  {:lift "Hissi"
    :escalator "Liukuportaat"
    :travelator "Liikkuva kävelytie"
    :ramp "Ramppi"
@@ -205,12 +204,10 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
-   :validator "Validator"
    :other  "Muu"}
 
   :ote.db.transport-service/mobility
-  {:unknown "Määrittelemätön"
-   :low-floor "Matalalattia"
+  {:low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
