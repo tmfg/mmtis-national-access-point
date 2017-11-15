@@ -21,6 +21,12 @@ Currently listening window resize event. Change to css media query.
 Currently we do not have a front page in OTE. When we are sure that
 it is not needed, remove all front-page instances away from OTE.
 
+### Material UI TextField caret positioning issue
+https://www.pivotaltracker.com/story/show/152798807  
+Added a temporary fix in o.ui.form-fields. 
+This should be fixed in some future version of cljs_react_material_ui library.
+
+
 ## CKAN
 
 * Monkey patched default CKAN authentication in napote_theme plugin.py to support login with email, because no simple way 
