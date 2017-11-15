@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-14 07:50+0000\n"
-"PO-Revision-Date: 2017-11-14 10:08+0200\n"
+"PO-Revision-Date: 2017-11-15 09:26+0200\n"
 "Last-Translator: \n"
 "Language: fi\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -798,6 +798,13 @@ msgstr "Etsi palveluntuottajia..."
 #: ckan/templates/organization/index.html:29
 msgid "There are currently no organizations for this site"
 msgstr "Sivustolla ei ole tällä hetkellä palveluntuottajia"
+
+#: ckan/templates/organization/new.html:3
+#: ckan/templates/organization/new.html:5
+#: ckan/templates/organization/new.html:7
+#: ckan/templates/organization/new.html:12
+msgid "Create an Organization"
+msgstr "Luo uusi palveluntuottaja"
 
 #: ckan/templates/organization/new_organization_form.html:17
 msgid "Update Organization"

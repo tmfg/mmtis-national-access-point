@@ -774,6 +774,11 @@ msgstr ""
 msgid "There are currently no organizations for this site"
 msgstr ""
 
+#: ckan/templates/organization/new.html:3 ckan/templates/organization/new.html:5
+#: ckan/templates/organization/new.html:7 ckan/templates/organization/new.html:12
+msgid "Create an Organization"
+msgstr ""
+
 #: ckan/templates/organization/new_organization_form.html:17
 msgid "Update Organization"
 msgstr ""

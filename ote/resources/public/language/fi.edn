@@ -35,7 +35,7 @@
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
    :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
-   :ote.db.transport-service/external-service-url "Rajapinnan URL-osoite"
+   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
 
    }
@@ -49,9 +49,9 @@
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/url                       "Palvelun osoite"
+   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
    :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun osoitetiedot"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/additional-services       "Muut palvelut"
@@ -76,7 +76,7 @@
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
-   :ote.db.transport-service/url                       "Palvelun osoite"
+   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
    :ote.db.transport-service/description               "Palvelun kuvaus"
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
    :ote.db.transport-service/accessibility     "Saavutettavuus"

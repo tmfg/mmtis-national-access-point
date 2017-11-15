@@ -62,14 +62,18 @@
     (when-let [bounds @bounds]
       (.fitBounds leaflet bounds))))
 
+(defn update-leaflet-bounds-soon [leaflet]
+  (.setTimeout js/window #(update-map-bounds-from-layers leaflet) 50)
+  )
+
 (defn update-bounds-from-layers [this]
   (let [^js/L.map
   leaflet (aget this "refs" "leaflet" "leafletElement")]
-    (update-map-bounds-from-layers leaflet)))
+    (update-leaflet-bounds-soon leaflet)))
 
 (defn update-bounds-on-load [this]
   (let [^js/L.map
   leaflet (aget this "refs" "leaflet" "leafletElement")]
     (.on leaflet "layeradd"
          (fn [m]
-           (update-map-bounds-from-layers leaflet)))))
+           (update-leaflet-bounds-soon leaflet)))))
