@@ -45,7 +45,8 @@ write_config () {
     "ckan.locale_default = fi" \
     "ckan.locale_order = fi en sv" \
     "ckan.locales_offered = fi en sv" \
-    "ckan.locales_filtered_out = en_GB"
+    "ckan.locales_filtered_out = en_GB" \
+    "ckan.auth.user_create_organizations = true" \
   #    "sqlalchemy.url = ${CKAN_SQLALCHEMY_URL}" \
   #    "solr_url = ${CKAN_SOLR_URL}" \
   #    "ckan.redis.url = ${CKAN_REDIS_URL}" \
