@@ -60,8 +60,10 @@
   ;; init
   (e! (org-viewer/->StartViewer))
   (fn [e! {:keys [transport-operator] :as app}]
-    (when transport-operator
+    (if (not-empty transport-operator)
       [theme
+       [:div.container
+        [basic-info transport-operator]
+        [contact-info transport-operator]]]
       [:div.container
-       [basic-info transport-operator]
-       [contact-info transport-operator]]])))
+       [:div (str (transform-val :common-texts :data-not-found) ".")]])))
