@@ -148,6 +148,7 @@
   (with-let [form-options (transportation-form-options e!)
              form-groups [(name-and-type-group e!)
                           (ts-common/contact-info-group)
+                          (ts-common/companies-group)
                           (ts-common/place-search-group e! ::t-service/passenger-transportation)
                           (ts-common/external-interfaces)
                           (luggage-restrictions-group)
@@ -159,8 +160,7 @@
                            ::t-service/booking-service)
                           (accessibility-group)
                           (pricing-group e!)
-                          (service-hours-group e!)
-                          (ts-common/companies-group)]]
+                          (service-hours-group e!)]]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
