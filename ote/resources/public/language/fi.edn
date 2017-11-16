@@ -38,6 +38,7 @@
    :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
 
+   :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palveluntuottajat"
    }
 
   ;; Service exception
@@ -114,7 +115,8 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."}
+ {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
+  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."}
 
 
  ;; Action buttons
@@ -131,7 +133,7 @@
   :add-new-price-class "Lisää hintarivi"
   :add-new-service-hour "Lisää palveluaika"
   :add-new-service-exception "Lisää poikkeus"
-
+  :add-new-company "Lisää palvelun tuottava yritys"
   :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"

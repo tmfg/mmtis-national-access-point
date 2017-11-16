@@ -159,7 +159,8 @@
                            ::t-service/booking-service)
                           (accessibility-group)
                           (pricing-group e!)
-                          (service-hours-group e!)]]
+                          (service-hours-group e!)
+                          (ts-common/companies-group)]]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
