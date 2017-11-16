@@ -412,7 +412,7 @@
   :interfaces "Koneluettavat rajapinnat: "
   :nap-interface ["Palvelun \"" :name "\" NAPissa olevien tietojen rajapinta: "]
   :external-interfaces ["Palvelun \"" :name "\" ulkopuoliset palveluntuottajan itse tarjoamat rajapinnat:"]
-  :showing-latest-services "Näytetään uusimmat palvelut, suodata listaa hakuehdoilla"
+  :showing-latest-services "Näytetään viimeksi muokatut palvelut. Hae palveluita syöttämällä hakuehdot."
   }
 
  }

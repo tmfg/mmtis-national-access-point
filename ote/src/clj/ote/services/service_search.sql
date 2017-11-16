@@ -13,6 +13,12 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
                    GROUP BY t."sub-type") count ON type."sub-type" = count."sub-type"
  ORDER BY count DESC
 
+-- name: latest-service-ids
+-- row-fn: :id
+SELECT id FROM "transport-service"
+ ORDER BY COALESCE(modified, created) DESC, name ASC
+ LIMIT 20;
+
 -- name: search
 -- Search for transport services by name, operation area or subtype
 SELECT t.id, t.name, t.type, t."sub-type",
