@@ -19,7 +19,6 @@
   ;; Define ENUMs
   ["week_day" ::day (specql.transform/transform (specql.transform/to-keyword))]
 
-
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_provider_type" ::transport_provider_type (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_service_subtype" ::transport_service_subtype (specql.transform/transform (specql.transform/to-keyword))]
@@ -48,6 +47,7 @@
   ["parking_provider_information" ::parking_provider_information]
   ["brokerage_service" ::brokerage_service]
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
+  ["company" ::company]
 
   ;; Tables
   ["external-interface-description" ::external-interface-description]

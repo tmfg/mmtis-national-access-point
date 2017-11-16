@@ -52,6 +52,24 @@
     :delete? true
     :add-label (tr [:buttons :add-external-interface])}))
 
+(defn companies-group
+  "Creates a form group for companies. A parent company can list its companies."
+  []
+  (form/group
+   {:label (tr [:field-labels :transport-service-common ::t-service/companies])
+    :columns 3}
+
+   (form/info (tr [:form-help :companies]))
+
+   {:name ::t-service/companies
+    :type :table
+    :table-fields [{:name ::t-service/name :type :string
+                    :label (tr [:field-labels :transport-service-common ::t-service/company-name])}
+                   {:name ::t-service/business-id :type :string
+                    :validate [[:business-id]]}]
+    :delete? true
+    :add-label (tr [:buttons :add-new-company])}))
+
 (defn contact-info-group []
   (form/group
    {:label  (tr [:passenger-transportation-page :header-contact-details])

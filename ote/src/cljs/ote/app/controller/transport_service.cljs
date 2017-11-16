@@ -20,7 +20,8 @@
     ::t-service/name
     ::t-service/sub-type
     ::t-service/external-interfaces
-    ::t-service/operation-area})
+    ::t-service/operation-area
+    ::t-service/companies})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
