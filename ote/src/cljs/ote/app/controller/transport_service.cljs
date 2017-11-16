@@ -181,9 +181,11 @@
   transport-service level there."
   [service from]
   (reduce (fn [service key]
-            (-> service
-                (assoc key (get-in service [from key]))
-                (update from dissoc key)))
+            (as-> service s
+              (if (contains? (get service from) key)
+                (assoc s key (get-in service [from key]))
+                s)
+              (update s from dissoc key)))
           service
           service-level-keys))
 
@@ -191,8 +193,10 @@
   "Reverse of `move-service-level-keys-from-form`."
   [service to]
   (reduce (fn [service key]
-            (-> service
-                (assoc-in [to key] (get service key))
-                (dissoc key)))
+            (as-> service s
+              (if (contains? service key)
+                (assoc-in s [to key] (get service key))
+                s)
+              (dissoc s key)))
           service
           service-level-keys))
