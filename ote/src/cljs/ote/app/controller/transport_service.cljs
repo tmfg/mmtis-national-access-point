@@ -29,6 +29,7 @@
   (case type
     :passenger-transportation-taxi :passenger-transportation
     :passenger-transportation-request :passenger-transportation
+    :passenger-transportation-other :passenger-transportation
     :passenger-transportation-schedule :passenger-transportation
     :terminal :terminal
     :rentals :rentals
@@ -41,6 +42,7 @@
   (case type
     :passenger-transportation-taxi :taxi
     :passenger-transportation-request :request
+    :passenger-transportation-other :other
     :passenger-transportation-schedule :schedule
     :terminal :terminal ;; No subtype for terminals - but it is still saved to database
     :rentals :rentals

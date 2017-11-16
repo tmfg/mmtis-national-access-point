@@ -68,7 +68,7 @@
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
 
 ;; Create order for transport_type
-(def passenger-transportation-sub-types [:taxi :request :schedule])
+(def passenger-transportation-sub-types [:taxi :request :other :schedule])
 
 ;; Create order for payment_method
 (def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])

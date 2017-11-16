@@ -23,6 +23,7 @@
   ;; Create order for service type selection dropdown
    [:passenger-transportation-taxi
     :passenger-transportation-request
+    :passenger-transportation-other
     :passenger-transportation-schedule
     :terminal
     :rentals
