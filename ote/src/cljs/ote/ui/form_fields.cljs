@@ -267,7 +267,7 @@
    {:format "24hr"
     :cancel-label cancel-label
     :ok-label ok-label
-    :minutes-step 5
+    :minutes-step 1
     :default-time (time/to-js-time time-picker-time)
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
