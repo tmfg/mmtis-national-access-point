@@ -63,7 +63,8 @@
 
    {:name ::t-service/companies
     :type :table
-    :table-fields [{:name ::t-service/name :type :string}
+    :table-fields [{:name ::t-service/name :type :string
+                    :label (tr [:field-labels :transport-service-common ::t-service/company-name])}
                    {:name ::t-service/business-id :type :string
                     :validate [[:business-id]]}]
     :delete? true
