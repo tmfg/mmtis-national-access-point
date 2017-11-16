@@ -409,7 +409,9 @@
   :no-results "Hakuehdoilla ei löytynyt palveluita"
   :one-result "Hakuehdoilla löytyi yksi palvelu"
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
-  :interfaces "Rajapinnat: "
+  :interfaces "Koneluettavat rajapinnat: "
+  :nap-interface ["Palvelun \"" :name "\" NAPissa olevien tietojen rajapinta: "]
+  :external-interfaces ["Palvelun \"" :name "\" ulkopuoliset palveluntuottajan itse tarjoamat rajapinnat:"]
   :showing-latest-services "Näytetään uusimmat palvelut, suodata listaa hakuehdoilla"
   }
 

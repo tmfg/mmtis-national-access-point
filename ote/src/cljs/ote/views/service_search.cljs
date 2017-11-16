@@ -34,30 +34,39 @@
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
   [:div
-   (tr [:service-search :interfaces])
-   [ui/flat-button
-    {:style {:margin-left "1em"}
-     :primary true
-     :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
-    (str name " GeoJSON")]
-   (doall
-    (for [{::t-service/keys [external-interface format ckan-resource-id]} external-interface-links
-          :let [description (::t-service/description external-interface)]]
-      [ui/flat-button
-       {:style {:margin-left "1em"}
-        :primary true
-        :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
-       (str (t-service/localized-text-for "FI" description)
-            " (" format ")")]))])
+   [:b (tr [:service-search :interfaces])]
+   [:ul
+    [:li (tr [:service-search :nap-interface] {:name name})
+     (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
+       [:a {:href url :target "_blank"} url])]
+    (when-not (empty? external-interface-links)
+      [:li (tr [:service-search :external-interfaces] {:name name})
+       [:ul
+        (doall
+         (for [{::t-service/keys [external-interface format ckan-resource-id]} external-interface-links
+               :let [description (::t-service/description external-interface)]]
+           [:li
+            [ui/flat-button
+             {:style {:margin-left "1em"}
+              :primary true
+              :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
+             (str (t-service/localized-text-for "FI" description)
+                  " (" format ")")]]))]])]])
 
 (defn- result-card [e! {::t-service/keys [id name sub-type contact-address
                                           operation-area-description contact-phone contact-email
-                                          operator-name] :as service}]
+                                          operator-name ckan-resource-id transport-operator-id]
+                        :as service}]
 
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type]
                             [:enums ::t-service/type])]
     [ui/card {:z-depth 1}
-     [ui/card-header {:title name :style style-base/title
+     [ui/card-header {:title (r/as-element
+                              [ui/flat-button
+                               {:primary true
+                                :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id
+                                                                         ckan-resource-id))}
+                               name]) :style style-base/title
                       :subtitle (sub-type-tr sub-type)}]
      [ui/card-text
       [data-items
