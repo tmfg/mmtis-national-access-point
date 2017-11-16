@@ -8,6 +8,8 @@
 
 (def mobile-width-px 950)
 
+(def wrapper {:padding-top "20px"})
+
 (def font {:font-family "'Roboto', sans-serif"})
 
 (def inline-block {:display "inline-block"})
