@@ -79,6 +79,7 @@
 (defn- fetch-transport-service-external-interfaces [db id]
   (fetch db ::t-service/external-interface-description
          #{::t-service/external-interface ::t-service/format
+           ::t-service/license ::t-service/license-url
            ::t-service/ckan-resource-id ::t-service/id}
          {::t-service/transport-service-id id}))
 
@@ -98,14 +99,16 @@
 
         external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
         external-resources
-        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format}]
+        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format
+                    lic ::t-service/license lic-url ::t-service/license-url}]
                 (verify-ckan-response
                  (ckan/add-or-update-dataset-resource!
                   c (merge
                      {:ckan/package-id (:ckan/id dataset)
                       :ckan/name (-> ei ::t-service/description first ::t-service/text)
                       :ckan/url (::t-service/url ei)
-                      :ckan/format fmt}))))
+                      :ckan/format fmt
+                      :ckan/license lic}))))
               external-interfaces)]
 
     ;; Update CKAN resource ids for all external interfaces

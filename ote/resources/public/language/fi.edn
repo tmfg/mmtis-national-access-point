@@ -37,12 +37,13 @@
    :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
    :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format-short "Muoto"
 
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/license "Lisenssi/käyttöehdot"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus verkko-osoite"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (WWW)"
    }
 
   ;; Service exception

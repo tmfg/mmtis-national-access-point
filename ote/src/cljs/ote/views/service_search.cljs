@@ -8,6 +8,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
             [ote.ui.form :as form]
+            [ote.ui.common :refer [linkify]]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.service-search :as ss]
@@ -31,27 +32,45 @@
 (defn- format-address [{::common/keys [street postal_code post_office]}]
   (str street ", " postal_code " " post_office))
 
+(def external-interface-table-columns
+  ;; [label width value-fn]
+  [[::t-service/external-service-description "21%"
+    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
+   [::t-service/external-service-url "21%"
+    (comp #(linkify % %) ::t-service/url ::t-service/external-interface)]
+   [::t-service/format-short "16%" ::t-service/format]
+   [::t-service/license "21%" ::t-service/license]
+   [::t-service/license-url "21%" (comp #(when-not (str/blank? %)
+                                           (linkify % %)) ::t-service/license-url)]])
+
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
   [:div
    [:b (tr [:service-search :interfaces])]
-   [:ul
-    [:li (tr [:service-search :nap-interface] {:name name})
-     (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
-       [:a {:href url :target "_blank"} url])]
-    (when-not (empty? external-interface-links)
-      [:li (tr [:service-search :external-interfaces] {:name name})
-       [:ul
-        (doall
-         (for [{::t-service/keys [external-interface format ckan-resource-id]} external-interface-links
-               :let [description (::t-service/description external-interface)]]
-           [:li
-            [ui/flat-button
-             {:style {:margin-left "1em"}
-              :primary true
-              :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id ckan-resource-id))}
-             (str (t-service/localized-text-for "FI" description)
-                  " (" format ")")]]))]])]])
+   [:div.nap-interface
+    (tr [:service-search :nap-interface] {:name name})
+    (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
+      [:a {:href url :target "_blank"} url])]
+   (when-not (empty? external-interface-links)
+     [:span
+      [:br]
+      [:b (tr [:service-search :external-interfaces] {:name name})
+       [ui/table
+        [ui/table-header {:adjust-for-checkbox false :display-select-all false}
+         (for [[k w _] external-interface-table-columns]
+           ^{:key k}
+           [ui/table-header-column {:style {:width w}}
+            (tr [:field-labels :transport-service-common k])])]
+        [ui/table-body {:display-row-checkbox false}
+         (map-indexed
+          (fn [i row]
+            ^{:key i}
+            [ui/table-row {:selectable false}
+             (for [[k w value-fn] external-interface-table-columns]
+               ^{:key k}
+               [ui/table-row-column {:style {:width w}}
+                (value-fn row)])])
+          external-interface-links)]]]])])
 
 (defn- result-card [e! {::t-service/keys [id name sub-type contact-address
                                           operation-area-description contact-phone contact-email
