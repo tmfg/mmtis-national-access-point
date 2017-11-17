@@ -318,6 +318,7 @@
   :user-menu-log-out                          "Kirjaudu ulos"
   :user-menu-profile                          "Näytä profiili"
   :title-operator-basic-details               "Perustiedot"
+  :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
   :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"

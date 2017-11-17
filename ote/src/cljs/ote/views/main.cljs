@@ -83,20 +83,20 @@
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
   [:div (stylefy/use-style style-topnav/clear)
-   [:ul
+   [:ul (stylefy/use-style style-topnav/ul)
     (when (> (:width app) style-base/mobile-width-px)
-      [:li (stylefy/use-style style-topnav/ul)
+      [:li
        [:a
         (merge (stylefy/use-style (if desktop?
                                     style-topnav/desktop-link
                                     style-topnav/link))
                {:href     "#"
                 :on-click #(e! (fp-controller/->GoToUrl "/"))})
-        [:img {:src "img/icons/nap-logo.svg"}]]])
+        [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
     (doall
      (for [{:keys [page label url]} header-links]
        ^{:key page}
-       [:li (stylefy/use-style style-topnav/ul)
+       [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
         [:a
          (merge (stylefy/use-style
                  (if (= page current-page)
@@ -124,8 +124,8 @@
      [:li (stylefy/use-style style-topnav/right)
       [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
                        :style {:padding 8
-                               :width 60
-                               :height 60}
+                               :width 56
+                               :height 56}
                        :icon-style {:height 40
                                     :width 40}}
        [ic/action-reorder {:style {:color "#fff"
@@ -138,7 +138,7 @@
 
 (defn- top-nav [e! app]
   (let [desktop? (> (:width app) style-base/mobile-width-px)]
-    [:div (stylefy/use-style style-topnav/topnav)
+    [:div (if desktop? (stylefy/use-style style-topnav/topnav-desktop) (stylefy/use-style style-topnav/topnav) )
      [:div.container-fluid
       (if desktop?
         (top-nav-links e! app true)
@@ -155,12 +155,7 @@
      [:div.col-md-8.footer-links
       [:ul.unstyled
        [:li
-        [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]
-     [:div.col-md-2.attribution
-      [:p
-       [:strong (tr [:common-texts :footer-made-width])]
-       [:a.hide-text.ckan-footer-logo {:href "http://ckan.org"}
-        (tr [:common-texts :footer-ckan-software])]]]]]])
+        [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]]]])
 
 (defn- debug-state [app]
   ;; NOTE: debug state is VERY slow if app state is HUGE
@@ -183,7 +178,7 @@
      (top-nav e! app)
 
 
-     [:div.container-fluid.wrapper
+     [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
       (case (:page app)
         :front-page [fp/own-services e! app]
         :own-services [fp/own-services e! app]
