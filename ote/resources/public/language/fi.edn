@@ -37,10 +37,13 @@
    :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
    :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format-short "Muoto"
 
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
+   :ote.db.transport-service/license "Lisenssi/käyttöehdot"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (WWW)"
    }
 
   ;; Service exception
@@ -222,6 +225,7 @@
    :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
+
   }
 
  ;; Per feature/page localization keys
@@ -415,7 +419,7 @@
   :interfaces "Koneluettavat rajapinnat: "
   :nap-interface ["Palvelun \"" :name "\" NAPissa olevien tietojen rajapinta: "]
   :external-interfaces ["Palvelun \"" :name "\" ulkopuoliset palveluntuottajan itse tarjoamat rajapinnat:"]
-  :showing-latest-services "Näytetään uusimmat palvelut, suodata listaa hakuehdoilla"
+  :showing-latest-services "Näytetään viimeksi muokatut palvelut. Hae palveluita syöttämällä hakuehdot."
   }
 
  }

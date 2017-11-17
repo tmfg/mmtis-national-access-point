@@ -42,13 +42,15 @@
    (form/info (tr [:form-help :external-interfaces]))
    {:name ::t-service/external-interfaces
     :type :table
-    :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "40%"
+    :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"
                     :read (comp ::t-service/description ::t-service/external-interface)
                     :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)}
-                   {:name ::t-service/external-service-url :type :string :width "40%"
+                   {:name ::t-service/external-service-url :type :string :width "21%"
                     :read (comp ::t-service/url ::t-service/external-interface)
                     :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)}
-                   {:name ::t-service/format :type :string :width "20%"}]
+                   {:name ::t-service/format :type :string :width "16%"}
+                   {:name ::t-service/license :type :string :width "21%"}
+                   {:name ::t-service/license-url :type :string :width "21%"}]
     :delete? true
     :add-label (tr [:buttons :add-external-interface])}))
 

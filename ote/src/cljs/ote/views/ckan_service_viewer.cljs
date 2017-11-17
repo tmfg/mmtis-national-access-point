@@ -4,6 +4,7 @@
   displays a map and data from the geojson file."
   (:require [ote.app.controller.ckan-service-viewer :as v]
             [ote.ui.leaflet :as leaflet]
+            [ote.ui.common :refer [linkify]]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-or]]
             [stylefy.core :as stylefy]
@@ -18,11 +19,7 @@
             [reagent.core :as r]
             cljsjs.leaflet))
 
-(defn linkify [url label]
-  (let [url (if (re-matches #"^\w+:.*" url)
-              url
-              (str "http://" url))]
-    [:a {:href url :target "_blank"} label]))
+
 
 (defmulti transform-value (fn [key value] key))
 
