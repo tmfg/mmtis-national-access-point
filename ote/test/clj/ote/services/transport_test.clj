@@ -159,19 +159,18 @@
            (::t-service/passenger-transportation service)
            (::t-service/passenger-transportation fetched))))))
 
-(defspec save-terminal-to-wrong-operator
-  1
-  (prop/for-all
-    [terminal-service gen-terminal-service] ;; Generate new terminal service
-    (let [response (http-post "admin" "transport-service"
-                              terminal-service) ;; Post generated data to server
-          service (:transit response) ;; Get response from transit
-          fetch-response (http-get "admin"
-                                   (str "transport-service/" (::t-service/id service))) ;; GET generated service from server
-          fetched (:transit fetch-response) ;; Get response from transit
-          modified-operator (assoc fetched ::t-service/transport-operator-id 2) ;; Change id from 1 -> 2
-          failed-response (http-post "admin" "transport-service"
-                                    modified-operator) ;; Post modified service data to server
-          fetched-failed-service (:transit failed-response) ;; Get response from transit
-          ]
-          (is  (not= (:status fetched-failed-service) 200)))))
+(deftest save-terminal-to-wrong-operator
+  (let [terminal-service (gen/generate gen-terminal-service)
+        response (http-post "admin" "transport-service"
+                            terminal-service)
+        service (:transit response)
+        ;; GET generated service from server
+        fetch-response (http-get "admin"
+                                 (str "transport-service/" (::t-service/id service)))
+        fetched (:transit fetch-response)
+        ;; Change id from 1 -> 2
+        modified-operator (assoc fetched ::t-service/transport-operator-id 2)]
+
+    (is (thrown-with-msg?
+         clojure.lang.ExceptionInfo #"status 403"
+         (http-post "admin" "transport-service" modified-operator)))))
