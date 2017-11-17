@@ -9,5 +9,8 @@ $P -f ../nap/ckan-initial-db.sql napote
 
 mvn flyway:migrate
 
+$P -f testdata-ckan.sql
+$P -f testdata-ote.sql
+
 $P -c "CREATE DATABASE napotetest_template WITH TEMPLATE napote OWNER napotetest;"
 $P -c "CREATE DATABASE napotetest WITH TEMPLATE napotetest_template OWNER napotetest;"
