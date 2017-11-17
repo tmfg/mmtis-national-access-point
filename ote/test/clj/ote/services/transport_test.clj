@@ -37,6 +37,7 @@
    ::t-service/real-time-information generators/gen-service-link
    ::t-service/accessibility-description generators/gen-localized-text-array
    ::t-service/service-hours generators/gen-service-hours-array
+   ::t-service/service-exceptions (gen/return []) ;; FIXME: generate these
    ::t-service/luggage-restrictions generators/gen-localized-text-array))
 
 (def gen-passenger-transportation-service
@@ -103,15 +104,18 @@
     (and (map? v1) (map? v2))
     (let [keys-v1 (non-nil-keys v1)
           keys-v2 (non-nil-keys v2)]
-      (and (= keys-v1 keys-v2)
-           (every? #(let [result (effectively-same-deep (get v1 %)
-                                                        (get v2 %))]
-                      (when-not result
-                        (println "Values for key" % "are not the same!"
-                                 "\nV1:" (pr-str v1)
-                                 "\nV2:" (pr-str v2)))
-                      result)
-                   keys-v1)))
+      (if-not (= keys-v1 keys-v2)
+        (do (println "Maps don't have the same non-empty keys: " keys-v1 " != " keys-v2)
+            false)
+        (and (= keys-v1 keys-v2)
+             (every? #(let [result (effectively-same-deep (get v1 %)
+                                                          (get v2 %))]
+                        (when-not result
+                          (println "Values for key" % "are not the same!"
+                                   "\nV1:" (pr-str v1)
+                                   "\nV2:" (pr-str v2)))
+                        result)
+                     keys-v1))))
 
     ;; Both values are vectors, check that values at every index are the same
     (and (vector? v1) (vector? v2))
@@ -133,7 +137,9 @@
 
     ;; Other values, just compare
     :default
-    (= v1 v2)))
+    (if-not (= v1 v2)
+      (do (println "Values are not the same: " v1 " != " v2) false)
+      true)))
 
 (defspec save-and-fetch-generated-passenger-transport-service
   50
@@ -157,14 +163,14 @@
   1
   (prop/for-all
     [terminal-service gen-terminal-service] ;; Generate new terminal service
-    (let [response (http-post "admin" "terminal-information"
+    (let [response (http-post "admin" "transport-service"
                               terminal-service) ;; Post generated data to server
           service (:transit response) ;; Get response from transit
           fetch-response (http-get "admin"
                                    (str "transport-service/" (::t-service/id service))) ;; GET generated service from server
           fetched (:transit fetch-response) ;; Get response from transit
           modified-operator (assoc fetched ::t-service/transport-operator-id 2) ;; Change id from 1 -> 2
-          failed-response (http-post "admin" "terminal-information"
+          failed-response (http-post "admin" "transport-service"
                                     modified-operator) ;; Post modified service data to server
           fetched-failed-service (:transit failed-response) ;; Get response from transit
           ]
