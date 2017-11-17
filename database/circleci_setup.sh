@@ -5,7 +5,7 @@
 sudo apt-get install postgresql-client maven
 
 P="psql -h localhost -p 5432 -U postgres"
-$P -f ../nap/ckan-initial-db.sql
+$P -f ../nap/ckan-initial-db.sql napote
 
 mvn flyway:migrate
 
