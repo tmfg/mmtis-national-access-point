@@ -58,7 +58,11 @@
 
 (def ^{:doc "Transport service columns to set as properties in GeoJSON export"}
   transport-service-properties-columns
-  (set/difference (specql/columns ::t-service/transport-service)
+  (set/difference (conj (specql/columns ::t-service/transport-service)
+                        ;; Fetch linked external interfaces
+                        [::t-service/external-interfaces (disj (specql/columns ::t-service/external-interface-description)
+                                                               ::t-service/id
+                                                               ::t-service/transport-service-id)])
                   modification/modification-field-keys))
 
 (defn- export-geojson [db transport-operator-id transport-service-id]
