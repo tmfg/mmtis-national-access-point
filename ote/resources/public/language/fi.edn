@@ -41,6 +41,8 @@
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
+   :ote.db.transport-service/license-description "Lisenssi/käyttöehdot"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus verkko-osoite"
    }
 
   ;; Service exception
@@ -221,6 +223,7 @@
    :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
+
   }
 
  ;; Per feature/page localization keys
