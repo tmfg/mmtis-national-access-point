@@ -31,9 +31,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run:
-          working_directory: ~/project/ote
-          command: lein deps
+      - run: cd ote && lein deps
 
       - save_cache:
           paths:
@@ -41,6 +39,4 @@ jobs:
           key: v1-dependencies-{{ checksum "ote/project.clj" }}
 
       # run tests!
-      - run:
-          working_directory: ~/project/ote
-          command: lein test
+      - run: cd ote && lein test
