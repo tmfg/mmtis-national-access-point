@@ -31,7 +31,9 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: lein deps
+      - run:
+          working_directory: ~/project/ote
+          command: lein deps
 
       - save_cache:
           paths:
