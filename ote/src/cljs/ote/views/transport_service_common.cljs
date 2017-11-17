@@ -49,12 +49,8 @@
                     :read (comp ::t-service/url ::t-service/external-interface)
                     :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)}
                    {:name ::t-service/format :type :string :width "16%"}
-                   {:name ::t-service/license-description :type :string :width "21%"
-                    :read (comp ::t-service/description ::t-service/license)
-                    :write #(assoc-in %1 [::t-service/license ::t-service/description] %2)}
-                   {:name ::t-service/license-url :type :string :width "21%"
-                    :read (comp ::t-service/url ::t-service/license)
-                    :write #(assoc-in %1 [::t-service/license ::t-service/url] %2)}]
+                   {:name ::t-service/license :type :string :width "21%"}
+                   {:name ::t-service/license-url :type :string :width "21%"}]
     :delete? true
     :add-label (tr [:buttons :add-external-interface])}))
 

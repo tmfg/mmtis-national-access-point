@@ -41,7 +41,7 @@
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
-   :ote.db.transport-service/license-description "Lisenssi/käyttöehdot"
+   :ote.db.transport-service/license "Lisenssi/käyttöehdot"
    :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus verkko-osoite"
    }
 
