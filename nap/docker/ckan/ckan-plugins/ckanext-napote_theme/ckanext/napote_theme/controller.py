@@ -7,7 +7,9 @@ import ckan.model as model
 import ckan.lib.helpers as h
 import ckan.logic as logic
 import ckan.logic.schema as schema
+import ckan.lib.captcha as captcha
 import ckan.lib.mailer as mailer
+import ckan.plugins as p
 
 import ckan.lib.navl.dictization_functions as dictization_functions
 
@@ -33,6 +35,14 @@ DataError = dictization_functions.DataError
 unflatten = dictization_functions.unflatten
 
 
+def set_repoze_user(user_id):
+    '''Set the repoze.who cookie to match a given user_id'''
+    if 'repoze.who.plugins' in request.environ:
+        rememberer = request.environ['repoze.who.plugins']['friendlyform']
+        identity = {'repoze.who.userid': user_id}
+        response.headerlist += rememberer.remember(request.environ,
+                                                   identity)
+
 class CustomUserController(UserController):
     def _new_form_to_db_schema(self):
         user_new_form_schema = schema.user_new_form_schema()
@@ -53,6 +63,46 @@ class CustomUserController(UserController):
         user_edit_form_schema['email'].append(email_uniq_validator)
 
         return user_edit_form_schema
+
+    def _save_new(self, context):
+        try:
+            data_dict = logic.clean_dict(unflatten(
+                logic.tuplize_dict(logic.parse_params(request.params))))
+            context['message'] = data_dict.get('log_message', '')
+            captcha.check_recaptcha(request)
+            user = get_action('user_create')(context, data_dict)
+        except NotAuthorized:
+            abort(403, _('Unauthorized to create user %s') % '')
+        except NotFound, e:
+            abort(404, _('User not found'))
+        except DataError:
+            abort(400, _(u'Integrity Error'))
+        except captcha.CaptchaError:
+            error_msg = _(u'Bad Captcha. Please try again.')
+            h.flash_error(error_msg)
+            return self.new(data_dict)
+        except ValidationError, e:
+            errors = e.error_dict
+            error_summary = e.error_summary
+            return self.new(data_dict, errors, error_summary)
+        if not c.user:
+            # log the user in programatically
+            set_repoze_user(data_dict['name'])
+            h.redirect_to(controller='home', action='index', __ckan_no_root=True)
+        else:
+            # #1799 User has managed to register whilst logged in - warn user
+            # they are not re-logged in as new user.
+            h.flash_success(_('User "%s" is now registered but you are still '
+                            'logged in as "%s" from before') %
+                            (data_dict['name'], c.user))
+            if authz.is_sysadmin(c.user):
+                # the sysadmin created a new user. We redirect him to the
+                # activity page for the newly created user
+                h.redirect_to(controller='user',
+                              action='activity',
+                              id=data_dict['name'])
+            else:
+                return render('user/logout_first.html')
 
     def register(self, data=None, errors=None, error_summary=None):
         return super(CustomUserController, self).register(data, errors, error_summary)
@@ -119,3 +169,36 @@ class CustomUserController(UserController):
                     h.flash_error(_('Could not send reset link: %s') %
                                   unicode(e))
         return render('user/request_reset.html')
+
+    def login(self, error=None):
+        # Do any plugin login stuff
+        for item in p.PluginImplementations(p.IAuthenticator):
+            item.login()
+
+        if 'error' in request.params:
+            h.flash_error(request.params['error'])
+
+        if not c.user:
+            came_from = request.params.get('came_from')
+            if not came_from:
+                came_from = h.url_for(controller='home', action='index',
+                                      __ckan_no_root=True)
+            c.login_handler = h.url_for(
+                self._get_repoze_handler('login_handler_path'),
+                came_from=came_from)
+            if error:
+                vars = {'error_summary': {'': error}}
+            else:
+                vars = {}
+            return render('user/login.html', extra_vars=vars)
+        else:
+            return render('user/logout_first.html')
+
+    def logout(self):
+        # Do any plugin logout stuff
+        for item in p.PluginImplementations(p.IAuthenticator):
+            item.logout()
+        url = h.url_for(controller='home', action='index',
+                        __ckan_no_root=True)
+        h.redirect_to(self._get_repoze_handler('logout_handler_path') +
+                      '?came_from=' + url)
