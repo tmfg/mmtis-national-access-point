@@ -12,7 +12,7 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: circleci/postgres:9.6
+      - image: solita/napotedb:latest
 
     working_directory: ~/repo
 
@@ -37,6 +37,9 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "ote/project.clj" }}
+
+      # setup database
+      - run: cd database && sh circleci_setup.sh
 
       # run tests!
       - run: cd ote && lein test
