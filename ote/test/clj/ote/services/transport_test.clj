@@ -140,7 +140,7 @@
   (prop/for-all
    [transport-service gen-passenger-transportation-service]
 
-   (let [response (http-post "admin" "passenger-transportation-info"
+   (let [response (http-post "admin" "transport-service"
                              transport-service)
          service (:transit response)
          fetch-response (http-get "admin"
