@@ -155,7 +155,8 @@
 
   :ote.db.transport-service/sub-type
   {:taxi     "Taksiliikenne"
-   :request  "Muu kutsuun perustuva liikenne"
+   :request  "Tilausajoliikenne, linja-auto"
+   :other  "Muu kutsuun perustuva liikenne"
    :schedule "Säännöllinen aikataulun mukainen liikenne"}
 
   :ote.db.transport-service/payment-methods
@@ -238,6 +239,7 @@
  {:terminal                 "Asemat, satamat ja muut terminaalit"
   :passenger-transportation-taxi "Taksiliikenne (henkilöiden kuljetuspalvelut)"
   :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+  :passenger-transportation-other "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
   :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
