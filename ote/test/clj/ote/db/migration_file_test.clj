@@ -1,0 +1,29 @@
+(ns ote.db.migration-file-test
+  "Test that migration files are named properly."
+  (:require  [clojure.test :as t :refer [deftest is testing]]
+             [clojure.java.io :as io])
+  (:import (java.io File)))
+
+(defn migration-number [name]
+  (second (re-matches #"^V1_(\d+)__.*\.sql$" name)))
+
+(deftest migration-files-ok
+  (let [files (->> (File. "../database/src/main/resources/db/migration")
+                   .listFiles
+                   seq
+                   (map #(.getName %))
+                   set)
+        migrations (disj files "afterMigrate.sql")]
+
+    (is (files "afterMigrate.sql") "afterMigrate script present")
+
+    (is (not (empty? migrations)))
+
+    (doseq [m migrations]
+      (is (re-matches #"^V1_\d+__.*\.sql$" m)
+          (str "File " m " doesn't match the migration filename pattern!")))
+
+    (let [numbers (group-by identity (map migration-number migrations))]
+      (doseq [n (keys numbers)]
+        (is (= 1 (count (numbers n)))
+            (str "Multiple migrations with number: " n))))))
