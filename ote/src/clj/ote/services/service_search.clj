@@ -50,7 +50,11 @@
     ;; Information JOINed from other tables
     ::t-service/operation-area-description
     ::t-service/external-interface-links
-    ::t-service/operator-name})
+    ::t-service/operator-name
+
+    ;; Modification info (to sort by)
+    ::modification/created
+    ::modification/modified})
 
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
@@ -79,14 +83,6 @@
                        {::t-service/published? true
                         ::t-service/sub-type (op/in types)}))))
 
-(defn- latest-service-ids [db]
-  (ids ::t-service/id
-       (specql/fetch db ::t-service/transport-service
-                     #{::t-service/id}
-                     {::t-service/published? true}
-                     {::specql/order-by ::modification/created
-                      ::specql/order-direction :desc
-                      ::specql/limit 20})))
 
 (defn- search [db filters]
   (let [result-id-sets [(operation-area-ids db (:operation-area filters))
