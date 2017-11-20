@@ -87,6 +87,7 @@
 
    {:name        ::common/postal_code
     :type        :string
+    :regex #"\d{0,5}"
     :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
@@ -116,11 +117,11 @@
     [:div.row
      (if published?
        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                      :disabled (form/disable-save? data)}
+                      :disabled (not (form/can-save? data))}
         (tr [:buttons :save-updated])]
        [:span
         [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                       :disabled (form/disable-save? data)}
+                       :disabled (not (form/can-save? data))}
          (tr [:buttons :save-and-publish])]
         [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
                         :disabled name-missing?}
