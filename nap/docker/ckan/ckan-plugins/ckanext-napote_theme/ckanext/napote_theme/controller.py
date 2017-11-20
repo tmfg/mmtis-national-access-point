@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import logging
-
+import ckan
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.lib.helpers as h
@@ -19,6 +19,8 @@ from ckan.controllers.user import UserController
 
 from validators import email_uniq_validator
 
+set_repoze_user = ckan.controllers.user.set_repoze_user
+
 log = logging.getLogger(__name__)
 
 abort = base.abort
@@ -34,14 +36,6 @@ UsernamePasswordError = logic.UsernamePasswordError
 DataError = dictization_functions.DataError
 unflatten = dictization_functions.unflatten
 
-
-def set_repoze_user(user_id):
-    '''Set the repoze.who cookie to match a given user_id'''
-    if 'repoze.who.plugins' in request.environ:
-        rememberer = request.environ['repoze.who.plugins']['friendlyform']
-        identity = {'repoze.who.userid': user_id}
-        response.headerlist += rememberer.remember(request.environ,
-                                                   identity)
 
 class CustomUserController(UserController):
     def _new_form_to_db_schema(self):
