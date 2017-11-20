@@ -87,6 +87,7 @@
 
    {:name        ::common/postal_code
     :type        :string
+    :regex #"\d{0,5}"
     :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
