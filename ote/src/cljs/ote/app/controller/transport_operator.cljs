@@ -41,12 +41,14 @@
   TransportOperatorResponse
   (process-event [{response :response} app]
     (assoc app
-      :transport-operator response))
+      :transport-operator (assoc response
+                            :loading? false)))
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
     ;(.log js/console " Transport operator data response" (clj->js response) (clj->js (get response :transport-operator)))
     (assoc app
-      :transport-operator (get response :transport-operator)
+      :transport-operator (assoc (get response :transport-operator)
+                            :loading? false)
       :transport-services (get response :transport-service-vector)
       :user (get response :user))))

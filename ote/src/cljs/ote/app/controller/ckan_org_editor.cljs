@@ -15,4 +15,5 @@
   (process-event [_ app]
     (let [ckan-group-id (.getAttribute (.getElementById js/document "nap_viewer") "data-group-id")]
       (to/transport-operator-data))
-    app))
+    (assoc app
+      :transport-operator {:loading? true})))
