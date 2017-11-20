@@ -16,8 +16,30 @@
             [ote.db.modification :as modification]
             [ote.time :as time]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [reagent.core :as r]))
 
+(defn- delete-service-action [e! {::t-service/keys [id name]
+                                  :keys [show-delete-modal?]
+                                  :as service}]
+  [:span
+   [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
+    [ic/action-delete]]
+   (when show-delete-modal?
+     [ui/dialog
+      {:open true
+       :title (tr [:dialog :delete-transport-service :title])
+       :actions [(r/as-element
+                  [ui/flat-button
+                   {:label (tr [:buttons :cancel])
+                    :primary true
+                    :on-click #(e! (ts/->CancelDeleteTransportService id))}])
+                 (r/as-element
+                  [ui/flat-button {:label (tr [:buttons :delete])
+                                   :secondary true
+                                   :on-click #(e! (ts/->ConfirmDeleteTransportService id))}])]}
+      (tr [:dialog :delete-transport-service :confirm] {:name name})])
+   ])
 (defn transport-services-table-rows [e! services transport-operator-id]
   [ui/table-body {:display-row-checkbox false}
    (doall
@@ -42,8 +64,7 @@
             [ui/table-row-column
              [ui/icon-button {:href edit-service-url  }
               [ic/content-create]]
-             [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
-              [ic/action-delete]]]]))
+             [delete-service-action e! row]]]))
        services))])
 
 (defn transport-services-listing [e! transport-operator-id services section-label]
