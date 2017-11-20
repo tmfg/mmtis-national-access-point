@@ -129,4 +129,4 @@
     (action ckan resource)))
 
 (defn delete-dataset! [ckan dataset-id]
-  (ckan-post ckan "action/package_delete" {:ckan/id dataset-id}))
+  (ckan-post ckan "action/dataset_purge" {:ckan/id dataset-id}))
