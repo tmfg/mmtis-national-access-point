@@ -763,3 +763,8 @@ Organization data
 .organization-info div {
     margin-bottom: 4px;
 }
+
+/* Hide hide-slug-preview */
+div.hide-slug-preview div.slug-preview {
+    display: none;
+}
