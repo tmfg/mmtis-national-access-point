@@ -6,6 +6,8 @@ from logging import getLogger
 from pkg_resources import resource_stream
 import csv
 import sys
+
+import ckan.authz as authz
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.plugins import DefaultTranslation
@@ -53,6 +55,13 @@ def authenticate_monkey_patch(self, environ, identity):
 authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_patch
 
 ### MONKEY PATCH CKAN AUTHENTICATION END ###
+
+def dataset_purge_custon_auth(context, data_dict):
+    # Defer authorization for package_pruge to package_update
+    # This authorization is similar to editing package fields.
+
+    return authz.is_authorized('package_update', context, data_dict)
+
 
 def log_debug(*args):
     log.info(*args)
@@ -106,16 +115,20 @@ def update_term_translations():
 
 
 class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultDatasetForm):
-    # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
-    # Enable after translations have been generated
+    plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IPluginObserver, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IRoutes, inherit=True)
+
+    # http://docs.ckan.org/en/latest/extensions/translating-extensions.html
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
+
+    def get_auth_functions(self):
+        return {'dataset_purge': dataset_purge_custon_auth}
 
     def get_helpers(self):
         return {
