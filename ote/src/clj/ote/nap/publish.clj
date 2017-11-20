@@ -6,7 +6,8 @@
             [ote.db.operation-area :as operation-area]
             [specql.core :refer [fetch] :as specql]
             [clojure.string :as str]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.components.db :as db]))
 
 (defn- fetch-service-operation-area-description
   "Fetch the operation area as a comma separated list (for SOLR facet search).
@@ -128,3 +129,18 @@
     {:dataset dataset
      :resource resource
      :external-resources external-resources}))
+
+(defn delete-published-service!
+  [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
+  (let [c (ckan/->CKAN api (get-in user [:user :apikey]))
+        dataset-id (-> db
+                       (specql/fetch ::t-service/transport-service
+                                     #{::t-service/ckan-dataset-id}
+                                     {::t-service/id transport-service-id})
+                       first
+                       ::t-service/ckan-dataset-id)]
+    (when-not dataset-id
+      (throw (ex-info "Can't find CKAN dataset-id for service"
+                      {::t-service/id transport-service-id})))
+
+    (ckan/delete-dataset! c dataset-id)))

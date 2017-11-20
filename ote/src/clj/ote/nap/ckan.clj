@@ -127,3 +127,6 @@
                  update-dataset-resource!
                  add-dataset-resource!)]
     (action ckan resource)))
+
+(defn delete-dataset! [ckan dataset-id]
+  (ckan-post ckan "action/package_delete" {:ckan/id dataset-id}))
