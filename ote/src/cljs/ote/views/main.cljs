@@ -71,21 +71,20 @@
 
 (defn header-links [app]
   (filter some?
-          (conj
-            [{:page  :front-page
-              :label [:common-texts :navigation-front-page]
-              :url   "/"}
+          [{:page  :front-page
+            :label [:common-texts :navigation-front-page]
+            :url   "/"}
 
-             {:page  :services
-              :label [:common-texts :navigation-dataset]}
+           {:page  :services
+            :label [:common-texts :navigation-dataset]}
 
-             {:page  :organizations
-              :label [:common-texts :navigation-organizations]
-              :url   "/organization"}]
+           {:page  :organizations
+            :label [:common-texts :navigation-organizations]
+            :url   "/organization"}
 
-            (when (logged-in? app)
-              {:page  :own-services
-               :label [:common-texts :navigation-own-service-list]}))))
+           (when (logged-in? app)
+             {:page  :own-services
+              :label [:common-texts :navigation-own-service-list]})]))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
   [:div (stylefy/use-style style-topnav/clear)
