@@ -106,7 +106,8 @@
           ::first-modification
           ::latest-modification
           ::schema
-          ::closed-groups))
+          ::closed-groups
+          :loading?))
 
 (defrecord ^:private Label [label])
 (defn- label? [x]
