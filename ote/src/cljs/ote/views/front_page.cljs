@@ -30,15 +30,17 @@
       {:open true
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
-                  [ui/raised-button
+                  [ui/flat-button
                    {:label (tr [:buttons :cancel])
                     :primary true
                     :on-click #(e! (ts/->CancelDeleteTransportService id))}])
                  (r/as-element
                   [ui/raised-button
                    {:label (tr [:buttons :delete])
+                    :icon (ic/action-delete-forever)
                     :secondary true
                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}])]}
+
       (tr [:dialog :delete-transport-service :confirm] {:name name})])
    ])
 (defn transport-services-table-rows [e! services transport-operator-id]
