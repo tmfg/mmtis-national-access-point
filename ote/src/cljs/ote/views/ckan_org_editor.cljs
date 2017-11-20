@@ -16,7 +16,11 @@
 (defn editor [e! status]
   ;; init
   (e! (org-edit/->StartEditor))
-  (fn [e! {:keys [transport-operator] :as app}]
-    [theme
-     [:div.container
-      [to-view/operator e! transport-operator]]]))
+  (fn [e! {:keys [transport-operator] :as app {:keys [loading?]} :transport-operator}]
+    (if loading?
+      [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+
+      [theme
+       [:div.ote-sovellus
+        [:div.container
+         [to-view/operator e! transport-operator]]]])))

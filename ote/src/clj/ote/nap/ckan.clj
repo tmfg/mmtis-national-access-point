@@ -128,22 +128,5 @@
                  add-dataset-resource!)]
     (action ckan resource)))
 
-
-
-
-(defn add-or-update-dataset-resource [ckan resource])
-
-;; Test locally
-
-#_(def c (->CKAN "http://localhost:8080/api/" "d7c6dccf-6541-4443-a9b4-7ab7c36735bc"))
-
-#_(def create-dataset-response
-  (create-dataset c {:ckan/name (str "uusia-tietoja-" (System/currentTimeMillis))
-                     :ckan/title "Täällä on taas uusia tietoja"
-                     :ckan/owner-org "taksiyritys-testinen-oy"
-                     :ckan/notes "Tässäpä sitä lisättiin sitten hepehp"
-                     :ckan/public true
-                     :ckan/extras [{:ckan/key "foo" :ckan/value "barsky"}
-                                   {:ckan/key "howgood" :ckan/value "very"}]
-                     :ckan/transport-service-type "Foo, dippadai, rentals"
-                     :ckan/operation-area "Oulu, Kempele, Hailuoto, 90100, Helsinki"}))
+(defn delete-dataset! [ckan dataset-id]
+  (ckan-post ckan "action/dataset_purge" {:ckan/id dataset-id}))

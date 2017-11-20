@@ -10,31 +10,38 @@
                     {% endif %}
                 {% endblock %}
 
-                <button data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar" type="button">
-                    <span class="fa-bar"></span>
-                    <span class="fa-bar"></span>
-                    <span class="fa-bar"></span>
+                {# The .header-image class hides the main text and uses image replacement for the title #}
+                <div class="{{ g.header_class }} pull-left">
+                    {% block header_logo %}
+                    <a class="brand" href="{{ h.url_for('home') }}">
+                        <img src="/nap-logo.svg"
+                             alt="{{ g.site_title }}"
+                             title="{{ g.site_title }}"
+                        />
+                    </a>
+                    {% endblock %}
+                </div>
+
+                <button data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar collapsible-btn" type="button">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
                 </button>
 
                 <div class="nav-collapse collapse">
                     <nav class="section navigation">
-                        {# The .header-image class hides the main text and uses image replacement for the title #}
-                        <div class="{{ g.header_class }} pull-left">
-                            {% block header_logo %}
-                                <a class="brand" href="{{ h.url_for('home') }}">
-                                    <img src="/nap-logo.svg"
-                                         alt="{{ g.site_title }}"
-                                         title="{{ g.site_title }}"
-                                    />
-                                </a>
-                            {% endblock %}
-                        </div>
+
 
                         {% block header_site_navigation %}
                             <ul class="nav nav-pills">
                                 {% block header_site_navigation_tabs %}
                                     {{ h.build_nav_main(('home', _('Home')),('search', _('Datasets')),('organizations_index', _('Organizations')) ) }}
                                 {% endblock %}
+                                <li>
+                                    <a href="/ote/index.html#/own-services" title="{{ _('Omat palvelutiedot') }}">
+                                        <span class="text">{{ _('My services') }}</span>
+                                    </a>
+                                </li>
                             </ul>
                         {% endblock %}
                     </nav>
@@ -49,18 +56,11 @@
                                                 type="button"
                                                 data-toggle="dropdown">
                         <span class="image" title="{{ _('View profile') }}">
-                                {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22) }}
                                 <span class="username">{{ c.userobj.display_name }}</span>
                         </span>
                                             <i class="fa fa-caret-down" aria-hidden="true"></i></button>
                                         <ul class="dropdown-menu">
                                             {% block header_account_logged %}
-                                                <li>
-                                                    <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}"
-                                                       title="{{ _('View profile') }}">
-                                                        <span class="username">{{ _('View profile') }}</span>
-                                                    </a>
-                                                </li>
                                                 {% if c.userobj.sysadmin %}
                                                     <li>
                                                         <a href="{{ h.url_for(controller='admin', action='index') }}"
@@ -73,7 +73,7 @@
                                                 {% set new_activities = h.new_activities() %}
                                                 <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
                                                     {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
-                                                    <a href="{{ h.url_for(controller='user', action='dashboard') }}"
+                                                    <a href="{{ h.url_for(controller='user', action='dashboard_datasets') }}"
                                                        title="{{ notifications_tooltip }}">
                                                         <i class="fa fa-tachometer" aria-hidden="true"></i>
                                                         <span class="text">{{ _('Dashboard') }}</span>
@@ -83,18 +83,9 @@
                                                 {% block header_account_settings_link %}
                                                     <li>
                                                         <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}"
-                                                           title="{{ _('Edit settings') }}">
-                                                            <i class="fa fa-cog" aria-hidden="true"></i>
-                                                            <span class="text">{{ _('Settings') }}</span>
-                                                        </a>
-                                                    </li>
-                                                {% endblock %}
-                                                {% block header_account_nap_manager_link %}
-                                                    <li>
-                                                        <a href="/ote/index.html"
-                                                           title="{{ _('NAP-data management') }}">
-                                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                                            <span class="text">{{ _('NAP-data management') }}</span>
+                                                           title="{{ _('View profile') }}">
+                                                            <i class="fa fa-user" aria-hidden="true"></i>
+                                                            <span class="text">{{ _('View profile') }}</span>
                                                         </a>
                                                     </li>
                                                 {% endblock %}
@@ -117,7 +108,7 @@
                                         </li>
                                         {% if h.check_access('user_create') %}
                                             <li>
-                                                <p class="navbar-text">
+                                                <p class="navbar-text visible-desktop">
                                                     /
                                                 </p>
                                             </li>

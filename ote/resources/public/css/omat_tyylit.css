@@ -1,20 +1,52 @@
 /* Tänne kaikki Material UI:ta muuttavat css muutokset - hox korvataan varmaan jossain vaiheessa less/sass tiedostoilla */
+/* Reset all attributes in css */
+* {
+  margin: 0;
+  padding: 0;
+}
 body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    min-height: 100%;
+    padding-bottom: 176px;
 }
-#oteapp {
+#oteapp, .ote-sovellus {
+    height: 100%;
+    min-height: 100%;
     padding: 0px;
+
 }
-/* Remove padding from container fluid*/
+/* Remove padding from container-fluid */
 .container-fluid {
     padding-left: 0px;
     padding-right: 0px;
 }
+.wrapper {
+    min-height: 100%;
+}
+
+@media only screen and (min-width: 1170px) {
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+        width: 1170px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
 html {
     font-family: 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
+    height: 100%;
+        min-height: 100%;
 }
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  margin-bottom: 1rem;
+ }
 
 .background-color {
     background: #3db7e4
@@ -53,63 +85,47 @@ html {
     bottom: 0px;*/
 }
 
-/* Testing nav bar*/
+/* Footer */
+footer {
+    display: block;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 
-.topnav {
-  overflow: hidden;
-  background-color: #000000;
-  color: #f2f2f2;
 }
-
-.topnav a {
-  bottom: 0;
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 25px 16px 11px 0px;
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: 700;
+.site-footer {
+    background: #444444;
+    color: #ffffff;
+    height: 100px;
+    padding: 20px 0;
+    margin-top: 20px;
 }
-
-.topnav > a:nth-of-type(1)  {
-    padding: 10px 10px 0px 15px;
+.site-footer .container-fluid {
+    position: relative;
 }
-
-.topnav > a:nth-of-type(2)  {
-    padding-left: 25px;
+.site-footer a {
+    color: #ccdee3;
 }
-
-.topnav a.ote-nav:hover {
-  border-bottom: 4px solid #1976D2;
+.footer-links .logo > img {
+    height: 70px;
+}
+ul.unstyled, ol.unstyled {
+    margin-left: 0;
+    list-style: none;
 }
 
-.topnav a.active {
-    border-bottom: 4px solid #1976D2;
+.unstyled {
+    margin: 0;
+    list-style: none;
 }
-.main-icon a:hover {
-    border-bottom: 0px solid #1976D2;
+.attribution .ckan-footer-logo {
+    display: block;
+    width: 68px;
+    height: 21px;
+    margin-top: 2px;
+    background: url(../../../base/images/ckan-logo-footer.png) no-repeat top left;
+    text-indent: -900em;
 }
-
-/* User menu */
-
-.topnav > div.user-menu {
-    padding-right: 20px;
-    float: right;
-    display: inline-block;
-}
-.topnav > div.user-data {
-    padding-top: 12px;
-    padding-bottom: 16px;
-    padding-left: 20px;
-    float: right;
-    display: inline-block;
-}
-div.user-data > div.user-name {
-    font-size: 15px;
-}
-div.user-data > div.user-organization {
-    font-size: 12px;
-}
-/* Top Navigation ends*/
+/* Footer ends */
+#oteapp > [data-reactroot] { height: 100% }

@@ -70,7 +70,8 @@
                              (eligibity-requirements)
                              (ts-common/service-url
                               (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                              ::t-service/booking-service)]]
+                              ::t-service/booking-service)
+                             ]]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div

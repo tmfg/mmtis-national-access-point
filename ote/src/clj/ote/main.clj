@@ -9,6 +9,7 @@
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
             [ote.services.viewer :as viewer]
+            [ote.services.service-search :as service-search]
 
             [ote.integration.export.geojson :as export-geojson]
             [taoensso.timbre :as log])
@@ -34,6 +35,10 @@
    ;; OpenStreetMap Overpass API queries
    :places (component/using (places/->Places (:places config)) [:http :db])
 
+   ;; Service search
+   :service-search (component/using
+                    (service-search/->ServiceSearch)
+                    [:http :db])
 
    ;; Integration: export GeoJSON
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])))

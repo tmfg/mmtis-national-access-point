@@ -35,10 +35,15 @@
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
    :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
-   :ote.db.transport-service/external-service-url "Rajapinnan URL-osoite"
-   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-
+   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format-short "Muoto"
+   :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
+   :ote.db.transport-service/company-name "Yrityksen nimi"
+   :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
+   :ote.db.transport-service/license "Lisenssi/käyttöehdot"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (WWW)"
    }
 
   ;; Service exception
@@ -50,10 +55,10 @@
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/url                       "Palvelun osoite"
+   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
    :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun osoitetiedot"
-
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/additional-services       "Muut palvelut"
    :ote.db.transport-service/price-class               "Hinnoittelu"
@@ -71,17 +76,18 @@
    :ote.db.transport-service/week-days                 "Viikonpäivät"
    :ote.db.transport-service/from                      "Aukeamisaika"
    :ote.db.transport-service/to                        "Kiinnimenoaika"
+   :ote.db.transport-service/all-day "24h"
 
    }
 
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
-   :ote.db.transport-service/url                       "Palvelun osoite"
+   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
    :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/information-service-accessibility "Esteettömyys-info-välineet"
-   :ote.db.transport-service/accessibility     "Esteettömyys-laitteet"
-   :ote.db.transport-service/mobility          "mobility"
+   :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
+   :ote.db.transport-service/accessibility     "Saavutettavuus"
+   :ote.db.transport-service/mobility          "Esteettömyys"
   }
 
   ;; Rental fields
@@ -98,21 +104,24 @@
 
 
   :transport-service
-  {:ote.db.transport-service/name "Palvelun mimi"
-   :ote.db.transport-service/sub-type "Liikkumispalvelun alatyyppi"
+  {:ote.db.transport-service/name "Palvelun nimi"
+   :ote.db.transport-service/type "Liikkumispalvelun tyyppi"
+   :ote.db.transport-service/sub-type "Liikkumispavelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {true "Julkaistu"
-                                                false "Ei julkaistu"}}
+                                                false "Ei julkaistu"}
 
-  ;; Common fields
-  :ote.db.common/street                               "Osoite"
-  :ote.db.common/post_office                          "Postitoimipaikka"
-  :ote.db.common/postal_code                          "Postinumero"}
+   ;; Common fields
+   :ote.db.common/street                               "Osoite"
+   :ote.db.common/post_office                          "Postitoimipaikka"
+   :ote.db.common/postal_code                          "Postinumero"
+   }
 
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."}
+ {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
+  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."}
 
 
  ;; Action buttons
@@ -129,7 +138,7 @@
   :add-new-price-class "Lisää hintarivi"
   :add-new-service-hour "Lisää palveluaika"
   :add-new-service-exception "Lisää poikkeus"
-
+  :add-new-company "Lisää palvelun tuottava yritys"
   :discard "Peruuta"
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
@@ -142,14 +151,15 @@
  :enums
  {:ote.db.transport-service/type
   {:terminal                 "Asemat, satamat ja muut terminaalit"
-   :passenger-transportation "Henkilöidenkuljetuspalvelut"
+   :passenger-transportation "Henkilöiden kuljetuspalvelut"
    :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
 
   :ote.db.transport-service/sub-type
   {:taxi     "Taksiliikenne"
-   :request  "Muu kutsuun perustuva liikenne"
+   :request  "Tilausajoliikenne, linja-auto"
+   :other  "Muu kutsuun perustuva liikenne"
    :schedule "Säännöllinen aikataulun mukainen liikenne"}
 
   :ote.db.transport-service/payment-methods
@@ -193,8 +203,7 @@
    }
 
   :ote.db.transport-service/accessibility
-  {:unknown "Määrittelemätön"
-   :lift "Hissi"
+  {:lift "Hissi"
    :escalator "Liukuportaat"
    :travelator "Liikkuva kävelytie"
    :ramp "Ramppi"
@@ -203,12 +212,10 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
-   :validator "Validator"
    :other  "Muu"}
 
   :ote.db.transport-service/mobility
-  {:unknown "Määrittelemätön"
-   :low-floor "Matalalattia"
+  {:low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
@@ -218,6 +225,7 @@
    :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
+
   }
 
  ;; Per feature/page localization keys
@@ -226,16 +234,17 @@
                 :rename-place "Anna uusi nimi (Enter hyväksyy)"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
-          :passenger-transportation "Henkilöidenkuljetuspalvelut"
+          :passenger-transportation "Henkilöiden kuljetuspalvelut"
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
           :brokerage                "Välityspalvelut"}
 
  :service-type-dropdown
  {:terminal                 "Asemat, satamat ja muut terminaalit"
-  :passenger-transportation-taxi "Taksiliikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-taxi "Taksiliikenne (henkilöiden kuljetuspalvelut)"
   :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (Henkilöidenkuljetuspalvelut)"
+  :passenger-transportation-other "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
+  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
   :brokerage                "Välityspalvelut"}
@@ -294,6 +303,12 @@
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   }
 
+ :select-service-type-page
+ {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
+  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
+                ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
+                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
+
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
@@ -308,17 +323,30 @@
   :header-nap-official-name                   "Palvelukatalogi"
   :navigation-own-service-list                "Omat palvelutiedot"
   :navigation-front-page                      "Etusivu"
+  :navigation-organizations                   "Palveluntuottajat"
+  :navigation-dataset                         "Palvelukatalogi"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Organisaation perustiedot"
-
-  :title-required-data-with-OTE               "Olennaisten tietojen kirjaaminen OTE:lla"
-  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
-                ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
+  :user-menu-log-out                          "Kirjaudu ulos"
+  :user-menu-profile                          "Näytä profiili"
   :title-operator-basic-details               "Perustiedot"
+  :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
-  :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
+  :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
+  :footer-livi-logo                           "Liikennevirasto Logo"
+  :footer-livi-url                            "Liikennevirasto.fi"
+  :footer-ckan-software                       "CKAN-ohjelmistolla"
+  :footer-made-width                          "Toteutettu"
+  }
+
+ :dialog
+ {:delete-transport-service
+  {:title "Poista liikkumispalvelun tiedot?"
+   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}}
+
+ :organization-viewer-page
+ {:contact-types  "Yhteystavat"
   }
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
@@ -388,5 +416,20 @@
                    "invoice" "Lasku"
                    }}
 
+
+ :service-search
+ {:label "Liikkumispalvelukatalogi"
+  :filters-label "Hakuehdot"
+  :text-search "Haku"
+  :text-search-placeholder "Hae nimellä tai sen osalla"
+  :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+  :no-results "Hakuehdoilla ei löytynyt palveluita"
+  :one-result "Hakuehdoilla löytyi yksi palvelu"
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :interfaces "Koneluettavat rajapinnat: "
+  :nap-interface ["Palvelun \"" :name "\" NAPissa olevien tietojen rajapinta: "]
+  :external-interfaces ["Palvelun \"" :name "\" ulkopuoliset palveluntuottajan itse tarjoamat rajapinnat:"]
+  :showing-latest-services "Näytetään viimeksi muokatut palvelut. Hae palveluita syöttämällä hakuehdot."
+  }
 
  }

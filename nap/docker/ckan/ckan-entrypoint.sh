@@ -37,13 +37,16 @@ write_config () {
     "host = 0.0.0.0" \
     "port = 5000"
 
+  # TODO: To translate CKAN terms and tags we need multilingual_dataset multilingual_resource multilingual_tag plugins
+  # However, in the plugins the languages supported are hardcoded, so we cannot use them as-is.
   ckan-paster --plugin=ckan config-tool "$CONFIG" -s app:main -e \
     "ckan.plugins = stats text_view image_view recline_view napote_theme" \
     "ckan.views.default_views = transport_service_view image_view text_view recline_view" \
     "ckan.locale_default = fi" \
     "ckan.locale_order = fi en sv" \
     "ckan.locales_offered = fi en sv" \
-    "ckan.locales_filtered_out = en_GB"
+    "ckan.locales_filtered_out = en_GB" \
+    "ckan.auth.user_create_organizations = true" \
   #    "sqlalchemy.url = ${CKAN_SQLALCHEMY_URL}" \
   #    "solr_url = ${CKAN_SOLR_URL}" \
   #    "ckan.redis.url = ${CKAN_REDIS_URL}" \
@@ -63,8 +66,6 @@ sync_plugin_changes () {
 watch_plugin_changes () {
   echo "Watching plugin source file changes at: $CKAN_CUSTOM_PLUGINS_PATH ..."
 
-  # Sync first to override possibly outdated plugin on startup
-  sync_plugin_changes $CKAN_CUSTOM_PLUGINS_PATH "$CKAN_HOME/src/"
 
   # Listen file change events
   # Settings: quiiet, monitor, recursive. Excludes events on some editor temp files, such as:  ___jb_*, ~ or .tmp
@@ -131,6 +132,9 @@ set_environment
 
 # Initializes the Database
 #ckan-paster --plugin=ckan db init -c "${CKAN_CONFIG}/ckan.ini"
+
+# Sync first to override possibly outdated plugin on startup
+sync_plugin_changes $CKAN_CUSTOM_PLUGINS_PATH "$CKAN_HOME/src/"
 
 # Start watching custom plugin changes in /ckan-plugins volume
 watch_plugin_changes

@@ -91,8 +91,7 @@
 
 
 (defn places-map [e! results]
-  (let [feature-group (atom nil)]
-    (r/create-class
+   (r/create-class
      {:component-did-mount #(do
                               (install-draw-control! e! %)
                               (leaflet/update-bounds-from-layers %))
@@ -106,12 +105,12 @@
          [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                              :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-         [leaflet/FeatureGroup]
+         ;[leaflet/FeatureGroup]
 
          (for [{:keys [place geojson]} results]
            ^{:key (::places/id place)}
            [leaflet/GeoJSON {:data geojson
-                             :style {:color "green"}}])])})))
+                             :style {:color "green"}}])])}))
 
 
 (defn marker-map [e! coordinate]

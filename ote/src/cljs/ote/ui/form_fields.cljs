@@ -13,6 +13,58 @@
             [ote.ui.buttons :as buttons]))
 
 
+
+(def text-field
+  "Temporary Material-ui reagent TextField fix. Requires Reagent v0.8.0-alpha2.
+  Fixes caret positioning when editing TextField input.
+  See: https://github.com/madvas/cljs-react-material-ui/issues/17"
+
+  (r/adapt-react-class
+    (aget js/MaterialUI "TextField")
+    {:synthetic-input
+     ;; A valid map value for `synthetic-input` does two things:
+     ;; 1) It implicitly marks this component class as an input type so that interactive
+     ;;    updates will work without cursor jumping.
+     ;; 2) Reagent defers to its functions when it goes to set a value for the input component,
+     ;;    or signal a change, providing enough data for us to decide which DOM node is our input
+     ;;    node to target and continue processing with that (or any arbitrary behaviour...); and
+     ;;    to handle onChange events arbitrarily.
+     ;;
+     ;;    Note: We can also use an extra hook `on-write` to execute more custom behaviour
+     ;;    when Reagent actually writes a new value to the input node, from within `on-update`.
+     ;;
+     ;;    Note: Both functions receive a `next` argument which represents the next fn to
+     ;;    execute in Reagent's processing chain.
+     {:on-update (fn [next root-node rendered-value dom-value component]
+                   (let [input-node (.querySelector root-node "input")
+                         textarea-nodes (array-seq (.querySelectorAll root-node "textarea"))
+                         textarea-node (when (= 2 (count textarea-nodes))
+                                         ;; We are dealing with EnhancedTextarea (i.e.
+                                         ;; multi-line TextField)
+                                         ;; so our target node is the second <textarea>...
+                                         (second textarea-nodes))
+                         target-node (or input-node textarea-node)]
+                     (when target-node
+                       ;; Call Reagent's input node value setter fn (extracted from input-set-value)
+                       ;; which handles updating of a given <input> element,
+                       ;; now that we have targeted the correct <input> within our component...
+                       (next target-node rendered-value dom-value component
+                             ;; Also hook into the actual value-writing step,
+                             ;; since `input-node-set-value doesn't necessarily update values
+                             ;; (i.e. not dirty).
+                             {:on-write
+                              (fn [new-value]
+                                ;; `blank?` is effectively the same conditional as Material-UI uses
+                                ;; to update its `hasValue` and `isClean` properties, which are
+                                ;; required for correct rendering of hint text etc.
+                                (if (clojure.string/blank? new-value)
+                                  (.setState component #js {:hasValue false :isClean false})
+                                  (.setState component #js {:hasValue true :isClean false})))}))))
+      :on-change (fn [next event]
+                   ;; All we do here is continue processing but with the event target value
+                   ;; extracted into a second argument, to match Material-UI's existing API.
+                   (next event (-> event .-target .-value)))}}))
+
 (defn read-only-atom [value]
   (r/wrap value
           #(assert false (str "Can't write to a read-only atom: " (pr-str value)))))
@@ -43,7 +95,7 @@
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-focus form? error warning table?]
                            :as   field} data]
-  [ui/text-field
+  [text-field
    {:floatingLabelText (when-not table?  label)
     :hintText          (placeholder field data)
     :on-change         #(let [v %2]
@@ -59,7 +111,7 @@
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
-  [ui/text-field
+  [text-field
    {:floatingLabelText label
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
@@ -80,7 +132,7 @@
       [:table
        [:tr
         [:td
-         [ui/text-field
+         [text-field
           {:floatingLabelText (when-not table? label)
            :hintText          (placeholder field data)
            :on-change         #(let [updated-language-data
@@ -133,20 +185,26 @@
        options))]))
 
 
-(defmethod field :multiselect-selection [{:keys [update! label name style show-option show-option-short options form? error] :as field} data]
+(defmethod field :multiselect-selection
+  [{:keys [update! label name style show-option show-option-short options form? error auto-width?]
+    :as field}
+   data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field {:style style
-                      :floating-label-text label
-                      :multiple true
-                      :value (clj->js (map option-idx selected-set))
-                      :selection-renderer (fn [values]
-                                            (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
-                      :on-change (fn [event index values]
-                                   (update! (into #{}
-                                                  (map (partial nth options))
-                                                  values)))} ;; Add selected value to vector
+    [ui/select-field
+     {:auto-width (boolean auto-width?)
+      :style style
+      :floating-label-text label
+      :multiple true
+      :value (clj->js (map option-idx selected-set))
+      :selection-renderer (fn [values]
+                            (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
+      :on-change (fn [event index values]
+                   (update! (into #{}
+                                  (map (partial nth options))
+                                  values)))}
+     ;; Add selected value to vector
      (doall
       (map-indexed
        (fn [i option]
@@ -193,13 +251,13 @@
 (defmethod field :time [{:keys [update!] :as opts} data]
   ;; FIXME: material-ui timepicker doesn't allow simply writing a time
   ;; best would be both, writing plus an icon to open selector dialog
-  (let [data (or (some-> data meta ::incomplete)
+  (let [data (or (some-> data ::incomplete)
                  (and data (time/format-time data))
                  "")]
     [field (assoc opts
                   :update! (fn [string]
-                             (update! (with-meta (time/parse-time string)
-                                        {::incomplete string})))
+                             (update! (assoc (time/parse-time string)
+                                             ::incomplete string)))
                   :type :string
                   :regex time-regex) data]))
 
@@ -209,7 +267,7 @@
    {:format "24hr"
     :cancel-label cancel-label
     :ok-label ok-label
-    :minutes-step 5
+    :minutes-step 1
     :default-time (time/to-js-time time-picker-time)
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
@@ -238,7 +296,10 @@
       (doall
        (for [{:keys [name label width] :as tf} table-fields]
          ^{:key name}
-         [ui/table-header-column {:style {:width width}} label]))
+         [ui/table-header-column {:style
+                                  {:width width
+                                   :white-space "pre-wrap"}}
+          label]))
       (when delete?
         [ui/table-header-column {:style {:width "70px"}}
          (tr [:buttons :delete])])]]
@@ -271,3 +332,8 @@
                     :label add-label
                     :label-style style-base/button-label-style
                     :disabled false}])])
+
+(defmethod field :checkbox [{:keys [update! label]} checked?]
+  [ui/checkbox {:label label
+                :checked checked?
+                :on-check #(update! (not checked?))}])

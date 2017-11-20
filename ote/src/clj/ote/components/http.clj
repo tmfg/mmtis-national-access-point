@@ -8,7 +8,8 @@
             [ote.nap.users :as nap-users]
             [taoensso.timbre :as log]
             [clojure.string :as str]
-            [ring.middleware.params :as params]))
+            [ring.middleware.params :as params]
+            [ring.middleware.gzip :as gzip]))
 
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
@@ -26,25 +27,28 @@
 
           ;; Handler for static resources
           resources
-          (params/wrap-params
-           (wrap-strip-prefix
-            strip-prefix
-            (route/resources "/")))
+          (gzip/wrap-gzip
+           (params/wrap-params
+            (wrap-strip-prefix
+             strip-prefix
+             (route/resources "/"))))
 
           ;; Handler for routes that don't require authenticated user
           public-handler
-          (params/wrap-params
-           (wrap-strip-prefix strip-prefix #(serve-request @public-handlers %)))
+          (gzip/wrap-gzip
+           (params/wrap-params
+            (wrap-strip-prefix strip-prefix #(serve-request @public-handlers %))))
 
           ;; Handler for routes that require authentication
           handler #(serve-request @handlers %)
           handler
           (if-let [auth-tkt (:auth-tkt config)]
-            (nap-cookie/wrap-check-cookie
-             auth-tkt
-             (nap-users/wrap-user-info
-              db
-              (wrap-strip-prefix strip-prefix handler)))
+            (gzip/wrap-gzip
+             (nap-cookie/wrap-check-cookie
+              auth-tkt
+              (nap-users/wrap-user-info
+               db
+               (wrap-strip-prefix strip-prefix handler))))
             handler)]
       (assoc this ::stop
              (server/run-server

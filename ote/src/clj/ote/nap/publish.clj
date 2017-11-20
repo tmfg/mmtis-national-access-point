@@ -6,7 +6,8 @@
             [ote.db.operation-area :as operation-area]
             [specql.core :refer [fetch] :as specql]
             [clojure.string :as str]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.components.db :as db]))
 
 (defn- fetch-service-operation-area-description
   "Fetch the operation area as a comma separated list (for SOLR facet search).
@@ -38,12 +39,13 @@
 
 (defmulti interface-description ::t-service/type)
 
-(defmethod interface-description :passenger-transportation [ts]
+(defmethod interface-description :default [ts]
   {:ckan/url (str "/ote/export/geojson/"
                   (::t-service/transport-operator-id ts) "/"
                   (::t-service/id ts))
    :ckan/name (str (::t-service/name ts) " GeoJSON")
    :ckan/format "GeoJSON"})
+
 
 (defn- ckan-resource-description
   "Create a CKAN resource description that can be used with the CKAN API to
@@ -78,6 +80,7 @@
 (defn- fetch-transport-service-external-interfaces [db id]
   (fetch db ::t-service/external-interface-description
          #{::t-service/external-interface ::t-service/format
+           ::t-service/license ::t-service/license-url
            ::t-service/ckan-resource-id ::t-service/id}
          {::t-service/transport-service-id id}))
 
@@ -97,16 +100,16 @@
 
         external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
         external-resources
-        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format id ::t-service/ckan-resource-id}]
+        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format
+                    lic ::t-service/license lic-url ::t-service/license-url}]
                 (verify-ckan-response
                  (ckan/add-or-update-dataset-resource!
                   c (merge
                      {:ckan/package-id (:ckan/id dataset)
                       :ckan/name (-> ei ::t-service/description first ::t-service/text)
                       :ckan/url (::t-service/url ei)
-                      :ckan/format fmt}
-                     (when id
-                       {:ckan/id id})))))
+                      :ckan/format fmt
+                      :ckan/license lic}))))
               external-interfaces)]
 
     ;; Update CKAN resource ids for all external interfaces
@@ -126,3 +129,18 @@
     {:dataset dataset
      :resource resource
      :external-resources external-resources}))
+
+(defn delete-published-service!
+  [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
+  (let [c (ckan/->CKAN api (get-in user [:user :apikey]))
+        dataset-id (-> db
+                       (specql/fetch ::t-service/transport-service
+                                     #{::t-service/ckan-dataset-id}
+                                     {::t-service/id transport-service-id})
+                       first
+                       ::t-service/ckan-dataset-id)]
+    (when-not dataset-id
+      (throw (ex-info "Can't find CKAN dataset-id for service"
+                      {::t-service/id transport-service-id})))
+
+    (ckan/delete-dataset! c dataset-id)))

@@ -14,10 +14,11 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
-                 [specql "0.7.0-alpha7"]
+                 [specql "0.7.0-alpha8"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
+                 [bk/ring-gzip "0.2.1"]
 
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
@@ -33,7 +34,7 @@
                  [cljs-ajax "0.7.2"]
 
                  ;; Frontend UI libraries
-                 [reagent "0.7.0"]
+                 [reagent "0.8.0-alpha2"]
                  [webjure/tuck "0.4.3"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]

@@ -20,7 +20,8 @@
     ::t-service/name
     ::t-service/sub-type
     ::t-service/external-interfaces
-    ::t-service/operation-area})
+    ::t-service/operation-area
+    ::t-service/companies})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
@@ -28,6 +29,7 @@
   (case type
     :passenger-transportation-taxi :passenger-transportation
     :passenger-transportation-request :passenger-transportation
+    :passenger-transportation-other :passenger-transportation
     :passenger-transportation-schedule :passenger-transportation
     :terminal :terminal
     :rentals :rentals
@@ -40,6 +42,7 @@
   (case type
     :passenger-transportation-taxi :taxi
     :passenger-transportation-request :request
+    :passenger-transportation-other :other
     :passenger-transportation-schedule :schedule
     :terminal :terminal ;; No subtype for terminals - but it is still saved to database
     :rentals :rentals
@@ -55,7 +58,10 @@
 (defrecord ModifyTransportServiceResponse [response])
 (defrecord OpenTransportServicePage [id])
 
+
 (defrecord DeleteTransportService [id])
+(defrecord ConfirmDeleteTransportService [id])
+(defrecord CancelDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
 
 (defrecord PublishTransportService [transport-service-id])
@@ -67,6 +73,14 @@
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
+
+(defn- update-service-by-id [app id update-fn & args]
+  (update app :transport-services
+          (fn [services]
+            (map #(if (= (::t-service/id %) id)
+                    (apply update-fn % args)
+                    %)
+                 services))))
 
 (extend-protocol tuck/Event
 
@@ -140,6 +154,18 @@
 
   DeleteTransportService
   (process-event [{id :id} app]
+    (update-service-by-id
+     app id
+     assoc :show-delete-modal? true))
+
+  CancelDeleteTransportService
+  (process-event [{id :id} app]
+    (update-service-by-id
+     app id
+     dissoc :show-delete-modal?))
+
+  ConfirmDeleteTransportService
+  (process-event [{id :id} app]
     (comm/get! (str "transport-service/delete/" id)
                {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)})
     app)
@@ -180,9 +206,11 @@
   transport-service level there."
   [service from]
   (reduce (fn [service key]
-            (-> service
-                (assoc key (get-in service [from key]))
-                (update from dissoc key)))
+            (as-> service s
+              (if (contains? (get service from) key)
+                (assoc s key (get-in service [from key]))
+                s)
+              (update s from dissoc key)))
           service
           service-level-keys))
 
@@ -190,8 +218,10 @@
   "Reverse of `move-service-level-keys-from-form`."
   [service to]
   (reduce (fn [service key]
-            (-> service
-                (assoc-in [to key] (get service key))
-                (dissoc key)))
+            (as-> service s
+              (if (contains? service key)
+                (assoc-in s [to key] (get service key))
+                s)
+              (dissoc s key)))
           service
           service-level-keys))

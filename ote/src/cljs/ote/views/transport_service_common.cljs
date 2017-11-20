@@ -7,7 +7,8 @@
             [ote.db.common :as common]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
-            [ote.views.place-search :as place-search]))
+            [ote.views.place-search :as place-search]
+            [clojure.string :as str]))
 
 (defn service-url
   "Creates a form group for service url hat creates two form elements url and localized text area"
@@ -41,15 +42,35 @@
    (form/info (tr [:form-help :external-interfaces]))
    {:name ::t-service/external-interfaces
     :type :table
-    :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "40%"
+    :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"
                     :read (comp ::t-service/description ::t-service/external-interface)
                     :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)}
-                   {:name ::t-service/external-service-url :type :string :width "40%"
+                   {:name ::t-service/external-service-url :type :string :width "21%"
                     :read (comp ::t-service/url ::t-service/external-interface)
                     :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)}
-                   {:name ::t-service/format :type :string :width "20%"}]
+                   {:name ::t-service/format :type :string :width "16%"}
+                   {:name ::t-service/license :type :string :width "21%"}
+                   {:name ::t-service/license-url :type :string :width "21%"}]
     :delete? true
     :add-label (tr [:buttons :add-external-interface])}))
+
+(defn companies-group
+  "Creates a form group for companies. A parent company can list its companies."
+  []
+  (form/group
+   {:label (tr [:field-labels :transport-service-common ::t-service/companies])
+    :columns 3}
+
+   (form/info (tr [:form-help :companies]))
+
+   {:name ::t-service/companies
+    :type :table
+    :table-fields [{:name ::t-service/name :type :string
+                    :label (tr [:field-labels :transport-service-common ::t-service/company-name])}
+                   {:name ::t-service/business-id :type :string
+                    :validate [[:business-id]]}]
+    :delete? true
+    :add-label (tr [:buttons :add-new-company])}))
 
 (defn contact-info-group []
   (form/group
@@ -66,6 +87,7 @@
 
    {:name        ::common/postal_code
     :type        :string
+    :regex #"\d{0,5}"
     :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
@@ -91,20 +113,21 @@
     :type        :string}))
 
 (defn footer [e! {published? ::t-service/published? :as data}]
-  [:div.row
-   (if published?
-     [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                    :disabled (form/disable-save? data)}
-      (tr [:buttons :save-updated])]
-     [:span
-      [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                     :disabled (form/disable-save? data)}
-       (tr [:buttons :save-and-publish])]
-      [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
-                      :disabled false}
-       (tr [:buttons :save-as-draft])]])
-   [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
-    (tr [:buttons :discard])]])
+  (let [name-missing? (str/blank? (::t-service/name data))]
+    [:div.row
+     (if published?
+       [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
+                      :disabled (not (form/can-save? data))}
+        (tr [:buttons :save-updated])]
+       [:span
+        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
+                       :disabled (not (form/can-save? data))}
+         (tr [:buttons :save-and-publish])]
+        [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
+                        :disabled name-missing?}
+         (tr [:buttons :save-as-draft])]])
+     [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+      (tr [:buttons :discard])]]))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group

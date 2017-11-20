@@ -23,6 +23,7 @@
   ;; Create order for service type selection dropdown
    [:passenger-transportation-taxi
     :passenger-transportation-request
+    :passenger-transportation-other
     :passenger-transportation-schedule
     :terminal
     :rentals
@@ -37,9 +38,9 @@
   [:div.row
    [:div {:class "col-sx-12 col-md-9"}
     [:div
-     [:h3 (tr [:common-texts :title-required-data-with-OTE])]]
+     [:h3 (tr [:select-service-type-page :title-required-data])]]
     [:div.row
-     [:p (tr [:common-texts :transport-service-type-selection-help-text])]]
+     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
     [:div.row
      [form/form (service-form-options e!)
       [
@@ -56,11 +57,11 @@
 (defn edit-service [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
   (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
-     (if-not loaded?
-       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-       (case (::transport-service/type service)
-         :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
-         :terminal [terminal/terminal e! (:transport-service app)]
-         :rentals [rental/rental e! (:transport-service app)]
-         :parking [parking/parking e! (:transport-service app)]
-         :brokerage [brokerage/brokerage e! (:transport-service app)]))))
+    (if (or (nil? service) (not loaded?))
+      [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+      (case (::transport-service/type service)
+        :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+        :terminal [terminal/terminal e! (:transport-service app)]
+        :rentals [rental/rental e! (:transport-service app)]
+        :parking [parking/parking e! (:transport-service app)]
+        :brokerage [brokerage/brokerage e! (:transport-service app)]))))

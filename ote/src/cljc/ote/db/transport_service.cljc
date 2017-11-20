@@ -19,7 +19,6 @@
   ;; Define ENUMs
   ["week_day" ::day (specql.transform/transform (specql.transform/to-keyword))]
 
-
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_provider_type" ::transport_provider_type (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_service_subtype" ::transport_service_subtype (specql.transform/transform (specql.transform/to-keyword))]
@@ -48,6 +47,7 @@
   ["parking_provider_information" ::parking_provider_information]
   ["brokerage_service" ::brokerage_service]
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
+  ["company" ::company]
 
   ;; Tables
   ["external-interface-description" ::external-interface-description]
@@ -58,13 +58,17 @@
                                                ::external-interface-description
                                                ::transport-service-id)}]
   ["operation_area" ::operation_area]
-  ["operation_area_geojson" ::operation_area_geojson])
+  ["operation_area_geojson" ::operation_area_geojson]
+
+  ["external_interface_search_result" ::external-interface-search-result]
+  ["transport_service_search_result" ::transport-service-search-result
+   ote.db.modification/modification-fields])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
 
 ;; Create order for transport_type
-(def passenger-transportation-sub-types [:taxi :request :schedule])
+(def passenger-transportation-sub-types [:taxi :request :other :schedule])
 
 ;; Create order for payment_method
 (def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])
@@ -83,11 +87,11 @@
                                   :displays-for-visually-impaired :large-print-timetables])
 
 ;; Create order for accessibility-facility
-(def accessibility [:unknown :lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
-                             :pallet-access-low-floor :validator :other])
+(def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
+                             :pallet-access-low-floor :other])
 
 ;; Create order for mobility-facility-facility
-(def mobility [:unknown :low-floor :step-free-access :suitable-for-wheelchairs
+(def mobility [:low-floor :step-free-access :suitable-for-wheelchairs
                :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
                :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
 
@@ -100,3 +104,6 @@
     :rentals ::rentals
     :parking ::parking
     :brokerage ::brokerage))
+
+(defn localized-text-for [language localized-text]
+  (some #(when (= (::lang %) language) (::text %)) localized-text))
