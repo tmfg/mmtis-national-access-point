@@ -332,3 +332,8 @@
                     :label add-label
                     :label-style style-base/button-label-style
                     :disabled false}])])
+
+(defmethod field :checkbox [{:keys [update! label]} checked?]
+  [ui/checkbox {:label label
+                :checked checked?
+                :on-check #(update! (not checked?))}])
