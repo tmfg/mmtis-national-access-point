@@ -42,19 +42,20 @@
 (def contact-methods [::to-definitions/phone
                       ::to-definitions/gsm
                       ::to-definitions/email
-                      ::to-definitions/facebook
-                      ::to-definitions/twitter
-                      ::to-definitions/instant-message])
+                     ; ::to-definitions/facebook
+                     ; ::to-definitions/twitter
+                     ; ::to-definitions/instant-message
+                     ])
 
 (defn contact-info [operator]
   [:div.row
-   [:div.span12 (stylefy/use-style style-ckan/content-title)  [:h2 (tr [:organization-viewer-page :contact-types])]]
+   [:div.span12 (stylefy/use-style style-ckan/content-title)  [:h2 (tr [:organization-page :contact-types])]]
 
    (doall
      (map (fn [key]
             ^{:key key} [:row.organization-info ;; HOX: I could not make stylefy work via class adding to ckan side.
-                         [:div.span2 [:b (transform-val :field-labels key)]]
-                         [:div.span10 (operator key " - ")]]) contact-methods))])
+                         [:div.span3 [:b (transform-val :field-labels key)]]
+                         [:div.span9 (operator key " - ")]]) contact-methods))])
 
 (defn viewer [e! status]
   ;; init

@@ -11,7 +11,7 @@
 (defn operator [e! status]
   [:span
    [:div
-    [:h3 "Organisaation tiedot"]]  ;;FIXME: translate
+    [:h3 (tr [:organization-page :organization-form-title])]]
    [form/form
     {:name->label (tr-key [:field-labels])
      :update! #(e! (to/->EditTransportOperatorState %))
@@ -54,15 +54,13 @@
        :type :string})
 
      (form/group
-      {:label "Yhteystavat" ;;FIXME: translate
+      {:label (tr [:organization-page :contact-types])
        :columns 1}
 
       {:name ::to-definitions/phone :type :string}
       {:name ::to-definitions/gsm :type :string}
       {:name ::to-definitions/email :type :string}
-      {:name ::to-definitions/facebook :type :string}
-      {:name ::to-definitions/twitter :type :string}
-      {:name ::to-definitions/instant-message :type :string})]
+     )]
 
     status]
    ])
