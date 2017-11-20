@@ -765,6 +765,6 @@ Organization data
 }
 
 /* Hide hide-slug-preview */
-div.hide-slug-preview div.slug-preview {
+div.napote-organization-form div.slug-preview {
     display: none;
 }

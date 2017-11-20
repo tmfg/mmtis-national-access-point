@@ -41,11 +41,7 @@
 
 (def contact-methods [::to-definitions/phone
                       ::to-definitions/gsm
-                      ::to-definitions/email
-                     ; ::to-definitions/facebook
-                     ; ::to-definitions/twitter
-                     ; ::to-definitions/instant-message
-                     ])
+                      ::to-definitions/email])
 
 (defn contact-info [operator]
   [:div.row
