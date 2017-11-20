@@ -175,6 +175,14 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
                     controller='ckanext.napote_theme.controller:CustomUserController',
                     action='register')
 
+        map.connect('/user/login',
+                            controller='ckanext.napote_theme.controller:CustomUserController',
+                            action='login')
+
+        map.connect('/user/_logout',
+                            controller='ckanext.napote_theme.controller:CustomUserController',
+                            action='logout')
+
         return map
 
     def after_map(self, map):
