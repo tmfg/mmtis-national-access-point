@@ -75,20 +75,23 @@
   "Delete single transport service by id"
   [nap-config db user id]
 
-  (authorization/with-transport-operator-check
-    db user (::t-service/transport-operator-id
-             (first (specql/fetch db ::t-service/transport-service
-                                  #{::t-service/transport-operator-id}
-                                  {::t-service/id id})))
-    #(do
-       ;; Before the transaction, call CKAN API to delete dataset
-       (publish/delete-published-service! nap-config db user id)
+  (let [{::t-service/keys [transport-operator-id published?]}
+        (first (specql/fetch db ::t-service/transport-service
+                             #{::t-service/transport-operator-id
+                               ::t-service/published?}
+                             {::t-service/id id}))]
+    (authorization/with-transport-operator-check
+      db user transport-operator-id
+      #(do
 
-       ;; Delete service, cascades to operation area and external interfaces
-       (tx/with-transaction db
-         (delete! db ::t-service/transport-service {::t-service/id id}))
+         (if published?
+           ;; For published services, call CKAN API to delete dataset
+           ;; this cascades to all OTE information
+           (publish/delete-published-service! nap-config db user id)
 
-       (http/transit-response id))))
+           ;; Otherwise delete from transport-service table
+           (delete! db ::t-service/transport-service {::t-service/id id}))
+         (http/transit-response id)))))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
