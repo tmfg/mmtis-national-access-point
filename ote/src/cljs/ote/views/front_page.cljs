@@ -41,8 +41,8 @@
                     :secondary true
                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}])]}
 
-      (tr [:dialog :delete-transport-service :confirm] {:name name})])
-   ])
+      (tr [:dialog :delete-transport-service :confirm] {:name name})])])
+
 (defn transport-services-table-rows [e! services transport-operator-id]
   [ui/table-body {:display-row-checkbox false}
    (doall
