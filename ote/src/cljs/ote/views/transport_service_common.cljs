@@ -117,11 +117,11 @@
     [:div.row
      (if published?
        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                      :disabled (form/disable-save? data)}
+                      :disabled (not (form/can-save? data))}
         (tr [:buttons :save-updated])]
        [:span
         [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
-                       :disabled (form/disable-save? data)}
+                       :disabled (not (form/can-save? data))}
          (tr [:buttons :save-and-publish])]
         [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
                         :disabled name-missing?}
