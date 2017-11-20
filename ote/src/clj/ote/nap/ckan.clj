@@ -127,3 +127,6 @@
                  update-dataset-resource!
                  add-dataset-resource!)]
     (action ckan resource)))
+
+(defn delete-dataset! [ckan dataset-id]
+  (ckan-post ckan "action/dataset_purge" {:ckan/id dataset-id}))

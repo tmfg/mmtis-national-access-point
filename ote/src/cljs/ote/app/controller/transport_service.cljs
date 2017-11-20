@@ -58,7 +58,10 @@
 (defrecord ModifyTransportServiceResponse [response])
 (defrecord OpenTransportServicePage [id])
 
+
 (defrecord DeleteTransportService [id])
+(defrecord ConfirmDeleteTransportService [id])
+(defrecord CancelDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
 
 (defrecord PublishTransportService [transport-service-id])
@@ -70,6 +73,14 @@
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
+
+(defn- update-service-by-id [app id update-fn & args]
+  (update app :transport-services
+          (fn [services]
+            (map #(if (= (::t-service/id %) id)
+                    (apply update-fn % args)
+                    %)
+                 services))))
 
 (extend-protocol tuck/Event
 
@@ -142,6 +153,18 @@
       app))
 
   DeleteTransportService
+  (process-event [{id :id} app]
+    (update-service-by-id
+     app id
+     assoc :show-delete-modal? true))
+
+  CancelDeleteTransportService
+  (process-event [{id :id} app]
+    (update-service-by-id
+     app id
+     dissoc :show-delete-modal?))
+
+  ConfirmDeleteTransportService
   (process-event [{id :id} app]
     (comm/get! (str "transport-service/delete/" id)
                {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)})

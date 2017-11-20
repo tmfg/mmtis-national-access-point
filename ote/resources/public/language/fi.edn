@@ -338,8 +338,12 @@
   :footer-livi-url                            "Liikennevirasto.fi"
   :footer-ckan-software                       "CKAN-ohjelmistolla"
   :footer-made-width                          "Toteutettu"
-
   }
+
+ :dialog
+ {:delete-transport-service
+  {:title "Poista liikkumispalvelun tiedot?"
+   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
