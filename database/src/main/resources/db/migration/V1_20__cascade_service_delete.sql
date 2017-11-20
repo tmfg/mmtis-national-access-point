@@ -22,7 +22,8 @@ ALTER TABLE "transport-service"
 
 ALTER TABLE "external-interface-description"
  DROP CONSTRAINT "external-interface-description_ckan-resource-id_fkey",
-  ADD CONSTRAINT "external-interface-description_ckan-resource-id_fkey"   FOREIGN KEY ("ckan-resource-id")
+  ADD CONSTRAINT "external-interface-description_ckan-resource-id_fkey"
+      FOREIGN KEY ("ckan-resource-id")
       REFERENCES resource (id)
       ON DELETE CASCADE;
 
