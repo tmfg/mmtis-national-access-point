@@ -251,13 +251,13 @@
 (defmethod field :time [{:keys [update!] :as opts} data]
   ;; FIXME: material-ui timepicker doesn't allow simply writing a time
   ;; best would be both, writing plus an icon to open selector dialog
-  (let [data (or (some-> data meta ::incomplete)
+  (let [data (or (some-> data ::incomplete)
                  (and data (time/format-time data))
                  "")]
     [field (assoc opts
                   :update! (fn [string]
-                             (update! (with-meta (time/parse-time string)
-                                        {::incomplete string})))
+                             (update! (assoc (time/parse-time string)
+                                             ::incomplete string)))
                   :type :string
                   :regex time-regex) data]))
 
@@ -332,3 +332,8 @@
                     :label add-label
                     :label-style style-base/button-label-style
                     :disabled false}])])
+
+(defmethod field :checkbox [{:keys [update! label]} checked?]
+  [ui/checkbox {:label label
+                :checked checked?
+                :on-check #(update! (not checked?))}])
