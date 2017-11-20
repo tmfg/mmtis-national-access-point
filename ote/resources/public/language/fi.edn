@@ -37,6 +37,7 @@
    :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
    :ote.db.transport-service/external-service-url "Rajapinnan URL-osoite"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
 
    }
 
@@ -52,7 +53,7 @@
    :ote.db.transport-service/url                       "Palvelun osoite"
    :ote.db.transport-service/description               "Palvelun kuvaus"
    :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/additional-services       "Muut palvelut"
    :ote.db.transport-service/price-class               "Hinnoittelu"
@@ -86,6 +87,8 @@
   ;; Rental fields
   :rentals
   {:eligibility-requirements  "Kelpoisuusvaatimukset"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+
    }
 
   ;; Parking fields
@@ -276,9 +279,11 @@
   :header-service-hours                    "Palveluajat"
   }
 
- :rentals-page
+ :rentals-page 
  {:header-service-info                     "Palvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
+  :header-accessibility                    "Esteettömyys"
+  :header-eligibity-requirements           "Kelpoisuusvaatimukset"
   }
 
  :terminal-page

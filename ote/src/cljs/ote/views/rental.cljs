@@ -35,16 +35,46 @@
     :type      :string
     :required? false}))
 
-(defn rental [e! status]
+(defn accessibility-group []
+  (form/group
+   {:label (tr [:rentals-page :header-accessibility])
+    :columns 3
+    :layout :row}
+
+   {:name        ::t-service/accessibility-tool
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool}
+
+   {:name ::t-service/accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5}))
+
+(defn eligibity-requirements []
+  (form/group
+   {:label (tr [:rentals-page :header-eligibity-requirements])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/eligibility-requirements
+    :type :string
+    :layout :row}))
+
+(defn rental [e! service]
   (reagent/with-let [options (rental-form-options e!)
                      groups [(name-group e!)
                              (ts-common/contact-info-group)
-                             (ts-common/place-search-group e! ::t-service/terminal)
-                             (ts-common/external-interfaces)]]
+                             (ts-common/place-search-group e! ::t-service/rentals)
+                             (ts-common/external-interfaces)
+                             (accessibility-group)
+                             (eligibity-requirements)
+                             (ts-common/service-url
+                              (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                              ::t-service/booking-service)]]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
        [:h3 (tr [:rentals-page :header-rental-service])]]
-      [form/form options groups (get status ::t-service/rental)]]]))
+      [form/form options groups (get service ::t-service/rentals)]]]))
 
 

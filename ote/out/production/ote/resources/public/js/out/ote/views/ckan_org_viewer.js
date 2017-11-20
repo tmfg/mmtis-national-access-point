@@ -1,0 +1,45 @@
+// Compiled by ClojureScript 1.9.908 {}
+goog.provide('ote.views.ckan_org_viewer');
+goog.require('cljs.core');
+goog.require('ote.app.controller.ckan_org_viewer');
+goog.require('clojure.string');
+goog.require('ote.app.controller.transport_operator');
+goog.require('ote.db.transport_operator');
+goog.require('ote.db.common');
+goog.require('stylefy.core');
+goog.require('ote.style.ckan');
+goog.require('ote.localization');
+/**
+ * Translate and transform value.
+ */
+ote.views.ckan_org_viewer.transform_val = (function ote$views$ckan_org_viewer$transform_val(key,value){
+return ote.localization.tr_or.call(null,ote.localization.tr.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [key,value], null)),[cljs.core.str.cljs$core$IFn$_invoke$arity$1(value)].join(''));
+});
+ote.views.ckan_org_viewer.basic_info = (function ote$views$ckan_org_viewer$basic_info(operator){
+return new cljs.core.PersistentVector(null, 10, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.row","div.row",133678515),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span12","div.span12",-1039736360),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"h2","h2",-372662728),ote.views.ckan_org_viewer.transform_val.call(null,new cljs.core.Keyword(null,"common-texts","common-texts",-934994303),new cljs.core.Keyword(null,"title-operator-basic-details","title-operator-basic-details",-193589889))], null)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span2","div.span2",2045435899),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"b","b",1482224470),ote.views.ckan_org_viewer.transform_val.call(null,new cljs.core.Keyword(null,"field-labels","field-labels",1197457113),new cljs.core.Keyword("ote.db.transport-operator","name","ote.db.transport-operator/name",1157372455))], null)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span10","div.span10",-48233268),operator.call(null,new cljs.core.Keyword("ote.db.transport-operator","name","ote.db.transport-operator/name",1157372455),"N/A")], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span2","div.span2",2045435899),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"b","b",1482224470),ote.views.ckan_org_viewer.transform_val.call(null,new cljs.core.Keyword(null,"field-labels","field-labels",1197457113),new cljs.core.Keyword("ote.db.transport-operator","business-id","ote.db.transport-operator/business-id",1648435334))], null)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span10","div.span10",-48233268),operator.call(null,new cljs.core.Keyword("ote.db.transport-operator","business-id","ote.db.transport-operator/business-id",1648435334),"N/A")], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span2","div.span2",2045435899),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"b","b",1482224470),ote.views.ckan_org_viewer.transform_val.call(null,new cljs.core.Keyword(null,"field-labels","field-labels",1197457113),new cljs.core.Keyword("ote.db.transport-operator","visiting-address","ote.db.transport-operator/visiting-address",1490976237))], null)], null),(function (){var address = operator.call(null,new cljs.core.Keyword("ote.db.transport-operator","visiting-address","ote.db.transport-operator/visiting-address",1490976237));
+return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span10","div.span10",-48233268),(cljs.core.truth_(address)?cljs.core.interpose.call(null,", ",cljs.core.vals.call(null,cljs.core.select_keys.call(null,address,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("ote.db.common","street","ote.db.common/street",-433179772),new cljs.core.Keyword("ote.db.common","postal_code","ote.db.common/postal_code",1541120368),new cljs.core.Keyword("ote.db.common","post_office","ote.db.common/post_office",994976709)], null)))):"N/A")], null);
+})(),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span2","div.span2",2045435899),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"b","b",1482224470),ote.views.ckan_org_viewer.transform_val.call(null,new cljs.core.Keyword(null,"field-labels","field-labels",1197457113),new cljs.core.Keyword("ote.db.transport-operator","homepage","ote.db.transport-operator/homepage",-421607635))], null)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span10","div.span10",-48233268),operator.call(null,new cljs.core.Keyword("ote.db.transport-operator","homepage","ote.db.transport-operator/homepage",-421607635),"N/A")], null)], null);
+});
+ote.views.ckan_org_viewer.contact_methods = new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("ote.db.transport-operator","phone","ote.db.transport-operator/phone",1003736305),new cljs.core.Keyword("ote.db.transport-operator","gsm","ote.db.transport-operator/gsm",-103419132),new cljs.core.Keyword("ote.db.transport-operator","email","ote.db.transport-operator/email",-1416884200),new cljs.core.Keyword("ote.db.transport-operator","facebook","ote.db.transport-operator/facebook",1531943967),new cljs.core.Keyword("ote.db.transport-operator","twitter","ote.db.transport-operator/twitter",-198302941),new cljs.core.Keyword("ote.db.transport-operator","instant-message","ote.db.transport-operator/instant-message",1219618835)], null);
+ote.views.ckan_org_viewer.contact_info = (function ote$views$ckan_org_viewer$contact_info(operator){
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.row","div.row",133678515),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span12","div.span12",-1039736360),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"h2","h2",-372662728),"Yhteystavat"], null)], null),cljs.core.doall.call(null,cljs.core.map.call(null,(function (key){
+return cljs.core.with_meta(new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"row","row",-570139521),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span2","div.span2",2045435899),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"b","b",1482224470),ote.views.ckan_org_viewer.transform_val.call(null,new cljs.core.Keyword(null,"field-labels","field-labels",1197457113),key)], null)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.span10","div.span10",-48233268),operator.call(null,key,"N/A")], null)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"key","key",-1516042587),key], null));
+}),ote.views.ckan_org_viewer.contact_methods))], null);
+});
+ote.views.ckan_org_viewer.viewer = (function ote$views$ckan_org_viewer$viewer(e_BANG_,status){
+e_BANG_.call(null,ote.app.controller.ckan_org_viewer.__GT_StartViewer.call(null));
+
+return (function (e_BANG___$1,p__52250){
+var map__52251 = p__52250;
+var map__52251__$1 = ((((!((map__52251 == null)))?((((map__52251.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__52251.cljs$core$ISeq$)))?true:false):false))?cljs.core.apply.call(null,cljs.core.hash_map,map__52251):map__52251);
+var app = map__52251__$1;
+var transport_operator = cljs.core.get.call(null,map__52251__$1,new cljs.core.Keyword(null,"transport-operator","transport-operator",-1434913982));
+if(cljs.core.truth_(transport_operator)){
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.container","div.container",72419955),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [ote.views.ckan_org_viewer.basic_info,transport_operator], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [ote.views.ckan_org_viewer.contact_info,transport_operator], null)], null);
+} else {
+return null;
+}
+});
+});
+
+//# sourceMappingURL=ckan_org_viewer.js.map?rel=1510137294848

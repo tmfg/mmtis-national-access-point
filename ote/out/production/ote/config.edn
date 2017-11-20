@@ -1,0 +1,14 @@
+{:db {:url "jdbc:postgresql://localhost:5432/napote"
+      :username "napote"
+      :password ""}
+ :http {:port 3000
+        :auth-tkt {:shared-secret "localdev"
+                   :max-age-in-seconds 36000
+                   :digest-algorithm "MD5"}}
+ :places {:finnish-municipalities
+          {:type :shapefile
+           :name-field "NAMEFIN"
+           :url "https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish-municipalities/SuomenKuntajako_2017_10k.shp"}}
+
+ :nap {:api "http://localhost:8080/api/"
+       :export-base-url "http://localhost:8080"}}
