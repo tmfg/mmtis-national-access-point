@@ -76,6 +76,7 @@
    :ote.db.transport-service/week-days                 "Viikonpäivät"
    :ote.db.transport-service/from                      "Aukeamisaika"
    :ote.db.transport-service/to                        "Kiinnimenoaika"
+   :ote.db.transport-service/all-day "24h"
 
    }
 
