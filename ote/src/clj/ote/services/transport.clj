@@ -71,15 +71,24 @@
       (assoc ::t-service/operation-area
              (places/fetch-transport-service-operation-area db id))))
 
-(defn- delete-transport-service
+(defn- delete-transport-service!
   "Delete single transport service by id"
-  [db id]
-  (tx/with-transaction db
-    ;; Delete operation area first
-    (delete! db ::t-service/operation_area {::t-service/transport-service-id id})
-    ;; Delete service
-    (delete! db ::t-service/transport-service {::t-service/id id})
-    id))
+  [nap-config db user id]
+
+  (authorization/with-transport-operator-check
+    db user (::t-service/transport-operator-id
+             (first (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/transport-operator-id}
+                                  {::t-service/id id})))
+    #(do
+       ;; Before the transaction, call CKAN API to delete dataset
+       (publish/delete-published-service! nap-config db user id)
+
+       ;; Delete service, cascades to operation area and external interfaces
+       (tx/with-transaction db
+         (delete! db ::t-service/transport-service {::t-service/id id}))
+
+       (http/transit-response id))))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -205,8 +214,9 @@
                                user :user}
          (save-transport-service-handler nap-config db user form-data))
 
-   (GET "/transport-service/delete/:id" [id]
-     (http/transit-response (delete-transport-service db (Long/parseLong id))))))
+   (GET "/transport-service/delete/:id" {{id :id} :params
+                                         user :user}
+        (delete-transport-service! nap-config db user (Long/parseLong id)))))
 
 (defn- transport-routes
   "Unauthenticated routes"
