@@ -56,7 +56,7 @@ authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_p
 
 ### MONKEY PATCH CKAN AUTHENTICATION END ###
 
-def dataset_purge_custon_auth(context, data_dict):
+def dataset_purge_custom_auth(context, data_dict):
     # Defer authorization for package_pruge to package_update
     # This authorization is similar to editing package fields.
 
@@ -128,7 +128,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_auth_functions(self):
-        return {'dataset_purge': dataset_purge_custon_auth}
+        return {'dataset_purge': dataset_purge_custom_auth}
 
     def get_helpers(self):
         return {
