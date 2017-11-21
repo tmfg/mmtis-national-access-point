@@ -71,6 +71,8 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
+   :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
+   :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
 
    ;; Service hour fields
    :ote.db.transport-service/week-days                 "Viikonpäivät"

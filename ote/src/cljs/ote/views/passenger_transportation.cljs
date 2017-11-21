@@ -86,24 +86,31 @@
 
 (defn pricing-group [e!]
   (form/group
-    {:label (tr [:passenger-transportation-page :header-price-information])
-     :columns 3
-     :actions [buttons/save
-               {:style    (stylefy/use-style style-base/base-button)
-                :label-style {:color "#FFFFFF" :font-weight "bold" :font-size "12px"}
-                :label    (tr [:buttons :add-new-price-class])
-                :disabled false
-                :on-click #(e! (ts/->AddPriceClassRow))}]}
+   {:label (tr [:passenger-transportation-page :header-price-information])
+    :columns 3
+    :layout :row}
 
-    {:name         ::t-service/price-classes
+   {:name         ::t-service/price-classes
     :type         :table
     :table-fields [{:name ::t-service/name :type :string
                     :label (tr [:field-labels :passenger-transportation ::t-service/price-class-name])}
                    {:name ::t-service/price-per-unit :type :number}
                    {:name ::t-service/unit :type :string}
-                   {:name ::t-service/currency :type :string :width "100px"}
-                   ]
-    :delete?      true}))
+                   {:name ::t-service/currency :type :string :width "100px"}]
+    :add-label (tr [:buttons :add-new-price-class])
+    :delete?      true}
+
+   {:name ::t-service/pricing-description
+    :type :localized-text
+    :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
+    :read (comp ::t-service/description ::t-service/pricing)
+    :columns 1}
+
+   {:name ::t-service/pricing-url
+    :type :string
+    :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
+    :read (comp ::t-service/url ::t-service/pricing)
+    :columns 1}))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
