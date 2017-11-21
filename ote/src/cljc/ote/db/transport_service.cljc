@@ -107,3 +107,6 @@
 
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) language) (::text %)) localized-text))
+
+(def pick-up-types
+  [:pick-up :return :pick-up-return])

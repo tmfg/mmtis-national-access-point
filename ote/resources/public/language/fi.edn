@@ -72,11 +72,6 @@
    :ote.db.transport-service/currency                  "Valuutta"
 
 
-   ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Viikonpäivät"
-   :ote.db.transport-service/from                      "Aukeamisaika"
-   :ote.db.transport-service/to                        "Kiinnimenoaika"
-   :ote.db.transport-service/all-day "24h"
 
    }
 
@@ -94,7 +89,6 @@
   :rentals
   {:eligibility-requirements  "Kelpoisuusvaatimukset"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-
    }
 
   ;; Parking fields
@@ -111,15 +105,22 @@
    :ote.db.transport-service/published?-values {true "Julkaistu"
                                                 false "Ei julkaistu"}
 
-   ;; Common fields
-   :ote.db.common/street                               "Osoite"
-   :ote.db.common/post_office                          "Postitoimipaikka"
-   :ote.db.common/postal_code                          "Postinumero"
+   ;; Service hour fields
+   :ote.db.transport-service/week-days                 "Viikonpäivät"
+   :ote.db.transport-service/from                      "Aukeamisaika"
+   :ote.db.transport-service/to                        "Kiinnimenoaika"
+   :ote.db.transport-service/all-day "24h"
+   }
+
+  ;; Common fields
+  :ote.db.common/street                               "Osoite"
+  :ote.db.common/post_office                          "Postitoimipaikka"
+  :ote.db.common/postal_code                          "Postinumero"
    }
 
 
  ;; Add form info elements here, these are textual help texts in the form
- :form-help
+ :form-help 
  {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."}
 
@@ -129,6 +130,7 @@
  {:save "Tallenna"
   :cancel "Peruuta"
   :delete "Poista"
+  :close "Sulje"
   :publish "Julkaise"
   :edit-service "Muokkaa palvelun tietoja"
 
@@ -143,7 +145,8 @@
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
-  :add-add-new-row         "Lisää uusi rivi"}
+  :add-add-new-row         "Lisää uusi rivi"
+  :add-new-pick-up-location "Lisää toimipiste"}
 
 
 
@@ -226,6 +229,10 @@
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
 
+  :ote.db.transport-service/pick-up-type
+  {:pick-up "Nouto"
+   :return "Palautus"
+   :pick-up-return "Nouto ja palautus"}
   }
 
  ;; Per feature/page localization keys
@@ -286,13 +293,15 @@
   :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
+  :header-pick-up-locations "Toimipisteet"
   }
 
- :rentals-page 
+ :rentals-page
  {:header-service-info                     "Palvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
-  :header-accessibility                    "Esteettömyys"
   :header-eligibity-requirements           "Kelpoisuusvaatimukset"
+  :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
+  :open-service-hours-and-exceptions       "Aseta palveluajat"
   }
 
  :terminal-page
@@ -301,6 +310,11 @@
   :header-add-new-terminal  "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
   :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
+  }
+
+ :opening-hours-dialog
+ {:close-dialog "Sulje"
+  :header-dialog "Toimipisteen aukioloajat"
   }
 
  :select-service-type-page
