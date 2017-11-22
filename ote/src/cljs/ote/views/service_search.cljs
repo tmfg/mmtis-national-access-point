@@ -83,12 +83,10 @@
     [ui/paper {:z-depth 2
                :style style/result-card}
      [:div.result-title (stylefy/use-style style/result-header)
-      [:a {:href "#"
-           :style style/result-link
-           :on-click #(do
-                        (.preventDefault %)
-                        (e! (ss/->OpenInterfaceInCKAN transport-operator-id id
-                                                      ckan-resource-id)))}
+      [:a {:href (str "/dataset/org-" transport-operator-id
+                      "-service-" id
+                      "/resource/" ckan-resource-id)
+           :style style/result-link}
        name]
       [data-items
 

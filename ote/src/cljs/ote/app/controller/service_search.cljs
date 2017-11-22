@@ -11,7 +11,6 @@
 (defrecord SearchResponse [response])
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
-(defrecord OpenInterfaceInCKAN [operator-id service-id ckan-resource-id])
 
 (defn- search-params [{oa ::t-service/operation-area
                        text :text-search
@@ -69,12 +68,4 @@
     (let [{:keys [empty-filters? results]} response]
       (update app :service-search assoc
               :results results
-              :empty-filters? empty-filters?)))
-
-  OpenInterfaceInCKAN
-  (process-event [{:keys [operator-id service-id ckan-resource-id]} app]
-    (let [url (str "/dataset/org-" operator-id "-service-" service-id "/resource/" ckan-resource-id)
-          location (.-location js/window)]
-      (set! (.-pathname location) url)
-      (set! (.-hash location) "")
-      app)))
+              :empty-filters? empty-filters?))))
