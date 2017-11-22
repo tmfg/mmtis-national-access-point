@@ -615,7 +615,7 @@ ul.media-grid {
 }
 
 .masthead .navigation .nav-pills li a:hover, nav.section.navigation.section-right ul a:hover {
-    background: rgba(0, 0, 0, .1);
+    background: rgba(0, 0, 0, .2);
 }
 
 .masthead .navbar .brand {
@@ -624,6 +624,11 @@ ul.media-grid {
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
     color: white;
+    padding: 10px 15px 10px 5px;
+}
+
+.masthead .navbar .brand:hover {
+    background: rgba(0, 0, 0, .2);
 }
 
 .navbar-form .select2-container {
