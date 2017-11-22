@@ -185,7 +185,7 @@ msgid "NAP home page organizations infobox"
 msgstr ""
 
 #: ckanext/napote_theme/templates/home/layout1.html:40
-msgid "To digize and publish services login is required"
+msgid "To digitize and publish services login is required"
 msgstr ""
 
 #: ckanext/napote_theme/templates/home/layout1.html:53
