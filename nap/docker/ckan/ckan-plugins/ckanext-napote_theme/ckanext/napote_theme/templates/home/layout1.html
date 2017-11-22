@@ -1,69 +1,49 @@
 <div role="main" class="hero">
-    {% if c.userobj %}
-        <div class="container">
+    <div class="container">
+        {% if c.userobj %}
             <div class="row row1 module">
                 <div class="span12">
-                    <p>{% trans user=c.userobj.display_name %}User greeting {{ user }}{% endtrans %}!</p>
-                    {% trans %}Datasets-page short info{% endtrans %}<br />
-                    {% trans %}Organizations-page short info{% endtrans %}
+                    <p><b>{% trans user=c.userobj.display_name %}User greeting {{ user }}{% endtrans %}!</b></p>
                 </div>
             </div>
 
-            <div class="row row2 module">
-                <div class="span12">
-                    <h2>{{ _('Heading/NAP home page logged in main heading') }}</h2>
-                </div>
-                <div class="span6">
-                    <div class="module-content box box--spaced box--gradient text-center">
-                        <p>{{ _('Transport service short description') }}</p>
-
-                        <div>
-                            <p>
-                                <a class="btn btn-primary"
-                                   href="/ote/index.html">{{ _('Go to data management') }}</a>
-                            </p>
-                        </div>
+            {% if not h.organizations_available() %}
+                <div class="row">
+                    <div class="span12 info-box">
+                        <i class="icon fa fa-exclamation-circle fa-4x" aria-hidden="true"></i>
+                        <p>
+                            {# Note: Use trans-tag to allow rendering of HTML tags in the translation string. #}
+                            {% trans %}NAP home page organizations infobox{% endtrans %}
+                        </p>
                     </div>
                 </div>
-                <div class="span6">
-                    <div class="module-content box box--spaced box--gradient text-center">
-                        <p>{{ _('RAE service short description') }}</p>
+            {% endif %}
 
-                        <div>
-                            <p>
-                                {# NOTE: https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer. #}
-
-                                <a class="btn btn-primary"
-                                   href="https://extranet.liikennevirasto.fi/extranet/web/f/rae?kategoria=1955433"
-                                   target="_blank" rel="noopener noreferrer">{{ _('Open RAE-service') }}</a>
-                            </p>
-                            <p>
-                                <small>({{ _('RAE service link description') }})</small>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-
-    {% if not c.userobj %}
-        <div class="container">
-            <div class="row row1">
+        {% else %}
+            <div class="row">
                 <div class="span12">
                     {% snippet 'home/snippets/header.html' %}
                 </div>
             </div>
+        {% endif %}
 
-            <div class="row row2">
-                <div class="span10 offset1">
-                    {% block promoted %}
-                        {% snippet 'home/snippets/promoted.html' %}
-                    {% endblock %}
-                </div>
+        <div class="row module">
+            <div class="span12">
+                {% block promoted %}
+                    {% snippet 'home/snippets/promoted.html' %}
+                {% endblock %}
             </div>
 
-            <div class="row row3 text-center">
+            {% if not c.userobj %}
+                <div class="span12">
+                    <br />
+                    <p>{{ _('To digize and publish services login is required') }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if not c.userobj %}
+            <div class="row text-center">
                 <div class="span12">
                     <p>{% link_for _('Log in'), controller='user', action='login', class_='btn btn-primary' %}</p>
                 </div>
@@ -75,7 +55,6 @@
 
                 </div>
             </div>
-        </div>
-    {% endif %}
-
+        {% endif %}
+    </div>
 </div>
