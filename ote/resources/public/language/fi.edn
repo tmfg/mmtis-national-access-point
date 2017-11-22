@@ -42,8 +42,8 @@
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
-   :ote.db.transport-service/license "Lisenssi/käyttöehdot"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (WWW)"
+   :ote.db.transport-service/license "Lisenssi / käyttöehdot"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus"
    }
 
   ;; Service exception
@@ -424,9 +424,8 @@
   :no-results "Hakuehdoilla ei löytynyt palveluita"
   :one-result "Hakuehdoilla löytyi yksi palvelu"
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
-  :interfaces "Koneluettavat rajapinnat: "
-  :nap-interface ["Palvelun \"" :name "\" NAPissa olevien tietojen rajapinta: "]
-  :external-interfaces ["Palvelun \"" :name "\" ulkopuoliset palveluntuottajan itse tarjoamat rajapinnat:"]
+  :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
+  :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Näytetään viimeksi muokatut palvelut. Hae palveluita syöttämällä hakuehdot."
   }
 
