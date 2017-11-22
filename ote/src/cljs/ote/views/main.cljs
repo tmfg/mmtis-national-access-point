@@ -23,6 +23,9 @@
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]))
 
+(defn logged-in? [app]
+  (not-empty (get-in app [:user :id])))
+
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
     "active"))
@@ -66,20 +69,22 @@
                 :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
-(def header-links
-  [{:page :front-page
-    :label [:common-texts :navigation-front-page]
-    :url "/"}
+(defn header-links [app]
+  (filter some?
+          [{:page  :front-page
+            :label [:common-texts :navigation-front-page]
+            :url   "/"}
 
-   {:page :services
-    :label [:common-texts :navigation-dataset]}
+           {:page  :services
+            :label [:common-texts :navigation-dataset]}
 
-   {:page :organizations
-    :label [:common-texts :navigation-organizations]
-    :url "/organization"}
+           {:page  :organizations
+            :label [:common-texts :navigation-organizations]
+            :url   "/organization"}
 
-   {:page :own-services
-    :label [:common-texts :navigation-own-service-list]}])
+           (when (logged-in? app)
+             {:page  :own-services
+              :label [:common-texts :navigation-own-service-list]})]))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
   [:div (stylefy/use-style style-topnav/clear)
@@ -93,8 +98,9 @@
                {:href     "#"
                 :on-click #(e! (fp-controller/->GoToUrl "/"))})
         [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
+
     (doall
-     (for [{:keys [page label url]} header-links]
+     (for [{:keys [page label url]} (header-links app)]
        ^{:key page}
        [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
         [:a

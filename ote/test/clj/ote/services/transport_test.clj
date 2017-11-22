@@ -38,7 +38,8 @@
    ::t-service/accessibility-description generators/gen-localized-text-array
    ::t-service/service-hours generators/gen-service-hours-array
    ::t-service/service-exceptions (gen/return []) ;; FIXME: generate these
-   ::t-service/luggage-restrictions generators/gen-localized-text-array))
+   ::t-service/luggage-restrictions generators/gen-localized-text-array
+   ::t-service/pricing generators/gen-service-link))
 
 (def gen-passenger-transportation-service
   (gen/hash-map

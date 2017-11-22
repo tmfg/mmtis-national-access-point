@@ -2,7 +2,7 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                     "Palveluntarjoajan nimi"
+  :ote.db.transport-operator/name                     "Palveluntuottajan nimi"
   :ote.db.transport-operator/business-id              "Y-tunnus"
   :ote.db.transport-operator/phone                    "Puhelin (toimisto)"
   :ote.db.transport-operator/gsm                      "Puhelin (GSM)"
@@ -71,6 +71,8 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
+   :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
+   :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
 
 
    }
@@ -273,7 +275,7 @@
   :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
   :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
-  :service-operator-short-description " -näkymään, jossa voit täydentää oman organisaatiosi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
+  :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
   :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
   :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
@@ -283,6 +285,11 @@
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
+  }
+
+ :organization-page
+ {:contact-types  "Yhteystavat"
+  :organization-form-title "Palveluntuottajan tiedot"
   }
 
  :passenger-transportation-page
@@ -320,7 +327,7 @@
  :select-service-type-page
  {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
-                ensin liikkumispalvelutyypin sekä organisaation ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
+                ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
                 Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
 
  :common-texts
@@ -340,7 +347,7 @@
   :navigation-organizations                   "Palveluntuottajat"
   :navigation-dataset                         "Palvelukatalogi"
   :user-menu-service-guide                    "Ohje"
-  :user-menu-service-operator                 "Organisaation perustiedot"
+  :user-menu-service-operator                 "Palveluntuottajan perustiedot"
   :user-menu-log-out                          "Kirjaudu ulos"
   :user-menu-profile                          "Näytä profiili"
   :title-operator-basic-details               "Perustiedot"
@@ -358,10 +365,6 @@
  {:delete-transport-service
   {:title "Poista liikkumispalvelun tiedot?"
    :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}}
-
- :organization-viewer-page
- {:contact-types  "Yhteystavat"
-  }
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
