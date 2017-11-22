@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-14 07:50+0000\n"
+"POT-Creation-Date: 2017-11-22 08:16+0000\n"
 "PO-Revision-Date: 2017-11-03 12:49+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -20,36 +20,66 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: ckanext/napote_theme/controller.py:67
+#: ckanext/napote_theme/controller.py:69
+#, python-format
+msgid "Unauthorized to create user %s"
+msgstr ""
+
+#: ckanext/napote_theme/controller.py:71
+#, fuzzy
+msgid "User not found"
+msgstr ""
+
+#: ckanext/napote_theme/controller.py:73
+#: ckanext/napote_theme/organization_controller.py:62
+msgid "Integrity Error"
+msgstr ""
+
+#: ckanext/napote_theme/controller.py:75
+msgid "Bad Captcha. Please try again."
+msgstr ""
+
+#: ckanext/napote_theme/controller.py:89
+#, python-format
+msgid ""
+"User \"%s\" is now registered but you are still logged in as \"%s\" from "
+"before"
+msgstr ""
+
+#: ckanext/napote_theme/controller.py:111
 msgid "Unauthorized to request reset password."
 msgstr ""
 
-#: ckanext/napote_theme/controller.py:106
+#: ckanext/napote_theme/controller.py:150
 #, python-format
 msgid "\"%s\" matched several users"
 msgstr ""
 
-#: ckanext/napote_theme/controller.py:108
-#: ckanext/napote_theme/controller.py:110
+#: ckanext/napote_theme/controller.py:152
+#: ckanext/napote_theme/controller.py:154
 #, python-format
 msgid "No such user: %s"
 msgstr ""
 
-#: ckanext/napote_theme/controller.py:115
+#: ckanext/napote_theme/controller.py:159
 msgid "Please check your inbox for a reset code."
 msgstr ""
 
-#: ckanext/napote_theme/controller.py:119
+#: ckanext/napote_theme/controller.py:163
 #, python-format
 msgid "Could not send reset link: %s"
 msgstr ""
 
-#: ckanext/napote_theme/plugin.py:190 ckanext/napote_theme/plugin.py:201
+#: ckanext/napote_theme/organization_controller.py:60
+msgid "Group not found"
+msgstr ""
+
+#: ckanext/napote_theme/plugin.py:215 ckanext/napote_theme/plugin.py:226
 #: ckanext/napote_theme/templates/package/read.html:9
 msgid "Transport Service Type"
 msgstr ""
 
-#: ckanext/napote_theme/plugin.py:263
+#: ckanext/napote_theme/plugin.py:288
 msgid "Transport Service View"
 msgstr ""
 
@@ -99,48 +129,48 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:41
 #: ckanext/napote_theme/templates/header.html:42
+#: ckanext/napote_theme/templates/header.html:43
 msgid "My services"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:58
-#: ckanext/napote_theme/templates/header.html:86
+#: ckanext/napote_theme/templates/header.html:60
 #: ckanext/napote_theme/templates/header.html:88
+#: ckanext/napote_theme/templates/header.html:90
 msgid "View profile"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:67
+#: ckanext/napote_theme/templates/header.html:69
 msgid "Sysadmin settings"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:69
+#: ckanext/napote_theme/templates/header.html:71
 msgid "Admin"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:75
+#: ckanext/napote_theme/templates/header.html:77
 #, python-format
 msgid "Dashboard (%(num)d new item)"
 msgid_plural "Dashboard (%(num)d new items)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ckanext/napote_theme/templates/header.html:79
+#: ckanext/napote_theme/templates/header.html:81
 msgid "Dashboard"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:95
 #: ckanext/napote_theme/templates/header.html:97
+#: ckanext/napote_theme/templates/header.html:99
 msgid "Log out"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:107
-#: ckanext/napote_theme/templates/home/layout1.html:68
+#: ckanext/napote_theme/templates/header.html:109
+#: ckanext/napote_theme/templates/home/layout1.html:48
 msgid "Log in"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:116
-#: ckanext/napote_theme/templates/home/layout1.html:74
+#: ckanext/napote_theme/templates/header.html:118
+#: ckanext/napote_theme/templates/home/layout1.html:54
 msgid "Register"
 msgstr ""
 
@@ -149,39 +179,16 @@ msgstr ""
 msgid "User greeting %(user)s"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/layout1.html:7
-msgid "Datasets-page short info"
+#: ckanext/napote_theme/templates/home/layout1.html:16
+#, fuzzy
+msgid "NAP home page organizations infobox"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/layout1.html:8
-msgid "Organizations-page short info"
+#: ckanext/napote_theme/templates/home/layout1.html:40
+msgid "To digitize and publish services login is required"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/layout1.html:14
-msgid "Heading/NAP home page logged in main heading"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/layout1.html:18
-msgid "Transport service short description"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/layout1.html:23
-msgid "Go to data management"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/layout1.html:30
-msgid "RAE service short description"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/layout1.html:38
-msgid "Open RAE-service"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/layout1.html:41
-msgid "RAE service link description"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/layout1.html:73
+#: ckanext/napote_theme/templates/home/layout1.html:53
 msgid "New user"
 msgstr ""
 
@@ -189,11 +196,15 @@ msgstr ""
 msgid "NAP home page hero text"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/snippets/promoted.html:8
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:7
 msgid "Heading/NAP home page intro heading"
 msgstr ""
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:10
+msgid "NAP home page publishing services info text"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:14
 msgid "NAP home page info text"
 msgstr ""
 
@@ -226,6 +237,24 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/organization/snippets/helper.html:8
 msgid "Service providers short info text"
+msgstr ""
+
+#: ckanext/napote_theme/templates/organization/snippets/organization_form.html:6
+msgid "Name"
+msgstr ""
+
+#: ckan/templates/organization/snippets/organization_form.html:10
+#: ckanext/napote_theme/templates/organization/snippets/organization_form.html:6
+msgid "My Organization"
+msgstr ""
+
+#: ckanext/napote_theme/templates/organization/snippets/organization_form.html:16
+msgid "Description"
+msgstr ""
+
+#: ckan/templates/organization/snippets/organization_form.html:20
+#: ckanext/napote_theme/templates/organization/snippets/organization_form.html:16
+msgid "A little information about my organization..."
 msgstr ""
 
 #: ckanext/napote_theme/templates/package/read.html:15
@@ -358,6 +387,26 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/snippets/navbar_language_selector.html:14
 msgid "Go"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/dashboard.html:6
+msgid "Edit settings"
+msgstr ""
+
+#: ckan/templates/user/dashboard.html:20
+#: ckan/templates/user/dashboard_datasets.html:12
+#: ckanext/napote_theme/templates/user/dashboard.html:9
+msgid "My Datasets"
+msgstr ""
+
+#: ckan/templates/user/dashboard.html:21
+#: ckan/templates/user/dashboard_organizations.html:12
+#: ckanext/napote_theme/templates/user/dashboard.html:10
+msgid "My Organizations"
+msgstr ""
+
+#: ckanext/napote_theme/templates/user/dashboard.html:11
+msgid "News feed"
 msgstr ""
 
 #: ckanext/napote_theme/templates/user/new.html:7
@@ -560,11 +609,6 @@ msgstr ""
 msgid "Before you can create a dataset you need to create an organization."
 msgstr ""
 
-#: ckan/templates/user/dashboard.html:20
-#: ckan/templates/user/dashboard_datasets.html:12
-msgid "My Datasets"
-msgstr ""
-
 #: ckan/templates/user/dashboard_datasets.html:17
 #: ckan/templates/user/read.html:14
 msgid "You haven't created any datasets."
@@ -667,15 +711,6 @@ msgstr ""
 msgid "No organization"
 msgstr ""
 
-#: ckan/templates/organization/snippets/organization_form.html:10
-msgid "My Organization"
-msgstr ""
-
-#: ckan/templates/user/dashboard.html:21
-#: ckan/templates/user/dashboard_organizations.html:12
-msgid "My Organizations"
-msgstr ""
-
 #: ckan/templates/organization/snippets/organization_form.html:18
 msgid "my-organization"
 msgstr ""
@@ -774,8 +809,10 @@ msgstr ""
 msgid "There are currently no organizations for this site"
 msgstr ""
 
-#: ckan/templates/organization/new.html:3 ckan/templates/organization/new.html:5
-#: ckan/templates/organization/new.html:7 ckan/templates/organization/new.html:12
+#: ckan/templates/organization/new.html:3
+#: ckan/templates/organization/new.html:5
+#: ckan/templates/organization/new.html:7
+#: ckan/templates/organization/new.html:12
 msgid "Create an Organization"
 msgstr ""
 
@@ -797,10 +834,6 @@ msgstr ""
 
 #: ckan/templates/organization/snippets/feeds.html:3
 msgid "Datasets in organization: {group}"
-msgstr ""
-
-#: ckan/templates/organization/snippets/organization_form.html:20
-msgid "A little information about my organization..."
 msgstr ""
 
 #: ckan/templates/organization/snippets/organization_form.html:60
@@ -842,3 +875,28 @@ msgid ""
 "<p><strong>Member:</strong> Can view the organization's private datasets,"
 " but not add new datasets.</p> "
 msgstr ""
+
+#~ msgid "Datasets-page short info"
+#~ msgstr ""
+
+#~ msgid "Organizations-page short info"
+#~ msgstr ""
+
+#~ msgid "Heading/NAP home page logged in main heading"
+#~ msgstr ""
+
+#~ msgid "Transport service short description"
+#~ msgstr ""
+
+#~ msgid "Go to data management"
+#~ msgstr ""
+
+#~ msgid "RAE service short description"
+#~ msgstr ""
+
+#~ msgid "Open RAE-service"
+#~ msgstr ""
+
+#~ msgid "RAE service link description"
+#~ msgstr ""
+

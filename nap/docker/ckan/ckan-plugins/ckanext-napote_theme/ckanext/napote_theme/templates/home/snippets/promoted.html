@@ -1,13 +1,17 @@
 {% set intro = g.site_intro_text %}
 
-<div class="module-content">
-    <header>
-        {% if intro %}
-            {{ h.render_markdown(intro) }}
-        {% else %}
-            <h1 class="page-heading">{{ _("Heading/NAP home page intro heading") }}</h1>
+<div>
+    {% if intro %}
+        {{ h.render_markdown(intro) }}
+    {% else %}
+        {% if c.userobj %}
             {# Note: Use trans-tag to allow rendering of HTML tags in the translation string. #}
-            <p>{% trans %}NAP home page info text{% endtrans %}</p>
+            <p>{% trans %}NAP home page publishing services info text{% endtrans %}</p>
         {% endif %}
-    </header>
+
+        <h1 class="page-heading">{{ _("Heading/NAP home page intro heading") }}</h1>
+
+        {# Note: Use trans-tag to allow rendering of HTML tags in the translation string. #}
+        <p>{% trans %}NAP home page info text{% endtrans %}</p>
+    {% endif %}
 </div>
