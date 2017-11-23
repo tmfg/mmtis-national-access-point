@@ -50,14 +50,15 @@
                     </nav>
 
                     <nav class="section navigation section-right">
-                        <ul class="nav">
+                        <ul class="nav nav-pills">
                             <li>
                                 {# FIXME: Change translation keys into english #}
-                                <a href="http://bit.ly/nap-palaute" title="{{ _('Anna palautetta') }}">
-                                    <span class="text">{{ _('Anna palautetta') }}</span>
+                                <a href="http://bit.ly/nap-palaute" title="{{ _('Give feedback') }}">
+                                    <span class="text">{{ _('Give feedback') }}</span>
                                 </a>
                             </li>
-
+                        </ul>
+                        <ul class="nav">
                             {% block header_account_container_content %}
                                 {% if c.userobj %}
                                     <li>

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-22 08:16+0000\n"
+"POT-Creation-Date: 2017-11-23 13:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,59 +93,64 @@ msgid ""
 "href=\"http://ckan.org\">CKAN</a>"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:38
+#: ckanext/napote_theme/templates/header.html:39
 msgid "Home"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:38
+#: ckanext/napote_theme/templates/header.html:39
 msgid "Datasets"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:38
+#: ckanext/napote_theme/templates/header.html:39
 msgid "Organizations"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:42
 #: ckanext/napote_theme/templates/header.html:43
+#: ckanext/napote_theme/templates/header.html:44
 msgid "My services"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:60
-#: ckanext/napote_theme/templates/header.html:88
-#: ckanext/napote_theme/templates/header.html:90
+#: ckanext/napote_theme/templates/header.html:56
+#: ckanext/napote_theme/templates/header.html:57
+msgid "Give feedback"
+msgstr ""
+
+#: ckanext/napote_theme/templates/header.html:70
+#: ckanext/napote_theme/templates/header.html:98
+#: ckanext/napote_theme/templates/header.html:100
 msgid "View profile"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:69
+#: ckanext/napote_theme/templates/header.html:79
 msgid "Sysadmin settings"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:71
+#: ckanext/napote_theme/templates/header.html:81
 msgid "Admin"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:77
+#: ckanext/napote_theme/templates/header.html:87
 #, python-format
 msgid "Dashboard (%(num)d new item)"
 msgid_plural "Dashboard (%(num)d new items)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ckanext/napote_theme/templates/header.html:81
+#: ckanext/napote_theme/templates/header.html:91
 msgid "Dashboard"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:97
-#: ckanext/napote_theme/templates/header.html:99
+#: ckanext/napote_theme/templates/header.html:107
+#: ckanext/napote_theme/templates/header.html:109
 msgid "Log out"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:109
+#: ckanext/napote_theme/templates/header.html:120
 #: ckanext/napote_theme/templates/home/layout1.html:48
 msgid "Log in"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:118
+#: ckanext/napote_theme/templates/header.html:129
 #: ckanext/napote_theme/templates/home/layout1.html:54
 msgid "Register"
 msgstr ""
@@ -171,15 +176,15 @@ msgstr ""
 msgid "NAP home page hero text"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/snippets/promoted.html:7
-msgid "Heading/NAP home page intro heading"
-msgstr ""
-
-#: ckanext/napote_theme/templates/home/snippets/promoted.html:10
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:9
 msgid "NAP home page publishing services info text"
 msgstr ""
 
-#: ckanext/napote_theme/templates/home/snippets/promoted.html:14
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:12
+msgid "Heading/NAP home page intro heading"
+msgstr ""
+
+#: ckanext/napote_theme/templates/home/snippets/promoted.html:15
 msgid "NAP home page info text"
 msgstr ""
 

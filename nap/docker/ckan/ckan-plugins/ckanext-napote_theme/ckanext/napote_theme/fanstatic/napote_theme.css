@@ -558,7 +558,7 @@ ul.media-grid {
 .masthead .nav-collapse .section-right {
     float: right;
     margin-left: 10px;
-    margin-top: 8px;
+    margin-top: 0;
 }
 
 @media (max-width: 979px) {
@@ -575,6 +575,10 @@ ul.media-grid {
         float: right !important;
         clear: none;
     }
+}
+
+.masthead .section-right .dropdown, .masthead .section-right .navbar-form{
+    margin-top: 10px;
 }
 
 .masthead .navigation {
