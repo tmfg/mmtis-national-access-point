@@ -122,11 +122,18 @@
                               (if url
                                 (e! (fp-controller/->GoToUrl url))
                                 (e! (fp-controller/->ChangePage page))))})
-         (tr label)]]))]
-   [:div.user-menu {:class (is-user-menu-active app)
-                    :style  (when (> (:width app) style-base/mobile-width-px)
+         (tr label)]]))
+    [:div.user-menu {:class (is-user-menu-active app)
+                     :style (when (> (:width app) style-base/mobile-width-px)
                               {:float "right"})}
-    (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]])
+     (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
+    [:ul (stylefy/use-style style-topnav/ul)
+     [:li
+      [:a (merge (stylefy/use-style
+                   (if desktop? style-topnav/desktop-link style-topnav/link))
+                 {:style {:float "right"}
+                  :href  "https://goo.gl/forms/MUlsAwAdmvDaZb5W2"})
+       "Anna palautetta"]]]]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
