@@ -317,7 +317,7 @@
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
   :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
   :link-add-new-api                           "Lisää uusi palvelu"
-  :own-api-list                               "Omat liikkumispalvelutiedot"
+  :own-api-list                               "Omat palvelutiedot"
   :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
   :api-name                                   "Rajapinnan nimi"
   :api-url                                    "Rajapinnan verkko-osoite"
