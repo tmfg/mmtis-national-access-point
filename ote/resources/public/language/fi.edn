@@ -23,6 +23,13 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
 
+   :ote.db.transport-service/guaranteed-accessibility-tool        "Vakio esteettömyysvälineet"
+   :ote.db.transport-service/guaranteed-accessibility-description "Vakio esteettömyyspalveluiden kuvaus"
+   :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavat esteettömyysvälineet"
+   :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavien esteettömyyspalveluiden kuvaus"
+
+   :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
+
    ;; Contact details
    :ote.db.transport-service/contact-address          "Osoitetiedot"
    :ote.db.transport-service/contact-phone             "Puhelin"
@@ -124,7 +131,11 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
  {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
-  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."}
+  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."
+
+  :guaranteed-accessibility-subtitle "Vakiona saatavilla olevat esteettömyyspalvelut"
+  :limited-accessibility-subtitle "Rajoitetusti saatavilla olevat esteettömyyspalvelut"
+  }
 
 
  ;; Action buttons
@@ -291,7 +302,7 @@
   :header-service-info                     "Palvelun perustiedot"
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
   :header-contact-details                  "Palvelun yhteystiedot"
-  :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
+  :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
 

@@ -32,6 +32,7 @@
   ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
   ["pick_up_type" ::pick_up_type]
   ["brokerage_service_type" ::brokerage_service_type]
+  ["transportable_aid" ::transportable-aid]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -39,6 +40,8 @@
   ["service_hours" ::service_hours]
   ["service_exception" ::service_exception]
   ["price_class" ::price_class]
+  ["assistance_notification_requirement" ::assistance-notification-requirement]
+  ["assistance_info" ::assistance-info]
   ["terminal_information" ::terminal_information]
   ["passenger_transportation_info" ::passenger_transportation_info]
   ["pick_up_location" ::pick_up_location]

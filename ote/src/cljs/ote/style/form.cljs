@@ -8,8 +8,9 @@
 
 
 
-(def form-group-base {:margin-bottom "1em" ;(em 1)
-                      ::stylefy/sub-styles {:form-field {:margin "1em" #_(em 1)}}})
+(def form-group-base {:margin-bottom "1em"})
+
+(def form-field  {:margin "0.5em 1em 0.5em 1em"})
 
 (def form-group-column (merge form-group-base
                               (base/flex-container "column")))
@@ -22,3 +23,10 @@
 (def form-info-text {:display "inline-block"
                      :position "relative"
                      :top "-0.5em"})
+
+(def half-width {:width "47%"}) ;; ~half width (with margins two elements per line)
+(def full-width {:width "100%"})
+
+(def subtitle (merge full-width
+                     {:margin "1em 0 0 0.5em"}))
+(def subtitle-h {:margin "0"})

@@ -13,16 +13,38 @@
             [ote.style.form :as style-form]
             [cljs-react-material-ui.icons :as ic]))
 
+(defonce keyword-counter (atom 0))
+
 (defn info
   "Create a new info form element that doesn't have any interaction, just shows a help text."
   [text]
-  {:name ::info
+  {:name (keyword (str info (swap! keyword-counter inc)))
    :type :component
+   :container-style style-form/full-width
    :component (fn [_]
                 [:div
                  [ic/action-info-outline]
                  [:div (stylefy/use-style style-form/form-info-text)
                   text]])})
+
+(defn divider
+  "Create a new divider form element that doesn't have any interaction,
+  just shows a horizontal divider"
+  []
+  {:name (keyword (str "divider" (swap! keyword-counter inc)))
+   :type :component
+   :container-style style-form/full-width
+   :component (fn [_]
+                [ui/divider])})
+
+(defn subtitle
+  "Create a subtitle inside a form group."
+  [text]
+  {:name (keyword (str "subtitle" (swap! keyword-counter inc)))
+   :type :component
+   :container-style style-form/subtitle
+   :component (fn [_]
+                [:h4.form-subtitle (stylefy/use-style style-form/subtitle-h) text])})
 
 (defrecord Group [label options schemas])
 
@@ -190,12 +212,12 @@
    modified errors warnings notices update-form]
   [:div.form-group (stylefy/use-style style)
    (doall
-    (for [{:keys [name editable? read write] :as s} schemas
+    (for [{:keys [name editable? read write container-style] :as s} schemas
           :let [editable? (and can-edit?
                                (or (nil? editable?)
                                    (editable? data)))]]
       ^{:key name}
-      [:div.form-field (stylefy/use-sub-style style :form-field)
+      [:div.form-field (stylefy/use-style (merge style-form/form-field container-style))
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)
