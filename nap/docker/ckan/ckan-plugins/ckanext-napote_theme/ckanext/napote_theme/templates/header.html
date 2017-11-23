@@ -58,19 +58,21 @@
                                 </a>
                             </li>
                         </ul>
-                        <ul class="nav">
-                            {% block header_account_container_content %}
-                                {% if c.userobj %}
+
+                        {% block header_account_container_content %}
+                            {% if c.userobj %}
+                                <ul class="nav">
                                     <li>
                                         <div class="dropdown account avatar authed" data-module="me"
                                              data-me="{{ c.userobj.id }}">
                                             <button class="btn btn-primary btn--transparent dropdown-toggle"
                                                     type="button"
                                                     data-toggle="dropdown">
-                        <span class="image" title="{{ _('View profile') }}">
-                                <span class="username">{{ c.userobj.display_name }}</span>
-                        </span>
-                                                <i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                                                <span class="image" title="{{ _('View profile') }}">
+                                                        <span class="username">{{ c.userobj.display_name }}</span>
+                                                </span>
+                                                <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                            </button>
                                             <ul class="dropdown-menu">
                                                 {% block header_account_logged %}
                                                     {% if c.userobj.sysadmin %}
@@ -114,25 +116,22 @@
                                             </ul>
                                         </div>
                                     </li>
-                                {% else %}
+                                </ul>
+                            {% else %}
+                                <ul class="nav nav-pills">
                                     {% block header_account_notlogged %}
                                         <li>
                                             {% link_for _('Log in'), controller='user', action='login' %}
                                         </li>
                                         {% if h.check_access('user_create') %}
                                             <li>
-                                                <p class="navbar-text visible-desktop">
-                                                    /
-                                                </p>
-                                            </li>
-                                            <li>
                                                 {% link_for _('Register'), controller='user', action='register', class_='sub' %}
                                             </li>
                                         {% endif %}
                                     {% endblock %}
-                                {% endif %}
-                            {% endblock %}
-                        </ul>
+                                </ul>
+                            {% endif %}
+                        {% endblock %}
 
                         {% snippet 'snippets/navbar_language_selector.html' %}
 
