@@ -133,7 +133,7 @@
                    (if desktop? style-topnav/desktop-link style-topnav/link))
                  {:style {:float "right"}
                   :href  "http://bit.ly/nap-palaute"})
-       "Anna palautetta"]]]]])
+       (tr [:common-texts :navigation-give-feedback])]]]]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
