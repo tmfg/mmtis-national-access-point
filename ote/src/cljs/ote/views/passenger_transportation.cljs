@@ -71,11 +71,33 @@
     :columns 3
     :layout :row}
 
-   (form/subtitle (tr [:form-help :guaranteed-accessibility-subtitle]))
    {:name        ::t-service/guaranteed-accessibility-tool
-    :type        :multiselect-selection
+    :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/accessibility-tool])
     :options     t-service/accessibility-tool
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name        ::t-service/limited-accessibility-tool
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/transportable-aid
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name ::t-service/limited-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/transportable-aid
     :full-width? true
     :container-style style-form/half-width}
 
@@ -85,23 +107,11 @@
     :full-width? true
     :container-style style-form/half-width}
 
-   (form/divider)
-   (form/subtitle (tr [:form-help :limited-accessibility-subtitle]))
-
-   {:name        ::t-service/limited-accessibility-tool
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool
-    :full-width? true
-    :container-style style-form/half-width}
-
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
     :rows 1 :max-rows 5
     :container-style style-form/half-width
     :full-width? true}
-
-   (form/divider)
 
    {:name ::t-service/accessibility-info-url
     :type :string
