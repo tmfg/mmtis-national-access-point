@@ -336,16 +336,20 @@
         ^{:key i}
         [ui/table-row {:selectable false :display-border false}
          (doall
-          (for [{:keys [name read write width] :as tf} table-fields
+          (for [{:keys [name read write width type component] :as tf} table-fields
                 :let [update-fn (if write
                                   #(update data i write %)
-                                  #(assoc-in data [i name] %))]]
+                                  #(assoc-in data [i name] %))
+                      value ((or read name) row)]]
             ^{:key name}
             [ui/table-row-column {:style {:width width}}
-             [field (assoc tf
-                           :table? true
-                           :update! #(update! (update-fn %)))
-              ((or read name) row)]]))
+             (if (= :component type)
+               (component {:update-form! #(update! (update-fn %))
+                           :data value})
+               [field (assoc tf
+                             :table? true
+                             :update! #(update! (update-fn %)))
+                value])]))
          (when delete?
            [ui/table-row-column {:style {:width "70px"}}
             [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)

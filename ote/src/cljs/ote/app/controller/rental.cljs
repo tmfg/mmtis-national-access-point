@@ -15,19 +15,19 @@
 
   EditRentalState
   (process-event [{data :data} app]
-    (update-in app [:transport-service ::t-service/rental] merge data))
+    (update-in app [:transport-service ::t-service/rentals] merge data))
 
 
   SaveRentalToDb
   (process-event [_ {service :transport-service :as app}]
     (let [service-data
           (-> service
-              (assoc ::t-service/type :rental
+              (assoc ::t-service/type :rentals
                      ::t-service/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
-              (update ::t-service/rental form/without-form-metadata)
-              (update-in [::t-service/rental ::t-service/operation-area]
+              (update ::t-service/rentals form/without-form-metadata)
+              (update-in [::t-service/rentals ::t-service/operation-area]
                          place-search/place-references))]
-      (comm/post! "rental"
+      (comm/post! "transport-service"
                   service-data
                   {:on-success (t/send-async! ->HandleRentalResponse)})
       app))
