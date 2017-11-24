@@ -280,6 +280,12 @@
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
+  :header-no-operator "Et ole lisännyt vielä palvelutuottajaa"
+  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun ensin lisätä uusi palveluntuottaja
+    tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
+   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
+   :to-add-new-operator-tab " välilehdestä."
+
   }
 
  :organization-page

@@ -208,6 +208,7 @@
 
        [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
         (case (:page app)
+          :no-operator [fp/no-operator e! app]
           :front-page [fp/own-services e! app]
           :own-services [fp/own-services e! app]
           :transport-service [t-service/select-service-type e! app]

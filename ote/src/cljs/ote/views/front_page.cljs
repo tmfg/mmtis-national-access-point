@@ -150,3 +150,18 @@
      (if (empty? my-services)
        [transport-service/select-service-type e! state] ;; Render service type selection page if no services added
        (table-container-for-front-page e! my-services state))]))
+
+(defn no-operator [e! state]
+  "If user haven't added service-operator, we will ask to do so."
+  [:div
+   [:div.row
+    [:div {:class "col-xs-12 col-sm-12 col-md-12"}
+     [:h3 (tr [:front-page :header-no-operator])]
+     [:p (tr [:front-page :desc-to-add-new-operator])]
+     [:p (tr [:front-page :to-add-new-operator])
+      [:a {:href "/organization/new"} (tr [:common-texts :navigation-organizations]) ]
+      (tr [:front-page :to-add-new-operator-tab])]
+     ]
+    ]
+   ]
+  )

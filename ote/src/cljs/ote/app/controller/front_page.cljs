@@ -76,9 +76,17 @@
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
-    (assoc app
-      :transport-operator-data-loaded? true
-      :transport-operators-with-services response
-      :transport-operator  (get (first response) :transport-operator)
-      :transport-service-vector (get (first response) :transport-service-vector)
-      :user (:user (first response)))))
+    (let [app (assoc app
+                :transport-operator-data-loaded? true
+                :user (:user (first response)))]
+    ;; First time users don't have operators.
+    ;; Ask them to add one
+    (if (and (nil? (get (first response) :transport-operator)) (not= :services (get app :page)))
+      (doall
+        (routes/navigate! :no-operator)
+        (assoc app :page :no-operator))
+
+      (assoc app
+        :transport-operators-with-services response
+        :transport-operator  (get (first response) :transport-operator)
+        :transport-service-vector (get (first response) :transport-service-vector))))))

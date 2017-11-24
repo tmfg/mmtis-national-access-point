@@ -97,7 +97,7 @@
   ;; FIXME: this should be middleware, not relying on client to make a POST request
   (tx/with-transaction db
     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
-      (or operator
+      (when (and id operator)
           ;; FIXME: what if name changed in CKAN, we should update?
           (insert! db ::transport-operator/transport-operator
                    {::transport-operator/name title

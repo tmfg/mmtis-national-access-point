@@ -9,5 +9,5 @@
            g.title as group_title
       FROM "user" u
  LEFT JOIN "member" m ON (m.table_name='user' AND m.state='active' AND m.table_id=u.id)
-      JOIN "group" g ON g.id = m.group_id
+ LEFT JOIN "group" g ON g.id = m.group_id
      WHERE u.name = :username;
