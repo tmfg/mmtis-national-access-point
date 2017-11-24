@@ -20,14 +20,13 @@
 (defn rental-form-options [e!]
   {:name->label (tr-key [:field-labels :rentals]
                         [:field-labels :transport-service]
+                        [:field-labels :transport-service-common]
                         [:field-labels]
                         )
    :update!     #(e! (rental/->EditRentalState %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [buttons/save {:on-click #(e! (rental/->SaveRentalToDb))
-                                 :disabled (form/disable-save? data)}
-                   (tr [:buttons :save])])})
+                  [ts-common/footer e! data])})
 
 (defn name-group [e!]
   (form/group
@@ -37,7 +36,7 @@
 
    {:name      ::t-service/name
     :type      :string
-    :required? false}))
+    :required? true}))
 
 (defn accessibility-group []
   (form/group
@@ -103,7 +102,7 @@
 
      {:name ::t-service/pick-up-locations
       :type :table
-      :table-fields [{:name ::t-service/name
+      :table-fields [{:name ::t-service/pick-up-name
                       :type :localized-text}
                      {:name ::t-service/pick-up-type
                       :type :selection
@@ -128,18 +127,19 @@
   (reagent/with-let [options (rental-form-options e!)
                      groups [(name-group e!)
                              (ts-common/contact-info-group)
-                             (ts-common/place-search-group e! ::t-service/rental)
+                             (ts-common/place-search-group e! ::t-service/rentals)
                              (ts-common/external-interfaces)
                              (accessibility-group)
                              (eligibity-requirements)
                              (ts-common/service-url
-                              (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                              ::t-service/booking-service)
-                             (pick-up-locations e!)]]
+                              (tr [:field-labels :transport-service-common ::t-service/rental-service])
+                              ::t-service/rental-service)
+                             (pick-up-locations e!)
+                             ]]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
        [:h3 (tr [:rentals-page :header-rental-service])]]
-      [form/form options groups (get service ::t-service/rental)]]]))
+      [form/form options groups (get service ::t-service/rentals)]]]))
 
 
