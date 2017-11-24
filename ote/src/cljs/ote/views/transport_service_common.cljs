@@ -8,7 +8,8 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.views.place-search :as place-search]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.time :as time]))
 
 (defn service-url
   "Creates a form group for service url hat creates two form elements url and localized text area"
@@ -29,8 +30,6 @@
     :read  (comp ::t-service/description service-url-field)
     :write (fn [data desc]
              (assoc-in data [service-url-field ::t-service/description] desc))}))
-
-
 
 (defn external-interfaces
   "Creates a form group for external services."
@@ -134,3 +133,65 @@
    (tuck/wrap-path e! :transport-service key ::t-service/operation-area)
    (tr [:field-labels :transport-service-common ::t-service/operation-area])
    ::t-service/operation-area))
+
+(defn service-hours-group []
+  (let [tr* (tr-key [:field-labels :service-exception])
+        write (fn [key]
+                (fn [{all-day? ::t-service/all-day :as data} time]
+                  ;; Don't allow changing time if all-day checked
+                  (if all-day?
+                    data
+                    (assoc data key time))))]
+    (form/group
+     {:label (tr [:passenger-transportation-page :header-service-hours])
+      :columns 3}
+
+     {:name         ::t-service/service-hours
+      :type         :table
+      :table-fields
+      [{:name ::t-service/week-days
+        :width "40%"
+        :type :multiselect-selection
+        :options t-service/days
+        :show-option (tr-key [:enums ::t-service/day :full])
+        :show-option-short (tr-key [:enums ::t-service/day :short])}
+       {:name ::t-service/all-day
+        :width "10%"
+        :type :checkbox
+        :write (fn [data all-day?]
+                 (merge data
+                        {::t-service/all-day all-day?}
+                        (when all-day?
+                          {::t-service/from (time/->Time 0 0 nil)
+                           ::t-service/to (time/->Time 24 0 nil)})))}
+
+       {:name ::t-service/from
+        :width "25%"
+        :type :time
+        :cancel-label (tr [:buttons :cancel])
+        :ok-label (tr [:buttons :save])
+        :write (write ::t-service/from)
+        :default-time {:hours "08" :minutes "00"}}
+       {:name ::t-service/to
+        :width "25%"
+        :type :time
+        :cancel-label (tr [:buttons :cancel])
+        :ok-label (tr [:buttons :save])
+        :write (write ::t-service/to)
+        :default-time {:hours "19" :minutes "00"}}]
+      :delete?      true
+      :add-label (tr [:buttons :add-new-service-hour])}
+
+     {:name ::t-service/service-exceptions
+      :type :table
+      :table-fields [{:name ::t-service/description
+                      :label (tr* :description)
+                      :type :localized-text}
+                     {:name ::t-service/from-date
+                      :type :date-picker
+                      :label (tr* :from-date)}
+                     {:name ::t-service/to-date
+                      :type :date-picker
+                      :label (tr* :to-date)}]
+      :delete? true
+      :add-label (tr [:buttons :add-new-service-exception])})))

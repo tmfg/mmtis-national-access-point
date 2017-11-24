@@ -1,4 +1,4 @@
-(ns ote.views.passenger-transportation
+ (ns ote.views.passenger-transportation
   "Required datas for passenger transportation provider"
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
@@ -154,67 +154,7 @@
     :read (comp ::t-service/url ::t-service/pricing)
     :columns 1}))
 
-(defn service-hours-group [e!]
-  (let [tr* (tr-key [:field-labels :service-exception])
-        write (fn [key]
-                (fn [{all-day? ::t-service/all-day :as data} time]
-                  ;; Don't allow changing time if all-day checked
-                  (if all-day?
-                    data
-                    (assoc data key time))))]
-    (form/group
-     {:label (tr [:passenger-transportation-page :header-service-hours])
-      :columns 3}
 
-     {:name         ::t-service/service-hours
-      :type         :table
-      :table-fields
-      [{:name ::t-service/week-days
-        :width "40%"
-        :type :multiselect-selection
-        :options t-service/days
-        :show-option (tr-key [:enums ::t-service/day :full])
-        :show-option-short (tr-key [:enums ::t-service/day :short])}
-       {:name ::t-service/all-day
-        :width "10%"
-        :type :checkbox
-        :write (fn [data all-day?]
-                 (merge data
-                        {::t-service/all-day all-day?}
-                        (when all-day?
-                          {::t-service/from (time/->Time 0 0 nil)
-                           ::t-service/to (time/->Time 24 0 nil)})))}
-
-       {:name ::t-service/from
-        :width "25%"
-        :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/from)
-        :default-time {:hours "08" :minutes "00"}}
-       {:name ::t-service/to
-        :width "25%"
-        :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/to)
-        :default-time {:hours "19" :minutes "00"}}]
-      :delete?      true
-      :add-label (tr [:buttons :add-new-service-hour])}
-
-     {:name ::t-service/service-exceptions
-      :type :table
-      :table-fields [{:name ::t-service/description
-                      :label (tr* :description)
-                      :type :localized-text}
-                     {:name ::t-service/from-date
-                      :type :date-picker
-                      :label (tr* :from-date)}
-                     {:name ::t-service/to-date
-                      :type :date-picker
-                      :label (tr* :to-date)}]
-      :delete? true
-      :add-label (tr [:buttons :add-new-service-exception])})))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-options (transportation-form-options e!)
@@ -231,11 +171,11 @@
                        (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
                        ::t-service/real-time-information)
                       (ts-common/service-url
-                       (tr [:field-labels :passenger-transportation ::t-service/booking-service])
+                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                        ::t-service/booking-service)
                       (accessibility-group)
                       (pricing-group e!)
-                      (service-hours-group e!)])]
+                      (ts-common/service-hours-group)])]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div

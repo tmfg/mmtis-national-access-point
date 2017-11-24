@@ -30,7 +30,7 @@
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
   ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
-  ["pick_up_type" ::pick_up_type]
+  ["pick_up_type" ::pick_up_type (specql.transform/transform (specql.transform/to-keyword))]
   ["brokerage_service_type" ::brokerage_service_type]
   ["transportable_aid" ::transportable-aid (specql.transform/transform (specql.transform/to-keyword))]
 
@@ -113,3 +113,6 @@
 
 (def transportable-aid
   [:wheelchair :walking-stick :assistance-dog :crutches :walker])
+
+(def pick-up-types
+  [:pick-up :return :pick-up-return])
