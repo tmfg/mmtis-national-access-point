@@ -45,22 +45,28 @@
 
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-profile])
-                   :on-click #(e! (fp-controller/->GoToUrl (str "/user/edit/" username)))}]
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-service-guide])
-                   :on-click #(e! (fp-controller/->ChangePage :front-page))} ]
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->ChangePage :front-page)))} ]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-service-operator])
-                   :on-click #(e! (fp-controller/->ChangePage :transport-operator))}]
+                   :on-click #(do
+                                (.preventDefault %)
+                                (e! (fp-controller/->ChangePage :transport-operator)))}]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text " Näytä debug state"
                    :on-click #(e! (fp-controller/->ToggleDebugState))} ]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-log-out])
-                   :on-click #(e! (fp-controller/->GoToUrl "/user/_logout"))} ]
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
    [ui/menu-item {:primary-text name ;; This is here so the user name is appearing in the header
                   :style {:color "#FFFFFF"}
-                  :on-click #(e! (fp-controller/->GoToUrl (str "/user/edit/" username))) }]
+                  :on-click #(do (.preventDefault %)
+                                 (e! (fp-controller/->GoToUrl (str "/user/edit/" username)))) }]
                   ])
 
 (defn- flash-message [msg]
@@ -96,7 +102,9 @@
                                     style-topnav/desktop-link
                                     style-topnav/link))
                {:href     "#"
-                :on-click #(e! (fp-controller/->GoToUrl "/"))})
+                :on-click #(do
+                             (.preventDefault %)
+                             (e! (fp-controller/->GoToUrl "/")))})
         [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
 
     (doall
@@ -109,14 +117,23 @@
                    (if desktop? style-topnav/desktop-active style-topnav/active)
                    (if desktop? style-topnav/desktop-link style-topnav/link)))
                 {:href     "#"
-                 :on-click (if url
-                             #(e! (fp-controller/->GoToUrl url))
-                             #(e! (fp-controller/->ChangePage page)))})
-         (tr label)]]))]
-   [:div.user-menu {:class (is-user-menu-active app)
-                    :style  (when (> (:width app) style-base/mobile-width-px)
+                 :on-click #(do
+                              (.preventDefault %)
+                              (if url
+                                (e! (fp-controller/->GoToUrl url))
+                                (e! (fp-controller/->ChangePage page))))})
+         (tr label)]]))
+    [:div.user-menu {:class (is-user-menu-active app)
+                     :style (when (> (:width app) style-base/mobile-width-px)
                               {:float "right"})}
-    (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]])
+     (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
+    [:ul (stylefy/use-style style-topnav/ul)
+     [:li
+      [:a (merge (stylefy/use-style
+                   (if desktop? style-topnav/desktop-link style-topnav/link))
+                 {:style {:float "right"}
+                  :href  "http://bit.ly/nap-palaute"})
+       (tr [:common-texts :navigation-give-feedback])]]]]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
@@ -125,7 +142,9 @@
      [:a (merge
           (stylefy/use-style style-topnav/link)
           {:href     "#"
-           :on-click #(e! (fp-controller/->GoToUrl "/"))})
+           :on-click #(do
+                        (.preventDefault %)
+                        (e! (fp-controller/->GoToUrl "/")))})
        [:img {:src "img/icons/nap-logo.svg"}]]]
      [:li (stylefy/use-style style-topnav/right)
       [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))

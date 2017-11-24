@@ -65,8 +65,7 @@
                    ;; join external interfaces
                    [::t-service/external-interfaces
                     (specql/columns ::t-service/external-interface-description)])
-             {::t-service/id id}
-             {::specql/limit 1})
+             {::t-service/id id})
       first
       (assoc ::t-service/operation-area
              (places/fetch-transport-service-operation-area db id))))

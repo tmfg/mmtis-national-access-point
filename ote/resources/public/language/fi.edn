@@ -43,8 +43,8 @@
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
-   :ote.db.transport-service/license "Lisenssi/käyttöehdot"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (WWW)"
+   :ote.db.transport-service/license "Lisenssi / käyttöehdot"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus"
    }
 
   ;; Service exception
@@ -339,7 +339,7 @@
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
   :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
   :link-add-new-api                           "Lisää uusi palvelu"
-  :own-api-list                               "Omat liikkumispalvelutiedot"
+  :own-api-list                               "Omat palvelutiedot"
   :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
   :api-name                                   "Rajapinnan nimi"
   :api-url                                    "Rajapinnan verkko-osoite"
@@ -349,6 +349,7 @@
   :navigation-front-page                      "Etusivu"
   :navigation-organizations                   "Palveluntuottajat"
   :navigation-dataset                         "Palvelukatalogi"
+  :navigation-give-feedback                   "Anna palautetta"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Palveluntuottajan perustiedot"
   :user-menu-log-out                          "Kirjaudu ulos"
@@ -446,9 +447,8 @@
   :no-results "Hakuehdoilla ei löytynyt palveluita"
   :one-result "Hakuehdoilla löytyi yksi palvelu"
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
-  :interfaces "Koneluettavat rajapinnat: "
-  :nap-interface ["Palvelun \"" :name "\" NAPissa olevien tietojen rajapinta: "]
-  :external-interfaces ["Palvelun \"" :name "\" ulkopuoliset palveluntuottajan itse tarjoamat rajapinnat:"]
+  :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
+  :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Näytetään viimeksi muokatut palvelut. Hae palveluita syöttämällä hakuehdot."
   }
 
