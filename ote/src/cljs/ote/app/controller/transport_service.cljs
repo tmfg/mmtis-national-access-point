@@ -82,9 +82,12 @@
                     %)
                  services))))
 
-(defmulti transform-by-type ::t-service/type)
+(defmulti transform-save-by-type
+  "Transform transport service before sending it to the server.
+  Dispatches on the type. By default, returns service as is."
+  ::t-service/type)
 
-(defmethod transform-by-type :rentals [service]
+(defmethod transform-save-by-type :rentals [service]
   (update-in service [::t-service/rentals ::t-service/pick-up-locations]
              (fn [pick-up-locations]
                (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
@@ -94,8 +97,28 @@
                           (dissoc ::t-service/service-hours-and-exceptions)))
                     pick-up-locations))))
 
-(defmethod transform-by-type :default [service]
-  service)
+(defmethod transform-save-by-type :default [service] service)
+
+(defmulti transform-edit-by-type
+  "Transform transport service for editing after receiving it from the server.
+  Dispatches on the type. By default, returns service as is."
+  ::t-service/type)
+
+(defmethod transform-edit-by-type :rentals [service]
+  (update-in service [::t-service/rentals ::t-service/pick-up-locations]
+             (fn [pick-up-locations]
+               (mapv (fn [{hours ::t-service/service-hours
+                           exceptions ::t-service/service-exceptions
+                           :as pick-up-location}]
+                       (-> pick-up-location
+                           (assoc ::t-service/service-hours-and-exceptions
+                                  {::t-service/service-hours hours
+                                   ::t-service/service-exceptions exceptions})
+                           (dissoc ::t-service/service-hours
+                                   ::t-service/service-exceptions)))
+                     pick-up-locations))))
+
+(defmethod transform-edit-by-type :default [service] service)
 
 (extend-protocol tuck/Event
 
@@ -137,9 +160,10 @@
       (assoc app
         :transport-service-loaded? true
         :transport-service
-             (-> response
-                 (update ::t-service/operation-area place-search/operation-area-to-places)
-                 (move-service-level-keys-to-form (t-service/service-key-by-type type))))))
+        (-> response
+            (update ::t-service/operation-area place-search/operation-area-to-places)
+            (move-service-level-keys-to-form (t-service/service-key-by-type type))
+            transform-edit-by-type))))
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage
@@ -201,7 +225,7 @@
               (update key form/without-form-metadata)
               (move-service-level-keys-from-form key)
               (update ::t-service/operation-area place-search/place-references)
-              transform-by-type)]
+              transform-save-by-type)]
       (comm/post! "transport-service" service-data
                   {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
       app))
