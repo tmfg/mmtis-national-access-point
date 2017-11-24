@@ -13,11 +13,12 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.service-search :as ss]
             [ote.style.base :as style-base]
+            [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
             [clojure.string :as str]))
 
 (defn data-items [& icons-and-items]
-  [:div (stylefy/use-style style-base/item-list-container)
+  [:div (stylefy/use-style style/data-items)
    (doall
     (keep-indexed
      (fn [i [icon item]]
@@ -46,29 +47,29 @@
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
   [:div
-   [:b (tr [:service-search :interfaces])]
    [:div.nap-interface
-    (tr [:service-search :nap-interface] {:name name})
+    [:b (tr [:service-search :nap-interface])]
     (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
       [:a {:href url :target "_blank"} url])]
    (when-not (empty? external-interface-links)
      [:span
       [:br]
-      [:b (tr [:service-search :external-interfaces] {:name name})
-       [ui/table
-        [ui/table-header {:adjust-for-checkbox false :display-select-all false}
-         (for [[k w _] external-interface-table-columns]
-           ^{:key k}
-           [ui/table-header-column {:style {:width w}}
-            (tr [:field-labels :transport-service-common k])])]
-        [ui/table-body {:display-row-checkbox false}
+      [:b (tr [:service-search :external-interfaces])
+       [:table
+        [:thead (stylefy/use-style style/external-interface-header)
+         [:tr
+          (for [[k w _] external-interface-table-columns]
+            ^{:key k}
+            [:th {:style {:width w}}
+             (tr [:field-labels :transport-service-common k])])]]
+        [:tbody (stylefy/use-style style/external-interface-body)
          (map-indexed
           (fn [i row]
             ^{:key i}
-            [ui/table-row {:selectable false}
+            [:tr {:selectable false}
              (for [[k w value-fn] external-interface-table-columns]
                ^{:key k}
-               [ui/table-row-column {:style {:width w}}
+               [:td {:style {:width w}}
                 (value-fn row)])])
           external-interface-links)]]]])])
 
@@ -79,34 +80,31 @@
 
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type]
                             [:enums ::t-service/type])]
-    [ui/card {:z-depth 1}
-     [ui/card-header {:title (r/as-element
-                              [ui/flat-button
-                               {:primary true
-                                :on-click #(e! (ss/->OpenInterfaceInCKAN transport-operator-id id
-                                                                         ckan-resource-id))}
-                               name]) :style style-base/title
-                      :subtitle (sub-type-tr sub-type)}]
-     [ui/card-text
+    [ui/paper {:z-depth 2
+               :style style/result-card}
+     [:div.result-title (stylefy/use-style style/result-header)
+      [:a {:href (str "/dataset/org-" transport-operator-id
+                      "-service-" id
+                      "/resource/" ckan-resource-id)
+           :style style/result-link}
+       name]
       [data-items
 
        [ic/action-home]
        (format-address contact-address)
 
-       [ic/maps-map]
-       (str/join ", " operation-area-description)
-
        [ic/communication-phone]
        contact-phone
 
        [ic/communication-email]
-       contact-email
+       contact-email]]
+     [:div.result-subtitle (stylefy/use-style style/subtitle)
+      [:div (stylefy/use-style style/subtitle-operator)
+       operator-name]
+      (sub-type-tr sub-type)]
 
-       [ic/communication-business]
-       operator-name]]
-     [ui/card-actions
-      (r/as-element
-       [external-interface-links e! service])]]))
+     [:div.result-interfaces
+      [external-interface-links e! service]]]))
 
 (defn results-listing [e! results empty-filters?]
   (let [result-count (count results)]
