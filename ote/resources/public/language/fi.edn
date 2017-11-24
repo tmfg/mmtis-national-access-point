@@ -23,10 +23,13 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "Vakio esteettömyysvälineet"
-   :ote.db.transport-service/guaranteed-accessibility-description "Vakio esteettömyyspalveluiden kuvaus"
-   :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavat esteettömyysvälineet"
-   :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavien esteettömyyspalveluiden kuvaus"
+   :ote.db.transport-service/guaranteed-accessibility-tool        "Aina saatavilla olevat esteettömyysvälineet"
+   :ote.db.transport-service/guaranteed-accessibility-description "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
+   :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavilla olevat esteettömyysvälineet"
+   :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
+
+   :ote.db.transport-service/guaranteed-transportable-aid "Aina kuljetettavissa olevat apuvälineet"
+   :ote.db.transport-service/limited-transportable-aid "Rajoitetusti kuljetettavissa olevat apuvälineet"
 
    :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
 
@@ -132,9 +135,6 @@
  :form-help
  {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."
-
-  :guaranteed-accessibility-subtitle "Vakiona saatavilla olevat esteettömyyspalvelut"
-  :limited-accessibility-subtitle "Rajoitetusti saatavilla olevat esteettömyyspalvelut"
   }
 
 
@@ -239,6 +239,13 @@
    :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
+
+  :ote.db.transport-service/transportable-aid
+  {:wheelchair "Pyörätuoli"
+   :walking-stick "Kävelykeppi"
+   :assistance-dog "Avustajakoira"
+   :crutches "Kainalosauvat"
+   :walker "Rollaattori"}
 
   }
 
