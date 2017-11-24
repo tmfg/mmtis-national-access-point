@@ -67,6 +67,7 @@
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
 
+(defrecord EditTransportService [form-data])
 (defrecord SaveTransportService [publish?])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
@@ -229,6 +230,11 @@
       (comm/post! "transport-service" service-data
                   {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
       app))
+
+  EditTransportService
+  (process-event [{form-data :form-data} {ts :transport-service :as app}]
+    (let [key (t-service/service-key-by-type (::t-service/type ts))]
+      (update-in app [:transport-service key] merge form-data)))
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
