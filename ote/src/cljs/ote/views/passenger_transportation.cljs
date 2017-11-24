@@ -7,7 +7,6 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.passenger-transportation :as pt]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
@@ -23,7 +22,7 @@
 
 (defn transportation-form-options [e!]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
-   :update!     #(e! (pt/->EditPassengerTransportationState %))
+   :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
