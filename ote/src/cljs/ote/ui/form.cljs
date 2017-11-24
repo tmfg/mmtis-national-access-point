@@ -282,22 +282,26 @@
                              #(reset! focus %)
                              modified
                              errors warnings notices
-                             update-form]]
+                             update-form]
+            expandable? (get options :expandable? true)
+            card? (get options :card? true)]
         [:div.form-group-container (stylefy/use-style style-form/form-group-container
                                                       {::stylefy/with-classes classes})
-         [ui/card {:z-depth 1
-                   :expanded (not (closed-groups label))
-                   :on-expand-change #(update-form (update data ::closed-groups toggle label))}
-          (when label
-            [ui/card-header {:title label
-                             :style {:padding-bottom "0px"}
-                             :title-style {:font-weight "bold"}
-                             :show-expandable-button true}])
-          [ui/card-text {:style {:padding-top "0px"} :expandable true}
-           group-component]
-          (when-let [actions (and (not (closed-groups label)) (:actions options))]
-            [ui/card-actions
-             (r/as-element actions)])]]))}))
+         (if-not card?
+           group-component
+           [ui/card {:z-depth 1
+                     :expanded (not (closed-groups label))
+                     :on-expand-change #(update-form (update data ::closed-groups toggle label))}
+            (when label
+              [ui/card-header {:title label
+                               :style {:padding-bottom "0px"}
+                               :title-style {:font-weight "bold"}
+                               :show-expandable-button expandable?}])
+            [ui/card-text {:style {:padding-top "0px"} :expandable true}
+             group-component]
+            (when-let [actions (and (not (closed-groups label)) (:actions options))]
+              [ui/card-actions
+               (r/as-element actions)])])]))}))
 
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the

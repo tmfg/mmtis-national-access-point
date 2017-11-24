@@ -82,6 +82,21 @@
                     %)
                  services))))
 
+(defmulti transform-by-type ::t-service/type)
+
+(defmethod transform-by-type :rentals [service]
+  (update-in service [::t-service/rentals ::t-service/pick-up-locations]
+             (fn [pick-up-locations]
+               (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
+                      (-> pick-up-location
+                          (assoc ::t-service/service-hours (::t-service/service-hours hours-and-exceptions)
+                                 ::t-service/service-exceptions (::t-service/service-exceptions hours-and-exceptions))
+                          (dissoc ::t-service/service-hours-and-exceptions)))
+                    pick-up-locations))))
+
+(defmethod transform-by-type :default [service]
+  service)
+
 (extend-protocol tuck/Event
 
   AddPriceClassRow
@@ -185,7 +200,8 @@
                      ::t-service/transport-operator-id (::t-operator/id operator))
               (update key form/without-form-metadata)
               (move-service-level-keys-from-form key)
-              (update ::t-service/operation-area place-search/place-references))]
+              (update ::t-service/operation-area place-search/place-references)
+              transform-by-type)]
       (comm/post! "transport-service" service-data
                   {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
       app))

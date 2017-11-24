@@ -30,7 +30,7 @@
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
   ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
-  ["pick_up_type" ::pick_up_type]
+  ["pick_up_type" ::pick_up_type (specql.transform/transform (specql.transform/to-keyword))]
   ["brokerage_service_type" ::brokerage_service_type]
 
   ;; UDT tyypit
@@ -107,3 +107,6 @@
 
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) language) (::text %)) localized-text))
+
+(def pick-up-types
+  [:pick-up :return :pick-up-return])
