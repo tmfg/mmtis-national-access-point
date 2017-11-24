@@ -32,7 +32,7 @@
   ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
   ["pick_up_type" ::pick_up_type]
   ["brokerage_service_type" ::brokerage_service_type]
-  ["transportable_aid" ::transportable-aid]
+  ["transportable_aid" ::transportable-aid (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -110,3 +110,6 @@
 
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) language) (::text %)) localized-text))
+
+(def transportable-aid
+  [:wheelchair :walking-stick :assistance-dog :crutches :walker])
