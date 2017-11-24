@@ -228,6 +228,19 @@
                         :checked (boolean (selected-set option))}])
        options))]))
 
+(defmethod field :checkbox-group [{:keys [update! label show-option options]} data]
+  (let [selected (set (or data #{}))]
+    [:div.checkbox-group
+     [:h4 label]
+     (map-indexed
+      (fn [i option]
+        (let [checked? (selected option)]
+          [ui/checkbox {:key i
+                        :label (show-option option)
+                        :checked checked?
+                        :on-check #(update! ((if checked? disj conj) selected option))}]))
+      options)]))
+
 
 (def phone-regex #"\+?\d+")
 
