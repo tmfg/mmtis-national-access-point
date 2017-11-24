@@ -30,3 +30,7 @@
 (def subtitle (merge full-width
                      {:margin "1em 0 0 0.5em"}))
 (def subtitle-h {:margin "0"})
+
+
+(def border-color "#C4C4C4")
+(def border-right {:border-right (str "solid 2px " border-color)})
