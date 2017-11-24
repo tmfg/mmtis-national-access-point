@@ -37,6 +37,7 @@
    :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
    :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Muoto"
    :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
@@ -55,12 +56,9 @@
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
-   :ote.db.transport-service/description               "Palvelun kuvaus"
    :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/additional-services       "Muut palvelut"
    :ote.db.transport-service/price-class               "Hinnoittelu"
    :ote.db.transport-service/service-hours             "Palveluajat"
    :ote.db.transport-service/operation-area            "Toiminta-alue"
@@ -89,8 +87,10 @@
 
   ;; Rental fields
   :rentals
-  {:eligibility-requirements  "Kelpoisuusvaatimukset"
+  {:ote.db.transport-service/eligibility-requirements  "Kelpoisuusvaatimukset"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/pick-up-name              "Nimi"
+   :ote.db.transport-service/pick-up-type              "Tyyppi"
    }
 
   ;; Parking fields
@@ -100,19 +100,22 @@
 
 
   :transport-service
-  {:ote.db.transport-service/name "Palvelun nimi"
-   :ote.db.transport-service/type "Liikkumispalvelun tyyppi"
-   :ote.db.transport-service/sub-type "Liikkumispavelun alatyyppi"
-   :ote.db.transport-service/published? "NAP-tila"
-   :ote.db.transport-service/published?-values {true "Julkaistu"
-                                                false "Ei julkaistu"}
+  {:ote.db.transport-service/name                "Palvelun nimi"
+   :ote.db.transport-service/additional-services "Muut palvelut"
+   :ote.db.transport-service/url                 "Palvelun verkko-osoite"
+   :ote.db.transport-service/description         "Palvelun kuvaus"
+   :ote.db.transport-service/type                "Liikkumispalvelun tyyppi"
+   :ote.db.transport-service/sub-type            "Liikkumispavelun alatyyppi"
+   :ote.db.transport-service/published?          "NAP-tila"
+   :ote.db.transport-service/published?-values   {true  "Julkaistu"
+                                                  false "Ei julkaistu"}
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Viikonpäivät"
-   :ote.db.transport-service/from                      "Aukeamisaika"
-   :ote.db.transport-service/to                        "Kiinnimenoaika"
-   :ote.db.transport-service/all-day "24h"
-   
+   :ote.db.transport-service/week-days           "Viikonpäivät"
+   :ote.db.transport-service/from                "Aukeamisaika"
+   :ote.db.transport-service/to                  "Kiinnimenoaika"
+   :ote.db.transport-service/all-day             "24h"
+   }
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
@@ -304,11 +307,11 @@
   }
 
  :rentals-page
- {:header-service-info                     "Palvelun perustiedot"
+ {:header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-eligibity-requirements           "Kelpoisuusvaatimukset"
   :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
-  :open-service-hours-and-exceptions       "Aseta palveluajat"
+  :open-service-hours-and-exceptions       "Palveluajat"
   }
 
  :terminal-page
