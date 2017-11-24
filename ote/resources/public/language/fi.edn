@@ -305,6 +305,14 @@
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   }
 
+ :parking-page
+ {:header-service-info  "Palvelun perustiedot"
+  :header-contact-details "Palvelun yhteystiedot"
+  :header-add-new-parking  "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
+  :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
+  :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
+  }
+
  :select-service-type-page
  {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
