@@ -52,7 +52,7 @@
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
-(defrecord SelectTransportServiceType [data])
+(defrecord SelectTransportServiceType [])
 
 (defrecord ModifyTransportService [id])
 (defrecord ModifyTransportServiceResponse [response])
@@ -70,6 +70,9 @@
 (defrecord SaveTransportService [publish?])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
+
+(defrecord SelectServiceType [data])
+(defrecord SelectOnlyServiceType [data])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -98,17 +101,38 @@
   (process-event [_ app]
     (assoc-in app [:t-service :price-class-open] false))
 
-  SelectTransportServiceType
+  SelectServiceType
+  ;; Set only service type and sub-type
   (process-event [{data :data} app]
-    ;; Clear selected transport type section from app state
-    ;; Navigate to selected transport type form
-    (let [service-type-subtype (get data :transport-service-type-subtype)
-          type (service-type-from-combined-service-type service-type-subtype)
-          sub-type (subtype-from-combined-service-type service-type-subtype)]
-            (routes/navigate! type)
-            (-> app
-                (assoc :transport-service {::t-service/type type})
-                (assoc-in [:transport-service (t-service/service-key-by-type type) ] {::t-service/sub-type sub-type}))))
+   (let [service-type-subtype data
+          type (service-type-from-combined-service-type data)
+          sub-type (subtype-from-combined-service-type service-type-subtype)
+          subtype-key (t-service/service-key-by-type type)
+          app (assoc-in app [:transport-service :transport-service-type-subtype ] data)
+          app (assoc-in app [:transport-service subtype-key ] {::t-service/sub-type sub-type})
+          app (assoc-in app [:transport-service ::t-service/type] type)
+          ]
+      app))
+
+  SelectTransportServiceType
+  ;; Redirect to add service page
+  (process-event [_ app]
+    (routes/navigate! (get-in app [:transport-service ::t-service/type]))
+      app)
+
+  SelectOnlyServiceType
+  ;; Set service type, sub-type and
+  (process-event [{data :data} app]
+    (let [service-type-subtype data
+          type (service-type-from-combined-service-type data)
+          sub-type (subtype-from-combined-service-type service-type-subtype)
+          subtype-key (t-service/service-key-by-type type)
+          app (assoc-in app [:transport-service :transport-service-type-subtype ] data)
+          app (assoc-in app [:transport-service subtype-key ] {::t-service/sub-type sub-type})
+          app (assoc-in app [:transport-service ::t-service/type] type)
+          ]
+    (routes/navigate! type)
+    app))
 
   ModifyTransportService
   (process-event [{id :id} app]
@@ -184,6 +208,8 @@
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id (::t-operator/id operator))
               (update key form/without-form-metadata)
+              (dissoc :transport-service-type-subtype)
+              (dissoc :select-transport-operator)
               (move-service-level-keys-from-form key)
               (update ::t-service/operation-area place-search/place-references))]
       (comm/post! "transport-service" service-data
@@ -199,7 +225,6 @@
   (process-event [_ app]
     (routes/navigate! :own-services)
     (dissoc app :transport-service)))
-
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the

@@ -107,10 +107,16 @@
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})]
+        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
+        ;; Clean up user data
+        cleaned-user (dissoc user
+                             :apikey
+                             :email
+                             :id)]
+
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
-     :user user}))
+     :user cleaned-user}))
 
 
 (defn- save-transport-operator [db data]
@@ -206,7 +212,14 @@
 
    (POST "/transport-operator/data" {user :user}
          (http/transit-response
-          (get-transport-operator-data db (-> user :groups first) (:user user))))
+           (map
+             (fn [group]
+               (get-transport-operator-data db group (:user user))
+             )
+             (:groups user)
+           )
+         )
+   )
 
    (POST "/transport-operator" {form-data :body
                                 user :user}

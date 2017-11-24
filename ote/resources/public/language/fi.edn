@@ -17,6 +17,7 @@
 
   ;; Transport service fields
   :transport-service-type-subtype "Valitse liikkumispalvelun tyyppi"
+  :select-transport-operator      "Valitse palveluntuottaja"
 
   :transport-service-common
   {:ote.db.transport-service/name "Palvelun nimi"
@@ -282,8 +283,8 @@
   }
 
  :organization-page
- {:contact-types  "Yhteystavat"
-  :organization-form-title "Palveluntuottajan tiedot"
+ {:contact-types            "Yhteystavat"
+  :organization-form-title  "Palveluntuottajan tiedot"
   }
 
  :passenger-transportation-page
@@ -336,6 +337,7 @@
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
   :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
+  :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo                           "Liikennevirasto Logo"
   :footer-livi-url                            "Liikennevirasto.fi"
   :footer-ckan-software                       "CKAN-ohjelmistolla"

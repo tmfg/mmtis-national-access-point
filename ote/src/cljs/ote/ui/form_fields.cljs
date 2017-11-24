@@ -164,11 +164,12 @@
              lang]))]]])))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error warning] :as field}
+(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
-    [ui/select-field {:style style
+    [ui/select-field {:auto-width (boolean auto-width?)
+                      :style style
                       :floating-label-text label
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))

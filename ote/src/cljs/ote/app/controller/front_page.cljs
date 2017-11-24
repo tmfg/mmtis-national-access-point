@@ -72,14 +72,13 @@
   GetTransportOperatorData
   (process-event [_ app]
     (comm/post! "transport-operator/data" {} {:on-success (tuck/send-async! ->TransportOperatorDataResponse)})
-    app)
+    (assoc app :transport-operator-data-loaded? false))
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
     (assoc app
-      :transport-operator (get response :transport-operator)
-      :transport-services (get response :transport-service-vector )
-      :user (get response :user ))))
-
-
-
+      :transport-operator-data-loaded? true
+      :transport-operators-with-services response
+      :transport-operator  (get (first response) :transport-operator)
+      :transport-service-vector (get (first response) :transport-service-vector)
+      :user (:user (first response)))))
