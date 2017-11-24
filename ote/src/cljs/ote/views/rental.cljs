@@ -8,7 +8,6 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.rental :as rental]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
@@ -21,9 +20,8 @@
   {:name->label (tr-key [:field-labels :rentals]
                         [:field-labels :transport-service]
                         [:field-labels :transport-service-common]
-                        [:field-labels]
-                        )
-   :update!     #(e! (rental/->EditRentalState %))
+                        [:field-labels])
+   :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
