@@ -3,7 +3,7 @@ VALUES ('Ajopalvelu Testinen Oy', '1234567-8', 'http://www.example.com',
 ROW('Testikatu 1','90666','Testi')::address, '79046442-ad25-4865-a174-ec199a4b39c4');
 
 INSERT INTO "transport-service"
-       ("transport-operator-id","type","terminal","passenger-transportation", "rental","parking",
+       ("transport-operator-id","type","terminal","passenger-transportation", "rentals","parking",
        "brokerage","created","created-by","modified","modified-by","published?",
        "contact-address", "contact-phone", "homepage")
 VALUES
