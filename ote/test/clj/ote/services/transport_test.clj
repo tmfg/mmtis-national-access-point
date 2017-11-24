@@ -20,7 +20,7 @@
              [clojure.string :as str]))
 
 
-(t/use-fixtures :once
+(t/use-fixtures :each
   (system-fixture
    :transport (component/using
                 (transport-service/->Transport
