@@ -23,6 +23,16 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
 
+   :ote.db.transport-service/guaranteed-accessibility-tool        "Aina saatavilla olevat esteettömyysvälineet"
+   :ote.db.transport-service/guaranteed-accessibility-description "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
+   :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavilla olevat esteettömyysvälineet"
+   :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
+
+   :ote.db.transport-service/guaranteed-transportable-aid "Aina kuljetettavissa olevat apuvälineet"
+   :ote.db.transport-service/limited-transportable-aid "Rajoitetusti kuljetettavissa olevat apuvälineet"
+
+   :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
+
    ;; Contact details
    :ote.db.transport-service/contact-address          "Osoitetiedot"
    :ote.db.transport-service/contact-phone             "Puhelin"
@@ -127,7 +137,8 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help 
  {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
-  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."}
+  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."
+  }
 
 
  ;; Action buttons
@@ -234,6 +245,13 @@
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other "Muu"}
 
+  :ote.db.transport-service/transportable-aid
+  {:wheelchair "Pyörätuoli"
+   :walking-stick "Kävelykeppi"
+   :assistance-dog "Avustajakoira"
+   :crutches "Kainalosauvat"
+   :walker "Rollaattori"}
+
   :ote.db.transport-service/pick-up-type
   {:pick-up "Nouto"
    :return "Palautus"
@@ -300,7 +318,7 @@
   :header-service-info                     "Palvelun perustiedot"
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
   :header-contact-details                  "Palvelun yhteystiedot"
-  :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
+  :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
   :header-pick-up-locations "Toimipisteet"

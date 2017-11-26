@@ -15,7 +15,8 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time])
+            [ote.time :as time]
+            [ote.style.form :as style-form])
   (:require-macros [reagent.core :refer [with-let]]))
 
 
@@ -69,19 +70,60 @@
     :columns 3
     :layout :row}
 
+   {:name        ::t-service/guaranteed-accessibility-tool
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name        ::t-service/limited-accessibility-tool
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/transportable-aid
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name ::t-service/limited-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/transportable-aid
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/limited-accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5
+    :container-style style-form/half-width
+    :full-width? true}
+
+   {:name ::t-service/accessibility-info-url
+    :type :string
+    :container-style style-form/half-width
+    :full-width? true}
+
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/additional-services])
-    :options     t-service/additional-services}
-
-   {:name        ::t-service/accessibility-tool
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool}
-
-   {:name ::t-service/accessibility-description
-    :type :localized-text
-    :rows 1 :max-rows 5}))
+    :options     t-service/additional-services
+    :container-style style-form/half-width
+    :full-width? true}
+   ))
 
 (defn pricing-group [e!]
   (form/group
