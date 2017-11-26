@@ -17,7 +17,8 @@
              [clojure.spec.test.alpha :as stest]
              [clojure.spec.alpha :as s]
              [ote.db.generators :as generators]
-             [clojure.string :as str]))
+             [clojure.string :as str]
+             [clojure.set :as set]))
 
 
 (t/use-fixtures :each
@@ -29,13 +30,19 @@
 
 (def gen-passenger-transportation
   (gen/hash-map
-   ::t-service/accessibility-tool (s/gen ::t-service/accessibility-tool)
+   ::t-service/guaranteed-accessibility-tool (s/gen ::t-service/accessibility-tool)
+   ::t-service/guaranteed-accessibility-description generators/gen-localized-text-array
+   ::t-service/guaranteed-transportable-aid (s/gen ::t-service/guaranteed-transportable-aid)
+   ::t-service/guaranteed-info-service-accessibility (s/gen ::t-service/guaranteed-info-service-accessibility)
+   ::t-service/limited-accessibility-tool (s/gen ::t-service/accessibility-tool)
+   ::t-service/limited-accessibility-description generators/gen-localized-text-array
+   ::t-service/limited-transportable-aid (s/gen ::t-service/limited-transportable-aid)
+   ::t-service/limited-info-service-accessibility (s/gen ::t-service/limited-info-service-accessibility)
    ::t-service/additional-services (s/gen ::t-service/additional-services)
    ::t-service/price-classes generators/gen-price-class-array
    ::t-service/booking-service generators/gen-service-link
    ::t-service/payment-methods (s/gen ::t-service/payment-methods)
    ::t-service/real-time-information generators/gen-service-link
-   ::t-service/accessibility-description generators/gen-localized-text-array
    ::t-service/service-hours generators/gen-service-hours-array
    ::t-service/service-exceptions (gen/return []) ;; FIXME: generate these
    ::t-service/luggage-restrictions generators/gen-localized-text-array
@@ -106,7 +113,11 @@
     (let [keys-v1 (non-nil-keys v1)
           keys-v2 (non-nil-keys v2)]
       (if-not (= keys-v1 keys-v2)
-        (do (println "Maps don't have the same non-empty keys: " keys-v1 " != " keys-v2)
+        (do (println "Maps don't have the same non-empty keys"
+                     (when-let [not-in-v1 (seq (set/difference keys-v2 keys-v1))]
+                       (str ", not in left: " (str/join ", " not-in-v1)))
+                     (when-let [not-in-v2 (seq (set/difference keys-v1 keys-v2))]
+                       (str ", not in right: " (str/join ", " not-in-v2))))
             false)
         (and (= keys-v1 keys-v2)
              (every? #(let [result (effectively-same-deep (get v1 %)
