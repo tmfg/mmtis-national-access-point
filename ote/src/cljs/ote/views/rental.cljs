@@ -8,7 +8,6 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.rental :as rental]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
@@ -21,9 +20,8 @@
   {:name->label (tr-key [:field-labels :rentals]
                         [:field-labels :transport-service]
                         [:field-labels :transport-service-common]
-                        [:field-labels]
-                        )
-   :update!     #(e! (rental/->EditRentalState %))
+                        [:field-labels])
+   :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
@@ -48,7 +46,7 @@
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/additional-services])
     :options     t-service/additional-services}
-   
+
    {:name        ::t-service/accessibility-tool
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/accessibility-tool])
@@ -102,19 +100,25 @@
 
      {:name ::t-service/pick-up-locations
       :type :table
-      :table-fields [{:name ::t-service/pick-up-name
-                      :type :localized-text}
+      :table-fields [{:name ::t-service/name
+                      :type :string}
                      {:name ::t-service/pick-up-type
                       :type :selection
                       :options t-service/pick-up-types
                       :show-option (tr-key [:enums ::t-service/pick-up-type])}
                      {:name ::common/street
-                      :type :string}
+                      :type :string
+                      :read (comp ::common/street ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
                      {:name ::common/postal_code
                       :type :string
-                      :regex #"\d{0,5}"}
+                      :regex #"\d{0,5}"
+                      :read (comp ::common/postal_code ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
                      {:name ::common/post_office
-                      :type :string}
+                      :type :string
+                      :read (comp ::common/post_office ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
                      {:name ::t-service/service-hours-and-exceptions
                       :type :component
                       :component (fn [{:keys [update-form! data]}]
@@ -141,5 +145,3 @@
       [:div
        [:h3 (tr [:rentals-page :header-rental-service])]]
       [form/form options groups (get service ::t-service/rentals)]]]))
-
-
