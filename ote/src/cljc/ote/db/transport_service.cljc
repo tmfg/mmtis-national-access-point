@@ -30,8 +30,9 @@
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
   ["additional_services" ::additional_services  (specql.transform/transform (specql.transform/to-keyword))]
-  ["pick_up_type" ::pick_up_type]
+  ["pick_up_type" ::pick_up_type (specql.transform/transform (specql.transform/to-keyword))]
   ["brokerage_service_type" ::brokerage_service_type]
+  ["transportable_aid" ::transportable-aid (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -39,10 +40,12 @@
   ["service_hours" ::service_hours]
   ["service_exception" ::service_exception]
   ["price_class" ::price_class]
+  ["assistance_notification_requirement" ::assistance-notification-requirement]
+  ["assistance_info" ::assistance-info]
   ["terminal_information" ::terminal_information]
   ["passenger_transportation_info" ::passenger_transportation_info]
   ["pick_up_location" ::pick_up_location]
-  ["rental_provider_informaton" ::rental_provider_informaton]
+  ["rental_provider_information" ::rental_provider_informaton]
   ["parking_provider_information" ::parking_provider_information]
   ["brokerage_service" ::brokerage_service]
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
@@ -106,3 +109,9 @@
 
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) language) (::text %)) localized-text))
+
+(def transportable-aid
+  [:wheelchair :walking-stick :assistance-dog :crutches :walker])
+
+(def pick-up-types
+  [:pick-up :return :pick-up-return])

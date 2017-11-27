@@ -39,7 +39,7 @@
     ::t-service/ckan-dataset-id
     ::t-service/terminal
     ::t-service/contact-address
-    ::t-service/rental
+    ::t-service/rentals
     ::t-service/homepage
     ::t-service/name
     ::t-service/type

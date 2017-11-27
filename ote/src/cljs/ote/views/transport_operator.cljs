@@ -11,7 +11,7 @@
 (defn operator [e! status]
   [:span
    [:div
-    [:h3 (tr [:organization-page :organization-form-title])]]
+    [:h1 (tr [:organization-page :organization-form-title])]]
    [form/form
     {:name->label (tr-key [:field-labels])
      :update! #(e! (to/->EditTransportOperatorState %))

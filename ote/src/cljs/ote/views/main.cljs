@@ -182,12 +182,27 @@
        [:li
         [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]]]])
 
-(defn- debug-state [app]
-  ;; NOTE: debug state is VERY slow if app state is HUGE
-  ;; (it tries to pr-str it)
-  (when (= true (get-in app [:ote-service-flags :show-debug]))
-    [:div.row
-     [debug/debug app]]))
+(defonce debug-state-toggle-listener (atom false))
+
+(defn- debug-state [e! app]
+  (when-not @debug-state-toggle-listener
+    (reset! debug-state-toggle-listener true)
+    (.addEventListener
+     js/window "keypress"
+     (fn [e]
+       (.log js/console e)
+       (when (and (.-ctrlKey e)
+                  (= "d" (.-key e)))
+         (.log js/console "jep")
+         (e! (fp-controller/->ToggleDebugState))))))
+  (r/create-class
+   ;; NOTE: debug state is VERY slow if app state is HUGE
+   ;; (it tries to pr-str it)
+   {:reagent-render
+    (fn [_ app]
+      (when (= true (get-in app [:ote-service-flags :show-debug]))
+        [:div.row
+         [debug/debug app]]))}))
 
 (defn ote-application
   "OTE application main view"
@@ -219,5 +234,5 @@
         [:div "ERROR: no such page " (pr-str (:page app))])]
 
      (when-let [msg (:flash-message app)] [flash-message msg])
-     [debug-state app]
+     [debug-state e! app]
      [footer]]]]))

@@ -70,4 +70,5 @@
   (merge inline-block
          {:position "relative"
           :margin-left "0.2em"
-          :top "-0.5em"}))
+          :top "-0.5em"
+          }))

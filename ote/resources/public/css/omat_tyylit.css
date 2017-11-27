@@ -47,7 +47,19 @@ h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   margin-bottom: 1rem;
  }
-
+h1 {
+  font-weight: 400;
+  font-size: 28px;
+}
+/* Global link color */
+a {
+    color: #2D75B4;
+    text-decoration: none;
+}
+a:hover {
+    color: #2D75B4;
+    text-decoration: underline;
+}
 .background-color {
     background: #3db7e4
 }
@@ -127,5 +139,11 @@ ul.unstyled, ol.unstyled {
     background: url(../../../base/images/ckan-logo-footer.png) no-repeat top left;
     text-indent: -900em;
 }
+
+span.search-card-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
 /* Footer ends */
 #oteapp > [data-reactroot] { height: 100% }
