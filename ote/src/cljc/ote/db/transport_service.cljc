@@ -113,7 +113,7 @@
   (some #(when (= (::lang %) language) (::text %)) localized-text))
 
 (def transportable-aid
-  [:wheelchair :walking-stick :assistance-dog :crutches :walker])
+  [:wheelchair :walking-stick :crutches :walker])
 
 (def pick-up-types
   [:pick-up :return :pick-up-return])
