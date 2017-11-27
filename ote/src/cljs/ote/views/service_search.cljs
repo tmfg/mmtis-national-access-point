@@ -48,13 +48,13 @@
                                                        transport-operator-id ckan-resource-id]}]
   [:div
    [:div.nap-interface
-    [:b (tr [:service-search :nap-interface])]
+    [:span.search-card-title (tr [:service-search :nap-interface])]
     (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
       [:a {:href url :target "_blank"} url])]
    (when-not (empty? external-interface-links)
      [:span
       [:br]
-      [:b (tr [:service-search :external-interfaces])
+      [:span.search-card-title (tr [:service-search :external-interfaces])
        [:table
         [:thead (stylefy/use-style style/external-interface-header)
          [:tr
@@ -69,7 +69,7 @@
             [:tr {:selectable false}
              (for [[k w value-fn] external-interface-table-columns]
                ^{:key k}
-               [:td {:style {:width w}}
+               [:td {:style {:width w :font-size "14px"}}
                 (value-fn row)])])
           external-interface-links)]]]])])
 
@@ -90,18 +90,20 @@
        name]
       [data-items
 
-       [ic/action-home]
+       [ic/action-home {:style { :color "#777" :height 18 :width 18   }}
+                        ]
        (format-address contact-address)
 
-       [ic/communication-phone]
+       [ic/communication-phone {:style { :color "#777" :height 18 :width 18   }}]
        contact-phone
 
        [ic/communication-email]
        contact-email]]
      [:div.result-subtitle (stylefy/use-style style/subtitle)
-      [:div (stylefy/use-style style/subtitle-operator)
+      [:div (stylefy/use-style style/subtitle-operator-first)
        operator-name]
-      (sub-type-tr sub-type)]
+      [:div (stylefy/use-style style/subtitle-operator)
+      (sub-type-tr sub-type)]]
 
      [:div.result-interfaces
       [external-interface-links e! service]]]))

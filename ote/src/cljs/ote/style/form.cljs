@@ -10,7 +10,7 @@
 
 (def form-group-base {:margin-bottom "1em"})
 
-(def form-field  {:margin "0.5em 1em 0.5em 1em"})
+(def form-field  {:margin "0.5em 1em 0.5em 0em"})
 
 (def form-group-column (merge form-group-base
                               (base/flex-container "column")))
@@ -18,7 +18,7 @@
                            (base/flex-container "row")
                            {:flex-wrap "wrap"}))
 
-(def form-group-container {:padding-bottom "0.33em"})
+(def form-group-container {:padding-bottom "1em"})
 
 (def form-info-text {:display "inline-block"
                      :position "relative"
