@@ -12,14 +12,19 @@
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
             [tuck.core :as tuck]
+            [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
+            [ote.style.form :as style-form]
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]))
 
 (defn form-options [e!]
-  {:name->label (tr-key [:field-labels :parking] [:field-labels :transport-service-common])
-   :update!     #(e! (parking/->EditParkingState %))
+  {:name->label (tr-key [:field-labels :parking]
+                        [:field-labels :transport-service-common]
+                        [:field-labels :transport-service]
+                        [:field-labels])
+   :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
@@ -37,31 +42,36 @@
 
 (defn pricing-group [e!]
   (form/group
-    {:label   (tr [:passenger-transportation-page :header-price-information])
+    {:label   (tr [:parking-page :header-price-and-payment-methods])
      :columns 3
      :layout  :row}
 
     {:name         ::t-service/price-classes
      :type         :table
      :table-fields [{:name  ::t-service/name :type :string
-                     :label (tr [:field-labels :passenger-transportation ::t-service/price-class-name])}
+                     :label (tr [:field-labels :parking ::t-service/price-class-name])}
                     {:name ::t-service/price-per-unit :type :number}
                     {:name ::t-service/unit :type :string}
                     {:name ::t-service/currency :type :string :width "100px"}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
-    {:name    ::t-service/pricing-description
-     :type    :localized-text
-     :write   #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
-     :read    (comp ::t-service/description ::t-service/pricing)
-     :columns 1}
+    {:name  ::t-service/pricing-description
+     :type  :localized-text
+     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
+     :read  (comp ::t-service/description ::t-service/pricing)}
 
-    {:name    ::t-service/pricing-url
-     :type    :string
-     :write   #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
-     :read    (comp ::t-service/url ::t-service/pricing)
-     :columns 1}))
+    {:name  ::t-service/pricing-url
+     :type  :string
+     :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
+     :read  (comp ::t-service/url ::t-service/pricing)}
+
+    (form/divider)
+
+    {:name        ::t-service/payment-methods
+     :type        :multiselect-selection
+     :show-option (tr-key [:enums ::t-service/payment-methods])
+     :options     t-service/payment-methods}))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
@@ -72,7 +82,7 @@
                     data
                     (assoc data key time))))]
     (form/group
-      {:label   (tr [:passenger-transportation-page :header-service-hours])
+      {:label   (tr [:parking-page :header-service-hours])
        :columns 3}
 
       {:name      ::t-service/service-hours
@@ -129,13 +139,17 @@
   (r/with-let [options (form-options e!)
                groups [(name-and-type-group e!)
                        (ts-common/contact-info-group)
-                       (ts-common/external-interfaces)]]
-
+                       (ts-common/external-interfaces)
+                       (ts-common/service-url
+                         (tr [:field-labels :parking ::t-service/real-time-information])
+                         ::t-service/real-time-information)
+                       (ts-common/service-url
+                         (tr [:field-labels :parking ::t-service/booking-service])
+                         ::t-service/booking-service)
+                       (pricing-group e!)
+                       (service-hours-group e!)]]
               [:div.row
                [:div {:class "col-lg-12"}
-                [:div
-                 [:h1 "Täydennä pysäköintiin liittyvät tiedot."]]
-
                 [:div {:style {:border  "dotted 5px red"
                                :padding "2em"
                                :margin  "1em"}}

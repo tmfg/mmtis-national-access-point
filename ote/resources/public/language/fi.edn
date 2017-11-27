@@ -106,6 +106,31 @@
   ;; Parking fields
   :parking
   {:parking-areas  "Parkkipaikkojen sijainnit"
+   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
+   :ote.db.transport-service/description               "Palvelun kuvaus"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
+   :ote.db.transport-service/additional-services       "Muut palvelut"
+   :ote.db.transport-service/price-class               "Hinnoittelu"
+   :ote.db.transport-service/service-hours             "Palveluajat"
+   :ote.db.transport-service/operation-area            "Toiminta-alue"
+
+   ;; Price Class fields
+   :ote.db.transport-service/price-class-name          "Hintaryhmä"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/currency                  "Valuutta"
+
+   :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
+   :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+
+   ;; Service hour fields
+   :ote.db.transport-service/week-days                 "Viikonpäivät"
+   :ote.db.transport-service/from                      "Aukeamisaika"
+   :ote.db.transport-service/to                        "Kiinnimenoaika"
+   :ote.db.transport-service/all-day                   "24h"
    }
 
 
@@ -341,11 +366,14 @@
   }
 
  :parking-page
- {:header-service-info  "Palvelun perustiedot"
-  :header-contact-details "Palvelun yhteystiedot"
-  :header-add-new-parking  "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
+ {:header-service-info                      "Palvelun perustiedot"
+  :header-contact-details                   "Palvelun yhteystiedot"
+  :header-payment-methods                   "Maksutavat"
+  :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
   :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
+  :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
+  :header-service-hours                     "Palveluajat"
   }
 
  :opening-hours-dialog
