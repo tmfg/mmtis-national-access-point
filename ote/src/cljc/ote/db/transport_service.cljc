@@ -43,7 +43,6 @@
   ["passenger_transportation_info" ::passenger_transportation_info]
   ["pick_up_location" ::pick_up_location]
   ["rental_provider_informaton" ::rental_provider_informaton]
-  ["parking_area" ::parking_area]
   ["parking_provider_information" ::parking_provider_information]
   ["brokerage_service" ::brokerage_service]
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
