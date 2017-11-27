@@ -23,13 +23,20 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Esteettömyyspalveluiden kuvaus"
 
+   :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
+   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)
+"
+
+   :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
+   :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+
    :ote.db.transport-service/guaranteed-accessibility-tool        "Aina saatavilla olevat esteettömyysvälineet"
    :ote.db.transport-service/guaranteed-accessibility-description "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
    :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavilla olevat esteettömyysvälineet"
    :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
 
-   :ote.db.transport-service/guaranteed-transportable-aid "Aina kuljetettavissa olevat apuvälineet"
-   :ote.db.transport-service/limited-transportable-aid "Rajoitetusti kuljetettavissa olevat apuvälineet"
+   :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
+   :ote.db.transport-service/limited-transportable-aid "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
 
    :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
 
@@ -135,9 +142,12 @@
 
 
  ;; Add form info elements here, these are textual help texts in the form
- :form-help 
+ :form-help
  {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."
+
+  :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
+  :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden esteettömyysominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
   }
 
 
@@ -248,7 +258,7 @@
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Pyörätuoli"
    :walking-stick "Kävelykeppi"
-   :assistance-dog "Avustajakoira"
+   :assistance-dog "Avustuskoira"
    :crutches "Kainalosauvat"
    :walker "Rollaattori"}
 
@@ -256,6 +266,14 @@
   {:pick-up "Nouto"
    :return "Palautus"
    :pick-up-return "Nouto ja palautus"}
+
+  :ote.db.transport-service/vehicle-accessibility
+  {:low-floor "Matalalattia"
+   :step-free-access "Portaaton pääsy"
+   :accessible-vehicle "Esteetön kulkuneuvo"
+   :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :boarding-assistance "Kyytiin nousun avustus"
+   :assistance-dog-space "Tila avustuskoiralle"}
   }
 
  ;; Per feature/page localization keys
