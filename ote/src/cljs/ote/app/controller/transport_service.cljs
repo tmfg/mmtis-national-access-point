@@ -92,10 +92,14 @@
   (update-in service [::t-service/rentals ::t-service/pick-up-locations]
              (fn [pick-up-locations]
                (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
-                      (-> pick-up-location
-                          (assoc ::t-service/service-hours (::t-service/service-hours hours-and-exceptions)
-                                 ::t-service/service-exceptions (::t-service/service-exceptions hours-and-exceptions))
-                          (dissoc ::t-service/service-hours-and-exceptions)))
+                      (as-> pick-up-location loc
+                        (if-let [hours (::t-service/service-hours hours-and-exceptions)]
+                          (assoc loc ::t-service/service-hours hours)
+                          loc)
+                        (if-let [exceptions (::t-service/service-hours hours-and-exceptions)]
+                          (assoc loc ::t-service/service-exceptions exceptions)
+                          loc)
+                        (dissoc loc ::t-service/service-hours-and-exceptions)))
                     pick-up-locations))))
 
 (defmethod transform-save-by-type :default [service] service)
