@@ -4,12 +4,20 @@
             [ote.time :as time]))
 
 (def write-options
-  {:handlers {ote.time.Time (t/write-handler (constantly "time")
-                                             time/format-time)}})
+  {:handlers
+   {ote.time.Time (t/write-handler (constantly "time")
+                                   time/format-time)
+    ote.time.Interval (t/write-handler (constantly "interval")
+                                       (partial into {}))}})
 
 (def read-options
-  {:handlers {"time" #?(:clj (t/read-handler time/parse-time)
-                        :cljs time/parse-time)
+  {:handlers {"time"
+              #?(:clj (t/read-handler time/parse-time)
+                 :cljs time/parse-time)
+
+              "interval"
+              #?(:clj (t/read-handler time/->PGInterval)
+                 :cljs time/map->Interval)
 
               ;; Transit "f" tag is an arbitrary precision decimal number that has no native
               ;; JS equivalent, for now we simply map it to parseFloat in JS as we are not doing
