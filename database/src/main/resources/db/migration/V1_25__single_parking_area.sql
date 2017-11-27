@@ -7,7 +7,6 @@ CREATE TYPE PARKING_CAPACITY AS
   "capacity" INTEGER
 );
 
-
 ALTER TYPE parking_area
   RENAME TO parking_provider_information;
 
@@ -21,7 +20,7 @@ ALTER TYPE parking_provider_information
 
 -- Support multiple additional services instead of just one.
 ALTER TYPE parking_provider_information
-  DROP ATTRIBUTE "additional-service",
+ DROP ATTRIBUTE "additional-service",
   ADD ATTRIBUTE "additional-services" SERVICE_LINK [];
 
 ALTER TABLE "transport-service"
