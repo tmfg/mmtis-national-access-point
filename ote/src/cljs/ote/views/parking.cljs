@@ -27,7 +27,7 @@
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
-     [:h3 "Täydennä pysäköintiin liittyvät tiedot."]]
+     [:h1 "Täydennä pysäköintiin liittyvät tiedot."]]
 
     [:div {:style {:border "dotted 5px red"
                    :padding "2em"

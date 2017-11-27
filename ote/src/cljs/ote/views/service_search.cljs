@@ -97,7 +97,7 @@
        [ic/communication-phone {:style { :color "#777" :height 18 :width 18   }}]
        contact-phone
 
-       [ic/communication-email]
+       [ic/communication-email {:style { :color "#777" :height 18 :width 18   }}]
        contact-email]]
      [:div.result-subtitle (stylefy/use-style style/subtitle)
       [:div (stylefy/use-style style/subtitle-operator-first)
@@ -112,7 +112,7 @@
   (let [result-count (count results)]
     [:div.col-xs-12.col-md-12.col-lg-12
 
-     [:h2 (stylefy/use-style style-base/large-title)
+     [:p
       (tr [:service-search (if empty-filters?
                              :showing-latest-services
                              (case result-count
@@ -131,7 +131,7 @@
   (let [sub-type (tr-key [:enums ::t-service/sub-type]
                          [:enums ::t-service/type])]
     [:div
-     [:h3 (tr [:service-search :label])]
+     [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]
@@ -164,7 +164,6 @@
            :as service-search}]
     [:div.service-search
      [filters-form e! service-search]
-     [ui/divider]
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
        [results-listing e! results empty-filters?])]))
