@@ -210,13 +210,8 @@
    (POST "/transport-operator/data" {user :user}
          (http/transit-response
            (map
-             (fn [group]
-               (get-transport-operator-data db group (:user user))
-             )
-             (:groups user)
-           )
-         )
-   )
+             (fn [group] (get-transport-operator-data db group (:user user)))
+             (:groups user))))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
