@@ -4,14 +4,33 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-operator :as to]
-            [ote.db.transport-operator :as to-definitions]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [ote.ui.form-fields :as form-fields]))
 
-(defn operator [e! status]
-  [:span
-   [:div
-    [:h1 (tr [:organization-page :organization-form-title])]]
+(defn operator [e! state]
+  [:div
+  [:div.row
+   [:div  {:class "col-xs-12 col-sm-4 col-md-4"}
+    [:h1 (tr [:organization-page :organization-form-title])]]]
+   (if (second (:transport-operators-with-services state))
+   [:div.row
+    [:div  {:class "col-xs-12 col-sm-4 col-md-4"}
+      [form-fields/field
+       {:label (tr [:field-labels :select-transport-operator])
+        :name        :select-transport-operator
+        :type        :selection
+        :show-option ::t-operator/name
+        :update!   #(e! (to/->SelectOperator %))
+        :options     (map :transport-operator (:transport-operators-with-services state))
+        :auto-width? true}
+       (get state :transport-operator)
+       ]]]
+    nil)
+
+   [:div.row
+
    [form/form
     {:name->label (tr-key [:field-labels])
      :update! #(e! (to/->EditTransportOperatorState %))
@@ -24,25 +43,25 @@
     [(form/group
       {:label (tr [:common-texts :title-operator-basic-details])
        :columns 1}
-      {:name ::to-definitions/name
+      {:name ::t-operator/name
        :type :string
        :validate [[:non-empty "Anna nimi"]]}  ;;FIXME: translate
 
-      {:name ::to-definitions/business-id
+      {:name ::t-operator/business-id
        :type :string
        :validate [[:business-id]]}
 
       {:name ::common/street
        :type :string
-       :read (comp ::common/street ::to-definitions/visiting-address)
+       :read (comp ::common/street ::t-operator/visiting-address)
        :write (fn [data street]
-                (assoc-in data [::to-definitions/visiting-address ::common/street] street))}
+                (assoc-in data [::t-operator/visiting-address ::common/street] street))}
 
       {:name ::common/postal_code
        :type :string
-       :read (comp ::common/postal_code ::to-definitions/visiting-address)
+       :read (comp ::common/postal_code ::t-operator/visiting-address)
        :write (fn [data postal-code]
-                (assoc-in data [::to-definitions/visiting-address ::common/postal_code] postal-code))}
+                (assoc-in data [::t-operator/visiting-address ::common/postal_code] postal-code))}
 
       {:name :ote.db.common/post_office
        :type :string
@@ -50,17 +69,17 @@
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
 
-      {:name ::to-definitions/homepage
+      {:name ::t-operator/homepage
        :type :string})
 
      (form/group
       {:label (tr [:organization-page :contact-types])
        :columns 1}
 
-      {:name ::to-definitions/phone :type :string}
-      {:name ::to-definitions/gsm :type :string}
-      {:name ::to-definitions/email :type :string}
+      {:name ::t-operator/phone :type :string}
+      {:name ::t-operator/gsm :type :string}
+      {:name ::t-operator/email :type :string}
      )]
 
-    status]
+    (:transport-operator state)]]
    ])

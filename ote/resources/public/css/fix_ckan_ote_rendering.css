@@ -1,0 +1,7 @@
+@media (min-width: 1200px) {
+    .row {
+        margin-left: -20px;
+        *
+        zoom: 1;
+    }
+}

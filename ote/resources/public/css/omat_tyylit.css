@@ -52,11 +52,11 @@ h1 {
   font-size: 28px;
 }
 /* Global link color */
-a {
+.wrapper a {
     color: #2D75B4;
     text-decoration: none;
 }
-a:hover {
+.wrapper a:hover {
     color: #2D75B4;
     text-decoration: underline;
 }
