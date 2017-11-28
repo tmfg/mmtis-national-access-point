@@ -69,8 +69,7 @@
 (def item-list-item
   (merge inline-block
          {:position "relative"
-          :margin-left "0.2em"
-          :top "-0.5em"}))
+          :margin-left "0.2em"}))
 
 (def help (merge (flex-container "row")
                  {:border-radius "0.5em"

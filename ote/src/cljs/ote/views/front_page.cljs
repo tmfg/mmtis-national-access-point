@@ -29,7 +29,7 @@
                                   :keys [show-delete-modal?]
                                   :as service}]
   [:span
-   [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
+   [ui/icon-button {:href "#" :on-click #(e! (ts/->DeleteTransportService id))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
