@@ -67,6 +67,14 @@
 (defmethod debug-show :pr-str [data p _ _]
   [:span (pr-str data)])
 
+(def debug-style {:position "fixed"
+                  :bottom "0"
+                  :max-height "200"
+                  :overflow-y "scroll"
+                  :background-color "wheat"
+                  :z-index "9999"
+                  :width "100%"})
+
 (defn debug [item]
   (let [open-paths (r/atom #{})
         toggle! #(swap! open-paths
@@ -75,5 +83,5 @@
                             (disj paths %)
                             (conj paths %))))]
     (fn [item]
-      [:div.debug
+      [:div.debug {:style debug-style}
        [debug-show item [] @open-paths toggle!]])))

@@ -13,7 +13,7 @@
   [:div
   [:div.row
    [:div  {:class "col-xs-12 col-sm-4 col-md-4"}
-    [:h3 (tr [:organization-page :organization-form-title])]]]
+    [:h1 (tr [:organization-page :organization-form-title])]]]
    (if (second (:transport-operators-with-services state))
    [:div.row
     [:div  {:class "col-xs-12 col-sm-4 col-md-4"}

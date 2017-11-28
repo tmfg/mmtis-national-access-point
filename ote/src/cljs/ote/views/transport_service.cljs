@@ -41,7 +41,7 @@
   [:div.row
    [:div {:class "col-sx-12 col-md-12"}
     [:div
-     [:h3 (tr [:select-service-type-page :title-required-data])]]
+     [:h1 (tr [:select-service-type-page :title-required-data])]]
     [:div.row
      [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
     [:div.row {:style {:padding-top "20px"}}

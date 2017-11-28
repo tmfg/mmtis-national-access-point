@@ -103,7 +103,7 @@
   [:div
    [:div.row
     [:div {:class "col-xs-12 col-sm-4 col-md-4"}
-     [:h3 (tr [:common-texts :own-api-list]) ]
+     [:h1 (tr [:common-texts :own-api-list]) ]
      ]
 
     [:div {:class "col-xs-12 col-sm-4 col-md-4"}

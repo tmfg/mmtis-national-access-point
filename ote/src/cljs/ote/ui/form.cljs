@@ -13,16 +13,38 @@
             [ote.style.form :as style-form]
             [cljs-react-material-ui.icons :as ic]))
 
+(defonce keyword-counter (atom 0))
+
 (defn info
   "Create a new info form element that doesn't have any interaction, just shows a help text."
   [text]
-  {:name ::info
+  {:name (keyword (str info (swap! keyword-counter inc)))
    :type :component
+   :container-style style-form/full-width
    :component (fn [_]
                 [:div
                  [ic/action-info-outline]
                  [:div (stylefy/use-style style-form/form-info-text)
                   text]])})
+
+(defn divider
+  "Create a new divider form element that doesn't have any interaction,
+  just shows a horizontal divider"
+  []
+  {:name (keyword (str "divider" (swap! keyword-counter inc)))
+   :type :component
+   :container-style style-form/full-width
+   :component (fn [_]
+                [ui/divider])})
+
+(defn subtitle
+  "Create a subtitle inside a form group."
+  [text]
+  {:name (keyword (str "subtitle" (swap! keyword-counter inc)))
+   :type :component
+   :container-style style-form/subtitle
+   :component (fn [_]
+                [:h4.form-subtitle (stylefy/use-style style-form/subtitle-h) text])})
 
 (defrecord Group [label options schemas])
 
@@ -190,12 +212,12 @@
    modified errors warnings notices update-form]
   [:div.form-group (stylefy/use-style style)
    (doall
-    (for [{:keys [name editable? read write] :as s} schemas
+    (for [{:keys [name editable? read write container-style] :as s} schemas
           :let [editable? (and can-edit?
                                (or (nil? editable?)
                                    (editable? data)))]]
       ^{:key name}
-      [:div.form-field (stylefy/use-sub-style style :form-field)
+      [:div.form-field (stylefy/use-style (merge style-form/form-field container-style))
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)
@@ -282,22 +304,26 @@
                              #(reset! focus %)
                              modified
                              errors warnings notices
-                             update-form]]
+                             update-form]
+            expandable? (get options :expandable? true)
+            card? (get options :card? true)]
         [:div.form-group-container (stylefy/use-style style-form/form-group-container
                                                       {::stylefy/with-classes classes})
-         [ui/card {:z-depth 1
-                   :expanded (not (closed-groups label))
-                   :on-expand-change #(update-form (update data ::closed-groups toggle label))}
-          (when label
-            [ui/card-header {:title label
-                             :style {:padding-bottom "0px"}
-                             :title-style {:font-weight "bold"}
-                             :show-expandable-button true}])
-          [ui/card-text {:style {:padding-top "0px"} :expandable true}
-           group-component]
-          (when-let [actions (and (not (closed-groups label)) (:actions options))]
-            [ui/card-actions
-             (r/as-element actions)])]]))}))
+         (if-not card?
+           group-component
+           [ui/card {:z-depth 1
+                     :expanded (not (closed-groups label))
+                     :on-expand-change #(update-form (update data ::closed-groups toggle label))}
+            (when label
+              [ui/card-header {:title label
+                               :style {:padding-bottom "0px"}
+                               :title-style {:font-weight "bold"}
+                               :show-expandable-button expandable?}])
+            [ui/card-text {:style {:padding-top "0px"} :expandable true}
+             group-component]
+            (when-let [actions (and (not (closed-groups label)) (:actions options))]
+              [ui/card-actions
+               (r/as-element actions)])])]))}))
 
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the

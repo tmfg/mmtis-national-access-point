@@ -1,4 +1,4 @@
-(ns ote.views.passenger-transportation
+ (ns ote.views.passenger-transportation
   "Required datas for passenger transportation provider"
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
@@ -7,7 +7,6 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.passenger-transportation :as pt]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
@@ -16,14 +15,15 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time])
+            [ote.time :as time]
+            [ote.style.form :as style-form])
   (:require-macros [reagent.core :refer [with-let]]))
 
 
 
 (defn transportation-form-options [e!]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
-   :update!     #(e! (pt/->EditPassengerTransportationState %))
+   :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
@@ -70,19 +70,60 @@
     :columns 3
     :layout :row}
 
+   {:name        ::t-service/guaranteed-accessibility-tool
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name        ::t-service/limited-accessibility-tool
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/accessibility-tool])
+    :options     t-service/accessibility-tool
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/transportable-aid
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name ::t-service/limited-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/transportable-aid
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/limited-accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5
+    :container-style style-form/half-width
+    :full-width? true}
+
+   {:name ::t-service/accessibility-info-url
+    :type :string
+    :container-style style-form/half-width
+    :full-width? true}
+
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/additional-services])
-    :options     t-service/additional-services}
-
-   {:name        ::t-service/accessibility-tool
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool}
-
-   {:name ::t-service/accessibility-description
-    :type :localized-text
-    :rows 1 :max-rows 5}))
+    :options     t-service/additional-services
+    :container-style style-form/half-width
+    :full-width? true}
+   ))
 
 (defn pricing-group [e!]
   (form/group
@@ -112,67 +153,7 @@
     :read (comp ::t-service/url ::t-service/pricing)
     :columns 1}))
 
-(defn service-hours-group [e!]
-  (let [tr* (tr-key [:field-labels :service-exception])
-        write (fn [key]
-                (fn [{all-day? ::t-service/all-day :as data} time]
-                  ;; Don't allow changing time if all-day checked
-                  (if all-day?
-                    data
-                    (assoc data key time))))]
-    (form/group
-     {:label (tr [:passenger-transportation-page :header-service-hours])
-      :columns 3}
 
-     {:name         ::t-service/service-hours
-      :type         :table
-      :table-fields
-      [{:name ::t-service/week-days
-        :width "40%"
-        :type :multiselect-selection
-        :options t-service/days
-        :show-option (tr-key [:enums ::t-service/day :full])
-        :show-option-short (tr-key [:enums ::t-service/day :short])}
-       {:name ::t-service/all-day
-        :width "10%"
-        :type :checkbox
-        :write (fn [data all-day?]
-                 (merge data
-                        {::t-service/all-day all-day?}
-                        (when all-day?
-                          {::t-service/from (time/->Time 0 0 nil)
-                           ::t-service/to (time/->Time 24 0 nil)})))}
-
-       {:name ::t-service/from
-        :width "25%"
-        :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/from)
-        :default-time {:hours "08" :minutes "00"}}
-       {:name ::t-service/to
-        :width "25%"
-        :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/to)
-        :default-time {:hours "19" :minutes "00"}}]
-      :delete?      true
-      :add-label (tr [:buttons :add-new-service-hour])}
-
-     {:name ::t-service/service-exceptions
-      :type :table
-      :table-fields [{:name ::t-service/description
-                      :label (tr* :description)
-                      :type :localized-text}
-                     {:name ::t-service/from-date
-                      :type :date-picker
-                      :label (tr* :from-date)}
-                     {:name ::t-service/to-date
-                      :type :date-picker
-                      :label (tr* :to-date)}]
-      :delete? true
-      :add-label (tr [:buttons :add-new-service-exception])})))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-options (transportation-form-options e!)
@@ -189,13 +170,13 @@
                        (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
                        ::t-service/real-time-information)
                       (ts-common/service-url
-                       (tr [:field-labels :passenger-transportation ::t-service/booking-service])
+                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                        ::t-service/booking-service)
                       (accessibility-group)
                       (pricing-group e!)
-                      (service-hours-group e!)])]
+                      (ts-common/service-hours-group)])]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 (tr [:passenger-transportation-page :header-passenger-transportation-service])]]
+       [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service])]]
       [form/form form-options form-groups form-data]]]))

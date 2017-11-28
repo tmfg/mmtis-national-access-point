@@ -6,7 +6,6 @@
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
-            [ote.app.controller.terminal :as terminal]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
@@ -18,7 +17,7 @@
 
 (defn terminal-form-options [e!]
   {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
-   :update!     #(e! (terminal/->EditTerminalState %))
+   :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
@@ -90,5 +89,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 (tr [:terminal-page :header-add-new-terminal])]]
+       [:h1 (tr [:terminal-page :header-add-new-terminal])]]
       [form/form options groups form-data]]]))

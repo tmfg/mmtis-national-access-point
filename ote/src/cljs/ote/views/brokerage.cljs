@@ -27,7 +27,13 @@
   [:div.row
    [:div {:class "col-lg-12"}
     [:div
-     [:h3 "Täydennä välityspalveluun liittyvät tiedot."]]
+     [:h1 "Täydennä välityspalveluun liittyvät tiedot."]]
+
+    [:div {:style {:border "dotted 5px red"
+                   :padding "2em"
+                   :margin "1em"}}
+     "Tämä lomake on työn alla! Tulossa testikäyttöön pian!"]
+
     [form/form (brokerage-form-options e!)
 
      [

@@ -40,7 +40,7 @@
   #{::t-service/id ::t-service/type
     :ote.db.transport-service/passenger-transportation
     :ote.db.transport-service/terminal
-    :ote.db.transport-service/rental
+    :ote.db.transport-service/rentals
     :ote.db.transport-service/brokerage
     :ote.db.transport-service/parking
     ::modification/created
