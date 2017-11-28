@@ -125,7 +125,7 @@
                         :label    (tr [:buttons :add-transport-service])
                         :on-click #(do
                                      (.preventDefault %)
-                                     (e! (fp/->ChangePage :transport-service)))
+                                     (e! (ts/->OpenTransportServiceTypePage)))
                         :primary  true}]]]
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}

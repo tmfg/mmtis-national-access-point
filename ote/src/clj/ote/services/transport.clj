@@ -97,7 +97,7 @@
   ;; FIXME: this should be middleware, not relying on client to make a POST request
   (tx/with-transaction db
     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
-      (when (and id operator)
+      (or operator
           ;; FIXME: what if name changed in CKAN, we should update?
           (insert! db ::transport-operator/transport-operator
                    {::transport-operator/name title
@@ -112,7 +112,6 @@
                              :apikey
                              :email
                              :id)]
-
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
      :user cleaned-user}))
@@ -189,12 +188,11 @@
   in the service to be stored is in the set of allowed operators for the user.
   If authorization check succeeds, the transport service is saved to the database and optionally
   published to CKAN."
-  [nap-config db user form-data]
-  (let [request (http/transit-request form-data)]
+  [nap-config db user request]
     (authorization/with-transport-operator-check
       db user (::t-service/transport-operator-id request)
       #(http/transit-response
-        (save-transport-service nap-config db user request)))))
+        (save-transport-service nap-config db user request))))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -222,12 +220,12 @@
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
-         (log/info "USER: " user)
+         ;(log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
 
    (POST "/transport-service" {form-data :body
                                user :user}
-         (save-transport-service-handler nap-config db user form-data))
+         (save-transport-service-handler nap-config db user (http/transit-request form-data)))
 
    (GET "/transport-service/delete/:id" {{id :id} :params
                                          user :user}
