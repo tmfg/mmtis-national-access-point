@@ -8,7 +8,11 @@
    {ote.time.Time (t/write-handler (constantly "time")
                                    time/format-time)
     ote.time.Interval (t/write-handler (constantly "interval")
-                                       (partial into {}))}})
+                                       (partial into {}))
+    #?@(:clj
+        [org.postgresql.util.PGInterval
+         (t/write-handler (constantly "interval")
+                          time/pginterval->interval)])}})
 
 (def read-options
   {:handlers {"time"

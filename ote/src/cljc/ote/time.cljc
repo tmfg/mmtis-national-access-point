@@ -119,10 +119,22 @@
                         {unit amount})))
 
 #?(:clj
-   (defn ->PGInterval [{:keys [years months days hours minutes seconds]}]
-     (org.postgresql.util.PGInterval.
-      (int years) (int months) (int days) (int hours)
-      (int minutes) (double seconds))))
+   (defn ->PGInterval [interval]
+     (if (instance? org.postgresql.util.PGInterval interval)
+       interval
+       (let [{:keys [years months days hours minutes seconds]} interval]
+         (org.postgresql.util.PGInterval.
+          (int years) (int months) (int days) (int hours)
+          (int minutes) (double seconds))))))
+
+#?(:clj
+   (defn pginterval->interval [^org.postgresql.util.PGInterval pg-interval]
+     (map->Interval {:years (.getYears pg-interval)
+                     :months (.getMonths pg-interval)
+                     :days (.getDays pg-interval)
+                     :hours (.getHours pg-interval)
+                     :minutes (.getMinutes pg-interval)
+                     :seconds (.getSeconds pg-interval)})))
 
 (s/def :specql.data-types/interval
    (partial instance? #?(:clj org.postgresql.util.PGInterval
