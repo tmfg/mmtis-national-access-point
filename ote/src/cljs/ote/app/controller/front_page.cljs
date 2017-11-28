@@ -18,6 +18,7 @@
 
 (defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
+(defrecord TransportOperatorDataFailed [error])
 
 (extend-protocol tuck/Event
 
@@ -70,9 +71,21 @@
     app)
 
   GetTransportOperatorData
+  ;; FIXME: this should be called something else, like SessionInit (the route as well)
   (process-event [_ app]
-    (comm/post! "transport-operator/data" {} {:on-success (tuck/send-async! ->TransportOperatorDataResponse)})
+    (comm/post! "transport-operator/data" {}
+                {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                 :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
     (assoc app :transport-operator-data-loaded? false))
+
+  TransportOperatorDataFailed
+  (process-event [{error :error} app]
+    ;; 401 is ok (means user is not logged in
+    (when (not= 401 (:status error))
+      (.log js/console "Failed to fetch transport operator data: " (pr-str error)))
+    (assoc app
+           :transport-operator-data-loaded? true
+           :user nil))
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
