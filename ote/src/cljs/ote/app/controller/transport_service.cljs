@@ -21,7 +21,8 @@
     ::t-service/sub-type
     ::t-service/external-interfaces
     ::t-service/operation-area
-    ::t-service/companies})
+    ::t-service/companies
+    ::t-service/published?})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
@@ -289,12 +290,12 @@
     (let [key (t-service/service-key-by-type (::t-service/type service))
           service-data
           (-> service
-              (assoc ::t-service/published? publish?
-                     ::t-service/transport-operator-id (::t-operator/id operator))
               (update key form/without-form-metadata)
               (dissoc :transport-service-type-subtype)
               (dissoc :select-transport-operator)
               (move-service-level-keys-from-form key)
+              (assoc ::t-service/published? publish?
+                     ::t-service/transport-operator-id (::t-operator/id operator))
               (update ::t-service/operation-area place-search/place-references)
               transform-save-by-type)]
       (comm/post! "transport-service" service-data
