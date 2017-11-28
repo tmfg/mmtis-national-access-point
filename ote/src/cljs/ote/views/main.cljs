@@ -190,10 +190,8 @@
     (.addEventListener
      js/window "keypress"
      (fn [e]
-       (.log js/console e)
        (when (and (.-ctrlKey e)
                   (= "d" (.-key e)))
-         (.log js/console "jep")
          (e! (fp-controller/->ToggleDebugState))))))
   (r/create-class
    ;; NOTE: debug state is VERY slow if app state is HUGE
