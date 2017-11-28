@@ -80,8 +80,8 @@
 
   TransportOperatorDataFailed
   (process-event [{error :error} app]
-    (if (= 401 (:status error))
-      (.log js/console "User is not logged in.")
+    ;; 401 is ok (means user is not logged in
+    (when (not= 401 (:status error))
       (.log js/console "Failed to fetch transport operator data: " (pr-str error)))
     (assoc app
            :transport-operator-data-loaded? true
