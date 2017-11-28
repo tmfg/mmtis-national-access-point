@@ -111,13 +111,17 @@
    {:name        ::t-service/homepage
     :type        :string}))
 
-(defn footer [e! {published? ::t-service/published? :as data}]
+(defn footer
+  "Transport service form -footer element. All transport service form should be using this function."
+  [e! {published? ::t-service/published? :as data}]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
      (if published?
+       ;; True
        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
                       :disabled (not (form/can-save? data))}
         (tr [:buttons :save-updated])]
+       ;; False
        [:span
         [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
                        :disabled (not (form/can-save? data))}
