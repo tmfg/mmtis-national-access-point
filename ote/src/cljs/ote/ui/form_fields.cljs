@@ -11,6 +11,7 @@
             [ote.ui.validation :as valid]
             [ote.time :as time]
             [ote.ui.buttons :as buttons]
+            [ote.ui.common :as common]
             [ote.style.form :as style-form]))
 
 
@@ -229,10 +230,12 @@
                         :checked (boolean (selected-set option))}])
        options))]))
 
-(defmethod field :checkbox-group [{:keys [update! label show-option options]} data]
+(defmethod field :checkbox-group [{:keys [update! label show-option options help]} data]
   (let [selected (set (or data #{}))]
     [:div.checkbox-group
-     [:h4 label]
+     [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
+     (when help
+       [common/help help])
      (map-indexed
       (fn [i option]
         (let [checked? (selected option)]

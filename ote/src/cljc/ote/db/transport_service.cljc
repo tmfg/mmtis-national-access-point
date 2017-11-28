@@ -33,6 +33,7 @@
   ["pick_up_type" ::pick_up_type (specql.transform/transform (specql.transform/to-keyword))]
   ["brokerage_service_type" ::brokerage_service_type]
   ["transportable_aid" ::transportable-aid (specql.transform/transform (specql.transform/to-keyword))]
+  ["vehicle_accessibility" ::vehicle-accessibility (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -87,7 +88,7 @@
 
 ;; Create order for accessibility-info-facility
 (def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
-                                  :displays-for-visually-impaired :large-print-timetables])
+                                        :displays-for-visually-impaired :large-print-timetables])
 
 ;; Create order for accessibility-facility
 (def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
@@ -112,7 +113,11 @@
   (some #(when (= (::lang %) language) (::text %)) localized-text))
 
 (def transportable-aid
-  [:wheelchair :walking-stick :assistance-dog :crutches :walker])
+  [:wheelchair :walking-stick :crutches :walker])
 
 (def pick-up-types
   [:pick-up :return :pick-up-return])
+
+(def vehicle-accessibility
+  [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs
+   :boarding-assistance :assistance-dog-space])

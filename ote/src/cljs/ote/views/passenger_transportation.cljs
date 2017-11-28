@@ -70,18 +70,35 @@
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/guaranteed-accessibility-tool
+   {:name        ::t-service/guaranteed-vehicle-accessibility
+    :help (tr [:form-help :guaranteed-vehicle-accessibility])
     :type        :checkbox-group
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/vehicle-accessibility
     :full-width? true
     :container-style (merge style-form/half-width
                             style-form/border-right)}
 
-   {:name        ::t-service/limited-accessibility-tool
+   {:name        ::t-service/limited-vehicle-accessibility
+    :help (tr [:form-help :limited-vehicle-accessibility])
     :type        :checkbox-group
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/vehicle-accessibility
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-info-service-accessibility
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
+    :options t-service/information-service-accessibility
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name ::t-service/limited-info-service-accessibility
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
+    :options t-service/information-service-accessibility
     :full-width? true
     :container-style style-form/half-width}
 
