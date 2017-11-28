@@ -99,7 +99,8 @@
                            :as   field} data]
   [text-field
    (merge
-    {:floatingLabelText (when-not table?  label)
+    {:floating-label-text (when-not table?  label)
+     :floating-label-fixed true
      :hintText          (placeholder field data)
      :on-change         #(let [v %2]
                            (if regex
@@ -117,7 +118,8 @@
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
   [text-field
-   {:floatingLabelText label
+   {:floating-label-text label
+    :floating-label-fixed true
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
     :value             (or data "")
@@ -140,7 +142,8 @@
         [:td
          [text-field
           (merge
-           {:floatingLabelText (when-not table? label)
+           {:floating-label-text (when-not table? label)
+            :floating-label-fixed true
             :hintText          (placeholder field data)
             :on-change         #(let [updated-language-data
                                       {:ote.db.transport-service/lang language
@@ -180,6 +183,7 @@
     [ui/select-field {:auto-width (boolean auto-width?)
                       :style style
                       :floating-label-text label
+                      :floating-label-fixed true
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))
                       :error-text        (or error warning "") ;; Show error text or warning text or empty string
@@ -207,6 +211,7 @@
      (merge
       {:style style
        :floating-label-text label
+       :floating-label-fixed true
        :multiple true
        :value (clj->js (map option-idx selected-set))
        :selection-renderer (fn [values]
