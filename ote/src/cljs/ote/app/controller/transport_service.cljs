@@ -80,7 +80,7 @@
          move-service-level-keys-to-form)
 
 (defn- update-service-by-id [app id update-fn & args]
-  (update app :transport-services
+  (update app :transport-service-vector
           (fn [services]
             (map #(if (= (::t-service/id %) id)
                     (apply update-fn % args)
@@ -130,7 +130,7 @@
 (defmethod transform-edit-by-type :default [service] service)
 
 (defn- add-service-for-operator [{:keys [transport-operator] :as app} service]
-  ;; Add service for currently selected transport operator
+  ;; Add service for currently selected transport operator and transport-operator-vector
   (-> app
       (update :transport-operators-with-services
               (fn [operators-with-services]
@@ -279,8 +279,9 @@
 
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
-    (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-services))]
-      (assoc app :transport-services filtered-map)))
+    (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
+      (assoc app :transport-service-vector filtered-map))
+    )
 
   SaveTransportService
   (process-event [{publish? :publish?} {service :transport-service
@@ -302,10 +303,11 @@
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
+    (let [app (add-service-for-operator
+                (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
+                response)]
     (routes/navigate! :own-services)
-    (add-service-for-operator
-      (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
-      response))
+    app))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]

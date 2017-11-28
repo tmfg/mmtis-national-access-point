@@ -28,8 +28,9 @@
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
                                   :as service}]
+  (.log js/console "Render delete-service-action"  (clj->js service))
   [:span
-   [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
+   [ui/icon-button {:href "#" :on-click #(e! (ts/->DeleteTransportService id))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog

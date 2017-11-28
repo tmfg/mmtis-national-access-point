@@ -20,7 +20,7 @@
   (let [allowed-operators (user-transport-operators db user)]
     (if-not (allowed-operators transport-operator-id)
       (do
-        (log/warn "User " user " tried to access transport-operator " transport-operator-id
+        (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
                   ", allowed transport operators: " allowed-operators)
         {:status 403 :body "Forbidden"})
 
