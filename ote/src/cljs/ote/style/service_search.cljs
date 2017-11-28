@@ -40,7 +40,6 @@
   (merge base/item-list-container
          {:display "inline-flex"
           :position "relative"
-          :top "7px"
           :font-size "14px"
           :color "#666"}))
 
@@ -53,8 +52,7 @@
   {:font-weight "normal"})
 
 (def icon-div { :display "inline-block"
+               :position "relative"
+               :top "4px"})
 
-               })
-(def item-div { :display "inline-block"
-
-               })
+(def contact-icon { :color "#777" :height 18 :width 18   })

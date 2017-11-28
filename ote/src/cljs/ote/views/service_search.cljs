@@ -25,13 +25,14 @@
        (when item
          ^{:key i}
          [:div (stylefy/use-style style-base/item-list-row-margin)
-          icon
+          [:div (stylefy/use-style style/icon-div) icon ]
           [:div (stylefy/use-style style-base/item-list-item)
            item]]))
       (partition 2 icons-and-items)))])
 
 (defn- format-address [{::common/keys [street postal_code post_office]}]
-  (str street ", " postal_code " " post_office))
+  (let [comma (if (not (empty? street)) ", " " ")]
+  (str street comma postal_code " " post_office)))
 
 (def external-interface-table-columns
   ;; [label width value-fn]
@@ -80,7 +81,7 @@
 
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type]
                             [:enums ::t-service/type])]
-    [ui/paper {:z-depth 2
+    [ui/paper {:z-depth 1
                :style style/result-card}
      [:div.result-title (stylefy/use-style style/result-header)
       [:a {:href (str "/dataset/org-" transport-operator-id
@@ -90,14 +91,13 @@
        name]
       [data-items
 
-       [ic/action-home {:style { :color "#777" :height 18 :width 18   }}
-                        ]
+       [ic/action-home {:style style/contact-icon}]
        (format-address contact-address)
 
-       [ic/communication-phone {:style { :color "#777" :height 18 :width 18   }}]
+       [ic/communication-phone {:style style/contact-icon}]
        contact-phone
 
-       [ic/communication-email {:style { :color "#777" :height 18 :width 18   }}]
+       [ic/communication-email ]
        contact-email]]
      [:div.result-subtitle (stylefy/use-style style/subtitle)
       [:div (stylefy/use-style style/subtitle-operator-first)

@@ -129,14 +129,14 @@
 
 (defmethod transform-edit-by-type :default [service] service)
 
-(defn- add-service-for-operator [{:keys [transport-operator] :as app} service]
+(defn- add-service-for-operator [app service]
   ;; Add service for currently selected transport operator and transport-operator-vector
-  (-> app
-      (update :transport-operators-with-services
+  (as-> app app
+      (update app :transport-operators-with-services
               (fn [operators-with-services]
                 (map (fn [operator-with-services]
-                       (if (= (:transport-operator operator-with-services)
-                              transport-operator)
+                       (if (= (get-in operator-with-services [:transport-operator ::t-operator/id])
+                              (::t-service/transport-operator-id service))
                          (update operator-with-services :transport-service-vector
                                  (fn [services]
                                    (let [service-idx (first (keep-indexed (fn [i s]
@@ -148,11 +148,11 @@
                                        (conj (vec services) service)))))
                          operator-with-services))
                      operators-with-services)))
-      (assoc :transport-service-vector (:transport-service-vector
-                                         (some #(when (= (:transport-operator %)
-                                                         transport-operator)
-                                                  (:transport-service-vector %))
-                                               (:transport-operators-with-services app))))))
+      (assoc app :transport-service-vector
+                 (some #(when (= (get-in % [:transport-operator ::t-operator/id])
+                                 (get-in app [:transport-operator ::t-operator/id]))
+                          (:transport-service-vector %))
+                       (:transport-operators-with-services app)))))
 
 (extend-protocol tuck/Event
 
