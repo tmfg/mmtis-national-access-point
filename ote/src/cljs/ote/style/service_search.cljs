@@ -5,7 +5,7 @@
 (def divider-color "lightGray")
 (def subtitle-color "#A4A4A4")
 
-(def result-card {:margin-top "1em" :padding "1em"})
+(def result-card {:margin-top "1em" :padding "1em" :padding-bottom "1.5em"})
 
 (def right-divider {:padding-right "0.5em"
                     :margin-right "0.5em"
@@ -17,9 +17,11 @@
 
 (def result-link
   (merge
-   {:font-size "16px"
-    :font-weight 900
-    :text-decoration "none"}
+   {:font-size "21px"
+    :font-weight 400
+    :color "#2D75B4"
+    ::stylefy/mode {:hover {:text-decoration "underline"}}
+    }
    right-divider))
 
 (def subtitle (merge
@@ -27,7 +29,8 @@
                 :font-size "90%"}
                bottom-divider))
 
-(def subtitle-operator (merge {:display "inline-block"}
+(def subtitle-operator  {:display "inline-block" :color "#666"})
+(def subtitle-operator-first (merge {:display "inline-block" :color "#666"}
                               right-divider))
 
 (def result-header {:width "100%" :display "block"
@@ -37,7 +40,9 @@
   (merge base/item-list-container
          {:display "inline-flex"
           :position "relative"
-          :top "7px"}))
+          :top "7px"
+          :font-size "14px"
+          :color "#666"}))
 
 (def external-interface-header
   {:color subtitle-color
@@ -46,3 +51,10 @@
 
 (def external-interface-body
   {:font-weight "normal"})
+
+(def icon-div { :display "inline-block"
+
+               })
+(def item-div { :display "inline-block"
+
+               })

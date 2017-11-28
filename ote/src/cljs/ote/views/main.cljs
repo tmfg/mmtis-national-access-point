@@ -24,7 +24,7 @@
             [ote.views.service-search :as service-search]))
 
 (defn logged-in? [app]
-  (not-empty (get-in app [:user :id])))
+  (not-empty (get-in app [:user :username])))
 
 (defn- is-topnav-active [give-page nav-page]
   (when (= give-page nav-page)
@@ -35,7 +35,7 @@
     "active"))
 
  (defn user-menu [e! name username]
-   [ui/select-field
+   [ui/drop-down-menu
     {:label-style {:color "#FFFFFF"}
      :list-style {:background-color "#2D75B4"}
      :on-click #(e! (fp-controller/->OpenUserMenu))
@@ -211,28 +211,32 @@
   ;; init - Get operator and service data from DB when refresh or on usage start
   (e! (fp-controller/->GetTransportOperatorData))
 
-  (fn [e! app]
-  [:div {:style (stylefy/use-style style-base/body)}
-   [theme
-    [:div.ote-sovellus
-     (top-nav e! app)
+  (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
+    (if (not loaded?)
+      [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+
+    [:div {:style (stylefy/use-style style-base/body)}
+     [theme
+      [:div.ote-sovellus
+       (top-nav e! app)
 
 
-     [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
-      (case (:page app)
-        :front-page [fp/own-services e! app]
-        :own-services [fp/own-services e! app]
-        :transport-service [t-service/select-service-type e! (:transport-service app)]
-        :transport-operator [to/operator e! (:transport-operator app)]
-        :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
-        :terminal [terminal/terminal e! (:transport-service app)]
-        :rentals [rental/rental e! (:transport-service app)]
-        :parking [parking/parking e! (:transport-service app)]
-        :brokerage [brokerage/brokerage e! (:transport-service app)]
-        :edit-service [t-service/edit-service e! app]
-        :services [service-search/service-search e! (:service-search app)]
-        [:div "ERROR: no such page " (pr-str (:page app))])]
+       [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
+        (case (:page app)
+          :no-operator [fp/no-operator e! app]
+          :front-page [fp/own-services e! app]
+          :own-services [fp/own-services e! app]
+          :transport-service [t-service/select-service-type e! app]
+          :transport-operator [to/operator e! app]
+          :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+          :terminal [terminal/terminal e! (:transport-service app)]
+          :rentals [rental/rental e! (:transport-service app)]
+          :parking [parking/parking e! (:transport-service app)]
+          :brokerage [brokerage/brokerage e! (:transport-service app)]
+          :edit-service [t-service/edit-service e! app]
+          :services [service-search/service-search e! (:service-search app)]
+          [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]
 
      (when-let [msg (:flash-message app)] [flash-message msg])
      [debug-state e! app]
-     [footer]]]]))
+     [footer]]]])))

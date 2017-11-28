@@ -13,14 +13,14 @@
             [ote.localization :refer [tr tr-or]]
             [ote.views.transport-operator :as to-view]))
 
-(defn editor [e! status]
+(defn editor [e! {ckan-organization-id :ckan-organization-id :as state}]
   ;; init
   (e! (org-edit/->StartEditor))
-  (fn [e! {:keys [transport-operator] :as app {:keys [loading?]} :transport-operator}]
-    (if loading?
+  (fn [e! state]
+      (if (get-in state [:transport-operator :loading?])
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
       [theme
        [:div.ote-sovellus
-        [:div.container
-         [to-view/operator e! transport-operator]]]])))
+        [:div
+         [to-view/operator e! state]]]])))

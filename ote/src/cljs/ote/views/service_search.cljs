@@ -48,13 +48,13 @@
                                                        transport-operator-id ckan-resource-id]}]
   [:div
    [:div.nap-interface
-    [:b (tr [:service-search :nap-interface])]
+    [:span.search-card-title (tr [:service-search :nap-interface])]
     (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
       [:a {:href url :target "_blank"} url])]
    (when-not (empty? external-interface-links)
      [:span
       [:br]
-      [:b (tr [:service-search :external-interfaces])
+      [:span.search-card-title (tr [:service-search :external-interfaces])
        [:table
         [:thead (stylefy/use-style style/external-interface-header)
          [:tr
@@ -69,7 +69,7 @@
             [:tr {:selectable false}
              (for [[k w value-fn] external-interface-table-columns]
                ^{:key k}
-               [:td {:style {:width w}}
+               [:td {:style {:width w :font-size "14px"}}
                 (value-fn row)])])
           external-interface-links)]]]])])
 
@@ -90,18 +90,20 @@
        name]
       [data-items
 
-       [ic/action-home]
+       [ic/action-home {:style { :color "#777" :height 18 :width 18   }}
+                        ]
        (format-address contact-address)
 
-       [ic/communication-phone]
+       [ic/communication-phone {:style { :color "#777" :height 18 :width 18   }}]
        contact-phone
 
-       [ic/communication-email]
+       [ic/communication-email {:style { :color "#777" :height 18 :width 18   }}]
        contact-email]]
      [:div.result-subtitle (stylefy/use-style style/subtitle)
-      [:div (stylefy/use-style style/subtitle-operator)
+      [:div (stylefy/use-style style/subtitle-operator-first)
        operator-name]
-      (sub-type-tr sub-type)]
+      [:div (stylefy/use-style style/subtitle-operator)
+      (sub-type-tr sub-type)]]
 
      [:div.result-interfaces
       [external-interface-links e! service]]]))
@@ -110,7 +112,7 @@
   (let [result-count (count results)]
     [:div.col-xs-12.col-md-12.col-lg-12
 
-     [:h2 (stylefy/use-style style-base/large-title)
+     [:p
       (tr [:service-search (if empty-filters?
                              :showing-latest-services
                              (case result-count
@@ -129,7 +131,7 @@
   (let [sub-type (tr-key [:enums ::t-service/sub-type]
                          [:enums ::t-service/type])]
     [:div
-     [:h3 (tr [:service-search :label])]
+     [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]
@@ -162,7 +164,6 @@
            :as service-search}]
     [:div.service-search
      [filters-form e! service-search]
-     [ui/divider]
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
        [results-listing e! results empty-filters?])]))

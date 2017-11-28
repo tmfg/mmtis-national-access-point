@@ -106,10 +106,15 @@
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})]
+        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
+        ;; Clean up user data
+        cleaned-user (dissoc user
+                             :apikey
+                             :email
+                             :id)]
     {:transport-operator transport-operator
      :transport-service-vector transport-services-vector
-     :user user}))
+     :user cleaned-user}))
 
 
 (defn- save-transport-operator [db data]
@@ -183,12 +188,11 @@
   in the service to be stored is in the set of allowed operators for the user.
   If authorization check succeeds, the transport service is saved to the database and optionally
   published to CKAN."
-  [nap-config db user form-data]
-  (let [request (http/transit-request form-data)]
+  [nap-config db user request]
     (authorization/with-transport-operator-check
       db user (::t-service/transport-operator-id request)
       #(http/transit-response
-        (save-transport-service nap-config db user request)))))
+        (save-transport-service nap-config db user request))))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -205,16 +209,18 @@
 
    (POST "/transport-operator/data" {user :user}
          (http/transit-response
-          (get-transport-operator-data db (-> user :groups first) (:user user))))
+           (map
+             (fn [group] (get-transport-operator-data db group (:user user)))
+             (:groups user))))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
-         (log/info "USER: " user)
+         ;(log/info "USER: " user)
          (http/transit-response (save-transport-operator db (http/transit-request form-data))))
 
    (POST "/transport-service" {form-data :body
                                user :user}
-         (save-transport-service-handler nap-config db user form-data))
+         (save-transport-service-handler nap-config db user (http/transit-request form-data)))
 
    (GET "/transport-service/delete/:id" {{id :id} :params
                                          user :user}

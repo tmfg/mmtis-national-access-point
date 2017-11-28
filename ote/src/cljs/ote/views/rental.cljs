@@ -143,5 +143,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 (tr [:rentals-page :header-rental-service])]]
+       [:h1 (tr [:rentals-page :header-rental-service])]]
       [form/form options groups (get service ::t-service/rentals)]]]))

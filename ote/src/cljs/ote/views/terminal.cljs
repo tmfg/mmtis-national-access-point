@@ -89,5 +89,5 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h3 (tr [:terminal-page :header-add-new-terminal])]]
+       [:h1 (tr [:terminal-page :header-add-new-terminal])]]
       [form/form options groups form-data]]]))

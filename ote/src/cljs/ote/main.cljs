@@ -53,12 +53,13 @@
                           (.getElementById js/document "nap_viewer")))))
 
 
-(defn ^:export ckan_org_edit []
+(defn ^:export ckan_org_edit [ckan-organization-id]
   (comm/set-base-url! "/ote/")
   (localization/load-language!
     :fi
     (fn [lang _]
       (reset! localization/selected-language lang)
       (stylefy/init)
+      (state/set-init-state! {:ckan-organization-id ckan-organization-id})
       (r/render-component [tuck/tuck state/app ckan-org-edit/editor]
                           (.getElementById js/document "nap_viewer")))))
