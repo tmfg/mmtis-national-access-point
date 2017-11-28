@@ -66,12 +66,11 @@
      :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
      :read  (comp ::t-service/url ::t-service/pricing)}
 
-    (form/divider)
-
-    {:name        ::t-service/payment-methods
-     :type        :multiselect-selection
-     :show-option (tr-key [:enums ::t-service/payment-methods])
-     :options     t-service/payment-methods}))
+    {:name            ::t-service/payment-methods
+     :type            :multiselect-selection
+     :container-style style-form/full-width
+     :show-option     (tr-key [:enums ::t-service/payment-methods])
+     :options         t-service/payment-methods}))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
@@ -83,7 +82,8 @@
                     (assoc data key time))))]
     (form/group
       {:label   (tr [:parking-page :header-service-hours])
-       :columns 3}
+       :columns 3
+       :layout  :row}
 
       {:name      ::t-service/service-hours
        :type      :table
@@ -133,7 +133,48 @@
                        :type  :date-picker
                        :label (tr* :to-date)}]
        :delete?      true
-       :add-label    (tr [:buttons :add-new-service-exception])})))
+       :add-label    (tr [:buttons :add-new-service-exception])}
+
+      ;;
+
+      {:name ::t-service/maximum-stay
+       :type :number}
+
+      {:label       (tr [:parking-page :time-unit])
+       :name        :maximum-stay-unit
+       :type        :selection
+       :show-option (tr-key [:parking-page :maximum-stay-units])
+       :options     [:hours :days]}
+
+      {:label (tr [:parking-page :maximum-stay-unlimited])
+       :name  :maximum-stay-unlimited
+       :type  :checkbox})))
+
+(defn capacities [e!]
+  (form/group
+    {:label   (tr [:parking-page :header-facilities-and-capacities])
+     :columns 3
+     :layout  :row}
+
+    {:name         ::t-service/parking-capacities
+     :type         :table
+     :table-fields [{:name        ::t-service/parking-facility
+                     :type        :selection
+                     :show-option (tr-key [:enums ::t-service/parking-facility])
+                     :options     t-service/parking-facilities}
+                    {:name ::t-service/capacity :type :number}]
+     :add-label    (tr [:buttons :add-new-price-class])
+     :delete?      true}))
+
+(defn charging-points [e!]
+  (form/group
+    {:label   (tr [:parking-page :header-charging-points])
+     :columns 3
+     :layout  :row}
+
+    {:name    ::t-service/charging-points
+     :columns 3
+     :type    :text-area}))
 
 (defn parking [e! {form-data ::t-service/parking}]
   (r/with-let [options (form-options e!)
@@ -146,6 +187,11 @@
                        (ts-common/service-url
                          (tr [:field-labels :parking ::t-service/booking-service])
                          ::t-service/booking-service)
+                       (ts-common/service-url
+                         (tr [:field-labels :parking ::t-service/additional-service-links])
+                         ::t-service/additional-service-links)
+                       (capacities e!)
+                       (charging-points e!)
                        (pricing-group e!)
                        (service-hours-group e!)]]
               [:div.row
@@ -157,4 +203,7 @@
                [:div {:class "col-lg-12"}
                 [:div
                  [:h3 (tr [:parking-page :header-add-new-parking])]]
-                [form/form options groups form-data]]]))
+
+                [form/form options groups (merge
+                                            {:maximum-stay-unit :hours}
+                                            form-data)]]]))

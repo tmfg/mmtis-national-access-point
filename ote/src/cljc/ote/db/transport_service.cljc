@@ -75,6 +75,9 @@
 ;; Create order for payment_method
 (def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])
 
+(def parking-facilities [:unknown :car-park :park-and-ride-park :motorcycle-park :cycle-park :rental-car-park
+                         :coach-park :disabled-park])
+
 ;; Create order for additional_services
 (def additional-services [:child-seat :animal-transport :other])
 
