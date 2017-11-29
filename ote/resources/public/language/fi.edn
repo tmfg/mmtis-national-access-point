@@ -58,7 +58,7 @@
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Konsernin tai markkinointiyrityksen edustaman palvelun tuottajat"
+   :ote.db.transport-service/companies "Konsernin, markkinointiyrityksen tai välityksen edustamat palvelun tuottajat"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/license "Lisenssi / käyttöehdot"
@@ -133,6 +133,8 @@
    :ote.db.transport-service/from                "Aukeamisaika"
    :ote.db.transport-service/to                  "Kiinnimenoaika"
    :ote.db.transport-service/all-day             "24h"
+
+   :ote.db.transport-service/brokerage?  "Välityspalvelu"
    }
 
   ;; Common fields
@@ -145,10 +147,13 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
  {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
-  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, täytä tähän yritysten nimet ja Y-tunnukset."
+  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
   :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden esteettömyysominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
+
+  :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
+
   }
 
 
