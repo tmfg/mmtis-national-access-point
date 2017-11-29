@@ -142,6 +142,8 @@
         (tr [:titles type])])]]])
 
 (defn own-services [e! state]
+  (e! (fp/->EnsureTransportOperator))
+  (fn [e! state]
   ;; Get services by default from first organization
   (let [my-services (if (empty? (:transport-service-vector state))
                       (:transport-service-vector (first (:transport-operators-with-services state)))
@@ -149,7 +151,7 @@
     [:div
      (if (empty? my-services)
        [transport-service/select-service-type e! state] ;; Render service type selection page if no services added
-       (table-container-for-front-page e! my-services state))]))
+       (table-container-for-front-page e! my-services state))])))
 
 (defn no-operator [e! state]
   "If user haven't added service-operator, we will ask to do so."
