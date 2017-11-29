@@ -163,7 +163,7 @@
                      :show-option (tr-key [:enums ::t-service/parking-facility])
                      :options     t-service/parking-facilities}
                     {:name ::t-service/capacity :type :number}]
-     :add-label    (tr [:buttons :add-new-price-class])
+     :add-label    (tr [:buttons :add-new-parking-capacity])
      :delete?      true}))
 
 (defn charging-points [e!]
