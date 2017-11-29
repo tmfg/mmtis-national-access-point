@@ -69,7 +69,7 @@
    ote.db.modification/modification-fields])
 
 ;; Create order for transport_type
-(def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
+(def transport-service-types [:terminal :passenger-transportation :rentals :parking])
 
 ;; Create order for transport_type
 (def passenger-transportation-sub-types [:taxi :request :other :schedule])

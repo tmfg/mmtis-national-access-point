@@ -22,16 +22,14 @@
             [ote.ui.form-fields :as form-fields]))
 
 (def modified-transport-service-types
-
   ;; Create order for service type selection dropdown
-   [:passenger-transportation-taxi
-    :passenger-transportation-request
-    :passenger-transportation-other
-    :passenger-transportation-schedule
-    :terminal
-    :rentals
-    :parking
-    :brokerage])
+  [:passenger-transportation-taxi
+   :passenger-transportation-request
+   :passenger-transportation-other
+   :passenger-transportation-schedule
+   :terminal
+   :rentals
+   :parking])
 
 (defn select-service-type [e! state]
   (let [multiple-operators (if (second (:transport-operators-with-services state)) true false)
