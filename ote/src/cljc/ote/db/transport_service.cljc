@@ -39,6 +39,7 @@
   ["service_link" ::service_link]
   ["service_hours" ::service_hours]
   ["service_exception" ::service_exception]
+  ["parking_capacity" ::parking_capacity]
   ["price_class" ::price_class]
   ["assistance_notification_requirement" ::assistance-notification-requirement]
   ["assistance_info" ::assistance-info]

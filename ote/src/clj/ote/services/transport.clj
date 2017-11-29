@@ -117,11 +117,19 @@
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
+  [service data-path]
+  (update-in service [data-path ::t-service/price-classes]
+             (fn [price-classes-float]
+               (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float))))
+
+(defn- floats-to-bigdec
+  "Frontend sends some values as floating points. Convert them to bigdecimals before db insert."
   [service]
-  (if (= :passenger-transportation (::t-service/type service))
-    (update-in service [::t-service/passenger-transportation ::t-service/price-classes]
-               (fn [price-classes-float]
-                 (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float)))
+  (case (::t-service/type service)
+    :passenger-transportation
+    (fix-price-classes service ::t-service/passenger-transportation)
+    :parking
+    (fix-price-classes service ::t-service/parking)
     service))
 
 (defn- save-external-interfaces
@@ -155,7 +163,7 @@
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
-                         fix-price-classes
+                         floats-to-bigdec
                          (dissoc ::t-service/external-interfaces))
         ;; Store to OTE database
         transport-service
