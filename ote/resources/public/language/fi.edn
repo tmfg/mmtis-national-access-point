@@ -101,7 +101,6 @@
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
    :ote.db.transport-service/accessibility     "Saavutettavuus"
    :ote.db.transport-service/mobility          "Esteettömyys"
-   :ote.db.transport-service/assistance          "Assistance"
 
 
    ;; assistance_notification_requirement fields
