@@ -234,10 +234,10 @@
           :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
 
   :ote.db.transport-service/information-service-accessibility
-  {:audio-for-hearing-impaired "Ääniopastus näkövammaisille"
+  {:audio-for-hearing-impaired "Äänivahvistimet huonokuuloisille"
    :audio-information "Kuulutukset"
    :visual-displays "Visuaaliset näytöt"
-   :displays-for-visually-impaired "Näytöt kuulovammaisille"
+   :displays-for-visually-impaired "Näytöt näkövammaisille (taktiili)"
    :large-print-timetables "Suuret kirjasimet aikatauluissa"
    :other "Muu"
    }
