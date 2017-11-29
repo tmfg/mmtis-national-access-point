@@ -56,7 +56,8 @@
    ::t-service/type (gen/return :passenger-transportation)
    ::t-service/passenger-transportation gen-passenger-transportation
    ::t-service/contact-address generators/gen-address
-   ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
+   ::t-service/contact-phone (s/gen ::t-service/contact-phone)
+   ::t-service/brokerage? (s/gen boolean?)))
 
 
 (def gen-terminal_information
