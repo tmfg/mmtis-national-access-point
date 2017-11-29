@@ -250,6 +250,12 @@
                         :on-check #(update! ((if checked? disj conj) selected option))}]))
       options)]))
 
+(defmethod field :checkbox [{:keys [update! label]} data]
+  (let [checked? (boolean data)]
+    [ui/checkbox {:label label
+                  :checked checked?
+                  :on-check #(update! (not checked?))}]))
+
 
 (def phone-regex #"\+?\d+")
 
