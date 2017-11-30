@@ -12,7 +12,7 @@
             [ote.time :as time]))
 
 (defn service-url
-  "Creates a form group for service url hat creates two form elements url and localized text area"
+  "Creates a form group for service url that creates two form elements url and localized text area"
   [label service-url-field]
   (form/group
     {:label label
@@ -30,6 +30,22 @@
     :read  (comp ::t-service/description service-url-field)
     :write (fn [data desc]
              (assoc-in data [service-url-field ::t-service/description] desc))}))
+
+(defn service-urls
+  "Creates a table for additional service urls."
+  [label service-url-field]
+  (form/group
+    {:label label
+     :columns 3}
+
+    {:name         service-url-field
+     :type         :table
+     :table-fields [{:name ::t-service/url
+                     :type :string}
+                    {:name ::t-service/description
+                     :type :localized-text}]
+     :delete?      true
+     :add-label    (tr [:buttons :add-new-service-link])}))
 
 (defn external-interfaces
   "Creates a form group for external services."

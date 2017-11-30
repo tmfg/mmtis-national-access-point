@@ -221,6 +221,7 @@
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
+  :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"
   :add-new-pick-up-location "Lisää toimipiste"}
 

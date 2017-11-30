@@ -178,7 +178,7 @@
                        (ts-common/service-url
                          (tr [:field-labels :parking ::t-service/booking-service])
                          ::t-service/booking-service)
-                       (ts-common/service-url
+                       (ts-common/service-urls
                          (tr [:field-labels :parking ::t-service/additional-service-links])
                          ::t-service/additional-service-links)
                        (capacities e!)
