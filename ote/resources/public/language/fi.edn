@@ -395,10 +395,6 @@
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
   :header-charging-points                   "Latauspisteet"
   :header-service-hours                     "Palveluajat ja pysäköintiaika"
-  :time-unit                                "Aikayksikkö"
-  :maximum-stay-units {:hours     "Tuntia"
-                      :days      "Päivää"}
-  :maximum-stay-unlimited                   "Rajoittamaton"
   }
 
  :opening-hours-dialog
@@ -442,6 +438,11 @@
   :footer-livi-url                            "Liikennevirasto.fi"
   :footer-ckan-software                       "CKAN-ohjelmistolla"
   :footer-made-width                          "Toteutettu"
+  :time-unit                                  "Aikayksikkö"
+  :time-units {:minutes  "Minuuttia"
+               :hours    "Tuntia"
+               :days     "Päivää"
+               :seconds  "Sekuntia"}
   }
 
  :dialog

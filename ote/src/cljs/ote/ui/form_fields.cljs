@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [clojure.string :as str]
-            [ote.localization :refer [tr]]
+            [ote.localization :refer [tr tr-key]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
@@ -286,6 +286,26 @@
                                              ::incomplete string)))
                   :type :string
                   :regex time-regex) data]))
+
+(defmethod field :interval [{:keys [update!] :as opts} data]
+  (let [[unit amount] (or (some (fn [[unit amount]]
+                                  (when (not (zero? amount)) [unit amount])) data) [:hours 0])]
+    (.log js/console unit amount)
+    [:div
+     [field (assoc opts
+              :update! (fn [num]
+                         (update! (time/interval (or num 0) unit)))
+              :type :number) (unit data)]
+     [field (assoc opts
+              :update! (fn [unit]
+                         (update! (time/interval amount unit)))
+              :label (tr [:common-texts :time-unit])
+              :name :maximum-stay-unit
+              :type :selection
+              :show-option (tr-key [:common-texts :time-units])
+              ;; TODO: Days not supported yet in ote.time
+              :options [:minutes :hours])
+      unit]]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
   (let [time-picker-time (if (= nil? data) default-time data)]

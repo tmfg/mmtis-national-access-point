@@ -139,3 +139,16 @@
 (s/def :specql.data-types/interval
    (partial instance? #?(:clj org.postgresql.util.PGInterval
                          :cljs Interval)))
+
+;; Hook into specql to allow us to read/write the interval
+;; We do not support interval fields other than hours, minutes and seconds.
+#?(:clj
+   (defmethod specql-composite/parse-value "interval" [_ string]
+     (let [[match h m s] (re-matches #"(\d+):(\d+):(\d+)" string)]
+       (or (cond
+             (nil? match) nil
+             (not= h "00") (->PGInterval (interval (Integer/parseInt h) :hours))
+             (not= m "00") (->PGInterval (interval (Integer/parseInt m) :minutes))
+             (not= s "00") (->PGInterval (interval (Double/parseDouble s) :seconds))
+             :default (->PGInterval (interval 0.0 :seconds)))
+           (throw (ex-info "Unsupported interval keyword" {:interval string}))))))
