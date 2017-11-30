@@ -77,4 +77,5 @@
                   :color "#434343"
                   :background-color "#DAEDF7"
                   :padding "0.2em"
-                  :margin "0.2em"}))
+                  :margin "0.2em"
+                  :align-items "center"}))

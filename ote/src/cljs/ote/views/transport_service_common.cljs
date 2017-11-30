@@ -69,7 +69,11 @@
                    {:name ::t-service/business-id :type :string
                     :validate [[:business-id]]}]
     :delete? true
-    :add-label (tr [:buttons :add-new-company])}))
+    :add-label (tr [:buttons :add-new-company])}
+
+   (form/info (tr [:form-help :brokerage?]))
+   {:name ::t-service/brokerage?
+    :type :checkbox}))
 
 (defn contact-info-group []
   (form/group
