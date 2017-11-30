@@ -187,11 +187,6 @@
                        (service-hours-group e!)]]
               [:div.row
                [:div {:class "col-lg-12"}
-                [:div {:style {:border  "dotted 5px red"
-                               :padding "2em"
-                               :margin  "1em"}}
-                 "Tämä lomake on työn alla! Tulossa testikäyttöön pian!"]]
-               [:div {:class "col-lg-12"}
                 [:div
                  [:h3 (tr [:parking-page :header-add-new-parking])]]
 
