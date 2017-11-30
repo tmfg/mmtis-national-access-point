@@ -6,6 +6,7 @@
             [ote.components.http :as http]
             [ote.components.db :as db]
 
+            [ote.services.index :as index]
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
             [ote.services.viewer :as viewer]
@@ -23,6 +24,10 @@
    ;; Basic components
    :db (db/database (:db config))
    :http (component/using (http/http-server (:http config)) [:db])
+
+   ;; Index page
+   :index (component/using (index/->Index (:dev-mode? config))
+                           [:http])
 
    ;; Services for the frontend
    :transport (component/using (transport-service/->Transport (:nap config)) [:http :db])
