@@ -11,6 +11,7 @@
             [ote.ui.validation :as valid]
             [ote.time :as time]
             [ote.ui.buttons :as buttons]
+            [ote.ui.common :as common]
             [ote.style.form :as style-form]))
 
 
@@ -98,7 +99,8 @@
                            :as   field} data]
   [text-field
    (merge
-    {:floatingLabelText (when-not table?  label)
+    {:floating-label-text (when-not table?  label)
+     :floating-label-fixed true
      :hintText          (placeholder field data)
      :on-change         #(let [v %2]
                            (if regex
@@ -116,7 +118,8 @@
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
   [text-field
-   {:floatingLabelText label
+   {:floating-label-text label
+    :floating-label-fixed true
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
     :value             (or data "")
@@ -139,7 +142,8 @@
         [:td
          [text-field
           (merge
-           {:floatingLabelText (when-not table? label)
+           {:floating-label-text (when-not table? label)
+            :floating-label-fixed true
             :hintText          (placeholder field data)
             :on-change         #(let [updated-language-data
                                       {:ote.db.transport-service/lang language
@@ -172,12 +176,14 @@
              lang]))]]])))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error warning] :as field}
+(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
-    [ui/select-field {:style style
+    [ui/select-field {:auto-width (boolean auto-width?)
+                      :style style
                       :floating-label-text label
+                      :floating-label-fixed true
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))
                       :error-text        (or error warning "") ;; Show error text or warning text or empty string
@@ -205,6 +211,7 @@
      (merge
       {:style style
        :floating-label-text label
+       :floating-label-fixed true
        :multiple true
        :value (clj->js (map option-idx selected-set))
        :selection-renderer (fn [values]
@@ -228,10 +235,12 @@
                         :checked (boolean (selected-set option))}])
        options))]))
 
-(defmethod field :checkbox-group [{:keys [update! label show-option options]} data]
+(defmethod field :checkbox-group [{:keys [update! label show-option options help]} data]
   (let [selected (set (or data #{}))]
     [:div.checkbox-group
-     [:h4 label]
+     [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
+     (when help
+       [common/help help])
      (map-indexed
       (fn [i option]
         (let [checked? (selected option)]
@@ -240,6 +249,12 @@
                         :checked checked?
                         :on-check #(update! ((if checked? disj conj) selected option))}]))
       options)]))
+
+(defmethod field :checkbox [{:keys [update! label]} data]
+  (let [checked? (boolean data)]
+    [ui/checkbox {:label label
+                  :checked checked?
+                  :on-check #(update! (not checked?))}]))
 
 
 (def phone-regex #"\+?\d+")

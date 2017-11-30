@@ -8,6 +8,7 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.front-page :as fp]
             [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.transport-operator :as to]
             [ote.views.transport-service :as transport-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
@@ -17,13 +18,18 @@
             [ote.time :as time]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [ote.ui.form-fields :as form-fields]))
+
+(defn select-operator-form-options [e!]
+  {:name->label (tr-key [:field-labels])
+   :update!     #(e! (to/->SelectOperator %))})
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
                                   :as service}]
   [:span
-   [ui/icon-button {:on-click #(e! (ts/->DeleteTransportService id))}
+   [ui/icon-button {:href "#" :on-click #(e! (ts/->DeleteTransportService id))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -39,6 +45,7 @@
                    {:label (tr [:buttons :delete])
                     :icon (ic/action-delete-forever)
                     :secondary true
+                    :primary true
                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}])]}
 
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
@@ -92,18 +99,33 @@
 
 
 
-(defn table-container-for-front-page [e! services status]
+(defn table-container-for-front-page [e! services state]
   [:div
    [:div.row
-    [:div {:class "col-xs-12 col-sm-6 col-md-8"}
-     [:h1 (tr [:common-texts :own-api-list])]
+    [:div {:class "col-xs-12 col-sm-4 col-md-4"}
+     [:h1 (tr [:common-texts :own-api-list]) ]
      ]
-    [:div {:class "col-xs-12 col-sm-6 col-md-4"}
+
+    [:div {:class "col-xs-12 col-sm-4 col-md-4"}
+     (if (second (:transport-operators-with-services state))
+     [form-fields/field
+      {:label (tr [:field-labels :select-transport-operator])
+       :name        :select-transport-operator
+       :type        :selection
+       :show-option ::t-operator/name
+       :update!   #(e! (to/->SelectOperator %))
+       :options     (map :transport-operator (:transport-operators-with-services state))
+       :auto-width? true}
+      (get state :transport-operator)
+      ]
+    nil)
+     ]
+    [:div {:class "col-xs-12 col-sm-4 col-md-4"}
      [ui/raised-button {:style {:margin-top "20px"}
                         :label    (tr [:buttons :add-transport-service])
                         :on-click #(do
                                      (.preventDefault %)
-                                     (e! (fp/->ChangePage :transport-service)))
+                                     (e! (ts/->OpenTransportServiceTypePage)))
                         :primary  true}]]]
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}
@@ -115,17 +137,33 @@
        ^{:key type}
        [transport-services-listing
         e!
-        (get-in status [:transport-operator ::t-operator/id])
+        (get-in state [:transport-operator ::t-operator/id])
         services
         (tr [:titles type])])]]])
 
-(defn own-services [e! status]
-  ;; init
-  (e! (fp/->GetTransportOperatorData))
-
-  (fn [e! {services :transport-services :as status}]
+(defn own-services [e! state]
+  (e! (fp/->EnsureTransportOperator))
+  (fn [e! state]
+  ;; Get services by default from first organization
+  (let [my-services (if (empty? (:transport-service-vector state))
+                      (:transport-service-vector (first (:transport-operators-with-services state)))
+                      (:transport-service-vector state))]
     [:div
+     (if (empty? my-services)
+       [transport-service/select-service-type e! state] ;; Render service type selection page if no services added
+       (table-container-for-front-page e! my-services state))])))
 
-     (if (empty? services)
-       [transport-service/select-service-type e! (:transport-service status)] ;; Render service type selection page if no services added
-       (table-container-for-front-page e! services status))]))
+(defn no-operator [e! state]
+  "If user haven't added service-operator, we will ask to do so."
+  [:div
+   [:div.row
+    [:div {:class "col-xs-12 col-sm-12 col-md-12"}
+     [:h3 (tr [:front-page :header-no-operator])]
+     [:p (tr [:front-page :desc-to-add-new-operator])]
+     [:p (tr [:front-page :to-add-new-operator])
+      [:a {:href "/organization/new"} (tr [:common-texts :navigation-organizations]) ]
+      (tr [:front-page :to-add-new-operator-tab])]
+     ]
+    ]
+   ]
+  )

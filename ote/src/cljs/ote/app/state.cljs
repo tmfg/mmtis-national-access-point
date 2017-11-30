@@ -39,3 +39,8 @@
       (swap! app assoc :width w :height h)))
 
 (.addEventListener js/window "resize" windowresize-handler)
+
+(defn set-init-state!
+  "May be called before app rendered to set initial state when starting up."
+  [state-map]
+  (swap! app merge state-map))

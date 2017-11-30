@@ -15,9 +15,11 @@
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
 (defrecord TransportOperatorFailed [response])
+(defrecord EnsureTransportOperator [])
 
 (defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
+(defrecord TransportOperatorDataFailed [error])
 
 (extend-protocol tuck/Event
 
@@ -52,6 +54,15 @@
     (assoc-in app [:ote-service-flags :user-menu-open] true)
     app)
 
+  EnsureTransportOperator
+  (process-event [_ app]
+    (if (empty? (get app :transport-operator))
+      (do
+        (routes/navigate! :no-operator)
+        (assoc app :page :no-operator)
+        )
+      app))
+
   GetTransportOperator
   (process-event [_ app]
       (comm/post! "transport-operator/group" {} {:on-success (tuck/send-async! ->TransportOperatorResponse)
@@ -70,16 +81,35 @@
     app)
 
   GetTransportOperatorData
+  ;; FIXME: this should be called something else, like SessionInit (the route as well)
   (process-event [_ app]
-    (comm/post! "transport-operator/data" {} {:on-success (tuck/send-async! ->TransportOperatorDataResponse)})
-    app)
+    (comm/post! "transport-operator/data" {}
+                {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                 :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
+    (assoc app :transport-operator-data-loaded? false))
+
+  TransportOperatorDataFailed
+  (process-event [{error :error} app]
+    ;; 401 is ok (means user is not logged in
+    (when (not= 401 (:status error))
+      (.log js/console "Failed to fetch transport operator data: " (pr-str error)))
+    (assoc app
+           :transport-operator-data-loaded? true
+           :user nil))
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
-    (assoc app
-      :transport-operator (get response :transport-operator)
-      :transport-services (get response :transport-service-vector )
-      :user (get response :user ))))
+    (let [app (assoc app
+                :transport-operator-data-loaded? true
+                :user (:user (first response)))]
+    ;; First time users don't have operators.
+    ;; Ask them to add one
+    (if (and (nil? (get (first response) :transport-operator)) (not= :services (get app :page)))
+      (doall
+        (routes/navigate! :no-operator)
+        (assoc app :page :no-operator))
 
-
-
+      (assoc app
+        :transport-operators-with-services response
+        :transport-operator  (get (first response) :transport-operator)
+        :transport-service-vector (get (first response) :transport-service-vector))))))

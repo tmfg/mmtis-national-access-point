@@ -34,10 +34,12 @@
    ::t-service/guaranteed-accessibility-description generators/gen-localized-text-array
    ::t-service/guaranteed-transportable-aid (s/gen ::t-service/guaranteed-transportable-aid)
    ::t-service/guaranteed-info-service-accessibility (s/gen ::t-service/guaranteed-info-service-accessibility)
+   ::t-service/guaranteed-vehicle-accessibility (s/gen ::t-service/guaranteed-vehicle-accessibility)
    ::t-service/limited-accessibility-tool (s/gen ::t-service/accessibility-tool)
    ::t-service/limited-accessibility-description generators/gen-localized-text-array
    ::t-service/limited-transportable-aid (s/gen ::t-service/limited-transportable-aid)
    ::t-service/limited-info-service-accessibility (s/gen ::t-service/limited-info-service-accessibility)
+   ::t-service/limited-vehicle-accessibility (s/gen ::t-service/limited-vehicle-accessibility)
    ::t-service/additional-services (s/gen ::t-service/additional-services)
    ::t-service/price-classes generators/gen-price-class-array
    ::t-service/booking-service generators/gen-service-link
@@ -54,7 +56,8 @@
    ::t-service/type (gen/return :passenger-transportation)
    ::t-service/passenger-transportation gen-passenger-transportation
    ::t-service/contact-address generators/gen-address
-   ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
+   ::t-service/contact-phone (s/gen ::t-service/contact-phone)
+   ::t-service/brokerage? (s/gen boolean?)))
 
 
 (def gen-terminal_information

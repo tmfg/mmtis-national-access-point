@@ -12,3 +12,5 @@
           {:font-weight "bold"}))
 
 (def localized-text-language-links {:text-align "right"})
+
+(def checkbox-group-label {:margin-bottom "4px"})

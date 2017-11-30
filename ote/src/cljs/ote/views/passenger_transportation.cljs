@@ -70,18 +70,35 @@
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/guaranteed-accessibility-tool
+   {:name        ::t-service/guaranteed-vehicle-accessibility
+    :help (tr [:form-help :guaranteed-vehicle-accessibility])
     :type        :checkbox-group
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/vehicle-accessibility
     :full-width? true
     :container-style (merge style-form/half-width
                             style-form/border-right)}
 
-   {:name        ::t-service/limited-accessibility-tool
+   {:name        ::t-service/limited-vehicle-accessibility
+    :help (tr [:form-help :limited-vehicle-accessibility])
     :type        :checkbox-group
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/vehicle-accessibility
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-info-service-accessibility
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
+    :options t-service/information-service-accessibility
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name ::t-service/limited-info-service-accessibility
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
+    :options t-service/information-service-accessibility
     :full-width? true
     :container-style style-form/half-width}
 
@@ -158,23 +175,21 @@
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-options (transportation-form-options e!)
              form-groups
-             (remove nil?
-                     [(name-and-type-group e!)
-                      (ts-common/contact-info-group)
-                      (when (= (::t-service/sub-type form-data) :schedule)
-                        (ts-common/companies-group))
-                      (ts-common/place-search-group e! ::t-service/passenger-transportation)
-                      (ts-common/external-interfaces)
-                      (luggage-restrictions-group)
-                      (ts-common/service-url
-                       (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
-                       ::t-service/real-time-information)
-                      (ts-common/service-url
-                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                       ::t-service/booking-service)
-                      (accessibility-group)
-                      (pricing-group e!)
-                      (ts-common/service-hours-group)])]
+             [(name-and-type-group e!)
+              (ts-common/contact-info-group)
+              (ts-common/companies-group)
+              (ts-common/place-search-group e! ::t-service/passenger-transportation)
+              (ts-common/external-interfaces)
+              (luggage-restrictions-group)
+              (ts-common/service-url
+               (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
+               ::t-service/real-time-information)
+              (ts-common/service-url
+               (tr [:field-labels :transport-service-common ::t-service/booking-service])
+               ::t-service/booking-service)
+              (accessibility-group)
+              (pricing-group e!)
+              (ts-common/service-hours-group)]]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
