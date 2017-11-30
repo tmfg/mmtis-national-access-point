@@ -14,5 +14,5 @@
 
 (defn help [help]
   [:div.help (stylefy/use-style style-base/help)
-   [:div [ic/action-info-outline]]
-   [:div help]])
+   [:div {:style {:padding "5px 0px 0px 10px"}} [ic/action-info-outline]]
+   [:div {:style {:padding "5px 5px 5px 10px "}} help]])
