@@ -40,8 +40,7 @@
      :list-style {:background-color "#2D75B4"}
      :on-click #(e! (fp-controller/->OpenUserMenu))
      :anchor-origin {:horizontal "right" :vertical "bottom"}
-     :target-origin {:horizontal "right" :vertical "top"}
-     }
+     :target-origin {:horizontal "right" :vertical "top"}}
 
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-profile])
@@ -92,6 +91,27 @@
              {:page  :own-services
               :label [:common-texts :navigation-own-service-list]})]))
 
+(def selectable-languages [["fi" "\ud83c\uddeb\ud83c\uddee"]
+                           ["sv" "\ud83c\uddf8\ud83c\uddea"]
+                           ["en" "\ud83c\uddec\ud83c\udde7"]])
+
+(defn- language-selection [e!]
+  (let [current-language @localization/selected-language]
+    [ui/drop-down-menu
+    {:label-style {:color "#FFFFFF"}
+     :list-style {:background-color "#2D75B4"}
+     :anchor-origin {:horizontal "right" :vertical "bottom"}
+     :target-origin {:horizontal "right" :vertical "top"}
+     :on-change #(e! (fp-controller/->SetLanguage %3))
+     :value current-language}
+
+     (doall
+      (for [[lang flag] selectable-languages]
+        [ui/menu-item {:key lang
+                       :value lang
+                       :style {:color "#FFFFFF"}
+                       :primary-text flag}]))]))
+
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
   [:div (stylefy/use-style style-topnav/clear)
    [:ul (stylefy/use-style style-topnav/ul)
@@ -126,7 +146,10 @@
     [:div.user-menu {:class (is-user-menu-active app)
                      :style (when (> (:width app) style-base/mobile-width-px)
                               {:float "right"})}
-     (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
+     [user-menu e!
+      (get-in app [:user :name])
+      (get-in app [:user :username])]]
+
     [:ul (stylefy/use-style style-topnav/ul)
      [:li
       [:a (merge (stylefy/use-style
@@ -167,7 +190,8 @@
      [:div.container-fluid
       (if desktop?
         (top-nav-links e! app true)
-        (mobile-top-nav-links e! app))]]))
+        (mobile-top-nav-links e! app))
+      [language-selection e!]]]))
 
 
 (defn- footer []

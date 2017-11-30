@@ -12,6 +12,8 @@
                        [clojure.string :as str]
                        [taoensso.timbre :as log]))
 
+(def supported-languages ["fi" "sv" "en"])
+
 (defonce loaded-languages (atom {}))
 
 (defn load-language!
