@@ -15,6 +15,11 @@ from routes.mapper import SubMapper
 from ckan.lib import authenticator
 from ckan.model import User
 
+from ckan.lib import i18n
+from ckan.plugins import PluginImplementations
+from ckan.plugins.interfaces import ITranslation
+from paste.deploy.converters import aslist
+
 csv.field_size_limit(sys.maxsize)
 
 log = getLogger(__name__)
@@ -55,6 +60,51 @@ def authenticate_monkey_patch(self, environ, identity):
 authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_patch
 
 ### MONKEY PATCH CKAN AUTHENTICATION END ###
+
+### MONKEY PATCH CKAN I18N LANGUAGE START ###
+
+supported_languages = ['fi', 'sv', 'en']
+
+# Take language from "finap_lang" cookie which both CKAN and OTE
+# can use. Language selection sets cookie and refreshes the page.
+def language_from_cookie(request):
+    lang = "fi"
+    try:
+        lang = request.cookies['finap_lang']
+    except:
+        pass
+
+    return lang
+
+def handle_request(request, tmpl_context):
+    ''' Set the language for the request '''
+
+    config = i18n.config
+
+    lang = language_from_cookie(request)
+    i18n.set_lang(lang)
+
+    log_debug("COOKIES: %s", pprint.pformat(request.cookies))
+
+    ## CODE AFTER THIS LINE IS TAKEN AS IS FROM ckan.lib.i18n
+    for plugin in PluginImplementations(ITranslation):
+        if lang in plugin.i18n_locales():
+            i18n._add_extra_translations(plugin.i18n_directory(), lang,
+                                    plugin.i18n_domain())
+
+    extra_directory = config.get('ckan.i18n.extra_directory')
+    extra_domain = config.get('ckan.i18n.extra_gettext_domain')
+    extra_locales = aslist(config.get('ckan.i18n.extra_locales'))
+    if extra_directory and extra_domain and extra_locales:
+        if lang in extra_locales:
+            _add_extra_translations(extra_directory, lang, extra_domain)
+
+    tmpl_context.language = lang
+    return lang
+
+i18n.handle_request = handle_request
+
+### MONKEY PATCH CKAN I18N LANGAUGE END ###
 
 def dataset_purge_custom_auth(context, data_dict):
     # Defer authorization for package_pruge to package_update
@@ -114,6 +164,15 @@ def update_term_translations():
         ]})
 
 
+class LanguageMiddleware(object):
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        print 'hei täällä kieli middleware'
+        return self.app(environ, start_response)
+
+
 class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultDatasetForm):
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IPluginObserver, inherit=True)
@@ -126,6 +185,8 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
+    plugins.implements(plugins.IMiddleware)
+
 
     def get_auth_functions(self):
         return {'dataset_purge': dataset_purge_custom_auth}
@@ -301,3 +362,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
 
     def form_template(self, context, data_dict):
         return "transport_service_view.html"
+
+    # Methods for IMiddleware
+
+    def make_middleware(self, app, config):
+        log_debug("make_middleware: app = %s, config = %s", pprint.pformat(app), pprint.pformat(config))
+        return LanguageMiddleware(app)
+
+    def make_error_log_middleware(self, app, config):
+        return app
