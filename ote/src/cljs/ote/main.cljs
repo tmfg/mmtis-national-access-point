@@ -18,9 +18,12 @@
             [stylefy.core :as stylefy]
             [ote.communication :as comm]))
 
+(defn language []
+  (keyword (.getAttribute js/document.body "data-language")))
+
 (defn ^:export main []
   (localization/load-language!
-   :fi
+   (language)
    (fn [lang _]
      (reset! localization/selected-language lang)
      (stylefy/init)

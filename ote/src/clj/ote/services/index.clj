@@ -30,7 +30,8 @@
     [:style {:id "_stylefy-constant-styles_"} ""]
     [:style {:id "_stylefy-styles_"}]]
 
-   [:body {:onload "ote.main.main();"}
+   [:body {:onload "ote.main.main();"
+           :data-language localization/*language*}
     [:div#oteapp]
     (when dev-mode?
       [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
