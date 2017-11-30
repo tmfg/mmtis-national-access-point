@@ -138,17 +138,7 @@
       ;;
 
       {:name ::t-service/maximum-stay
-       :type :number}
-
-      {:label       (tr [:parking-page :time-unit])
-       :name        :maximum-stay-unit
-       :type        :selection
-       :show-option (tr-key [:parking-page :maximum-stay-units])
-       :options     [:hours :days]}
-
-      {:label (tr [:parking-page :maximum-stay-unlimited])
-       :name  :maximum-stay-unlimited
-       :type  :checkbox})))
+       :type :interval})))
 
 (defn capacities [e!]
   (form/group
@@ -174,12 +164,13 @@
 
     {:name    ::t-service/charging-points
      :columns 3
-     :type    :text-area}))
+     :type   :localized-text}))
 
 (defn parking [e! {form-data ::t-service/parking}]
   (r/with-let [options (form-options e!)
                groups [(name-and-type-group e!)
                        (ts-common/contact-info-group)
+                       (ts-common/place-search-group e! ::t-service/parking)
                        (ts-common/external-interfaces)
                        (ts-common/service-url
                          (tr [:field-labels :parking ::t-service/real-time-information])
