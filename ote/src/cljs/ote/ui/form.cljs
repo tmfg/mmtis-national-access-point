@@ -210,12 +210,12 @@
    modified errors warnings notices update-form]
   [:div.form-group (stylefy/use-style style)
    (doall
-    (for [{:keys [name editable? read write container-style] :as s} schemas
+    (for [{:keys [name editable? read write container-style container-class] :as s} schemas
           :let [editable? (and can-edit?
                                (or (nil? editable?)
                                    (editable? data)))]]
       ^{:key name}
-      [:div.form-field (stylefy/use-style (merge style-form/form-field container-style))
+      [:div.form-field {:class container-class :style (merge style-form/form-field container-style)}
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)

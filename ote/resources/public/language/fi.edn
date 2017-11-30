@@ -82,7 +82,10 @@
    :ote.db.transport-service/operation-area            "Toiminta-alue"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name "Hintaryhmä"
+   :ote.db.transport-service/price-class-name-taxi     "Tuote"
+   :ote.db.transport-service/price-class-name-other    "Hintaryhmä"
+   :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
+   :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
    :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
@@ -356,7 +359,7 @@
  :passenger-transportation-page
  {:header-passenger-transportation-service "Henkilöiden kuljetuspalvelun tiedot"
   :header-service-info                     "Palvelun perustiedot"
-  :header-restrictions-payments            "Rajoitukset ja maksutavat"
+  :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Palvelun yhteystiedot"
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"

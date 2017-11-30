@@ -33,4 +33,5 @@
 
 
 (def border-color "#C4C4C4")
-(def border-right {:border-right (str "solid 2px " border-color)})
+(def border-right {:border-right (str "solid 2px " border-color)
+                   :box-sizing "border-box"})
