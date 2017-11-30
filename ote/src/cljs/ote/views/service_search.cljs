@@ -97,7 +97,7 @@
        [ic/communication-phone {:style style/contact-icon}]
        contact-phone
 
-       [ic/communication-email ]
+       [ic/communication-email {:style style/contact-icon}]
        contact-email]]
      [:div.result-subtitle (stylefy/use-style style/subtitle)
       [:div (stylefy/use-style style/subtitle-operator-first)

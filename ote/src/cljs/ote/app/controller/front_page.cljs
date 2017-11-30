@@ -15,6 +15,7 @@
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
 (defrecord TransportOperatorFailed [response])
+(defrecord EnsureTransportOperator [])
 
 (defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
@@ -52,6 +53,15 @@
   (process-event [_ app]
     (assoc-in app [:ote-service-flags :user-menu-open] true)
     app)
+
+  EnsureTransportOperator
+  (process-event [_ app]
+    (if (empty? (get app :transport-operator))
+      (do
+        (routes/navigate! :no-operator)
+        (assoc app :page :no-operator)
+        )
+      app))
 
   GetTransportOperator
   (process-event [_ app]

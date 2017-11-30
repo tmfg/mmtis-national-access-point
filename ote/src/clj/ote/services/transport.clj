@@ -98,10 +98,11 @@
   (tx/with-transaction db
     (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
       (or operator
+          (and id
           ;; FIXME: what if name changed in CKAN, we should update?
           (insert! db ::transport-operator/transport-operator
                    {::transport-operator/name title
-                    ::transport-operator/ckan-group-id id})))))
+                    ::transport-operator/ckan-group-id id}))))))
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
