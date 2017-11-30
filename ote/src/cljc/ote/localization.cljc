@@ -49,10 +49,10 @@
      (defmacro with-language
        "Run `body` with `*language*` bound to the given language."
        [language & body]
-       (load-language! language
-                       (fn [language _]
-                         (binding [*language* language]
-                           ~@body))))))
+       `(load-language! ~language
+                        (fn [language# _#]
+                          (binding [*language* language#]
+                            ~@body))))))
 
 (defn- message-part [part parameters]
   (cond
