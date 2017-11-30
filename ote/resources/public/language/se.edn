@@ -169,26 +169,26 @@
 
  ;; Action buttons
  :buttons
- {:save "Tallenna"
+ {:save "Spara"
   :cancel "Peruuta"
   :delete "Poista"
   :close "Sulje"
   :publish "Julkaise"
   :edit-service "Muokkaa uppassningens tietoja"
 
-  :save-and-publish "Tallenna ja julkaise"
-  :save-as-draft "Tallenna luonnoksena"
-  :save-updated "Tallenna päivitetyt tiedot"
-  :add-new-price-class "Lisää hintarivi"
-  :add-new-service-hour "Lisää palveluaika"
-  :add-new-service-exception "Lisää poikkeus"
-  :add-new-company "Lisää uppassningens tuottava yritys"
+  :save-and-publish "Spara och publisera"
+  :save-as-draft "Spara kladd"
+  :save-updated "Spara päivitetyt tiedot"
+  :add-new-price-class "Lägga till hintarivi"
+  :add-new-service-hour "Lägga till palveluaika"
+  :add-new-service-exception "Lägga till poikkeus"
+  :add-new-company "Lägga till uppassningens tuottava yritys"
   :discard "Peruuta"
 
-  :add-transport-service   "Lisää liikkumispalvelusi tiedot"
-  :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
-  :add-add-new-row         "Lisää uusi rivi"
-  :add-new-pick-up-location "Lisää toimipiste"}
+  :add-transport-service   "Lägga till liikkumispalvelusi tiedot"
+  :add-external-interface "Lägga till itse ylläpitämäsi rajapinta"
+  :add-add-new-row         "Lägga till ny rivi"
+  :add-new-pick-up-location "Lägga till toimipiste"}
 
 
 
@@ -208,9 +208,9 @@
    :schedule "Säännöllinen aikataulun mukainen liikenne"}
 
   :ote.db.transport-service/payment-methods
-  {:cash                "Käteinen"
-   :debit-card          "Pankkikortti"
-   :credit-card         "Luottokortti"
+  {:cash                "Kontanter"
+   :debit-card          "Bankkort"
+   :credit-card         "Kreditkort"
    :mobilepay           "Mobiilimaksu"
    :contactless-payment "Lähimaksu"
    :invoice             "Lasku"
@@ -295,7 +295,7 @@
  ;; Per feature/page localization keys
  :place-search {:name                "Paikan namn"
                 :place-auto-complete "Hae paikka nimellä"
-                :rename-place "Anna uusi namn (Enter hyväksyy)"}
+                :rename-place "Anna ny namn (Enter hyväksyy)"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
           :passenger-transportation "Henkilöiden kuljetuspalvelut"
@@ -332,7 +332,7 @@
   :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
   :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
-  :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
+  :publish-new-service            "Haluatko julkaista nya palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
   :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
    joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
@@ -341,7 +341,7 @@
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
   :header-no-operator "Et ole lisännyt vielä palvelutuottajaa"
-  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun ensin lisätä uusi uppassningenstuottaja
+  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun ensin lisätä ny uppassningenstuottaja
     tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut uppassningenstuottajan jäseneksi."
    :to-add-new-operator "Mikäli lisäät uuden uppassningenstuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
@@ -375,7 +375,7 @@
  :terminal-page
  {:header-service-info                "Uppassningens perustiedot"
   :header-contact-details             "Uppassningens yhteystiedot"
-  :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän uppassningens tiedot."
+  :header-add-new-terminal            "Lägga till Satamaan, Asemaan tai Terminaaliin liittyvän uppassningens tiedot."
   :header-assistance                  "Avustusuppassningens tilauksen tiedot"
   :header-accessibility               "Uppassningens saavutettavuus ja esteettömyys"
   }
@@ -396,7 +396,7 @@
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
   :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
-  :link-add-new-api                           "Lisää uusi palvelu"
+  :link-add-new-api                           "Lägga till ny palvelu"
   :own-api-list                               "Omat palvelutiedot"
   :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
   :api-name                                   "Rajapinnan namn"
@@ -489,9 +489,9 @@
 
 
                    ;; payment methods
-                   "debit-card" "Pankkikortti"
-                   "credit-card" "Luottokortti"
-                   "cash" "Käteinen"
+                   "debit-card" "Bankkort"
+                   "credit-card" "Kreditkort"
+                   "cash" "Kontanter"
                    "contactless-payment" "Lähimaksu"
                    "mobilepay" "Mobiilimaksu"
                    "invoice" "Lasku"
