@@ -36,6 +36,13 @@
     :type      :string
     :required? true}))
 
+(defn vehicle-group []
+  ;; (form/group
+  ;;  {:label (tr [:rentals-page :header-vehicles])
+  ;;   :columns 3
+  ;;   :layout :row})
+  )
+
 (defn accessibility-group []
   (form/group
    {:label (tr [:rentals-page :header-other-services-and-accessibility])
@@ -55,6 +62,22 @@
    {:name ::t-service/accessibility-description
     :type :localized-text
     :rows 1 :max-rows 5}))
+
+(defn luggage-restrictions-groups []
+  (form/group
+   {:label (tr [:rentals-page :header-restrictions-payments])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/luggage-restrictions
+    :type :localized-text
+    :rows 1 :max-rows 5}
+
+   {:name        ::t-service/payment-methods
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/payment-methods])
+    :options     t-service/payment-methods})
+  )
 
 (defn eligibity-requirements []
   (form/group
@@ -133,11 +156,13 @@
                              (ts-common/contact-info-group)
                              (ts-common/place-search-group e! ::t-service/rentals)
                              (ts-common/external-interfaces)
+                             ;; (vehicle-group)
+                             (luggage-restrictions-groups)
                              (accessibility-group)
                              (eligibity-requirements)
                              (ts-common/service-url
-                              (tr [:field-labels :transport-service-common ::t-service/rental-service])
-                              ::t-service/rental-service)
+                              (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                              ::t-service/booking-service)
                              (pick-up-locations e!)
                              ]]
     [:div.row

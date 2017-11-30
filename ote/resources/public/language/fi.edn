@@ -105,7 +105,9 @@
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/eligibility-requirements  "Kelpoisuusvaatimukset"
+  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
+   :ote.db.transport-service/eligibility-requirements  "Kelpoisuusvaatimukset"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
@@ -353,6 +355,8 @@
  {:header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-eligibity-requirements           "Kelpoisuusvaatimukset"
+  :header-restrictions-payments            "Rajoitukset ja maksutavat"
+  :header-vehicles                         "Vuokrattavat ajoneuvot"
   :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
   :open-service-hours-and-exceptions       "Palveluajat"
   }
