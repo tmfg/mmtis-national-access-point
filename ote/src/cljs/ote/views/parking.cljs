@@ -6,7 +6,6 @@
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
-            [ote.app.controller.parking :as parking]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
