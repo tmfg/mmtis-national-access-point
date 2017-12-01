@@ -21,7 +21,7 @@
 
               "interval"
               #?(:clj (t/read-handler time/->PGInterval)
-                 :cljs time/map->Interval)
+                 :cljs (comp time/map->Interval #(aget % 1)))
 
               ;; Transit "f" tag is an arbitrary precision decimal number that has no native
               ;; JS equivalent, for now we simply map it to parseFloat in JS as we are not doing
