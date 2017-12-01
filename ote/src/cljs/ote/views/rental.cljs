@@ -14,7 +14,8 @@
             [ote.views.place-search :as place-search]
             [tuck.core :as tuck]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.style.form :as style-form]))
 
 (defn rental-form-options [e!]
   {:name->label (tr-key [:field-labels :rentals]
@@ -45,23 +46,58 @@
 
 (defn accessibility-group []
   (form/group
-   {:label (tr [:rentals-page :header-other-services-and-accessibility])
+   {:label (tr [:rentals-page :header-accessibility])
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/additional-services
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/additional-services])
-    :options     t-service/additional-services}
+   {:name        ::t-service/guaranteed-vehicle-accessibility
+    :help (tr [:form-help :guaranteed-vehicle-accessibility])
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/rental-vehicle-accessibility
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
 
-   {:name        ::t-service/accessibility-tool
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool}
+   {:name        ::t-service/limited-vehicle-accessibility
+    :help (tr [:form-help :limited-vehicle-accessibility])
+    :type        :checkbox-group 
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/rental-vehicle-accessibility
+    :full-width? true
+    :container-style style-form/half-width}
 
-   {:name ::t-service/accessibility-description
+   {:name ::t-service/guaranteed-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/rental-transportable-aid
+    :full-width? true
+    :container-style (merge style-form/half-width
+                            style-form/border-right)}
+
+   {:name ::t-service/limited-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/rental-transportable-aid
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
-    :rows 1 :max-rows 5}))
+    :rows 1 :max-rows 5
+    :full-width? true
+    :container-style style-form/half-width}
+
+   {:name ::t-service/limited-accessibility-description
+    :type :localized-text
+    :rows 1 :max-rows 5
+    :container-style style-form/half-width
+    :full-width? true}
+
+   {:name ::t-service/accessibility-info-url
+    :type :string
+    :container-style style-form/half-width
+    :full-width? true}))
 
 (defn luggage-restrictions-groups []
   (form/group

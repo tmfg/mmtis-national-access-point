@@ -121,3 +121,9 @@
 (def vehicle-accessibility
   [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs
    :boarding-assistance :assistance-dog-space])
+
+(def rental-vehicle-accessibility
+  [:disability-adapted-vehicle])
+
+(def rental-transportable-aid
+  [:wheelchair])
