@@ -2,7 +2,8 @@
   "Common small UI utilities"
   (:require [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.style.form :as style-form]))
 
 (defn linkify [url label]
   (if-not url
@@ -14,5 +15,5 @@
 
 (defn help [help]
   [:div.help (stylefy/use-style style-base/help)
-   [:div {:style {:padding "5px 0px 0px 10px"}} [ic/action-info-outline]]
-   [:div {:style {:padding "5px 5px 5px 10px "}} help]])
+   [:div (stylefy/use-style style-form/help-icon-element) [ic/action-info-outline]]
+   [:div (stylefy/use-style style-form/help-text-element) help]])
