@@ -126,6 +126,39 @@
   ;; Parking fields
   :parking
   {:parking-areas  "Parking area locations"
+   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
+   :ote.db.transport-service/description               "Palvelun kuvaus"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
+   :ote.db.transport-service/additional-service-links  "Muut palvelut"
+   :ote.db.transport-service/price-class               "Hinnoittelu"
+   :ote.db.transport-service/service-hours             "Palveluajat"
+   :ote.db.transport-service/operation-area            "Toiminta-alue"
+
+   ;; Parking facilities and capacity
+   :ote.db.transport-service/parking-facility          "Pysäköintipaikan tyyppi"
+   :ote.db.transport-service/capacity                  "Paikkojen määrä"
+
+   ;; Charging point fields
+   :ote.db.transport-service/charging-points           "Kuvaus latauspisteistä"
+
+   ;; Price Class fields
+   :ote.db.transport-service/price-class-name          "Hintaryhmä"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/currency                  "Valuutta"
+
+   :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
+   :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+
+   ;; Service hour fields
+   :ote.db.transport-service/week-days                 "Viikonpäivät"
+   :ote.db.transport-service/from                      "Aukeamisaika"
+   :ote.db.transport-service/to                        "Kiinnimenoaika"
+   :ote.db.transport-service/all-day                   "24h"
+   :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
    }
 
 
@@ -161,9 +194,9 @@
  {:external-interfaces "Tässä kohdassa lisäät ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut,
  varaus- ja myyntirajapinnan ja muut olennaisia tietoa sisältävät rajapinnat.
  Jos ulkoiset rajapinnat ovat vajanaisia tai rajapintoja ei ole, täytä vastaavasti tämän osion alla olevat kohdat,
- jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa.":external-interfaces-eg-rae "Huom: Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
+ jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
+  :external-interfaces-eg-rae "Huom: Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
   :RAE-tool "Rae-työkalu"
-
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden accessibilityominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
@@ -186,6 +219,7 @@
   :save-and-publish "Tallenna ja julkaise"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
+  :add-new-parking-capacity "Lisää uusi pysäköintityyppi"
   :add-new-price-class "Lisää hintarivi"
   :add-new-service-hour "Lisää palveluaika"
   :add-new-service-exception "Lisää poikkeus"
@@ -194,6 +228,7 @@
 
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
+  :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"
   :add-new-pick-up-location "Lisää toimipiste"}
 
@@ -297,6 +332,16 @@
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"}
+
+  :ote.db.transport-service/parking-facility
+  {:unknown "Tuntematon"
+   :car-park "Autopaikat"
+   :park-and-ride-park "Liityntäpysäköinti"
+   :motorcycle-park "Moottoripyörät"
+   :cycle-park "Polkupyörät"
+   :rental-car-park "Vuokra-autot"
+   :coach-park "Linja-autot"
+   :disabled-park "Invapaikat"}
   }
 
  ;; Per feature/page localization keys
@@ -387,6 +432,19 @@
   :header-accessibility               "Palvelun saavutettavuus ja accessibility"
   }
 
+ :parking-page
+ {:header-service-info                      "Palvelun perustiedot"
+  :header-contact-details                   "Palvelun yhteystiedot"
+  :header-payment-methods                   "Maksutavat"
+  :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
+  :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
+  :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
+  :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
+  :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
+  :header-charging-points                   "Latauspisteet"
+  :header-service-hours                     "Palveluajat ja pysäköintiaika"
+  }
+
  :opening-hours-dialog
  {:close-dialog "Sulje"
   :header-dialog "Toimipisteen aukioloajat"
@@ -430,6 +488,11 @@
   :footer-ckan-software                       "CKAN-ohjelmistolla"
   :footer-made-width                          "Toteutettu"
   :no-such-page                               "Valittua sivua ei löydy: "
+  :time-unit                                  "Aikayksikkö"
+  :time-units {:minutes  "Minuuttia"
+               :hours    "Tuntia"
+               :days     "Päivää"
+               :seconds  "Sekuntia"}
   }
 
  :dialog
