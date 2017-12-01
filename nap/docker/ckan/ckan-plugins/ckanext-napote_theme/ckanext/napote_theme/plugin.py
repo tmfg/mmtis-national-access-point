@@ -251,7 +251,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
 
     def after_map(self, map):
         with SubMapper(map, controller='package') as m:
-            m.connect('search', '/ote/index.html#/services', action='search',
+            m.connect('search', '/ote/#/services', action='search',
                       highlight_actions='index search')
         return map
 
