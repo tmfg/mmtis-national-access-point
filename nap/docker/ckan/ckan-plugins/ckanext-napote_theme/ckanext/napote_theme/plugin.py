@@ -161,16 +161,6 @@ def update_term_translations():
             }
         ]})
 
-
-class LanguageMiddleware(object):
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        print 'hei täällä kieli middleware'
-        return self.app(environ, start_response)
-
-
 class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultDatasetForm):
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IPluginObserver, inherit=True)
@@ -183,8 +173,6 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
-    plugins.implements(plugins.IMiddleware)
-
 
     def get_auth_functions(self):
         return {'dataset_purge': dataset_purge_custom_auth}
@@ -360,12 +348,3 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
 
     def form_template(self, context, data_dict):
         return "transport_service_view.html"
-
-    # Methods for IMiddleware
-
-    def make_middleware(self, app, config):
-        log_debug("make_middleware: app = %s, config = %s", pprint.pformat(app), pprint.pformat(config))
-        return LanguageMiddleware(app)
-
-    def make_error_log_middleware(self, app, config):
-        return app
