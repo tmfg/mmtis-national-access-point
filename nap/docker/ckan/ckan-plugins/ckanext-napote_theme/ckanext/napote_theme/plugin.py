@@ -84,8 +84,6 @@ def handle_request(request, tmpl_context):
     lang = language_from_cookie(request)
     i18n.set_lang(lang)
 
-    log_debug("COOKIES: %s", pprint.pformat(request.cookies))
-
     ## CODE AFTER THIS LINE IS TAKEN AS IS FROM ckan.lib.i18n
     for plugin in PluginImplementations(ITranslation):
         if lang in plugin.i18n_locales():
