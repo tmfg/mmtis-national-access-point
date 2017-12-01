@@ -95,7 +95,7 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? full-width? style]
+                                  focus on-focus form? error warning table? full-width? style input-style]
                            :as   field} data]
   [text-field
    (merge
@@ -115,7 +115,9 @@
     (when full-width?
       {:full-width true})
     (when style
-      {:style style}))])
+      {:style style})
+    (when input-style
+      {:input-style input-style}))])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]

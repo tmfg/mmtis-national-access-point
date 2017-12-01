@@ -155,7 +155,8 @@
     :name         ::t-service/price-classes
     :type         :table
     :table-fields [{:name ::t-service/name :type :string :label price-class-name-label}
-                   {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}}
+                   {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+                    :input-style {:text-align "right" :padding-right "5px"}}
                    {:name ::t-service/unit :type :string :style {:width "100px"}}]
     :add-label (tr [:buttons :add-new-price-class])
     :delete?      true}
