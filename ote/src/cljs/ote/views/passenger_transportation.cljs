@@ -49,18 +49,15 @@
 
 (defn luggage-restrictions-group []
   (form/group
-   {:label (tr [:passenger-transportation-page :header-restrictions-payments])
+   {:label (tr [:passenger-transportation-page :header-restrictions])
     :columns 3
     :layout :row}
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :rows 1 :max-rows 5}
+    :rows 5 :max-rows 5}
 
-   {:name        ::t-service/payment-methods
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/payment-methods])
-    :options     t-service/payment-methods}))
+   ))
 
 
 
@@ -76,8 +73,8 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/vehicle-accessibility
     :full-width? true
-    :container-style (merge style-form/half-width
-                            style-form/border-right)}
+    :container-class "col-md-6"
+    :container-style style-form/border-right}
 
    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
@@ -85,90 +82,104 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/vehicle-accessibility
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-5"}
 
    {:name ::t-service/guaranteed-info-service-accessibility
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options t-service/information-service-accessibility
     :full-width? true
-    :container-style (merge style-form/half-width
-                            style-form/border-right)}
+    :container-class "col-md-6"
+    :container-style style-form/border-right}
 
    {:name ::t-service/limited-info-service-accessibility
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options t-service/information-service-accessibility
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-5"}
 
    {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/transportable-aid
     :full-width? true
-    :container-style (merge style-form/half-width
-                            style-form/border-right)}
+    :container-class "col-md-6"
+    :container-style style-form/border-right}
 
    {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/transportable-aid
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-5"}
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
     :rows 1 :max-rows 5
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-5"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
     :rows 1 :max-rows 5
-    :container-style style-form/half-width
+    :container-class "col-md-6"
     :full-width? true}
 
    {:name ::t-service/accessibility-info-url
     :type :string
-    :container-style style-form/half-width
+    :container-class "col-md-5"
     :full-width? true}
 
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/additional-services])
     :options     t-service/additional-services
-    :container-style style-form/half-width
+    :container-class "col-md-6"
     :full-width? true}
    ))
 
-(defn pricing-group [e!]
+(defn pricing-group [e! form-data]
+  (let [price-class-name-label (cond
+                                 (= :taxi (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
+                                 (= :other (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
+                                 (= :request (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
+                                 (= :schedule (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
+                                 :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))]
   (form/group
    {:label (tr [:passenger-transportation-page :header-price-information])
     :columns 3
     :layout :row}
 
-   {:name         ::t-service/price-classes
+   {:container-class "col-md-9"
+    :name         ::t-service/price-classes
     :type         :table
-    :table-fields [{:name ::t-service/name :type :string
-                    :label (tr [:field-labels :passenger-transportation ::t-service/price-class-name])}
-                   {:name ::t-service/price-per-unit :type :number}
-                   {:name ::t-service/unit :type :string}
-                   {:name ::t-service/currency :type :string :width "100px"}]
+    :table-fields [{:name ::t-service/name :type :string :label price-class-name-label}
+                   {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+                    :input-style {:text-align "right" :padding-right "5px"}}
+                   {:name ::t-service/unit :type :string :style {:width "100px"}}]
     :add-label (tr [:buttons :add-new-price-class])
     :delete?      true}
 
-   {:name ::t-service/pricing-description
+   {:container-class "col-md-2"
+    :name        ::t-service/payment-methods
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/payment-methods])
+    :options     t-service/payment-methods}
+
+   {:container-class "col-md-5"
+    :name ::t-service/pricing-description
     :type :localized-text
     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
     :read (comp ::t-service/description ::t-service/pricing)
-    :columns 1}
+    }
 
-   {:name ::t-service/pricing-url
+   {:container-class "col-md-6"
+    :name ::t-service/pricing-url
     :type :string
     :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
     :read (comp ::t-service/url ::t-service/pricing)
-    :columns 1}))
+    })))
 
 
 
@@ -188,7 +199,7 @@
                (tr [:field-labels :transport-service-common ::t-service/booking-service])
                ::t-service/booking-service)
               (accessibility-group)
-              (pricing-group e!)
+              (pricing-group e! form-data)
               (ts-common/service-hours-group)]]
     [:div.row
      [:div {:class "col-lg-12"}
