@@ -38,7 +38,13 @@
    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
 
-   (form/info (tr [:form-help :external-interfaces]))
+   (form/info
+     [:div
+      [:p (tr [:form-help :external-interfaces]) ]
+      [:p (tr [:form-help :external-interfaces-eg-rae])
+        [:a {:target "_blank" :href "https://extranet.liikennevirasto.fi/"}
+          (tr [:form-help :RAE-tool]) ]]])
+
    {:name ::t-service/external-interfaces
     :type :table
     :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"

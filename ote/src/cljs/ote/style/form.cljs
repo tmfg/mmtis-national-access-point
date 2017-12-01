@@ -35,3 +35,6 @@
 (def border-color "#C4C4C4")
 (def border-right {:border-right (str "solid 2px " border-color)
                    :box-sizing "border-box"})
+
+(def help-icon-element {:padding "0px 0px 0px 10px"})
+(def help-text-element {:padding "5px 5px 5px 10px"})
