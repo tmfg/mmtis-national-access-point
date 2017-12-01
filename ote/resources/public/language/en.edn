@@ -81,7 +81,10 @@
    :ote.db.transport-service/operation-area            "Operation area"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name "Price class"
+   :ote.db.transport-service/price-class-name-taxi     "Product"
+   :ote.db.transport-service/price-class-name-other    "Price class"
+   :ote.db.transport-service/price-class-name-request  "Price class"
+   :ote.db.transport-service/price-class-name-schedule "Price class"
    :ote.db.transport-service/price-per-unit            "Price per unit"
    :ote.db.transport-service/unit                      "Unit"
    :ote.db.transport-service/currency                  "Currency"
@@ -344,7 +347,7 @@
     tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
    :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
-
+  :operator-dont-have-any-services "Operator don't have any services yet."
   }
 
  :organization-page
@@ -355,7 +358,7 @@
  :passenger-transportation-page
  {:header-passenger-transportation-service "Henkilöiden kuljetuspalvelun tiedot"
   :header-service-info                     "Palvelun perustiedot"
-  :header-restrictions-payments            "Rajoitukset ja maksutavat"
+  :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Palvelun yhteystiedot"
   :header-other-services-and-accessibility "Accessibility ja muut palvelut"
   :header-price-information                "Hintatiedot"
