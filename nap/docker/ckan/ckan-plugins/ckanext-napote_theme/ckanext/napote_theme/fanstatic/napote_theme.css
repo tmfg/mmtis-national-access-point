@@ -863,7 +863,7 @@ div.napote-organization-form div.slug-preview {
 }
 
 .finap-lang > a {
-    display: inline-block;
-    padding-left: 10px;
-    padding-right: 10px;
+    display: inline-block !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
 }
