@@ -121,8 +121,7 @@
     nil)
      ]
     [:div {:class "col-xs-12 col-sm-4 col-md-4"}
-     [ui/raised-button {:style {:margin-top "20px"}
-                        :label    (tr [:buttons :add-transport-service])
+     [ui/raised-button {:label    (tr [:buttons :add-transport-service])
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))
