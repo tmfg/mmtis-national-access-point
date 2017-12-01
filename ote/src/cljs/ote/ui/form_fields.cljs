@@ -305,7 +305,6 @@
 (defmethod field :interval [{:keys [update!] :as opts} data]
   (let [[unit amount] (or (some (fn [[unit amount]]
                                   (when (not (zero? amount)) [unit amount])) data) [:hours 0])]
-    (.log js/console unit amount)
     [:div
      [field (assoc opts
               :update! (fn [num]

@@ -94,12 +94,6 @@
   Dispatches on the type. By default, returns service as is."
   ::t-service/type)
 
-(defmethod transform-save-by-type :parking [service]
-  (update-in service [::t-service/parking]
-             (fn [parking]
-               (-> parking
-                   (dissoc :maximum-stay-unit :maximum-stay-unlimited)))))
-
 (defmethod transform-save-by-type :rentals [service]
   (update-in service [::t-service/rentals ::t-service/pick-up-locations]
              (fn [pick-up-locations]
