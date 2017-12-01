@@ -14,11 +14,39 @@
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
 
+(defn- parse-accept-language [accept-language]
+  ;; Parse accept language and return a vector of language codes in the order they appear.
+  ;; Doesn't take weights into account and removes other locale information (like 'en-US' vs 'en-GB').
+  (vec
+   (distinct
+    (for [language (str/split accept-language #",")
+          :when (>= (count language) 2)
+          :let [lang (subs language 0 2)]]
+      lang))))
+
+(defn wrap-accept-language [handler]
+  (fn [{{accept-language "accept-language"} :headers :as req}]
+    (handler
+     (if-not accept-language
+       ;; No "Accept-Language" header specified, return request as is
+       req
+       ;; Parse header and assoc a :accept-language key to the request
+       (assoc req :accept-language (parse-accept-language accept-language))))))
+
 (defn wrap-strip-prefix [strip-prefix handler]
   (fn [{uri :uri :as req}]
     (handler (if (str/starts-with? uri strip-prefix)
                 (assoc req :uri (subs uri (count strip-prefix)))
                 req))))
+
+(defn wrap-middleware [strip-prefix handler & extra-middleware]
+  (gzip/wrap-gzip
+   (params/wrap-params
+    (wrap-accept-language
+     (reduce (fn [handler middleware]
+               (middleware handler))
+             (wrap-strip-prefix strip-prefix handler)
+             extra-middleware)))))
 
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
@@ -27,34 +55,22 @@
 
           ;; Handler for static resources
           resources
-          (gzip/wrap-gzip
-           (params/wrap-params
-            (wrap-strip-prefix
-             strip-prefix
-             (route/resources "/"))))
+          (wrap-middleware strip-prefix (route/resources "/"))
 
           ;; Handler for routes that don't require authenticated user
           public-handler
-          (gzip/wrap-gzip
-           (params/wrap-params
-            (wrap-strip-prefix strip-prefix #(serve-request @public-handlers %))))
+          (wrap-middleware strip-prefix #(serve-request @public-handlers %))
 
           ;; Handler for routes that require authentication
-          handler #(serve-request @handlers %)
           handler
-          (if-let [auth-tkt (:auth-tkt config)]
-            (gzip/wrap-gzip
-             (nap-cookie/wrap-check-cookie
-              auth-tkt
-              (nap-users/wrap-user-info
-               db
-               (wrap-strip-prefix strip-prefix handler))))
-            handler)]
+          (wrap-middleware strip-prefix #(serve-request @handlers %)
+                           (partial nap-users/wrap-user-info db)
+                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config)))]
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (or (resources req)
-                    (public-handler req)
+                (or (public-handler req)
+                    (resources req)
                     (handler req)))
               config))))
   (stop [{stop ::stop :as this}]

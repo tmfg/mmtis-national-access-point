@@ -12,6 +12,8 @@
                        [clojure.string :as str]
                        [taoensso.timbre :as log]))
 
+(def supported-languages ["fi" "sv" "en"])
+
 (defonce loaded-languages (atom {}))
 
 (defn load-language!
@@ -49,10 +51,10 @@
      (defmacro with-language
        "Run `body` with `*language*` bound to the given language."
        [language & body]
-       (load-language! language
-                       (fn [language _]
-                         (binding [*language* language]
-                           ~@body))))))
+       `(load-language! ~language
+                        (fn [language# _#]
+                          (binding [*language* language#]
+                            ~@body))))))
 
 (defn- message-part [part parameters]
   (cond

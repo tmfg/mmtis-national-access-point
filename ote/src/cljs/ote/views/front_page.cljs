@@ -52,7 +52,7 @@
      (map-indexed
       (fn [i {::t-service/keys [id type published? name]
               ::modification/keys [created modified] :as row}]
-         (let [edit-service-url (str "/ote/index.html#/edit-service/" id)]
+         (let [edit-service-url (str "/ote/#/edit-service/" id)]
            ^{:key i}
            [ui/table-row {:selectable false :display-border false}
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
@@ -117,8 +117,7 @@
     nil)
      ]
     [:div {:class "col-xs-12 col-sm-4 col-md-4"}
-     [ui/raised-button {:style {:margin-top "20px"}
-                          :label    (tr [:buttons :add-transport-service])
+     [ui/raised-button {:label (tr [:buttons :add-transport-service])
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))

@@ -16,11 +16,16 @@
             [ote.localization :as localization]
             [ote.app.routes :as routes]
             [stylefy.core :as stylefy]
-            [ote.communication :as comm]))
+            [ote.communication :as comm]
+            [goog.net.Cookies]))
+
+(defn language []
+  (.get (goog.net.Cookies. js/document)
+        "finap_lang" "fi"))
 
 (defn ^:export main []
   (localization/load-language!
-   :fi
+   (language)
    (fn [lang _]
      (reset! localization/selected-language lang)
      (stylefy/init)

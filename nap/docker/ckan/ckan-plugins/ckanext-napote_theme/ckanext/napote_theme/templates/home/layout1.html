@@ -5,6 +5,10 @@
                 <div class="span12">
                     <p><b>{% trans user=c.userobj.display_name %}User greeting {{ user }}{% endtrans %}!</b></p>
                 </div>
+                <div class="span12" style="border: red 4px dashed;">
+                    <p style="padding: 10px;">HUOM: Tämä on NAP -palvelun testiversio. <br>
+                        Tiedot eivät siirry varsinaiseen NAP-palveluun, joka avataan tuotannossa 20.12.2017.</p>
+                </div>
             </div>
 
             {% if not h.organizations_available() %}
