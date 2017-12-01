@@ -163,6 +163,8 @@
  varaus- ja myyntirajapinnan ja muut olennaisia tietoa sisältävät rajapinnat.
  Jos ulkoiset rajapinnat ovat vajanaisia tai rajapintoja ei ole, täytä vastaavasti tämän osion alla olevat kohdat,
  jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
+  :external-interfaces-eg-rae "Huom: Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
+  :RAE-tool "Rae-työkalu"
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita uppassningenstuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset uppassningens liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
