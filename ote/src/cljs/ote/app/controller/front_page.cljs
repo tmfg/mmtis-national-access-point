@@ -11,6 +11,7 @@
 (defrecord OpenHeader [])
 (defrecord ToggleDebugState [])
 (defrecord Logout [])
+(defrecord SetLanguage [lang])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -112,4 +113,9 @@
       (assoc app
         :transport-operators-with-services response
         :transport-operator  (get (first response) :transport-operator)
-        :transport-service-vector (get (first response) :transport-service-vector))))))
+        :transport-service-vector (get (first response) :transport-service-vector)))))
+
+  SetLanguage
+  (process-event [{lang :lang} app]
+    (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
+    (.reload js/window.location)))

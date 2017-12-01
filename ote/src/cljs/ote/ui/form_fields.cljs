@@ -95,7 +95,7 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? full-width?]
+                                  focus on-focus form? error warning table? full-width? style input-style]
                            :as   field} data]
   [text-field
    (merge
@@ -113,7 +113,11 @@
                           style-base/error-element
                           style-base/required-element)}
     (when full-width?
-      {:full-width true}))])
+      {:full-width true})
+    (when style
+      {:style style})
+    (when input-style
+      {:input-style input-style}))])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
@@ -272,8 +276,8 @@
   ;;
   ;; The value updated to the app model is always a parsed number.
   (let [txt (r/atom (if data (.toFixed data 2) ""))]
-    (fn [{:keys [update!] :as opts} data]
-      [field (assoc opts
+    (fn [{:keys [update! currency?] :as opts} data]
+      [:span [field (assoc opts
                     :type :string
                     :parse js/parseFloat
                     :regex number-regex
@@ -285,7 +289,7 @@
                                      (-> %
                                          (str/replace #"," ".")
                                          (js/parseFloat %))))))
-       @txt])))
+       @txt] (when currency? "€")])))
 
 (def time-regex #"\d{0,2}(:\d{0,2})?")
 

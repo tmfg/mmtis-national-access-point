@@ -2,138 +2,137 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                     "Palveluntuottajan nimi"
-  :ote.db.transport-operator/business-id              "Y-tunnus"
-  :ote.db.transport-operator/phone                    "Puhelin (toimisto)"
-  :ote.db.transport-operator/gsm                      "Puhelin (GSM)"
-  :ote.db.transport-operator/email                    "Sähköpostiosoite"
-  :ote.db.transport-operator/homepage                 "WWW-osoite"
-  :ote.db.transport-operator/visiting-address         "Käyntiosoite"
-  :ote.db.transport-operator/billing-address          "Laskutusosoite"
+  :ote.db.transport-operator/name                     "Transport operator name"
+  :ote.db.transport-operator/business-id              "Business ID"
+  :ote.db.transport-operator/phone                    "Phone (office)"
+  :ote.db.transport-operator/gsm                      "Phone (GSM)"
+  :ote.db.transport-operator/email                    "Email address"
+  :ote.db.transport-operator/homepage                 "WWW-address"
+  :ote.db.transport-operator/visiting-address         "Visiting address"
+  :ote.db.transport-operator/billing-address          "Billing address"
 
   :ote.db.transport-operator/facebook "Facebook"
   :ote.db.transport-operator/twitter "Twitter"
-  :ote.db.transport-operator/instant-message "Pikaviestin"
+  :ote.db.transport-operator/instant-message "Instant message"
 
   ;; Transport service fields
-  :transport-service-type-subtype "Valitse liikkumispalvelun tyyppi"
-  :select-transport-operator      "Valitse palveluntuottaja"
+  :transport-service-type-subtype "Select transport service type"
+  :select-transport-operator      "Select transport operator"
 
   :transport-service-common
-  {:ote.db.transport-service/name "Palvelun nimi"
-   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
-   :ote.db.transport-service/accessibility-description "Kuvaus palvelun esteettömyydestä"
+  {:ote.db.transport-service/name "Service name"
+   :ote.db.transport-service/accessibility-tool        "Accessibility tools"
+   :ote.db.transport-service/accessibility-description "Accessibility description"
 
-   :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)
-"
+   :ote.db.transport-service/guaranteed-vehicle-accessibility "Vehicle accessibility (guaranteed availability)"
+   :ote.db.transport-service/limited-vehicle-accessibility "Vehicle accessibility (limited availability)"
 
-   :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
-   :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+   :ote.db.transport-service/guaranteed-info-service-accessibility "Info service accessibility (guaranteed availability)"
+   :ote.db.transport-service/limited-info-service-accessibility "Info service accessibility (limited availability)"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "Aina saatavilla olevat esteettömyysvälineet"
-   :ote.db.transport-service/guaranteed-accessibility-description "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
-   :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavilla olevat esteettömyysvälineet"
-   :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
+   :ote.db.transport-service/guaranteed-accessibility-tool        "Always available accessibilityvälineet"
+   :ote.db.transport-service/guaranteed-accessibility-description "Always available accessibility description"
+   :ote.db.transport-service/limited-accessibility-tool        "Limited availability accessibility"
+   :ote.db.transport-service/limited-accessibility-description "Limited availability accessibility description"
 
-   :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
-   :ote.db.transport-service/limited-transportable-aid "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
+   :ote.db.transport-service/guaranteed-transportable-aid "Transportable aid (guaranteed availability)"
+   :ote.db.transport-service/limited-transportable-aid "Transportable aid (limited availability)"
 
-   :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
+   :ote.db.transport-service/accessibility-info-url "Accessibility description (WWW)"
 
    ;; Contact details
-   :ote.db.transport-service/contact-address          "Osoitetiedot"
-   :ote.db.transport-service/contact-phone             "Puhelin"
-   :ote.db.transport-service/contact-email             "Sähköposti"
-   :ote.db.transport-service/homepage                  "Kotisivu"
+   :ote.db.transport-service/contact-address          "Address"
+   :ote.db.transport-service/contact-phone             "Phone"
+   :ote.db.transport-service/contact-email             "Email"
+   :ote.db.transport-service/homepage                  "Homepage"
 
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
-   :ote.db.transport-service/location                  "Sijainti"
+   :ote.db.transport-service/operation-area            "Operation area"
+   :ote.db.transport-service/location                  "Location"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
-   :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan kuvaus"
-   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
-   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
-   :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
-   :ote.db.transport-service/company-name "Yrityksen nimi"
-   :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
-   :ote.db.transport-service/license "Lisenssi / käyttöehdot"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus"
+   :ote.db.transport-service/external-interfaces "External interfaces"
+   :ote.db.transport-service/external-service-description "External interface description"
+   :ote.db.transport-service/external-service-url "Interface URL address"
+   :ote.db.transport-service/booking-service "Booking service address"
+   :ote.db.transport-service/rental-service "Rental service address"
+   :ote.db.transport-service/format "External interface format (eg. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format-short "Format"
+   :ote.db.transport-service/companies "Companies that produce the service"
+   :ote.db.transport-service/company-name "Company name"
+   :ote.db.transport-service/business-id "Company business ID"
+   :ote.db.transport-service/license "License / terms of use"
+   :ote.db.transport-service/license-url "License or terms of use description"
    }
 
   ;; Service exception
   :service-exception
-  {:description "Poikkeuksen kuvaus"
-   :from-date "Alkupvm"
-   :to-date "Loppupvm"}
+  {:description "Exception description"
+   :from-date "From date"
+   :to-date "To date"}
 
   ;; Passenger transportation fields
   :passenger-transportation
-  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/price-class               "Hinnoittelu"
-   :ote.db.transport-service/service-hours             "Palveluajat"
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
+  {:ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
+   :ote.db.transport-service/real-time-information     "Realtime information web-address"
+   :ote.db.transport-service/booking-service           "Booking service web-address"
+   :ote.db.transport-service/payment-methods           "Select payment methods"
+   :ote.db.transport-service/price-class               "Pricing"
+   :ote.db.transport-service/service-hours             "Service hours"
+   :ote.db.transport-service/operation-area            "Operation area"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name-taxi     "Tuote"
-   :ote.db.transport-service/price-class-name-other    "Hintaryhmä"
-   :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
-   :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
-   :ote.db.transport-service/unit                      "Yksikkö"
-   :ote.db.transport-service/currency                  "Valuutta"
+   :ote.db.transport-service/price-class-name-taxi     "Product"
+   :ote.db.transport-service/price-class-name-other    "Price class"
+   :ote.db.transport-service/price-class-name-request  "Price class"
+   :ote.db.transport-service/price-class-name-schedule "Price class"
+   :ote.db.transport-service/price-per-unit            "Price per unit"
+   :ote.db.transport-service/unit                      "Unit"
+   :ote.db.transport-service/currency                  "Currency"
 
-   :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
-   :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/pricing-description "Pricing description"
+   :ote.db.transport-service/pricing-url "Pricing web-address"
 
 
    }
 
   ;; Terminal fields
   :terminal
-  {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
-   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
-   :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
-   :ote.db.transport-service/accessibility     "Saavutettavuus"
-   :ote.db.transport-service/mobility          "Esteettömyys"
+  {:ote.db.transport-service/indoor-map "Indoor map"
+   :ote.db.transport-service/url                       "Service web-address"
+   :ote.db.transport-service/description               "Service description"
+   :ote.db.transport-service/information-service-accessibility "Information service accessibility"
+   :ote.db.transport-service/accessibility     "Accessibility"
+   :ote.db.transport-service/mobility          "Accessibility"
 
 
    ;; assistance_notification_requirement fields
-   :ote.db.transport-service/hours-before           "Palvelu on varattava (tuntia) ennen"
-   :ote.db.transport-service/telephone              "Varaa palvelu numerosta"
-   :ote.db.transport-service/email                  "Varaa palvelu sähköpostilla (email)"
-   :ote.db.transport-service/assistance-url         "Tee varaus osoitteesta (www)"
-   :ote.db.transport-service/assistance-description "Avustupalveluja koskeva kuvaus"
+   :ote.db.transport-service/hours-before           "Service requires notification hours before"
+   :ote.db.transport-service/telephone              "Notification telephonenumber"
+   :ote.db.transport-service/email                  "Notification email"
+   :ote.db.transport-service/assistance-url         "Notificaiton web-page"
+   :ote.db.transport-service/assistance-description "Assistance service description"
 
 
    }
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/eligibility-requirements  "Kelpoisuusvaatimukset"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/pick-up-name              "Nimi"
-   :ote.db.transport-service/pick-up-type              "Tyyppi"
+  {:ote.db.transport-service/eligibility-requirements  "Eligibility requirements"
+   :ote.db.transport-service/booking-service           "Booking service address"
+   :ote.db.transport-service/pick-up-name              "Name"
+   :ote.db.transport-service/pick-up-type              "Type"
    }
 
   ;; Parking fields
   :parking
-  {:parking-areas  "Parkkipaikkojen sijainnit"
+  {:parking-areas  "Parking area locations"
    }
 
 
   :transport-service
-  {:ote.db.transport-service/name                "Palvelun nimi"
+  {:ote.db.transport-service/name                "Palvelun name"
    :ote.db.transport-service/additional-services "Muut palvelut"
-   :ote.db.transport-service/url                 "Palvelun verkko-osoite"
+   :ote.db.transport-service/url                 "Palvelun verkko-address"
    :ote.db.transport-service/description         "Palvelun kuvaus"
    :ote.db.transport-service/type                "Liikkumispalvelun tyyppi"
    :ote.db.transport-service/sub-type            "Liikkumispavelun alatyyppi"
@@ -151,24 +150,19 @@
    }
 
   ;; Common fields
-  :ote.db.common/street                               "Osoite"
+  :ote.db.common/street                               "Address"
   :ote.db.common/post_office                          "Postitoimipaikka"
-  :ote.db.common/postal_code                          "Postinumero"
+  :ote.db.common/postal_code                          "Postinumber"
    }
 
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Tässä kohdassa lisäät ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut,
- varaus- ja myyntirajapinnan ja muut olennaisia tietoa sisältävät rajapinnat.
- Jos ulkoiset rajapinnat ovat vajanaisia tai rajapintoja ei ole, täytä vastaavasti tämän osion alla olevat kohdat,
- jotta palvelusi kaikki olennaiset tiedot on tallennettu koneluettavassa muodossa."
-  :external-interfaces-eg-rae "Huom: Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
-  :RAE-tool "Rae-työkalu"
+ {:external-interfaces "Tässä kohdassa voit lisätä itse ylläpitämäsi koneluettavat rajapinnat. Jos sinulla ei ole rajapintoja, jätä tämä tyhjäksi ja täytä kaikki tämän osion alla olevat kohdat."
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
 
-  :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
-  :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden esteettömyysominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
+  :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden accessibilityominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
+  :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden accessibilityominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
 
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
@@ -193,7 +187,7 @@
   :add-new-company "Lisää palvelun tuottava yritys"
   :discard "Peruuta"
 
-  :add-transport-service   "Lisää palvelustiedot"
+  :add-transport-service   "Lisää liikkumispalvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-add-new-row         "Lisää uusi rivi"
   :add-new-pick-up-location "Lisää toimipiste"}
@@ -301,9 +295,9 @@
   }
 
  ;; Per feature/page localization keys
- :place-search {:name                "Paikan nimi"
+ :place-search {:name                "Paikan name"
                 :place-auto-complete "Hae paikka nimellä"
-                :rename-place "Anna uusi nimi (Enter hyväksyy)"}
+                :rename-place "Anna uusi name (Enter hyväksyy)"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
           :passenger-transportation "Henkilöiden kuljetuspalvelut"
@@ -323,8 +317,8 @@
 
 
  :front-page
- {:table-header-service-name      "Palvelun nimi"
-  :table-header-service-url       "Palvelun verkko-osoite"
+ {:table-header-service-name      "Palvelun name"
+  :table-header-service-url       "Palvelun verkko-address"
   :table-header-NAP-status        "NAP tila"
   :table-header-modified          "Muokattu"
   :table-header-created           "Luotu"
@@ -353,7 +347,7 @@
     tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
    :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
-   :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."
+  :operator-dont-have-any-services "Operator don't have any services yet."
   }
 
  :organization-page
@@ -366,7 +360,7 @@
   :header-service-info                     "Palvelun perustiedot"
   :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Palvelun yhteystiedot"
-  :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
+  :header-other-services-and-accessibility "Accessibility ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
   :header-pick-up-locations "Toimipisteet"
@@ -376,7 +370,7 @@
  {:header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-eligibity-requirements           "Kelpoisuusvaatimukset"
-  :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
+  :header-other-services-and-accessibility "Muut palvelut ja accessibility"
   :open-service-hours-and-exceptions       "Palveluajat"
   }
 
@@ -385,7 +379,7 @@
   :header-contact-details             "Palvelun yhteystiedot"
   :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
   :header-assistance                  "Avustuspalvelun tilauksen tiedot"
-  :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
+  :header-accessibility               "Palvelun saavutettavuus ja accessibility"
   }
 
  :opening-hours-dialog
@@ -407,8 +401,8 @@
   :link-add-new-api                           "Lisää uusi palvelu"
   :own-api-list                               "Omat palvelutiedot"
   :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
-  :api-name                                   "Rajapinnan nimi"
-  :api-url                                    "Rajapinnan verkko-osoite"
+  :api-name                                   "Rajapinnan name"
+  :api-url                                    "Rajapinnan verkko-address"
   :finap-status                               "NAP tila"
   :header-nap-official-name                   "Palvelukatalogi"
   :navigation-own-service-list                "Omat palvelutiedot"
@@ -423,7 +417,7 @@
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
-  :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
+  :invalid-postal-code                        "Tarkista postinumber (5 numbera)"
   :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
   :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo                           "Liikennevirasto Logo"
@@ -443,17 +437,17 @@
  ;; and we must show those as is.
  :viewer {"transport-operator" "Palveluntuottaja"
           "transport-service" "Liikkumispalvelun tiedot"
-          "contact-address" "Osoite"
-          "contact-email" "Sähköpostiosoite"
+          "contact-address" "Address"
+          "contact-email" "Emailaddress"
           "homepage" "Kotisivu"
           "post_office" "Postitoimipaikka"
-          "postal_code" "Postinumero"
-          "street" "Katuosoite"
-          "contact-phone" "Puhelinnumero"
-          "id" "Tunnistenumero"
-          "name" "Nimi"
+          "postal_code" "Postinumber"
+          "street" "Katuaddress"
+          "contact-phone" "Phonenumber"
+          "id" "Tunnistenumber"
+          "name" "Name"
           "published?" "Julkaistu?"
-          "transport-operator-id" "Palveluntuottajan tunnistenumero"
+          "transport-operator-id" "Palveluntuottajan tunnistenumber"
           "type" "Palvelun tyyppi"
 
           "passenger-transportation" "Henkilöiden kuljetuspalvelun tiedot"
@@ -474,7 +468,7 @@
           "booking-service" "Varauspalvelu"
           "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
 
-          "url" "WWW-osoite"
+          "url" "WWW-address"
 
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
