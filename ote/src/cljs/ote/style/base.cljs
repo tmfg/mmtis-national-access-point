@@ -79,3 +79,13 @@
                   :padding "0.2em"
                   :margin "0.2em"
                   :align-items "center"}))
+
+(def language-selection
+  {:border-top "solid 1px white"
+   :margin-top "5px"
+   :padding-top "5px"
+   :text-align "center"})
+
+(def language-flag
+  {:padding-left "10px"
+   :padding-right "10px"})

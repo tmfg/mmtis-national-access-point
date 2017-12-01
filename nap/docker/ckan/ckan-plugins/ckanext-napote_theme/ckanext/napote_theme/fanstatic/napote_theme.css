@@ -852,3 +852,18 @@ Organization data
 div.napote-organization-form div.slug-preview {
     display: none;
 }
+
+.finap-lang  {
+    text-align: center;
+    border-top: solid 1px white;
+    padding-top: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.finap-lang > a {
+    display: inline-block !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
