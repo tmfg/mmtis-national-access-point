@@ -98,3 +98,57 @@
 #?(:clj
    (defmethod specql-composite/stringify-value "time" [_ time]
      (format-time time)))
+
+;; Define a record that models a Postgres interval type on the frontend
+;; Units less than second are expressed as fractional seconds (as in postgres)
+
+(defrecord Interval [years months days hours minutes seconds])
+
+(defn interval
+  "Returns an interval of the given amount and unit.
+  Example:
+  `(interval 2 :hours)` returns an Interval record with
+  hours set to 2 and all other fields set to zero."
+  [amount unit]
+  (map->Interval (merge {:years 0
+                         :months 0
+                         :days 0
+                         :hours 0
+                         :minutes 0
+                         :seconds 0.0}
+                        {unit amount})))
+
+#?(:clj
+   (defn ->PGInterval [interval]
+     (if (instance? org.postgresql.util.PGInterval interval)
+       interval
+       (let [{:keys [years months days hours minutes seconds]} interval]
+         (org.postgresql.util.PGInterval.
+          (int years) (int months) (int days) (int hours)
+          (int minutes) (double seconds))))))
+
+#?(:clj
+   (defn pginterval->interval [^org.postgresql.util.PGInterval pg-interval]
+     (map->Interval {:years (.getYears pg-interval)
+                     :months (.getMonths pg-interval)
+                     :days (.getDays pg-interval)
+                     :hours (.getHours pg-interval)
+                     :minutes (.getMinutes pg-interval)
+                     :seconds (.getSeconds pg-interval)})))
+
+(s/def :specql.data-types/interval
+   (partial instance? #?(:clj org.postgresql.util.PGInterval
+                         :cljs Interval)))
+
+;; Hook into specql to allow us to read/write the interval
+;; We do not support interval fields other than hours, minutes and seconds.
+#?(:clj
+   (defmethod specql-composite/parse-value "interval" [_ string]
+     (let [[match h m s] (re-matches #"(\d+):(\d+):(\d+)" string)]
+       (or (cond
+             (nil? match) nil
+             (not= h "00") (->PGInterval (interval (Integer/parseInt h) :hours))
+             (not= m "00") (->PGInterval (interval (Integer/parseInt m) :minutes))
+             (not= s "00") (->PGInterval (interval (Double/parseDouble s) :seconds))
+             :default (->PGInterval (interval 0.0 :seconds)))
+           (throw (ex-info "Unsupported interval keyword" {:interval string}))))))
