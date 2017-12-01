@@ -3,7 +3,7 @@
              [ote.localization :as localization]
              [clojure.set :as set]))
 
-(def languages ["fi" "se"])
+(def languages ["fi" "sv" "en"])
 
 (defn- deep-key-paths [prefix-path m]
   (reduce-kv (fn [key-paths key val]
