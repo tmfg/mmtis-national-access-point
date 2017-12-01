@@ -21,10 +21,6 @@
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]))
 
-(defn select-operator-form-options [e!]
-  {:name->label (tr-key [:field-labels])
-   :update!     #(e! (to/->SelectOperator %))})
-
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
                                   :as service}]
@@ -99,7 +95,7 @@
 
 
 
-(defn table-container-for-front-page [e! services state]
+(defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
    [:div.row
     [:div {:class "col-xs-12 col-sm-4 col-md-4"}
@@ -122,36 +118,49 @@
      ]
     [:div {:class "col-xs-12 col-sm-4 col-md-4"}
      [ui/raised-button {:style {:margin-top "20px"}
-                        :label    (tr [:buttons :add-transport-service])
+                          :label    (tr [:buttons :add-transport-service])
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))
                         :primary  true}]]]
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}
-     ;; Table for transport services
 
-     (for [type t-service/transport-service-types
-           :let [services (filter #(= (:ote.db.transport-service/type %) type) services)]
+     (if (and has-services? (not (empty? operator-services)))
+      ;; TRUE -> Table for transport services
+      (for [type t-service/transport-service-types
+           :let [services (filter #(= (:ote.db.transport-service/type %) type) operator-services)]
            :when (not (empty? services))]
        ^{:key type}
        [transport-services-listing
         e!
         (get-in state [:transport-operator ::t-operator/id])
         services
-        (tr [:titles type])])]]])
+        (tr [:titles type])])
+
+      ;; FALSE -> explain user why table is empty
+      [:div
+       [:br]
+       [:p (tr [:front-page :operator-dont-have-any-services])]
+       ])
+     ]]])
 
 (defn own-services [e! state]
   (e! (fp/->EnsureTransportOperator))
   (fn [e! state]
   ;; Get services by default from first organization
-  (let [my-services (if (empty? (:transport-service-vector state))
+  (let [has-services? (not (empty? (map #(get-in % [:transport-service-vector ::t-service/id]) state)))
+        operator-services (some #(when (= (get-in state [:transport-operator ::t-operator/id]) (get-in % [:transport-operator ::t-operator/id]))
+                             %)
+                          (:transport-operators-with-services state))
+        operator-services (if (empty? operator-services)
                       (:transport-service-vector (first (:transport-operators-with-services state)))
                       (:transport-service-vector state))]
     [:div
-     (if (empty? my-services)
+     (if has-services?
+       (table-container-for-front-page e! has-services? operator-services state)
        [transport-service/select-service-type e! state] ;; Render service type selection page if no services added
-       (table-container-for-front-page e! my-services state))])))
+       )])))
 
 (defn no-operator [e! state]
   "If user haven't added service-operator, we will ask to do so."
