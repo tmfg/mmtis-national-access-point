@@ -163,6 +163,7 @@
 
     {:name    ::t-service/charging-points
      :columns 3
+     :rows 5
      :type   :localized-text}))
 
 (defn parking [e! {form-data ::t-service/parking}]
