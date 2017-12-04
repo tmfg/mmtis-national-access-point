@@ -19,7 +19,8 @@
             [ote.views.brokerage :as brokerage]
             [ote.views.parking :as parking]
             [ote.views.rental :as rental]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.common :as ui-common]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -94,9 +95,11 @@
   (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
     (if (or (nil? service) (not loaded?))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-      (case (::t-service/type service)
-        :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
-        :terminal [terminal/terminal e! (:transport-service app)]
-        :rentals [rental/rental e! (:transport-service app)]
-        :parking [parking/parking e! (:transport-service app)]
-        :brokerage [brokerage/brokerage e! (:transport-service app)]))))
+      [:span
+       [ui-common/scroll-into-view]
+       (case (::t-service/type service)
+         :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+         :terminal [terminal/terminal e! (:transport-service app)]
+         :rentals [rental/rental e! (:transport-service app)]
+         :parking [parking/parking e! (:transport-service app)]
+         :brokerage [brokerage/brokerage e! (:transport-service app)])])))
