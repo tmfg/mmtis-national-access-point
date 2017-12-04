@@ -19,15 +19,12 @@
    [:div (stylefy/use-style style-form/help-icon-element) [ic/action-info-outline]]
    [:div (stylefy/use-style style-form/help-text-element) help]])
 
-(defn scroll-into-view
-  "Element that scrolls itself into view after being shown. Why? Because IE."
+(defn scroll-to-top
+  "Element that scrolls the page to top after being shown. Why? Because IE."
   []
   (r/create-class
    {:component-did-mount
-    (fn [this]
-      (let [el (aget this "refs" "scroll-me")]
-        (.scrollIntoView el)))
+    #(.scrollTo js/window 0 0)
     :reagent-render
     (fn []
-      [:div {:style {:display "inline-block"}
-             :ref "scroll-me"}])}))
+      [:div {:style {:display "inline-block"}}])}))

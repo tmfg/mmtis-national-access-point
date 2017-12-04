@@ -90,7 +90,7 @@
 
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
-   [ui-common/scroll-into-view]
+   [ui-common/scroll-to-top]
    (case type
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
      :terminal [terminal/terminal e! (:transport-service app)]
