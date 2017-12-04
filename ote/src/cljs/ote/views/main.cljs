@@ -15,7 +15,6 @@
             [ote.views.brokerage :as brokerage]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
-            [ote.ui.debug :as debug]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
@@ -33,14 +32,6 @@
 (defn- is-user-menu-active [app]
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
     "active"))
-
-
-
-(defn- flash-message [msg]
-  [ui/snackbar {:open (boolean msg)
-                :message (or msg "")
-                :style style-base/flash-message
-                :auto-hide-duration 5000}])
 
 (defn header-links [app]
   (filter some?
@@ -98,9 +89,6 @@
                    :on-click #(do
                                 (.preventDefault %)
                                 (e! (fp-controller/->ChangePage :transport-operator)))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text " Näytä debug state"
-                   :on-click #(e! (fp-controller/->ToggleDebugState))} ]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-log-out])
                    :on-click #(do (.preventDefault %)
@@ -202,25 +190,7 @@
        [:li
         [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]]]])
 
-(defonce debug-state-toggle-listener (atom false))
 
-(defn- debug-state [e! app]
-  (when-not @debug-state-toggle-listener
-    (reset! debug-state-toggle-listener true)
-    (.addEventListener
-     js/window "keypress"
-     (fn [e]
-       (when (and (.-ctrlKey e)
-                  (= "d" (.-key e)))
-         (e! (fp-controller/->ToggleDebugState))))))
-  (r/create-class
-   ;; NOTE: debug state is VERY slow if app state is HUGE
-   ;; (it tries to pr-str it)
-   {:reagent-render
-    (fn [_ app]
-      (when (= true (get-in app [:ote-service-flags :show-debug]))
-        [:div.row
-         [debug/debug app]]))}))
 
 (defn ote-application
   "OTE application main view"
@@ -234,9 +204,9 @@
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
     [:div {:style (stylefy/use-style style-base/body)}
-     [theme
+     [theme app
       [:div.ote-sovellus
-       (top-nav e! app)
+       [top-nav e! app]
 
 
        [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
@@ -255,6 +225,4 @@
           :services [service-search/service-search e! (:service-search app)]
           [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]
 
-     (when-let [msg (:flash-message app)] [flash-message msg])
-     [debug-state e! app]
-     [footer]]]])))
+       [footer]]]])))
