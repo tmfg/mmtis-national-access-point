@@ -124,3 +124,6 @@
 (def vehicle-accessibility
   [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs
    :boarding-assistance :assistance-dog-space])
+
+(def parking-vehicle-accessibility
+  [:low-floor :boarding-assistance])
