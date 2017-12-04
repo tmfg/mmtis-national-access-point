@@ -69,8 +69,7 @@
 (def item-list-item
   (merge inline-block
          {:position "relative"
-          :margin-left "0.2em"
-          :top "-0.5em"}))
+          :margin-left "0.2em"}))
 
 (def help (merge (flex-container "row")
                  {:border-radius "0.5em"
@@ -78,4 +77,15 @@
                   :color "#434343"
                   :background-color "#DAEDF7"
                   :padding "0.2em"
-                  :margin "0.2em"}))
+                  :margin "0.2em"
+                  :align-items "center"}))
+
+(def language-selection
+  {:border-top "solid 1px white"
+   :margin-top "5px"
+   :padding-top "5px"
+   :text-align "center"})
+
+(def language-flag
+  {:padding-left "10px"
+   :padding-right "10px"})

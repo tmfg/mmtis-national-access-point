@@ -40,6 +40,7 @@
   ["service_link" ::service_link]
   ["service_hours" ::service_hours]
   ["service_exception" ::service_exception]
+  ["parking_capacity" ::parking_capacity]
   ["price_class" ::price_class]
   ["assistance_notification_requirement" ::assistance-notification-requirement]
   ["assistance_info" ::assistance-info]
@@ -47,7 +48,6 @@
   ["passenger_transportation_info" ::passenger_transportation_info]
   ["pick_up_location" ::pick_up_location]
   ["rental_provider_information" ::rental_provider_informaton]
-  ["parking_area" ::parking_area]
   ["parking_provider_information" ::parking_provider_information]
   ["brokerage_service" ::brokerage_service]
   ["brokerage_provider_informaton" ::brokerage_provider_informaton]
@@ -69,13 +69,16 @@
    ote.db.modification/modification-fields])
 
 ;; Create order for transport_type
-(def transport-service-types [:terminal :passenger-transportation :rentals :parking :brokerage])
+(def transport-service-types [:terminal :passenger-transportation :rentals :parking])
 
 ;; Create order for transport_type
 (def passenger-transportation-sub-types [:taxi :request :other :schedule])
 
 ;; Create order for payment_method
 (def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])
+
+(def parking-facilities [:unknown :car-park :park-and-ride-park :motorcycle-park :cycle-park :rental-car-park
+                         :coach-park :disabled-park])
 
 ;; Create order for additional_services
 (def additional-services [:child-seat :animal-transport :other])

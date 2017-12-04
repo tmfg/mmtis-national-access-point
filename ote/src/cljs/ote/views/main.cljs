@@ -15,7 +15,6 @@
             [ote.views.brokerage :as brokerage]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
-            [ote.ui.debug :as debug]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
@@ -34,47 +33,6 @@
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
     "active"))
 
- (defn user-menu [e! name username]
-   [ui/drop-down-menu
-    {:label-style {:color "#FFFFFF"}
-     :list-style {:background-color "#2D75B4"}
-     :on-click #(e! (fp-controller/->OpenUserMenu))
-     :anchor-origin {:horizontal "right" :vertical "bottom"}
-     :target-origin {:horizontal "right" :vertical "top"}
-     }
-
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-profile])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-service-guide])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->ChangePage :front-page)))} ]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-service-operator])
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (fp-controller/->ChangePage :transport-operator)))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text " Näytä debug state"
-                   :on-click #(e! (fp-controller/->ToggleDebugState))} ]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-log-out])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
-   [ui/menu-item {:primary-text name ;; This is here so the user name is appearing in the header
-                  :style {:color "#FFFFFF"}
-                  :on-click #(do (.preventDefault %)
-                                 (e! (fp-controller/->GoToUrl (str "/user/edit/" username)))) }]
-                  ])
-
-(defn- flash-message [msg]
-  [ui/snackbar {:open (boolean msg)
-                :message (or msg "")
-                :style style-base/flash-message
-                :auto-hide-duration 5000}])
-
 (defn header-links [app]
   (filter some?
           [{:page  :front-page
@@ -91,6 +49,53 @@
            (when (logged-in? app)
              {:page  :own-services
               :label [:common-texts :navigation-own-service-list]})]))
+
+(def selectable-languages [["fi" "\ud83c\uddeb\ud83c\uddee"]
+                           ["sv" "\ud83c\uddf8\ud83c\uddea"]
+                           ["en" "\ud83c\uddec\ud83c\udde7"]])
+
+(defn- language-selection [e!]
+  (let [current-language @localization/selected-language]
+    [:div (stylefy/use-style style-base/language-selection)
+
+     (doall
+      (for [[lang flag] selectable-languages]
+        [:a (merge
+             (stylefy/use-style style-base/language-flag)
+             {:key lang
+              :on-click #(e! (fp-controller/->SetLanguage lang))
+              :style {:color "#FFFFFF"}})
+         flag]))]))
+
+(defn user-menu [e! name username]
+   [ui/drop-down-menu
+    {:label-style {:color "#FFFFFF"}
+     :list-style {:background-color "#2D75B4"}
+     :on-click #(e! (fp-controller/->OpenUserMenu))
+     :anchor-origin {:horizontal "right" :vertical "bottom"}
+     :target-origin {:horizontal "right" :vertical "top"}
+     :selection-renderer (constantly name)}
+
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-profile])
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-service-guide])
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->ChangePage :front-page)))} ]
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-service-operator])
+                   :on-click #(do
+                                (.preventDefault %)
+                                (e! (fp-controller/->ChangePage :transport-operator)))}]
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (tr [:common-texts :user-menu-log-out])
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
+
+    [ui/menu-item {:style {:color "#FFFFFF"}
+                   :primary-text (r/as-element [language-selection e!])}]])
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
   [:div (stylefy/use-style style-topnav/clear)
@@ -126,7 +131,10 @@
     [:div.user-menu {:class (is-user-menu-active app)
                      :style (when (> (:width app) style-base/mobile-width-px)
                               {:float "right"})}
-     (r/as-element (user-menu e! (get-in app [:user :name]) (get-in app [:user :username])))]
+     [user-menu e!
+      (get-in app [:user :name])
+      (get-in app [:user :username])]]
+
     [:ul (stylefy/use-style style-topnav/ul)
      [:li
       [:a (merge (stylefy/use-style
@@ -182,27 +190,7 @@
        [:li
         [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]]]])
 
-(defonce debug-state-toggle-listener (atom false))
 
-(defn- debug-state [e! app]
-  (when-not @debug-state-toggle-listener
-    (reset! debug-state-toggle-listener true)
-    (.addEventListener
-     js/window "keypress"
-     (fn [e]
-       (.log js/console e)
-       (when (and (.-ctrlKey e)
-                  (= "d" (.-key e)))
-         (.log js/console "jep")
-         (e! (fp-controller/->ToggleDebugState))))))
-  (r/create-class
-   ;; NOTE: debug state is VERY slow if app state is HUGE
-   ;; (it tries to pr-str it)
-   {:reagent-render
-    (fn [_ app]
-      (when (= true (get-in app [:ote-service-flags :show-debug]))
-        [:div.row
-         [debug/debug app]]))}))
 
 (defn ote-application
   "OTE application main view"
@@ -216,9 +204,9 @@
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
     [:div {:style (stylefy/use-style style-base/body)}
-     [theme
+     [theme app
       [:div.ote-sovellus
-       (top-nav e! app)
+       [top-nav e! app]
 
 
        [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
@@ -237,6 +225,4 @@
           :services [service-search/service-search e! (:service-search app)]
           [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]
 
-     (when-let [msg (:flash-message app)] [flash-message msg])
-     [debug-state e! app]
-     [footer]]]])))
+       [footer]]]])))

@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [clojure.string :as str]
-            [ote.localization :refer [tr]]
+            [ote.localization :refer [tr tr-key]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
@@ -95,11 +95,12 @@
       (and placeholder-fn (placeholder-fn row))))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? full-width?]
+                                  focus on-focus form? error warning table? full-width? style input-style]
                            :as   field} data]
   [text-field
    (merge
-    {:floatingLabelText (when-not table?  label)
+    {:floating-label-text (when-not table?  label)
+     :floating-label-fixed true
      :hintText          (placeholder field data)
      :on-change         #(let [v %2]
                            (if regex
@@ -112,12 +113,17 @@
                           style-base/error-element
                           style-base/required-element)}
     (when full-width?
-      {:full-width true}))])
+      {:full-width true})
+    (when style
+      {:style style})
+    (when input-style
+      {:input-style input-style}))])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
   [text-field
-   {:floatingLabelText label
+   {:floating-label-text label
+    :floating-label-fixed true
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
     :value             (or data "")
@@ -140,7 +146,8 @@
         [:td
          [text-field
           (merge
-           {:floatingLabelText (when-not table? label)
+           {:floating-label-text (when-not table? label)
+            :floating-label-fixed true
             :hintText          (placeholder field data)
             :on-change         #(let [updated-language-data
                                       {:ote.db.transport-service/lang language
@@ -180,6 +187,7 @@
     [ui/select-field {:auto-width (boolean auto-width?)
                       :style style
                       :floating-label-text label
+                      :floating-label-fixed true
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))
                       :error-text        (or error warning "") ;; Show error text or warning text or empty string
@@ -207,6 +215,7 @@
      (merge
       {:style style
        :floating-label-text label
+       :floating-label-fixed true
        :multiple true
        :value (clj->js (map option-idx selected-set))
        :selection-renderer (fn [values]
@@ -245,6 +254,12 @@
                         :on-check #(update! ((if checked? disj conj) selected option))}]))
       options)]))
 
+(defmethod field :checkbox [{:keys [update! label]} data]
+  (let [checked? (boolean data)]
+    [ui/checkbox {:label label
+                  :checked checked?
+                  :on-check #(update! (not checked?))}]))
+
 
 (def phone-regex #"\+?\d+")
 
@@ -261,8 +276,8 @@
   ;;
   ;; The value updated to the app model is always a parsed number.
   (let [txt (r/atom (if data (.toFixed data 2) ""))]
-    (fn [{:keys [update!] :as opts} data]
-      [field (assoc opts
+    (fn [{:keys [update! currency?] :as opts} data]
+      [:span [field (assoc opts
                     :type :string
                     :parse js/parseFloat
                     :regex number-regex
@@ -274,7 +289,7 @@
                                      (-> %
                                          (str/replace #"," ".")
                                          (js/parseFloat %))))))
-       @txt])))
+       @txt] (when currency? "€")])))
 
 (def time-regex #"\d{0,2}(:\d{0,2})?")
 
@@ -290,6 +305,25 @@
                                              ::incomplete string)))
                   :type :string
                   :regex time-regex) data]))
+
+(defmethod field :interval [{:keys [update!] :as opts} data]
+  (let [[unit amount] (or (some (fn [[unit amount]]
+                                  (when (not (zero? amount)) [unit amount])) data) [:hours 0])]
+    [:div
+     [field (assoc opts
+              :update! (fn [num]
+                         (update! (time/interval (or num 0) unit)))
+              :type :number) (unit data)]
+     [field (assoc opts
+              :update! (fn [unit]
+                         (update! (time/interval amount unit)))
+              :label (tr [:common-texts :time-unit])
+              :name :maximum-stay-unit
+              :type :selection
+              :show-option (tr-key [:common-texts :time-units])
+              ;; TODO: Days not supported yet in ote.time
+              :options [:minutes :hours])
+      unit]]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
   (let [time-picker-time (if (= nil? data) default-time data)]

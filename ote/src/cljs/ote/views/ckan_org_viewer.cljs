@@ -58,7 +58,7 @@
   (e! (org-viewer/->StartViewer))
   (fn [e! {:keys [transport-operator] :as app}]
     (if (not-empty transport-operator)
-      [theme
+      [theme status
        [:div.container
         [basic-info transport-operator]
         [contact-info transport-operator]]]

@@ -13,6 +13,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.format :as fmt]))
 
+;; max length 16 chars (optional plus followed by digits)
+(def phone-number-regex #"^((\+?\d{0,15})|(\d{0,16}))$")
 
 (defn empty-value? [arvo]
   (or (nil? arvo)

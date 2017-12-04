@@ -12,7 +12,7 @@
             [ote.time :as time]))
 
 (defn service-url
-  "Creates a form group for service url hat creates two form elements url and localized text area"
+  "Creates a form group for service url that creates two form elements url and localized text area"
   [label service-url-field]
   (form/group
     {:label label
@@ -31,6 +31,22 @@
     :write (fn [data desc]
              (assoc-in data [service-url-field ::t-service/description] desc))}))
 
+(defn service-urls
+  "Creates a table for additional service urls."
+  [label service-url-field]
+  (form/group
+    {:label label
+     :columns 3}
+
+    {:name         service-url-field
+     :type         :table
+     :table-fields [{:name ::t-service/url
+                     :type :string}
+                    {:name ::t-service/description
+                     :type :localized-text}]
+     :delete?      true
+     :add-label    (tr [:buttons :add-new-service-link])}))
+
 (defn external-interfaces
   "Creates a form group for external services."
   []
@@ -38,7 +54,13 @@
    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
 
-   (form/info (tr [:form-help :external-interfaces]))
+   (form/info
+     [:div
+      [:p (tr [:form-help :external-interfaces]) ]
+      [:p (tr [:form-help :external-interfaces-eg-rae])
+        [:a {:target "_blank" :href "https://extranet.liikennevirasto.fi/"}
+          (tr [:form-help :RAE-tool]) ]]])
+
    {:name ::t-service/external-interfaces
     :type :table
     :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"
@@ -69,7 +91,11 @@
                    {:name ::t-service/business-id :type :string
                     :validate [[:business-id]]}]
     :delete? true
-    :add-label (tr [:buttons :add-new-company])}))
+    :add-label (tr [:buttons :add-new-company])}
+
+   (form/info (tr [:form-help :brokerage?]))
+   {:name ::t-service/brokerage?
+    :type :checkbox}))
 
 (defn contact-info-group []
   (form/group
@@ -111,13 +137,17 @@
    {:name        ::t-service/homepage
     :type        :string}))
 
-(defn footer [e! {published? ::t-service/published? :as data}]
+(defn footer
+  "Transport service form -footer element. All transport service form should be using this function."
+  [e! {published? ::t-service/published? :as data}]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
      (if published?
+       ;; True
        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
                       :disabled (not (form/can-save? data))}
         (tr [:buttons :save-updated])]
+       ;; False
        [:span
         [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
                        :disabled (not (form/can-save? data))}

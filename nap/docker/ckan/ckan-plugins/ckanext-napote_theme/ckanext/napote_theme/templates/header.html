@@ -40,7 +40,7 @@
                                 {% endblock %}
                                 {% if c.userobj %}
                                     <li>
-                                        <a href="/ote/index.html#/own-services" title="{{ _('My services') }}">
+                                        <a href="/ote/#/own-services" title="{{ _('My services') }}">
                                             <span class="text">{{ _('My services') }}</span>
                                         </a>
                                     </li>
@@ -111,7 +111,15 @@
                                                                 <span class="text">{{ _('Log out') }}</span>
                                                             </a>
                                                         </li>
-                                                    {% endblock %}
+                                                        {% endblock %}
+                                                <li class="finap-lang">
+                                                  <a href="#"
+                                                     onClick="document.cookie='finap_lang=fi;path=/';location.reload();">🇫🇮</a>
+                                                  <a href="#"
+                                                     onClick="document.cookie='finap_lang=sv;path=/';location.reload();">🇸🇪</a>
+                                                  <a href="#"
+                                                     onClick="document.cookie='finap_lang=en;path=/';location.reload();">🇬🇧</a>
+                                                </li>
                                                 {% endblock %}
                                             </ul>
                                         </div>
@@ -132,8 +140,6 @@
                                 </ul>
                             {% endif %}
                         {% endblock %}
-
-                        {% snippet 'snippets/navbar_language_selector.html' %}
 
                     </nav>
                 </div>
