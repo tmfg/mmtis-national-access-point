@@ -43,6 +43,9 @@
     [:div.row
      [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
     [:div.row {:style {:padding-top "20px"}}
+     [:p {:style {:font-style "italic"}}
+      (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
+    [:div.row {:style {:padding-top "20px"}}
 
       (if multiple-operators
         [:div
