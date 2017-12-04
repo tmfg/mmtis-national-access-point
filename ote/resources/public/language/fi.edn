@@ -25,8 +25,7 @@
    :ote.db.transport-service/accessibility-description "Kuvaus palvelun esteettömyydestä"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)
-"
+   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
@@ -303,6 +302,7 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
+   :wheelchair-access-toilet "Inva WC"
    :other  "Muu"}
 
   :ote.db.transport-service/mobility
@@ -432,8 +432,9 @@
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
   :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
-  :header-assistance                  "Avustuspalvelun tilauksen tiedot"
+  :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
+  :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
  :parking-page
