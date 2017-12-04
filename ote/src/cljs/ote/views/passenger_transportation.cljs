@@ -187,7 +187,7 @@
     :name ::t-service/pricing-url
     :full-width? true
     :type :string
-    :write #(assoc %1 [::t-service/payment-method-descriptio] %2)
+    :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
     :read (comp ::t-service/url ::t-service/pricing)
     })))
 
