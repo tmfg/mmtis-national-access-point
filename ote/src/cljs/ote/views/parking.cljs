@@ -161,10 +161,50 @@
      :columns 3
      :layout  :row}
 
-    {:name    ::t-service/charging-points
+    {:name            ::t-service/charging-points
+     :rows            5
+     :type            :localized-text
+     :full-width?     true
+     :container-class "col-md-6"}))
+
+(defn accessibility-group []
+  (form/group
+    {:label   (tr [:parking-page :header-accessibility])
      :columns 3
-     :rows 5
-     :type   :localized-text}))
+     :layout  :row}
+
+    {:name            ::t-service/accessibility
+     :type            :checkbox-group
+     :show-option     (tr-key [:enums ::t-service/accessibility])
+     :options         t-service/accessibility
+     :full-width?     true
+     :container-class "col-md-6"}
+
+    {:name            ::t-service/mobility
+     :type            :checkbox-group
+     :show-option     (tr-key [:enums ::t-service/mobility])
+     :options         t-service/parking-mobility
+     :full-width?     true
+     :container-class "col-md-5"}
+
+    {:name            ::t-service/information-service-accessibility
+     :type            :checkbox-group
+     :show-option     (tr-key [:enums ::t-service/information-service-accessibility])
+     :options         t-service/information-service-accessibility
+     :full-width?     true
+     :container-class "col-md-6"}
+
+    {:name            ::t-service/accessibility-description
+     :type            :localized-text
+     :rows            5
+     :max-rows        5
+     :container-class "col-md-5"
+     :full-width?     true}
+
+    {:name            ::t-service/accessibility-info-url
+     :type            :string
+     :container-class "col-md-5"
+     :full-width?     true}))
 
 (defn parking [e! {form-data ::t-service/parking}]
   (r/with-let [options (form-options e!)
@@ -184,6 +224,7 @@
                        (capacities e!)
                        (charging-points e!)
                        (pricing-group e!)
+                       (accessibility-group)
                        (service-hours-group e!)]]
               [:div.row
                [:div {:class "col-lg-12"}

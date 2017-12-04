@@ -24,6 +24,10 @@
    :ote.db.transport-service/accessibility-tool        "Accessibility tools"
    :ote.db.transport-service/accessibility-description "Accessibility description"
 
+   :ote.db.transport-service/accessibility     "Accessibility"
+   :ote.db.transport-service/mobility          "Mobility"
+   :ote.db.transport-service/information-service-accessibility "Info service accessibility"
+
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Vehicle accessibility (guaranteed availability)"
    :ote.db.transport-service/limited-vehicle-accessibility "Vehicle accessibility (limited availability)"
 
@@ -437,7 +441,7 @@
   :header-contact-details                   "Palvelun yhteystiedot"
   :header-payment-methods                   "Maksutavat"
   :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
-  :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
+  :header-accessibility                     "Palvelun saavutettavuus ja esteettömyys"
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"

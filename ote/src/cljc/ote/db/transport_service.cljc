@@ -102,6 +102,11 @@
                :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
                :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
 
+;; Create order for mobility-facility for parking services
+(def parking-mobility [:low-floor :step-free-access :suitable-for-wheelchairs
+                       :suitable-for-heavily-disabled :boarding-assistance
+                       :tactile-patform-edges :tactile-guiding-strips :other])
+
 (defn service-key-by-type
   "Returns the service column keyword for the given type enum value."
   [type]
@@ -124,6 +129,3 @@
 (def vehicle-accessibility
   [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs
    :boarding-assistance :assistance-dog-space])
-
-(def parking-vehicle-accessibility
-  [:low-floor :boarding-assistance])
