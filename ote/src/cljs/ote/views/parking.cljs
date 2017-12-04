@@ -49,27 +49,41 @@
      :type         :table
      :table-fields [{:name  ::t-service/name :type :string
                      :label (tr [:field-labels :parking ::t-service/price-class-name])}
-                    {:name ::t-service/price-per-unit :type :number}
-                    {:name ::t-service/unit :type :string}
-                    {:name ::t-service/currency :type :string :width "100px"}]
+                    {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+                     :input-style {:text-align "right" :padding-right "5px"}}
+                    {:name ::t-service/unit :type :string :style {:width "100px"}}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
-    {:name  ::t-service/pricing-description
+    {:container-class "col-md-6"
+     :name  ::t-service/pricing-description
      :type  :localized-text
+     :full-width? true
      :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
      :read  (comp ::t-service/description ::t-service/pricing)}
 
-    {:name  ::t-service/pricing-url
+    {:container-class "col-md-5"
+     :name  ::t-service/pricing-url
      :type  :string
+     :full-width? true
      :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
      :read  (comp ::t-service/url ::t-service/pricing)}
 
-    {:name            ::t-service/payment-methods
+    {:container-class "col-md-3"
+     :name            ::t-service/payment-methods
      :type            :multiselect-selection
-     :container-style style-form/full-width
      :show-option     (tr-key [:enums ::t-service/payment-methods])
-     :options         t-service/payment-methods}))
+     :options         t-service/payment-methods}
+
+    {:container-class "col-md-8"
+     :name ::t-service/payment-method-description
+     :type :localized-text
+     :rows 1
+     :rows-max 12
+     :full-width? true
+     }
+
+    ))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
