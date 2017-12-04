@@ -49,9 +49,9 @@
      :type         :table
      :table-fields [{:name  ::t-service/name :type :string
                      :label (tr [:field-labels :parking ::t-service/price-class-name])}
-                    {:name ::t-service/price-per-unit :type :number}
-                    {:name ::t-service/unit :type :string}
-                    {:name ::t-service/currency :type :string :width "100px"}]
+                    {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+                     :input-style {:text-align "right" :padding-right "5px"}}
+                    {:name ::t-service/unit :type :string :style {:width "100px"}}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
