@@ -310,7 +310,7 @@
                 (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
                 response)]
     (routes/navigate! :own-services)
-    app))
+    (dissoc app :transport-service)))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
