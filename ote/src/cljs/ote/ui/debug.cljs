@@ -68,6 +68,7 @@
   [:span (pr-str data)])
 
 (def debug-style {:position "fixed"
+                  :left "0"
                   :bottom "0"
                   :max-height "200"
                   :overflow-y "scroll"

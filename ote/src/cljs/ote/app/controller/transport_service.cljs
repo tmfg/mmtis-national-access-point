@@ -213,7 +213,8 @@
                               ::t-service/terminal
                               ::t-service/rentals
                               ::t-service/brokerage
-                              ::t-service/parking)
+                              ::t-service/parking
+                              ::t-service/id)
       app (assoc app :transport-service new-transport-service)]
       (routes/navigate! :transport-service)
       app))

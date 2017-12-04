@@ -208,6 +208,7 @@
 
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
+  :operation-area "Add the service operation area (for example province) by typing the name in the text field and selecting it from the list. You can also draw the area with the map drawing tools. You can name the area freely (like \"Itäkeskus taxi station\")."
   }
 
 
@@ -303,6 +304,7 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
+   :wheelchair-access-toilet "Inva WC"
    :other  "Muu"}
 
   :ote.db.transport-service/mobility
@@ -434,6 +436,7 @@
   :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
   :header-assistance                  "Avustuspalvelun tilauksen tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja accessibility"
+  :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
  :parking-page

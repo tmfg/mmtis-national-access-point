@@ -9,7 +9,6 @@
 (defrecord GoToUrl [url])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
-(defrecord ToggleDebugState [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
 
@@ -33,13 +32,6 @@
   (process-event [{url :url} app]
     (set! (.-location js/window) url )
     app)
-
-  ToggleDebugState
-  (process-event [_ app]
-    (cond
-      (get-in app [:ote-service-flags :show-debug]) (assoc-in app [:ote-service-flags :show-debug] false)
-      :default (assoc-in app [:ote-service-flags :show-debug] true)
-      ))
 
   OpenUserMenu
   (process-event [_ app]
