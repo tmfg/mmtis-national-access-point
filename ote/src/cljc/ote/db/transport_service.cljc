@@ -95,7 +95,7 @@
 
 ;; Create order for accessibility-facility
 (def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
-                             :pallet-access-low-floor :other])
+                             :pallet-access-low-floor :wheelchair-access-toilet :other])
 
 ;; Create order for mobility-facility-facility
 (def mobility [:low-floor :step-free-access :suitable-for-wheelchairs

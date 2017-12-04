@@ -301,6 +301,7 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
+   :wheelchair-access-toilet "Inva WC"
    :other  "Muu"}
 
   :ote.db.transport-service/mobility
@@ -432,6 +433,7 @@
   :header-add-new-terminal            "Lägga till Satamaan, Asemaan tai Terminaaliin liittyvän uppassningens tiedot."
   :header-assistance                  "Avustusuppassningens tilauksen tiedot"
   :header-accessibility               "Uppassningens saavutettavuus ja esteettömyys"
+  :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
  :parking-page
