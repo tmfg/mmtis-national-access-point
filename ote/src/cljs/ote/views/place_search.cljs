@@ -158,6 +158,9 @@
     (form/group
      {:label label
       :columns 3}
+
+     (form/info (tr [:form-help :operation-area]))
+
      {:type :component
       :name name
       :required? true
