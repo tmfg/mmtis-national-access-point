@@ -2,8 +2,7 @@
   "Integrate into CKAN user and group information via database queries."
   (:require [jeesql.core :refer [defqueries]]
             [ote.db.utils :as db-utils]
-            [taoensso.timbre :as log]
-            [clojure.core.cache :as cache]))
+            [taoensso.timbre :as log]))
 
 ;; FIXME:
 ;; CKAN tables are owned by the ckan user and access needs to be granted to them
@@ -32,9 +31,7 @@
         find-user (partial find-user db)]
     (fn [{username :user-id :as req}]
       (if-let [user (when username
-                      (get (swap! cached-user-info
-                                  #(cache/through find-user % username))
-                           username))]
+                      (find-user username))]
         (do (log/debug "User found: " (pr-str user))
             (handler (assoc req :user user)))
         (do (log/info "No user info, return 401")
