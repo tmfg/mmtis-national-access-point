@@ -92,6 +92,7 @@
 
    :ote.db.transport-service/pricing-description "Hinnoittelun beskrivning"
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
 
 
    }
@@ -153,6 +154,7 @@
 
    :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
 
    ;; Service hour fields
    :ote.db.transport-service/week-days                 "Viikonpäivät"

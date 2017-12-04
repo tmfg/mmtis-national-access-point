@@ -151,7 +151,7 @@
     :columns 3
     :layout :row}
 
-   {:container-class "col-md-9"
+   {:container-class "col-md-12"
     :name         ::t-service/price-classes
     :type         :table
     :table-fields [{:name ::t-service/name :type :string :label price-class-name-label}
@@ -161,23 +161,33 @@
     :add-label (tr [:buttons :add-new-price-class])
     :delete?      true}
 
-   {:container-class "col-md-2"
+   {:container-class "col-md-6"
     :name        ::t-service/payment-methods
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/payment-methods])
     :options     t-service/payment-methods}
 
    {:container-class "col-md-5"
+    :name ::t-service/payment-method-description
+    :type :localized-text
+    :rows 6
+    :rows-max 12
+    :full-width? true
+    }
+
+   {:container-class "col-md-6"
     :name ::t-service/pricing-description
     :type :localized-text
+    :full-width? true
     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
     :read (comp ::t-service/description ::t-service/pricing)
     }
 
-   {:container-class "col-md-6"
+   {:container-class "col-md-5"
     :name ::t-service/pricing-url
+    :full-width? true
     :type :string
-    :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
+    :write #(assoc %1 [::t-service/payment-method-descriptio] %2)
     :read (comp ::t-service/url ::t-service/pricing)
     })))
 

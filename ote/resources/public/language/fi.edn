@@ -90,6 +90,7 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
 
@@ -153,6 +154,7 @@
 
    :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
 
    ;; Service hour fields
    :ote.db.transport-service/week-days                 "Viikonpäivät"
