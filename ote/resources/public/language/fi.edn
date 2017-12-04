@@ -431,6 +431,7 @@
   :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
   :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
+  :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
  :parking-page

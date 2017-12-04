@@ -94,6 +94,7 @@
 
    {:container-class "col-md-6"
     :name        ::t-service/accessibility
+    :label       (tr [:terminal-page :header-checkboxlist-accessibility])
     :type        :checkbox-group
     :full-width? true
     :show-option (tr-key [:enums ::t-service/accessibility])
