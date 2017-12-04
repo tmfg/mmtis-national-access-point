@@ -205,6 +205,7 @@
 
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
+  :operation-area "Lisää toiminta-alue (esim. maakunta) kirjoittamalla alueen nimi tekstikenttään ja valitsemalla haluttu alue listalta. Voit myös piirtää alueen kartan piirtotyökaluilla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
   }
 
 
