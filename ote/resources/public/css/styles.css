@@ -69,6 +69,11 @@ h1 {
     height: 400px;
 }
 
+/* Fix MaterialUI IE bug*/
+input::-ms-clear {
+    display: none;
+}
+
 .set-bottom {
     display : table-row;
     vertical-align : bottom;
