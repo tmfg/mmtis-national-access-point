@@ -44,7 +44,7 @@
   GoToUrl
   (process-event [{url :url :as e} app]
     (navigate e app (fn [app]
-                      #(set! (.-location js/window) url)
+                      (set! (.-location js/window) url)
                       app)))
 
   StayOnPage
