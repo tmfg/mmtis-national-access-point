@@ -20,7 +20,8 @@
             [ote.views.parking :as parking]
             [ote.views.rental :as rental]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :as ui-common]))
+            [ote.ui.common :as ui-common]
+            [reagent.core :as r]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
