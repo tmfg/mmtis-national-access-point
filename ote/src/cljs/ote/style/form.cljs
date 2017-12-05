@@ -10,8 +10,6 @@
 
 (def form-group-base {:margin-bottom "1em"})
 
-(def form-field  {:margin "0.5em 1em 0.5em 0em"})
-
 (def form-group-column (merge form-group-base
                               (base/flex-container "column")))
 (def form-group-row (merge form-group-base

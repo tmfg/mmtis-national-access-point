@@ -415,7 +415,8 @@
   }
 
  :passenger-transportation-page
- {:header-passenger-transportation-service "Henkilöiden kuljetusuppassningens tiedot"
+ {:header-passenger-transportation-service-new  "Lisää henkilöiden kuljetusuppassningens tiedot"
+  :header-passenger-transportation-service-edit  "Muokkaa henkilöiden kuljetusuppassningens tiedot"
   :header-service-info                     "Uppassningens perustiedot"
   :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Uppassningens yhteystiedot"
@@ -436,7 +437,8 @@
  :terminal-page
  {:header-service-info                "Uppassningens perustiedot"
   :header-contact-details             "Uppassningens yhteystiedot"
-  :header-add-new-terminal            "Lägga till Satamaan, Asemaan tai Terminaaliin liittyvän uppassningens tiedot."
+  :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustusuppassningens tilauksen tiedot"
   :header-accessibility               "Uppassningens saavutettavuus ja esteettömyys"
   :header-checkboxlist-accessibility  "Esteettömyys"
@@ -464,7 +466,7 @@
  {:title-required-data               "Aloita liikkumisuppassningens lisääminen valitsemalla liikkumisuppassningens typ"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä uppassningenstuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
+                Jos tarjoat useita liikkumispalveluita, lisää jokainen erikseen."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
