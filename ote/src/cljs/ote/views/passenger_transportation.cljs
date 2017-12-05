@@ -36,13 +36,6 @@
 
    {:name ::t-service/name
     :type :string
-    :required? true}
-
-   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
-    :name ::t-service/sub-type
-    :type        :selection
-    :show-option (tr-key [:enums :ote.db.transport-service/sub-type])
-    :options     t-service/passenger-transportation-sub-types
     :required? true}))
 
 
