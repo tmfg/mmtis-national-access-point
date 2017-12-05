@@ -216,12 +216,12 @@
           :own-services [fp/own-services e! app]
           :transport-service [t-service/select-service-type e! app]
           :transport-operator [to/operator e! app]
-          :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
-          :terminal [terminal/terminal e! (:transport-service app)]
-          :rentals [rental/rental e! (:transport-service app)]
-          :parking [parking/parking e! (:transport-service app)]
-          :brokerage [brokerage/brokerage e! (:transport-service app)]
-          :edit-service [t-service/edit-service e! app]
+
+          ;; Routes for the service form, one for editing an existing one by id
+          ;; and another when creating a new service
+          :edit-service [t-service/edit-service-by-id e! app]
+          :new-service [t-service/edit-new-service e! app]
+
           :services [service-search/service-search e! (:service-search app)]
           [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]
 
