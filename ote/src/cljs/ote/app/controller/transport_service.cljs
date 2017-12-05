@@ -323,7 +323,7 @@
   CancelTransportServiceForm
   (process-event [_ app]
     (routes/navigate! :own-services)
-    (dissoc app :transport-service))
+    (dissoc app :transport-service :before-unload-message))
 
   SetNewServiceType
   (process-event [{type :type} app]
