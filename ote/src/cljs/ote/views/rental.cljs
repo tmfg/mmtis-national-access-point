@@ -99,6 +99,34 @@
     :container-style style-form/half-width
     :full-width? true}))
 
+(defn additional-services []
+  (form/group
+   {:label (tr [:rentals-page :header-additional-services])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/pick-up-locations
+    :type :table
+    :table-fields [{:name ::t-service/additional-service-name
+                    :type        :selection
+                    :show-option (tr-key [:enums ::t-service/additional-services])
+                    :options     t-service/additional-services}
+
+                   {:name ::t-service/additional-service-price
+                    :type :string}
+                   ;; {:name ::t-service/additional-service-type
+                   ;;  :type :string
+                   ;;  :read (comp ::common/street ::t-service/pick-up-address)
+                   ;;  :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
+                   ;; {:name ::t-service/additional-service-price
+                   ;;  :type :string
+                   ;;  :regex #"\d{0,5}"
+                   ;;  :read (comp ::common/postal_code ::t-service/pick-up-address)
+                   ;;  :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
+                   ]
+    :delete? true
+    :add-label (tr [:buttons :add-new-additional-service])}))
+
 (defn luggage-restrictions-groups []
   (form/group
    {:label (tr [:rentals-page :header-restrictions-payments])
@@ -195,6 +223,7 @@
                              ;; (vehicle-group)
                              (luggage-restrictions-groups)
                              (accessibility-group)
+                             (additional-services)
                              (eligibity-requirements)
                              (ts-common/service-url
                               (tr [:field-labels :transport-service-common ::t-service/booking-service])

@@ -124,6 +124,9 @@
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
+   :ote.db.transport-service/additional-service-name   "Palvelu"
+   :ote.db.transport-service/additional-service-price  "Hinta"
+   :ote.db.transport-service/additional-service-unit   "Yksikkö"
    }
 
   ;; Parking fields
@@ -234,7 +237,8 @@
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"
-  :add-new-pick-up-location "Lisää toimipiste"}
+  :add-new-pick-up-location "Lisää toimipiste"
+  :add-new-additional-service "Lisää palvelu"}
 
 
 
@@ -336,7 +340,7 @@
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"
-   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"}
+   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
   }
 
   :ote.db.transport-service/parking-facility
@@ -429,6 +433,7 @@
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
   :header-vehicles                         "Vuokrattavat ajoneuvot"
   :header-accessibility                    "Esteettömyys"
+  :header-additional-services              "Lisäpalvelut"
   :open-service-hours-and-exceptions       "Palveluajat"
   }
 
