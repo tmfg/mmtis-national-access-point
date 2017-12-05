@@ -29,8 +29,7 @@
    :ote.db.transport-service/information-service-accessibility "Infopalveluiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)
-"
+   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
@@ -97,8 +96,6 @@
    :ote.db.transport-service/pricing-description "Hinnoittelun beskrivning"
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
    :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
-
-
    }
 
   ;; Terminal fields
@@ -464,7 +461,14 @@
  {:title-required-data               "Aloita liikkumisuppassningens lisääminen valitsemalla liikkumisuppassningens typ"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä uppassningenstuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
+                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
+  :transport-service-type-selection-help-example "Esimerkki: Palveluntuottajana on yritys nimeltä \"RapidBus Oy\",
+     jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
+     Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
+     tyyppiä.
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."
+  :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
+  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
