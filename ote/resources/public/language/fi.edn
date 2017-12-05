@@ -231,7 +231,7 @@
   :add-new-company "Lisää palvelun tuottava yritys"
   :discard "Peruuta"
 
-  :add-transport-service   "Lisää palvelustiedot"
+  :add-transport-service   "Lisää palvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"

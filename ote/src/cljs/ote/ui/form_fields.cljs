@@ -92,7 +92,8 @@
 
 (defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
   (or placeholder
-      (and placeholder-fn (placeholder-fn row))))
+      (and placeholder-fn (placeholder-fn row))
+      ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-focus form? error warning table? full-width? style input-style]
@@ -139,7 +140,8 @@
     (let [data (or data [])
           languages (or (:languages field) languages)
           language @selected-language
-          language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)]
+          language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
+          rows (or rows 1)]
       [:table {:style (when full-width?
                         style-form/full-width)}
        [:tr
@@ -163,7 +165,7 @@
             :multiLine         true
             :rows rows
             :rows-max (or rows-max rows)
-            :error-text        error}
+            :error-text       (or error "")}
            (when full-width?
              {:full-width true}))]]]
        [:tr
@@ -171,12 +173,13 @@
          (doall
           (for [lang languages]
             ^{:key lang}
-            [:a (merge
-                 (stylefy/use-style
-                  (if (= lang language)
-                    style-form-fields/localized-text-language-selected
-                    style-form-fields/localized-text-language))
-                 {:on-click #(reset! selected-language lang)})
+            [:a  (merge
+                  (stylefy/use-style
+                     (if (= lang language)
+                       style-form-fields/localized-text-language-selected
+                       style-form-fields/localized-text-language))
+                  {:href "#" :on-click #(do (.preventDefault %)
+                                            (reset! selected-language lang))})
              lang]))]]])))
 
 

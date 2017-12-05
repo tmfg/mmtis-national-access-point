@@ -77,6 +77,7 @@
 
 (defrecord SelectServiceType [data])
 (defrecord SelectOnlyServiceType [data])
+(defrecord SetNewServiceType [type])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -188,7 +189,7 @@
   SelectTransportServiceType
   ;; Redirect to add service page
   (process-event [_ app]
-    (routes/navigate! (get-in app [:transport-service ::t-service/type]))
+    (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
       app)
 
   SelectOnlyServiceType
@@ -202,8 +203,8 @@
           app (assoc-in app [:transport-service subtype-key ] {::t-service/sub-type sub-type})
           app (assoc-in app [:transport-service ::t-service/type] type)
           ]
-    (routes/navigate! type)
-    app))
+      (routes/navigate! :new-service {:type (name type)})
+      app))
 
   OpenTransportServiceTypePage
   ;; :transport-service :<transport-service-type> needs to be cleaned up before creating a new one
@@ -310,7 +311,7 @@
                 (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
                 response)]
     (routes/navigate! :own-services)
-    app))
+    (dissoc app :transport-service)))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
@@ -320,7 +321,12 @@
   CancelTransportServiceForm
   (process-event [_ app]
     (routes/navigate! :own-services)
-    (dissoc app :transport-service)))
+    (dissoc app :transport-service))
+
+  SetNewServiceType
+  (process-event [{type :type} app]
+    ;; This is needed when directly loading a new service URL to set the type
+    (assoc-in app [:transport-service ::t-service/type] type)))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the
