@@ -32,14 +32,19 @@
           [debug/debug app]])])))
 
 (defn on-before-unload []
-  (let [before-unload-message (atom nil)]
+  (let [state (atom {})]
     {:component-will-mount
      #(set! (.-onbeforeunload js/window)
             (fn []
-              @before-unload-message))
+              (let [{:keys [before-unload-message navigation-prompt-open?]} @state]
+                ;; Don't show browser's onbeforeunload dialog if internal
+                ;; prompt dialog is already open
+                (when-not navigation-prompt-open?
+                  before-unload-message))))
      :component-will-receive-props
      (fn [_ [_ _ app _]]
-       (reset! before-unload-message (:before-unload-message app)))}))
+       (reset! state
+               (select-keys app [:before-unload-message :navigation-prompt-open?])))}))
 
 (defn navigation-prompt [e! msg confirm]
   (let [tr (tr-key [:dialog :navigation-prompt])]
