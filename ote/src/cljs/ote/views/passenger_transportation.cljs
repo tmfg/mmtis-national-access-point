@@ -34,9 +34,20 @@
     :columns 3
     :layout :row}
 
-   {:name ::t-service/name
-    :type :string
-    :required? true}))
+   {:name           ::t-service/name
+    :type           :string
+    :full-width?    true
+    :container-class "col-md-6"
+    :required?      true}
+
+   {:container-class "col-md-5"
+    :name            ::t-service/sub-type
+    :type            :selection
+    :full-width?     true
+    :disabled?       true
+    :show-option     (tr-key [:enums :ote.db.transport-service/sub-type])
+    :options         t-service/passenger-transportation-sub-types
+    :required?       true}))
 
 
 
@@ -186,7 +197,7 @@
 
 
 
-(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
+(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as state}]
   (with-let [form-options (transportation-form-options e!)
              form-groups
              [(name-and-type-group e!)
@@ -207,5 +218,7 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service])]]
+       (if (nil? (get state ::t-service/id))
+         [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-new])]
+         [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-edit])])]
       [form/form form-options form-groups form-data]]]))

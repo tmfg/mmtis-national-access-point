@@ -23,13 +23,15 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
 
-(defn name-and-type-group [e!]
+(defn name-group [e!]
   (form/group
     {:label (tr [:terminal-page :header-service-info])
      :columns 3
      :layout :row}
 
     {:name ::t-service/name
+     :container-class "col-md-6"
+     :full-width? true
      :type :string
      :required? true}))
 
@@ -113,9 +115,9 @@
 
    ))
 
-(defn terminal [e! {form-data ::t-service/terminal}]
+(defn terminal [e! {form-data ::t-service/terminal :as state}]
   (r/with-let [options (terminal-form-options e!)
-               groups [(name-and-type-group e!)
+               groups [(name-group e!)
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)
@@ -125,5 +127,7 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       [:h1 (tr [:terminal-page :header-add-new-terminal])]]
+       (if (nil? (get state ::t-service/id))
+         [:h1 (tr [:terminal-page :header-add-new-terminal])]
+         [:h1 (tr [:terminal-page :header-edit-terminal])])]
       [form/form options groups form-data]]]))

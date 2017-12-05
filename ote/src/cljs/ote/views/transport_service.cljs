@@ -43,8 +43,6 @@
     [:div.row
      [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
     [:div.row {:style {:padding-top "20px"}}
-
-      (if multiple-operators
         [:div
           [:div {:class "col-sx-12 col-sm-4 col-md-4"}
           [form-fields/field
@@ -75,18 +73,7 @@
                                 :on-click #(e! (ts/->SelectTransportServiceType))
                                 :primary  true
                                 :disabled disabled?}]]]
-        ; else
-        [:div {:class "col-sx-12 col-sm-4 col-md-4"}
-         [form-fields/field
-          {:label (tr [:field-labels :transport-service-type-subtype])
-           :name        :transport-service-type-subtype
-           :type        :selection
-           :update!     #(e! (ts/->SelectOnlyServiceType %))
-           :show-option (tr-key [:service-type-dropdown])
-           :options     modified-transport-service-types
-           :auto-width? true}
-          (get-in state [:transport-service :transport-service-type-subtype])]
-         ])
+
     ]]]))
 
 (defn edit-service [e! app]
