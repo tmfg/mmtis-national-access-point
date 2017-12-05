@@ -466,8 +466,9 @@
      jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
      Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
      tyyppiä.
-     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
-
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."
+  :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
+  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.

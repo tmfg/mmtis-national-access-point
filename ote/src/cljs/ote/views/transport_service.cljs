@@ -41,7 +41,10 @@
     [:div
      [:h1 (tr [:select-service-type-page :title-required-data])]]
     [:div.row
-     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
+     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]
+     [:br]
+     [:p (tr [:select-service-type-page :transport-service-type-brokerage-help-text])]]
+
     [:div.row {:style {:padding-top "20px"}}
      [:p {:style {:font-style "italic"}}
       (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
