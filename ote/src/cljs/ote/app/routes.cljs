@@ -1,7 +1,8 @@
 (ns ote.app.routes
   "Routes for the frontend app."
   (:require [bide.core :as r]
-            [ote.app.state :as state]))
+            [ote.app.state :as state]
+            [ote.app.controller.front-page :as fp-controller]))
 
 (def ote-router
   (r/router
@@ -19,9 +20,23 @@
     ["/services" :services]]))
 
 (defn- on-navigate [name params query]
-  (swap! state/app merge {:page name
-                          :params params
-                          :query query}))
+  (swap! state/app
+         (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
+           (if (and before-unload-message (not navigation-prompt-open?))
+             (let [new-url js/window.location.href]
+               ;; push previous URL to the history (the one we want to stay on)
+               (.pushState js/window.history #js {} js/document.title
+                           url)
+               ;; Open confirmation dialog and only go to new page
+               ;; if the user confirms navigation.
+               (assoc app
+                      :navigation-prompt-open? true
+                      :navigation-confirm (fp-controller/->GoToUrl new-url)))
+
+             (merge app {:page name
+                         :params params
+                         :query query
+                         :url js/window.location.href})))))
 (defn start! []
   (r/start! ote-router {:default :front-page
                         :on-navigate on-navigate}))
