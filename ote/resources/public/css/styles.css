@@ -51,6 +51,10 @@ h1 {
   font-weight: 400;
   font-size: 28px;
 }
+h2 {
+    font-weight: 400;
+    font-size: 20px;
+}
 /* Global link color */
 .wrapper a {
     color: #2D75B4;

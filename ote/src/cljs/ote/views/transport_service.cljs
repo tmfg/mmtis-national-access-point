@@ -72,19 +72,19 @@
                :show-option ::t-operator/name
                :options     (map :transport-operator (:transport-operators-with-services state))
                :auto-width? true}
-              (get state :transport-operator)]
-              ]
-             [:div {:class "col-sx-12 col-sm-4 col-md-4"}
-             [ui/raised-button {:style {:margin-top "20px"}
-                                :label    (tr [:buttons :next])
-                                :on-click #(e! (ts/->SelectTransportServiceType))
-                                :primary  true
-                                :disabled disabled?}]]]]]]))
+              (get state :transport-operator)]]]]
+    [:div.row
+     [:div {:class "col-sx-12 col-sm-4 col-md-4"}
+      [ui/raised-button {:style {:margin-top "20px"}
+                         :label    (tr [:buttons :next])
+                         :on-click #(e! (ts/->SelectTransportServiceType))
+                         :primary  true
+                         :disabled disabled?}]]]]]))
 
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
    (case type
-     :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+     :passenger-transportation [pt/passenger-transportation-info e! app]
      :terminal [terminal/terminal e! (:transport-service app)]
      :rentals [rental/rental e! (:transport-service app)]
      :parking [parking/parking e! (:transport-service app)]

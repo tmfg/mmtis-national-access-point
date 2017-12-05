@@ -8,6 +8,7 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
@@ -186,7 +187,7 @@
 
 
 
-(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as state}]
+(defn passenger-transportation-info [e! {form-data [:transport-service ::t-service/passenger-transportation] :as state}]
   (with-let [form-options (transportation-form-options e!)
              form-groups
              [(name-group e!)
@@ -207,10 +208,11 @@
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
-       (if (nil? (get state ::t-service/id))
+       (if (nil? (get-in state [:transport-service ::t-service/id]))
          [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-new])]
          [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-edit])])
 
-       [:p (stylefy/use-style style-form/subheader)  (tr [:enums :ote.db.transport-service/sub-type (get-in state [::t-service/passenger-transportation ::t-service/sub-type] )])]
+       [:p (stylefy/use-style style-form/subheader)  (tr [:enums :ote.db.transport-service/sub-type (get-in state [:transport-service ::t-service/passenger-transportation ::t-service/sub-type] )])]
+       [:h2 (get-in state [:transport-operator ::t-operator/name])]
        ]
       [form/form form-options form-groups form-data]]]))
