@@ -19,7 +19,8 @@
             [ote.views.brokerage :as brokerage]
             [ote.views.parking :as parking]
             [ote.views.rental :as rental]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.common :as ui-common]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -41,7 +42,13 @@
     [:div
      [:h1 (tr [:select-service-type-page :title-required-data])]]
     [:div.row
-     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]]
+     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]
+     [:br]
+     [:p (tr [:select-service-type-page :transport-service-type-brokerage-help-text])]]
+
+    [:div.row {:style {:padding-top "20px"}}
+     [:p {:style {:font-style "italic"}}
+      (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
     [:div.row {:style {:padding-top "20px"}}
         [:div
           [:div {:class "col-sx-12 col-sm-4 col-md-4"}
@@ -69,21 +76,28 @@
               ]
              [:div {:class "col-sx-12 col-sm-4 col-md-4"}
              [ui/raised-button {:style {:margin-top "20px"}
-                                :label    (tr [:buttons :add-transport-service])
+                                :label    (tr [:buttons :next])
                                 :on-click #(e! (ts/->SelectTransportServiceType))
                                 :primary  true
-                                :disabled disabled?}]]]
+                                :disabled disabled?}]]]]]]))
 
-    ]]]))
+(defn edit-service [e! type {service :transport-service :as app}]
+  [:span
+   (case type
+     :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
+     :terminal [terminal/terminal e! (:transport-service app)]
+     :rentals [rental/rental e! (:transport-service app)]
+     :parking [parking/parking e! (:transport-service app)]
+     :brokerage [brokerage/brokerage e! (:transport-service app)])])
 
-(defn edit-service [e! app]
+(defn edit-service-by-id [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
   (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
     (if (or (nil? service) (not loaded?))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-      (case (::t-service/type service)
-        :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
-        :terminal [terminal/terminal e! (:transport-service app)]
-        :rentals [rental/rental e! (:transport-service app)]
-        :parking [parking/parking e! (:transport-service app)]
-        :brokerage [brokerage/brokerage e! (:transport-service app)]))))
+      [edit-service e! (::t-service/type service) app])))
+
+(defn edit-new-service [e! app]
+  (e! (ts/->SetNewServiceType (keyword (get-in app [:params :type]))))
+  (fn [e! app]
+    [edit-service e! (keyword (get-in app [:params :type]))  app]))

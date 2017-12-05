@@ -28,7 +28,7 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data])})
 
-(defn name-and-type-group [e!]
+(defn name-group [e!]
   (form/group
    {:label (tr [:passenger-transportation-page :header-service-info])
     :columns 3
@@ -38,18 +38,7 @@
     :type           :string
     :full-width?    true
     :container-class "col-md-6"
-    :required?      true}
-
-   {:container-class "col-md-5"
-    :name            ::t-service/sub-type
-    :type            :selection
-    :full-width?     true
-    :disabled?       true
-    :show-option     (tr-key [:enums :ote.db.transport-service/sub-type])
-    :options         t-service/passenger-transportation-sub-types
-    :required?       true}))
-
-
+    :required?      true}))
 
 (defn luggage-restrictions-group []
   (form/group
@@ -200,7 +189,7 @@
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as state}]
   (with-let [form-options (transportation-form-options e!)
              form-groups
-             [(name-and-type-group e!)
+             [(name-group e!)
               (ts-common/contact-info-group)
               (ts-common/companies-group)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
@@ -220,5 +209,8 @@
       [:div
        (if (nil? (get state ::t-service/id))
          [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-new])]
-         [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-edit])])]
+         [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service-edit])])
+
+       [:p (stylefy/use-style style-form/subheader)  (tr [:enums :ote.db.transport-service/sub-type (get-in state [::t-service/passenger-transportation ::t-service/sub-type] )])]
+       ]
       [form/form form-options form-groups form-data]]]))

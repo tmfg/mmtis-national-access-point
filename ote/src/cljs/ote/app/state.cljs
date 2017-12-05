@@ -19,11 +19,7 @@
            :transport-operator {}
 
            ;; Currently selected / edited transport service
-           :transport-service
-           #:ote.db.transport-service
-           {:passenger-transportation
-            {:ote.db.transport-service/real-time-information
-             #:ote.db.transport-service {:url "www.example.com/url"}}}}))
+           :transport-service {}}))
 
 ;; Separate app state for viewer mode
 (defonce viewer (r/atom {:loading? true
