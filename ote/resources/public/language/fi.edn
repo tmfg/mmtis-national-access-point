@@ -93,11 +93,9 @@
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
-   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
-
-
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
    }
 
   ;; Terminal fields
@@ -465,7 +463,12 @@
                 ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
                 Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
   :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
-  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
+  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."
+  :transport-service-type-selection-help-example "Esimerkki: Palveluntuottajana on yritys nimeltä \"RapidBus Oy\",
+     jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
+     Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
+     tyyppiä.
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
