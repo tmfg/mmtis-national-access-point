@@ -16,7 +16,8 @@
             [ote.style.form :as style-form]
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.util.values :as values]))
 
 (defn form-options [e! schemas]
   {:name->label (tr-key [:field-labels :parking]
@@ -47,6 +48,7 @@
 
     {:name         ::t-service/price-classes
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
                      :label (tr [:field-labels :parking ::t-service/price-class-name])}
                     {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
@@ -100,6 +102,7 @@
 
       {:name      ::t-service/service-hours
        :type      :table
+       :prepare-for-save values/without-empty-rows
        :table-fields
                   [{:name              ::t-service/week-days
                     :width             "40%"
@@ -136,6 +139,7 @@
 
       {:name         ::t-service/service-exceptions
        :type         :table
+       :prepare-for-save values/without-empty-rows
        :table-fields [{:name  ::t-service/description
                        :label (tr* :description)
                        :type  :localized-text}
@@ -161,6 +165,7 @@
 
     {:name         ::t-service/parking-capacities
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name        ::t-service/parking-facility
                      :type        :selection
                      :show-option (tr-key [:enums ::t-service/parking-facility])

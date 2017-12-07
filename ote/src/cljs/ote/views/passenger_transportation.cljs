@@ -154,6 +154,7 @@
    {:container-class "col-md-12"
     :name         ::t-service/price-classes
     :type         :table
+    :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/name :type :string :label price-class-name-label}
                    {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
                     :input-style {:text-align "right" :padding-right "5px"}}

@@ -14,7 +14,8 @@
             [ote.views.place-search :as place-search]
             [tuck.core :as tuck]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.util.values :as values]))
 
 (defn rental-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :rentals]
@@ -100,6 +101,7 @@
 
      {:name ::t-service/pick-up-locations
       :type :table
+      :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/name
                       :type :string}
                      {:name ::t-service/pick-up-type
