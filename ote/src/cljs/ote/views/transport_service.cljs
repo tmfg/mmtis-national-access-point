@@ -20,7 +20,9 @@
             [ote.views.parking :as parking]
             [ote.views.rental :as rental]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :as ui-common]))
+            [ote.ui.common :as ui-common]
+            [stylefy.core :as stylefy]
+            [ote.style.form :as style-form]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -81,10 +83,25 @@
                          :primary  true
                          :disabled disabled?}]]]]]))
 
+(defn edit-service-header-text [service-type]
+  (case service-type
+    :passenger-transportation (tr [:passenger-transportation-page :header-edit-passenger-transportation])
+    :terminal (tr [:terminal-page :header-edit-terminal])
+    :rentals (tr [:rentals-page :header-edit-rentals])
+    :parking (tr [:parking-page :header-edit-parking])
+  ))
+
+(defn new-service-header-text [service-type]
+  (case service-type
+    :passenger-transportation (tr [:passenger-transportation-page :header-new-passenger-transportation])
+    :terminal (tr [:terminal-page :header-new-terminal])
+    :rentals (tr [:rentals-page :header-new-rentals])
+    :parking (tr [:parking-page :header-new-parking])))
+
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
    (case type
-     :passenger-transportation [pt/passenger-transportation-info e! app]
+     :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
      :terminal [terminal/terminal e! (:transport-service app)]
      :rentals [rental/rental e! (:transport-service app)]
      :parking [parking/parking e! (:transport-service app)]
@@ -95,9 +112,29 @@
   (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
     (if (or (nil? service) (not loaded?))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-      [edit-service e! (::t-service/type service) app])))
+      [:div
+       [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
+       ;; Passenger transport service has sub type, and here it is shown to users
+       (when (= :passenger-transportation (keyword (::t-service/type service)))
+             [:p (stylefy/use-style style-form/subheader)
+              (tr [:enums :ote.db.transport-service/sub-type
+                   (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/sub-type])])])
+       [:h2 (get-in app [:transport-operator ::t-operator/name])]
+       [edit-service e! (::t-service/type service) app]])))
 
 (defn edit-new-service [e! app]
   (e! (ts/->SetNewServiceType (keyword (get-in app [:params :type]))))
   (fn [e! app]
-    [edit-service e! (keyword (get-in app [:params :type]))  app]))
+    (let [service-type (keyword (get-in app [:params :type]))
+          new-header-text (new-service-header-text service-type)]
+      [:div
+         [:h1 new-header-text ]
+          ;; Passenger transport service has sub type, and here it is shown to users
+          (when (= :passenger-transportation service-type)
+             [:p (stylefy/use-style style-form/subheader)
+              (tr [:enums :ote.db.transport-service/sub-type
+                   (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/sub-type])])])
+
+       [:div.row
+       [:h2 (get-in app [:transport-operator ::t-operator/name])]]
+       [edit-service e! service-type  app]])))

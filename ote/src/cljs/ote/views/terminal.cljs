@@ -125,9 +125,4 @@
                        (assistance-service-group)
                        (accessibility-and-other-services-group)]]
     [:div.row
-     [:div {:class "col-lg-12"}
-      [:div
-       (if (nil? (get state ::t-service/id))
-         [:h1 (tr [:terminal-page :header-add-new-terminal])]
-         [:h1 (tr [:terminal-page :header-edit-terminal])])]
-      [form/form options groups form-data]]]))
+      [form/form options groups form-data]]))

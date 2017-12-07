@@ -413,8 +413,8 @@
   }
 
  :passenger-transportation-page
- {:header-passenger-transportation-service-new "Lisää uusi henkilöiden kuljetuspalvelu"
-  :header-passenger-transportation-service-edit "Muokkaa henkilöiden kuljetuspalvelua"
+ {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
+  :header-edit-passenger-transportation    "Muokkaa henkilöiden kuljetuspalvelua"
   :header-service-info                     "Palvelun perustiedot"
   :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Palvelun yhteystiedot"
@@ -425,7 +425,9 @@
   }
 
  :rentals-page
- {:header-service-info                     "Vuokrauspalvelun perustiedot"
+ {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
+  :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
+  :header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-eligibity-requirements           "Kelpoisuusvaatimukset"
   :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
@@ -435,7 +437,7 @@
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
-  :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
   :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
@@ -443,7 +445,9 @@
   }
 
  :parking-page
- {:header-service-info                      "Palvelun perustiedot"
+ {:header-new-parking                       "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-edit-parking                      "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-service-info                      "Palvelun perustiedot"
   :header-contact-details                   "Palvelun yhteystiedot"
   :header-payment-methods                   "Maksutavat"
   :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
