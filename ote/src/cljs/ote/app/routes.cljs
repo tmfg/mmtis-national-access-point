@@ -18,13 +18,29 @@
     ["/edit-service/:id" :edit-service]
     ["/services" :services]]))
 
-(defn- on-navigate [name params query]
-  (swap! state/app merge {:page name
-                          :params params
-                          :query query}))
-(defn start! []
+
+(defn- on-navigate [go-to-url-event name params query]
+  (swap! state/app
+         (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
+           (if (and before-unload-message (not navigation-prompt-open?))
+             (let [new-url js/window.location.href]
+               ;; push previous URL to the history (the one we want to stay on)
+               (.pushState js/window.history #js {} js/document.title
+                           url)
+               ;; Open confirmation dialog and only go to new page
+               ;; if the user confirms navigation.
+               (assoc app
+                      :navigation-prompt-open? true
+                      :navigation-confirm (go-to-url-event new-url)))
+
+             (merge app {:page name
+                         :params params
+                         :query query
+                         :url js/window.location.href})))))
+
+(defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page
-                        :on-navigate on-navigate}))
+                        :on-navigate (partial on-navigate go-to-url-event)}))
 
 (defn navigate!
   "Navigate to given page with optional route and query parameters.
