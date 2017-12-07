@@ -17,8 +17,10 @@
             [ote.views.theme :refer [theme]]
             [ote.views.place-search :as place-search]
             [reagent.core :as r]
+            [ote.util.values :as values]
             cljsjs.leaflet
             [ote.time :as time]))
+
 
 
 (defn ignore-key? [key]
@@ -40,22 +42,6 @@
 
 (defmethod transform-value :default [_ value]
   (tr-or (tr [:viewer :values value]) (str value)))
-
-(defn effectively-empty? [value]
-  (or (nil? value)
-
-      ;; This is a map that is empty or only has effectively empty values
-      (and (map? value)
-           (or (empty? value)
-               (every? effectively-empty? (vals value))))
-
-      ;; This is an empty collection or only has effectively empty values
-      (and (coll? value)
-           (or (empty? value)
-               (every? effectively-empty? value)))
-
-      ;; This is a blank (empty or just whitespace) string
-      (and (string? value) (str/blank? value))))
 
 (declare properties-table records-table)
 
@@ -99,7 +85,7 @@
    [:tbody
     (for [[key value] (sort-by first properties)
           :when (and (not (ignore-key? key))
-                     (not (effectively-empty? value)))]
+                     (not (values/effectively-empty? value)))]
       ^{:key key}
       [:tr
        [:th {:scope "row" :width "25%"}
