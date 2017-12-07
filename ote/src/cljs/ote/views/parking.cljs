@@ -18,7 +18,7 @@
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]))
 
-(defn form-options [e!]
+(defn form-options [e! schemas]
   {:name->label (tr-key [:field-labels :parking]
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service]
@@ -26,7 +26,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
+                  [ts-common/footer e! data schemas])})
 
 (defn name-and-type-group [e!]
   (form/group
@@ -221,8 +221,7 @@
      :full-width?     true}))
 
 (defn parking [e! {form-data ::t-service/parking}]
-  (r/with-let [options (form-options e!)
-               groups [(name-and-type-group e!)
+  (r/with-let [groups [(name-and-type-group e!)
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/parking)
                        (ts-common/external-interfaces)
@@ -239,7 +238,8 @@
                        (charging-points e!)
                        (pricing-group e!)
                        (accessibility-group)
-                       (service-hours-group e!)]]
+                       (service-hours-group e!)]
+               options (form-options e! groups)]
               [:div.row
                [:div {:class "col-lg-12"}
                 [:div
