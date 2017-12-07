@@ -23,5 +23,6 @@
       - markusva
       - markussak
       - tonida
+      - villeliski
   roles:
     - solita.jenkins
