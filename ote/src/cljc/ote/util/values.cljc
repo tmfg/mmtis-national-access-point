@@ -1,5 +1,6 @@
 (ns ote.util.values
-  "Common utilities for checking values.")
+  "Common utilities for checking values."
+  (:require [clojure.string :as str]))
 
 (defn effectively-empty?
   "Check if the given value is effectively empty.
