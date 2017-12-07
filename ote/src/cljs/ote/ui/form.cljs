@@ -224,7 +224,7 @@
                                (or (nil? editable?)
                                    (editable? data)))]]
       ^{:key name}
-      [:div.form-field {:class container-class :style (merge style-form/form-field container-style)}
+      [:div.form-field {:class container-class :style container-style}
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)

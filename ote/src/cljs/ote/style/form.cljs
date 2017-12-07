@@ -10,8 +10,6 @@
 
 (def form-group-base {:margin-bottom "1em"})
 
-(def form-field  {:margin "0.5em 1em 0.5em 0em"})
-
 (def form-group-column (merge form-group-base
                               (base/flex-container "column")))
 (def form-group-row (merge form-group-base
@@ -31,6 +29,9 @@
                      {:margin "1em 0 0 0.5em"}))
 (def subtitle-h {:margin "0"})
 
+(def subheader {:color "#666"
+                :margin-top "-10px"
+                :padding-bottom "10px"})
 
 (def border-color "#C4C4C4")
 (def border-right {:border-right (str "solid 2px " border-color)

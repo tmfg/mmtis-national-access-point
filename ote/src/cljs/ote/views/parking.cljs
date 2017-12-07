@@ -246,10 +246,6 @@
                        (service-hours-group e!)]
                options (form-options e! groups)]
               [:div.row
-               [:div {:class "col-lg-12"}
-                [:div
-                 [:h3 (tr [:parking-page :header-add-new-parking])]]
-
                 [form/form options groups (merge
                                             {:maximum-stay-unit :hours}
-                                            form-data)]]]))
+                                            form-data)]]))
