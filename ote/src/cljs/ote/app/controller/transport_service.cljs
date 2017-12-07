@@ -284,7 +284,8 @@
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
-      (assoc app :transport-service-vector filtered-map))
+      (assoc app :transport-service-vector filtered-map
+             :page :own-services))
     )
 
   SaveTransportService

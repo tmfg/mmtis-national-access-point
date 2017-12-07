@@ -5,7 +5,7 @@
 
 (def ote-router
   (r/router
-   [["/" :front-page]
+   [["/" :own-services]
     ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
@@ -23,7 +23,7 @@
                           :params params
                           :query query}))
 (defn start! []
-  (r/start! ote-router {:default :front-page
+  (r/start! ote-router {:default :own-services
                         :on-navigate on-navigate}))
 
 (defn navigate!

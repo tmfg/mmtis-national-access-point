@@ -6,7 +6,7 @@
 (defonce app
   (r/atom {;; current page
            ;; see ote.app.routes
-           :page :front-page
+           :page :own-services
            :params nil ; parameters from url route
            :query nil ; query parameters from url (like "?foo=bar")
 
