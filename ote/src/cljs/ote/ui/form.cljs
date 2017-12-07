@@ -19,7 +19,7 @@
 (defn info
   "Create a new info form element that doesn't have any interaction, just shows a help text."
   [text]
-  {:name (keyword (str info (swap! keyword-counter inc)))
+  {:name (keyword (str "info" (swap! keyword-counter inc)))
    :type :component
    :container-style style-form/full-width
    :component (fn [_]
