@@ -16,9 +16,10 @@
             [ote.style.form :as style-form]
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.util.values :as values]))
 
-(defn form-options [e!]
+(defn form-options [e! schemas]
   {:name->label (tr-key [:field-labels :parking]
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service]
@@ -26,7 +27,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
+                  [ts-common/footer e! data schemas])})
 
 (defn name-and-type-group [e!]
   (form/group
@@ -47,6 +48,7 @@
 
     {:name         ::t-service/price-classes
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
                      :label (tr [:field-labels :parking ::t-service/price-class-name])}
                     {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
@@ -100,6 +102,7 @@
 
       {:name      ::t-service/service-hours
        :type      :table
+       :prepare-for-save values/without-empty-rows
        :table-fields
                   [{:name              ::t-service/week-days
                     :width             "40%"
@@ -136,6 +139,7 @@
 
       {:name         ::t-service/service-exceptions
        :type         :table
+       :prepare-for-save values/without-empty-rows
        :table-fields [{:name  ::t-service/description
                        :label (tr* :description)
                        :type  :localized-text}
@@ -161,6 +165,7 @@
 
     {:name         ::t-service/parking-capacities
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name        ::t-service/parking-facility
                      :type        :selection
                      :show-option (tr-key [:enums ::t-service/parking-facility])
@@ -221,8 +226,7 @@
      :full-width?     true}))
 
 (defn parking [e! {form-data ::t-service/parking}]
-  (r/with-let [options (form-options e!)
-               groups [(name-and-type-group e!)
+  (r/with-let [groups [(name-and-type-group e!)
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/parking)
                        (ts-common/external-interfaces)
@@ -239,7 +243,8 @@
                        (charging-points e!)
                        (pricing-group e!)
                        (accessibility-group)
-                       (service-hours-group e!)]]
+                       (service-hours-group e!)]
+               options (form-options e! groups)]
               [:div.row
                 [form/form options groups (merge
                                             {:maximum-stay-unit :hours}

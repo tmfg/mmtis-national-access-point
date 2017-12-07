@@ -17,7 +17,7 @@
   ;; init
   (e! (org-edit/->StartEditor))
   (fn [e! state]
-    [theme state
+    [theme e! state
      [:div.ote-sovellus
       (if (get-in state [:transport-operator :loading?])
         [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]

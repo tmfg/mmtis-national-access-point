@@ -17,6 +17,7 @@
             [ote.views.theme :refer [theme]]
             [ote.views.place-search :as place-search]
             [reagent.core :as r]
+            [ote.util.values :as values]
             cljsjs.leaflet))
 
 
@@ -39,21 +40,7 @@
   (tr-or (tr [:viewer :values value]) (str value)))
 
 
-(defn effectively-empty? [value]
-  (or (nil? value)
 
-      ;; This is a map that is empty or only has effectively empty values
-      (and (map? value)
-           (or (empty? value)
-               (every? effectively-empty? (vals value))))
-
-      ;; This is an empty collection or only has effectively empty values
-      (and (coll? value)
-           (or (empty? value)
-               (every? effectively-empty? value)))
-
-      ;; This is a blank (empty or just whitespace) string
-      (and (string? value) (str/blank? value))))
 
 (declare properties-table records-table)
 
@@ -87,7 +74,7 @@
    [:table.table.table-striped.table-bordered.table-condensed
      [:tbody
       (for [[key value] (sort-by first properties)
-            :when (not (effectively-empty? value))]
+            :when (not (values/effectively-empty? value))]
         ^{:key key}
         [:tr
          [:th {:scope "row" :width "25%"}
@@ -152,7 +139,7 @@
 
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
-      [theme app
+      [theme e! app
         [:div.transport-service-view
           [:div.row.pull-right
             (if (and logged-in? authorized?)

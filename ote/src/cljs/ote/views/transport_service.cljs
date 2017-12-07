@@ -22,7 +22,9 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
             [stylefy.core :as stylefy]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [ote.ui.common :as ui-common]
+            [reagent.core :as r]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -52,6 +54,7 @@
      [:p {:style {:font-style "italic"}}
       (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
     [:div.row {:style {:padding-top "20px"}}
+     
         [:div
           [:div {:class "col-sx-12 col-sm-4 col-md-4"}
           [form-fields/field

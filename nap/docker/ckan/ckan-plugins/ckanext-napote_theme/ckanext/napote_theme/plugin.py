@@ -239,6 +239,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
                     controller='ckanext.napote_theme.organization_controller:CustomOrganizationController',
                     action='new')
 
+        map.connect('/organization/member_new/{id}',
+                    controller='ckanext.napote_theme.organization_controller:CustomOrganizationController',
+                    action='member_new')
+
         map.connect('/user/login',
                             controller='ckanext.napote_theme.controller:CustomUserController',
                             action='login')

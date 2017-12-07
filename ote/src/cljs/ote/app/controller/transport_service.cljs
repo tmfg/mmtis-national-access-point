@@ -71,7 +71,7 @@
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
 
 (defrecord EditTransportService [form-data])
-(defrecord SaveTransportService [publish?])
+(defrecord SaveTransportService [schemas publish?])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
 
@@ -288,14 +288,15 @@
     )
 
   SaveTransportService
-  (process-event [{publish? :publish?} {service :transport-service
-                                        operator :transport-operator :as app}]
+  (process-event [{:keys [schemas publish?]} {service :transport-service
+                                              operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
           service-data
           (-> service
-              (update key form/without-form-metadata)
-              (dissoc :transport-service-type-subtype)
-              (dissoc :select-transport-operator)
+              (update key (comp (partial form/prepare-for-save schemas)
+                                form/without-form-metadata))
+              (dissoc :transport-service-type-subtype
+                      :select-transport-operator)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id (::t-operator/id operator))
@@ -303,7 +304,7 @@
               transform-save-by-type)]
       (comm/post! "transport-service" service-data
                   {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
-      app))
+      (dissoc app :before-unload-message)))
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
@@ -316,12 +317,14 @@
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type ts))]
-      (update-in app [:transport-service key] merge form-data)))
+      (-> app
+          (update-in [:transport-service key] merge form-data)
+          (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
 
   CancelTransportServiceForm
   (process-event [_ app]
     (routes/navigate! :own-services)
-    (dissoc app :transport-service))
+    (dissoc app :transport-service :before-unload-message))
 
   SetNewServiceType
   (process-event [{type :type} app]

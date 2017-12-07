@@ -204,7 +204,7 @@
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
     [:div {:style (stylefy/use-style style-base/body)}
-     [theme app
+     [theme e! app
       [:div.ote-sovellus
        [top-nav e! app]
 
