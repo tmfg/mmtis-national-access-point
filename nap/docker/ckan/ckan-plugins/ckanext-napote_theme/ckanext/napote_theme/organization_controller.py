@@ -53,7 +53,9 @@ class CustomOrganizationController(OrganizationController):
 
             # Redirect to the appropriate _read route for the type of group
             if group['type'] == 'organization':
-                h.redirect_to(h.url_for_static('organization/edit/{0}'.format(group['name'])))
+                # Modified content
+                # Redirect to OTE when organization is made
+                h.redirect_to(h.url_for_static('/ote/#/transport-operator'))
             else:
                 h.redirect_to(group['type'] + '_read', id=group['name'])
         except (NotFound, NotAuthorized), e:
