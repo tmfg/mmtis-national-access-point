@@ -124,7 +124,8 @@
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
-   :ote.db.transport-service/additional-service-name   "Palvelu"
+   :ote.db.transport-service/rental-additional-services "Muut palvelut"
+   :ote.db.transport-service/additional-service-type   "Palvelu"
    :ote.db.transport-service/additional-service-price  "Hinta"
    :ote.db.transport-service/additional-service-unit   "Yksikkö"
    }

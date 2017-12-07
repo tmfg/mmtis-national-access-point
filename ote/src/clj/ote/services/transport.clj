@@ -123,19 +123,24 @@
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
-  [service data-path]
-  (update-in service [data-path ::t-service/price-classes]
-             (fn [price-classes-float]
-               (mapv #(update % ::t-service/price-per-unit bigdec) price-classes-float))))
+  ([service data-path]
+   (fix-price-classes service data-path [::t-service/price-per-unit]))
+  ([service data-path price-per-unit-path]
+   (update-in service data-path 
+              (fn [price-classes-float]
+                (mapv #(update-in % price-per-unit-path bigdec) price-classes-float)))))
 
 (defn- floats-to-bigdec
   "Frontend sends some values as floating points. Convert them to bigdecimals before db insert."
   [service]
   (case (::t-service/type service)
     :passenger-transportation
-    (fix-price-classes service ::t-service/passenger-transportation)
+    (fix-price-classes service [::t-service/passenger-transportation ::t-service/price-classes])
     :parking
-    (fix-price-classes service ::t-service/parking)
+    (fix-price-classes service [::t-service/parking ::t-service/price-classes])
+    :rentals
+    (fix-price-classes service [::t-service/rentals ::t-service/rental-additional-services]
+                       [::t-service/additional-service-price ::t-service/price-per-unit])
     service))
 
 (defn- save-external-interfaces

@@ -1,0 +1,11 @@
+-- New type for rental additional services
+CREATE TYPE rental_additional_service AS (
+  "additional-service-type" additional_services,
+  "additional-service-price" price_class
+);
+
+ALTER TYPE rental_provider_information
+ DROP ATTRIBUTE "additional-services";
+
+ALTER TYPE rental_provider_information
+  ADD ATTRIBUTE "rental-additional-services" rental_additional_service[];

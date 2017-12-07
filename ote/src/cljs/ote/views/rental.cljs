@@ -105,25 +105,22 @@
     :columns 3
     :layout :row}
 
-   {:name ::t-service/pick-up-locations
+   {:name ::t-service/rental-additional-services
     :type :table
-    :table-fields [{:name ::t-service/additional-service-name
+    :table-fields [{:name ::t-service/additional-service-type
                     :type        :selection
                     :show-option (tr-key [:enums ::t-service/additional-services])
                     :options     t-service/additional-services}
 
                    {:name ::t-service/additional-service-price
-                    :type :string}
-                   ;; {:name ::t-service/additional-service-type
-                   ;;  :type :string
-                   ;;  :read (comp ::common/street ::t-service/pick-up-address)
-                   ;;  :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
-                   ;; {:name ::t-service/additional-service-price
-                   ;;  :type :string
-                   ;;  :regex #"\d{0,5}"
-                   ;;  :read (comp ::common/postal_code ::t-service/pick-up-address)
-                   ;;  :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
-                   ]
+                    :type :number
+                    :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
+                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)}
+
+                   {:name ::t-service/additional-service-unit
+                    :type :string
+                    :read (comp ::t-service/unit ::t-service/additional-service-price)
+                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/unit] %2)}]
     :delete? true
     :add-label (tr [:buttons :add-new-additional-service])}))
 
