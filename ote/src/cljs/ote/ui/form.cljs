@@ -178,7 +178,6 @@
   (reduce
    (fn [prepared-data {:keys [name read write prepare-for-save] :as s}]
      (let [value (prepare-for-save ((or read name) data))]
-       (.log js/console "PREPARE " (pr-str name) " = " (pr-str value))
        (if write
          (write prepared-data value)
          (assoc prepared-data name value))))
