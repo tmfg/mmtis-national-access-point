@@ -572,6 +572,20 @@
                    "umbrella" "Sateenvarjo"
                    "buggy" "Lastenvaunut"
                    "other" "Muu"
+                   "boarding-assistance" "Boarding assistance"
+                   "low-floor" "Low floor"
+                   "accessible-vehicle" "Accessible vehicle"
+                   "step-free-access" "Step free access"
+                   "suitable-for-wheelchairs" "Suitable for wheelchairs"
+                   "assistance-dog-space" "Place for assistance dog"
+                   "crutches" "Crutches"
+                   "walker" "Walker"
+                   "walking-stick" "Walking stick"
+                   "visual-displays" "Visual display"
+                   "large-print-timetables" "Large print timetables"
+                   "displays-for-visually-impaired" "Displays for visually impaired (tactile)"
+                   "audio-information" "Audio information"
+                   "audio-for-hearing-impaired" "Audio for hearing impaired"
 
                    ;; additional services
                    "animal-transport" "Eläinkuljetus"
@@ -617,7 +631,10 @@
           "service-hours" "Service hours"
           "week-days" "Week days"
           "from" "From"
-          "to" "To"}
+          "to" "To"
+          "from-date" "From date"
+          "to-date" "To date"
+          "sub-type" "Sub type"}
 
 
  :service-search

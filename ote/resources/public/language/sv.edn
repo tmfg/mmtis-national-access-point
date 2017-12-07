@@ -572,6 +572,20 @@
                    "umbrella" "Sateenvarjo"
                    "buggy" "Lastenvaunut"
                    "other" "Muu"
+                   "boarding-assistance" "Kyytiin nousun avustus"
+                   "low-floor" "Matalalattia"
+                   "accessible-vehicle" "Esteetön kulkuneuvo"
+                   "step-free-access" "Portaaton pääsy"
+                   "suitable-for-wheelchairs" "Sopii pyörätuolille"
+                   "assistance-dog-space" "Tila avustuskoiralle"
+                   "crutches" "Kainalosauvat"
+                   "walker" "Rollaattori"
+                   "walking-stick" "Kävelykeppi"
+"visual-displays" "Visuaaliset näytöt"
+                   "large-print-timetables" "Suuret kirjasimet aikatauluissa"
+                   "displays-for-visually-impaired" "Näytöt näkövammaisille (taktiili)"
+                   "audio-information" "Kuulutukset"
+                   "audio-for-hearing-impaired" "Äänivahvistimet huonokuuloisille"
 
                    ;; additional services
                    "animal-transport" "Eläinkuljetus"
@@ -617,7 +631,10 @@
           "service-hours" "Toiminta-ajat"
           "week-days" "Dagar"
           "from" "Från"
-          "to" "Till"}
+          "to" "Till"
+          "from-date" "Från"
+          "to-date" "Till"
+          "sub-type" "Alityyppi"}
 
 
 
