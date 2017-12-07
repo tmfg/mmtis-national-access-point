@@ -16,20 +16,22 @@
             [ote.views.transport-service-common :as ts-common]
             [ote.style.form :as style-form]))
 
-(defn terminal-form-options [e!]
+(defn terminal-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
+                  [ts-common/footer e! data schemas])})
 
-(defn name-and-type-group [e!]
+(defn name-group [e!]
   (form/group
     {:label (tr [:terminal-page :header-service-info])
      :columns 3
      :layout :row}
 
     {:name ::t-service/name
+     :container-class "col-md-6"
+     :full-width? true
      :type :string
      :required? true}))
 
@@ -114,16 +116,13 @@
    ))
 
 (defn terminal [e! {form-data ::t-service/terminal}]
-  (r/with-let [options (terminal-form-options e!)
-               groups [(name-and-type-group e!)
+  (r/with-let [groups [(name-group e!)
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)
                        (indoor-map-group)
                        (assistance-service-group)
-                       (accessibility-and-other-services-group)]]
+                       (accessibility-and-other-services-group)]
+               options (terminal-form-options e! groups)]
     [:div.row
-     [:div {:class "col-lg-12"}
-      [:div
-       [:h1 (tr [:terminal-page :header-add-new-terminal])]]
-      [form/form options groups form-data]]]))
+      [form/form options groups form-data]]))

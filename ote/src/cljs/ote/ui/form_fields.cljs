@@ -12,7 +12,8 @@
             [ote.time :as time]
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [ote.util.values :as values]))
 
 
 
@@ -183,11 +184,13 @@
              lang]))]]])))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width?] :as field}
+(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
-    [ui/select-field {:auto-width (boolean auto-width?)
+    [ui/select-field
+     (merge
+      {:auto-width (boolean auto-width?)
                       :style style
                       :floating-label-text label
                       :floating-label-fixed true
@@ -198,6 +201,8 @@
                                            style-base/error-element
                                            style-base/required-element)
                       }
+      (when disabled?
+        {:disabled true}))
      (doall
       (map-indexed
        (fn [i option]
@@ -356,54 +361,58 @@
 
 
 (defmethod field :table [{:keys [table-fields update! delete? add-label] :as opts} data]
-  [:div
-   [ui/table
-    [ui/table-header {:adjust-for-checkbox false
-                      :display-select-all false}
-     [ui/table-row {:selectable false}
-      (doall
-       (for [{:keys [name label width] :as tf} table-fields]
-         ^{:key name}
-         [ui/table-header-column {:style
-                                  {:width width
-                                   :white-space "pre-wrap"}}
-          label]))
-      (when delete?
-        [ui/table-header-column {:style {:width "70px"}}
-         (tr [:buttons :delete])])]]
+  (let [data (if (empty? data)
+               ;; have table always contain at least one row
+               [{}]
+               data)]
+    [:div
+     [ui/table
+      [ui/table-header {:adjust-for-checkbox false
+                        :display-select-all false}
+       [ui/table-row {:selectable false}
+        (doall
+         (for [{:keys [name label width] :as tf} table-fields]
+           ^{:key name}
+           [ui/table-header-column {:style
+                                    {:width width
+                                     :white-space "pre-wrap"}}
+            label]))
+        (when delete?
+          [ui/table-header-column {:style {:width "70px"}}
+           (tr [:buttons :delete])])]]
 
-    [ui/table-body {:display-row-checkbox false}
-     (map-indexed
-      (fn [i row]
-        ^{:key i}
-        [ui/table-row {:selectable false :display-border false}
-         (doall
-          (for [{:keys [name read write width type component] :as tf} table-fields
-                :let [update-fn (if write
-                                  #(update data i write %)
-                                  #(assoc-in data [i name] %))
-                      value ((or read name) row)]]
-            ^{:key name}
-            [ui/table-row-column {:style {:width width}}
-             (if (= :component type)
-               (component {:update-form! #(update! (update-fn %))
-                           :data value})
-               [field (assoc tf
-                             :table? true
-                             :update! #(update! (update-fn %)))
-                value])]))
-         (when delete?
-           [ui/table-row-column {:style {:width "70px"}}
-            [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
-                                                                (take i data))
-                                                              (drop (inc i) data))))}
-             [ic/action-delete]]])])
-      data)]]
-   (when add-label
-     [buttons/save {:on-click #(update! (conj (or data []) {}))
-                    :label add-label
-                    :label-style style-base/button-label-style
-                    :disabled false}])])
+      [ui/table-body {:display-row-checkbox false}
+       (map-indexed
+        (fn [i row]
+          ^{:key i}
+          [ui/table-row {:selectable false :display-border false}
+           (doall
+            (for [{:keys [name read write width type component] :as tf} table-fields
+                  :let [update-fn (if write
+                                    #(update data i write %)
+                                    #(assoc-in data [i name] %))
+                        value ((or read name) row)]]
+              ^{:key name}
+              [ui/table-row-column {:style {:width width}}
+               (if (= :component type)
+                 (component {:update-form! #(update! (update-fn %))
+                             :data value})
+                 [field (assoc tf
+                               :table? true
+                               :update! #(update! (update-fn %)))
+                  value])]))
+           (when delete?
+             [ui/table-row-column {:style {:width "70px"}}
+              [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                                  (take i data))
+                                                                (drop (inc i) data))))}
+               [ic/action-delete]]])])
+        data)]]
+     (when add-label
+       [buttons/save {:on-click #(update! (conj (or data []) {}))
+                      :label add-label
+                      :label-style style-base/button-label-style
+                      :disabled (values/effectively-empty? (last data))}])]))
 
 (defmethod field :checkbox [{:keys [update! label]} checked?]
   [ui/checkbox {:label label

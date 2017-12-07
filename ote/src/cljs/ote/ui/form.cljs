@@ -19,7 +19,7 @@
 (defn info
   "Create a new info form element that doesn't have any interaction, just shows a help text."
   [text]
-  {:name (keyword (str info (swap! keyword-counter inc)))
+  {:name (keyword (str "info" (swap! keyword-counter inc)))
    :type :component
    :container-style style-form/full-width
    :component (fn [_]
@@ -174,6 +174,15 @@
     ::first-modification (or first (t/now))
     ::latest-modification (t/now)))
 
+(defn prepare-for-save [schemas data]
+  (reduce
+   (fn [prepared-data {:keys [name read write prepare-for-save] :as s}]
+     (let [value (prepare-for-save ((or read name) data))]
+       (if write
+         (write prepared-data value)
+         (assoc prepared-data name value))))
+   data
+   (filter :prepare-for-save (unpack-groups schemas))))
 
 (defn field-ui
   "UI for a single form field"
@@ -215,7 +224,7 @@
                                (or (nil? editable?)
                                    (editable? data)))]]
       ^{:key name}
-      [:div.form-field {:class container-class :style (merge style-form/form-field container-style)}
+      [:div.form-field {:class container-class :style container-style}
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)

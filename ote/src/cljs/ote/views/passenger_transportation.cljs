@@ -8,6 +8,7 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.views.place-search :as place-search]
@@ -16,36 +17,30 @@
             [ote.style.base :as style-base]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
-            [ote.style.form :as style-form])
+            [ote.style.form :as style-form]
+            [ote.util.values :as values])
   (:require-macros [reagent.core :refer [with-let]]))
 
 
 
-(defn transportation-form-options [e!]
+(defn transportation-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
+                  [ts-common/footer e! data schemas])})
 
-(defn name-and-type-group [e!]
+(defn name-group [e!]
   (form/group
    {:label (tr [:passenger-transportation-page :header-service-info])
     :columns 3
     :layout :row}
 
-   {:name ::t-service/name
-    :type :string
-    :required? true}
-
-   {:style style-base/long-drowpdown ;; Pass only style from stylefy base
-    :name ::t-service/sub-type
-    :type        :selection
-    :show-option (tr-key [:enums :ote.db.transport-service/sub-type])
-    :options     t-service/passenger-transportation-sub-types
-    :required? true}))
-
-
+   {:name           ::t-service/name
+    :type           :string
+    :full-width?    true
+    :container-class "col-md-6"
+    :required?      true}))
 
 (defn luggage-restrictions-group []
   (form/group
@@ -154,6 +149,7 @@
    {:container-class "col-md-12"
     :name         ::t-service/price-classes
     :type         :table
+    :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/name :type :string :label price-class-name-label}
                    {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
                     :input-style {:text-align "right" :padding-right "5px"}}
@@ -194,9 +190,8 @@
 
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
-  (with-let [form-options (transportation-form-options e!)
-             form-groups
-             [(name-and-type-group e!)
+  (with-let [form-groups
+             [(name-group e!)
               (ts-common/contact-info-group)
               (ts-common/companies-group)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
@@ -210,9 +205,7 @@
                ::t-service/booking-service)
               (accessibility-group)
               (pricing-group e! form-data)
-              (ts-common/service-hours-group)]]
+              (ts-common/service-hours-group)]
+             form-options (transportation-form-options e! form-groups)]
     [:div.row
-     [:div {:class "col-lg-12"}
-      [:div
-       [:h1 (tr [:passenger-transportation-page :header-passenger-transportation-service])]]
-      [form/form form-options form-groups form-data]]]))
+     [form/form form-options form-groups form-data]]))

@@ -25,7 +25,6 @@
 
 
 (defn- debug-state [app]
-  (.log js/console "debug is visible? " @debug-visible?)
   [:span
    (when @debug-visible?
      [:div.row

@@ -9,7 +9,8 @@
             [ote.app.controller.transport-service :as ts]
             [ote.views.place-search :as place-search]
             [clojure.string :as str]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.util.values :as values]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -40,6 +41,7 @@
 
     {:name         service-url-field
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name ::t-service/url
                      :type :string}
                     {:name ::t-service/description
@@ -63,6 +65,7 @@
 
    {:name ::t-service/external-interfaces
     :type :table
+    :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"
                     :read (comp ::t-service/description ::t-service/external-interface)
                     :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)}
@@ -86,6 +89,7 @@
 
    {:name ::t-service/companies
     :type :table
+    :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/name :type :string
                     :label (tr [:field-labels :transport-service-common ::t-service/company-name])}
                    {:name ::t-service/business-id :type :string
@@ -102,8 +106,11 @@
    {:label  (tr [:passenger-transportation-page :header-contact-details])
     :columns 3
     :layout :row}
+
    {:name        ::common/street
     :type        :string
+    :container-class "col-md-4"
+    :full-width?  true
     :read (comp ::common/street ::t-service/contact-address)
     :write (fn [data street]
              (assoc-in data [::t-service/contact-address ::common/street] street))
@@ -112,6 +119,8 @@
 
    {:name        ::common/postal_code
     :type        :string
+    :container-class "col-md-2"
+    :full-width?  true
     :regex #"\d{0,5}"
     :read (comp ::common/postal_code ::t-service/contact-address)
     :write (fn [data postal-code]
@@ -122,37 +131,45 @@
 
    {:name        ::common/post_office
     :type        :string
+    :container-class "col-md-5"
+    :full-width?  true
     :read (comp ::common/post_office ::t-service/contact-address)
     :write (fn [data post-office]
              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
     :label (tr [:field-labels ::common/post_office])
     :required? true}
 
-   {:name        ::t-service/contact-phone
-    :type        :string}
-
    {:name        ::t-service/contact-email
-    :type        :string}
+    :type        :string
+    :container-class "col-md-4"
+    :full-width?  true}
+
+   {:name        ::t-service/contact-phone
+    :type        :string
+    :container-class "col-md-2"
+    :full-width?  true}
 
    {:name        ::t-service/homepage
-    :type        :string}))
+    :type        :string
+    :container-class "col-md-5"
+    :full-width?  true}))
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
-  [e! {published? ::t-service/published? :as data}]
+  [e! {published? ::t-service/published? :as data} schemas]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
      (if published?
        ;; True
-       [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
+       [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
                       :disabled (not (form/can-save? data))}
         (tr [:buttons :save-updated])]
        ;; False
        [:span
-        [buttons/save {:on-click #(e! (ts/->SaveTransportService true))
+        [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
                        :disabled (not (form/can-save? data))}
          (tr [:buttons :save-and-publish])]
-        [buttons/save  {:on-click #(e! (ts/->SaveTransportService false))
+        [buttons/save  {:on-click #(e! (ts/->SaveTransportService schemas false))
                         :disabled name-missing?}
          (tr [:buttons :save-as-draft])]])
      [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
@@ -178,6 +195,7 @@
 
      {:name         ::t-service/service-hours
       :type         :table
+      :prepare-for-save values/without-empty-rows
       :table-fields
       [{:name ::t-service/week-days
         :width "40%"
@@ -214,6 +232,7 @@
 
      {:name ::t-service/service-exceptions
       :type :table
+      :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/description
                       :label (tr* :description)
                       :type :localized-text}

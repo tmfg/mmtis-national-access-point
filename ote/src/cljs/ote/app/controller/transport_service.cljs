@@ -71,7 +71,7 @@
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
 
 (defrecord EditTransportService [form-data])
-(defrecord SaveTransportService [publish?])
+(defrecord SaveTransportService [schemas publish?])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
 
@@ -289,12 +289,13 @@
     )
 
   SaveTransportService
-  (process-event [{publish? :publish?} {service :transport-service
-                                        operator :transport-operator :as app}]
+  (process-event [{:keys [schemas publish?]} {service :transport-service
+                                              operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
           service-data
           (-> service
-              (update key form/without-form-metadata)
+              (update key (comp (partial form/prepare-for-save schemas)
+                                form/without-form-metadata))
               (dissoc :transport-service-type-subtype
                       :select-transport-operator)
               (move-service-level-keys-from-form key)
