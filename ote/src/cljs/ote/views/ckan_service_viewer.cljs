@@ -32,13 +32,13 @@
 (defmethod transform-value "homepage" [_ value] (linkify value value))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
-(defmethod transform-value "lang" [_ value]
+(defn flag-for [lang]
   ;; Show unicode country flags for supported languages, otherwise show language code
-  (case value
+  (case lang
     "FI" "\ud83c\uddeb\ud83c\uddee" ; finnish flag
     "SV" "\ud83c\uddf8\ud83c\uddea" ; swedish flag
     "EN" "\ud83c\uddec\ud83c\udde7" ; united kingdom flag
-    value))
+    lang))
 
 (defmethod transform-value :default [_ value]
   (tr-or (tr [:viewer :values value]) (str value)))
@@ -49,7 +49,10 @@
                        (fn [{:strs [hours minutes seconds] :as v}]
                          (time/format-time {:hours hours
                                             :minutes minutes
-                                            :seconds seconds}))})
+                                            :seconds seconds}))
+                       #{"lang" "text"}
+                       (fn [{:strs [lang text]}]
+                         (str (flag-for lang) " " text))})
 
 (defn show-value [key value]
   (let [formatter (when (map? value)
@@ -65,7 +68,17 @@
       (and (coll? value)
            (every? map? value)
            (apply = (map keys value)))
-      [records-table value]
+      (if-let [fmt (keyset-formatter (set (keys (first value))))]
+        ;; If there is a formatter for this keyset, just join the items
+        [:span.list-of-values
+         (doall
+          (map-indexed
+           (fn [i v]
+             ^{:key i}
+             [:span.list-item (fmt v)])
+           value))]
+        ;; otherwise, show a table
+        [records-table value])
 
       ;; Collection of values
       (coll? value)
