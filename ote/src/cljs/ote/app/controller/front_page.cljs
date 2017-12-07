@@ -32,6 +32,16 @@
                          :before-unload-message
                          :navigation-confirm))))
 
+(defn get-transport-operator-data [app]
+   (if (get app :transport-operator-data-loaded? true)
+     (do
+       (comm/post! "transport-operator/data" {}
+                  {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                   :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
+      (assoc app :transport-operator-data-loaded? false
+                 :services-changed? false)
+       ) app))
+
 (extend-protocol tuck/Event
 
   ChangePage
@@ -67,11 +77,8 @@
 
   EnsureTransportOperator
   (process-event [_ app]
-    (if (empty? (get app :transport-operator))
-      (do
-        (routes/navigate! :no-operator)
-        (assoc app :page :no-operator)
-        )
+     (if (get app :services-changed?)
+      (get-transport-operator-data app)
       app))
 
   GetTransportOperator
@@ -94,10 +101,7 @@
   GetTransportOperatorData
   ;; FIXME: this should be called something else, like SessionInit (the route as well)
   (process-event [_ app]
-    (comm/post! "transport-operator/data" {}
-                {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
-                 :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-    (assoc app :transport-operator-data-loaded? false))
+    (get-transport-operator-data app))
 
   TransportOperatorDataFailed
   (process-event [{error :error} app]
@@ -110,9 +114,8 @@
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
-    (let [app (assoc app
-                :transport-operator-data-loaded? true
-                :user (:user (first response)))]
+    (let [app (assoc app :transport-operator-data-loaded? true
+                         :user (:user (first response)))]
     ;; First time users don't have operators.
     ;; Ask them to add one
     (if (and (nil? (get (first response) :transport-operator)) (not= :services (get app :page)))
