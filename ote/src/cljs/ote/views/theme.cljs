@@ -13,23 +13,23 @@
                 :style style-base/flash-message
                 :auto-hide-duration 5000}])
 
-(defonce debug-state-toggle-listener (atom false))
-
-(defn- debug-state [_]
-  (let [visible? (r/atom false)]
-    (when-not @debug-state-toggle-listener
-      (reset! debug-state-toggle-listener true)
-      (.addEventListener
+(defonce debug-visible? (r/atom false))
+(defonce debug-state-toggle-listener
+  (do (.addEventListener
        js/window "keypress"
        (fn [e]
          (when (or (and (.-ctrlKey e) (= "d" (.-key e)))
                    (and (.-ctrlKey e) (= "b" (.-key e))))
-           (swap! visible? not)))))
-    (fn [app]
-      [:span
-       (when @visible?
-         [:div.row
-          [debug/debug app]])])))
+           (swap! debug-visible? not))))
+      true))
+
+
+(defn- debug-state [app]
+  (.log js/console "debug is visible? " @debug-visible?)
+  [:span
+   (when @debug-visible?
+     [:div.row
+      [debug/debug app]])])
 
 (defn on-before-unload []
   (let [state (atom {})]
