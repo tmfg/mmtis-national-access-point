@@ -17,11 +17,6 @@ body {
     padding: 0px;
 
 }
-/* Remove padding from container-fluid */
-.container-fluid {
-    padding-left: 0px;
-    padding-right: 0px;
-}
 .wrapper {
     min-height: 100%;
 }
