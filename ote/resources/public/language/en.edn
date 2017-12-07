@@ -585,7 +585,39 @@
                    "contactless-payment" "Lähimaksu"
                    "mobilepay" "Mobiilimaksu"
                    "invoice" "Lasku"
-                   }}
+
+                   ;; week days
+                   "MON" "Mon"
+                   "TUE" "Tue"
+                   "WED" "Wed"
+                   "THU" "Thu"
+                   "FRI" "Fri"
+                   "SAT" "Sat"
+                   "SUN" "Sun"
+                   }
+          "brokerage?" "Brokerage service?"
+          "companies" "Companies that produce the service"
+          "external-interfaces" "External interfaces"
+          "license" "License/terms of use"
+          "format" "Format"
+          "license-url" "License/terms of use URL"
+          "external-interface" "External interface"
+          "accessibility-info-url" "Accessibility description (WWW)"
+          "guaranteed-accessibility-description" "Guaranteed accessibility description"
+          "guaranteed-info-service-accessibility" "Guaranteed info service accessibility"
+          "guaranteed-transportable-aid" "Guaranteed transportable aid"
+          "guaranteed-vehicle-accessibility" "Guaranteed vehicle accessibility"
+          "limited-accessibility-description" "Limited availability accessibility description"
+          "limited-info-service-accessibility" "Limited availability info service accessibility"
+          "limited-transportable-aid" "Limited availability transportable aid"
+          "limited-vehicle-accessibility" "Limited availability vehicle accessibility"
+          "payment-method-description" "Payment method description"
+          "pricing" "Pricing"
+          "service-exceptions" "Service hour exceptions"
+          "service-hours" "Service hours"
+          "week-days" "Week days"
+          "from" "From"
+          "to" "To"}
 
 
  :service-search
