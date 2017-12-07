@@ -80,9 +80,9 @@
      :selection-renderer (constantly name)}
 
      [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:commont-texts :user-menu-summary])
+                    :primary-text (tr [:common-texts :user-menu-summary])
                     :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
+                                   (e! (fp-controller/->GoToUrl "dashboard/datasets")))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-profile])
                    :on-click #(do (.preventDefault %)
@@ -99,6 +99,23 @@
 
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (r/as-element [language-selection e!])}]]))
+
+
+(defn is-page-active
+  "Return true if given current-page belongs to given page-group"
+  [page-group current-page]
+  (cond
+    (= page-group :own-services)
+      (cond
+        (= :own-services current-page) true
+        (= :transport-service current-page) true
+        (= :new-service current-page) true
+        (= :edit-service current-page) true
+        :default false)
+    (= page-group :services)
+      (cond
+        (= :services current-page) true
+        :default false)))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
   [:div (stylefy/use-style style-topnav/clear)
@@ -121,7 +138,7 @@
        [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
         [:a
          (merge (stylefy/use-style
-                 (if (= page current-page)
+                 (if (is-page-active page current-page)
                    (if desktop? style-topnav/desktop-active style-topnav/active)
                    (if desktop? style-topnav/desktop-link style-topnav/link)))
                 {:href     "#"
@@ -154,14 +171,16 @@
       [:a (merge (stylefy/use-style
                    (if desktop? style-topnav/desktop-link style-topnav/link))
                  {:style {:float "right"}
-                  :href  "http://bit.ly/nap-palaute"})
+                  :href  "http://bit.ly/nap-palaute"
+                  :target "_blank"})
        (tr [:common-texts :navigation-give-feedback])]]]
     [:ul (stylefy/use-style style-topnav/ul)
       [:li
         [:a (merge (stylefy/use-style
               (if desktop? style-topnav/desktop-link style-topnav/link))
             {:style {:float "right"}
-             :href  "http://bit.ly/nap-palaute"})
+             :href  "http://bit.ly/nap-palaute"
+             :target "_blank"})
             (tr [:common-texts :navigation-give-feedback])]]])
     ]])
 

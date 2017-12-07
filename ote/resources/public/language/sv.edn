@@ -499,7 +499,7 @@
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Uppassningenstuottajan perustiedot"
   :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Näytä profiili"
+  :user-menu-profile                          "Käyttäjätilin muokkaus"
   :user-menu-summary                          "Yhteenveto"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"

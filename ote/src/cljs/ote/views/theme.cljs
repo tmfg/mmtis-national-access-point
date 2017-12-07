@@ -81,9 +81,6 @@
                        ;; Hint color in text fields
                        :disabledColor  (color :grey900)
 
-                       ;; Border color
-                       :borderColor (color :grey600)
-
                        ;; Main text color
                        :text-color     (color :grey900)
                        }
