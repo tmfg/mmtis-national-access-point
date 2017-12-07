@@ -21,12 +21,12 @@
 
 
 
-(defn transportation-form-options [e!]
+(defn transportation-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
+                  [ts-common/footer e! data schemas])})
 
 (defn name-and-type-group [e!]
   (form/group
@@ -194,8 +194,7 @@
 
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
-  (with-let [form-options (transportation-form-options e!)
-             form-groups
+  (with-let [form-groups
              [(name-and-type-group e!)
               (ts-common/contact-info-group)
               (ts-common/companies-group)
@@ -210,7 +209,8 @@
                ::t-service/booking-service)
               (accessibility-group)
               (pricing-group e! form-data)
-              (ts-common/service-hours-group)]]
+              (ts-common/service-hours-group)]
+             form-options (transportation-form-options e! form-groups)]
     [:div.row
      [:div {:class "col-lg-12"}
       [:div
