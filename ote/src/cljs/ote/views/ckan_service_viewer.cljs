@@ -17,9 +17,12 @@
             [ote.views.theme :refer [theme]]
             [ote.views.place-search :as place-search]
             [reagent.core :as r]
-            cljsjs.leaflet))
+            cljsjs.leaflet
+            [ote.time :as time]))
 
 
+(defn ignore-key? [key]
+  (str/ends-with? key "-id"))
 
 (defmulti transform-value (fn [key value] key))
 
@@ -37,7 +40,6 @@
 
 (defmethod transform-value :default [_ value]
   (tr-or (tr [:viewer :values value]) (str value)))
-
 
 (defn effectively-empty? [value]
   (or (nil? value)
@@ -57,45 +59,55 @@
 
 (declare properties-table records-table)
 
+(def keyset-formatter {#{"hours" "minutes" "seconds"}
+                       (fn [{:strs [hours minutes seconds] :as v}]
+                         (time/format-time {:hours hours
+                                            :minutes minutes
+                                            :seconds seconds}))})
+
 (defn show-value [key value]
-  (cond
-    ;; This is an object, show key/value table
-    (map? value)
-    [properties-table value]
+  (let [formatter (when (map? value)
+                    (keyset-formatter (set (keys value))))
+        value ((or formatter identity) value)]
+    (cond
+      ;; This is an object, show key/value table
+      (map? value)
+      [properties-table value]
 
-    ;; This is a collection of maps, each having the same keys
-    ;; we can show this as a table
-    (and (coll? value)
-         (every? map? value)
-         (apply = (map keys value)))
-    [records-table value]
+      ;; This is a collection of maps, each having the same keys
+      ;; we can show this as a table
+      (and (coll? value)
+           (every? map? value)
+           (apply = (map keys value)))
+      [records-table value]
 
-    ;; Collection of values
-    (coll? value)
-    [:span
-     (map-indexed
-      (fn [i value]
-        ^{:key i}
-        [:div (stylefy/use-style style-ckan/info-block)
-         [show-value "" value]]) value)]
+      ;; Collection of values
+      (coll? value)
+      [:span
+       (map-indexed
+        (fn [i value]
+          ^{:key i}
+          [:div (stylefy/use-style style-ckan/info-block)
+           [show-value "" value]]) value)]
 
-    ;; Other values, like strings and numbers
-    :default
-    [:span (transform-value key value)]))
+      ;; Other values, like strings and numbers
+      :default
+      [:span (transform-value key value)])))
 
 (defn properties-table [properties]
-   [:table.table.table-striped.table-bordered.table-condensed
-     [:tbody
-      (for [[key value] (sort-by first properties)
-            :when (not (effectively-empty? value))]
-        ^{:key key}
-        [:tr
-         [:th {:scope "row" :width "25%"}
-          (tr-or (tr [:viewer key]) key)]
-         [:td [show-value key value]]])]])
+  [:table.table.table-striped.table-bordered.table-condensed
+   [:tbody
+    (for [[key value] (sort-by first properties)
+          :when (and (not (ignore-key? key))
+                     (not (effectively-empty? value)))]
+      ^{:key key}
+      [:tr
+       [:th {:scope "row" :width "25%"}
+        (tr-or (tr [:viewer key]) key)]
+       [:td [show-value key value]]])]])
 
 (defn records-table [rows]
-  (let [headers (keys (first rows))
+  (let [headers (filter (complement ignore-key?) (keys (first rows)))
         labels (into {}
                      (map (juxt identity #(tr [:viewer %])))
                      headers)
