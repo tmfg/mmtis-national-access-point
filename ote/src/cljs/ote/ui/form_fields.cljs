@@ -248,14 +248,15 @@
      [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
      (when help
        [common/help help])
-     (map-indexed
-      (fn [i option]
-        (let [checked? (selected option)]
-          [ui/checkbox {:key i
-                        :label (show-option option)
-                        :checked checked?
-                        :on-check #(update! ((if checked? disj conj) selected option))}]))
-      options)]))
+     (doall
+      (map-indexed
+       (fn [i option]
+         (let [checked? (selected option)]
+           [ui/checkbox {:key i
+                         :label (show-option option)
+                         :checked checked?
+                         :on-check #(update! ((if checked? disj conj) selected option))}]))
+       options))]))
 
 (defmethod field :checkbox [{:keys [update! label]} data]
   (let [checked? (boolean data)]

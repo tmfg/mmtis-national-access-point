@@ -15,6 +15,7 @@
             [ote.views.ckan-org-editor :as ckan-org-edit]
             [ote.localization :as localization]
             [ote.app.routes :as routes]
+            [ote.app.controller.front-page :as fp-controller]
             [stylefy.core :as stylefy]
             [ote.communication :as comm]
             [goog.net.Cookies]))
@@ -29,7 +30,7 @@
    (fn [lang _]
      (reset! localization/selected-language lang)
      (stylefy/init)
-     (routes/start!)
+     (routes/start! fp-controller/->GoToUrl)
      (state/windowresize-handler nil) ;; Calculate window width
      (r/render-component [tuck/tuck state/app main/ote-application]
                          (.getElementById js/document "oteapp")))))
@@ -40,7 +41,7 @@
 (defn ^:export geojson_view []
   (comm/set-base-url! "/ote/")
   (localization/load-language!
-   :fi
+   (language)
    (fn [lang _]
      (reset! localization/selected-language lang)
      (stylefy/init)
@@ -50,7 +51,7 @@
 (defn ^:export ckan_org_view []
   (comm/set-base-url! "/ote/")
   (localization/load-language!
-    :fi
+    (language)
     (fn [lang _]
       (reset! localization/selected-language lang)
       (stylefy/init)
@@ -61,7 +62,7 @@
 (defn ^:export ckan_org_edit [ckan-organization-id]
   (comm/set-base-url! "/ote/")
   (localization/load-language!
-    :fi
+    (language)
     (fn [lang _]
       (reset! localization/selected-language lang)
       (stylefy/init)

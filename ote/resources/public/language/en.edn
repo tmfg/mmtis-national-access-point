@@ -515,7 +515,13 @@
  :dialog
  {:delete-transport-service
   {:title "Poista liikkumispalvelun tiedot?"
-   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}}
+   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}
+
+  :navigation-prompt
+  {:title "Confirm navigation"
+   :stay "Stay on this page"
+   :leave "Leave page"
+   :unsaved-data "Form contains unsaved data. Do you really want to leave the page?"}}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)

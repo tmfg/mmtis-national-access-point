@@ -7,6 +7,7 @@
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
 (defrecord GoToUrl [url])
+(defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
 (defrecord Logout [])
@@ -21,17 +22,34 @@
 (defrecord TransportOperatorDataResponse [response])
 (defrecord TransportOperatorDataFailed [error])
 
+(defn navigate [event {:keys [before-unload-message navigation-prompt-open?] :as app} navigate-fn]
+  (if (and before-unload-message (not navigation-prompt-open?))
+    (assoc app
+           :navigation-prompt-open? true
+           :navigation-confirm event)
+    (navigate-fn (dissoc app
+                         :navigation-prompt-open?
+                         :before-unload-message
+                         :navigation-confirm))))
+
 (extend-protocol tuck/Event
 
   ChangePage
-  (process-event [{given-page :given-page} app]
-    (routes/navigate! given-page)
-    (assoc app :page given-page))
+  (process-event [{given-page :given-page :as e} app]
+    (navigate e app (fn [app]
+                      (do
+                        (routes/navigate! given-page)
+                        (assoc app :page given-page)))))
 
   GoToUrl
-  (process-event [{url :url} app]
-    (set! (.-location js/window) url )
-    app)
+  (process-event [{url :url :as e} app]
+    (navigate e app (fn [app]
+                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+                      app)))
+
+  StayOnPage
+  (process-event [_ app]
+    (dissoc app :navigation-prompt-open?))
 
   OpenUserMenu
   (process-event [_ app]

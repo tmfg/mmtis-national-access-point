@@ -152,7 +152,7 @@
 
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
 
-      [theme app
+      [theme e! app
         [:div.transport-service-view
           [:div.row.pull-right
             (if (and logged-in? authorized?)
