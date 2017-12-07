@@ -80,7 +80,7 @@
 
                        ;; Hint color in text fields
                        :disabledColor  (color :grey900)
-                       
+
                        ;; Main text color
                        :text-color     (color :grey900)
                        }
