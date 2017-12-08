@@ -114,6 +114,9 @@
 
                    {:name ::t-service/additional-service-price
                     :type :number
+                    :currency? true
+                    :style {:width "100px"}
+                    :input-style {:text-align "right" :padding-right "5px"}
                     :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
                     :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)}
 
