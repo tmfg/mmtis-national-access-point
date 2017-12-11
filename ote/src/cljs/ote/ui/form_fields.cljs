@@ -129,7 +129,7 @@
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
     :value             (or data "")
-    :multiLine         true
+    :multi-line        true
     :rows              rows
     :error-text        error}])
 
@@ -163,9 +163,9 @@
                                                lang)) data)
                                      (conj data updated-language-data))))
             :value             (or (:ote.db.transport-service/text language-data) "")
-            :multiLine         true
+            :multi-line         true
             :rows rows
-            :rows-max (or rows-max rows)
+            :rows-max (or rows-max 200)
             :error-text       (or error "")}
            (when full-width?
              {:full-width true}))]]]

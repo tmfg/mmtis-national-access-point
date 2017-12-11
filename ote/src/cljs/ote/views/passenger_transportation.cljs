@@ -50,7 +50,7 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :rows 5 :max-rows 5}
+    :rows 5}
 
    ))
 
@@ -111,13 +111,13 @@
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
-    :rows 1 :max-rows 5
+    :rows 1
     :full-width? true
     :container-class "col-md-5"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
-    :rows 1 :max-rows 5
+    :rows 1
     :container-class "col-md-6"
     :full-width? true}
 
@@ -167,7 +167,6 @@
     :name ::t-service/payment-method-description
     :type :localized-text
     :rows 6
-    :rows-max 12
     :full-width? true
     }
 

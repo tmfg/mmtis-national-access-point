@@ -55,7 +55,7 @@
 
    {:name ::t-service/accessibility-description
     :type :localized-text
-    :rows 1 :max-rows 5}))
+    :rows 1 }))
 
 (defn eligibity-requirements []
   (form/group

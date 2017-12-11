@@ -27,7 +27,7 @@
              (assoc-in data [service-url-field ::t-service/url] url))}
     {:name ::t-service/description
     :type  :localized-text
-    :rows  1 :rows-max 3
+    :rows  1
     :read  (comp ::t-service/description service-url-field)
     :write (fn [data desc]
              (assoc-in data [service-url-field ::t-service/description] desc))}))
