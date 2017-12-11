@@ -119,7 +119,7 @@
     (let [app (assoc app
                      :transport-operator-data-loaded? true
                      :user (:user (first response)))]
-      (if (and (empty? response)
+      (if (and (nil? (:transport-operator (first response)))
                (not= :services page))
         ;; First time users don't have operators.
         ;; Ask them to add one
