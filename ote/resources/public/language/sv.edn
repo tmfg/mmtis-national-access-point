@@ -304,6 +304,11 @@
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
    :wheelchair-access-toilet "Inva WC"
+
+   :step-free-access "Portaaton pääsy"
+   :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
+   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
    :other  "Muu"}
 
   :ote.db.transport-service/transportable-aid
@@ -628,7 +633,6 @@
           "from-date" "Från"
           "to-date" "Till"
           "sub-type" "Alityyppi"}
-
 
 
 
