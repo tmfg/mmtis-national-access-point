@@ -66,11 +66,11 @@
                form-groups (operator-form-groups)]
     [:div
      [:div.row
-      [:div  {:class "col-xs-12 col-sm-4 col-md-4"}
+      [:div  {:class "col-xs-12"}
        [:h1 (tr [:organization-page :organization-form-title])]]]
      (when (second (:transport-operators-with-services state))
        [:div.row
-        [:div  {:class "col-xs-12 col-sm-4 col-md-4"}
+        [:div  {:class "col-xs-12"}
          [form-fields/field
           {:label (tr [:field-labels :select-transport-operator])
            :name        :select-transport-operator
@@ -81,7 +81,7 @@
            :auto-width? true}
           (get state :transport-operator)]]])
 
-     [:div.row
+     [:div.row.organization-info
 
       [form/form
        form-options

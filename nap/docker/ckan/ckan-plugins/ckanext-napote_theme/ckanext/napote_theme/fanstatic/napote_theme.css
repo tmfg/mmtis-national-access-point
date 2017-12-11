@@ -846,6 +846,7 @@ Organization data
 **/
 .organization-info div {
     margin-bottom: 4px;
+    margin-right: 5px;
 }
 
 /* Hide hide-slug-preview */

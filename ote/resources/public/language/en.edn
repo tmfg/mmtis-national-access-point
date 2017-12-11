@@ -89,7 +89,7 @@
    :ote.db.transport-service/price-class-name-other    "Price class"
    :ote.db.transport-service/price-class-name-request  "Price class"
    :ote.db.transport-service/price-class-name-schedule "Price class"
-   :ote.db.transport-service/price-per-unit            "Price per unit"
+   :ote.db.transport-service/price-per-unit            "Price per unit (€)"
    :ote.db.transport-service/unit                      "Unit"
    :ote.db.transport-service/currency                  "Currency"
 
@@ -149,7 +149,7 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
@@ -494,10 +494,13 @@
   :navigation-organizations                   "Palveluntuottajat"
   :navigation-dataset                         "Palvelukatalogi"
   :navigation-give-feedback                   "Anna palautetta"
+  :navigation-login                           "Kirjaudu sisään"
+  :navigation-register                        "Luo tunnus"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Palveluntuottajan perustiedot"
   :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Näytä profiili"
+  :user-menu-profile                          "Käyttäjätilin muokkaus"
+  :user-menu-summary                          "Yhteenveto"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
