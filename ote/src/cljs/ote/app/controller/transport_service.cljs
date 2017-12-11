@@ -23,7 +23,8 @@
     ::t-service/operation-area
     ::t-service/companies
     ::t-service/published?
-    ::t-service/brokerage?})
+    ::t-service/brokerage?
+    ::t-service/description})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
