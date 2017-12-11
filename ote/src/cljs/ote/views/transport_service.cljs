@@ -36,11 +36,10 @@
    :rentals
    :parking])
 
-(defn select-service-type [e! state]
+(defn select-service-type [e! {:keys [transport-operator transport-service] :as state}]
   (let [multiple-operators (if (second (:transport-operators-with-services state)) true false)
-        disabled? (if (or (nil? (get-in state [:transport-service :transport-service-type-subtype]))
-                          (nil? (get state :transport-operator))
-                           ) true false)]
+        disabled? (or (nil? (:transport-service-type-subtype transport-service))
+                      (nil? (::t-operator/id transport-operator)))]
   [:div.row
    [:div {:class "col-sx-12 col-md-12"}
     [:div
@@ -65,8 +64,7 @@
              :show-option (tr-key [:service-type-dropdown])
              :options     modified-transport-service-types
              :auto-width? true}
-            (get-in state [:transport-service :transport-service-type-subtype])]
-            ]
+            (:transport-service-type-subtype transport-service)]]
 
            [:div {:class "col-sx-12 col-sm-4 col-md-4"}
              [form-fields/field
@@ -75,9 +73,9 @@
                :type        :selection
                :update!     #(e! (to/->SelectOperator %))
                :show-option ::t-operator/name
-               :options     (map :transport-operator (:transport-operators-with-services state))
+               :options     (mapv :transport-operator (:transport-operators-with-services state))
                :auto-width? true}
-              (get state :transport-operator)]]]]
+              transport-operator]]]]
     [:div.row
      [:div {:class "col-sx-12 col-sm-4 col-md-4"}
       [ui/raised-button {:style {:margin-top "20px"}
