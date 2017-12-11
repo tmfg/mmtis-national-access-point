@@ -244,3 +244,21 @@
                       :label (tr* :to-date)}]
       :delete? true
       :add-label (tr [:buttons :add-new-service-exception])})))
+
+(defn name-group [label]
+  (form/group
+   {:label label
+    :columns 3
+    :layout :row}
+
+   {:name           ::t-service/name
+    :type           :string
+    :full-width?    true
+    :container-class "col-md-6"
+    :required?      true}
+
+   {:name ::t-service/description
+    :type :localized-text
+    :rows 5
+    :full-width? true
+    :container-class "col-md-8"}))

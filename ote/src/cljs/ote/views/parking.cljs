@@ -29,17 +29,6 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas])})
 
-(defn name-and-type-group [e!]
-  (form/group
-    {:label   (tr [:parking-page :header-service-info])
-     :columns 3
-     :layout  :row}
-
-    {:name      ::t-service/name
-     :type      :string
-     :required? true}))
-
-
 (defn pricing-group [e!]
   (form/group
     {:label   (tr [:parking-page :header-price-and-payment-methods])
@@ -226,7 +215,7 @@
      :full-width?     true}))
 
 (defn parking [e! {form-data ::t-service/parking}]
-  (r/with-let [groups [(name-and-type-group e!)
+  (r/with-let [groups [(ts-common/name-group (tr [:parking-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/parking)
                        (ts-common/external-interfaces)
