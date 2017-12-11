@@ -38,9 +38,9 @@
        (comm/post! "transport-operator/data" {}
                   {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
                    :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-      (assoc app :transport-operator-data-loaded? false
-                 :services-changed? false)
-       ) app))
+       (assoc app :transport-operator-data-loaded? false
+                  :services-changed? false))
+     app))
 
 (extend-protocol tuck/Event
 
@@ -77,7 +77,7 @@
 
   EnsureTransportOperator
   (process-event [_ app]
-     (if (get app :services-changed?)
+     (if (:services-changed? app)
       (get-transport-operator-data app)
       app))
 
