@@ -277,28 +277,40 @@
                 :type :string
                 :regex phone-regex)])
 
-(def number-regex #"\d*([\.,]\d*)?")
+(def number-regex #"\d*([\.,]\d{0,2})?")
 
 (defmethod field :number [_  data]
   ;; Number field contains internal state that has the current
   ;; typed in text (which may be an incompletely typed number).
   ;;
   ;; The value updated to the app model is always a parsed number.
-  (let [txt (r/atom (if data (.toFixed data 2) ""))]
-    (fn [{:keys [update! currency?] :as opts} data]
-      [:span [field (assoc opts
-                    :type :string
-                    :parse js/parseFloat
-                    :regex number-regex
-                    :update! #(do
-                                (reset! txt %)
-                                (update!
-                                   (if (str/blank? %)
-                                     nil
-                                     (-> %
-                                         (str/replace #"," ".")
-                                         (js/parseFloat %))))))
-       @txt] (when currency? "€")])))
+  (let [fmt #(if % (str/replace (.toFixed % 2) #"(,|\.)00" "") "")
+        state (r/atom {:value data
+                       :txt (fmt data)})]
+    (r/create-class
+     {:component-will-receive-props
+      (fn [_ [_ _ new-value]]
+        (swap! state
+               (fn [{:keys [value txt] :as state}]
+                 (if (not= value new-value)
+                   {:value new-value
+                    :txt (fmt new-value)}
+                   state))))
+      :reagent-render
+      (fn [{:keys [update! currency?] :as opts} data]
+        [:span [field (assoc opts
+                             :type :string
+                             :regex number-regex
+                             :update! #(let [new-value (if (str/blank? %)
+                                                         nil
+                                                         (-> %
+                                                             (str/replace #"," ".")
+                                                             (js/parseFloat %)))]
+                                         (reset! state {:value new-value
+                                                        :txt %})
+                                         (update! new-value)))
+                (:txt @state)]
+         (when currency? "€")])})))
 
 (def time-regex #"\d{0,2}(:\d{0,2})?")
 

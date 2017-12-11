@@ -27,16 +27,6 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas])})
 
-(defn name-group [e!]
-  (form/group
-   {:label (tr [:rentals-page :header-service-info])
-    :columns 3
-    :layout :row}
-
-   {:name      ::t-service/name
-    :type      :string
-    :required? true}))
-
 (defn accessibility-group []
   (form/group
    {:label (tr [:rentals-page :header-other-services-and-accessibility])
@@ -130,7 +120,7 @@
       :add-label (tr [:buttons :add-new-pick-up-location])})))
 
 (defn rental [e! service]
-  (reagent/with-let [groups [(name-group e!)
+  (reagent/with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
                              (ts-common/contact-info-group)
                              (ts-common/place-search-group e! ::t-service/rentals)
                              (ts-common/external-interfaces)

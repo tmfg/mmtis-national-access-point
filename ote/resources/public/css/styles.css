@@ -94,6 +94,11 @@ input::-ms-clear {
     padding-bottom: 14px;
     font-size: 28px;
 }
+
+/* Organization page grid exceptions */
+div.organization-info > .form div {
+    padding-right: 5px;
+}
 /* Debug container */
 .debug {
     font-size: 12px;

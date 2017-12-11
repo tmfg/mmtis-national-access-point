@@ -47,7 +47,9 @@
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
+    (routes/navigate! :own-services)
     (assoc app
+      :page :own-services
       :flash-message (tr [:common-texts :transport-operator-saved ])
       :transport-operator data
       :transport-operators-with-services (map (fn [{:keys [transport-operator] :as operator-with-services}]

@@ -30,17 +30,7 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas])})
 
-(defn name-group [e!]
-  (form/group
-   {:label (tr [:passenger-transportation-page :header-service-info])
-    :columns 3
-    :layout :row}
 
-   {:name           ::t-service/name
-    :type           :string
-    :full-width?    true
-    :container-class "col-md-6"
-    :required?      true}))
 
 (defn luggage-restrictions-group []
   (form/group
@@ -191,7 +181,7 @@
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
   (with-let [form-groups
-             [(name-group e!)
+             [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)

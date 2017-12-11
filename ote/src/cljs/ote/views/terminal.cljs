@@ -23,18 +23,6 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas])})
 
-(defn name-group [e!]
-  (form/group
-    {:label (tr [:terminal-page :header-service-info])
-     :columns 3
-     :layout :row}
-
-    {:name ::t-service/name
-     :container-class "col-md-6"
-     :full-width? true
-     :type :string
-     :required? true}))
-
 (defn- indoor-map-group []
   (ts-common/service-url
    (tr [:field-labels :terminal ::t-service/indoor-map])
@@ -116,7 +104,7 @@
    ))
 
 (defn terminal [e! {form-data ::t-service/terminal}]
-  (r/with-let [groups [(name-group e!)
+  (r/with-let [groups [(ts-common/name-group (tr [:terminal-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)

@@ -5,7 +5,7 @@
 
 (def ote-router
   (r/router
-   [["/" :front-page]
+   [["/" :own-services]
     ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
@@ -39,7 +39,7 @@
                          :url js/window.location.href})))))
 
 (defn start! [go-to-url-event]
-  (r/start! ote-router {:default :front-page
+  (r/start! ote-router {:default :own-services
                         :on-navigate (partial on-navigate go-to-url-event)}))
 
 (defn navigate!
