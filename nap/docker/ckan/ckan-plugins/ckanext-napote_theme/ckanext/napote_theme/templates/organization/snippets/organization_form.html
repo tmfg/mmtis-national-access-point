@@ -13,7 +13,7 @@
 
     {{ form.input('name', label='', id='field-url', value=data.name, type='hidden', attrs=attrs ) }}
 
-    {{ form.markdown('description', label=_('Description'), id='field-description', placeholder=_('A little information about my organization...'), value=data.description, error=errors.description) }}
+    {{ form.textarea('description', label=_('Description'), id='field-description', placeholder=_('A little information about my organization...'), value=data.description, error=errors.description) }}
 
     {% set is_upload = data.image_url and not data.image_url.startswith('http') %}
     {% set is_url = data.image_url and data.image_url.startswith('http') %}
