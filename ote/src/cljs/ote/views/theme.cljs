@@ -81,14 +81,6 @@
                        ;; Hint color in text fields
                        :disabledColor  (color :grey900)
 
-                       ;; Border color
-                       :borderColor (color :grey600)
-
-                       :shadowColor (color :grey900)
-
-                       ;; canvas color
-                       ;;:canvas-color  (color :lightBlue50)
-
                        ;; Main text color
                        :text-color     (color :grey900)
                        }
