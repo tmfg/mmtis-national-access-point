@@ -89,7 +89,7 @@
    :ote.db.transport-service/price-class-name-other    "Price class"
    :ote.db.transport-service/price-class-name-request  "Price class"
    :ote.db.transport-service/price-class-name-schedule "Price class"
-   :ote.db.transport-service/price-per-unit            "Price per unit"
+   :ote.db.transport-service/price-per-unit            "Price per unit (€)"
    :ote.db.transport-service/unit                      "Unit"
    :ote.db.transport-service/currency                  "Currency"
 
@@ -149,7 +149,7 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
