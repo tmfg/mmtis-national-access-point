@@ -95,7 +95,7 @@
                     :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips
                     :other])
 
-;; Create separate order for accessibility-info-facility
+;; Create order for accessibility-info-facility
 (def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
                                         :displays-for-visually-impaired :large-print-timetables :other])
 
@@ -103,6 +103,9 @@
 (def parking-accessibility [:lift :ramp :stairs :narrow-entrance :barrier :wheelchair-access-toilet
                             :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips
                             :other])
+
+(def parking-information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
+                                                :displays-for-visually-impaired :other])
 
 (defn service-key-by-type
   "Returns the service column keyword for the given type enum value."

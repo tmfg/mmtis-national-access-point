@@ -202,7 +202,7 @@
     {:name            ::t-service/information-service-accessibility
      :type            :checkbox-group
      :show-option     (tr-key [:enums ::t-service/information-service-accessibility])
-     :options         t-service/information-service-accessibility
+     :options         t-service/parking-information-service-accessibility
      :full-width?     true
      :container-class "col-md-5"}
 
