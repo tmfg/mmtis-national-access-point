@@ -79,7 +79,6 @@
                                                         <li>
                                                             <a href="{{ h.url_for(controller='admin', action='index') }}"
                                                                title="{{ _('Sysadmin settings') }}">
-                                                                <!--i class="fa fa-gavel" aria-hidden="true"></i-->
                                                                 <span class="text">{{ _('Admin') }}</span>
                                                             </a>
                                                         </li>
@@ -89,7 +88,6 @@
                                                         {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
                                                         <a href="{{ h.url_for(controller='user', action='dashboard_datasets') }}"
                                                            title="{{ notifications_tooltip }}">
-                                                            <!--i class="fa fa-tachometer" aria-hidden="true"></i-->
                                                             <span class="text">{{ _('Dashboard') }}</span>
                                                             <span class="badge">{{ new_activities }}</span>
                                                         </a>
@@ -98,14 +96,12 @@
                                                         <li>
                                                             <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}"
                                                                title="{{ _('View profile') }}">
-                                                                <!--i class="fa fa-user" aria-hidden="true"></i-->
                                                                 <span class="text">{{ _('View profile') }}</span>
                                                             </a>
                                                         </li>
                                                         <li>
                                                             <a href="/ote/#/transport-operator"
                                                                title="{{ _('View organization info') }}">
-                                                                <!--i class="fa fa-building-o" aria-hidden="true"></i-->
                                                                 <span class="text">{{ _('Edit Organization') }}</span>
                                                             </a>
                                                         </li>
@@ -114,7 +110,6 @@
                                                         <li>
                                                             <a href="{{ h.url_for('/user/_logout') }}"
                                                                title="{{ _('Log out') }}">
-                                                                <!--i class="fa fa-sign-out" aria-hidden="true"></i-->
                                                                 <span class="text">{{ _('Log out') }}</span>
                                                             </a>
                                                         </li>

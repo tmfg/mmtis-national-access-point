@@ -68,7 +68,7 @@
          flag]))]))
 
 (defn user-menu [e! name username]
-  (when (not (nil? username))
+  (when username
     [ui/drop-down-menu
     {:menu-style {}
      :underline-style {}
@@ -101,7 +101,7 @@
                    :primary-text (r/as-element [language-selection e!])}]]))
 
 
-(defn is-page-active
+(defn page-active
   "Return true if given current-page belongs to given page-group"
   [page-group current-page]
   (cond
@@ -138,7 +138,7 @@
        [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
         [:a
          (merge (stylefy/use-style
-                 (if (is-page-active page current-page)
+                 (if (page-active? page current-page)
                    (if desktop? style-topnav/desktop-active style-topnav/active)
                    (if desktop? style-topnav/desktop-link style-topnav/link)))
                 {:href     "#"
