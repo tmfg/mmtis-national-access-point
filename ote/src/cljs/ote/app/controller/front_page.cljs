@@ -1,6 +1,7 @@
 (ns ote.app.controller.front-page
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
+            [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]))
 
 
@@ -122,11 +123,17 @@
       (doall
         (routes/navigate! :no-operator)
         (assoc app :page :no-operator))
-
-      (assoc app
-        :transport-operators-with-services response
-        :transport-operator  (get (first response) :transport-operator)
-        :transport-service-vector (get (first response) :transport-service-vector)))))
+      ;; Get services from response.
+      ;; Use selected operator if possible, if not, use the first one from the response
+      ;; Get selected services from the response using selected operator id
+      (assoc app :transport-operators-with-services response
+                 :transport-operator  (if (:transport-operator app)
+                                        (:transport-operator app)
+                                        (get (first response) :transport-operator))
+                 :transport-service-vector (some #(when (= (get-in % [:transport-operator ::t-operator/id])
+                                                           (get-in app [:transport-operator ::t-operator/id]))
+                                                        (:transport-service-vector %))
+                                                 (:transport-operators-with-services app))))))
 
   SetLanguage
   (process-event [{lang :lang} app]
