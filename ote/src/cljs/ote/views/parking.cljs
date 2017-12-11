@@ -195,29 +195,22 @@
     {:name            ::t-service/accessibility
      :type            :checkbox-group
      :show-option     (tr-key [:enums ::t-service/accessibility])
-     :options         t-service/accessibility
+     :options         t-service/parking-accessibility
      :full-width?     true
      :container-class "col-md-6"}
-
-    {:name            ::t-service/mobility
-     :type            :checkbox-group
-     :show-option     (tr-key [:enums ::t-service/mobility])
-     :options         t-service/parking-mobility
-     :full-width?     true
-     :container-class "col-md-5"}
 
     {:name            ::t-service/information-service-accessibility
      :type            :checkbox-group
      :show-option     (tr-key [:enums ::t-service/information-service-accessibility])
      :options         t-service/information-service-accessibility
      :full-width?     true
-     :container-class "col-md-6"}
+     :container-class "col-md-5"}
 
     {:name            ::t-service/accessibility-description
      :type            :localized-text
      :rows            5
      :max-rows        5
-     :container-class "col-md-5"
+     :container-class "col-md-6"
      :full-width?     true}
 
     {:name            ::t-service/accessibility-info-url
