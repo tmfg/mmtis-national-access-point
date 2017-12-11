@@ -58,7 +58,6 @@
 - name: Copy CKAN schema
   copy: src=../../nap/docker/solr/schema.xml dest=/var/solr/data/ckan/conf/schema.xml
 
-- name:
 - name: Create core.properties
   template: src=templates/core.properties.j2 dest=/var/solr/data/ckan/core.properties
 

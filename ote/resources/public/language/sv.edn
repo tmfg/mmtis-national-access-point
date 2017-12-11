@@ -582,6 +582,20 @@
                    "umbrella" "Sateenvarjo"
                    "buggy" "Lastenvaunut"
                    "other" "Muu"
+                   "boarding-assistance" "Kyytiin nousun avustus"
+                   "low-floor" "Matalalattia"
+                   "accessible-vehicle" "Esteetön kulkuneuvo"
+                   "step-free-access" "Portaaton pääsy"
+                   "suitable-for-wheelchairs" "Sopii pyörätuolille"
+                   "assistance-dog-space" "Tila avustuskoiralle"
+                   "crutches" "Kainalosauvat"
+                   "walker" "Rollaattori"
+                   "walking-stick" "Kävelykeppi"
+"visual-displays" "Visuaaliset näytöt"
+                   "large-print-timetables" "Suuret kirjasimet aikatauluissa"
+                   "displays-for-visually-impaired" "Näytöt näkövammaisille (taktiili)"
+                   "audio-information" "Kuulutukset"
+                   "audio-for-hearing-impaired" "Äänivahvistimet huonokuuloisille"
 
                    ;; additional services
                    "animal-transport" "Eläinkuljetus"
@@ -595,7 +609,44 @@
                    "contactless-payment" "Lähimaksu"
                    "mobilepay" "Mobiilimaksu"
                    "invoice" "Lasku"
-                   }}
+
+                   ;; week days
+                   "MON" "Mån"
+                   "TUE" "Tis"
+                   "WED" "Ons"
+                   "THU" "Tors"
+                   "FRI" "Fre"
+                   "SAT" "Lör"
+                   "SUN" "Sön"
+                   }
+          "brokerage?" "Välityspalvelu?"
+          "companies" "Palvelun tuottamiseen osallistuvat yritykset"
+          "external-interfaces" "Ulkoiset rajapinnat"
+          "license" "Lisenssi/käyttöehdot"
+          "format" "Muoto"
+          "license-url" "Lisenssi/käyttöehdot URL"
+          "external-interface" "Ulkoinen rajapinta"
+          "accessibility-info-url" "Esteettömyyspalveluiden kuvaus (WWW)"
+          "guaranteed-accessibility-description" "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
+          "guaranteed-info-service-accessibility" "Infopalveluiden esteettömyys (taattu saatavuus)"
+          "guaranteed-transportable-aid" "Kuljetettavat apuvälineet (taattu saatavuus)"
+          "guaranteed-vehicle-accessibility" "Liikennevälineiden esteettömyysominaisuudet (aina saatavilla)."
+          "limited-accessibility-description" "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
+          "limited-info-service-accessibility" "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+          "limited-transportable-aid" "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
+          "limited-vehicle-accessibility" "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
+          "payment-method-description" "Maksutapojen lisätiedot"
+          "pricing" "Hinnoittelu"
+          "service-exceptions" "Toiminta-aikojen poikkeukset"
+          "service-hours" "Toiminta-ajat"
+          "week-days" "Dagar"
+          "from" "Från"
+          "to" "Till"
+          "from-date" "Från"
+          "to-date" "Till"
+          "sub-type" "Alityyppi"}
+
+
 
 
  :service-search
