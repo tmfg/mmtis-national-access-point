@@ -1,0 +1,7 @@
+---
+
+- name: Install Hostsfile
+  hosts: all
+  become: true
+  tasks:
+    - include: tasks/hosts.yml
