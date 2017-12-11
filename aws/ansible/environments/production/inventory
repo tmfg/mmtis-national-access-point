@@ -1,0 +1,11 @@
+[ckan]
+napote-ckan1-prod
+napote-ckan2-prod
+
+[solr]
+napote-solr1-prod
+napote-solr2-prod
+
+[ote]
+napote-ote1-prod
+napote-ote2-prod
