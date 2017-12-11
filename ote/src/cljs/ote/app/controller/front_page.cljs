@@ -1,6 +1,7 @@
 (ns ote.app.controller.front-page
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
+            [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]))
 
 
@@ -31,6 +32,16 @@
                          :navigation-prompt-open?
                          :before-unload-message
                          :navigation-confirm))))
+
+(defn get-transport-operator-data [app]
+   (if (get app :transport-operator-data-loaded? true)
+     (do
+       (comm/post! "transport-operator/data" {}
+                  {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                   :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
+       (assoc app :transport-operator-data-loaded? false
+                  :services-changed? false))
+     app))
 
 (extend-protocol tuck/Event
 
@@ -67,11 +78,8 @@
 
   EnsureTransportOperator
   (process-event [_ app]
-    (if (empty? (get app :transport-operator))
-      (do
-        (routes/navigate! :no-operator)
-        (assoc app :page :no-operator)
-        )
+     (if (:services-changed? app)
+      (get-transport-operator-data app)
       app))
 
   GetTransportOperator
@@ -94,10 +102,7 @@
   GetTransportOperatorData
   ;; FIXME: this should be called something else, like SessionInit (the route as well)
   (process-event [_ app]
-    (comm/post! "transport-operator/data" {}
-                {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
-                 :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-    (assoc app :transport-operator-data-loaded? false))
+    (get-transport-operator-data app))
 
   TransportOperatorDataFailed
   (process-event [{error :error} app]
@@ -110,20 +115,25 @@
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
-    (let [app (assoc app
-                :transport-operator-data-loaded? true
-                :user (:user (first response)))]
+    (let [app (assoc app :transport-operator-data-loaded? true
+                         :user (:user (first response)))]
     ;; First time users don't have operators.
     ;; Ask them to add one
     (if (and (nil? (get (first response) :transport-operator)) (not= :services (get app :page)))
       (doall
         (routes/navigate! :no-operator)
         (assoc app :page :no-operator))
-
-      (assoc app
-        :transport-operators-with-services response
-        :transport-operator  (get (first response) :transport-operator)
-        :transport-service-vector (get (first response) :transport-service-vector)))))
+      ;; Get services from response.
+      ;; Use selected operator if possible, if not, use the first one from the response
+      ;; Get selected services from the response using selected operator id
+      (assoc app :transport-operators-with-services response
+                 :transport-operator  (if (:transport-operator app)
+                                        (:transport-operator app)
+                                        (get (first response) :transport-operator))
+                 :transport-service-vector (some #(when (= (get-in % [:transport-operator ::t-operator/id])
+                                                           (get-in app [:transport-operator ::t-operator/id]))
+                                                        (:transport-service-vector %))
+                                                 (:transport-operators-with-services app))))))
 
   SetLanguage
   (process-event [{lang :lang} app]

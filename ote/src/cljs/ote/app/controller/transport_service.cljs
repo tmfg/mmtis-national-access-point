@@ -284,8 +284,9 @@
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
-      (assoc app :transport-service-vector filtered-map))
-    )
+      (assoc app :transport-service-vector filtered-map
+                 :page :own-services
+                 :services-changed? true)))
 
   SaveTransportService
   (process-event [{:keys [schemas publish?]} {service :transport-service
@@ -312,7 +313,9 @@
                 (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
                 response)]
     (routes/navigate! :own-services)
-    (dissoc app :transport-service)))
+    (-> app
+        (assoc :services-changed? true)
+        (dissoc :transport-service))))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
