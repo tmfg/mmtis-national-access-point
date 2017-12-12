@@ -15,6 +15,7 @@
             [tuck.core :as tuck]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
+            [ote.style.form :as style-form]
             [ote.util.values :as values]))
 
 (defn rental-form-options [e! schemas]
@@ -27,35 +28,176 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas])})
 
+(defn price-group []
+  (form/group
+   {:label (tr [:rentals-page :header-service-info])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/price-classes
+    :type :table
+    :table-fields [{:name ::t-service/price-per-unit
+                    :type :number
+                    :currency? true
+                    :style {:width "100px"}
+                    :input-style {:text-align "right" :padding-right "5px"}}
+
+                   {:name ::t-service/unit
+                    :type :string}] 
+    :delete? true
+    :add-label (tr [:buttons :add-new-price-class])}
+   ))
+
+(defn price-classes [update-form! data]
+  (reagent/with-let [open? (reagent/atom false)]
+    [:div
+     [ui/flat-button {:label (tr [:rentals-page :open-rental-prices])
+                      :on-click #(reset! open? true)}]
+     [ui/dialog
+      {:open @open?
+       :auto-scroll-body-content true
+       :title (tr [:price-dialog :header-dialog])
+       :actions [(reagent/as-element
+                  [ui/flat-button {:label (tr [:buttons :close])
+                                   :on-click #(reset! open? false)}])]}
+      [form/form {:update! update-form!
+                  :name->label (tr-key [:field-labels :rentals]
+                                       [:field-labels :transport-service]
+                                       [:field-labels])}
+       [(assoc-in (price-group) [:options :card?] false)]
+       data]]
+     ]))
+
+(defn vehicle-group []
+  (form/group
+   {:label (tr [:rentals-page :header-vehicles])
+    :columns 3}
+   
+   {:name ::t-service/vehicle-classes
+    :type :table
+    :table-fields [{:name ::t-service/vehicle-type
+                    :type :string}
+                   {:name ::t-service/license-required
+                    :type :string}
+                   {:name ::t-service/minimum-age
+                    :type :number}
+                   {:name :price-group
+                    :type :component
+                    :component (fn [{:keys [update-form! data]}]
+                                 [price-classes update-form! data])
+                    }]
+    :delete? true
+    :add-label (tr [:buttons :add-new-vehicle])})
+  )
+
 (defn accessibility-group []
   (form/group
-   {:label (tr [:rentals-page :header-other-services-and-accessibility])
+   {:label (tr [:rentals-page :header-accessibility])
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/additional-services
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/additional-services])
-    :options     t-service/additional-services}
+   {:name        ::t-service/guaranteed-vehicle-accessibility 
+    :help (tr [:form-help :guaranteed-vehicle-accessibility])
+    :type        :checkbox-group
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/rental-vehicle-accessibility
+    :full-width? true
+    :container-class "col-md-6"}
 
-   {:name        ::t-service/accessibility-tool
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool}
+   {:name        ::t-service/limited-vehicle-accessibility
+    :help (tr [:form-help :limited-vehicle-accessibility])
+    :type        :checkbox-group 
+    :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
+    :options     t-service/rental-vehicle-accessibility
+    :full-width? true
+    :container-class "col-md-6"}
 
-   {:name ::t-service/accessibility-description
+   {:name ::t-service/guaranteed-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/rental-transportable-aid
+    :full-width? true
+    :container-class "col-md-6"}
+
+   {:name ::t-service/limited-transportable-aid
+    :type :checkbox-group
+    :show-option (tr-key [:enums ::t-service/transportable-aid])
+    :options t-service/rental-transportable-aid
+    :full-width? true
+    :container-class "col-md-6"}
+
+   {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
-    :rows 1 }))
+    :rows 1
+    :full-width? true
+    :container-class "col-md-6"}
 
-(defn eligibity-requirements []
+   {:name ::t-service/limited-accessibility-description
+    :type :localized-text
+    :rows 1
+    :container-class "col-md-6"
+    :full-width? true}
+
+   {:name ::t-service/accessibility-info-url
+    :type :string
+    :container-class "col-md-6"
+    :full-width? true}))
+
+(defn additional-services []
   (form/group
-   {:label (tr [:rentals-page :header-eligibity-requirements])
+   {:label (tr [:rentals-page :header-additional-services])
     :columns 3
     :layout :row}
 
-   {:name ::t-service/eligibility-requirements
-    :type :string
-    :layout :row}))
+   {:name ::t-service/rental-additional-services
+    :type :table
+    :table-fields [{:name ::t-service/additional-service-type
+                    :type        :selection
+                    :show-option (tr-key [:enums ::t-service/additional-services])
+                    :options     t-service/additional-services}
+
+                   {:name ::t-service/additional-service-price
+                    :type :number
+                    :currency? true
+                    :style {:width "100px"}
+                    :input-style {:text-align "right" :padding-right "5px"}
+                    :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
+                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)}
+
+                   {:name ::t-service/additional-service-unit
+                    :type :string
+                    :read (comp ::t-service/unit ::t-service/additional-service-price)
+                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/unit] %2)}]
+    :delete? true
+    :add-label (tr [:buttons :add-new-additional-service])}))
+
+(defn luggage-restrictions-groups []
+  (form/group
+   {:label (tr [:rentals-page :header-restrictions-payments])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/luggage-restrictions
+    :type :localized-text
+    :rows 1}
+
+   {:name        ::t-service/payment-methods
+    :type        :multiselect-selection
+    :show-option (tr-key [:enums ::t-service/payment-methods])
+    :options     t-service/payment-methods})
+  )
+
+(defn usage-area []
+  (form/group
+   {:label (tr [:rentals-page :header-usage-area])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/usage-area
+    :type :localized-text
+    :full-width? true
+    :container-class "col-md-12"
+    :rows 1}))
 
 (defn service-hours-for-location [update-form! data]
   (reagent/with-let [open? (reagent/atom false)]
@@ -124,13 +266,16 @@
                              (ts-common/contact-info-group)
                              (ts-common/place-search-group e! ::t-service/rentals)
                              (ts-common/external-interfaces)
+                             (vehicle-group)
+                             (luggage-restrictions-groups)
                              (accessibility-group)
-                             (eligibity-requirements)
+                             (additional-services)
+                             (usage-area)
                              (ts-common/service-url
-                              (tr [:field-labels :transport-service-common ::t-service/rental-service])
-                              ::t-service/rental-service)
+                              (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                              ::t-service/booking-service)
                              (pick-up-locations e!)
                              ]
                      options (rental-form-options e! groups)]
     [:div.row
-      [form/form options groups (get service ::t-service/rentals)]]))
+     [form/form options groups (get service ::t-service/rentals)]]))
