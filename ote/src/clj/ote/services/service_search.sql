@@ -18,6 +18,7 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
 -- name: latest-service-ids
 -- row-fn: :id
 SELECT id FROM "transport-service"
+ WHERE "published?" = TRUE
  ORDER BY COALESCE(modified, created) DESC, name ASC
  LIMIT 20;
 
