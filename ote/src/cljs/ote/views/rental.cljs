@@ -64,7 +64,6 @@
                   :name->label (tr-key [:field-labels :rentals]
                                        [:field-labels :transport-service]
                                        [:field-labels])}
-       ;; [(assoc-in (ts-common/service-hours-group) [:options :card?] false)]
        [(assoc-in (price-group) [:options :card?] false)]
        data]]
      ]))
@@ -83,7 +82,6 @@
                    {:name ::t-service/minimum-age
                     :type :number}
                    {:name :price-group
-                    :label (tr [:field-labels :rentals ::t-service/price-classes])
                     :type :component
                     :component (fn [{:keys [update-form! data]}]
                                  [price-classes update-form! data])
@@ -104,8 +102,7 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/rental-vehicle-accessibility
     :full-width? true
-    :container-style (merge style-form/half-width
-                            style-form/border-right)}
+    :container-class "col-md-6"}
 
    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
@@ -113,38 +110,37 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/rental-vehicle-accessibility
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-6"}
 
    {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
-    :container-style (merge style-form/half-width
-                            style-form/border-right)}
+    :container-class "col-md-6"}
 
    {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-6"}
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
-    :rows 1 :max-rows 5
+    :rows 1
     :full-width? true
-    :container-style style-form/half-width}
+    :container-class "col-md-6"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
-    :rows 1 :max-rows 5
-    :container-style style-form/half-width
+    :rows 1
+    :container-class "col-md-6"
     :full-width? true}
 
    {:name ::t-service/accessibility-info-url
     :type :string
-    :container-style style-form/half-width
+    :container-class "col-md-6"
     :full-width? true}))
 
 (defn additional-services []
@@ -183,7 +179,7 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :rows 1 :max-rows 5}
+    :rows 1}
 
    {:name        ::t-service/payment-methods
     :type        :multiselect-selection
@@ -198,8 +194,10 @@
     :layout :row}
 
    {:name ::t-service/usage-area
-    :type :string
-    :layout :row}))
+    :type :localized-text
+    :full-width? true
+    :container-class "col-md-12"
+    :rows 1}))
 
 (defn service-hours-for-location [update-form! data]
   (reagent/with-let [open? (reagent/atom false)]
