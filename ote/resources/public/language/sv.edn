@@ -508,6 +508,7 @@
                :hours    "Tuntia"
                :days     "Päivää"
                :seconds  "Sekuntia"}
+  :save-failed                                "Tallennettaessa sattui virhe. Tarkista lomakkeen tiedot"
   }
 
  :dialog

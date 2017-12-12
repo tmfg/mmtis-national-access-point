@@ -74,6 +74,7 @@
 (defrecord EditTransportService [form-data])
 (defrecord SaveTransportService [schemas publish?])
 (defrecord SaveTransportServiceResponse [response])
+(defrecord FailedTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
 
 (defrecord SelectServiceType [data])
@@ -305,7 +306,8 @@
               (update ::t-service/operation-area place-search/place-references)
               transform-save-by-type)]
       (comm/post! "transport-service" service-data
-                  {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
+                  {:on-success (tuck/send-async! ->SaveTransportServiceResponse)
+                   :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
       (dissoc app :before-unload-message)))
 
   SaveTransportServiceResponse
@@ -317,6 +319,10 @@
     (-> app
         (assoc :services-changed? true)
         (dissoc :transport-service))))
+
+  FailedTransportServiceResponse
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error (tr [:common-texts :save-failed]))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]

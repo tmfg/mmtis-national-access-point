@@ -48,7 +48,10 @@
                   :padding-top "20px"
                   :font-weight "600"})
 
-(def flash-message {:top "100px"})
+(def success-flash-message-content {:background-color "#dff0d8" :color "#3c763d"})
+(def success-flash-message-body {:background-color "#dff0d8"})
+(def error-flash-message-content {:background-color "#f2dede" :color "#a94442"})
+(def error-flash-message-body {:background-color "#f2dede"})
 
 (def title {:font-weight "bold"})
 

@@ -23,6 +23,8 @@
 (defrecord TransportOperatorDataResponse [response])
 (defrecord TransportOperatorDataFailed [error])
 
+(defrecord ClearFlashMessage [])
+
 (defn navigate [event {:keys [before-unload-message navigation-prompt-open?] :as app} navigate-fn]
   (if (and before-unload-message (not navigation-prompt-open?))
     (assoc app
@@ -147,4 +149,8 @@
   SetLanguage
   (process-event [{lang :lang} app]
     (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
-    (.reload js/window.location)))
+    (.reload js/window.location))
+
+  ClearFlashMessage
+  (process-event [_ app]
+     (dissoc app :flash-message :flash-message-error)))
