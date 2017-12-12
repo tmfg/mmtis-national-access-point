@@ -74,7 +74,7 @@
    {:label (tr [:rentals-page :header-vehicles])
     :columns 3}
    
-   {:name ::t-service/rental-vehicles
+   {:name ::t-service/vehicle-classes
     :type :table
     :table-fields [{:name ::t-service/vehicle-type
                     :type :string}

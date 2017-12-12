@@ -111,15 +111,15 @@
                             (dissoc loc ::t-service/service-hours-and-exceptions)))
                         pick-up-locations)
                    ))
-      (update-in [::t-service/rentals ::t-service/rental-vehicles]
-                 (fn [rental-vehicles]               
+      (update-in [::t-service/rentals ::t-service/vehicle-classes]
+                 (fn [vehicle-classes]               
                    (mapv (fn [{prices-and-units :price-group :as price-group}]
                           (as-> price-group price
                             (if-let [prices (::t-service/price-classes prices-and-units)]
                               (assoc price ::t-service/price-classes prices)
                               price)
                             (dissoc price :price-group)))
-                        rental-vehicles)))))
+                        vehicle-classes)))))
 
 (defmethod transform-save-by-type :default [service] service)
 
@@ -142,15 +142,15 @@
                                (dissoc ::t-service/service-hours
                                        ::t-service/service-exceptions)))
                          pick-up-locations)))
-      (update-in [::t-service/rentals ::t-service/rental-vehicles]
-                 (fn [rental-vehicles]
+      (update-in [::t-service/rentals ::t-service/vehicle-classes]
+                 (fn [vehicle-classes]
                    (mapv (fn [{price-classes ::t-service/price-classes
-                               :as rental-vehicle}]
-                           (-> rental-vehicle
+                               :as vehicle-class}]
+                           (-> vehicle-class
                                (assoc :price-group 
                                       {::t-service/price-classes price-classes})
                                (dissoc ::t-service/price-classes)))
-                         rental-vehicles)))))
+                         vehicle-classes)))))
 
 (defmethod transform-edit-by-type :default [service] service)
 
