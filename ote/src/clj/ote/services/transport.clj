@@ -130,6 +130,15 @@
               (fn [price-classes-float]
                 (mapv #(update-in % price-per-unit-path bigdec) price-classes-float)))))
 
+(defn- update-rental-vehicle-prices [service]
+  (update-in service [::t-service/rentals ::t-service/rental-vehicles]
+             (fn [vehicles]
+               (mapv #(let [before %
+                            after (fix-price-classes % [::t-service/vehicle-prices])]
+                        (println "BEFORE: " % "nAFTER:" after)
+                        after)
+                     vehicles))))
+
 (defn- floats-to-bigdec
   "Frontend sends some values as floating points. Convert them to bigdecimals before db insert."
   [service]
@@ -139,8 +148,10 @@
     :parking
     (fix-price-classes service [::t-service/parking ::t-service/price-classes])
     :rentals
-    (fix-price-classes service [::t-service/rentals ::t-service/rental-additional-services]
-                       [::t-service/additional-service-price ::t-service/price-per-unit])
+    (-> service
+        (fix-price-classes [::t-service/rentals ::t-service/rental-additional-services]
+                           [::t-service/additional-service-price ::t-service/price-per-unit])
+        update-rental-vehicle-prices)
     service))
 
 (defn- save-external-interfaces

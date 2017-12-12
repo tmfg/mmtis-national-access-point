@@ -121,7 +121,7 @@
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/usage-area                "Sallitut maat"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/rental-vehicle            "Vuokrattavat ajoneuvot"
+   :ote.db.transport-service/rental-vehicles           "Vuokrattavat ajoneuvot"
    :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
    :ote.db.transport-service/license-required          "Ajokorttiluokka"
    :ote.db.transport-service/minimum-age               "Alaikäraja"

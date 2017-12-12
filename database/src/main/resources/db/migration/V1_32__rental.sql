@@ -19,7 +19,7 @@ CREATE TYPE rental_vehicle AS (
 );
 
 ALTER TYPE rental_provider_information
-  ADD ATTRIBUTE "rental-vehicle" rental_vehicle[];
+  ADD ATTRIBUTE "rental-vehicles" rental_vehicle[];
 
 ALTER TYPE rental_provider_information
   ADD ATTRIBUTE "usage-area" VARCHAR(500);

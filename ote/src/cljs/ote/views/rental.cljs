@@ -83,15 +83,14 @@
    {:label (tr [:rentals-page :header-vehicles])
     :columns 3}
    
-   {:name ::t-service/rental-vehicle
+   {:name ::t-service/rental-vehicles
     :type :table
     :table-fields [{:name ::t-service/vehicle-type
                     :type :string}
                    {:name ::t-service/license-required
                     :type :string}
                    {:name ::t-service/minimum-age
-                    :type :string
-                    :regex #"\d{0,2}"}
+                    :type :number}
                    {:name :price-group
                     :label (tr [:field-labels :rentals ::t-service/vehicle-prices])
                     :type :component
