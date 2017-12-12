@@ -196,6 +196,7 @@
 
    :ote.db.transport-service/brokerage?  "Välityspalvelu"
 
+   :ote.db.transport-service/available-from-and-to-title "Palvelun voimassaoloaika"
    :ote.db.transport-service/available-from "Tillgänglig från"
    :ote.db.transport-service/available-to "Tillgänglig till"
    :ote.db.transport-service/available-from-nil "Nu"
@@ -225,6 +226,8 @@
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
   :operation-area "Lägga till toiminta-alue (esim. maakunta) kirjoittamalla alueen nimi tekstikenttään ja valitsemalla haluttu alue listalta. Voit myös piirtää alueen kartan piirtotyökaluilla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+
+  :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -kentän päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -kentän päivämäärä tyhjäksi (\"Toistaiseksi\")."
   }
 
 
@@ -478,7 +481,7 @@
  {:header-dialog "Ajoneuvon hintatiedot"
   :close-dialog  "Sulje"
   }
- 
+
  :opening-hours-dialog
  {:close-dialog "Sulje"
   :header-dialog "Toimipisteen aukioloajat"

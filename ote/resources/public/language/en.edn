@@ -196,6 +196,7 @@
 
    :ote.db.transport-service/brokerage?  "Välityspalvelu"
 
+   :ote.db.transport-service/available-from-and-to-title "Service availability date"
    :ote.db.transport-service/available-from "Available from"
    :ote.db.transport-service/available-to "Available to"
    :ote.db.transport-service/available-from-nil "Immediately"
@@ -225,6 +226,8 @@
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
   :operation-area "Add the service operation area (for example province) by typing the name in the text field and selecting it from the list. You can also draw the area with the map drawing tools. You can name the area freely (like \"Itäkeskus taxi station\")."
+
+  :available-from-and-to "Set date range when this service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
   }
 
 
@@ -480,7 +483,7 @@
  {:header-dialog "Ajoneuvon hintatiedot"
   :close-dialog  "Sulje"
   }
- 
+
  :opening-hours-dialog
  {:close-dialog "Sulje"
   :header-dialog "Toimipisteen aukioloajat"

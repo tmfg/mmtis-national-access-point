@@ -75,7 +75,8 @@
                   :background-color "#DAEDF7"
                   :padding "0.2em"
                   :margin "0.2em"
-                  :align-items "center"}))
+                  :align-items "center"
+                  :white-space "pre-wrap"}))
 
 (def language-selection
   {:border-top "solid 1px white"
