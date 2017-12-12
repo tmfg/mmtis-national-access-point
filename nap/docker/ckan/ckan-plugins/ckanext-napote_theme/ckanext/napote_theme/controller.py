@@ -201,7 +201,7 @@ class CustomUserController(UserController):
 
             user_dict = get_action('user_show')(context, data_dict)
 
-            return h.redirect_to(str('/ote/#/'))
+            return h.redirect_to(str('/ote/#/?logged_in=1'))
         else:
             err = _('Login failed. Bad username or password.')
             if asbool(config.get('ckan.legacy_templates', 'false')):
