@@ -375,12 +375,15 @@
                     :locale "fi-FI"
                     :Date-time-format js/Intl.DateTimeFormat}]
    (when show-clear?
-         [ui/icon-button {:on-click #(update! nil)
-                          :disabled? (not data)
-                      :style {:position "relative"
-                              :left "-30px"
-                              :top "5px"}}
-      [ic/content-clear]])])
+     [ui/icon-button {:on-click #(update! nil)
+                      :disabled? (not data)
+                      :style {:width 16 :height 16
+                              :position "relative"
+                              :padding 0
+                              :left -15
+                              :top "5px"}
+                      :icon-style {:width 16 :height 16}}
+      [ic/content-clear {:style {:width 16 :height 16}}]])])
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
