@@ -13,7 +13,8 @@ import ckan.plugins as p
 
 import ckan.lib.navl.dictization_functions as dictization_functions
 
-from ckan.common import _, c, request, response
+from ckan.common import _, c, request, response, config
+from paste.deploy.converters import asbool
 
 from ckan.controllers.user import UserController
 
@@ -175,7 +176,7 @@ class CustomUserController(UserController):
         if not c.user:
             came_from = request.params.get('came_from')
             if not came_from:
-                came_from = h.url_for(controller='home', action='index',
+                came_from = h.url_for(controller='user', action='logged_in',
                                       __ckan_no_root=True)
             c.login_handler = h.url_for(
                 self._get_repoze_handler('login_handler_path'),
@@ -187,6 +188,28 @@ class CustomUserController(UserController):
             return render('user/login.html', extra_vars=vars)
         else:
             return render('user/logout_first.html')
+
+    def logged_in(self):
+        # redirect if needed
+        came_from = request.params.get('came_from', '')
+        if h.url_is_local(came_from):
+            return h.redirect_to(str(came_from))
+
+        if c.user:
+            context = None
+            data_dict = {'id': c.user}
+
+            user_dict = get_action('user_show')(context, data_dict)
+
+            return h.redirect_to(str('/ote/#/'))
+        else:
+            err = _('Login failed. Bad username or password.')
+            if asbool(config.get('ckan.legacy_templates', 'false')):
+                h.flash_error(err)
+                h.redirect_to(controller='user',
+                              action='login', came_from=came_from)
+            else:
+                return self.login(error=err)
 
     def logout(self):
         # Do any plugin logout stuff
