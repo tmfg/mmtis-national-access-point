@@ -374,7 +374,7 @@
                     :cancel-label (or cancel-label (tr [:buttons :cancel]))
                     :locale "fi-FI"
                     :Date-time-format js/Intl.DateTimeFormat}]
-   (when show-clear? data
+   (when show-clear?
          [ui/icon-button {:on-click #(update! nil)
                           :disabled? (not data)
                       :style {:position "relative"
