@@ -16,7 +16,7 @@
                                 }
 
            ;; Currently selected / edited transport operator (company basic info)
-           :transport-operator {}
+           :transport-operator nil
 
            ;; Currently selected / edited transport service
            :transport-service {}}))

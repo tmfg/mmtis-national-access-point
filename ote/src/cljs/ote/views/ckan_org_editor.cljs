@@ -1,7 +1,6 @@
 (ns ote.views.ckan-org-editor
   "OTE organization data editor for CKAN organization info page. (CKAN embedded view)"
-  (:require [ote.app.controller.ckan-org-editor :as org-edit]
-            [ote.views.theme :refer [theme]]
+  (:require [ote.views.theme :refer [theme]]
             [cljs-react-material-ui.reagent :as ui]
             [clojure.string :as str]
             [ote.app.controller.transport-operator :as to]
@@ -11,11 +10,12 @@
             [ote.style.ckan :as style-ckan]
             [ote.style.base :as style-base]
             [ote.localization :refer [tr tr-or]]
-            [ote.views.transport-operator :as to-view]))
+            [ote.views.transport-operator :as to-view]
+            [ote.app.controller.front-page :as fp-controller]))
 
 (defn editor [e! _]
   ;; init
-  (e! (org-edit/->StartEditor))
+  (e! (fp-controller/->GetTransportOperatorData))
   (fn [e! state]
     [theme e! state
      [:div.ote-sovellus
