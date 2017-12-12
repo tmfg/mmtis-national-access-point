@@ -257,6 +257,16 @@
     :container-class "col-md-6"
     :required?      true}
 
+   {:name ::t-service/available-from
+    :type :date-picker
+    :show-clear? true
+    :hint-text (tr [:field-labels :transport-service ::t-service/available-from-nil])}
+
+   {:name ::t-service/available-to
+    :type :date-picker
+    :show-clear? true
+    :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])}
+
    {:name ::t-service/description
     :type :localized-text
     :rows 5

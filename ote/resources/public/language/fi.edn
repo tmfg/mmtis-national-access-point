@@ -182,13 +182,19 @@
    :ote.db.transport-service/all-day             "24h"
 
    :ote.db.transport-service/brokerage?  "Välityspalvelu"
+
+   :ote.db.transport-service/available-from "Saatavilla alkaen"
+   :ote.db.transport-service/available-to "Saatavilla asti"
+   :ote.db.transport-service/available-from-nil "Heti"
+   :ote.db.transport-service/available-to-nil "Toistaiseksi"
    }
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"
-   }
+
+  }
 
 
  ;; Add form info elements here, these are textual help texts in the form
