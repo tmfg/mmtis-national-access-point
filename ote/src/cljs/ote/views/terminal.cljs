@@ -16,22 +16,12 @@
             [ote.views.transport-service-common :as ts-common]
             [ote.style.form :as style-form]))
 
-(defn terminal-form-options [e!]
+(defn terminal-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
-
-(defn name-and-type-group [e!]
-  (form/group
-    {:label (tr [:terminal-page :header-service-info])
-     :columns 3
-     :layout :row}
-
-    {:name ::t-service/name
-     :type :string
-     :required? true}))
+                  [ts-common/footer e! data schemas])})
 
 (defn- indoor-map-group []
   (ts-common/service-url
@@ -44,7 +34,16 @@
      :columns 3
      :layout :row}
 
-    ;{:name ::t-service/assistance :type :string}
+
+    {:name ::t-service/assistance-description
+     :type :localized-text
+     :full-width true
+     :container-class "col-md-12"
+     :rows 5
+     :full-width? true
+     :write #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
+     :read (comp ::t-service/description ::t-service/assistance)}
+
     {:name ::t-service/hours-before
      :type :number ;; FIXME: When :interval type is ready, change to interval
      :write #(assoc-in %1 [::t-service/assistance ::t-service/notification-requirements  ::t-service/hours-before] %2)
@@ -61,10 +60,7 @@
      :type :string
      :write #(assoc-in %1 [::t-service/assistance ::t-service/notification-requirements ::t-service/url] %2)
      :read (comp ::t-service/url ::t-service/notification-requirements ::t-service/assistance)}
-    {:name ::t-service/assistance-description
-     :type :localized-text
-     :write #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
-     :read (comp ::t-service/description ::t-service/assistance)}
+
     ))
 
 
@@ -74,51 +70,46 @@
     :columns 3
     :layout :row}
 
-   {:container-style style-form/half-width
-    :name        ::t-service/accessibility-tool
-    :type        :checkbox-group
+   {:container-class "col-md-6"
+    :name ::t-service/accessibility-description
+    :type :localized-text
     :full-width? true
-    :show-option (tr-key [:enums ::t-service/accessibility-tool])
-    :options     t-service/accessibility-tool}
+    :rows 5}
 
-   {:container-style style-form/half-width
-    :name        ::t-service/mobility
-    :type        :checkbox-group
-    :full-width? true
-    :show-option (tr-key [:enums ::t-service/mobility])
-    :options     t-service/mobility}
+   {:container-class "col-md-5"
+    :name ::t-service/accessibility-info-url
+    :type :string
+    :full-width? true}
 
-   {:name        ::t-service/information-service-accessibility
-    :type        :checkbox-group
-    :full-width? true
-    :container-style style-form/half-width
-    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
-    :options     t-service/information-service-accessibility}
-
-   {:container-style style-form/half-width
+   {:container-class "col-md-6"
     :name        ::t-service/accessibility
+    :label       (tr [:terminal-page :header-checkboxlist-accessibility])
     :type        :checkbox-group
     :full-width? true
     :show-option (tr-key [:enums ::t-service/accessibility])
     :options     t-service/accessibility}
 
-   {:container-style style-form/half-width
-    :name ::t-service/accessibility-description
-    :type :localized-text
-    :rows 1 :max-rows 5}
+   {:name        ::t-service/information-service-accessibility
+    :type        :checkbox-group
+    :full-width? true
+    :container-class "col-md-5"
+    :show-option (tr-key [:enums ::t-service/information-service-accessibility])
+    :options     t-service/information-service-accessibility}
+
+
+
+
+
    ))
 
 (defn terminal [e! {form-data ::t-service/terminal}]
-  (r/with-let [options (terminal-form-options e!)
-               groups [(name-and-type-group e!)
+  (r/with-let [groups [(ts-common/name-group (tr [:terminal-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)
                        (indoor-map-group)
                        (assistance-service-group)
-                       (accessibility-and-other-services-group)]]
+                       (accessibility-and-other-services-group)]
+               options (terminal-form-options e! groups)]
     [:div.row
-     [:div {:class "col-lg-12"}
-      [:div
-       [:h1 (tr [:terminal-page :header-add-new-terminal])]]
-      [form/form options groups form-data]]]))
+      [form/form options groups form-data]]))

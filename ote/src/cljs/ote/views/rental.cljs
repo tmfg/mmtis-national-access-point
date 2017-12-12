@@ -15,9 +15,10 @@
             [tuck.core :as tuck]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [ote.util.values :as values]))
 
-(defn rental-form-options [e!]
+(defn rental-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :rentals]
                         [:field-labels :transport-service]
                         [:field-labels :transport-service-common]
@@ -25,17 +26,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
-
-(defn name-group [e!]
-  (form/group
-   {:label (tr [:rentals-page :header-service-info])
-    :columns 3
-    :layout :row}
-
-   {:name      ::t-service/name
-    :type      :string
-    :required? true}))
+                  [ts-common/footer e! data schemas])})
 
 (defn price-group []
   (form/group
@@ -244,6 +235,7 @@
 
      {:name ::t-service/pick-up-locations
       :type :table
+      :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/name
                       :type :string}
                      {:name ::t-service/pick-up-type
@@ -272,8 +264,7 @@
       :add-label (tr [:buttons :add-new-pick-up-location])})))
 
 (defn rental [e! service]
-  (reagent/with-let [options (rental-form-options e!)
-                     groups [(name-group e!)
+  (reagent/with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
                              (ts-common/contact-info-group)
                              (ts-common/place-search-group e! ::t-service/rentals)
                              (ts-common/external-interfaces)
@@ -286,9 +277,7 @@
                               (tr [:field-labels :transport-service-common ::t-service/booking-service])
                               ::t-service/booking-service)
                              (pick-up-locations e!)
-                             ]]
+                             ]
+                     options (rental-form-options e! groups)]
     [:div.row
-     [:div {:class "col-lg-12"}
-      [:div
-       [:h1 (tr [:rentals-page :header-rental-service])]]
-      [form/form options groups (get service ::t-service/rentals)]]]))
+     [form/form options groups (get service ::t-service/rentals)]]))

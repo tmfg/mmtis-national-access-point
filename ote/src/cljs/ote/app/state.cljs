@@ -6,7 +6,7 @@
 (defonce app
   (r/atom {;; current page
            ;; see ote.app.routes
-           :page :front-page
+           :page :own-services
            :params nil ; parameters from url route
            :query nil ; query parameters from url (like "?foo=bar")
 
@@ -16,14 +16,10 @@
                                 }
 
            ;; Currently selected / edited transport operator (company basic info)
-           :transport-operator {}
+           :transport-operator nil
 
            ;; Currently selected / edited transport service
-           :transport-service
-           #:ote.db.transport-service
-           {:passenger-transportation
-            {:ote.db.transport-service/real-time-information
-             #:ote.db.transport-service {:url "www.example.com/url"}}}}))
+           :transport-service {}}))
 
 ;; Separate app state for viewer mode
 (defonce viewer (r/atom {:loading? true

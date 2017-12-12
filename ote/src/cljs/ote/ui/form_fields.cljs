@@ -12,7 +12,8 @@
             [ote.time :as time]
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [ote.util.values :as values]))
 
 
 
@@ -92,7 +93,8 @@
 
 (defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
   (or placeholder
-      (and placeholder-fn (placeholder-fn row))))
+      (and placeholder-fn (placeholder-fn row))
+      ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-focus form? error warning table? full-width? style input-style]
@@ -127,7 +129,7 @@
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
     :value             (or data "")
-    :multiLine         true
+    :multi-line        true
     :rows              rows
     :error-text        error}])
 
@@ -139,7 +141,8 @@
     (let [data (or data [])
           languages (or (:languages field) languages)
           language @selected-language
-          language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)]
+          language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
+          rows (or rows 1)]
       [:table {:style (when full-width?
                         style-form/full-width)}
        [:tr
@@ -160,10 +163,10 @@
                                                lang)) data)
                                      (conj data updated-language-data))))
             :value             (or (:ote.db.transport-service/text language-data) "")
-            :multiLine         true
+            :multi-line         true
             :rows rows
-            :rows-max (or rows-max rows)
-            :error-text        error}
+            :rows-max (or rows-max 200)
+            :error-text       (or error "")}
            (when full-width?
              {:full-width true}))]]]
        [:tr
@@ -171,20 +174,23 @@
          (doall
           (for [lang languages]
             ^{:key lang}
-            [:a (merge
-                 (stylefy/use-style
-                  (if (= lang language)
-                    style-form-fields/localized-text-language-selected
-                    style-form-fields/localized-text-language))
-                 {:on-click #(reset! selected-language lang)})
+            [:a  (merge
+                  (stylefy/use-style
+                     (if (= lang language)
+                       style-form-fields/localized-text-language-selected
+                       style-form-fields/localized-text-language))
+                  {:href "#" :on-click #(do (.preventDefault %)
+                                            (reset! selected-language lang))})
              lang]))]]])))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width?] :as field}
+(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
-    [ui/select-field {:auto-width (boolean auto-width?)
+    [ui/select-field
+     (merge
+      {:auto-width (boolean auto-width?)
                       :style style
                       :floating-label-text label
                       :floating-label-fixed true
@@ -195,6 +201,8 @@
                                            style-base/error-element
                                            style-base/required-element)
                       }
+      (when disabled?
+        {:disabled true}))
      (doall
       (map-indexed
        (fn [i option]
@@ -245,14 +253,15 @@
      [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
      (when help
        [common/help help])
-     (map-indexed
-      (fn [i option]
-        (let [checked? (selected option)]
-          [ui/checkbox {:key i
-                        :label (show-option option)
-                        :checked checked?
-                        :on-check #(update! ((if checked? disj conj) selected option))}]))
-      options)]))
+     (doall
+      (map-indexed
+       (fn [i option]
+         (let [checked? (selected option)]
+           [ui/checkbox {:key i
+                         :label (show-option option)
+                         :checked checked?
+                         :on-check #(update! ((if checked? disj conj) selected option))}]))
+       options))]))
 
 (defmethod field :checkbox [{:keys [update! label]} data]
   (let [checked? (boolean data)]
@@ -268,28 +277,40 @@
                 :type :string
                 :regex phone-regex)])
 
-(def number-regex #"\d*([\.,]\d*)?")
+(def number-regex #"\d*([\.,]\d{0,2})?")
 
 (defmethod field :number [_  data]
   ;; Number field contains internal state that has the current
   ;; typed in text (which may be an incompletely typed number).
   ;;
   ;; The value updated to the app model is always a parsed number.
-  (let [txt (r/atom (if data (.toFixed data 2) ""))]
-    (fn [{:keys [update! currency?] :as opts} data]
-      [:span [field (assoc opts
-                    :type :string
-                    :parse js/parseFloat
-                    :regex number-regex
-                    :update! #(do
-                                (reset! txt %)
-                                (update!
-                                   (if (str/blank? %)
-                                     nil
-                                     (-> %
-                                         (str/replace #"," ".")
-                                         (js/parseFloat %))))))
-       @txt] (when currency? "€")])))
+  (let [fmt #(if % (str/replace (.toFixed % 2) #"(,|\.)00" "") "")
+        state (r/atom {:value data
+                       :txt (fmt data)})]
+    (r/create-class
+     {:component-will-receive-props
+      (fn [_ [_ _ new-value]]
+        (swap! state
+               (fn [{:keys [value txt] :as state}]
+                 (if (not= value new-value)
+                   {:value new-value
+                    :txt (fmt new-value)}
+                   state))))
+      :reagent-render
+      (fn [{:keys [update! currency?] :as opts} data]
+        [:span [field (assoc opts
+                             :type :string
+                             :regex number-regex
+                             :update! #(let [new-value (if (str/blank? %)
+                                                         nil
+                                                         (-> %
+                                                             (str/replace #"," ".")
+                                                             (js/parseFloat %)))]
+                                         (reset! state {:value new-value
+                                                        :txt %})
+                                         (update! new-value)))
+                (:txt @state)]
+         (when currency? "€")])})))
 
 (def time-regex #"\d{0,2}(:\d{0,2})?")
 
@@ -352,54 +373,58 @@
 
 
 (defmethod field :table [{:keys [table-fields update! delete? add-label] :as opts} data]
-  [:div
-   [ui/table
-    [ui/table-header {:adjust-for-checkbox false
-                      :display-select-all false}
-     [ui/table-row {:selectable false}
-      (doall
-       (for [{:keys [name label width] :as tf} table-fields]
-         ^{:key name}
-         [ui/table-header-column {:style
-                                  {:width width
-                                   :white-space "pre-wrap"}}
-          label]))
-      (when delete?
-        [ui/table-header-column {:style {:width "70px"}}
-         (tr [:buttons :delete])])]]
+  (let [data (if (empty? data)
+               ;; have table always contain at least one row
+               [{}]
+               data)]
+    [:div
+     [ui/table
+      [ui/table-header {:adjust-for-checkbox false
+                        :display-select-all false}
+       [ui/table-row {:selectable false}
+        (doall
+         (for [{:keys [name label width] :as tf} table-fields]
+           ^{:key name}
+           [ui/table-header-column {:style
+                                    {:width width
+                                     :white-space "pre-wrap"}}
+            label]))
+        (when delete?
+          [ui/table-header-column {:style {:width "70px"}}
+           (tr [:buttons :delete])])]]
 
-    [ui/table-body {:display-row-checkbox false}
-     (map-indexed
-      (fn [i row]
-        ^{:key i}
-        [ui/table-row {:selectable false :display-border false}
-         (doall
-          (for [{:keys [name read write width type component] :as tf} table-fields
-                :let [update-fn (if write
-                                  #(update data i write %)
-                                  #(assoc-in data [i name] %))
-                      value ((or read name) row)]]
-            ^{:key name}
-            [ui/table-row-column {:style {:width width}}
-             (if (= :component type)
-               (component {:update-form! #(update! (update-fn %))
-                           :data value})
-               [field (assoc tf
-                             :table? true
-                             :update! #(update! (update-fn %)))
-                value])]))
-         (when delete?
-           [ui/table-row-column {:style {:width "70px"}}
-            [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
-                                                                (take i data))
-                                                              (drop (inc i) data))))}
-             [ic/action-delete]]])])
-      data)]]
-   (when add-label
-     [buttons/save {:on-click #(update! (conj (or data []) {}))
-                    :label add-label
-                    :label-style style-base/button-label-style
-                    :disabled false}])])
+      [ui/table-body {:display-row-checkbox false}
+       (map-indexed
+        (fn [i row]
+          ^{:key i}
+          [ui/table-row {:selectable false :display-border false}
+           (doall
+            (for [{:keys [name read write width type component] :as tf} table-fields
+                  :let [update-fn (if write
+                                    #(update data i write %)
+                                    #(assoc-in data [i name] %))
+                        value ((or read name) row)]]
+              ^{:key name}
+              [ui/table-row-column {:style {:width width}}
+               (if (= :component type)
+                 (component {:update-form! #(update! (update-fn %))
+                             :data value})
+                 [field (assoc tf
+                               :table? true
+                               :update! #(update! (update-fn %)))
+                  value])]))
+           (when delete?
+             [ui/table-row-column {:style {:width "70px"}}
+              [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                                  (take i data))
+                                                                (drop (inc i) data))))}
+               [ic/action-delete]]])])
+        data)]]
+     (when add-label
+       [buttons/save {:on-click #(update! (conj (or data []) {}))
+                      :label add-label
+                      :label-style style-base/button-label-style
+                      :disabled (values/effectively-empty? (last data))}])]))
 
 (defmethod field :checkbox [{:keys [update! label]} checked?]
   [ui/checkbox {:label label

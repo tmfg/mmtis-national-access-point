@@ -1,12 +1,14 @@
 (ns ote.app.controller.front-page
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
+            [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]))
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
 (defrecord GoToUrl [url])
+(defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
 (defrecord Logout [])
@@ -21,17 +23,45 @@
 (defrecord TransportOperatorDataResponse [response])
 (defrecord TransportOperatorDataFailed [error])
 
+(defn navigate [event {:keys [before-unload-message navigation-prompt-open?] :as app} navigate-fn]
+  (if (and before-unload-message (not navigation-prompt-open?))
+    (assoc app
+           :navigation-prompt-open? true
+           :navigation-confirm event)
+    (navigate-fn (dissoc app
+                         :navigation-prompt-open?
+                         :before-unload-message
+                         :navigation-confirm))))
+
+(defn get-transport-operator-data [app]
+  (if (:transport-operator-data-loaded? app true)
+     (do
+       (comm/post! "transport-operator/data" {}
+                   {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                    :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
+       (assoc app
+              :transport-operator-data-loaded? false
+              :services-changed? false))
+     app))
+
 (extend-protocol tuck/Event
 
   ChangePage
-  (process-event [{given-page :given-page} app]
-    (routes/navigate! given-page)
-    (assoc app :page given-page))
+  (process-event [{given-page :given-page :as e} app]
+    (navigate e app (fn [app]
+                      (do
+                        (routes/navigate! given-page)
+                        (assoc app :page given-page)))))
 
   GoToUrl
-  (process-event [{url :url} app]
-    (set! (.-location js/window) url )
-    app)
+  (process-event [{url :url :as e} app]
+    (navigate e app (fn [app]
+                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+                      app)))
+
+  StayOnPage
+  (process-event [_ app]
+    (dissoc app :navigation-prompt-open?))
 
   OpenUserMenu
   (process-event [_ app]
@@ -49,11 +79,8 @@
 
   EnsureTransportOperator
   (process-event [_ app]
-    (if (empty? (get app :transport-operator))
-      (do
-        (routes/navigate! :no-operator)
-        (assoc app :page :no-operator)
-        )
+     (if (:services-changed? app)
+      (get-transport-operator-data app)
       app))
 
   GetTransportOperator
@@ -76,10 +103,7 @@
   GetTransportOperatorData
   ;; FIXME: this should be called something else, like SessionInit (the route as well)
   (process-event [_ app]
-    (comm/post! "transport-operator/data" {}
-                {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
-                 :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-    (assoc app :transport-operator-data-loaded? false))
+    (get-transport-operator-data app))
 
   TransportOperatorDataFailed
   (process-event [{error :error} app]
@@ -91,21 +115,34 @@
            :user nil))
 
   TransportOperatorDataResponse
-  (process-event [{response :response} app]
+  (process-event [{response :response} {:keys [page ckan-organization-id transport-operator] :as app}]
     (let [app (assoc app
-                :transport-operator-data-loaded? true
-                :user (:user (first response)))]
-    ;; First time users don't have operators.
-    ;; Ask them to add one
-    (if (and (nil? (get (first response) :transport-operator)) (not= :services (get app :page)))
-      (doall
-        (routes/navigate! :no-operator)
-        (assoc app :page :no-operator))
+                     :transport-operator-data-loaded? true
+                     :user (:user (first response)))]
+      (if (and (nil? (:transport-operator (first response)))
+               (not= :services page))
+        ;; First time users don't have operators.
+        ;; Ask them to add one
+        (do
+          (routes/navigate! :no-operator)
+          (assoc app :page :no-operator))
 
-      (assoc app
-        :transport-operators-with-services response
-        :transport-operator  (get (first response) :transport-operator)
-        :transport-service-vector (get (first response) :transport-service-vector)))))
+        ;; Get services from response.
+        ;; Use selected operator if possible, if not, use the first one from the response.
+        ;; Selected can either be previously selected or ckan-organization-id (CKAN edit view)
+        (let [selected-operator (or
+                                 (some #(when (or (= (::t-operator/id transport-operator)
+                                                     (get-in % [:transport-operator ::t-operator/id]))
+                                                  (= ckan-organization-id
+                                                     (get-in % [:transport-operator ::t-operator/ckan-group-id])))
+                                          %)
+                                       response)
+                                 (first response))]
+
+          (assoc app
+                 :transport-operators-with-services response
+                 :transport-operator (:transport-operator selected-operator)
+                 :transport-service-vector (:transport-service-vector selected-operator))))))
 
   SetLanguage
   (process-event [{lang :lang} app]

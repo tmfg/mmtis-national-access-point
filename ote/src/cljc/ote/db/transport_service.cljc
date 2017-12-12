@@ -25,7 +25,6 @@
   ["accessibility_tool" ::accessibility_tool (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_info_facility" ::accessibility_info_facility (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_facility" ::accessibility_facility (specql.transform/transform (specql.transform/to-keyword))]
-  ["mobility_facility" ::mobility_facility (specql.transform/transform (specql.transform/to-keyword))]
   ["passenger_information_facility" ::passenger_information_facility]
   ["safety_facility" ::safety_facility]
   ["parking_facility" ::parking_facility (specql.transform/transform (specql.transform/to-keyword))]
@@ -91,18 +90,24 @@
 
 (def days [:MON :TUE :WED :THU :FRI :SAT :SUN])
 
-;; Create order for accessibility-info-facility
-(def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
-                                        :displays-for-visually-impaired :large-print-timetables])
 
 ;; Create order for accessibility-facility
 (def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
-                             :pallet-access-low-floor :other])
+                    :pallet-access-low-floor :wheelchair-access-toilet
+                    :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips
+                    :other])
 
-;; Create order for mobility-facility-facility
-(def mobility [:low-floor :step-free-access :suitable-for-wheelchairs
-               :suitable-for-heavily-disabled :boarding-assistance :onboard-assistance
-               :unaccompanied-minor-assistance :tactile-patform-edges :tactile-guiding-strips :other])
+;; Create order for accessibility-info-facility
+(def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
+                                        :displays-for-visually-impaired :large-print-timetables :other])
+
+;; Create order for accessibility-facility for parking services
+(def parking-accessibility [:lift :ramp :stairs :narrow-entrance :barrier :wheelchair-access-toilet
+                            :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips
+                            :other])
+
+(def parking-information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
+                                                :displays-for-visually-impaired :other])
 
 (defn service-key-by-type
   "Returns the service column keyword for the given type enum value."

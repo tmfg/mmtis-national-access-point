@@ -24,6 +24,9 @@
    :ote.db.transport-service/accessibility-tool        "Accessibility tools"
    :ote.db.transport-service/accessibility-description "Accessibility description"
 
+   :ote.db.transport-service/accessibility     "Accessibility"
+   :ote.db.transport-service/information-service-accessibility "Info service accessibility"
+
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Vehicle accessibility (guaranteed availability)"
    :ote.db.transport-service/limited-vehicle-accessibility "Vehicle accessibility (limited availability)"
 
@@ -85,14 +88,13 @@
    :ote.db.transport-service/price-class-name-other    "Price class"
    :ote.db.transport-service/price-class-name-request  "Price class"
    :ote.db.transport-service/price-class-name-schedule "Price class"
-   :ote.db.transport-service/price-per-unit            "Price per unit"
+   :ote.db.transport-service/price-per-unit            "Price per unit (€)"
    :ote.db.transport-service/unit                      "Unit"
    :ote.db.transport-service/currency                  "Currency"
 
    :ote.db.transport-service/pricing-description "Pricing description"
    :ote.db.transport-service/pricing-url "Pricing web-address"
-
-
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
    }
 
   ;; Terminal fields
@@ -102,7 +104,6 @@
    :ote.db.transport-service/description               "Service description"
    :ote.db.transport-service/information-service-accessibility "Information service accessibility"
    :ote.db.transport-service/accessibility     "Accessibility"
-   :ote.db.transport-service/mobility          "Accessibility"
 
 
    ;; assistance_notification_requirement fields
@@ -159,12 +160,13 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
    :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
 
    ;; Service hour fields
    :ote.db.transport-service/week-days                 "Viikonpäivät"
@@ -240,6 +242,7 @@
   :add-new-company "Lisää palvelun tuottava yritys"
   :discard "Peruuta"
 
+  :next "Next"
   :add-transport-service   "Lisää liikkumispalvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-new-service-link "Lisää uusi palvelu"
@@ -315,19 +318,13 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
-   :other  "Muu"}
+   :wheelchair-access-toilet "Inva WC"
 
-  :ote.db.transport-service/mobility
-  {:low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
-   :boarding-assistance  "Kyytiin nousun avustus"
-   :onboard-assistance "Kyydin aikainen avustus"
-   :unaccompanied-minor-assistance "Alaikäisten avustus"
-   :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
+   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other "Muu"}
+   :other  "Muu"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Pyörätuoli"
@@ -413,7 +410,7 @@
     tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
    :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Operator don't have any services yet."
+   :operator-dont-have-any-services "Operator don't have any services yet."
   }
 
  :organization-page
@@ -422,7 +419,8 @@
   }
 
  :passenger-transportation-page
- {:header-passenger-transportation-service "Henkilöiden kuljetuspalvelun tiedot"
+ {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
+  :header-edit-passenger-transportation    "Muokkaa henkilöiden kuljetuspalvelua"
   :header-service-info                     "Palvelun perustiedot"
   :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Palvelun yhteystiedot"
@@ -433,7 +431,9 @@
   }
 
  :rentals-page
- {:header-service-info                     "Vuokrauspalvelun perustiedot"
+ {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
+  :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
+  :header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-usage-area                       "Maarajoitukset"
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
@@ -447,17 +447,21 @@
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
-  :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
+  :header-new-terminal                "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustuspalvelun tilauksen tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja accessibility"
+  :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
  :parking-page
- {:header-service-info                      "Palvelun perustiedot"
+ {:header-new-parking                       "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-edit-parking                      "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-service-info                      "Palvelun perustiedot"
   :header-contact-details                   "Palvelun yhteystiedot"
   :header-payment-methods                   "Maksutavat"
   :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
-  :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
+  :header-accessibility                     "Palvelun saavutettavuus ja esteettömyys"
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
@@ -479,7 +483,14 @@
  {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
+                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
+  :transport-service-type-selection-help-example "Esimerkki: Palveluntuottajana on yritys nimeltä \"RapidBus Oy\",
+     jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
+     Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
+     tyyppiä.
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."
+  :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
+  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
@@ -498,10 +509,13 @@
   :navigation-organizations                   "Palveluntuottajat"
   :navigation-dataset                         "Palvelukatalogi"
   :navigation-give-feedback                   "Anna palautetta"
+  :navigation-login                           "Kirjaudu sisään"
+  :navigation-register                        "Luo tunnus"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Palveluntuottajan perustiedot"
   :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Näytä profiili"
+  :user-menu-profile                          "Käyttäjätilin muokkaus"
+  :user-menu-summary                          "Yhteenveto"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
@@ -518,12 +532,19 @@
                :hours    "Tuntia"
                :days     "Päivää"
                :seconds  "Sekuntia"}
+  :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   }
 
  :dialog
  {:delete-transport-service
   {:title "Poista liikkumispalvelun tiedot?"
-   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}}
+   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}
+
+  :navigation-prompt
+  {:title "Confirm navigation"
+   :stay "Stay on this page"
+   :leave "Leave page"
+   :unsaved-data "Form contains unsaved data. Do you really want to leave the page?"}}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
@@ -577,6 +598,20 @@
                    "umbrella" "Sateenvarjo"
                    "buggy" "Lastenvaunut"
                    "other" "Muu"
+                   "boarding-assistance" "Boarding assistance"
+                   "low-floor" "Low floor"
+                   "accessible-vehicle" "Accessible vehicle"
+                   "step-free-access" "Step free access"
+                   "suitable-for-wheelchairs" "Suitable for wheelchairs"
+                   "assistance-dog-space" "Place for assistance dog"
+                   "crutches" "Crutches"
+                   "walker" "Walker"
+                   "walking-stick" "Walking stick"
+                   "visual-displays" "Visual display"
+                   "large-print-timetables" "Large print timetables"
+                   "displays-for-visually-impaired" "Displays for visually impaired (tactile)"
+                   "audio-information" "Audio information"
+                   "audio-for-hearing-impaired" "Audio for hearing impaired"
 
                    ;; additional services
                    "animal-transport" "Eläinkuljetus"
@@ -590,7 +625,42 @@
                    "contactless-payment" "Lähimaksu"
                    "mobilepay" "Mobiilimaksu"
                    "invoice" "Lasku"
-                   }}
+
+                   ;; week days
+                   "MON" "Mon"
+                   "TUE" "Tue"
+                   "WED" "Wed"
+                   "THU" "Thu"
+                   "FRI" "Fri"
+                   "SAT" "Sat"
+                   "SUN" "Sun"
+                   }
+          "brokerage?" "Brokerage service?"
+          "companies" "Companies that produce the service"
+          "external-interfaces" "External interfaces"
+          "license" "License/terms of use"
+          "format" "Format"
+          "license-url" "License/terms of use URL"
+          "external-interface" "External interface"
+          "accessibility-info-url" "Accessibility description (WWW)"
+          "guaranteed-accessibility-description" "Guaranteed accessibility description"
+          "guaranteed-info-service-accessibility" "Guaranteed info service accessibility"
+          "guaranteed-transportable-aid" "Guaranteed transportable aid"
+          "guaranteed-vehicle-accessibility" "Guaranteed vehicle accessibility"
+          "limited-accessibility-description" "Limited availability accessibility description"
+          "limited-info-service-accessibility" "Limited availability info service accessibility"
+          "limited-transportable-aid" "Limited availability transportable aid"
+          "limited-vehicle-accessibility" "Limited availability vehicle accessibility"
+          "payment-method-description" "Payment method description"
+          "pricing" "Pricing"
+          "service-exceptions" "Service hour exceptions"
+          "service-hours" "Service hours"
+          "week-days" "Week days"
+          "from" "From"
+          "to" "To"
+          "from-date" "From date"
+          "to-date" "To date"
+          "sub-type" "Sub type"}
 
 
  :service-search

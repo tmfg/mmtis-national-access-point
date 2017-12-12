@@ -16,9 +16,10 @@
             [ote.style.form :as style-form]
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.util.values :as values]))
 
-(defn form-options [e!]
+(defn form-options [e! schemas]
   {:name->label (tr-key [:field-labels :parking]
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service]
@@ -26,18 +27,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data])})
-
-(defn name-and-type-group [e!]
-  (form/group
-    {:label   (tr [:parking-page :header-service-info])
-     :columns 3
-     :layout  :row}
-
-    {:name      ::t-service/name
-     :type      :string
-     :required? true}))
-
+                  [ts-common/footer e! data schemas])})
 
 (defn pricing-group [e!]
   (form/group
@@ -47,29 +37,43 @@
 
     {:name         ::t-service/price-classes
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
                      :label (tr [:field-labels :parking ::t-service/price-class-name])}
-                    {:name ::t-service/price-per-unit :type :number}
-                    {:name ::t-service/unit :type :string}
-                    {:name ::t-service/currency :type :string :width "100px"}]
+                    {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+                     :input-style {:text-align "right" :padding-right "5px"}}
+                    {:name ::t-service/unit :type :string :style {:width "100px"}}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
-    {:name  ::t-service/pricing-description
+    {:container-class "col-md-6"
+     :name  ::t-service/pricing-description
      :type  :localized-text
+     :full-width? true
      :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
      :read  (comp ::t-service/description ::t-service/pricing)}
 
-    {:name  ::t-service/pricing-url
+    {:container-class "col-md-5"
+     :name  ::t-service/pricing-url
      :type  :string
+     :full-width? true
      :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
      :read  (comp ::t-service/url ::t-service/pricing)}
 
-    {:name            ::t-service/payment-methods
+    {:container-class "col-md-3"
+     :name            ::t-service/payment-methods
      :type            :multiselect-selection
-     :container-style style-form/full-width
      :show-option     (tr-key [:enums ::t-service/payment-methods])
-     :options         t-service/payment-methods}))
+     :options         t-service/payment-methods}
+
+    {:container-class "col-md-8"
+     :name ::t-service/payment-method-description
+     :type :localized-text
+     :rows 1
+     :full-width? true
+     }
+
+    ))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
@@ -86,6 +90,7 @@
 
       {:name      ::t-service/service-hours
        :type      :table
+       :prepare-for-save values/without-empty-rows
        :table-fields
                   [{:name              ::t-service/week-days
                     :width             "40%"
@@ -122,6 +127,7 @@
 
       {:name         ::t-service/service-exceptions
        :type         :table
+       :prepare-for-save values/without-empty-rows
        :table-fields [{:name  ::t-service/description
                        :label (tr* :description)
                        :type  :localized-text}
@@ -147,6 +153,7 @@
 
     {:name         ::t-service/parking-capacities
      :type         :table
+     :prepare-for-save values/without-empty-rows
      :table-fields [{:name        ::t-service/parking-facility
                      :type        :selection
                      :show-option (tr-key [:enums ::t-service/parking-facility])
@@ -161,14 +168,45 @@
      :columns 3
      :layout  :row}
 
-    {:name    ::t-service/charging-points
+    {:name            ::t-service/charging-points
+     :rows            5
+     :type            :localized-text
+     :full-width?     true
+     :container-class "col-md-6"}))
+
+(defn accessibility-group []
+  (form/group
+    {:label   (tr [:parking-page :header-accessibility])
      :columns 3
-     :rows 5
-     :type   :localized-text}))
+     :layout  :row}
+
+    {:name            ::t-service/accessibility
+     :type            :checkbox-group
+     :show-option     (tr-key [:enums ::t-service/accessibility])
+     :options         t-service/parking-accessibility
+     :full-width?     true
+     :container-class "col-md-6"}
+
+    {:name            ::t-service/information-service-accessibility
+     :type            :checkbox-group
+     :show-option     (tr-key [:enums ::t-service/information-service-accessibility])
+     :options         t-service/parking-information-service-accessibility
+     :full-width?     true
+     :container-class "col-md-5"}
+
+    {:name            ::t-service/accessibility-description
+     :type            :localized-text
+     :rows            5
+     :container-class "col-md-6"
+     :full-width?     true}
+
+    {:name            ::t-service/accessibility-info-url
+     :type            :string
+     :container-class "col-md-5"
+     :full-width?     true}))
 
 (defn parking [e! {form-data ::t-service/parking}]
-  (r/with-let [options (form-options e!)
-               groups [(name-and-type-group e!)
+  (r/with-let [groups [(ts-common/name-group (tr [:parking-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/parking)
                        (ts-common/external-interfaces)
@@ -184,12 +222,10 @@
                        (capacities e!)
                        (charging-points e!)
                        (pricing-group e!)
-                       (service-hours-group e!)]]
+                       (accessibility-group)
+                       (service-hours-group e!)]
+               options (form-options e! groups)]
               [:div.row
-               [:div {:class "col-lg-12"}
-                [:div
-                 [:h3 (tr [:parking-page :header-add-new-parking])]]
-
                 [form/form options groups (merge
                                             {:maximum-stay-unit :hours}
-                                            form-data)]]]))
+                                            form-data)]]))

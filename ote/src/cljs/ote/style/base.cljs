@@ -37,8 +37,6 @@
 (def required-element { :color "#FF9800"})
 (def error-element { :color "#B71C1C"
                     :font-weight "600"})
-(def long-drowpdown {:width "350px" })
-(def extra-long-drowpdown {:width "425px" })
 
 ;; Front page
 
@@ -50,11 +48,10 @@
                   :padding-top "20px"
                   :font-weight "600"})
 
-(def flash-message {:top "100px"})
+(def flash-message {:top "70px"})
 
 (def title {:font-weight "bold"})
 
-(def large-title (merge title {:font-size "150%"}))
 
 (defn flex-container [dir]
   {:display "flex" :flex-direction dir})

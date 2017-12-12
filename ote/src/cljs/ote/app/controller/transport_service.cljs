@@ -23,7 +23,8 @@
     ::t-service/operation-area
     ::t-service/companies
     ::t-service/published?
-    ::t-service/brokerage?})
+    ::t-service/brokerage?
+    ::t-service/description})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
@@ -71,12 +72,13 @@
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
 
 (defrecord EditTransportService [form-data])
-(defrecord SaveTransportService [publish?])
+(defrecord SaveTransportService [schemas publish?])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
 
 (defrecord SelectServiceType [data])
 (defrecord SelectOnlyServiceType [data])
+(defrecord SetNewServiceType [type])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -209,7 +211,7 @@
   SelectTransportServiceType
   ;; Redirect to add service page
   (process-event [_ app]
-    (routes/navigate! (get-in app [:transport-service ::t-service/type]))
+    (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
       app)
 
   SelectOnlyServiceType
@@ -223,8 +225,8 @@
           app (assoc-in app [:transport-service subtype-key ] {::t-service/sub-type sub-type})
           app (assoc-in app [:transport-service ::t-service/type] type)
           ]
-    (routes/navigate! type)
-    app))
+      (routes/navigate! :new-service {:type (name type)})
+      app))
 
   OpenTransportServiceTypePage
   ;; :transport-service :<transport-service-type> needs to be cleaned up before creating a new one
@@ -234,7 +236,8 @@
                               ::t-service/terminal
                               ::t-service/rentals
                               ::t-service/brokerage
-                              ::t-service/parking)
+                              ::t-service/parking
+                              ::t-service/id)
       app (assoc app :transport-service new-transport-service)]
       (routes/navigate! :transport-service)
       app))
@@ -303,18 +306,20 @@
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
-      (assoc app :transport-service-vector filtered-map))
-    )
+      (assoc app :transport-service-vector filtered-map
+                 :page :own-services
+                 :services-changed? true)))
 
   SaveTransportService
-  (process-event [{publish? :publish?} {service :transport-service
-                                        operator :transport-operator :as app}]
+  (process-event [{:keys [schemas publish?]} {service :transport-service
+                                              operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
           service-data
           (-> service
-              (update key form/without-form-metadata)
-              (dissoc :transport-service-type-subtype)
-              (dissoc :select-transport-operator)
+              (update key (comp (partial form/prepare-for-save schemas)
+                                form/without-form-metadata))
+              (dissoc :transport-service-type-subtype
+                      :select-transport-operator)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id (::t-operator/id operator))
@@ -322,7 +327,7 @@
               transform-save-by-type)]
       (comm/post! "transport-service" service-data
                   {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
-      app))
+      (dissoc app :before-unload-message)))
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
@@ -330,17 +335,26 @@
                 (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
                 response)]
     (routes/navigate! :own-services)
-    app))
+    (-> app
+        (assoc :services-changed? true)
+        (dissoc :transport-service))))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type ts))]
-      (update-in app [:transport-service key] merge form-data)))
+      (-> app
+          (update-in [:transport-service key] merge form-data)
+          (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
 
   CancelTransportServiceForm
   (process-event [_ app]
     (routes/navigate! :own-services)
-    (dissoc app :transport-service)))
+    (dissoc app :transport-service :before-unload-message))
+
+  SetNewServiceType
+  (process-event [{type :type} app]
+    ;; This is needed when directly loading a new service URL to set the type
+    (assoc-in app [:transport-service ::t-service/type] type)))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the

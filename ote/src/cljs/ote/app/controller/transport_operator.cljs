@@ -13,13 +13,10 @@
 (defrecord SaveTransportOperatorResponse [data])
 
 (defrecord TransportOperatorResponse [response])
-(defrecord TransportOperatorDataResponse [response])
+
 
 (defn transport-operator-by-ckan-group-id[id]
   (comm/get! (str "transport-operator/" id) {:on-success (t/send-async! ->TransportOperatorResponse)}))
-
-(defn transport-operator-data []
-  (comm/post! "transport-operator/data" {} {:on-success (t/send-async! ->TransportOperatorDataResponse)}))
 
 (extend-protocol t/Event
 
@@ -47,7 +44,9 @@
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
+    (routes/navigate! :own-services)
     (assoc app
+      :page :own-services
       :flash-message (tr [:common-texts :transport-operator-saved ])
       :transport-operator data
       :transport-operators-with-services (map (fn [{:keys [transport-operator] :as operator-with-services}]
@@ -62,20 +61,4 @@
   (process-event [{response :response} app]
     (assoc app
       :transport-operator (assoc response
-                            :loading? false)))
-
-  TransportOperatorDataResponse
-  (process-event [{response :response} app]
-    (let [ckan-organization-id (get app :ckan-organization-id)
-          selected-operator (if (not (nil? ckan-organization-id))
-                                  (some #(when (= ckan-organization-id (get-in % [:transport-operator ::t-operator/ckan-group-id]))
-                                    %)
-                                   response)
-                                  nil)]
-    (assoc app
-      :loading? false
-      :transport-operators-with-services response
-      ;; If operator is selected (ckan-organizatin-id is set) use it. Else take the first
-      :transport-operator (if (nil? selected-operator) (get (first response) :transport-operator) (:transport-operator selected-operator))
-      :transport-service-vector (get (first response) :transport-service-vector)
-      :user (get response :user)))))
+                            :loading? false))))

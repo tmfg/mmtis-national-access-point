@@ -48,7 +48,9 @@
    ::t-service/service-hours generators/gen-service-hours-array
    ::t-service/service-exceptions (gen/return []) ;; FIXME: generate these
    ::t-service/luggage-restrictions generators/gen-localized-text-array
-   ::t-service/pricing generators/gen-service-link))
+   ::t-service/pricing generators/gen-service-link
+   ::t-service/payment-method-description generators/gen-localized-text-array
+   ))
 
 (def gen-passenger-transportation-service
   (gen/hash-map
@@ -85,12 +87,10 @@
     (is (= (::t-service/price-classes ps)
            [#:ote.db.transport-service{:name "starting",
                                        :price-per-unit 5.9M,
-                                       :unit "trip",
-                                       :currency "EUR"}
+                                       :unit "trip"}
             #:ote.db.transport-service{:name "basic fare",
                                        :price-per-unit 4.9M,
-                                       :unit "km",
-                                       :currency "EUR"}]))
+                                       :unit "km"}]))
 
     (is (= (::t-service/homepage service) "www.solita.fi"))
     (is (= (::t-service/contact-phone service) "123456"))))

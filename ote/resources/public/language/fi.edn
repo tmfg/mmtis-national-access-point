@@ -24,9 +24,11 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Kuvaus palvelun esteettömyydestä"
 
+   :ote.db.transport-service/accessibility     "Esteettömyys"
+   :ote.db.transport-service/information-service-accessibility "Infopalveluiden esteettömyys"
+
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)
-"
+   :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
@@ -86,14 +88,13 @@
    :ote.db.transport-service/price-class-name-other    "Hintaryhmä"
    :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
    :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
-
-
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
    }
 
   ;; Terminal fields
@@ -103,7 +104,6 @@
    :ote.db.transport-service/description               "Palvelun kuvaus"
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
    :ote.db.transport-service/accessibility     "Saavutettavuus"
-   :ote.db.transport-service/mobility          "Esteettömyys"
 
 
    ;; assistance_notification_requirement fields
@@ -160,12 +160,13 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö"
+   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/currency                  "Valuutta"
 
    :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
 
    ;; Service hour fields
    :ote.db.transport-service/week-days                 "Viikonpäivät"
@@ -241,7 +242,8 @@
   :add-new-company "Lisää palvelun tuottava yritys"
   :discard "Peruuta"
 
-  :add-transport-service   "Lisää palvelustiedot"
+  :next "Jatka"
+  :add-transport-service  "Lisää palvelusi tiedot"
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"
@@ -316,19 +318,13 @@
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
-   :other  "Muu"}
+   :wheelchair-access-toilet "Inva WC"
 
-  :ote.db.transport-service/mobility
-  {:low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
-   :boarding-assistance  "Kyytiin nousun avustus"
-   :onboard-assistance "Kyydin aikainen avustus"
-   :unaccompanied-minor-assistance "Alaikäisten avustus"
-   :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
+   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other "Muu"}
+   :other  "Muu"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Pyörätuoli"
@@ -425,7 +421,8 @@
   }
 
  :passenger-transportation-page
- {:header-passenger-transportation-service "Henkilöiden kuljetuspalvelun tiedot"
+ {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
+  :header-edit-passenger-transportation    "Muokkaa henkilöiden kuljetuspalvelua"
   :header-service-info                     "Palvelun perustiedot"
   :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
   :header-contact-details                  "Palvelun yhteystiedot"
@@ -436,7 +433,9 @@
   }
 
  :rentals-page
- {:header-service-info                     "Vuokrauspalvelun perustiedot"
+ {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
+  :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
+  :header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-usage-area                       "Maarajoitukset"
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
@@ -450,17 +449,21 @@
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
-  :header-add-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot."
-  :header-assistance                  "Avustuspalvelun tilauksen tiedot"
+  :header-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
+  :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
+  :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
  :parking-page
- {:header-service-info                      "Palvelun perustiedot"
+ {:header-new-parking                       "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-edit-parking                      "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-service-info                      "Palvelun perustiedot"
   :header-contact-details                   "Palvelun yhteystiedot"
   :header-payment-methods                   "Maksutavat"
   :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
-  :header-other-services-and-accessibility  "Muut palvelut ja esteettömyys"
+  :header-accessibility                     "Palvelun esteettömyystiedot"
   :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
   :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
@@ -482,7 +485,14 @@
  {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."}
+                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
+  :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
+  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."
+  :transport-service-type-selection-help-example "Esimerkki: Palveluntuottajana on yritys nimeltä \"RapidBus Oy\",
+     jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
+     Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
+     tyyppiä.
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
@@ -501,10 +511,13 @@
   :navigation-organizations                   "Palveluntuottajat"
   :navigation-dataset                         "Palvelukatalogi"
   :navigation-give-feedback                   "Anna palautetta"
+  :navigation-login                           "Kirjaudu sisään"
+  :navigation-register                        "Luo tunnus"
   :user-menu-service-guide                    "Ohje"
-  :user-menu-service-operator                 "Palveluntuottajan perustiedot"
+  :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
   :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Näytä profiili"
+  :user-menu-profile                          "Käyttäjätilin muokkaus"
+  :user-menu-summary                          "Yhteenveto"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
@@ -521,12 +534,19 @@
                :hours    "Tuntia"
                :days     "Päivää"
                :seconds  "Sekuntia"}
+  :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   }
 
  :dialog
  {:delete-transport-service
   {:title "Poista liikkumispalvelun tiedot?"
-   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}}
+   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}
+
+  :navigation-prompt
+  {:title "Sivulta poistumisen varmistus"
+   :stay "Jää"
+   :leave "Poistu"
+   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
@@ -580,6 +600,20 @@
                    "umbrella" "Sateenvarjo"
                    "buggy" "Lastenvaunut"
                    "other" "Muu"
+                   "boarding-assistance" "Kyytiin nousun avustus"
+                   "low-floor" "Matalalattia"
+                   "accessible-vehicle" "Esteetön kulkuneuvo"
+                   "step-free-access" "Portaaton pääsy"
+                   "suitable-for-wheelchairs" "Sopii pyörätuolille"
+                   "assistance-dog-space" "Tila avustuskoiralle"
+                   "crutches" "Kainalosauvat"
+                   "walker" "Rollaattori"
+                   "walking-stick" "Kävelykeppi"
+                   "visual-displays" "Visuaaliset näytöt"
+                   "large-print-timetables" "Suuret kirjasimet aikatauluissa"
+                   "displays-for-visually-impaired" "Näytöt näkövammaisille (taktiili)"
+                   "audio-information" "Kuulutukset"
+                   "audio-for-hearing-impaired" "Äänivahvistimet huonokuuloisille"
 
                    ;; additional services
                    "animal-transport" "Eläinkuljetus"
@@ -593,7 +627,43 @@
                    "contactless-payment" "Lähimaksu"
                    "mobilepay" "Mobiilimaksu"
                    "invoice" "Lasku"
-                   }}
+
+                   ;; week days
+                   "MON" "Ma"
+                   "TUE" "Ti"
+                   "WED" "Ke"
+                   "THU" "To"
+                   "FRI" "Pe"
+                   "SAT" "La"
+                   "SUN" "Su"
+                   }
+          "brokerage?" "Välityspalvelu?"
+          "companies" "Palvelun tuottamiseen osallistuvat yritykset"
+          "external-interfaces" "Ulkoiset rajapinnat"
+          "license" "Lisenssi/käyttöehdot"
+          "format" "Muoto"
+          "license-url" "Lisenssi/käyttöehdot URL"
+          "external-interface" "Ulkoinen rajapinta"
+          "accessibility-info-url" "Esteettömyyspalveluiden kuvaus (WWW)"
+          "guaranteed-accessibility-description" "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
+          "guaranteed-info-service-accessibility" "Infopalveluiden esteettömyys (taattu saatavuus)"
+          "guaranteed-transportable-aid" "Kuljetettavat apuvälineet (taattu saatavuus)"
+          "guaranteed-vehicle-accessibility" "Liikennevälineiden esteettömyysominaisuudet (aina saatavilla)."
+          "limited-accessibility-description" "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
+          "limited-info-service-accessibility" "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+          "limited-transportable-aid" "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
+          "limited-vehicle-accessibility" "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
+          "payment-method-description" "Maksutapojen lisätiedot"
+          "pricing" "Hinnoittelu"
+          "service-exceptions" "Toiminta-aikojen poikkeukset"
+          "service-hours" "Toiminta-ajat"
+          "week-days" "Viikonpäivät"
+          "from" "Alkaen"
+          "to" "Päättyen"
+          "from-date" "Alkaen (pvm)"
+          "to-date" "Päättyen (pvm)"
+          "sub-type" "Alityyppi"}
+
 
 
  :service-search
