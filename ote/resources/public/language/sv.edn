@@ -182,6 +182,11 @@
    :ote.db.transport-service/all-day             "24h"
 
    :ote.db.transport-service/brokerage?  "Välityspalvelu"
+
+   :ote.db.transport-service/available-from "Tillgänglig från"
+   :ote.db.transport-service/available-to "Tillgänglig till"
+   :ote.db.transport-service/available-from-nil "Nu"
+   :ote.db.transport-service/available-to-nil "Hittills"
    }
 
   ;; Common fields
