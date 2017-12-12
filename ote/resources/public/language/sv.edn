@@ -342,7 +342,9 @@
    :accessible-vehicle "Esteetön kulkuneuvo"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :boarding-assistance "Kyytiin nousun avustus"
-   :assistance-dog-space "Tila avustuskoiralle"}
+   :assistance-dog-space "Tila avustuskoiralle"
+   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
+   }
 
   :ote.db.transport-service/parking-facility
   {:unknown "Tuntematon"
