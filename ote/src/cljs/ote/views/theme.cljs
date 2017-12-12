@@ -80,6 +80,7 @@
     {:reagent-render
      (fn [e! {msg :flash-message
               error-msg :flash-message-error
+              query :query
               navigation-prompt-open? :navigation-prompt-open?
               navigation-confirm :navigation-confirm
               before-unload-message :before-unload-message
@@ -102,10 +103,10 @@
            :menu-item {:selected-text-color (color :blue700)}})}
           [:span
 
-         (when msg
-           [flash-message e! msg])
          (when error-msg
            [flash-message-error e! error-msg])
+         (when (or msg (:logged_in query))
+           [flash-message (or msg (tr [:common-texts :logged-in]))])
          content
          (when navigation-prompt-open?
            [navigation-prompt e! before-unload-message navigation-confirm])
