@@ -37,11 +37,69 @@
     :type      :string
     :required? true}))
 
+(defn price-group []
+  (form/group
+   {:label (tr [:rentals-page :header-service-info])
+    :columns 3
+    :layout :row}
+
+   {:name ::t-service/vehicle-prices
+    :type :table
+    :table-fields [{:name ::t-service/price-per-unit
+                    :type :number
+                    :currency? true
+                    :style {:width "100px"}
+                    :input-style {:text-align "right" :padding-right "5px"}}
+
+                   {:name ::t-service/unit
+                    :type :string}] 
+    :delete? true
+    :add-label (tr [:buttons :add-new-price-class])}
+   ))
+
+(defn vehicle-prices [update-form! data]
+  (reagent/with-let [open? (reagent/atom false)]
+    [:div
+     [ui/flat-button {:label (tr [:rentals-page :open-rental-prices])
+                      :on-click #(reset! open? true)}]
+     [ui/dialog
+      {:open @open?
+       :auto-scroll-body-content true
+       :title (tr [:price-dialog :header-dialog])
+       :actions [(reagent/as-element
+                  [ui/flat-button {:label (tr [:buttons :close])
+                                   :on-click #(reset! open? false)}])]}
+      [form/form {:update! update-form!
+                  :name->label (tr-key [:field-labels :rentals]
+                                       [:field-labels :transport-service]
+                                       [:field-labels])}
+       ;; [(assoc-in (ts-common/service-hours-group) [:options :card?] false)]
+       [(assoc-in (price-group) [:options :card?] false)]
+       data]]
+     ]))
+
 (defn vehicle-group []
-  ;; (form/group
-  ;;  {:label (tr [:rentals-page :header-vehicles])
-  ;;   :columns 3
-  ;;   :layout :row})
+  (form/group
+   {:label (tr [:rentals-page :header-vehicles])
+    :columns 3}
+   
+   {:name ::t-service/rental-vehicle
+    :type :table
+    :table-fields [{:name ::t-service/vehicle-type
+                    :type :string}
+                   {:name ::t-service/license-required
+                    :type :string}
+                   {:name ::t-service/minimum-age
+                    :type :string
+                    :regex #"\d{0,2}"}
+                   {:name :price-group
+                    :label (tr [:field-labels :rentals ::t-service/vehicle-prices])
+                    :type :component
+                    :component (fn [{:keys [update-form! data]}]
+                                 [vehicle-prices update-form! data])
+                    }]
+    :delete? true
+    :add-label (tr [:buttons :add-new-vehicle])})
   )
 
 (defn accessibility-group []
@@ -50,7 +108,7 @@
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/guaranteed-vehicle-accessibility
+   {:name        ::t-service/guaranteed-vehicle-accessibility 
     :help (tr [:form-help :guaranteed-vehicle-accessibility])
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
@@ -143,13 +201,13 @@
     :options     t-service/payment-methods})
   )
 
-(defn eligibity-requirements []
+(defn usage-area []
   (form/group
-   {:label (tr [:rentals-page :header-eligibity-requirements])
+   {:label (tr [:rentals-page :header-usage-area])
     :columns 3
     :layout :row}
 
-   {:name ::t-service/eligibility-requirements
+   {:name ::t-service/usage-area
     :type :string
     :layout :row}))
 
@@ -220,11 +278,11 @@
                              (ts-common/contact-info-group)
                              (ts-common/place-search-group e! ::t-service/rentals)
                              (ts-common/external-interfaces)
-                             ;; (vehicle-group)
+                             (vehicle-group)
                              (luggage-restrictions-groups)
                              (accessibility-group)
                              (additional-services)
-                             (eligibity-requirements)
+                             (usage-area)
                              (ts-common/service-url
                               (tr [:field-labels :transport-service-common ::t-service/booking-service])
                               ::t-service/booking-service)

@@ -120,8 +120,15 @@
   :rentals
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/eligibility-requirements  "Kelpoisuusvaatimukset"
+   :ote.db.transport-service/usage-area                "Sallitut maat"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/rental-vehicle            "Vuokrattavat ajoneuvot"
+   :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
+   :ote.db.transport-service/license-required          "Ajokorttiluokka"
+   :ote.db.transport-service/minimum-age               "Alaikäraja"
+   :ote.db.transport-service/price-per-unit            "Hinta"
+   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/vehicle-prices            "Hinta "
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
    :ote.db.transport-service/rental-additional-services "Muut palvelut"
@@ -239,7 +246,8 @@
   :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"
   :add-new-pick-up-location "Lisää toimipiste"
-  :add-new-additional-service "Lisää palvelu"}
+  :add-new-additional-service "Lisää palvelu"
+  :add-new-vehicle "Lisää ajoneuvo"}
 
 
 
@@ -430,12 +438,13 @@
  :rentals-page
  {:header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
-  :header-eligibity-requirements           "Kelpoisuusvaatimukset"
+  :header-usage-area                       "Maarajoitukset"
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
   :header-vehicles                         "Vuokrattavat ajoneuvot"
   :header-accessibility                    "Esteettömyys"
   :header-additional-services              "Lisäpalvelut"
   :open-service-hours-and-exceptions       "Palveluajat"
+  :open-rental-prices                      "Hintatiedot"
   }
 
  :terminal-page
@@ -459,6 +468,11 @@
   :header-service-hours                     "Palveluajat ja pysäköintiaika"
   }
 
+ :price-dialog
+ {:header-dialog "Ajoneuvon hintatiedot"
+  :close-dialog  "Sulje"
+  }
+ 
  :opening-hours-dialog
  {:close-dialog "Sulje"
   :header-dialog "Toimipisteen aukioloajat"

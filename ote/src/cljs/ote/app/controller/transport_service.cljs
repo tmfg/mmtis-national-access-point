@@ -95,18 +95,29 @@
   ::t-service/type)
 
 (defmethod transform-save-by-type :rentals [service]
-  (update-in service [::t-service/rentals ::t-service/pick-up-locations]
-             (fn [pick-up-locations]
-               (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
-                      (as-> pick-up-location loc
-                        (if-let [hours (::t-service/service-hours hours-and-exceptions)]
-                          (assoc loc ::t-service/service-hours hours)
-                          loc)
-                        (if-let [exceptions (::t-service/service-hours hours-and-exceptions)]
-                          (assoc loc ::t-service/service-exceptions exceptions)
-                          loc)
-                        (dissoc loc ::t-service/service-hours-and-exceptions)))
-                    pick-up-locations))))
+  (-> service
+      (update-in [::t-service/rentals ::t-service/pick-up-locations]
+                 (fn [pick-up-locations]
+                   (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
+                          (as-> pick-up-location loc
+                            (if-let [hours (::t-service/service-hours hours-and-exceptions)]
+                              (assoc loc ::t-service/service-hours hours)
+                              loc)
+                            (if-let [exceptions (::t-service/service-hours hours-and-exceptions)]
+                              (assoc loc ::t-service/service-exceptions exceptions)
+                              loc)
+                            (dissoc loc ::t-service/service-hours-and-exceptions)))
+                        pick-up-locations)
+                   ))
+      (update-in [::t-service/rentals ::t-service/rental-vehicle]
+                 (fn [rental-vehicle]               
+                   (map (fn [{prices-and-units :price-group :as price-group}]
+                          (as-> price-group price
+                            (if-let [prices (::t-service/vehicle-prices prices-and-units)]
+                              (assoc price ::t-service/vehicle-prices prices)
+                              price)
+                            (dissoc price :price-group)))
+                        rental-vehicle)))))
 
 (defmethod transform-save-by-type :default [service] service)
 
