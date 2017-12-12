@@ -24,8 +24,7 @@
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Beskrivning uppassningens esteettömyydestä"
 
-   :ote.db.transport-service/accessibility     "Saavutettavuus"
-   :ote.db.transport-service/mobility          "Esteettömyys"
+   :ote.db.transport-service/accessibility     "Esteettömyys"
    :ote.db.transport-service/information-service-accessibility "Infopalveluiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
@@ -104,8 +103,7 @@
    :ote.db.transport-service/url                       "Uppassningens verkko-adress"
    :ote.db.transport-service/description               "Uppassningens beskrivning"
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
-   :ote.db.transport-service/accessibility     "Saavutettavuus"
-   :ote.db.transport-service/mobility          "Esteettömyys"
+   :ote.db.transport-service/accessibility     "Esteettömyys"
 
 
    ;; assistance_notification_requirement fields
@@ -306,19 +304,12 @@
    :barrier "Puomi"
    :pallet-access-low-floor "Kuormalavalinjan matala lattia"
    :wheelchair-access-toilet "Inva WC"
-   :other  "Muu"}
 
-  :ote.db.transport-service/mobility
-  {:low-floor "Matalalattia"
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :suitable-for-heavily-disabled  "Sopii vaikeasti liikuntaesteisille"
-   :boarding-assistance  "Kyytiin nousun avustus"
-   :onboard-assistance "Kyydin aikainen avustus"
-   :unaccompanied-minor-assistance "Alaikäisten avustus"
-   :tactile-patform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
+   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other "Muu"}
+   :other  "Muu"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Pyörätuoli"
@@ -646,7 +637,6 @@
           "from-date" "Från"
           "to-date" "Till"
           "sub-type" "Alityyppi"}
-
 
 
 
