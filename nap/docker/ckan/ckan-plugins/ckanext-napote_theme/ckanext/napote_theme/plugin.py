@@ -247,6 +247,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
                             controller='ckanext.napote_theme.controller:CustomUserController',
                             action='login')
 
+        map.connect('/user/logged_in',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='logged_in')
+
         map.connect('/user/_logout',
                             controller='ckanext.napote_theme.controller:CustomUserController',
                             action='logout')

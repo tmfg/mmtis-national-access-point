@@ -6,6 +6,7 @@
 (def ote-router
   (r/router
    [["/" :own-services]
+    ["/:logged-in" :own-services]
     ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
