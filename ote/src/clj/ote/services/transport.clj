@@ -134,8 +134,7 @@
   (update-in service [::t-service/rentals ::t-service/rental-vehicles]
              (fn [vehicles]
                (mapv #(let [before %
-                            after (fix-price-classes % [::t-service/vehicle-prices])]
-                        (println "BEFORE: " % "nAFTER:" after)
+                            after (fix-price-classes % [::t-service/vehicle-prices])]                        
                         after)
                      vehicles))))
 
