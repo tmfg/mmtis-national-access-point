@@ -6,7 +6,7 @@
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
-(defrecord ChangePage [given-page])
+(defrecord ChangePage [given-page params])
 (defrecord GoToUrl [url])
 (defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
@@ -47,11 +47,13 @@
 (extend-protocol tuck/Event
 
   ChangePage
-  (process-event [{given-page :given-page :as e} app]
+  (process-event [{given-page :given-page params :params :as e} app]
     (navigate e app (fn [app]
                       (do
-                        (routes/navigate! given-page)
-                        (assoc app :page given-page)))))
+                        (routes/navigate! given-page params)
+                        (assoc app
+                          :page given-page
+                          :params params)))))
 
   GoToUrl
   (process-event [{url :url :as e} app]

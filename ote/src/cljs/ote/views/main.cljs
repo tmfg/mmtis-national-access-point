@@ -91,7 +91,7 @@
                    :primary-text (tr [:common-texts :user-menu-service-operator])
                    :on-click #(do
                                 (.preventDefault %)
-                                (e! (fp-controller/->ChangePage :transport-operator)))}]
+                                (e! (fp-controller/->ChangePage :transport-operator nil)))}]
     [ui/menu-item {:style {:color "#FFFFFF"}
                    :primary-text (tr [:common-texts :user-menu-log-out])
                    :on-click #(do (.preventDefault %)
@@ -142,7 +142,7 @@
                               (.preventDefault %)
                               (if url
                                 (e! (fp-controller/->GoToUrl url))
-                                (e! (fp-controller/->ChangePage page))))})
+                                (e! (fp-controller/->ChangePage page nil))))})
          (tr label)]]))
     [:div.user-menu {:class (is-user-menu-active app)
                      :style (when (> (:width app) style-base/mobile-width-px)
