@@ -34,13 +34,14 @@
                          :navigation-confirm))))
 
 (defn get-transport-operator-data [app]
-   (if (get app :transport-operator-data-loaded? true)
+  (if (:transport-operator-data-loaded? app true)
      (do
        (comm/post! "transport-operator/data" {}
-                  {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
-                   :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-       (assoc app :transport-operator-data-loaded? false
-                  :services-changed? false))
+                   {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                    :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
+       (assoc app
+              :transport-operator-data-loaded? false
+              :services-changed? false))
      app))
 
 (extend-protocol tuck/Event
@@ -114,26 +115,34 @@
            :user nil))
 
   TransportOperatorDataResponse
-  (process-event [{response :response} app]
-    (let [app (assoc app :transport-operator-data-loaded? true
-                         :user (:user (first response)))]
-    ;; First time users don't have operators.
-    ;; Ask them to add one
-    (if (and (nil? (get (first response) :transport-operator)) (not= :services (get app :page)))
-      (doall
-        (routes/navigate! :no-operator)
-        (assoc app :page :no-operator))
-      ;; Get services from response.
-      ;; Use selected operator if possible, if not, use the first one from the response
-      ;; Get selected services from the response using selected operator id
-      (assoc app :transport-operators-with-services response
-                 :transport-operator  (if (:transport-operator app)
-                                        (:transport-operator app)
-                                        (get (first response) :transport-operator))
-                 :transport-service-vector (some #(when (= (get-in % [:transport-operator ::t-operator/id])
-                                                           (get-in app [:transport-operator ::t-operator/id]))
-                                                        (:transport-service-vector %))
-                                                 (:transport-operators-with-services app))))))
+  (process-event [{response :response} {:keys [page ckan-organization-id transport-operator] :as app}]
+    (let [app (assoc app
+                     :transport-operator-data-loaded? true
+                     :user (:user (first response)))]
+      (if (and (nil? (:transport-operator (first response)))
+               (not= :services page))
+        ;; First time users don't have operators.
+        ;; Ask them to add one
+        (do
+          (routes/navigate! :no-operator)
+          (assoc app :page :no-operator))
+
+        ;; Get services from response.
+        ;; Use selected operator if possible, if not, use the first one from the response.
+        ;; Selected can either be previously selected or ckan-organization-id (CKAN edit view)
+        (let [selected-operator (or
+                                 (some #(when (or (= (::t-operator/id transport-operator)
+                                                     (get-in % [:transport-operator ::t-operator/id]))
+                                                  (= ckan-organization-id
+                                                     (get-in % [:transport-operator ::t-operator/ckan-group-id])))
+                                          %)
+                                       response)
+                                 (first response))]
+
+          (assoc app
+                 :transport-operators-with-services response
+                 :transport-operator (:transport-operator selected-operator)
+                 :transport-service-vector (:transport-service-vector selected-operator))))))
 
   SetLanguage
   (process-event [{lang :lang} app]

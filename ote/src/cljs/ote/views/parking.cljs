@@ -70,7 +70,6 @@
      :name ::t-service/payment-method-description
      :type :localized-text
      :rows 1
-     :rows-max 12
      :full-width? true
      }
 
@@ -205,7 +204,6 @@
     {:name            ::t-service/accessibility-description
      :type            :localized-text
      :rows            5
-     :max-rows        5
      :container-class "col-md-5"
      :full-width?     true}
 
