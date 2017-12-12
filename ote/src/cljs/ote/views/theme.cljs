@@ -11,17 +11,15 @@
 (defn- flash-message-error [e! msg]
   [ui/snackbar {:open (boolean msg)
         :message (or msg "")
-        :content-style  style-base/error-flash-message-content
-        :body-style   style-base/error-flash-message-body
+        :body-style style-base/error-flash-message-body
         :auto-hide-duration 4000
         :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
 
 (defn- flash-message [e! msg ]
   [ui/snackbar {:open (boolean msg)
                :message (or msg "")
-               :content-style  style-base/success-flash-message-content
-               :body-style  style-base/success-flash-message-body
-               :auto-hide-duration 2000
+               :body-style style-base/success-flash-message-body
+               :auto-hide-duration 4000
                :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
 
 (defonce debug-visible? (r/atom false))
@@ -103,11 +101,11 @@
            :menu-item {:selected-text-color (color :blue700)}})}
           [:span
 
-         (when error-msg
-           [flash-message-error e! error-msg])
-         (when (or msg (:logged_in query))
-           [flash-message (or msg (tr [:common-texts :logged-in]))])
-         content
-         (when navigation-prompt-open?
-           [navigation-prompt e! before-unload-message navigation-confirm])
-         [debug-state app]]])})))
+             (when error-msg
+               [flash-message-error e! error-msg])
+             (when (or msg (:logged_in query))
+                   [flash-message e! (or msg (tr [:common-texts :logged-in]))])
+             content
+             (when navigation-prompt-open?
+               [navigation-prompt e! before-unload-message navigation-confirm])
+             [debug-state app]]])})))

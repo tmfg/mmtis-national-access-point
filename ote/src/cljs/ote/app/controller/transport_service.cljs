@@ -11,6 +11,16 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.place-search :as place-search]))
 
+(defn clean-app-state [app]
+      (let [transport-service (get app :transport-service)
+            new-transport-service (dissoc transport-service ::t-service/passenger-transportation
+                                          ::t-service/terminal
+                                          ::t-service/rentals
+                                          ::t-service/brokerage
+                                          ::t-service/parking
+                                          ::t-service/id)
+            app (assoc app :transport-service new-transport-service)])
+      app)
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -191,8 +201,9 @@
   SelectTransportServiceType
   ;; Redirect to add service page
   (process-event [_ app]
-    (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
-      app)
+    (let [app (clean-app-state app)]
+      (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
+      app))
 
   SelectOnlyServiceType
   ;; Set service type, sub-type and
@@ -211,14 +222,7 @@
   OpenTransportServiceTypePage
   ;; :transport-service :<transport-service-type> needs to be cleaned up before creating a new one
   (process-event [_ app]
-    (let [transport-service (get app :transport-service)
-          new-transport-service (dissoc transport-service ::t-service/passenger-transportation
-                              ::t-service/terminal
-                              ::t-service/rentals
-                              ::t-service/brokerage
-                              ::t-service/parking
-                              ::t-service/id)
-      app (assoc app :transport-service new-transport-service)]
+    (let [app (clean-app-state app)]
       (routes/navigate! :transport-service)
       app))
 
@@ -322,7 +326,7 @@
 
   FailedTransportServiceResponse
   (process-event [{response :response} app]
-    (assoc app :flash-message-error (tr [:common-texts :save-failed]))
+    (assoc app :flash-message-error (tr [:common-texts :save-failed])))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
