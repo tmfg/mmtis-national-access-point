@@ -128,7 +128,7 @@
    :ote.db.transport-service/minimum-age               "Alaikäraja"
    :ote.db.transport-service/price-per-unit            "Hinta"
    :ote.db.transport-service/unit                      "Yksikkö"
-   :ote.db.transport-service/vehicle-prices            "Hinta "
+   :ote.db.transport-service/price-classes             "Hinta"
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
    :ote.db.transport-service/rental-additional-services "Muut palvelut"

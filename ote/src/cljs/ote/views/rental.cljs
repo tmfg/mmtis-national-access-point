@@ -34,7 +34,7 @@
     :columns 3
     :layout :row}
 
-   {:name ::t-service/vehicle-prices
+   {:name ::t-service/price-classes
     :type :table
     :table-fields [{:name ::t-service/price-per-unit
                     :type :number
@@ -48,7 +48,7 @@
     :add-label (tr [:buttons :add-new-price-class])}
    ))
 
-(defn vehicle-prices [update-form! data]
+(defn price-classes [update-form! data]
   (reagent/with-let [open? (reagent/atom false)]
     [:div
      [ui/flat-button {:label (tr [:rentals-page :open-rental-prices])
@@ -83,10 +83,10 @@
                    {:name ::t-service/minimum-age
                     :type :number}
                    {:name :price-group
-                    :label (tr [:field-labels :rentals ::t-service/vehicle-prices])
+                    :label (tr [:field-labels :rentals ::t-service/price-classes])
                     :type :component
                     :component (fn [{:keys [update-form! data]}]
-                                 [vehicle-prices update-form! data])
+                                 [price-classes update-form! data])
                     }]
     :delete? true
     :add-label (tr [:buttons :add-new-vehicle])})

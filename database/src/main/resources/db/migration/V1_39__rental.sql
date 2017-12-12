@@ -15,7 +15,7 @@ CREATE TYPE rental_vehicle AS (
   "vehicle-type" VARCHAR(128),
   "license-required" VARCHAR(20),
   "minimum-age" INTEGER,
-  "vehicle-prices" price_class[]
+  "price-classes" price_class[]
 );
 
 ALTER TYPE rental_provider_information

@@ -130,11 +130,11 @@
               (fn [price-classes-float]
                 (mapv #(update-in % price-per-unit-path bigdec) price-classes-float)))))
 
-(defn- update-rental-vehicle-prices [service]
+(defn- update-rental-price-classes [service]
   (update-in service [::t-service/rentals ::t-service/rental-vehicles]
              (fn [vehicles]
                (mapv #(let [before %
-                            after (fix-price-classes % [::t-service/vehicle-prices])]                        
+                            after (fix-price-classes % [::t-service/price-classes])]                        
                         after)
                      vehicles))))
 
@@ -150,7 +150,7 @@
     (-> service
         (fix-price-classes [::t-service/rentals ::t-service/rental-additional-services]
                            [::t-service/additional-service-price ::t-service/price-per-unit])
-        update-rental-vehicle-prices)
+        update-rental-price-classes)
     service))
 
 (defn- save-external-interfaces

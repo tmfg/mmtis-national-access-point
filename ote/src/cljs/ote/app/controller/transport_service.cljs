@@ -115,8 +115,8 @@
                  (fn [rental-vehicles]               
                    (mapv (fn [{prices-and-units :price-group :as price-group}]
                           (as-> price-group price
-                            (if-let [prices (::t-service/vehicle-prices prices-and-units)]
-                              (assoc price ::t-service/vehicle-prices prices)
+                            (if-let [prices (::t-service/price-classes prices-and-units)]
+                              (assoc price ::t-service/price-classes prices)
                               price)
                             (dissoc price :price-group)))
                         rental-vehicles)))))
@@ -144,12 +144,12 @@
                          pick-up-locations)))
       (update-in [::t-service/rentals ::t-service/rental-vehicles]
                  (fn [rental-vehicles]
-                   (mapv (fn [{vehicle-prices ::t-service/vehicle-prices
+                   (mapv (fn [{price-classes ::t-service/price-classes
                                :as rental-vehicle}]
                            (-> rental-vehicle
                                (assoc :price-group 
-                                      {::t-service/vehicle-prices vehicle-prices})
-                               (dissoc ::t-service/vehicle-prices)))
+                                      {::t-service/price-classes price-classes})
+                               (dissoc ::t-service/price-classes)))
                          rental-vehicles)))))
 
 (defmethod transform-edit-by-type :default [service] service)
