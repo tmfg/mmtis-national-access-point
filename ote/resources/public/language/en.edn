@@ -517,6 +517,7 @@
                :hours    "Tuntia"
                :days     "Päivää"
                :seconds  "Sekuntia"}
+  :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   }
 
  :dialog

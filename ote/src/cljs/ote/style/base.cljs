@@ -48,7 +48,7 @@
                   :padding-top "20px"
                   :font-weight "600"})
 
-(def flash-message {:top "100px"})
+(def flash-message {:top "70px"})
 
 (def title {:font-weight "bold"})
 
