@@ -229,6 +229,8 @@
 
 
 
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -244,21 +246,21 @@
 
        (if (or (= false loaded?) (= true (nil? loaded?)))
          [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+           [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
+             [:div.container-fluid
+              (case (:page app)
+                :no-operator [fp/no-operator e! app]
+                :front-page [fp/own-services e! app]
+                :own-services [fp/own-services e! app]
+                :transport-service [t-service/select-service-type e! app]
+                :transport-operator [to/operator e! app]
 
-         [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
-          (case (:page app)
-            :no-operator [fp/no-operator e! app]
-            :front-page [fp/own-services e! app]
-            :own-services [fp/own-services e! app]
-            :transport-service [t-service/select-service-type e! app]
-            :transport-operator [to/operator e! app]
+                ;; Routes for the service form, one for editing an existing one by id
+                ;; and another when creating a new service
+                :edit-service [t-service/edit-service-by-id e! app]
+                :new-service [t-service/edit-new-service e! app]
 
-            ;; Routes for the service form, one for editing an existing one by id
-            ;; and another when creating a new service
-            :edit-service [t-service/edit-service-by-id e! app]
-            :new-service [t-service/edit-new-service e! app]
-
-            :services [service-search/service-search e! (:service-search app)]
-            [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])])
+                :services [service-search/service-search e! (:service-search app)]
+                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
 
        [footer]]]]))
