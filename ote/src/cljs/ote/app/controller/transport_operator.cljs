@@ -25,7 +25,9 @@
   CreateTransportOperator
   (process-event [_ app]
     (routes/navigate! :transport-operator)
-    (assoc app :transport-operator {:new? true}))
+    (assoc app
+           :transport-operator {:new? true}
+           :services-changed? true))
 
   SelectOperator
   (process-event [{data :data} app]
