@@ -130,3 +130,6 @@
 
 (defn delete-dataset! [ckan dataset-id]
   (ckan-post ckan "action/dataset_purge" {:ckan/id dataset-id}))
+
+(defn create-organization! [ckan organization]
+  (ckan-post ckan "action/organization_create" organization))

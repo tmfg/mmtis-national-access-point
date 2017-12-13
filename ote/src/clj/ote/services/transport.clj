@@ -5,7 +5,7 @@
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [clj-time.core :as time]
             [specql.op :as op]
-            [ote.db.transport-operator :as transport-operator]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [compojure.core :refer [routes GET POST DELETE]]
@@ -20,19 +20,20 @@
             [ote.nap.publish :as publish]
             [ote.db.modification :as modification]
             [ote.access-rights :as access]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [ote.nap.ckan :as ckan])
   (:import (java.time LocalTime)
            (java.sql Timestamp)))
 
 (defqueries "ote/services/places.sql")
 
 (def transport-operator-columns
-  #{::transport-operator/id ::transport-operator/business-id ::transport-operator/email
-    ::transport-operator/name})
+  #{::t-operator/id ::t-operator/business-id ::t-operator/email
+    ::t-operator/name})
 
 (defn get-transport-operator [db where]
-  (let [operator (first (fetch db ::transport-operator/transport-operator
-                (specql/columns ::transport-operator/transport-operator)
+  (let [operator (first (fetch db ::t-operator/transport-operator
+                (specql/columns ::t-operator/transport-operator)
                 where {::specql/limit 1}))]
     operator))
 
@@ -96,18 +97,18 @@
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
   ;; FIXME: this should be middleware, not relying on client to make a POST request
   (tx/with-transaction db
-    (let [operator (get-transport-operator db {::transport-operator/ckan-group-id id})]
+    (let [operator (get-transport-operator db {::t-operator/ckan-group-id id})]
       (or operator
           (and id
           ;; FIXME: what if name changed in CKAN, we should update?
-          (insert! db ::transport-operator/transport-operator
-                   {::transport-operator/name title
-                    ::transport-operator/ckan-group-id id}))))))
+          (insert! db ::t-operator/transport-operator
+                   {::t-operator/name title
+                    ::t-operator/ckan-group-id id}))))))
 
 
 (defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
-        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::transport-operator/id transport-operator)})
+        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::t-operator/id transport-operator)})
         ;; Clean up user data
         cleaned-user (dissoc user
                              :apikey
@@ -118,15 +119,34 @@
      :user cleaned-user}))
 
 
-(defn- save-transport-operator [db data]
-  (upsert! db ::transport-operator/transport-operator data))
+(defn- save-transport-operator [nap-config db user data]
+  (if (:new? data)
+    (tx/with-transaction db
+      ;; Create operator in CKAN
+      (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
+            {id ::t-operator/id :as operator}
+            (insert! db ::t-operator/transport-operator
+                     (dissoc data  ::t-operator/id :new?))
+
+            {ckan-group-id :ckan/id :as ckan-response}
+            (ckan/create-organization!
+             ckan
+             {:ckan/name (str "transport-operator-" (::t-operator/id operator))
+              :ckan/title (::t-operator/name operator)})]
+        (update! db ::t-operator/transport-operator
+                 {::t-operator/ckan-group-id ckan-group-id}
+                 {::t-operator/id id})
+        operator))
+
+    ;; FIXME: check access!!!!!
+    (upsert! db ::t-operator/transport-operator data)))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   ([service data-path]
    (fix-price-classes service data-path [::t-service/price-per-unit]))
   ([service data-path price-per-unit-path]
-   (update-in service data-path 
+   (update-in service data-path
               (fn [price-classes-float]
                 (mapv #(update-in % price-per-unit-path bigdec) price-classes-float)))))
 
@@ -134,7 +154,7 @@
   (update-in service [::t-service/rentals ::t-service/vehicle-classes]
              (fn [vehicles]
                (mapv #(let [before %
-                            after (fix-price-classes % [::t-service/price-classes])]                        
+                            after (fix-price-classes % [::t-service/price-classes])]
                         after)
                      vehicles))))
 
@@ -240,7 +260,9 @@
    (POST "/transport-operator" {form-data :body
                                 user :user}
          ;(log/info "USER: " user)
-         (http/transit-response (save-transport-operator db (http/transit-request form-data))))
+         (http/transit-response
+          (save-transport-operator nap-config db user
+                                   (http/transit-request form-data))))
 
    (POST "/transport-service" {form-data :body
                                user :user}
@@ -256,7 +278,7 @@
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
          (http/transit-response
-          (get-transport-operator db {::transport-operator/ckan-group-id ckan-group-id})))))
+          (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
 
 (defrecord Transport [nap-config]
   component/Lifecycle
