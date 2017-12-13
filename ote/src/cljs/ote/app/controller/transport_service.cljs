@@ -11,16 +11,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.place-search :as place-search]))
 
-(defn clean-app-state [app]
-      (let [transport-service (get app :transport-service)
-            new-transport-service (dissoc transport-service ::t-service/passenger-transportation
-                                          ::t-service/terminal
-                                          ::t-service/rentals
-                                          ::t-service/brokerage
-                                          ::t-service/parking
-                                          ::t-service/id)
-            app (assoc app :transport-service new-transport-service)])
-      app)
+(defn new-transport-service [app]
+      (update app :transport-service select-keys #{::t-service/type}))
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -225,7 +217,7 @@
   SelectTransportServiceType
   ;; Redirect to add service page
   (process-event [_ app]
-    (let [app (clean-app-state app)]
+    (let [app (new-transport-service app)]
       (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
       app))
 
@@ -246,7 +238,7 @@
   OpenTransportServiceTypePage
   ;; :transport-service :<transport-service-type> needs to be cleaned up before creating a new one
   (process-event [_ app]
-    (let [app (clean-app-state app)]
+    (let [app (new-transport-service app)]
       (routes/navigate! :transport-service)
       app))
 

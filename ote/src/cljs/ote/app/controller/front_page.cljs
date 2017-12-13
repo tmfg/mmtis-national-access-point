@@ -8,6 +8,7 @@
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
 (defrecord GoToUrl [url])
+(defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
@@ -58,8 +59,13 @@
   GoToUrl
   (process-event [{url :url :as e} app]
     (navigate e app (fn [app]
-                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
-                      app)))
+      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+      app)))
+
+  OpenNewTab
+  (process-event [{url :url :as e} app]
+    (.open js/window url)
+    app)
 
   StayOnPage
   (process-event [_ app]
