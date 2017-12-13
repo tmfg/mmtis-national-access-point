@@ -778,6 +778,14 @@ nav.section.navigation.section-right > form {
     background: linear-gradient(to bottom, #2D75B4 30%, #2e5e9b 100%);
 }
 
+.info-box a {
+    color: #fff;
+}
+
+.info-box a:hover {
+    text-decoration: underline;
+}
+
 .info-box p {
     overflow: hidden;
 }
