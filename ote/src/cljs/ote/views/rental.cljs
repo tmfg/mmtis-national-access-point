@@ -194,7 +194,7 @@
     :layout :row}
 
    {:name ::t-service/usage-area
-    :type :localized-text
+    :type :string
     :full-width? true
     :container-class "col-md-12"
     :rows 1}))
