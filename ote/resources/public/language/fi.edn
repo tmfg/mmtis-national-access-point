@@ -89,7 +89,7 @@
    :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
    :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
    :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
    :ote.db.transport-service/currency                  "Valuutta"
 
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
@@ -127,14 +127,14 @@
    :ote.db.transport-service/license-required          "Ajokorttiluokka"
    :ote.db.transport-service/minimum-age               "Alaikäraja"
    :ote.db.transport-service/price-per-unit            "Hinta (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
    :ote.db.transport-service/price-classes             "Hinta"
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
    :ote.db.transport-service/rental-additional-services "Muut palvelut"
    :ote.db.transport-service/additional-service-type   "Palvelu"
    :ote.db.transport-service/additional-service-price  "Hinta (€)"
-   :ote.db.transport-service/additional-service-unit   "Yksikkö"
+   :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
    }
 
   ;; Parking fields
@@ -161,7 +161,7 @@
    ;; Price Class fields
    :ote.db.transport-service/price-class-name          "Hintaryhmä"
    :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
    :ote.db.transport-service/currency                  "Valuutta"
 
    :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
