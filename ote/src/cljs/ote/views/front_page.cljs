@@ -3,6 +3,7 @@
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.common :refer [linkify]]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
@@ -60,7 +61,7 @@
         [ui/table-row-column
          (if published?
            (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
-             [:a {:href url :target "_blank"} url])
+             [linkify url url {:target "_blank"}])
            [:span.draft
             (tr [:field-labels :transport-service ::t-service/published?-values false])])]
         [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
@@ -165,9 +166,6 @@
      [:h3 (tr [:front-page :header-no-operator])]
      [:p (tr [:front-page :desc-to-add-new-operator])]
      [:p (tr [:front-page :to-add-new-operator])
-      [:a {:href "/organization/new"} (tr [:common-texts :navigation-organizations]) ]
+      [linkify "/organization/new" (tr [:common-texts :navigation-organizations])]
       (tr [:front-page :to-add-new-operator-tab])]
-     ]
-    ]
-   ]
-  )
+     ]]])

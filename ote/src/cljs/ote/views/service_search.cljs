@@ -39,11 +39,11 @@
   [[::t-service/external-service-description "21%"
     (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
    [::t-service/external-service-url "21%"
-    (comp #(linkify % %) ::t-service/url ::t-service/external-interface)]
+    (comp #(linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
    [::t-service/format-short "16%" ::t-service/format]
    [::t-service/license "21%" ::t-service/license]
    [::t-service/license-url "21%" (comp #(when-not (str/blank? %)
-                                           (linkify % %)) ::t-service/license-url)]])
+                                           (linkify % % {:target "_blank"})) ::t-service/license-url)]])
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
@@ -51,7 +51,7 @@
    [:div.nap-interface
     [:span.search-card-title (tr [:service-search :nap-interface])]
     (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
-      [:a {:href url :target "_blank"} url])]
+      [linkify url url {:target "_blank"}])]
    (when-not (empty? external-interface-links)
      [:span
       [:br]
@@ -84,11 +84,9 @@
     [ui/paper {:z-depth 1
                :style style/result-card}
      [:div.result-title (stylefy/use-style style/result-header)
-      [:a {:href (str "/dataset/org-" transport-operator-id
-                      "-service-" id
-                      "/resource/" ckan-resource-id)
-           :style style/result-link}
-       name]
+      [linkify (str "/dataset/org-" transport-operator-id
+                    "-service-" id
+                    "/resource/" ckan-resource-id) name {:style style/result-link}]
       [data-items
 
        [ic/action-home {:style style/contact-icon}]

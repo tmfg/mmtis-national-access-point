@@ -4,6 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.common :refer [linkify]]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
@@ -152,32 +153,29 @@
       (get-in app [:user :username])]]
 
     (if (nil? (get-in app [:user :username]))
-    [:ul (stylefy/use-style style-topnav/ul)
-
-           [:li
-       [:a (merge (stylefy/use-style (if desktop? style-topnav/desktop-link style-topnav/link))
-                  {:style {:float "right" }
-                   :href "/user/register"}) (tr [:common-texts :navigation-register])]]
-     [:li
-      [:a (merge (stylefy/use-style
-                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                 {:style {:float "right" }
-                   :href "/user/login"}) (tr [:common-texts :navigation-login])]]
-     [:li
-      [:a (merge (stylefy/use-style
-                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                 {:style {:float "right"}
-                  :href  "http://bit.ly/nap-palaute"
-                  :target "_blank"})
-       (tr [:common-texts :navigation-give-feedback])]]]
-    [:ul (stylefy/use-style style-topnav/ul)
-      [:li
-        [:a (merge (stylefy/use-style
-              (if desktop? style-topnav/desktop-link style-topnav/link))
-            {:style {:float "right"}
-             :href  "http://bit.ly/nap-palaute"
-             :target "_blank"})
-            (tr [:common-texts :navigation-give-feedback])]]])
+      [:ul (stylefy/use-style style-topnav/ul)
+       [:li
+        [linkify "/user/register" (tr [:common-texts :navigation-register])
+         (merge (stylefy/use-style (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}})]]
+       [:li
+        [linkify "/user/login" (tr [:common-texts :navigation-login])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}})]]
+       [:li
+        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}
+                 :target "_blank"})]]]
+      [:ul (stylefy/use-style style-topnav/ul)
+       [:li
+        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}
+                 :target "_blank"})]]])
     ]])
 
 (defn- mobile-top-nav-links [e! app]
@@ -225,7 +223,7 @@
      [:div.col-md-8.footer-links
       [:ul.unstyled
        [:li
-        [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]]]])
+        [linkify "https://www.liikennevirasto.fi/" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]]]]]])
 
 
 
