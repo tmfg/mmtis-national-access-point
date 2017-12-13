@@ -6,8 +6,9 @@
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
-(defrecord ChangePage [given-page])
+(defrecord ChangePage [given-page params])
 (defrecord GoToUrl [url])
+(defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
@@ -22,6 +23,8 @@
 (defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
 (defrecord TransportOperatorDataFailed [error])
+
+(defrecord ClearFlashMessage [])
 
 (defn navigate [event {:keys [before-unload-message navigation-prompt-open?] :as app} navigate-fn]
   (if (and before-unload-message (not navigation-prompt-open?))
@@ -47,17 +50,24 @@
 (extend-protocol tuck/Event
 
   ChangePage
-  (process-event [{given-page :given-page :as e} app]
+  (process-event [{given-page :given-page params :params :as e} app]
     (navigate e app (fn [app]
                       (do
-                        (routes/navigate! given-page)
-                        (assoc app :page given-page)))))
+                        (routes/navigate! given-page params)
+                        (assoc app
+                          :page given-page
+                          :params params)))))
 
   GoToUrl
   (process-event [{url :url :as e} app]
     (navigate e app (fn [app]
-                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
-                      app)))
+      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+      app)))
+
+  OpenNewTab
+  (process-event [{url :url :as e} app]
+    (.open js/window url)
+    app)
 
   StayOnPage
   (process-event [_ app]
@@ -147,4 +157,8 @@
   SetLanguage
   (process-event [{lang :lang} app]
     (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
-    (.reload js/window.location)))
+    (.reload js/window.location))
+
+  ClearFlashMessage
+  (process-event [_ app]
+     (dissoc app :flash-message :flash-message-error)))

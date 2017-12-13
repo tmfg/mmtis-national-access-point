@@ -11,6 +11,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.place-search :as place-search]))
 
+(defn new-transport-service [app]
+      (update app :transport-service select-keys #{::t-service/type}))
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -69,6 +71,7 @@
 (defrecord ConfirmDeleteTransportService [id])
 (defrecord CancelDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
+(defrecord FailedDeleteTransportServiceResponse [response])
 
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
@@ -76,6 +79,7 @@
 (defrecord EditTransportService [form-data])
 (defrecord SaveTransportService [schemas publish?])
 (defrecord SaveTransportServiceResponse [response])
+(defrecord FailedTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
 
 (defrecord SelectServiceType [data])
@@ -213,8 +217,9 @@
   SelectTransportServiceType
   ;; Redirect to add service page
   (process-event [_ app]
-    (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
-      app)
+    (let [app (new-transport-service app)]
+      (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
+      app))
 
   SelectOnlyServiceType
   ;; Set service type, sub-type and
@@ -233,14 +238,7 @@
   OpenTransportServiceTypePage
   ;; :transport-service :<transport-service-type> needs to be cleaned up before creating a new one
   (process-event [_ app]
-    (let [transport-service (get app :transport-service)
-          new-transport-service (dissoc transport-service ::t-service/passenger-transportation
-                              ::t-service/terminal
-                              ::t-service/rentals
-                              ::t-service/brokerage
-                              ::t-service/parking
-                              ::t-service/id)
-      app (assoc app :transport-service new-transport-service)]
+    (let [app (new-transport-service app)]
       (routes/navigate! :transport-service)
       app))
 
@@ -302,7 +300,8 @@
   ConfirmDeleteTransportService
   (process-event [{id :id} app]
     (comm/get! (str "transport-service/delete/" id)
-               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)})
+               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)
+                :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
     app)
 
   DeleteTransportServiceResponse
@@ -310,7 +309,12 @@
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
       (assoc app :transport-service-vector filtered-map
                  :page :own-services
+                 :flash-message (tr [:common-texts :delete-service-success])
                  :services-changed? true)))
+
+  FailedDeleteTransportServiceResponse
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
   SaveTransportService
   (process-event [{:keys [schemas publish?]} {service :transport-service
@@ -328,7 +332,8 @@
               (update ::t-service/operation-area place-search/place-references)
               transform-save-by-type)]
       (comm/post! "transport-service" service-data
-                  {:on-success (tuck/send-async! ->SaveTransportServiceResponse)})
+                  {:on-success (tuck/send-async! ->SaveTransportServiceResponse)
+                   :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
       (dissoc app :before-unload-message)))
 
   SaveTransportServiceResponse
@@ -340,6 +345,10 @@
     (-> app
         (assoc :services-changed? true)
         (dissoc :transport-service))))
+
+  FailedTransportServiceResponse
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error (tr [:common-texts :save-failed])))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]

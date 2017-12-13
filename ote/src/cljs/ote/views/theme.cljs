@@ -2,16 +2,27 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [get-mui-theme color]]
             [ote.ui.debug :as debug]
+            [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [reagent.core :as r]
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.front-page :as fp-controller]))
 
-(defn- flash-message [msg]
+(defn- flash-message-error [e! msg]
   [ui/snackbar {:open (boolean msg)
-                :message (or msg "")
-                :style style-base/flash-message
-                :auto-hide-duration 5000}])
+        :message (or msg "")
+        :body-style style-base/error-flash-message-body
+        :auto-hide-duration 6000
+        :action (tr [:common-texts :navigation-give-feedback])
+        :on-action-touch-tap #(e! (fp-controller/->OpenNewTab "http://bit.ly/nap-palaute"))
+        :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
+
+(defn- flash-message [e! msg ]
+  [ui/snackbar {:open (boolean msg)
+               :message (or msg "")
+               :body-style style-base/success-flash-message-body
+               :auto-hide-duration 4000
+               :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
 
 (defonce debug-visible? (r/atom false))
 (defonce debug-state-toggle-listener
@@ -68,6 +79,7 @@
     (on-before-unload)
     {:reagent-render
      (fn [e! {msg :flash-message
+              error-msg :flash-message-error
               query :query
               navigation-prompt-open? :navigation-prompt-open?
               navigation-confirm :navigation-confirm
@@ -89,11 +101,13 @@
            :button    {:labelColor "#fff"}
            ;; Change drop down list items selected color
            :menu-item {:selected-text-color (color :blue700)}})}
-        [:span
+          [:span
 
-         (when (or msg (:logged_in query))
-           [flash-message (or msg (tr [:common-texts :logged-in]))])
-         content
-         (when navigation-prompt-open?
-           [navigation-prompt e! before-unload-message navigation-confirm])
-         [debug-state app]]])})))
+             (when error-msg
+               [flash-message-error e! error-msg])
+             (when (or msg (:logged_in query))
+                   [flash-message e! (or msg (tr [:common-texts :logged-in]))])
+             content
+             (when navigation-prompt-open?
+               [navigation-prompt e! before-unload-message navigation-confirm])
+             [debug-state app]]])})))
