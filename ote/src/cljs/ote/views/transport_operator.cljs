@@ -4,6 +4,8 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
+            [stylefy.core :as stylefy]
+            [ote.style.form :as style-form]
             [ote.app.controller.transport-operator :as to]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
@@ -68,6 +70,17 @@
      [:div.row
       [:div  {:class "col-xs-12"}
        [:h1 (tr [:organization-page :organization-form-title])]]]
+     [:p
+      (tr [:organization-page :help-desc-1])]
+     [:p
+      (tr [:organization-page :help-desc-2])
+      [:b (tr [:common-texts :title-operator-basic-details]) ]
+      (tr [:organization-page :help-desc-3])]
+     [:p
+      [:b (tr [:organization-page :contact-types]) ]
+      (tr [:organization-page :help-desc-4])]
+     [:p (tr [:organization-page :help-desc-5])]
+     [:br]
      (when (second (:transport-operators-with-services state))
        [:div.row
         [:div  {:class "col-xs-12"}
@@ -81,7 +94,7 @@
            :auto-width? true}
           (get state :transport-operator)]]])
 
-     [:div.row.organization-info
+     [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
 
       [form/form
        form-options
