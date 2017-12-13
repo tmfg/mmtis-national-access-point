@@ -46,6 +46,8 @@
   ["terminal_information" ::terminal_information]
   ["passenger_transportation_info" ::passenger_transportation_info]
   ["pick_up_location" ::pick_up_location]
+  ["rental_additional_service" ::rental_additional_service]
+  ["rental_vehicle" ::rental_vehicle]
   ["rental_provider_information" ::rental_provider_informaton]
   ["parking_provider_information" ::parking_provider_information]
   ["brokerage_service" ::brokerage_service]
@@ -129,3 +131,9 @@
 (def vehicle-accessibility
   [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs
    :boarding-assistance :assistance-dog-space])
+
+(def rental-vehicle-accessibility
+  [:disability-adapted-vehicle])
+
+(def rental-transportable-aid
+  [:wheelchair])

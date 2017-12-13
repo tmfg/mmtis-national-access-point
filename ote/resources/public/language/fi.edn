@@ -118,10 +118,23 @@
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/eligibility-requirements  "Kelpoisuusvaatimukset"
+  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
+   :ote.db.transport-service/usage-area                "Sallitut maat"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
+   :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
+   :ote.db.transport-service/license-required          "Ajokorttiluokka"
+   :ote.db.transport-service/minimum-age               "Alaikäraja"
+   :ote.db.transport-service/price-per-unit            "Hinta (€)"
+   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/price-classes             "Hinta"
    :ote.db.transport-service/pick-up-name              "Nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
+   :ote.db.transport-service/rental-additional-services "Muut palvelut"
+   :ote.db.transport-service/additional-service-type   "Palvelu"
+   :ote.db.transport-service/additional-service-price  "Hinta (€)"
+   :ote.db.transport-service/additional-service-unit   "Yksikkö"
    }
 
   ;; Parking fields
@@ -182,13 +195,20 @@
    :ote.db.transport-service/all-day             "24h"
 
    :ote.db.transport-service/brokerage?  "Välityspalvelu"
+
+   :ote.db.transport-service/available-from-and-to-title "Palvelun voimassaoloaika"
+   :ote.db.transport-service/available-from "Saatavilla alkaen"
+   :ote.db.transport-service/available-to "Saatavilla asti"
+   :ote.db.transport-service/available-from-nil "Heti"
+   :ote.db.transport-service/available-to-nil "Toistaiseksi"
    }
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"
-   }
+
+  }
 
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -207,6 +227,8 @@
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
   :operation-area "Lisää toiminta-alue (esim. maakunta) kirjoittamalla alueen nimi tekstikenttään ja valitsemalla haluttu alue listalta. Voit myös piirtää alueen kartan piirtotyökaluilla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+
+  :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
   }
 
 
@@ -234,7 +256,9 @@
   :add-external-interface "Lisää itse ylläpitämäsi rajapinta"
   :add-new-service-link "Lisää uusi palvelu"
   :add-add-new-row         "Lisää uusi rivi"
-  :add-new-pick-up-location "Lisää toimipiste"}
+  :add-new-pick-up-location "Lisää toimipiste"
+  :add-new-additional-service "Lisää palvelu"
+  :add-new-vehicle "Lisää ajoneuvo"}
 
 
 
@@ -329,7 +353,9 @@
    :accessible-vehicle "Esteetön kulkuneuvo"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :boarding-assistance "Kyytiin nousun avustus"
-   :assistance-dog-space "Tila avustuskoiralle"}
+   :assistance-dog-space "Tila avustuskoiralle"
+   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
+  }
 
   :ote.db.transport-service/parking-facility
   {:unknown "Tuntematon"
@@ -340,7 +366,7 @@
    :rental-car-park "Vuokra-autot"
    :coach-park "Linja-autot"
    :disabled-park "Invapaikat"}
-  }
+ }
 
  ;; Per feature/page localization keys
  :place-search {:name                "Paikan nimi"
@@ -420,9 +446,13 @@
   :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
   :header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
-  :header-eligibity-requirements           "Kelpoisuusvaatimukset"
-  :header-other-services-and-accessibility "Muut palvelut ja esteettömyys"
+  :header-usage-area                       "Maarajoitukset"
+  :header-restrictions-payments            "Rajoitukset ja maksutavat"
+  :header-vehicles                         "Vuokrattavat ajoneuvot"
+  :header-accessibility                    "Esteettömyys"
+  :header-additional-services              "Lisäpalvelut"
   :open-service-hours-and-exceptions       "Palveluajat"
+  :open-rental-prices                      "Hintatiedot"
   }
 
  :terminal-page
@@ -448,6 +478,11 @@
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
   :header-charging-points                   "Latauspisteet"
   :header-service-hours                     "Palveluajat ja pysäköintiaika"
+  }
+
+ :price-dialog
+ {:header-dialog "Ajoneuvon hintatiedot"
+  :close-dialog  "Sulje"
   }
 
  :opening-hours-dialog

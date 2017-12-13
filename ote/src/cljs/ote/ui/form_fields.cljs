@@ -357,16 +357,33 @@
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
-(defmethod field :date-picker [{:keys [update! label ok-label cancel-label] :as opts} data]
-  [ui/date-picker {:hint-text label
-                   :value data
-                   :on-change (fn [_ date]
-                                (update! date))
-                   :format-date time/format-date
-                   :ok-label (or ok-label (tr [:buttons :save]))
-                   :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                   :locale "fi-FI"
-                   :Date-time-format js/Intl.DateTimeFormat}])
+(defmethod field :date-picker [{:keys [update! label ok-label cancel-label
+                                       show-clear? hint-text] :as opts} data]
+  [:div (stylefy/use-style style-base/inline-block)
+   [ui/date-picker {:style {:display "inline-block"}
+                    :text-field-style {:width "150px"}
+                    :hint-text (or hint-text "")
+                    :floating-label-text label
+                    :floating-label-fixed true
+                    :auto-ok true
+                    :value data
+                    :on-change (fn [_ date]
+                                 (update! date))
+                    :format-date time/format-date
+                    :ok-label (or ok-label (tr [:buttons :save]))
+                    :cancel-label (or cancel-label (tr [:buttons :cancel]))
+                    :locale "fi-FI"
+                    :Date-time-format js/Intl.DateTimeFormat}]
+   (when show-clear?
+     [ui/icon-button {:on-click #(update! nil)
+                      :disabled? (not data)
+                      :style {:width 16 :height 16
+                              :position "relative"
+                              :padding 0
+                              :left -15
+                              :top "5px"}
+                      :icon-style {:width 16 :height 16}}
+      [ic/content-clear {:style {:width 16 :height 16}}]])])
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])

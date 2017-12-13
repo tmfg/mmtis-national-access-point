@@ -261,4 +261,17 @@
     :type :localized-text
     :rows 5
     :full-width? true
-    :container-class "col-md-8"}))
+    :container-class "col-md-8"}
+
+   (form/subtitle (tr [:field-labels :transport-service ::t-service/available-from-and-to-title]))
+
+   (form/info (tr [:form-help :available-from-and-to]))
+   {:name ::t-service/available-from
+    :type :date-picker
+    :show-clear? true
+    :hint-text (tr [:field-labels :transport-service ::t-service/available-from-nil])}
+
+   {:name ::t-service/available-to
+    :type :date-picker
+    :show-clear? true
+    :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])}))
