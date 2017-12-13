@@ -77,6 +77,7 @@
 (defrecord ConfirmDeleteTransportService [id])
 (defrecord CancelDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
+(defrecord FailedDeleteTransportServiceResponse [response])
 
 (defrecord PublishTransportService [transport-service-id])
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
@@ -284,7 +285,8 @@
   ConfirmDeleteTransportService
   (process-event [{id :id} app]
     (comm/get! (str "transport-service/delete/" id)
-               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)})
+               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)
+                :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
     app)
 
   DeleteTransportServiceResponse
@@ -292,7 +294,12 @@
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
       (assoc app :transport-service-vector filtered-map
                  :page :own-services
+                 :flash-message (tr [:common-texts :delete-service-success])
                  :services-changed? true)))
+
+  FailedDeleteTransportServiceResponse
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
   SaveTransportService
   (process-event [{:keys [schemas publish?]} {service :transport-service

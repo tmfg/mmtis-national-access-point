@@ -509,6 +509,8 @@
                :days     "Päivää"
                :seconds  "Sekuntia"}
   :save-failed                                "Tallennettaessa sattui virhe. Tarkista lomakkeen tiedot"
+  :delete-service-success                     "Palvelu poistettiin onnistuneesti."
+  :delete-service-error                       "Palvelun poisto epäonnistui. Koita hetken päästä uudestaan."
   :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   }
 
