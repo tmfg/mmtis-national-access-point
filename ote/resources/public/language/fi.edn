@@ -41,7 +41,7 @@
    :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
    :ote.db.transport-service/limited-transportable-aid "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
 
-   :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
+   :ote.db.transport-service/accessibility-info-url "Esteettömyyspalveluiden kuvaus (WWW)"
 
    ;; Contact details
    :ote.db.transport-service/contact-address          "Osoitetiedot"

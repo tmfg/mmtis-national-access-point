@@ -60,7 +60,7 @@
      [:div
       [:p (tr [:form-help :external-interfaces]) ]
       [:p (tr [:form-help :external-interfaces-eg-rae])
-        [:a {:target "_blank" :href "https://extranet.liikennevirasto.fi/"}
+        [:a {:target "_blank" :href "https://extranet.liikennevirasto.fi/extranet/web/f/rae?kategoria=1955433"}
           (tr [:form-help :RAE-tool]) ]]])
 
    {:name ::t-service/external-interfaces
