@@ -121,25 +121,31 @@
 
 (defn- save-transport-operator [nap-config db user data]
   (if (:new? data)
+    ;; Create new transport operator
     (tx/with-transaction db
-      ;; Create operator in CKAN
       (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
+
+            ;; Insert to our database
             {id ::t-operator/id :as operator}
             (insert! db ::t-operator/transport-operator
                      (dissoc data  ::t-operator/id :new?))
 
+            ;; Create organization in CKAN
             {ckan-group-id :ckan/id :as ckan-response}
             (ckan/create-organization!
              ckan
              {:ckan/name (str "transport-operator-" (::t-operator/id operator))
               :ckan/title (::t-operator/name operator)})]
+
+        ;; Update CKAN org id
         (update! db ::t-operator/transport-operator
                  {::t-operator/ckan-group-id ckan-group-id}
                  {::t-operator/id id})
         operator))
 
-    ;; FIXME: check access!!!!!
-    (upsert! db ::t-operator/transport-operator data)))
+    (authorization/with-transport-operator-check
+      db user (::t-operator/id data)
+      #(upsert! db ::t-operator/transport-operator data))))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
