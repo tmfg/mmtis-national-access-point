@@ -8,6 +8,7 @@
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page])
 (defrecord GoToUrl [url])
+(defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
@@ -22,6 +23,8 @@
 (defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
 (defrecord TransportOperatorDataFailed [error])
+
+(defrecord ClearFlashMessage [])
 
 (defn navigate [event {:keys [before-unload-message navigation-prompt-open?] :as app} navigate-fn]
   (if (and before-unload-message (not navigation-prompt-open?))
@@ -56,8 +59,13 @@
   GoToUrl
   (process-event [{url :url :as e} app]
     (navigate e app (fn [app]
-                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
-                      app)))
+      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+      app)))
+
+  OpenNewTab
+  (process-event [{url :url :as e} app]
+    (.open js/window url)
+    app)
 
   StayOnPage
   (process-event [_ app]
@@ -147,4 +155,8 @@
   SetLanguage
   (process-event [{lang :lang} app]
     (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
-    (.reload js/window.location)))
+    (.reload js/window.location))
+
+  ClearFlashMessage
+  (process-event [_ app]
+     (dissoc app :flash-message :flash-message-error)))

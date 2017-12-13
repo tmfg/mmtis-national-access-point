@@ -11,6 +11,7 @@
 (defrecord EditTransportOperatorState [data])
 (defrecord SaveTransportOperator [])
 (defrecord SaveTransportOperatorResponse [data])
+(defrecord FailedTransportOperatorResponse [response])
 
 (defrecord TransportOperatorResponse [response])
 
@@ -39,8 +40,13 @@
     (let [operator-data (-> app
                             :transport-operator
                             form/without-form-metadata)]
-      (comm/post! "transport-operator" operator-data {:on-success (t/send-async! ->SaveTransportOperatorResponse)})
+      (comm/post! "transport-operator" operator-data {:on-success (t/send-async! ->SaveTransportOperatorResponse)
+                                                      :on-failure (t/send-async! ->FailedTransportOperatorResponse)})
       app))
+
+  FailedTransportOperatorResponse
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error (tr [:common-texts :save-failed])))
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
