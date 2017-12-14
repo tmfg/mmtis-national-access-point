@@ -28,8 +28,8 @@
 
 (defmulti transform-value (fn [key value] key))
 
-(defmethod transform-value "url" [_ value] (linkify value value))
-(defmethod transform-value "homepage" [_ value] (linkify value value))
+(defmethod transform-value "url" [_ value] (linkify value value {:target "_blank"}))
+(defmethod transform-value "homepage" [_ value] (linkify value value {:target "_blank"}))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
 (defn flag-for [lang]

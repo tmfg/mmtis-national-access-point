@@ -26,6 +26,7 @@
   (process-event [_ app]
     (routes/navigate! :transport-operator)
     (assoc app
+           :page :transport-operator
            :transport-operator {:new? true}
            :services-changed? true))
 

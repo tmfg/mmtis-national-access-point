@@ -8,6 +8,8 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
+            [stylefy.core :as stylefy]
+            [ote.style.form :as style-form]
             [ote.ui.common :as ui-common]
             [ote.ui.form-fields :as form-fields]
 
@@ -109,10 +111,21 @@
                    :organization-new-title
                    :organization-form-title)])]]]
 
-     [:div.row.organization-info
+       [:p
+        (tr [:organization-page :help-desc-1])]
+       [:p
+        (tr [:organization-page :help-desc-2])
+        [:b (tr [:common-texts :title-operator-basic-details]) ]
+        (tr [:organization-page :help-desc-3])]
+       [:p
+        [:b (tr [:organization-page :contact-types]) ]
+        (tr [:organization-page :help-desc-4])]
+       [:br]
 
-      [form/form
-       form-options
-       form-groups
+       [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
 
-       (:transport-operator state)]]]))
+        [form/form
+         form-options
+         form-groups
+
+         (:transport-operator state)]]]))
