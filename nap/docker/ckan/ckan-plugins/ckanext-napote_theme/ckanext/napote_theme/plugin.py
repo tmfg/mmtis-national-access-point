@@ -102,7 +102,7 @@ def handle_request(request, tmpl_context):
     extra_locales = aslist(config.get('ckan.i18n.extra_locales'))
     if extra_directory and extra_domain and extra_locales:
         if lang in extra_locales:
-            _add_extra_translations(extra_directory, lang, extra_domain)
+            i18n._add_extra_translations(extra_directory, lang, extra_domain)
 
     tmpl_context.language = lang
     return lang
