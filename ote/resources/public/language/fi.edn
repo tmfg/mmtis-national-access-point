@@ -430,6 +430,7 @@
  :organization-page
  {:contact-types            "Yhteystavat"
   :organization-form-title  "Palveluntuottajan tiedot"
+  :organization-new-title "Lisää palveluntuottaja"
   }
 
  :passenger-transportation-page

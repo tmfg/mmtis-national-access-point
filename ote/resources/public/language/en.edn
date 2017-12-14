@@ -428,6 +428,7 @@
  :organization-page
  {:contact-types            "Yhteystavat"
   :organization-form-title  "Palveluntuottajan tiedot"
+  :organization-new-title "Create new transport operator"
   }
 
  :passenger-transportation-page

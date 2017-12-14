@@ -426,6 +426,7 @@
  :organization-page
  {:contact-types            "Yhteystavat"
   :organization-form-title  "Uppassningenstuottajan tiedot"
+  :organization-new-title "Lägga till uppassningensproducent"
   }
 
  :passenger-transportation-page
