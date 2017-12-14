@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-23 13:09+0000\n"
-"PO-Revision-Date: 2017-12-13 14:56+0200\n"
+"PO-Revision-Date: 2017-12-14 12:36+0200\n"
 "Last-Translator: \n"
 "Language: fi\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 2.0.5\n"
 
 #: ckanext/napote_theme/controller.py:69
 #, python-format
@@ -473,8 +473,8 @@ msgstr ""
 #: ckanext/napote_theme/templates/user/new.html:9
 msgid "why sign up info text"
 msgstr ""
-"Sinun täytyy luoda tunnus voidaksesi tallentaa ja julkaista liikkumispalveluita "
-"ja niihin liittyviä rajapintoja.<br />\n"
+"Sinun täytyy luoda henkilökohtainen tunnus voidaksesi tallentaa ja julkaista "
+"liikkumispalveluita ja niihin liittyviä rajapintoja.<br />\n"
 "Pidä käyttäjätunnuksesi muistissa, sillä tarvitset sitä sisäänkirjautumiseen ja "
 "unohtuneen salasanan palauttamiseen."
 
@@ -938,6 +938,14 @@ msgstr ""
 "<p><strong>Jäsen:</strong> Voi katsella oman ryhmänsä (palveluntuottaja) "
 "yksityisiä \n"
 "palveluita, mutta ei muokata niitä.</p>"
+
+#: ckan/templates/user/edit_user_form.html:10
+msgid "Full name"
+msgstr "Oma nimi"
+
+#: ckan/templates/user/new_user_form.html:6
+msgid "Full Name"
+msgstr "Oma nimi"
 
 #~ msgid "Heading/NAP home page logged in main heading"
 #~ msgstr "Liikkumispalveluiden tallennus ja julkaisu"
