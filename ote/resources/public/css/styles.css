@@ -54,6 +54,9 @@ h2 {
     font-weight: 400;
     font-size: 20px;
 }
+p {
+    line-height: 21px;
+}
 /* Global link color */
 .wrapper a {
     color: #2D75B4;

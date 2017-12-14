@@ -120,7 +120,6 @@
        [:p
         [:b (tr [:organization-page :contact-types]) ]
         (tr [:organization-page :help-desc-4])]
-       [:p (tr [:organization-page :help-desc-5])]
        [:br]
 
        [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
