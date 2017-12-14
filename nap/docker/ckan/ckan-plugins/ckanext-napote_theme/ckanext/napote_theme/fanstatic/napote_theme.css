@@ -667,7 +667,11 @@ nav.section.navigation.section-right ul a {
 }
 
 
+hr {
+    border-top: 0;
+    border-bottom: 1px solid #ccc;
 
+}
 
 form.navbar-form {
     border: 0px;
