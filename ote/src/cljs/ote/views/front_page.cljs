@@ -20,7 +20,8 @@
             [ote.style.base :as style-base]
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :as ui-common]))
+            [ote.ui.common :as ui-common]
+            [ote.views.transport-operator :as t-operator-view]))
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
@@ -94,33 +95,6 @@
        (transport-services-table-rows e! services transport-operator-id)]]]))
 
 
-(defn transport-operator-selection [e! {operator :transport-operator
-                                        operators :transport-operators-with-services}]
-  [:span
-   (when-not (empty? operators)
-     [ui-common/table2
-      [form-fields/field
-       {:label (tr [:field-labels :select-transport-operator])
-        :name        :select-transport-operator
-        :type        :selection
-        :show-option #(if (nil? %)
-                        (tr [:buttons :add-new-transport-operator])
-                        (::t-operator/name %))
-        :update!   #(if (nil? %)
-                      (e! (to/->CreateTransportOperator))
-                      (e! (to/->SelectOperator %)))
-        :options     (into (mapv :transport-operator operators)
-                           [:divider nil])
-        :auto-width? true}
-       operator]
-      [ui/flat-button {:label (tr [:buttons :edit])
-                       :style {:margin-top "1.5em"
-                               :font-size "8pt"}
-                       :icon (ic/content-create {:style {:width 16 :height 16}})
-                       :on-click #(do
-                                    (.preventDefault %)
-                                    (e! (fp/->ChangePage :transport-operator nil)))}]])])
-
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
    [:div.row
@@ -135,7 +109,7 @@
                         :icon (ic/content-add)}]]]
 
     [:div {:class "col-md-12"}
-     [transport-operator-selection e! state]]]
+     [t-operator-view/transport-operator-selection e! state]]]
 
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}
