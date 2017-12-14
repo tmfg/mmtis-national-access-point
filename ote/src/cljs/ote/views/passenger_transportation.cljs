@@ -40,7 +40,7 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :rows 5}
+    :rows 2}
 
    ))
 

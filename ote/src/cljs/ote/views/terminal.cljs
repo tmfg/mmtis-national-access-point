@@ -39,7 +39,7 @@
      :type :localized-text
      :full-width true
      :container-class "col-md-12"
-     :rows 5
+     :rows 2
      :full-width? true
      :write #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
      :read (comp ::t-service/description ::t-service/assistance)}
@@ -74,7 +74,7 @@
     :name ::t-service/accessibility-description
     :type :localized-text
     :full-width? true
-    :rows 5}
+    :rows 2}
 
    {:container-class "col-md-5"
     :name ::t-service/accessibility-info-url
