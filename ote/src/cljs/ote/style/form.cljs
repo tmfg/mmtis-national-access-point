@@ -22,7 +22,6 @@
                      :position "relative"
                      :top "-0.5em"})
 
-(def half-width {:width "47%"}) ;; ~half width (with margins two elements per line)
 (def full-width {:width "100%"})
 
 (def subtitle (merge full-width
@@ -39,3 +38,5 @@
 
 (def help-icon-element {:padding "0px 0px 0px 10px"})
 (def help-text-element {:padding "5px 5px 5px 10px"})
+
+(def organization-padding {:padding-top "20px"})

@@ -131,11 +131,13 @@
                      :user (:user (first response)))]
       (if (and (nil? (:transport-operator (first response)))
                (not= :services page))
-        ;; First time users don't have operators.
-        ;; Ask them to add one
+        ;; If page is :transport-operator and user has no operators, start creating a new one
         (do
-          (routes/navigate! :no-operator)
-          (assoc app :page :no-operator))
+          (if (= (:page app) :transport-operator)
+            (assoc app
+                   :transport-operator {:new? true}
+                   :services-changed? true)
+            app))
 
         ;; Get services from response.
         ;; Use selected operator if possible, if not, use the first one from the response.
