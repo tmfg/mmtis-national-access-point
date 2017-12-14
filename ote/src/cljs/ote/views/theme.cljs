@@ -45,12 +45,26 @@
   (let [state (atom {})]
     {:component-will-mount
      #(set! (.-onbeforeunload js/window)
-            (fn []
+            (fn [evt]
               (let [{:keys [before-unload-message navigation-prompt-open?]} @state]
                 ;; Don't show browser's onbeforeunload dialog if internal
                 ;; prompt dialog is already open
-                (when-not navigation-prompt-open?
-                  before-unload-message))))
+
+                ;; NOTE: This contains a fix for IE11. IE11 probably fails to trigger on-navigate event if
+                ;; our ->GoToUrl i.e. #(set! (.-location js/window) ...) is used. Which is turn fails to set
+                ;; "navigation-prompt-open?" flag to true. This causes beforeunload prompt to trigger every time user
+                ;; navigates out of OTE app. The fix below adds additional check for before-unload-message and
+                ;; prevents triggering a browser prompt if the message is not set. Additionally the actual event object
+                ;; and event cb return value are modified to make sure that no prompt is shown on IE11 when it shouldn't.
+                ;; TODO: Fix the actual problems related to url changes on IE11. (or wontfix)
+                (if (or navigation-prompt-open? (not before-unload-message))
+                  (do
+                    (js-delete evt "returnValue")
+                    js/undefined)
+                  (do
+                    (when before-unload-message
+                      (set! (.-returnValue evt) before-unload-message))
+                    before-unload-message)))))
      :component-will-receive-props
      (fn [_ [_ _ app _]]
        (reset! state

@@ -3,6 +3,7 @@
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.common :refer [linkify]]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
@@ -62,7 +63,7 @@
         [ui/table-row-column
          (if published?
            (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
-             [:a {:href url :target "_blank"} url])
+             [linkify url url {:target "_blank"}])
            [:span.draft
             (tr [:field-labels :transport-service ::t-service/published?-values false])])]
         [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
@@ -129,10 +130,30 @@
         [:br]
         [:p (tr [:front-page :operator-dont-have-any-services])]])]]])
 
+(defn no-operator
+      "If user haven't added service-operator, we will ask to do so."
+      [e! state]
+      [:div
+       [:div.row
+        [:div {:class "col-xs-12 col-sm-12 col-md-12"}
+         [:h3 (tr [:front-page :header-no-operator])]
+         [:p (tr [:front-page :desc-to-add-new-operator])]
+         [:br]
+         [ui/raised-button {:label (tr [:buttons :add-new-transport-operator])
+                            :primary true
+                            :on-click #(do
+                                         (.preventDefault %)
+                                         (e! (to/->CreateTransportOperator)))
+                            :icon (ic/content-create)}]]]])
+
 (defn own-services [e! state]
   (e! (fp/->EnsureTransportOperator))
   (fn [e! state]
-    ;; Get services by default from first organization
+      (if (and (:transport-operator-data-loaded? state)
+               (not (contains? state :transport-operators-with-services)))
+        [no-operator e! state]
+
+      ;; Get services by default from first organization
     (let [has-services? (not (empty? (map #(get-in % [:transport-service-vector ::t-service/id]) state)))
           operator-services (some #(when (= (get-in state [:transport-operator ::t-operator/id]) (get-in % [:transport-operator ::t-operator/id]))
                                      %)
@@ -144,20 +165,4 @@
        (if has-services?
          [table-container-for-front-page e! has-services? operator-services state]
          ;; Render service type selection page if no services added
-         [transport-service/select-service-type e! state])])))
-
-(defn no-operator
-  "If user haven't added service-operator, we will ask to do so."
-  [e! state]
-  [:div
-   [:div.row
-    [:div {:class "col-xs-12 col-sm-12 col-md-12"}
-     [:h3 (tr [:front-page :header-no-operator])]
-     [:p (tr [:front-page :desc-to-add-new-operator])]
-     [:br]
-     [ui/raised-button {:label (tr [:buttons :add-new-transport-operator])
-                        :primary true
-                        :on-click #(do
-                                     (.preventDefault %)
-                                     (e! (to/->CreateTransportOperator)))
-                        :icon (ic/content-create)}]]]])
+         [transport-service/select-service-type e! state])]))))

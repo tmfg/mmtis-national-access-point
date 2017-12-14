@@ -428,7 +428,11 @@
  :organization-page
  {:contact-types            "Yhteystavat"
   :organization-form-title  "Palveluntuottajan tiedot"
-  :organization-new-title "Create new transport operator"
+  :organization-new-title   "Create new transport operator"
+  :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
+  :help-desc-2              "Täytä "
+  :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
+  :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   }
 
  :passenger-transportation-page
