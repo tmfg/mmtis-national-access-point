@@ -151,7 +151,8 @@
       [:ul (stylefy/use-style style-topnav/ul)
        [:li
         [linkify "/user/register" (tr [:common-texts :navigation-register])
-         (merge (stylefy/use-style (if desktop? style-topnav/desktop-link style-topnav/link))
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
         [linkify "/user/login" (tr [:common-texts :navigation-login])

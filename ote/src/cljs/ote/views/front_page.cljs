@@ -70,7 +70,7 @@
         [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
         [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
         [ui/table-row-column
-         [ui/icon-button {:on-click #(e! (fp/->ChangePage :edit-service {:id id}))}
+         [ui/icon-button {:href "#" :on-click #(e! (fp/->ChangePage :edit-service {:id id}))}
           [ic/content-create]]
          [delete-service-action e! row]]])
      services))])
