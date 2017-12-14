@@ -88,3 +88,5 @@
 (def language-flag
   {:padding-left "10px"
    :padding-right "10px"})
+
+(def section-margin {:margin-top "1em"})

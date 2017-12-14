@@ -239,6 +239,7 @@
   :close "Sulje"
   :publish "Julkaise"
   :edit-service "Muokkaa uppassningens tietoja"
+  :edit "Muokkaa"
 
   :save-and-publish "Spara och publisera"
   :save-as-draft "Spara kladd"
@@ -257,7 +258,8 @@
   :add-add-new-row         "Lägga till ny rivi"
   :add-new-pick-up-location "Lägga till toimipiste"
   :add-new-additional-service "Lisää palvelu"
-  :add-new-vehicle "Lisää ajoneuvo"}
+  :add-new-vehicle "Lisää ajoneuvo"
+  :add-new-transport-operator "Lägga till ny transport operator"}
 
  ;; Database enumeration values
  :enums
@@ -424,6 +426,11 @@
  :organization-page
  {:contact-types            "Yhteystavat"
   :organization-form-title  "Uppassningenstuottajan tiedot"
+  :organization-new-title   "Lägga till uppassningensproducent"
+  :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
+  :help-desc-2              "Täytä "
+  :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
+  :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   }
 
  :passenger-transportation-page

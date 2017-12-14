@@ -206,8 +206,11 @@
      (doall
       (map-indexed
        (fn [i option]
-         ^{:key i}
-         [ui/menu-item {:value i :primary-text (show-option option)}])
+         (if (= :divider option)
+           ^{:key i}
+           [ui/divider]
+           ^{:key i}
+           [ui/menu-item {:value i :primary-text (show-option option)}]))
        options))]))
 
 

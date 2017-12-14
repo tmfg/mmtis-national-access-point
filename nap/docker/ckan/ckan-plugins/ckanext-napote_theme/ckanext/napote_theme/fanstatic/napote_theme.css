@@ -519,7 +519,7 @@ body {
 
 /* Change background color to white for every page*/
 div[role=main] {
-    background: white; /* Overwrite .main background color */
+     background: #f1f1f1; /* Overwrite .main background color */
 }
 
 /* Clean up borders */
@@ -808,6 +808,7 @@ nav.section.navigation.section-right > form {
     color: #ffffff;
     background: url('/home_header.jpg');
     border-radius: 0;
+    margin-top: 2px;
 }
 
 .homepage .home-header img {
