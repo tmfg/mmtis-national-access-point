@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-23 13:09+0000\n"
-"PO-Revision-Date: 2017-12-14 15:05+0200\n"
+"PO-Revision-Date: 2017-12-14 15:15+0200\n"
 "Last-Translator: \n"
 "Language: fi\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -30,8 +30,7 @@ msgstr "Ei oikeuksia luoda käyttäjää %s"
 msgid "User not found"
 msgstr "Käyttäjää ei löydy"
 
-#: ckanext/napote_theme/controller.py:73
-#: ckanext/napote_theme/organization_controller.py:62
+#: ckanext/napote_theme/controller.py:73 ckanext/napote_theme/organization_controller.py:62
 msgid "Integrity Error"
 msgstr ""
 
@@ -41,8 +40,7 @@ msgstr ""
 
 #: ckanext/napote_theme/controller.py:89
 #, python-format
-msgid ""
-"User \"%s\" is now registered but you are still logged in as \"%s\" from before"
+msgid "User \"%s\" is now registered but you are still logged in as \"%s\" from before"
 msgstr ""
 
 #: ckanext/napote_theme/controller.py:111
@@ -88,56 +86,48 @@ msgstr "Sähköpostiosoite on jo käytössä."
 
 #: ckanext/napote_theme/templates/footer.html:23
 msgid ""
-"<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" href="
-"\"http://ckan.org\">CKAN</a>"
+"<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" href=\"http://ckan.org"
+"\">CKAN</a>"
 msgstr ""
 
 #: ckanext/napote_theme/templates/header.html:39
 msgid "Home"
 msgstr "Etusivu"
 
-#: ckan/templates/group/read_base.html:17
-#: ckan/templates/group/snippets/info.html:36 ckan/templates/header.html:103
-#: ckan/templates/organization/bulk_process.html:20
-#: ckan/templates/organization/edit_base.html:23
-#: ckan/templates/organization/read_base.html:17 ckan/templates/package/base.html:7
-#: ckan/templates/package/base.html:17 ckan/templates/package/base.html:21
-#: ckan/templates/package/search.html:4 ckan/templates/package/search.html:7
+#: ckan/templates/group/read_base.html:17 ckan/templates/group/snippets/info.html:36
+#: ckan/templates/header.html:103 ckan/templates/organization/bulk_process.html:20
+#: ckan/templates/organization/edit_base.html:23 ckan/templates/organization/read_base.html:17
+#: ckan/templates/package/base.html:7 ckan/templates/package/base.html:17
+#: ckan/templates/package/base.html:21 ckan/templates/package/search.html:4
+#: ckan/templates/package/search.html:7
 #: ckan/templates/package/snippets/new_package_breadcrumb.html:1
 #: ckan/templates/revision/diff.html:11 ckan/templates/revision/read.html:65
-#: ckan/templates/snippets/context/group.html:17
-#: ckan/templates/snippets/context/user.html:19
+#: ckan/templates/snippets/context/group.html:17 ckan/templates/snippets/context/user.html:19
 #: ckan/templates/snippets/organization.html:59 ckan/templates/user/read.html:5
 #: ckan/templates/user/read_base.html:19 ckan/templates/user/read_base.html:53
 #: ckanext/napote_theme/templates/header.html:39
 msgid "Datasets"
 msgstr "Palvelukatalogi"
 
-#: ckan/controllers/group.py:305 ckan/controllers/home.py:61
-#: ckan/controllers/package.py:240 ckan/lib/helpers.py:833
-#: ckan/templates/header.html:104 ckan/templates/organization/edit_base.html:5
-#: ckan/templates/organization/edit_base.html:8
-#: ckan/templates/organization/index.html:3
-#: ckan/templates/organization/index.html:6
-#: ckan/templates/organization/index.html:18
-#: ckan/templates/organization/read_base.html:3
+#: ckan/controllers/group.py:305 ckan/controllers/home.py:61 ckan/controllers/package.py:240
+#: ckan/lib/helpers.py:833 ckan/templates/header.html:104
+#: ckan/templates/organization/edit_base.html:5 ckan/templates/organization/edit_base.html:8
+#: ckan/templates/organization/index.html:3 ckan/templates/organization/index.html:6
+#: ckan/templates/organization/index.html:18 ckan/templates/organization/read_base.html:3
 #: ckan/templates/organization/read_base.html:6 ckan/templates/package/base.html:14
 #: ckanext/napote_theme/templates/header.html:39
 msgid "Organizations"
 msgstr "Palveluntuottajat"
 
-#: ckanext/napote_theme/templates/header.html:43
-#: ckanext/napote_theme/templates/header.html:44
+#: ckanext/napote_theme/templates/header.html:43 ckanext/napote_theme/templates/header.html:44
 msgid "My services"
 msgstr "Omat palvelutiedot"
 
-#: ckanext/napote_theme/templates/header.html:56
-#: ckanext/napote_theme/templates/header.html:57
+#: ckanext/napote_theme/templates/header.html:56 ckanext/napote_theme/templates/header.html:57
 msgid "Give feedback"
 msgstr "Anna palautetta"
 
-#: ckanext/napote_theme/templates/header.html:70
-#: ckanext/napote_theme/templates/header.html:98
+#: ckanext/napote_theme/templates/header.html:70 ckanext/napote_theme/templates/header.html:98
 #: ckanext/napote_theme/templates/header.html:100
 msgid "View profile"
 msgstr "Käyttäjätilin muokkaus"
@@ -161,8 +151,7 @@ msgstr[1] ""
 msgid "Dashboard"
 msgstr ""
 
-#: ckanext/napote_theme/templates/header.html:107
-#: ckanext/napote_theme/templates/header.html:109
+#: ckanext/napote_theme/templates/header.html:107 ckanext/napote_theme/templates/header.html:109
 msgid "Log out"
 msgstr ""
 
@@ -186,19 +175,18 @@ msgid "NAP home page organizations infobox"
 msgstr ""
 "Julkaistaksesi liikkumispalvelutietoja, käyttäjätilisi tulee olla osana jotakin "
 "palveluntuottajaa. \n"
-"Voit joko 1) luoda uuden palveluntuottajan NAP-järjestelmään, tai 2) pyytää "
-"olemassaolevan palveluntuottajan ylläpitäjää lisäämään henkilökohtaisen "
-"käyttäjätilisi osaksi kyseistä palveluntuottajaa.<br />\n"
-"Nämä asiat saat hoidettua <a href=\"/ote/#/own-services\"><b>Omat palvelutiedot</"
-"b></a>-sivulla. \n"
+"Voit joko 1) luoda uuden palveluntuottajan NAP-järjestelmään, tai 2) pyytää olemassaolevan "
+"palveluntuottajan ylläpitäjää lisäämään henkilökohtaisen käyttäjätilisi osaksi kyseistä "
+"palveluntuottajaa.<br />\n"
+"Nämä asiat saat hoidettua <a href=\"/ote/#/own-services\"><b>Omat palvelutiedot</b></a>-"
+"sivulla. \n"
 "<br /><br />\n"
 " Palveluntuottajalla tarkoitetaan edustamaasi yritystä tai esimerkiksi yhteisöä."
 
 #: ckanext/napote_theme/templates/home/layout1.html:40
 msgid "To digitize and publish services login is required"
 msgstr ""
-"Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii "
-"kirjautumisen palveluun."
+"Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii kirjautumisen palveluun."
 
 #: ckanext/napote_theme/templates/home/layout1.html:53
 msgid "New user"
@@ -212,9 +200,8 @@ msgstr "Liikkumispalveluiden katalogi."
 msgid "NAP home page publishing services info text"
 msgstr ""
 "<h2>Omien palvelutietojen julkaisu</h2>\n"
-"Liikkumispalvelusi olennaisten tietojen tallentaminen, julkaisu ja päivittäminen "
-"hoituu kätevästi <a href=\"/ote/index.html#/own-services\">Omat palvelutiedot</"
-"a>-näkymässä."
+"Liikkumispalvelusi olennaisten tietojen tallentaminen, julkaisu ja päivittäminen hoituu "
+"kätevästi <a href=\"/ote/index.html#/own-services\">Omat palvelutiedot</a>-näkymässä."
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:12
 msgid "Heading/NAP home page intro heading"
@@ -223,32 +210,29 @@ msgstr "Mikä on NAP?"
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:15
 msgid "NAP home page info text"
 msgstr ""
-"NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access "
-"Point, NAP), johon <b>liikkumispalvelun tuottajien</b> on toimitettava tietoja "
-"digitaalisista <b>olennaisten tietojen</b> koneluettavista rajapinnoistaan. \n"
-"NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on aikaansaada "
-"mahdollisimman helppokäyttöisiä uusia yhdistettyjä liikkumispalveluita ja "
-"infopalveluita.\n"
+"NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), "
+"johon <b>liikkumispalvelun tuottajien</b> on toimitettava tietoja digitaalisista <b>olennaisten "
+"tietojen</b> koneluettavista rajapinnoistaan. \n"
+"NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on aikaansaada mahdollisimman "
+"helppokäyttöisiä uusia yhdistettyjä liikkumispalveluita ja infopalveluita.\n"
 "\n"
 "<h2>Mitä ovat liikkumispalvelut?</h2>\n"
 "Liikkumispalveluilla tarkoitetaan:<br />\n"
 "1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)<br />\n"
 "2) asemia, satamia ja terminaaleja<br />\n"
 "3) pysäköintilaitoksia<br />\n"
-"4) liikennevälineiden vuokrauspalveluita ja kaupallisia "
-"yhteistyökäyttöpalveluita<br />\n"
+"4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita<br />\n"
 "5) välityspalveluita\n"
 "<br />\n"
 "<h2>Mitä tarkoitetaan olennaisilla tiedoilla?</h2>\n"
 "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat ja "
-"esteettömyystiedot. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se "
-"on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.\n"
+"esteettömyystiedot. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu "
+"liikkumispalveluiden tuottajille ja kehittäjille.\n"
 "<br/>\n"
 "<h2>NAP-palvelun rakenne</h2>\n"
-"<b>Palvelukatalogi</b>-sivulla voit tarkastella ja hakea palvelussa julkaistuja "
-"rajapintoja.<br />\n"
-"<b>Palveluntuottajat</b>-sivulla on listattuna palveluun rekisteröityneet "
-"organisaatiot."
+"<b>Palvelukatalogi</b>-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.<br /"
+">\n"
+"<b>Palveluntuottajat</b>-sivulla on listattuna palveluun rekisteröityneet organisaatiot."
 
 #: ckanext/napote_theme/templates/organization/edit_base.html:5
 msgid "Edit"
@@ -267,10 +251,9 @@ msgstr "Info"
 #: ckanext/napote_theme/templates/package/search.html:13
 msgid "Facets info text"
 msgstr ""
-"Voit rajata haettavia palveluita käyttämällä alla olevia pikahakulinkkejä.<br /"
-">\n"
-"Kun klikkaat hakulinkkiä, se siirtyy hakusanaksi hakualueelle. Voit kerralla "
-"aktivoida klikkaamalla useammankin hakulinkin."
+"Voit rajata haettavia palveluita käyttämällä alla olevia pikahakulinkkejä.<br />\n"
+"Kun klikkaat hakulinkkiä, se siirtyy hakusanaksi hakualueelle. Voit kerralla aktivoida "
+"klikkaamalla useammankin hakulinkin."
 
 #: ckanext/napote_theme/templates/organization/snippets/help.html:4
 #: ckanext/napote_theme/templates/organization/snippets/helper.html:4
@@ -284,16 +267,15 @@ msgstr ""
 #: ckanext/napote_theme/templates/organization/snippets/helper.html:8
 msgid "Service providers short info text"
 msgstr ""
-"Palveluntuottajat voivat luoda, hallita ja julkistaa useita palveluita. "
-"Käyttäjillä voi olla palveluntuottajaryhmässä erilaisia rooleja  ja eritasoisia "
-"oikeuksia palveluiden luomiseen, muokkaamiseen ja julkaisemiseen.<br />\n"
+"Palveluntuottajat voivat luoda, hallita ja julkistaa useita palveluita. Käyttäjillä voi olla "
+"palveluntuottajaryhmässä erilaisia rooleja  ja eritasoisia oikeuksia palveluiden luomiseen, "
+"muokkaamiseen ja julkaisemiseen.<br />\n"
 "<br />\n"
 "Palveluntuottajilla tarkoitetaan:<br />\n"
 "- henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)<br />\n"
 "- asemia, satamia ja terminaaleja<br />\n"
 "- pysäköintilaitoksia<br />\n"
-"- liikennevälineiden vuokrauspalveluita ja kaupallisia "
-"yhteistyökäyttöpalveluita\n"
+"- liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita\n"
 "- välityspalveluita <br />"
 
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:6
@@ -318,9 +300,8 @@ msgstr "Kirjoita tähän kuvaus palveluntuottajasta..."
 msgid "Operation Areas"
 msgstr "Toiminta-alueet"
 
-#: ckan/logic/converters.py:146 ckan/logic/validators.py:149
-#: ckan/logic/validators.py:191 ckan/templates/package/read_base.html:19
-#: ckanext/napote_theme/templates/package/read_base.html:9
+#: ckan/logic/converters.py:146 ckan/logic/validators.py:149 ckan/logic/validators.py:191
+#: ckan/templates/package/read_base.html:19 ckanext/napote_theme/templates/package/read_base.html:9
 #: ckanext/stats/templates/ckanext/stats/index.html:89
 msgid "Dataset"
 msgstr "Palvelu"
@@ -425,9 +406,7 @@ msgid "Embed resource view"
 msgstr "Sulauta rajapintanäkymä"
 
 #: ckanext/napote_theme/templates/package/snippets/resource_view.html:59
-msgid ""
-"You can copy and paste the embed code into a CMS or blog software that supports "
-"raw HTML"
+msgid "You can copy and paste the embed code into a CMS or blog software that supports raw HTML"
 msgstr ""
 
 #: ckanext/napote_theme/templates/package/snippets/resource_view.html:62
@@ -450,14 +429,12 @@ msgstr ""
 msgid "Edit settings"
 msgstr ""
 
-#: ckan/templates/user/dashboard.html:20
-#: ckan/templates/user/dashboard_datasets.html:12
+#: ckan/templates/user/dashboard.html:20 ckan/templates/user/dashboard_datasets.html:12
 #: ckanext/napote_theme/templates/user/dashboard.html:9
 msgid "My Datasets"
 msgstr "Minun palveluni"
 
-#: ckan/templates/user/dashboard.html:21
-#: ckan/templates/user/dashboard_organizations.html:12
+#: ckan/templates/user/dashboard.html:21 ckan/templates/user/dashboard_organizations.html:12
 #: ckanext/napote_theme/templates/user/dashboard.html:10
 msgid "My Organizations"
 msgstr "Edustamani palveluntuottajat"
@@ -473,11 +450,11 @@ msgstr ""
 #: ckanext/napote_theme/templates/user/new.html:9
 msgid "why sign up info text"
 msgstr ""
-"Sinun täytyy luoda tunnus voidaksesi tallentaa ja julkaista liikkumispalveluita "
+"Sinun täytyy luoda henkilökohtainen tunnus voidaksesi tallentaa ja julkaista liikkumispalveluita "
 "ja niihin liittyviä rajapintoja.<br />\n"
-"Älä luo itsellesi käyttäjätunnusta NAPiin jos et ole liikkumispalvelujen "
-"tuottaja ja vain hyödynnät NAPissa olevia tietoja. Siirry silloin suoraan "
-"Palvelukatalogiin."
+"Älä luo itsellesi käyttäjätunnusta NAPiin jos et ole liikkumispalvelujen tuottaja ja vain "
+"hyödynnät NAPissa olevia tietoja. Siirry silloin suoraan Palvelukatalogiin.\n"
+"<hr />Jos olet jo rekisteröitynyt, kirjaudu sisään täältä."
 
 #: ckanext/napote_theme/templates/user/request_reset.html:7
 msgid "Reset your password"
@@ -565,15 +542,13 @@ msgstr "Etsi palveluita"
 msgid "Search datasets..."
 msgstr "Etsi palveluita..."
 
-#: ckan/controllers/package.py:324 ckan/controllers/package.py:332
-#: ckan/controllers/package.py:370 ckan/controllers/package.py:437
-#: ckan/controllers/package.py:753 ckan/controllers/package.py:801
-#: ckan/controllers/package.py:819 ckan/controllers/package.py:920
-#: ckan/controllers/package.py:968 ckan/controllers/package.py:1020
-#: ckan/controllers/package.py:1067 ckan/controllers/package.py:1215
-#: ckan/controllers/package.py:1231 ckan/controllers/package.py:1294
-#: ckan/controllers/package.py:1393 ckan/controllers/package.py:1428
-#: ckan/controllers/package.py:1535
+#: ckan/controllers/package.py:324 ckan/controllers/package.py:332 ckan/controllers/package.py:370
+#: ckan/controllers/package.py:437 ckan/controllers/package.py:753 ckan/controllers/package.py:801
+#: ckan/controllers/package.py:819 ckan/controllers/package.py:920 ckan/controllers/package.py:968
+#: ckan/controllers/package.py:1020 ckan/controllers/package.py:1067
+#: ckan/controllers/package.py:1215 ckan/controllers/package.py:1231
+#: ckan/controllers/package.py:1294 ckan/controllers/package.py:1393
+#: ckan/controllers/package.py:1428 ckan/controllers/package.py:1535
 msgid "Dataset not found"
 msgstr "Palvelua ei löydy"
 
@@ -601,9 +576,8 @@ msgstr "Haulla \"{query}\" ei löytynyt palveluita"
 msgid "No datasets found"
 msgstr "Palveluita ei löytynyt"
 
-#: ckan/controllers/package.py:435 ckan/controllers/package.py:817
-#: ckan/controllers/package.py:918 ckan/controllers/package.py:966
-#: ckan/controllers/package.py:1217
+#: ckan/controllers/package.py:435 ckan/controllers/package.py:817 ckan/controllers/package.py:918
+#: ckan/controllers/package.py:966 ckan/controllers/package.py:1217
 #, python-format
 msgid "Unauthorized to read package %s"
 msgstr "Ei oikeuksia tutkia palvelua %s"
@@ -624,8 +598,7 @@ msgstr "Ei oikeuksia luoda palvelua"
 msgid "Unauthorized to update dataset"
 msgstr "Ei oikeuksia päivittää palvelua"
 
-#: ckan/controllers/package.py:646 ckan/controllers/package.py:683
-#: ckan/controllers/package.py:709
+#: ckan/controllers/package.py:646 ckan/controllers/package.py:683 ckan/controllers/package.py:709
 msgid "The dataset {id} could not be found."
 msgstr "Palvelua {id} ei löytynyt."
 
@@ -686,8 +659,7 @@ msgstr "Rajapintoja muokattu."
 msgid "Package resource(s) invalid"
 msgstr "Virhe palvelun rajapinnassa."
 
-#: ckan/logic/action/get.py:1097 ckan/logic/action/update.py:75
-#: ckan/logic/action/update.py:89
+#: ckan/logic/action/get.py:1097 ckan/logic/action/update.py:75 ckan/logic/action/update.py:89
 msgid "Resource was not found."
 msgstr "Rajapintaa ei löytynyt."
 
@@ -816,10 +788,8 @@ msgid "User %s not authorized to add dataset to this organization"
 msgstr "Käyttäjällä %s ei ole oikeutta luoda palvelua tähän palveluntuottajaan"
 
 #: ckan/templates/package/snippets/cannot_create_package.html:19
-msgid ""
-"Ask a system administrator to create an organization before you can continue."
-msgstr ""
-"Pyydä järjestelmän ylläpitäjää luomaan palveluntuottaja ennen kuin voit jatkaa."
+msgid "Ask a system administrator to create an organization before you can continue."
+msgstr "Pyydä järjestelmän ylläpitäjää luomaan palveluntuottaja ennen kuin voit jatkaa."
 
 #: ckan/logic/auth/create.py:129
 #, python-format
@@ -849,14 +819,12 @@ msgstr "Palveluntuottajaa ei löytynyt"
 msgid "Are you sure you want to delete organization - {name}?"
 msgstr "Haluatko varmasti poistaa palveluntuottajan - {name}?"
 
-#: ckan/templates/organization/edit.html:6
-#: ckan/templates/organization/snippets/info.html:13
+#: ckan/templates/organization/edit.html:6 ckan/templates/organization/snippets/info.html:13
 #: ckan/templates/organization/snippets/info.html:16
 msgid "Edit Organization"
 msgstr "Muokkaa palveluntuottajaa"
 
-#: ckan/templates/organization/index.html:13
-#: ckan/templates/user/dashboard_organizations.html:7
+#: ckan/templates/organization/index.html:13 ckan/templates/user/dashboard_organizations.html:7
 msgid "Add Organization"
 msgstr "Lisää palveluntuottaja"
 
@@ -895,11 +863,11 @@ msgstr "Palveluntuottajan {group} palvelut:"
 
 #: ckan/templates/organization/snippets/organization_form.html:60
 msgid ""
-"Are you sure you want to delete this Organization? This will delete all the "
-"public and private datasets belonging to this organization."
+"Are you sure you want to delete this Organization? This will delete all the public and private "
+"datasets belonging to this organization."
 msgstr ""
-"Haluatko varmasti poistaa tämän palveluntuottajan? Tämä poistaa kaikki julkiset "
-"ja yksityiset palvelut, jotka kuuluvat tälle palveluntuottajalle."
+"Haluatko varmasti poistaa tämän palveluntuottajan? Tämä poistaa kaikki julkiset ja yksityiset "
+"palvelut, jotka kuuluvat tälle palveluntuottajalle."
 
 #: ckan/templates/snippets/search_result_text.html:27
 msgid "{number} organization found for \"{query}\""
@@ -927,17 +895,24 @@ msgstr "Sinua ei ole lisätty jäseksi mihinkään palveluntuottajaan"
 
 #: ckan/templates/organization/member_new.html:81
 msgid ""
-" <p><strong>Admin:</strong> Can add/edit and delete datasets, as well as manage "
-"organization members.</p> <p><strong>Editor:</strong> Can add and edit datasets, "
-"but not manage organization members.</p> <p><strong>Member:</strong> Can view "
-"the organization's private datasets, but not add new datasets.</p> "
+" <p><strong>Admin:</strong> Can add/edit and delete datasets, as well as manage organization "
+"members.</p> <p><strong>Editor:</strong> Can add and edit datasets, but not manage organization "
+"members.</p> <p><strong>Member:</strong> Can view the organization's private datasets, but not "
+"add new datasets.</p> "
 msgstr ""
 "<p><strong>Ylläpitäjä:</strong> Voi lisätä, muokata ja poistaa \n"
 "palveluita sekä hallinnoida palveluntuottajan jäseniä.</p> \n"
 "<p><strong>Muokkaaja:</strong> Voi lisätä ja muokata palveluita.</p> \n"
-"<p><strong>Jäsen:</strong> Voi katsella oman ryhmänsä (palveluntuottaja) "
-"yksityisiä \n"
+"<p><strong>Jäsen:</strong> Voi katsella oman ryhmänsä (palveluntuottaja) yksityisiä \n"
 "palveluita, mutta ei muokata niitä.</p>"
+
+#: ckan/templates/user/edit_user_form.html:10
+msgid "Full name"
+msgstr "Oma nimi"
+
+#: ckan/templates/user/new_user_form.html:6
+msgid "Full Name"
+msgstr "Oma nimi"
 
 #~ msgid "Heading/NAP home page logged in main heading"
 #~ msgstr "Liikkumispalveluiden tallennus ja julkaisu"
