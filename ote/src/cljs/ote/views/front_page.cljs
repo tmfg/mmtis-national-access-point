@@ -19,7 +19,9 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [reagent.core :as r]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.common :as ui-common]
+            [ote.views.transport-operator :as t-operator-view]))
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
@@ -74,7 +76,7 @@
 
 (defn transport-services-listing [e! transport-operator-id services section-label]
   (when (> (count services) 0)
-    [:div.row
+    [:div.row (stylefy/use-style style-base/section-margin)
      [:div {:class "col-xs-12 col-md-12"}
       [:h3 section-label]
 
@@ -93,39 +95,26 @@
        (transport-services-table-rows e! services transport-operator-id)]]]))
 
 
-
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
    [:div.row
-    [:div {:class "col-xs-12 col-sm-4 col-md-4"}
-     [:h1 (tr [:common-texts :own-api-list]) ]
-     ]
-
-    [:div {:class "col-xs-12 col-sm-4 col-md-4"}
-     (if (second (:transport-operators-with-services state))
-     [form-fields/field
-      {:label (tr [:field-labels :select-transport-operator])
-       :name        :select-transport-operator
-       :type        :selection
-       :show-option ::t-operator/name
-       :update!   #(e! (to/->SelectOperator %))
-       :options     (map :transport-operator (:transport-operators-with-services state))
-       :auto-width? true}
-      (get state :transport-operator)
-      ]
-    nil)
-     ]
-    [:div {:class "col-xs-12 col-sm-4 col-md-4"}
-     [ui/raised-button {:label (tr [:buttons :add-transport-service])
+    [:div {:class "col-md-12"}
+     [:h1 (tr [:common-texts :own-api-list])
+      [ui/raised-button {:label (tr [:buttons :add-transport-service])
+                        :style {:float "right"}
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))
-                        :primary  true}]]]
+                        :primary  true
+                        :icon (ic/content-add)}]]]
+
+    [:div {:class "col-md-12"}
+     [t-operator-view/transport-operator-selection e! state]]]
+
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}
-
      (if (and has-services? (not (empty? operator-services)))
-      ;; TRUE -> Table for transport services
+       ;; TRUE -> Table for transport services
        (doall
         (for [type t-service/transport-service-types
               :let [services (filter #(= (:ote.db.transport-service/type %) type) operator-services)]
@@ -143,31 +132,32 @@
 (defn own-services [e! state]
   (e! (fp/->EnsureTransportOperator))
   (fn [e! state]
-  ;; Get services by default from first organization
-  (let [has-services? (not (empty? (map #(get-in % [:transport-service-vector ::t-service/id]) state)))
-        operator-services (some #(when (= (get-in state [:transport-operator ::t-operator/id]) (get-in % [:transport-operator ::t-operator/id]))
-                             %)
-                          (:transport-operators-with-services state))
-        operator-services (if (empty? operator-services)
-                      (:transport-service-vector (first (:transport-operators-with-services state)))
-                      (:transport-service-vector state))]
-    [:div
-     (if has-services?
-       (table-container-for-front-page e! has-services? operator-services state)
-       [transport-service/select-service-type e! state] ;; Render service type selection page if no services added
-       )])))
+    ;; Get services by default from first organization
+    (let [has-services? (not (empty? (map #(get-in % [:transport-service-vector ::t-service/id]) state)))
+          operator-services (some #(when (= (get-in state [:transport-operator ::t-operator/id]) (get-in % [:transport-operator ::t-operator/id]))
+                                     %)
+                                  (:transport-operators-with-services state))
+          operator-services (if (empty? operator-services)
+                              (:transport-service-vector (first (:transport-operators-with-services state)))
+                              (:transport-service-vector state))]
+      [:div
+       (if has-services?
+         [table-container-for-front-page e! has-services? operator-services state]
+         ;; Render service type selection page if no services added
+         [transport-service/select-service-type e! state])])))
 
-(defn no-operator [e! state]
+(defn no-operator
   "If user haven't added service-operator, we will ask to do so."
+  [e! state]
   [:div
    [:div.row
     [:div {:class "col-xs-12 col-sm-12 col-md-12"}
      [:h3 (tr [:front-page :header-no-operator])]
      [:p (tr [:front-page :desc-to-add-new-operator])]
-     [:p (tr [:front-page :to-add-new-operator])
-      [:a {:href "/organization/new"} (tr [:common-texts :navigation-organizations]) ]
-      (tr [:front-page :to-add-new-operator-tab])]
-     ]
-    ]
-   ]
-  )
+     [:br]
+     [ui/raised-button {:label (tr [:buttons :add-new-transport-operator])
+                        :primary true
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (to/->CreateTransportOperator)))
+                        :icon (ic/content-create)}]]]])

@@ -259,7 +259,7 @@
 
    {:name ::t-service/description
     :type :localized-text
-    :rows 5
+    :rows 2
     :full-width? true
     :container-class "col-md-8"}
 

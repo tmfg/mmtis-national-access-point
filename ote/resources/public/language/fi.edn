@@ -240,6 +240,7 @@
   :close "Sulje"
   :publish "Julkaise"
   :edit-service "Muokkaa palvelun tietoja"
+  :edit "Muokkaa"
 
   :save-and-publish "Tallenna ja julkaise"
   :save-as-draft "Tallenna luonnoksena"
@@ -258,7 +259,9 @@
   :add-add-new-row         "Lisää uusi rivi"
   :add-new-pick-up-location "Lisää toimipiste"
   :add-new-additional-service "Lisää palvelu"
-  :add-new-vehicle "Lisää ajoneuvo"}
+  :add-new-vehicle "Lisää ajoneuvo"
+  :add-new-transport-operator "Lisää uusi palveluntuottaja"
+  }
 
 
 
@@ -427,6 +430,7 @@
  :organization-page
  {:contact-types            "Yhteystavat"
   :organization-form-title  "Palveluntuottajan tiedot"
+  :organization-new-title "Lisää palveluntuottaja"
   :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
   :help-desc-2              "Täytä "
   :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."

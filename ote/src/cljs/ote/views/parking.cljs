@@ -169,7 +169,7 @@
      :layout  :row}
 
     {:name            ::t-service/charging-points
-     :rows            5
+     :rows            2
      :type            :localized-text
      :full-width?     true
      :container-class "col-md-6"}))
@@ -196,7 +196,7 @@
 
     {:name            ::t-service/accessibility-description
      :type            :localized-text
-     :rows            5
+     :rows            2
      :container-class "col-md-6"
      :full-width?     true}
 
