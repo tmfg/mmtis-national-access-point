@@ -84,21 +84,16 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl "/dashboard/datasets")))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-profile])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-service-operator])
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (fp-controller/->ChangePage :transport-operator nil)))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-log-out])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
+                    :primary-text (tr [:common-texts :user-menu-profile])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
+     [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (tr [:common-texts :user-menu-log-out])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
 
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (r/as-element [language-selection e!])}]]))
+     [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (r/as-element [language-selection e!])}]]))
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service})
 (def services-pages #{:services})

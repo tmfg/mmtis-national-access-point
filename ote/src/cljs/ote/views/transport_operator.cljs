@@ -1,15 +1,51 @@
 (ns ote.views.transport-operator
   "Form to edit transport operator information."
-  (:require [ote.ui.form :as form]
+  (:require [reagent.core :as r]
+            [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.icons :as ic]
+
+            [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
+            [ote.ui.common :as ui-common]
+            [ote.ui.form-fields :as form-fields]
+
             [ote.app.controller.transport-operator :as to]
+            [ote.app.controller.front-page :as fp]
+
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
-            [ote.ui.form-fields :as form-fields]
-            [reagent.core :as r]))
+            [ote.localization :refer [tr tr-key]]))
+
+(defn transport-operator-selection [e! {operator :transport-operator
+                                        operators :transport-operators-with-services}]
+  [:span
+   ;; Show operator selection if there are operators and we are not creating a new one
+   (when (and (not (empty? operators))
+              (not (:new? operator)))
+     [ui-common/table2
+      [form-fields/field
+       {:label (tr [:field-labels :select-transport-operator])
+        :name        :select-transport-operator
+        :type        :selection
+        :show-option #(if (nil? %)
+                        (tr [:buttons :add-new-transport-operator])
+                        (::t-operator/name %))
+        :update!   #(if (nil? %)
+                      (e! (to/->CreateTransportOperator))
+                      (e! (to/->SelectOperator %)))
+        :options     (into (mapv :transport-operator operators)
+                           [:divider nil])
+        :auto-width? true}
+       operator]
+      [ui/flat-button {:label (tr [:buttons :edit])
+                       :style {:margin-top "1.5em"
+                               :font-size "8pt"}
+                       :icon (ic/content-create {:style {:width 16 :height 16}})
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (fp/->ChangePage :transport-operator nil)))}]])])
 
 (defn- operator-form-groups []
   [(form/group
@@ -31,6 +67,7 @@
 
     {:name ::common/postal_code
      :type :string
+     :regex #"\d{0,5}"
      :read (comp ::common/postal_code ::t-operator/visiting-address)
      :write (fn [data postal-code]
               (assoc-in data [::t-operator/visiting-address ::common/postal_code] postal-code))}
@@ -61,25 +98,16 @@
                                :disabled (form/disable-save? data)}
                  (tr [:buttons :save])])})
 
-(defn operator [e! state]
+(defn operator [e! {operator :transport-operator :as state}]
   (r/with-let [form-options (operator-form-options e!)
                form-groups (operator-form-groups)]
     [:div
      [:div.row
       [:div  {:class "col-xs-12"}
-       [:h1 (tr [:organization-page :organization-form-title])]]]
-     (when (second (:transport-operators-with-services state))
-       [:div.row
-        [:div  {:class "col-xs-12"}
-         [form-fields/field
-          {:label (tr [:field-labels :select-transport-operator])
-           :name        :select-transport-operator
-           :type        :selection
-           :show-option ::t-operator/name
-           :update!   #(e! (to/->SelectOperator %))
-           :options     (map :transport-operator (:transport-operators-with-services state))
-           :auto-width? true}
-          (get state :transport-operator)]]])
+       [:h1 (tr [:organization-page
+                 (if (:new? operator)
+                   :organization-new-title
+                   :organization-form-title)])]]]
 
      [:div.row.organization-info
 

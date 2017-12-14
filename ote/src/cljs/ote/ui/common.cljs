@@ -18,3 +18,14 @@
   [:div.help (stylefy/use-style style-base/help)
    [:div (stylefy/use-style style-form/help-icon-element) [ic/action-info-outline]]
    [:div (stylefy/use-style style-form/help-text-element) help]])
+
+(defn table2 [& items]
+  [:table
+   [:tbody
+    (map-indexed
+     (fn [i [left right]]
+       ^{:key i}
+       [:tr
+        [:td left]
+        [:td right]])
+     (partition 2 items))]])
