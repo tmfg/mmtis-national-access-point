@@ -4,6 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.common :refer [linkify]]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
@@ -84,21 +85,16 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl "/dashboard/datasets")))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-profile])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-service-operator])
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (fp-controller/->ChangePage :transport-operator nil)))}]
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (tr [:common-texts :user-menu-log-out])
-                   :on-click #(do (.preventDefault %)
-                                  (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
+                    :primary-text (tr [:common-texts :user-menu-profile])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
+     [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (tr [:common-texts :user-menu-log-out])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
 
-    [ui/menu-item {:style {:color "#FFFFFF"}
-                   :primary-text (r/as-element [language-selection e!])}]]))
+     [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (r/as-element [language-selection e!])}]]))
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service})
 (def services-pages #{:services})
@@ -152,32 +148,29 @@
       (get-in app [:user :username])]]
 
     (if (nil? (get-in app [:user :username]))
-    [:ul (stylefy/use-style style-topnav/ul)
-
-           [:li
-       [:a (merge (stylefy/use-style (if desktop? style-topnav/desktop-link style-topnav/link))
-                  {:style {:float "right" }
-                   :href "/user/register"}) (tr [:common-texts :navigation-register])]]
-     [:li
-      [:a (merge (stylefy/use-style
-                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                 {:style {:float "right" }
-                   :href "/user/login"}) (tr [:common-texts :navigation-login])]]
-     [:li
-      [:a (merge (stylefy/use-style
-                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                 {:style {:float "right"}
-                  :href  "http://bit.ly/nap-palaute"
-                  :target "_blank"})
-       (tr [:common-texts :navigation-give-feedback])]]]
-    [:ul (stylefy/use-style style-topnav/ul)
-      [:li
-        [:a (merge (stylefy/use-style
-              (if desktop? style-topnav/desktop-link style-topnav/link))
-            {:style {:float "right"}
-             :href  "http://bit.ly/nap-palaute"
-             :target "_blank"})
-            (tr [:common-texts :navigation-give-feedback])]]])
+      [:ul (stylefy/use-style style-topnav/ul)
+       [:li
+        [linkify "/user/register" (tr [:common-texts :navigation-register])
+         (merge (stylefy/use-style (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}})]]
+       [:li
+        [linkify "/user/login" (tr [:common-texts :navigation-login])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}})]]
+       [:li
+        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}
+                 :target "_blank"})]]]
+      [:ul (stylefy/use-style style-topnav/ul)
+       [:li
+        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}
+                 :target "_blank"})]]])
     ]])
 
 (defn- mobile-top-nav-links [e! app]
@@ -225,9 +218,11 @@
      [:div.col-md-8.footer-links
       [:ul.unstyled
        [:li
-        [:a {:href "https://www.liikennevirasto.fi/"} (tr [:common-texts :footer-livi-url])]]]]]]])
+        [linkify "https://www.liikennevirasto.fi/" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]]]]]])
 
 
+
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
 
 (defn ote-application
   "OTE application main view"
@@ -244,21 +239,20 @@
 
        (if (or (= false loaded?) (= true (nil? loaded?)))
          [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+           [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
+             [:div.container-fluid
+              (case (:page app)
+                :front-page [fp/own-services e! app]
+                :own-services [fp/own-services e! app]
+                :transport-service [t-service/select-service-type e! app]
+                :transport-operator [to/operator e! app]
 
-         [:div.container-fluid.wrapper (stylefy/use-style style-base/wrapper)
-          (case (:page app)
-            :no-operator [fp/no-operator e! app]
-            :front-page [fp/own-services e! app]
-            :own-services [fp/own-services e! app]
-            :transport-service [t-service/select-service-type e! app]
-            :transport-operator [to/operator e! app]
+                ;; Routes for the service form, one for editing an existing one by id
+                ;; and another when creating a new service
+                :edit-service [t-service/edit-service-by-id e! app]
+                :new-service [t-service/edit-new-service e! app]
 
-            ;; Routes for the service form, one for editing an existing one by id
-            ;; and another when creating a new service
-            :edit-service [t-service/edit-service-by-id e! app]
-            :new-service [t-service/edit-new-service e! app]
-
-            :services [service-search/service-search e! (:service-search app)]
-            [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])])
+                :services [service-search/service-search e! (:service-search app)]
+                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
 
        [footer]]]]))

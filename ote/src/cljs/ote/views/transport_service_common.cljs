@@ -5,6 +5,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
+            [ote.ui.common :refer [linkify]]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.views.place-search :as place-search]
@@ -58,10 +59,10 @@
 
    (form/info
      [:div
-      [:p (tr [:form-help :external-interfaces]) ]
+      [:p (tr [:form-help :external-interfaces])]
       [:p (tr [:form-help :external-interfaces-eg-rae])
-        [:a {:target "_blank" :href "https://extranet.liikennevirasto.fi/extranet/web/f/rae?kategoria=1955433"}
-          (tr [:form-help :RAE-tool]) ]]])
+       [linkify "https://extranet.liikennevirasto.fi/extranet/web/f/rae?kategoria=1955433" (tr [:form-help :RAE-tool])
+        {:target "_blank"}]]])
 
    {:name ::t-service/external-interfaces
     :type :table
@@ -259,7 +260,7 @@
 
    {:name ::t-service/description
     :type :localized-text
-    :rows 5
+    :rows 2
     :full-width? true
     :container-class "col-md-8"}
 

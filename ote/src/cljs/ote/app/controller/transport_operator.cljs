@@ -14,12 +14,21 @@
 (defrecord FailedTransportOperatorResponse [response])
 
 (defrecord TransportOperatorResponse [response])
+(defrecord CreateTransportOperator [])
 
 
 (defn transport-operator-by-ckan-group-id[id]
   (comm/get! (str "transport-operator/" id) {:on-success (t/send-async! ->TransportOperatorResponse)}))
 
 (extend-protocol t/Event
+
+  CreateTransportOperator
+  (process-event [_ app]
+    (routes/navigate! :transport-operator)
+    (assoc app
+           :page :transport-operator
+           :transport-operator {:new? true}
+           :services-changed? true))
 
   SelectOperator
   (process-event [{data :data} app]
@@ -52,16 +61,17 @@
   (process-event [{data :data} app]
     (routes/navigate! :own-services)
     (assoc app
-      :page :own-services
-      :flash-message (tr [:common-texts :transport-operator-saved ])
-      :transport-operator data
-      :transport-operators-with-services (map (fn [{:keys [transport-operator] :as operator-with-services}]
-                                                (if (= (::t-operator/id data)
-                                                       (::t-operator/id transport-operator))
-                                                  (assoc operator-with-services
-                                                    :transport-operator data)
-                                                  operator-with-services))
-                                              (:transport-operators-with-services app))))
+           :page :own-services
+           :flash-message (tr [:common-texts :transport-operator-saved ])
+           :transport-operator data
+           :transport-operators-with-services (map (fn [{:keys [transport-operator] :as operator-with-services}]
+                                                     (if (= (::t-operator/id data)
+                                                            (::t-operator/id transport-operator))
+                                                       (assoc operator-with-services
+                                                              :transport-operator data)
+                                                       operator-with-services))
+                                                   (:transport-operators-with-services app))
+           :services-changed? true))
 
   TransportOperatorResponse
   (process-event [{response :response} app]

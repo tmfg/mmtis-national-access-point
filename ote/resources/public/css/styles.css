@@ -18,7 +18,11 @@ body {
 
 }
 .wrapper {
+    padding: 20px 0px 20px 0px;
     min-height: 100%;
+}
+.grey-wrapper {
+    background-color: #f1f1f1;
 }
 
 @media only screen and (min-width: 1170px) {
@@ -49,6 +53,9 @@ h1 {
 h2 {
     font-weight: 400;
     font-size: 20px;
+}
+p {
+    line-height: 21px;
 }
 /* Global link color */
 .wrapper a {
@@ -120,7 +127,6 @@ footer {
     color: #ffffff;
     height: 100px;
     padding: 20px 0;
-    margin-top: 20px;
 }
 .site-footer .container-fluid {
     position: relative;
