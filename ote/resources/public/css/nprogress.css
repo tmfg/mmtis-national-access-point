@@ -30,7 +30,6 @@
     transform: rotate(3deg) translate(0px, -4px);
 }
 
-/* Remove these to get rid of the spinner */
 #nprogress .spinner {
     display: block;
     position: fixed;
@@ -88,6 +87,22 @@
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 1200px) {
+    #nprogress .spinner .loading-msg {
+        display: none;
+    }
+
+    #nprogress .spinner {
+        top: 15px;
+        right: 10px;
+    }
+
+    #nprogress .spinner-icon {
+        width: 25px;
+        height: 25px;
     }
 }
 
