@@ -62,7 +62,6 @@
 
   AddPlace
   (process-event [{id :id} app]
-    ;(.log js/console "ADD PLACE:" id)
     (if (some #(= id (::places/id (:place %)))
               (get-in app [:place-search :results]))
       ;; This name has already been added, don't do it again
