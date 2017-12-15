@@ -917,3 +917,10 @@ msgid ""
 " not add new datasets.</p> "
 msgstr ""
 
+#: ckan/templates/user/edit_user_form.html:10
+msgid "Full name"
+msgstr ""
+
+#: ckan/templates/user/new_user_form.html:6
+msgid "Full Name"
+msgstr ""

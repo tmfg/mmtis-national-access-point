@@ -7,6 +7,8 @@ from pkg_resources import resource_stream
 import csv
 import sys
 
+import ckan.logic as logic
+import ckan.model as model
 import ckan.authz as authz
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
@@ -14,6 +16,7 @@ from ckan.lib.plugins import DefaultTranslation
 from routes.mapper import SubMapper
 from ckan.lib import authenticator
 from ckan.model import User
+from ckan.common import c
 
 from ckan.lib import i18n
 from ckan.plugins import PluginImplementations
@@ -23,6 +26,7 @@ from paste.deploy.converters import aslist
 csv.field_size_limit(sys.maxsize)
 
 log = getLogger(__name__)
+
 
 ### FIXME: MONKEY PATCH CKAN AUTHENTICATION START ###
 
@@ -57,6 +61,7 @@ def authenticate_monkey_patch(self, environ, identity):
 
     return None
 
+
 authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_patch
 
 ### MONKEY PATCH CKAN AUTHENTICATION END ###
@@ -64,6 +69,7 @@ authenticator.UsernamePasswordAuthenticator.authenticate = authenticate_monkey_p
 ### MONKEY PATCH CKAN I18N LANGUAGE START ###
 
 supported_languages = ['fi', 'sv', 'en']
+
 
 # Take language from "finap_lang" cookie which both CKAN and OTE
 # can use. Language selection sets cookie and refreshes the page.
@@ -75,6 +81,7 @@ def language_from_cookie(request):
         pass
 
     return lang
+
 
 def handle_request(request, tmpl_context):
     ''' Set the language for the request '''
@@ -88,21 +95,29 @@ def handle_request(request, tmpl_context):
     for plugin in PluginImplementations(ITranslation):
         if lang in plugin.i18n_locales():
             i18n._add_extra_translations(plugin.i18n_directory(), lang,
-                                    plugin.i18n_domain())
+                                         plugin.i18n_domain())
 
     extra_directory = config.get('ckan.i18n.extra_directory')
     extra_domain = config.get('ckan.i18n.extra_gettext_domain')
     extra_locales = aslist(config.get('ckan.i18n.extra_locales'))
     if extra_directory and extra_domain and extra_locales:
         if lang in extra_locales:
-            _add_extra_translations(extra_directory, lang, extra_domain)
+            i18n._add_extra_translations(extra_directory, lang, extra_domain)
 
     tmpl_context.language = lang
     return lang
 
+
 i18n.handle_request = handle_request
 
+
 ### MONKEY PATCH CKAN I18N LANGAUGE END ###
+
+
+
+
+
+### Custom auth functions ###
 
 def dataset_purge_custom_auth(context, data_dict):
     # Defer authorization for package_pruge to package_update
@@ -110,6 +125,13 @@ def dataset_purge_custom_auth(context, data_dict):
 
     return authz.is_authorized('package_update', context, data_dict)
 
+
+def user_list_custom_auth(context, data_dict):
+    # Allow only sysadmins to view user list
+    return authz.is_authorized('sysadmin', context, data_dict)
+
+
+### HELPERS ####
 
 def log_debug(*args):
     log.info(*args)
@@ -128,6 +150,15 @@ def get_in(data, *keys):
         return data
     except (IndexError, KeyError) as e:
         return None
+
+
+def user_orgs(user_name, permission='manage_group', include_dataset_count=False):
+    context = {'model': model, 'user': c.user}
+    data_dict = {
+        'id': user_name,
+        'permission': permission,
+        'include_dataset_count': include_dataset_count}
+    return logic.get_action('organization_list_for_user')(context, data_dict)
 
 
 # TODO: This is an example, how to translate our dataset fields. ckan multilingual needs to be added into ckan.plugins for this to work.
@@ -161,6 +192,7 @@ def update_term_translations():
             }
         ]})
 
+
 class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultDatasetForm):
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IPluginObserver, inherit=True)
@@ -175,12 +207,15 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_auth_functions(self):
-        return {'dataset_purge': dataset_purge_custom_auth}
+        return {'dataset_purge': dataset_purge_custom_auth,
+                'user_list': user_list_custom_auth
+                }
 
     def get_helpers(self):
         return {
             'tags_to_select_options': tags_to_select_options,
-            'log_debug': log_debug}
+            'log_debug': log_debug,
+            'user_orgs': user_orgs}
 
     def after_load(self, service):
         # update_term_translations()
@@ -244,16 +279,16 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
                     action='member_new')
 
         map.connect('/user/login',
-                            controller='ckanext.napote_theme.controller:CustomUserController',
-                            action='login')
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='login')
 
         map.connect('/user/logged_in',
                     controller='ckanext.napote_theme.controller:CustomUserController',
                     action='logged_in')
 
         map.connect('/user/_logout',
-                            controller='ckanext.napote_theme.controller:CustomUserController',
-                            action='logout')
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='logout')
 
         return map
 

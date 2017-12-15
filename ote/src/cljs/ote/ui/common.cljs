@@ -10,9 +10,10 @@
   ([url label]
    (linkify url label nil))
   ([url label a-props]
-   (let [a-props (when (= (:target a-props) "_blank")
-                ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
-                (assoc a-props :rel "noopener noreferrer"))]
+   (let [a-props (if (= (:target a-props) "_blank")
+                   ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
+                   (assoc a-props :rel "noopener noreferrer")
+                   a-props)]
 
      (if-not url
        [:span]
