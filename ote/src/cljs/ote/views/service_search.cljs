@@ -151,7 +151,7 @@
 
         {:name ::t-service/sub-type
          :type :multiselect-selection
-         :show-option #(str (sub-type (:sub-type %)) " (" (:count %) ")")
+         :show-option #(str (sub-type (:sub-type %)))
          :options (::t-service/sub-type facets)
          :auto-width? true})]
       filters]]))
