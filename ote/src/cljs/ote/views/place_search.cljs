@@ -23,7 +23,7 @@
   not be able to erase text."
   [this]
   (let [refs (aget this "refs")]
-    (.log js/console "monkey patching chip bug")
+    ;(.log js/console "monkey patching chip bug")
     (gobj/forEach
      refs
      (fn [chip ref _]
@@ -73,7 +73,7 @@
 (defn install-draw-control!
   "Install Leaflet draw plugin to to places-map component."
   [e! this]
-  (.log js/console "install draw control")
+  ;(.log js/console "install draw control")
   (let [^js/L.map
         m (aget this "refs" "leaflet" "leafletElement")
 
@@ -114,7 +114,7 @@
 
 
 (defn marker-map [e! coordinate]
-  (.log js/console "rendering marker map coordinate->"coordinate)
+  ;(.log js/console "rendering marker map coordinate->"coordinate)
   [leaflet/Map {
                 :center #js [65.01212149716532 25.47065377235413]
                 :zoom 16
