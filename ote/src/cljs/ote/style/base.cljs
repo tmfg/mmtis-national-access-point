@@ -32,6 +32,7 @@
                          :font-weight "bold"
                          :text-transform "uppercase"
                          :color "#FFFFFF"})
+(def button-add-row {:padding-top "20px"})
 
 ;; Form elements
 (def required-element { :color "#FF9800"})
