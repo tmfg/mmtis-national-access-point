@@ -183,7 +183,7 @@
    :ote.db.transport-service/url                 "Uppassningens WWW-adress"
    :ote.db.transport-service/description         "Uppassningens beskrivning"
    :ote.db.transport-service/type                "Liikkumisuppassningens typ"
-   :ote.db.transport-service/sub-type            "Liikkumispavelun alatyp"
+   :ote.db.transport-service/sub-type            "Liikkumispalvelun alatyp"
    :ote.db.transport-service/published?          "NAP-tila"
    :ote.db.transport-service/published?-values   {true  "Julkaistu"
                                                   false "Ei julkaistu"}
