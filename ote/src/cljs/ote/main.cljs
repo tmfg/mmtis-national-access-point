@@ -9,6 +9,7 @@
             [cljsjs.leaflet-draw]
             [cljsjs.nprogress]
             [tuck.core :as tuck]
+            [ote.localization :refer [tr]]
             [ote.app.state :as state]
             [ote.views.main :as main]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
@@ -31,6 +32,11 @@
    (fn [lang _]
      (reset! localization/selected-language lang)
      (stylefy/init)
+     (.configure js/NProgress #js
+         {:template (str "<div class=\"bar\" role=\"bar\"><div class=\"peg\"></div></div>
+                                  <div class=\"spinner\" role=\"spinner\"><span class=\"loading-msg\">"
+                         (tr [:common-texts :loading])
+                         "...</span><div class=\"spinner-icon\"></div></div>")})
      (routes/start! fp-controller/->GoToUrl)
      (state/windowresize-handler nil) ;; Calculate window width
      (r/render-component [tuck/tuck state/app main/ote-application]

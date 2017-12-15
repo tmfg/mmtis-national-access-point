@@ -555,6 +555,7 @@
   :delete-service-success                     "Palvelu poistettiin onnistuneesti."
   :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
   :logged-in                                  "Kirjauduit sisään onnistuneesti!"
+  :loading                                    "Lataa"
   }
 
  :dialog
