@@ -2,6 +2,7 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [get-mui-theme color]]
             [ote.ui.debug :as debug]
+            [ote.ui.nprogress :as progress]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [reagent.core :as r]
@@ -88,11 +89,9 @@
 (defn theme
   "App container that sets the theme and common elements like flash message."
   [e! app content]
-  (.configure js/NProgress #js
-      {:template (str "<div class=\"bar\" role=\"bar\"><div class=\"peg\"></div></div>
-                                  <div class=\"spinner\" role=\"spinner\"><span class=\"loading-msg\">"
-                      (tr [:common-texts :loading])
-                      "...</span><div class=\"spinner-icon\"></div></div>")})
+
+  (progress/configure (tr [:common-texts :loading]))
+
   (r/create-class
    (merge
     (on-before-unload)

@@ -1,7 +1,6 @@
 (ns ote.app.controller.service-search
   "Service search controller"
   (:require [tuck.core :as tuck]
-            [cljsjs.nprogress]
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [clojure.string :as str]))
@@ -28,8 +27,7 @@
 (defn- search
   ([app] (search app 500))
   ([{service-search :service-search :as app} timeout-ms]
-   (let [on-success (tuck/send-async! ->SearchResponse)
-         on-failure  #(.done js/NProgress)]
+   (let [on-success (tuck/send-async! ->SearchResponse)]
      ;; Clear old timeout, if any
      (when-let [search-timeout (:search-timeout service-search)]
        (.clearTimeout js/window search-timeout))
@@ -38,12 +36,9 @@
       app
       [:service-search :search-timeout]
       (.setTimeout js/window
-                   #(do
-                      (.start js/NProgress)
-                      (comm/get! "service-search"
-                                   {:params     (search-params (:filters service-search))
-                                    :on-failure on-failure
-                                    :on-success on-success}))
+                   #(comm/get! "service-search"
+                      {:params     (search-params (:filters service-search))
+                       :on-success on-success})
                    timeout-ms)))))
 
 (extend-protocol tuck/Event
@@ -70,7 +65,6 @@
 
   SearchResponse
   (process-event [{response :response} app]
-    (.done js/NProgress)
     (let [{:keys [empty-filters? results]} response]
       (update app :service-search assoc
               :results results
