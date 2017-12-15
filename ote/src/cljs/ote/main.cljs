@@ -9,7 +9,6 @@
             [cljsjs.leaflet-draw]
             [cljsjs.nprogress]
             [tuck.core :as tuck]
-            [ote.localization :refer [tr]]
             [ote.app.state :as state]
             [ote.views.main :as main]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
