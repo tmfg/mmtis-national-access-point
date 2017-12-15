@@ -45,6 +45,7 @@
                  [funcool/bide "1.5.1"] ; URL router
                  [stylefy "1.0.1"]
                  [cljsjs/leaflet-draw "0.4.12-0"]
+                 [cljsjs/nprogress "0.2.0-1"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]
