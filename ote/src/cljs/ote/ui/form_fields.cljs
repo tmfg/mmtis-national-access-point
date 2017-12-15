@@ -170,7 +170,7 @@
            (when full-width?
              {:full-width true}))]]]
        [:tr
-        [:td (stylefy/use-style style-form-fields/localized-text-language-links)
+        [:td
          (doall
           (for [lang languages]
             ^{:key lang}
@@ -184,7 +184,7 @@
              lang]))]]])))
 
 
-(defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width? disabled?] :as field}
+(defmethod field :selection [{:keys [update! table? label name style show-option options form? error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
@@ -192,7 +192,7 @@
      (merge
       {:auto-width (boolean auto-width?)
                       :style style
-                      :floating-label-text label
+                      :floating-label-text (when-not table? label)
                       :floating-label-fixed true
                       :value (option-idx data)
                       :on-change #(update! (nth options %2))
