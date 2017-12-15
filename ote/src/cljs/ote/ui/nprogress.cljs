@@ -13,12 +13,13 @@
 (defn start []
   (.start js/NProgress))
 
-(defn done [& force?]
+(defn done [& [force?]]
+  (.log js/console force?)
   (.done js/NProgress force?))
 
-(defn inc [& amount]
+(defn inc [& [amount]]
   (.inc js/NProgress amount))
 
-(defn set [& amount]
+(defn set [& [amount]]
   (.set js/NProgress amount))
 
