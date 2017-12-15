@@ -263,7 +263,7 @@
      (doall
       (map-indexed
        (fn [i option]
-         (let [checked? (if (nil? (selected option)) false true)]
+         (let [checked? (boolean (selected option))]
            [ui/checkbox {:key i
                          :label (show-option option)
                          :checked checked?
