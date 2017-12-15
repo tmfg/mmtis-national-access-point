@@ -80,6 +80,9 @@
                   :align-items "center"
                   :white-space "pre-wrap"}))
 
+(def filters-form
+  {:border "solid 1px #0046ad"})
+
 (def language-selection
   {:border-top "solid 1px white"
    :margin-top "5px"
