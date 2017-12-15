@@ -40,3 +40,4 @@
 (def help-text-element {:padding "5px 5px 5px 10px"})
 
 (def organization-padding {:padding-top "20px"})
+(def table-header-style {:border-bottom "0px solid white" :color "black"})

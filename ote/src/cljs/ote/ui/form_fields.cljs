@@ -399,18 +399,19 @@
                data)]
     [:div
      [ui/table
-      [ui/table-header {:adjust-for-checkbox false
-                        :display-select-all false}
-       [ui/table-row {:selectable false}
+      [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
+                              {:style style-form/table-header-style})
+       [ui/table-row (merge {:selectable false}
+                            {:style style-form/table-header-style})
         (doall
          (for [{:keys [name label width] :as tf} table-fields]
            ^{:key name}
            [ui/table-header-column {:style
-                                    {:width width
-                                     :white-space "pre-wrap"}}
+                                    (merge {:width width :white-space "pre-wrap"}
+                                           style-form/table-header-style)}
             label]))
         (when delete?
-          [ui/table-header-column {:style {:width "70px"}}
+          [ui/table-header-column {:style (merge {:width "70px"} style-form/table-header-style)}
            (tr [:buttons :delete])])]]
 
       [ui/table-body {:display-row-checkbox false}
@@ -441,10 +442,11 @@
                [ic/action-delete]]])])
         data)]]
      (when add-label
-       [buttons/save {:on-click #(update! (conj (or data []) {}))
+       [:div (stylefy/use-style style-base/button-add-row)
+           [buttons/save {:on-click #(update! (conj (or data []) {}))
                       :label add-label
                       :label-style style-base/button-label-style
-                      :disabled (values/effectively-empty? (last data))}])]))
+                      :disabled (values/effectively-empty? (last data))}]])]))
 
 (defmethod field :checkbox [{:keys [update! label]} checked?]
   [ui/checkbox {:label label
