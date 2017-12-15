@@ -54,17 +54,17 @@
 
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
-   :ote.db.transport-service/external-service-description "Ulkoisen rajapinnan beskrivning"
-   :ote.db.transport-service/external-service-url "Rajapinnan verkko-adress"
-   :ote.db.transport-service/booking-service           "Varausuppassningens adresstiedot"
-   :ote.db.transport-service/rental-service            "Vuokrausuppassningens adresstiedot"
+   :ote.db.transport-service/external-service-description "Rajapinnan kuvaus lyhyesti"
+   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
+   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Uppassningens tuottamiseen osallistuvat yritykset"
-   :ote.db.transport-service/company-name "Yrityksen namn"
-   :ote.db.transport-service/business-id "Yrityksen FO-nummer"
-   :ote.db.transport-service/license "Lisenssi / käyttöehdot"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen beskrivning"
+   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
+   :ote.db.transport-service/company-name "Yrityksen nimi"
+   :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
+   :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
+   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
    }
 
   ;; Service exception
