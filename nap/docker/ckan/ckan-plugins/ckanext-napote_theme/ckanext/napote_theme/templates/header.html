@@ -36,7 +36,24 @@
                         {% block header_site_navigation %}
                             <ul class="nav nav-pills">
                                 {% block header_site_navigation_tabs %}
-                                    {{ h.build_nav_main(('home', _('Home')),('search', _('Datasets')),('organizations_index', _('Organizations')) ) }}
+                                <li {% if c.controller == 'home' %} class="active" {% endif %}>
+                                <a href="/" title="{{ _('Home') }}">
+                                    <span class="text">{{ _('Home') }}</span>
+                                </a>
+                                </li>
+                                <li>
+                                    <a href="/ote/#/services" title="{{ _('Datasets') }}">
+                                        <span class="text">{{ _('Datasets') }}</span>
+                                    </a>
+                                </li>
+                                <li  {% if c.controller == 'organization' %} class="active"
+                                {% elif  c.controller == 'dashboard' %} class="active"
+                                {% elif  c.controller == 'user' %} class="active"
+                                {% endif %}>
+                                <a href="/organization" title="{{ _('Organizations') }}">
+                                    <span class="text">{{ _('Organizations') }}</span>
+                                </a>
+                                </li>
                                 {% endblock %}
                                 {% if c.userobj %}
                                     <li>
@@ -130,11 +147,11 @@
                             {% else %}
                                 <ul class="nav nav-pills">
                                     {% block header_account_notlogged %}
-                                        <li>
+                                        <li {% if c.controller == 'ckanext.napote_theme.controller:CustomUserController' and c.action == 'login' %} class="active" {% endif %}>
                                             {% link_for _('Log in'), controller='user', action='login' %}
                                         </li>
                                         {% if h.check_access('user_create') %}
-                                            <li>
+                                            <li{% if c.controller == 'ckanext.napote_theme.controller:CustomUserController' and c.action == 'register' %} class="active" {% endif %}>
                                                 {% link_for _('Register'), controller='user', action='register', class_='sub' %}
                                             </li>
                                         {% endif %}
