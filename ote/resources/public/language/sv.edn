@@ -233,33 +233,34 @@
 
  ;; Action buttons
  :buttons
- {:save "Spara"
+ {:save "Tallenna"
   :cancel "Peruuta"
   :delete "Poista"
   :close "Sulje"
   :publish "Julkaise"
-  :edit-service "Muokkaa uppassningens tietoja"
+  :edit-service "Muokkaa palvelun tietoja"
   :edit "Muokkaa"
 
-  :save-and-publish "Spara och publisera"
-  :save-as-draft "Spara kladd"
-  :save-updated "Spara päivitetyt tiedot"
-  :add-new-parking-capacity "Lisää uusi pysäköintityyppi"
-  :add-new-price-class "Lägga till hintarivi"
-  :add-new-service-hour "Lägga till palveluaika"
-  :add-new-service-exception "Lägga till poikkeus"
-  :add-new-company "Lägga till uppassningens tuottava yritys"
+  :save-and-publish "Tallenna ja julkaise"
+  :save-as-draft "Tallenna luonnoksena"
+  :save-updated "Tallenna päivitetyt tiedot"
+  :add-new-parking-capacity "Lisää rivi"
+  :add-new-price-class "Lisää rivi"
+  :add-new-service-hour "Lisää rivi"
+  :add-new-service-exception "Lisää rivi"
+  :add-new-company "Lisää rivi"
   :discard "Peruuta"
 
   :next "Jatka"
-  :add-transport-service   "Lägga till liikkumispalvelusi tiedot"
-  :add-external-interface "Lägga till itse ylläpitämäsi rajapinta"
-  :add-new-service-link "Lisää uusi palvelu"
-  :add-add-new-row         "Lägga till ny rivi"
-  :add-new-pick-up-location "Lägga till toimipiste"
-  :add-new-additional-service "Lisää palvelu"
-  :add-new-vehicle "Lisää ajoneuvo"
-  :add-new-transport-operator "Lägga till ny transport operator"}
+  :add-transport-service  "Lisää palvelusi tiedot"
+  :add-external-interface "Lisää rivi"
+  :add-new-service-link "Lisää rivi"
+  :add-add-new-row         "Lisää uusi rivi"
+  :add-new-pick-up-location "Lisää rivi"
+  :add-new-additional-service "Lisää rivi"
+  :add-new-vehicle "Lisää rivi"
+  :add-new-transport-operator "Lisää uusi palveluntuottaja"
+  }
 
  ;; Database enumeration values
  :enums

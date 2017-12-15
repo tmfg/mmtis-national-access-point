@@ -24,8 +24,7 @@
 (defn cancel [opts label]
   [button-container
    [ui/flat-button
-    (merge {:button-style style-base/base-button
-            :style {:padding-left "1.1em"
+    (merge {:style {:padding-left "1.1em"
                     :padding-right "1.1em"
                     :text-transform "uppercase"
                     :color (color :blue700)
