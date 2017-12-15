@@ -14,7 +14,6 @@
   (.start js/NProgress))
 
 (defn done [& [force?]]
-  (.log js/console force?)
   (.done js/NProgress force?))
 
 (defn inc [& [amount]]

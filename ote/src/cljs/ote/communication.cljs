@@ -23,10 +23,12 @@
   (when (zero? @query-counter)
     (progress/done)))
 
-(defn- handle-response! []
-  (progress/inc)
-  (swap! query-counter dec)
-  (check-progress!))
+(defn- response-handler! [handler]
+  (fn [& args]
+    (progress/inc)
+    (swap! query-counter dec)
+    (check-progress!)
+    (apply handler args)))
 
 (defn- request-url [url]
   (str @base-url url))
@@ -42,8 +44,8 @@
   (swap! query-counter inc)
   (GET (request-url url)
        {:params          params
-        :handler         (comp handle-response! on-success)
-        :error-handler   (comp handle-response! on-failure)
+        :handler         (response-handler! on-success)
+        :error-handler   (response-handler! on-failure)
         :response-format (or response-format (transit-response-format))}))
 
 (defn post!
@@ -57,7 +59,7 @@
   (swap! query-counter inc)
   (POST (request-url url)
         {:params          body
-         :handler         (comp handle-response! on-success)
-         :error-handler   (comp handle-response! on-failure)
+         :handler         (response-handler! on-success)
+         :error-handler   (response-handler! on-failure)
          :format          (transit-request-format)
          :response-format (or response-format (transit-response-format))}))
