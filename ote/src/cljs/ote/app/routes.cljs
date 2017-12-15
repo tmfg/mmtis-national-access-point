@@ -49,6 +49,5 @@
   ([page] (navigate! page nil nil))
   ([page params] (navigate! page params nil))
   ([page params query]
-   (.log js/console "NAVIGATE: " (pr-str page))
    (.setTimeout js/window
                 #(r/navigate! ote-router page params query) 0)))

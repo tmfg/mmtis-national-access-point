@@ -101,7 +101,8 @@
                            :as   field} data]
   [text-field
    (merge
-    {:floating-label-text (when-not table?  label)
+    {:name name
+     :floating-label-text (when-not table?  label)
      :floating-label-fixed true
      :hintText          (placeholder field data)
      :on-change         #(let [v %2]
@@ -124,7 +125,8 @@
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
   [text-field
-   {:floating-label-text label
+   {:name name
+    :floating-label-text label
     :floating-label-fixed true
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
@@ -145,11 +147,13 @@
           rows (or rows 1)]
       [:table {:style (when full-width?
                         style-form/full-width)}
+       [:tbody
        [:tr
         [:td
          [text-field
           (merge
-           {:floating-label-text (when-not table? label)
+           {:name name
+            :floating-label-text (when-not table? label)
             :floating-label-fixed true
             :hintText          (placeholder field data)
             :on-change         #(let [updated-language-data
@@ -181,7 +185,7 @@
                        style-form-fields/localized-text-language))
                   {:href "#" :on-click #(do (.preventDefault %)
                                             (reset! selected-language lang))})
-             lang]))]]])))
+             lang]))]]]])))
 
 
 (defmethod field :selection [{:keys [update! label name style show-option options form? error warning auto-width? disabled?] :as field}
@@ -259,7 +263,7 @@
      (doall
       (map-indexed
        (fn [i option]
-         (let [checked? (selected option)]
+         (let [checked? (boolean (selected option))]
            [ui/checkbox {:key i
                          :label (show-option option)
                          :checked checked?
@@ -379,7 +383,7 @@
                     :Date-time-format js/Intl.DateTimeFormat}]
    (when show-clear?
      [ui/icon-button {:on-click #(update! nil)
-                      :disabled? (not data)
+                      :disabled (not data)
                       :style {:width 16 :height 16
                               :position "relative"
                               :padding 0
