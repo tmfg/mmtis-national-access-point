@@ -92,6 +92,16 @@
                        :payload payload})))
     (-> response :body (cheshire/decode ckan-key->keyword))))
 
+(defn- ckan-get [{:keys [url api-key]} path ]
+  (let [response
+       @(http/get (str url path)
+                  {:headers {"Content-Type" "application/json"
+                              "Authorization" api-key}})]
+      (when-not (= 200 (:status response))
+                (throw (ex-info (str "CKAN API call " path " failed.")
+                                {:response response})))
+      (-> response :body (cheshire/decode ckan-key->keyword))))
+
 (defn- ckan-dataset-action! [ckan action dataset]
   (when-not (s/valid? :ckan/dataset dataset)
     (throw (ex-info "Invalid CKAN dataset map"
@@ -133,3 +143,9 @@
 
 (defn create-organization! [ckan organization]
   (ckan-post ckan "action/organization_create" organization))
+
+(defn get-organization [ckan organization-name]
+  (ckan-get ckan (str "action/organization_show?id=" organization-name)))
+
+(defn update-organization! [ckan organization]
+  (ckan-post ckan "action/organization_update" organization))
