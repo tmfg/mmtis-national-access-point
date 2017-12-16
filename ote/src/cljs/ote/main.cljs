@@ -7,6 +7,7 @@
             [cljs-react-material-ui.icons :as ic]
             [cljsjs.react-leaflet]
             [cljsjs.leaflet-draw]
+            [cljsjs.nprogress]
             [tuck.core :as tuck]
             [ote.app.state :as state]
             [ote.views.main :as main]
