@@ -76,7 +76,9 @@
         m (aget this "refs" "leaflet" "leafletElement")
 
         fg (new js/L.FeatureGroup)
-        dc (new js/L.Control.Draw #js {:edit #js {:featureGroup fg
+        dc (new js/L.Control.Draw #js {:draw #js {:circlemarker false
+                                                  :circle false}
+                                       :edit #js {:featureGroup fg
                                                   :remove false}})]
     (.addLayer m fg)
     (.addControl m dc)
