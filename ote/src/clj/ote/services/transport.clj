@@ -126,26 +126,31 @@
       (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
 
             ;; Insert to our database
-            {id ::t-operator/id :as operator}
-            (insert! db ::t-operator/transport-operator
-                     (dissoc data  ::t-operator/id :new?))
+            operator  (insert! db ::t-operator/transport-operator
+                        (dissoc data  ::t-operator/id :new?))
 
             ;; Create organization in CKAN
-            {ckan-group-id :ckan/id :as ckan-response}
-            (ckan/create-organization!
-             ckan
+            ckan-response (ckan/create-organization! ckan
              {:ckan/name (str "transport-operator-" (::t-operator/id operator))
               :ckan/title (::t-operator/name operator)})]
-
         ;; Update CKAN org id
         (update! db ::t-operator/transport-operator
-                 {::t-operator/ckan-group-id ckan-group-id}
-                 {::t-operator/id id})
+                 {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])} ;; Values to set
+                 {::t-operator/id (::t-operator/id operator)} ;; Where clause
+                 )
         operator))
 
-    (authorization/with-transport-operator-check
-      db user (::t-operator/id data)
-      #(upsert! db ::t-operator/transport-operator data))))
+    ;; Edit transport operator
+    (tx/with-transaction db
+       (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
+            operator (authorization/with-transport-operator-check
+                        db user (::t-operator/id data)
+                        #(upsert! db ::t-operator/transport-operator data))
+             ckan-org (get
+                        (ckan/get-organization ckan (str "transport-operator-" (::t-operator/id operator)))
+                        :ckan/result)
+             ckan-org (assoc ckan-org :ckan/title (::t-operator/name operator))] ;; We show only title in ckan side - so no need to update other values
+        (ckan/update-organization! ckan ckan-org)))))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
