@@ -693,4 +693,27 @@
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   }
 
+ :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"
+                                      :polygon   "Piirrä monikulmio"
+                                      :rectangle "Piirrä neliö"
+                                      :marker    "Lisää piste"}
+                            :actions {:title "Peruuta piirros"
+                                      :text  "Peruuta"}
+                            :finish  {:title "Lopeta piirtäminen"
+                                      :text  "Lopeta"}
+                            :undo    {:title "Poista viimeksi piirretty piste"
+                                      :text  "Poista viimeisin piste"}}
+                 :handlers {:marker      {:tooltip {:start "Klikkaa karttaa lisääksesi pisteen."}}
+                            :polygon     {:tooltip {:start "Klikkaa aloittaaksesi monikulmion piirtäminen."
+                                                    :cont  "Klikkaa jatkaaksesi monikulmion piirtämistä."
+                                                    :end   "Klikkaa ensimmäistä pistettä sulkeaksesi monikulmion."}}
+                            :polyline    {:error   "<strong>Virhe:</strong> viivat eivät saa ylittää toisiaan!"
+                                          :tooltip {:start "Klikkaa aloittaaksesi viivan piirtäminen."
+                                                    :cont  "Klikkaa jatkaaksesi viivan piirtämistä."
+                                                    :end   "Klikkaa viimeistä pistettä piirtämisen lopettamiseksi."}}
+                            :rectangle   {:tooltip {:start "Klikkaa ja raahaa piirtääksesi neliön."}}
+                            :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
+                            :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
+                                     :radius "Säde"}
+                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
  }
