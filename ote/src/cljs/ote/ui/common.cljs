@@ -25,7 +25,6 @@
 
 (defn help [help]
   [:div.help (stylefy/use-style style-base/help)
-   [:div (stylefy/use-style style-form/help-icon-element) [ic/action-info-outline]]
    [:div (stylefy/use-style style-form/help-text-element) help]])
 
 (defn table2 [& items]
