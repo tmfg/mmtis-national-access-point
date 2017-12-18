@@ -137,18 +137,29 @@
                {::t-operator/id (::t-operator/id operator)})
       operator)))
 
-(defn- update-transport-operator [nap-config db user data]
+(defn- update-transport-operator [nap-config db user {id ::t-operator/id :as data}]
   ;; Edit transport operator
-  (tx/with-transaction db
-    (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
-          operator (authorization/with-transport-operator-check
-                     db user (::t-operator/id data)
-                     #(upsert! db ::t-operator/transport-operator data))
-          ckan-org (get
-                    (ckan/get-organization ckan (str "transport-operator-" (::t-operator/id operator)))
-                    :ckan/result)
-          ckan-org (assoc ckan-org :ckan/title (::t-operator/name operator))] ;; We show only title in ckan side - so no need to update other values
-      (ckan/update-organization! ckan ckan-org))))
+  (authorization/with-transport-operator-check
+    db user id
+    #(tx/with-transaction db
+       (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
+             operator
+             (upsert! db ::t-operator/transport-operator data)
+
+             operator-ckan-id
+             (::t-operator/ckan-group-id
+              (first
+               (fetch db ::t-operator/transport-operator
+                      #{::t-operator/ckan-group-id}
+                      {::t-operator/id id})))]
+         ;; We show only title in ckan side - so no need to update other values
+         (ckan/update-organization!
+          ckan
+          (->  (ckan/get-organization ckan operator-ckan-id)
+               :ckan/result
+               (assoc :ckan/title (::t-operator/name operator))))
+         ;; Return operator
+         operator))))
 
 (defn- save-transport-operator [nap-config db user data]
   ((if (:new? data)
