@@ -334,7 +334,7 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
    :wheelchair-access-toilet "Inva WC"
    :step-free-access "Inga trappsteg"
    :suitable-for-wheelchairs "Lämplig för rullstol"
-   :tactile-patform-edges  "Varning vid perrongkanten"
+   :tactile-platform-edges  "Varning vid perrongkanten"
    :tactile-guiding-strips "Beröringstyrda förlinjer"
    :other  "Annat"}
 
