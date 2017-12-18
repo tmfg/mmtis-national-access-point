@@ -332,24 +332,11 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
    :barrier "Bom"
    :pallet-access-low-floor "Låggolv (Kuormalavalinjan matala lattia)"
    :wheelchair-access-toilet "Inva WC"
-   :step-free-access "Portaaton pääsy"
-   :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
-   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other  "Annat"}
-
-  #_:ote.db.transport-service/mobility
-  #_{:low-floor "Låggolv"
    :step-free-access "Inga trappsteg"
    :suitable-for-wheelchairs "Lämplig för rullstol"
-   :suitable-for-heavily-disabled  "Lämplig för gravt rörelsehämmade"
-   :boarding-assistance  "Assistans vid ombordstigning"
-   :onboard-assistance "Assistans under resan"
-   :unaccompanied-minor-assistance "Assitans av minderåriga"
    :tactile-patform-edges  "Varning vid perrongkanten"
    :tactile-guiding-strips "Beröringstyrda förlinjer"
-   :other "Annat"
-   }
+   :other  "Annat"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Rullstol"
@@ -361,7 +348,7 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
   :ote.db.transport-service/pick-up-type
   {:pick-up "Avhämtning"
    :return "Returnering"
-   :pick-up-return "Nouto ja palautus"}
+   :pick-up-return "Avhämtning och returnering"}
 
   :ote.db.transport-service/vehicle-accessibility
   {:low-floor "Låggolv"
