@@ -18,7 +18,8 @@
   Runs body-fn if user has access, otherwise returns an HTTP error response and logs a warning."
   [db user transport-operator-id body-fn]
   (let [allowed-operators (user-transport-operators db user)]
-    (if-not (allowed-operators transport-operator-id)
+    (if (or (nil? transport-operator-id)
+            (not (contains? allowed-operators transport-operator-id)))
       (do
         (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
                   ", allowed transport operators: " allowed-operators)

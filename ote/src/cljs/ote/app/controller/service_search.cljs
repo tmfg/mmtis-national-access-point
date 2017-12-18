@@ -37,8 +37,8 @@
       [:service-search :search-timeout]
       (.setTimeout js/window
                    #(comm/get! "service-search"
-                               {:params (search-params (:filters service-search))
-                                :on-success on-success})
+                      {:params     (search-params (:filters service-search))
+                       :on-success on-success})
                    timeout-ms)))))
 
 (extend-protocol tuck/Event

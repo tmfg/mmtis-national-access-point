@@ -2,231 +2,230 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                     "Uppassningproducent namn"
+  :ote.db.transport-operator/name                     "Tjästeproducentens namn"
   :ote.db.transport-operator/business-id              "FO-nummer"
-  :ote.db.transport-operator/phone                    "Telefon (toimisto)"
+  :ote.db.transport-operator/phone                    "Telefon (kontor)"
   :ote.db.transport-operator/gsm                      "Telefon (GSM)"
-  :ote.db.transport-operator/email                    "e-postadress"
+  :ote.db.transport-operator/email                    "E-post"
   :ote.db.transport-operator/homepage                 "WWW-adress"
-  :ote.db.transport-operator/visiting-address         "Käyntiadress"
-  :ote.db.transport-operator/billing-address          "Laskutusadress"
+  :ote.db.transport-operator/visiting-address         "Besöksadress"
+  :ote.db.transport-operator/billing-address          "Faktureringsadress"
 
   :ote.db.transport-operator/facebook "Facebook"
   :ote.db.transport-operator/twitter "Twitter"
-  :ote.db.transport-operator/instant-message "Pikaviestin"
+  :ote.db.transport-operator/instant-message "Instant"
 
   ;; Transport service fields
-  :transport-service-type-subtype "Välja förflyttning uppassningens typ"
-  :select-transport-operator      "Välja uppassningensproducent"
+  :transport-service-type-subtype "Välj tjänstetyp"
+  :select-transport-operator      "Välj tjänsteproducent"
 
   :transport-service-common
-  {:ote.db.transport-service/name "Uppassningens namn"
+  {:ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
-   :ote.db.transport-service/accessibility-description "Beskrivning uppassningens esteettömyydestä"
+   :ote.db.transport-service/accessibility-description "Kuvaus palvelun esteettömyydestä"
 
-   :ote.db.transport-service/accessibility     "Esteettömyys"
+   :ote.db.transport-service/accessibility     "Tillgänglighet"
    :ote.db.transport-service/information-service-accessibility "Infopalveluiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
-   :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+   :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglihet (garanteras delvis)"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "Aina saatavilla olevat esteettömyysvälineet"
-   :ote.db.transport-service/guaranteed-accessibility-description "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
+   :ote.db.transport-service/guaranteed-accessibility-tool        "garanteras alltid"
+   :ote.db.transport-service/guaranteed-accessibility-description "Aina saatavilla olevien esteettömyyspalveluiden kuvaus"
    :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavilla olevat esteettömyysvälineet"
-   :ote.db.transport-service/limited-accessibility-description "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
+   :ote.db.transport-service/limited-accessibility-description "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
 
-   :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
-   :ote.db.transport-service/limited-transportable-aid "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
+   :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (alltid)"
+   :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (inte garanterad, kontakta tjänsteproducenten)"
 
-   :ote.db.transport-service/accessibility-info-url "Esteettömyyspalveluiden beskrivning (WWW)"
+   :ote.db.transport-service/accessibility-info-url "Esteettömyspalveluiden kuvaus (WWW)"
 
    ;; Contact details
-   :ote.db.transport-service/contact-address          "Adressdata"
+   :ote.db.transport-service/contact-address          "Adressuppgifter"
    :ote.db.transport-service/contact-phone             "Telefon"
-   :ote.db.transport-service/contact-email             "E-postadress"
-   :ote.db.transport-service/homepage                  "Hemsida"
+   :ote.db.transport-service/contact-email             "E-post"
+   :ote.db.transport-service/homepage                  "www-adress"
 
-   :ote.db.transport-service/operation-area            "Aktivitet område"
-   :ote.db.transport-service/location                  "Läge"
+   :ote.db.transport-service/operation-area            "Verksamhetsområde"
+   :ote.db.transport-service/location                  "Plats"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
-   :ote.db.transport-service/external-service-description "Rajapinnan kuvaus lyhyesti"
-   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
-   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
-   :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
-   :ote.db.transport-service/company-name "Yrityksen nimi"
-   :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
-   :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
+   :ote.db.transport-service/external-interfaces "Externa gränssnitt"
+   :ote.db.transport-service/external-service-description "Beskrivning av externt gränssnitt"
+   :ote.db.transport-service/external-service-url "Gränssnittets tekniska adress"
+   :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
+   :ote.db.transport-service/rental-service            "Hyrtjänstens adress"
+   :ote.db.transport-service/format "Gränssnittets format (tex. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format-short "Form"
+   :ote.db.transport-service/companies "De företag som producerar tjänsten"
+   :ote.db.transport-service/company-name "Företagts namn"
+   :ote.db.transport-service/business-id "Företagets FO-nummer"
+   :ote.db.transport-service/license "Licens/användarvillkor"
+   :ote.db.transport-service/license-url "Beskrivning av licens"
    }
 
   ;; Service exception
   :service-exception
-  {:description "Poikkeuksen beskrivning"
-   :from-date "Alkupvm"
-   :to-date "Loppupvm"}
+  {:description "Undantag, ingen tjänst"
+   :from-date "Startdatum"
+   :to-date "Slutdatum"}
 
   ;; Passenger transportation fields
   :passenger-transportation
-  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/real-time-information     "Reaaliaikauppassningens verkko-adresstiedot"
-   :ote.db.transport-service/booking-service           "Varausuppassningens adresstiedot"
-   :ote.db.transport-service/payment-methods           "Välja maksutavat"
-   :ote.db.transport-service/price-class               "Hinnoittelu"
-   :ote.db.transport-service/service-hours             "Palveluajat"
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
+  {:ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resegods"
+   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
+   :ote.db.transport-service/booking-service           "Bokningstjänst www-adress"
+   :ote.db.transport-service/payment-methods           "Välj betalsätt"
+   :ote.db.transport-service/price-class               "Prissättning"
+   :ote.db.transport-service/service-hours             "Tjänstetider"
+   :ote.db.transport-service/operation-area            "Verksamhetsområde"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name-taxi     "Tuote"
-   :ote.db.transport-service/price-class-name-other    "Hintaryhmä"
-   :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
-   :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
-   :ote.db.transport-service/currency                  "Valuutta"
+   :ote.db.transport-service/price-class-name-taxi     "Produkt"
+   :ote.db.transport-service/price-class-name-other    "Priskategori"
+   :ote.db.transport-service/price-class-name-request  "Priskategori"
+   :ote.db.transport-service/price-class-name-schedule "Priskategori"
+   :ote.db.transport-service/price-per-unit            "Pris per enhet"
+   :ote.db.transport-service/unit                      "Enhet tex per resa eller per timme etc."
+   :ote.db.transport-service/currency                  "Valuta"
 
-   :ote.db.transport-service/pricing-description "Hinnoittelun beskrivning"
-   :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
-   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
+   :ote.db.transport-service/pricing-description "Beskriv prissättningen"
+   :ote.db.transport-service/pricing-url "Prissättning www-sidor"
+   :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"
    }
 
   ;; Terminal fields
   :terminal
-  {:ote.db.transport-service/indoor-map "Sisätilakartan adresstiedot"
-   :ote.db.transport-service/url                       "Uppassningens verkko-adress"
-   :ote.db.transport-service/description               "Uppassningens beskrivning"
+  {:ote.db.transport-service/indoor-map "Inomhuskarta www-sidor"
+   :ote.db.transport-service/url                       "Tjänstens www-sidor"
+   :ote.db.transport-service/description               "Tjänstebeskriving"
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
-   :ote.db.transport-service/accessibility     "Esteettömyys"
+   :ote.db.transport-service/accessibility     "Saavutettavuus"
+
 
 
    ;; assistance_notification_requirement fields
-   :ote.db.transport-service/hours-before           "Palvelu on varattava (tuntia) ennen"
-   :ote.db.transport-service/telephone              "Varaa palvelu nummersta"
-   :ote.db.transport-service/email                  "Varaa palvelu sähköpostilla (email)"
-   :ote.db.transport-service/assistance-url         "Tee varaus osoitteesta (www)"
-   :ote.db.transport-service/assistance-description "Avustupalveluja koskeva beskrivning"
+   :ote.db.transport-service/hours-before           "Tjänsten måste beställas (timmar) i förväg"
+   :ote.db.transport-service/telephone              "Beställ tjänsten på nummer"
+   :ote.db.transport-service/email                  "beställ tjänsten per e-mail (email)"
+   :ote.db.transport-service/assistance-url         "Gör bokning på adressen (www)"
+   :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
 
 
    }
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
+  {;:ote.db.transport-service/eligibility-requirements  "Duglighetskrav"
+   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/usage-area                "Sallitut maat"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
+   :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
+    :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
    :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
    :ote.db.transport-service/license-required          "Ajokorttiluokka"
    :ote.db.transport-service/minimum-age               "Alaikäraja"
    :ote.db.transport-service/price-per-unit            "Hinta (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
+   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
    :ote.db.transport-service/price-classes             "Hinta"
-   :ote.db.transport-service/pick-up-name              "Nimi"
-   :ote.db.transport-service/pick-up-type              "Tyyppi"
-   :ote.db.transport-service/rental-additional-services "Muut palvelut"
+   :ote.db.transport-service/pick-up-name              "Namn"
+   :ote.db.transport-service/pick-up-type              "Typ"
+      :ote.db.transport-service/rental-additional-services "Muut palvelut"
    :ote.db.transport-service/additional-service-type   "Palvelu"
    :ote.db.transport-service/additional-service-price  "Hinta (€)"
-   :ote.db.transport-service/additional-service-unit   "Yksikkö"
+   :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
+
    }
 
   ;; Parking fields
   :parking
-  {:parking-areas  "Parkkipaikkojen sijainnit"
-   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
-   :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/additional-service-links  "Muut palvelut"
-   :ote.db.transport-service/price-class               "Hinnoittelu"
-   :ote.db.transport-service/service-hours             "Palveluajat"
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
+  {:parking-areas  "P-platsernas läge"
+   :ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resgods"
+   :ote.db.transport-service/url                       "Tjänstens www-adress"
+   :ote.db.transport-service/description               "Tjänstebeskrivning"
+   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
+   :ote.db.transport-service/booking-service           "Bokningstjänstens www-adress"
+   :ote.db.transport-service/payment-methods           "Välj betalsätt"
+   :ote.db.transport-service/additional-service-links  "Andra tjänster"
+   :ote.db.transport-service/price-class               "Prissättning"
+   :ote.db.transport-service/service-hours             "Tjänstetider"
+   :ote.db.transport-service/operation-area            "Verksamhetsområde"
 
    ;; Parking facilities and capacity
-   :ote.db.transport-service/parking-facility          "Pysäköintipaikan tyyppi"
-   :ote.db.transport-service/capacity                  "Paikkojen määrä"
+   :ote.db.transport-service/parking-facility          "Parkeringsplatsen typ"
+   :ote.db.transport-service/capacity                  "Antalet platser"
 
    ;; Charging point fields
-   :ote.db.transport-service/charging-points           "Kuvaus latauspisteistä"
+   :ote.db.transport-service/charging-points           "Beskriving av laddningspunkterna"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
-   :ote.db.transport-service/currency                  "Valuutta"
+   :ote.db.transport-service/price-class-name          "Priskategori"
+   :ote.db.transport-service/price-per-unit            "Pris per enhet"
+   :ote.db.transport-service/unit                      "per enhet tex resa/km etc.)"
+   :ote.db.transport-service/currency                  "Valuta"
 
-   :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
-   :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
-   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
+   :ote.db.transport-service/pricing-description       "Beskrivning av prissättning"
+   :ote.db.transport-service/pricing-url               "Prissättning www-adress"
+   :ote.db.transport-service/payment-method-description "Betalsätt info"
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Viikonpäivät"
-   :ote.db.transport-service/from                      "Aukeamisaika"
-   :ote.db.transport-service/to                        "Kiinnimenoaika"
+   :ote.db.transport-service/week-days                 "Veckodagar"
+   :ote.db.transport-service/from                      "Öppnas kl"
+   :ote.db.transport-service/to                        "Stängs kl"
    :ote.db.transport-service/all-day                   "24h"
-   :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
+   :ote.db.transport-service/maximum-stay              "Max parkeringstid"
    }
 
 
   :transport-service
-  {:ote.db.transport-service/name                "Uppassningens namn"
-   :ote.db.transport-service/additional-services "Andra uppassningar"
-   :ote.db.transport-service/url                 "Uppassningens WWW-adress"
-   :ote.db.transport-service/description         "Uppassningens beskrivning"
-   :ote.db.transport-service/type                "Liikkumisuppassningens typ"
-   :ote.db.transport-service/sub-type            "Liikkumispavelun alatyp"
-   :ote.db.transport-service/published?          "NAP-tila"
-   :ote.db.transport-service/published?-values   {true  "Julkaistu"
-                                                  false "Ei julkaistu"}
+  {:ote.db.transport-service/name                "Tjänstens namn"
+   :ote.db.transport-service/additional-services "Övriga tjänster"
+   :ote.db.transport-service/url                 "Tjänstens www-adress"
+   :ote.db.transport-service/description         "Tjänstebeskrivning"
+   :ote.db.transport-service/type                "Tjänstetyp"
+   :ote.db.transport-service/sub-type            "Kategori"
+   :ote.db.transport-service/published?          "NAP-status"
+   :ote.db.transport-service/published?-values   {true  "Publicerad"
+                                                  false "Ej publicerad"}
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days           "Viikonpäivät"
-   :ote.db.transport-service/from                "Aukeamisaika"
-   :ote.db.transport-service/to                  "Kiinnimenoaika"
+   :ote.db.transport-service/week-days           "Veckodagar"
+   :ote.db.transport-service/from                "Öppnas kl"
+   :ote.db.transport-service/to                  "Stänger kl"
    :ote.db.transport-service/all-day             "24h"
 
-   :ote.db.transport-service/brokerage?  "Välityspalvelu"
+   :ote.db.transport-service/brokerage?  "Förmedlingstjänst"
 
    :ote.db.transport-service/available-from-and-to-title "Palvelun voimassaoloaika"
-   :ote.db.transport-service/available-from "Tillgänglig från"
-   :ote.db.transport-service/available-to "Tillgänglig till"
-   :ote.db.transport-service/available-from-nil "Nu"
-   :ote.db.transport-service/available-to-nil "Hittills"
+   :ote.db.transport-service/available-from "Saatavilla alkaen"
+   :ote.db.transport-service/available-to "Saatavilla asti"
+   :ote.db.transport-service/available-from-nil "Heti"
+   :ote.db.transport-service/available-to-nil "Toistaiseksi"
    }
 
   ;; Common fields
   :ote.db.common/street                               "Adress"
-  :ote.db.common/post_office                          "Postitoimipaikka"
-  :ote.db.common/postal_code                          "Postinummer"
+  :ote.db.common/post_office                          "Postanstalt"
+  :ote.db.common/postal_code                          "Postnummer"
    }
 
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Tässä kohdassa lisäät ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut,
- varaus- ja myyntirajapinnan ja muut olennaisia tietoa sisältävät rajapinnat.
- Jos ulkoiset rajapinnat ovat vajanaisia tai rajapintoja ei ole, täytä vastaavasti tämän osion alla olevat kohdat,
- jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa. Huom. Tavalliset verkkosivusisällöt eivät kuulu tähän osioon."
-  :external-interfaces-eg-rae "Huom. Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
-  :RAE-tool "Rae-työkalu"
-  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita uppassningenstuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
+ {:external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
+  :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
+  :RAE-tool "Se info om RAE"
+  :companies "Om tjänsten erbjuds av en koncern, marknadsföringsbolag eller annan organisation med flera tjänsteproducenter, var vänlig fyll i företagets namn on FO-nummer."
 
-  :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset uppassningens liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
-  :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat uppassningens liikennevälineiden esteettömyysominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
+  :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Garanterad = behöver inte beställas separat."
+  :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Beställes = finns inte garanterat i alla fordon, skäl att beställa i förväg."
 
-  :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
+  :brokerage? "Kruxa här om tjänsten är en förmedlingstjänst som skall anmälas till Trafi."
 
-  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.
-  Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+  :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
   }
@@ -234,201 +233,200 @@
 
  ;; Action buttons
  :buttons
- {:save "Tallenna"
-  :cancel "Peruuta"
-  :delete "Poista"
-  :close "Sulje"
-  :publish "Julkaise"
-  :edit-service "Muokkaa palvelun tietoja"
-  :edit "Muokkaa"
+ {:save "Spara"
+  :cancel "Ångra"
+  :delete "Ta bort"
+  :close "Stäng"
+  :publish "Publicera"
+  :edit-service "Redigera tjänstens info"
+  :edit "Redigera"
 
-  :save-and-publish "Tallenna ja julkaise"
-  :save-as-draft "Tallenna luonnoksena"
-  :save-updated "Tallenna päivitetyt tiedot"
-  :add-new-parking-capacity "Lisää rivi"
-  :add-new-price-class "Lisää rivi"
-  :add-new-service-hour "Lisää rivi"
-  :add-new-service-exception "Lisää rivi"
-  :add-new-company "Lisää rivi"
-  :discard "Peruuta"
+  :save-and-publish "Spara och publicera"
+  :save-as-draft "Spara utkast"
+  :save-updated "Spara uppdaterad info"
+  :add-new-parking-capacity "Lägg till ny parkeringstyp"
+  :add-new-price-class "Lägg till prisrad"
+  :add-new-service-hour "Lägg till betjäningstid"
+  :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
+  :add-new-company "Lägg till företag"
+  :discard "Ångra"
 
-  :next "Jatka"
-  :add-transport-service  "Lisää palvelusi tiedot"
-  :add-external-interface "Lisää rivi"
-  :add-new-service-link "Lisää rivi"
-  :add-add-new-row         "Lisää uusi rivi"
-  :add-new-pick-up-location "Lisää rivi"
-  :add-new-additional-service "Lisää rivi"
-  :add-new-vehicle "Lisää rivi"
-  :add-new-transport-operator "Lisää uusi palveluntuottaja"
+  :next "Fortsätt"
+  :add-transport-service  "Lägg till info om tjänsten"
+  :add-external-interface "Lägg till externt gränssnitt"
+  :add-new-service-link "Lägg till ny tjänst"
+  :add-add-new-row         "Lägg till ny rad"
+  :add-new-pick-up-location "Lägg till verksamhetsställe"
+  :add-new-additional-service "Lägga till"
+  :add-new-vehicle "Lägga till"
+  :add-new-transport-operator "Lägga till ny tjänsteproducent"
   }
+
+
 
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/type
-  {:terminal                 "Asemat, satamat ja muut terminaalit"
-   :passenger-transportation "Henkilöiden kuljetuspalvelut"
-   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-   :brokerage                "Välityspalvelut"}
+  {:terminal                 "Stationer, hamnar och övriga terminaler"
+   :passenger-transportation "Persontransporttjänster"
+   :rentals                  "Fordonsuthyrning och kommersiella  samanvändningstjänster"
+   :parking                  "Almmänna kommersiella parkeringstjänster"
+   :brokerage                "Förmedlingstjänster"}
 
   :ote.db.transport-service/sub-type
-  {:taxi     "Taksiliikenne"
-   :request  "Tilausajoliikenne, linja-auto"
-   :other  "Muu kutsuun perustuva liikenne"
-   :schedule "Säännöllinen aikataulun mukainen liikenne"}
+  {:taxi     "Taksitjänst"
+   :request  "Beställningstrafik med buss"
+   :other  "Annan beställ-/anropsstyrd trafik"
+   :schedule "Regelbunden linjebaserad trafik"}
 
   :ote.db.transport-service/payment-methods
-  {:cash                "Kontanter"
+  {:cash                "Kontant"
    :debit-card          "Bankkort"
    :credit-card         "Kreditkort"
-   :mobilepay           "Mobiilimaksu"
-   :contactless-payment "Lähimaksu"
-   :invoice             "Lasku"
-   :other               "Muu"}
+   :mobilepay           "Mobilbetalning"
+   :contactless-payment "Närbetalning"
+   :invoice             "Faktura"
+   :other               "Annat"}
 
   :ote.db.transport-service/additional-services
-  {:child-seat       "Lastenistuin"
-   :animal-transport "Eläinkuljetus"
-   :other            "Muu"}
+  {:child-seat       "Barnstol"
+   :animal-transport "Djur tillåtet"
+   :other            "Annat"}
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair       "Pyörätuoli"
-   :walkingstick     "Kävelykeppi"
-   :audio-navigator  "Ääniopastus"
-   :visual-navigator "Visuaaliset opasteet"
-   :passenger-cart   "Henkilökuljetuskärryt"
-   :pushchair        "Lastenrattaat"
-   :umbrella         "Sateenvarjo"
-   :buggy            "Lastenvaunut"
-   :other            "Muu"}
+  {:wheelchair       "Rullstol"
+   :walkingstick     "Käpp"
+   :audio-navigator  "Audioinfo"
+   :visual-navigator "Visuell skyltning"
+   :passenger-cart   "Persontransportvagn"
+   :pushchair        "Barnvagn"
+   :umbrella         "Paraply"
+   :buggy            "Barnvagn"
+   :other            "Annan"}
 
   :ote.db.transport-service/day
-  {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
-   :full {:MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
-          :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
+  {:short {:MON "Må" :TUE "Ti" :WED "On" :THU "To" :FRI "Fr" :SAT "Lö" :SUN "Sö"}
+   :full {:MON "Måndag" :TUE "Tisdag" :WED "Onsdag" :THU "Torsdag"
+          :FRI "Fredag" :SAT "Lördag" :SUN "Söndag"}}
 
   :ote.db.transport-service/information-service-accessibility
-  {:audio-for-hearing-impaired "Äänivahvistimet huonokuuloisille"
-   :audio-information "Kuulutukset"
-   :visual-displays "Visuaaliset näytöt"
-   :displays-for-visually-impaired "Näytöt näkövammaisille (taktiili)"
-   :large-print-timetables "Suuret kirjasimet aikatauluissa"
+  {:audio-for-hearing-impaired "Ljudförstärkning för hörselskadade"
+   :audio-information "Utrop"
+   :visual-displays "Visuella displays"
+   :displays-for-visually-impaired "Tavlor för synskadade (taktil)"
+   :large-print-timetables "Stora tidtabellsskyltar"
    :other "Muu"
    }
 
   :ote.db.transport-service/accessibility
-  {:lift "Hissi"
-   :escalator "Liukuportaat"
-   :travelator "Liikkuva kävelytie"
-   :ramp "Ramppi"
-   :stairs "Portaat"
-   :shuttle "Sukkulaliikenne"
-   :narrow-entrance "Kapea sisäänkäynti"
-   :barrier "Puomi"
-   :pallet-access-low-floor "Kuormalavalinjan matala lattia"
+  {:lift "Hiss"
+   :escalator "Rulltrappor"
+   :travelator "Rullband"
+   :ramp "Ramp"
+   :stairs "Trappor"
+   :shuttle "Skytteltransport"
+   :narrow-entrance "Smal ingång"
+   :barrier "Bom"
+   :pallet-access-low-floor "Låggolv (Kuormalavalinjan matala lattia)"
    :wheelchair-access-toilet "Inva WC"
-
-   :step-free-access "Portaaton pääsy"
-   :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
-   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other  "Muu"}
+   :step-free-access "Inga trappsteg"
+   :suitable-for-wheelchairs "Lämplig för rullstol"
+   :tactile-platform-edges  "Varning vid perrongkanten"
+   :tactile-guiding-strips "Beröringstyrda förlinjer"
+   :other  "Annat"}
 
   :ote.db.transport-service/transportable-aid
-  {:wheelchair "Pyörätuoli"
-   :walking-stick "Kävelykeppi"
+  {:wheelchair "Rullstol"
+   :walking-stick "Gångkäpp"
    :assistance-dog "Avustuskoira"
-   :crutches "Kainalosauvat"
-   :walker "Rollaattori"}
+   :crutches "Kryckor"
+   :walker "Rollator"}
 
   :ote.db.transport-service/pick-up-type
-  {:pick-up "Nouto"
-   :return "Palautus"
-   :pick-up-return "Nouto ja palautus"}
+  {:pick-up "Avhämtning"
+   :return "Returnering"
+   :pick-up-return "Avhämtning och returnering"}
 
   :ote.db.transport-service/vehicle-accessibility
-  {:low-floor "Matalalattia"
-   :step-free-access "Portaaton pääsy"
+  {:low-floor "Låggolv"
+   :step-free-access "Inga trappsteg"
    :accessible-vehicle "Esteetön kulkuneuvo"
-   :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :boarding-assistance "Kyytiin nousun avustus"
+   :suitable-for-wheelchairs "Lämplig för rullstol"
+   :boarding-assistance "Assistans vid ombordstigning"
    :assistance-dog-space "Tila avustuskoiralle"
-   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
-   }
+   :disability-adapted-vehicle "Disability adapted vehicle"}
 
   :ote.db.transport-service/parking-facility
   {:unknown "Tuntematon"
-   :car-park "Autopaikat"
-   :park-and-ride-park "Liityntäpysäköinti"
-   :motorcycle-park "Moottoripyörät"
-   :cycle-park "Polkupyörät"
-   :rental-car-park "Vuokra-autot"
-   :coach-park "Linja-autot"
-   :disabled-park "Invapaikat"}
+   :car-park "Bilplatser"
+   :park-and-ride-park "Infartsparkering"
+   :motorcycle-park "Motorcyklar"
+   :cycle-park "Cyklar"
+   :rental-car-park "Hyrbilar"
+   :coach-park "Bussar"
+   :disabled-park "Invaplatser"}
   }
 
  ;; Per feature/page localization keys
- :place-search {:name                "Paikan namn"
-                :place-auto-complete "Hae paikka nimellä"
-                :rename-place "Anna ny namn (Enter hyväksyy)"}
+ :place-search {:name                "Platsnamn"
+                :place-auto-complete "Sök plats"
+                :rename-place "Ange nytt namn (Enter godkänn)"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
-          :passenger-transportation "Henkilöiden kuljetuspalvelut"
+          :passenger-transportation "Persontransporttjänster"
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-          :brokerage                "Välityspalvelut"}
+          :brokerage                "Förmedlingstjänst"}
 
  :service-type-dropdown
  {:terminal                 "Asemat, satamat ja muut terminaalit"
-  :passenger-transportation-taxi "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-other "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
+  :passenger-transportation-taxi "Taxitjänst (persontransport)"
+  :passenger-transportation-request "Tilausajoliikenne, linja-auto (persontransport)"
+  :passenger-transportation-other "Muu kutsuun perustuva liikenne (persontransport)"
+  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (persontransport)"
   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-  :brokerage                "Välityspalvelut"}
+  :brokerage                "Förmedlingstjänster"}
 
 
  :front-page
- {:table-header-service-name      "Uppassningens namn"
-  :table-header-service-url       "Uppassningens verkko-adress"
+ {:table-header-service-name      "Tjänstens namn"
+  :table-header-service-url       "Tjänstens www-adress"
   :table-header-NAP-status        "NAP tila"
   :table-header-modified          "Muokattu"
   :table-header-created           "Luotu"
   :table-header-actions           "Toiminnot"
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
-  :header-explain-more            "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page          "Siirry omat palvelutiedot -näkymään"
-  :hello                          "Hei "
+  :header-explain-more            "Nu förstår jag inte riktigt, kan du förklara närmare?"
+  :move-to-services-page          "Gå till Egna tjänster"
+  :hello                          "Hej "
   :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
-    päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
+    päivittämisen, sekä tietojen julkaisun NAP -palvelukatalogiin."
   :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
   :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
-  :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
+  :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perustietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
-  :publish-new-service            "Haluatko julkaista nya palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
+  :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
   :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
    joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
-  :help-more-explanation2         "Toinen vaihtoehto on lisätä liikkumisuppassningens olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
+  :help-more-explanation2         "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
-  :header-no-operator "Et ole lisännyt vielä palvelutuottajaa"
-  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun ensin lisätä ny uppassningenstuottaja
-    tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut uppassningenstuottajan jäseneksi."
-   :to-add-new-operator "Mikäli lisäät uuden uppassningenstuottajan, voit tehdä sen "
+  :header-no-operator "Du har ännu inte skapat en tjänsteproducent"
+  :desc-to-add-new-operator "För att kunna skapa en ny mobilitetstjänst måste du först skapa en ny tjänsteproducent eller be administratören för en existerande tjänst koppla dig till den tjänsten."
+   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."
+   :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."
   }
 
  :organization-page
  {:contact-types            "Yhteystavat"
-  :organization-form-title  "Uppassningenstuottajan tiedot"
-  :organization-new-title   "Lägga till uppassningensproducent"
+  :organization-form-title  "Palveluntuottajan tiedot"
+  :organization-new-title "Lisää palveluntuottaja"
   :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
   :help-desc-2              "Täytä "
   :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
@@ -438,17 +436,18 @@
  :passenger-transportation-page
  {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
   :header-edit-passenger-transportation    "Muokkaa henkilöiden kuljetuspalvelua"
-  :header-service-info                     "Uppassningens perustiedot"
+  :header-service-info                     "Palvelun perustiedot"
   :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
-  :header-contact-details                  "Uppassningens yhteystiedot"
+  :header-contact-details                  "Palvelun yhteystiedot"
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
   :header-pick-up-locations "Toimipisteet"
+
   }
 
  :rentals-page
-{:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
+ {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
   :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
   :header-service-info                     "Vuokrauspalvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
@@ -462,12 +461,12 @@
   }
 
  :terminal-page
- {:header-service-info                "Uppassningens perustiedot"
-  :header-contact-details             "Uppassningens yhteystiedot"
-  :header-new-terminal                "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+ {:header-service-info                "Palvelun perustiedot"
+  :header-contact-details             "Palvelun yhteystiedot"
+  :header-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
   :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
-  :header-assistance                  "Avustusuppassningens tilauksen tiedot"
-  :header-accessibility               "Uppassningens saavutettavuus ja esteettömyys"
+  :header-assistance                  "Avustuspalveluiden tiedot"
+  :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
   :header-checkboxlist-accessibility  "Esteettömyys"
   }
 
@@ -483,7 +482,7 @@
   :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
   :header-charging-points                   "Latauspisteet"
-  :header-service-hours                     "Palveluajat ja pysäköintiaika"
+  :header-service-hours                     "Tjänstens öppettider och parkeringstid"
   }
 
  :price-dialog
@@ -497,177 +496,173 @@
   }
 
  :select-service-type-page
- {:title-required-data               "Aloita liikkumisuppassningens lisääminen valitsemalla liikkumisuppassningens typ"
-  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
-                ensin liikkumispalvelutyypin sekä uppassningenstuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
-  :transport-service-type-selection-help-example "Esimerkki: Palveluntuottajana on yritys nimeltä \"RapidBus Oy\",
-     jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
-     Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
-     tyyppiä.
-     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."
-  :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
-  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
+ {:title-required-data               "Börja med att välja tjänstetyp"
+  :transport-service-type-selection-help-text "Du kan spara väsentlig information om mobilitetstjänsten genom att först välja tjänstetyp och tjänsteproducent och därefter det formulär som öppnas.
+                Fyll i en ny blankett för varje tjänst."
+  :transport-service-type-brokerage-help-text "Gör på samma sätt om du erbjuder en förmedlingstjänst."
+  :transport-service-type-selection-help-example "Exempel: Tjänsteproducenten \"RapidBus Oy\" har två olika tjänster \"Rapidbus Tilausbussit\" och \"Rapidbus Taksipalvelu\"
+. Tjänsterna beskrivs var för sig på egen blankett. i dett exempel fyller man i en blankett \"Beställningstrafik med buss\" och \"Taksitjänst\"."}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
   :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
-  :link-add-new-api                           "Lägga till ny palvelu"
+  :link-add-new-api                           "Lisää uusi palvelu"
   :own-api-list                               "Omat palvelutiedot"
-  :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
-  :api-name                                   "Rajapinnan namn"
-  :api-url                                    "Rajapinnan verkko-adress"
-  :finap-status                               "NAP tila"
-  :header-nap-official-name                   "Palvelukatalogi"
-  :navigation-own-service-list                "Omat palvelutiedot"
-  :navigation-front-page                      "Etusivu"
-  :navigation-organizations                   "Uppassningenstuottajat"
-  :navigation-dataset                         "Palvelukatalogi"
-  :navigation-give-feedback                   "Anna palautetta"
-  :navigation-login                           "Kirjaudu sisään"
-  :navigation-register                        "Rekisteröidy"
-  :user-menu-service-guide                    "Ohje"
-  :user-menu-service-operator                 "Uppassningenstuottajan perustiedot"
-  :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Käyttäjätilin muokkaus"
+  :passenger-transportation-service-text      "Persontransporttjänster"
+  :api-name                                   "Gränssnittets namn"
+  :api-url                                    "Gränsnittets tekniska adress"
+  :finap-status                               "NAP statua"
+  :header-nap-official-name                   "Tjänstekatalog"
+  :navigation-own-service-list                "Egna tjänsteuppgifter"
+  :navigation-front-page                      "Framsida"
+  :navigation-organizations                   "Tjänsteproducenter"
+  :navigation-dataset                         "Tjänstekatalog"
+  :navigation-give-feedback                   "Feedback"
+  :navigation-login                           "Logga in"
+  :navigation-register                        "Registrera"
+  :user-menu-service-guide                    "Anvisning"
+  :user-menu-service-operator                 "Tjänsteproducentens basinfo"
+  :user-menu-log-out                          "Utloggning"
+  :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Yhteenveto"
-  :title-operator-basic-details               "Perustiedot"
-  :data-not-found                             "Tietoja ei löytynyt"
-  :required-field                             "Tieto vaaditaan"
-  :invalid-postal-code                        "Tarkista postinummer (5 nummera)"
-  :transport-service-saved                    "Liikkumisuppassningens tiedot tallennettu!"
-  :transport-operator-saved                   "Uppassningenstarjoajan tiedot tallennettu!"
+  :title-operator-basic-details               "Basinfo"
+  :data-not-found                             "Inga uppgifter hittades"
+  :required-field                             "Obligatorisk uppgigt"
+  :invalid-postal-code                        "Kolla postnumret (5 siffror)"
+  :transport-service-saved                    "Uppgifterna sparade!"
+  :transport-operator-saved                   "Uppgifterna sparade!"
   :footer-livi-logo                           "Liikennevirasto Logo"
   :footer-livi-url                            "Liikennevirasto.fi"
-  :footer-ckan-software                       "CKAN-ohjelmistolla"
-  :footer-made-width                          "Toteutettu"
-  :no-such-page                               "Valittua sivua ei löydy: "
-  :time-unit                                  "Aikayksikkö"
-  :time-units {:minutes  "Minuuttia"
-               :hours    "Tuntia"
-               :days     "Päivää"
-               :seconds  "Sekuntia"}
-  :save-failed                                "Tallennettaessa sattui virhe. Jos ongelma toistuu "
-  :delete-service-success                     "Palvelu poistettiin onnistuneesti."
-  :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
-  :logged-in                                  "Kirjauduit sisään onnistuneesti!"
+  :footer-ckan-software                       "CKAN"
+  :footer-made-width                          "Made with"
+  :no-such-page                               "Valda sidan hittas ej: "
+  :time-unit                                  "Tidsenhet"
+  :time-units {:minutes  "Minuter"
+               :hours    "Timmar"
+               :days     "Dagar"
+               :seconds  "Sekunder"}
+  :save-failed "Tallennettaessa sattui virhe. Jos ongelm toistuu "
+  :delete-service-success "Palvelu poistettiin onnistuneesti."
+  :delete-service-error "Palvelun poisto epäonnistui. Jos ongelma toistuu "
+  :logged-in "Kirjauduit sisään onnistuneesti!"
+  :loading "Ladda"
   }
 
  :dialog
  {:delete-transport-service
-  {:title "Poista liikkumisuppassningens tiedot?"
-   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumisuppassningens pysyvästi?"]}
+  {:title "Ta bort hela tjänsten?"
+   :confirm ["Vill du ta bort tjänsten \"" :name "\" slutgiltigt?"]}
 
   :navigation-prompt
-  {:title "Sivulta poistumisen varmistus"
-   :stay "Jää"
-   :leave "Poistu"
-   :unsaved-data "Form har osparande information, vilja du navigera borta?"}}
+  {:title "Vill du lämna denna sida"
+   :stay "Stanna"
+   :leave "Lämna"
+   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
- :viewer {"transport-operator" "Uppassningenstuottaja"
-          "transport-service" "Liikkumisuppassningens tiedot"
+ :viewer {"transport-operator" "Palveluntuottaja"
+          "transport-service" "Liikkumispalvelun tiedot"
           "contact-address" "Adress"
-          "contact-email" "e-postadress"
-          "homepage" "Kotisivu"
-          "post_office" "Postitoimipaikka"
-          "postal_code" "Postinummer"
-          "street" "Katuadress"
-          "contact-phone" "Telefonnummer"
-          "id" "Tunnistenummer"
+          "contact-email" "E-post"
+          "homepage" "www-sidor"
+          "post_office" "Postanstalt"
+          "postal_code" "Postnummer"
+          "street" "Gatuadress"
+          "contact-phone" "Telefonnr"
+          "id" "id"
           "name" "Namn"
-          "published?" "Julkaistu?"
-          "transport-operator-id" "Uppassningenstuottajan tunnistenummer"
-          "type" "Uppassningens typ"
+          "published?" "Publicerat?"
+          "transport-operator-id" "Tjänsteproducentens id"
+          "type" "Tjänstetyp"
 
-          "passenger-transportation" "Henkilöiden kuljetusuppassningens tiedot"
-          "accessibility-description" "Beskrivning saavutettavuudesta"
-          "accessibility-tool" "Saavutettavuusvälineet"
-          "additional-services" "Lisäpalvelut"
-          "payment-methods" "Maksuvälineet"
-          "price-classes" "Hintaluokat"
-          "currency" "Rahayksikkö"
-          "price-per-unit" "yksikköhinta"
-          "unit" "yksikkö"
+          "passenger-transportation" "Persontransporttjänstens uppgifter"
+          "accessibility-description" "Beskrivning av tillgänglighet"
+          "accessibility-tool" "Redskap"
+          "additional-services" "Tilläggstjänster"
+          "payment-methods" "Betalsätt"
+          "price-classes" "Priskategori"
+          "currency" "valuta"
+          "price-per-unit" "Enhetspris"
+          "unit" "enhet"
 
-          "lang" "Kieli"
-          "text" "Teksti"
+          "lang" "Språk"
+          "text" "Text"
 
           "description" "Beskrivning"
-          "real-time-information" "Reaaliaikaiset palvelutiedot"
-          "booking-service" "Varauspalvelu"
-          "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
+          "real-time-information" "Realtidsinfo"
+          "booking-service" "Bokningstjänst"
+          "luggage-restrictions" "Begränsningar gällande resgods"
 
           "url" "WWW-adress"
 
-          :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
-                   true "Kyllä"
-                   false "Ei"
+          :values {"passenger-transportation" "Persontransport"
+                   true "Ja"
+                   false "Nej"
 
                    ;; accessibility tools
-                   "wheelchair" "Pyörätuoli"
-                   "walkingstick" "Kävelykeppi"
-                   "audio-navigator" "Ääniopastus"
-                   "visual-navigator" "Visuaaliset opasteet"
-                   "passenger-cart" "Henkilökuljetuskärryt"
-                   "pushchair" "Lastenrattaat"
-                   "umbrella" "Sateenvarjo"
-                   "buggy" "Lastenvaunut"
+                   "wheelchair" "Rullstol"
+                   "walkingstick" "Gåkäpp"
+                   "audio-navigator" "Audioguide"
+                   "visual-navigator" "Visuella skyltar"
+                   "passenger-cart" "Persontransportvagn"
+                   "pushchair" "pushchair"
+                   "umbrella" "paraply"
+                   "buggy" "Barnvagn"
                    "other" "Muu"
-                   "boarding-assistance" "Kyytiin nousun avustus"
-                   "low-floor" "Matalalattia"
-                   "accessible-vehicle" "Esteetön kulkuneuvo"
-                   "step-free-access" "Portaaton pääsy"
-                   "suitable-for-wheelchairs" "Sopii pyörätuolille"
-                   "assistance-dog-space" "Tila avustuskoiralle"
-                   "crutches" "Kainalosauvat"
-                   "walker" "Rollaattori"
-                   "walking-stick" "Kävelykeppi"
-"visual-displays" "Visuaaliset näytöt"
-                   "large-print-timetables" "Suuret kirjasimet aikatauluissa"
-                   "displays-for-visually-impaired" "Näytöt näkövammaisille (taktiili)"
-                   "audio-information" "Kuulutukset"
-                   "audio-for-hearing-impaired" "Äänivahvistimet huonokuuloisille"
+                   "boarding-assistance" "Assistans vid ombordstigning"
+                   "low-floor" "Låggolv"
+                   "accessible-vehicle" "Hinderfritt fordon"
+                   "step-free-access" "Ingång utan trappa"
+                   "suitable-for-wheelchairs" "Lämplig för rullstol"
+                   "assistance-dog-space" "Plats för assistanshund"
+                   "crutches" "Kryckor"
+                   "walker" "Rollator"
+                   "walking-stick" "Gåkäpp"
+                   "visual-displays" "Monitorer"
+                   "large-print-timetables" "Tidtabellskyltar med stor text"
+                   "displays-for-visually-impaired" "Taktila skyltar (taktiili)"
+                   "audio-information" "Utrop"
+                   "audio-for-hearing-impaired" "Ljudförstärkning för hörselskadade"
 
                    ;; additional services
-                   "animal-transport" "Eläinkuljetus"
-                   "child-seat"       "Lastenistuin"
+                   "animal-transport" "Djurtransport tillåten"
+                   "child-seat"       "Barnstol"
 
 
                    ;; payment methods
                    "debit-card" "Bankkort"
                    "credit-card" "Kreditkort"
-                   "cash" "Kontanter"
-                   "contactless-payment" "Lähimaksu"
-                   "mobilepay" "Mobiilimaksu"
-                   "invoice" "Lasku"
+                   "cash" "Kontant"
+                   "contactless-payment" "Kontaktlös kortbetalning"
+                   "mobilepay" "Mobile pay"
+                   "invoice" "Faktura"
 
                    ;; week days
-                   "MON" "Mån"
-                   "TUE" "Tis"
-                   "WED" "Ons"
-                   "THU" "Tors"
-                   "FRI" "Fre"
-                   "SAT" "Lör"
-                   "SUN" "Sön"
+                   "MON" "Må"
+                   "TUE" "Ti"
+                   "WED" "On"
+                   "THU" "To"
+                   "FRI" "Fr"
+                   "SAT" "Lö"
+                   "SUN" "Sö"
                    }
-          "brokerage?" "Välityspalvelu?"
-          "companies" "Palvelun tuottamiseen osallistuvat yritykset"
-          "external-interfaces" "Ulkoiset rajapinnat"
-          "license" "Lisenssi/käyttöehdot"
-          "format" "Muoto"
-          "license-url" "Lisenssi/käyttöehdot URL"
-          "external-interface" "Ulkoinen rajapinta"
-          "accessibility-info-url" "Esteettömyyspalveluiden kuvaus (WWW)"
-          "guaranteed-accessibility-description" "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
-          "guaranteed-info-service-accessibility" "Infopalveluiden esteettömyys (taattu saatavuus)"
+          "brokerage?" "Förmedlingstjänst?"
+          "companies" "Företag som medverkar i tjänsteproduktionen"
+          "external-interfaces" "Yttre tekniska gränssnitt"
+          "license" "Licens"
+          "format" "Format"
+          "license-url" "Lisens URL"
+          "external-interface" "Yttre gränssnitt"
+          "accessibility-info-url" "Tillgänglighetsbeskriving (www-adress)"
+          "guaranteed-accessibility-description" "Garanterad tillgänglighet"
+          "guaranteed-info-service-accessibility" "Tillgänglig info (garanterad)"
           "guaranteed-transportable-aid" "Kuljetettavat apuvälineet (taattu saatavuus)"
           "guaranteed-vehicle-accessibility" "Liikennevälineiden esteettömyysominaisuudet (aina saatavilla)."
-          "limited-accessibility-description" "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
+          "limited-accessibility-description" "Rajoitetusti saatavilla olevien esteettömyyspalveluiden kuvaus"
           "limited-info-service-accessibility" "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
           "limited-transportable-aid" "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
           "limited-vehicle-accessibility" "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
@@ -675,11 +670,11 @@
           "pricing" "Hinnoittelu"
           "service-exceptions" "Toiminta-aikojen poikkeukset"
           "service-hours" "Toiminta-ajat"
-          "week-days" "Dagar"
-          "from" "Från"
-          "to" "Till"
-          "from-date" "Från"
-          "to-date" "Till"
+          "week-days" "Viikonpäivät"
+          "from" "Alkaen"
+          "to" "Päättyen"
+          "from-date" "Alkaen (pvm)"
+          "to-date" "Päättyen (pvm)"
           "sub-type" "Alityyppi"}
 
 
@@ -687,15 +682,15 @@
  :service-search
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
-  :text-search "Haku"
-  :text-search-placeholder "Hae nimellä tai sen osalla"
-  :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
-  :no-results "Hakuehdoilla ei löytynyt palveluita"
-  :one-result "Hakuehdoilla löytyi yksi palvelu"
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
-  :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
-  :external-interfaces ["Uppassningenstuottajan itse tarjoamat rajapinnat"]
-  :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
+  :text-search "Sök"
+  :text-search-placeholder "Sök med namn"
+  :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
+  :no-results "Inga resultat"
+  :one-result "Hittades en tjänst"
+  :many-results ["Hittades " :count " tjänster"]
+  :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
+  :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
+  :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   }
 
  }
