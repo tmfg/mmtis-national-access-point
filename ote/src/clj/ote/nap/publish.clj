@@ -25,17 +25,21 @@
   "Create a CKAN dataset description that can be used with the CKAN API to
   create a dataset. The owner organization is the user's organization."
   [db user {ds-id ::t-service/ckan-dataset-id service-id ::t-service/id :as ts}]
-  (merge
-   {:ckan/name (str "org-" (::t-service/transport-operator-id ts)
-                    "-service-" service-id)
-    :ckan/title (::t-service/name ts)
-    :ckan/owner-org (get-in user [:group :name])
-    :ckan/transport-service-type (name (::t-service/type ts))
-    :ckan/operation-area (fetch-service-operation-area-description db service-id)}
+  (let [operator (first (fetch db ::t-operator/transport-operator
+                                      #{::t-operator/ckan-group-id}
+                                      {::t-operator/id (::t-service/transport-operator-id ts)}))]
 
-   ;; If dataset has already been created, add its id
-   (when ds-id
-     {:ckan/id ds-id})))
+    (merge
+      {:ckan/name                   (str "org-" (::t-service/transport-operator-id ts)
+                                         "-service-" service-id)
+       :ckan/title                  (::t-service/name ts)
+       :ckan/owner-org              (::t-operator/ckan-group-id operator)
+       :ckan/transport-service-type (name (::t-service/type ts))
+       :ckan/operation-area         (fetch-service-operation-area-description db service-id)}
+
+      ;; If dataset has already been created, add its id
+      (when ds-id
+        {:ckan/id ds-id}))))
 
 (defmulti interface-description ::t-service/type)
 
