@@ -133,7 +133,7 @@
                                                     :ckan/title (::t-operator/name operator)})]
       ;; Update CKAN org id
       (update! db ::t-operator/transport-operator
-               {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])} ;; Values to set
+               {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])}
                {::t-operator/id (::t-operator/id operator)})
       operator)))
 
