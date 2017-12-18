@@ -103,24 +103,24 @@
     :type :localized-text
     :rows 1
     :full-width? true
-    :container-class "col-md-5"}
+    :container-class "col-md-6"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
     :rows 1
-    :container-class "col-md-6"
+    :container-class "col-md-5"
     :full-width? true}
 
    {:name ::t-service/accessibility-info-url
     :type :string
-    :container-class "col-md-5"
+    :container-class "col-md-6"
     :full-width? true}
 
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/additional-services])
     :options     t-service/additional-services
-    :container-class "col-md-6"
+    :container-class "col-md-5"
     :full-width? true}
    ))
 
