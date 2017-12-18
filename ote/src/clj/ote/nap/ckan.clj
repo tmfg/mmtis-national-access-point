@@ -144,8 +144,8 @@
 (defn create-organization! [ckan organization]
   (ckan-post ckan "action/organization_create" organization))
 
-(defn get-organization [ckan organization-name]
-  (ckan-get ckan (str "action/organization_show?id=" organization-name)))
+(defn get-organization [ckan organization-id]
+  (ckan-get ckan (str "action/organization_show?id=" organization-id)))
 
 (defn update-organization! [ckan organization]
   (ckan-post ckan "action/organization_update" organization))
