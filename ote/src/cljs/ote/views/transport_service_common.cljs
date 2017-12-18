@@ -11,7 +11,8 @@
             [ote.views.place-search :as place-search]
             [clojure.string :as str]
             [ote.time :as time]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [ote.style.form :as style-form]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -61,7 +62,7 @@
      [:div
       [:p (tr [:form-help :external-interfaces])]
       [:p (tr [:form-help :external-interfaces-eg-rae])
-       [linkify "https://extranet.liikennevirasto.fi/extranet/web/f/rae?kategoria=1955433" (tr [:form-help :RAE-tool])
+       [linkify "https://www.liikennevirasto.fi/liikennejarjestelma/henkiloliikenne/liikennepalvelulaki/rae-tyokalu" (tr [:form-help :RAE-tool])
         {:target "_blank"}]]])
 
    {:name ::t-service/external-interfaces
@@ -77,7 +78,16 @@
                    {:name ::t-service/license :type :string :width "21%"}
                    {:name ::t-service/license-url :type :string :width "21%"}]
     :delete? true
-    :add-label (tr [:buttons :add-external-interface])}))
+    :add-label (tr [:buttons :add-external-interface])}
+
+   {:name ::t-service/notice-external-interfaces?
+    :type :checkbox
+    :required? true
+    :style style-form/padding-top
+    :validate [[:checked?]]
+    }
+
+   ))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
@@ -100,6 +110,7 @@
 
    (form/info (tr [:form-help :brokerage?]))
    {:name ::t-service/brokerage?
+    :style style-form/padding-top
     :type :checkbox}))
 
 (defn contact-info-group []

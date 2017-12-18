@@ -34,7 +34,7 @@
 
 (defmethod validate-rule :non-empty [_ _ data _ _ & [message]]
   (when (str/blank? data)
-    (or message "Anna arvo")))
+    (or message (tr [:common-texts :required-field]))))
 
 (defmethod validate-rule :non-negative-if-key [_ _ data row _ & [key value message]]
   (when (and (= (key row) value)
@@ -124,6 +124,11 @@
     (and (not (empty-value? data)) (not (re-matches #"^\d{5}$" data)))
     (or message (tr [:common-texts :invalid-postal-code]))
   ))
+
+;; Validate that checkbox is checked
+(defmethod validate-rule :checked? [_ _ data _ _ ]
+  (when (= false data)
+    (tr [:common-texts :required-field])))
 
 (defn validate-rules
   "Returns all validation errors for a field as a sequence. If the sequence is empty,

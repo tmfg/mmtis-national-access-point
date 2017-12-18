@@ -65,6 +65,7 @@
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/license "Lisenssi / käyttöehdot"
    :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus"
+   :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
    }
 
   ;; Service exception
