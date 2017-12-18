@@ -135,9 +135,10 @@
                                       [:field-labels :transport-service-common]
                                       [:field-labels :transport-service])}
       [(form/group
-        {:label (tr [:service-search :filters-label])
-         :columns 3
-         :layout :row}
+         {:label        (tr [:service-search :filters-label])
+          :columns      3
+          :layout       :row
+          :card-options {:style style-base/filters-form}}
 
         {:name :text-search
          :type :string
@@ -150,7 +151,7 @@
 
         {:name ::t-service/sub-type
          :type :multiselect-selection
-         :show-option #(str (sub-type (:sub-type %)) " (" (:count %) ")")
+         :show-option #(str (sub-type (:sub-type %)))
          :options (::t-service/sub-type facets)
          :auto-width? true})]
       filters]]))

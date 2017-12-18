@@ -20,8 +20,11 @@
       (localization/load-language! lang (fn [_ translation]
                                           (swap! langs assoc lang (deep-key-paths [] translation)))))
     (let [langs @langs
-          all-key-paths (reduce set/union (vals langs))]
+          fi-key-paths (langs "fi")]
       (doseq [[lang lang-key-paths] langs]
-        (doseq [key-path all-key-paths]
+        (doseq [key-path fi-key-paths]
           (is (lang-key-paths key-path)
-              (str "Translation for " key-path " missing in language " lang)))))))
+              (str "Translation for " key-path " missing in language " lang)))
+        (doseq [key-path lang-key-paths]
+          (is (fi-key-paths key-path)
+              (str "Extra key " key-path " in language " lang)))))))

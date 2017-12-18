@@ -287,50 +287,54 @@
 
 (defn form-group-ui [form-options group]
   (r/create-class
-   {:should-component-update
-    (form-group-should-update? group)
+    {:should-component-update
+     (form-group-should-update? group)
 
-    :reagent-render
-    (fn [{:keys [name->label update-field-fn can-edit? focus update-form
-                 data closed-groups] :as form-options}
-         {:keys [label schemas options] :as group}]
-      (let [{::keys [modified errors warnings notices]} data
-            columns (or (:columns options) 1)
-            classes (get col-classes columns)
-            schemas (with-automatic-labels name->label schemas)
-            style (if (= :row (:layout options))
-                    style-form/form-group-row
-                    style-form/form-group-column)
-            group-component [group-ui
-                             style
-                             schemas
-                             data
-                             update-field-fn
-                             can-edit?
-                             @focus
-                             #(reset! focus %)
-                             modified
-                             errors warnings notices
-                             update-form]
-            expandable? (get options :expandable? true)
-            card? (get options :card? true)]
-        [:div.form-group-container (stylefy/use-style style-form/form-group-container
-                                                      {::stylefy/with-classes classes})
-         (if-not card?
-           group-component
-           [ui/card {:z-depth 1
-                     :expanded (not (closed-groups label))
-                     :on-expand-change #(update-form (update data ::closed-groups toggle label))}
-            (when label
-              [ui/card-header {:title label
-                               :style {:padding-bottom "0px"}
-                               :title-style {:font-weight "bold"}
-                               :show-expandable-button expandable?}])
-            [ui/card-text {:style {:padding-top "0px"} :expandable true}
-             group-component]
-            (when-let [actions (and (not (closed-groups label)) (:actions options))]
-              [ui/card-actions
-               (r/as-element actions)])])]))}))
+     :reagent-render
+     (fn [{:keys [name->label update-field-fn can-edit? focus update-form
+                  data closed-groups] :as form-options}
+          {:keys [label schemas options] :as group}]
+       (let [{::keys [modified errors warnings notices]} data
+             columns (or (:columns options) 1)
+             classes (get col-classes columns)
+             schemas (with-automatic-labels name->label schemas)
+             style (if (= :row (:layout options))
+                     style-form/form-group-row
+                     style-form/form-group-column)
+             container-style (:container-style options)
+             card-options (:card-options options)
+             group-component [group-ui
+                              style
+                              schemas
+                              data
+                              update-field-fn
+                              can-edit?
+                              @focus
+                              #(reset! focus %)
+                              modified
+                              errors warnings notices
+                              update-form]
+             expandable? (get options :expandable? true)
+             card? (get options :card? true)]
+         [:div.form-group-container (merge (stylefy/use-style style-form/form-group-container
+                                                              {::stylefy/with-classes classes})
+                                           {:style container-style})
+          (if-not card?
+            group-component
+            [ui/card (merge {:z-depth          1
+                             :expanded         (not (closed-groups label))
+                             :on-expand-change #(update-form (update data ::closed-groups toggle label))}
+                            card-options)
+             (when label
+               [ui/card-header {:title                  label
+                                :style                  {:padding-bottom "0px"}
+                                :title-style            {:font-weight "bold"}
+                                :show-expandable-button expandable?}])
+             [ui/card-text {:style {:padding-top "0px"} :expandable true}
+              group-component]
+             (when-let [actions (and (not (closed-groups label)) (:actions options))]
+               [ui/card-actions
+                (r/as-element actions)])])]))}))
 
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the
