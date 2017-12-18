@@ -253,7 +253,7 @@
   :discard "Peruuta"
 
   :next "Jatka"
-  :add-transport-service  "Lisää palvelusi tiedot"
+  :add-transport-service  "Lisää uusi palvelu"
   :add-external-interface "Lisää rivi"
   :add-new-service-link "Lisää rivi"
   :add-add-new-row         "Lisää uusi rivi"
@@ -424,7 +424,7 @@
     tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
    :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
-   :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."
+   :operator-dont-have-any-services "Et ole vielä lisännyt tarjoamiesi liikkumispalveluiden tietoja NAP-palvelukatalogiin."
   }
 
  :organization-page

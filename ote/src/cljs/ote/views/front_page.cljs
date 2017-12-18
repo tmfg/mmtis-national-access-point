@@ -101,13 +101,19 @@
    [:div.row
     [:div {:class "col-md-12"}
      [:h1 (tr [:common-texts :own-api-list])
+
+
       [ui/raised-button {:label (tr [:buttons :add-transport-service])
                         :style {:float "right"}
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))
                         :primary  true
-                        :icon (ic/content-add)}]]]
+                        :icon (ic/content-add)}]]
+     [:div {:style {:border "red 4px dashed"}}
+      [:p {:style {:padding "10px"}} "HUOM: Tämä on NAP -palvelun testiversio."
+       [:br]
+       "Tiedot eivät siirry varsinaiseen NAP-palveluun, joka avataan tuotannossa 20.12.2017."]]]
 
     [:div {:class "col-md-12"}
      [t-operator-view/transport-operator-selection e! state]]]
@@ -128,7 +134,15 @@
        ;; FALSE -> explain user why table is empty
        [:div
         [:br]
-        [:p (tr [:front-page :operator-dont-have-any-services])]])]]])
+        [:p (tr [:front-page :operator-dont-have-any-services])]
+        [:div {:style {:padding-top "20px"}}]
+        [ui/raised-button {:label (tr [:buttons :add-transport-service])
+                           ;:style {:float "right"}
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts/->OpenTransportServiceTypePage)))
+                           :primary  true
+                           :icon (ic/content-add)}]])]]])
 
 (defn no-operator
       "If user haven't added service-operator, we will ask to do so."
