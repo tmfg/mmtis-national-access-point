@@ -115,3 +115,9 @@
   (if (= "" tr-result)
     default-value
     tr-result))
+
+(defn tr-tree
+  ([tree-path]
+   (tr-tree #?(:clj *language* :cljs @selected-language) tree-path))
+  ([language tree-path]
+   (get-in (get @loaded-languages language) tree-path)))
