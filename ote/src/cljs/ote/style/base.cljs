@@ -71,10 +71,8 @@
           :margin-left "0.2em"}))
 
 (def help (merge (flex-container "row")
-                 {:border-radius "0.5em"
-                  :border "solid 1px #c4c4c4"
-                  :color "#434343"
-                  :background-color "#DAEDF7"
+                 {:border-bottom "1px solid #dddddd"
+                  :color "#666666"
                   :padding "0.2em"
                   :margin "0.2em"
                   :align-items "center"
