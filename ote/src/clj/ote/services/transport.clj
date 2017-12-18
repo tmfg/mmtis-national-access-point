@@ -118,39 +118,42 @@
      :transport-service-vector transport-services-vector
      :user cleaned-user}))
 
+(defn- create-transport-operator [nap-config db user data]
+  ;; Create new transport operator
+  (tx/with-transaction db
+    (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
+
+          ;; Insert to our database
+          operator  (insert! db ::t-operator/transport-operator
+                             (dissoc data  ::t-operator/id :new?))
+
+          ;; Create organization in CKAN
+          ckan-response (ckan/create-organization! ckan
+                                                   {:ckan/name (str "transport-operator-" (::t-operator/id operator))
+                                                    :ckan/title (::t-operator/name operator)})]
+      ;; Update CKAN org id
+      (update! db ::t-operator/transport-operator
+               {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])} ;; Values to set
+               {::t-operator/id (::t-operator/id operator)})
+      operator)))
+
+(defn- update-transport-operator [nap-config db user data]
+  ;; Edit transport operator
+  (tx/with-transaction db
+    (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
+          operator (authorization/with-transport-operator-check
+                     db user (::t-operator/id data)
+                     #(upsert! db ::t-operator/transport-operator data))
+          ckan-org (get
+                    (ckan/get-organization ckan (str "transport-operator-" (::t-operator/id operator)))
+                    :ckan/result)
+          ckan-org (assoc ckan-org :ckan/title (::t-operator/name operator))] ;; We show only title in ckan side - so no need to update other values
+      (ckan/update-organization! ckan ckan-org))))
 
 (defn- save-transport-operator [nap-config db user data]
-  (if (:new? data)
-    ;; Create new transport operator
-    (tx/with-transaction db
-      (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
-
-            ;; Insert to our database
-            operator  (insert! db ::t-operator/transport-operator
-                        (dissoc data  ::t-operator/id :new?))
-
-            ;; Create organization in CKAN
-            ckan-response (ckan/create-organization! ckan
-             {:ckan/name (str "transport-operator-" (::t-operator/id operator))
-              :ckan/title (::t-operator/name operator)})]
-        ;; Update CKAN org id
-        (update! db ::t-operator/transport-operator
-                 {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])} ;; Values to set
-                 {::t-operator/id (::t-operator/id operator)} ;; Where clause
-                 )
-        operator))
-
-    ;; Edit transport operator
-    (tx/with-transaction db
-       (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
-            operator (authorization/with-transport-operator-check
-                        db user (::t-operator/id data)
-                        #(upsert! db ::t-operator/transport-operator data))
-             ckan-org (get
-                        (ckan/get-organization ckan (str "transport-operator-" (::t-operator/id operator)))
-                        :ckan/result)
-             ckan-org (assoc ckan-org :ckan/title (::t-operator/name operator))] ;; We show only title in ckan side - so no need to update other values
-        (ckan/update-organization! ckan ckan-org)))))
+  ((if (:new? data)
+     create-transport-operator
+     update-transport-operator) nap-config db user data))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
