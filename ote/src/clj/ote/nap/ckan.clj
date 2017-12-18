@@ -92,15 +92,15 @@
                        :payload payload})))
     (-> response :body (cheshire/decode ckan-key->keyword))))
 
-(defn- ckan-get [{:keys [url api-key]} path ]
+(defn- ckan-get [{:keys [url api-key]} path]
   (let [response
-       @(http/get (str url path)
-                  {:headers {"Content-Type" "application/json"
+        @(http/get (str url path)
+                   {:headers {"Content-Type" "application/json"
                               "Authorization" api-key}})]
-      (when-not (= 200 (:status response))
-                (throw (ex-info (str "CKAN API call " path " failed.")
-                                {:response response})))
-      (-> response :body (cheshire/decode ckan-key->keyword))))
+    (when-not (= 200 (:status response))
+      (throw (ex-info (str "CKAN API call " path " failed.")
+                      {:response response})))
+    (-> response :body (cheshire/decode ckan-key->keyword))))
 
 (defn- ckan-dataset-action! [ckan action dataset]
   (when-not (s/valid? :ckan/dataset dataset)
