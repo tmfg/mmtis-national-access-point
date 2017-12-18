@@ -84,10 +84,7 @@
     :type :checkbox
     :required? true
     :style style-form/padding-top
-    :validate [[:checked?]]
-    }
-
-   ))
+    :validate [[:checked?]]}))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."

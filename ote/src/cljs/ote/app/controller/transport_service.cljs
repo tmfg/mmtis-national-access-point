@@ -28,7 +28,8 @@
     ::t-service/brokerage?
     ::t-service/description
     ::t-service/available-from
-    ::t-service/available-to})
+    ::t-service/available-to
+    ::t-service/notice-external-interfaces?})
 
 (defn service-type-from-combined-service-type
   "Returns service type keyword from combined type-subtype key."
