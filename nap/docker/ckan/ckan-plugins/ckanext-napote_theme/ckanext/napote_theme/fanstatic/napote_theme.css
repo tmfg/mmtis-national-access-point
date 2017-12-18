@@ -517,6 +517,11 @@ body {
     font-weight: normal;
 }
 
+a {
+    color: rgb(25, 118, 210);
+    font-weight: normal;
+}
+
 /* Change background color to white for every page*/
 div[role=main] {
      background: #f1f1f1; /* Overwrite .main background color */
