@@ -194,15 +194,16 @@
     [:div.component (component {:update-form! #(update-form s)
                                 :data data})]
     (if editable?
-      [form-fields/field (assoc s
-                                :form? true
-                                :update! update-fn
-                                :error (when (not (empty? errors))
-                                         (str/join " " errors))
-                                :warning (when
-                                           (and required? (validation/empty-value? data) )
-                                           (tr [:common-texts :required-field])))
-                                data]
+      [:div (stylefy/use-style style-form/form-field)
+       [form-fields/field (assoc s
+                            :form? true
+                            :update! update-fn
+                            :error (when (not (empty? errors))
+                                     (str/join " " errors))
+                            :warning (when
+                                       (and required? (validation/empty-value? data))
+                                       (tr [:common-texts :required-field])))
+        data]]
       [:div.form-control-static
        (if fmt
          (fmt ((or read #(get % name)) data))
