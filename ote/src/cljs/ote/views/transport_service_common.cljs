@@ -108,6 +108,8 @@
     :columns 3
     :layout :row}
 
+   (form/info (tr [:form-help :description-why-contact-info]))
+
    {:name        ::common/street
     :type        :string
     :container-class "col-md-4"
