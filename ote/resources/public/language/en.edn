@@ -213,11 +213,9 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Tässä kohdassa lisäät ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut,
- varaus- ja myyntirajapinnan ja muut olennaisia tietoa sisältävät rajapinnat.
- Jos ulkoiset rajapinnat ovat vajanaisia tai rajapintoja ei ole, täytä vastaavasti tämän osion alla olevat kohdat,
- jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa. Huom. Tavalliset verkkosivusisällöt eivät kuulu tähän osioon."
+ {:external-interfaces "Tässä kohdassa lisäät mahdolliset ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut, tariffit, varaus- ja myyntirajapinta ja muut olennaisia tietoa sisältävät rajapinnat.\nRajapinta on yksinkertaisimmillaan tietoa (tiedosto) sähköisessä muodossa internet-osoitteessa. Koneluettava ohjelmointirajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa, esim. muodossa csv, xml, json tai gtfs.\nMikäli liikkumispalvelustasi ei ole olemassa rajapintoja, jätä tämä kohta tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
   :external-interfaces-eg-rae "Huom. Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
+  :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Rae-työkalu"
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
 
@@ -229,6 +227,7 @@
   :operation-area "Add the service operation area (for example province) by typing the name in the text field and selecting it from the list. You can also draw the area with the map drawing tools. You can name the area freely (like \"Itäkeskus taxi station\")."
 
   :available-from-and-to "Set date range when this service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
+  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   }
 
 
@@ -403,6 +402,7 @@
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
   :header-explain-more            "Nyt en ymmärrä, selittäisitkö tarkemmin?"
   :move-to-services-page          "Siirry omat palvelutiedot -näkymään"
+  :move-to-organizations-page     "Siirry palveluntuottajat-näkymään"
   :hello                          "Hei "
   :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
@@ -419,10 +419,14 @@
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
-  :header-no-operator "Et ole lisännyt vielä palvelutuottajaa"
-  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun ensin lisätä uusi palveluntuottaja
-    tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
-   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
+  :header-no-operator "Käyttäjätilisi ei kuulu vielä yhdenkään palveluntuottajan alle"
+  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun olla jonkin palveluntuottajan edustaja."
+  :desc-to-add-new-operator-2 "Onko edustamasi palveluntuottaja (esim. yritys, yhteisö tai muu organisaatio) jo lisätty NAP-palveluun?"
+  :desc-to-add-new-operator-3 "Voit tarkistaa sen palveluntuottajat-näkymässä."
+  :desc-to-add-new-operator-4 "Mikäli löysit edustamasi organisaation, pyydä sen
+         hallinoijaa lisäämään sinut kyseisen organisaation edustajaksi. Edustajat voivat hallita kyseisen organisaation liikkumispalveluita tästä näkymästä."
+  :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
+  :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
    :operator-dont-have-any-services "Operator don't have any services yet."
   }

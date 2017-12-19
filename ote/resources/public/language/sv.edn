@@ -216,10 +216,9 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "
-
-Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
+ {:external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
   :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
+  :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Se info om RAE"
   :companies "Om tjänsten erbjuds av en koncern, marknadsföringsbolag eller annan organisation med flera tjänsteproducenter, var vänlig fyll i företagets namn on FO-nummer."
 
@@ -231,6 +230,7 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
+  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   }
 
 
@@ -403,6 +403,7 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
   :header-explain-more            "Nu förstår jag inte riktigt, kan du förklara närmare?"
   :move-to-services-page          "Gå till Egna tjänster"
+  :move-to-organizations-page     "Siirry palveluntuottajat-näkymään"
   :hello                          "Hej "
   :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittämisen, sekä tietojen julkaisun NAP -palvelukatalogiin."
@@ -421,9 +422,14 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
   :header-no-operator "Du har ännu inte skapat en tjänsteproducent"
   :desc-to-add-new-operator "För att kunna skapa en ny mobilitetstjänst måste du först skapa en ny tjänsteproducent eller be administratören för en existerande tjänst koppla dig till den tjänsten."
-   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
-   :to-add-new-operator-tab " välilehdestä."
-   :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."
+  :desc-to-add-new-operator-2 "Onko edustamasi palveluntuottaja (esim. yritys, yhteisö tai muu organisaatio) jo lisätty NAP-palveluun?"
+  :desc-to-add-new-operator-3 "Voit tarkistaa sen palveluntuottajat-näkymässä."
+  :desc-to-add-new-operator-4 "Mikäli löysit edustamasi organisaation, pyydä sen
+         hallinoijaa lisäämään sinut kyseisen organisaation edustajaksi. Edustajat voivat hallita kyseisen organisaation liikkumispalveluita tästä näkymästä."
+  :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
+  :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
+  :to-add-new-operator-tab " välilehdestä."
+  :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."
   }
 
  :organization-page

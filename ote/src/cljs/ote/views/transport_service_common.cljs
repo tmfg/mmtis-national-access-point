@@ -80,11 +80,15 @@
     :delete? true
     :add-label (tr [:buttons :add-external-interface])}
 
-   {:name ::t-service/notice-external-interfaces?
-    :type :checkbox
-    :required? true
-    :style style-form/padding-top
-    :validate [[:checked?]]}))
+    (form/info
+     [:div
+      [:p (tr [:form-help :external-interfaces-end])]])
+    
+    {:name ::t-service/notice-external-interfaces?
+     :type :checkbox
+     :required? true
+     :style style-form/padding-top
+     :validate [[:checked?]]}))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
@@ -115,6 +119,8 @@
    {:label  (tr [:passenger-transportation-page :header-contact-details])
     :columns 3
     :layout :row}
+
+   (form/info (tr [:form-help :description-why-contact-info]))
 
    {:name        ::common/street
     :type        :string
