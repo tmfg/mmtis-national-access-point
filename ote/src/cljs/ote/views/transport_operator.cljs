@@ -115,16 +115,17 @@
                    :organization-new-title
                    :organization-form-title)])]]]
 
-       [:p
-        (tr [:organization-page :help-desc-1])]
-       [:p
-        (tr [:organization-page :help-desc-2])
-        [:b (tr [:common-texts :title-operator-basic-details]) ]
-        (tr [:organization-page :help-desc-3])]
-       [:p
-        [:b (tr [:organization-page :contact-types]) ]
-        (tr [:organization-page :help-desc-4])]
-       [:br]
+     [:div {:style {:white-space "pre-wrap"}}
+      [:p
+       (tr [:organization-page :help-desc-1])]
+      [:p
+       (tr [:organization-page :help-desc-2])
+       [:b (tr [:common-texts :title-operator-basic-details]) ]
+       (tr [:organization-page :help-desc-3])]
+      [:p
+       [:b (tr [:organization-page :contact-types]) ]
+       (tr [:organization-page :help-desc-4])]]
+     [:br]
 
        [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
 

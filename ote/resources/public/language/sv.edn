@@ -440,7 +440,7 @@
   :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
   :help-desc-2              "Täytä "
   :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
+  :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille.\n\nKuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."
   }
 
  :passenger-transportation-page
