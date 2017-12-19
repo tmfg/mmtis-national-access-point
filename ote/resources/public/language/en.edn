@@ -3,6 +3,7 @@
  :field-labels
  {;; Transport operator fields
   :ote.db.transport-operator/name                     "Transport operator name"
+  :ote.db.transport-operator/ckan-description "Transport operator description"
   :ote.db.transport-operator/business-id              "Business ID"
   :ote.db.transport-operator/phone                    "Phone (office)"
   :ote.db.transport-operator/gsm                      "Phone (GSM)"

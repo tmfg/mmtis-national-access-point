@@ -3,6 +3,7 @@
  :field-labels
  {;; Transport operator fields
   :ote.db.transport-operator/name                     "Palveluntuottajan nimi"
+  :ote.db.transport-operator/ckan-description "Palveluntuottajan kuvaus"
   :ote.db.transport-operator/business-id              "Y-tunnus"
   :ote.db.transport-operator/phone                    "Puhelin (toimisto)"
   :ote.db.transport-operator/gsm                      "Puhelin (GSM)"
