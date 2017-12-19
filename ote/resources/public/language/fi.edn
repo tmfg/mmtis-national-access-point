@@ -408,10 +408,10 @@
   :hello                          "Hei "
   :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
-  :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
+  :own-services-short-description "-näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
   :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
-  :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
+  :service-operator-short-description "-näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
   :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
   :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
@@ -533,7 +533,7 @@
   :navigation-front-page                      "Etusivu"
   :navigation-organizations                   "Palveluntuottajat"
   :navigation-dataset                         "Palvelukatalogi"
-  :navigation-give-feedback                   "Anna palautetta"
+  :navigation-give-feedback                   "Anna palautetta palvelusta"
   :navigation-login                           "Kirjaudu sisään"
   :navigation-register                        "Rekisteröidy"
   :user-menu-service-guide                    "Ohje"
@@ -541,6 +541,7 @@
   :user-menu-log-out                          "Kirjaudu ulos"
   :user-menu-profile                          "Käyttäjätilin muokkaus"
   :user-menu-summary                          "Yhteenveto"
+  :user-menu-nap-help                         "NAP-palvelun käyttöohje"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
