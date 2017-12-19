@@ -127,7 +127,7 @@
 
 ;; Validate that checkbox is checked
 (defmethod validate-rule :checked? [_ _ data _ _ ]
-  (when (= false data)
+  (when (not data)
     (tr [:common-texts :required-field])))
 
 (defn validate-rules
