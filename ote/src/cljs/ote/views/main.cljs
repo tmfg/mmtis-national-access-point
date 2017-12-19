@@ -53,7 +53,7 @@
 
 (def selectable-languages [["fi" "\ud83c\uddeb\ud83c\uddee"]
                            ["sv" "\ud83c\uddf8\ud83c\uddea"]
-                           ["en" "\ud83c\uddec\ud83c\udde7"]])
+                           #_["en" "\ud83c\uddec\ud83c\udde7"]])
 
 (defn- language-selection [e!]
   (let [current-language @localization/selected-language]
