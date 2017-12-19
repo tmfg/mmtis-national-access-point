@@ -66,8 +66,10 @@
 
   OpenNewTab
   (process-event [{url :url :as e} app]
-    (.open js/window url)
-    app)
+    (let [window-open (.open js/window)]
+         (set! (.-opener window-open) nil)
+         (set! (.-location window-open) url)
+    app))
 
   StayOnPage
   (process-event [_ app]
