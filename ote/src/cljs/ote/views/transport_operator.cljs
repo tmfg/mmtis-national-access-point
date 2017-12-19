@@ -57,6 +57,10 @@
      :type :string
      :required? true}
 
+    {:name ::t-operator/ckan-description
+     :type :text-area
+     :rows 2}
+
     {:name ::t-operator/business-id
      :type :string
      :validate [[:business-id]]}

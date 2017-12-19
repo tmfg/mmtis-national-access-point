@@ -26,6 +26,7 @@
            (java.sql Timestamp)))
 
 (defqueries "ote/services/places.sql")
+(defqueries "ote/services/transport.sql")
 
 (def transport-operator-columns
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
@@ -33,9 +34,11 @@
 
 (defn get-transport-operator [db where]
   (let [operator (first (fetch db ::t-operator/transport-operator
-                (specql/columns ::t-operator/transport-operator)
-                where {::specql/limit 1}))]
-    operator))
+                               (specql/columns ::t-operator/transport-operator)
+                               where {::specql/limit 1}))]
+    (assoc operator ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
+                                                       db {:id (::t-operator/ckan-group-id operator)})
+                                                      ""))))
 
 (def transport-services-columns
   #{::t-service/id ::t-service/type
@@ -125,12 +128,16 @@
 
           ;; Insert to our database
           operator  (insert! db ::t-operator/transport-operator
-                             (dissoc data  ::t-operator/id :new?))
+                             (dissoc data
+                                     ::t-operator/id :new?
+                                     ::t-operator/ckan-description))
 
           ;; Create organization in CKAN
-          ckan-response (ckan/create-organization! ckan
-                                                   {:ckan/name (str "transport-operator-" (::t-operator/id operator))
-                                                    :ckan/title (::t-operator/name operator)})]
+          ckan-response (ckan/create-organization!
+                         ckan
+                         {:ckan/name (str "transport-operator-" (::t-operator/id operator))
+                          :ckan/title (::t-operator/name operator)
+                          :ckan/description (or (::t-operator/ckan-description data) "")})]
       ;; Update CKAN org id
       (update! db ::t-operator/transport-operator
                {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])}
@@ -144,7 +151,9 @@
     #(tx/with-transaction db
        (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
              operator
-             (upsert! db ::t-operator/transport-operator data)
+             (upsert! db ::t-operator/transport-operator
+                      (dissoc data
+                              ::t-operator/ckan-description))
 
              operator-ckan-id
              (::t-operator/ckan-group-id
@@ -157,7 +166,8 @@
           ckan
           (->  (ckan/get-organization ckan operator-ckan-id)
                :ckan/result
-               (assoc :ckan/title (::t-operator/name operator))))
+               (assoc :ckan/title (::t-operator/name operator)
+                      :ckan/description (or (::t-operator/ckan-description data) ""))))
          ;; Return operator
          operator))))
 
