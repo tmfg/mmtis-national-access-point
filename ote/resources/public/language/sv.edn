@@ -619,6 +619,15 @@
                    true "Ja"
                    false "Nej"
 
+                   ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
+                   "taxi" "Taksiliikenne (henkilöiden kuljetuspalvelut)"
+                   "request" "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+                   ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
+                   "schedule" "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
+                   "terminal"                 "Asemat, satamat ja muut terminaalit"
+                   "rentals"                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+                   "parking"                  "Yleiset kaupalliset pysäköintipalvelut"
+
                    ;; accessibility tools
                    "wheelchair" "Rullstol"
                    "walkingstick" "Gåkäpp"
