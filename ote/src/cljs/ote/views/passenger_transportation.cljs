@@ -136,6 +136,10 @@
     :columns 3
     :layout :row}
 
+   (form/info
+     [:div
+      [:p (tr [:form-help :pricing-info])]])
+
    {:container-class "col-md-12"
     :name         ::t-service/price-classes
     :type         :table

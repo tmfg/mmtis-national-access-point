@@ -35,7 +35,11 @@
      :columns 3
      :layout  :row}
 
-    {:name         ::t-service/price-classes
+    (form/info
+     [:div
+      [:p (tr [:form-help :pricing-info])]])
+
+   {:name         ::t-service/price-classes
      :type         :table
      :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
