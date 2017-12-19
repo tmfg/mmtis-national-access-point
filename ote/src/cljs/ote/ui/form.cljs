@@ -327,7 +327,7 @@
                             card-options)
              (when label
                [ui/card-header {:title                  label
-                                :style                  {:padding-bottom "0px"}
+                                :style                  {:padding-bottom "10px"}
                                 :title-style            {:font-weight "bold"}
                                 :show-expandable-button expandable?}])
              [ui/card-text {:style {:padding-top "0px"} :expandable true}
