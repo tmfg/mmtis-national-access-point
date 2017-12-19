@@ -215,10 +215,9 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "
-
-Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
+ {:external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
   :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
+  :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Se info om RAE"
   :companies "Om tjänsten erbjuds av en koncern, marknadsföringsbolag eller annan organisation med flera tjänsteproducenter, var vänlig fyll i företagets namn on FO-nummer."
 
@@ -230,6 +229,7 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
+  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   }
 
 
@@ -701,4 +701,27 @@ Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutt
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   }
 
+ :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"
+                                      :polygon   "Piirrä monikulmio"
+                                      :rectangle "Piirrä neliö"
+                                      :marker    "Lisää piste"}
+                            :actions {:title "Peruuta piirros"
+                                      :text  "Peruuta"}
+                            :finish  {:title "Lopeta piirtäminen"
+                                      :text  "Lopeta"}
+                            :undo    {:title "Poista viimeksi piirretty piste"
+                                      :text  "Poista viimeisin piste"}}
+                 :handlers {:marker      {:tooltip {:start "Klikkaa karttaa lisääksesi pisteen."}}
+                            :polygon     {:tooltip {:start "Klikkaa aloittaaksesi monikulmion piirtäminen."
+                                                    :cont  "Klikkaa jatkaaksesi monikulmion piirtämistä."
+                                                    :end   "Klikkaa ensimmäistä pistettä sulkeaksesi monikulmion."}}
+                            :polyline    {:error   "<strong>Virhe:</strong> viivat eivät saa ylittää toisiaan!"
+                                          :tooltip {:start "Klikkaa aloittaaksesi viivan piirtäminen."
+                                                    :cont  "Klikkaa jatkaaksesi viivan piirtämistä."
+                                                    :end   "Klikkaa viimeistä pistettä piirtämisen lopettamiseksi."}}
+                            :rectangle   {:tooltip {:start "Klikkaa ja raahaa piirtääksesi neliön."}}
+                            :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
+                            :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
+                                     :radius "Säde"}
+                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
  }
