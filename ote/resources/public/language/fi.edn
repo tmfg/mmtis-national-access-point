@@ -213,11 +213,9 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Tässä kohdassa lisäät ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut,
- varaus- ja myyntirajapinnan ja muut olennaisia tietoa sisältävät rajapinnat.
- Jos ulkoiset rajapinnat ovat vajanaisia tai rajapintoja ei ole, täytä vastaavasti tämän osion alla olevat kohdat,
- jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa. Huom. Tavalliset verkkosivusisällöt eivät kuulu tähän osioon."
+ {:external-interfaces "Tässä kohdassa lisäät mahdolliset ulkoiset koneluettavat rajapinnat, esim. reitit- ja aikataulut, tariffit, varaus- ja myyntirajapinta ja muut olennaisia tietoa sisältävät rajapinnat.\nRajapinta on yksinkertaisimmillaan tietoa (tiedosto) sähköisessä muodossa internet-osoitteessa. Koneluettava ohjelmointirajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa, esim. muodossa csv, xml, json tai gtfs.\nMikäli liikkumispalvelustasi ei ole olemassa rajapintoja, jätä tämä kohta tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
   :external-interfaces-eg-rae "Huom. Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
+  :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Rae-työkalu"
   :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
 

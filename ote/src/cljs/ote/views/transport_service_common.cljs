@@ -77,7 +77,11 @@
                    {:name ::t-service/license :type :string :width "21%"}
                    {:name ::t-service/license-url :type :string :width "21%"}]
     :delete? true
-    :add-label (tr [:buttons :add-external-interface])}))
+    :add-label (tr [:buttons :add-external-interface])}
+
+   (form/info
+     [:div
+      [:p (tr [:form-help :external-interfaces-end])]])))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
