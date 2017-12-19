@@ -104,9 +104,8 @@
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (r/as-element [language-selection e!])}]]))
 
-(def own-services-pages #{:own-services :transport-service :new-service :edit-service})
+(def own-services-pages #{:own-services :transport-service :new-service :edit-service :transport-operator :organizations})
 (def services-pages #{:services})
-(def organizations-pages #{:transport-operator :organizations})
 
 (defn page-active?
 "Return true if given current-page belongs to given page-group"
@@ -114,7 +113,6 @@
   (cond
     (= page-group :own-services) (own-services-pages current-page)
     (= page-group :services) (services-pages current-page)
-    (= page-group :organizations) (organizations-pages current-page)
       :default false))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
