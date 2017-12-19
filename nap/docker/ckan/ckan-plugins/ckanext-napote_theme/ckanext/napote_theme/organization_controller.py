@@ -112,7 +112,11 @@ class CustomOrganizationController(OrganizationController):
                 c.group_dict = self._action('group_member_create')(
                     context, data_dict)
 
-                self._redirect_to_this_controller(action='members', id=id)
+                # activity page for the newly created user
+                h.redirect_to(controller='organization',
+                              action='members',
+                              id=id)
+
             else:
                 user = request.params.get('user')
                 if user:
