@@ -1,6 +1,7 @@
 (ns ote.views.front-page
   "Front page for OTE service - Select service type and other basic functionalities"
-  (:require [reagent.core :as reagent]
+  (:require [clojure.string :as s]
+            [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.common :refer [linkify]]
@@ -96,18 +97,29 @@
        (transport-services-table-rows e! services transport-operator-id)]]]))
 
 
+(defn warn-about-test-server []
+  (let [page-url (-> (.-location js/window))]
+     (when (s/includes? (str page-url) "testi") ;; if url contains "testi" show message -> testi.finap.fi
+           [:div {:style {:border "red 4px dashed"}}
+            [:p {:style {:padding "10px"}} "HUOM: Tämä on NAP -palvelun testiversio."
+             [:br]
+             "Tiedot eivät siirry varsinaiseen NAP-palveluun, joka avataan tuotannossa 20.12.2017."]])))
+
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
    [:div.row
     [:div {:class "col-md-12"}
      [:h1 (tr [:common-texts :own-api-list])
+
+
       [ui/raised-button {:label (tr [:buttons :add-transport-service])
                         :style {:float "right"}
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))
                         :primary  true
-                        :icon (ic/content-add)}]]]
+                        :icon (ic/content-add)}]]
+     (warn-about-test-server)]
 
     [:div {:class "col-md-12"}
      [t-operator-view/transport-operator-selection e! state]]]
@@ -128,7 +140,14 @@
        ;; FALSE -> explain user why table is empty
        [:div
         [:br]
-        [:p (tr [:front-page :operator-dont-have-any-services])]])]]])
+        [:p (tr [:front-page :operator-dont-have-any-services])]
+        [:div {:style {:padding-top "20px"}}]
+        [ui/raised-button {:label (tr [:buttons :add-transport-service])
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts/->OpenTransportServiceTypePage)))
+                           :primary  true
+                           :icon (ic/content-add)}]])]]])
 
 (defn no-operator
       "If user haven't added service-operator, we will ask to do so."
@@ -136,8 +155,10 @@
       [:div
        [:div.row
         [:div {:class "col-xs-12 col-sm-12 col-md-12"}
+
          [:h1 (tr [:front-page :header-no-operator])]
          [:h3 (tr [:front-page :desc-to-add-new-operator])]
+         (warn-about-test-server)
 
          [:p (tr [:front-page :desc-to-add-new-operator-2])]
          [:p (tr [:front-page :desc-to-add-new-operator-3])]
