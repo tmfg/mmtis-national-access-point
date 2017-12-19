@@ -6,7 +6,7 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.leaflet :as leaflet]
             [ote.ui.form :as form]
-            [ote.localization :refer [tr]]
+            [ote.localization :refer [tr tr-tree]]
             [cljs-react-material-ui.reagent :as ui]
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]
@@ -72,6 +72,9 @@
 (defn install-draw-control!
   "Install Leaflet draw plugin to to places-map component."
   [e! this]
+
+  (set! (.-draw js/L.drawLocal) (clj->js (tr-tree [:leaflet-draw])))
+
   (let [^js/L.map
         m (aget this "refs" "leaflet" "leafletElement")
 
