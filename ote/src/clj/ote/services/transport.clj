@@ -36,9 +36,10 @@
   (let [operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
                                where {::specql/limit 1}))]
-    (assoc operator ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
-                                                       db {:id (::t-operator/ckan-group-id operator)})
-                                                      ""))))
+    (when operator
+      (assoc operator ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
+                                                         db {:id (::t-operator/ckan-group-id operator)})
+                                                        "")))))
 
 (def transport-services-columns
   #{::t-service/id ::t-service/type
