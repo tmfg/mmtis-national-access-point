@@ -7,6 +7,7 @@
 ;; FIXME: use garden unit helpers (currently stylefy has a bug and they don't work)
 
 
+(def form-field {:margin-right "10px"})
 
 (def form-group-base {:margin-bottom "1em"})
 
