@@ -58,8 +58,7 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/vehicle-accessibility
     :full-width? true
-    :container-class "col-md-6"
-    :container-style style-form/border-right}
+    :container-class "col-md-6"}
 
    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
@@ -74,8 +73,7 @@
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options t-service/information-service-accessibility
     :full-width? true
-    :container-class "col-md-6"
-    :container-style style-form/border-right}
+    :container-class "col-md-6"}
 
    {:name ::t-service/limited-info-service-accessibility
     :type :checkbox-group
@@ -89,8 +87,7 @@
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/transportable-aid
     :full-width? true
-    :container-class "col-md-6"
-    :container-style style-form/border-right}
+    :container-class "col-md-6"}
 
    {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
@@ -108,7 +105,7 @@
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
     :rows 1
-    :container-class "col-md-5"
+    :container-class "col-md-6"
     :full-width? true}
 
    {:name ::t-service/accessibility-info-url

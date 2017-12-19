@@ -407,10 +407,10 @@
   :hello                          "Hej "
   :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittämisen, sekä tietojen julkaisun NAP -palvelukatalogiin."
-  :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
+  :own-services-short-description "-näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
   :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
-  :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perustietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
+  :service-operator-short-description "-näkymään, jossa voit täydentää tilisi perustietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
   :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
   :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
@@ -536,6 +536,7 @@
   :user-menu-log-out                          "Utloggning"
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Yhteenveto"
+  :user-menu-nap-help                         "NAP-palvelun käyttöohje"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgigt"

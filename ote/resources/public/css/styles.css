@@ -125,7 +125,7 @@ footer {
 .site-footer {
     background: #444444;
     color: #ffffff;
-    height: 100px;
+    min-height: 100px;
     padding: 20px 0;
 }
 .site-footer .container-fluid {
@@ -133,6 +133,10 @@ footer {
 }
 .site-footer a {
     color: #ccdee3;
+    text-decoration: none;
+}
+.site-footer a:hover {
+    text-decoration: underline;
 }
 .footer-links .logo > img {
     height: 70px;

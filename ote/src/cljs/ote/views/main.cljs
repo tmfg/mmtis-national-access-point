@@ -89,6 +89,14 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (tr [:common-texts :user-menu-nap-help])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->OpenNewTab "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf")))}]
+     [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (tr [:common-texts :navigation-give-feedback])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->OpenNewTab "http://bit.ly/nap-palaute")))}]
+     [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-log-out])
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
@@ -158,21 +166,7 @@
         [linkify "/user/login" (tr [:common-texts :navigation-login])
          (merge (stylefy/use-style
                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}})]]
-       [:li
-        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
-         (merge (stylefy/use-style
-                  (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}
-                 :target "_blank"})]]]
-      [:ul (stylefy/use-style style-topnav/ul)
-       [:li
-        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
-         (merge (stylefy/use-style
-                  (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}
-                 :target "_blank"})]]])
-    ]])
+                {:style {:float "right"}})]]])]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
@@ -219,7 +213,11 @@
      [:div.col-md-8.footer-links
       [:ul.unstyled
        [:li
-        [linkify "https://www.liikennevirasto.fi/" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]]]]]])
+        [linkify "https://www.liikennevirasto.fi/" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
+       [:li
+        [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
+       [:li
+        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]]]]]])
 
 
 
