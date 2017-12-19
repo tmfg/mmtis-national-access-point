@@ -226,11 +226,11 @@
 
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
-  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.
-  Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
+  :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
   }
 
 

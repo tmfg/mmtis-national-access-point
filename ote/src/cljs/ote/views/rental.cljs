@@ -34,6 +34,9 @@
     :columns 3
     :layout :row}
 
+   (form/info
+    (tr [:form-help :pricing-info]))
+
    {:name ::t-service/price-classes
     :type :table
     :table-fields [{:name ::t-service/price-per-unit
