@@ -217,7 +217,8 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
+ {:name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
+  :external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
   :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
   :external-interfaces-end "Fyll härnedan i alla formulärets uppgifter ifall du inte lagt till ett enda maskinläsbart externt gränssnitt. Ifall du uppgett gränssitt som inte uppfyller alla krav var vänlig fyll i formuläret till den del gränssnitten ovan bör kompletteras."
   :RAE-tool "Se info om RAE"
