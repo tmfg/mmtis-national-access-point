@@ -35,7 +35,7 @@
     :layout :row}
 
    (form/info
-    (tr [:form-help :pricing-info]))
+    (tr [:field-labels :rentals :rentals-pricing-info]))
 
    {:name ::t-service/price-classes
     :type :table

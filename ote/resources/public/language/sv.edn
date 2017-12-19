@@ -139,7 +139,7 @@
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-
+   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
    }
 
   ;; Parking fields

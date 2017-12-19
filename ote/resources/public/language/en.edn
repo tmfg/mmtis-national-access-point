@@ -137,6 +137,7 @@
    :ote.db.transport-service/additional-service-type   "Palvelu"
    :ote.db.transport-service/additional-service-price  "Hinta (€)"
    :ote.db.transport-service/additional-service-unit   "Yksikkö"
+   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
    }
 
   ;; Parking fields
