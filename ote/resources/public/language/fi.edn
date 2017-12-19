@@ -402,6 +402,7 @@
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
   :header-explain-more            "Nyt en ymmärrä, selittäisitkö tarkemmin?"
   :move-to-services-page          "Siirry omat palvelutiedot -näkymään"
+  :move-to-organizations-page     "Siirry palveluntuottajat-näkymään"
   :hello                          "Hei "
   :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
@@ -418,9 +419,13 @@
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
-  :header-no-operator "Et ole lisännyt vielä palvelutuottajaa"
-  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun ensin lisätä uusi palveluntuottaja
-    tai pyytää olemassaolevan palvelutuottajan hallinnoijan lisäämään sinut palveluntuottajan jäseneksi."
+  :header-no-operator "Käyttäjätilisi ei kuulu vielä yhdenkään palveluntuottajan alle"
+  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun olla jonkin palveluntuottajan edustaja."
+  :desc-to-add-new-operator-2 "Onko edustamasi palveluntuottaja (esim. yritys, yhteisö tai muu organisaatio) jo lisätty NAP-palveluun?"
+  :desc-to-add-new-operator-3 "Voit tarkistaa sen palveluntuottajat-näkymässä."
+  :desc-to-add-new-operator-4 "Mikäli löysit edustamasi organisaation, pyydä sen
+         hallinoijaa lisäämään sinut kyseisen organisaation edustajaksi. Edustajat voivat hallita kyseisen organisaation liikkumispalveluita tästä näkymästä."
+  :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
    :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
    :operator-dont-have-any-services "Palveluntuottajalla ei ole vielä palveluita."

@@ -136,15 +136,27 @@
       [:div
        [:div.row
         [:div {:class "col-xs-12 col-sm-12 col-md-12"}
-         [:h3 (tr [:front-page :header-no-operator])]
-         [:p (tr [:front-page :desc-to-add-new-operator])]
-         [:br]
-         [ui/raised-button {:label (tr [:buttons :add-new-transport-operator])
+         [:h1 (tr [:front-page :header-no-operator])]
+         [:h3 (tr [:front-page :desc-to-add-new-operator])]
+
+         [:p (tr [:front-page :desc-to-add-new-operator-2])]
+         [:p (tr [:front-page :desc-to-add-new-operator-3])]
+         [ui/raised-button {:label (tr [:front-page :move-to-organizations-page])
                             :primary true
                             :on-click #(do
                                          (.preventDefault %)
+                                         (e! (fp/->GoToUrl "/organization")))
+                            :style {:margin "20px 0px 20px 0px"}}]
+         [:p (tr [:front-page :desc-to-add-new-operator-4])]
+
+         [:div.row {:style {:padding-top "60px"}}
+          [:p (tr [:front-page :desc-to-add-new-operator-5])]
+          [ui/raised-button {:label (tr [:buttons :add-new-transport-operator])
+                             :primary true
+                             :on-click #(do
+                                         (.preventDefault %)
                                          (e! (to/->CreateTransportOperator)))
-                            :icon (ic/content-create)}]]]])
+                             :style {:margin-top "20px"}}]]]]])
 
 (defn own-services [e! state]
   (e! (fp/->EnsureTransportOperator))
