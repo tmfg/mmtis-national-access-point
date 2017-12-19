@@ -444,6 +444,7 @@
   :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
   :help-desc-5-linklabel    "jäsenet sivulla"
+  :help-desc-6 "\nPalveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."
   }
 
  :passenger-transportation-page
