@@ -43,3 +43,5 @@
 
 (def organization-padding {:padding-top "20px"})
 (def table-header-style {:border-bottom "0px solid white" :color "black"})
+
+(def padding-top {:padding-top "20px"})

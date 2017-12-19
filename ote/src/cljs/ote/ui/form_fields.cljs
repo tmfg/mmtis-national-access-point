@@ -452,7 +452,11 @@
                       :label-style style-base/button-label-style
                       :disabled (values/effectively-empty? (last data))}]])]))
 
-(defmethod field :checkbox [{:keys [update! label]} checked?]
-  [ui/checkbox {:label label
-                :checked checked?
-                :on-check #(update! (not checked?))}])
+(defmethod field :checkbox [{:keys [update! label warning style]} checked?]
+  [:div (when warning (stylefy/use-style style-base/required-element))
+    [ui/checkbox {:label label
+                  :checked checked?
+                  :on-check #(update! (not checked?))
+                  :style style}]
+    (when warning
+        (tr [:common-texts :required-field]))])
