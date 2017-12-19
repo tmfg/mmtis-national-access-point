@@ -440,6 +440,8 @@
   :help-desc-2              "Täytä "
   :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
   :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
+  :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
+  :help-desc-5-linklabel    "jäsenet sivulla"
   }
 
  :passenger-transportation-page
