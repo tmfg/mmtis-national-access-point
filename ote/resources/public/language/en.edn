@@ -34,9 +34,9 @@
    :ote.db.transport-service/limited-info-service-accessibility "Info service accessibility (limited availability)"
 
    :ote.db.transport-service/guaranteed-accessibility-tool        "Always available accessibilityvälineet"
-   :ote.db.transport-service/guaranteed-accessibility-description "Always available accessibility description"
+   :ote.db.transport-service/guaranteed-accessibility-description "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
    :ote.db.transport-service/limited-accessibility-tool        "Limited availability accessibility"
-   :ote.db.transport-service/limited-accessibility-description "Limited availability accessibility description"
+   :ote.db.transport-service/limited-accessibility-description "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
 
    :ote.db.transport-service/guaranteed-transportable-aid "Transportable aid (guaranteed availability)"
    :ote.db.transport-service/limited-transportable-aid "Transportable aid (limited availability)"
@@ -224,7 +224,8 @@
 
   :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
 
-  :operation-area "Add the service operation area (for example province) by typing the name in the text field and selecting it from the list. You can also draw the area with the map drawing tools. You can name the area freely (like \"Itäkeskus taxi station\")."
+  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.
+  Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
 
   :available-from-and-to "Set date range when this service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
@@ -670,11 +671,11 @@
           "license-url" "License/terms of use URL"
           "external-interface" "External interface"
           "accessibility-info-url" "Accessibility description (WWW)"
-          "guaranteed-accessibility-description" "Guaranteed accessibility description"
+          "guaranteed-accessibility-description" "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
           "guaranteed-info-service-accessibility" "Guaranteed info service accessibility"
           "guaranteed-transportable-aid" "Guaranteed transportable aid"
           "guaranteed-vehicle-accessibility" "Guaranteed vehicle accessibility"
-          "limited-accessibility-description" "Limited availability accessibility description"
+          "limited-accessibility-description" "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
           "limited-info-service-accessibility" "Limited availability info service accessibility"
           "limited-transportable-aid" "Limited availability transportable aid"
           "limited-vehicle-accessibility" "Limited availability vehicle accessibility"

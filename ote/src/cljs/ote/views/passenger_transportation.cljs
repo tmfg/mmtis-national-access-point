@@ -67,7 +67,7 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/vehicle-accessibility
     :full-width? true
-    :container-class "col-md-5"}
+    :container-class "col-md-6"}
 
    {:name ::t-service/guaranteed-info-service-accessibility
     :type :checkbox-group
@@ -82,7 +82,7 @@
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options t-service/information-service-accessibility
     :full-width? true
-    :container-class "col-md-5"}
+    :container-class "col-md-6"}
 
    {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
@@ -97,7 +97,7 @@
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/transportable-aid
     :full-width? true
-    :container-class "col-md-5"}
+    :container-class "col-md-6"}
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
