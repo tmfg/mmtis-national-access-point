@@ -266,6 +266,8 @@
     :columns 3
     :layout :row}
 
+   (form/info (tr [:form-help :name-info]))
+
    {:name           ::t-service/name
     :type           :string
     :full-width?    true
