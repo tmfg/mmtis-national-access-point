@@ -212,7 +212,7 @@
   :ote.db.common/street                               "Adress"
   :ote.db.common/post_office                          "Postkontor"
   :ote.db.common/postal_code                          "Postnummer"
-   }
+  }
 
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -713,27 +713,28 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   }
 
- :leaflet-draw  {:toolbar  {:buttons {:polyline  "Rita sträck"
-                                      :polygon   "Rita månghörning"
-                                      :rectangle "Rita kvadrat"
-                                      :marker    "Lägg till punkt"}
-                            :actions {:title "Annulera"
-                                      :text  "Ångra"}
-                            :finish  {:title "Sluta rita"
-                                      :text  "Sluta"}
-                            :undo    {:title "Ta bort den senast ritade punkten"
-                                      :text  "Ta bort den senast ritade punkten"}}
-                 :handlers {:marker      {:tooltip {:start "Klicka på kartan för att lägga till punkt."}}
-                            :polygon     {:tooltip {:start "Klicka på kartan för att rita månhörning."
-                                                    :cont  Klicka för att fortsätta rita månghörning."
-                                                    :end   "Klicka på den första punkten för att sluta månghörningen."}}
-                            :polyline    {:error   "<strong>Fel:</strong> strecken får inte korsa varandra"
-                                          :tooltip {:start "Klicka på kartan för att börja rita streck."
-                                                    :cont  "Klicka för att fortsätta rita streck."
-                                                    :end   "Klicka på den sista punkten för att avsluta ritandet."}}
-                            :rectangle   {:tooltip {:start "Klicka och dra för att rita en fyrkant."}}
-                            :simpleshape {:tooltip {:end "Släpp musknappen för att avsluta."}}
-                            :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
-                                     :radius "Radie"}
-                            :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
+ :leaflet-draw
+ {:toolbar  {:buttons {:polyline  "Rita sträck"
+                       :polygon   "Rita månghörning"
+                       :rectangle "Rita kvadrat"
+                       :marker    "Lägg till punkt"}
+             :actions {:title "Annulera"
+                       :text  "Ångra"}
+             :finish  {:title "Sluta rita"
+                       :text  "Sluta"}
+             :undo    {:title "Ta bort den senast ritade punkten"
+                       :text  "Ta bort den senast ritade punkten"}}
+  :handlers {:marker      {:tooltip {:start "Klicka på kartan för att lägga till punkt."}}
+             :polygon     {:tooltip {:start "Klicka på kartan för att rita månhörning."
+                                     :cont  "Klicka för att fortsätta rita månghörning."
+                                     :end   "Klicka på den första punkten för att sluta månghörningen."}}
+             :polyline    {:error   "<strong>Fel:</strong> strecken får inte korsa varandra"
+                           :tooltip {:start "Klicka på kartan för att börja rita streck."
+                                     :cont  "Klicka för att fortsätta rita streck."
+                                     :end   "Klicka på den sista punkten för att avsluta ritandet."}}
+             :rectangle   {:tooltip {:start "Klicka och dra för att rita en fyrkant."}}
+             :simpleshape {:tooltip {:end "Släpp musknappen för att avsluta."}}
+             :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
+                      :radius "Radie"}
+             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
  }
