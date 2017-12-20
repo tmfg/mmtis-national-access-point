@@ -53,7 +53,7 @@
 
 (def ^{:doc "Transport operator columns to set as properties in GeoJSON export"}
   transport-operator-properties-columns
-  #{::t-operator/id ::t-operator/name ::t-operator/business-id
+  #{::t-operator/name ::t-operator/business-id
     ::t-operator/phone ::t-operator/homepage ::t-operator/email})
 
 (def ^{:doc "Transport service columns to set as properties in GeoJSON export"}
@@ -63,7 +63,8 @@
                         [::t-service/external-interfaces (disj (specql/columns ::t-service/external-interface-description)
                                                                ::t-service/id
                                                                ::t-service/transport-service-id)])
-                  modification/modification-field-keys))
+                  modification/modification-field-keys
+                  #{::t-service/id ::t-service/notice-external-interfaces? ::t-service/published?}))
 
 (defn- export-geojson [db transport-operator-id transport-service-id]
   (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
