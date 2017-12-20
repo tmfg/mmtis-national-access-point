@@ -60,7 +60,9 @@
        [ui/table-row {:selectable false :display-border false}
         [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
         [ui/table-row-column
-         [:a {:href "#" :on-click #(e! (fp/->ChangePage :edit-service {:id id}))} name]]
+         [:a {:href "#" :on-click  #(do
+                                      (.preventDefault %)
+                                      (e! (fp/->ChangePage :edit-service {:id id})))} name]]
         [ui/table-row-column
          (if published?
            (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
@@ -71,7 +73,9 @@
         [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
         [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
         [ui/table-row-column
-         [ui/icon-button {:href "#" :on-click #(e! (fp/->ChangePage :edit-service {:id id}))}
+         [ui/icon-button {:href "#" :on-click #(do
+                                                 (.preventDefault %)
+                                                 (e! (fp/->ChangePage :edit-service {:id id})))}
           [ic/content-create]]
          [delete-service-action e! row]]])
      services))])
