@@ -217,7 +217,7 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
+ {:name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
   :external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
   :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
   :external-interfaces-end "Fyll härnedan i alla formulärets uppgifter ifall du inte lagt till ett enda maskinläsbart externt gränssnitt. Ifall du uppgett gränssitt som inte uppfyller alla krav var vänlig fyll i formuläret till den del gränssnitten ovan bör kompletteras."
@@ -445,7 +445,7 @@
   :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
   :help-desc-5-linklabel    "jäsenet sivulla"
-  :help-desc-6 "\nPalveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."
+  :help-desc-6 "\nBeskrivningen ska ge NAP-användaren en uppfattning om vilken typ av tjänsteproducent det är fråga om."
   }
 
  :passenger-transportation-page
