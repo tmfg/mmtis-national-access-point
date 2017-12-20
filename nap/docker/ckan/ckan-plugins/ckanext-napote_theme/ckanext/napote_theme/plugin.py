@@ -123,19 +123,13 @@ i18n.handle_request = handle_request
 
 ### MONKEY PATCH CKAN MAILER USER MAIL SEND START ###
 
-class MailerException(Exception):
-    pass
-
 def _mail_recipient_monkey_patch(recipient_name, recipient_email,
                     sender_name, sender_url, subject,
                     body, headers={}):
     mail_from = config.get('smtp.mail_from')
     msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
     for k, v in headers.items():
-        if k in msg.keys():
-            msg.replace_header(k, v)
-        else:
-            msg.add_header(k, v)
+        msg[k] = v
     subject = Header(subject.encode('utf-8'), 'utf-8')
     msg['Subject'] = subject
     msg['From'] = _("%s <%s>") % (sender_name, mail_from)
@@ -164,7 +158,7 @@ def _mail_recipient_monkey_patch(recipient_name, recipient_email,
         smtp_connection.connect(smtp_server)
     except socket.error, e:
         log.exception(e)
-        raise MailerException('SMTP server could not be connected to: "%s" %s'
+        raise mailer.MailerException('SMTP server could not be connected to: "%s" %s'
                               % (smtp_server, e))
     try:
         # Identify ourselves and prompt the server for supported features.
@@ -178,7 +172,7 @@ def _mail_recipient_monkey_patch(recipient_name, recipient_email,
                 # Re-identify ourselves over TLS connection.
                 smtp_connection.ehlo()
             else:
-                raise MailerException("SMTP server does not support STARTTLS")
+                raise mailer.MailerException("SMTP server does not support STARTTLS")
 
         # If 'smtp.user' is in CKAN config, try to login to SMTP server.
         if smtp_user:
@@ -192,7 +186,7 @@ def _mail_recipient_monkey_patch(recipient_name, recipient_email,
     except smtplib.SMTPException, e:
         msg = '%r' % e
         log.exception(msg)
-        raise MailerException(msg)
+        raise mailer.MailerException(msg)
     finally:
         smtp_connection.quit()
 
