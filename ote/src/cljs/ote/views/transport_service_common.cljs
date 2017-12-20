@@ -62,7 +62,7 @@
      [:div
       [:p (tr [:form-help :external-interfaces])]
       [:p (tr [:form-help :external-interfaces-eg-rae])
-       [linkify "https://www.liikennevirasto.fi/liikennejarjestelma/henkiloliikenne/liikennepalvelulaki/rae-tyokalu" (tr [:form-help :RAE-tool])
+       [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
         {:target "_blank"}]]])
 
    {:name ::t-service/external-interfaces
@@ -83,7 +83,7 @@
     (form/info
      [:div
       [:p (tr [:form-help :external-interfaces-end])]])
-    
+
     {:name ::t-service/notice-external-interfaces?
      :type :checkbox
      :required? true
