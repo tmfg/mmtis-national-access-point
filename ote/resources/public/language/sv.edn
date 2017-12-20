@@ -139,7 +139,7 @@
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
-
+   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
    }
 
   ;; Parking fields
@@ -442,6 +442,9 @@
   :help-desc-2              "Skriv i formulärets "
   :help-desc-3              " -del uppgifter om företaget, samfundet eller annan organsiation."
   :help-desc-4              " -delens uppgifter är tillägnade tjänsteutvecklare och andta profesionella NAP-användare, inte resenär eller annan slutkund."
+  :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
+  :help-desc-5-linklabel    "jäsenet sivulla"
+  :help-desc-6 "\nBeskrivningen ska ge NAP-användaren en uppfattning om vilken typ av tjänsteproducent det är fråga om."
   }
 
  :passenger-transportation-page
@@ -538,6 +541,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :user-menu-log-out                          "Utloggning"
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Sammandrag"
+  :user-menu-nap-help                         "NAP hjälp"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
