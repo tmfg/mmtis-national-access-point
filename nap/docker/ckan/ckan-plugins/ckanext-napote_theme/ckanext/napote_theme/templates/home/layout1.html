@@ -1,11 +1,21 @@
 <div role="main" class="hero">
     <div class="container">
         {% if c.userobj %}
+            <script type="text/javascript">
+                window.addEventListener('load', function hideTestEnvInfo() {
+                    var el = window.document.querySelector('#test-env-warning');
+
+                    if (el && window.location.hostname.indexOf('testi') !== -1) {
+                        el.style.display = 'none';
+                    }
+                });
+            </script>
+
             <div class="row row1 module">
                 <div class="span12">
                     <p><b>{% trans user=c.userobj.display_name %}User greeting {{ user }}{% endtrans %}!</b></p>
                 </div>
-                <div class="span12" style="border: red 4px dashed;">
+                <div id="test-env-warning" class="span12" style="border: red 4px dashed;">
                     <p style="padding: 10px;">HUOM: Tämä on NAP -palvelun testiversio. <br>
                         Tiedot eivät siirry varsinaiseen NAP-palveluun, joka avataan tuotannossa 20.12.2017.</p>
                 </div>
