@@ -116,7 +116,7 @@
    :ote.db.transport-service/assistance-url         "Gör bokning på adressen (www)"
    :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
    :ote.db.transport-service/assistance-place-description  "Assistanstjänsternas placering i terminalen/stationen"
-   :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör betsällas på förhand."
+   :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör beställas på förhand."
    }
 
   ;; Rental fields
