@@ -51,9 +51,9 @@
              {:page  :own-services
               :label [:common-texts :navigation-own-service-list]})]))
 
-(def selectable-languages [["fi" "\ud83c\uddeb\ud83c\uddee"]
-                           ["sv" "\ud83c\uddf8\ud83c\uddea"]
-                           #_["en" "\ud83c\uddec\ud83c\udde7"]])
+(def selectable-languages [["fi" "suomi"]
+                           ["sv" "svenska"]
+                           #_["en" "english"]])
 
 (defn- language-selection [e!]
   (let [current-language @localization/selected-language]

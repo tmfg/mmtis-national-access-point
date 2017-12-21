@@ -84,12 +84,12 @@
 
 (def language-selection
   {:border-top "solid 1px white"
+   :font-size  "12px"
    :margin-top "5px"
    :padding-top "5px"
    :text-align "center"})
 
 (def language-flag
-  {:padding-left "10px"
-   :padding-right "10px"})
+  {:padding-right "10px"})
 
 (def section-margin {:margin-top "1em"})
