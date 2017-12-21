@@ -13,7 +13,8 @@
             [goog.object :as gobj]
             cljsjs.leaflet
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [clojure.string :as str]))
 
 (set! *warn-on-infer* true)
 
@@ -92,10 +93,20 @@
             ;;(aset js/window "the_geom" geojson)
             (e! (ps/->AddDrawnGeometry geojson))))))
 
+(defn customize-zoom-controls
+  "Use customized zoom controls to allow translation of the zoom button titles."
+  [e! this]
+  (let [^js/L.map
+        m (aget this "refs" "leaflet" "leafletElement")
+        zoom (new js/L.control.zoom #js {:zoomInTitle (tr [:leaflet :zoom-in])
+                                         :zoomOutTitle (tr [:leaflet :zoom-out])})]
+    (.addControl m zoom)))
+
 
 (defn places-map [e! results]
    (r/create-class
      {:component-did-mount #(do
+                              (customize-zoom-controls e! %)
                               (install-draw-control! e! %)
                               (leaflet/update-bounds-from-layers %))
       :component-did-update leaflet/update-bounds-from-layers
@@ -104,6 +115,7 @@
         [leaflet/Map {;;:prefer-canvas true
                       :ref "leaflet"
                       :center #js [65 25]
+                      :zoomControl false
                       :zoom 5}
          [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                              :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
