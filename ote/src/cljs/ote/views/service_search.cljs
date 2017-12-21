@@ -87,7 +87,8 @@
     [ui/paper {:z-depth 1
                :style style/result-card}
      [:div.result-title (stylefy/use-style style/result-header)
-      [:a {:on-click #(do
+      [:a {:href "#"
+           :on-click #(do
                         (.preventDefault %)
                         (e! (ss/->ShowServiceGeoJSON
                              (str js/document.location.protocol "//" js/document.location.host
