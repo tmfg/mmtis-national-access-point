@@ -14,20 +14,24 @@
 
   StartViewer
   (process-event [_ app]
-    (let [url (.getAttribute (.getElementById js/document "nap_viewer") "data-resource-url")
-          element (aget (.getElementsByClassName js/document "authed") 0)
-          logged-in? (not (nil? element))] ;; Is user is logged in
+    (if-let [elt (.getElementById js/document "nap_viewer")]
+      ;; If we are in an embedded CKAN viewer, fetch the resource
+      (let [url (.getAttribute elt "data-resource-url")
+            element (aget (.getElementsByClassName js/document "authed") 0)
+            logged-in? (not (nil? element))] ;; Is user is logged in
 
-      (comm/get! "viewer" {:params {:url url}
-                           :on-success (tuck/send-async! ->ResourceFetched)
-                           :response-format :json})
+        (comm/get! "viewer" {:params {:url url}
+                             :on-success (tuck/send-async! ->ResourceFetched)
+                             :response-format :json})
 
-      (comm/post! "transport-operator/group" {} {:on-success (tuck/send-async! ->TransportOperatorResponse)})
+        (comm/post! "transport-operator/group" {} {:on-success (tuck/send-async! ->TransportOperatorResponse)})
 
-      (assoc app
-             :url url
-             :logged-in? logged-in?
-             :loading? true)))
+        (assoc app
+               :url url
+               :logged-in? logged-in?
+               :loading? true))
+      ;; If not in embedded CKAN viewer page, do nothing
+      app))
 
   ResourceFetched
   (process-event [{response :response} app]
