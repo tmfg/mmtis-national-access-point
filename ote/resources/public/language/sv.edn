@@ -555,6 +555,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :delete-service-error "Tjänsten gick inte att ta bort "
   :logged-in "Inloggningen lyckades!"
   :loading "Ladda"
+  :language "Språk"
   }
 
  :dialog
