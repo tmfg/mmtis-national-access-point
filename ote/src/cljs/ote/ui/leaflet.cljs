@@ -77,3 +77,11 @@
     (.on leaflet "layeradd"
          (fn [m]
            (update-leaflet-bounds-soon leaflet)))))
+
+(defn customize-zoom-controls
+  "Use customized zoom controls to allow translation of the zoom button titles."
+  [e! this opts]
+  (let [^js/L.map
+  m (aget this "refs" "leaflet" "leafletElement")
+        zoom (new js/L.control.zoom (clj->js opts))]
+    (.addControl m zoom)))

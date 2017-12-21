@@ -154,20 +154,24 @@
 
 (defn operation-area [e! {:keys [geojson] :as app}]
   (r/create-class
-    {:display-name "operation-area-map"
-     :component-did-mount #(leaflet/update-bounds-on-load %)
+    {:display-name         "operation-area-map"
+     :component-did-mount  #(do
+                              (leaflet/customize-zoom-controls e! % {:zoomInTitle (tr [:leaflet :zoom-in])
+                                                                     :zoomOutTitle (tr [:leaflet :zoom-out])})
+                              (leaflet/update-bounds-on-load %))
      :component-did-update leaflet/update-bounds-from-layers
      :reagent-render
-     (fn [e! {:keys [geojson] :as app}]
-       [leaflet/Map {:ref "leaflet"
-                     :center #js [65 25]
-                     :zoom 5}
-        [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+                           (fn [e! {:keys [geojson] :as app}]
+                             [leaflet/Map {:ref         "leaflet"
+                                           :center      #js [65 25]
+                                           :zoomControl false
+                                           :zoom        5}
+                              [leaflet/TileLayer {:url         "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                                                  :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-        (when geojson
-          [leaflet/GeoJSON {:data geojson
-                            :style {:color "green"}}])])}))
+                              (when geojson
+                                [leaflet/GeoJSON {:data  geojson
+                                                  :style {:color "green"}}])])}))
 
 (defn viewer [e! _]
   (e! (v/->StartViewer))
