@@ -50,7 +50,7 @@
    "%02d:%02d:%02d" hours minutes seconds))
 
 (defn format-time [{:keys [hours minutes seconds] :as time}]
-  (if seconds
+  (if (and seconds (not= 0 seconds))
     (format-time-full time)
     (#?(:clj format
         :cljs gstr/format)
