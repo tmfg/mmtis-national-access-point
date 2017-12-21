@@ -12,8 +12,23 @@
                 <ul class="unstyled">
                     {% block footer_links %}
                         <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/">Liikennevirasto.fi</a></li>
-                        <li><a target="_blank" rel="noopener noreferrer" href="http://bit.ly/nap-palaute">{{ _('Give feedback') }}</a></li>
                         <li><a target="_blank" rel="noopener noreferrer" href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf">{{_('NAP user guide label')}}</a></li>
+                        <li><a target="_blank" rel="noopener noreferrer" href="http://bit.ly/nap-palaute">{{ _('Give feedback') }}</a></li>
+                        <ul class="unstyled finap-lang">
+                            <li>{{ _('Language') }}:</li>
+                            <li>
+                                <a href="#"
+                                   onClick="document.cookie='finap_lang=fi;path=/';location.reload();">suomi</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   onClick="document.cookie='finap_lang=sv;path=/';location.reload();">svenska</a>
+                            </li>
+                            <!--li>
+                                <a href="#"
+                                   onClick="document.cookie='finap_lang=en;path=/';location.reload();">english</a>
+                            </li-->
+                        </ul>
                     {% endblock %}
                 </ul>
             {% endblock %}
@@ -25,21 +40,6 @@
                         <a class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{% endtrans %}
                 </p>
             {% endblock %}
-
-            <ul class="unstyled finap-lang">
-                <li>{{ _('Language') }}:</li>
-                <li>
-                    <a href="#"
-                       onClick="document.cookie='finap_lang=fi;path=/';location.reload();">suomi</a>
-                </li>
-                <li>
-                    <a href="#"
-                       onClick="document.cookie='finap_lang=sv;path=/';location.reload();">svenska</a>
-                </li>
-                <!--li>
-                    <a href="#"
-                       onClick="document.cookie='finap_lang=en;path=/';location.reload();">english</a>
-                </li-->
             </ul>
         </div>
     </div>
