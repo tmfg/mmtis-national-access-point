@@ -12,6 +12,10 @@
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
 
+(defrecord ShowServiceGeoJSON [url])
+(defrecord CloseServiceGeoJSON [])
+(defrecord GeoJSONFetched [response])
+
 (defn- search-params [{oa ::t-service/operation-area
                        text :text-search
                        st ::t-service/sub-type
@@ -68,4 +72,25 @@
     (let [{:keys [empty-filters? results]} response]
       (update app :service-search assoc
               :results results
-              :empty-filters? empty-filters?))))
+              :empty-filters? empty-filters?)))
+
+  ShowServiceGeoJSON
+  (process-event [{:keys [url]} app]
+    (comm/get! "viewer" {:params {:url url}
+                         :on-success (tuck/send-async! ->GeoJSONFetched)
+                         :response-format :json})
+    (update app :service-search assoc
+            :resource nil
+            :geojson nil
+            :loading-geojson? true))
+
+  CloseServiceGeoJSON
+  (process-event [_ app]
+    (update app :service-search dissoc :resource :geojson :loading-geojson?))
+
+  GeoJSONFetched
+  (process-event [{response :response} app]
+    (update app :service-search assoc
+            :resource response
+            :geojson (clj->js response)
+            :loading-geojson? false)))

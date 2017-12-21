@@ -15,7 +15,8 @@
             [ote.style.base :as style-base]
             [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.views.ckan-service-viewer :as ckan-service-viewer]))
 
 (defn data-items [& icons-and-items]
   [:div (stylefy/use-style style/data-items)
@@ -83,9 +84,12 @@
     [ui/paper {:z-depth 1
                :style style/result-card}
      [:div.result-title (stylefy/use-style style/result-header)
-      [linkify (str "/dataset/org-" transport-operator-id
-                    "-service-" id
-                    "/resource/" ckan-resource-id) name {:style style/result-link}]
+      [:a {:on-click #(do
+                        (.preventDefault %)
+                        (e! (ss/->ShowServiceGeoJSON
+                             (str js/document.location.protocol "//" js/document.location.host
+                                  "/ote/export/geojson/" transport-operator-id "/" id))))}
+       name]
       [data-items
 
        [ic/action-home {:style style/contact-icon}]
@@ -159,8 +163,20 @@
   (e! (ss/->InitServiceSearch))
   (fn [e! {results :results
            empty-filters? :empty-filters?
+           resource :resource
+           geojson :geojson
+           loading-geojson? :loading-geojson?
            :as service-search}]
     [:div.service-search
+     (when (or geojson loading-geojson?)
+       [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
+                   :open true
+                   :modal false
+                   :auto-scroll-body-content true
+                   :on-request-close #(e! (ss/->CloseServiceGeoJSON))}
+        [ckan-service-viewer/viewer e! {:resource resource
+                                        :geojson geojson
+                                        :loading? loading-geojson?}]])
      [filters-form e! service-search]
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
