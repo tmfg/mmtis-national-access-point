@@ -10,6 +10,7 @@
             [stylefy.core :as stylefy]
             [ote.style.ckan :as style-ckan]
             [ote.style.base :as style-base]
+            [ote.style.service-viewer :as style]
             [ote.app.controller.transport-service :as ts]
             [ote.ui.buttons :as buttons]
             [cljs-react-material-ui.reagent :as ui]
@@ -83,11 +84,12 @@
       ;; Collection of values
       (coll? value)
       [:span
-       (map-indexed
-        (fn [i value]
-          ^{:key i}
-          [:div (stylefy/use-style style-ckan/info-block)
-           [show-value "" value]]) value)]
+       (doall
+        (map-indexed
+         (fn [i value]
+           ^{:key i}
+           [:div (stylefy/use-style style-ckan/info-block)
+            [show-value "" value]]) value))]
 
       ;; Other values, like strings and numbers
       :default
@@ -95,15 +97,24 @@
 
 (defn properties-table [properties]
   [:table.table.table-striped.table-bordered.table-condensed
+   (stylefy/use-style style/properties-table)
    [:tbody
-    (for [[key value] (sort-by first properties)
-          :when (and (not (ignore-key? key))
-                     (not (values/effectively-empty? value)))]
-      ^{:key key}
-      [:tr
-       [:th {:scope "row" :width "25%"}
-        (tr-or (tr [:viewer key]) key)]
-       [:td [show-value key value]]])]])
+    (doall
+     (map
+      (fn [[key value] stripe-style]
+        ^{:key key}
+        [:tr (stylefy/use-style stripe-style)
+         [:th (merge {:scope "row" :width "25%"}
+                     (stylefy/use-style style/th))
+          (tr-or (tr [:viewer key]) key)]
+         [:td (stylefy/use-style style/td)
+          [show-value key value]]])
+
+      (filter (fn [[key value]]
+                (and (not (ignore-key? key))
+                     (not (values/effectively-empty? value))))
+              (sort-by first properties))
+      (cycle style/striped-styles)))]])
 
 (defn records-table [rows]
   (let [headers (filter (complement ignore-key?) (keys (first rows)))
@@ -113,18 +124,20 @@
         sorted-headers (sort-by (comp str/lower-case labels) headers)]
     [:table
      [:thead
-      (for [h sorted-headers]
-        ^{:key h}
-        [:th {:scope "col"} (labels h)])]
+      (doall
+       (for [h sorted-headers]
+         ^{:key h}
+         [:th {:scope "col"} (labels h)]))]
      [:tbody
-      (map-indexed
-       (fn [i row]
-         ^{:key i}
-         [:tr
-          (for [h sorted-headers]
-            ^{:key h}
-            [:td [show-value h (get row h)]])])
-       rows)]]))
+      (doall
+       (map-indexed
+        (fn [i row]
+          ^{:key i}
+          [:tr
+           (for [h sorted-headers]
+             ^{:key h}
+             [:td [show-value h (get row h)]])])
+        rows))]]))
 
 (defn show-features [{:strs [features] :as resource}]
   (let [{:strs [transport-operator transport-service] :as props}
