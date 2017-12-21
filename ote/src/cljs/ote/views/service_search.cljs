@@ -60,20 +60,23 @@
        [:table
         [:thead (stylefy/use-style style/external-interface-header)
          [:tr
-          (for [[k w _] external-interface-table-columns]
-            ^{:key k}
-            [:th {:style {:width w}}
-             (tr [:field-labels :transport-service-common k])])]]
+          (doall
+           (for [[k w _] external-interface-table-columns]
+             ^{:key k}
+             [:th {:style {:width w}}
+              (tr [:field-labels :transport-service-common k])]))]]
         [:tbody (stylefy/use-style style/external-interface-body)
-         (map-indexed
-          (fn [i row]
-            ^{:key i}
-            [:tr {:selectable false}
-             (for [[k w value-fn] external-interface-table-columns]
-               ^{:key k}
-               [:td {:style {:width w :font-size "14px"}}
-                (value-fn row)])])
-          external-interface-links)]]]])])
+         (doall
+          (map-indexed
+           (fn [i row]
+             ^{:key i}
+             [:tr {:selectable false}
+              (doall
+               (for [[k w value-fn] external-interface-table-columns]
+                 ^{:key k}
+                 [:td {:style {:width w :font-size "14px"}}
+                  (value-fn row)]))])
+           external-interface-links))]]]])])
 
 (defn- result-card [e! {::t-service/keys [id name type contact-address
                                           operation-area-description contact-phone contact-email
