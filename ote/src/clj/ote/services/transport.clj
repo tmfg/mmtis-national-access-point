@@ -236,7 +236,7 @@
   [nap-config db user {places ::t-service/operation-area
                        external-interfaces ::t-service/external-interfaces
                        :as data}]
-  ;(println "DATA: " (pr-str data))
+  (println "DATA: " (pr-str data))
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)

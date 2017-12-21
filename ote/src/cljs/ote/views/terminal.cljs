@@ -28,12 +28,11 @@
    (tr [:field-labels :terminal ::t-service/indoor-map])
    ::t-service/indoor-map))
 
-(defn- assistance-service-group []
+(defn- assistance-service-group [data]
   (form/group
     {:label (tr [:terminal-page :header-assistance])
      :columns 3
      :layout :row}
-
 
     {:name ::t-service/assistance-description
      :type :localized-text
@@ -43,6 +42,23 @@
      :full-width? true
      :write #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
      :read (comp ::t-service/description ::t-service/assistance)}
+
+    {:name ::t-service/assistance-place-description
+     :type :localized-text
+     :full-width true
+     :container-class "col-md-12"
+     :rows 2
+     :full-width? true
+     :write #(assoc-in %1 [::t-service/assistance ::t-service/assistance-place-description] %2)
+     :read (comp ::t-service/assistance-place-description ::t-service/assistance)}
+
+    {:name ::t-service/assistance-by-reservation
+     :type :checkbox
+     :style style-form/padding-top
+     :container-class "col-md-12"
+     :write #(assoc-in %1 [::t-service/assistance ::t-service/assistance-by-reservation-only] %2)
+     :read (comp ::t-service/notification-requirements ::t-service/assistance)
+     }
 
     {:name ::t-service/hours-before
      :type :number ;; FIXME: When :interval type is ready, change to interval
@@ -108,7 +124,7 @@
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)
                        (indoor-map-group)
-                       (assistance-service-group)
+                       (assistance-service-group form-data)
                        (accessibility-and-other-services-group)]
                options (terminal-form-options e! groups)]
     [:div.row
