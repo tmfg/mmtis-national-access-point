@@ -173,7 +173,11 @@
                    :open true
                    :modal false
                    :auto-scroll-body-content true
-                   :on-request-close #(e! (ss/->CloseServiceGeoJSON))}
+                   :on-request-close #(e! (ss/->CloseServiceGeoJSON))
+                   :actions [(r/as-element
+                              [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
+                                               :primary true}
+                               (tr [:buttons :close])])]}
         [ckan-service-viewer/viewer e! {:resource resource
                                         :geojson geojson
                                         :loading? loading-geojson?}]])
