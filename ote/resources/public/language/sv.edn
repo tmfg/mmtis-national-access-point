@@ -115,8 +115,8 @@
    :ote.db.transport-service/email                  "beställ tjänsten per e-mail (email)"
    :ote.db.transport-service/assistance-url         "Gör bokning på adressen (www)"
    :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
-   :ote.db.transport-service/assistance-place-description "Avustupalvelujen sijaintien kuvaus"
-   :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."
+   :ote.db.transport-service/assistance-place-description  "Assistanstjänsternas placering i terminalen/stationen"
+   :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör betsällas på förhand."
    }
 
   ;; Rental fields

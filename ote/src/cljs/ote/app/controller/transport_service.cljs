@@ -333,7 +333,8 @@
   SetNewServiceType
   (process-event [_ app]
     ;; This is needed when directly loading a new service URL to set the type
-    (-> app
+    (let [sub-type (keyword (get-in app [:params :sub-type]))]
+      (-> app
         (assoc-in [:transport-service ::t-service/sub-type] sub-type)
         (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type) )))))
 
