@@ -82,14 +82,23 @@
 (def filters-form
   {:border "solid 1px #0046ad"})
 
-(def language-selection
+(def language-selection-dropdown
   {:border-top "solid 1px white"
+   :font-size  "12px"
    :margin-top "5px"
+   :color "#fff"
    :padding-top "5px"
    :text-align "center"})
 
+(def language-selection-footer
+  {:border-top "solid 1px white"
+   :width "100%"
+   :color "#fff"
+   :display "inline-block"
+   :margin-top "5px"
+   :padding-top "5px"})
+
 (def language-flag
-  {:padding-left "10px"
-   :padding-right "10px"})
+  {:padding-right "10px"})
 
 (def section-margin {:margin-top "1em"})

@@ -568,6 +568,7 @@
   :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
   :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   :loading                                    "Loading"
+  :language                                   "Language"
   }
 
  :dialog

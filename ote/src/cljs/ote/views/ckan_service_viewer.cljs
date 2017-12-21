@@ -33,12 +33,12 @@
 (defmethod transform-value "homepage" [_ value] (linkify value value {:target "_blank"}))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
-(defn flag-for [lang]
+(defn lang-name-for [lang]
   ;; Show unicode country flags for supported languages, otherwise show language code
   (case lang
-    "FI" "\ud83c\uddeb\ud83c\uddee" ; finnish flag
-    "SV" "\ud83c\uddf8\ud83c\uddea" ; swedish flag
-    "EN" "\ud83c\uddec\ud83c\udde7" ; united kingdom flag
+    "FI" "suomi" ; finnish flag
+    "SV" "svenska" ; swedish flag
+    "EN" "english" ; united kingdom flag
     lang))
 
 (defmethod transform-value :default [_ value]
@@ -53,7 +53,7 @@
                                             :seconds seconds}))
                        #{"lang" "text"}
                        (fn [{:strs [lang text]}]
-                         (str (flag-for lang) " " text))})
+                         (str (lang-name-for lang) ": " text))})
 
 (defn show-value [key value]
   (let [formatter (when (map? value)

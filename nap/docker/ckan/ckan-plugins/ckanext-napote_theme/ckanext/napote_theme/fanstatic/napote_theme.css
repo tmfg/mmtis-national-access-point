@@ -872,7 +872,7 @@ div.napote-organization-form div.slug-preview {
     display: none;
 }
 
-.finap-lang  {
+.dropdown .finap-lang  {
     text-align: center;
     border-top: solid 1px white;
     padding-top: 5px;
@@ -881,8 +881,22 @@ div.napote-organization-form div.slug-preview {
     margin-right: 10px;
 }
 
-.finap-lang > a {
+.dropdown .finap-lang > a {
     display: inline-block !important;
     padding-left: 10px !important;
     padding-right: 10px !important;
+}
+
+.site-footer ul.finap-lang  {
+    display: inline-block;
+    border-top: solid 1px white;
+    padding-top: 5px;
+    margin-top: 5px;
+    white-space: nowrap;
+    width: auto;
+}
+
+.site-footer .finap-lang > li {
+    display: inline-block !important;
+    margin-right: 10px !important;
 }
