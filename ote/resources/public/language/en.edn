@@ -114,8 +114,8 @@
    :ote.db.transport-service/email                  "Notification email"
    :ote.db.transport-service/assistance-url         "Notificaiton web-page"
    :ote.db.transport-service/assistance-description "Assistance service description"
-
-
+   :ote.db.transport-service/assistance-place-description "Assistance service location"
+   :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."
    }
 
   ;; Rental fields
@@ -278,10 +278,13 @@
    :brokerage                "Välityspalvelut"}
 
   :ote.db.transport-service/sub-type
-  {:taxi     "Taksiliikenne"
-   :request  "Tilausajoliikenne, linja-auto"
-   :other  "Muu kutsuun perustuva liikenne"
-   :schedule "Säännöllinen aikataulun mukainen liikenne"}
+  {:terminal      "Asemat, satamat ja muut terminaalit"
+   :taxi          "Taksiliikenne (henkilöiden kuljetuspalvelut)"
+   :request       "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+   :other         "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
+   :schedule      "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
+   :rentals       "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :parking       "Yleiset kaupalliset pysäköintipalvelut"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Käteinen"
@@ -384,17 +387,6 @@
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
           :brokerage                "Välityspalvelut"}
-
- :service-type-dropdown
- {:terminal                 "Asemat, satamat ja muut terminaalit"
-  :passenger-transportation-taxi "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-other "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-  :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-  :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-  :brokerage                "Välityspalvelut"}
-
 
  :front-page
  {:table-header-service-name      "Palvelun name"
@@ -598,6 +590,8 @@
           "published?" "Julkaistu?"
           "transport-operator-id" "Palveluntuottajan tunnistenumber"
           "type" "Palvelun tyyppi"
+          "email" "Email"
+          "phone" "Phone"
 
           "passenger-transportation" "Henkilöiden kuljetuspalvelun tiedot"
           "accessibility-description" "Kuvaus saavutettavuudesta"

@@ -11,9 +11,8 @@
     ["/passenger-transportation" :passenger-transportation]
     ["/terminal" :terminal]
     ["/rentals" :rentals]
-    ["/brokerage" :brokerage]
     ["/parking" :parking]
-    ["/new-service/:type" :new-service]
+    ["/new-service/:sub-type" :new-service]
     ["/new-service" :transport-service]
     ["/edit-service/:id" :edit-service]
     ["/services" :services]]))

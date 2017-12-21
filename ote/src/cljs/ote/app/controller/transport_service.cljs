@@ -12,7 +12,7 @@
             [ote.app.controller.place-search :as place-search]))
 
 (defn new-transport-service [app]
-      (update app :transport-service select-keys #{::t-service/type}))
+      (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type}))
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -20,7 +20,6 @@
     ::t-service/contact-email
     ::t-service/homepage
     ::t-service/name
-    ::t-service/sub-type
     ::t-service/external-interfaces
     ::t-service/operation-area
     ::t-service/companies
@@ -31,36 +30,22 @@
     ::t-service/available-to
     ::t-service/notice-external-interfaces?})
 
-(defn service-type-from-combined-service-type
-  "Returns service type keyword from combined type-subtype key."
-  [type]
-  (case type
-    :passenger-transportation-taxi :passenger-transportation
-    :passenger-transportation-request :passenger-transportation
-    :passenger-transportation-other :passenger-transportation
-    :passenger-transportation-schedule :passenger-transportation
-    :terminal :terminal
-    :rentals :rentals
-    :parking :parking
-    :brokerage :brokerage))
-
-(defn subtype-from-combined-service-type
-  "Returns service subtype keyword from combined type-subtype key."
-  [type]
-  (case type
-    :passenger-transportation-taxi :taxi
-    :passenger-transportation-request :request
-    :passenger-transportation-other :other
-    :passenger-transportation-schedule :schedule
-    :terminal :terminal ;; No subtype for terminals - but it is still saved to database
-    :rentals :rentals
-    :parking :parking
-    :brokerage :brokerage))
+(defn service-type-from-sub-type
+      "Returns service type keyword based on sub-type."
+      [type]
+      (case type
+            :taxi :passenger-transportation
+            :request :passenger-transportation
+            :other :passenger-transportation
+            :schedule :passenger-transportation
+            :terminal :terminal
+            :rentals :rentals
+            :parking :parking))
 
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
-(defrecord SelectTransportServiceType [])
+(defrecord NavigateToNewService [])
 
 (defrecord ModifyTransportService [id])
 (defrecord ModifyTransportServiceResponse [response])
@@ -84,7 +69,6 @@
 (defrecord CancelTransportServiceForm [])
 
 (defrecord SelectServiceType [data])
-(defrecord SelectOnlyServiceType [data])
 (defrecord SetNewServiceType [type])
 
 (declare move-service-level-keys-from-form
@@ -205,35 +189,18 @@
   SelectServiceType
   ;; Set only service type and sub-type
   (process-event [{data :data} app]
-   (let [service-type-subtype data
-          type (service-type-from-combined-service-type data)
-          sub-type (subtype-from-combined-service-type service-type-subtype)
-          subtype-key (t-service/service-key-by-type type)
-          app (assoc-in app [:transport-service :transport-service-type-subtype ] data)
-          app (assoc-in app [:transport-service subtype-key ] {::t-service/sub-type sub-type})
+    (let [type (service-type-from-sub-type data)
+          app (assoc-in app [:transport-service ::t-service/sub-type] data)
           app (assoc-in app [:transport-service ::t-service/type] type)
           ]
       app))
 
-  SelectTransportServiceType
+  NavigateToNewService
   ;; Redirect to add service page
   (process-event [_ app]
-    (let [app (new-transport-service app)]
-      (routes/navigate! :new-service {:type (name (get-in app [:transport-service ::t-service/type]))})
-      app))
-
-  SelectOnlyServiceType
-  ;; Set service type, sub-type and
-  (process-event [{data :data} app]
-    (let [service-type-subtype data
-          type (service-type-from-combined-service-type data)
-          sub-type (subtype-from-combined-service-type service-type-subtype)
-          subtype-key (t-service/service-key-by-type type)
-          app (assoc-in app [:transport-service :transport-service-type-subtype ] data)
-          app (assoc-in app [:transport-service subtype-key ] {::t-service/sub-type sub-type})
-          app (assoc-in app [:transport-service ::t-service/type] type)
-          ]
-      (routes/navigate! :new-service {:type (name type)})
+    (let [app (new-transport-service app)
+          sub-type (get-in app [:transport-service ::t-service/sub-type])]
+      (routes/navigate! :new-service {:sub-type (name sub-type)})
       app))
 
   OpenTransportServiceTypePage
@@ -364,9 +331,11 @@
     (dissoc app :transport-service :before-unload-message))
 
   SetNewServiceType
-  (process-event [{type :type} app]
+  (process-event [_ app]
     ;; This is needed when directly loading a new service URL to set the type
-    (assoc-in app [:transport-service ::t-service/type] type)))
+    (-> app
+        (assoc-in [:transport-service ::t-service/sub-type] sub-type)
+        (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type) )))))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the

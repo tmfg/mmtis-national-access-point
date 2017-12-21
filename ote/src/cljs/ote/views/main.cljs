@@ -13,7 +13,6 @@
             [ote.views.terminal :as terminal]
             [ote.views.rental :as rental]
             [ote.views.parking :as parking]
-            [ote.views.brokerage :as brokerage]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
             [stylefy.core :as stylefy]

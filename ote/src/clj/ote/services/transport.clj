@@ -42,24 +42,24 @@
                                                         "")))))
 
 (def transport-services-columns
-  #{::t-service/id ::t-service/type
-    :ote.db.transport-service/passenger-transportation
-    :ote.db.transport-service/terminal
-    :ote.db.transport-service/rentals
-    :ote.db.transport-service/brokerage
-    :ote.db.transport-service/parking
-    ::modification/created
-    ::modification/modified
+  #{::t-service/id
+    ::t-service/name
+    ::t-service/type
+    ::t-service/sub-type
     ::t-service/published?
-    ::t-service/name})
+    ::t-service/passenger-transportation
+    ::t-service/terminal
+    ::t-service/rentals
+    ::t-service/parking
+    ::modification/created
+    ::modification/modified})
 
 (defn get-transport-services [db where]
   "Return Vector of transport-services"
   (fetch db ::t-service/transport-service
                 transport-services-columns
                 where
-                {::specql/order-by ::t-service/type
-                 ::specql/order-direction :desc}))
+                {::specql/order-by ::t-service/type ::specql/order-direction :desc}))
 
 (defn- get-transport-service
   "Get single transport service by id"
@@ -236,7 +236,7 @@
   [nap-config db user {places ::t-service/operation-area
                        external-interfaces ::t-service/external-interfaces
                        :as data}]
-  ;(println "DATA: " (pr-str data))
+  (println "DATA: " (pr-str data))
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
