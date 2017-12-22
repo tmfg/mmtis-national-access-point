@@ -99,9 +99,7 @@
     :passenger-transportation (tr [:passenger-transportation-page :header-new-passenger-transportation])
     :terminal (tr [:terminal-page :header-new-terminal])
     :rentals (tr [:rentals-page :header-new-rentals])
-    :parking (tr [:parking-page :header-new-parking])
-    ;; by default use passenger transport
-    (tr [:passenger-transportation-page :header-new-passenger-transportation])))
+    :parking (tr [:parking-page :header-new-parking])))
 
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
@@ -109,9 +107,7 @@
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
      :terminal [terminal/terminal e! (:transport-service app)]
      :rentals [rental/rental e! (:transport-service app)]
-     :parking [parking/parking e! (:transport-service app)]
-     ;; by default - assume passenger transport
-     [pt/passenger-transportation-info e! (:transport-service app)])])
+     :parking [parking/parking e! (:transport-service app)])])
 
 (defn edit-service-by-id [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
@@ -144,11 +140,13 @@
   "Render container and headers for empty service form"
   (e! (ts/->SetNewServiceType app))
   (fn [e! app]
-    (let [service-sub-type (get-in app [:transport-service ::t-service/sub-type])
+    (when (get-in app [:transport-service ::t-service/type])
+      (let [service-sub-type (get-in app [:transport-service ::t-service/sub-type])
           service-type (get-in app [:transport-service ::t-service/type])
           new-header-text (new-service-header-text service-type)]
-      [:div
-         [:h1 new-header-text ]
+
+           [:div
+            [:h1 new-header-text ]
           ;; Passenger transport service has sub type, and here it is shown to users
           (when (= :passenger-transportation service-type)
              [:p (stylefy/use-style style-form/subheader)
@@ -157,4 +155,4 @@
 
        [:div.row
        [:h2 (get-in app [:transport-operator ::t-operator/name])]]
-       [edit-service e! service-type  app]])))
+       [edit-service e! service-type  app]]))))
