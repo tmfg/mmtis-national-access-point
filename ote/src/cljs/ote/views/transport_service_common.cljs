@@ -53,7 +53,7 @@
 
 (defn external-interfaces
   "Creates a form group for external services."
-  []
+  [& [rae-info?]]
   (form/group
    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
@@ -61,9 +61,10 @@
    (form/info
      [:div
       [:p (tr [:form-help :external-interfaces])]
-      [:p (tr [:form-help :external-interfaces-eg-rae])
-       [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
-        {:target "_blank"}]]])
+      (when rae-info?
+        [:p (tr [:form-help :external-interfaces-eg-rae])
+         [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
+          {:target "_blank"}]])])
 
    {:name ::t-service/external-interfaces
     :type :table
