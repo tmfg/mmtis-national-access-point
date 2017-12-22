@@ -83,7 +83,8 @@
         dc (new js/L.Control.Draw #js {:draw #js {:circlemarker false
                                                   :circle false}
                                        :edit #js {:featureGroup fg
-                                                  :remove false}})]
+                                                  :remove false
+                                                  :edit false}})]
     (.addLayer m fg)
     (.addControl m dc)
     (.on m (aget js/L "Draw" "Event" "CREATED")
