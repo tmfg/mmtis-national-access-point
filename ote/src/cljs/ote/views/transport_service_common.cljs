@@ -12,7 +12,8 @@
             [clojure.string :as str]
             [ote.time :as time]
             [ote.util.values :as values]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [cljs-react-material-ui.reagent :as ui]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -174,6 +175,10 @@
   [e! {published? ::t-service/published? :as data} schemas]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
+     (when (not (empty? (:ote.ui.form/missing-required-fields data)))
+       [ui/card {:style {:margin-top "0.5em" :margin-bottom "0.5em"}}
+        [ui/card-text (tr [:form-help :publish-missing-required])]])
+
      (if published?
        ;; True
        [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
