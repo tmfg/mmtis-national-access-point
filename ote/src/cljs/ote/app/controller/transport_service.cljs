@@ -311,7 +311,8 @@
                 response)]
     (routes/navigate! :own-services)
     (-> app
-        (assoc :services-changed? true)
+        (assoc :services-changed? true
+               :page :own-services)
         (dissoc :transport-service))))
 
   FailedTransportServiceResponse
