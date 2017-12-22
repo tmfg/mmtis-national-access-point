@@ -95,6 +95,12 @@
                    (year-month-and-day comparison-date)))
     (or message (str "Date must " (fmt/pvm comparison-date)))))
 
+;; Valid time HH:MM
+(defmethod validate-rule :time [_ _ data _ _ & [message]]
+  (when
+    (and (not (empty-value? data)) (not (re-matches #"^(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])?$" data)))
+    (or message "Invalid time format")))
+
 (defmethod validate-rule :number-range [_ _ data _ _ & [min-value max-value message]]
   (when-not (<= min-value data max-value)
     (or message (str "Number must be between " min-value " and " max-value))))
