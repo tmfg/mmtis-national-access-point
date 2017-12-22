@@ -1,2 +1,0 @@
-include napote-ssh-config-full to your ssh-config file by adding following line to the beginning of your ~/.ssh/config -file
-Include ~/path/to/here/napote-ssh-config-full

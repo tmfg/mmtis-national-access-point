@@ -16,7 +16,6 @@
             [ote.views.passenger-transportation :as pt]
             [ote.views.terminal :as terminal]
             [ote.app.routes :as routes]
-            [ote.views.brokerage :as brokerage]
             [ote.views.parking :as parking]
             [ote.views.rental :as rental]
             [ote.ui.form-fields :as form-fields]
@@ -28,17 +27,17 @@
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
-  [:passenger-transportation-taxi
-   :passenger-transportation-request
-   :passenger-transportation-other
-   :passenger-transportation-schedule
+  [:taxi
+   :request
+   :other
+   :schedule
    :terminal
    :rentals
    :parking])
 
 (defn select-service-type [e! {:keys [transport-operator transport-service] :as state}]
   (let [multiple-operators (if (second (:transport-operators-with-services state)) true false)
-        disabled? (or (nil? (:transport-service-type-subtype transport-service))
+        disabled? (or (nil? (::t-service/sub-type transport-service))
                       (nil? (::t-operator/id transport-operator)))]
   [:div.row
    [:div {:class "col-sx-12 col-md-12"}
@@ -57,14 +56,16 @@
         [:div
           [:div {:class "col-sx-12 col-sm-4 col-md-4"}
           [form-fields/field
-            {:label (tr [:field-labels :transport-service-type-subtype])
-             :name        :transport-service-type-subtype
+
+           {:label (tr [:field-labels :transport-service-type-subtype])
+             :name        ::t-service/sub-type
              :type        :selection
              :update!      #(e! (ts/->SelectServiceType %))
-             :show-option (tr-key [:service-type-dropdown])
+             :show-option (tr-key [:enums ::t-service/sub-type])
              :options     modified-transport-service-types
              :auto-width? true}
-            (:transport-service-type-subtype transport-service)]]
+
+           (::t-service/sub-type transport-service)]]
 
            [:div {:class "col-sx-12 col-sm-4 col-md-4"}
              [form-fields/field
@@ -75,12 +76,13 @@
                :show-option ::t-operator/name
                :options     (mapv :transport-operator (:transport-operators-with-services state))
                :auto-width? true}
+
               transport-operator]]]]
     [:div.row
      [:div {:class "col-sx-12 col-sm-4 col-md-4"}
       [ui/raised-button {:style {:margin-top "20px"}
                          :label    (tr [:buttons :next])
-                         :on-click #(e! (ts/->SelectTransportServiceType))
+                         :on-click #(e! (ts/->NavigateToNewService))
                          :primary  true
                          :disabled disabled?}]]]]]))
 
@@ -105,8 +107,7 @@
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
      :terminal [terminal/terminal e! (:transport-service app)]
      :rentals [rental/rental e! (:transport-service app)]
-     :parking [parking/parking e! (:transport-service app)]
-     :brokerage [brokerage/brokerage e! (:transport-service app)])])
+     :parking [parking/parking e! (:transport-service app)])])
 
 (defn edit-service-by-id [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
@@ -131,14 +132,16 @@
          (when (= :passenger-transportation (keyword (::t-service/type service)))
            [:p (stylefy/use-style style-form/subheader)
             (tr [:enums :ote.db.transport-service/sub-type
-                 (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/sub-type])])])
+                 (get-in app [:transport-service ::t-service/sub-type])])])
          [:h2 (get-in app [:transport-operator ::t-operator/name])]
          [edit-service e! (::t-service/type service) app]]))}))
 
 (defn edit-new-service [e! app]
-  (e! (ts/->SetNewServiceType (keyword (get-in app [:params :type]))))
+  "Render container and headers for empty service form"
+  (e! (ts/->SetNewServiceType app))
   (fn [e! app]
-    (let [service-type (keyword (get-in app [:params :type]))
+    (let [service-sub-type (get-in app [:transport-service ::t-service/sub-type])
+          service-type (get-in app [:transport-service ::t-service/type])
           new-header-text (new-service-header-text service-type)]
       [:div
          [:h1 new-header-text ]
@@ -146,7 +149,7 @@
           (when (= :passenger-transportation service-type)
              [:p (stylefy/use-style style-form/subheader)
               (tr [:enums :ote.db.transport-service/sub-type
-                   (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/sub-type])])])
+                   (get-in app [:transport-service ::t-service/sub-type])])])
 
        [:div.row
        [:h2 (get-in app [:transport-operator ::t-operator/name])]]

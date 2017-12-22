@@ -13,7 +13,6 @@
             [ote.views.terminal :as terminal]
             [ote.views.rental :as rental]
             [ote.views.parking :as parking]
-            [ote.views.brokerage :as brokerage]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
             [stylefy.core :as stylefy]
@@ -51,21 +50,22 @@
              {:page  :own-services
               :label [:common-texts :navigation-own-service-list]})]))
 
-(def selectable-languages [["fi" "\ud83c\uddeb\ud83c\uddee"]
-                           ["sv" "\ud83c\uddf8\ud83c\uddea"]
-                           #_["en" "\ud83c\uddec\ud83c\udde7"]])
+(def selectable-languages [["fi" "suomi"]
+                           ["sv" "svenska"]
+                           #_["en" "english"]])
 
-(defn- language-selection [e!]
+(defn- language-selection [e! style link-style show-label?]
   (let [current-language @localization/selected-language]
-    [:div (stylefy/use-style style-base/language-selection)
+    [:div (stylefy/use-style style) (when show-label? (str (tr [:common-texts :language]) ": "))
 
      (doall
       (for [[lang flag] selectable-languages]
         [:a (merge
              (stylefy/use-style style-base/language-flag)
              {:key lang
+              :href "#"
               :on-click #(e! (fp-controller/->SetLanguage lang))
-              :style {:color "#FFFFFF"}})
+              :style link-style})
          flag]))]))
 
 (defn user-menu [e! name username]
@@ -101,8 +101,7 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
 
-     [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (r/as-element [language-selection e!])}]]))
+     [ui/menu-item {:primary-text (r/as-element [language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service :transport-operator :organizations})
 (def services-pages #{:services})
@@ -201,21 +200,23 @@
         (mobile-top-nav-links e! app))]]))
 
 
-(defn- footer []
+(defn- footer [e!]
   [:footer.site-footer
    [:div.container-fluid
     [:div.row
      [:div.col-md-2.footer-links
       [:a.logo {:href "#" }
        [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
-     [:div.col-md-8.footer-links
+     [:div.col-md-2.footer-links
       [:ul.unstyled
        [:li
         [linkify "https://www.liikennevirasto.fi/" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
        [:li
         [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
        [:li
-        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]]]]]])
+        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
+       [:li
+        [language-selection e! style-base/language-selection-footer nil true]]]]]]])
 
 
 
@@ -252,4 +253,4 @@
                 :services [service-search/service-search e! (:service-search app)]
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
 
-       [footer]]]]))
+       [footer e!]]]]))
