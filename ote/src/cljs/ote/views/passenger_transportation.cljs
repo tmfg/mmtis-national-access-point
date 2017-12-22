@@ -179,13 +179,13 @@
 
 
 
-(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation}]
+(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service}]
   (with-let [form-groups
              [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
-              (ts-common/external-interfaces)
+              (ts-common/external-interfaces (= :schedule (get service ::t-service/sub-type)))
               (luggage-restrictions-group)
               (ts-common/service-url
                (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
