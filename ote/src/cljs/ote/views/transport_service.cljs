@@ -99,7 +99,9 @@
     :passenger-transportation (tr [:passenger-transportation-page :header-new-passenger-transportation])
     :terminal (tr [:terminal-page :header-new-terminal])
     :rentals (tr [:rentals-page :header-new-rentals])
-    :parking (tr [:parking-page :header-new-parking])))
+    :parking (tr [:parking-page :header-new-parking])
+    ;; by default use passenger transport
+    (tr [:passenger-transportation-page :header-new-passenger-transportation])))
 
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
@@ -107,7 +109,9 @@
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
      :terminal [terminal/terminal e! (:transport-service app)]
      :rentals [rental/rental e! (:transport-service app)]
-     :parking [parking/parking e! (:transport-service app)])])
+     :parking [parking/parking e! (:transport-service app)]
+     ;; by default - assume passenger transport
+     [pt/passenger-transportation-info e! (:transport-service app)])])
 
 (defn edit-service-by-id [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
