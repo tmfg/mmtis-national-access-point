@@ -140,11 +140,13 @@
   "Render container and headers for empty service form"
   (e! (ts/->SetNewServiceType app))
   (fn [e! app]
-    (let [service-sub-type (get-in app [:transport-service ::t-service/sub-type])
+    (when (get-in app [:transport-service ::t-service/type])
+      (let [service-sub-type (get-in app [:transport-service ::t-service/sub-type])
           service-type (get-in app [:transport-service ::t-service/type])
           new-header-text (new-service-header-text service-type)]
-      [:div
-         [:h1 new-header-text ]
+
+           [:div
+            [:h1 new-header-text ]
           ;; Passenger transport service has sub type, and here it is shown to users
           (when (= :passenger-transportation service-type)
              [:p (stylefy/use-style style-form/subheader)
@@ -153,4 +155,4 @@
 
        [:div.row
        [:h2 (get-in app [:transport-operator ::t-operator/name])]]
-       [edit-service e! service-type  app]])))
+       [edit-service e! service-type  app]]))))
