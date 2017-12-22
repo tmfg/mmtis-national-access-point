@@ -35,7 +35,9 @@
 (def button-add-row {:padding-top "20px"})
 
 ;; Form elements
-(def required-element { :color "#FF9800"})
+(def required-element { :color "#B71C1C"
+                       :font-weight "600"}) ;; currently same as error
+
 (def error-element { :color "#B71C1C"
                     :font-weight "600"})
 
@@ -50,7 +52,7 @@
                   :font-weight "600"})
 
 (def success-flash-message-body {:background-color "rgba(128, 149, 50, 0.87)"})
-(def error-flash-message-body {:background-color "rgba(190, 0, 0, 0.87)"})
+(def error-flash-message-body {:max-width "800px" :background-color "rgba(190, 0, 0, 0.87)"})
 
 (def title {:font-weight "bold"})
 
@@ -82,14 +84,23 @@
 (def filters-form
   {:border "solid 1px #0046ad"})
 
-(def language-selection
+(def language-selection-dropdown
   {:border-top "solid 1px white"
+   :font-size  "12px"
    :margin-top "5px"
+   :color "#fff"
    :padding-top "5px"
    :text-align "center"})
 
+(def language-selection-footer
+  {:border-top "solid 1px white"
+   :width "100%"
+   :color "#fff"
+   :display "inline-block"
+   :margin-top "5px"
+   :padding-top "5px"})
+
 (def language-flag
-  {:padding-left "10px"
-   :padding-right "10px"})
+  {:padding-right "10px"})
 
 (def section-margin {:margin-top "1em"})

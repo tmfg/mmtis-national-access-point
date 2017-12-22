@@ -20,7 +20,7 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
 SELECT id FROM "transport-service"
  WHERE "published?" = TRUE
  ORDER BY COALESCE(modified, created) DESC, name ASC
- LIMIT 20;
+ LIMIT 1000;
 
 -- name: search
 -- Search for transport services by name, operation area or subtype

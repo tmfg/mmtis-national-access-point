@@ -1,9 +1,13 @@
 # encoding: utf-8
 
-import pprint
+import smtplib
+import socket
 import mimetypes
+from time import time
+from email.mime.text import MIMEText
+from email.header import Header
+from email import Utils
 from logging import getLogger
-from pkg_resources import resource_stream
 import csv
 import sys
 
@@ -15,8 +19,10 @@ import ckan.plugins.toolkit as tk
 from ckan.lib.plugins import DefaultTranslation
 from routes.mapper import SubMapper
 from ckan.lib import authenticator
+import paste.deploy.converters
+from ckan.lib import mailer
+from ckan.common import c, _, config
 from ckan.model import User
-from ckan.common import c
 
 from ckan.lib import i18n
 from ckan.plugins import PluginImplementations
@@ -115,6 +121,79 @@ i18n.handle_request = handle_request
 
 
 
+### MONKEY PATCH CKAN MAILER USER MAIL SEND START ###
+
+def _mail_recipient_monkey_patch(recipient_name, recipient_email,
+                    sender_name, sender_url, subject,
+                    body, headers={}):
+    mail_from = config.get('smtp.mail_from')
+    msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
+    for k, v in headers.items():
+        msg[k] = v
+    subject = Header(subject.encode('utf-8'), 'utf-8')
+    msg['Subject'] = subject
+    msg['From'] = _("%s <%s>") % (sender_name, mail_from)
+    # NOTE: Removed reciepient_name
+    recipient = u"%s" % (recipient_email)
+    msg['To'] = Header(recipient, 'utf-8')
+    msg['Date'] = Utils.formatdate(time())
+
+    # Send the email using Python's smtplib.
+    smtp_connection = smtplib.SMTP()
+    if 'smtp.test_server' in config:
+        # If 'smtp.test_server' is configured we assume we're running tests,
+        # and don't use the smtp.server, starttls, user, password etc. options.
+        smtp_server = config['smtp.test_server']
+        smtp_starttls = False
+        smtp_user = None
+        smtp_password = None
+    else:
+        smtp_server = config.get('smtp.server', 'localhost')
+        smtp_starttls = paste.deploy.converters.asbool(
+            config.get('smtp.starttls'))
+        smtp_user = config.get('smtp.user')
+        smtp_password = config.get('smtp.password')
+
+    try:
+        smtp_connection.connect(smtp_server)
+    except socket.error, e:
+        log.exception(e)
+        raise mailer.MailerException('SMTP server could not be connected to: "%s" %s'
+                              % (smtp_server, e))
+    try:
+        # Identify ourselves and prompt the server for supported features.
+        smtp_connection.ehlo()
+
+        # If 'smtp.starttls' is on in CKAN config, try to put the SMTP
+        # connection into TLS mode.
+        if smtp_starttls:
+            if smtp_connection.has_extn('STARTTLS'):
+                smtp_connection.starttls()
+                # Re-identify ourselves over TLS connection.
+                smtp_connection.ehlo()
+            else:
+                raise mailer.MailerException("SMTP server does not support STARTTLS")
+
+        # If 'smtp.user' is in CKAN config, try to login to SMTP server.
+        if smtp_user:
+            assert smtp_password, ("If smtp.user is configured then "
+                                   "smtp.password must be configured as well.")
+            smtp_connection.login(smtp_user, smtp_password)
+
+        smtp_connection.sendmail(mail_from, [recipient_email], msg.as_string())
+        log.info("Sent email to {0}".format(recipient_email))
+
+    except smtplib.SMTPException, e:
+        msg = '%r' % e
+        log.exception(msg)
+        raise mailer.MailerException(msg)
+    finally:
+        smtp_connection.quit()
+
+
+mailer._mail_recipient = _mail_recipient_monkey_patch
+
+### MONKEY PATCH CKAN MAILER USER MAIL SEND END###
 
 
 ### Custom auth functions ###

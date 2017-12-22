@@ -114,8 +114,8 @@
    :ote.db.transport-service/email                  "Notification email"
    :ote.db.transport-service/assistance-url         "Notificaiton web-page"
    :ote.db.transport-service/assistance-description "Assistance service description"
-
-
+   :ote.db.transport-service/assistance-place-description "Assistance service location"
+   :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."
    }
 
   ;; Rental fields
@@ -232,6 +232,8 @@
   :available-from-and-to "Set date range when this service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
+
+  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
   }
 
 
@@ -278,10 +280,13 @@
    :brokerage                "Välityspalvelut"}
 
   :ote.db.transport-service/sub-type
-  {:taxi     "Taksiliikenne"
-   :request  "Tilausajoliikenne, linja-auto"
-   :other  "Muu kutsuun perustuva liikenne"
-   :schedule "Säännöllinen aikataulun mukainen liikenne"}
+  {:terminal      "Asemat, satamat ja muut terminaalit"
+   :taxi          "Taksiliikenne (henkilöiden kuljetuspalvelut)"
+   :request       "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+   :other         "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
+   :schedule      "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
+   :rentals       "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :parking       "Yleiset kaupalliset pysäköintipalvelut"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Käteinen"
@@ -384,17 +389,6 @@
           :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
           :parking                  "Yleiset kaupalliset pysäköintipalvelut"
           :brokerage                "Välityspalvelut"}
-
- :service-type-dropdown
- {:terminal                 "Asemat, satamat ja muut terminaalit"
-  :passenger-transportation-taxi "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-request "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-other "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-  :passenger-transportation-schedule "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-  :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-  :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-  :brokerage                "Välityspalvelut"}
-
 
  :front-page
  {:table-header-service-name      "Palvelun name"
@@ -568,6 +562,7 @@
   :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
   :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   :loading                                    "Loading"
+  :language                                   "Language"
   }
 
  :dialog
@@ -598,6 +593,8 @@
           "published?" "Julkaistu?"
           "transport-operator-id" "Palveluntuottajan tunnistenumber"
           "type" "Palvelun tyyppi"
+          "email" "Email"
+          "phone" "Phone"
 
           "passenger-transportation" "Henkilöiden kuljetuspalvelun tiedot"
           "accessibility-description" "Kuvaus saavutettavuudesta"
@@ -719,6 +716,11 @@
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
+  }
+
+ :leaflet
+ {:zoom-in "Zoom In"
+  :zoom-out "Zoom Out"
   }
 
  :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"

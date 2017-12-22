@@ -12,7 +12,8 @@
             [clojure.string :as str]
             [ote.time :as time]
             [ote.util.values :as values]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [cljs-react-material-ui.reagent :as ui]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -53,7 +54,7 @@
 
 (defn external-interfaces
   "Creates a form group for external services."
-  []
+  [& [rae-info?]]
   (form/group
    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
@@ -61,9 +62,10 @@
    (form/info
      [:div
       [:p (tr [:form-help :external-interfaces])]
-      [:p (tr [:form-help :external-interfaces-eg-rae])
-       [linkify "https://www.liikennevirasto.fi/liikennejarjestelma/henkiloliikenne/liikennepalvelulaki/rae-tyokalu" (tr [:form-help :RAE-tool])
-        {:target "_blank"}]]])
+      (when rae-info?
+        [:p (tr [:form-help :external-interfaces-eg-rae])
+         [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
+          {:target "_blank"}]])])
 
    {:name ::t-service/external-interfaces
     :type :table
@@ -83,7 +85,7 @@
     (form/info
      [:div
       [:p (tr [:form-help :external-interfaces-end])]])
-    
+
     {:name ::t-service/notice-external-interfaces?
      :type :checkbox
      :required? true
@@ -174,6 +176,10 @@
   [e! {published? ::t-service/published? :as data} schemas]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
+     (when (not (empty? (:ote.ui.form/missing-required-fields data)))
+       [ui/card {:style {:margin-top "0.5em" :margin-bottom "0.5em"}}
+        [ui/card-text (tr [:form-help :publish-missing-required])]])
+
      (if published?
        ;; True
        [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))

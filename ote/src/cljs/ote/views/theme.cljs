@@ -118,7 +118,11 @@
 
            :button    {:labelColor "#fff"}
            ;; Change drop down list items selected color
-           :menu-item {:selected-text-color (color :blue700)}})}
+           :menu-item {:selected-text-color (color :blue700)}
+
+           ;; This determines the width of dialogs (12 * desktop-keyline-increment)
+           ;; original value is 64
+           :spacing {:desktop-keyline-increment 80}})}
           [:span
 
              (when error-msg
