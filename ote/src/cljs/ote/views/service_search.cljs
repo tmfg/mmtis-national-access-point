@@ -78,12 +78,11 @@
                   (value-fn row)]))])
            external-interface-links))]]]])])
 
-(defn- result-card [e! {::t-service/keys [id name type contact-address
+(defn- result-card [e! {::t-service/keys [id name sub-type contact-address
                                           operation-area-description contact-phone contact-email
                                           operator-name ckan-resource-id transport-operator-id]
                         :as service}]
-  (let [sub-type-tr (tr-key [:enums ::t-service/sub-type]
-                            [:enums ::t-service/type])]
+  (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])]
     [ui/paper {:z-depth 1
                :style style/result-card}
      [:div.result-title (stylefy/use-style style/result-header)
@@ -108,7 +107,7 @@
       [:div (stylefy/use-style style/subtitle-operator-first)
        operator-name]
       [:div (stylefy/use-style style/subtitle-operator)
-      (sub-type-tr type)]]
+      (sub-type-tr sub-type)]]
 
      [:div.result-interfaces
       [external-interface-links e! service]]]))

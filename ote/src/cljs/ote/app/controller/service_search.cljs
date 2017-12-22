@@ -7,7 +7,6 @@
 
 
 (defrecord UpdateSearchFilters [filters])
-(defrecord Search [])
 (defrecord SearchResponse [response])
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
