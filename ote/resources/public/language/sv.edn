@@ -234,6 +234,8 @@
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
+
+  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   }
 
 
