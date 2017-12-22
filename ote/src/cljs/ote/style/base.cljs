@@ -35,7 +35,9 @@
 (def button-add-row {:padding-top "20px"})
 
 ;; Form elements
-(def required-element { :color "#FF9800"})
+(def required-element { :color "#B71C1C"
+                       :font-weight "600"}) ;; currently same as error
+
 (def error-element { :color "#B71C1C"
                     :font-weight "600"})
 
