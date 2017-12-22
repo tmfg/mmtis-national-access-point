@@ -718,6 +718,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   }
 
+ :leaflet
+ {:zoom-in "Zooma in"
+  :zoom-out "Zooma ut"
+  }
+
  :leaflet-draw
  {:toolbar  {:buttons {:polyline  "Rita sträck"
                        :polygon   "Rita månghörning"

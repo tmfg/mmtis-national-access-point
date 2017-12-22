@@ -13,7 +13,8 @@
             [goog.object :as gobj]
             cljsjs.leaflet
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [clojure.string :as str]))
 
 (set! *warn-on-infer* true)
 
@@ -96,6 +97,8 @@
 (defn places-map [e! results]
    (r/create-class
      {:component-did-mount #(do
+                              (leaflet/customize-zoom-controls e! % {:zoomInTitle (tr [:leaflet :zoom-in])
+                                                                     :zoomOutTitle (tr [:leaflet :zoom-out])})
                               (install-draw-control! e! %)
                               (leaflet/update-bounds-from-layers %))
       :component-did-update leaflet/update-bounds-from-layers
@@ -104,6 +107,7 @@
         [leaflet/Map {;;:prefer-canvas true
                       :ref "leaflet"
                       :center #js [65 25]
+                      :zoomControl false
                       :zoom 5}
          [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                              :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]

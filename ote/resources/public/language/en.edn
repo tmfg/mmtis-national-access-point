@@ -722,6 +722,11 @@
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
   }
 
+ :leaflet
+ {:zoom-in "Zoom In"
+  :zoom-out "Zoom Out"
+  }
+
  :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"
                                       :polygon   "Piirrä monikulmio"
                                       :rectangle "Piirrä neliö"
