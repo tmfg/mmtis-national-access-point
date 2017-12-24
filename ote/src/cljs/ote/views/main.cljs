@@ -20,7 +20,8 @@
             [ote.style.topnav :as style-topnav]
             [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
-            [ote.views.service-search :as service-search]))
+            [ote.views.service-search :as service-search]
+            [ote.ui.form :as form]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -160,10 +161,12 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        [linkify "/user/login" (tr [:common-texts :navigation-login])
-         (merge (stylefy/use-style
-                  (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}})]]])]])
+        [:a {:href "#"
+             :on-click #(do
+                          (.preventDefault %)
+                          (e! (fp-controller/->ShowLoginDialog)))
+             :style {:float "right"}}
+         (tr [:common-texts :navigation-login])]]])]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
@@ -222,6 +225,24 @@
 
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
 
+(defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
+  [ui/dialog {:open true
+              :label "Kirjaudu sisään XXX"
+              :on-request-close #(e! (fp-controller/->LoginCancel))}
+   [form/form {:name->label (tr-key [:field-labels :login])
+               :update! #(e! (fp-controller/->UpdateLoginCredentials %))
+               :footer-fn (fn [data]
+                            [ui/raised-button {:on-click #(e! (fp-controller/->Login))
+                                               :label "Kirjaudu sisään XXX"}])}
+    [(form/group
+      {:label "Kirjautumistiedot XXX" :expandable? false
+       :columns 3}
+       {:name :email
+        :type :string}
+       {:name :password
+        :type :string :password? true})]
+    credentials]])
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -229,28 +250,33 @@
   ;; init - Get operator and service data from DB when refresh or on usage start
   (e! (fp-controller/->GetTransportOperatorData))
 
-  (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
+  (fn [e! {loaded? :transport-operator-data-loaded?
+           login :login
+           :as app}]
     [:div {:style (stylefy/use-style style-base/body)}
      [theme e! app
       [:div.ote-sovellus
        [top-nav e! app]
 
-       (if (or (= false loaded?) (= true (nil? loaded?)))
+       (when (:show? login)
+         [login-dialog e! login])
+
+       (if (not loaded?)
          [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-           [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
-             [:div.container-fluid
-              (case (:page app)
-                :front-page [fp/own-services e! app]
-                :own-services [fp/own-services e! app]
-                :transport-service [t-service/select-service-type e! app]
-                :transport-operator [to/operator e! app]
+         [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
+          [:div.container-fluid
+           (case (:page app)
+             :front-page [fp/own-services e! app]
+             :own-services [fp/own-services e! app]
+             :transport-service [t-service/select-service-type e! app]
+             :transport-operator [to/operator e! app]
 
-                ;; Routes for the service form, one for editing an existing one by id
-                ;; and another when creating a new service
-                :edit-service [t-service/edit-service-by-id e! app]
-                :new-service [t-service/edit-new-service e! app]
+             ;; Routes for the service form, one for editing an existing one by id
+             ;; and another when creating a new service
+             :edit-service [t-service/edit-service-by-id e! app]
+             :new-service [t-service/edit-new-service e! app]
 
-                :services [service-search/service-search e! (:service-search app)]
-                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+             :services [service-search/service-search e! (:service-search app)]
+             [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
 
        [footer e!]]]]))

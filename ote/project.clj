@@ -23,6 +23,9 @@
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
 
+                 ;; Password hashing
+                 [buddy/buddy-hashers "1.3.0"]
+
                  ;; Cache libraries
                  [org.clojure/core.cache "0.6.5"]
 

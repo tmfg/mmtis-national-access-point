@@ -211,6 +211,8 @@
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"
 
+  :login {:email "Sähköpostiosoite"
+          :password "Salasana"}
   }
 
 
