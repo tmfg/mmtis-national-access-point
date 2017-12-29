@@ -177,6 +177,9 @@
      create-transport-operator
      update-transport-operator) nap-config db user data))
 
+(defn ensure-bigdec [value]
+      (when (not (nil? value )) (bigdec value)))
+
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   ([service data-path]
@@ -184,7 +187,7 @@
   ([service data-path price-per-unit-path]
    (update-in service data-path
               (fn [price-classes-float]
-                (mapv #(update-in % price-per-unit-path bigdec) price-classes-float)))))
+                (mapv #(update-in % price-per-unit-path ensure-bigdec) price-classes-float)))))
 
 (defn- update-rental-price-classes [service]
   (update-in service [::t-service/rentals ::t-service/vehicle-classes]
