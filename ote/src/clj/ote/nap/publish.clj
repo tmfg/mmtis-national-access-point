@@ -115,7 +115,7 @@
                                    (-> external-interface ::t-service/description first ::t-service/text)
                                    "Rajapinta")
                       :ckan/url (if (not (nil? (::t-service/url external-interface))) (::t-service/url external-interface) "Osoite puuttuu")
-                      :ckan/format fmt
+                      :ckan/format (if (nil? fmt) "" fmt)
                       :ckan/license lic}))))
               external-interfaces)]
 
