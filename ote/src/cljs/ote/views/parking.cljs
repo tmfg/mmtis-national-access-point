@@ -43,9 +43,11 @@
      :type         :table
      :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
-                     :label (tr [:field-labels :parking ::t-service/price-class-name])}
+                     :label (tr [:field-labels :parking ::t-service/price-class-name])
+                     :required? true}
                     {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
-                     :input-style {:text-align "right" :padding-right "5px"}}
+                     :input-style {:text-align "right" :padding-right "5px"}
+                     :required? true}
                     {:name ::t-service/unit :type :string :style {:width "100px"}}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
@@ -101,7 +103,8 @@
                     :type              :multiselect-selection
                     :options           t-service/days
                     :show-option       (tr-key [:enums ::t-service/day :full])
-                    :show-option-short (tr-key [:enums ::t-service/day :short])}
+                    :show-option-short (tr-key [:enums ::t-service/day :short])
+                    :required? true}
                    {:name  ::t-service/all-day
                     :width "10%"
                     :type  :checkbox
@@ -118,14 +121,16 @@
                     :cancel-label (tr [:buttons :cancel])
                     :ok-label     (tr [:buttons :save])
                     :write        (write ::t-service/from)
-                    :default-time {:hours "08" :minutes "00"}}
+                    :default-time {:hours "08" :minutes "00"}
+                    :required? true}
                    {:name         ::t-service/to
                     :width        "25%"
                     :type         :time
                     :cancel-label (tr [:buttons :cancel])
                     :ok-label     (tr [:buttons :save])
                     :write        (write ::t-service/to)
-                    :default-time {:hours "19" :minutes "00"}}]
+                    :default-time {:hours "19" :minutes "00"}
+                    :required? true}]
        :delete?   true
        :add-label (tr [:buttons :add-new-service-hour])}
 
@@ -161,8 +166,10 @@
      :table-fields [{:name        ::t-service/parking-facility
                      :type        :selection
                      :show-option (tr-key [:enums ::t-service/parking-facility])
-                     :options     t-service/parking-facilities}
-                    {:name ::t-service/capacity :type :number}]
+                     :options     t-service/parking-facilities
+                     :required? true}
+                    {:name ::t-service/capacity :type :number
+                     :required? true}]
      :add-label    (tr [:buttons :add-new-parking-capacity])
      :delete?      true}))
 
