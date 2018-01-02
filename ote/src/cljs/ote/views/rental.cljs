@@ -43,10 +43,12 @@
                     :type :number
                     :currency? true
                     :style {:width "100px"}
-                    :input-style {:text-align "right" :padding-right "5px"}}
+                    :input-style {:text-align "right" :padding-right "5px"}
+                    :required? true}
 
                    {:name ::t-service/unit
-                    :type :string}] 
+                    :type :string
+                    :required? true}]
     :delete? true
     :add-label (tr [:buttons :add-new-price-class])}
    ))
@@ -75,7 +77,7 @@
   (form/group
    {:label (tr [:rentals-page :header-vehicles])
     :columns 3}
-   
+
    {:name ::t-service/vehicle-classes
     :type :table
     :table-fields [{:name ::t-service/vehicle-type
@@ -87,8 +89,7 @@
                    {:name :price-group
                     :type :component
                     :component (fn [{:keys [update-form! data]}]
-                                 [price-classes update-form! data])
-                    }]
+                                 [price-classes update-form! data])}]
     :delete? true
     :add-label (tr [:buttons :add-new-vehicle])})
   )
@@ -99,7 +100,7 @@
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/guaranteed-vehicle-accessibility 
+   {:name        ::t-service/guaranteed-vehicle-accessibility
     :help (tr [:form-help :guaranteed-vehicle-accessibility])
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
@@ -109,7 +110,7 @@
 
    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
-    :type        :checkbox-group 
+    :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/rental-vehicle-accessibility
     :full-width? true
@@ -157,7 +158,8 @@
     :table-fields [{:name ::t-service/additional-service-type
                     :type        :selection
                     :show-option (tr-key [:enums ::t-service/additional-services])
-                    :options     t-service/additional-services}
+                    :options     t-service/additional-services
+                    :required? true}
 
                    {:name ::t-service/additional-service-price
                     :type :number
@@ -165,7 +167,8 @@
                     :style {:width "100px"}
                     :input-style {:text-align "right" :padding-right "5px"}
                     :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
-                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)}
+                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)
+                    :required? true}
 
                    {:name ::t-service/additional-service-unit
                     :type :string
@@ -238,11 +241,13 @@
       :type :table
       :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/name
-                      :type :string}
+                      :type :string
+                      :required? true}
                      {:name ::t-service/pick-up-type
                       :type :selection
                       :options t-service/pick-up-types
-                      :show-option (tr-key [:enums ::t-service/pick-up-type])}
+                      :show-option (tr-key [:enums ::t-service/pick-up-type])
+                      :required? true}
                      {:name ::common/street
                       :type :string
                       :read (comp ::common/street ::t-service/pick-up-address)

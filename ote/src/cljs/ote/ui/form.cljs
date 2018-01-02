@@ -200,6 +200,9 @@
                             :update! update-fn
                             :error (when (not (empty? errors))
                                      (str/join " " errors))
+
+                            ;; Pass raw error data (for composite fields like tables)
+                            :error-data errors
                             :warning (when
                                        (and required? (validation/empty-value? data))
                                        (tr [:common-texts :required-field])))

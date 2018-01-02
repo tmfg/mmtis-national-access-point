@@ -72,11 +72,14 @@
     :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"
                     :read (comp ::t-service/description ::t-service/external-interface)
-                    :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)}
+                    :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
+                    :required? true}
                    {:name ::t-service/external-service-url :type :string :width "21%"
                     :read (comp ::t-service/url ::t-service/external-interface)
-                    :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)}
-                   {:name ::t-service/format :type :string :width "16%"}
+                    :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
+                    :required? true}
+                   {:name ::t-service/format :type :string :width "16%"
+                    :required? true}
                    {:name ::t-service/license :type :string :width "21%"}
                    {:name ::t-service/license-url :type :string :width "21%"}]
     :delete? true
@@ -105,9 +108,12 @@
     :type :table
     :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/name :type :string
-                    :label (tr [:field-labels :transport-service-common ::t-service/company-name])}
+                    :label (tr [:field-labels :transport-service-common ::t-service/company-name])
+                    :required? true}
                    {:name ::t-service/business-id :type :string
-                    :validate [[:business-id]]}]
+                    :validate [[:business-id]]
+                    :required? true
+                    :regex #"\d{0,7}(-\d?)?"}]
     :delete? true
     :add-label (tr [:buttons :add-new-company])}
 
@@ -223,7 +229,8 @@
         :type :multiselect-selection
         :options t-service/days
         :show-option (tr-key [:enums ::t-service/day :full])
-        :show-option-short (tr-key [:enums ::t-service/day :short])}
+        :show-option-short (tr-key [:enums ::t-service/day :short])
+        :required? true}
        {:name ::t-service/all-day
         :width "10%"
         :type :checkbox
@@ -240,14 +247,16 @@
         :cancel-label (tr [:buttons :cancel])
         :ok-label (tr [:buttons :save])
         :write (write ::t-service/from)
-        :default-time {:hours "08" :minutes "00"}}
+        :default-time {:hours "08" :minutes "00"}
+        :required? true}
        {:name ::t-service/to
         :width "25%"
         :type :time
         :cancel-label (tr [:buttons :cancel])
         :ok-label (tr [:buttons :save])
         :write (write ::t-service/to)
-        :default-time {:hours "19" :minutes "00"}}]
+        :default-time {:hours "19" :minutes "00"}
+        :required? true}]
       :delete?      true
       :add-label (tr [:buttons :add-new-service-hour])}
 
