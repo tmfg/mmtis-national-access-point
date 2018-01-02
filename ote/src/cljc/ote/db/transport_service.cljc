@@ -17,8 +17,7 @@
 (s/def :specql.data-types/timestamptz any?)
 
 #?(:clj
-   (defmethod specql-composite/parse-value "bool" [_ v]
-      (println "BOOLEAN " v)
+   (defmethod specql-composite/parse-value "bool" [_ v]      
      (= "t" v)))
 
 #?(:clj
