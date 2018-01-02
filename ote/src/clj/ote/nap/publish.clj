@@ -104,15 +104,18 @@
 
         external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
         external-resources
-        (mapv (fn [{ei ::t-service/external-interface fmt ::t-service/format
+        (mapv (fn [{external-interface ::t-service/external-interface fmt ::t-service/format
                     lic ::t-service/license lic-url ::t-service/license-url}]
                 (verify-ckan-response
                  (ckan/add-or-update-dataset-resource!
                   c (merge
                      {:ckan/package-id (:ckan/id dataset)
-                      :ckan/name (-> ei ::t-service/description first ::t-service/text)
-                      :ckan/url (::t-service/url ei)
-                      :ckan/format fmt
+                      ;:ckan/name (-> external-interface ::t-service/description first ::t-service/text)
+                      :ckan/name (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
+                                   (-> external-interface ::t-service/description first ::t-service/text)
+                                   "Rajapinta")
+                      :ckan/url (if (not (nil? (::t-service/url external-interface))) (::t-service/url external-interface) "Osoite puuttuu")
+                      :ckan/format (if (nil? fmt) "" fmt)
                       :ckan/license lic}))))
               external-interfaces)]
 
