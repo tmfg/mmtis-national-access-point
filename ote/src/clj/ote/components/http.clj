@@ -115,6 +115,14 @@
    :headers {"Content-Type" "application/json+transit"}
    :body (transit/clj->transit data)})
 
+(defn no-cache-transit-response
+  "Return the given Clojure `data` as a Transit response with status code 200."
+  [data]
+  {:status 200
+   :headers {"Content-Type" "application/json+transit"
+             "Cache-Control" "no-cache, no-store"}
+   :body (transit/clj->transit data)})
+
 (defn transit-request
   "Parse HTTP POST body as Transit data."
   [in]
