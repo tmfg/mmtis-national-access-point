@@ -57,7 +57,7 @@
      :style style-form/padding-top
      :container-class "col-md-12"
      :write #(assoc-in %1 [::t-service/assistance ::t-service/assistance-by-reservation-only] %2)
-     :read (comp ::t-service/notification-requirements ::t-service/assistance)
+     :read (comp ::t-service/assistance-by-reservation-only ::t-service/assistance)
      }
 
     {:name ::t-service/hours-before

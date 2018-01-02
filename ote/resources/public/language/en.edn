@@ -701,7 +701,12 @@
           "to" "To"
           "from-date" "From date"
           "to-date" "To date"
-          "sub-type" "Sub type"}
+          "sub-type" "Sub type"
+          "terminal" " "
+          ;; Assistance
+          "assistance" "Avustuspalvelut"
+          "assistance-place-description" "Sijainti"
+          "assistance-by-reservation-only" "Tilattava etukäteen"}
 
 
  :service-search

@@ -8,12 +8,25 @@
             [ote.db.common]
             [specql.data-types]
             [ote.time]
-            [ote.db.modification])
+            [ote.db.modification]
+            #?(:clj [specql.impl.composite :as specql-composite]))
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
 ;; FIXME: specql doesn't define timestamp with time zone type
 (s/def :specql.data-types/timestamptz any?)
+
+#?(:clj
+   (defmethod specql-composite/parse-value "bool" [_ v]
+      (println "BOOLEAN " v)
+     (= "t" v)))
+
+#?(:clj
+  (defmethod specql-composite/stringify-value "bool" [_ v]
+    (cond
+      (nil? v) ""
+      (true? v) "t"
+      (false? v) "f")))
 
 (define-tables
   ;; Define ENUMs

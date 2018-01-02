@@ -703,7 +703,12 @@
           "to" "Päättyen"
           "from-date" "Alkaen (pvm)"
           "to-date" "Päättyen (pvm)"
-          "sub-type" "Alityyppi"}
+          "sub-type" "Alityyppi"
+          "terminal" " "
+          ;; Assistance
+          "assistance" "Avustuspalvelut"
+          "assistance-place-description" "Sijainti"
+          "assistance-by-reservation-only" "Tilattava etukäteen"}
 
 
 

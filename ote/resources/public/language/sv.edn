@@ -697,7 +697,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "to" "Till"
           "from-date" "Från (datum)"
           "to-date" "Till (datum)"
-          "sub-type" "Undertyp"}
+          "sub-type" "Undertyp"
+          "terminal" " "
+          ;; Assistance
+          "assistance" "Avustuspalvelut"
+          "assistance-place-description" "Sijainti"
+          "assistance-by-reservation-only" "Tilattava etukäteen"}
 
 
 
