@@ -426,7 +426,11 @@
                                                                (< i (count error-data))
                                                                (nth error-data i))]
              ^{:key i}
-             [ui/table-row {:selectable false :display-border false}
+             [ui/table-row (merge {:selectable false :display-border false}
+                                  ;; If there are errors or missing fields, make the
+                                  ;; row taller to show error messages
+                                  (when (or errors missing-required-fields)
+                                    {:style {:height 65}}))
               (doall
                (for [{:keys [name read write width type component] :as tf} table-fields
                      :let [field-error (get errors name)
