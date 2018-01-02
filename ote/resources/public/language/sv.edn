@@ -702,7 +702,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           ;; Assistance
           "assistance" "Avustuspalvelut"
           "assistance-place-description" "Sijainti"
-          "assistance-by-reservation-only" "Tilattava etukäteen"}
+          "assistance-by-reservation-only" "Varattava etukäteen"
+          "notification-requirements" "Varausta koskevat vaatimukset"
+          "hours-before" "Palvelu varattava (tuntia) ennen"
+          "telephone" "Puhelin"}
 
 
 
