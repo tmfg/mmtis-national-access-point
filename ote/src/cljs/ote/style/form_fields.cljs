@@ -4,9 +4,13 @@
 (def localized-text-language
   {:text-decoration "none"
    :margin-left "0.5em"
-   :font-weight 12
-   ;:margin-right "1em"
    :cursor "pointer"})
+
+(def localized-text-language-container
+  {:font-size "12px"
+   :float "right"
+   :padding-right "2em"
+   :margin-top "-10px"})
 
 (def localized-text-language-selected
   (merge localized-text-language
