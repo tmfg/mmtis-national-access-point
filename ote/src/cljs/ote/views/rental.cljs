@@ -249,6 +249,8 @@
                       :required? true}
                      {:name ::t-service/pick-up-type
                       :type :selection
+                      :auto-width? true
+                      :style {:width "130%"}
                       :options t-service/pick-up-types
                       :show-option (tr-key [:enums ::t-service/pick-up-type])
                       :required? true}
@@ -258,6 +260,7 @@
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
                      {:name ::common/postal_code
                       :type :string
+                      :width "10%"
                       :regex #"\d{0,5}"
                       :read (comp ::common/postal_code ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
