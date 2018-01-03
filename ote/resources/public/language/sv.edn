@@ -558,6 +558,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :logged-in "Inloggningen lyckades!"
   :loading "Ladda"
   :language "Språk"
+
+  :hours-placeholder "tt"
+  :minutes-placeholder "mm"
   }
 
  :dialog

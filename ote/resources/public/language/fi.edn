@@ -565,6 +565,9 @@
   :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   :loading                                    "Lataa"
   :language                                   "Kieli"
+
+  :hours-placeholder "tt"
+  :minutes-placeholder "mm"
   }
 
  :dialog

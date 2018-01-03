@@ -13,7 +13,8 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
             [ote.style.form :as style-form]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [goog.string :as gstr]))
 
 
 
@@ -97,7 +98,8 @@
       ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? full-width? style input-style]
+                                  focus on-focus form? error warning table? full-width?
+                                  style input-style hint-style]
                            :as   field} data]
   [text-field
    (merge
@@ -114,7 +116,9 @@
      :error-text        (or error warning "") ;; Show error text or warning text or empty string
      :error-style       (if error ;; Error is more critical than required - showing it first
                           style-base/error-element
-                          style-base/required-element)}
+                          style-base/required-element)
+     :hint-style (merge style-base/placeholder
+                        hint-style)}
     (when full-width?
       {:full-width true})
     (when style
@@ -319,20 +323,52 @@
                 (:txt @state)]
          (when currency? "€")])})))
 
-(def time-regex #"\d{0,2}(:\d{0,2})?")
+;; Matches empty or any valid hour (0 - 23)
+(def hour-regex #"^(((1|2|3|4|5|6|7|8|9|0))|((0|1)(1|2|3|4|5|6|7|8|9|0)?)|(2(0|1|2|3)?))?$")
 
-(defmethod field :time [{:keys [update!] :as opts} data]
-  ;; FIXME: material-ui timepicker doesn't allow simply writing a time
-  ;; best would be both, writing plus an icon to open selector dialog
-  (let [data (or (some-> data ::incomplete)
-                 (and data (time/format-time data))
-                 "")]
-    [field (assoc opts
-                  :update! (fn [string]
-                             (update! (assoc (time/parse-time string)
-                                             ::incomplete string)))
-                  :type :string
-                  :regex time-regex) data]))
+;; Matches empty or any valid minute (0 - 59)
+(def minute-regex #"^((0|1|2|3|4|5)(1|2|3|4|5|6|7|8|9|0)?)?$")
+
+(defmethod field :time [{:keys [update! error warning] :as opts}
+                        {:keys [hours hours-text minutes minutes-text] :as data}]
+  [:div (stylefy/use-style style-base/inline-block)
+   [field (merge
+           {:type :string
+            :regex hour-regex
+            :style {:width 30}
+            :input-style {:text-align "right"}
+            :hint-style {:position "absolute" :right "0"}
+            :update! (fn [hour]
+                       (let [h (if (str/blank? hour)
+                                 nil
+                                 (js/parseInt hour))]
+                         (update! (assoc (time/->Time h minutes nil)
+                                         :hours-text hour))))}
+           (when (not hours)
+             {:placeholder (tr [:common-texts :hours-placeholder])}))
+    (if (not hours)
+      ""
+      (or hours-text (str hours)))]
+   "."
+   [field (merge
+           {:type :string
+            :regex minute-regex
+            :style {:width 30}
+            :update! (fn [minute]
+                       (let [m (if (str/blank? minute)
+                                 nil
+                                 (js/parseInt minute))]
+                         (update! (assoc (time/->Time hours m nil)
+                                         :minutes-text minute))))}
+           (when (not minutes)
+             {:placeholder (tr [:common-texts :minutes-placeholder])}))
+    (if (not minutes)
+      ""
+      (or minutes-text (gstr/format "%02d" minutes)))]
+
+   (when warning
+     [:div (stylefy/use-style style-base/error-element) warning])
+   ])
 
 (defmethod field :interval [{:keys [update!] :as opts} data]
   (let [[unit amount] (or (some (fn [[unit amount]]

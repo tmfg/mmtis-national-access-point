@@ -44,6 +44,12 @@
                            (cljs-time/today-at hours minutes seconds)))))))
 
 
+(defn empty-time?
+  "Check if time is empty. Requires both hours and minutes to be set."
+  [{:keys [hours minutes]}]
+  (or (nil? hours)
+      (nil? minutes)))
+
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)

@@ -104,3 +104,5 @@
   {:padding-right "10px"})
 
 (def section-margin {:margin-top "1em"})
+
+(def placeholder {:color "#a0a0a0"})
