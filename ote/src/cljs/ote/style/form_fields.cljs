@@ -4,6 +4,7 @@
 (def localized-text-language
   {:text-decoration "none"
    :margin-left "0.5em"
+   :font-weight 12
    ;:margin-right "1em"
    :cursor "pointer"})
 

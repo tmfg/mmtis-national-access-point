@@ -137,8 +137,10 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? label name rows rows-max error full-width?]
+(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width?]
                                    :as   field} data]
+  (.log js/console (clj->js name) " ERROR ******************* " error)
+  (.log js/console (clj->js name) " WARNING ******************* " warning)
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
           languages (or (:languages field) languages)
@@ -185,7 +187,17 @@
                        style-form-fields/localized-text-language))
                   {:href "#" :on-click #(do (.preventDefault %)
                                             (reset! selected-language lang))})
-             lang]))]]]])))
+             lang]))]]
+        (when (or error warning)
+          [:tr
+           [:td
+            [:div (stylefy/use-style style-base/required-element)
+             (if error error warning)
+            ]
+           ]
+           ]
+          )
+        ]])))
 
 
 (defmethod field :selection [{:keys [update! table? label name style show-option options form? error warning auto-width? disabled?] :as field}
