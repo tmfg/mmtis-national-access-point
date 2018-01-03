@@ -28,7 +28,7 @@
    (tr [:field-labels :terminal ::t-service/indoor-map])
    ::t-service/indoor-map))
 
-(defn- assistance-service-group [data]
+(defn- assistance-service-group []
   (form/group
     {:label (tr [:terminal-page :header-assistance])
      :columns 3
@@ -124,7 +124,7 @@
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)
                        (indoor-map-group)
-                       (assistance-service-group form-data)
+                       (assistance-service-group)
                        (accessibility-and-other-services-group)]
                options (terminal-form-options e! groups)]
     [:div.row
