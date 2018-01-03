@@ -16,7 +16,8 @@
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
             [ote.style.form :as style-form]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [ote.ui.validation :as validation]))
 
 (defn rental-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :rentals]
@@ -96,11 +97,11 @@
 
 (defn accessibility-group []
   (form/group
-   {:label (tr [:rentals-page :header-accessibility])
+    {:label (tr [:rentals-page :header-accessibility])
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/guaranteed-vehicle-accessibility
+    {:name        ::t-service/guaranteed-vehicle-accessibility
     :help (tr [:form-help :guaranteed-vehicle-accessibility])
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
@@ -108,7 +109,7 @@
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name        ::t-service/limited-vehicle-accessibility
+    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
@@ -116,33 +117,35 @@
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name ::t-service/guaranteed-transportable-aid
+    {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name ::t-service/limited-transportable-aid
+    {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name ::t-service/guaranteed-accessibility-description
-    :type :localized-text
-    :rows 1
-    :full-width? true
-    :container-class "col-md-6"}
+    {:name            ::t-service/guaranteed-accessibility-description
+     :type            :localized-text
+     :is-empty?       validation/empty-localized-text?
+     :rows            1
+     :full-width?     true
+     :container-class "col-md-6"}
 
-   {:name ::t-service/limited-accessibility-description
+    {:name ::t-service/limited-accessibility-description
     :type :localized-text
+     :is-empty? validation/empty-localized-text?
     :rows 1
     :container-class "col-md-6"
     :full-width? true}
 
-   {:name ::t-service/accessibility-info-url
+    {:name ::t-service/accessibility-info-url
     :type :string
     :container-class "col-md-6"
     :full-width? true}))
@@ -185,6 +188,7 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :rows 1}
 
    {:name        ::t-service/payment-methods

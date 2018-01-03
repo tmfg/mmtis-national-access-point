@@ -13,7 +13,8 @@
             [ote.time :as time]
             [ote.util.values :as values]
             [ote.style.form :as style-form]
-            [cljs-react-material-ui.reagent :as ui]))
+            [cljs-react-material-ui.reagent :as ui]
+            [ote.ui.validation :as validation]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -30,6 +31,7 @@
              (assoc-in data [service-url-field ::t-service/url] url))}
     {:name ::t-service/description
     :type  :localized-text
+     :is-empty? validation/empty-localized-text?
     :rows  1
     :read  (comp ::t-service/description service-url-field)
     :write (fn [data desc]
@@ -48,7 +50,8 @@
      :table-fields [{:name ::t-service/url
                      :type :string}
                     {:name ::t-service/description
-                     :type :localized-text}]
+                     :type :localized-text
+                     :is-empty? validation/empty-localized-text?}]
      :delete?      true
      :add-label    (tr [:buttons :add-new-service-link])}))
 
@@ -56,10 +59,10 @@
   "Creates a form group for external services."
   [& [rae-info?]]
   (form/group
-   {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
+    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
 
-   (form/info
+    (form/info
      [:div
       [:p (tr [:form-help :external-interfaces])]
       (when rae-info?
@@ -67,23 +70,36 @@
          [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
           {:target "_blank"}]])])
 
-   {:name ::t-service/external-interfaces
-    :type :table
-    :prepare-for-save values/without-empty-rows
-    :table-fields [{:name ::t-service/external-service-description :type :localized-text :width "21%"
-                    :read (comp ::t-service/description ::t-service/external-interface)
-                    :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
-                    :required? true}
-                   {:name ::t-service/external-service-url :type :string :width "21%"
-                    :read (comp ::t-service/url ::t-service/external-interface)
-                    :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
-                    :required? true}
-                   {:name ::t-service/format :type :string :width "16%"
-                    :required? true}
-                   {:name ::t-service/license :type :string :width "21%"}
-                   {:name ::t-service/license-url :type :string :width "21%"}]
-    :delete? true
-    :add-label (tr [:buttons :add-external-interface])}
+    {:name             ::t-service/external-interfaces
+     :type             :table
+     :prepare-for-save values/without-empty-rows
+     :table-fields     [{:name      ::t-service/external-service-description
+                         :type :localized-text
+                         ;:width "21%"
+                         :read      (comp ::t-service/description ::t-service/external-interface)
+                         :write     #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
+                         :required? true
+                         :is-empty? validation/empty-localized-text?}
+                        {:name      ::t-service/external-service-url
+                         :type :string
+                         :width "18%"
+                         :read      (comp ::t-service/url ::t-service/external-interface)
+                         :write     #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
+                         :required? true}
+                        {:name      ::t-service/format
+                         :type :string
+                         :width "12%"
+                         :required? true}
+                        {:name ::t-service/license
+                         :type :string
+                         :width "18%"
+                         }
+                        {:name ::t-service/license-url
+                         :type :string
+                         ;:width "21%"
+                         }]
+     :delete?          true
+     :add-label        (tr [:buttons :add-external-interface])}
 
     (form/info
      [:div
@@ -267,7 +283,8 @@
       :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/description
                       :label (tr* :description)
-                      :type :localized-text}
+                      :type :localized-text
+                      :is-empty? validation/empty-localized-text?}
                      {:name ::t-service/from-date
                       :type :date-picker
                       :label (tr* :from-date)}
@@ -293,6 +310,7 @@
 
    {:name ::t-service/description
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :rows 2
     :full-width? true
     :container-class "col-md-8"}

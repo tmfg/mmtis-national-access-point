@@ -20,6 +20,11 @@
   (or (nil? val)
       (str/blank? val)))
 
+(defn empty-localized-text? [value]
+  (let [text-value (get (first value) :ote.db.transport-service/text)]
+    (or (nil? text-value)
+      (str/blank? text-value))))
+
 ;; validate-rule multimethod implements validation rule checking by keyword name
 ;; Parameters:
 ;; name = the keyword name of the field

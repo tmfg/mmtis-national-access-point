@@ -36,6 +36,7 @@
 
 ;; Form elements
 (def required-element { :color "#B71C1C"
+                       :font-size 14
                        :font-weight "600"}) ;; currently same as error
 
 (def error-element { :color "#B71C1C"

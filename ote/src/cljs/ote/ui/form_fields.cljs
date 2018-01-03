@@ -141,7 +141,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? label name rows rows-max error full-width?]
+(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width?]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -149,47 +149,53 @@
           language @selected-language
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
-      [:table {:style (when full-width?
-                        style-form/full-width)}
-       [:tbody
-       [:tr
-        [:td
-         [text-field
-          (merge
-           {:name name
-            :floating-label-text (when-not table? label)
-            :floating-label-fixed true
-            :hintText          (placeholder field data)
-            :on-change         #(let [updated-language-data
-                                      {:ote.db.transport-service/lang language
-                                       :ote.db.transport-service/text %2}]
-                                  (update!
-                                   (if language-data
-                                     (mapv (fn [lang]
-                                             (if (= (:ote.db.transport-service/lang lang) language)
-                                               updated-language-data
-                                               lang)) data)
-                                     (conj data updated-language-data))))
-            :value             (or (:ote.db.transport-service/text language-data) "")
-            :multi-line         true
-            :rows rows
-            :rows-max (or rows-max 200)
-            :error-text       (or error "")}
-           (when full-width?
-             {:full-width true}))]]]
-       [:tr
-        [:td
-         (doall
-          (for [lang languages]
-            ^{:key lang}
-            [:a  (merge
-                  (stylefy/use-style
-                     (if (= lang language)
-                       style-form-fields/localized-text-language-selected
-                       style-form-fields/localized-text-language))
-                  {:href "#" :on-click #(do (.preventDefault %)
-                                            (reset! selected-language lang))})
-             lang]))]]]])))
+      [:div.table-responsive
+        [:table.table {:style (when full-width? style-form/full-width)}
+         [:tbody
+           [:tr
+            [:td
+             [text-field
+              (merge
+               {:name name
+                :floating-label-text (when-not table? label)
+                :floating-label-fixed true
+                :hintText          (placeholder field data)
+                :on-change         #(let [updated-language-data
+                                          {:ote.db.transport-service/lang language
+                                           :ote.db.transport-service/text %2}]
+                                      (update!
+                                       (if language-data
+                                         (mapv (fn [lang]
+                                                 (if (= (:ote.db.transport-service/lang lang) language)
+                                                   updated-language-data
+                                                   lang)) data)
+                                         (conj data updated-language-data))))
+                :value             (or (:ote.db.transport-service/text language-data) "")
+                :multi-line         true
+                :rows rows
+                :rows-max (or rows-max 200)
+                :error-text       (or error "")}
+               (when full-width?
+                 {:full-width true}))]]]
+           [:tr
+            [:td
+             [:div (stylefy/use-style style-form-fields/localized-text-language-container)
+             (doall
+              (for [lang languages]
+                ^{:key lang}
+                [:a  (merge
+                      (stylefy/use-style
+                         (if (= lang language)
+                           style-form-fields/localized-text-language-selected
+                           style-form-fields/localized-text-language))
+                      {:href "#" :on-click #(do (.preventDefault %)
+                                                (reset! selected-language lang))})
+                 lang]))]]]
+            (when (or error warning)
+              [:tr
+               [:td
+                [:div (stylefy/use-style style-base/required-element)
+                 (if error error warning)]]])]]])))
 
 
 (defmethod field :selection [{:keys [update! table? label name style show-option options form? error warning auto-width? disabled?] :as field}

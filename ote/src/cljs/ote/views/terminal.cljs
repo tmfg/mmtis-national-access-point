@@ -14,7 +14,8 @@
             [ote.style.base :as style-base]
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
-            [ote.style.form :as style-form]))
+            [ote.style.form :as style-form]
+            [ote.ui.validation :as validation]))
 
 (defn terminal-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
@@ -35,13 +36,13 @@
      :layout :row}
 
     {:name ::t-service/assistance-description
-     :type :localized-text
-     :full-width true
+     :is-empty?       validation/empty-localized-text?
+     :full-width      true
      :container-class "col-md-12"
-     :rows 2
-     :full-width? true
-     :write #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
-     :read (comp ::t-service/description ::t-service/assistance)}
+     :rows            2
+     :full-width?     true
+     :write           #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
+     :read            (comp ::t-service/description ::t-service/assistance)}
 
     {:name ::t-service/assistance-place-description
      :type :localized-text
@@ -89,6 +90,7 @@
    {:container-class "col-md-6"
     :name ::t-service/accessibility-description
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :full-width? true
     :rows 2}
 
