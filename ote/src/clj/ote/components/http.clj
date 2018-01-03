@@ -116,12 +116,9 @@
    :body (transit/clj->transit data)})
 
 (defn no-cache-transit-response
-  "Return the given Clojure `data` as a Transit response with status code 200."
+  "Return the given Clojure `data` as a Transit response with status code 200 and no-cache headers."
   [data]
-  (let [response (transit-response data)
-        headers (merge (get response :headers)  {"Cache-Control" "no-cache, no-store"})
-        response (assoc response :headers headers)]
-    response))
+  (update (transit-response data) :headers merge {"Cache-Control" "no-cache, no-store"}))
 
 (defn transit-request
   "Parse HTTP POST body as Transit data."
