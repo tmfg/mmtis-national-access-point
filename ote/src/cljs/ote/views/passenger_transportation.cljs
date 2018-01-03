@@ -1,24 +1,25 @@
  (ns ote.views.passenger-transportation
   "Required datas for passenger transportation provider"
-  (:require [reagent.core :as reagent]
-            [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
-            [ote.app.controller.transport-service :as ts]
-            [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
-            [ote.views.place-search :as place-search]
-            [tuck.core :as tuck]
-            [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]
-            [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]
-            [ote.style.form :as style-form]
-            [ote.util.values :as values])
+   (:require [reagent.core :as reagent]
+             [cljs-react-material-ui.reagent :as ui]
+             [cljs-react-material-ui.icons :as ic]
+             [ote.ui.form :as form]
+             [ote.ui.form-groups :as form-groups]
+             [ote.ui.buttons :as buttons]
+             [ote.app.controller.transport-service :as ts]
+             [ote.db.transport-service :as t-service]
+             [ote.db.transport-operator :as t-operator]
+             [ote.db.common :as common]
+             [ote.localization :refer [tr tr-key]]
+             [ote.views.place-search :as place-search]
+             [tuck.core :as tuck]
+             [stylefy.core :as stylefy]
+             [ote.style.base :as style-base]
+             [ote.views.transport-service-common :as ts-common]
+             [ote.time :as time]
+             [ote.style.form :as style-form]
+             [ote.util.values :as values]
+             [ote.ui.validation :as validation])
   (:require-macros [reagent.core :refer [with-let]]))
 
 
@@ -34,15 +35,16 @@
 
 (defn luggage-restrictions-group []
   (form/group
-   {:label (tr [:passenger-transportation-page :header-restrictions])
+    {:label (tr [:passenger-transportation-page :header-restrictions])
     :columns 3
     :layout :row}
 
-   {:name ::t-service/luggage-restrictions
-    :type :localized-text
-    :rows 2}
+    {:name      ::t-service/luggage-restrictions
+     :type      :localized-text
+     :is-empty? validation/empty-localized-text?
+     :rows      2}
 
-   ))
+    ))
 
 
 
@@ -98,12 +100,14 @@
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :rows 1
     :full-width? true
     :container-class "col-md-6"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :rows 1
     :container-class "col-md-6"
     :full-width? true}
@@ -157,6 +161,7 @@
    {:container-class "col-md-5"
     :name ::t-service/payment-method-description
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :rows 6
     :full-width? true
     }
@@ -164,6 +169,7 @@
    {:container-class "col-md-6"
     :name ::t-service/pricing-description
     :type :localized-text
+    :is-empty? validation/empty-localized-text?
     :full-width? true
     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
     :read (comp ::t-service/description ::t-service/pricing)

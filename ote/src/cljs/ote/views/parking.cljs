@@ -17,7 +17,8 @@
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [ote.ui.validation :as validation]))
 
 (defn form-options [e! schemas]
   {:name->label (tr-key [:field-labels :parking]
@@ -39,7 +40,7 @@
      [:div
       [:p (tr [:form-help :pricing-info])]])
 
-   {:name         ::t-service/price-classes
+    {:name         ::t-service/price-classes
      :type         :table
      :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
@@ -53,11 +54,12 @@
      :delete?      true}
 
     {:container-class "col-md-6"
-     :name  ::t-service/pricing-description
-     :type  :localized-text
-     :full-width? true
-     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
-     :read  (comp ::t-service/description ::t-service/pricing)}
+     :name            ::t-service/pricing-description
+     :type            :localized-text
+     :full-width?     true
+     :write           #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
+     :read            (comp ::t-service/description ::t-service/pricing)
+     :is-empty?       validation/empty-localized-text?}
 
     {:container-class "col-md-5"
      :name  ::t-service/pricing-url
@@ -77,6 +79,7 @@
      :type :localized-text
      :rows 1
      :full-width? true
+     :is-empty? validation/empty-localized-text?
      }
 
     ))
@@ -139,7 +142,8 @@
        :prepare-for-save values/without-empty-rows
        :table-fields [{:name  ::t-service/description
                        :label (tr* :description)
-                       :type  :localized-text}
+                       :type  :localized-text
+                       :is-empty? validation/empty-localized-text?}
                       {:name  ::t-service/from-date
                        :type  :date-picker
                        :label (tr* :from-date)}
@@ -182,6 +186,7 @@
     {:name            ::t-service/charging-points
      :rows            2
      :type            :localized-text
+     :is-empty? validation/empty-localized-text?
      :full-width?     true
      :container-class "col-md-6"}))
 
@@ -207,6 +212,7 @@
 
     {:name            ::t-service/accessibility-description
      :type            :localized-text
+     :is-empty? validation/empty-localized-text?
      :rows            2
      :container-class "col-md-6"
      :full-width?     true}
