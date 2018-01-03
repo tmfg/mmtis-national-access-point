@@ -16,9 +16,9 @@
 ;; max length 16 chars (optional plus followed by digits)
 (def phone-number-regex #"^((\+?\d{0,15})|(\d{0,16}))$")
 
-(defn empty-value? [arvo]
-  (or (nil? arvo)
-      (str/blank? arvo)))
+(defn empty-value? [val]
+  (or (nil? val)
+      (str/blank? val)))
 
 ;; validate-rule multimethod implements validation rule checking by keyword name
 ;; Parameters:
