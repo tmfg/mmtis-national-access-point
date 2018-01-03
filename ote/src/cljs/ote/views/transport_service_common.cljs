@@ -248,7 +248,8 @@
         :ok-label (tr [:buttons :save])
         :write (write ::t-service/from)
         :default-time {:hours "08" :minutes "00"}
-        :required? true}
+        :required? true
+        :is-empty? time/empty-time?}
        {:name ::t-service/to
         :width "25%"
         :type :time
@@ -256,7 +257,8 @@
         :ok-label (tr [:buttons :save])
         :write (write ::t-service/to)
         :default-time {:hours "19" :minutes "00"}
-        :required? true}]
+        :required? true
+        :is-empty? time/empty-time?}]
       :delete?      true
       :add-label (tr [:buttons :add-new-service-hour])}
 
