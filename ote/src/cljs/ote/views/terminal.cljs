@@ -38,6 +38,7 @@
      :layout :row}
 
     {:name ::t-service/assistance-description
+     :type :localized-text
      :is-empty?       validation/empty-localized-text?
      :full-width      true
      :container-class "col-md-12"
