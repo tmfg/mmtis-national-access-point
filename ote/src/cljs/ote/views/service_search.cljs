@@ -112,7 +112,7 @@
      [:div.result-interfaces
       [external-interface-links e! service]]]))
 
-(defn results-listing [e! {:keys [results empty-filters? total-service-count]}]
+(defn results-listing [e! {:keys [results empty-filters? total-service-count fetching-more?]}]
   (let [result-count (count results)]
     [:div.col-xs-12.col-md-12.col-lg-12
      [:p
@@ -128,7 +128,11 @@
       (for [result results]
         ^{:key (::t-service/id result)}
         [result-card e! result]))
-     [scroll-sensor #(.log js/console "sensori näkyy")]]))
+
+     (if fetching-more?
+       [:span "... haetaan lisää, venaas hetki..."]
+       ;; FIXME: show only if there are more results
+       [scroll-sensor #(e! (ss/->FetchMore))])]))
 
 (defn filters-form [e! {filters :filters
                         facets :facets

@@ -7,9 +7,10 @@
 
 
 (defrecord UpdateSearchFilters [filters])
-(defrecord SearchResponse [response])
+(defrecord SearchResponse [response append?])
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
+(defrecord FetchMore [])
 
 (defrecord ShowServiceGeoJSON [url])
 (defrecord CloseServiceGeoJSON [])
@@ -32,9 +33,9 @@
       :offset offset})))
 
 (defn- search
-  ([app] (search app 500))
-  ([{service-search :service-search :as app} timeout-ms]
-   (let [on-success (tuck/send-async! ->SearchResponse)]
+  ([app append?] (search app append? 500))
+  ([{service-search :service-search :as app} append? timeout-ms]
+   (let [on-success (tuck/send-async! ->SearchResponse append?)]
      ;; Clear old timeout, if any
      (when-let [search-timeout (:search-timeout service-search)]
        (.clearTimeout js/window search-timeout))
@@ -48,6 +49,8 @@
                                 :on-success on-success})
                    timeout-ms)))))
 
+(def page-size 25)
+
 (extend-protocol tuck/Event
 
   InitServiceSearch
@@ -55,7 +58,22 @@
     (comm/get! "service-search/facets"
                {:on-success (tuck/send-async! ->FacetsResponse)})
     ;; Immediately do a search without any parameters
-    (search (update-in app [:service-search :filters] merge {:limit 50 :offset 0}) 0))
+    (search (update-in app [:service-search :filters] merge
+                       {:limit page-size :offset 0})
+            false 0))
+
+  FetchMore
+  (process-event [_ app]
+    (.log js/console "HAETAAN LISÄÄ")
+    (search
+     (-> app
+         (update :service-search assoc :fetching-more? true)
+         (update-in [:service-search :filters]
+                    (fn [{:keys [limit offset] :as filters}]
+                      (assoc filters
+                             :limit page-size
+                             :offset (count (get-in app [:service-search :results]))))))
+     true))
 
   FacetsResponse
   (process-event [{facets :facets} app]
@@ -68,15 +86,18 @@
   (process-event [{filters :filters} app]
     (-> app
         (update-in [:service-search :filters] merge filters)
-        search))
+        (search false)))
 
   SearchResponse
-  (process-event [{response :response} app]
+  (process-event [{response :response append? :append?} app]
     (let [{:keys [empty-filters? results total-service-count]} response]
       (update app :service-search assoc
-              :results results
+              :results (if append?
+                         (into (get-in app [:service-search :results]) results)
+                         (vec results))
               :empty-filters? empty-filters?
-              :total-service-count total-service-count)))
+              :total-service-count total-service-count
+              :fetching-more? false)))
 
   ShowServiceGeoJSON
   (process-event [{:keys [url]} app]
