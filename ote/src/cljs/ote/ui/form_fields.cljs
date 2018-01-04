@@ -333,11 +333,11 @@
                 (:txt @state)]
          (when currency? "€")])})))
 
-;; Matches empty or any valid hour (0 - 23)
-(def hour-regex #"^(((1|2|3|4|5|6|7|8|9|0))|((0|1)(1|2|3|4|5|6|7|8|9|0)?)|(2(0|1|2|3)?))?$")
+;; Matches empty or any valid hour (00 - 23)
+(def hour-regex #"^(0?[0-9]|1[0-9]|2[0-3])$")
 
-;; Matches empty or any valid minute (0 - 59)
-(def minute-regex #"^((0|1|2|3|4|5)(1|2|3|4|5|6|7|8|9|0)?)?$")
+;; Matches empty or any valid minute (00 - 59)
+(def minute-regex #"^(0?[0-9]|[1-5][0-9])$")
 
 (defmethod field :time [{:keys [update! error warning] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
