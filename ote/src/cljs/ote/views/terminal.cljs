@@ -41,7 +41,7 @@
      :type :localized-text
      :is-empty?       validation/empty-localized-text?
      :full-width      true
-     :container-class "col-md-12"
+     :container-class "col-md-6"
      :rows            2
      :full-width?     true
      :write           #(assoc-in %1 [::t-service/assistance ::t-service/description] %2)
@@ -50,7 +50,7 @@
     {:name ::t-service/assistance-place-description
      :type :localized-text
      :full-width true
-     :container-class "col-md-12"
+     :container-class "col-md-6"
      :rows 2
      :full-width? true
      :write #(assoc-in %1 [::t-service/assistance ::t-service/assistance-place-description] %2)
