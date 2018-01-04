@@ -1,23 +1,26 @@
 <div role="main" class="hero">
     <div class="container">
-        {% if c.userobj %}
-            <script type="text/javascript">
+        <script type="text/javascript">
                 window.addEventListener('load', function hideTestEnvInfo() {
                     var el = window.document.querySelector('#test-env-warning');
 
-                    if (el && window.location.hostname.indexOf('testi') !== -1) {
-                        el.style.display = 'block';
+                    if (el && window.location.hostname.indexOf('localhost') !== -1) {
+                        el.style = 'border: red 4px dashed;';
                     }
                 });
             </script>
+            <div class="row">
+                <div id="test-env-warning" class="span12" style="position: absolute; top: -9999px;left: -9999px;">
+                    <p style="margin: 10px 0px 0px 10px; font-weight: bold;">TÄMÄ ON TESTIPALVELU! </p>
+                    <p style="margin: 10px;">Julkinen NAP-palvelukatalogi löytyy osoitteesta:  <a href="https://finap.fi/ote/#/services">finap.fi</a></p>
+                    <p style="margin: 10px;">Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta <a href="http://www.liikennevirasto.fi/nap">www.liikennevirasto.fi/nap </a></p>
+                </div>
+            </div>
 
+        {% if c.userobj %}
             <div class="row row1 module">
                 <div class="span12">
                     <p><b>{% trans user=c.userobj.display_name %}User greeting {{ user }}{% endtrans %}!</b></p>
-                </div>
-                <div id="test-env-warning" class="span12" style="border: red 4px dashed; display: none;">
-                    <p style="padding: 10px;">HUOM: Tämä on NAP -palvelun testiversio. <br>
-                        Tiedot eivät siirry varsinaiseen NAP-palveluun, joka avataan tuotannossa 20.12.2017.</p>
                 </div>
             </div>
 

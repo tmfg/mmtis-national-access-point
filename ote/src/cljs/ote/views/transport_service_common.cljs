@@ -75,7 +75,7 @@
      :prepare-for-save values/without-empty-rows
      :table-fields     [{:name      ::t-service/external-service-description
                          :type :localized-text
-                         ;:width "21%"
+                         :width "25%"
                          :read      (comp ::t-service/description ::t-service/external-interface)
                          :write     #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
                          :required? true
