@@ -729,7 +729,7 @@
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
-  :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
+  :showing-latest-services ["Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut. Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
   }
 
  :leaflet
