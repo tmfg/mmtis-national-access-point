@@ -73,7 +73,7 @@
                       (assoc filters
                              :limit page-size
                              :offset (count (get-in app [:service-search :results]))))))
-     true))
+     true 0))
 
   FacetsResponse
   (process-event [{facets :facets} app]
