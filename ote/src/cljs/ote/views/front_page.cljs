@@ -109,7 +109,7 @@
              [:br]
              "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/ote/#/services"} "finap.fi" ]
              [:br]
-             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "http://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
+             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
              ]])))
 
 (defn table-container-for-front-page [e! has-services? operator-services state]
