@@ -284,7 +284,7 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-        (http/transit-response (get-transport-service db (Long/parseLong id))))
+        (http/no-cache-transit-response (get-transport-service db (Long/parseLong id))))
 
    (POST "/transport-operator/group" {user :user}
      (http/transit-response

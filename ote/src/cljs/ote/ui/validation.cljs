@@ -25,6 +25,10 @@
     (or (nil? text-value)
       (str/blank? text-value))))
 
+(defn empty-enum-dropdown? [value]
+  (or (nil? (first value))
+    (str/blank? (first value))))
+
 ;; validate-rule multimethod implements validation rule checking by keyword name
 ;; Parameters:
 ;; name = the keyword name of the field

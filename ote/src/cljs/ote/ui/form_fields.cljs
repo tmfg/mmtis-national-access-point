@@ -229,40 +229,44 @@
 
 
 (defmethod field :multiselect-selection
-  [{:keys [update! label name style show-option show-option-short options form? error
+  [{:keys [update! label name style show-option show-option-short options form? error warning
            auto-width? full-width?]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field
-     (merge
-      {:style style
-       :floating-label-text label
-       :floating-label-fixed true
-       :multiple true
-       :value (clj->js (map option-idx selected-set))
-       :selection-renderer (fn [values]
-                             (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
-       :on-change (fn [event index values]
-                    (update! (into #{}
-                                   (map (partial nth options))
-                                   values)))}
-      (when auto-width?
-        {:auto-width true})
-      (when full-width?
-        {:full-width true}))
-     ;; Add selected value to vector
-     (doall
-      (map-indexed
-       (fn [i option]
-         ^{:key i}
-         [ui/menu-item {:value i
-                        :primary-text (show-option option)
-                        :inset-children true
-                        :checked (boolean (selected-set option))}])
-       options))]))
+    [:div
+      [ui/select-field
+       (merge
+        {:style style
+         :floating-label-text label
+         :floating-label-fixed true
+         :multiple true
+         :value (clj->js (map option-idx selected-set))
+         :selection-renderer (fn [values]
+                               (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
+         :on-change (fn [event index values]
+                      (update! (into #{}
+                                     (map (partial nth options))
+                                     values)))}
+        (when auto-width?
+          {:auto-width true})
+        (when full-width?
+          {:full-width true}))
+       ;; Add selected value to vector
+       (doall
+        (map-indexed
+         (fn [i option]
+           ^{:key i}
+           [ui/menu-item {:value i
+                          :primary-text (show-option option)
+                          :inset-children true
+                          :checked (boolean (selected-set option))}])
+         options))]
+    (when (or error warning)
+      [:div (stylefy/use-style style-base/required-element)
+       (if error error warning)])]))
 
 (defmethod field :checkbox-group [{:keys [update! label show-option options help]} data]
   (let [selected (set (or data #{}))]
@@ -329,11 +333,11 @@
                 (:txt @state)]
          (when currency? "€")])})))
 
-;; Matches empty or any valid hour (0 - 23)
-(def hour-regex #"^(((1|2|3|4|5|6|7|8|9|0))|((0|1)(1|2|3|4|5|6|7|8|9|0)?)|(2(0|1|2|3)?))?$")
+;; Matches empty or any valid hour (0 (or 00) - 23)
+(def hour-regex #"^(0?[0-9]|1[0-9]|2[0-3])$")
 
-;; Matches empty or any valid minute (0 - 59)
-(def minute-regex #"^((0|1|2|3|4|5)(1|2|3|4|5|6|7|8|9|0)?)?$")
+;; Matches empty or any valid minute (0 (or 00) - 59)
+(def minute-regex #"^(0?[0-9]|[1-5][0-9])$")
 
 (defmethod field :time [{:keys [update! error warning] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
