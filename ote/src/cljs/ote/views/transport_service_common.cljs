@@ -246,16 +246,19 @@
         :options t-service/days
         :show-option (tr-key [:enums ::t-service/day :full])
         :show-option-short (tr-key [:enums ::t-service/day :short])
-        :required? true}
+        :required? true
+        :is-empty? validation/empty-enum-dropdown?}
        {:name ::t-service/all-day
         :width "10%"
         :type :checkbox
         :write (fn [data all-day?]
                  (merge data
                         {::t-service/all-day all-day?}
-                        (when all-day?
+                        (if all-day?
                           {::t-service/from (time/->Time 0 0 nil)
-                           ::t-service/to (time/->Time 24 0 nil)})))}
+                           ::t-service/to (time/->Time 24 0 nil)}
+                          {::t-service/from nil
+                           ::t-service/to nil})))}
 
        {:name ::t-service/from
         :width "25%"

@@ -229,40 +229,44 @@
 
 
 (defmethod field :multiselect-selection
-  [{:keys [update! label name style show-option show-option-short options form? error
+  [{:keys [update! label name style show-option show-option-short options form? error warning
            auto-width? full-width?]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field
-     (merge
-      {:style style
-       :floating-label-text label
-       :floating-label-fixed true
-       :multiple true
-       :value (clj->js (map option-idx selected-set))
-       :selection-renderer (fn [values]
-                             (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
-       :on-change (fn [event index values]
-                    (update! (into #{}
-                                   (map (partial nth options))
-                                   values)))}
-      (when auto-width?
-        {:auto-width true})
-      (when full-width?
-        {:full-width true}))
-     ;; Add selected value to vector
-     (doall
-      (map-indexed
-       (fn [i option]
-         ^{:key i}
-         [ui/menu-item {:value i
-                        :primary-text (show-option option)
-                        :inset-children true
-                        :checked (boolean (selected-set option))}])
-       options))]))
+    [:div
+      [ui/select-field
+       (merge
+        {:style style
+         :floating-label-text label
+         :floating-label-fixed true
+         :multiple true
+         :value (clj->js (map option-idx selected-set))
+         :selection-renderer (fn [values]
+                               (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
+         :on-change (fn [event index values]
+                      (update! (into #{}
+                                     (map (partial nth options))
+                                     values)))}
+        (when auto-width?
+          {:auto-width true})
+        (when full-width?
+          {:full-width true}))
+       ;; Add selected value to vector
+       (doall
+        (map-indexed
+         (fn [i option]
+           ^{:key i}
+           [ui/menu-item {:value i
+                          :primary-text (show-option option)
+                          :inset-children true
+                          :checked (boolean (selected-set option))}])
+         options))]
+    (when (or error warning)
+      [:div (stylefy/use-style style-base/required-element)
+       (if error error warning)])]))
 
 (defmethod field :checkbox-group [{:keys [update! label show-option options help]} data]
   (let [selected (set (or data #{}))]
