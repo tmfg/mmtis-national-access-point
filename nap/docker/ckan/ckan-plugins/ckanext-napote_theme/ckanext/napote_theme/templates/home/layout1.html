@@ -4,7 +4,7 @@
                 window.addEventListener('load', function hideTestEnvInfo() {
                     var el = window.document.querySelector('#test-env-warning');
 
-                    if (el && window.location.hostname.indexOf('localhost') !== -1) {
+                    if (el && window.location.hostname.indexOf('testi') !== -1) {
                         el.style = 'border: red 4px dashed;';
                     }
                 });
