@@ -18,6 +18,7 @@
 (defn- search-params [{oa ::t-service/operation-area
                        text :text-search
                        st ::t-service/sub-type
+                       limit :limit offset :offset
                        :as filters}]
   (merge
    (when-not (empty? oa)
@@ -25,7 +26,10 @@
    (when text
      {:text text})
    (when-not (empty? st)
-     {:sub_types (str/join "," (map (comp name :sub-type) st))})))
+     {:sub_types (str/join "," (map (comp name :sub-type) st))})
+   (when (and limit offset)
+     {:limit limit
+      :offset offset})))
 
 (defn- search
   ([app] (search app 500))
@@ -40,8 +44,8 @@
       [:service-search :search-timeout]
       (.setTimeout js/window
                    #(comm/get! "service-search"
-                      {:params     (search-params (:filters service-search))
-                       :on-success on-success})
+                               {:params     (search-params (:filters service-search))
+                                :on-success on-success})
                    timeout-ms)))))
 
 (extend-protocol tuck/Event
@@ -51,7 +55,7 @@
     (comm/get! "service-search/facets"
                {:on-success (tuck/send-async! ->FacetsResponse)})
     ;; Immediately do a search without any parameters
-    (search app 0))
+    (search (update-in app [:service-search :filters] merge {:limit 50 :offset 0}) 0))
 
   FacetsResponse
   (process-event [{facets :facets} app]
@@ -68,10 +72,11 @@
 
   SearchResponse
   (process-event [{response :response} app]
-    (let [{:keys [empty-filters? results]} response]
+    (let [{:keys [empty-filters? results total-service-count]} response]
       (update app :service-search assoc
               :results results
-              :empty-filters? empty-filters?)))
+              :empty-filters? empty-filters?
+              :total-service-count total-service-count)))
 
   ShowServiceGeoJSON
   (process-event [{:keys [url]} app]

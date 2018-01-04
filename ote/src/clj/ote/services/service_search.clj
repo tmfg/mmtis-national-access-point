@@ -84,21 +84,29 @@
                         ::t-service/sub-type (op/in types)}))))
 
 
-(defn- search [db filters]
-  (let [result-id-sets [(operation-area-ids db (:operation-area filters))
-                        (sub-type-ids db (:sub-type filters))
-                        (text-search-ids db (:text filters))]
+(defn- search [db {:keys [operation-area sub-type text offset limit] :as filters}]
+  (let [result-id-sets [(operation-area-ids db operation-area)
+                        (sub-type-ids db sub-type)
+                        (text-search-ids db text)]
         empty-filters? (every? nil? result-id-sets)
         ids (if empty-filters?
               ;; No filters specified, show latest services
               (latest-service-ids db)
               ;; Combine with intersection (AND)
               (apply set/intersection
-                     (remove nil? result-id-sets)))]
+                     (remove nil? result-id-sets)))
+        options (if (and offset limit)
+                  {:specql.core/offset offset
+                   :specql.core/limit limit
+                   :specql.core/order-by :ote.db.modification/created
+                   :specql.core/order-direction :desc}
+                  {})]
     {:empty-filters? empty-filters?
+     :total-service-count (total-service-count db)
      :results (specql/fetch db ::t-service/transport-service-search-result
                             search-result-columns
-                            {::t-service/id (op/in ids)})}))
+                            {::t-service/id (op/in ids)}
+                            options)}))
 
 (defn- service-search-routes [db]
   (routes
@@ -113,7 +121,9 @@
                   :text (params "text")
                   :sub-type (when-let [st (some-> (params "sub_types")
                                                   (str/split #","))]
-                              (into #{} (map keyword st)))})))))
+                              (into #{} (map keyword st)))
+                  :limit (some-> "limit" params (Integer/parseInt))
+                  :offset (some-> "offset" params (Integer/parseInt))})))))
 
 (defrecord ServiceSearch []
   component/Lifecycle
