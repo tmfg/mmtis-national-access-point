@@ -18,7 +18,9 @@
             [ote.ui.validation :as validation]))
 
 (defn terminal-form-options [e! schemas]
-  {:name->label (tr-key [:field-labels :terminal] [:field-labels :transport-service-common])
+  {:name->label (tr-key [:field-labels :terminal]
+                        [:field-labels :transport-service-common]
+                        [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
@@ -36,6 +38,7 @@
      :layout :row}
 
     {:name ::t-service/assistance-description
+     :type :localized-text
      :is-empty?       validation/empty-localized-text?
      :full-width      true
      :container-class "col-md-12"
@@ -112,19 +115,14 @@
     :full-width? true
     :container-class "col-md-5"
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
-    :options     t-service/information-service-accessibility}
-
-
-
-
-
-   ))
+    :options     t-service/information-service-accessibility}))
 
 (defn terminal [e! {form-data ::t-service/terminal}]
   (r/with-let [groups [(ts-common/name-group (tr [:terminal-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces)
+                       (ts-common/service-hours-group)
                        (indoor-map-group)
                        (assistance-service-group)
                        (accessibility-and-other-services-group)]
