@@ -9,8 +9,7 @@
 (def localized-text-language-container
   {:font-size "12px"
    :float "right"
-   :padding-right "2em"
-   :margin-top "-10px"})
+   :margin-top "-3px"})
 
 (def localized-text-language-selected
   (merge localized-text-language

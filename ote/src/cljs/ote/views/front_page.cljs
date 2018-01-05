@@ -105,9 +105,12 @@
   (let [page-url (-> (.-location js/window))]
      (when (s/includes? (str page-url) "testi") ;; if url contains "testi" show message -> testi.finap.fi
            [:div {:style {:border "red 4px dashed"}}
-            [:p {:style {:padding "10px"}} "HUOM: Tämä on NAP -palvelun testiversio."
+            [:p {:style {:padding "10px"}} "TÄMÄ ON TESTIPALVELU!"
              [:br]
-             "Tiedot eivät siirry varsinaiseen NAP-palveluun, joka avataan tuotannossa 20.12.2017."]])))
+             "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/ote/#/services"} "finap.fi" ]
+             [:br]
+             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
+             ]])))
 
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
