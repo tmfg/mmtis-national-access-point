@@ -23,19 +23,24 @@
     {:label label
     :layout :row
     :columns 3}
+
     {:class "set-bottom"
-    :name   ::t-service/url
-    :type   :string
-    :read   (comp ::t-service/url service-url-field)
-    :write  (fn [data url]
-             (assoc-in data [service-url-field ::t-service/url] url))}
+     :name   ::t-service/url
+     :type   :string
+     :read   (comp ::t-service/url service-url-field)
+     :write  (fn [data url]
+             (assoc-in data [service-url-field ::t-service/url] url))
+     :container-class "col-md-6"
+     :full-width?  true}
     {:name ::t-service/description
-    :type  :localized-text
+     :type  :localized-text
      :is-empty? validation/empty-localized-text?
-    :rows  1
-    :read  (comp ::t-service/description service-url-field)
-    :write (fn [data desc]
-             (assoc-in data [service-url-field ::t-service/description] desc))}))
+     :rows  1
+     :read  (comp ::t-service/description service-url-field)
+     :write (fn [data desc]
+             (assoc-in data [service-url-field ::t-service/description] desc))
+     :container-class "col-md-6"
+     :full-width?  true}))
 
 (defn service-urls
   "Creates a table for additional service urls."
@@ -226,7 +231,7 @@
 
 (defn service-hours-group []
   (let [tr* (tr-key [:field-labels :service-exception])
-        write (fn [key]
+        write-time (fn [key]
                 (fn [{all-day? ::t-service/all-day :as data} time]
                   ;; Don't allow changing time if all-day checked
                   (if all-day?
@@ -263,19 +268,13 @@
        {:name ::t-service/from
         :width "25%"
         :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/from)
-        :default-time {:hours "08" :minutes "00"}
+        :write (write-time ::t-service/from)
         :required? true
         :is-empty? time/empty-time?}
        {:name ::t-service/to
         :width "25%"
         :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/to)
-        :default-time {:hours "19" :minutes "00"}
+        :write (write-time ::t-service/to)
         :required? true
         :is-empty? time/empty-time?}]
       :delete?      true

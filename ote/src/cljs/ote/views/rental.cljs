@@ -139,11 +139,11 @@
      :container-class "col-md-6"}
 
     {:name ::t-service/limited-accessibility-description
-    :type :localized-text
+     :type :localized-text
      :is-empty? validation/empty-localized-text?
-    :rows 1
-    :container-class "col-md-6"
-    :full-width? true}
+     :rows 1
+     :container-class "col-md-6"
+     :full-width? true}
 
     {:name ::t-service/accessibility-info-url
     :type :string
@@ -189,7 +189,9 @@
    {:name ::t-service/luggage-restrictions
     :type :localized-text
     :is-empty? validation/empty-localized-text?
-    :rows 1}
+    :rows 1
+    :container-class "col-md-6"
+    :full-width?  true}
 
    {:name        ::t-service/payment-methods
     :type        :multiselect-selection

@@ -42,7 +42,9 @@
     {:name      ::t-service/luggage-restrictions
      :type      :localized-text
      :is-empty? validation/empty-localized-text?
-     :rows      2}
+     :rows      1
+     :container-class "col-xs-12"
+     :full-width?  true}
 
     ))
 
