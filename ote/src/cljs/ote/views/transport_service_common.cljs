@@ -226,7 +226,7 @@
 
 (defn service-hours-group []
   (let [tr* (tr-key [:field-labels :service-exception])
-        write (fn [key]
+        write-time (fn [key]
                 (fn [{all-day? ::t-service/all-day :as data} time]
                   ;; Don't allow changing time if all-day checked
                   (if all-day?
@@ -251,31 +251,27 @@
        {:name ::t-service/all-day
         :width "10%"
         :type :checkbox
-        :write (fn [data all-day?]
+        :write (do
+                 #(assoc-in %1 [::t-service/service-hours ::t-service/all-day] %2)
+                 (fn [data all-day?]
                  (merge data
                         {::t-service/all-day all-day?}
                         (if all-day?
                           {::t-service/from (time/->Time 0 0 nil)
                            ::t-service/to (time/->Time 24 0 nil)}
                           {::t-service/from nil
-                           ::t-service/to nil})))}
+                           ::t-service/to nil}))))}
 
        {:name ::t-service/from
         :width "25%"
         :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/from)
-        :default-time {:hours "08" :minutes "00"}
+        :write (write-time ::t-service/from)
         :required? true
         :is-empty? time/empty-time?}
        {:name ::t-service/to
         :width "25%"
         :type :time
-        :cancel-label (tr [:buttons :cancel])
-        :ok-label (tr [:buttons :save])
-        :write (write ::t-service/to)
-        :default-time {:hours "19" :minutes "00"}
+        :write (write-time ::t-service/to)
         :required? true
         :is-empty? time/empty-time?}]
       :delete?      true
