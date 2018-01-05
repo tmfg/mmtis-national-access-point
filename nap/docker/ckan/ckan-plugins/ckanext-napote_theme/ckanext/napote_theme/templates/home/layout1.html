@@ -5,11 +5,13 @@
                     var el = window.document.querySelector('#test-env-warning');
 
                     if (el && window.location.hostname.indexOf('testi') !== -1) {
+                         {# Remove positioning and replace it with border to make the element visible in testing environment. #}
                         el.style = 'border: red 4px dashed;';
                     }
                 });
             </script>
             <div class="row">
+                {# Move element out of view due to <p> element padding #}
                 <div id="test-env-warning" class="span12" style="position: absolute; top: -9999px;left: -9999px;">
                     <p style="margin: 10px 0px 0px 10px; font-weight: bold;">TÄMÄ ON TESTIPALVELU! </p>
                     <p style="margin: 10px;">Julkinen NAP-palvelukatalogi löytyy osoitteesta:  <a href="https://finap.fi/ote/#/services">finap.fi</a></p>
