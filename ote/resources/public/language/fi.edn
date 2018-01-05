@@ -113,8 +113,8 @@
    :ote.db.transport-service/telephone              "Varaa palvelu numerosta"
    :ote.db.transport-service/email                  "Varaa palvelu sähköpostilla (email)"
    :ote.db.transport-service/assistance-url         "Tee varaus osoitteesta (www)"
-   :ote.db.transport-service/assistance-description "Avustupalveluja koskeva kuvaus"
-   :ote.db.transport-service/assistance-place-description "Avustupalvelujen sijaintien kuvaus"
+   :ote.db.transport-service/assistance-description "Avustuspalveluja koskeva kuvaus"
+   :ote.db.transport-service/assistance-place-description "Avustuspalvelujen sijaintien kuvaus"
    :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."
    }
 
