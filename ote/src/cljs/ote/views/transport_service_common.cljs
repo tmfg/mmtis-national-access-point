@@ -23,19 +23,24 @@
     {:label label
     :layout :row
     :columns 3}
+
     {:class "set-bottom"
-    :name   ::t-service/url
-    :type   :string
-    :read   (comp ::t-service/url service-url-field)
-    :write  (fn [data url]
-             (assoc-in data [service-url-field ::t-service/url] url))}
+     :name   ::t-service/url
+     :type   :string
+     :read   (comp ::t-service/url service-url-field)
+     :write  (fn [data url]
+             (assoc-in data [service-url-field ::t-service/url] url))
+     :container-class "col-md-6"
+     :full-width?  true}
     {:name ::t-service/description
-    :type  :localized-text
+     :type  :localized-text
      :is-empty? validation/empty-localized-text?
-    :rows  1
-    :read  (comp ::t-service/description service-url-field)
-    :write (fn [data desc]
-             (assoc-in data [service-url-field ::t-service/description] desc))}))
+     :rows  1
+     :read  (comp ::t-service/description service-url-field)
+     :write (fn [data desc]
+             (assoc-in data [service-url-field ::t-service/description] desc))
+     :container-class "col-md-6"
+     :full-width?  true}))
 
 (defn service-urls
   "Creates a table for additional service urls."
@@ -251,16 +256,14 @@
        {:name ::t-service/all-day
         :width "10%"
         :type :checkbox
-        :write (do
-                 #(assoc-in %1 [::t-service/service-hours ::t-service/all-day] %2)
-                 (fn [data all-day?]
+        :write (fn [data all-day?]
                  (merge data
                         {::t-service/all-day all-day?}
                         (if all-day?
                           {::t-service/from (time/->Time 0 0 nil)
                            ::t-service/to (time/->Time 24 0 nil)}
                           {::t-service/from nil
-                           ::t-service/to nil}))))}
+                           ::t-service/to nil})))}
 
        {:name ::t-service/from
         :width "25%"
