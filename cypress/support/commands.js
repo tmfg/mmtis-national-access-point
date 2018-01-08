@@ -25,9 +25,12 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... });
 
 
-// Login without UI using CKAN repoze.auth_tkt login
-// https://docs.cypress.io/guides/getting-started/testing-your-app.html#Logging-In
-// Note: cy.visit should be called before invoking this command, so that the host url is properly set.
+/**
+ * Login without UI using CKAN repoze.auth_tkt login
+ * https://docs.cypress.io/guides/getting-started/testing-your-app.html#Logging-In
+ *
+ * NOTE: Cypress automatically clears all cookies before each test to prevent state from being shared across tests.
+ */
 Cypress.Commands.add('login', (login, password) => {
     const username = login || Cypress.env('NAP_LOGIN');
 
@@ -43,4 +46,23 @@ Cypress.Commands.add('login', (login, password) => {
             password: password || Cypress.env('NAP_PASSWORD')
         },
     });
+});
+
+
+Cypress.Commands.add('logout', () => {
+    cy.log(`Logging out`);
+
+    cy.request({
+        method: 'GET',
+        url: '/user/_logout',
+        followRedirect: false,
+    });
+});
+
+/**
+ * Cookies will not be cleared before the NEXT test starts
+ * Use preferably in beforeEach block.
+ */
+Cypress.Commands.add('preserveSessionOnce', () => {
+    Cypress.Cookies.preserveOnce('auth_tkt', 'ckan', 'finap_lang');
 });
