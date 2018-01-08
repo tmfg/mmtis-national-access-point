@@ -91,8 +91,13 @@
          (if published?
            ;; For published services, call CKAN API to delete dataset
            ;; this cascades to all OTE information
-           (publish/delete-published-service! nap-config db user id)
-
+           (do
+             (try
+               (publish/delete-published-service! nap-config db user id)
+               ;; If for some reason the service is not found
+               ;; from ckan then delete service from OTE anyway
+               (catch Exception e
+                 (delete! db ::t-service/transport-service {::t-service/id id}))))
            ;; Otherwise delete from transport-service table
            (delete! db ::t-service/transport-service {::t-service/id id}))
          (http/transit-response id)))))
