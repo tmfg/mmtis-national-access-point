@@ -42,7 +42,9 @@
     {:name      ::t-service/luggage-restrictions
      :type      :localized-text
      :is-empty? validation/empty-localized-text?
-     :rows      2}
+     :rows      2
+     :full-width? true
+     :container-class "col-xs-12"}
 
     ))
 
@@ -60,7 +62,7 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/vehicle-accessibility
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
@@ -68,60 +70,60 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/vehicle-accessibility
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/guaranteed-info-service-accessibility
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options t-service/information-service-accessibility
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/limited-info-service-accessibility
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options t-service/information-service-accessibility
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/transportable-aid
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/transportable-aid
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
     :is-empty? validation/empty-localized-text?
     :rows 1
     :full-width? true
-    :container-class "col-md-6"}
+    :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
     :is-empty? validation/empty-localized-text?
     :rows 1
-    :container-class "col-md-6"
+    :container-class "col-xs-12 col-sm-6 col-md-6"
     :full-width? true}
 
    {:name ::t-service/accessibility-info-url
     :type :string
-    :container-class "col-md-6"
+    :container-class "col-xs-12 col-sm-6 col-md-6"
     :full-width? true}
 
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/additional-services])
     :options     t-service/additional-services
-    :container-class "col-md-5"
+    :container-class "col-xs-12 col-sm-6 col-md-6"
     :full-width? true}
    ))
 
@@ -141,7 +143,7 @@
      [:div
       [:p (tr [:form-help :pricing-info])]])
 
-   {:container-class "col-md-12"
+   {:container-class "col-xs-12"
     :name         ::t-service/price-classes
     :type         :table
     :prepare-for-save values/without-empty-rows
@@ -152,13 +154,13 @@
     :add-label (tr [:buttons :add-new-price-class])
     :delete?      true}
 
-   {:container-class "col-md-6"
+   {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name        ::t-service/payment-methods
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/payment-methods])
     :options     t-service/payment-methods}
 
-   {:container-class "col-md-5"
+   {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/payment-method-description
     :type :localized-text
     :is-empty? validation/empty-localized-text?
@@ -166,7 +168,7 @@
     :full-width? true
     }
 
-   {:container-class "col-md-6"
+   {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/pricing-description
     :type :localized-text
     :is-empty? validation/empty-localized-text?
@@ -175,7 +177,7 @@
     :read (comp ::t-service/description ::t-service/pricing)
     }
 
-   {:container-class "col-md-5"
+   {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/pricing-url
     :full-width? true
     :type :string
