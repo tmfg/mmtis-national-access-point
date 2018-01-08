@@ -1,0 +1,8 @@
+{
+  "contact": {
+    "street": "Test street 3",
+    "postal_code": 90100,
+    "post_office": "Oulu"
+  },
+  "areas": ["Oulu", "Helsinki"]
+}

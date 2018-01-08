@@ -3,13 +3,13 @@
 
 // Basic app logic and structure
 
-describe('NAP Main', () => {
-    beforeEach(() => {
+describe('NAP Main', function () {
+    beforeEach(function () {
         cy.visit('/');
     });
 
     // https://docs.cypress.io/guides/getting-started/testing-your-app.html#Logging-In
-    it('should login properly', () => {
+    it('should login properly', function () {
         cy.login();
 
         // Check if our repoze auth-tkt session cookie exists after login
@@ -25,14 +25,14 @@ describe('NAP Main', () => {
         });
     });
 
-    it('.should() - assert that <title> is correct', () => {
+    it('.should() - assert that <title> is correct', function () {
         cy.title().should('include', 'Tervetuloa - NAP');
     });
 });
 
 
-describe('Header - Logged Out', () => {
-    it('CKAN should have proper header links', () => {
+describe('Header - Logged Out', function () {
+    it('CKAN should have proper header links', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
@@ -44,7 +44,7 @@ describe('Header - Logged Out', () => {
         });
     });
 
-    it('OTE should have proper header links', () => {
+    it('OTE should have proper header links', function () {
         cy.visit('/ote/');
 
         cy.get('.ote-sovellus .container-fluid').find('ul')
@@ -58,12 +58,18 @@ describe('Header - Logged Out', () => {
     });
 });
 
-describe('Header - Logged In', () => {
-    beforeEach(() => {
+describe('Header - Logged In', function () {
+    // Login only once before the tests run
+    before(function () {
         cy.login();
     });
 
-    it('CKAN should have proper header links', () => {
+    beforeEach(function () {
+        // Session cookies will not be cleared before the NEXT test starts
+        cy.preserveSessionOnce();
+    });
+
+    it('CKAN should have proper header links', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
