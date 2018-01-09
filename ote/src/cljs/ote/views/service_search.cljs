@@ -153,7 +153,8 @@
         {:name ::t-service/operation-area
          :type :multiselect-selection
          :show-option #(str (:text %) " (" (:count %) ")")
-         :options (::t-service/operation-area facets)}
+         :options (::t-service/operation-area facets)
+         :auto-width? true}
 
         {:name ::t-service/sub-type
          :type :multiselect-selection
