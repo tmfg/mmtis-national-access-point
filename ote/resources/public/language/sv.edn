@@ -535,7 +535,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :user-menu-log-out                          "Utloggning"
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Sammandrag"
-  :user-menu-nap-help                         "NAP hjälp"
+  :user-menu-nap-help                         "Hjälp"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"

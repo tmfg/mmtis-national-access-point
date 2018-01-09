@@ -542,7 +542,7 @@
   :user-menu-log-out                          "Kirjaudu ulos"
   :user-menu-profile                          "Käyttäjätilin muokkaus"
   :user-menu-summary                          "Yhteenveto"
-  :user-menu-nap-help                         "NAP-palvelun käyttöohje"
+  :user-menu-nap-help                         "Käyttöohje"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
