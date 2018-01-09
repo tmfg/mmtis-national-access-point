@@ -206,8 +206,8 @@
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
      (when (not (empty? (:ote.ui.form/missing-required-fields data)))
-       [ui/card {:style {:margin-top "0.5em" :margin-bottom "0.5em"}}
-        [ui/card-text (tr [:form-help :publish-missing-required])]])
+       [ui/card {:style {:margin-bottom "1em"}}
+        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
      (if published?
        ;; True
