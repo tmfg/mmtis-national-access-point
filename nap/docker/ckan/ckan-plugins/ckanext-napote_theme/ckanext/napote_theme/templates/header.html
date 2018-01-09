@@ -32,7 +32,6 @@
                 <div class="nav-collapse collapse">
                     <nav class="section navigation">
 
-
                         {% block header_site_navigation %}
                             <ul class="nav nav-pills">
                                 {% block header_site_navigation_tabs %}
@@ -70,6 +69,13 @@
 
                         {% block header_account_container_content %}
                             {% if c.userobj %}
+                                <ul class="nav nav-pills">
+                                    <li>
+                                        <a href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" target="_blank" title="NAP-palvelun käyttöohje">
+                                            <span class="text">{{_('NAP user guide label')}}</span>
+                                        </a>
+                                    </li>
+                                </ul>
                                 <ul class="nav">
                                     <li>
                                         <div class="dropdown account avatar authed" data-module="me"
@@ -114,11 +120,6 @@
                                                                 <span class="text">{{ _('Give feedback') }}</span>
                                                             </a>
                                                         </li>
-                                                        <li>
-                                                            <a href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" target="_blank" title="NAP-palvelun käyttöohje">
-                                                                <span class="text">{{_('NAP user guide label')}}</span>
-                                                            </a>
-                                                        </li>
 
 
                                                 {% endblock %}
@@ -145,6 +146,11 @@
                                 </ul>
                             {% else %}
                                 <ul class="nav nav-pills">
+                                    <li>
+                                        <a href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" target="_blank" title="NAP-palvelun käyttöohje">
+                                            <span class="text">{{_('NAP user guide label')}}</span>
+                                        </a>
+                                    </li>
                                     {% block header_account_notlogged %}
                                         <li {% if c.controller == 'ckanext.napote_theme.controller:CustomUserController' and c.action == 'login' %} class="active" {% endif %}>
                                             {% link_for _('Log in'), controller='user', action='login' %}
