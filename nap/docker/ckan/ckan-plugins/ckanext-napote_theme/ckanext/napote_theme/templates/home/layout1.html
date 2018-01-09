@@ -1,3 +1,4 @@
+{% set intro_list = g.site_intro_text %}
 <div role="main" class="hero">
     <div class="container">
         <script type="text/javascript">
@@ -18,8 +19,23 @@
                     <p style="margin: 10px;">Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta <a href="http://www.liikennevirasto.fi/nap">www.liikennevirasto.fi/nap </a></p>
                 </div>
             </div>
-
         {% if c.userobj %}
+
+            {% if intro_list %}
+                {% set splitted_list = intro_list.split('--') %}
+                {% for intro in splitted_list: %}
+                <div style="background-color: orange; padding: 10px; margin-top: 5px; color: white;">
+                    <div class="row">
+                        <div class="span1" style="">
+                            <i class="fa fa-info-circle" style="font-size: 32px; padding: 10px 0px 10px 0px;"></i>
+                        </div>
+                        <div class="span10">
+                            {{ h.render_markdown(intro) }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
             <div class="row row1 module">
                 <div class="span12">
                     <p><b>{% trans user=c.userobj.display_name %}User greeting {{ user }}{% endtrans %}!</b></p>
