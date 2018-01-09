@@ -281,19 +281,18 @@
 
 (defn rental [e! service]
   (with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
-                             (ts-common/contact-info-group)
-                             (ts-common/place-search-group e! ::t-service/rentals)
-                             (ts-common/external-interfaces)
-                             (vehicle-group)
-                             (luggage-restrictions-groups)
-                             (accessibility-group)
-                             (additional-services)
-                             (usage-area)
-                             (ts-common/service-url
-                              (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                              ::t-service/booking-service)
-                             (pick-up-locations e!)
-                             ]
+                     (ts-common/contact-info-group)
+                     (ts-common/place-search-group e! ::t-service/rentals)
+                     (ts-common/external-interfaces)
+                     (vehicle-group)
+                     (luggage-restrictions-groups)
+                     (accessibility-group)
+                     (additional-services)
+                     (usage-area)
+                     (ts-common/service-url
+                      (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                      ::t-service/booking-service)
+                     (pick-up-locations e!)]
                      options (rental-form-options e! groups)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))

@@ -308,8 +308,7 @@
                        :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
           (-> app
               (assoc :service-save-in-progress true)
-              (dissoc :before-unload-message))
-          )
+              (dissoc :before-unload-message)))
           (dissoc app :before-unload-message))))
 
   SaveTransportServiceResponse
