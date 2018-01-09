@@ -95,6 +95,7 @@
    :ote.db.transport-service/currency                  "Valuta"
 
    :ote.db.transport-service/pricing-description "Beskriv prissättningen"
+   :ote.db.transport-service/pricing-description-taxi "Beskriv prissättningen"
    :ote.db.transport-service/pricing-url "Prissättning www-sidor"
    :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"
    }

@@ -22,8 +22,6 @@
              [ote.ui.validation :as validation])
   (:require-macros [reagent.core :refer [with-let]]))
 
-
-
 (defn transportation-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
@@ -125,13 +123,19 @@
     :full-width? true}
    ))
 
-(defn pricing-group [e! form-data]
+(defn pricing-group [sub-type]
   (let [price-class-name-label (cond
-                                 (= :taxi (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
-                                 (= :other (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
-                                 (= :request (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
-                                 (= :schedule (get form-data ::t-service/sub-type)) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
-                                 :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))]
+                                 (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
+                                 (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
+                                 (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
+                                 (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
+                                 :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))
+        price-description-label (cond
+                                 (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description-taxi])
+                                 (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
+                                 (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
+                                 (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
+                                 :else (tr [:field-labels :passenger-transportation ::t-service/pricing-description]))]
   (form/group
    {:label (tr [:passenger-transportation-page :header-price-information])
     :columns 3
@@ -168,6 +172,7 @@
 
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/pricing-description
+    :label price-description-label
     :type :localized-text
     :is-empty? validation/empty-localized-text?
     :full-width? true
@@ -200,7 +205,7 @@
                (tr [:field-labels :transport-service-common ::t-service/booking-service])
                ::t-service/booking-service)
               (accessibility-group)
-              (pricing-group e! form-data)
+              (pricing-group (get service ::t-service/sub-type))
               (ts-common/service-hours-group)]
              form-options (transportation-form-options e! form-groups)]
     [:div.row
