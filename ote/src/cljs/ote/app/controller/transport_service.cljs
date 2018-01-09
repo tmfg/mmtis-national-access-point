@@ -299,10 +299,17 @@
                      ::t-service/transport-operator-id (::t-operator/id operator))
               (update ::t-service/operation-area place-search/place-references)
               transform-save-by-type)]
-      (comm/post! "transport-service" service-data
-                  {:on-success (tuck/send-async! ->SaveTransportServiceResponse)
-                   :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
-      (dissoc app :before-unload-message)))
+
+      ;; Disable post if concurrent save event is in progress
+      (if (not (:service-save-in-progress app))
+        (do
+          (comm/post! "transport-service" service-data
+                      {:on-success (tuck/send-async! ->SaveTransportServiceResponse)
+                       :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
+          (-> app
+              (assoc :service-save-in-progress true)
+              (dissoc :before-unload-message)))
+          (dissoc app :before-unload-message))))
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
@@ -311,13 +318,15 @@
                 response)]
     (routes/navigate! :own-services)
     (-> app
-        (assoc :services-changed? true
+        (assoc :service-save-in-progress false
+               :services-changed? true
                :page :own-services)
         (dissoc :transport-service))))
 
   FailedTransportServiceResponse
   (process-event [{response :response} app]
-    (assoc app :flash-message-error (tr [:common-texts :save-failed])))
+    (assoc app :service-save-in-progress false
+               :flash-message-error (tr [:common-texts :save-failed])))
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
