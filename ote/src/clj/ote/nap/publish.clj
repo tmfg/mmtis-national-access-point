@@ -88,6 +88,11 @@
            ::t-service/ckan-resource-id ::t-service/id}
          {::t-service/transport-service-id id}))
 
+(defn delete-resources-from-published-service!
+  [{:keys [api export-base-url] :as nap-config} user resources]
+  (let [ids (map #(:ote.db.transport-service/ckan-resource-id %) resources)]
+    (doall (map #(ckan/delete-dataset-resource! (ckan/->CKAN api (get-in user [:user :apikey])) %) ids))))
+
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
   [{:keys [api export-base-url] :as nap-config} db user transport-service-id]
@@ -110,7 +115,6 @@
                  (ckan/add-or-update-dataset-resource!
                   c (merge
                      {:ckan/package-id (:ckan/id dataset)
-                      ;:ckan/name (-> external-interface ::t-service/description first ::t-service/text)
                       :ckan/name (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
                                    (-> external-interface ::t-service/description first ::t-service/text)
                                    "Rajapinta")

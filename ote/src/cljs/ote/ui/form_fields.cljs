@@ -469,50 +469,52 @@
       [ui/table-body {:display-row-checkbox false}
        (doall
         (map-indexed
-         (fn [i row]
+         (fn [i row]           
            (let [{:keys [errors missing-required-fields]} (and error-data
                                                                (< i (count error-data))
                                                                (nth error-data i))]
-             ^{:key i}
-             [ui/table-row (merge {:selectable false :display-border false}
-                                  ;; If there are errors or missing fields, make the
-                                  ;; row taller to show error messages
-                                  (when (or errors missing-required-fields)
-                                    {:style {:height 65}}))
-              (doall
-               (for [{:keys [name read write width type component] :as tf} table-fields
-                     :let [field-error (get errors name)
-                           missing? (get missing-required-fields name)
-                           update-fn (if write
-                                       #(update data i write %)
-                                       #(assoc-in data [i name] %))
-                           value ((or read name) row)]]
-                 ^{:key name}
-                 [ui/table-row-column {:style {:width width}}
-                  (if (= :component type)
-                    (component {:update-form! #(update! (update-fn %))
-                                :data value})
-                    [field (merge (assoc tf
-                                         :table? true
-                                         :update! #(update! (update-fn %)))
-                                  (when missing?
-                                    {:warning (tr [:common-texts :required-field])})
-                                  (when field-error
-                                    {:error field-error}))
-                     value])]))
-              (when delete?
-                [ui/table-row-column {:style {:width "70px"}}
-                 [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
-                                                                     (take i data))
-                                                                   (drop (inc i) data))))}
-                  [ic/action-delete]]])]))
+             (when (not (:deleted? row))
+               
+               ^{:key i}
+               [ui/table-row (merge {:selectable false :display-border false}
+                                    ;; If there are errors or missing fields, make the
+                                    ;; row taller to show error messages
+                                    (when (or errors missing-required-fields)
+                                      {:style {:height 65}}))
+                (doall 
+                 (for [{:keys [name read write width type component] :as tf} table-fields
+                       :let [field-error (get errors name)
+                             missing? (get missing-required-fields name)
+                             update-fn (if write
+                                         #(update data i write %)
+                                         #(assoc-in data [i name] %))
+                             value ((or read name) row)]]
+                   ^{:key name}
+                   [ui/table-row-column {:style {:width width}}                    
+                    (if (= :component type)
+                      (component {:update-form! #(update! (update-fn %))
+                                  :data value})
+                      [field (merge (assoc tf
+                                           :table? true
+                                           :update! #(update! (update-fn %)))
+                                    (when missing?
+                                      {:warning (tr [:common-texts :required-field])})
+                                    (when field-error
+                                      {:error field-error}))
+                       value])]))
+                (when delete?
+                  [ui/table-row-column {:style {:width "70px"}}
+                   [ui/icon-button {:on-click #(update!
+                                                (when (>= i 0)
+                                                  (assoc-in data [i :deleted?] true)))}                  
+                    [ic/action-delete]]])])))
          data))]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
-           [buttons/save {:on-click #(update! (conj (or data []) {}))
-                      :label add-label
-                      :label-style style-base/button-label-style
-                      :disabled (values/effectively-empty? (last data))}]])]))
+        [buttons/save {:on-click #(update! (conj (or data []) {}))
+                       :label add-label
+                       :label-style style-base/button-label-style
+                       :disabled (values/effectively-empty? (last data))}]])]))
 
 (defmethod field :checkbox [{:keys [update! label warning error style]} checked?]
   [:div (when error (stylefy/use-style style-base/required-element))
