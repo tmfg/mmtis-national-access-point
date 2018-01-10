@@ -249,9 +249,17 @@
          :selection-renderer (fn [values]
                                (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
          :on-change (fn [event index values]
-                      (update! (into #{}
-                                     (map (partial nth options))
-                                     values)))}
+                      (cond
+                        ;; Select all - if :ALL option is present, if first element is selected and if all options aren't selected
+                        (and (some #(= :ALL %) options) (some #(= 0 %) values) (<= (count values) (count (drop 1 options))))
+                          (update! (drop 1 options))
+                        ;;Deselect all
+                        (and (some #(= :ALL %) options) (some #(= 0 %) values) (= (count options) (count values)))
+                          (update! (into #{} nil))
+                        ;; Select one
+                        :else (update! (into #{}
+                                             (map (partial nth options))
+                                             values))))}
         (when auto-width?
           {:auto-width true})
         (when full-width?

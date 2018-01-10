@@ -39,7 +39,7 @@
 
 (def gen-service-hours
   (gen/hash-map
-   ::t-service/week-days (gen/vector (gen/elements t-service/days) 1 7)
+   ::t-service/week-days (gen/vector (gen/elements (drop 1 t-service/days)) 1 7) ;; Drop :ALL at the beginning of the vector
    ::t-service/from gen-time
    ::t-service/to gen-time
    ::t-service/description gen-localized-text-array))
