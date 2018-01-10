@@ -119,6 +119,8 @@
                           style-base/required-element)
      :hint-style (merge style-base/placeholder
                         hint-style)}
+    (when max-length
+      {:max-length max-length})
     (when full-width?
       {:full-width true})
     (when style

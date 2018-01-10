@@ -6,7 +6,7 @@
 (def body {:margin 0
            :padding 0})
 
-(def mobile-width-px 950)
+(def mobile-width-px 1000)
 
 (def wrapper {:padding-top "20px"})
 

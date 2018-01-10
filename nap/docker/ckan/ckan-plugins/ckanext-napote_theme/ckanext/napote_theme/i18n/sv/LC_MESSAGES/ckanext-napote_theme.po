@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2017-12-19 17:21+0200\n"
+"PO-Revision-Date: 2018-01-09 14:45+0200\n"
 "Last-Translator: \n"
 "Language: sv\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -112,7 +112,7 @@ msgstr "Ge respons"
 #: ckanext/napote_theme/templates/footer.html:16
 #: ckanext/napote_theme/templates/header.html:119
 msgid "NAP user guide label"
-msgstr "NAP-palvelun käyttöohje"
+msgstr "Käyttöohje"
 
 #: ckanext/napote_theme/templates/footer.html:24
 msgid ""
