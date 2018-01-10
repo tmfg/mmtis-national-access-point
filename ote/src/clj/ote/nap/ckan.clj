@@ -132,6 +132,9 @@
 (defn update-dataset-resource! [ckan resource]
   (ckan-resource-action! ckan "action/resource_update" resource))
 
+(defn delete-dataset-resource! [ckan resource-id]
+  (ckan-post ckan "action/resource_delete" {:id resource-id}))
+
 (defn add-or-update-dataset-resource! [ckan resource]
   (let [action (if (:ckan/id resource)
                  update-dataset-resource!
