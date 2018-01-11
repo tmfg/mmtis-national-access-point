@@ -15,7 +15,7 @@
   "videoRecording": true,
   "videoUploadOnPasses": true,
   "viewportHeight": 660,
-  "viewportWidth": 1000,
+  "viewportWidth": 1080,
   "waitForAnimations": true,
   "watchForFileChanges": true
 }

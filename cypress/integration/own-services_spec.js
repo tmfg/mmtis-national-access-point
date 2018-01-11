@@ -81,7 +81,7 @@ describe('Add a new service', function () {
                     .then(() => {
                         cy.contains(area).click();
 
-                        return cy.wait(1000);
+                        return cy.wait(2000);
                     });
             });
 
