@@ -124,18 +124,16 @@
    ))
 
 (defn pricing-group [sub-type]
-  (let [price-class-name-label (cond
-                                 (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
-                                 (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
-                                 (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
-                                 (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
-                                 :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))
-        price-description-label (cond
-                                 (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description-taxi])
-                                 (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
-                                 (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
-                                 (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
-                                 :else (tr [:field-labels :passenger-transportation ::t-service/pricing-description]))]
+  (let [price-class-name-label
+          (cond
+            (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
+            (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
+            (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
+            (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
+            :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))
+        price-description-label (if (= :taxi sub-type)
+                                  (tr [:field-labels :passenger-transportation ::t-service/pricing-description-taxi])
+                                  (tr [:field-labels :passenger-transportation ::t-service/pricing-description]))]
   (form/group
    {:label (tr [:passenger-transportation-page :header-price-information])
     :columns 3
@@ -191,7 +189,7 @@
 
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service}]
-  (with-let [form-groups
+  (let [form-groups
              [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group)
