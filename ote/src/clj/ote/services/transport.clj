@@ -226,8 +226,15 @@
                   {::t-service/transport-service-id transport-service-id
                    ::t-service/ckan-resource-id op/null?})
 
+  ;; Delete removed services from OTE db
+  (doseq [{id ::t-service/id}
+          (filter (fn [el] (:deleted? el)) external-interfaces)]
+    (specql/delete! db ::t-service/external-interface-description
+                    {::t-service/id id}))
+  
   ;; Update or insert new external interfaces
-  (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if} external-interfaces]
+  (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if}
+          (filter (fn [el] (not (:deleted? el))) external-interfaces)]
     (if ckan-resource-id
       (specql/update! db ::t-service/external-interface-description
                       ext-if
@@ -236,8 +243,6 @@
 
       (specql/insert! db ::t-service/external-interface-description
                       (assoc ext-if ::t-service/transport-service-id transport-service-id)))))
-
-
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
@@ -250,13 +255,14 @@
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
                          (dissoc ::t-service/external-interfaces))
+
         ;; Store to OTE database
         transport-service
         (jdbc/with-db-transaction [db db]
           (let [transport-service (upsert! db ::t-service/transport-service service-info)
                 transport-service-id (::t-service/id transport-service)]
 
-            ;; Save possible external interfaces
+            ;; Save possible external interfaces            
             (save-external-interfaces db transport-service-id external-interfaces)
 
             ;; Save operation areas
@@ -266,6 +272,7 @@
 
     ;; If published, use CKAN API to add dataset and resource
     (when (::t-service/published? data)
+      (publish/delete-resources-from-published-service! nap-config user (filter #(:deleted? %) external-interfaces))
       (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
 
     ;; Return the stored transport-service

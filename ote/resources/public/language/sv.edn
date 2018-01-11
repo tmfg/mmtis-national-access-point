@@ -318,7 +318,7 @@
 
   :ote.db.transport-service/day
   {:short {:MON "Må" :TUE "Ti" :WED "On" :THU "To" :FRI "Fr" :SAT "Lö" :SUN "Sö"}
-   :full {:MON "Måndag" :TUE "Tisdag" :WED "Onsdag" :THU "Torsdag"
+   :full {:ALL "Välj allt" :MON "Måndag" :TUE "Tisdag" :WED "Onsdag" :THU "Torsdag"
           :FRI "Fredag" :SAT "Lördag" :SUN "Söndag"}}
 
   :ote.db.transport-service/information-service-accessibility

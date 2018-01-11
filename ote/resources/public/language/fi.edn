@@ -318,7 +318,7 @@
 
   :ote.db.transport-service/day
   {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
-   :full {:MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
+   :full {:ALL "Valitse kaikki" :MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
           :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
 
   :ote.db.transport-service/information-service-accessibility
