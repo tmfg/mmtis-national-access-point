@@ -453,8 +453,10 @@
 
 
 (defmethod field :table [{:keys [table-fields update! delete? add-label error-data] :as opts} data]
-  (let [data (if (empty? data)
-               ;; have table always contain at least one row
+  (let [data (if (or (empty? data)
+                     (and delete?
+                          (every? true? (map :deleted? data))))
+               ;; have table always contain at least one (not deleted) row
                [{}]
                data)]
     [:div
@@ -513,8 +515,9 @@
                 (when delete?
                   [ui/table-row-column {:style {:width "70px"}}
                    [ui/icon-button {:on-click #(update!
-                                                (when (>= i 0)
-                                                  (assoc-in data [i :deleted?] true)))}                  
+                                                (when (>= i 0)                                                  
+                                                  (assoc-in data [i :deleted?] true)
+                                        ))}                  
                     [ic/action-delete]]])])))
          data))]]
      (when add-label
