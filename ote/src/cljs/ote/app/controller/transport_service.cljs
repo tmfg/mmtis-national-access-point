@@ -28,7 +28,8 @@
     ::t-service/description
     ::t-service/available-from
     ::t-service/available-to
-    ::t-service/notice-external-interfaces?})
+    ::t-service/notice-external-interfaces?
+    ::t-service/companies-csv-url})
 
 (defn service-type-from-sub-type
       "Returns service type keyword based on sub-type."

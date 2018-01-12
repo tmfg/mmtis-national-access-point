@@ -139,6 +139,11 @@
     :delete? true
     :add-label (tr [:buttons :add-new-company])}
 
+   {:name ::t-service/companies-csv-url
+    :full-width?  true
+    :container-class "col-xs-12 col-sm-6 col-md-6"
+    :type :string}
+
    (form/info (tr [:form-help :brokerage?]))
    {:name ::t-service/brokerage?
     :style style-form/padding-top
