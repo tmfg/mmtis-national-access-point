@@ -7,7 +7,7 @@
 
 
 (defrecord UpdateSearchFilters [filters])
-(defrecord SearchResponse [response append?])
+(defrecord SearchResponse [response params append?])
 (defrecord InitServiceSearch [])
 (defrecord FacetsResponse [facets])
 (defrecord FetchMore [])
@@ -35,19 +35,20 @@
 (defn- search
   ([app append?] (search app append? 500))
   ([{service-search :service-search :as app} append? timeout-ms]
-   (let [on-success (tuck/send-async! ->SearchResponse append?)]
+   (let [params (search-params (:filters service-search))
+         on-success (tuck/send-async! ->SearchResponse params append?)]
      ;; Clear old timeout, if any
      (when-let [search-timeout (:search-timeout service-search)]
        (.clearTimeout js/window search-timeout))
 
-     (assoc-in
-      app
-      [:service-search :search-timeout]
-      (.setTimeout js/window
-                   #(comm/get! "service-search"
-                               {:params     (search-params (:filters service-search))
-                                :on-success on-success})
-                   timeout-ms)))))
+     (-> app
+         (assoc-in [:service-search :params] params)
+         (assoc-in [:service-search :search-timeout]
+                   (.setTimeout js/window
+                                #(comm/get! "service-search"
+                                            {:params     params
+                                             :on-success on-success})
+                                timeout-ms))))))
 
 (def page-size 25)
 
@@ -85,19 +86,27 @@
   UpdateSearchFilters
   (process-event [{filters :filters} app]
     (-> app
-        (update-in [:service-search :filters] merge filters)
+        (update-in [:service-search :filters] merge
+                   (assoc filters
+                          :limit page-size
+                          :offset 0))
         (search false)))
 
   SearchResponse
-  (process-event [{response :response append? :append?} app]
-    (let [{:keys [empty-filters? results total-service-count]} response]
-      (update app :service-search assoc
-              :results (if append?
-                         (into (get-in app [:service-search :results]) results)
-                         (vec results))
-              :empty-filters? empty-filters?
-              :total-service-count total-service-count
-              :fetching-more? false)))
+  (process-event [{response :response params :params append? :append?} app]
+    (if (not= params (get-in app [:service-search :params]))
+      ;; If the response event has different search parameters than the
+      ;; latest sent fetch, it is a stale response, do nothing
+      app
+      (let [{:keys [empty-filters? results total-service-count filter-service-count]} response]
+        (update app :service-search assoc
+                :results (if append?
+                           (into (get-in app [:service-search :results]) results)
+                           (vec results))
+                :empty-filters? empty-filters?
+                :total-service-count total-service-count
+                :fetching-more? false
+                :filter-service-count filter-service-count))))
 
   ShowServiceGeoJSON
   (process-event [{:keys [url]} app]
