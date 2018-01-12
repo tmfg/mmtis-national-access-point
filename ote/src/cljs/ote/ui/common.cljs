@@ -37,3 +37,24 @@
         [:td left]
         [:td right]])
      (partition 2 items))]])
+
+(defn scroll-sensor [on-scroll]
+  (let [sensor-node (atom nil)
+        check-scroll (fn [event]
+                       (let [viewport-y-min 0
+                             viewport-y-max (.-innerHeight js/window)
+                             element-y (.-y (.getBoundingClientRect @sensor-node))]
+                         (when (<= viewport-y-min element-y viewport-y-max)
+                           (on-scroll))))]
+
+    (r/create-class
+     {:component-did-mount
+      (fn [this]
+        (reset! sensor-node (aget this "refs" "sensor"))
+        (.addEventListener js/document "scroll" check-scroll))
+      :component-will-unmount
+      (fn [this]
+        (.removeEventListener js/document "scroll" check-scroll))
+      :reagent-render
+      (fn [_]
+        [:span {:ref "sensor"}])})))

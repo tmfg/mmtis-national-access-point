@@ -8,7 +8,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
             [ote.ui.form :as form]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [scroll-sensor linkify]]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.service-search :as ss]
@@ -112,22 +112,28 @@
      [:div.result-interfaces
       [external-interface-links e! service]]]))
 
-(defn results-listing [e! results empty-filters?]
-  (let [result-count (count results)]
-    [:div.col-xs-12.col-md-12.col-lg-12
+(defn results-listing [e! {:keys [results empty-filters? total-service-count
+                                  filter-service-count fetching-more?]}]
+  [:div.col-xs-12.col-md-12.col-lg-12
+   [:p
+    (tr [:service-search (if empty-filters?
+                           :showing-latest-services
+                           (case filter-service-count
+                             0 :no-results
+                             1 :one-result
+                             :many-results))]
+        {:count filter-service-count})
+    " "
+    (tr [:service-search :total-services] {:total-service-count total-service-count})]
+   (doall
+    (for [result results]
+      ^{:key (::t-service/id result)}
+      [result-card e! result]))
 
-     [:p
-      (tr [:service-search (if empty-filters?
-                             :showing-latest-services
-                             (case result-count
-                               0 :no-results
-                               1 :one-result
-                               :many-results))]
-          {:count result-count})]
-     (doall
-      (for [result results]
-        ^{:key (::t-service/id result)}
-        [result-card e! result]))]))
+   (if fetching-more?
+     [:span (tr [:service-search :fetching-more])]
+     (when (> filter-service-count (count results))
+       [scroll-sensor #(e! (ss/->FetchMore))]))])
 
 (defn filters-form [e! {filters :filters
                         facets :facets
@@ -166,6 +172,7 @@
 (defn service-search [e! _]
   (e! (ss/->InitServiceSearch))
   (fn [e! {results :results
+           total-service-count :total-service-count
            empty-filters? :empty-filters?
            resource :resource
            geojson :geojson
@@ -188,4 +195,4 @@
      [filters-form e! service-search]
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
-       [results-listing e! results empty-filters?])]))
+       [results-listing e! service-search])]))
