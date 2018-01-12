@@ -745,6 +745,8 @@
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
+  :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
+  :fetching-more "Haetaan lisää palveluita..."
   }
 
  :leaflet

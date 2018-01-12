@@ -25,3 +25,7 @@ SELECT id FROM "transport-service"
 -- name: search
 -- Search for transport services by name, operation area or subtype
 SELECT t.id, t.name, t.type, t."sub-type",
+
+-- name: total-service-count
+-- single?: true
+SELECT COUNT(id) FROM "transport-service" WHERE "published?" = TRUE;

@@ -114,7 +114,11 @@
   :aliases {;; Alias for doing a full production build
             "production" ["do" "clean," "deps," "compile,"
                           "cljsbuild" "once" "prod,"
-                          "uberjar"]}
+                          "postbuild,"
+                          "uberjar"]
+
+            "postbuild" ["run" "-m" "ote.tools.postbuild"]
+            }
   :repl-options {:init-ns ote.main
                  :init (ote.main/start)}
   :main ote.main)
