@@ -89,13 +89,15 @@
                    :specql.core/limit limit
                    :specql.core/order-by :ote.db.modification/created
                    :specql.core/order-direction :desc}
-                  {})]
+                  {})
+        results (specql/fetch db ::t-service/transport-service-search-result
+                              search-result-columns
+                              {::t-service/id (op/in ids)}
+                              options)]
     {:empty-filters? empty-filters?
      :total-service-count (total-service-count db)
-     :results (specql/fetch db ::t-service/transport-service-search-result
-                            search-result-columns
-                            {::t-service/id (op/in ids)}
-                            options)}))
+     :results results
+     :filter-service-count (count ids)}))
 
 (defn- service-search-routes [db]
   (routes
