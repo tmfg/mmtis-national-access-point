@@ -43,3 +43,61 @@ jobs:
 
       # run tests!
       - run: cd ote && lein test
+
+  e2e-pr:
+    docker:
+      # specify the version you desire here
+      - image: circleci/clojure:lein-2.7.1
+      - image: solita/napotedb:latest
+      - image: solita/napote-cypress:latest
+
+    working_directory: ~/repo
+
+    environment:
+      LEIN_ROOT: "true"
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      CYPRESS_BASE_URL: "http://localhost:8080"
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "ote/project.clj" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: cd ote && lein deps
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "ote/project.clj" }}
+
+      # setup database
+      - run: cd database && sh circleci_setup.sh
+
+      - run:
+          command: cd ote && lein production
+
+      - run:
+          name: Run smoke tests for pull request
+          command: |
+            # Creating dummy container which will hold cypress tests and config
+            docker create -v /cypress-env --name cypress-env solita/napote-cypress /bin/true
+
+            # Copy cypress config and tests into volume
+            docker cp cypress.json cypress-env:/cypress
+            docker cp cypress cypress-env:/cypress
+
+            # Run cypress in cypress container with cypress-env volume
+            docker run --volumes-from cypress-env --env CYPRESS_BASE_URL --env CYPRESS_RECORD_KEY -w /cypress solita/napote-cypress cypress run --record
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      #- build
+      - e2e-pr

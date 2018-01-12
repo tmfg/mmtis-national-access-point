@@ -14,12 +14,12 @@ networks:
 services:
   napote-ckan:
     container_name: napote-ckan
+    image: solita/napote-ckan:latest
     build:
       context: ./ckan
       args:
       - CKAN_SITE_URL=${CKAN_SITE_URL}
       - CKAN_PORT=${CKAN_PORT}
-    #image: solita/napote-ckan:latest
     networks:
       - napote
     links:
@@ -40,8 +40,8 @@ services:
   napotedb:
     restart: always
     container_name: napotedb
+    image: solita/napotedb:latest
     build: ../../database/
-    #image: solita/napotedb:latest
     networks:
       - napote
     ports:
@@ -54,8 +54,8 @@ services:
 
   napote-solr:
     container_name: napote-solr
-    build: ./solr
-    #image: solita/napote-solr:latest
+    image: solita/napote-solr:latest
+    #build: ./solr
     networks:
       - napote
     ports:
@@ -63,8 +63,8 @@ services:
 
   napote-redis:
     container_name: napote-redis
-    build: ./redis
-    #image: solita/napote-redis:latest
+    image: solita/napote-redis:latest
+    #build: ./redis
     networks:
       - napote
     ports:
@@ -73,8 +73,8 @@ services:
   napote-nginx:
     restart: always
     container_name: napote-nginx
-    build: ./nginx
-    #image: solita/napote-nginx:latest
+    image: solita/napote-nginx:latest
+    #build: ./nginx
     networks:
       - napote
     links:
