@@ -81,7 +81,7 @@
    (fetch db ::t-service/transport-service transport-operator-descriptor-columns
           {::t-service/id id})))
 
-(defn- fetch-transport-service-external-interfaces [db id]
+(defn fetch-transport-service-external-interfaces [db id]
   (fetch db ::t-service/external-interface-description
          #{::t-service/external-interface ::t-service/format
            ::t-service/license ::t-service/license-url
@@ -89,9 +89,10 @@
          {::t-service/transport-service-id id}))
 
 (defn delete-resources-from-published-service!
-  [{:keys [api export-base-url] :as nap-config} user resources]
-  (let [ids (map #(:ote.db.transport-service/ckan-resource-id %) resources)]
-    (doall (map #(ckan/delete-dataset-resource! (ckan/->CKAN api (get-in user [:user :apikey])) %) ids))))
+  [{:keys [api export-base-url] :as nap-config} user removed-resources]
+  (let [ckan (ckan/->CKAN api (get-in user [:user :apikey]))]
+    (doseq [{ckan-resource-id ::t-service/ckan-resource-id} removed-resources]
+      (ckan/delete-dataset-resource! ckan ckan-resource-id))))
 
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
