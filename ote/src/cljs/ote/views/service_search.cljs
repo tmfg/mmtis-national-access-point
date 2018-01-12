@@ -112,27 +112,28 @@
      [:div.result-interfaces
       [external-interface-links e! service]]]))
 
-(defn results-listing [e! {:keys [results empty-filters? total-service-count fetching-more?]}]
-  (let [result-count (count results)]
-    [:div.col-xs-12.col-md-12.col-lg-12
-     [:p
-      (tr [:service-search (if empty-filters?
-                             :showing-latest-services
-                             (case result-count
-                               0 :no-results
-                               1 :one-result
-                               :many-results))]
-          {:count result-count
-           :total-service-count total-service-count})]
-     (doall
-      (for [result results]
-        ^{:key (::t-service/id result)}
-        [result-card e! result]))
+(defn results-listing [e! {:keys [results empty-filters? total-service-count
+                                  filter-service-count fetching-more?]}]
+  [:div.col-xs-12.col-md-12.col-lg-12
+   [:p
+    (tr [:service-search (if empty-filters?
+                           :showing-latest-services
+                           (case filter-service-count
+                             0 :no-results
+                             1 :one-result
+                             :many-results))]
+        {:count filter-service-count})
+    " "
+    (tr [:service-search :total-services] {:total-service-count total-service-count})]
+   (doall
+    (for [result results]
+      ^{:key (::t-service/id result)}
+      [result-card e! result]))
 
-     (if fetching-more?
-       [:span "... haetaan lisää, venaas hetki..."]
-       ;; FIXME: show only if there are more results
-       [scroll-sensor #(e! (ss/->FetchMore))])]))
+   (if fetching-more?
+     [:span (tr [:service-search :fetching-more])]
+     (when (> filter-service-count (count results))
+       [scroll-sensor #(e! (ss/->FetchMore))]))])
 
 (defn filters-form [e! {filters :filters
                         facets :facets
