@@ -53,6 +53,9 @@
      :ckan/name   (str (::t-service/name ts) " GeoJSON")
      :ckan/format "GeoJSON"}
 
+    (when (::t-service/ckan-resource-id ts)
+      {:ckan/id (::t-service/ckan-resource-id ts)})
+
     (when (::modification/created ts)
       {:ckan/created (time/pgtimestamp->ckan-timestring (::modification/created ts))})
 
@@ -119,18 +122,29 @@
 
         external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
         external-resources
-        (mapv (fn [{external-interface ::t-service/external-interface fmt ::t-service/format
-                    lic ::t-service/license lic-url ::t-service/license-url}]
+        (mapv (fn [{external-interface ::t-service/external-interface
+                    fmt                ::t-service/format
+                    lic                ::t-service/license
+                    lic-url            ::t-service/license-url
+                    resource-id        ::t-service/ckan-resource-id}]
                 (verify-ckan-response
-                 (ckan/add-or-update-dataset-resource!
-                  c (merge
-                     {:ckan/package-id (:ckan/id dataset)
-                      :ckan/name (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
-                                   (-> external-interface ::t-service/description first ::t-service/text)
-                                   "Rajapinta")
-                      :ckan/url (if (not (nil? (::t-service/url external-interface))) (::t-service/url external-interface) "Osoite puuttuu")
-                      :ckan/format (if (nil? fmt) "" fmt)
-                      :ckan/license lic}))))
+                  (ckan/add-or-update-dataset-resource!
+                    c (merge
+                        {:ckan/package-id (:ckan/id dataset)
+                         :ckan/name       (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
+                                            (-> external-interface ::t-service/description first ::t-service/text)
+                                            "Rajapinta")
+                         :ckan/url        (if (not (nil? (::t-service/url external-interface)))
+                                            (::t-service/url external-interface)
+                                            "Osoite puuttuu")
+                         :ckan/format     (if (nil? fmt) "" fmt)
+                         :ckan/license    lic}
+
+                        (when resource-id
+                          {:ckan/id resource-id})
+
+                        (when (::modification/modified ts)
+                          {:ckan/last-modified (time/pgtimestamp->ckan-timestring (::modification/modified ts))})))))
               external-interfaces)]
 
     ;; Update CKAN resource ids for all external interfaces
