@@ -65,7 +65,6 @@
 
   FetchMore
   (process-event [_ app]
-    (.log js/console "HAETAAN LISÄÄ")
     (search
      (-> app
          (update :service-search assoc :fetching-more? true)
