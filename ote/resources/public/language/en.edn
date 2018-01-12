@@ -741,7 +741,9 @@
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
-  :showing-latest-services ["No search filters. Showing latest modified services. Catalog has total of " :total-service-count " services."]
+  :showing-latest-services "No search filters. Showing latest modified services."
+  :total-services ["Catalog has total of " :total-service-count " services."]
+  :fetching-more "Fetching more services..."
   }
 
  :leaflet
