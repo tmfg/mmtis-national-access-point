@@ -43,7 +43,8 @@
         check-scroll (fn [event]
                        (let [viewport-y-min 0
                              viewport-y-max (.-innerHeight js/window)
-                             element-y (.-y (.getBoundingClientRect @sensor-node))]
+                             element-y (.-top (.getBoundingClientRect @sensor-node))]
+
                          (when (<= viewport-y-min element-y viewport-y-max)
                            (on-scroll))))]
 
@@ -51,10 +52,10 @@
      {:component-did-mount
       (fn [this]
         (reset! sensor-node (aget this "refs" "sensor"))
-        (.addEventListener js/document "scroll" check-scroll))
+        (.addEventListener js/window "scroll" check-scroll))
       :component-will-unmount
       (fn [this]
-        (.removeEventListener js/document "scroll" check-scroll))
+        (.removeEventListener js/window "scroll" check-scroll))
       :reagent-render
       (fn [_]
         [:span {:ref "sensor"}])})))
