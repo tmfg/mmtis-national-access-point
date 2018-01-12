@@ -87,7 +87,7 @@
 (def accessibility-tool [:wheelchair :walkingstick :audio-navigator :visual-navigator :passenger-cart
                           :pushchair :umbrella :buggy :other])
 
-(def days [:MON :TUE :WED :THU :FRI :SAT :SUN])
+(def days [:ALL :MON :TUE :WED :THU :FRI :SAT :SUN])
 
 
 ;; Create order for accessibility-facility

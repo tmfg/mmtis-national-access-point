@@ -3,11 +3,13 @@
   (:require [ote.nap.ckan :as ckan]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.modification :as modification]
             [ote.db.operation-area :as operation-area]
             [specql.core :refer [fetch] :as specql]
             [clojure.string :as str]
             [taoensso.timbre :as log]
-            [ote.components.db :as db]))
+            [ote.components.db :as db]
+            [ote.time :as time]))
 
 (defn- fetch-service-operation-area-description
   "Fetch the operation area as a comma separated list (for SOLR facet search).
@@ -44,11 +46,18 @@
 (defmulti interface-description ::t-service/type)
 
 (defmethod interface-description :default [ts]
-  {:ckan/url (str "/ote/export/geojson/"
-                  (::t-service/transport-operator-id ts) "/"
-                  (::t-service/id ts))
-   :ckan/name (str (::t-service/name ts) " GeoJSON")
-   :ckan/format "GeoJSON"})
+  (merge
+    {:ckan/url    (str "/ote/export/geojson/"
+                       (::t-service/transport-operator-id ts) "/"
+                       (::t-service/id ts))
+     :ckan/name   (str (::t-service/name ts) " GeoJSON")
+     :ckan/format "GeoJSON"}
+
+    (when (::modification/created ts)
+      {:ckan/created (time/pgtimestamp->ckan-timestring (::modification/created ts))})
+
+    (when (::modification/modified ts)
+      {:ckan/last-modified (time/pgtimestamp->ckan-timestring (::modification/modified ts))})))
 
 
 (defn- ckan-resource-description
@@ -74,7 +83,8 @@
   descriptor."
   #{::t-service/id ::t-service/transport-operator-id
     ::t-service/name ::t-service/type
-    ::t-service/ckan-dataset-id ::t-service/ckan-resource-id})
+    ::t-service/ckan-dataset-id ::t-service/ckan-resource-id
+    ::modification/created ::modification/modified})
 
 (defn- fetch-transport-service [db id]
   (first
@@ -87,6 +97,11 @@
            ::t-service/license ::t-service/license-url
            ::t-service/ckan-resource-id ::t-service/id}
          {::t-service/transport-service-id id}))
+
+(defn delete-resources-from-published-service!
+  [{:keys [api export-base-url] :as nap-config} user resources]
+  (let [ids (map #(:ote.db.transport-service/ckan-resource-id %) resources)]
+    (doall (map #(ckan/delete-dataset-resource! (ckan/->CKAN api (get-in user [:user :apikey])) %) ids))))
 
 (defn publish-service-to-ckan!
   "Use CKAN API to creata a dataset (package) and resource for the given transport service id."
@@ -110,7 +125,6 @@
                  (ckan/add-or-update-dataset-resource!
                   c (merge
                      {:ckan/package-id (:ckan/id dataset)
-                      ;:ckan/name (-> external-interface ::t-service/description first ::t-service/text)
                       :ckan/name (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
                                    (-> external-interface ::t-service/description first ::t-service/text)
                                    "Rajapinta")

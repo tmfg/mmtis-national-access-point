@@ -28,7 +28,8 @@
     (progress/inc)
     (swap! query-counter dec)
     (check-progress!)
-    (apply handler args)))
+    (when handler
+      (apply handler args))))
 
 (defn- request-url [url]
   (str @base-url url))

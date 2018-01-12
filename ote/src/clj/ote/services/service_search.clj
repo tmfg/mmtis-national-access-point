@@ -31,30 +31,31 @@
 (def search-result-columns
   #{::t-service/contact-email
     ::t-service/sub-type
-    ::t-service/parking
+    ;::t-service/parking
     ::t-service/ckan-resource-id
-    ::t-service/brokerage
+    ;::t-service/brokerage
     ::t-service/id
     ::t-service/contact-gsm
     ::t-service/ckan-dataset-id
-    ::t-service/terminal
+    ;::t-service/terminal
     ::t-service/contact-address
-    ::t-service/rentals
-    ::t-service/homepage
+    ;::t-service/rentals
+    ;::t-service/homepage
     ::t-service/name
     ::t-service/type
     ::t-service/transport-operator-id
     ::t-service/contact-phone
-    ::t-service/passenger-transportation
+    ;::t-service/passenger-transportation
 
     ;; Information JOINed from other tables
-    ::t-service/operation-area-description
+    ;::t-service/operation-area-description
     ::t-service/external-interface-links
     ::t-service/operator-name
 
     ;; Modification info (to sort by)
-    ::modification/created
-    ::modification/modified})
+    ;::modification/created
+    ;::modification/modified
+    })
 
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
