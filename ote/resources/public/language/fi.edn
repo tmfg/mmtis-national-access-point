@@ -64,6 +64,7 @@
    :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
+   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv tiedoston osoite (www)"
    :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
    :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."

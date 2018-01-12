@@ -64,6 +64,7 @@
    :ote.db.transport-service/companies "De företag som producerar tjänsten"
    :ote.db.transport-service/company-name "Företagts namn"
    :ote.db.transport-service/business-id "Företagets FO-nummer"
+   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv tiedoston osoite (www)"
    :ote.db.transport-service/license "Licens/användarvillkor"
    :ote.db.transport-service/license-url "Beskrivning av licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
