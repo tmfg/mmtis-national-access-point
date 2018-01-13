@@ -2,7 +2,8 @@
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
             [ote.db.transport-operator :as t-operator]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.app.controller.login :as login]))
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
@@ -129,36 +130,8 @@
            :user nil))
 
   TransportOperatorDataResponse
-  (process-event [{response :response} {:keys [page ckan-organization-id transport-operator] :as app}]
-    (let [app (assoc app
-                     :transport-operator-data-loaded? true
-                     :user (:user (first response)))]
-      (if (and (nil? (:transport-operator (first response)))
-               (not= :services page))
-        ;; If page is :transport-operator and user has no operators, start creating a new one
-        (do
-          (if (= (:page app) :transport-operator)
-            (assoc app
-                   :transport-operator {:new? true}
-                   :services-changed? true)
-            app))
-
-        ;; Get services from response.
-        ;; Use selected operator if possible, if not, use the first one from the response.
-        ;; Selected can either be previously selected or ckan-organization-id (CKAN edit view)
-        (let [selected-operator (or
-                                 (some #(when (or (= (::t-operator/id transport-operator)
-                                                     (get-in % [:transport-operator ::t-operator/id]))
-                                                  (= ckan-organization-id
-                                                     (get-in % [:transport-operator ::t-operator/ckan-group-id])))
-                                          %)
-                                       response)
-                                 (first response))]
-
-          (assoc app
-                 :transport-operators-with-services response
-                 :transport-operator (:transport-operator selected-operator)
-                 :transport-service-vector (:transport-service-vector selected-operator))))))
+  (process-event [{response :response} app]
+    (login/update-transport-operator-data app response))
 
   SetLanguage
   (process-event [{lang :lang} app]
