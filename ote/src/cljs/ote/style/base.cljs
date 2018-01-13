@@ -73,14 +73,13 @@
          {:position "relative"
           :margin-left "0.2em"}))
 
-(def help (merge (flex-container "row")
-                 {:border-radius "0.2em"
-                  :color "#666666"
-                  :background-color "#DAEDF7"
-                  :padding "0.2em"
-                  :margin "0.2em"
-                  :align-items "center"
-                  :white-space "pre-wrap"}))
+(def help {:border-radius "0.2em"
+           :color "#666666"
+           :background-color "#DAEDF7"
+           :padding "0.2em"
+           :margin "0.2em"
+           :align-items "center"
+           :white-space "pre-wrap"})
 
 (def filters-form
   {:border "solid 1px #0046ad"})
