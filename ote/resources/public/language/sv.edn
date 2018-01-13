@@ -318,7 +318,7 @@
 
   :ote.db.transport-service/day
   {:short {:MON "Må" :TUE "Ti" :WED "On" :THU "To" :FRI "Fr" :SAT "Lö" :SUN "Sö"}
-   :full {:MON "Måndag" :TUE "Tisdag" :WED "Onsdag" :THU "Torsdag"
+   :full {:ALL "Välj allt" :MON "Måndag" :TUE "Tisdag" :WED "Onsdag" :THU "Torsdag"
           :FRI "Fredag" :SAT "Lördag" :SUN "Söndag"}}
 
   :ote.db.transport-service/information-service-accessibility
@@ -535,7 +535,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :user-menu-log-out                          "Utloggning"
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Sammandrag"
-  :user-menu-nap-help                         "NAP hjälp"
+  :user-menu-nap-help                         "Hjälp"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
@@ -558,6 +558,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :logged-in "Inloggningen lyckades!"
   :loading "Ladda"
   :language "Språk"
+
+  :hours-placeholder "tt"
+  :minutes-placeholder "mm"
   }
 
  :dialog
@@ -644,6 +647,18 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "crutches" "Kryckor"
                    "walker" "Rollator"
                    "walking-stick" "Gåkäpp"
+                   "escalator" "Rulltrappor"
+                   "lift" "Hiss"
+                   "narrow-entrance" "Smal ingång"
+                   "pallet-access-low-floor" "Låggolv (Kuormalavalinjan matala lattia)"
+                   "barrier" "Bom"
+                   "travelator" "Rullband"
+                   "ramp" "Ramp"
+                   "stairs" "Trappor"
+                   "shuttle" "Skytteltransport"
+                   "tactile-guiding-strips" "Beröringstyrda följlinjer"
+                   "tactile-platform-edges" "Varning vid perrongkanten"
+                   "wheelchair-access-toilet" "Inva WC"
                    "visual-displays" "Monitorer"
                    "large-print-timetables" "Tidtabellskyltar med stor text"
                    "displays-for-visually-impaired" "Taktila skyltar (taktiili)"
@@ -672,6 +687,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "SAT" "Lö"
                    "SUN" "Sö"
                    }
+          ;; accessibility
+          "accessibility" "Tillgänglihet"
+          "information-service-accessibility" "Information (tillgänglighet)"
           "brokerage?" "Förmedlingstjänst?"
           "companies" "Företag som medverkar i tjänsteproduktionen"
           "external-interfaces" "Yttre tekniska gränssnitt"
@@ -697,7 +715,15 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "to" "Till"
           "from-date" "Från (datum)"
           "to-date" "Till (datum)"
-          "sub-type" "Undertyp"}
+          "sub-type" "Undertyp"
+          "terminal" " "
+          ;; Assistance
+          "assistance" "Avustuspalvelut"
+          "assistance-place-description" "Sijainti"
+          "assistance-by-reservation-only" "Varattava etukäteen"
+          "notification-requirements" "Varausta koskevat vaatimukset"
+          "hours-before" "Palvelu varattava (tuntia) ennen"
+          "telephone" "Puhelin"}
 
 
 
@@ -713,6 +739,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
+  :total-services ["Katalog har total " :total-service-count " tjänster."]
+  :fetching-more "Fetching more services..."
   }
 
  :leaflet

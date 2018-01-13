@@ -144,11 +144,11 @@
         (-> features first (get "properties"))]
     [:div
      (when transport-operator
-       [:div
+       [:div {:style {:padding-top "20px"}}
         [:h2 (tr [:viewer "transport-operator"])]
         [properties-table transport-operator]])
      (when transport-service
-       [:div
+       [:div {:style {:padding-top "20px"}}
         [:h2 (tr [:viewer "transport-service"])]
         [properties-table transport-service]])]))
 

@@ -805,6 +805,31 @@ nav.section.navigation.section-right > form {
     height: 100%;
 }
 
+.notification-box {
+    margin-top: 5px;
+    padding: 5px 5px 5px 20px;
+    color: white;
+    background: #ff9900;
+    background: linear-gradient(to bottom, #ff9900 10%, #e68a00 100%);
+}
+
+.notification-box a {
+    color: #fff;
+}
+
+.notification-box a:hover {
+    text-decoration: underline;
+}
+
+.notification-box p {
+    overflow: hidden;
+}
+
+.notification-box .icon {
+    font-size: 32px;
+    padding: 10px 0px 10px 0px;
+}
+
 /** HEADER **/
 
 .masthead .section-right {

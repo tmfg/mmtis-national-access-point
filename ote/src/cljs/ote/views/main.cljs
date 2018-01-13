@@ -90,10 +90,6 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:common-texts :user-menu-nap-help])
-                    :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->OpenNewTab "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf")))}]
-     [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :navigation-give-feedback])
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->OpenNewTab "http://bit.ly/nap-palaute")))}]
@@ -161,12 +157,18 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        [:a {:href "#"
-             :on-click #(do
-                          (.preventDefault %)
-                          (e! (fp-controller/->ShowLoginDialog)))
-             :style {:float "right"}}
-         (tr [:common-texts :navigation-login])]]])]])
+        [linkify "/user/login" (tr [:common-texts :navigation-login])
+         (merge (stylefy/use-style
+                  (if desktop? style-topnav/desktop-link style-topnav/link))
+                {:style {:float "right"}})]]])
+
+    [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
+     [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
+      (merge (stylefy/use-style
+               (if desktop? style-topnav/desktop-link style-topnav/link))
+             {:target "_blank"
+              :style (when (> (:width app) style-base/mobile-width-px)
+                       {:float "right"})})]]]])
 
 (defn- mobile-top-nav-links [e! app]
   [:div
@@ -213,7 +215,7 @@
      [:div.col-md-2.footer-links
       [:ul.unstyled
        [:li
-        [linkify "https://www.liikennevirasto.fi/" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
+        [linkify "https://www.liikennevirasto.fi/nap" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
        [:li
         [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
        [:li

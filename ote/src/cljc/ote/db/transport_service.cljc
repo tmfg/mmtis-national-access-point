@@ -8,12 +8,11 @@
             [ote.db.common]
             [specql.data-types]
             [ote.time]
-            [ote.db.modification])
+            [ote.db.modification]
+            #?(:clj [specql.impl.composite :as specql-composite]))
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
-;; FIXME: specql doesn't define timestamp with time zone type
-(s/def :specql.data-types/timestamptz any?)
 
 (define-tables
   ;; Define ENUMs
@@ -88,7 +87,7 @@
 (def accessibility-tool [:wheelchair :walkingstick :audio-navigator :visual-navigator :passenger-cart
                           :pushchair :umbrella :buggy :other])
 
-(def days [:MON :TUE :WED :THU :FRI :SAT :SUN])
+(def days [:ALL :MON :TUE :WED :THU :FRI :SAT :SUN])
 
 
 ;; Create order for accessibility-facility

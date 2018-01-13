@@ -28,7 +28,8 @@
     (progress/inc)
     (swap! query-counter dec)
     (check-progress!)
-    (apply handler args)))
+    (when handler
+      (apply handler args))))
 
 (defn- request-url [url]
   (str @base-url url))
@@ -44,6 +45,7 @@
   (swap! query-counter inc)
   (GET (request-url url)
        {:params          params
+        :cache           false
         :handler         (response-handler! on-success)
         :error-handler   (response-handler! on-failure)
         :response-format (or response-format (transit-response-format))}))

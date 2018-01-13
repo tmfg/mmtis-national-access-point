@@ -13,7 +13,8 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
             [ote.style.form :as style-form]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [goog.string :as gstr]))
 
 
 
@@ -97,7 +98,8 @@
       ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? full-width? style input-style password?]
+                                  focus on-focus form? error warning table? full-width?
+                                  style input-style hint-style password?]
                            :as   field} data]
   [text-field
    (merge
@@ -114,7 +116,11 @@
      :error-text        (or error warning "") ;; Show error text or warning text or empty string
      :error-style       (if error ;; Error is more critical than required - showing it first
                           style-base/error-element
-                          style-base/required-element)}
+                          style-base/required-element)
+     :hint-style (merge style-base/placeholder
+                        hint-style)}
+    (when max-length
+      {:max-length max-length})
     (when full-width?
       {:full-width true})
     (when style
@@ -139,7 +145,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? label name rows rows-max error full-width?]
+(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width?]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -147,47 +153,53 @@
           language @selected-language
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
-      [:table {:style (when full-width?
-                        style-form/full-width)}
-       [:tbody
-       [:tr
-        [:td
-         [text-field
-          (merge
-           {:name name
-            :floating-label-text (when-not table? label)
-            :floating-label-fixed true
-            :hintText          (placeholder field data)
-            :on-change         #(let [updated-language-data
-                                      {:ote.db.transport-service/lang language
-                                       :ote.db.transport-service/text %2}]
-                                  (update!
-                                   (if language-data
-                                     (mapv (fn [lang]
-                                             (if (= (:ote.db.transport-service/lang lang) language)
-                                               updated-language-data
-                                               lang)) data)
-                                     (conj data updated-language-data))))
-            :value             (or (:ote.db.transport-service/text language-data) "")
-            :multi-line         true
-            :rows rows
-            :rows-max (or rows-max 200)
-            :error-text       (or error "")}
-           (when full-width?
-             {:full-width true}))]]]
-       [:tr
-        [:td
-         (doall
-          (for [lang languages]
-            ^{:key lang}
-            [:a  (merge
-                  (stylefy/use-style
-                     (if (= lang language)
-                       style-form-fields/localized-text-language-selected
-                       style-form-fields/localized-text-language))
-                  {:href "#" :on-click #(do (.preventDefault %)
-                                            (reset! selected-language lang))})
-             lang]))]]]])))
+      [:div.table-responsive
+        [:table.table {:style (when full-width? style-form/full-width)}
+         [:tbody
+           [:tr
+            [:td
+             [text-field
+              (merge
+               {:name name
+                :floating-label-text (when-not table? label)
+                :floating-label-fixed true
+                :hintText          (placeholder field data)
+                :on-change         #(let [updated-language-data
+                                          {:ote.db.transport-service/lang language
+                                           :ote.db.transport-service/text %2}]
+                                      (update!
+                                       (if language-data
+                                         (mapv (fn [lang]
+                                                 (if (= (:ote.db.transport-service/lang lang) language)
+                                                   updated-language-data
+                                                   lang)) data)
+                                         (conj data updated-language-data))))
+                :value             (or (:ote.db.transport-service/text language-data) "")
+                :multi-line         true
+                :rows rows
+                :rows-max (or rows-max 200)
+                :error-text       (or error "")}
+               (when full-width?
+                 {:full-width true}))]]]
+           [:tr
+            [:td
+             [:div (stylefy/use-style style-form-fields/localized-text-language-container)
+             (doall
+              (for [lang languages]
+                ^{:key lang}
+                [:a  (merge
+                      (stylefy/use-style
+                         (if (= lang language)
+                           style-form-fields/localized-text-language-selected
+                           style-form-fields/localized-text-language))
+                      {:href "#" :on-click #(do (.preventDefault %)
+                                                (reset! selected-language lang))})
+                 lang]))]]]
+            (when (or error warning)
+              [:tr
+               [:td
+                [:div (stylefy/use-style style-base/required-element)
+                 (if error error warning)]]])]]])))
 
 
 (defmethod field :selection [{:keys [update! table? label name style show-option options form? error warning auto-width? disabled?] :as field}
@@ -221,40 +233,52 @@
 
 
 (defmethod field :multiselect-selection
-  [{:keys [update! label name style show-option show-option-short options form? error
+  [{:keys [update! label name style show-option show-option-short options form? error warning
            auto-width? full-width?]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [selected-set (set (or data #{}))
         option-idx (zipmap options (range))]
-    [ui/select-field
-     (merge
-      {:style style
-       :floating-label-text label
-       :floating-label-fixed true
-       :multiple true
-       :value (clj->js (map option-idx selected-set))
-       :selection-renderer (fn [values]
-                             (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
-       :on-change (fn [event index values]
-                    (update! (into #{}
-                                   (map (partial nth options))
-                                   values)))}
-      (when auto-width?
-        {:auto-width true})
-      (when full-width?
-        {:full-width true}))
-     ;; Add selected value to vector
-     (doall
-      (map-indexed
-       (fn [i option]
-         ^{:key i}
-         [ui/menu-item {:value i
-                        :primary-text (show-option option)
-                        :inset-children true
-                        :checked (boolean (selected-set option))}])
-       options))]))
+    [:div
+      [ui/select-field
+       (merge
+        {:style style
+         :floating-label-text label
+         :floating-label-fixed true
+         :multiple true
+         :value (clj->js (map option-idx selected-set))
+         :selection-renderer (fn [values]
+                               (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
+         :on-change (fn [event index values]
+                      (cond
+                        ;; Select all - if :ALL option is present, if first element is selected and if all options aren't selected
+                        (and (some #(= :ALL %) options) (some #(= 0 %) values) (<= (count values) (count (drop 1 options))))
+                          (update! (drop 1 options))
+                        ;;Deselect all
+                        (and (some #(= :ALL %) options) (some #(= 0 %) values) (= (count options) (count values)))
+                          (update! (into #{} nil))
+                        ;; Select one
+                        :else (update! (into #{}
+                                             (map (partial nth options))
+                                             values))))}
+        (when auto-width?
+          {:auto-width true})
+        (when full-width?
+          {:full-width true}))
+       ;; Add selected value to vector
+       (doall
+        (map-indexed
+         (fn [i option]
+           ^{:key i}
+           [ui/menu-item {:value i
+                          :primary-text (show-option option)
+                          :inset-children true
+                          :checked (boolean (selected-set option))}])
+         options))]
+    (when (or error warning)
+      [:div (stylefy/use-style style-base/required-element)
+       (if error error warning)])]))
 
 (defmethod field :checkbox-group [{:keys [update! label show-option options help]} data]
   (let [selected (set (or data #{}))]
@@ -321,20 +345,52 @@
                 (:txt @state)]
          (when currency? "€")])})))
 
-(def time-regex #"\d{0,2}(:\d{0,2})?")
+;; Matches empty or any valid hour (0 (or 00) - 23)
+(def hour-regex #"^(^$|0?[0-9]|1[0-9]|2[0-3])$")
 
-(defmethod field :time [{:keys [update!] :as opts} data]
-  ;; FIXME: material-ui timepicker doesn't allow simply writing a time
-  ;; best would be both, writing plus an icon to open selector dialog
-  (let [data (or (some-> data ::incomplete)
-                 (and data (time/format-time data))
-                 "")]
-    [field (assoc opts
-                  :update! (fn [string]
-                             (update! (assoc (time/parse-time string)
-                                             ::incomplete string)))
-                  :type :string
-                  :regex time-regex) data]))
+;; Matches empty or any valid minute (0 (or 00) - 59)
+(def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
+
+(defmethod field :time [{:keys [update! error warning] :as opts}
+                        {:keys [hours hours-text minutes minutes-text] :as data}]
+  [:div (stylefy/use-style style-base/inline-block)
+   [field (merge
+           {:type :string
+            :regex hour-regex
+            :style {:width 30}
+            :input-style {:text-align "right"}
+            :hint-style {:position "absolute" :right "0"}
+            :update! (fn [hour]
+                       (let [h (if (str/blank? hour)
+                                 nil
+                                 (js/parseInt hour))]
+                         (update! (assoc (time/->Time h minutes nil)
+                                         :hours-text hour))))}
+           (when (not hours)
+             {:placeholder (tr [:common-texts :hours-placeholder])}))
+    (if (not hours)
+      ""
+      (or hours-text (str hours)))]
+   "."
+   [field (merge
+           {:type :string
+            :regex minute-regex
+            :style {:width 30}
+            :update! (fn [minute]
+                       (let [m (if (str/blank? minute)
+                                 nil
+                                 (js/parseInt minute))]
+                         (update! (assoc (time/->Time hours m nil)
+                                         :minutes-text minute))))}
+           (when (not minutes)
+             {:placeholder (tr [:common-texts :minutes-placeholder])}))
+    (if (not minutes)
+      ""
+      (or minutes-text (gstr/format "%02d" minutes)))]
+
+   (when warning
+     [:div (stylefy/use-style style-base/error-element) warning])
+   ])
 
 (defmethod field :interval [{:keys [update!] :as opts} data]
   (let [[unit amount] (or (some (fn [[unit amount]]
@@ -398,9 +454,9 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields update! delete? add-label] :as opts} data]
+(defmethod field :table [{:keys [table-fields update! delete? add-label error-data] :as opts} data]
   (let [data (if (empty? data)
-               ;; have table always contain at least one row
+               ;; table always contains at least one row
                [{}]
                data)]
     [:div
@@ -421,38 +477,52 @@
            (tr [:buttons :delete])])]]
 
       [ui/table-body {:display-row-checkbox false}
-       (map-indexed
-        (fn [i row]
-          ^{:key i}
-          [ui/table-row {:selectable false :display-border false}
-           (doall
-            (for [{:keys [name read write width type component] :as tf} table-fields
-                  :let [update-fn (if write
-                                    #(update data i write %)
-                                    #(assoc-in data [i name] %))
-                        value ((or read name) row)]]
-              ^{:key name}
-              [ui/table-row-column {:style {:width width}}
-               (if (= :component type)
-                 (component {:update-form! #(update! (update-fn %))
-                             :data value})
-                 [field (assoc tf
-                               :table? true
-                               :update! #(update! (update-fn %)))
-                  value])]))
-           (when delete?
-             [ui/table-row-column {:style {:width "70px"}}
-              [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
-                                                                  (take i data))
-                                                                (drop (inc i) data))))}
-               [ic/action-delete]]])])
-        data)]]
+       (doall
+        (map-indexed
+         (fn [i row]
+           (let [{:keys [errors missing-required-fields]} (and error-data
+                                                               (< i (count error-data))
+                                                               (nth error-data i))]
+               ^{:key i}
+               [ui/table-row (merge {:selectable false :display-border false}
+                                    ;; If there are errors or missing fields, make the
+                                    ;; row taller to show error messages
+                                    (when (or errors missing-required-fields)
+                                      {:style {:height 65}}))
+                (doall
+                 (for [{:keys [name read write width type component] :as tf} table-fields
+                       :let [field-error (get errors name)
+                             missing? (get missing-required-fields name)
+                             update-fn (if write
+                                         #(update data i write %)
+                                         #(assoc-in data [i name] %))
+                             value ((or read name) row)]]
+                   ^{:key name}
+                   [ui/table-row-column {:style {:width width}}
+                    (if (= :component type)
+                      (component {:update-form! #(update! (update-fn %))
+                                  :data value})
+                      [field (merge (assoc tf
+                                           :table? true
+                                           :update! #(update! (update-fn %)))
+                                    (when missing?
+                                      {:warning (tr [:common-texts :required-field])})
+                                    (when field-error
+                                      {:error field-error}))
+                       value])]))
+                (when delete?
+                  [ui/table-row-column {:style {:width "70px"}}
+                 [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                                     (take i data))
+                                                                   (drop (inc i) data))))}
+                  [ic/action-delete]]])]))
+         data))]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
-           [buttons/save {:on-click #(update! (conj (or data []) {}))
-                      :label add-label
-                      :label-style style-base/button-label-style
-                      :disabled (values/effectively-empty? (last data))}]])]))
+        [buttons/save {:on-click #(update! (conj (or data []) {}))
+                       :label add-label
+                       :label-style style-base/button-label-style
+                       :disabled (values/effectively-empty? (last data))}]])]))
 
 (defmethod field :checkbox [{:keys [update! label warning error style]} checked?]
   [:div (when error (stylefy/use-style style-base/required-element))

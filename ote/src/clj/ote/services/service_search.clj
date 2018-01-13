@@ -31,30 +31,19 @@
 (def search-result-columns
   #{::t-service/contact-email
     ::t-service/sub-type
-    ::t-service/parking
     ::t-service/ckan-resource-id
-    ::t-service/brokerage
     ::t-service/id
     ::t-service/contact-gsm
     ::t-service/ckan-dataset-id
-    ::t-service/terminal
     ::t-service/contact-address
-    ::t-service/rentals
-    ::t-service/homepage
     ::t-service/name
     ::t-service/type
     ::t-service/transport-operator-id
     ::t-service/contact-phone
-    ::t-service/passenger-transportation
 
     ;; Information JOINed from other tables
-    ::t-service/operation-area-description
     ::t-service/external-interface-links
-    ::t-service/operator-name
-
-    ;; Modification info (to sort by)
-    ::modification/created
-    ::modification/modified})
+    ::t-service/operator-name})
 
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
@@ -84,21 +73,31 @@
                         ::t-service/sub-type (op/in types)}))))
 
 
-(defn- search [db filters]
-  (let [result-id-sets [(operation-area-ids db (:operation-area filters))
-                        (sub-type-ids db (:sub-type filters))
-                        (text-search-ids db (:text filters))]
+(defn- search [db {:keys [operation-area sub-type text offset limit] :as filters}]
+  (let [result-id-sets [(operation-area-ids db operation-area)
+                        (sub-type-ids db sub-type)
+                        (text-search-ids db text)]
         empty-filters? (every? nil? result-id-sets)
         ids (if empty-filters?
               ;; No filters specified, show latest services
               (latest-service-ids db)
               ;; Combine with intersection (AND)
               (apply set/intersection
-                     (remove nil? result-id-sets)))]
+                     (remove nil? result-id-sets)))
+        options (if (and offset limit)
+                  {:specql.core/offset offset
+                   :specql.core/limit limit
+                   :specql.core/order-by :ote.db.modification/created
+                   :specql.core/order-direction :desc}
+                  {})
+        results (specql/fetch db ::t-service/transport-service-search-result
+                              search-result-columns
+                              {::t-service/id (op/in ids)}
+                              options)]
     {:empty-filters? empty-filters?
-     :results (specql/fetch db ::t-service/transport-service-search-result
-                            search-result-columns
-                            {::t-service/id (op/in ids)})}))
+     :total-service-count (total-service-count db)
+     :results results
+     :filter-service-count (count ids)}))
 
 (defn- service-search-routes [db]
   (routes
@@ -113,7 +112,9 @@
                   :text (params "text")
                   :sub-type (when-let [st (some-> (params "sub_types")
                                                   (str/split #","))]
-                              (into #{} (map keyword st)))})))))
+                              (into #{} (map keyword st)))
+                  :limit (some-> "limit" params (Integer/parseInt))
+                  :offset (some-> "offset" params (Integer/parseInt))})))))
 
 (defrecord ServiceSearch []
   component/Lifecycle

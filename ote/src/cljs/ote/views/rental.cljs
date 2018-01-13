@@ -16,7 +16,9 @@
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
             [ote.style.form :as style-form]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [ote.ui.validation :as validation])
+  (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas]
   {:name->label (tr-key [:field-labels :rentals]
@@ -43,10 +45,12 @@
                     :type :number
                     :currency? true
                     :style {:width "100px"}
-                    :input-style {:text-align "right" :padding-right "5px"}}
+                    :input-style {:text-align "right" :padding-right "5px"}
+                    :required? true}
 
                    {:name ::t-service/unit
-                    :type :string}] 
+                    :type :string
+                    :required? true}]
     :delete? true
     :add-label (tr [:buttons :add-new-price-class])}
    ))
@@ -75,7 +79,7 @@
   (form/group
    {:label (tr [:rentals-page :header-vehicles])
     :columns 3}
-   
+
    {:name ::t-service/vehicle-classes
     :type :table
     :table-fields [{:name ::t-service/vehicle-type
@@ -87,19 +91,18 @@
                    {:name :price-group
                     :type :component
                     :component (fn [{:keys [update-form! data]}]
-                                 [price-classes update-form! data])
-                    }]
+                                 [price-classes update-form! data])}]
     :delete? true
     :add-label (tr [:buttons :add-new-vehicle])})
   )
 
 (defn accessibility-group []
   (form/group
-   {:label (tr [:rentals-page :header-accessibility])
+    {:label (tr [:rentals-page :header-accessibility])
     :columns 3
     :layout :row}
 
-   {:name        ::t-service/guaranteed-vehicle-accessibility 
+    {:name        ::t-service/guaranteed-vehicle-accessibility
     :help (tr [:form-help :guaranteed-vehicle-accessibility])
     :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
@@ -107,41 +110,43 @@
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name        ::t-service/limited-vehicle-accessibility
+    {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
-    :type        :checkbox-group 
+    :type        :checkbox-group
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/rental-vehicle-accessibility
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name ::t-service/guaranteed-transportable-aid
+    {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name ::t-service/limited-transportable-aid
+    {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
     :container-class "col-md-6"}
 
-   {:name ::t-service/guaranteed-accessibility-description
-    :type :localized-text
-    :rows 1
-    :full-width? true
-    :container-class "col-md-6"}
+    {:name            ::t-service/guaranteed-accessibility-description
+     :type            :localized-text
+     :is-empty?       validation/empty-localized-text?
+     :rows            1
+     :full-width?     true
+     :container-class "col-md-6"}
 
-   {:name ::t-service/limited-accessibility-description
-    :type :localized-text
-    :rows 1
-    :container-class "col-md-6"
-    :full-width? true}
+    {:name ::t-service/limited-accessibility-description
+     :type :localized-text
+     :is-empty? validation/empty-localized-text?
+     :rows 1
+     :container-class "col-md-6"
+     :full-width? true}
 
-   {:name ::t-service/accessibility-info-url
+    {:name ::t-service/accessibility-info-url
     :type :string
     :container-class "col-md-6"
     :full-width? true}))
@@ -157,7 +162,8 @@
     :table-fields [{:name ::t-service/additional-service-type
                     :type        :selection
                     :show-option (tr-key [:enums ::t-service/additional-services])
-                    :options     t-service/additional-services}
+                    :options     t-service/additional-services
+                    :required? true}
 
                    {:name ::t-service/additional-service-price
                     :type :number
@@ -165,7 +171,8 @@
                     :style {:width "100px"}
                     :input-style {:text-align "right" :padding-right "5px"}
                     :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
-                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)}
+                    :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)
+                    :required? true}
 
                    {:name ::t-service/additional-service-unit
                     :type :string
@@ -182,7 +189,10 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :rows 1}
+    :is-empty? validation/empty-localized-text?
+    :rows 1
+    :container-class "col-md-6"
+    :full-width?  true}
 
    {:name        ::t-service/payment-methods
     :type        :multiselect-selection
@@ -238,17 +248,22 @@
       :type :table
       :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/name
-                      :type :string}
+                      :type :string
+                      :required? true}
                      {:name ::t-service/pick-up-type
                       :type :selection
+                      :auto-width? true
+                      :style {:width "130%"}
                       :options t-service/pick-up-types
-                      :show-option (tr-key [:enums ::t-service/pick-up-type])}
+                      :show-option (tr-key [:enums ::t-service/pick-up-type])
+                      :required? true}
                      {:name ::common/street
                       :type :string
                       :read (comp ::common/street ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
                      {:name ::common/postal_code
                       :type :string
+                      :width "10%"
                       :regex #"\d{0,5}"
                       :read (comp ::common/postal_code ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
@@ -265,20 +280,19 @@
       :add-label (tr [:buttons :add-new-pick-up-location])})))
 
 (defn rental [e! service]
-  (reagent/with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
-                             (ts-common/contact-info-group)
-                             (ts-common/place-search-group e! ::t-service/rentals)
-                             (ts-common/external-interfaces)
-                             (vehicle-group)
-                             (luggage-restrictions-groups)
-                             (accessibility-group)
-                             (additional-services)
-                             (usage-area)
-                             (ts-common/service-url
-                              (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                              ::t-service/booking-service)
-                             (pick-up-locations e!)
-                             ]
+  (with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
+                     (ts-common/contact-info-group)
+                     (ts-common/place-search-group e! ::t-service/rentals)
+                     (ts-common/external-interfaces)
+                     (vehicle-group)
+                     (luggage-restrictions-groups)
+                     (accessibility-group)
+                     (additional-services)
+                     (usage-area)
+                     (ts-common/service-url
+                      (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                      ::t-service/booking-service)
+                     (pick-up-locations e!)]
                      options (rental-form-options e! groups)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))

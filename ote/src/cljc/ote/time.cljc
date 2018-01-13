@@ -44,6 +44,12 @@
                            (cljs-time/today-at hours minutes seconds)))))))
 
 
+(defn empty-time?
+  "Check if time is empty. Requires both hours and minutes to be set."
+  [{:keys [hours minutes]}]
+  (or (nil? hours)
+      (nil? minutes)))
+
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)
@@ -152,3 +158,12 @@
              (not= s "00") (->PGInterval (interval (Double/parseDouble s) :seconds))
              :default (->PGInterval (interval 0.0 :seconds)))
            (throw (ex-info "Unsupported interval keyword" {:interval string}))))))
+
+
+#?(:clj
+   (defn pgtimestamp->ckan-timestring
+     "CKAN uses unstandard format of ISO8601 called CKAN8601. It is in format 'yyyy-MM-ddTHH:mm:ss'.
+     This format is required for e.g. last_updated or created fields in CKAN api payloads."
+     [timestamp]
+     (format/unparse (format/formatters :date-hour-minute-second)
+                     (coerce/from-sql-time timestamp))))

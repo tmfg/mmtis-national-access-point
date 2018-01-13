@@ -16,9 +16,18 @@
 ;; max length 16 chars (optional plus followed by digits)
 (def phone-number-regex #"^((\+?\d{0,15})|(\d{0,16}))$")
 
-(defn empty-value? [arvo]
-  (or (nil? arvo)
-      (str/blank? arvo)))
+(defn empty-value? [val]
+  (or (nil? val)
+      (str/blank? val)))
+
+(defn empty-localized-text? [value]
+  (let [text-value (get (first value) :ote.db.transport-service/text)]
+    (or (nil? text-value)
+      (str/blank? text-value))))
+
+(defn empty-enum-dropdown? [value]
+  (or (nil? (first value))
+    (str/blank? (first value))))
 
 ;; validate-rule multimethod implements validation rule checking by keyword name
 ;; Parameters:
@@ -141,34 +150,9 @@
               (apply validate-rule rule name data row table options))))
         rules))
 
-(defn validate-row
-  "Validate all fields of a single row/form of data.
-  Returns a map of {field-name [errors]}.
-  Type selects the validations to use and must be one of: `#{:validate :warn :notice}`.
-  The default type is `:validate`."
-  ([table row schemas] (validate-row table row schemas :validate))
-  ([table row schemas type]
-   (loop [v {}
-          [s & schemas] schemas]
-     (if-not s
-       v
-       (let [{:keys [name read]} s
-             validoi (type s)]
-         (if (empty? validoi)
-           (recur v schemas)
-           (let [errors (validate-rules name (if read
-                                                 (read row)
-                                                 (get row name))
-                                          row table
-                                          validoi)]
-             (recur (if (empty? errors)
-                      v
-                      (assoc v name errors))
-                    schemas))))))))
-
 (defn missing-required-fields
   "Returns a sequence of schemas that are marked as required and are missing a value."
-  [row skeema]
+  [row schema]
   (keep (fn [{:keys [required? read name type is-empty?] :as s}]
           (when (and required?
                      ((or is-empty? empty-value?)
@@ -176,4 +160,51 @@
                         (read row)
                         (get row name))))
             s))
-        skeema))
+        schema))
+
+(declare validate-row)
+
+(defn validate-table [table-rows table-fields]
+  (let [validated-rows
+        (mapv
+         (fn [row]
+           (let [errors (validate-row nil row table-fields)
+                 missing-fields (missing-required-fields
+                                 row table-fields)]
+             (if (and (empty? errors) (empty? missing-fields))
+               nil
+               {:errors errors
+                :missing-required-fields (into #{} (map :name) missing-fields)})))
+         table-rows)]
+    (if (every? nil? validated-rows)
+      nil ;; all clear, this table is valid
+      validated-rows)))
+
+(defn validate-row
+  "Validate all fields of a single row/form of data.
+  Returns a map of {field-name [errors]}.
+  Type selects the validations to use and must be one of: `#{:validate :warn :notice}`.
+  The default type is `:validate`."
+  ([table row schemas] (validate-row table row schemas :validate))
+  ([table row schemas error-type]
+   (loop [v {}
+          [s & schemas] schemas]
+     (if-not s
+       v
+       (let [{:keys [name read type table-fields]} s
+             table? (= :table type)
+             validoi (error-type s)]
+         (if (and (not table?) (empty? validoi))
+           (recur v schemas)
+           (let [value (if read
+                         (read row)
+                         (get row name))
+                 errors (if table?
+                          (validate-table value table-fields)
+                          (validate-rules name value
+                                          row table
+                                          validoi))]
+             (recur (if (empty? errors)
+                      v
+                      (assoc v name errors))
+                    schemas))))))))

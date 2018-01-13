@@ -17,7 +17,8 @@
             [ote.app.controller.transport-service :as ts]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
-            [ote.util.values :as values]))
+            [ote.util.values :as values]
+            [ote.ui.validation :as validation]))
 
 (defn form-options [e! schemas]
   {:name->label (tr-key [:field-labels :parking]
@@ -39,23 +40,26 @@
      [:div
       [:p (tr [:form-help :pricing-info])]])
 
-   {:name         ::t-service/price-classes
+    {:name         ::t-service/price-classes
      :type         :table
      :prepare-for-save values/without-empty-rows
      :table-fields [{:name  ::t-service/name :type :string
-                     :label (tr [:field-labels :parking ::t-service/price-class-name])}
+                     :label (tr [:field-labels :parking ::t-service/price-class-name])
+                     :required? true}
                     {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
-                     :input-style {:text-align "right" :padding-right "5px"}}
+                     :input-style {:text-align "right" :padding-right "5px"}
+                     :required? true}
                     {:name ::t-service/unit :type :string :style {:width "100px"}}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
     {:container-class "col-md-6"
-     :name  ::t-service/pricing-description
-     :type  :localized-text
-     :full-width? true
-     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
-     :read  (comp ::t-service/description ::t-service/pricing)}
+     :name            ::t-service/pricing-description
+     :type            :localized-text
+     :full-width?     true
+     :write           #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
+     :read            (comp ::t-service/description ::t-service/pricing)
+     :is-empty?       validation/empty-localized-text?}
 
     {:container-class "col-md-5"
      :name  ::t-service/pricing-url
@@ -75,13 +79,14 @@
      :type :localized-text
      :rows 1
      :full-width? true
+     :is-empty? validation/empty-localized-text?
      }
 
     ))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
-        write (fn [key]
+        write-time (fn [key]
                 (fn [{all-day? ::t-service/all-day :as data} time]
                   ;; Don't allow changing time if all-day checked
                   (if all-day?
@@ -101,31 +106,34 @@
                     :type              :multiselect-selection
                     :options           t-service/days
                     :show-option       (tr-key [:enums ::t-service/day :full])
-                    :show-option-short (tr-key [:enums ::t-service/day :short])}
+                    :show-option-short (tr-key [:enums ::t-service/day :short])
+                    :required? true
+                    :is-empty? validation/empty-enum-dropdown?
+                    }
                    {:name  ::t-service/all-day
                     :width "10%"
                     :type  :checkbox
                     :write (fn [data all-day?]
                              (merge data
                                     {::t-service/all-day all-day?}
-                                    (when all-day?
+                                    (if all-day?
                                       {::t-service/from (time/->Time 0 0 nil)
-                                       ::t-service/to   (time/->Time 24 0 nil)})))}
+                                       ::t-service/to (time/->Time 24 0 nil)}
+                                      {::t-service/from nil
+                                       ::t-service/to nil})))}
 
                    {:name         ::t-service/from
                     :width        "25%"
                     :type         :time
-                    :cancel-label (tr [:buttons :cancel])
-                    :ok-label     (tr [:buttons :save])
-                    :write        (write ::t-service/from)
-                    :default-time {:hours "08" :minutes "00"}}
+                    :write        (write-time ::t-service/from)
+                    :required? true
+                    :is-empty? time/empty-time?}
                    {:name         ::t-service/to
                     :width        "25%"
                     :type         :time
-                    :cancel-label (tr [:buttons :cancel])
-                    :ok-label     (tr [:buttons :save])
-                    :write        (write ::t-service/to)
-                    :default-time {:hours "19" :minutes "00"}}]
+                    :write        (write-time ::t-service/to)
+                    :required? true
+                    :is-empty? time/empty-time?}]
        :delete?   true
        :add-label (tr [:buttons :add-new-service-hour])}
 
@@ -134,7 +142,8 @@
        :prepare-for-save values/without-empty-rows
        :table-fields [{:name  ::t-service/description
                        :label (tr* :description)
-                       :type  :localized-text}
+                       :type  :localized-text
+                       :is-empty? validation/empty-localized-text?}
                       {:name  ::t-service/from-date
                        :type  :date-picker
                        :label (tr* :from-date)}
@@ -161,8 +170,10 @@
      :table-fields [{:name        ::t-service/parking-facility
                      :type        :selection
                      :show-option (tr-key [:enums ::t-service/parking-facility])
-                     :options     t-service/parking-facilities}
-                    {:name ::t-service/capacity :type :number}]
+                     :options     t-service/parking-facilities
+                     :required? true}
+                    {:name ::t-service/capacity :type :number
+                     :required? true}]
      :add-label    (tr [:buttons :add-new-parking-capacity])
      :delete?      true}))
 
@@ -175,6 +186,7 @@
     {:name            ::t-service/charging-points
      :rows            2
      :type            :localized-text
+     :is-empty? validation/empty-localized-text?
      :full-width?     true
      :container-class "col-md-6"}))
 
@@ -200,6 +212,7 @@
 
     {:name            ::t-service/accessibility-description
      :type            :localized-text
+     :is-empty? validation/empty-localized-text?
      :rows            2
      :container-class "col-md-6"
      :full-width?     true}

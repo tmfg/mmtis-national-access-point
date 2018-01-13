@@ -91,8 +91,13 @@
          (if published?
            ;; For published services, call CKAN API to delete dataset
            ;; this cascades to all OTE information
-           (publish/delete-published-service! nap-config db user id)
-
+           (do
+             (try
+               (publish/delete-published-service! nap-config db user id)
+               ;; If for some reason the service is not found
+               ;; from ckan then delete service from OTE anyway
+               (catch Exception e
+                 (delete! db ::t-service/transport-service {::t-service/id id}))))
            ;; Otherwise delete from transport-service table
            (delete! db ::t-service/transport-service {::t-service/id id}))
          (http/transit-response id)))))
@@ -177,6 +182,9 @@
      create-transport-operator
      update-transport-operator) nap-config db user data))
 
+(defn ensure-bigdec [value]
+      (when (not (nil? value )) (bigdec value)))
+
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
   ([service data-path]
@@ -184,7 +192,7 @@
   ([service data-path price-per-unit-path]
    (update-in service data-path
               (fn [price-classes-float]
-                (mapv #(update-in % price-per-unit-path bigdec) price-classes-float)))))
+                (mapv #(update-in % price-per-unit-path ensure-bigdec) price-classes-float)))))
 
 (defn- update-rental-price-classes [service]
   (update-in service [::t-service/rentals ::t-service/vehicle-classes]
@@ -211,15 +219,21 @@
 
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
-  [db transport-service-id external-interfaces]
+  [db transport-service-id external-interfaces removed-resources]
 
   ;; Delete services that have not been published yet
   (specql/delete! db ::t-service/external-interface-description
                   {::t-service/transport-service-id transport-service-id
                    ::t-service/ckan-resource-id op/null?})
 
+  ;; Delete removed services from OTE db
+  (doseq [{id ::t-service/id} removed-resources]
+    (specql/delete! db ::t-service/external-interface-description
+                    {::t-service/id id}))
+  
   ;; Update or insert new external interfaces
-  (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if} external-interfaces]
+  (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if}
+          (filter (fn [el] (not (:deleted? el))) external-interfaces)]
     (if ckan-resource-id
       (specql/update! db ::t-service/external-interface-description
                       ext-if
@@ -229,7 +243,13 @@
       (specql/insert! db ::t-service/external-interface-description
                       (assoc ext-if ::t-service/transport-service-id transport-service-id)))))
 
-
+(defn- removable-resources
+  [from-db from-client]
+  (let [in-db (into #{} (map ::t-service/id) from-db)
+        from-ui (into #{} (map ::t-service/id) from-client)
+        to-delete (map #(select-keys % #{::t-service/ckan-resource-id ::t-service/id})
+                       (filter (comp (complement from-ui) ::t-service/id) from-db))]
+    to-delete))
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
@@ -242,14 +262,17 @@
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
                          (dissoc ::t-service/external-interfaces))
+
+        resources-from-db (publish/fetch-transport-service-external-interfaces db (::t-service/id data))
+        removed-resources (removable-resources resources-from-db external-interfaces)
         ;; Store to OTE database
         transport-service
         (jdbc/with-db-transaction [db db]
           (let [transport-service (upsert! db ::t-service/transport-service service-info)
                 transport-service-id (::t-service/id transport-service)]
 
-            ;; Save possible external interfaces
-            (save-external-interfaces db transport-service-id external-interfaces)
+            ;; Save possible external interfaces            
+            (save-external-interfaces db transport-service-id external-interfaces removed-resources)
 
             ;; Save operation areas
             (places/save-transport-service-operation-area! db transport-service-id places)
@@ -258,6 +281,7 @@
 
     ;; If published, use CKAN API to add dataset and resource
     (when (::t-service/published? data)
+      (publish/delete-resources-from-published-service! nap-config user removed-resources)
       (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
 
     ;; Return the stored transport-service
@@ -281,7 +305,7 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-        (http/transit-response (get-transport-service db (Long/parseLong id))))
+        (http/no-cache-transit-response (get-transport-service db (Long/parseLong id))))
 
    (POST "/transport-operator/group" {user :user}
      (http/transit-response

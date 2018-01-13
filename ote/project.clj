@@ -14,7 +14,7 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
-                 [specql "0.7.0-alpha10"]
+                 [specql "0.7.0-alpha12"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
@@ -117,7 +117,11 @@
   :aliases {;; Alias for doing a full production build
             "production" ["do" "clean," "deps," "compile,"
                           "cljsbuild" "once" "prod,"
-                          "uberjar"]}
+                          "postbuild,"
+                          "uberjar"]
+
+            "postbuild" ["run" "-m" "ote.tools.postbuild"]
+            }
   :repl-options {:init-ns ote.main
                  :init (ote.main/start)}
   :main ote.main)

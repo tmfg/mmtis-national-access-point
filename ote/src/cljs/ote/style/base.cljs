@@ -6,7 +6,7 @@
 (def body {:margin 0
            :padding 0})
 
-(def mobile-width-px 950)
+(def mobile-width-px 1000)
 
 (def wrapper {:padding-top "20px"})
 
@@ -36,6 +36,7 @@
 
 ;; Form elements
 (def required-element { :color "#B71C1C"
+                       :font-size 14
                        :font-weight "600"}) ;; currently same as error
 
 (def error-element { :color "#B71C1C"
@@ -104,3 +105,5 @@
   {:padding-right "10px"})
 
 (def section-margin {:margin-top "1em"})
+
+(def placeholder {:color "#a0a0a0"})
