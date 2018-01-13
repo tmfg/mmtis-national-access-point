@@ -141,7 +141,7 @@
 
    {:name ::t-service/brokerage?
     :style style-form/padding-top
-    :external-help {:help-text      (tr [:form-help :brokerage?])
+    :extended-help {:help-text      (tr [:form-help :brokerage?])
                     :help-link-text (tr [:form-help :brokerage-link])
                     :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
     :type :checkbox}))

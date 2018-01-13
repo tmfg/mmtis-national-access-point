@@ -533,11 +533,11 @@
    (when error
      (tr [:common-texts :required-field]))])
 
-(defmethod field :checkbox [{:keys [update! label warning error style external-help]} checked?]
-  (if external-help
+(defmethod field :checkbox [{:keys [update! label warning error style extended-help]} checked?]
+  (if extended-help
     [common/extended-help
-     (:help-text external-help)
-     (:help-link-text external-help)
-     (:help-link external-help)
+     (:help-text extended-help)
+     (:help-link-text extended-help)
+     (:help-link extended-help)
      (checkbox-container update! label warning error style checked?)]
     (checkbox-container update! label warning error style checked?)))
