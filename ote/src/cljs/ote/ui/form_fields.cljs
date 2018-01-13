@@ -524,25 +524,20 @@
                        :label-style style-base/button-label-style
                        :disabled (values/effectively-empty? (last data))}]])]))
 
-(defmethod field :checkbox [{:keys [update! label warning error style]} checked?]
+(defn- checkbox-container [update! label warning error style checked?]
   [:div (when error (stylefy/use-style style-base/required-element))
-    [ui/checkbox {:label label
-                  :checked checked?
-                  :on-check #(update! (not checked?))
-                  :style style}]
-    (when error
-        (tr [:common-texts :required-field]))])
+   [ui/checkbox {:label label
+                 :checked checked?
+                 :on-check #(update! (not checked?))
+                 :style style}]
+   (when error
+     (tr [:common-texts :required-field]))])
 
-(defmethod field :brokerage-help-checkbox [{:keys [update! label warning error style help-text help-link-text help-link]} checked?]
-  [common/extended-help
-    help-text
-    help-link-text
-    help-link
-    [:div (when error (stylefy/use-style style-base/required-element))
-     [ui/checkbox {:label label
-                   :checked checked?
-                   :on-check #(update! (not checked?))
-                   :label-style {:color "#666666" }
-                   :style {:padding "10px 0px 0px 10px"}}]
-     (when error
-       (tr [:common-texts :required-field]))]])
+(defmethod field :checkbox [{:keys [update! label warning error style external-help]} checked?]
+  (if external-help
+    [common/extended-help
+     (:help-text external-help)
+     (:help-link-text external-help)
+     (:help-link external-help)
+     (checkbox-container update! label warning error style checked?)]
+    (checkbox-container update! label warning error style checked?)))

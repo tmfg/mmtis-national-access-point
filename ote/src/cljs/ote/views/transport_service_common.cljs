@@ -141,10 +141,10 @@
 
    {:name ::t-service/brokerage?
     :style style-form/padding-top
-    :help-text (tr [:form-help :brokerage?])
-    :help-link-text (tr [:form-help :brokerage-link])
-    :help-link "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"
-    :type :brokerage-help-checkbox}))
+    :external-help {:help-text      (tr [:form-help :brokerage?])
+                    :help-link-text (tr [:form-help :brokerage-link])
+                    :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
+    :type :checkbox}))
 
 (defn contact-info-group []
   (form/group
