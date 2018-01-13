@@ -6,7 +6,9 @@
             [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [compojure.core :refer [routes POST]]
-            [ote.nap.cookie :as cookie])
+            [ote.nap.cookie :as cookie]
+            [ote.nap.users :as users]
+            [ote.services.transport :as transport])
   (:import (java.util Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
@@ -40,16 +42,18 @@
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
-  ;;(println "LOGIN WITH: " credentials)
   (let [login-info (first (fetch-login-info db {:email email}))]
     (if login-info
       (if (hashers/check password
                          (passlib->buddy (:password login-info)))
         ;; User was found and password is correct, return user info
-        ;; FIXME: set cookie and return user info
         (with-auth-tkt
-          ;; FIXME: return user info to app state
-          (http/transit-response {:user "FOUND"})
+          (http/transit-response
+           {:success? true
+            :session-data
+            (let [user (users/find-user db (:name login-info))]
+              (map #(transport/get-transport-operator-data db % (:user user))
+                   (:groups user)))})
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
                           {:digest-algorithm (:digest-algorithm auth-tkt-config)
                            :timestamp (java.util.Date.)
