@@ -210,6 +210,9 @@
   :ote.db.common/street                               "Address"
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumber"
+
+  :login {:email "Email"
+          :password "Password"}
    }
 
 
@@ -744,6 +747,22 @@
   :showing-latest-services "No search filters. Showing latest modified services."
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."
+  }
+
+ :login
+ {:label "Login credentials"
+  :login-button "Login"
+
+  :no-account? "Need an account?"
+  :no-account-help "Register, it will only take a moment."
+  :no-account-button "Create account"
+
+  :forgot-password? "Forgot password?"
+  :forgot-password-help "No problem, use the password reset form."
+  :forgot-password-button "Reset password"
+
+  :error {:no-such-user "Unknown user"
+          :incorrect-password "Incorrect password"}
   }
 
  :leaflet

@@ -212,6 +212,9 @@
   :ote.db.common/street                               "Adress"
   :ote.db.common/post_office                          "Postkontor"
   :ote.db.common/postal_code                          "Postnummer"
+
+  :login {:email "Epost"
+          :password "Lösenord"}
   }
 
 
@@ -741,6 +744,22 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."
+  }
+
+ :login
+ {:label "Inloggning"
+  :login-button "Logga in"
+
+  :no-account? "Behöver du ett konto?"
+  :no-account-help "Skapa ett konto, det tar bara en minut."
+  :no-account-button "Skapa ett konto"
+
+  :forgot-password? "Glömt din lösenord?"
+  :forgot-password-help "Inga problem, använd vårt formulär för återskapande av lösenord för att återställa det."
+  :forgot-password-button "Glömt ditt löseonrd?"
+
+  :error {:no-such-user "Okänd konto"
+          :incorrect-password "Fel lösenord"}
   }
 
  :leaflet

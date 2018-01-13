@@ -751,6 +751,22 @@
   :fetching-more "Haetaan lisää palveluita..."
   }
 
+ :login
+ {:label "Kirjautumistiedot"
+  :login-button "Kirjaudu sisään"
+
+  :no-account? "Tarvitsetko käyttäjätilin?"
+  :no-account-help "Rekisteröidy, se vie vain hetken."
+  :no-account-button "Luo käyttäjätili"
+
+  :forgot-password? "Unohditko salasanasi?"
+  :forgot-password-help "Ei ongelmaa, käytä salasanan uudelleenasetuksen lomaketta."
+  :forgot-password-button "Aseta salasana uudelleen"
+
+  :error {:no-such-user "Tuntematon käyttäjä"
+          :incorrect-password "Väärä salasana"}
+  }
+
  :leaflet
  {:zoom-in "Lähennä"
   :zoom-out "Loitonna"
