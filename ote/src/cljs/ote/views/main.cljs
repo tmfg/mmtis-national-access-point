@@ -21,7 +21,8 @@
             [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]
-            [ote.ui.form :as form]))
+            [ote.ui.form :as form]
+            [ote.app.controller.login :as login]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -157,10 +158,13 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        [linkify "/user/login" (tr [:common-texts :navigation-login])
+        [linkify "#" (tr [:common-texts :navigation-login])
          (merge (stylefy/use-style
                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}})]]])
+                {:style {:float "right"}}
+                {:on-click #(do
+                              (.preventDefault %)
+                              (e! (login/->ShowLoginDialog)))})]]])
 
     [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
      [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
@@ -229,21 +233,44 @@
 
 (defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
   [ui/dialog {:open true
-              :label "Kirjaudu sisään XXX"
-              :on-request-close #(e! (fp-controller/->LoginCancel))}
-   [form/form {:name->label (tr-key [:field-labels :login])
-               :update! #(e! (fp-controller/->UpdateLoginCredentials %))
-               :footer-fn (fn [data]
-                            [ui/raised-button {:on-click #(e! (fp-controller/->Login))
-                                               :label "Kirjaudu sisään XXX"}])}
-    [(form/group
-      {:label "Kirjautumistiedot XXX" :expandable? false
-       :columns 3}
-       {:name :email
-        :type :string}
-       {:name :password
-        :type :string :password? true})]
-    credentials]])
+              :on-request-close #(e! (login/->LoginCancel))}
+   [:div (stylefy/use-style (merge (style-base/flex-container "row")))
+    [:div {:style {:flex-basis 0 :flex-grow 1}}
+     [form/form {:name->label (tr-key [:field-labels :login])
+                 :update! #(e! (login/->UpdateLoginCredentials %))
+                 :footer-fn (fn [data]
+                              [ui/raised-button {:primary true
+                                                 :on-click #(e! (login/->Login))
+                                                 :label (tr [:login :login-button])}])}
+      [(form/group
+        {:label (tr [:login :label]) :expandable? false
+         :columns 3}
+        {:name :email
+         :type :string}
+        {:name :password
+         :type :string :password? true})]
+      credentials]
+     (when failed?
+       [:div (stylefy/use-style style-base/error-element)
+        (tr [:login :error error])])]
+
+    [:div {:style {:flex-basis 0 :flex-grow 1}}
+     [:div (stylefy/use-style (merge (style-base/flex-container "column")
+                                     {:margin-left "1em"
+                                      :padding-left "1em"}))
+      [ui/card
+       [ui/card-header {:title (tr [:login :no-account?])}]
+       [ui/card-text
+        [:div
+         [:div (tr [:login :no-account-help])]
+         [linkify "/user/register" (tr [:login :no-account-button])]]]]
+
+      [ui/card
+       [ui/card-header {:title (tr [:login :forgot-password?])}]
+       [ui/card-text
+        [:div
+         [:div (tr [:login :forgot-password-help])]
+         [linkify "/user/reset" (tr [:login :forgot-password-button])]]]]]]]])
 
 (defn ote-application
   "OTE application main view"
