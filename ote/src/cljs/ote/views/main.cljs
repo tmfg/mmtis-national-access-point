@@ -22,7 +22,9 @@
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]
             [ote.ui.form :as form]
-            [ote.app.controller.login :as login]))
+            [ote.app.controller.login :as login]
+            [ote.ui.common :as common]
+            [ote.ui.form-fields :as form-fields]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -231,29 +233,62 @@
 
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
 
+(defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
+  [:div
+   (when failed?
+     [:div (stylefy/use-style style-base/error-element)
+      (tr [:login :error error])])
+   [form/form {:name->label (tr-key [:field-labels :login])
+               :update! #(e! (login/->UpdateLoginCredentials %))
+               :footer-fn (fn [data]
+                            [ui/raised-button {:primary true
+                                               :on-click #(e! (login/->Login))
+                                               :label (tr [:login :login-button])}])}
+    [(form/group
+      {:label (tr [:login :label]) :expandable? false
+       :columns 3}
+      {:name :email
+       :type :string}
+      {:name :password
+       :type :string :password? true})]
+    credentials]])
+
+(defn mobile-login-form [e! {:keys [credentials failed? error] :as login}]
+  [ui/card
+   [ui/card-title {:title (tr [:login :label])}]
+   [ui/card-text
+    [:div (stylefy/use-style (merge (style-base/flex-container "column")
+                                    {:justify-content "center"}))
+     (when failed?
+       [:div (stylefy/use-style style-base/error-element)
+        (tr [:login :error error])])
+     [form-fields/field {:label (tr [:field-labels :login :email])
+                         :type :string :name :email
+                         :style {:width "95%" :align-self "center"}
+                         :update! #(e! (login/->UpdateLoginCredentials {:email %}))}
+      (:email credentials)]
+     [form-fields/field {:label (tr [:field-labels :login :password])
+                         :type :string :name :password
+                         :password? true
+                         :style {:width "95%" :align-self "center"}
+                         :update! #(e! (login/->UpdateLoginCredentials {:password %}))}
+      (:password credentials)]
+     [:div (stylefy/use-style (style-base/flex-container "row"))
+      [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
+                         :primary true
+                         :on-click #(e! (login/->Login))
+                         :label (tr [:login :login-button])}]
+      [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
+                         :secondary true
+                         :on-click #(e! (login/->LoginCancel))
+                         :label (tr [:buttons :cancel])}]]]]])
+
 (defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
   [ui/dialog {:open true
               :on-request-close #(e! (login/->LoginCancel))}
    [:div (stylefy/use-style (merge (style-base/flex-container "row")))
     [:div {:style {:flex-basis 0 :flex-grow 1}}
-     [form/form {:name->label (tr-key [:field-labels :login])
-                 :update! #(e! (login/->UpdateLoginCredentials %))
-                 :footer-fn (fn [data]
-                              [ui/raised-button {:primary true
-                                                 :on-click #(e! (login/->Login))
-                                                 :label (tr [:login :login-button])}])}
-      [(form/group
-        {:label (tr [:login :label]) :expandable? false
-         :columns 3}
-        {:name :email
-         :type :string}
-        {:name :password
-         :type :string :password? true})]
-      credentials]
-     (when failed?
-       [:div (stylefy/use-style style-base/error-element)
-        (tr [:login :error error])])]
-
+     [login-form e! login]]
     [:div {:style {:flex-basis 0 :flex-grow 1}}
      [:div (stylefy/use-style (merge (style-base/flex-container "column")
                                      {:margin-left "1em"
@@ -284,28 +319,31 @@
            :as app}]
     [:div {:style (stylefy/use-style style-base/body)}
      [theme e! app
-      [:div.ote-sovellus
-       [top-nav e! app]
+      (if (and (:show? login) common/mobile?)
+        [mobile-login-form e! login]
 
-       (when (:show? login)
-         [login-dialog e! login])
+        [:div.ote-sovellus
+         [top-nav e! app]
 
-       (if (not loaded?)
-         [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-         [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
-          [:div.container-fluid
-           (case (:page app)
-             :front-page [fp/own-services e! app]
-             :own-services [fp/own-services e! app]
-             :transport-service [t-service/select-service-type e! app]
-             :transport-operator [to/operator e! app]
+         (when (:show? login)
+           [login-dialog e! login])
 
-             ;; Routes for the service form, one for editing an existing one by id
-             ;; and another when creating a new service
-             :edit-service [t-service/edit-service-by-id e! app]
-             :new-service [t-service/edit-new-service e! app]
+         (if (not loaded?)
+           [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+           [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
+            [:div.container-fluid
+             (case (:page app)
+               :front-page [fp/own-services e! app]
+               :own-services [fp/own-services e! app]
+               :transport-service [t-service/select-service-type e! app]
+               :transport-operator [to/operator e! app]
 
-             :services [service-search/service-search e! (:service-search app)]
-             [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+               ;; Routes for the service form, one for editing an existing one by id
+               ;; and another when creating a new service
+               :edit-service [t-service/edit-service-by-id e! app]
+               :new-service [t-service/edit-new-service e! app]
 
-       [footer e!]]]]))
+               :services [service-search/service-search e! (:service-search app)]
+               [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+
+         [footer e!]])]]))
