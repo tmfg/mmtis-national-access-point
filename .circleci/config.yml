@@ -101,9 +101,11 @@ jobs:
           command: cd /tmp/ote && java -jar ote.jar
           background: true
 
+      - run: curl --connect-timeout 5 --max-time 10 --retry 5 --retry-connrefused --retry-max-time 40 ${CYPRESS_BASE_URL}
+
       - run:
           name: Run smoke tests for pull request
-          command: cypress run --record
+          command: cypress run --record --spec cypress/integration/smoke/ote_spec.js
 
 workflows:
   version: 2
