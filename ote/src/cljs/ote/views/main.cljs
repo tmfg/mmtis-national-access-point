@@ -253,35 +253,56 @@
        :type :string :password? true})]
     credentials]])
 
+(defn login-action-cards []
+  [:div {:style {:flex-basis 0 :flex-grow 1}}
+   [:div (stylefy/use-style (merge (style-base/flex-container "column")
+                                   {:margin-left "1em"
+                                    :padding-left "1em"}))
+    [ui/card
+     [ui/card-header {:title (tr [:login :no-account?])}]
+     [ui/card-text
+      [:div
+       [:div (tr [:login :no-account-help])]
+       [linkify "/user/register" (tr [:login :no-account-button])]]]]
+
+    [ui/card
+     [ui/card-header {:title (tr [:login :forgot-password?])}]
+     [ui/card-text
+      [:div
+       [:div (tr [:login :forgot-password-help])]
+       [linkify "/user/reset" (tr [:login :forgot-password-button])]]]]]])
+
 (defn mobile-login-form [e! {:keys [credentials failed? error] :as login}]
-  [ui/card
-   [ui/card-title {:title (tr [:login :label])}]
-   [ui/card-text
-    [:div (stylefy/use-style (merge (style-base/flex-container "column")
-                                    {:justify-content "center"}))
-     (when failed?
-       [:div (stylefy/use-style style-base/error-element)
-        (tr [:login :error error])])
-     [form-fields/field {:label (tr [:field-labels :login :email])
-                         :type :string :name :email
-                         :style {:width "95%" :align-self "center"}
-                         :update! #(e! (login/->UpdateLoginCredentials {:email %}))}
-      (:email credentials)]
-     [form-fields/field {:label (tr [:field-labels :login :password])
-                         :type :string :name :password
-                         :password? true
-                         :style {:width "95%" :align-self "center"}
-                         :update! #(e! (login/->UpdateLoginCredentials {:password %}))}
-      (:password credentials)]
-     [:div (stylefy/use-style (style-base/flex-container "row"))
-      [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
-                         :primary true
-                         :on-click #(e! (login/->Login))
-                         :label (tr [:login :login-button])}]
-      [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
-                         :secondary true
-                         :on-click #(e! (login/->LoginCancel))
-                         :label (tr [:buttons :cancel])}]]]]])
+  [:span
+   [ui/card
+    [ui/card-title {:title (tr [:login :label])}]
+    [ui/card-text
+     [:div (stylefy/use-style (merge (style-base/flex-container "column")
+                                     {:justify-content "center"}))
+      (when failed?
+        [:div (stylefy/use-style style-base/error-element)
+         (tr [:login :error error])])
+      [form-fields/field {:label (tr [:field-labels :login :email])
+                          :type :string :name :email
+                          :style {:width "95%" :align-self "center"}
+                          :update! #(e! (login/->UpdateLoginCredentials {:email %}))}
+       (:email credentials)]
+      [form-fields/field {:label (tr [:field-labels :login :password])
+                          :type :string :name :password
+                          :password? true
+                          :style {:width "95%" :align-self "center"}
+                          :update! #(e! (login/->UpdateLoginCredentials {:password %}))}
+       (:password credentials)]
+      [:div (stylefy/use-style (style-base/flex-container "row"))
+       [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
+                          :primary true
+                          :on-click #(e! (login/->Login))
+                          :label (tr [:login :login-button])}]
+       [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
+                          :secondary true
+                          :on-click #(e! (login/->LoginCancel))
+                          :label (tr [:buttons :cancel])}]]]]]
+   [login-action-cards]])
 
 (defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
   [ui/dialog {:open true
@@ -289,23 +310,7 @@
    [:div (stylefy/use-style (merge (style-base/flex-container "row")))
     [:div {:style {:flex-basis 0 :flex-grow 1}}
      [login-form e! login]]
-    [:div {:style {:flex-basis 0 :flex-grow 1}}
-     [:div (stylefy/use-style (merge (style-base/flex-container "column")
-                                     {:margin-left "1em"
-                                      :padding-left "1em"}))
-      [ui/card
-       [ui/card-header {:title (tr [:login :no-account?])}]
-       [ui/card-text
-        [:div
-         [:div (tr [:login :no-account-help])]
-         [linkify "/user/register" (tr [:login :no-account-button])]]]]
-
-      [ui/card
-       [ui/card-header {:title (tr [:login :forgot-password?])}]
-       [ui/card-text
-        [:div
-         [:div (tr [:login :forgot-password-help])]
-         [linkify "/user/reset" (tr [:login :forgot-password-button])]]]]]]]])
+    [login-action-cards]]])
 
 (defn ote-application
   "OTE application main view"
@@ -319,31 +324,31 @@
            :as app}]
     [:div {:style (stylefy/use-style style-base/body)}
      [theme e! app
-      (if (and (:show? login) common/mobile?)
-        [mobile-login-form e! login]
+      [:div.ote-sovellus
+       [top-nav e! app]
 
-        [:div.ote-sovellus
-         [top-nav e! app]
+       (if (and (:show? login) common/mobile?)
+         [mobile-login-form e! login]
+         [:span
+          (when (:show? login)
+            [login-dialog e! login])
 
-         (when (:show? login)
-           [login-dialog e! login])
+          (if (not loaded?)
+            [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+            [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
+             [:div.container-fluid
+              (case (:page app)
+                :front-page [fp/own-services e! app]
+                :own-services [fp/own-services e! app]
+                :transport-service [t-service/select-service-type e! app]
+                :transport-operator [to/operator e! app]
 
-         (if (not loaded?)
-           [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-           [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
-            [:div.container-fluid
-             (case (:page app)
-               :front-page [fp/own-services e! app]
-               :own-services [fp/own-services e! app]
-               :transport-service [t-service/select-service-type e! app]
-               :transport-operator [to/operator e! app]
+                ;; Routes for the service form, one for editing an existing one by id
+                ;; and another when creating a new service
+                :edit-service [t-service/edit-service-by-id e! app]
+                :new-service [t-service/edit-new-service e! app]
 
-               ;; Routes for the service form, one for editing an existing one by id
-               ;; and another when creating a new service
-               :edit-service [t-service/edit-service-by-id e! app]
-               :new-service [t-service/edit-new-service e! app]
+                :services [service-search/service-search e! (:service-search app)]
+                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
-               :services [service-search/service-search e! (:service-search app)]
-               [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
-
-         [footer e!]])]]))
+       [footer e!]]]]))
