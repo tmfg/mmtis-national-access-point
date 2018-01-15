@@ -1005,6 +1005,12 @@ msgstr "Oma nimi"
 msgid "Full Name"
 msgstr "Oma nimi"
 
+#: ckan/logic/validators.py:343
+msgid ""
+"Must be purely lowercase alphanumeric (ascii) characters and these symbols: "
+"-_"
+msgstr ""
+
 #~ msgid "Heading/NAP home page logged in main heading"
 #~ msgstr "Liikkumispalveluiden tallennus ja julkaisu"
 
