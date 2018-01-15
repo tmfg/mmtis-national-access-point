@@ -58,9 +58,20 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       CYPRESS_BASE_URL: "http://localhost:8080"
+      CYPRESS_NAP_LOGIN: "admin"
+      CYPRESS_NAP_PASSWORD: "admin"
+      OTE_BASE_URL: "http://localhost:8080"
+      OTE_DB_URL: "jdbc:postgresql://localhost:5432/napotetest"
+      OTE_DB_USERNAME: "napote"
+      OTE_DB_PASSWORD: ""
+      OTE_AUTH_SHARED_SECRET: "test"
 
     steps:
       - checkout
+      
+      - run: sudo apt-get update && sudo apt-get install gettext-base
+      
+      - setup_remote_docker
 
       # Download and cache dependencies
       - restore_cache:
@@ -80,7 +91,20 @@ jobs:
       - run: cd database && sh circleci_setup.sh
 
       - run:
+          name: Make production build of OTE app
           command: cd ote && lein production
+
+      - run:
+          name: Configure build
+          command: |
+            mkdir /tmp/ote
+            mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
+            envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
+
+      - run:
+          name: Run OTE app
+          command: cd /tmp/ote && java -jar ote.jar
+          background: true
 
       - run:
           name: Run smoke tests for pull request
@@ -93,7 +117,7 @@ jobs:
             docker cp cypress cypress-env:/cypress
 
             # Run cypress in cypress container with cypress-env volume
-            docker run --volumes-from cypress-env --env CYPRESS_BASE_URL --env CYPRESS_RECORD_KEY -w /cypress solita/napote-cypress cypress run --record
+            docker run --volumes-from cypress-env -p 8080:8080 --env CYPRESS_BASE_URL --env CYPRESS_RECORD_KEY -w /cypress solita/napote-cypress cypress run --record
 
 workflows:
   version: 2
