@@ -247,7 +247,7 @@
      {:name ::t-service/pick-up-locations
       :type :table
       :prepare-for-save values/without-empty-rows
-      :table-fields [{:name ::t-service/name
+      :table-fields [{:name ::t-service/pick-up-name
                       :type :string
                       :required? true}
                      {:name ::t-service/pick-up-type

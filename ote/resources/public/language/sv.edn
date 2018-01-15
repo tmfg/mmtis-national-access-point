@@ -95,6 +95,7 @@
    :ote.db.transport-service/currency                  "Valuta"
 
    :ote.db.transport-service/pricing-description "Beskriv prissättningen"
+   :ote.db.transport-service/pricing-description-taxi "Beskriv prissättningen"
    :ote.db.transport-service/pricing-url "Prissättning www-sidor"
    :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"
    }
@@ -133,7 +134,7 @@
    :ote.db.transport-service/price-per-unit            "Pris (€)"
    :ote.db.transport-service/unit                      "Prissättningsgrund (tex. zon, resa, km)"
    :ote.db.transport-service/price-classes             "Pris"
-   :ote.db.transport-service/pick-up-name              "Namn"
+   :ote.db.transport-service/pick-up-name              "Verksamhetsställes namn"
    :ote.db.transport-service/pick-up-type              "Typ"
       :ote.db.transport-service/rental-additional-services "Övriga tjänster"
    :ote.db.transport-service/additional-service-type   "Tjänst"
@@ -212,6 +213,9 @@
   :ote.db.common/street                               "Adress"
   :ote.db.common/post_office                          "Postkontor"
   :ote.db.common/postal_code                          "Postnummer"
+
+  :login {:email "Epost"
+          :password "Lösenord"}
   }
 
 
@@ -228,6 +232,7 @@
   :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Beställes = finns inte garanterat i alla fordon, skäl att beställa i förväg."
 
   :brokerage? "Kruxa här om tjänsten är en förmedlingstjänst som skall anmälas till Trafi."
+  :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
 
@@ -741,6 +746,22 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."
+  }
+
+ :login
+ {:label "Inloggning"
+  :login-button "Logga in"
+
+  :no-account? "Behöver du ett konto?"
+  :no-account-help "Skapa ett konto, det tar bara en minut."
+  :no-account-button "Skapa ett konto"
+
+  :forgot-password? "Glömt din lösenord?"
+  :forgot-password-help "Inga problem, använd vårt formulär för återskapande av lösenord för att återställa det."
+  :forgot-password-button "Glömt ditt löseonrd?"
+
+  :error {:no-such-user "Okänd konto"
+          :incorrect-password "Fel lösenord"}
   }
 
  :leaflet

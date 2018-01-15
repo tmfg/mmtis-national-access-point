@@ -23,6 +23,9 @@
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
 
+                 ;; Password hashing
+                 [buddy/buddy-hashers "1.3.0"]
+
                  ;; Cache libraries
                  [org.clojure/core.cache "0.6.5"]
 
@@ -114,7 +117,11 @@
   :aliases {;; Alias for doing a full production build
             "production" ["do" "clean," "deps," "compile,"
                           "cljsbuild" "once" "prod,"
-                          "uberjar"]}
+                          "postbuild,"
+                          "uberjar"]
+
+            "postbuild" ["run" "-m" "ote.tools.postbuild"]
+            }
   :repl-options {:init-ns ote.main
                  :init (ote.main/start)}
   :main ote.main)

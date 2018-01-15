@@ -139,9 +139,11 @@
     :delete? true
     :add-label (tr [:buttons :add-new-company])}
 
-   (form/info (tr [:form-help :brokerage?]))
    {:name ::t-service/brokerage?
     :style style-form/padding-top
+    :extended-help {:help-text      (tr [:form-help :brokerage?])
+                    :help-link-text (tr [:form-help :brokerage-link])
+                    :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
     :type :checkbox}))
 
 (defn contact-info-group []
@@ -206,8 +208,8 @@
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
      (when (not (empty? (:ote.ui.form/missing-required-fields data)))
-       [ui/card {:style {:margin-top "0.5em" :margin-bottom "0.5em"}}
-        [ui/card-text (tr [:form-help :publish-missing-required])]])
+       [ui/card {:style {:margin-bottom "1em"}}
+        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
      (if published?
        ;; True

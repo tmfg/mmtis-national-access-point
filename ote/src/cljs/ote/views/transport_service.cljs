@@ -126,15 +126,18 @@
     (fn [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
       (if (or (nil? service) (not loaded?))
         [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-        [:div
-         [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
-         ;; Passenger transport service has sub type, and here it is shown to users
-         (when (= :passenger-transportation (keyword (::t-service/type service)))
-           [:p (stylefy/use-style style-form/subheader)
-            (tr [:enums :ote.db.transport-service/sub-type
-                 (get-in app [:transport-service ::t-service/sub-type])])])
-         [:h2 (get-in app [:transport-operator ::t-operator/name])]
-         [edit-service e! (::t-service/type service) app]]))}))
+        ;; Render transport service page only if given id matches with the loaded id
+        ;; This will prevent page render with "wrong" or "empty" transport-service data
+        (when (= (get-in app [:params :id]) (str (get-in app [:transport-service ::t-service/id])))
+          [:div
+            [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
+             ;; Passenger transport service has sub type, and here it is shown to users
+            (when (= :passenger-transportation (keyword (::t-service/type service)))
+              [:p (stylefy/use-style style-form/subheader)
+                (tr [:enums :ote.db.transport-service/sub-type
+                     (get-in app [:transport-service ::t-service/sub-type])])])
+            [:h2 (get-in app [:transport-operator ::t-operator/name])]
+            [edit-service e! (::t-service/type service) app]])))}))
 
 (defn edit-new-service [e! app]
   "Render container and headers for empty service form"

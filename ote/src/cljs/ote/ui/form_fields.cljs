@@ -99,7 +99,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-focus form? error warning table? full-width?
-                                  style input-style hint-style]
+                                  style input-style hint-style password?]
                            :as   field} data]
   [text-field
    (merge
@@ -126,7 +126,9 @@
     (when style
       {:style style})
     (when input-style
-      {:input-style input-style}))])
+      {:input-style input-style})
+    (when password?
+      {:type "password"}))])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
@@ -354,6 +356,7 @@
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
            {:type :string
+            :name "hours"
             :regex hour-regex
             :style {:width 30}
             :input-style {:text-align "right"}
@@ -372,6 +375,7 @@
    "."
    [field (merge
            {:type :string
+            :name "minutes"
             :regex minute-regex
             :style {:width 30}
             :update! (fn [minute]
@@ -454,7 +458,7 @@
 
 (defmethod field :table [{:keys [table-fields update! delete? add-label error-data] :as opts} data]
   (let [data (if (empty? data)
-               ;; have table always contain at least one row
+               ;; table always contains at least one row
                [{}]
                data)]
     [:div
@@ -477,19 +481,17 @@
       [ui/table-body {:display-row-checkbox false}
        (doall
         (map-indexed
-         (fn [i row]           
+         (fn [i row]
            (let [{:keys [errors missing-required-fields]} (and error-data
                                                                (< i (count error-data))
                                                                (nth error-data i))]
-             (when (not (:deleted? row))
-               
                ^{:key i}
                [ui/table-row (merge {:selectable false :display-border false}
                                     ;; If there are errors or missing fields, make the
                                     ;; row taller to show error messages
                                     (when (or errors missing-required-fields)
                                       {:style {:height 65}}))
-                (doall 
+                (doall
                  (for [{:keys [name read write width type component] :as tf} table-fields
                        :let [field-error (get errors name)
                              missing? (get missing-required-fields name)
@@ -498,7 +500,7 @@
                                          #(assoc-in data [i name] %))
                              value ((or read name) row)]]
                    ^{:key name}
-                   [ui/table-row-column {:style {:width width}}                    
+                   [ui/table-row-column {:style {:width width}}
                     (if (= :component type)
                       (component {:update-form! #(update! (update-fn %))
                                   :data value})
@@ -512,10 +514,10 @@
                        value])]))
                 (when delete?
                   [ui/table-row-column {:style {:width "70px"}}
-                   [ui/icon-button {:on-click #(update!
-                                                (when (>= i 0)
-                                                  (assoc-in data [i :deleted?] true)))}                  
-                    [ic/action-delete]]])])))
+                 [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                                     (take i data))
+                                                                   (drop (inc i) data))))}
+                  [ic/action-delete]]])]))
          data))]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
@@ -524,11 +526,20 @@
                        :label-style style-base/button-label-style
                        :disabled (values/effectively-empty? (last data))}]])]))
 
-(defmethod field :checkbox [{:keys [update! label warning error style]} checked?]
+(defn- checkbox-container [update! label warning error style checked?]
   [:div (when error (stylefy/use-style style-base/required-element))
-    [ui/checkbox {:label label
-                  :checked checked?
-                  :on-check #(update! (not checked?))
-                  :style style}]
-    (when error
-        (tr [:common-texts :required-field]))])
+   [ui/checkbox {:label label
+                 :checked checked?
+                 :on-check #(update! (not checked?))
+                 :style style}]
+   (when error
+     (tr [:common-texts :required-field]))])
+
+(defmethod field :checkbox [{:keys [update! label warning error style extended-help]} checked?]
+  (if extended-help
+    [common/extended-help
+     (:help-text extended-help)
+     (:help-link-text extended-help)
+     (:help-link extended-help)
+     (checkbox-container update! label warning error style checked?)]
+    (checkbox-container update! label warning error style checked?)))
