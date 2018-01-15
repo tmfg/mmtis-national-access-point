@@ -18,8 +18,13 @@ RUN apt-get install --no-install-recommends -y apt-transport-https  && \
     curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
     apt-get install --no-install-recommends -y nodejs && \
     node -v && npm -v && \
-    npm i -g npx && \
-    apt-get -y autoremove && \
+    npm i -g npx
+
+# Install extra packages (for CI scripts)
+RUN apt-get install -y sudo
+
+# Cleanup
+RUN apt-get -y autoremove && \
     apt-get -y autoclean && \
     rm -rf /var/lib/apt/lists/*
 
