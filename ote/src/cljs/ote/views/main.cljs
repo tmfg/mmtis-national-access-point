@@ -160,11 +160,11 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        [linkify "#" (tr [:common-texts :navigation-login])
+        [linkify "/user/login" (tr [:common-texts :navigation-login])
          (merge (stylefy/use-style
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}}
-                {:on-click #(do
+                #_{:on-click #(do
                               (.preventDefault %)
                               (e! (login/->ShowLoginDialog)))})]]])
 
