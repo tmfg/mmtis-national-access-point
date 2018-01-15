@@ -127,7 +127,8 @@
           ::latest-modification
           ::schema
           ::closed-groups
-          :loading?))
+          :loading?
+          :csv-count))
 
 (defrecord ^:private Label [label])
 (defn- label? [x]

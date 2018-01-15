@@ -98,7 +98,7 @@
       ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-focus form? error warning table? full-width?
+                                  focus on-blur form? error warning table? full-width?
                                   style input-style hint-style]
                            :as   field} data]
   [text-field
@@ -106,6 +106,7 @@
     {:name name
      :floating-label-text (when-not table?  label)
      :floating-label-fixed true
+     :on-blur           on-blur
      :hintText          (placeholder field data)
      :on-change         #(let [v %2]
                            (if regex

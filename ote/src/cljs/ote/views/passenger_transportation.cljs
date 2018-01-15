@@ -19,7 +19,8 @@
              [ote.time :as time]
              [ote.style.form :as style-form]
              [ote.util.values :as values]
-             [ote.ui.validation :as validation])
+             [ote.ui.validation :as validation]
+             [reagent.core :as r])
   (:require-macros [reagent.core :refer [with-let]]))
 
 
@@ -189,7 +190,7 @@
   (with-let [form-groups
              [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
-              (ts-common/companies-group)
+              (ts-common/companies-group e!)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
               (ts-common/external-interfaces (= :schedule (get service ::t-service/sub-type)))
               (luggage-restrictions-group)
