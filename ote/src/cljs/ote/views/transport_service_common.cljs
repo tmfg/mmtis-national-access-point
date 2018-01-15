@@ -139,9 +139,11 @@
     :delete? true
     :add-label (tr [:buttons :add-new-company])}
 
-   (form/info (tr [:form-help :brokerage?]))
    {:name ::t-service/brokerage?
     :style style-form/padding-top
+    :extended-help {:help-text      (tr [:form-help :brokerage?])
+                    :help-link-text (tr [:form-help :brokerage-link])
+                    :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
     :type :checkbox}))
 
 (defn contact-info-group []

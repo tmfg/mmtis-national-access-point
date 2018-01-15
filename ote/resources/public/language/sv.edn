@@ -228,6 +228,7 @@
   :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Beställes = finns inte garanterat i alla fordon, skäl att beställa i förväg."
 
   :brokerage? "Kruxa här om tjänsten är en förmedlingstjänst som skall anmälas till Trafi."
+  :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
 
