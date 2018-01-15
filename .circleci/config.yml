@@ -79,6 +79,8 @@ jobs:
     working_directory: ~/repo
 
     environment:
+      ## this enables colors + fixes failing unit tests (they say)
+      TERM: "xterm"
       LEIN_ROOT: "true"
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
