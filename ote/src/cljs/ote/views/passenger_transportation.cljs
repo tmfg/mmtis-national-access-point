@@ -189,7 +189,7 @@
 
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service}]
-  (let [form-groups
+  (with-let [form-groups
              [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group)
