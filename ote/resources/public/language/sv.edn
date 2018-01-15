@@ -133,7 +133,7 @@
    :ote.db.transport-service/price-per-unit            "Pris (€)"
    :ote.db.transport-service/unit                      "Prissättningsgrund (tex. zon, resa, km)"
    :ote.db.transport-service/price-classes             "Pris"
-   :ote.db.transport-service/pick-up-name              "Namn"
+   :ote.db.transport-service/pick-up-name              "Verksamhetsställes namn"
    :ote.db.transport-service/pick-up-type              "Typ"
       :ote.db.transport-service/rental-additional-services "Övriga tjänster"
    :ote.db.transport-service/additional-service-type   "Tjänst"
