@@ -211,6 +211,8 @@
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"
 
+  :login {:email "Sähköpostiosoite"
+          :password "Salasana"}
   }
 
 
@@ -748,6 +750,22 @@
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
   :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
   :fetching-more "Haetaan lisää palveluita..."
+  }
+
+ :login
+ {:label "Kirjautumistiedot"
+  :login-button "Kirjaudu sisään"
+
+  :no-account? "Tarvitsetko käyttäjätilin?"
+  :no-account-help "Rekisteröidy, se vie vain hetken."
+  :no-account-button "Luo käyttäjätili"
+
+  :forgot-password? "Unohditko salasanasi?"
+  :forgot-password-help "Ei ongelmaa, käytä salasanan uudelleenasetuksen lomaketta."
+  :forgot-password-button "Aseta salasana uudelleen"
+
+  :error {:no-such-user "Tuntematon käyttäjä"
+          :incorrect-password "Väärä salasana"}
   }
 
  :leaflet

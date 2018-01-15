@@ -20,7 +20,11 @@
             [ote.style.topnav :as style-topnav]
             [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
-            [ote.views.service-search :as service-search]))
+            [ote.views.service-search :as service-search]
+            [ote.ui.form :as form]
+            [ote.app.controller.login :as login]
+            [ote.ui.common :as common]
+            [ote.ui.form-fields :as form-fields]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -156,10 +160,13 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        [linkify "/user/login" (tr [:common-texts :navigation-login])
+        [linkify "#" (tr [:common-texts :navigation-login])
          (merge (stylefy/use-style
                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}})]]])
+                {:style {:float "right"}}
+                {:on-click #(do
+                              (.preventDefault %)
+                              (e! (login/->ShowLoginDialog)))})]]])
 
     [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
      [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
@@ -226,6 +233,85 @@
 
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
 
+(defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
+  [:div
+   (when failed?
+     [:div (stylefy/use-style style-base/error-element)
+      (tr [:login :error error])])
+   [form/form {:name->label (tr-key [:field-labels :login])
+               :update! #(e! (login/->UpdateLoginCredentials %))
+               :footer-fn (fn [data]
+                            [ui/raised-button {:primary true
+                                               :on-click #(e! (login/->Login))
+                                               :label (tr [:login :login-button])}])}
+    [(form/group
+      {:label (tr [:login :label]) :expandable? false
+       :columns 3}
+      {:name :email
+       :type :string}
+      {:name :password
+       :type :string :password? true})]
+    credentials]])
+
+(defn login-action-cards []
+  [:div {:style {:flex-basis 0 :flex-grow 1}}
+   [:div (stylefy/use-style (merge (style-base/flex-container "column")
+                                   {:margin-left "1em"
+                                    :padding-left "1em"}))
+    [ui/card
+     [ui/card-header {:title (tr [:login :no-account?])}]
+     [ui/card-text
+      [:div
+       [:div (tr [:login :no-account-help])]
+       [linkify "/user/register" (tr [:login :no-account-button])]]]]
+
+    [ui/card
+     [ui/card-header {:title (tr [:login :forgot-password?])}]
+     [ui/card-text
+      [:div
+       [:div (tr [:login :forgot-password-help])]
+       [linkify "/user/reset" (tr [:login :forgot-password-button])]]]]]])
+
+(defn mobile-login-form [e! {:keys [credentials failed? error] :as login}]
+  [:span
+   [ui/card
+    [ui/card-title {:title (tr [:login :label])}]
+    [ui/card-text
+     [:div (stylefy/use-style (merge (style-base/flex-container "column")
+                                     {:justify-content "center"}))
+      (when failed?
+        [:div (stylefy/use-style style-base/error-element)
+         (tr [:login :error error])])
+      [form-fields/field {:label (tr [:field-labels :login :email])
+                          :type :string :name :email
+                          :style {:width "95%" :align-self "center"}
+                          :update! #(e! (login/->UpdateLoginCredentials {:email %}))}
+       (:email credentials)]
+      [form-fields/field {:label (tr [:field-labels :login :password])
+                          :type :string :name :password
+                          :password? true
+                          :style {:width "95%" :align-self "center"}
+                          :update! #(e! (login/->UpdateLoginCredentials {:password %}))}
+       (:password credentials)]
+      [:div (stylefy/use-style (style-base/flex-container "row"))
+       [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
+                          :primary true
+                          :on-click #(e! (login/->Login))
+                          :label (tr [:login :login-button])}]
+       [ui/raised-button {:style {:flex-basis 0 :flex-grow 1}
+                          :secondary true
+                          :on-click #(e! (login/->LoginCancel))
+                          :label (tr [:buttons :cancel])}]]]]]
+   [login-action-cards]])
+
+(defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
+  [ui/dialog {:open true
+              :on-request-close #(e! (login/->LoginCancel))}
+   [:div (stylefy/use-style (merge (style-base/flex-container "row")))
+    [:div {:style {:flex-basis 0 :flex-grow 1}}
+     [login-form e! login]]
+    [login-action-cards]]])
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -233,15 +319,23 @@
   ;; init - Get operator and service data from DB when refresh or on usage start
   (e! (fp-controller/->GetTransportOperatorData))
 
-  (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
+  (fn [e! {loaded? :transport-operator-data-loaded?
+           login :login
+           :as app}]
     [:div {:style (stylefy/use-style style-base/body)}
      [theme e! app
       [:div.ote-sovellus
        [top-nav e! app]
 
-       (if (or (= false loaded?) (= true (nil? loaded?)))
-         [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-           [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
+       (if (and (:show? login) common/mobile?)
+         [mobile-login-form e! login]
+         [:span
+          (when (:show? login)
+            [login-dialog e! login])
+
+          (if (not loaded?)
+            [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+            [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
              [:div.container-fluid
               (case (:page app)
                 :front-page [fp/own-services e! app]
@@ -255,6 +349,6 @@
                 :new-service [t-service/edit-new-service e! app]
 
                 :services [service-search/service-search e! (:service-search app)]
-                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
        [footer e!]]]]))
