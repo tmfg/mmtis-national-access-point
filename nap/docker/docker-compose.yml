@@ -55,7 +55,7 @@ services:
   napote-solr:
     container_name: napote-solr
     image: solita/napote-solr:latest
-    #build: ./solr
+    build: ./solr
     networks:
       - napote
     ports:
@@ -64,7 +64,7 @@ services:
   napote-redis:
     container_name: napote-redis
     image: solita/napote-redis:latest
-    #build: ./redis
+    build: ./redis
     networks:
       - napote
     ports:
@@ -74,7 +74,7 @@ services:
     restart: always
     container_name: napote-nginx
     image: solita/napote-nginx:latest
-    #build: ./nginx
+    build: ./nginx
     networks:
       - napote
     links:
