@@ -16,7 +16,9 @@
 (defn base64->hex
   "Convert base64 encoded string to hex"
   [base64]
-  (let [bytes (.decode (Base64/getDecoder) base64)]
+  (let [bytes (.decode (Base64/getDecoder)
+                       ;; Passlib uses unconventional \. character instead of \+ in base64
+                       (str/replace base64 #"\." "+"))]
     (str/join (map #(format "%02x" %) bytes))))
 
 (defn passlib->buddy
