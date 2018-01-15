@@ -4,7 +4,12 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.form :as style-form]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [clojure.string :as str]))
+
+(def mobile?
+  (let [ua (str/lower-case js/window.navigator.userAgent)]
+    (boolean (some (partial str/includes? ua) ["android" "iphone" "ipad" "mobile"]))))
 
 (defn linkify
   ([url label]

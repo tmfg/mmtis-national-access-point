@@ -99,7 +99,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-focus form? error warning table? full-width?
-                                  style input-style hint-style]
+                                  style input-style hint-style password?]
                            :as   field} data]
   [text-field
    (merge
@@ -126,7 +126,9 @@
     (when style
       {:style style})
     (when input-style
-      {:input-style input-style}))])
+      {:input-style input-style})
+    (when password?
+      {:type "password"}))])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]

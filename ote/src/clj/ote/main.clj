@@ -11,6 +11,7 @@
             [ote.services.places :as places]
             [ote.services.viewer :as viewer]
             [ote.services.service-search :as service-search]
+            [ote.services.login :as login-service]
 
             [ote.integration.export.geojson :as export-geojson]
             [taoensso.timbre :as log])
@@ -46,7 +47,11 @@
                     [:http :db])
 
    ;; Integration: export GeoJSON
-   :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])))
+   :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
+
+   :login (component/using
+           (login-service/->LoginService (get-in config [:http :auth-tkt]))
+           [:db :http])))
 
 (defn start []
   (alter-var-root
