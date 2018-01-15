@@ -93,6 +93,9 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: /tmp/ote
 
+      # setup database
+      - run: cd database && sh circleci_setup.sh
+
       - run:
           name: Run OTE app
           command: cd /tmp/ote && java -jar ote.jar
