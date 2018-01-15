@@ -124,6 +124,11 @@
    {:label (tr [:field-labels :transport-service-common ::t-service/companies])
     :columns 3}
 
+   {:name ::t-service/companies-csv-url
+    :full-width?  true
+    :container-class "col-xs-12 col-sm-6 col-md-6"
+    :type :string}
+
    (form/info (tr [:form-help :companies]))
 
    {:name ::t-service/companies
@@ -139,14 +144,11 @@
     :delete? true
     :add-label (tr [:buttons :add-new-company])}
 
-   {:name ::t-service/companies-csv-url
-    :full-width?  true
-    :container-class "col-xs-12 col-sm-6 col-md-6"
-    :type :string}
-
-   (form/info (tr [:form-help :brokerage?]))
    {:name ::t-service/brokerage?
     :style style-form/padding-top
+    :extended-help {:help-text      (tr [:form-help :brokerage?])
+                    :help-link-text (tr [:form-help :brokerage-link])
+                    :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
     :type :checkbox}))
 
 (defn contact-info-group []

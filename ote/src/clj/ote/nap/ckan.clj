@@ -9,7 +9,7 @@
 
 
 (s/def :ckan/dataset (s/keys :req [:ckan/name :ckan/owner-org]
-                             :opt [:ckan/notes :ckan/title :ckan/private
+                             :opt [:ckan/id :ckan/notes :ckan/title :ckan/private
                                    :ckan/author :ckan/author-email
                                    :ckan/maintainer :ckan/maintainer-email
                                    :ckan/license-id :ckan/url :ckan/version
@@ -45,13 +45,14 @@
 
 
 (s/def :ckan/resource (s/keys :req [:ckan/package-id :ckan/url]
-                              :opt [:ckan/revision-id :ckan/description
+                              :opt [:ckan/id :ckan/revision-id :ckan/description
                                     :ckan/format :ckan/hash :ckan/name
                                     :ckan/resource-type :ckan/mimetype
                                     :ckan/mimetype-inner :ckan/cache-url
                                     :ckan/size :ckan/created :ckan/last-modified
                                     :ckan/cache-last-updated]))
 
+(s/def :ckan/id string?)
 (s/def :ckan/revision-id string?)
 (s/def :ckan/description string?)
 (s/def :ckan/format string?)
@@ -111,8 +112,10 @@
 (defn create-dataset! [ckan dataset]
   (ckan-dataset-action! ckan "action/package_create" dataset))
 
-(defn update-dataset! [ckan dataset]
-  (ckan-dataset-action! ckan "action/package_update" dataset))
+(defn update-dataset!
+  "Perform an update of the provided parameters, while leaving other params unchanged."
+  [ckan dataset]
+  (ckan-dataset-action! ckan "action/package_patch" dataset))
 
 (defn create-or-update-dataset! [ckan dataset]
   (let [action (if (:ckan/id dataset)
@@ -129,8 +132,10 @@
 (defn add-dataset-resource! [ckan resource]
   (ckan-resource-action! ckan "action/resource_create" resource))
 
-(defn update-dataset-resource! [ckan resource]
-  (ckan-resource-action! ckan "action/resource_update" resource))
+(defn update-dataset-resource!
+  "Perform an update of the provided parameters, while leaving other params unchanged."
+  [ckan resource]
+  (ckan-resource-action! ckan "action/resource_patch" resource))
 
 (defn delete-dataset-resource! [ckan resource-id]
   (ckan-post ckan "action/resource_delete" {:id resource-id}))

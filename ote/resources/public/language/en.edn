@@ -226,7 +226,8 @@
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden accessibilityominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
   :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden accessibilityominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
 
-  :brokerage? "Jos kyseessä on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu, laita alle raksi."
+  :brokerage? "Välityspalvelu välittää korvausta vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsoa sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta."
+  :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
   :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
 
@@ -742,7 +743,9 @@
   :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
-  :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
+  :showing-latest-services "No search filters. Showing latest modified services."
+  :total-services ["Catalog has total of " :total-service-count " services."]
+  :fetching-more "Fetching more services..."
   }
 
  :leaflet

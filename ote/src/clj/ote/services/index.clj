@@ -5,7 +5,8 @@
             [hiccup.core :refer [html]]
             [ote.localization :as localization :refer [tr]]
             [clojure.string :as str]
-            [com.stuartsierra.component :as component]))
+            [com.stuartsierra.component :as component]
+            [ote.tools.git :refer [current-revision-sha]]))
 
 (def supported-languages #{"fi" "sv" "en"})
 (def default-language "fi")
@@ -16,6 +17,12 @@
                   {:href "https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
                    :integrity "sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="}
                   {:href "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.12/leaflet.draw.css"}])
+
+(defn ote-js-location [dev-mode?]
+  (str "js/ote"
+       (when-not dev-mode?
+         (str "-" (:current-revision-sha (current-revision-sha))))
+       ".js"))
 
 (defn index-page [dev-mode?]
   [:html
@@ -36,7 +43,8 @@
     [:div#oteapp]
     (when dev-mode?
       [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
-    [:script {:src "js/ote.js" :type "text/javascript"}]
+    [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
+
     [:script {:type "text/javascript"} "goog.require('ote.main');"]]])
 
 (defn index [dev-mode? accepted-languages]

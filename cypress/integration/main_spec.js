@@ -41,6 +41,7 @@ describe('Header - Logged Out', function () {
             cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/organization');
             cy.contains('Kirjaudu sisään').should('have.attr', 'href').and('eq', '/user/login');
             cy.contains('Rekisteröidy').should('have.attr', 'href').and('eq', '/user/register');
+            cy.contains('Käyttöohje');
         });
     });
 
@@ -77,6 +78,7 @@ describe('Header - Logged In', function () {
             cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
             cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/organization');
             cy.contains('Omat palvelutiedot').should('have.attr', 'href').and('eq', '/ote/#/own-services');
+            cy.contains('Käyttöohje');
 
             cy.get('.section-right').within($el => {
                 cy.contains('Test user');
@@ -85,7 +87,6 @@ describe('Header - Logged In', function () {
                 cy.contains('Yhteenveto');
                 cy.contains('Käyttäjätilin muokkaus');
                 cy.contains('Anna palautetta palvelusta');
-                cy.contains('NAP-palvelun käyttöohje');
                 cy.contains('Kirjaudu ulos');
                 cy.contains('suomi');
                 cy.contains('svenska');
