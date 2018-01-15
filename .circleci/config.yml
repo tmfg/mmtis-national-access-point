@@ -64,10 +64,11 @@ jobs:
 
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory
-          root: /tmp
+          root: /tmp/ote
           # Must be relative path from root
           paths:
-            - ote
+            - ote.jar
+            - config.edn
 
   e2e-pr:
     docker:
