@@ -14,7 +14,8 @@
             [ote.services.login :as login-service]
 
             [ote.integration.export.geojson :as export-geojson]
-            [taoensso.timbre :as log])
+            [taoensso.timbre :as log]
+            [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling])
   (:gen-class))
 
 (defonce ^{:doc "Handle for OTE-system"}
@@ -53,13 +54,19 @@
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
            [:db :http])))
 
+(defn configure-logging [config]
+  (log/merge-config!
+   {:appenders
+    {:rolling
+     (timbre-rolling/rolling-appender {:path "logs/ote.log" :pattern :daily})}}))
+
 (defn start []
   (alter-var-root
    #'ote
-   (constantly
-    (-> "config.edn" slurp read-string
-        ote-system ; luo järjestelmä
-        component/start-system))))
+   (fn [_]
+     (let [config (read-string (slurp "config.edn"))]
+       (configure-logging config)
+       (component/start-system (ote-system config))))))
 
 (defn stop []
   (component/stop-system ote)
