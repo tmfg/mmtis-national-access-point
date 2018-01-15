@@ -3,7 +3,7 @@
 ### THIS IS MEANT TO BE RUN INSIDE CircleCI CONTAINERS ONLY!
 
 sudo apt-get update
-sudo apt-get install postgresql-client maven
+sudo apt-get install -y postgresql-client maven
 
 P="psql -h localhost -p 5432 -U postgres"
 $P -f ../nap/ckan-initial-db.sql napote
