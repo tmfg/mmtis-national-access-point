@@ -13,7 +13,7 @@
   "trashAssetsBeforeHeadlessRuns": true,
   "videoCompression": 32,
   "videoRecording": true,
-  "videoUploadOnPasses": false,
+  "videoUploadOnPasses": true,
   "viewportHeight": 660,
   "viewportWidth": 1080,
   "waitForAnimations": true,
