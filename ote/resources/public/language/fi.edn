@@ -222,7 +222,7 @@
   :external-interfaces-eg-rae "Huom. Tallenna tarvittaessa säännöllisen liikenteen tiedot Liikenneviraston RAE työkalulla: "
   :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Rae-työkalu"
-  :companies "Jos palvelu on konsernitason tai markkinointiyrityksen palvelu, johon kuuluu useita palveluntuottajia, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja Y-tunnukset."
+  :companies "Jos palvelun tuottamiseen osallistuu useita yrityksiä, tai palvelussa muuten välitetään useiden yritysten palveluita, täytä tähän yritysten nimet ja y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
   :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden esteettömyysominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
@@ -239,6 +239,12 @@
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
   }
 
+ ;; CSV parsing
+ :csv
+ {:url-parse-failed "Tarkista antamasi tiedoston osoite."
+  :csv-parse-failed ".CSV tiedoston parsiminen epäonnistui."
+  :parsing-success ["Antamastasi tiedostosta löydettiin  " :count " yritystä."]
+  }
 
  ;; Action buttons
  :buttons

@@ -238,6 +238,12 @@
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
   }
 
+ ;; CSV parsing
+ :csv
+ {:url-parse-failed "Please, check given url."
+  :csv-parse-failed "Failed to parse .CSV file."
+  :parsing-success ["Found  " :count " companies."]
+  }
 
  ;; Action buttons
  :buttons

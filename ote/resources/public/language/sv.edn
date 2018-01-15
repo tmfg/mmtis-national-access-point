@@ -240,6 +240,12 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   }
 
+ ;; CSV parsing
+ :csv
+ {:url-parse-failed "Tarkista antamasi tiedoston osoite."
+  :csv-parse-failed ".CSV tiedoston parsiminen epäonnistui."
+  :parsing-success ["Antamastasi tiedostosta löydettiin  " :count " yritystä."]
+  }
 
  ;; Action buttons
  :buttons
