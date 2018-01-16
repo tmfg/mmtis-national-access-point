@@ -99,6 +99,18 @@ jobs:
       # setup database
       - run: cd database && sh circleci_setup.sh
 
+      - restore_cache:
+          key: v1-npm-deps-
+
+      - run:
+          name: Install Cypress
+          command: npm i cypress@1.x
+
+      - save_cache:
+          key: v1-npm-deps-
+          paths:
+            - node_modules
+
       - run:
           name: Run OTE app
           command: cd /tmp/ote && java -jar ote.jar
@@ -106,7 +118,7 @@ jobs:
 
       - run:
           name: Run smoke tests for pull request
-          command: cypress run --record --spec cypress/integration/smoke/ote_spec.js
+          command: $(npm bin)/cypress run --browser chrome --record --spec cypress/integration/smoke/ote_spec.js
 
 workflows:
   version: 2
