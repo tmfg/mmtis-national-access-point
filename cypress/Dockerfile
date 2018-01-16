@@ -3,6 +3,10 @@ FROM openjdk:8-jdk
 USER root
 
 ENV NODE_VERSION 6
+ENV TERM xterm
+
+# Allow installing when the main user is root
+ENV npm_config_unsafe_perm true
 
 # Install cypress deps
 RUN apt-get update && \
@@ -33,20 +37,11 @@ RUN apt-get install --no-install-recommends -y apt-transport-https  && \
     npm i -g npx
 
 # Install extra packages (for CI scripts)
-RUN apt-get install -y sudo zip
+RUN apt-get install -y sudo zip git
 
 # Cleanup
 RUN apt-get -y autoremove && \
     apt-get -y autoclean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install cypress
-RUN npm i -g cypress@1.x
-RUN cypress verify
-
-RUN cypress --version
 RUN google-chrome --version
-
-RUN mkdir /cypress-env
-
-VOLUME ["/cypress-env"]
