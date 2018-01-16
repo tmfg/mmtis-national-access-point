@@ -97,6 +97,7 @@ jobs:
           at: /tmp/ote
 
       # setup database
+      - run: curl https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish_municipalities.csv -o database/finnish_municipalities.csv
       - run: cd database && sh circleci_setup.sh
 
       - restore_cache:

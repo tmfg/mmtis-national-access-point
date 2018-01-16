@@ -13,21 +13,11 @@ mvn flyway:migrate
 $P -f testdata-ckan.sql napote
 $P -f testdata-ote.sql napote
 
-echo "Insert Finnish municipalities"
-$P -c "TRUNCATE finnish_municipalities;" || true
-$P -c "\COPY finnish_municipalities FROM /static-data/finnish_municipalities.csv CSV HEADER;" || true
-
-echo "Insert Finnish postal codes"
-$P -c "TRUNCATE finnish_postal_codes;" || true
-$P -c "\COPY finnish_postal_codes FROM /static-data/finnish_postal_codes.csv CSV HEADER;" || true
-
-echo "Insert Finnish regions"
-$P -c "TRUNCATE finnish_regions;" || true
-$P -c "\COPY finnish_regions FROM /static-data/maakunnat.csv CSV HEADER;" || true
-
-echo "Insert countries"
-$P -c "TRUNCATE country;" || true
-$P -c "\COPY country FROM /static-data/countries.csv CSV HEADER;" || true
+if [ -f finnish_municipalities.csv ]; then
+    echo "Insert Finnish municipalities"
+    $P napote -c "TRUNCATE finnish_municipalities;" || true
+    $P napote -c "\COPY finnish_municipalities FROM finnish_municipalities.csv CSV HEADER;" || true
+fi
 
 
 echo "Clean up and free connections"
