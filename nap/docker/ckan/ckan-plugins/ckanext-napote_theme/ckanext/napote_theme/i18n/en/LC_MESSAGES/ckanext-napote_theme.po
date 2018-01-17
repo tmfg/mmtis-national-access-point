@@ -935,3 +935,9 @@ msgstr ""
 #: ckan/templates/user/new_user_form.html:6
 msgid "Full Name"
 msgstr ""
+
+#: ckan/logic/validators.py:343
+msgid ""
+"Must be purely lowercase alphanumeric (ascii) characters and these symbols: "
+"-_"
+msgstr ""

@@ -20,9 +20,16 @@ jobs:
       LEIN_ROOT: "true"
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
+      OTE_BASE_URL: "http://localhost:8080"
+      OTE_DB_URL: "jdbc:postgresql://localhost:5432/napotetest"
+      OTE_DB_USERNAME: "napote"
+      OTE_DB_PASSWORD: ""
+      OTE_AUTH_SHARED_SECRET: "test"
 
     steps:
       - checkout
+
+      - run: sudo apt-get update && sudo apt-get -y install gettext-base
 
       # Download and cache dependencies
       - restore_cache:
@@ -43,3 +50,83 @@ jobs:
 
       # run tests!
       - run: cd ote && lein test
+
+      - run:
+          name: Make production build of OTE app
+          command: cd ote && lein production
+
+      - run:
+          name: Configure build
+          command: |
+            mkdir /tmp/ote
+            mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
+            envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
+
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory
+          root: /tmp/ote
+          # Must be relative path from root
+          paths:
+            - ote.jar
+            - config.edn
+
+  e2e-pr:
+    docker:
+      # specify the version you desire here
+      - image: solita/napote-cypress:latest
+      - image: solita/napotedb:latest
+
+    working_directory: ~/repo
+
+    environment:
+      ## this enables colors + fixes failing unit tests (they say)
+      TERM: "xterm"
+      LEIN_ROOT: "true"
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      CYPRESS_BASE_URL: "http://localhost:3000"
+      CYPRESS_NAP_LOGIN: "admin@napoteadmin123.com"
+      CYPRESS_NAP_PASSWORD: "admin"
+      #DEBUG: "cypress*"
+
+    steps:
+      - checkout
+
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /tmp/ote
+
+      # setup database
+      - run: curl https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish_municipalities.csv -o database/finnish_municipalities.csv
+      - run: cd database && sh circleci_setup.sh
+
+      - restore_cache:
+          key: v1-npm-deps-
+
+      - run:
+          name: Install Cypress
+          command: npm i cypress@1.x && $(npm bin)/cypress verify
+
+      - save_cache:
+          key: v1-npm-deps-
+          paths:
+            - node_modules
+
+      - run:
+          name: Run OTE app
+          command: cd /tmp/ote && java -jar ote.jar
+          background: true
+
+      # Note: When running with chrome, it seems we cannot record a video. Only Electron browser can record a video.
+      - run:
+          name: Run smoke tests for pull request
+          command: $(npm bin)/cypress run --browser chrome --record --spec cypress/integration/smoke/ote_spec.js
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - e2e-pr:
+          requires:
+            - build

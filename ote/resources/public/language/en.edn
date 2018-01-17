@@ -96,6 +96,7 @@
    :ote.db.transport-service/currency                  "Currency"
 
    :ote.db.transport-service/pricing-description "Pricing description"
+   :ote.db.transport-service/pricing-description-taxi "Pricing description"
    :ote.db.transport-service/pricing-url "Pricing web-address"
    :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
    }
@@ -132,7 +133,7 @@
    :ote.db.transport-service/price-per-unit            "Hinta (€)"
    :ote.db.transport-service/unit                      "Yksikkö"
    :ote.db.transport-service/price-classes             "Hinta"
-   :ote.db.transport-service/pick-up-name              "Nimi"
+   :ote.db.transport-service/pick-up-name              "Toimipisteen nimi"
    :ote.db.transport-service/pick-up-type              "Tyyppi"
    :ote.db.transport-service/rental-additional-services "Muut palvelut"
    :ote.db.transport-service/additional-service-type   "Palvelu"
@@ -211,6 +212,9 @@
   :ote.db.common/street                               "Address"
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumber"
+
+  :login {:email "Email"
+          :password "Password"}
    }
 
 
@@ -226,7 +230,7 @@
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden accessibilityominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
   :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden accessibilityominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
 
-  :brokerage? "Välityspalvelu välittää korvausta vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsoa sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta."
+  :brokerage? "Välityspalvelu välittää korvausta vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsota sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta."
   :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
   :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
@@ -752,6 +756,22 @@
   :showing-latest-services "No search filters. Showing latest modified services."
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."
+  }
+
+ :login
+ {:label "Login credentials"
+  :login-button "Login"
+
+  :no-account? "Need an account?"
+  :no-account-help "Register, it will only take a moment."
+  :no-account-button "Create account"
+
+  :forgot-password? "Forgot password?"
+  :forgot-password-help "No problem, use the password reset form."
+  :forgot-password-button "Reset password"
+
+  :error {:no-such-user "Unknown user"
+          :incorrect-password "Incorrect password"}
   }
 
  :leaflet

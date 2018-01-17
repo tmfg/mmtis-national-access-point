@@ -115,7 +115,7 @@
                     ::t-operator/ckan-group-id id}))))))
 
 
-(defn- get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
+(defn get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
         transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::t-operator/id transport-operator)})
         ;; Clean up user data
@@ -230,7 +230,7 @@
   (doseq [{id ::t-service/id} removed-resources]
     (specql/delete! db ::t-service/external-interface-description
                     {::t-service/id id}))
-  
+
   ;; Update or insert new external interfaces
   (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if}
           (filter (fn [el] (not (:deleted? el))) external-interfaces)]
@@ -271,7 +271,7 @@
           (let [transport-service (upsert! db ::t-service/transport-service service-info)
                 transport-service-id (::t-service/id transport-service)]
 
-            ;; Save possible external interfaces            
+            ;; Save possible external interfaces
             (save-external-interfaces db transport-service-id external-interfaces removed-resources)
 
             ;; Save operation areas

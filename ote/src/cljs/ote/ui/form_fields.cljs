@@ -99,7 +99,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style]
+                                  style input-style hint-style password?]
                            :as   field} data]
   [text-field
    (merge
@@ -127,7 +127,9 @@
     (when style
       {:style style})
     (when input-style
-      {:input-style input-style}))])
+      {:input-style input-style})
+    (when password?
+      {:type "password"}))])
 
 (defmethod field :text-area [{:keys [update! label name rows error]
                               :as   field} data]
@@ -355,6 +357,7 @@
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
            {:type :string
+            :name "hours"
             :regex hour-regex
             :style {:width 30}
             :input-style {:text-align "right"}
@@ -373,6 +376,7 @@
    "."
    [field (merge
            {:type :string
+            :name "minutes"
             :regex minute-regex
             :style {:width 30}
             :update! (fn [minute]
