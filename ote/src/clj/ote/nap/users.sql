@@ -26,5 +26,6 @@ SELECT u.id as id,
                m.state='active' AND
                m.table_id=u.id) as groups
   FROM "user" u
- WHERE (:email::VARCHAR IS NOT NULL AND u.email LIKE :email)
-    OR (:name::VARCHAR IS NOT NULL AND u.fullname LIKE :name);
+ WHERE state = 'active' AND
+       ((:email::VARCHAR IS NOT NULL AND u.email LIKE :email) OR
+        (:name::VARCHAR IS NOT NULL AND u.fullname LIKE :name));
