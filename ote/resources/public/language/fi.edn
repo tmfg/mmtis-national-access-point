@@ -541,6 +541,7 @@
   :navigation-give-feedback                   "Anna palautetta palvelusta"
   :navigation-login                           "Kirjaudu sisään"
   :navigation-register                        "Rekisteröidy"
+  :navigation-admin                           "Ylläpitopaneeli"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
   :user-menu-log-out                          "Kirjaudu ulos"

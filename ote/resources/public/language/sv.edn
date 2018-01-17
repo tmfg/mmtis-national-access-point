@@ -535,6 +535,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-give-feedback                   "Feedback"
   :navigation-login                           "Logga in"
   :navigation-register                        "Registrera"
+  :navigation-admin                           "Admin panel"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"
