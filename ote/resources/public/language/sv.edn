@@ -201,7 +201,7 @@
    :ote.db.transport-service/to                  "Stänger kl"
    :ote.db.transport-service/all-day             "24h"
 
-   :ote.db.transport-service/brokerage?  "Förmedlingstjänst"
+   :ote.db.transport-service/brokerage?  "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Trafiksäkerhetsverket Trafi."
 
    :ote.db.transport-service/available-from-and-to-title "Tjänstens giltighetstid"
    :ote.db.transport-service/available-from "Startdatum"
@@ -227,13 +227,13 @@
   :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
   :external-interfaces-end "Fyll härnedan i alla formulärets uppgifter ifall du inte lagt till ett enda maskinläsbart externt gränssnitt. Ifall du uppgett gränssitt som inte uppfyller alla krav var vänlig fyll i formuläret till den del gränssnitten ovan bör kompletteras."
   :RAE-tool "Se info om RAE"
-  :companies "Om tjänsten erbjuds av en koncern, marknadsföringsbolag eller annan organisation med flera tjänsteproducenter, var vänlig fyll i företagets namn on FO-nummer."
+  :companies "Om tjänsten tillhandahålls av flera tjänsteproducenter inom en koncern eller ett marknadsföringsföretag, eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
 
   :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Garanterad = behöver inte beställas separat."
   :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Beställes = finns inte garanterat i alla fordon, skäl att beställa i förväg."
 
-  :brokerage? "Kruxa här om tjänsten är en förmedlingstjänst som skall anmälas till Trafi."
-  :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
+  :brokerage? "Om även andra företag bidrar till att producera tjänsten eller om flera företags tjänster förmedlas via tjänsten, ska dessa företags namn och FO-nummer meddelas i den här sektionen. Den här punkten ska bara fyllas i av de instanser som koordinerar tjänsteproduktionen (t.ex. taxiförmedlingscentraler eller en beställande myndighet). Punkten fylls inte i av enskilda företag som anlitas av förmedlingstjänsten."
+  :brokerage-link "Läs mer om skyldigheterna gällande förmedlingstjänster från och med 1.7.2018."
 
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
 
@@ -730,12 +730,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "sub-type" "Undertyp"
           "terminal" " "
           ;; Assistance
-          "assistance" "Avustuspalvelut"
-          "assistance-place-description" "Sijainti"
-          "assistance-by-reservation-only" "Varattava etukäteen"
-          "notification-requirements" "Varausta koskevat vaatimukset"
-          "hours-before" "Palvelu varattava (tuntia) ennen"
-          "telephone" "Puhelin"}
+          "assistance" "Assistanstjänster"
+          "assistance-place-description" "Plats (Assistanspunkt?)"
+          "assistance-by-reservation-only" "Bokas i förväg"
+          "notification-requirements" "Krav gällande bokningen"
+          "hours-before" "Tjänsten ska bokas (timmar) i förväg"
+          "telephone" "Telefon"}
 
 
 

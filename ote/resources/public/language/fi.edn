@@ -64,7 +64,7 @@
    :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
-   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv tiedoston osoite (www)"
+   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämän .csv tiedoston osoite (www)"
    :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
    :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
@@ -230,7 +230,7 @@
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
   :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden esteettömyysominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
 
-  :brokerage? "Välityspalvelu välittää korvausta vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsota sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta."
+  :brokerage? "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
   :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
   :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
