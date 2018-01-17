@@ -8,7 +8,6 @@
 
 (defn- require-admin-user [route user]
   (when (not (:admin? user))
-    (log/warn "Non admin user tried to call " route ", user: " user)
     (throw (SecurityException. "admin only"))))
 
 (defn- admin-service [route {user :user
