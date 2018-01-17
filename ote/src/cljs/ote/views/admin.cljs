@@ -29,14 +29,16 @@
           [ui/table-row
            [ui/table-header-column "Käyttäjätunnus"]
            [ui/table-header-column "Nimi"]
-           [ui/table-header-column "Sähköposti"]]]
+           [ui/table-header-column "Sähköposti"]
+           [ui/table-header-column "Organisaatiot"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
-           (for [{:keys [username name email]} results]
+           (for [{:keys [username name email groups]} results]
              [ui/table-row {:selectable false}
               [ui/table-row-column username]
               [ui/table-row-column name]
-              [ui/table-row-column email]]))]]])]))
+              [ui/table-row-column email]
+              [ui/table-row-column groups]]))]]])]))
 
 (defn admin-panel [e! app]
   (let [selected-tab (or (get-in app [:params :admin-page]) "users")]
