@@ -10,7 +10,6 @@
             [clojure.data.csv :as csv]
             [clojure.string :as s]))
 
-
 (defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
   [url]
@@ -27,8 +26,10 @@
             repeat)
        (rest csv-data)))
 
-
-(defn- check-csv [url-data]
+(defn- check-csv
+  "Fetch csv file from given url, parse it and return status map that contains information about the count of companies
+  in the file."
+  [url-data]
   (let [url (ensure-url (get url-data :url))
         response @(httpkit/get url {:as :text
                                     :timeout 30000})]
