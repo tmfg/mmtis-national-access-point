@@ -29,14 +29,19 @@ jobs:
     steps:
       - checkout
 
-      - run: sudo apt-get update && sudo apt-get -y install gettext-base
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "ote/project.clj" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
+
+      # Install apt deps, awscli and add pip --user binaries into path
+      - run:
+          name: Install apt deps
+          command: |
+            sudo apt-get update && sudo apt-get -y install gettext-base python-pip python-dev jq
+            pip install awscli --upgrade --user
+            echo 'export PATH=$PATH:$HOME/.local/bin' >> $BASH_ENV
 
       - run: cd ote && lein deps
 
@@ -61,6 +66,14 @@ jobs:
             mkdir /tmp/ote
             mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
             envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
+
+      - run:
+          name: Deploy build artifacts
+          command: |
+            mkdir deploy
+            ln /tmp/ote/ote.jar deploy/ote-${CIRCLE_BRANCH}.jar
+            pg_dump -h localhost -p 5432 -U postgres -Z 1 napotetest > deploy/ote-${CIRCLE_BRANCH}-pgdump.gz
+            aws s3 cp deploy s3://napote-circleci/build-artifacts --recursive
 
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory
