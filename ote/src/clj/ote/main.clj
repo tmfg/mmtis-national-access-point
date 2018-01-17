@@ -12,6 +12,7 @@
             [ote.services.viewer :as viewer]
             [ote.services.service-search :as service-search]
             [ote.services.login :as login-service]
+            [ote.services.admin :as admin-service]
 
             [ote.integration.export.geojson :as export-geojson]
             [taoensso.timbre :as log]
@@ -52,6 +53,10 @@
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
+           [:db :http])
+
+   :admin (component/using
+           (admin-service/->Admin)
            [:db :http])))
 
 (defn configure-logging [config]

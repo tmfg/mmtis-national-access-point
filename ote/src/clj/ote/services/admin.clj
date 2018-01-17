@@ -13,12 +13,13 @@
 
 (defn- admin-service [route {user :user
                              form-data :body :as req} db handler]
-  (require-admin-user route user)
+  (require-admin-user route (:user user))
   (http/transit-response
    (handler db user (http/transit-request form-data))))
 
 (defn- list-users [db user query]
-  (nap-users/list-users db ))
+  (nap-users/list-users db {:email (str "%" query "%")
+                            :name (str "%" query "%")}))
 
 (defn- admin-routes [db http]
   (routes
