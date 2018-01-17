@@ -236,11 +236,12 @@
   EnsureCsvFile
   (process-event [_ app]
     (let [url (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/companies-csv-url])]
-    (comm/post! (str "check-company-csv")
-                {:url url}
-                {:on-success (tuck/send-async! ->EnsureCsvFileResponse)
-                 :on-failure (tuck/send-async! ->FailedCsvFileResponse)})
-    (update-in app [:transport-service] dissoc :csv)))
+      (when (and url (not (empty? url)))
+        (comm/post! (str "check-company-csv")
+                    {:url url}
+                    {:on-success (tuck/send-async! ->EnsureCsvFileResponse)
+                     :on-failure (tuck/send-async! ->FailedCsvFileResponse)}))
+    (update-in app [:transport-service ::t-service/passenger-transportation] dissoc :csv-count)))
 
   EnsureCsvFileResponse
   (process-event [{response :response} app]

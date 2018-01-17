@@ -11,14 +11,14 @@
             [clojure.string :as s]))
 
 
-(defn- ensure-url
+(defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
   [url]
   (if (not (s/includes? url "http"))
      (str "http://" url)
      url))
 
-(defn- parse-response->csv
+(defn parse-response->csv
   "Convert given vector to map where map key is given in the first line of csv file."
   [csv-data]
   (map zipmap
@@ -37,7 +37,7 @@
         (let [data (when (= 200 (:status response))
                                (csv/read-csv (:body response)))]
             {:status :success
-              :count (count (parse-response->csv data))})
+             :count (count (parse-response->csv data))})
         (catch Exception e
           (log/info "CSV parsing failed: " e)
           {:status :failed
