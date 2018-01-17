@@ -31,7 +31,9 @@
  *
  * NOTE: Cypress automatically clears all cookies before each test to prevent state from being shared across tests.
  */
-Cypress.Commands.add('login', (login, password) => {
+
+// CKAN login
+/* Cypress.Commands.add('login', (login, password) => {
     const username = login || Cypress.env('NAP_LOGIN');
 
     cy.log(`Logging in with username: ${username}`);
@@ -45,6 +47,21 @@ Cypress.Commands.add('login', (login, password) => {
             login: username,
             password: password || Cypress.env('NAP_PASSWORD')
         },
+    });
+});*/
+
+// OTE login
+Cypress.Commands.add('login', (login, password) => {
+    const username = login || Cypress.env('NAP_LOGIN');
+
+    cy.log(`Logging in with username: ${username}`);
+
+    cy.request({
+        method: 'POST',
+        url: '/ote/login',
+        form: false, // indicates the body should be form urlencoded and sets Content-Type: application/x-www-form-urlencoded headers
+        followRedirect: false,
+        body: ["^ ", "~:email", username, "~:password", password || Cypress.env('NAP_PASSWORD')]
     });
 });
 
