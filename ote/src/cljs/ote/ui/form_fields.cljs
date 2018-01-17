@@ -356,6 +356,7 @@
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
            {:type :string
+            :name "hours"
             :regex hour-regex
             :style {:width 30}
             :input-style {:text-align "right"}
@@ -374,6 +375,7 @@
    "."
    [field (merge
            {:type :string
+            :name "minutes"
             :regex minute-regex
             :style {:width 30}
             :update! (fn [minute]

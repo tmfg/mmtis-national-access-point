@@ -1,0 +1,14 @@
+{:db {:url "$OTE_DB_URL"
+      :username "$OTE_DB_USERNAME"
+      :password "$OTE_DB_PASSWORD"}
+ :http {:port 3000
+        :strip-prefix "/ote"
+        :auth-tkt {:shared-secret "$OTE_AUTH_SHARED_SECRET"
+                   :max-age-in-seconds 36000
+                   :digest-algorithm "MD5"}}
+ :places {:finnish-municipalities
+          {:type :shapefile
+           :name-field "NAMEFIN"
+           :url "https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish-municipalities/SuomenKuntajako_2017_10k.shp"}}
+ :nap {:api "${OTE_BASE_URL}/api/"
+       :export-base-url "$OTE_BASE_URL"}}

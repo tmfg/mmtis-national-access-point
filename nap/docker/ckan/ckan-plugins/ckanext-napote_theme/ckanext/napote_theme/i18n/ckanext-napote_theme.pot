@@ -1,7 +1,6 @@
 # !! WARNING DO NOT USE setup.py extract_messages to override this file! Add new changes manually !!
 # NOTE: We override some CKAN default translation keys here in addition to keys used in our templates.
 #
-
 # Translations template for ckanext-napote_theme.
 # Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the ckanext-napote_theme
@@ -13,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-19 11:08+0000\n"
+"POT-Creation-Date: 2018-01-17 12:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,6 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+"X-Generator: Poedit 2.0.5\n"
 
 #: ckanext/napote_theme/controller.py:70
 #, python-format
@@ -56,7 +56,8 @@ msgstr ""
 msgid "\"%s\" matched several users"
 msgstr ""
 
-#: ckanext/napote_theme/controller.py:153 ckanext/napote_theme/controller.py:155
+#: ckanext/napote_theme/controller.py:153
+#: ckanext/napote_theme/controller.py:155
 #, python-format
 msgid "No such user: %s"
 msgstr ""
@@ -116,8 +117,8 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/footer.html:24
 msgid ""
-"<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" "
-"href=\"http://ckan.org\">CKAN</a>"
+"<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" href="
+"\"http://ckan.org\">CKAN</a>"
 msgstr ""
 
 #: ckanext/napote_theme/templates/header.html:40
@@ -127,12 +128,36 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/header.html:45
 #: ckanext/napote_theme/templates/header.html:46
+#: ckan/templates/group/read_base.html:17
+#: ckan/templates/group/snippets/info.html:36 ckan/templates/header.html:103
+#: ckan/templates/organization/bulk_process.html:20
+#: ckan/templates/organization/edit_base.html:23
+#: ckan/templates/organization/read_base.html:17
+#: ckan/templates/package/base.html:7 ckan/templates/package/base.html:17
+#: ckan/templates/package/base.html:21 ckan/templates/package/search.html:4
+#: ckan/templates/package/search.html:7
+#: ckan/templates/package/snippets/new_package_breadcrumb.html:1
+#: ckan/templates/revision/diff.html:11 ckan/templates/revision/read.html:65
+#: ckan/templates/snippets/context/group.html:17
+#: ckan/templates/snippets/context/user.html:19
+#: ckan/templates/snippets/organization.html:59 ckan/templates/user/read.html:5
+#: ckan/templates/user/read_base.html:19 ckan/templates/user/read_base.html:53
 msgid "Datasets"
 msgstr ""
 
 #: ckanext/napote_theme/templates/header.html:53
 #: ckanext/napote_theme/templates/header.html:54
 #: ckanext/napote_theme/templates/user/list.html:18
+#: ckan/controllers/group.py:305 ckan/controllers/home.py:61
+#: ckan/controllers/package.py:240 ckan/lib/helpers.py:833
+#: ckan/templates/header.html:104 ckan/templates/organization/edit_base.html:5
+#: ckan/templates/organization/edit_base.html:8
+#: ckan/templates/organization/index.html:3
+#: ckan/templates/organization/index.html:6
+#: ckan/templates/organization/index.html:18
+#: ckan/templates/organization/read_base.html:3
+#: ckan/templates/organization/read_base.html:6
+#: ckan/templates/package/base.html:14
 msgid "Organizations"
 msgstr ""
 
@@ -268,6 +293,7 @@ msgid "Name"
 msgstr ""
 
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:6
+#: ckan/templates/organization/snippets/organization_form.html:10
 msgid "My Organization"
 msgstr ""
 
@@ -276,6 +302,7 @@ msgid "Description"
 msgstr ""
 
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:16
+#: ckan/templates/organization/snippets/organization_form.html:20
 msgid "A little information about my organization..."
 msgstr ""
 
@@ -284,6 +311,9 @@ msgid "Operation Areas"
 msgstr ""
 
 #: ckanext/napote_theme/templates/package/read_base.html:9
+#: ckan/logic/converters.py:146 ckan/logic/validators.py:149
+#: ckan/logic/validators.py:191 ckan/templates/package/read_base.html:19
+#: ckanext/stats/templates/ckanext/stats/index.html:89
 msgid "Dataset"
 msgstr ""
 
@@ -413,11 +443,15 @@ msgid "Edit settings"
 msgstr ""
 
 #: ckanext/napote_theme/templates/user/dashboard.html:9
+#: ckan/templates/user/dashboard.html:20
+#: ckan/templates/user/dashboard_datasets.html:12
 msgid "My Datasets"
 msgstr ""
 
 #: ckanext/napote_theme/templates/user/dashboard.html:10
 #: ckanext/napote_theme/templates/user/dashboard_organizations.html:6
+#: ckan/templates/user/dashboard.html:21
+#: ckan/templates/user/dashboard_organizations.html:12
 msgid "My Organizations"
 msgstr ""
 
@@ -426,6 +460,7 @@ msgid "News feed"
 msgstr ""
 
 #: ckanext/napote_theme/templates/user/dashboard_organizations.html:15
+#: ckan/templates/user/dashboard_organizations.html:21
 msgid "You are not a member of any organizations."
 msgstr ""
 
@@ -468,16 +503,9 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
-
-
-
-
-
-#### CKAN DEFAULT TRANSLATION OVERRIDES ####
-#### NOTE: Add new translation overrides here manually ###
-
-## Datasets
-
+# ### CKAN DEFAULT TRANSLATION OVERRIDES ####
+# ### NOTE: Add new translation overrides here manually ###
+# # Datasets
 #: ckan/templates/package/snippets/resources_list.html:13
 msgid "Data and Resources"
 msgstr ""
@@ -496,28 +524,6 @@ msgstr ""
 
 #: ckan/templates/snippets/package_item.html:57
 msgid "This dataset has no description"
-msgstr ""
-
-#: ckan/logic/converters.py:146 ckan/logic/validators.py:149
-#: ckan/logic/validators.py:191 ckan/templates/package/read_base.html:19
-#: ckanext/stats/templates/ckanext/stats/index.html:89
-msgid "Dataset"
-msgstr ""
-
-#: ckan/templates/group/read_base.html:17
-#: ckan/templates/group/snippets/info.html:36 ckan/templates/header.html:103
-#: ckan/templates/organization/bulk_process.html:20
-#: ckan/templates/organization/edit_base.html:23
-#: ckan/templates/organization/read_base.html:17 ckan/templates/package/base.html:7
-#: ckan/templates/package/base.html:17 ckan/templates/package/base.html:21
-#: ckan/templates/package/search.html:4 ckan/templates/package/search.html:7
-#: ckan/templates/package/snippets/new_package_breadcrumb.html:1
-#: ckan/templates/revision/diff.html:11 ckan/templates/revision/read.html:65
-#: ckan/templates/snippets/context/group.html:17
-#: ckan/templates/snippets/context/user.html:19
-#: ckan/templates/snippets/organization.html:59 ckan/templates/user/read.html:5
-#: ckan/templates/user/read_base.html:19 ckan/templates/user/read_base.html:53
-msgid "Datasets"
 msgstr ""
 
 #: ckan/templates/home/snippets/stats.html:11
@@ -541,7 +547,6 @@ msgid "{num} Dataset"
 msgid_plural "{num} Datasets"
 msgstr[0] ""
 msgstr[1] ""
-
 
 #: ckan/templates/group/snippets/group_item.html:34
 #: ckan/templates/organization/snippets/organization_item.html:33
@@ -637,11 +642,6 @@ msgstr ""
 msgid "Unauthorized to read dataset %s"
 msgstr ""
 
-#: ckan/controllers/revision.py:110
-#, python-format
-msgid "Datasets affected: %s.\n"
-msgstr ""
-
 #: ckan/logic/validators.py:741
 msgid "Datasets with no organization can't be private."
 msgstr ""
@@ -668,23 +668,12 @@ msgstr ""
 msgid "Before you can create a dataset you need to create an organization."
 msgstr ""
 
-#: ckan/templates/user/dashboard.html:20
-#: ckan/templates/user/dashboard_datasets.html:12
-msgid "My Datasets"
-msgstr ""
-
-#: ckan/templates/user/dashboard_datasets.html:17 ckan/templates/user/read.html:14
+#: ckan/templates/user/dashboard_datasets.html:17
+#: ckan/templates/user/read.html:14
 msgid "You haven't created any datasets."
 msgstr ""
 
-#: ckan/logic/validators.py:741
-msgid "Datasets with no organization can't be private."
-msgstr ""
-
-
-## Resources
-
-
+# # Resources
 #: ckan/logic/validators.py:200
 msgid "Resource"
 msgstr ""
@@ -702,10 +691,7 @@ msgstr ""
 msgid "Resource was not found."
 msgstr ""
 
-
-## Activity stream (datasets/resources/organizations)
-
-
+# # Activity stream (datasets/resources/organizations)
 #: ckan/lib/activity_streams.py:60
 msgid "{actor} added the tag {tag} to the dataset {dataset}"
 msgstr ""
@@ -766,10 +752,7 @@ msgstr ""
 msgid "{actor} created the organization {organization}"
 msgstr ""
 
-
-## Organizations
-
-
+# # Organizations
 #: ckan/templates/package/snippets/package_basic_fields.html:70
 #: ckan/templates/snippets/organization.html:23
 msgid "Organization"
@@ -779,33 +762,12 @@ msgstr ""
 msgid "organization"
 msgstr ""
 
-#: ckan/controllers/group.py:305 ckan/controllers/home.py:61
-#: ckan/controllers/package.py:240 ckan/lib/helpers.py:833
-#: ckan/templates/header.html:104 ckan/templates/organization/edit_base.html:5
-#: ckan/templates/organization/edit_base.html:8
-#: ckan/templates/organization/index.html:3
-#: ckan/templates/organization/index.html:6
-#: ckan/templates/organization/index.html:18
-#: ckan/templates/organization/read_base.html:3
-#: ckan/templates/organization/read_base.html:6 ckan/templates/package/base.html:14
-msgid "Organizations"
-msgstr ""
-
 #: ckan/templates/home/snippets/stats.html:17
 msgid "organizations"
 msgstr ""
 
 #: ckan/templates/package/snippets/package_basic_fields.html:74
 msgid "No organization"
-msgstr ""
-
-#: ckan/templates/organization/snippets/organization_form.html:10
-msgid "My Organization"
-msgstr ""
-
-#: ckan/templates/user/dashboard.html:21
-#: ckan/templates/user/dashboard_organizations.html:12
-msgid "My Organizations"
 msgstr ""
 
 #: ckan/templates/organization/snippets/organization_form.html:18
@@ -836,7 +798,6 @@ msgstr ""
 msgid "Organization not found"
 msgstr ""
 
-
 #: ckan/controllers/group.py:620
 msgid "Organization has been deleted."
 msgstr ""
@@ -855,7 +816,8 @@ msgid "User %s not authorized to add dataset to this organization"
 msgstr ""
 
 #: ckan/templates/package/snippets/cannot_create_package.html:19
-msgid "Ask a system administrator to create an organization before you can continue."
+msgid ""
+"Ask a system administrator to create an organization before you can continue."
 msgstr ""
 
 #: ckan/logic/auth/create.py:129
@@ -905,8 +867,10 @@ msgstr ""
 msgid "There are currently no organizations for this site"
 msgstr ""
 
-#: ckan/templates/organization/new.html:3 ckan/templates/organization/new.html:5
-#: ckan/templates/organization/new.html:7 ckan/templates/organization/new.html:12
+#: ckan/templates/organization/new.html:3
+#: ckan/templates/organization/new.html:5
+#: ckan/templates/organization/new.html:7
+#: ckan/templates/organization/new.html:12
 msgid "Create an Organization"
 msgstr ""
 
@@ -928,10 +892,6 @@ msgstr ""
 
 #: ckan/templates/organization/snippets/feeds.html:3
 msgid "Datasets in organization: {group}"
-msgstr ""
-
-#: ckan/templates/organization/snippets/organization_form.html:20
-msgid "A little information about my organization..."
 msgstr ""
 
 #: ckan/templates/organization/snippets/organization_form.html:60
@@ -960,18 +920,13 @@ msgstr[1] ""
 msgid "No organizations found"
 msgstr ""
 
-#: ckan/templates/user/dashboard_organizations.html:21
-msgid "You are not a member of any organizations."
-msgstr ""
-
-
 #: ckan/templates/organization/member_new.html:81
 msgid ""
 " <p><strong>Admin:</strong> Can add/edit and delete datasets, as well as "
-"manage organization members.</p> <p><strong>Editor:</strong> Can add and edit"
-" datasets, but not manage organization members.</p> "
-"<p><strong>Member:</strong> Can view the organization's private datasets, but"
-" not add new datasets.</p> "
+"manage organization members.</p> <p><strong>Editor:</strong> Can add and "
+"edit datasets, but not manage organization members.</p> <p><strong>Member:</"
+"strong> Can view the organization's private datasets, but not add new "
+"datasets.</p> "
 msgstr ""
 
 #: ckan/templates/user/edit_user_form.html:10
@@ -981,3 +936,11 @@ msgstr ""
 #: ckan/templates/user/new_user_form.html:6
 msgid "Full Name"
 msgstr ""
+
+#: ckan/logic/validators.py:343
+msgid ""
+"Must be purely lowercase alphanumeric (ascii) characters and these symbols: -"
+"_"
+msgstr ""
+"Tulee olla kokonaisuudessaan pienin alfanumeerisin (ascii) merkein ja näillä "
+"symbooleilla: -_"
