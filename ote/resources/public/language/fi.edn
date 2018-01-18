@@ -281,6 +281,7 @@
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
   :add-new-transport-operator "Lisää uusi palveluntuottaja"
+  :add-new-member "Lisää käyttäjä"
   }
 
 
