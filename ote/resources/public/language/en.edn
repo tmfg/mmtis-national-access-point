@@ -1,4 +1,11 @@
 {
+ :document-title
+ {:default "NAP - service catalog"
+  :services "Services"
+  :operators "Operators"
+  :own-services "Own services"
+  :admin "Admin"
+  }
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
