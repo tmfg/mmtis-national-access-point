@@ -1,4 +1,12 @@
 {
+ :document-title
+ {:default "NAP - liikkumispalvelukatalogi"
+  :services "Palvelukatalogi"
+  :operators "Palveluntuottajat"
+  :own-services "Omat palvelutiedot"
+  :admin "Ylläpitopaneeli"
+  }
+
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
