@@ -61,9 +61,10 @@
            (admin-service/->Admin)
            [:db :http])))
 
-(defn configure-logging [config]
+(defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!
-   {:appenders
+   {:level (or level :debug)
+    :appenders
     {:rolling
      (timbre-rolling/rolling-appender {:path "logs/ote.log" :pattern :daily})}}))
 
@@ -72,7 +73,7 @@
    #'ote
    (fn [_]
      (let [config (read-string (slurp "config.edn"))]
-       (configure-logging config)
+       (configure-logging (:log config))
        (component/start-system (ote-system config))))))
 
 (defn stop []
