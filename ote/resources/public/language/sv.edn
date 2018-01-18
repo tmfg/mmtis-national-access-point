@@ -1,4 +1,12 @@
 {
+ :document-title
+ {:default "NAP - mobilitetstjänstekatalog"
+  :services "Tjänstekatalog"
+  :operators "Tjänsteproducenter"
+  :own-services "Egna tjänsteuppgifter"
+  :admin "Admin"
+  }
+
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
