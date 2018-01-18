@@ -7,7 +7,8 @@
    :cursor "pointer"})
 
 (def localized-text-language-container
-  {:font-size "12px"})
+  {:font-size "12px"
+   :margin-top "-5px"})
 
 (def localized-text-language-selected
   (merge localized-text-language
