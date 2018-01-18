@@ -7,10 +7,13 @@
 
                  ;; Logitus (clj + cljs)
                  [com.taoensso/timbre "4.10.0"]
+                 [com.fzakaria/slf4j-timbre "0.3.8"]
 
                  ;; PostgreSQL JDBC ajuri, yhteyspooli ja muut apukirjastot
                  [org.postgresql/postgresql "42.1.4"]
-                 [net.postgis/postgis-jdbc "2.1.7.2"]
+                 [net.postgis/postgis-jdbc "2.1.7.2"
+                  :exclusions [ch.qos.logback/logback-classic
+                               ch.qos.logback/logback-core]]
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
@@ -34,7 +37,8 @@
                  [com.cognitect/transit-cljs "0.8.239"]
 
 
-                 [cljs-ajax "0.7.2"]
+                 [cljs-ajax "0.7.2"
+                  :exclusions [org.apache.httpcomponents/httpasyncclient]]
 
                  ;; Frontend UI libraries
                  [reagent "0.8.0-alpha2"]
