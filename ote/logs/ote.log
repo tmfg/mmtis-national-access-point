@@ -1,0 +1,277 @@
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:919] - HikariPool-1 - configuration:
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - allowPoolSuspension.............false
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - autoCommit......................true
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - catalog.........................none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - connectionInitSql...............none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - connectionTestQuery.............none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - connectionTimeout...............30000
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - dataSource......................none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - dataSourceClassName.............none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - dataSourceJNDI..................none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - dataSourceProperties............{password=<masked>, prepStmtCacheSqlLimit=2048, cachePrepStmts=true, prepStmtCacheSize=250}
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - driverClassName.................none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - healthCheckProperties...........{}
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - healthCheckRegistry.............none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - idleTimeout.....................600000
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - initializationFailFast..........true
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - initializationFailTimeout.......1
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - isolateInternalQueries..........false
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - jdbc4ConnectionTest.............false
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - jdbcUrl........................."jdbc:postgresql://localhost:5432/napote"
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - leakDetectionThreshold..........0
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - maxLifetime.....................1800000
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - maximumPoolSize.................10
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - metricRegistry..................none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - metricsTrackerFactory...........none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - minimumIdle.....................10
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - password........................<masked>
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - poolName........................"HikariPool-1"
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - readOnly........................false
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - registerMbeans..................false
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - scheduledExecutor...............none
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - scheduledExecutorService........internal
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - threadFactory...................internal
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - transactionIsolation............default
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - username........................"napote"
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.HikariConfig:948] - validationTimeout...............5000
+18-01-18 11:10:55 ThinkPad-X260 INFO [com.zaxxer.hikari.HikariDataSource:71] - HikariPool-1 - Starting...
+18-01-18 11:10:55 ThinkPad-X260 INFO [com.zaxxer.hikari.pool.PoolBase:503] - HikariPool-1 - Driver does not support get/set network timeout for connections. (Method org.postgresql.jdbc.PgConnection.getNetworkTimeout() is not yet implemented.)
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:519] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@10ab6440
+18-01-18 11:10:55 ThinkPad-X260 INFO [com.zaxxer.hikari.HikariDataSource:73] - HikariPool-1 - Start completed.
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=1, active=0, idle=1, waiting=0)
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@72d7e223
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5d02e77d
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@20909a4a
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6a2ac60c
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@fac9763
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7f066309
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@65ba374a
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@f49085f
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6d42256b
+18-01-18 11:10:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - After adding stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:11:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:11:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:12:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:12:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:13:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:13:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:14:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:14:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:15:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:15:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:16:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:16:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:17:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:17:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:18:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:18:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:19:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:19:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:20:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:20:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:21:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:21:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:22:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:22:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:23:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:23:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:24:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:24:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:25:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:25:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:26:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:26:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:27:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:27:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:28:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:28:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:29:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:29:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:30:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:30:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:31:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:31:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:32:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:32:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:33:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:33:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:34:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:34:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:35:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:35:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:36:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:36:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:37:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:37:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:38:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:38:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:39:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:39:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:40:14 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@7f066309: (connection has passed maxLifetime)
+18-01-18 11:40:14 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5eb96d36
+18-01-18 11:40:14 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@72d7e223: (connection has passed maxLifetime)
+18-01-18 11:40:14 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@716c6de5
+18-01-18 11:40:16 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@5d02e77d: (connection has passed maxLifetime)
+18-01-18 11:40:16 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7ce834db
+18-01-18 11:40:24 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@10ab6440: (connection has passed maxLifetime)
+18-01-18 11:40:24 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3f0f6089
+18-01-18 11:40:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:40:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@6a2ac60c: (connection has passed maxLifetime)
+18-01-18 11:40:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@10da6c6c
+18-01-18 11:40:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@65ba374a: (connection has passed maxLifetime)
+18-01-18 11:40:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5768d7c5
+18-01-18 11:40:28 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@f49085f: (connection has passed maxLifetime)
+18-01-18 11:40:28 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@8a61434
+18-01-18 11:40:46 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@fac9763: (connection has passed maxLifetime)
+18-01-18 11:40:46 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@658ac99e
+18-01-18 11:40:54 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@20909a4a: (connection has passed maxLifetime)
+18-01-18 11:40:54 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3708c40a
+18-01-18 11:40:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@6d42256b: (connection has passed maxLifetime)
+18-01-18 11:40:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@18ddd9ef
+18-01-18 11:40:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:41:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:41:47 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:41:47 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:41:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:42:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:42:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:43:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:43:35 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:43:41 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:43:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:44:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:44:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:45:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:45:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:46:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:46:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:47:06 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:47:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:47:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:48:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:48:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:49:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:49:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:50:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:50:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:51:25 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:51:36 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:51:39 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:51:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:51:59 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:52:24 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:52:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:52:50 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:52:50 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 11:52:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:53:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:53:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:54:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:54:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:55:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:55:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:56:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:56:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:57:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:57:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:58:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:58:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:59:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 11:59:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:00:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:00:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:01:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:01:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:02:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:02:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:03:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:03:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:04:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:04:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:05:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:05:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:06:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:06:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:07:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:07:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:08:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:08:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:09:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:09:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@3f0f6089: (connection has passed maxLifetime)
+18-01-18 12:09:55 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5ab6d4ef
+18-01-18 12:09:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:09:59 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@716c6de5: (connection has passed maxLifetime)
+18-01-18 12:09:59 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7563c4bd
+18-01-18 12:10:06 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@8a61434: (connection has passed maxLifetime)
+18-01-18 12:10:06 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@769d756b
+18-01-18 12:10:12 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@5eb96d36: (connection has passed maxLifetime)
+18-01-18 12:10:12 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1773a1b2
+18-01-18 12:10:13 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@5768d7c5: (connection has passed maxLifetime)
+18-01-18 12:10:13 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@38a6b858
+18-01-18 12:10:14 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@7ce834db: (connection has passed maxLifetime)
+18-01-18 12:10:14 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2bcac4a8
+18-01-18 12:10:21 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@10da6c6c: (connection has passed maxLifetime)
+18-01-18 12:10:21 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@360228de
+18-01-18 12:10:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:10:27 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@18ddd9ef: (connection has passed maxLifetime)
+18-01-18 12:10:27 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7ffc7dd7
+18-01-18 12:10:31 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@658ac99e: (connection has passed maxLifetime)
+18-01-18 12:10:31 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5029792c
+18-01-18 12:10:37 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.PoolBase:134] - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@3708c40a: (connection has passed maxLifetime)
+18-01-18 12:10:37 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:634] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7cb3932
+18-01-18 12:10:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:11:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:11:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:12:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:12:31 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:12:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:13:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:13:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:14:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:14:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:15:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:15:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:16:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:16:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:17:24 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:17:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:17:36 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:17:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:18:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:18:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:19:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:19:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:20:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:20:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:21:18 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:21:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:21:54 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:21:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:22:01 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:22:02 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:22:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:22:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:23:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:23:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:24:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:24:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:25:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:25:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:26:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:26:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:27:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:27:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:28:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:28:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:29:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:29:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:30:18 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:30:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:30:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:31:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:31:39 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:31:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:32:19 ThinkPad-X260 DEBUG [ote.nap.users:33] - User found:  {:user {:id "401139db-8f3e-4371-8233-5d51d4c4c8b6", :username "admin", :name "Admin Adminson", :apikey "d7c6dccf-6541-4443-a9b4-7ab7c36735bc", :email "admin@napoteadmin123.com", :admin? true}, :group {:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"}, :groups ({:id "79046442-ad25-4865-a174-ec199a4b39c4", :name "taksiyritys-testinen-oy", :title "Taksiyritys Testinen Oy"})}
+18-01-18 12:32:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:32:56 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
+18-01-18 12:33:26 ThinkPad-X260 DEBUG [com.zaxxer.hikari.pool.HikariPool:390] - HikariPool-1 - Pool stats (total=10, active=0, idle=10, waiting=0)
