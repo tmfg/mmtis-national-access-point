@@ -499,19 +499,7 @@
     }
 }
 
-/* Custom tuning for mobile views */
-@media (min-width: 1200px) {
-    .masthead .nav-collapse {
-        float: right;
-    }
-}
-
-@media (max-width: 979px) and (min-width: 768px) {
-    .container {
-        width: 724px;
-    }
-}
-
+/* Custom tuning for mobile views - reduce padding*/
 @media (max-width: 767px) {
     body {
         padding-left: 5px;
