@@ -41,13 +41,25 @@
                            [:divider nil])
         :auto-width? true}
        operator]
-      [ui/flat-button {:label (tr [:buttons :edit])
-                       :style {:margin-top "1.5em"
-                               :font-size "8pt"}
-                       :icon (ic/content-create {:style {:width 16 :height 16}})
-                       :on-click #(do
-                                    (.preventDefault %)
-                                    (e! (fp/->ChangePage :transport-operator nil)))}]])])
+
+      [:div
+       [ui/flat-button {:label (tr [:buttons :edit])
+                        :style {:margin-top "1.5em"
+                                :font-size "8pt"}
+                        :icon (ic/content-create {:style {:width 16 :height 16}})
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (fp/->ChangePage :transport-operator nil)))}]
+
+       [ui/flat-button {:label (tr [:buttons :add-new-member])
+                        :style {:margin-top "1.5em"
+                                :font-size "8pt"}
+                        :icon (ic/content-add {:style {:width 16 :height 16}})
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (fp/->GoToUrl
+                                          (str "/organization/member_new/"
+                                               (get operator ::t-operator/ckan-group-id)))))}]]])])
 
 (defn- operator-form-groups []
   [(form/group
