@@ -48,6 +48,16 @@
              (wrap-strip-prefix strip-prefix handler)
              extra-middleware)))))
 
+(defn wrap-security-exception [handler]
+  (fn [req]
+    (try
+      (handler req)
+      (catch SecurityException se
+        (log/warn se "Security exception in " (:uri req) ", user: " (:user req))
+        {:status 403
+         :headers {}
+         :body ""}))))
+
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
   (start [{db :db :as this}]
@@ -64,6 +74,7 @@
           ;; Handler for routes that require authentication
           handler
           (wrap-middleware strip-prefix #(serve-request @handlers %)
+                           wrap-security-exception
                            (partial nap-users/wrap-user-info db)
                            (partial nap-cookie/wrap-check-cookie (:auth-tkt config)))]
       (assoc this ::stop

@@ -10,8 +10,10 @@
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
             [ote.services.viewer :as viewer]
+            [ote.services.external :as external]
             [ote.services.service-search :as service-search]
             [ote.services.login :as login-service]
+            [ote.services.admin :as admin-service]
 
             [ote.integration.export.geojson :as export-geojson]
             [taoensso.timbre :as log]
@@ -34,6 +36,7 @@
    ;; Services for the frontend
    :transport (component/using (transport-service/->Transport (:nap config)) [:http :db])
    :viewer (component/using (viewer/->Viewer) [:http])
+   :external (component/using (external/->External (:nap config)) [:http :db])
 
    ;; Return localization information to frontend
    :localization (component/using
@@ -52,6 +55,10 @@
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
+           [:db :http])
+
+   :admin (component/using
+           (admin-service/->Admin)
            [:db :http])))
 
 (defn configure-logging [config]

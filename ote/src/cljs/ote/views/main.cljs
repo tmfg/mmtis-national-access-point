@@ -24,7 +24,8 @@
             [ote.ui.form :as form]
             [ote.app.controller.login :as login]
             [ote.ui.common :as common]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.views.admin :as admin]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -52,7 +53,11 @@
 
            (when (logged-in? app)
              {:page  :own-services
-              :label [:common-texts :navigation-own-service-list]})]))
+              :label [:common-texts :navigation-own-service-list]})
+
+           (when (:admin? (:user app))
+             {:page :admin
+              :label [:common-texts :navigation-admin]})]))
 
 (def selectable-languages [["fi" "suomi"]
                            ["sv" "svenska"]
@@ -349,6 +354,8 @@
                 :new-service [t-service/edit-new-service e! app]
 
                 :services [service-search/service-search e! (:service-search app)]
+
+                :admin [admin/admin-panel e! app]
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
        [footer e!]]]]))

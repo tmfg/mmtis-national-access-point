@@ -15,7 +15,10 @@
     ["/new-service/:sub-type" :new-service]
     ["/new-service" :transport-service]
     ["/edit-service/:id" :edit-service]
-    ["/services" :services]]))
+    ["/services" :services]
+
+    ["/admin" :admin]
+    ["/admin/:admin-page" :admin]]))
 
 
 (defn- on-navigate [go-to-url-event name params query]

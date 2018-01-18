@@ -25,6 +25,15 @@
    :component (fn [_]
                 [common/help text])})
 
+(defn info-with-link
+  "Create a new info form element that doesn't have any interaction, just shows a help text."
+  [text link-url link-text]
+  {:name (keyword (str "info-link" (swap! keyword-counter inc)))
+   :type :component
+   :container-style style-form/full-width
+   :component (fn [_]
+                [common/extended-help text link-text link-url nil])})
+
 (defn divider
   "Create a new divider form element that doesn't have any interaction,
   just shows a horizontal divider"
@@ -127,7 +136,8 @@
           ::latest-modification
           ::schema
           ::closed-groups
-          :loading?))
+          :loading?
+          :csv-count))
 
 (defrecord ^:private Label [label])
 (defn- label? [x]

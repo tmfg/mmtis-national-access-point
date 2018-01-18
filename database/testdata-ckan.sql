@@ -75,3 +75,8 @@ WHERE revision.id = '7b7f56df-1c88-48b7-b807-6bcfaedb274a';
 
 
 -- ### ... ###
+
+-- Add regular user (normaluser/password)
+INSERT INTO "public"."user"("id","name","apikey","created","about","openid","password","fullname","email","reset_key","sysadmin","activity_streams_email_notifications","state")
+VALUES
+(E'676a2532-b106-4329-b95e-e30c8c8265d5',E'normaluser',E'8eb7bf65-2a7b-45dd-a576-be10a02c3801',E'2018-01-17 11:46:11.658956',NULL,NULL,E'$pbkdf2-sha512$25000$UApBKOXcW6uVci4FQKiVcg$B4j1WY60oVyXvJHA9YRXIN8wKl8lD.Gzn802IwOLTuCgcIqbaaEQIJcqaIWr2ROf4XBtKdCTSCyroLhIMpFC9g',E'User Userson',E'user.userson@example.com',NULL,FALSE,FALSE,E'active');

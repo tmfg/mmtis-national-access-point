@@ -14,7 +14,9 @@
             [ote.util.values :as values]
             [ote.style.form :as style-form]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.validation :as validation]))
+            [ote.ui.validation :as validation]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -119,14 +121,39 @@
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
-  []
+  [e!]
   (form/group
-   {:label (tr [:field-labels :transport-service-common ::t-service/companies])
+    {:label (tr [:field-labels :transport-service-common ::t-service/companies])
     :columns 3}
 
-   (form/info (tr [:form-help :companies]))
+    (form/info (tr [:form-help :companies-main-info]))
+    (form/info-with-link (tr [:form-help :csv-info]) "/ote/csv/valitettavat-yritykset-esimerkki.csv" (tr [:form-help :csv-file-example]))
 
-   {:name ::t-service/companies
+    {:name ::t-service/companies-csv-url
+    :full-width?  true
+    :on-blur #(e! (ts/->EnsureCsvFile))
+    :container-class "col-xs-12 col-sm-6 col-md-6"
+    :type :string}
+
+    {:name      :csv-count
+     :type      :component
+     :component (fn [data]
+                  (let [success (if (= :success (get-in data [:data :status]))
+                                  true
+                                  false)
+                        count (if (get-in data [:data :count])
+                                (get-in data [:data :count])
+                                nil)]
+
+                    (cond
+                      (and data success) [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count count})]
+                      (and data (= false success)) [:span (stylefy/use-style style-base/required-element) (tr [:csv (get-in data [:data :error])])]
+                      :defalt [:span]
+                      )))}
+
+    (form/info (tr [:form-help :companies-info]))
+
+    {:name ::t-service/companies
     :type :table
     :prepare-for-save values/without-empty-rows
     :table-fields [{:name ::t-service/name :type :string
@@ -139,12 +166,12 @@
     :delete? true
     :add-label (tr [:buttons :add-new-company])}
 
-   {:name ::t-service/brokerage?
-    :style style-form/padding-top
-    :extended-help {:help-text      (tr [:form-help :brokerage?])
-                    :help-link-text (tr [:form-help :brokerage-link])
-                    :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
-    :type :checkbox}))
+    {:name ::t-service/brokerage?
+     :style style-form/padding-top
+     :extended-help {:help-text      (tr [:form-help :brokerage?])
+                     :help-link-text (tr [:form-help :brokerage-link])
+                     :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
+     :type :checkbox}))
 
 (defn contact-info-group []
   (form/group
