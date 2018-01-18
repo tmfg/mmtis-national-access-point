@@ -28,7 +28,9 @@
     ::t-service/description
     ::t-service/available-from
     ::t-service/available-to
-    ::t-service/notice-external-interfaces?})
+    ::t-service/notice-external-interfaces?
+    ::t-service/companies-csv-url
+    :csv-count})
 
 (defn service-type-from-sub-type
       "Returns service type keyword based on sub-type."
@@ -70,6 +72,10 @@
 
 (defrecord SelectServiceType [data])
 (defrecord SetNewServiceType [type])
+
+(defrecord EnsureCsvFile [])
+(defrecord EnsureCsvFileResponse [response])
+(defrecord FailedCsvFileResponse [response])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -226,6 +232,26 @@
             (update ::t-service/operation-area place-search/operation-area-to-places)
             (move-service-level-keys-to-form (t-service/service-key-by-type type))
             transform-edit-by-type))))
+
+  EnsureCsvFile
+  (process-event [_ app]
+    (let [url (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/companies-csv-url])]
+      (when (and url (not (empty? url)))
+        (comm/post! (str "check-company-csv")
+                    {:url url}
+                    {:on-success (tuck/send-async! ->EnsureCsvFileResponse)
+                     :on-failure (tuck/send-async! ->FailedCsvFileResponse)}))
+    (update-in app [:transport-service ::t-service/passenger-transportation] dissoc :csv-count)))
+
+  EnsureCsvFileResponse
+  (process-event [{response :response} app]
+    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count]  response))
+
+  FailedCsvFileResponse
+  (process-event [{response :response} app]
+    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response)
+    )
+
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage

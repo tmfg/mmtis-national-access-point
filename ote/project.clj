@@ -68,6 +68,8 @@
 
                  ;; JSON
                  [cheshire "5.8.0"]
+                 ;; CSV
+                 [org.clojure/data.csv "0.1.4"]
 
                  ;; jostain tulee vanha guava, ylikirjoitetaan
                  [com.google.guava/guava "21.0"]]
