@@ -27,23 +27,23 @@
                    (services-by-id id 0)))
           operators)))
 
-(defn list-operators [db {:keys [query limit offset]}]
+(defn list-operators [db {:keys [filter limit offset]}]
   {:results
    (fetch-service-counts
     db
     (specql/fetch db ::t-operator/transport-operator
                   operator-listing-columns
-                  (if (str/blank? query)
+                  (if (str/blank? filter)
                     {}
-                    {::t-operator/name (op/ilike (str "%" query "%"))})
+                    {::t-operator/name (op/ilike (str "%" filter "%"))})
                   {:specql.core/order-by ::t-operator/name
                    :specql.core/order-direction :asc
                    :specql.core/limit (or limit 25)
                    :specql.core/offset (or offset 0)}))
    :total-count
-   (if (str/blank? query)
+   (if (str/blank? filter)
      (count-all-operators db)
-     (count-matching-operators db {:name (str "%" query "%")}))})
+     (count-matching-operators db {:name (str "%" filter "%")}))})
 
 (defn operator-routes [db]
   (routes
@@ -56,7 +56,7 @@
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-           (http/publish! http (operator-routes db))))
+           (http/publish! http {:authenticated? false} (operator-routes db))))
 
   (stop [{stop ::stop :as this}]
     (stop)

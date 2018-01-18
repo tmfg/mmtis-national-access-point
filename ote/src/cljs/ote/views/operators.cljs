@@ -11,16 +11,18 @@
 (defn operators-list [e! operators]
   [:div
    (doall
-    (for [{::t-operator/keys [id name business-id homepage
-                              email phone gsm visiting-address]} operators]
+    (for [{::t-operator/keys [id name business-id homepage email
+                              phone gsm visiting-address service-count]} operators]
       ^{:key id}
       [ui/card
        [ui/card-header {:title name :subtitle homepage}]
        [ui/card-text
-        [:div "email: " email
-         "phone: " phone
-         "gsm: " gsm
-         "visiting-address: " (str visiting-address)]]]))])
+        [:div
+         [:div service-count " palvelua"]
+         (when email [:span "email: " email])
+         (when phone [:span "phone: " phone])
+         (when gsm [:span  "gsm: " gsm])
+         (when visiting-address [:span  "visiting-address: " (str visiting-address)])]]]))])
 
 (defn operators [e! _]
   (e! (operators-controller/->Init))
@@ -35,12 +37,12 @@
        (:loading? operators)
        [:div "Haetaan palveluntuottajia... XXX"]
 
-       (empty? (:results operators))
+       (zero? (:total-count operators))
        [:div "Hakuehdoilla ei löytynyt operaattoreita XXX"]
 
        :default
        [:div
         (if (str/blank? (:filter operators))
-          (str "Yhteensä " (count (:results operators)) " palveluntuottajaa XXX.")
-          (str "Hakuehdoilla löytyi " (count (:results operators)) " palveluntuottajaa"))
+          (str "Yhteensä " (:total-count operators) " palveluntuottajaa XXX.")
+          (str "Hakuehdoilla löytyi " (:total-count operators) " palveluntuottajaa"))
         [operators-list e! (:results operators)]])]))
