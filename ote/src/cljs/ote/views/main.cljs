@@ -25,7 +25,8 @@
             [ote.app.controller.login :as login]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
-            [ote.views.admin :as admin]))
+            [ote.views.admin :as admin]
+            [ote.views.operators :as operators]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -356,6 +357,9 @@
                 :services [service-search/service-search e! (:service-search app)]
 
                 :admin [admin/admin-panel e! app]
+
+                :operators [operators/operators e! app]
+
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
        [footer e!]]]]))
