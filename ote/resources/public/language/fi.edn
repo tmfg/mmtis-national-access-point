@@ -488,7 +488,7 @@
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
-  :header-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-new-terminal                "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
   :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
