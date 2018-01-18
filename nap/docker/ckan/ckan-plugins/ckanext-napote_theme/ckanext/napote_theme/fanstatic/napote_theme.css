@@ -499,6 +499,26 @@
     }
 }
 
+/* Custom tuning for mobile views */
+@media (min-width: 1200px) {
+    .masthead .nav-collapse {
+        float: right;
+    }
+}
+
+@media (max-width: 979px) and (min-width: 768px) {
+    .container {
+        width: 724px;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
 /*
 * #############################################################
 */
@@ -512,7 +532,7 @@
 /** BASE **/
 
 body {
-    background: #444444; /** LIVI pääväri, harmaat 5. **/
+    background: #fff;
     font-family: 'Roboto', sans-serif;
     font-weight: normal;
 }
@@ -690,7 +710,7 @@ nav.section.navigation.section-right > form {
 
 .homepage .hero {
     background: none;
-    background-color: white;
+    background-color: #fff;
 }
 
 .homepage [role=main] {

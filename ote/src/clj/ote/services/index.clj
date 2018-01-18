@@ -27,6 +27,8 @@
 (defn index-page [dev-mode?]
   [:html
    [:head
+    [:meta {:name "viewport"
+            :content "width=device-width, initial-scale=1.0"}]
     [:title "FINAP"]
     (for [{:keys [href integrity]} stylesheets]
       [:link (merge {:rel "stylesheet"
