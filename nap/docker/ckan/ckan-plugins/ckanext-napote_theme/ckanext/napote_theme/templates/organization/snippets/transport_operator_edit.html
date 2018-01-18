@@ -7,7 +7,10 @@
 
 <div id="nap_viewer"></div>
 
-<script src="/ote/js/out/goog/base.js"></script>
+{# Get base.js only in localhost #}
+{% if "localhost" in c.environ['HTTP_REFERER']: %}
+    <script src="/ote/js/out/goog/base.js"></script>
+{% endif %}
 <script src="/ote/js/ote.js"></script>
 <script>goog.require("ote.main")</script>
 <script>
