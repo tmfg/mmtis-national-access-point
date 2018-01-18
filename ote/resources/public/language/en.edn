@@ -64,7 +64,7 @@
    :ote.db.transport-service/companies "Companies that produce the service"
    :ote.db.transport-service/company-name "Company name"
    :ote.db.transport-service/business-id "Company business ID"
-   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv tiedoston osoite (www)"
+   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv-tiedoston osoite (www)"
    :ote.db.transport-service/license "License / terms of use"
    :ote.db.transport-service/license-url "License or terms of use description"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
@@ -226,9 +226,9 @@
   :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Rae-työkalu"
   :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
-  :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.matka.fi/resources/palveluyritykset.csv)."
+  :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.matka.fi/resources/palveluyritykset.csv)."
   :csv-file-example "Katso tästä esimerkkitiedosto."
-  :companies-info "Jos sinulla ei ole .csv tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
+  :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden accessibilityominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
   :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden accessibilityominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
@@ -248,7 +248,7 @@
  ;; CSV parsing
  :csv
  {:url-parse-failed "Please, check given url."
-  :csv-parse-failed "Failed to parse .CSV file."
+  :csv-parse-failed "Failed to parse .csv file."
   :parsing-success ["Found  " :count " companies."]
   }
 
