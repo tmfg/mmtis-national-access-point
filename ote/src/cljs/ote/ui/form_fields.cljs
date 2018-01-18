@@ -104,7 +104,7 @@
   [text-field
    (merge
     {:name name
-     :floating-label-text (when-not table?  label)
+     :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
      :hintText          (placeholder field data)
@@ -131,11 +131,11 @@
     (when password?
       {:type "password"}))])
 
-(defmethod field :text-area [{:keys [update! label name rows error]
+(defmethod field :text-area [{:keys [update! table? label name rows error]
                               :as   field} data]
   [text-field
    {:name name
-    :floating-label-text label
+    :floating-label-text (when-not table? label)
     :floating-label-fixed true
     :hintText          (placeholder field data)
     :on-change         #(update! %2)
@@ -234,7 +234,7 @@
 
 
 (defmethod field :multiselect-selection
-  [{:keys [update! label name style show-option show-option-short options form? error warning
+  [{:keys [update! table? label name style show-option show-option-short options form? error warning
            auto-width? full-width?]
     :as field}
    data]
@@ -245,7 +245,7 @@
       [ui/select-field
        (merge
         {:style style
-         :floating-label-text label
+         :floating-label-text (when-not table? label)
          :floating-label-fixed true
          :multiple true
          :value (clj->js (map option-idx selected-set))
@@ -280,29 +280,6 @@
     (when (or error warning)
       [:div (stylefy/use-style style-base/required-element)
        (if error error warning)])]))
-
-(defmethod field :checkbox-group [{:keys [update! label show-option options help]} data]
-  (let [selected (set (or data #{}))]
-    [:div.checkbox-group
-     [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
-     (when help
-       [common/help help])
-     (doall
-      (map-indexed
-       (fn [i option]
-         (let [checked? (boolean (selected option))]
-           [ui/checkbox {:key i
-                         :label (show-option option)
-                         :checked checked?
-                         :on-check #(update! ((if checked? disj conj) selected option))}]))
-       options))]))
-
-(defmethod field :checkbox [{:keys [update! label]} data]
-  (let [checked? (boolean data)]
-    [ui/checkbox {:label label
-                  :checked checked?
-                  :on-check #(update! (not checked?))}]))
-
 
 (def phone-regex #"\+?\d+")
 
@@ -425,13 +402,13 @@
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
-(defmethod field :date-picker [{:keys [update! label ok-label cancel-label
+(defmethod field :date-picker [{:keys [update! table? label ok-label cancel-label
                                        show-clear? hint-text] :as opts} data]
   [:div (stylefy/use-style style-base/inline-block)
    [ui/date-picker {:style {:display "inline-block"}
                     :text-field-style {:width "150px"}
                     :hint-text (or hint-text "")
-                    :floating-label-text label
+                    :floating-label-text (when-not table? label)
                     :floating-label-fixed true
                     :auto-ok true
                     :value data
@@ -527,20 +504,36 @@
                        :label-style style-base/button-label-style
                        :disabled (values/effectively-empty? (last data))}]])]))
 
-(defn- checkbox-container [update! label warning error style checked?]
+(defn- checkbox-container [update! table? label warning error style checked?]
   [:div (when error (stylefy/use-style style-base/required-element))
-   [ui/checkbox {:label label
-                 :checked checked?
+   [ui/checkbox {:label    (when-not table? label)
+                 :checked  checked?
                  :on-check #(update! (not checked?))
-                 :style style}]
+                 :style    style}]
    (when error
      (tr [:common-texts :required-field]))])
 
-(defmethod field :checkbox [{:keys [update! label warning error style extended-help]} checked?]
+(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help]} checked?]
   (if extended-help
     [common/extended-help
      (:help-text extended-help)
      (:help-link-text extended-help)
      (:help-link extended-help)
-     (checkbox-container update! label warning error style checked?)]
-    (checkbox-container update! label warning error style checked?)))
+     (checkbox-container update! table? label warning error style checked?)]
+    (checkbox-container update! table? label warning error style checked?)))
+
+(defmethod field :checkbox-group [{:keys [update! table? label show-option options help]} data]
+  (let [selected (set (or data #{}))]
+    [:div.checkbox-group
+     [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
+     (when help
+       [common/help help])
+     (doall
+       (map-indexed
+         (fn [i option]
+           (let [checked? (boolean (selected option))]
+             [ui/checkbox {:key      i
+                           :label    (when-not table? (show-option option))
+                           :checked  checked?
+                           :on-check #(update! ((if checked? disj conj) selected option))}]))
+         options))]))
