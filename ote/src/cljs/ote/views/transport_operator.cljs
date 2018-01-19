@@ -26,7 +26,8 @@
    ;; Show operator selection if there are operators and we are not creating a new one
    (when (and (not (empty? operators))
               (not (:new? operator)))
-     [ui-common/table2
+     [:div.row
+     [:div.col-sm-4.col-md-3
       [form-fields/field
        {:label (tr [:field-labels :select-transport-operator])
         :name        :select-transport-operator
@@ -40,17 +41,18 @@
         :options     (into (mapv :transport-operator operators)
                            [:divider nil])
         :auto-width? true}
-       operator]
+       operator]]
 
-      [:div
+       [:div.col-xs-12.col-sm-3.col-md-2
        [ui/flat-button {:label (tr [:buttons :edit])
                         :style {:margin-top "1.5em"
                                 :font-size "8pt"}
                         :icon (ic/content-create {:style {:width 16 :height 16}})
                         :on-click #(do
                                      (.preventDefault %)
-                                     (e! (fp/->ChangePage :transport-operator nil)))}]
+                                     (e! (fp/->ChangePage :transport-operator nil)))}]]
 
+       [:div.col-xs-12.col-sm-3.col-md-2
        [ui/flat-button {:label (tr [:buttons :add-new-member])
                         :style {:margin-top "1.5em"
                                 :font-size "8pt"}
