@@ -69,7 +69,7 @@
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
+   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/companies-csv-url "Yrityslistan osoite"
