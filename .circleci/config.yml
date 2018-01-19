@@ -6,12 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: circleci/clojure:lein-2.7.1
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
+      - image: solita/napote-circleci:latest
       - image: solita/napotedb:latest
 
     working_directory: ~/repo
@@ -31,24 +26,17 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "ote/project.clj" }}
+          - v2-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      # Install apt deps, awscli and add pip --user binaries into path
-      - run:
-          name: Install apt deps
-          command: |
-            sudo apt-get update && sudo apt-get -y install gettext-base python-pip python-dev jq
-            pip install awscli --upgrade --user
-            echo 'export PATH=$PATH:$HOME/.local/bin' >> $BASH_ENV
+          - v2-dependencies-{{ .Branch }}
+          - v2-dependencies-
 
       - run: cd ote && lein deps
 
       - save_cache:
+          key: v2-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "ote/project.clj" }}
 
       # setup database
       - run: cd database && sh circleci_setup.sh
@@ -85,8 +73,7 @@ jobs:
 
   e2e-pr:
     docker:
-      # specify the version you desire here
-      - image: solita/napote-cypress:latest
+      - image: solita/napote-circleci:latest
       - image: solita/napotedb:latest
 
     working_directory: ~/repo
@@ -114,14 +101,15 @@ jobs:
       - run: cd database && sh circleci_setup.sh
 
       - restore_cache:
-          key: v1-npm-deps-
+          keys:
+            - v2-npm-deps-
 
       - run:
           name: Install Cypress
           command: npm i cypress@1.x && $(npm bin)/cypress verify
 
       - save_cache:
-          key: v1-npm-deps-
+          key: v2-npm-deps-
           paths:
             - node_modules
 

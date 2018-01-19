@@ -1,9 +1,6 @@
 #!/bin/sh
 
-### THIS IS MEANT TO BE RUN INSIDE CircleCI CONTAINERS ONLY!
-
-sudo apt-get update
-sudo apt-get install -y postgresql-client maven
+### THIS IS MEANT TO BE RUN INSIDE our solita/napote-circleci CONTAINERS ONLY!
 
 P="psql -h localhost -p 5432 -U postgres"
 $P -f ../nap/ckan-initial-db.sql napote
