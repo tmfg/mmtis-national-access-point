@@ -19,7 +19,7 @@ job('Backup FINAP database') {
 
         shell('mv napote-${ENV}.dump napote-${ENV}-`date +%Y-%m-%d`.dump')
 
-        shell('AWS_ACCESS_KEY_ID=${vault_backup_aws_key_id} AWS_SECRET_ACCESS_KEY=${vault_backup_aws_secret} aws s3 cp napote-*.dump s3://finap-backup/')
+        shell('AWS_ACCESS_KEY_ID=${vault_backup_aws_key_id} AWS_SECRET_ACCESS_KEY=${vault_backup_aws_secret} aws s3 cp napote-${ENV}-`date +%Y-%m-%d`.dump s3://finap-backup/')
 
         shell('rm *.dump')
 
