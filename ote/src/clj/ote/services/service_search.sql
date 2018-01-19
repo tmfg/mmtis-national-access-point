@@ -1,9 +1,8 @@
 -- name: operation-area-facet
 SELECT "operation-area" as text, COUNT(*) as count
   FROM "operation-area-facet" o
- WHERE o."operation-area" IN (SELECT f.namefin FROM "finnish_municipalities" f)
  GROUP BY text
- ORDER BY count DESC, text ASC;
+ ORDER BY text ASC;
 
 -- name: sub-type-facet
 SELECT type."sub-type", COALESCE(count.count, 0) AS count

@@ -158,7 +158,7 @@
 
         {:name ::t-service/operation-area
          :type :multiselect-selection
-         :show-option #(str (:text %))
+         :show-option #(:text %)
          :options (::t-service/operation-area facets)
          :auto-width? true}
 
