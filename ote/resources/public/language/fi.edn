@@ -388,6 +388,7 @@
    :step-free-access "Portaaton pääsy"
    :accessible-vehicle "Esteetön kulkuneuvo"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"
    :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
