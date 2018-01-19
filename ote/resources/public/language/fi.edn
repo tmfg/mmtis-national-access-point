@@ -605,6 +605,16 @@
    :leave "Poistu"
    :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
 
+ :operators
+ {:title "Palveluntuottajat"
+  :filter "Hae nimen osalla"
+  :loading "Haetaan palveluntuottajia..."
+  :result-service-count [:service-count " palvelua"]
+  :no-results "Hakuehdoilla ei löytynyt palveluntuottajia"
+  :result-count ["Hakuehdoilla löytyi " :total-count " palveluntuottajaa"]
+  :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
+  }
+
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.

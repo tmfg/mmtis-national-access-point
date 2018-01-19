@@ -14,15 +14,16 @@
   (when-let [timeout (:timeout operators)]
     (.clearTimeout js/window timeout))
   (let [on-success (tuck/send-async! ->SearchResponse append?)]
-    (assoc-in
-     app [:operators :timeout]
-     (.setTimeout js/window
-                  #(comm/post! "operators/list"
-                               {:filter (:filter operators)
-                                :limit (:limit operators)
-                                :offset (:offset operators)}
-                               {:on-success on-success})
-                  timeout-ms))))
+    (update
+     app :operators assoc
+     :loading? true
+     :timeout (.setTimeout js/window
+                           #(comm/post! "operators/list"
+                                        {:filter (:filter operators)
+                                         :limit (:limit operators)
+                                         :offset (:offset operators)}
+                                        {:on-success on-success})
+                           timeout-ms))))
 
 (extend-protocol tuck/Event
   Init
@@ -54,6 +55,7 @@
           total-count (:total-count response)]
       (.log js/console "got: " (pr-str results))
       (update app :operators assoc
+              :loading? false
               :results (if append?
                          (into (get-in app [:operators :results])
                                results)
