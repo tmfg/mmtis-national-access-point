@@ -83,7 +83,8 @@
                        ;; Prevent uberjar from cleaning cljs generated files
                        :auto-clean false}
              :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]
-                                  [clj-http "3.7.0"]]
+                                  [clj-http "3.7.0"]
+                                  [com.atlassian.commonmark/commonmark "0.11.0"]]
                    :test-paths ["test/clj"]}}
 
   :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]
