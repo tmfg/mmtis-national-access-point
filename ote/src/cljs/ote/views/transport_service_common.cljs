@@ -234,7 +234,7 @@
   [e! {published? ::t-service/published? :as data} schemas]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
-     (when (not (empty? (:ote.ui.form/missing-required-fields data)))
+     (when (not (form/can-save? data))
        [ui/card {:style {:margin-bottom "1em"}}
         [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
