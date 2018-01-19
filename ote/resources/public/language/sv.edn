@@ -1,4 +1,12 @@
 {
+ :document-title
+ {:default "NAP - mobilitetstjänstekatalog"
+  :services "Tjänstekatalog"
+  :operators "Tjänsteproducenter"
+  :own-services "Egna tjänsteuppgifter"
+  :admin "Admin"
+  }
+
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -283,16 +291,15 @@
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
   :add-new-transport-operator "Lägg till ny tjänsteproducent"
+  :add-new-member "Lägg till användare"
   }
-
-
 
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/type
   {:terminal                 "Stationer, hamnar och övriga terminaler"
    :passenger-transportation "Persontransporttjänster"
-   :rentals                  "Fordonsuthyrning och kommersiella  samanvändningstjänster"
+   :rentals                  "Fordonsuthyrning och kommersiella samanvändningstjänster"
    :parking                  "Almmänna kommersiella parkeringstjänster"
    :brokerage                "Förmedlingstjänster"}
 
