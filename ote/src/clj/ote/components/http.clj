@@ -50,7 +50,7 @@
      (reduce (fn [handler middleware]
                (middleware handler))
              (wrap-strip-prefix strip-prefix handler)
-             extra-middleware)))))
+             (remove nil? extra-middleware))))))
 
 (defn wrap-security-exception [handler]
   (fn [req]
@@ -63,11 +63,16 @@
          :body ""}))))
 
 (defn wrap-session [{session :session} handler]
-  (session/wrap-session
-   handler
-   {:store (session-cookie/cookie-store {:key (:key session)})
-    :cookie-name "ote-session"
-    :cookie-attrs {:http-only true}}))
+  (if-not session
+    ;; No session config, return handler as is
+    handler
+
+    ;; Session config defined, add session and anti CSRF
+    (session/wrap-session
+     (anti-forgery/wrap-anti-forgery handler)
+     {:store (session-cookie/cookie-store {:key (:key session)})
+      :cookie-name "ote-session"
+      :cookie-attrs {:http-only true}})))
 
 
 (defrecord HttpServer [config handlers public-handlers]
@@ -82,7 +87,6 @@
           ;; Handler for routes that don't require authenticated user
           public-handler
           (wrap-middleware strip-prefix #(serve-request @public-handlers %)
-                           anti-forgery/wrap-anti-forgery
                            (partial wrap-session config)
                            cookies/wrap-cookies)
 
@@ -92,7 +96,6 @@
                            wrap-security-exception
                            (partial nap-users/wrap-user-info db)
                            (partial nap-cookie/wrap-check-cookie (:auth-tkt config))
-                           anti-forgery/wrap-anti-forgery
                            (partial wrap-session config)
                            cookies/wrap-cookies)]
       (assoc this ::stop
