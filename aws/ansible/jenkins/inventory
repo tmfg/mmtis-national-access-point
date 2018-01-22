@@ -1,4 +1,4 @@
 [jenkins]
-napote-jenkins
+napote-bastion
 
 [jenkins:vars]

@@ -63,7 +63,7 @@
          [:a {:href "#" :on-click  #(do
                                       (.preventDefault %)
                                       (e! (fp/->ChangePage :edit-service {:id id})))} name]]
-        [ui/table-row-column
+        [ui/table-row-column {:class "hidden-xs hidden-sm "}
          (if published?
            (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
              [linkify url url {:target "_blank"}])
@@ -92,7 +92,7 @@
         [ui/table-row {:selectable false}
          [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "10px"}} "Id"]
          [ui/table-header-column (tr [:front-page :table-header-service-name])]
-         [ui/table-header-column (tr [:front-page :table-header-service-url])]
+         [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-service-url])]
          [ui/table-header-column {:class "hidden-xs "} (tr [:front-page :table-header-NAP-status])]
          [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-modified])]
          [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-created])]
@@ -115,9 +115,9 @@
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
    [:div.row
-    [:div {:class "col-md-12"}
-     [:h1 (tr [:common-texts :own-api-list])
-
+    [:div.col-xs-12.col-sm-6.col-md-9
+     [:h1 (tr [:common-texts :own-api-list])]]
+    [:div.col-xs-12.col-sm-6.col-md-3
 
       [ui/raised-button {:label (tr [:buttons :add-transport-service])
                         :style {:float "right"}
@@ -125,11 +125,12 @@
                                      (.preventDefault %)
                                      (e! (ts/->OpenTransportServiceTypePage)))
                         :primary  true
-                        :icon (ic/content-add)}]]
-     (warn-about-test-server)]
+                        :icon (ic/content-add)}]]]
+
+     (warn-about-test-server)
 
     [:div {:class "col-md-12"}
-     [t-operator-view/transport-operator-selection e! state]]]
+     [t-operator-view/transport-operator-selection e! state]]
 
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}

@@ -1,4 +1,12 @@
 {
+ :document-title
+ {:default "NAP - mobilitetstjänstekatalog"
+  :services "Tjänstekatalog"
+  :operators "Tjänsteproducenter"
+  :own-services "Egna tjänsteuppgifter"
+  :admin "Admin"
+  }
+
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -379,6 +387,7 @@
    :step-free-access "Inga trappsteg"
    :accessible-vehicle "Fordon utan hinder (esteetön)"
    :suitable-for-wheelchairs "Lämplig för rullstol"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Assistans vid ombordstigning"
    :assistance-dog-space "Plats för assistenshund"
    :disability-adapted-vehicle "Fordon lämpat för rörelsehindrade"}

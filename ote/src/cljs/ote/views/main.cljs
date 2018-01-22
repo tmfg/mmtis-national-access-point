@@ -317,6 +317,20 @@
      [login-form e! login]]
     [login-action-cards]]])
 
+(defn document-title [page]
+  (set! (.-title js/document)
+        (case page
+          :services (tr [:document-title :services])
+          :operators (tr [:document-title :operators])
+          :own-services (tr [:document-title :own-services])
+          :admin (tr [:document-title :admin])
+
+          ;; default title for other pages
+          (tr [:document-title :default])))
+
+  ;; Render as an empty span
+  [:span])
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -342,6 +356,7 @@
             [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
             [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
              [:div.container-fluid
+              [document-title (:page app)]
               (case (:page app)
                 :front-page [fp/own-services e! app]
                 :own-services [fp/own-services e! app]

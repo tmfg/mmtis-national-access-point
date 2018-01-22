@@ -24,9 +24,23 @@
          (str "-" (:current-revision-sha (current-revision-sha))))
        ".js"))
 
+(def favicons
+  [{:rel "apple-touch-icon" :sizes "180x180" :href "/ote/favicon/apple-touch-icon.png?v=E6jNQXq6yK"}
+   {:rel "icon" :type "image/png" :sizes "32x32" :href "/ote/favicon/favicon-32x32.png?v=E6jNQXq6yK"}
+   {:rel "icon" :type "image/png" :sizes "16x16" :href "/ote/favicon/favicon-16x16.png?v=E6jNQXq6yK"}
+   {:rel "manifest" :href "/ote/favicon/manifest.json?v=E6jNQXq6yK"}
+   {:rel "mask-icon" :href "/ote/favicon/safari-pinned-tab.svg?v=E6jNQXq6yK" :color "#5bbad5"}
+   {:rel "shortcut icon" :href "/ote/favicon/favicon.ico?v=E6jNQXq6yK"}])
+
 (defn index-page [dev-mode?]
   [:html
    [:head
+
+    (for [f favicons]
+      [:link f])
+    [:meta {:name "theme-color" :content "#ffffff"}]
+    [:meta {:name "viewport"
+            :content "width=device-width, initial-scale=1.0"}]
     [:title "FINAP"]
     (for [{:keys [href integrity]} stylesheets]
       [:link (merge {:rel "stylesheet"
