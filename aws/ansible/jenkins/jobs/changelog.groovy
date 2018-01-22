@@ -10,6 +10,9 @@ job('Generate ChangeLog from Github PRs') {
         cron('0 22 * * *')
     }
     steps {
-        shell('cd tools/changelog && lein run')
+        leiningenBuilder {
+            subdirPath('tools/changelog')
+            task('run')
+        }
     }
 }
