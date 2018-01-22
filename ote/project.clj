@@ -22,6 +22,8 @@
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
                  [bk/ring-gzip "0.2.1"]
+                 [ring/ring-anti-forgery "1.1.0"]
+
 
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
