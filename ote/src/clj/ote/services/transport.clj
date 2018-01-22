@@ -75,7 +75,7 @@
       (assoc ::t-service/operation-area
              (places/fetch-transport-service-operation-area db id))))
 
-(defn- delete-transport-service!
+(defn delete-transport-service!
   "Delete single transport service by id"
   [nap-config db user id]
 

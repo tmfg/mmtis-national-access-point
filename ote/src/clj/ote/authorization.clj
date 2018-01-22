@@ -17,12 +17,19 @@
   "Check that user has access (belongs to) the given transport operator.
   Runs body-fn if user has access, otherwise returns an HTTP error response and logs a warning."
   [db user transport-operator-id body-fn]
-  (let [allowed-operators (user-transport-operators db user)]
-    (if (or (nil? transport-operator-id)
-            (not (contains? allowed-operators transport-operator-id)))
-      (do
-        (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
-                  ", allowed transport operators: " allowed-operators)
-        {:status 403 :body "Forbidden"})
+  (let [allowed-operators (user-transport-operators db user)
+        is-admin? (get-in user [:user :admin?])
+        access-denied #(do
+                         (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
+                         ", allowed transport operators: " allowed-operators)
+                         {:status 403 :body "Forbidden"})]
+    (cond
+      (nil? transport-operator-id)
+        (access-denied)
 
+      (and (not is-admin?)
+           (not (contains? allowed-operators transport-operator-id)))
+        (access-denied) ;; not nil, not admin - owns service
+
+      :else
       (body-fn))))
