@@ -15,4 +15,9 @@ job('Generate ChangeLog from Github PRs') {
             task('run')
         }
     }
+    publishers {
+        archiveArtifacts {
+            pattern('tools/changelog/changelog.html')
+        }
+    }
 }
