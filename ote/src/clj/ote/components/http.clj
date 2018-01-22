@@ -9,7 +9,11 @@
             [taoensso.timbre :as log]
             [clojure.string :as str]
             [ring.middleware.params :as params]
-            [ring.middleware.gzip :as gzip]))
+            [ring.middleware.gzip :as gzip]
+            [ring.middleware.anti-forgery :as anti-forgery]
+            [ring.middleware.session :as session]
+            [ring.middleware.session.cookie :as session-cookie]
+            [ring.middleware.cookies :as cookies]))
 
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
@@ -58,6 +62,14 @@
          :headers {}
          :body ""}))))
 
+(defn wrap-session [{session :session} handler]
+  (session/wrap-session
+   handler
+   {:store (session-cookie/cookie-store {:key (:key session)})
+    :cookie-name "ote-session"
+    :cookie-attrs {:http-only true}}))
+
+
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
   (start [{db :db :as this}]
@@ -69,14 +81,20 @@
 
           ;; Handler for routes that don't require authenticated user
           public-handler
-          (wrap-middleware strip-prefix #(serve-request @public-handlers %))
+          (wrap-middleware strip-prefix #(serve-request @public-handlers %)
+                           anti-forgery/wrap-anti-forgery
+                           (partial wrap-session config)
+                           cookies/wrap-cookies)
 
           ;; Handler for routes that require authentication
           handler
           (wrap-middleware strip-prefix #(serve-request @handlers %)
                            wrap-security-exception
                            (partial nap-users/wrap-user-info db)
-                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config)))]
+                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config))
+                           anti-forgery/wrap-anti-forgery
+                           (partial wrap-session config)
+                           cookies/wrap-cookies)]
       (assoc this ::stop
              (server/run-server
               (fn [req]
