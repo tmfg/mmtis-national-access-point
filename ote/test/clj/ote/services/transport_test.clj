@@ -50,6 +50,7 @@
    ::t-service/luggage-restrictions generators/gen-localized-text-array
    ::t-service/pricing generators/gen-service-link
    ::t-service/payment-method-description generators/gen-localized-text-array
+   ::t-service/service-hours-info generators/gen-localized-text-array
    ))
 
 (def gen-passenger-transportation-service
