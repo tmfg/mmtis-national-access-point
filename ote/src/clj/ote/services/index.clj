@@ -6,7 +6,8 @@
             [ote.localization :as localization :refer [tr]]
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
-            [ote.tools.git :refer [current-revision-sha]]))
+            [ote.tools.git :refer [current-revision-sha]]
+            [ring.middleware.anti-forgery :as anti-forgery]))
 
 (def supported-languages #{"fi" "sv" "en"})
 (def default-language "fi")
@@ -53,7 +54,8 @@
     [:style {:id "_stylefy-styles_"}]]
 
    [:body {:onload "ote.main.main();"
-           :data-language localization/*language*}
+           :data-language localization/*language*
+           :data-anti-csrf-token anti-forgery/*anti-forgery-token*}
     [:div#oteapp]
     (when dev-mode?
       [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
