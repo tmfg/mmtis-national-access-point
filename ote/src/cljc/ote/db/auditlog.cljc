@@ -13,7 +13,7 @@
   ["auditlog_event_type" ::auditlog-event-type (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
-  ["auditlog-event-attribute" ::auditlog-event-attribute]
+  ["auditlog_event_attribute" ::auditlog-event-attribute]
 
   ;; Tables
   ["auditlog" ::auditlog])

@@ -2,7 +2,7 @@ CREATE TYPE auditlog_event_type AS ENUM ('delete-service','modify-service','add-
        'modify-operator', 'add-operator', 'delete-user', 'modify-user', 'add-user');
 
 
-CREATE TYPE "auditlog-event-attribute" AS (
+CREATE TYPE "auditlog_event_attribute" AS (
   "name" text,
   "value" text);
 
@@ -12,7 +12,7 @@ CREATE TYPE "auditlog-event-attribute" AS (
 CREATE TABLE auditlog (
   id SERIAL PRIMARY KEY,
   "event-type" auditlog_event_type,
-  "event-attributes" "auditlog-event-attribute"[],
+  "event-attributes" "auditlog_event_attribute"[],
   "event-timestamp" timestamp with time zone,
   "created-by" TEXT REFERENCES "user" (id)
 );

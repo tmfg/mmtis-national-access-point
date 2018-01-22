@@ -27,16 +27,13 @@
 (defn- admin-delete-transport-service!
   "Allow admin delete single transport service by id"
   [nap-config db user id]
-  (let [str-id (str id)
-        return nil ;(transport/delete-transport-service! nap-config db user id)
-        my-map {::auditlog/event-type :delete-service
-                ::auditlog/event-attributes
-                                      [{::auditlog/name "transport-service-id", ::auditlog/value str-id}]
-                ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
-                ::auditlog/created-by (get-in user [:user :id])}
-        ]
-    (println "my-map " my-map)
-    (upsert! db ::auditlog/auditlog my-map)
+  (let [return (transport/delete-transport-service! nap-config db user id)
+        auditlog {::auditlog/event-type :delete-service
+                  ::auditlog/event-attributes
+                                      [{::auditlog/name "transport-service-id", ::auditlog/value (str id)}]
+                  ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
+                  ::auditlog/created-by (get-in user [:user :id])}]
+    (upsert! db ::auditlog/auditlog auditlog)
     return))
 
 
