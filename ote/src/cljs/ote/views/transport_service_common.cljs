@@ -325,7 +325,14 @@
                       :type :date-picker
                       :label (tr* :to-date)}]
       :delete? true
-      :add-label (tr [:buttons :add-new-service-exception])})))
+      :add-label (tr [:buttons :add-new-service-exception])}
+
+     {:name ::t-service/service-hours-info
+      :label (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
+      :type :localized-text
+      :is-empty? validation/empty-localized-text?
+      :full-width? true
+      :container-class "col-xs-12"})))
 
 (defn name-group [label]
   (form/group
