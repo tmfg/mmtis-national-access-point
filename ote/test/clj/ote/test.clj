@@ -9,7 +9,9 @@
              [clj-http.client :as http-client]
              [taoensso.timbre :as log]
              [ote.nap.cookie :as nap-cookie]
-             [ote.transit :as transit])
+             [ote.transit :as transit]
+             [ring.middleware.session.cookie :as session-cookie]
+             [ring.middleware.anti-forgery :as anti-forgery])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
@@ -65,6 +67,8 @@
       (finally (.close s)))))
 
 (def auth-tkt-config {:shared-secret "test" :max-age-in-seconds 60})
+(def anti-csrf-token "forge me not")
+(def session-key "cookie0123456789")
 
 (defn system-fixture [& system-map-entries]
   (fn [tests]
@@ -74,7 +78,8 @@
                               :db (db/database test-db-config)
                               :http (component/using
                                      (http/http-server {:port (port)
-                                                        :auth-tkt auth-tkt-config})
+                                                        :auth-tkt auth-tkt-config
+                                                        :session {:key session-key}})
                                      [:db])
                               system-map-entries))]
         (tests)
@@ -83,26 +88,34 @@
 (defn- url-for-path [path]
   (str "http://localhost:" (get-in *ote* [:http :config :port]) "/" path))
 
+(defn- cookie [name value]
+  (reify Cookie
+    (getName [_] name)
+    (getValue [_] (java.net.URLEncoder/encode value))
+    (getDomain [_] "localhost")
+    (isExpired [_ _] false)
+    (getPath [_] "/")
+    (getPorts [_] (int-array [(get-in *ote* [:http :config :port])]))
+    (getVersion [_] 2)
+    (isPersistent [_] true)
+    (isSecure [_] false)
+    (getComment [_] nil)
+    (getCommentURL [_] nil)))
+
 (defn- cookie-store-for-user [user]
   (reify CookieStore
     (getCookies [_]
-      [(reify Cookie
-         (getName [_] "auth_tkt")
-         (getValue [_]
-           (nap-cookie/unparse "0.0.0.0" "test"
-                               {:digest-algorithm "MD5"
-                                :timestamp (java.util.Date.)
-                                :user-id user
-                                :user-data ""}))
-         (getDomain [_] "localhost")
-         (isExpired [_ _] false)
-         (getPath [_] "/")
-         (getPorts [_] (int-array [(get-in *ote* [:http :config :port])]))
-         (getVersion [_] 2)
-         (isPersistent [_] true)
-         (isSecure [_] false)
-         (getComment [_] nil)
-         (getCommentURL [_] nil))])))
+      [(cookie "auth_tkt"
+               (nap-cookie/unparse "0.0.0.0" "test"
+                                   {:digest-algorithm "MD5"
+                                    :timestamp (java.util.Date.)
+                                    :user-id user
+                                    :user-data ""}))
+       (cookie "ote-session"
+               (#'session-cookie/seal (.getBytes session-key)
+                                      {::anti-forgery/anti-forgery-token anti-csrf-token}))])
+    (addCookie [_ c]
+      (println "Adding cookie: " c))))
 
 (defn- read-transit-response [res]
   (if (= (:status res) 200)
@@ -112,11 +125,13 @@
 (defn http-get [user path]
   (-> path
       url-for-path
-      (http-client/get {:cookie-store (cookie-store-for-user user)})
+      (http-client/get {:headers {"X-CSRF-Token" anti-csrf-token}
+                        :cookie-store (cookie-store-for-user user)})
       read-transit-response))
 
 (defn http-post [user path payload]
   (-> path url-for-path
-      (http-client/post {:body (transit/clj->transit payload)
+      (http-client/post {:headers {"X-CSRF-Token" anti-csrf-token}
+                         :body (transit/clj->transit payload)
                          :cookie-store (cookie-store-for-user user)})
       read-transit-response))
