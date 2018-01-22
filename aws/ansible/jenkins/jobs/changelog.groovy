@@ -19,5 +19,6 @@ job('Generate ChangeLog from Github PRs') {
         archiveArtifacts {
             pattern('tools/changelog/changelog.html')
         }
+        downstream('OTE build from master','SUCCESS')
     }
 }
