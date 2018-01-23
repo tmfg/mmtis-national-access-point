@@ -12,5 +12,9 @@
 
 (define-tables
   ;; Tables
-  ["transport-operator" ::transport-operator])
+  ["group" ::group
+   {"name" ::group-name
+    "id" ::group-id}]
 
+  ["transport-operator" ::transport-operator
+   {::ckan-group (rel/has-one ::ckan-group-id ::group ::group-id)}])

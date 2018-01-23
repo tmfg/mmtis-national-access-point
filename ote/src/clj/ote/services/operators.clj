@@ -15,7 +15,8 @@
   #{::t-operator/id ::t-operator/name
     ::t-operator/homepage ::t-operator/email
     ::t-operator/phone ::t-operator/gsm
-    ::t-operator/visiting-address})
+    ::t-operator/visiting-address
+    [::t-operator/ckan-group #{::t-operator/description}]})
 
 (defn fetch-service-counts [db operators]
   (let [ids (into #{} (map ::t-operator/id) operators)
