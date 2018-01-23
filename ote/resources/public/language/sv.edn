@@ -604,7 +604,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :filter "Sök tjänsteproducenten..."
   :loading "Laddar tjänsteproducenter"
   :result-service-count [:service-count " tjänster"]
-  :no-result "Inga tjänsteproducenter hittades"
+  :no-results "Inga tjänsteproducenter hittades"
   :result-count ["Hittades " :total-count " tjänsteproducenter"]
   :result-count-all ["Total " :total-count " tjänsteproducenter"]}
 
