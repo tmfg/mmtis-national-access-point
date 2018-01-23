@@ -11,7 +11,8 @@
             [stylefy.core :as stylefy]
             [ote.views.service-search :as service-search]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.app.controller.front-page :as fp-controller]))
 
 (defn operators-list [e! operators]
   [:div
@@ -23,9 +24,8 @@
                  :style style-service-search/result-card}
        [:div (stylefy/use-style style-service-search/result-header)
         [:div [:a {:href "#"
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! :FIXME))}
+                   :on-click #(do (.preventDefault %)
+                                  (e! (fp-controller/->ChangePage :services {:operator id})))}
                name]
          " "
          (tr [:operators :result-service-count] {:service-count service-count})]
