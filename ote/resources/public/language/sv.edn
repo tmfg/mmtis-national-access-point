@@ -599,6 +599,15 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
    :leave "Lämna"
    :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
 
+ :operators
+ {:title "Tjänsteproducenter"
+  :filter "Sök tjänsteproducenten..."
+  :loading "Laddar tjänsteproducenter"
+  :result-service-count [:service-count " tjänster"]
+  :no-result "Inga tjänsteproducenter hittas"
+  :result-count ["Hittas " :total-count " tjänsteproducenter"]
+  :result-count-all ["Total " :total-count " tjänsteproducenter"]}
+
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
@@ -766,6 +775,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."
+  :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
+  :operator-no-services "Tjänsteproducenten har inga tjänster."
   }
 
  :login
