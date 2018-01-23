@@ -609,7 +609,7 @@
 
  :operators
  {:title "Palveluntuottajat"
-  :filter "Hae nimen osalla"
+  :filter "Hae nimellä tai nimen osalla"
   :loading "Haetaan palveluntuottajia..."
   :result-service-count [:service-count " palvelua"]
   :no-results "Hakuehdoilla ei löytynyt palveluntuottajia"
