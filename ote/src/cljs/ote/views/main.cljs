@@ -48,9 +48,8 @@
            {:page  :services
             :label [:common-texts :navigation-dataset]}
 
-           {:page  :organizations
-            :label [:common-texts :navigation-organizations]
-            :url   "/organization"}
+           {:page  :operators
+            :label [:common-texts :navigation-organizations]}
 
            (when (logged-in? app)
              {:page  :own-services
