@@ -175,18 +175,17 @@
            (::t-service/passenger-transportation service)
            (::t-service/passenger-transportation fetched))))))
 
-(deftest save-terminal-to-wrong-operator
-  (let [terminal-service (gen/generate gen-terminal-service)
-        response (http-post "admin" "transport-service"
-                            terminal-service)
+(deftest save-terminal-service-to-wrong-operator
+  (let [generated-terminal-service (gen/generate gen-terminal-service)
+        response (http-post "admin" "transport-service" generated-terminal-service)
         service (:transit response)
         ;; GET generated service from server
-        fetch-response (http-get "admin"
-                                 (str "transport-service/" (::t-service/id service)))
-        fetched (:transit fetch-response)
-        ;; Change id from 1 -> 2
-        modified-operator (assoc fetched ::t-service/transport-operator-id 2)]
+        terminal-service (http-get "admin" (str "transport-service/" (::t-service/id service)))
+        fetched (:transit terminal-service)
+        ;; Change operator id from 1 -> 2 - which will cause error
+        modified-terminal-service (assoc fetched ::t-service/transport-operator-id 2)]
 
     (is (thrown-with-msg?
-         clojure.lang.ExceptionInfo #"status 403"
-         (http-post "admin" "transport-service" modified-operator)))))
+          ;; Gives error, because admin has access to all operators, but there isn't operator with id 2
+          clojure.lang.ExceptionInfo #"status 500"
+         (http-post "admin" "transport-service" modified-terminal-service)))))
