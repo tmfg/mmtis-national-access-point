@@ -1,4 +1,12 @@
 {
+ :document-title
+ {:default "NAP - liikkumispalvelukatalogi"
+  :services "Palvelukatalogi"
+  :operators "Palveluntuottajat"
+  :own-services "Omat palvelutiedot"
+  :admin "Ylläpitopaneeli"
+  }
+
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -61,13 +69,14 @@
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
+   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/companies-csv-url "Yrityslistan osoite"
    :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
    :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
+   :ote.db.transport-service/service-hours-info "Lisätiedot"
    }
 
   ;; Service exception
@@ -281,6 +290,7 @@
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
   :add-new-transport-operator "Lisää uusi palveluntuottaja"
+  :add-new-member "Lisää käyttäjä"
   }
 
 
@@ -379,6 +389,7 @@
    :step-free-access "Portaaton pääsy"
    :accessible-vehicle "Esteetön kulkuneuvo"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"
    :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
@@ -487,7 +498,7 @@
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
-  :header-new-terminal            "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-new-terminal                "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
   :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"

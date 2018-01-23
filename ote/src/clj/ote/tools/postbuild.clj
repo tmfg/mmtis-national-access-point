@@ -4,7 +4,7 @@
             [clojure.java.io :as io]))
 
 (defn rename-ote-js []
-  (.renameTo (io/file "resources/public/js/ote.js")
+  (io/copy (io/file "resources/public/js/ote.js")
              (io/file (str "resources/public/js/ote-"
                            (:current-revision-sha
                             (current-revision-sha))

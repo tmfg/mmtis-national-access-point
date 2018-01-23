@@ -9,7 +9,19 @@ job('OTE build from master') {
     triggers {
         scm('H/15 * * * *')
     }
+
+    environmentVariables {
+        groovy('''
+          def changelog_job = jenkins.model.Jenkins.getInstance().getItem('Generate ChangeLog from Github PRs')
+          def changelog_build = changelog_job.getLastSuccessfulBuild()
+          def changelog_artifact_path = new java.io.File(changelog_build.getArtifactManager().root().toURI())
+          return [changelog_html: changelog_artifact_path.getAbsolutePath() + '/tools/changelog/changelog.html']
+        ''')
+    }
+
     steps {
+
+        shell('cp "${changelog_html}" ote/resources/public/')
 
         shell('sh database/testdb.sh')
 

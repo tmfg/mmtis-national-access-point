@@ -26,7 +26,8 @@
    ;; Show operator selection if there are operators and we are not creating a new one
    (when (and (not (empty? operators))
               (not (:new? operator)))
-     [ui-common/table2
+     [:div.row
+     [:div.col-sm-4.col-md-3
       [form-fields/field
        {:label (tr [:field-labels :select-transport-operator])
         :name        :select-transport-operator
@@ -40,14 +41,27 @@
         :options     (into (mapv :transport-operator operators)
                            [:divider nil])
         :auto-width? true}
-       operator]
-      [ui/flat-button {:label (tr [:buttons :edit])
-                       :style {:margin-top "1.5em"
-                               :font-size "8pt"}
-                       :icon (ic/content-create {:style {:width 16 :height 16}})
-                       :on-click #(do
-                                    (.preventDefault %)
-                                    (e! (fp/->ChangePage :transport-operator nil)))}]])])
+       operator]]
+
+       [:div.col-xs-12.col-sm-3.col-md-2
+       [ui/flat-button {:label (tr [:buttons :edit])
+                        :style {:margin-top "1.5em"
+                                :font-size "8pt"}
+                        :icon (ic/content-create {:style {:width 16 :height 16}})
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (fp/->ChangePage :transport-operator nil)))}]]
+
+       [:div.col-xs-12.col-sm-3.col-md-2
+       [ui/flat-button {:label (tr [:buttons :add-new-member])
+                        :style {:margin-top "1.5em"
+                                :font-size "8pt"}
+                        :icon (ic/content-add {:style {:width 16 :height 16}})
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (fp/->GoToUrl
+                                          (str "/organization/member_new/"
+                                               (get operator ::t-operator/ckan-group-id)))))}]]])])
 
 (defn- operator-form-groups []
   [(form/group

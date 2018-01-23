@@ -128,7 +128,7 @@
   [:pick-up :return :pick-up-return])
 
 (def vehicle-accessibility
-  [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs
+  [:low-floor :step-free-access :accessible-vehicle :suitable-for-wheelchairs :suitable-for-stretchers
    :boarding-assistance :assistance-dog-space])
 
 (def rental-vehicle-accessibility

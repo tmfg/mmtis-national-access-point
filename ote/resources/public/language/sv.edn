@@ -1,4 +1,12 @@
 {
+ :document-title
+ {:default "NAP - mobilitetstjänstekatalog"
+  :services "Tjänstekatalog"
+  :operators "Tjänsteproducenter"
+  :own-services "Egna tjänsteuppgifter"
+  :admin "Admin"
+  }
+
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -68,6 +76,7 @@
    :ote.db.transport-service/license "Licens/användarvillkor"
    :ote.db.transport-service/license-url "Beskrivning av licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
+   :ote.db.transport-service/service-hours-info "Tilläggsinfo"
    }
 
   ;; Service exception
@@ -283,16 +292,15 @@
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
   :add-new-transport-operator "Lägg till ny tjänsteproducent"
+  :add-new-member "Lägg till användare"
   }
-
-
 
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/type
   {:terminal                 "Stationer, hamnar och övriga terminaler"
    :passenger-transportation "Persontransporttjänster"
-   :rentals                  "Fordonsuthyrning och kommersiella  samanvändningstjänster"
+   :rentals                  "Fordonsuthyrning och kommersiella samanvändningstjänster"
    :parking                  "Almmänna kommersiella parkeringstjänster"
    :brokerage                "Förmedlingstjänster"}
 
@@ -379,6 +387,7 @@
    :step-free-access "Inga trappsteg"
    :accessible-vehicle "Fordon utan hinder (esteetön)"
    :suitable-for-wheelchairs "Lämplig för rullstol"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Assistans vid ombordstigning"
    :assistance-dog-space "Plats för assistenshund"
    :disability-adapted-vehicle "Fordon lämpat för rörelsehindrade"}

@@ -1,4 +1,11 @@
 {
+ :document-title
+ {:default "NAP - service catalog"
+  :services "Services"
+  :operators "Operators"
+  :own-services "Own services"
+  :admin "Admin"
+  }
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -68,6 +75,7 @@
    :ote.db.transport-service/license "License / terms of use"
    :ote.db.transport-service/license-url "License or terms of use description"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
+   :ote.db.transport-service/service-hours-info "Lisätiedot"
    }
 
   ;; Service exception
@@ -281,6 +289,7 @@
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
   :add-new-transport-operator "Lisää uusi palveluntuottaja"
+  :add-new-member "Lisää käyttäjä"
   }
 
 
@@ -378,6 +387,7 @@
    :step-free-access "Portaaton pääsy"
    :accessible-vehicle "Esteetön kulkuneuvo"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"
    :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
@@ -486,7 +496,7 @@
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
   :header-contact-details             "Palvelun yhteystiedot"
-  :header-new-terminal                "Lisää Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tiedot"
+  :header-new-terminal                "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
   :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustuspalvelun tilauksen tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja accessibility"
