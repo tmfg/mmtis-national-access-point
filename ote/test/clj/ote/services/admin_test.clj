@@ -7,7 +7,7 @@
 (t/use-fixtures :each
   (system-fixture
    :admin (component/using
-           (admin/->Admin)
+           (admin/->Admin (:nap nil))
            [:http :db])))
 
 (deftest user-listing-allowed-for-admin-only
