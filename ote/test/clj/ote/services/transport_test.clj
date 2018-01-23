@@ -130,15 +130,16 @@
 
 (deftest save-terminal-service-to-wrong-operator
   (let [generated-terminal-service (gen/generate s-generators/gen-terminal-service)
-        response (http-post "normaluser" "transport-service" generated-terminal-service)
+        modified-terminal-service (assoc generated-terminal-service ::t-service/transport-operator-id 2)
+        response (http-post "normaluser" "transport-service" modified-terminal-service)
         service (:transit response)
         ;; GET generated service from server
         terminal-service (http-get "normaluser" (str "transport-service/" (::t-service/id service)))
         fetched (:transit terminal-service)
-        ;; Change operator id from 1 -> 2 - which will cause error
-        modified-terminal-service (assoc fetched ::t-service/transport-operator-id 1)]
+        ;; Change operator id from 2 -> 1 - which will cause error
+        problematic-terminal-service (assoc fetched ::t-service/transport-operator-id 1)]
 
+    ;; Gives error, because user doesn't have access rights to operator 1
     (is (thrown-with-msg?
-          ;; Gives error, because admin has access to all operators, but there isn't operator with id 1
           clojure.lang.ExceptionInfo #"status 403"
-         (http-post "admin" "transport-service" modified-terminal-service)))))
+          (http-post "normaluser" "transport-service" problematic-terminal-service)))))
