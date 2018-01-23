@@ -4,8 +4,8 @@
     #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
             [specql.data-types]
     #?(:clj [specql.impl.composite :as specql-composite]))
-  #?(:cljs
-     (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+    #?(:cljs
+        (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
 
 (define-tables

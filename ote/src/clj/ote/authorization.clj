@@ -29,7 +29,7 @@
 
       (and (not is-admin?)
            (not (contains? allowed-operators transport-operator-id)))
-        (access-denied) ;; not nil, not admin - owns service
+        (access-denied)
 
       :else
       (body-fn))))
