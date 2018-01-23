@@ -72,11 +72,20 @@
                        {::t-service/published? true
                         ::t-service/sub-type (op/in types)}))))
 
+(defn- operator-ids [db operators]
+  (when-not (empty? operators)
+    (ids ::t-service/id
+         (specql/fetch db ::t-service/transport-service
+                       #{::t-service/id}
+                       {::t-service/published? true
+                        ::t-service/transport-operator-id (op/in operators)}))))
 
-(defn- search [db {:keys [operation-area sub-type text offset limit] :as filters}]
+(defn- search [db {:keys [operation-area sub-type text operators offset limit]
+                   :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
                         (sub-type-ids db sub-type)
-                        (text-search-ids db text)]
+                        (text-search-ids db text)
+                        (operator-ids db operators)]
         empty-filters? (every? nil? result-id-sets)
         ids (if empty-filters?
               ;; No filters specified, show latest services
@@ -113,6 +122,9 @@
                   :sub-type (when-let [st (some-> (params "sub_types")
                                                   (str/split #","))]
                               (into #{} (map keyword st)))
+                  :operators (map #(Long/parseLong %)
+                                  (some-> "operators" params
+                                          (str/split #",")))
                   :limit (some-> "limit" params (Integer/parseInt))
                   :offset (some-> "offset" params (Integer/parseInt))})))))
 
