@@ -17,6 +17,7 @@
              [clojure.spec.test.alpha :as stest]
              [clojure.spec.alpha :as s]
              [ote.db.generators :as generators]
+             [ote.db.service-generators :as s-generators]
              [clojure.string :as str]
              [clojure.set :as set]))
 
@@ -28,54 +29,6 @@
                   (:nap nil))
                 [:http :db])))
 
-(def gen-passenger-transportation
-  (gen/hash-map
-   ::t-service/guaranteed-accessibility-tool (s/gen ::t-service/accessibility-tool)
-   ::t-service/guaranteed-accessibility-description generators/gen-localized-text-array
-   ::t-service/guaranteed-transportable-aid (s/gen ::t-service/guaranteed-transportable-aid)
-   ::t-service/guaranteed-info-service-accessibility (s/gen ::t-service/guaranteed-info-service-accessibility)
-   ::t-service/guaranteed-vehicle-accessibility (s/gen ::t-service/guaranteed-vehicle-accessibility)
-   ::t-service/limited-accessibility-tool (s/gen ::t-service/accessibility-tool)
-   ::t-service/limited-accessibility-description generators/gen-localized-text-array
-   ::t-service/limited-transportable-aid (s/gen ::t-service/limited-transportable-aid)
-   ::t-service/limited-info-service-accessibility (s/gen ::t-service/limited-info-service-accessibility)
-   ::t-service/limited-vehicle-accessibility (s/gen ::t-service/limited-vehicle-accessibility)
-   ::t-service/additional-services (s/gen ::t-service/additional-services)
-   ::t-service/price-classes generators/gen-price-class-array
-   ::t-service/booking-service generators/gen-service-link
-   ::t-service/payment-methods (s/gen ::t-service/payment-methods)
-   ::t-service/real-time-information generators/gen-service-link
-   ::t-service/service-hours generators/gen-service-hours-array
-   ::t-service/service-exceptions (gen/return []) ;; FIXME: generate these
-   ::t-service/luggage-restrictions generators/gen-localized-text-array
-   ::t-service/pricing generators/gen-service-link
-   ::t-service/payment-method-description generators/gen-localized-text-array
-   ::t-service/service-hours-info generators/gen-localized-text-array
-   ))
-
-(def gen-passenger-transportation-service
-  (gen/hash-map
-   ::t-service/transport-operator-id (gen/return 1)
-   ::t-service/type (gen/return :passenger-transportation)
-   ::t-service/passenger-transportation gen-passenger-transportation
-   ::t-service/contact-address generators/gen-address
-   ::t-service/contact-phone (s/gen ::t-service/contact-phone)
-   ::t-service/brokerage? (s/gen boolean?)))
-
-
-(def gen-terminal_information
-  (gen/hash-map
-    ::t-service/service-hours generators/gen-service-hours-array
-    ::t-service/indoor-map generators/gen-service-link
-    ))
-
-(def gen-terminal-service
-  (gen/hash-map
-    ::t-service/transport-operator-id (gen/return 1)
-    ::t-service/type (gen/return :terminal)
-    ::t-service/terminal gen-terminal_information
-    ::t-service/contact-address generators/gen-address
-    ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
 
 ;; We have a single transport service inserted in the test data,
 ;; check that its information is fetched ok
@@ -160,7 +113,7 @@
 (defspec save-and-fetch-generated-passenger-transport-service
   50
   (prop/for-all
-   [transport-service gen-passenger-transportation-service]
+   [transport-service s-generators/gen-passenger-transportation-service]
 
    (let [response (http-post "admin" "transport-service"
                              transport-service)
@@ -175,18 +128,18 @@
            (::t-service/passenger-transportation service)
            (::t-service/passenger-transportation fetched))))))
 
-(deftest save-terminal-to-wrong-operator
-  (let [terminal-service (gen/generate gen-terminal-service)
-        response (http-post "admin" "transport-service"
-                            terminal-service)
+(deftest save-terminal-service-to-wrong-operator
+  (let [generated-terminal-service (gen/generate s-generators/gen-terminal-service)
+        modified-terminal-service (assoc generated-terminal-service ::t-service/transport-operator-id 2)
+        response (http-post "normaluser" "transport-service" modified-terminal-service)
         service (:transit response)
         ;; GET generated service from server
-        fetch-response (http-get "admin"
-                                 (str "transport-service/" (::t-service/id service)))
-        fetched (:transit fetch-response)
-        ;; Change id from 1 -> 2
-        modified-operator (assoc fetched ::t-service/transport-operator-id 2)]
+        terminal-service (http-get "normaluser" (str "transport-service/" (::t-service/id service)))
+        fetched (:transit terminal-service)
+        ;; Change operator id from 2 -> 1 - which will cause error
+        problematic-terminal-service (assoc fetched ::t-service/transport-operator-id 1)]
 
+    ;; Gives error, because user doesn't have access rights to operator 1
     (is (thrown-with-msg?
-         clojure.lang.ExceptionInfo #"status 403"
-         (http-post "admin" "transport-service" modified-operator)))))
+          clojure.lang.ExceptionInfo #"status 403"
+          (http-post "normaluser" "transport-service" problematic-terminal-service)))))

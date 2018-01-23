@@ -61,7 +61,7 @@
                 where
                 {::specql/order-by ::t-service/type ::specql/order-direction :desc}))
 
-(defn- get-transport-service
+(defn get-transport-service
   "Get single transport service by id"
   [db id]
   (-> db
@@ -75,7 +75,7 @@
       (assoc ::t-service/operation-area
              (places/fetch-transport-service-operation-area db id))))
 
-(defn- delete-transport-service!
+(defn delete-transport-service!
   "Delete single transport service by id"
   [nap-config db user id]
 

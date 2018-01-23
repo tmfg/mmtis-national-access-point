@@ -368,7 +368,7 @@
                 :edit-service [t-service/edit-service-by-id e! app]
                 :new-service [t-service/edit-new-service e! app]
 
-                :services [service-search/service-search e! (:service-search app)]
+                :services [service-search/service-search e! app (:service-search app)]
 
                 :admin [admin/admin-panel e! app]
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
