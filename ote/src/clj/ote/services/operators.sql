@@ -1,7 +1,7 @@
 -- name: fetch-operator-service-counts
 SELECT t."transport-operator-id" as id, COUNT(t.id) AS services
   FROM "transport-service" t
- WHERE t."transport-service-id" IN (:operators) AND
+ WHERE t."transport-operator-id" IN (:operators) AND
        t."published?" = TRUE
 GROUP BY t."transport-operator-id"
 
