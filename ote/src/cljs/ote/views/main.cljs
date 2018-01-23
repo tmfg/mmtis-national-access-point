@@ -369,7 +369,8 @@
                 :edit-service [t-service/edit-service-by-id e! app]
                 :new-service [t-service/edit-new-service e! app]
 
-                :services [service-search/service-search e! (:service-search app)]
+                :services [service-search/service-search
+                           e! (:service-search app) (:params app)]
 
                 :admin [admin/admin-panel e! app]
 
