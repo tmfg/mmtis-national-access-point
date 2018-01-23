@@ -53,9 +53,11 @@
     [:style {:id "_stylefy-constant-styles_"} ""]
     [:style {:id "_stylefy-styles_"}]]
 
-   [:body {:onload "ote.main.main();"
-           :data-language localization/*language*
-           :data-anti-csrf-token anti-forgery/*anti-forgery-token*}
+   [:body (merge
+           {:onload "ote.main.main();"
+            :data-language localization/*language*}
+           (when (bound? #'anti-forgery/*anti-forgery-token*)
+             {:data-anti-csrf-token anti-forgery/*anti-forgery-token*}))
     [:div#oteapp]
     (when dev-mode?
       [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
