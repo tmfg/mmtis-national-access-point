@@ -60,10 +60,11 @@
        [:div (tr [:operators :no-results])]
 
        [:div
-        (tr [:operators (if (str/blank? (:filter operators))
-                          :result-count-all
-                          :result-count)]
-            {:total-count (:total-count operators)})
+        (when-not (:loading? operators)
+          (tr [:operators (if (str/blank? (:filter operators))
+                            :result-count-all
+                            :result-count)]
+              {:total-count (:total-count operators)}))
         [operators-list e! (:results operators)]
         (when (> (:total-count operators) (count (:results operators)))
           (if (:loading? operators)
