@@ -113,16 +113,22 @@
       [external-interface-links e! service]]]))
 
 (defn results-listing [e! {:keys [results empty-filters? total-service-count
-                                  filter-service-count fetching-more?]}]
+                                  filter-service-count fetching-more?]} operator]
   [:div.col-xs-12.col-md-12.col-lg-12
    [:p
-    (tr [:service-search (if empty-filters?
-                           :showing-latest-services
-                           (case filter-service-count
-                             0 :no-results
-                             1 :one-result
-                             :many-results))]
-        {:count filter-service-count})
+    (if operator
+      (tr (if (zero? filter-service-count)
+            [:service-search :operator-no-services]
+            [:service-search :operator-services])
+          {:name (::t-service/operator-name (first results))
+           :count filter-service-count})
+      (tr [:service-search (if empty-filters?
+                             :showing-latest-services
+                             (case filter-service-count
+                               0 :no-results
+                               1 :one-result
+                               :many-results))]
+          {:count filter-service-count}))
     " "
     (tr [:service-search :total-services] {:total-service-count total-service-count})]
    (doall
@@ -169,30 +175,40 @@
          :auto-width? true})]
       filters]]))
 
-(defn service-search [e! _]
-  (e! (ss/->InitServiceSearch))
-  (fn [e! {results :results
-           total-service-count :total-service-count
-           empty-filters? :empty-filters?
-           resource :resource
-           geojson :geojson
-           loading-geojson? :loading-geojson?
-           :as service-search}]
-    [:div.service-search
-     (when (or geojson loading-geojson?)
-       [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
-                   :open true
-                   :modal false
-                   :auto-scroll-body-content true
-                   :on-request-close #(e! (ss/->CloseServiceGeoJSON))
-                   :actions [(r/as-element
-                              [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
-                                               :primary true}
-                               (tr [:buttons :close])])]}
-        [ckan-service-viewer/viewer e! {:resource resource
-                                        :geojson geojson
-                                        :loading? loading-geojson?}]])
-     [filters-form e! service-search]
-     (if (nil? results)
-       [:div (tr [:service-search :no-filters])]
-       [results-listing e! service-search])]))
+(defn service-search [e! _ {op :operator}]
+  (let [operator (atom op)]
+    (e! (ss/->InitServiceSearch))
+    (r/create-class
+     {:component-will-receive-props
+      (fn [_ [_ _ _ {op :operator}]]
+        (when (not= op @operator)
+          (reset! operator op)
+          (e! (ss/->InitServiceSearch))))
+      :reagent-render
+      (fn [e! {results :results
+               total-service-count :total-service-count
+               empty-filters? :empty-filters?
+               resource :resource
+               geojson :geojson
+               loading-geojson? :loading-geojson?
+               :as service-search}
+           params]
+        [:div.service-search
+         (when (or geojson loading-geojson?)
+           [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
+                       :open true
+                       :modal false
+                       :auto-scroll-body-content true
+                       :on-request-close #(e! (ss/->CloseServiceGeoJSON))
+                       :actions [(r/as-element
+                                  [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
+                                                   :primary true}
+                                   (tr [:buttons :close])])]}
+            [ckan-service-viewer/viewer e! {:resource resource
+                                            :geojson geojson
+                                            :loading? loading-geojson?}]])
+         (when-not (:operator params)
+           [filters-form e! service-search])
+         (if (nil? results)
+           [:div (tr [:service-search :no-filters])]
+           [results-listing e! service-search (:operator params)])])})))

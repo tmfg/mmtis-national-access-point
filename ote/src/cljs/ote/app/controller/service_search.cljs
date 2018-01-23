@@ -35,7 +35,9 @@
 (defn- search
   ([app append?] (search app append? 500))
   ([{service-search :service-search :as app} append? timeout-ms]
-   (let [params (search-params (:filters service-search))
+   (let [params (if-let [operator (get-in app [:params :operator])]
+                  {:operators operator}
+                  (search-params (:filters service-search)))
          on-success (tuck/send-async! ->SearchResponse params append?)]
      ;; Clear old timeout, if any
      (when-let [search-timeout (:search-timeout service-search)]
