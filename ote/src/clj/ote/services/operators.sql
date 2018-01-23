@@ -1,9 +1,9 @@
 -- name: fetch-operator-service-counts
-SELECT o.id, COUNT(t.id) AS services
-  FROM "transport-operator" o
-       JOIN "transport-service" t ON t."transport-operator-id" = o.id
- WHERE o.id IN (:operators)
-GROUP BY o.id
+SELECT t."transport-operator-id" as id, COUNT(t.id) AS services
+  FROM "transport-service" t
+ WHERE t."transport-service-id" IN (:operators) AND
+       t."published?" = TRUE
+GROUP BY t."transport-operator-id"
 
 -- name: count-matching-operators
 -- single?: true
