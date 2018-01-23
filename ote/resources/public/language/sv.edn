@@ -76,6 +76,7 @@
    :ote.db.transport-service/license "Licens/användarvillkor"
    :ote.db.transport-service/license-url "Beskrivning av licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
+   :ote.db.transport-service/service-hours-info "Tilläggsinfo"
    }
 
   ;; Service exception
@@ -386,6 +387,7 @@
    :step-free-access "Inga trappsteg"
    :accessible-vehicle "Fordon utan hinder (esteetön)"
    :suitable-for-wheelchairs "Lämplig för rullstol"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Assistans vid ombordstigning"
    :assistance-dog-space "Plats för assistenshund"
    :disability-adapted-vehicle "Fordon lämpat för rörelsehindrade"}

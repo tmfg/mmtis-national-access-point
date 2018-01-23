@@ -234,7 +234,7 @@
   [e! {published? ::t-service/published? :as data} schemas]
   (let [name-missing? (str/blank? (::t-service/name data))]
     [:div.row
-     (when (not (empty? (:ote.ui.form/missing-required-fields data)))
+     (when (not (form/can-save? data))
        [ui/card {:style {:margin-bottom "1em"}}
         [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
@@ -325,7 +325,14 @@
                       :type :date-picker
                       :label (tr* :to-date)}]
       :delete? true
-      :add-label (tr [:buttons :add-new-service-exception])})))
+      :add-label (tr [:buttons :add-new-service-exception])}
+
+     {:name ::t-service/service-hours-info
+      :label (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
+      :type :localized-text
+      :is-empty? validation/empty-localized-text?
+      :full-width? true
+      :container-class "col-xs-12"})))
 
 (defn name-group [label]
   (form/group

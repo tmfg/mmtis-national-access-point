@@ -69,13 +69,14 @@
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Muoto"
-   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat yritykset"
+   :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/companies-csv-url "Yrityslistan osoite"
    :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
    :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
+   :ote.db.transport-service/service-hours-info "Lisätiedot"
    }
 
   ;; Service exception
@@ -388,6 +389,7 @@
    :step-free-access "Portaaton pääsy"
    :accessible-vehicle "Esteetön kulkuneuvo"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
+   :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"
    :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"

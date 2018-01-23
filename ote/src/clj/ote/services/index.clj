@@ -35,9 +35,12 @@
 (defn index-page [dev-mode?]
   [:html
    [:head
+
     (for [f favicons]
       [:link f])
     [:meta {:name "theme-color" :content "#ffffff"}]
+    [:meta {:name "viewport"
+            :content "width=device-width, initial-scale=1.0"}]
     [:title "FINAP"]
     (for [{:keys [href integrity]} stylesheets]
       [:link (merge {:rel "stylesheet"
