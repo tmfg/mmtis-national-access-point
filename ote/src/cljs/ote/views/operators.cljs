@@ -18,7 +18,8 @@
   [:div
    (doall
     (for [{::t-operator/keys [id name business-id homepage email
-                              phone gsm visiting-address service-count]} operators]
+                              phone gsm visiting-address service-count
+                              ckan-group]} operators]
       ^{:key id}
       [ui/paper {:z-depth 1
                  :style style-service-search/result-card}
@@ -35,7 +36,8 @@
          (when homepage [common/linkify homepage homepage {:target "_blank"}])
 
          [ic/action-home {:style style-service-search/contact-icon}]
-         (service-search/format-address visiting-address)
+         (when-not (every? str/blank? (vals visiting-address))
+           (service-search/format-address visiting-address))
 
          [ic/communication-phone {:style style-service-search/contact-icon}]
          phone
@@ -44,7 +46,10 @@
          (when (not= gsm phone) gsm) ; only show if different number than phone
 
          [ic/communication-email {:style style-service-search/contact-icon}]
-         email]]]))])
+         email]
+
+        [:div.description
+         (::t-operator/description ckan-group)]]]))])
 
 (defn operators [e! _]
   (e! (operators-controller/->Init))
