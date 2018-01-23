@@ -8,6 +8,7 @@
             [ote.nap.users :as nap-users]
             [specql.core :as specql]
             [ote.db.auditlog :as auditlog]
+            [ote.db.transport-service :as t-service]
             [ote.services.transport :as transport]))
 
 (defn- require-admin-user [route user]
@@ -25,18 +26,18 @@
                             :name (str "%" query "%")}))
 
 (defn- admin-delete-transport-service!
-  "Allow admin delete single transport service by id"
+  "Allow admin to delete single transport service by id"
   [nap-config db user id]
-  (let [return (transport/delete-transport-service! nap-config db user id)
+  (let [deleted-service (transport/get-transport-service db id)
+        return (transport/delete-transport-service! nap-config db user id)
         auditlog {::auditlog/event-type :delete-service
                   ::auditlog/event-attributes
-                                      [{::auditlog/name "transport-service-id", ::auditlog/value (str id)}]
+                                      [{::auditlog/name "transport-service-id", ::auditlog/value (str id)},
+                                       {::auditlog/name "transport-service-name", ::auditlog/value (::t-service/name deleted-service)}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in user [:user :id])}]
     (upsert! db ::auditlog/auditlog auditlog)
     return))
-
-
 
 (defn- admin-routes [db http nap-config]
   (routes

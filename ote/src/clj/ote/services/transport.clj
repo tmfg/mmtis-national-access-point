@@ -61,7 +61,7 @@
                 where
                 {::specql/order-by ::t-service/type ::specql/order-direction :desc}))
 
-(defn- get-transport-service
+(defn get-transport-service
   "Get single transport service by id"
   [db id]
   (-> db
