@@ -16,6 +16,7 @@
     ["/new-service" :transport-service]
     ["/edit-service/:id" :edit-service]
     ["/services" :services]
+    ["/services/:operator" :services]
     ["/operators" :operators]
 
     ["/admin" :admin]
