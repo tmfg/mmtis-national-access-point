@@ -1,5 +1,34 @@
 {% ckan_extends %}
 
+{% block links %}
+    {{ super() }}
+    {% block ga_tracking %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113014221-1"></script>
+        <script>
+            (function () {
+                var host = window.location.hostname;
+
+                window.dataLayer = window.dataLayer || [];
+
+                function gtag() {
+                    dataLayer.push(arguments);
+                }
+
+                gtag('js', new Date());
+
+                gtag('config', 'UA-113014221-1');
+
+                if (host === "localhost" || host.indexOf('testi') !== -1) {
+                    window['ga-disable-UA-113014221-1'] = true;
+                }
+            }())
+        </script>
+
+
+    {% endblock %}
+{% endblock %}
+
 {% block styles %}
     {{ super() }}
 
