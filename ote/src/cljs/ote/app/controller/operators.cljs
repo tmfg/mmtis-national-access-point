@@ -53,7 +53,6 @@
   (process-event [{response :response append? :append?} app]
     (let [results (:results response)
           total-count (:total-count response)]
-      (.log js/console "got: " (pr-str results))
       (update app :operators assoc
               :loading? false
               :results (if append?
