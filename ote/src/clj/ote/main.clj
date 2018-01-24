@@ -59,7 +59,7 @@
            [:db :http])
 
    :admin (component/using
-           (admin-service/->Admin)
+           (admin-service/->Admin (:nap config))
            [:db :http])
 
    :operators (component/using (operators-service/->Operators) [:db :http])))

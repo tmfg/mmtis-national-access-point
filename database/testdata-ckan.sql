@@ -80,3 +80,27 @@ WHERE revision.id = '7b7f56df-1c88-48b7-b807-6bcfaedb274a';
 INSERT INTO "public"."user"("id","name","apikey","created","about","openid","password","fullname","email","reset_key","sysadmin","activity_streams_email_notifications","state")
 VALUES
 (E'676a2532-b106-4329-b95e-e30c8c8265d5',E'normaluser',E'8eb7bf65-2a7b-45dd-a576-be10a02c3801',E'2018-01-17 11:46:11.658956',NULL,NULL,E'$pbkdf2-sha512$25000$UApBKOXcW6uVci4FQKiVcg$B4j1WY60oVyXvJHA9YRXIN8wKl8lD.Gzn802IwOLTuCgcIqbaaEQIJcqaIWr2ROf4XBtKdCTSCyroLhIMpFC9g',E'User Userson',E'user.userson@example.com',NULL,FALSE,FALSE,E'active');
+
+INSERT INTO "public"."revision"("id","timestamp","author","message","state","approved_timestamp")
+VALUES
+(E'8f1410fe-5a9d-4a96-be5a-3f8bc4273ff4',E'2018-01-23 08:38:51.32146',E'normaluser',E'REST API: Luo jäsenobjekti ',E'active',NULL);
+
+INSERT INTO "public"."revision"("id","timestamp","author","message","state","approved_timestamp")
+VALUES
+(E'9d7176c9-df56-492d-b243-f4ca762d014f',E'2018-01-23 08:38:51.286964',E'normaluser',E'REST API: Luo objekti transport-operator-2',E'active',NULL);
+
+INSERT INTO "public"."group"("id","name","title","description","created","state","revision_id","type","approval_status","image_url","is_organization")
+VALUES
+(E'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4',E'transport-operator-2',E'Normaali yritys Oy',E'',E'2018-01-23 08:26:55.597997',E'active',E'9d7176c9-df56-492d-b243-f4ca762d014f',E'organization',E'approved',E'',TRUE);
+
+INSERT INTO "public"."group_revision"("id","name","title","description","created","state","revision_id","continuity_id","expired_id","revision_timestamp","expired_timestamp","current","type","approval_status","image_url","is_organization")
+VALUES
+(E'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4',E'transport-operator-2',E'Terminaali Oy',E'',E'2018-01-23 08:38:51.300609',E'active',E'9d7176c9-df56-492d-b243-f4ca762d014f',E'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4',NULL,E'2018-01-23 08:38:51.286964',E'9999-12-31 00:00:00',NULL,E'organization',E'approved',E'',TRUE);
+
+INSERT INTO "public"."member"("id","table_id","group_id","state","revision_id","table_name","capacity")
+VALUES
+(E'76d4d130-5167-448c-9c6b-c8f897993383',E'676a2532-b106-4329-b95e-e30c8c8265d5',E'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4',E'active',E'9d7176c9-df56-492d-b243-f4ca762d014f',E'user',E'admin');
+
+INSERT INTO "public"."member_revision"("id","table_id","group_id","state","revision_id","continuity_id","expired_id","revision_timestamp","expired_timestamp","current","table_name","capacity")
+VALUES
+(E'76d4d130-5167-448c-9c6b-c8f897993383',E'676a2532-b106-4329-b95e-e30c8c8265d5',E'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4',E'active',E'9d7176c9-df56-492d-b243-f4ca762d014f',E'76d4d130-5167-448c-9c6b-c8f897993383',NULL,E'2018-01-23 08:38:51.32146',E'9999-12-31 00:00:00',NULL,E'user',E'admin');

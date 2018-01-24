@@ -16,7 +16,32 @@
             [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
             [clojure.string :as str]
-            [ote.views.ckan-service-viewer :as ckan-service-viewer]))
+            [ote.views.ckan-service-viewer :as ckan-service-viewer]
+            [ote.app.controller.admin :as admin]))
+
+(defn- delete-service-action [e! id name show-delete-modal?]
+  [:span
+   [ui/icon-button {:href "/ote/#/services" :on-click #(e! (admin/->DeleteTransportService id))}
+    [ic/action-delete]]
+   (when show-delete-modal?
+     [ui/dialog
+      {:open true
+       :title (tr [:dialog :delete-transport-service :title])
+       :actions [(r/as-element
+                   [ui/flat-button
+                    {:label (tr [:buttons :cancel])
+                     :primary true
+                     :on-click #(e! (admin/->CancelDeleteTransportService id))}])
+                 (r/as-element
+                   [ui/raised-button
+                    {:label (tr [:buttons :delete])
+                     :icon (ic/action-delete-forever)
+                     :secondary true
+                     :primary true
+                     :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
+
+      (tr [:dialog :delete-transport-service :confirm] {:name name})])])
+
 
 (defn data-items [& icons-and-items]
   [:div (stylefy/use-style style/data-items)
@@ -78,10 +103,11 @@
                   (value-fn row)]))])
            external-interface-links))]]]])])
 
-(defn- result-card [e! {::t-service/keys [id name sub-type contact-address
-                                          operation-area-description contact-phone contact-email
-                                          operator-name ckan-resource-id transport-operator-id]
-                        :as service}]
+(defn- result-card [e! admin?
+                    {::t-service/keys [id name sub-type contact-address
+                                       operation-area-description contact-phone contact-email
+                                       operator-name ckan-resource-id transport-operator-id]
+                     :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])]
     [ui/paper {:z-depth 1
                :style style/result-card}
@@ -102,7 +128,12 @@
        contact-phone
 
        [ic/communication-email {:style style/contact-icon}]
-       contact-email]]
+       contact-email]
+
+      (when admin?
+        [:div {:style {:float "right"}}
+         [delete-service-action e! id name (get service :show-delete-modal?)]])]
+
      [:div.result-subtitle (stylefy/use-style style/subtitle)
       [:div (stylefy/use-style style/subtitle-operator-first)
        operator-name]
@@ -112,34 +143,37 @@
      [:div.result-interfaces
       [external-interface-links e! service]]]))
 
-(defn results-listing [e! {:keys [results empty-filters? total-service-count
-                                  filter-service-count fetching-more?]} operator]
-  [:div.col-xs-12.col-md-12.col-lg-12
-   [:p
-    (if operator
-      (tr (if (zero? filter-service-count)
-            [:service-search :operator-no-services]
-            [:service-search :operator-services])
-          {:name (::t-service/operator-name (first results))
-           :count filter-service-count})
-      (tr [:service-search (if empty-filters?
-                             :showing-latest-services
-                             (case filter-service-count
-                               0 :no-results
-                               1 :one-result
-                               :many-results))]
-          {:count filter-service-count}))
-    " "
-    (tr [:service-search :total-services] {:total-service-count total-service-count})]
-   (doall
-    (for [result results]
-      ^{:key (::t-service/id result)}
-      [result-card e! result]))
 
-   (if fetching-more?
-     [:span (tr [:service-search :fetching-more])]
-     (when (> filter-service-count (count results))
-       [scroll-sensor #(e! (ss/->FetchMore))]))])
+(defn results-listing [e! {service-search :service-search user :user :as app}]
+  (let [{:keys [results empty-filters? total-service-count
+                filter-service-count fetching-more?]} service-search
+        operator (:operator (:params app))]
+    [:div.col-xs-12.col-md-12.col-lg-12
+     [:p
+      (if operator
+        (tr (if (zero? filter-service-count)
+              [:service-search :operator-no-services]
+              [:service-search :operator-services])
+            {:name (::t-service/operator-name (first results))
+             :count filter-service-count})
+        (tr [:service-search (if empty-filters?
+                               :showing-latest-services
+                               (case filter-service-count
+                                 0 :no-results
+                                 1 :one-result
+                                 :many-results))]
+            {:count filter-service-count}))
+      " "
+      (tr [:service-search :total-services] {:total-service-count total-service-count})]
+     (doall
+      (for [result results]
+        ^{:key (::t-service/id result)}
+        [result-card e! (:admin? user) result]))
+
+     (if fetching-more?
+       [:span (tr [:service-search :fetching-more])]
+       (when (> filter-service-count (count results))
+         [scroll-sensor #(e! (ss/->FetchMore))]))]))
 
 (defn filters-form [e! {filters :filters
                         facets :facets
@@ -175,24 +209,25 @@
          :auto-width? true})]
       filters]]))
 
-(defn service-search [e! _ {op :operator}]
-  (let [operator (atom op)]
+(defn service-search [e! app]
+  (let [operator (atom (get-in app [:params :operator]))]
     (e! (ss/->InitServiceSearch))
     (r/create-class
      {:component-will-receive-props
-      (fn [_ [_ _ _ {op :operator}]]
+      (fn [_ [_ _ {{op :operator} :params}]]
         (when (not= op @operator)
           (reset! operator op)
           (e! (ss/->InitServiceSearch))))
       :reagent-render
-      (fn [e! {results :results
-               total-service-count :total-service-count
-               empty-filters? :empty-filters?
-               resource :resource
-               geojson :geojson
-               loading-geojson? :loading-geojson?
-               :as service-search}
-           params]
+      (fn [e! {{results :results
+                 total-service-count :total-service-count
+                 empty-filters? :empty-filters?
+                 resource :resource
+                 geojson :geojson
+                 loading-geojson? :loading-geojson?
+                :as service-search} :service-search
+               params :params
+               :as app}]
         [:div.service-search
          (when (or geojson loading-geojson?)
            [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
@@ -211,4 +246,4 @@
            [filters-form e! service-search])
          (if (nil? results)
            [:div (tr [:service-search :no-filters])]
-           [results-listing e! service-search (:operator params)])])})))
+           [results-listing e! app])])})))
