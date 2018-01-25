@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import boto3
+import urlparse
 
 """
 Required Lambda Environment Variables:
@@ -24,22 +25,26 @@ def terminate_instances(response_url):
 
 def lambda_handler(event, context):
     token = os.environ['slacktoken']
+
+    # We assume that API Gateway has mapped the urlencoded data from slack into event['body'], so we can parse it using urlparse.
+    data = dict(urlparse.parse_qsl(event['body']))
+
     # The user_name field is being phased out from Slack. Always identify users by the combination of their user_id and team_id.
-    user_id = event.get('user_id', None)
+    user_id = data.get('user_id', None)
     allowed = os.environ['allowed_users'].split(',')
 
     if not user_id in allowed:
         return {'text': 'You are not on the allowed user list.', 'response_type': 'ephemeral'}
     else:
         try:
-            if event.get('token') == token:
-                if event['command'] == '/napotedeploy':
-                    deploy(event.get('text', ''), event['response_url'])
+            if data.get('token') == token:
+                if data['command'] == '/napotedeploy':
+                    deploy(data.get('text', ''), data['response_url'])
 
-                    return {'text': 'Searching branch with query: ' + event.get('text', '') + '. Please wait...',
+                    return {'text': 'Searching branch with query: ' + data.get('text', '') + '. Please wait...',
                             'response_type': 'ephemeral'}
-                elif event['command'] == '/napoteterminate':
-                    terminate_instances(event['response_url'])
+                elif data['command'] == '/napoteterminate':
+                    terminate_instances(data['response_url'])
 
                     return {'text': 'Terminating running EC2 instances. Please wait...', 'response_type': 'ephemeral'}
                 else:
