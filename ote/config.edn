@@ -16,5 +16,5 @@
 
  :log {:level :debug}
  :ga {:tracking-code "UA-113014221-1"}
- :enabled-features "example-feature, " ;; add features to the string, split by "," to enable them in production
+ :enabled-features #{:example-feature} ;; add features to the set to enable them in production
  }
