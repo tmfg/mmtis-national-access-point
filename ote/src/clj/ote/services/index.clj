@@ -37,7 +37,7 @@
 (defn index-page [config]
   (let [dev-mode? (:dev-mode? config)
         ga-conf (:ga config)
-        flags (:flags config)
+        flags (:enabled-features config)
         ]
     [:html
      [:head
@@ -72,7 +72,7 @@
 
       [:body {:id           "main-body"
               :onload       "ote.main.main();"
-              :new-login    (str (:new-login flags))
+              :features     flags
               :data-language localization/*language*}
       [:div#oteapp]
       (when dev-mode?

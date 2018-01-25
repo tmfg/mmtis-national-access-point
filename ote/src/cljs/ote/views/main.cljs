@@ -166,7 +166,7 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        (if (flag-controller/should-use-new-login)
+        (if (flag-controller/use-in-production? "new-login")
         [linkify "#" (tr [:common-texts :navigation-login])
          (merge (stylefy/use-style
                   (if desktop? style-topnav/desktop-link style-topnav/link))

@@ -8,17 +8,24 @@
 
 (defn true-string? [s] (= s "true"))
 
+(defn in?
+  "Return true if coll contains element"
+  [coll elm]
+  (some #(= elm %) coll))
+
 (defn is-in-production []
   (let [page-url (-> (.-location js/window))]
     (if (or (s/includes? (str page-url) "testi") (s/includes? (str page-url) "localhost"))
       false
       true)))
 
-(defn should-use-new-login []
-  (let [new-login  (-> js/document
+(defn use-in-production?
+  "Check if given feature (f) is enabled in production"
+  [f]
+  (let [features  (str/split (-> js/document
                        (.getElementById "main-body")
-                       (.getAttribute "new-login"))]
+                       (.getAttribute "features")), ",")]
     ;; Check environment - if in production use config.edn value, if not, return true
     (if (is-in-production)
-      (true-string? new-login)
+      (in? features f)
       true)))
