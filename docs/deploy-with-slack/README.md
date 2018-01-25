@@ -1,6 +1,6 @@
 ## Deploy branches with Slack slash commands [WIP]
 
-For warm up, read the related blog post here: http://dev.solita.fi/2017/04/12/easy-test-deployments.html
+As a warm up, read the related blog post here: http://dev.solita.fi/2017/04/12/easy-test-deployments.html
 
 We are basing our implementation on this blog post, using a slightly different environment and adding some enhancements not mentioned there.
 This guide will contain all the steps, code and security policy settings required to build a similar level of automation as introduced in the related blog post.
@@ -45,6 +45,9 @@ Verification token is needed to verify that messages received by our Lambda func
 
 ## Setup your AWS environment
 
+It is better to get an isolated AWS environment or a limited aws user for this setup, so you do not mess up your
+main deployment environment accidentally. This is going to be a separated sandbox for your investigative testing needs.
+
 ### Lambda
 
 We are using AWS Lambda for handling our Slack Slash command queries and triggering actions on our EC2 instances.
@@ -59,7 +62,9 @@ First, go to the Functions view and click "Create function" and Author from scra
 Name your function and select Python 2.7 Runtime.
 In the Role section, click "Create a custom role". We will use this same role for each of our Lambda function for convenience.
 
+
 **Setup Lambda user role and security**
+
 Now you should be in the AWS role creation page.
 For "IAM Role", select "Create a new IAM Role". Lets name the role, for example "deploy_branch""
 Now, open View Policy Document and click Edit. Copy-paste the following policy snippet in the editor box.
@@ -159,16 +164,21 @@ Code: [deploy_async](aws-lambda-scripts/deploy_async.py)
 
 Create a new function as described above. You can now reuse the previously created role in the "Existing role"-selection.
 
-**Let's add some code**  
+
+**Let's add some code** 
+ 
 Copy the code from file: [slack_deployhook](aws-lambda-scripts/slack_deployhook.py), into the Function code editor and
 click "Save".
 
-**A word about Cloud Init**
+
+**A word about Cloud Init**  
+
 Our EC2 instance supports [cloud-init](https://cloud-init.io/). The cloud-init configuration script is in yml-format.
 We can pass the configuration as "UserData" string using the boto3-client to our EC2 instance. Cloud-init allows
 us to control our EC2 instance as one would control e.g. CircleCI build process. This level of control also facilitates
 the update process of the instance; we do not have to create a new AMI version each time we want to add some small update
 to the deployment steps.
+
 
 **A brief introduction to GitHub API**
 
@@ -181,7 +191,9 @@ Currently, we are utilizing the anonymous version of the GitHub API. One can sen
 This is more than enough for our development team. In case you need to increase your query limit, you can register for 
 an API key, and send up to 5000 queries per hour.
 
+
 **Settings**  
+
 Add a longer timeout for this function, about 5 minutes would be good.
 It might take some time for EC2 to boot up our instance (1-10 min), and we do not want to allow our Lambda function to
 timeout and restart.
@@ -191,7 +203,9 @@ Code: [terminate_instances](aws-lambda-scripts/terminate_instances.py)
 
 Create a new function as described above. You can now reuse the previously created role in the "Existing role"-selection.
 
+
 **Let's add some code**  
+
 Copy the code from file: [terminate_instances](aws-lambda-scripts/terminate_instances.py), into the Function code editor and
 click "Save".
 
@@ -200,7 +214,8 @@ or stopped instance. Ideally, we would like this function to run every evening, 
 the instances after use. You can also create another Slack Slash command, as is done in the slack_deployhook function, that
 terminates all the instances by command.
 
-**CloudWatch cron trigger*
+
+**CloudWatch cron trigger**
 
 We want to terminate all the instances at 19:00 GMT+2 every day after work hours. This is very simple process.  
 In the function editor, at the "Add triggers"-menu, click "CloudWatch Events". Then, select "Create a new rule" and name it.  
@@ -209,14 +224,34 @@ This defines an event that triggers each day at 17:00 UTC.
 Finally, click "Add".
 
 
-### API Gateway (TODO)
+### API Gateway
 
 We will create a custom API using API Gateway. This API will be our endpoint for Slack to send queries. It will also
-trigger our slack_deployhook Lambda function.
+trigger our ```slack_deployhook``` Lambda function. To start, go to the API Gateway dashboard. Now, let's create a freshly
+baked API!
 
-1. **Create API**
-1. **Add a new API resource**  
-1. **Add POST - Integration Request Body Mapping Template**
+1. In the menu click APIs and then "Create API".
+1. Name your API and click "Create API" in the bottom corner. Don't worry about Endpoint Type."
+1. Click Resources -> Actions and choose "Create Resource"
+1. Name your resource to e.g. "deploy" and click Create Resource in the bottom corner.
+1. Now, click your newly created /deploy resource and choose Actions -> "Create Method". Finally, select POST and click the tick-button.
+
+We have created an API endpoint that we will used by our Slack slash commands. Let's trigger our ```slack_deployhook```
+function with this endpoint.
+
+1. In /deploy - POST - Setup, select "Lambda Function" as Integration type".
+1. For Lambda Region, select whatever region you used when you created your Lambda functions.
+1. Write your function name, ```slack_deployhook```, in the Lambda Function textfield and click "Save".
+
+Slack sends all POST request in x-www-form-urlencoded form. We have to convert those into JSON, so we can pass them to our
+Lambda function. For this, we'll have to create a Body Mapping Template.
+
+1. Click /deploy -> Post.
+1. In /deploy - POST - Method Execution view, click "Integration Request".
+1. In "Body Mapping Templates", click "Never", for "Request body passthrough".
+1. Then, click "+ Add mapping template".
+1. Write "application/x-www-form-urlencoded" in the Content-Type section and click the tick-button.
+1. Now, click the "application/x-www-form-urlencoded"-link and copy the snippet below into the opening text area and save.
 
 Template for converting Slack request body from x-www-form-urlencoded to json:
 ```text
@@ -226,15 +261,24 @@ Template for converting Slack request body from x-www-form-urlencoded to json:
 ```
 
 Our Slack lambda function will receive an event with urlencoded data in "body"-attribute. This can be easily parsed
-with python code and converted into dict.
+with python code and converted into a dict.
+
+The final phase of API creation is to deploy it. After deploying, we get a public URL for our API.
+
+1. Click Actions -> Deploy API.
+1. In Deploy API dialog, select "prod" and click Deploy.
+1. Now you should be redirected in the Stages-view. Copy the "Invoke URL". This is the base URL of our API and it is 
+something like: https://<random-code>.execute-api.<region>.amazonaws.com/prod/<resource_path>
+1. In Stages-view, click "prod" -> / -> /deploy -> POST and copy the "Invoke URL". We'll need this for our Slack App.
+
+
+**Final touches**  
+Go to your Slack APP and edit your Slash Commands. Copy the URL above into the "Request URL"-textfields.
+
 
 More info: [AWS forum thread](https://forums.aws.amazon.com/thread.jspa?messageID=673012&tstart=0#673012)
            [Amazon API Gateway - Mapping Template Reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
 
-
-
-It is better to get an isolated AWS environment or a limited aws user for this setup, so you do not mess up your
-main deployment enviroment accidentally. This is going to be a separated sandbox for your investigative testing needs.
 
 ### EC2 (TODO)
 #### 1. Create a Key pair
