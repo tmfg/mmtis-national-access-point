@@ -13,6 +13,7 @@
 
 (def operator-listing-columns
   #{::t-operator/id ::t-operator/name
+    ::t-operator/business-id
     ::t-operator/homepage ::t-operator/email
     ::t-operator/phone ::t-operator/gsm
     ::t-operator/visiting-address
