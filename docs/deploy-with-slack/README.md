@@ -280,21 +280,84 @@ More info: [AWS forum thread](https://forums.aws.amazon.com/thread.jspa?messageI
            [Amazon API Gateway - Mapping Template Reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
 
 
-### EC2 (TODO)
+### EC2
+
+Phew, we have come a long way. We have setup CircleCI builds, created a custom Slack App, confgured an API Gateway and created
+A bunch of Lambda functions. Only one step left anymore, so bear with me for a moment.  
+We are using Amazon Elastic Compute Cloud, because it is very simple to launch and control new instances. Each time
+a deploy hook function is triggered we want to boot up a fresh Centos 7 instance with all dependencies installed.
+To begin, go to your EC2 Dashbord page.
+
+
 #### 1. Create a Key pair
+First, we'll have to create an SSH key pair. It will be used to connect to our launched instance in a secure manner.  
+
+1. In Network & Security meny, click Key Pairs.
+1. Click "Create Key Pair" and name it. Click Create, and wait for download dialog.
+1. Notice, that this is the only moment that you can download the .pem-file required for ssh-connection. Download the file
+and store it in a secure place. Never place it in a public repository! If you failed to download the file, delete the key pair
+and create a new one.
+
 #### 2. Launch a Centos 7 Instance
+Let's launch a bare-bones Centos 7 instance that we are going to use as a base for our AMI.
+
+1. In Instances-menu, click "Instances". Click, Launch Instance.
+1. You should now be in Instance Wizard page.
+1. In Step 1, click AWS Marketplace and search for CentOS 7. Find CentOS 7 (x86_64) - with Updates HVM and click Select-button.
+1. In the opening dialog click Continue.
+1. Leave all the settings in default values and click Review and Launch.
+1. In the opening dialog, select the key pair we created above, and click Launch Instances.
+
 #### 3. Setup and configure your instance
 First, take a look in this directory: [aws-ec2-ami-files](aws-ec2-ami-files/)
 
-TODO:
+You can use the provided bash-scripts to install dependencies in the instance and to configure postgres and nginx properly
+for our project. However, ```start-ote.sh```, ```setup-db.sh``` and```config.end``` are required. These files are 
+run by the cloud-init, as defined in the ```deploy_async``` Lambda function.
+
+You can connect to the instance by selecting the running instance in the Instances-view and by clicking Connect-button.
+Read the instructions in the opening dialog.
+
 #### 4. Create a new Amazon Machine Image (AMI) based on the instance
 
-TODO:
+Now that you have installed all the stuff needed in the instance, it is time to freeze it and create a new AMI.
 
-#### 5. Setup network security
-TODO:
-*
+1. In the Instances-view, click your running instance and then click Actions -> Image -> Create Image.
+1. Name and describe your image, and click "Create Image"-button.
+1. The image creation process will start and it will take a while, so you might want to grab a cup coffee.
+1. You can track the image status in Images-> AMIs view.
+1. Copy the AMI ID.
 
+
+**Setup network security**
+
+By default, we are launching each new instance in the "default" network security group.
+For convenience, we will edit the default group instead of creating a new one.
+
+1. Click Network & Security -> Security Groups.
+1. Find and select the "default"-group.
+1. Open Inboud-tab, and add the following rules, and click Save:
+  1. Type: HTTP, Source: Custom 0.0.0.0/0
+  1. Type: SSH, Source: Custom 0.0.0.0/0
+
+These rules allows us to connect to the running instance via SSH if debugging is needed. Also, we'll have to allow
+access to port 80 to serve the deployed app.
+
+**Final touches**
+
+Edit your ```deploy_async``` Lambda function and paste your AMI ID and Key pair name in the proper places here:
+```python
+...
+
+res = ec2.run_instances(ImageId='<your-ami-image-id>',
+                                InstanceType='t2.medium',
+                                UserData=script,
+                                KeyName='<your-ec2-keypair-name>',
+                                MinCount=1,
+                                MaxCount=1)                      
+...
+
+```
 
 
 
