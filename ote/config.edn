@@ -15,4 +15,6 @@
        :export-base-url "http://localhost:8080"}
 
  :log {:level :debug}
- :ga {:tracking-code "UA-113014221-1"}}
+ :ga {:tracking-code "UA-113014221-1"}
+ :flags {:new-login false} ;; set true if new feature is shown in production
+ }

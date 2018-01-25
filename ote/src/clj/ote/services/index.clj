@@ -34,9 +34,11 @@
    {:rel "mask-icon" :href "/ote/favicon/safari-pinned-tab.svg?v=E6jNQXq6yK" :color "#5bbad5"}
    {:rel "shortcut icon" :href "/ote/favicon/favicon.ico?v=E6jNQXq6yK"}])
 
-(defn index-page [dev-mode?]
-  (let [config (read-string (slurp "config.edn"))
-        ga-conf (:ga config)]
+(defn index-page [config]
+  (let [dev-mode? (:dev-mode? config)
+        ga-conf (:ga config)
+        flags (:flags config)
+        ]
     [:html
      [:head
 
@@ -68,8 +70,10 @@
             window['ga-disable-" (:tracking-code ga-conf) "'] = true;
           }")))
 
-      [:body {:onload        "ote.main.main();"
-             :data-language localization/*language*}
+      [:body {:id           "main-body"
+              :onload       "ote.main.main();"
+              :new-login    (str (:new-login flags))
+              :data-language localization/*language*}
       [:div#oteapp]
       (when dev-mode?
         [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
