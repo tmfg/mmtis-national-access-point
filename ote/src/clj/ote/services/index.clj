@@ -7,7 +7,8 @@
             [ote.localization :as localization :refer [tr]]
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
-            [ote.tools.git :refer [current-revision-sha]]))
+            [ote.tools.git :refer [current-revision-sha]]
+            [clojure.string :as s]))
 
 (def supported-languages #{"fi" "sv" "en"})
 (def default-language "fi")
@@ -55,12 +56,17 @@
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
       [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
-      (when (not dev-mode?)
+      (when dev-mode?
         (javascript-tag
-          (str "window.dataLayer = window.dataLayer || [];
+          (str "var host = window.location.hostname;
+          window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config','" (:tracking-code ga-conf) "');")))
+          gtag('config','" (:tracking-code ga-conf) "');
+
+          if (host === 'localhost' || host.indexOf('testi') !== -1) {
+            window['ga-disable-" (:tracking-code ga-conf) "'] = true;
+          }")))
 
       [:body {:onload        "ote.main.main();"
              :data-language localization/*language*}
