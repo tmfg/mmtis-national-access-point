@@ -611,7 +611,10 @@
  {:title "Palveluntuottajat"
   :filter "Hae nimellä tai nimen osalla"
   :loading "Haetaan palveluntuottajia..."
-  :result-service-count [:service-count " palvelua"]
+  :result-service-count-single "1 julkaistu palvelu"
+  :result-service-count [:service-count " julkaistua palvelua"]
+  :result-no-services "Ei julkaistuja palveluita"
+  :description-read-more "Lue koko kuvaus"
   :no-results "Hakuehdoilla ei löytynyt palveluntuottajia"
   :result-count ["Hakuehdoilla löytyi " :total-count " palveluntuottajaa"]
   :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
@@ -775,9 +778,9 @@
   :text-search "Haku"
   :text-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
-  :no-results "Hakuehdoilla ei löytynyt palveluita"
-  :one-result "Hakuehdoilla löytyi yksi palvelu"
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :no-results "Hakuehdoilla ei löytynyt palveluita."
+  :one-result "Hakuehdoilla löytyi yksi palvelu."
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua."]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."

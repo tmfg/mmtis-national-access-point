@@ -609,7 +609,10 @@
  {:title "Transport operators"
   :filter "Search by name"
   :loading "Fetching transport operators..."
+  :result-service-count-single "one service"
   :result-service-count [:service-count " services"]
+  :result-no-services "No published services."
+  :description-read-more "See more."
   :no-results "No transport operators found for search term"
   :result-count ["Found " :total-count " transport operators with search term"]
   :result-count-all ["Total " :total-count " transport operators"]}
