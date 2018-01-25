@@ -146,18 +146,30 @@
    (partial instance? #?(:clj org.postgresql.util.PGInterval
                          :cljs Interval)))
 
-;; Hook into specql to allow us to read/write the interval
-;; We do not support interval fields other than hours, minutes and seconds.
+#?(:clj (def interval-fields-regex #"(\d+(\.\d+)?) (\w+)"))
 #?(:clj
    (defmethod specql-composite/parse-value "interval" [_ string]
-     (let [[match h m s] (re-matches #"(\d+):(\d+):(\d+)" string)]
-       (or (cond
-             (nil? match) nil
-             (not= h "00") (->PGInterval (interval (Integer/parseInt h) :hours))
-             (not= m "00") (->PGInterval (interval (Integer/parseInt m) :minutes))
-             (not= s "00") (->PGInterval (interval (Double/parseDouble s) :seconds))
-             :default (->PGInterval (interval 0.0 :seconds)))
-           (throw (ex-info "Unsupported interval keyword" {:interval string}))))))
+     (merge
+      {:years 0 :months 0 :days 0 :hours 0 :minutes 0 :seconds 0.0}
+      (when-let [field-matches (re-seq interval-fields-regex string)]
+        (reduce (fn [interval [_ amount _ unit]]
+                  (assoc interval
+                         (case unit
+                           ("year" "years") :years
+                           ("mon" "mons") :months
+                           ("day" "days") :days
+                           "hours" :hours
+                           "mins" :minutes
+                           "secs" :seconds)
+                         (if (= unit "secs")
+                           (Double/parseDouble amount)
+                           (Integer/parseInt amount))))
+                {} field-matches))
+      (when-let [match (re-matches #".* (\d+):(\d+):(\d+)" string)]
+        (let [[_ h m s] match]
+          {:hours (Integer/parseInt h)
+           :minutes (Integer/parseInt m)
+           :seconds (Double/parseDouble s)})))))
 
 
 #?(:clj
