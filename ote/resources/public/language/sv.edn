@@ -573,6 +573,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :footer-made-width                          "Made with"
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
+  :time-unlimited "Obegränsad"
   :time-units {:minutes  "Minuter"
                :hours    "Timmar"
                :days     "Dagar"
