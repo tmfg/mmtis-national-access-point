@@ -1,4 +1,4 @@
-## Deploy branches with Slack slash commands [WIP]
+## Deploy branches with Slack slash commands
 
 As a warm up, read the related blog post here: http://dev.solita.fi/2017/04/12/easy-test-deployments.html
 
@@ -21,12 +21,53 @@ managing AWS user permissions with security groups, roles and custom policies, C
 
 
 
-## Setup automatic builds per branch (for CircleCI) (TODO)
+## Setup automatic builds per branch (for CircleCI)
 Refer to: [.circleci](../../.circleci)
 
-1. **Create an S3 bucket for your build artifacts**  
-1. **Create a circle-ci aws user and config user security**  
-1. **Config a build and S3 deploy task**  
+We are using CircleCI for building and testing our feature branches, and we are running our staging and production builds separately in Jenkins.  
+The main idea here is to create a new build for each commit pushed in a feature branch and send the needed build artifacts
+to somewhere easily accessible storage, such as AWS S3.
+
+In short you could:
+
+1. Create an own S3 bucket for your build artifacts.
+1. Create a separate circle-ci aws user and config user security
+    1. Allow circle-ci user only to push new artifacts into a predefined bucket. You can use a security policy, such as:
+    ```json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:PutObject"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::napote-circleci/build-artifacts/*"
+                ]
+            }
+        ]
+    }
+    ```
+    This allows CircleCI AWS user to puy new artifacts only into build-artifacts directory in napote-circleci bucket.
+    
+1. Config a build and S3 deploy task
+
+    If using S3, this is quite straightforward. We are using the AWS client for simplicity.
+    
+    The following snippet is from: [config.yml](../../.circleci/config.yml)
+    ```yml
+    - run:
+      name: Deploy build artifacts
+      command: |
+        mkdir deploy
+        ln /tmp/ote/ote.jar deploy/ote-${CIRCLE_BRANCH}.jar
+        pg_dump -h localhost -p 5432 -U postgres -Z 1 napotetest > deploy/ote-${CIRCLE_BRANCH}-pgdump.gz
+        aws s3 cp deploy s3://napote-circleci/build-artifacts --recursive
+    ```
+    
+    We have created a custom CircleCI docker image that included all the dependencies needed for our build tasks.  
+    You can check it out at [Docker Hub](https://hub.docker.com/r/solita/napote-circleci/) or in this [repo](../../.circleci/Dockerfile).
 
 ## Create a custom Slack App
 https://api.slack.com/apps
