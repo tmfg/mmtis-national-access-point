@@ -127,7 +127,7 @@
     :columns 3}
 
     (form/info (tr [:form-help :companies-main-info]))
-    (form/info-with-link (tr [:form-help :csv-info]) "/ote/csv/valitettavat-yritykset-esimerkki.csv" (tr [:form-help :csv-file-example]))
+    (form/info-with-link (tr [:form-help :csv-info]) "/ote/csv/palveluyritykset.csv" (tr [:form-help :csv-file-example]))
 
     {:name ::t-service/companies-csv-url
     :full-width?  true
