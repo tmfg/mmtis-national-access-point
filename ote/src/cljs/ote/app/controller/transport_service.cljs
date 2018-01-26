@@ -105,6 +105,9 @@
                             (if-let [exceptions (::t-service/service-exceptions hours-and-exceptions)]
                               (assoc loc ::t-service/service-exceptions exceptions)
                               loc)
+                            (if-let [info (::t-service/service-hours-info hours-and-exceptions)]
+                              (assoc loc ::t-service/service-hours-info info)
+                              loc)
                             (dissoc loc ::t-service/service-hours-and-exceptions)))
                         pick-up-locations)))
       (update-in [::t-service/rentals ::t-service/vehicle-classes]
@@ -130,11 +133,13 @@
                  (fn [pick-up-locations]
                    (mapv (fn [{hours ::t-service/service-hours
                                exceptions ::t-service/service-exceptions
+                               info ::t-service/service-hours-info
                                :as pick-up-location}]
                            (-> pick-up-location
                                (assoc ::t-service/service-hours-and-exceptions
                                       {::t-service/service-hours hours
-                                       ::t-service/service-exceptions exceptions})
+                                       ::t-service/service-exceptions exceptions
+                                       ::t-service/service-hours-info info})
                                (dissoc ::t-service/service-hours
                                        ::t-service/service-exceptions)))
                          pick-up-locations)))
