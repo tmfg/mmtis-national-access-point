@@ -19,6 +19,7 @@ checkouts/
 .lein-repl-history
 figwheel_server.log
 ote.log
+ote.log*
 
 
 ### Intellij ###

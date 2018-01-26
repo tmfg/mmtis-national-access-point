@@ -3,10 +3,12 @@
   (:require [ote.components.http :as http]
             [compojure.core :refer [routes GET]]
             [hiccup.core :refer [html]]
+            [hiccup.element :refer [javascript-tag]]
             [ote.localization :as localization :refer [tr]]
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
-            [ote.tools.git :refer [current-revision-sha]]))
+            [ote.tools.git :refer [current-revision-sha]]
+            [clojure.string :as s]))
 
 (def supported-languages #{"fi" "sv" "en"})
 (def default-language "fi")
@@ -33,33 +35,47 @@
    {:rel "shortcut icon" :href "/ote/favicon/favicon.ico?v=E6jNQXq6yK"}])
 
 (defn index-page [dev-mode?]
-  [:html
-   [:head
+  (let [config (read-string (slurp "config.edn"))
+        ga-conf (:ga config)]
+    [:html
+     [:head
 
-    (for [f favicons]
-      [:link f])
-    [:meta {:name "theme-color" :content "#ffffff"}]
-    [:meta {:name "viewport"
-            :content "width=device-width, initial-scale=1.0"}]
-    [:title "FINAP"]
-    (for [{:keys [href integrity]} stylesheets]
-      [:link (merge {:rel "stylesheet"
-                     :href href}
-                    (when (str/starts-with? href "https://")
-                      {:crossorigin ""})
-                    (when integrity
-                      {:integrity integrity}))])
-    [:style {:id "_stylefy-constant-styles_"} ""]
-    [:style {:id "_stylefy-styles_"}]]
+      (for [f favicons]
+        [:link f])
+      [:meta {:name "theme-color" :content "#ffffff"}]
+      [:meta {:name    "viewport"
+              :content "width=device-width, initial-scale=1.0"}]
+      [:title "FINAP"]
+      (for [{:keys [href integrity]} stylesheets]
+        [:link (merge {:rel  "stylesheet"
+                       :href href}
+                      (when (str/starts-with? href "https://")
+                        {:crossorigin ""})
+                      (when integrity
+                        {:integrity integrity}))])
+      [:style {:id "_stylefy-constant-styles_"} ""]
+      [:style {:id "_stylefy-styles_"}]
+      [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
+      (when (not dev-mode?)
+        (javascript-tag
+          (str "var host = window.location.hostname;
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config','" (:tracking-code ga-conf) "');
 
-   [:body {:onload "ote.main.main();"
-           :data-language localization/*language*}
-    [:div#oteapp]
-    (when dev-mode?
-      [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
-    [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
+          if (host === 'localhost' || host.indexOf('testi') !== -1) {
+            window['ga-disable-" (:tracking-code ga-conf) "'] = true;
+          }")))
 
-    [:script {:type "text/javascript"} "goog.require('ote.main');"]]])
+      [:body {:onload        "ote.main.main();"
+             :data-language localization/*language*}
+      [:div#oteapp]
+      (when dev-mode?
+        [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
+      [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
+
+      [:script {:type "text/javascript"} "goog.require('ote.main');"]]]]))
 
 (defn index [dev-mode? accepted-languages]
   (let [lang (or (some supported-languages accepted-languages) default-language)]
