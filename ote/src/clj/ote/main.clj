@@ -58,7 +58,7 @@
            [:db :http])
 
    :admin (component/using
-           (admin-service/->Admin)
+           (admin-service/->Admin (:nap config))
            [:db :http])))
 
 (defn configure-logging [{:keys [level] :as log-config}]

@@ -14,4 +14,5 @@
  :nap {:api "http://localhost:8080/api/"
        :export-base-url "http://localhost:8080"}
 
- :log {:level :debug}}
+ :log {:level :debug}
+ :ga {:tracking-code "UA-113014221-1"}}
