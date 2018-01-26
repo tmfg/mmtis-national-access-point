@@ -75,6 +75,7 @@ https://api.slack.com/apps
 1. Create New App
 1. Name app and define workspace
 1. Active Incoming Webhooks
+    1. Copy the Webhook URL **Warning: Do not publish this url anywhere!**
 1. Add Slash Commands
     1. /napotedeploy
     1. /napoteterminate  
@@ -164,7 +165,7 @@ Click, "Create function".
 Copy the code from file: [slack_deployhook](aws-lambda-scripts/slack_deployhook.py), into the Function code editor and
 click "Save".
 
-Notice, that in the code we need to define slacktoken and allowed_users environment variables. 
+Notice, that in the code we need to define ```slacktoken``` and ```allowed_users``` environment variables. 
 
 ```python
 def lambda_handler(event, context):
@@ -255,6 +256,8 @@ or stopped instance. Ideally, we would like this function to run every evening, 
 the instances after use. You can also create another Slack Slash command, as is done in the slack_deployhook function, that
 terminates all the instances by command.
 
+Define ```slack_webhook``` environment variable. This is the Webhook URL of your Slack App.
+
 
 **CloudWatch cron trigger**
 
@@ -263,6 +266,10 @@ In the function editor, at the "Add triggers"-menu, click "CloudWatch Events". T
 For "Rule type", select Schedule expression and add ```cron(0 17 * * ? *)```.
 This defines an event that triggers each day at 17:00 UTC.  
 Finally, click "Add".
+
+**Settings**
+Add a longer timeout for this function, about 1 minutes should be fine.
+
 
 
 ### API Gateway
