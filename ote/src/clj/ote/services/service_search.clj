@@ -7,6 +7,7 @@
             [compojure.core :refer [routes GET]]
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.service-search :as search]
             [ote.db.common :as common]
             [ote.db.modification :as modification]
@@ -80,6 +81,15 @@
                        {::t-service/published? true
                         ::t-service/transport-operator-id (op/in operators)}))))
 
+(defn operator-completions
+  "Return a list of completions that match the given search term."
+  [db term]
+  (into []
+        (specql/fetch db ::t-operator/transport-operator
+                      #{::t-operator/name ::t-operator/id}
+                      {::t-operator/name (op/ilike (str "%" term "%"))}
+                      {::specql/order-by ::t-operator/name})))
+
 (defn- search [db {:keys [operation-area sub-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
@@ -110,11 +120,15 @@
 
 (defn- service-search-routes [db]
   (routes
-   (GET "/service-search/facets" []
+    (GET "/operator-completions/:term" [term]
+      (http/transit-response
+        (operator-completions db term)))
+
+    (GET "/service-search/facets" []
         (http/transit-response (search-facets db)))
 
    (GET "/service-search" {params :query-params}
-        (http/transit-response
+        (http/no-cache-transit-response ;; IE caches all responses too aggressively, so set caches off
          (search db
                  {:operation-area (some-> (params "operation_area")
                                           (str/split #","))

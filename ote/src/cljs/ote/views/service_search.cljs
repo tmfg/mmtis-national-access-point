@@ -17,7 +17,8 @@
             [stylefy.core :as stylefy]
             [clojure.string :as str]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
-            [ote.app.controller.admin :as admin]))
+            [ote.app.controller.admin :as admin]
+            [tuck.core :as tuck]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:span
@@ -175,11 +176,61 @@
        (when (> filter-service-count (count results))
          [scroll-sensor #(e! (ss/->FetchMore))]))]))
 
+(defn result-chips [e! results]
+  (r/create-class
+    {:component-did-mount ote.views.place-search/monkey-patch-chip-backspace
+     :component-did-update ote.views.place-search/monkey-patch-chip-backspace
+     :reagent-render
+     (fn [e! results]
+       [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
+        (for [{::t-operator/keys [name id] :as result} (map :operator results)]
+          ^{:key id}
+          [:span
+           [ui/chip {:ref id
+                     :style {:margin 4}
+
+                     ;; Toggle edit mode when clicking (for hand drawn geometries)
+                     :on-click #(.log js/console " ilmeisesti click")
+                     :on-request-delete #(.log js/console " koitettiin deletoida")}
+
+
+                     ;:on-request-delete #(e! (ps/->RemovePlaceById id))}
+            ]])])}))
+
+
+(defn- parse-operator-data-source [completions]
+  (.log js/console "parse-operator-data-source->completions" completions )
+  (apply array
+         (map (fn [{::t-operator/keys [id name]}]
+                #js {:text name
+                     :id id
+                     :value (r/as-element
+                              [ui/menu-item {:primary-text name}])})
+              completions)))
+
+(defn operator-search [e! results]
+  (.log js/console "operator-search " (clj->js operator-search))
+  [:div.place-search
+
+   [:div.col-xs-12.col-md-3
+   [result-chips e! results]
+
+   [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
+
+                       :filter (constantly true) ;; no filter, backend returns what we want
+                       :dataSource (parse-operator-data-source results )
+                       :on-update-input #(e! (ote.app.controller.service-search/->SetOperatorName %))
+                       :search-text (or (:name operator-search) "")
+                       :on-new-request #(e! (ote.app.controller.service-search/->AddOperator (aget % "id")))}]]
+   ])
+
 (defn filters-form [e! {filters :filters
                         facets :facets
+                        operators :operators
                         :as service-search}]
   (let [sub-type (tr-key [:enums ::t-service/sub-type]
-                         [:enums ::t-service/type])]
+                         [:enums ::t-service/type])
+        empty-operators? true]
     [:div
      [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
@@ -192,24 +243,52 @@
           :layout       :row
           :card-options {:style style-base/filters-form}}
 
-        {:name :text-search
+         {:name :text-search
          :type :string
          :placeholder (tr [:service-search :text-search-placeholder])}
 
-        {:name ::t-service/operation-area
+         {:name ::t-service/operation-area
          :type :multiselect-selection
          :show-option #(str (:text %) " (" (:count %) ")")
          :options (::t-service/operation-area facets)
          :auto-width? true}
 
-        {:name ::t-service/sub-type
+         {:name ::t-service/sub-type
          :type :multiselect-selection
          :show-option #(str (sub-type (:sub-type %)))
          :options (::t-service/sub-type facets)
-         :auto-width? true})]
+         :auto-width? true}
+
+         {:type      :component
+          :name      :operators
+          :is-empty? empty-operators?
+          :component (fn [{data :data}]
+                       [:span
+                        (.log js/console ":component data " (pr-str data))
+                        [operator-search
+                         (tuck/wrap-path e! :service-search :filters)
+                         (get data :results)]
+                        ]
+                       )}
+
+         #_ {:type      :component
+          :name      :operator-search
+          :is-empty? empty-operators?
+          :component (fn [{data :data}]
+                       [:span
+                        (.log js/console ":component data " (pr-str data))
+                        (.log js/console "wrap " (tuck/wrap-path e! :service-search))
+                        [operator-search
+                         (tuck/wrap-path e! :service-search)
+                         (get-in data [:service-search :operators])]
+                        ]
+                       )}
+
+         )]
       filters]]))
 
 (defn service-search [e! app]
+  (.log js/console "------------------ service-search --------------------")
   (let [operator (atom (get-in app [:params :operator]))]
     (e! (ss/->InitServiceSearch))
     (r/create-class

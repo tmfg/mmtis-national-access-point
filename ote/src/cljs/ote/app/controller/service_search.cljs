@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [clojure.string :as str]))
 
 
@@ -15,6 +16,10 @@
 (defrecord ShowServiceGeoJSON [url])
 (defrecord CloseServiceGeoJSON [])
 (defrecord GeoJSONFetched [response])
+(defrecord SetOperatorName [name])
+(defrecord OperatorCompletionsResponse [completions name])
+(defrecord AddOperator [id])
+(defrecord FetchOperatorResponse [response operator])
 
 (defn- search-params [{oa ::t-service/operation-area
                        text :text-search
@@ -54,6 +59,15 @@
 
 (def page-size 25)
 
+
+(defn- add-operator
+  "Return app with a new operator added."
+  [app operator]
+  (update-in app [:operator-search :results]
+             #(conj (or % [])
+                    {:operator operator})))
+
+
 (extend-protocol tuck/Event
 
   InitServiceSearch
@@ -86,6 +100,7 @@
 
   UpdateSearchFilters
   (process-event [{filters :filters} app]
+    (.log js/console " Tätä kutsutaan kun data muuttuu? " (clj->js filters))
     (-> app
         (update-in [:service-search :filters] merge
                    (assoc filters
@@ -128,4 +143,51 @@
     (update app :service-search assoc
             :resource response
             :geojson (clj->js response)
-            :loading-geojson? false)))
+            :loading-geojson? false))
+
+  SetOperatorName
+  (process-event [{name :name} app]
+    (.log js/console "Ssssssssssssssapp" (clj->js app))
+    (let [app (assoc-in app [:operators :name] name)]
+      (when (>= (count name) 2)
+        (comm/get! (str "operator-completions/" name)
+                   {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
+      app))
+
+  OperatorCompletionsResponse
+  (process-event [result app]
+    (.log js/console "OperatorCompletionsResponse " (pr-str result))
+    (.log js/console "OperatorCompletionsResponse " (pr-str name))
+    (.log js/console "OperatorCompletionsResponse app" (clj->js app))
+    (assoc-in app [:operators :results] (:completions result))
+    #_ (if-not (= name (get-in app [:service-search :operators :name]))
+      ;; Received stale completions (name is not what was searched for), ignore
+      app
+      (assoc-in app [:service-search :operators :completions]
+                (let [name-lower (str/lower-case name)]
+                  (sort-by #(str/index-of (str/lower-case (::t-operator/name %))
+                                          name-lower)
+                           completions)))))
+
+  AddOperator
+  (process-event [{id :id} app]
+    (.log js/console " AddOperator id " id)
+    (if (some #(= id (::t-operator/id (:operator %)))
+              (get-in app [:operator-search :results]))
+      ;; This name has already been added, don't do it again
+      app
+      (if-let [operator (some #(when (= id (::t-operator/id %)) %)
+                           (get-in app [:operator-search :completions]))]
+        (do
+          (comm/get! (str "transport-operator/" id)
+                     {:on-success (tuck/send-async! ->FetchOperatorResponse operator)})
+          (-> app
+              (assoc-in [:operator-search :name] "")
+              (assoc-in [:operator-search :completions] nil)))
+        app)))
+
+  FetchOperatorResponse
+  (process-event [{:keys [operator]} app]
+    (add-operator app operator))
+
+  )
