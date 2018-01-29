@@ -43,14 +43,11 @@
 
 (def transport-services-columns
   #{::t-service/id
+    ::t-service/transport-operator-id
     ::t-service/name
     ::t-service/type
     ::t-service/sub-type
     ::t-service/published?
-    ::t-service/passenger-transportation
-    ::t-service/terminal
-    ::t-service/rentals
-    ::t-service/parking
     ::modification/created
     ::modification/modified})
 
@@ -114,6 +111,16 @@
                    {::t-operator/name title
                     ::t-operator/ckan-group-id id}))))))
 
+
+(defn get-user-transport-operators-with-services [db groups user]
+  (let [operators (map #(ensure-transport-operator-for-group db %) groups)
+        operator-ids (into #{} (map ::t-operator/id) operators)
+        operator-services (get-transport-services db {::t-service/transport-operator-id (op/in operator-ids)})]
+    (map (fn [{id ::t-operator/id :as operator}]
+            {:transport-operator operator
+             :transport-service-vector (vec (filter #(= id (::t-service/transport-operator-id %)) operator-services))
+             :user (dissoc user :apikey :email :id)})
+          operators)))
 
 (defn get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
@@ -313,9 +320,7 @@
 
    (POST "/transport-operator/data" {user :user}
          (http/transit-response
-           (map
-             (fn [group] (get-transport-operator-data db group (:user user)))
-             (:groups user))))
+           (get-user-transport-operators-with-services db (:groups user) user)))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}

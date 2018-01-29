@@ -135,13 +135,14 @@
                 (second (get-in coordinate  [:coordinates  :coordinates]))]}]])
 
 (defn- completions [completions]
+  (let [sorted-completions  (sort-by ::places/namefin completions)]
   (apply array
          (map (fn [{::places/keys [id namefin type]}]
                 #js {:text namefin
                      :id id
                      :value (r/as-element
                              [ui/menu-item {:primary-text namefin}])})
-              completions)))
+              sorted-completions))))
 
 (defn place-search [e! place-search]
   (let [results (:results place-search)]
@@ -154,6 +155,7 @@
 
                         :filter (constantly true) ;; no filter, backend returns what we want
                         :dataSource (completions (:completions place-search))
+                        :maxSearchResults 12
                         :on-update-input #(e! (ps/->SetPlaceName %))
                         :search-text (or (:name place-search) "")
                         :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]]
