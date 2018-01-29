@@ -165,8 +165,8 @@
                            (Double/parseDouble amount)
                            (Integer/parseInt amount))))
                 {} field-matches))
-      (when-let [match (re-matches #".* (\d+):(\d+):(\d+)" string)]
-        (let [[_ h m s] match]
+      (when-let [match (re-matches #"(.* )?(\d+):(\d+):(\d+)" string)]
+        (let [[_ _ h m s] match]
           {:hours (Integer/parseInt h)
            :minutes (Integer/parseInt m)
            :seconds (Double/parseDouble s)})))))
