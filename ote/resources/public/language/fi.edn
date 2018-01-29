@@ -236,7 +236,7 @@
   :external-interfaces-end "Täytä tästä eteenpäin lomakkeen kaikki kohdat, jos et ole edellä lisännyt yhtään ulkoista rajapintaa. Mikäli lisäämäsi ulkoiset rajapinnat ovat tiedoiltaan vajavaisia, täytä loppuosa lomakkeesta soveltuvin osin, jotta palvelusi kaikki olennaiset tiedot tallentuvat koneluettavassa muodossa."
   :RAE-tool "Rae-työkalu"
   :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
-  :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.matka.fi/resources/palveluyritykset.csv)."
+  :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
   :csv-file-example "Katso tästä esimerkkitiedosto."
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
 
