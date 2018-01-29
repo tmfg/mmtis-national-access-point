@@ -374,7 +374,6 @@
 (def time-unit-order [:minutes :hours :days])
 
 (defn- normalize-interval [{:keys [minutes hours days]}]
-  (.log js/console "minutes: " minutes ", hours: " hours ", days: " days)
   (cond
     (and minutes (not= 0 minutes))
     [:minutes (+ minutes (* 60 (or hours 0)) (* 60 24 (or days 0)))]
