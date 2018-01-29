@@ -88,3 +88,8 @@
            (case service-type
              :passenger-transportation ::t-service/passenger-transportation
              :parking ::t-service/parking) type-specific)))
+
+(def gen-transport-service
+  (gen/frequency
+   [[50 (service-type-generator :passenger-transportation)]
+    [50 (service-type-generator :parking)]]))
