@@ -56,7 +56,7 @@
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
       [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
-      (when dev-mode?
+      (when (not dev-mode?)
         (javascript-tag
           (str "var host = window.location.hostname;
           window.dataLayer = window.dataLayer || [];
@@ -64,7 +64,7 @@
           gtag('js', new Date());
           gtag('config','" (:tracking-code ga-conf) "');
 
-          if (host === 'localhost' || host.indexOf('testi') !== -1) {
+          if (host === 'localhost' || host.indexOf('testi') !== -1) {
             window['ga-disable-" (:tracking-code ga-conf) "'] = true;
           }")))
 
