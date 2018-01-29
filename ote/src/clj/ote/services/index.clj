@@ -37,8 +37,7 @@
 (defn index-page [config]
   (let [dev-mode? (:dev-mode? config)
         ga-conf (:ga config)
-        flags (str/join "," (:enabled-features config))
-        ]
+        flags (str/join "," (map name (:enabled-features config)))]
     [:html
      [:head
 
