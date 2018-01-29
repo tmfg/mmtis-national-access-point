@@ -776,7 +776,7 @@
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
   :text-search "Haku"
-  :operators "Testikey"
+  :operators "Palveluntuottajat"
   :text-search-placeholder "Hae nimellä tai sen osalla"
   :operator-search "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
