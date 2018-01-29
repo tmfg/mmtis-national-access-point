@@ -149,27 +149,29 @@
 #?(:clj (def interval-fields-regex #"(\d+(\.\d+)?) (\w+)"))
 #?(:clj
    (defmethod specql-composite/parse-value "interval" [_ string]
-     (merge
-      {:years 0 :months 0 :days 0 :hours 0 :minutes 0 :seconds 0.0}
-      (when-let [field-matches (re-seq interval-fields-regex string)]
-        (reduce (fn [interval [_ amount _ unit]]
-                  (assoc interval
-                         (case unit
-                           ("year" "years") :years
-                           ("mon" "mons") :months
-                           ("day" "days") :days
-                           "hours" :hours
-                           "mins" :minutes
-                           "secs" :seconds)
-                         (if (= unit "secs")
-                           (Double/parseDouble amount)
-                           (Integer/parseInt amount))))
-                {} field-matches))
-      (when-let [match (re-matches #"(.* )?(\d+):(\d+):(\d+)" string)]
-        (let [[_ _ h m s] match]
-          {:hours (Integer/parseInt h)
-           :minutes (Integer/parseInt m)
-           :seconds (Double/parseDouble s)})))))
+     (->PGInterval
+      (map->Interval
+       (merge
+        {:years 0 :months 0 :days 0 :hours 0 :minutes 0 :seconds 0.0}
+        (when-let [field-matches (re-seq interval-fields-regex string)]
+          (reduce (fn [interval [_ amount _ unit]]
+                    (assoc interval
+                           (case unit
+                             ("year" "years") :years
+                             ("mon" "mons") :months
+                             ("day" "days") :days
+                             "hours" :hours
+                             "mins" :minutes
+                             "secs" :seconds)
+                           (if (= unit "secs")
+                             (Double/parseDouble amount)
+                             (Integer/parseInt amount))))
+                  {} field-matches))
+        (when-let [match (re-matches #"(.* )?(\d+):(\d+):(\d+)" string)]
+          (let [[_ _ h m s] match]
+            {:hours (Integer/parseInt h)
+             :minutes (Integer/parseInt m)
+             :seconds (Double/parseDouble s)})))))))
 
 
 #?(:clj
