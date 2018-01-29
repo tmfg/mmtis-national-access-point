@@ -369,12 +369,24 @@
       (or minutes-text (gstr/format "%02d" minutes)))]
 
    (when warning
-     [:div (stylefy/use-style style-base/error-element) warning])
-   ])
+     [:div (stylefy/use-style style-base/error-element) warning])])
+
+(def time-unit-order [:minutes :hours :days])
+
+(defn- normalize-interval [{:keys [minutes hours days]}]
+  (.log js/console "minutes: " minutes ", hours: " hours ", days: " days)
+  (cond
+    (and minutes (not= 0 minutes))
+    [:minutes (+ minutes (* 60 (or hours 0)) (* 60 24 (or days 0)))]
+
+    (and hours (not= 0 hours))
+    [:hours (+ hours (* 24 (or days 0)))]
+
+    days
+    [:days days]))
 
 (defmethod field :interval [{:keys [update! enabled-label] :as opts} data]
-  (let [[unit amount] (or (some (fn [[unit amount]]
-                                  (when (not (zero? amount)) [unit amount])) data) [:hours 0])]
+  (let [[unit amount] (or (normalize-interval data) [:hours 0])]
     [:div {:style {:width "100%" :padding-top "0.5em"}}
      [ui/toggle {:label enabled-label
                  :label-position "right"
@@ -390,7 +402,7 @@
                                  (update! (time/interval (or num 0) unit)))
                       :placeholder (tr [:common-texts :time-unlimited])
                       :type :number
-                      :style {:width 200}) (unit data)]
+                      :style {:width 200}) amount]
         [field (assoc opts
                       :update! (fn [unit]
                                  (update! (time/interval amount unit)))
