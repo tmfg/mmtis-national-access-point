@@ -177,25 +177,21 @@
          [scroll-sensor #(e! (ss/->FetchMore))]))]))
 
 (defn result-chips [e! chip-results]
-  (r/create-class
-    {:component-did-mount  ote.views.place-search/monkey-patch-chip-backspace
-     :component-did-update ote.views.place-search/monkey-patch-chip-backspace
-     :reagent-render
-                     (fn [e! chip-results]
-                       [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-                        (for [{::t-operator/keys [name id] :as result} chip-results]
-                          ^{:key (str "transport-operator-" id)}
-                          [:span
-                           [ui/chip {:ref               id
-                                     :style             {:margin 4}
-                                     :on-request-delete #(do
-                                                           (e! (ss/->RemoveOperatorById id))
-                                                           (e! (ss/->UpdateSearchFilters nil)))}
-                            name]])])}))
+  (fn [e! chip-results]
+    [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
+    (for [{::t-operator/keys [name id] :as result} chip-results]
+      ^{:key (str "transport-operator-" id)}
+      [:span
+       [ui/chip {:ref               id
+                 :style             {:margin 4}
+                 :on-request-delete #(do
+                                       (e! (ss/->RemoveOperatorById id))
+                                       (e! (ss/->UpdateSearchFilters nil)))}
+        name]])]))
 
 
 (defn- parse-operator-data-source [completions]
-  (apply array
+  (into-array
          (map (fn [{::t-operator/keys [id name]}]
                 #js {:text  name
                      :id    id
@@ -287,9 +283,7 @@
         [ckan-service-viewer/viewer e! {:resource resource
                                         :geojson  geojson
                                         :loading? loading-geojson?}]])
-     ;(when-not (:operator params)
      [filters-form e! service-search]
-     ;)
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
        [results-listing e! app])]))

@@ -200,7 +200,6 @@
            component] :as s}
    data update-fn editable? update-form
    modified? errors warnings notices]
-  ;(.log js/console "field-ui " (clj->js data) update-fn update-form)
   (if (= type :component)
     [:div.component (component {:update-form! #(update-form s)
                                 :data data})]
