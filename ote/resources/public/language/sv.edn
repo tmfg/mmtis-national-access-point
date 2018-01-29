@@ -619,8 +619,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "email" "E-post"
           "phone" "Telefonnr"
 
-
-          "passenger-transportation" "Persontransporttjänstens uppgifter"
+          "passenger-transportation" "Palvelukohtaiset tiedot"
+          "parking" "Palvelukohtaiset tiedot"
+          "rentals" "Palvelukohtaiset tiedot"
           "accessibility-description" "Beskrivning av tillgänglighet"
           "accessibility-tool" "Redskap"
           "additional-services" "Tilläggstjänster"
@@ -639,19 +640,30 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "luggage-restrictions" "Begränsningar gällande resgods"
 
           "url" "WWW-adress"
+          "companies-csv-url" "Yrityslistan osoite"
+          "service-hours-info" "Tilläggsinfo"
+          "indoor-map" "Inomhuskarta www-sidor"
+          "pick-up-locations" "Verksamhetsställen"
+          "rental-additional-services" "Övriga tjänster"
+          "usage-area" "Tillåtna länder"
+          "vehicle-classes" "Fordon som uthyres"
+
+          "additional-service-links" "Andra tjänster"
+          "charging-points" "Beskriving av laddningspunkterna"
+          "parking-capacities" "Parkkipaikkojen määrä"
 
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
                    false "Nej"
 
                    ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-                   "request" "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+                   "taxi" "Taxitjänst (persontransport)"
+                   "request" "Abbonerad trafik, buss (persontransport)"
                    ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-                   "terminal"                 "Asemat, satamat ja muut terminaalit"
-                   "rentals"                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                   "parking"                  "Yleiset kaupalliset pysäköintipalvelut"
+                   "schedule" "Regelbunden ruttbaserad trafik (persontransport)"
+                   "terminal"                 "Stationer, hamnar och övriga terminaler"
+                   "rentals"                  "Fordonsuthyrning och komersiella samanvändningstjänster"
+                   "parking"                  "Allmänna kommersiella parkeringstjänster"
 
                    ;; accessibility tools
                    "wheelchair" "Rullstol"
@@ -689,11 +701,21 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "displays-for-visually-impaired" "Taktila skyltar (taktiili)"
                    "audio-information" "Utrop"
                    "audio-for-hearing-impaired" "Ljudförstärkning för hörselskadade"
+                   "disability-adapted-vehicle" "Fordon lämpat för rörelsehindrade"
 
                    ;; additional services
                    "animal-transport" "Djurtransport tillåten"
                    "child-seat"       "Barnstol"
 
+                   ;; parking types
+                   "unknown" "Okänd"
+                   "car-park" "Bilplatser"
+                   "park-and-ride-park" "Infartsparkering"
+                   "motorcycle-park" "Motorcyklar"
+                   "cycle-park" "Cyklar"
+                   "rental-car-park" "Hyrbilar"
+                   "coach-park" "Bussar"
+                   "disabled-park" "Invaplatser"
 
                    ;; payment methods
                    "debit-card" "Bankkort"

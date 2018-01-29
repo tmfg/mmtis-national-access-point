@@ -627,7 +627,9 @@
           "email" "Sähköpostiosoite"
           "phone" "Puhelinnumero"
 
-          "passenger-transportation" "Henkilöiden kuljetuspalvelun tiedot"
+          "passenger-transportation" "Palvelukohtaiset tiedot"
+          "parking" "Palvelukohtaiset tiedot"
+          "rentals" "Palvelukohtaiset tiedot"
           "accessibility-description" "Kuvaus saavutettavuudesta"
           "accessibility-tool" "Saavutettavuusvälineet"
           "additional-services" "Lisäpalvelut"
@@ -646,6 +648,17 @@
           "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
 
           "url" "WWW-osoite"
+          "companies-csv-url" "Yrityslistan osoite"
+          "service-hours-info" "Lisätiedot"
+          "indoor-map" "Sisätilakartan osoitetiedot"
+          "pick-up-locations" "Toimipisteet"
+          "rental-additional-services" "Muut palvelut"
+          "usage-area" "Sallitut maat"
+          "vehicle-classes" "Vuokrattavat ajoneuvot"
+
+          "additional-service-links" "Muut palvelut"
+          "charging-points" "Kuvaus latauspisteistä"
+          "parking-capacities" "Parkkipaikkojen määrä"
 
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
@@ -696,11 +709,21 @@
                    "displays-for-visually-impaired" "Näytöt näkövammaisille (taktiili)"
                    "audio-information" "Kuulutukset"
                    "audio-for-hearing-impaired" "Äänivahvistimet huonokuuloisille"
+                   "disability-adapted-vehicle" "Käsihallintalaitteilla varustettuja autoja"
 
                    ;; additional services
                    "animal-transport" "Eläinkuljetus"
                    "child-seat"       "Lastenistuin"
 
+                   ;; parking types
+                   "unknown" "Tuntematon"
+                   "car-park" "Autopaikat"
+                   "park-and-ride-park" "Liityntäpysäköinti"
+                   "motorcycle-park" "Moottoripyörät"
+                   "cycle-park" "Polkupyörät"
+                   "rental-car-park" "Vuokra-autot"
+                   "coach-park" "Linja-autot"
+                   "disabled-park" "Invapaikat"
 
                    ;; payment methods
                    "debit-card" "Pankkikortti"
