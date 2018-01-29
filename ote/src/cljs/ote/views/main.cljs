@@ -110,6 +110,7 @@
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service :transport-operator :organizations})
 (def services-pages #{:services})
+(def operator-pages #{:operators})
 
 (defn page-active?
 "Return true if given current-page belongs to given page-group"
@@ -117,6 +118,7 @@
   (cond
     (= page-group :own-services) (own-services-pages current-page)
     (= page-group :services) (services-pages current-page)
+    (= page-group :operators) (operator-pages current-page)
       :default false))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]

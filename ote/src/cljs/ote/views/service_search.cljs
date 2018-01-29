@@ -176,68 +176,63 @@
        (when (> filter-service-count (count results))
          [scroll-sensor #(e! (ss/->FetchMore))]))]))
 
-(defn result-chips [e! results]
+(defn result-chips [e! chip-results]
   (r/create-class
-    {:component-did-mount ote.views.place-search/monkey-patch-chip-backspace
+    {:component-did-mount  ote.views.place-search/monkey-patch-chip-backspace
      :component-did-update ote.views.place-search/monkey-patch-chip-backspace
      :reagent-render
-     (fn [e! results]
-       [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-        (for [{::t-operator/keys [name id] :as result} (map :operator results)]
-          ^{:key id}
-          [:span
-           [ui/chip {:ref id
-                     :style {:margin 4}
-
-                     ;; Toggle edit mode when clicking (for hand drawn geometries)
-                     :on-click #(.log js/console " ilmeisesti click")
-                     :on-request-delete #(.log js/console " koitettiin deletoida")}
-
-
-                     ;:on-request-delete #(e! (ps/->RemovePlaceById id))}
-            ]])])}))
+                     (fn [e! chip-results]
+                       [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
+                        (for [{::t-operator/keys [name id] :as result} chip-results]
+                          ^{:key (str "transport-operator-" id)}
+                          [:span
+                           [ui/chip {:ref               id
+                                     :style             {:margin 4}
+                                     :on-request-delete #(do
+                                                           (e! (ss/->RemoveOperatorById id))
+                                                           (e! (ss/->UpdateSearchFilters nil)))}
+                            name]])])}))
 
 
 (defn- parse-operator-data-source [completions]
-  (.log js/console "parse-operator-data-source->completions" completions )
   (apply array
          (map (fn [{::t-operator/keys [id name]}]
-                #js {:text name
-                     :id id
+                #js {:text  name
+                     :id    id
                      :value (r/as-element
                               [ui/menu-item {:primary-text name}])})
               completions)))
 
-(defn operator-search [e! results]
-  (.log js/console "operator-search " (clj->js operator-search))
+(defn operator-search [e! data]
+  (let [results (:results data)
+        chip-results (:chip-results data)]
   [:div.place-search
 
    [:div.col-xs-12.col-md-3
-   [result-chips e! results]
+   [result-chips e! chip-results]
 
    [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
-
                        :filter (constantly true) ;; no filter, backend returns what we want
                        :dataSource (parse-operator-data-source results )
-                       :on-update-input #(e! (ote.app.controller.service-search/->SetOperatorName %))
-                       :search-text (or (:name operator-search) "")
-                       :on-new-request #(e! (ote.app.controller.service-search/->AddOperator (aget % "id")))}]]
-   ])
+                       :on-update-input #(e! (ss/->SetOperatorName %))
+                       :search-text (or (:name data) "")
+                       :on-new-request #(do
+                                          (e! (ss/->AddOperator (aget % "id")))
+                                          (e! (ss/->UpdateSearchFilters nil)))}]]]))
 
 (defn filters-form [e! {filters :filters
                         facets :facets
                         operators :operators
                         :as service-search}]
   (let [sub-type (tr-key [:enums ::t-service/sub-type]
-                         [:enums ::t-service/type])
-        empty-operators? true]
+                         [:enums ::t-service/type])]
     [:div
      [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]
                                       [:field-labels :transport-service])}
-      [(form/group
+       [(form/group
          {:label        (tr [:service-search :filters-label])
           :columns      3
           :layout       :row
@@ -261,68 +256,38 @@
 
          {:type      :component
           :name      :operators
-          :is-empty? empty-operators?
           :component (fn [{data :data}]
-                       [:span
-                        (.log js/console ":component data " (pr-str data))
-                        [operator-search
-                         (tuck/wrap-path e! :service-search :filters)
-                         (get data :results)]
-                        ]
-                       )}
-
-         #_ {:type      :component
-          :name      :operator-search
-          :is-empty? empty-operators?
-          :component (fn [{data :data}]
-                       [:span
-                        (.log js/console ":component data " (pr-str data))
-                        (.log js/console "wrap " (tuck/wrap-path e! :service-search))
-                        [operator-search
-                         (tuck/wrap-path e! :service-search)
-                         (get-in data [:service-search :operators])]
-                        ]
-                       )}
-
-         )]
-      filters]]))
+                       [:span [operator-search e! data]])})]
+         filters]]))
 
 (defn service-search [e! app]
-  (.log js/console "------------------ service-search --------------------")
-  (let [operator (atom (get-in app [:params :operator]))]
-    (e! (ss/->InitServiceSearch))
-    (r/create-class
-     {:component-will-receive-props
-      (fn [_ [_ _ {{op :operator} :params}]]
-        (when (not= op @operator)
-          (reset! operator op)
-          (e! (ss/->InitServiceSearch))))
-      :reagent-render
-      (fn [e! {{results :results
-                 total-service-count :total-service-count
-                 empty-filters? :empty-filters?
-                 resource :resource
-                 geojson :geojson
-                 loading-geojson? :loading-geojson?
-                :as service-search} :service-search
-               params :params
-               :as app}]
-        [:div.service-search
-         (when (or geojson loading-geojson?)
-           [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
-                       :open true
-                       :modal false
-                       :auto-scroll-body-content true
-                       :on-request-close #(e! (ss/->CloseServiceGeoJSON))
-                       :actions [(r/as-element
-                                  [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
-                                                   :primary true}
-                                   (tr [:buttons :close])])]}
-            [ckan-service-viewer/viewer e! {:resource resource
-                                            :geojson geojson
-                                            :loading? loading-geojson?}]])
-         (when-not (:operator params)
-           [filters-form e! service-search])
-         (if (nil? results)
-           [:div (tr [:service-search :no-filters])]
-           [results-listing e! app])])})))
+  (e! (ss/->InitServiceSearch))
+  (fn [e! {{results             :results
+            total-service-count :total-service-count
+            empty-filters?      :empty-filters?
+            resource            :resource
+            geojson             :geojson
+            loading-geojson?    :loading-geojson?
+            :as                 service-search} :service-search
+           params                               :params
+           :as                                  app}]
+    [:div.service-search
+     (when (or geojson loading-geojson?)
+       [ui/dialog {:title                    (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
+                   :open                     true
+                   :modal                    false
+                   :auto-scroll-body-content true
+                   :on-request-close         #(e! (ss/->CloseServiceGeoJSON))
+                   :actions                  [(r/as-element
+                                                [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
+                                                                 :primary  true}
+                                                 (tr [:buttons :close])])]}
+        [ckan-service-viewer/viewer e! {:resource resource
+                                        :geojson  geojson
+                                        :loading? loading-geojson?}]])
+     ;(when-not (:operator params)
+     [filters-form e! service-search]
+     ;)
+     (if (nil? results)
+       [:div (tr [:service-search :no-filters])]
+       [results-listing e! app])]))

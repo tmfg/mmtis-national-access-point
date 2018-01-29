@@ -144,7 +144,6 @@
               completions)))
 
 (defn place-search [e! place-search]
-  (.log js/console "************** place-search " place-search)
   (let [results (:results place-search)]
     [:div.place-search
 

@@ -2,14 +2,16 @@
   "Controller for operator listing view"
   (:require [tuck.core :as tuck]
             [ote.db.transport-operator :as t-operator]
-            [ote.communication :as comm]))
+            [ote.communication :as comm]
+            [ote.app.routes :as routes]))
 
 (defrecord Init [])
 (defrecord UpdateOperatorFilter [filter])
 (defrecord SearchResponse [response append?])
 (defrecord FetchMore [])
-(defrecord OpenModal [id])
-(defrecord CloseModal [id])
+(defrecord OpenOperatorModal [id])
+(defrecord CloseOperatorModal [id])
+(defrecord ShowOperatorServices [operator])
 
 (def page-size 32)
 
@@ -71,19 +73,21 @@
                                results)
                          (vec results))
               :total-count total-count)))
-  OpenModal
+  OpenOperatorModal
   (process-event [{id :id} app]
-    (.log js/console " Avataan modaali id " (pr-str id))
-    (.log js/console " Avataan modaali id " (clj->js id))
     (update-operator-by-id
       app id
-      assoc :show-modal? true)
-    )
+      assoc :show-modal? true))
 
-  CloseModal
+  CloseOperatorModal
   (process-event [{id :id} app]
-    (.log js/console " suljetaan modaali id " id)
     (update-operator-by-id
       app id
-      dissoc :show-modal?)
-    ))
+      dissoc :show-modal?))
+
+  ShowOperatorServices
+  (process-event [{operator :operator} app]
+    (let [filtered-operator {::t-operator/name (::t-operator/name operator)
+          ::t-operator/id (::t-operator/id operator)}]
+      (routes/navigate! :services)
+    (ote.app.controller.service-search/add-operator-to-chip-list app filtered-operator))))

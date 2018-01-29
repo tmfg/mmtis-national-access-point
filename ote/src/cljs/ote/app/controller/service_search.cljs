@@ -19,9 +19,10 @@
 (defrecord SetOperatorName [name])
 (defrecord OperatorCompletionsResponse [completions name])
 (defrecord AddOperator [id])
-(defrecord FetchOperatorResponse [response operator])
+(defrecord RemoveOperatorById [id])
 
-(defn- search-params [{oa ::t-service/operation-area
+(defn- search-params [{operators :operators
+                       oa ::t-service/operation-area
                        text :text-search
                        st ::t-service/sub-type
                        limit :limit offset :offset
@@ -29,6 +30,8 @@
   (merge
    (when-not (empty? oa)
      {:operation_area (str/join "," (map :text oa))})
+   (when-not (empty? (get operators :chip-results))
+     {:operators (str/join "," (map ::t-operator/id (get operators :chip-results)))})
    (when text
      {:text text})
    (when-not (empty? st)
@@ -40,9 +43,7 @@
 (defn- search
   ([app append?] (search app append? 500))
   ([{service-search :service-search :as app} append? timeout-ms]
-   (let [params (if-let [operator (get-in app [:params :operator])]
-                  {:operators operator}
-                  (search-params (:filters service-search)))
+   (let [params (search-params (:filters service-search))
          on-success (tuck/send-async! ->SearchResponse params append?)]
      ;; Clear old timeout, if any
      (when-let [search-timeout (:search-timeout service-search)]
@@ -60,12 +61,12 @@
 (def page-size 25)
 
 
-(defn- add-operator
-  "Return app with a new operator added."
+(defn add-operator-to-chip-list
+  "Return app with a new operator added to chip list."
   [app operator]
-  (update-in app [:operator-search :results]
+  (update-in app [:service-search :filters :operators :chip-results]
              #(conj (or % [])
-                    {:operator operator})))
+                    operator)))
 
 
 (extend-protocol tuck/Event
@@ -95,12 +96,12 @@
   (process-event [{facets :facets} app]
     (update app :service-search assoc
             :facets facets
-            :filters {::t-service/operation-area []
-                      ::t-service/sub-type []}))
+            :filters (merge (get-in app [:service-search :filters])
+                            {::t-service/operation-area []
+                             ::t-service/sub-type []})))
 
   UpdateSearchFilters
   (process-event [{filters :filters} app]
-    (.log js/console " Tätä kutsutaan kun data muuttuu? " (clj->js filters))
     (-> app
         (update-in [:service-search :filters] merge
                    (assoc filters
@@ -147,47 +148,34 @@
 
   SetOperatorName
   (process-event [{name :name} app]
-    (.log js/console "Ssssssssssssssapp" (clj->js app))
-    (let [app (assoc-in app [:operators :name] name)]
-      (when (>= (count name) 2)
+    (let [app (assoc-in app [:service-search :filters :operators :name] name)]
+      (when (>= (count name) 3) ;; Search after three (3) chars is given
         (comm/get! (str "operator-completions/" name)
                    {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
       app))
 
   OperatorCompletionsResponse
   (process-event [result app]
-    (.log js/console "OperatorCompletionsResponse " (pr-str result))
-    (.log js/console "OperatorCompletionsResponse " (pr-str name))
-    (.log js/console "OperatorCompletionsResponse app" (clj->js app))
-    (assoc-in app [:operators :results] (:completions result))
-    #_ (if-not (= name (get-in app [:service-search :operators :name]))
-      ;; Received stale completions (name is not what was searched for), ignore
-      app
-      (assoc-in app [:service-search :operators :completions]
-                (let [name-lower (str/lower-case name)]
-                  (sort-by #(str/index-of (str/lower-case (::t-operator/name %))
-                                          name-lower)
-                           completions)))))
+    (assoc-in app [:service-search :filters :operators :results] (:completions result)))
 
   AddOperator
   (process-event [{id :id} app]
-    (.log js/console " AddOperator id " id)
     (if (some #(= id (::t-operator/id (:operator %)))
-              (get-in app [:operator-search :results]))
+              (get-in app [:service-search :filters :operators :chip-results]))
       ;; This name has already been added, don't do it again
       app
       (if-let [operator (some #(when (= id (::t-operator/id %)) %)
-                           (get-in app [:operator-search :completions]))]
-        (do
-          (comm/get! (str "transport-operator/" id)
-                     {:on-success (tuck/send-async! ->FetchOperatorResponse operator)})
-          (-> app
-              (assoc-in [:operator-search :name] "")
-              (assoc-in [:operator-search :completions] nil)))
+                           (get-in app [:service-search :filters :operators :results]))]
+        (-> app
+            (add-operator-to-chip-list operator)
+            (assoc-in [:service-search :filters :operators :name] ""))
         app)))
 
-  FetchOperatorResponse
-  (process-event [{:keys [operator]} app]
-    (add-operator app operator))
-
+  RemoveOperatorById
+  (process-event [{id :id} app]
+    (update-in app [:service-search :filters :operators :chip-results]
+               (fn [results]
+                 (filterv
+                   (fn [x] (not= id (get x ::t-operator/id)))
+                   results))))
   )
