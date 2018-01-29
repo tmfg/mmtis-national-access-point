@@ -190,6 +190,7 @@
    :ote.db.transport-service/to                        "Stängs kl"
    :ote.db.transport-service/all-day                   "24h"
    :ote.db.transport-service/maximum-stay              "Max parkeringstid"
+   :maximum-stay-limited "Parkeringstid begränsad"
    }
 
 
@@ -573,7 +574,6 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :footer-made-width                          "Made with"
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
-  :time-unlimited "Obegränsad"
   :time-units {:minutes  "Minuter"
                :hours    "Timmar"
                :days     "Dagar"

@@ -187,6 +187,7 @@
    :ote.db.transport-service/to                        "Kiinnimenoaika"
    :ote.db.transport-service/all-day                   "24h"
    :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
+   :maximum-stay-limited "Maximum stay time limited"
    }
 
 
@@ -579,7 +580,6 @@
   :footer-made-width                          "Toteutettu"
   :no-such-page                               "Valittua sivua ei löydy: "
   :time-unit                                  "Aikayksikkö"
-  :time-unlimited "Unlimited"
   :time-units {:minutes  "Minuuttia"
                :hours    "Tuntia"
                :days     "Päivää"
