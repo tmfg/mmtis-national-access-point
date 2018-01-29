@@ -206,19 +206,21 @@
 (defn operator-search [e! data]
   (let [results (:results data)
         chip-results (:chip-results data)]
-  [:div.place-search
-
+  [:div
    [:div.col-xs-12.col-md-3
-   [result-chips e! chip-results]
+     [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
+                        :floating-label-fixed true
+                        :hintText  (tr [:service-search :operator-search-placeholder])
+                        :hint-style style-base/placeholder
+                        :filter (constantly true) ;; no filter, backend returns what we want
+                         :dataSource (parse-operator-data-source results )
+                         :on-update-input #(e! (ss/->SetOperatorName %))
+                         :search-text (or (:name data) "")
+                         :on-new-request #(do
+                                            (e! (ss/->AddOperator (aget % "id")))
+                                            (e! (ss/->UpdateSearchFilters nil)))}]
 
-   [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
-                       :filter (constantly true) ;; no filter, backend returns what we want
-                       :dataSource (parse-operator-data-source results )
-                       :on-update-input #(e! (ss/->SetOperatorName %))
-                       :search-text (or (:name data) "")
-                       :on-new-request #(do
-                                          (e! (ss/->AddOperator (aget % "id")))
-                                          (e! (ss/->UpdateSearchFilters nil)))}]]]))
+      [result-chips e! chip-results]]]))
 
 (defn filters-form [e! {filters :filters
                         facets :facets
