@@ -54,8 +54,7 @@
            {:success? true
             :session-data
             (let [user (users/find-user db (:name login-info))]
-              (map #(transport/get-transport-operator-data db % (:user user))
-                   (:groups user)))})
+              (transport/get-user-transport-operators-with-services db (:groups user) user))})
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
                           {:digest-algorithm (:digest-algorithm auth-tkt-config)
                            :timestamp (java.util.Date.)

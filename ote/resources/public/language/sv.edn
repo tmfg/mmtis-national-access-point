@@ -191,8 +191,8 @@
    :ote.db.transport-service/from                      "Öppnas kl"
    :ote.db.transport-service/to                        "Stängs kl"
    :ote.db.transport-service/all-day                   "24h"
-   :ote.db.transport-service/maximum-stay              "Max parkeringstid"}
-
+   :ote.db.transport-service/maximum-stay              "Max parkeringstid"
+   :maximum-stay-limited "Parkeringstid begränsad"}
 
 
   :transport-service
@@ -494,8 +494,6 @@
   :header-service-hours                    "Betjäningstider"
   :header-pick-up-locations "Verksamhetsställen"}
 
-
-
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"
   :header-new-rentals                      "Lägg till uppgifter gällande uthyrning"
@@ -616,6 +614,19 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
    :stay "Stanna"
    :leave "Lämna"
    :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
+
+ :operators
+ {:title "Tjänsteproducenter"
+  :filter "Sök tjänsteproducenten..."
+  :loading "Laddar tjänsteproducenter"
+  :result-service-count-single "1 tjänster"
+  :result-service-count [:service-count " tjänster"]
+  :result-no-services "Inga tjänsteproducenter"
+  :description-read-more "Läs mer"
+  :no-results "Inga tjänsteproducenter hittades"
+  :result-count ["Hittades " :total-count " tjänsteproducenter"]
+  :result-count-all ["Total " :total-count " tjänsteproducenter"]
+  }
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
@@ -790,7 +801,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
  {:label "Mobilitetstjänstekatalog"
   :filters-label "Sökvillkor"
   :text-search "Sök"
+  :operators "Tjänsteproducent"
   :text-search-placeholder "Sök med namn"
+  :operator-search "Tjänsteproducent"
+  :operator-search-placeholder "Sök med namn"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :no-results "Inga resultat"
   :one-result "Hittades en tjänst"
@@ -799,8 +813,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
-  :fetching-more "Fetching more services..."}
-
+  :fetching-more "Fetching more services..."
+  :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
+  :operator-no-services "Tjänsteproducenten har inga tjänster."}
 
  :login
  {:label "Inloggning"

@@ -190,8 +190,8 @@
    :ote.db.transport-service/from                      "Aukeamisaika"
    :ote.db.transport-service/to                        "Kiinnimenoaika"
    :ote.db.transport-service/all-day                   "24h"
-   :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"}
-
+   :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
+   :maximum-stay-limited "Pysäköintiaika rajoitettu"}
 
 
   :transport-service
@@ -624,6 +624,19 @@
    :leave "Poistu"
    :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
 
+ :operators
+ {:title "Palveluntuottajat"
+  :filter "Hae nimellä tai nimen osalla"
+  :loading "Haetaan palveluntuottajia..."
+  :result-service-count-single "1 julkaistu palvelu"
+  :result-service-count [:service-count " julkaistua palvelua"]
+  :result-no-services "Ei julkaistuja palveluita"
+  :description-read-more "Lue koko kuvaus"
+  :no-results "Hakuehdoilla ei löytynyt palveluntuottajia"
+  :result-count ["Hakuehdoilla löytyi " :total-count " palveluntuottajaa"]
+  :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
+  }
+
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
@@ -796,18 +809,22 @@
  :service-search
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
-  :text-search "Haku"
+  :text-search "Palvelun nimi"
+  :operators "Palveluntuottajat"
   :text-search-placeholder "Hae nimellä tai sen osalla"
+  :operator-search "Palveluntuottaja"
+  :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
-  :no-results "Hakuehdoilla ei löytynyt palveluita"
-  :one-result "Hakuehdoilla löytyi yksi palvelu"
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :no-results "Hakuehdoilla ei löytynyt palveluita."
+  :one-result "Hakuehdoilla löytyi yksi palvelu."
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua."]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
   :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
-  :fetching-more "Haetaan lisää palveluita..."}
-
+  :fetching-more "Haetaan lisää palveluita..."
+  :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
+  :operator-no-services "Palveluntuottajalla ei ole palveluita."}
 
  :login
  {:label "Kirjautumistiedot"
