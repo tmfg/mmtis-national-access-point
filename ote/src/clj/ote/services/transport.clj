@@ -320,7 +320,7 @@
 
    (POST "/transport-operator/data" {user :user}
          (http/transit-response
-           (get-user-transport-operators-with-services db (:groups user) user)))
+           (get-user-transport-operators-with-services db (:groups user) (:user user))))
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
