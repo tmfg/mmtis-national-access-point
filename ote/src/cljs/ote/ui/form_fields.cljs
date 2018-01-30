@@ -373,7 +373,7 @@
 
 (def time-unit-order [:minutes :hours :days])
 
-(defn- normalize-interval [{:keys [minutes hours days]}]
+(defn- normalize-interval [{:keys [minutes hours days] :as interval}]
   (cond
     (and minutes (not= 0 minutes))
     [:minutes (+ minutes (* 60 (or hours 0)) (* 60 24 (or days 0)))]
@@ -393,18 +393,25 @@
                  :on-toggle #(update!
                               (if data
                                 nil
-                                (time/interval nil :days)))}]
+                                (time/interval 0 :days)))}]
      (when-not (nil? data)
        [:div
         [field (assoc opts
                       :update! (fn [num]
-                                 (update! (time/interval (or num 0) unit)))
+                                 (let [unit (or (::preferred-unit data) unit)]
+                                   (update!
+                                    (assoc (if (str/blank? num)
+                                             (time/interval 0 unit)
+                                             (time/interval (js/parseInt num) unit))
+                                           ::preferred-unit unit))))
                       :placeholder (tr [:common-texts :time-unlimited])
-                      :type :number
+                      :type :string
+                      :regex #"\d{0,4}"
                       :style {:width 200}) amount]
         [field (assoc opts
                       :update! (fn [unit]
-                                 (update! (time/interval amount unit)))
+                                 (assoc (update! (time/interval amount unit))
+                                        ::preferred-unit unit))
                       :label (tr [:common-texts :time-unit])
                       :name :maximum-stay-unit
                       :type :selection
@@ -413,7 +420,7 @@
                       :style {:width 150
                               :position "relative"
                               :top 15})
-         unit]])]))
+         (or (::preferred-unit data) unit)]])]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
   (let [time-picker-time (if (= nil? data) default-time data)]
