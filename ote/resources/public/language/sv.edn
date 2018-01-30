@@ -62,10 +62,10 @@
    :ote.db.transport-service/location                  "Plats"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Externa gränssnitt"
-   :ote.db.transport-service/data-content "Tietosisältö"
-   :ote.db.transport-service/external-service-description "Beskrivning av externt gränssnitt"
-   :ote.db.transport-service/external-service-url "Gränssnittets tekniska adress"
+   :ote.db.transport-service/external-interfaces "Externa maskinläsbara gränssnitt" ;; NOTE: Check translation context
+   :ote.db.transport-service/data-content "Informationsinnehåll" ;; NOTE: Check translation context
+   :ote.db.transport-service/external-service-description "Tilläggsuppgifter" ;; NOTE: Check translation context
+   :ote.db.transport-service/external-service-url "WWW-adress" ;; NOTE: Check translation context
    :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
    :ote.db.transport-service/rental-service            "Hyrtjänstens adress"
    :ote.db.transport-service/format "Form"
@@ -405,17 +405,17 @@
    :disabled-park "Invaplatser"}
 
   :ote.db.transport-service/interface-data-content
-  {:route-and-schedule "Reitti- ja aikataulutiedot"
-   :luggage-restrictions "Matkatavararajoitukset"
-   :realtime-interface "Reaaliaikarajapinta"
-   :booking-interface "Varausrajapinta"
-   :accessibility-services "Esteettömyyspalvelut"
-   :other-services "Muut palvelut"
-   :pricing "Hintatiedot"
-   :service-hours "Palveluajat"
-   :disruptions "Häiriötilanteet"
-   :payment-interface "Lippu- ja myyntirajapinta"
-   :other "Muu"}}
+  {:route-and-schedule "Rutt- och tidtabellsinformation" ;; NOTE: Check translation context
+   :luggage-restrictions "Resgodsbegränsningar" ;; NOTE: Check translation context
+   :realtime-interface "Realtidsgränssitt" ;; NOTE: Check translation context
+   :booking-interface "Bokningsgränssnitt" ;; NOTE: Check translation context
+   :accessibility-services "Tillgänglighetstjänster" ;; NOTE: Check translation context
+   :other-services "Övriga tjänster" ;; NOTE: Check translation context
+   :pricing "Prisinformation" ;; NOTE: Check translation context
+   :service-hours "Betjäningstider" ;; NOTE: Check translation context
+   :disruptions "Störningsinformation" ;; NOTE: Check translation context
+   :payment-interface "Biljett- och försäljningsgränssnitt" ;; NOTE: Check translation context
+   :other "Övrigt"}}
 
 
   ;; ENUMS end
@@ -742,21 +742,21 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "SUN" "Sö"
 
                    ;; Data content
-                   "route-and-schedule" "Reitti- ja aikataulutiedot"
-                   "luggage-restrictions" "Matkatavararajoitukset"
-                   "realtime-interface" "Reaaliaikarajapinta"
-                   "booking-interface" "Varausrajapinta"
-                   "accessibility-services" "Esteettömyyspalvelut"
-                   "other-services" "Muut palvelut"
-                   "pricing" "Hintatiedot"
-                   "service-hours" "Palveluajat"
-                   "disruptions" "Häiriötilanteet"
-                   "payment-interface" "Lippu- ja myyntirajapinta"}
+                   "route-and-schedule" "Rutt- och tidtabellsinformation" ;; NOTE: Check translation context
+                   "luggage-restrictions" "Resgodsbegränsningar" ;; NOTE: Check translation context
+                   "realtime-interface" "Realtidsgränssitt" ;; NOTE: Check translation context
+                   "booking-interface" "Bokningsgränssnitt" ;; NOTE: Check translation context
+                   "accessibility-services" "Tillgänglighetstjänster" ;; NOTE: Check translation context
+                   "other-services" "Övriga tjänster" ;; NOTE: Check translation context
+                   "pricing" "Prisinformation" ;; NOTE: Check translation context
+                   "service-hours" "Betjäningstider" ;; NOTE: Check translation context
+                   "disruptions" "Störningsinformation" ;; NOTE: Check translation context
+                   "payment-interface" "Biljett- och försäljningsgränssnit"} ;; NOTE: Check translation context
 
           ;; External interfaces
-          "external-interfaces" "Yttre tekniska gränssnitt"
+          "external-interfaces" "Externa maskinläsbara gränssnitt" ;; NOTE: Check translation context
           "license" "Licens"
-          "data-content" "Tietosisältö"
+          "data-content" "Informationsinnehåll" ;; NOTE: Check translation context
           "format" "Format"
           "external-interface" "Yttre gränssnitt"
 
