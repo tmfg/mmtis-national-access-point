@@ -4,8 +4,8 @@
   :services "Tjänstekatalog"
   :operators "Tjänsteproducenter"
   :own-services "Egna tjänsteuppgifter"
-  :admin "Admin"
-  }
+  :admin "Admin"}
+
 
  ;; Labels for database fields
  :field-labels
@@ -62,22 +62,24 @@
    :ote.db.transport-service/location                  "Plats"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Externa gränssnitt"
-   :ote.db.transport-service/external-service-description "Beskrivning av externt gränssnitt"
-   :ote.db.transport-service/external-service-url "Gränssnittets tekniska adress"
+   :ote.db.transport-service/external-interfaces "Externa maskinläsbara gränssnitt" ;; NOTE: Check translation context
+   :ote.db.transport-service/data-content "Informationsinnehåll" ;; NOTE: Check translation context
+   :ote.db.transport-service/external-service-description "Tilläggsuppgifter" ;; NOTE: Check translation context
+   :ote.db.transport-service/external-service-url "WWW-adress" ;; NOTE: Check translation context
    :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
    :ote.db.transport-service/rental-service            "Hyrtjänstens adress"
-   :ote.db.transport-service/format "Gränssnittets format (tex. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format "Form"
    :ote.db.transport-service/format-short "Form"
    :ote.db.transport-service/companies "De företag som producerar tjänsten"
    :ote.db.transport-service/company-name "Företagts namn"
    :ote.db.transport-service/business-id "Företagets FO-nummer"
    :ote.db.transport-service/companies-csv-url "Företagslistans tekniska address"
-   :ote.db.transport-service/license "Licens/användarvillkor"
-   :ote.db.transport-service/license-url "Beskrivning av licens"
+   :ote.db.transport-service/license "Licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
-   :ote.db.transport-service/service-hours-info "Tilläggsinfo"
-   }
+
+   ;; Service hours
+   :ote.db.transport-service/service-hours-info "Tilläggsinfo"}
+
 
   ;; Service exception
   :service-exception
@@ -107,8 +109,8 @@
    :ote.db.transport-service/pricing-description "Beskriv prissättningen"
    :ote.db.transport-service/pricing-description-taxi "Beskriv prissättningen"
    :ote.db.transport-service/pricing-url "Prissättning www-sidor"
-   :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"
-   }
+   :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"}
+
 
   ;; Terminal fields
   :terminal
@@ -127,8 +129,8 @@
    :ote.db.transport-service/assistance-url         "Gör bokning på adressen (www)"
    :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
    :ote.db.transport-service/assistance-place-description  "Assistanstjänsternas placering i terminalen/stationen"
-   :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör beställas på förhand."
-   }
+   :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör beställas på förhand."}
+
 
   ;; Rental fields
   :rentals
@@ -150,8 +152,8 @@
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
-   }
+   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."}
+
 
   ;; Parking fields
   :parking
@@ -190,8 +192,7 @@
    :ote.db.transport-service/to                        "Stängs kl"
    :ote.db.transport-service/all-day                   "24h"
    :ote.db.transport-service/maximum-stay              "Max parkeringstid"
-   :maximum-stay-limited "Parkeringstid begränsad"
-   }
+   :maximum-stay-limited "Parkeringstid begränsad"}
 
 
   :transport-service
@@ -217,8 +218,8 @@
    :ote.db.transport-service/available-from "Startdatum"
    :ote.db.transport-service/available-to "Slutdatum"
    :ote.db.transport-service/available-from-nil "Genast"
-   :ote.db.transport-service/available-to-nil "Tillsvidare"
-   }
+   :ote.db.transport-service/available-to-nil "Tillsvidare"}
+
 
   ;; Common fields
   :ote.db.common/street                               "Adress"
@@ -226,8 +227,8 @@
   :ote.db.common/postal_code                          "Postnummer"
 
   :login {:email "Epost"
-          :password "Lösenord"}
-  }
+          :password "Lösenord"}}
+
 
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -254,15 +255,15 @@
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
-  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
-  }
+  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."}
+
 
  ;; CSV parsing
  :csv
  {:url-parse-failed "Kontrollera adressen"
   :csv-parse-failed "Felaktigt format. .csv-filen gick inte att läsa"
-  :parsing-success ["I listan hittades " :count " företag."]
-  }
+  :parsing-success ["I listan hittades " :count " företag."]}
+
 
  ;; Action buttons
  :buttons
@@ -293,8 +294,8 @@
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
   :add-new-transport-operator "Lägg till ny tjänsteproducent"
-  :add-new-member "Lägg till användare"
-  }
+  :add-new-member "Lägg till användare"}
+
 
  ;; Database enumeration values
  :enums
@@ -351,8 +352,8 @@
    :visual-displays "Visuella displays"
    :displays-for-visually-impaired "Tavlor för synskadade (taktil)"
    :large-print-timetables "Stora tidtabellsskyltar"
-   :other "Annat"
-   }
+   :other "Annat"}
+
 
   :ote.db.transport-service/accessibility
   {:lift "Hiss"
@@ -402,7 +403,23 @@
    :rental-car-park "Hyrbilar"
    :coach-park "Bussar"
    :disabled-park "Invaplatser"}
-  }
+
+  :ote.db.transport-service/interface-data-content
+  {:route-and-schedule "Rutt- och tidtabellsinformation" ;; NOTE: Check translation context
+   :luggage-restrictions "Resgodsbegränsningar" ;; NOTE: Check translation context
+   :realtime-interface "Realtidsgränssitt" ;; NOTE: Check translation context
+   :booking-interface "Bokningsgränssnitt" ;; NOTE: Check translation context
+   :accessibility-services "Tillgänglighetstjänster" ;; NOTE: Check translation context
+   :other-services "Övriga tjänster" ;; NOTE: Check translation context
+   :pricing "Prisinformation" ;; NOTE: Check translation context
+   :service-hours "Betjäningstider" ;; NOTE: Check translation context
+   :disruptions "Störningsinformation" ;; NOTE: Check translation context
+   :payment-interface "Biljett- och försäljningsgränssnitt" ;; NOTE: Check translation context
+   :other "Övrigt"}}
+
+
+  ;; ENUMS end
+
 
  ;; Per feature/page localization keys
  :place-search {:name                "Platsnamn"
@@ -450,8 +467,8 @@
   :desc-to-add-new-operator-5 "Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Tjänsteproducenten har ännu ingen tjänst i NAP-katalogen."
-  }
+  :operator-dont-have-any-services "Tjänsteproducenten har ännu ingen tjänst i NAP-katalogen."}
+
 
  :organization-page
  {:contact-types            "Kontaktalternativ"
@@ -463,8 +480,8 @@
   :help-desc-4              " -delens uppgifter är tillägnade tjänsteutvecklare och andta profesionella NAP-användare, inte resenär eller annan slutkund."
   :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
   :help-desc-5-linklabel    "jäsenet sivulla"
-  :help-desc-6 "\nBeskrivningen ska ge NAP-användaren en uppfattning om vilken typ av tjänsteproducent det är fråga om."
-  }
+  :help-desc-6 "\nBeskrivningen ska ge NAP-användaren en uppfattning om vilken typ av tjänsteproducent det är fråga om."}
+
 
  :passenger-transportation-page
  {:header-new-passenger-transportation     "Lägg till persontransporttjänst"
@@ -475,9 +492,7 @@
   :header-other-services-and-accessibility "Tillgänglighet"
   :header-price-information                "Prisinformation"
   :header-service-hours                    "Betjäningstider"
-  :header-pick-up-locations "Verksamhetsställen"
-
-  }
+  :header-pick-up-locations "Verksamhetsställen"}
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"
@@ -490,8 +505,8 @@
   :header-accessibility                    "Tillgänglighet"
   :header-additional-services              "Tilläggsinfo"
   :open-service-hours-and-exceptions       "Betjäningstider"
-  :open-rental-prices                      "Prisuppgifter"
-  }
+  :open-rental-prices                      "Prisuppgifter"}
+
 
  :terminal-page
  {:header-service-info                "Tjänstens basinfo"
@@ -500,8 +515,8 @@
   :header-edit-terminal               "Redigera uppgifter om hamn, station eller övrig terminal"
   :header-assistance                  "Information on assistanstjänst"
   :header-accessibility               "Tillgänglihet"
-  :header-checkboxlist-accessibility  "Tillgänglighet"
-  }
+  :header-checkboxlist-accessibility  "Tillgänglighet"}
+
 
  :parking-page
  {:header-new-parking                       "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
@@ -515,18 +530,18 @@
   :header-price-and-payment-methods         "Prisuppgifter och betalsätt"
   :header-facilities-and-capacities         "Parkeringsområden och antaler P-platser"
   :header-charging-points                   "Laddningspunkter"
-  :header-service-hours                     "Tjänstens öppettider och parkeringstid"
-  }
+  :header-service-hours                     "Tjänstens öppettider och parkeringstid"}
+
 
  :price-dialog
  {:header-dialog "Fordonspris"
-  :close-dialog  "Stäng"
-  }
+  :close-dialog  "Stäng"}
+
 
  :opening-hours-dialog
  {:close-dialog "Sälj"
-  :header-dialog "Betjäningsställets öppettider"
-  }
+  :header-dialog "Betjäningsställets öppettider"}
+
 
  :select-service-type-page
  {:title-required-data               "Börja med att välja tjänstetyp"
@@ -586,8 +601,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :language "Språk"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"
-  }
+  :minutes-placeholder "mm"}
+
 
  :dialog
  {:delete-transport-service
@@ -725,17 +740,31 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "FRI" "Fr"
                    "SAT" "Lö"
                    "SUN" "Sö"
-                   }
+
+                   ;; Data content
+                   "route-and-schedule" "Rutt- och tidtabellsinformation" ;; NOTE: Check translation context
+                   "luggage-restrictions" "Resgodsbegränsningar" ;; NOTE: Check translation context
+                   "realtime-interface" "Realtidsgränssitt" ;; NOTE: Check translation context
+                   "booking-interface" "Bokningsgränssnitt" ;; NOTE: Check translation context
+                   "accessibility-services" "Tillgänglighetstjänster" ;; NOTE: Check translation context
+                   "other-services" "Övriga tjänster" ;; NOTE: Check translation context
+                   "pricing" "Prisinformation" ;; NOTE: Check translation context
+                   "service-hours" "Betjäningstider" ;; NOTE: Check translation context
+                   "disruptions" "Störningsinformation" ;; NOTE: Check translation context
+                   "payment-interface" "Biljett- och försäljningsgränssnit"} ;; NOTE: Check translation context
+
+          ;; External interfaces
+          "external-interfaces" "Externa maskinläsbara gränssnitt" ;; NOTE: Check translation context
+          "license" "Licens"
+          "data-content" "Informationsinnehåll" ;; NOTE: Check translation context
+          "format" "Format"
+          "external-interface" "Yttre gränssnitt"
+
           ;; accessibility
           "accessibility" "Tillgänglihet"
           "information-service-accessibility" "Information (tillgänglighet)"
           "brokerage?" "Förmedlingstjänst?"
           "companies" "Företag som medverkar i tjänsteproduktionen"
-          "external-interfaces" "Yttre tekniska gränssnitt"
-          "license" "Licens"
-          "format" "Format"
-          "license-url" "Lisens URL"
-          "external-interface" "Yttre gränssnitt"
           "accessibility-info-url" "Tillgänglighetsbeskriving (www-adress)"
           "guaranteed-accessibility-description" "Garanterad tillgänglighet"
           "guaranteed-info-service-accessibility" "Tillgänglig info (garanterad)"
@@ -745,6 +774,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "limited-info-service-accessibility" "Infotjänsternas tillgänglighet (begränsad tillgänglighet)"
           "limited-transportable-aid" "Hjälpmedel som får transporteras (begränsad tillgänglighet)"
           "limited-vehicle-accessibility" "Fordonens tillgänglihet (begränsad tillgänglighet)"
+
           "payment-method-description" "Tilläggsinfo om betalsätt"
           "pricing" "Prissättning"
           "service-exceptions" "Undantag i verksamhetstider"
@@ -756,6 +786,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "to-date" "Till (datum)"
           "sub-type" "Undertyp"
           "terminal" " "
+
           ;; Assistance
           "assistance" "Assistanstjänster"
           "assistance-place-description" "Plats (Assistanspunkt?)"
@@ -784,8 +815,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
-  :operator-no-services "Tjänsteproducenten har inga tjänster."
-  }
+  :operator-no-services "Tjänsteproducenten har inga tjänster."}
 
  :login
  {:label "Inloggning"
@@ -800,13 +830,13 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :forgot-password-button "Glömt ditt löseonrd?"
 
   :error {:no-such-user "Okänd konto"
-          :incorrect-password "Fel lösenord"}
-  }
+          :incorrect-password "Fel lösenord"}}
+
 
  :leaflet
  {:zoom-in "Zooma in"
-  :zoom-out "Zooma ut"
-  }
+  :zoom-out "Zooma ut"}
+
 
  :leaflet-draw
  {:toolbar  {:buttons {:polyline  "Rita sträck"
@@ -831,5 +861,5 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
              :simpleshape {:tooltip {:end "Släpp musknappen för att avsluta."}}
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
-             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
- }
+             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}}
+
