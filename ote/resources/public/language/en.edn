@@ -361,7 +361,7 @@
    :shuttle "Sukkulaliikenne"
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
-   :pallet-access-low-floor "Kuormalavalinjan matala lattia"
+   :pallet-access-low-floor "Matala lattia"
    :wheelchair-access-toilet "Inva WC"
 
    :step-free-access "Portaaton pääsy"
@@ -687,7 +687,7 @@
                    "escalator" "Liukuportaat"
                    "lift" "Hissi"
                    "narrow-entrance" "Kapea sisäänkäynti"
-                   "pallet-access-low-floor" "Kuormalavalinjan matala lattia"
+                   "pallet-access-low-floor" "Matala lattia"
                    "barrier" "Puomi"
                    "travelator" "Liikkuva kävelytie"
                    "ramp" "Ramppi"

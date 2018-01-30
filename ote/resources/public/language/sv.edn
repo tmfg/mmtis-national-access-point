@@ -251,7 +251,7 @@
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
-  :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
+  :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   }
@@ -387,7 +387,7 @@
    :step-free-access "Inga trappsteg"
    :accessible-vehicle "Fordon utan hinder (esteetön)"
    :suitable-for-wheelchairs "Lämplig för rullstol"
-   :suitable-for-stretchers "Paarikuljetus"
+   :suitable-for-stretchers "Bårtransport"
    :boarding-assistance "Assistans vid ombordstigning"
    :assistance-dog-space "Plats för assistenshund"
    :disability-adapted-vehicle "Fordon lämpat för rörelsehindrade"}
@@ -619,9 +619,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "email" "E-post"
           "phone" "Telefonnr"
 
-          "passenger-transportation" "Palvelukohtaiset tiedot"
-          "parking" "Palvelukohtaiset tiedot"
-          "rentals" "Palvelukohtaiset tiedot"
+          "passenger-transportation" "Tjänstespecifika uppgifter"
+          "parking" "Tjänstespecifika uppgifter"
+          "rentals" "Tjänstespecifika uppgifter"
           "accessibility-description" "Beskrivning av tillgänglighet"
           "accessibility-tool" "Redskap"
           "additional-services" "Tilläggstjänster"
@@ -640,7 +640,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "luggage-restrictions" "Begränsningar gällande resgods"
 
           "url" "WWW-adress"
-          "companies-csv-url" "Yrityslistan osoite"
+          "companies-csv-url" "Företagslistans tekniska address"
           "service-hours-info" "Tilläggsinfo"
           "indoor-map" "Inomhuskarta www-sidor"
           "pick-up-locations" "Verksamhetsställen"
@@ -650,7 +650,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
 
           "additional-service-links" "Andra tjänster"
           "charging-points" "Beskriving av laddningspunkterna"
-          "parking-capacities" "Parkkipaikkojen määrä"
+          "parking-capacities" "Antalet parkeringsplatser"
 
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
@@ -687,7 +687,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "escalator" "Rulltrappor"
                    "lift" "Hiss"
                    "narrow-entrance" "Smal ingång"
-                   "pallet-access-low-floor" "Låggolv (Kuormalavalinjan matala lattia)"
+                   "pallet-access-low-floor" "Låggolv"
                    "barrier" "Bom"
                    "travelator" "Rullband"
                    "ramp" "Ramp"
