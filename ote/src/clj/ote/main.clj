@@ -14,6 +14,7 @@
             [ote.services.service-search :as service-search]
             [ote.services.login :as login-service]
             [ote.services.admin :as admin-service]
+            [ote.services.operators :as operators-service]
 
             [ote.integration.export.geojson :as export-geojson]
             [taoensso.timbre :as log]
@@ -59,7 +60,9 @@
 
    :admin (component/using
            (admin-service/->Admin (:nap config))
-           [:db :http])))
+           [:db :http])
+
+   :operators (component/using (operators-service/->Operators) [:db :http])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!

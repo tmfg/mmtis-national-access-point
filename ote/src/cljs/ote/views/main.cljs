@@ -26,7 +26,8 @@
             [ote.app.controller.flags :as flags]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
-            [ote.views.admin :as admin]))
+            [ote.views.admin :as admin]
+            [ote.views.operators :as operators]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -40,6 +41,12 @@
     "active"))
 
 (defn header-links [app]
+  (let [operators-list-link (if (flags/enabled? :ote-operators-list)
+                             {:page  :operators
+                              :label [:common-texts :navigation-organizations]}
+                             {:page  :organizations
+                              :label [:common-texts :navigation-organizations]
+                              :url   "/organization"})]
   (filter some?
           [{:page  :front-page
             :label [:common-texts :navigation-front-page]
@@ -48,9 +55,7 @@
            {:page  :services
             :label [:common-texts :navigation-dataset]}
 
-           {:page  :organizations
-            :label [:common-texts :navigation-organizations]
-            :url   "/organization"}
+           operators-list-link
 
            (when (logged-in? app)
              {:page  :own-services
@@ -58,7 +63,7 @@
 
            (when (:admin? (:user app))
              {:page :admin
-              :label [:common-texts :navigation-admin]})]))
+              :label [:common-texts :navigation-admin]})])))
 
 (def selectable-languages [["fi" "suomi"]
                            ["sv" "svenska"]
@@ -111,6 +116,7 @@
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service :transport-operator :organizations})
 (def services-pages #{:services})
+(def operator-pages #{:operators})
 
 (defn page-active?
 "Return true if given current-page belongs to given page-group"
@@ -118,6 +124,7 @@
   (cond
     (= page-group :own-services) (own-services-pages current-page)
     (= page-group :services) (services-pages current-page)
+    (= page-group :operators) (operator-pages current-page)
       :default false))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
@@ -374,9 +381,12 @@
                 :edit-service [t-service/edit-service-by-id e! app]
                 :new-service [t-service/edit-new-service e! app]
 
-                :services [service-search/service-search e! app (:service-search app)]
+                :services [service-search/service-search e! app]
 
                 :admin [admin/admin-panel e! app]
+
+                :operators [operators/operators e! app]
+
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
        [footer e!]]]]))

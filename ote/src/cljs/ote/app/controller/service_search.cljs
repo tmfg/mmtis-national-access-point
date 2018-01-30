@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [clojure.string :as str]))
 
 
@@ -15,8 +16,13 @@
 (defrecord ShowServiceGeoJSON [url])
 (defrecord CloseServiceGeoJSON [])
 (defrecord GeoJSONFetched [response])
+(defrecord SetOperatorName [name])
+(defrecord OperatorCompletionsResponse [completions name])
+(defrecord AddOperator [id])
+(defrecord RemoveOperatorById [id])
 
-(defn- search-params [{oa ::t-service/operation-area
+(defn- search-params [{operators :operators
+                       oa ::t-service/operation-area
                        text :text-search
                        st ::t-service/sub-type
                        limit :limit offset :offset
@@ -24,6 +30,8 @@
   (merge
    (when-not (empty? oa)
      {:operation_area (str/join "," (map :text oa))})
+   (when-not (empty? (get operators :chip-results))
+     {:operators (str/join "," (map ::t-operator/id (get operators :chip-results)))})
    (when text
      {:text text})
    (when-not (empty? st)
@@ -52,6 +60,15 @@
 
 (def page-size 25)
 
+
+(defn add-operator-to-chip-list
+  "Return app with a new operator added to chip list."
+  [app operator]
+  (update-in app [:service-search :filters :operators :chip-results]
+             #(conj (or % [])
+                    operator)))
+
+
 (extend-protocol tuck/Event
 
   InitServiceSearch
@@ -79,8 +96,9 @@
   (process-event [{facets :facets} app]
     (update app :service-search assoc
             :facets facets
-            :filters {::t-service/operation-area []
-                      ::t-service/sub-type []}))
+            :filters (merge (get-in app [:service-search :filters])
+                            {::t-service/operation-area []
+                             ::t-service/sub-type []})))
 
   UpdateSearchFilters
   (process-event [{filters :filters} app]
@@ -126,4 +144,38 @@
     (update app :service-search assoc
             :resource response
             :geojson (clj->js response)
-            :loading-geojson? false)))
+            :loading-geojson? false))
+
+  SetOperatorName
+  (process-event [{name :name} app]
+    (let [app (assoc-in app [:service-search :filters :operators :name] name)]
+      (when (>= (count name) 3) ;; Search after three (3) chars is given
+        (comm/get! (str "operator-completions/" name)
+                   {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
+      app))
+
+  OperatorCompletionsResponse
+  (process-event [result app]
+    (assoc-in app [:service-search :filters :operators :results] (:completions result)))
+
+  AddOperator
+  (process-event [{id :id} app]
+    (if (some #(= id (::t-operator/id (:operator %)))
+              (get-in app [:service-search :filters :operators :chip-results]))
+      ;; This name has already been added, don't do it again
+      app
+      (if-let [operator (some #(when (= id (::t-operator/id %)) %)
+                           (get-in app [:service-search :filters :operators :results]))]
+        (-> app
+            (add-operator-to-chip-list operator)
+            (assoc-in [:service-search :filters :operators :name] ""))
+        app)))
+
+  RemoveOperatorById
+  (process-event [{id :id} app]
+    (update-in app [:service-search :filters :operators :chip-results]
+               (fn [results]
+                 (filterv
+                   (fn [x] (not= id (get x ::t-operator/id)))
+                   results))))
+  )
