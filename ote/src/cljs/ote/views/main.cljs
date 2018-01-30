@@ -23,6 +23,7 @@
             [ote.views.service-search :as service-search]
             [ote.ui.form :as form]
             [ote.app.controller.login :as login]
+            [ote.app.controller.flags :as flags]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.admin :as admin]
@@ -167,13 +168,18 @@
                   (if desktop? style-topnav/desktop-link style-topnav/link))
                 {:style {:float "right"}})]]
        [:li
-        [linkify "#" (tr [:common-texts :navigation-login])
-         (merge (stylefy/use-style
-                  (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}}
-                {:on-click #(do
-                              (.preventDefault %)
-                              (e! (login/->ShowLoginDialog)))})]]])
+        (if (flags/enabled? :ote-login)
+          [linkify "#" (tr [:common-texts :navigation-login])
+           (merge (stylefy/use-style
+                   (if desktop? style-topnav/desktop-link style-topnav/link))
+                  {:style {:float "right"}}
+                  {:on-click #(do
+                                (.preventDefault %)
+                                (e! (login/->ShowLoginDialog)))})]
+          [linkify "/user/login" (tr [:common-texts :navigation-login])
+           (merge (stylefy/use-style
+                   (if desktop? style-topnav/desktop-link style-topnav/link))
+                  {:style {:float "right"}})])]])
 
     [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
      [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])

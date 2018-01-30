@@ -42,7 +42,7 @@
     (is (= "admin@napoteadmin123.com" (:email (first users))))))
 
 (deftest delete-service-made-by-normaluser
-  (let [generated-service (gen/generate s-generators/gen-passenger-transportation-service)
+  (let [generated-service (gen/generate s-generators/gen-transport-service)
         modified-service (assoc generated-service ::t-service/transport-operator-id 2)
         response (http-post "normaluser" "transport-service" modified-service)
         parsed-response (:transit response)

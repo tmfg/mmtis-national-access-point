@@ -31,7 +31,7 @@
    :http (component/using (http/http-server (:http config)) [:db])
 
    ;; Index page
-   :index (component/using (index/->Index (:dev-mode? config))
+   :index (component/using (index/->Index config)
                            [:http])
 
    ;; Services for the frontend
