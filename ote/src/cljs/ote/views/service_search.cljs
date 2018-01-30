@@ -209,10 +209,11 @@
                         :hintText  (tr [:service-search :operator-search-placeholder])
                         :hint-style style-base/placeholder
                         :filter (constantly true) ;; no filter, backend returns what we want
-                         :dataSource (parse-operator-data-source results )
-                         :on-update-input #(e! (ss/->SetOperatorName %))
-                         :search-text (or (:name data) "")
-                         :on-new-request #(do
+                        :maxSearchResults 12
+                        :dataSource (parse-operator-data-source results )
+                        :on-update-input #(e! (ss/->SetOperatorName %))
+                        :search-text (or (:name data) "")
+                        :on-new-request #(do
                                             (e! (ss/->AddOperator (aget % "id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
