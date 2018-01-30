@@ -8,7 +8,7 @@ CREATE TYPE interface_data_content AS ENUM (
   'pricing',
   'service-hours',
   'disruptions',
-  'payment-interface'
+  'payment-interface',
   'other'
 );
 
