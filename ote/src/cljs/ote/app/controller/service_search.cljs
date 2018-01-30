@@ -63,10 +63,12 @@
 
 (defn add-operator-to-chip-list
   "Return app with a new operator added to chip list."
-  [app operator]
-  (update-in app [:service-search :filters :operators :chip-results]
-             #(conj (or % [])
-                    operator)))
+  ([app operator]
+   (add-operator-to-chip-list app operator false))
+  ([app operator clear?]
+    (update-in app [:service-search :filters :operators :chip-results]
+               #(conj (if clear? [] (or % []))
+                      operator))))
 
 
 (extend-protocol tuck/Event

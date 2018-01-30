@@ -91,4 +91,4 @@
     (let [filtered-operator {::t-operator/name (::t-operator/name operator)
           ::t-operator/id (::t-operator/id operator)}]
       (routes/navigate! :services)
-    (ss/add-operator-to-chip-list app filtered-operator))))
+    (ss/add-operator-to-chip-list app filtered-operator true))))
