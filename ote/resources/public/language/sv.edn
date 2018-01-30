@@ -150,7 +150,7 @@
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
+   :rentals-pricing-info                               "Fyll i tabellen prisuppgifter och/eller uppgifter om grunderna för hur priset bestäms."
    }
 
   ;; Parking fields
