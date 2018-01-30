@@ -18,7 +18,7 @@
 
 (set! *warn-on-infer* true)
 
-(defn- monkey-patch-chip-backspace
+(defn monkey-patch-chip-backspace
   "Pre 1.0 fix for bug in MaterialUI Chip which unconditionally
   cancels a backspace events (causing an embedded input field to
   not be able to erase text."

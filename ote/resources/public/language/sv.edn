@@ -600,6 +600,19 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
    :leave "Lämna"
    :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
 
+ :operators
+ {:title "Tjänsteproducenter"
+  :filter "Sök tjänsteproducenten..."
+  :loading "Laddar tjänsteproducenter"
+  :result-service-count-single "1 tjänster"
+  :result-service-count [:service-count " tjänster"]
+  :result-no-services "Inga tjänsteproducenter"
+  :description-read-more "Läs mer"
+  :no-results "Inga tjänsteproducenter hittades"
+  :result-count ["Hittades " :total-count " tjänsteproducenter"]
+  :result-count-all ["Total " :total-count " tjänsteproducenter"]
+  }
+
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
@@ -757,7 +770,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
  {:label "Mobilitetstjänstekatalog"
   :filters-label "Sökvillkor"
   :text-search "Sök"
+  :operators "Tjänsteproducent"
   :text-search-placeholder "Sök med namn"
+  :operator-search "Tjänsteproducent"
+  :operator-search-placeholder "Sök med namn"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :no-results "Inga resultat"
   :one-result "Hittades en tjänst"
@@ -767,6 +783,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."
+  :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
+  :operator-no-services "Tjänsteproducenten har inga tjänster."
   }
 
  :login

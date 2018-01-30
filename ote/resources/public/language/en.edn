@@ -606,6 +606,18 @@
    :leave "Leave page"
    :unsaved-data "Form contains unsaved data. Do you really want to leave the page?"}}
 
+ :operators
+ {:title "Transport operators"
+  :filter "Search by name"
+  :loading "Fetching transport operators..."
+  :result-service-count-single "one service"
+  :result-service-count [:service-count " services"]
+  :result-no-services "No published services."
+  :description-read-more "See more."
+  :no-results "No transport operators found for search term"
+  :result-count ["Found " :total-count " transport operators with search term"]
+  :result-count-all ["Total " :total-count " transport operators"]}
+
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
@@ -761,7 +773,10 @@
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
   :text-search "Haku"
+  :operators "Palveluntuottajat"
   :text-search-placeholder "Hae nimellä tai sen osalla"
+  :operator-search "Transport operator"
+  :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
   :no-results "Hakuehdoilla ei löytynyt palveluita"
   :one-result "Hakuehdoilla löytyi yksi palvelu"
@@ -771,6 +786,8 @@
   :showing-latest-services "No search filters. Showing latest modified services."
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."
+  :operator-services ["Transport operator " :name " has " :count " services"]
+  :operator-no-services "Transport operator has no services."
   }
 
  :login
