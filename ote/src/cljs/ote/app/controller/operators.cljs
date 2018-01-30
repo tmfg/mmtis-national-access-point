@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck]
             [ote.db.transport-operator :as t-operator]
             [ote.communication :as comm]
+            [ote.app.controller.service-search :as ss]
             [ote.app.routes :as routes]))
 
 (defrecord Init [])
@@ -90,4 +91,4 @@
     (let [filtered-operator {::t-operator/name (::t-operator/name operator)
           ::t-operator/id (::t-operator/id operator)}]
       (routes/navigate! :services)
-    (ote.app.controller.service-search/add-operator-to-chip-list app filtered-operator))))
+    (ss/add-operator-to-chip-list app filtered-operator))))

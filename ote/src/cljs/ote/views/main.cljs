@@ -41,6 +41,12 @@
     "active"))
 
 (defn header-links [app]
+  (let [operators-list-link (if (flags/enabled? :ote-operators-list)
+                             {:page  :operators
+                              :label [:common-texts :navigation-organizations]}
+                             {:page  :organizations
+                              :label [:common-texts :navigation-organizations]
+                              :url   "/organization"})]
   (filter some?
           [{:page  :front-page
             :label [:common-texts :navigation-front-page]
@@ -49,8 +55,7 @@
            {:page  :services
             :label [:common-texts :navigation-dataset]}
 
-           {:page  :operators
-            :label [:common-texts :navigation-organizations]}
+           operators-list-link
 
            (when (logged-in? app)
              {:page  :own-services
@@ -58,7 +63,7 @@
 
            (when (:admin? (:user app))
              {:page :admin
-              :label [:common-texts :navigation-admin]})]))
+              :label [:common-texts :navigation-admin]})])))
 
 (def selectable-languages [["fi" "suomi"]
                            ["sv" "svenska"]
