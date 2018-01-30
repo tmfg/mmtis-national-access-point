@@ -3,11 +3,13 @@
   (:require [ote.components.http :as http]
             [compojure.core :refer [routes GET]]
             [hiccup.core :refer [html]]
+            [hiccup.element :refer [javascript-tag]]
             [ote.localization :as localization :refer [tr]]
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
             [ote.tools.git :refer [current-revision-sha]]
             [ring.middleware.anti-forgery :as anti-forgery]))
+
 
 (def supported-languages #{"fi" "sv" "en"})
 (def default-language "fi")
@@ -25,6 +27,19 @@
          (str "-" (:current-revision-sha (current-revision-sha))))
        ".js"))
 
+(defn google-analytics-scripts [ga-conf]
+  (list
+   [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
+   (javascript-tag
+    (str "var host = window.location.hostname; "
+         "window.dataLayer = window.dataLayer || []; "
+         "function gtag(){dataLayer.push(arguments);} "
+         "gtag('js', new Date()); "
+         "gtag('config','" (:tracking-code ga-conf) "'); "
+         "if (host === 'localhost' || host.indexOf('testi') !== -1) { "
+         "  window['ga-disable-" (:tracking-code ga-conf) "'] = true; "
+         "}"))))
+
 (def favicons
   [{:rel "apple-touch-icon" :sizes "180x180" :href "/ote/favicon/apple-touch-icon.png?v=E6jNQXq6yK"}
    {:rel "icon" :type "image/png" :sizes "32x32" :href "/ote/favicon/favicon-32x32.png?v=E6jNQXq6yK"}
@@ -33,37 +48,43 @@
    {:rel "mask-icon" :href "/ote/favicon/safari-pinned-tab.svg?v=E6jNQXq6yK" :color "#5bbad5"}
    {:rel "shortcut icon" :href "/ote/favicon/favicon.ico?v=E6jNQXq6yK"}])
 
-(defn index-page [dev-mode?]
-  [:html
-   [:head
+(defn index-page [config]
+  (let [dev-mode? (:dev-mode? config)
+        ga-conf (:ga config)
+        flags (str/join "," (map name (:enabled-features config)))]
+    [:html
+     [:head
 
-    (for [f favicons]
-      [:link f])
-    [:meta {:name "theme-color" :content "#ffffff"}]
-    [:meta {:name "viewport"
-            :content "width=device-width, initial-scale=1.0"}]
-    [:title "FINAP"]
-    (for [{:keys [href integrity]} stylesheets]
-      [:link (merge {:rel "stylesheet"
-                     :href href}
-                    (when (str/starts-with? href "https://")
-                      {:crossorigin ""})
-                    (when integrity
-                      {:integrity integrity}))])
-    [:style {:id "_stylefy-constant-styles_"} ""]
-    [:style {:id "_stylefy-styles_"}]]
+      (for [f favicons]
+        [:link f])
+      [:meta {:name "theme-color" :content "#ffffff"}]
+      [:meta {:name    "viewport"
+              :content "width=device-width, initial-scale=1.0"}]
+      [:title "FINAP"]
+      (for [{:keys [href integrity]} stylesheets]
+        [:link (merge {:rel  "stylesheet"
+                       :href href}
+                      (when (str/starts-with? href "https://")
+                        {:crossorigin ""})
+                      (when integrity
+                        {:integrity integrity}))])
+      [:style {:id "_stylefy-constant-styles_"} ""]
+      [:style {:id "_stylefy-styles_"}]
+      (when (not dev-mode?)
+        (google-analytics-scripts ga-conf))]
 
-   [:body (merge
-           {:onload "ote.main.main();"
-            :data-language localization/*language*}
-           (when (bound? #'anti-forgery/*anti-forgery-token*)
-             {:data-anti-csrf-token anti-forgery/*anti-forgery-token*}))
-    [:div#oteapp]
-    (when dev-mode?
-      [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
-    [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
-
-    [:script {:type "text/javascript"} "goog.require('ote.main');"]]])
+     [:body (merge
+             {:id "main-body"
+              :onload "ote.main.main();"
+              :features flags
+              :data-language localization/*language*}
+             (when (bound? #'anti-forgery/*anti-forgery-token*)
+               {:data-anti-csrf-token anti-forgery/*anti-forgery-token*}))
+      [:div#oteapp]
+      (when dev-mode?
+        [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
+      [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
+      [:script {:type "text/javascript"} "goog.require('ote.main');"]]]))
 
 (defn index [dev-mode? accepted-languages]
   (let [lang (or (some supported-languages accepted-languages) default-language)]

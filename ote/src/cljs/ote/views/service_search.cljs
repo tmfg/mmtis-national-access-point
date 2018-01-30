@@ -16,7 +16,32 @@
             [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
             [clojure.string :as str]
-            [ote.views.ckan-service-viewer :as ckan-service-viewer]))
+            [ote.views.ckan-service-viewer :as ckan-service-viewer]
+            [ote.app.controller.admin :as admin]))
+
+(defn- delete-service-action [e! id name show-delete-modal?]
+  [:span
+   [ui/icon-button {:href "/ote/#/services" :on-click #(e! (admin/->DeleteTransportService id))}
+    [ic/action-delete]]
+   (when show-delete-modal?
+     [ui/dialog
+      {:open true
+       :title (tr [:dialog :delete-transport-service :title])
+       :actions [(r/as-element
+                   [ui/flat-button
+                    {:label (tr [:buttons :cancel])
+                     :primary true
+                     :on-click #(e! (admin/->CancelDeleteTransportService id))}])
+                 (r/as-element
+                   [ui/raised-button
+                    {:label (tr [:buttons :delete])
+                     :icon (ic/action-delete-forever)
+                     :secondary true
+                     :primary true
+                     :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
+
+      (tr [:dialog :delete-transport-service :confirm] {:name name})])])
+
 
 (defn data-items [& icons-and-items]
   [:div (stylefy/use-style style/data-items)
@@ -78,7 +103,7 @@
                   (value-fn row)]))])
            external-interface-links))]]]])])
 
-(defn- result-card [e! {::t-service/keys [id name sub-type contact-address
+(defn- result-card [e! app {::t-service/keys [id name sub-type contact-address
                                           operation-area-description contact-phone contact-email
                                           operator-name ckan-resource-id transport-operator-id]
                         :as service}]
@@ -102,7 +127,12 @@
        contact-phone
 
        [ic/communication-email {:style style/contact-icon}]
-       contact-email]]
+       contact-email]
+
+      (when (get-in app [:user :admin?])
+        [:div {:style {:float "right"}}
+         [delete-service-action e! id name (get service :show-delete-modal?)]])
+      ]
      [:div.result-subtitle (stylefy/use-style style/subtitle)
       [:div (stylefy/use-style style/subtitle-operator-first)
        operator-name]
@@ -112,7 +142,7 @@
      [:div.result-interfaces
       [external-interface-links e! service]]]))
 
-(defn results-listing [e! {:keys [results empty-filters? total-service-count
+(defn results-listing [e! app {:keys [results empty-filters? total-service-count
                                   filter-service-count fetching-more?]}]
   [:div.col-xs-12.col-md-12.col-lg-12
    [:p
@@ -128,7 +158,7 @@
    (doall
     (for [result results]
       ^{:key (::t-service/id result)}
-      [result-card e! result]))
+      [result-card e! app result]))
 
    (if fetching-more?
      [:span (tr [:service-search :fetching-more])]
@@ -158,7 +188,7 @@
 
         {:name ::t-service/operation-area
          :type :multiselect-selection
-         :show-option #(str (:text %) " (" (:count %) ")")
+         :show-option #(:text %)
          :options (::t-service/operation-area facets)
          :auto-width? true}
 
@@ -169,9 +199,9 @@
          :auto-width? true})]
       filters]]))
 
-(defn service-search [e! _]
+(defn service-search [e! app _]
   (e! (ss/->InitServiceSearch))
-  (fn [e! {results :results
+  (fn [e! app {results :results
            total-service-count :total-service-count
            empty-filters? :empty-filters?
            resource :resource
@@ -195,4 +225,4 @@
      [filters-form e! service-search]
      (if (nil? results)
        [:div (tr [:service-search :no-filters])]
-       [results-listing e! service-search])]))
+       [results-listing e! app service-search])]))

@@ -102,21 +102,23 @@
                             (if-let [hours (::t-service/service-hours hours-and-exceptions)]
                               (assoc loc ::t-service/service-hours hours)
                               loc)
-                            (if-let [exceptions (::t-service/service-hours hours-and-exceptions)]
+                            (if-let [exceptions (::t-service/service-exceptions hours-and-exceptions)]
                               (assoc loc ::t-service/service-exceptions exceptions)
                               loc)
+                            (if-let [info (::t-service/service-hours-info hours-and-exceptions)]
+                              (assoc loc ::t-service/service-hours-info info)
+                              loc)
                             (dissoc loc ::t-service/service-hours-and-exceptions)))
-                        pick-up-locations)
-                   ))
+                        pick-up-locations)))
       (update-in [::t-service/rentals ::t-service/vehicle-classes]
-                 (fn [vehicle-classes]               
+                 (fn [vehicle-classes]
                    (mapv (fn [{prices-and-units :price-group :as price-group}]
-                          (as-> price-group price
-                            (if-let [prices (::t-service/price-classes prices-and-units)]
-                              (assoc price ::t-service/price-classes prices)
-                              price)
-                            (dissoc price :price-group)))
-                        vehicle-classes)))))
+                           (as-> price-group price
+                             (if-let [prices (::t-service/price-classes prices-and-units)]
+                               (assoc price ::t-service/price-classes prices)
+                               price)
+                             (dissoc price :price-group)))
+                         vehicle-classes)))))
 
 (defmethod transform-save-by-type :default [service] service)
 
@@ -131,11 +133,13 @@
                  (fn [pick-up-locations]
                    (mapv (fn [{hours ::t-service/service-hours
                                exceptions ::t-service/service-exceptions
+                               info ::t-service/service-hours-info
                                :as pick-up-location}]
                            (-> pick-up-location
                                (assoc ::t-service/service-hours-and-exceptions
                                       {::t-service/service-hours hours
-                                       ::t-service/service-exceptions exceptions})
+                                       ::t-service/service-exceptions exceptions
+                                       ::t-service/service-hours-info info})
                                (dissoc ::t-service/service-hours
                                        ::t-service/service-exceptions)))
                          pick-up-locations)))
@@ -144,7 +148,7 @@
                    (mapv (fn [{price-classes ::t-service/price-classes
                                :as vehicle-class}]
                            (-> vehicle-class
-                               (assoc :price-group 
+                               (assoc :price-group
                                       {::t-service/price-classes price-classes})
                                (dissoc ::t-service/price-classes)))
                          vehicle-classes)))))

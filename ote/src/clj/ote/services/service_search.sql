@@ -1,8 +1,8 @@
 -- name: operation-area-facet
 SELECT "operation-area" as text, COUNT(*) as count
-  FROM "operation-area-facet"
+  FROM "operation-area-facet" o
  GROUP BY text
- ORDER BY count DESC;
+ ORDER BY text ASC;
 
 -- name: sub-type-facet
 SELECT type."sub-type", COALESCE(count.count, 0) AS count

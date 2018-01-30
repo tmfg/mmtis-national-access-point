@@ -30,7 +30,7 @@
    :http (component/using (http/http-server (:http config)) [:db])
 
    ;; Index page
-   :index (component/using (index/->Index (:dev-mode? config))
+   :index (component/using (index/->Index config)
                            [:http])
 
    ;; Services for the frontend
@@ -58,7 +58,7 @@
            [:db :http])
 
    :admin (component/using
-           (admin-service/->Admin)
+           (admin-service/->Admin (:nap config))
            [:db :http])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
