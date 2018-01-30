@@ -88,7 +88,7 @@
 
 
 (defn operators-list [e! operators]
-  [:div
+  [:div.row
    (doall
     (for [{::t-operator/keys [id name business-id homepage email
                               phone gsm visiting-address service-count
@@ -143,4 +143,4 @@
         (when (> (:total-count operators) (count (:results operators)))
           (if (:loading? operators)
             [:div (tr [:operators :loading])]
-             [common/scroll-sensor #(e! (operators-controller/->FetchMore))]))])]]))
+            [common/scroll-sensor #(e! (operators-controller/->FetchMore))]))])]]))
