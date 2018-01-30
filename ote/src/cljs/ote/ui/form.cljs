@@ -398,7 +398,7 @@
           [:div.form {:class class}
            (when label
              [:h3.form-label label])
-           [:span.form-groups
+           [:div.form-groups.row
             (doall
              (map-indexed
               (fn [i form-group]
