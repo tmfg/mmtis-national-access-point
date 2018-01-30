@@ -87,9 +87,10 @@
                               phone gsm visiting-address service-count
                               ckan-group] :as operator} operators]
       ^{:key (str "operator-" id)}
-      [:div {:class "col-md-6" :style {:padding "1em 1em 0 0"}}
+      [:div {:class "col-md-6" :style {:padding "10px 10px 0px 0px"}}
       [ui/paper {:z-depth 1
-                 :style {:min-height "180px"}}
+                 :style {:min-height "155px"}
+                 }
        [:div (stylefy/use-style style-service-search/operator-result-header)
          [:a
           {:href "#"
@@ -107,7 +108,7 @@
                (tr [:operators :description-read-more])]]
             (::t-operator/description ckan-group))]
          (operator-modal e! operator)
-         [:div {:style {:position "absolute" :bottom "1em" }}
+         [:div {:style {:position "absolute" :bottom "5px" }}
           (show-service-count-link e! operator)]]]]))])
 
 (defn operators [e! _]
