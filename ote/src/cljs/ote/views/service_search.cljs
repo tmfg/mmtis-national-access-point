@@ -66,10 +66,9 @@
     (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
    [::t-service/external-service-url "21%"
     (comp #(linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
+   [::t-service/data-content "21%" ::t-service/data-content]
    [::t-service/format-short "16%" ::t-service/format]
-   [::t-service/license "21%" ::t-service/license]
-   [::t-service/license-url "21%" (comp #(when-not (str/blank? %)
-                                           (linkify % % {:target "_blank"})) ::t-service/license-url)]])
+   [::t-service/license "21%" ::t-service/license]])
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
