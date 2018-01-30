@@ -63,19 +63,21 @@
 
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "Externa gränssnitt"
+   :ote.db.transport-service/data-content "Tietosisältö"
    :ote.db.transport-service/external-service-description "Beskrivning av externt gränssnitt"
    :ote.db.transport-service/external-service-url "Gränssnittets tekniska adress"
    :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
    :ote.db.transport-service/rental-service            "Hyrtjänstens adress"
-   :ote.db.transport-service/format "Gränssnittets format (tex. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format "Form"
    :ote.db.transport-service/format-short "Form"
    :ote.db.transport-service/companies "De företag som producerar tjänsten"
    :ote.db.transport-service/company-name "Företagts namn"
    :ote.db.transport-service/business-id "Företagets FO-nummer"
    :ote.db.transport-service/companies-csv-url "Företagslistans tekniska address"
-   :ote.db.transport-service/license "Licens/användarvillkor"
-   :ote.db.transport-service/license-url "Beskrivning av licens"
+   :ote.db.transport-service/license "Licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
+
+   ;; Service hours
    :ote.db.transport-service/service-hours-info "Tilläggsinfo"
    }
 
@@ -401,6 +403,22 @@
    :rental-car-park "Hyrbilar"
    :coach-park "Bussar"
    :disabled-park "Invaplatser"}
+
+  :ote.db.transport-service/interface-data-content
+  {:route-and-schedule "Reitti- ja aikataulutiedot"
+   :luggage-restrictions "Matkatavararajoitukset"
+   :realtime-interface "Reaaliaikarajapinta"
+   :booking-interface "Varausrajapinta"
+   :accessibility-services "Esteettömyyspalvelut"
+   :other-services "Muut palvelut"
+   :pricing "Hintatiedot"
+   :service-hours "Palveluajat"
+   :disruptions "Häiriötilanteet"
+   :payment-interface "Lippu- ja myyntirajapinta"
+   :other "Muu"}
+
+
+  ;; ENUMS end
   }
 
  ;; Per feature/page localization keys

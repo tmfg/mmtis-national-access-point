@@ -81,31 +81,40 @@
     {:name             ::t-service/external-interfaces
      :type             :table
      :prepare-for-save values/without-empty-rows
-     :table-fields     [{:name      ::t-service/external-service-description
-                         :type :localized-text
-                         :width "25%"
-                         :read      (comp ::t-service/description ::t-service/external-interface)
-                         :write     #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
+     :table-fields     [{:name ::t-service/data-content
+                         :width "20%"
+                         :auto-width? true
+                         :full-width? true
+                         :type :multiselect-selection
+                         :options t-service/interface-data-contents
+                         :show-option (tr-key [:enums ::t-service/interface-data-content])
                          :required? true
-                         :is-empty? validation/empty-localized-text?}
+                         :is-empty? validation/empty-enum-dropdown?}
                         {:name      ::t-service/external-service-url
-                         :type :string
-                         :width "18%"
+                         :type      :string
+                         :width     "20%"
+                         :full-width? true
                          :read      (comp ::t-service/url ::t-service/external-interface)
                          :write     #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
                          :required? true}
                         {:name      ::t-service/format
-                         :type :string
-                         :width "12%"
+                         :type      :string
+                         :width     "20%"
+                         :full-width? true
                          :required? true}
-                        {:name ::t-service/license
-                         :type :string
-                         :width "18%"
+                        {:name  ::t-service/license
+                         :type  :string
+                         :width "20%"
+                         :full-width? true
                          }
-                        {:name ::t-service/license-url
-                         :type :string
-                         ;:width "21%"
-                         }]
+                        {:name      ::t-service/external-service-description
+                         :type      :localized-text
+                         :width     "20%"
+                         :full-width? true
+                         :read      (comp ::t-service/description ::t-service/external-interface)
+                         :write     #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
+                         :required? true
+                         :is-empty? validation/empty-localized-text?}]
      :delete?          true
      :add-label        (tr [:buttons :add-external-interface])}
 

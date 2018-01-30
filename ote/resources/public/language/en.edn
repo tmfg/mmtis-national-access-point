@@ -61,8 +61,9 @@
    :ote.db.transport-service/location                  "Location"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "External interfaces"
-   :ote.db.transport-service/external-service-description "External interface description"
+   :ote.db.transport-service/external-interfaces "External machine readable interfaces"
+   :ote.db.transport-service/data-content "Data content"
+   :ote.db.transport-service/external-service-description "More info"
    :ote.db.transport-service/external-service-url "Interface URL address"
    :ote.db.transport-service/booking-service "Booking service address"
    :ote.db.transport-service/rental-service "Rental service address"
@@ -73,8 +74,10 @@
    :ote.db.transport-service/business-id "Company business ID"
    :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv-tiedoston osoite (www)"
    :ote.db.transport-service/license "License / terms of use"
-   :ote.db.transport-service/license-url "License or terms of use description"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
+
+
+   ;; Service hours
    :ote.db.transport-service/service-hours-info "Lisätiedot"
    }
 
@@ -402,7 +405,23 @@
    :rental-car-park "Vuokra-autot"
    :coach-park "Linja-autot"
    :disabled-park "Invapaikat"}
-  }
+
+  :ote.db.transport-service/interface-data-content
+  {:route-and-schedule "Reitti- ja aikataulutiedot"
+   :luggage-restrictions "Matkatavararajoitukset"
+   :realtime-interface "Reaaliaikarajapinta"
+   :booking-interface "Varausrajapinta"
+   :accessibility-services "Esteettömyyspalvelut"
+   :other-services "Muut palvelut"
+   :pricing "Hintatiedot"
+   :service-hours "Palveluajat"
+   :disruptions "Häiriötilanteet"
+   :payment-interface "Lippu- ja myyntirajapinta"
+   :other "Muu"}
+
+
+  ;; ENUMS end
+ }
 
  ;; Per feature/page localization keys
  :place-search {:name                "Paikan name"

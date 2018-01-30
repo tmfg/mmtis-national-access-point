@@ -62,20 +62,23 @@
    :ote.db.transport-service/location                  "Sijainti"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
-   :ote.db.transport-service/external-service-description "Rajapinnan kuvaus lyhyesti"
-   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
+   :ote.db.transport-service/external-interfaces "Ulkoiset koneluettavat rajapinnat"
+   :ote.db.transport-service/data-content "Tietosisältö"
+   :ote.db.transport-service/external-service-description "Lisätietoja"
+   :ote.db.transport-service/external-service-url "Web-osoite"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
-   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format "Formaatti"
    :ote.db.transport-service/format-short "Muoto"
    :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/companies-csv-url "Yrityslistan osoite"
-   :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
+   :ote.db.transport-service/license "Lisenssi"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
+
+
+   ;; Service hours
    :ote.db.transport-service/service-hours-info "Lisätiedot"
    }
 
@@ -404,6 +407,22 @@
    :rental-car-park "Vuokra-autot"
    :coach-park "Linja-autot"
    :disabled-park "Invapaikat"}
+
+  :ote.db.transport-service/interface-data-content
+  {:route-and-schedule "Reitti- ja aikataulutiedot"
+   :luggage-restrictions "Matkatavararajoitukset"
+   :realtime-interface "Reaaliaikarajapinta"
+   :booking-interface "Varausrajapinta"
+   :accessibility-services "Esteettömyyspalvelut"
+   :other-services "Muut palvelut"
+   :pricing "Hintatiedot"
+   :service-hours "Palveluajat"
+   :disruptions "Häiriötilanteet"
+   :payment-interface "Lippu- ja myyntirajapinta"
+   :other "Muu"}
+
+
+  ;; ENUMS end
  }
 
  ;; Per feature/page localization keys
