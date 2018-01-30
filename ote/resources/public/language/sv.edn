@@ -190,6 +190,7 @@
    :ote.db.transport-service/to                        "Stängs kl"
    :ote.db.transport-service/all-day                   "24h"
    :ote.db.transport-service/maximum-stay              "Max parkeringstid"
+   :maximum-stay-limited "Parkeringstid begränsad"
    }
 
 

@@ -15,8 +15,7 @@
 (def gen-terminal_information
   (gen/hash-map
     ::t-service/service-hours generators/gen-service-hours-array
-    ::t-service/indoor-map generators/gen-service-link
-    ))
+    ::t-service/indoor-map generators/gen-service-link))
 
 (def gen-terminal-service
   (gen/hash-map
@@ -25,8 +24,7 @@
     ::t-service/sub-type (gen/return :terminal)
     ::t-service/terminal gen-terminal_information
     ::t-service/contact-address generators/gen-address
-    ::t-service/contact-phone (s/gen ::t-service/contact-phone)
-    ))
+    ::t-service/contact-phone (s/gen ::t-service/contact-phone)))
 
 (def gen-passenger-transportation
   (gen/hash-map
@@ -50,14 +48,48 @@
     ::t-service/luggage-restrictions generators/gen-localized-text-array
     ::t-service/pricing generators/gen-service-link
     ::t-service/payment-method-description generators/gen-localized-text-array
-    ::t-service/service-hours-info generators/gen-localized-text-array
-    ))
+    ::t-service/service-hours-info generators/gen-localized-text-array))
 
-(def gen-passenger-transportation-service
+(def gen-parking
   (gen/hash-map
-    ::t-service/transport-operator-id (gen/return 1)
-    ::t-service/type (gen/return :passenger-transportation)
-    ::t-service/passenger-transportation gen-passenger-transportation
-    ::t-service/contact-address generators/gen-address
-    ::t-service/contact-phone (s/gen ::t-service/contact-phone)
-    ::t-service/brokerage? (s/gen boolean?)))
+   ::t-service/information-service-accessibility (s/gen ::t-service/information-service-accessibility)
+   ::t-service/charging-points generators/gen-localized-text-array
+   ::t-service/price-classes generators/gen-price-class-array
+   ::t-service/booking-service generators/gen-service-link
+   ::t-service/office-hours-exceptions generators/gen-service-exceptions-array
+   ::t-service/payment-methods generators/gen-payment-methods
+   ::t-service/real-time-information generators/gen-service-link
+   ::t-service/maximum-stay generators/gen-interval
+   ::t-service/accessibility-description generators/gen-localized-text-array
+   ::t-service/office-hours generators/gen-service-hours-array
+   ::t-service/accessibility generators/gen-accessibility-facility-array
+   ::t-service/additional-service-links (gen/vector generators/gen-service-link 0 7)
+   ::t-service/payment-method-description generators/gen-localized-text-array
+   ::t-service/service-exceptions generators/gen-service-exceptions-array
+   ::t-service/accessibility-info-url generators/gen-url
+   ::t-service/parking-capacities generators/gen-parking-capacity-array
+   ::t-service/service-hours generators/gen-service-hours-array))
+
+(def gen-transport-service-common
+  (gen/hash-map
+   ::t-service/transport-operator-id (gen/return 1)
+   ::t-service/type (gen/return :passenger-transportation)
+   ::t-service/contact-address generators/gen-address
+   ::t-service/contact-phone (s/gen ::t-service/contact-phone)
+   ::t-service/brokerage? (s/gen boolean?)))
+
+(defn service-type-generator [service-type]
+  (gen/let [common gen-transport-service-common
+            type-specific (case service-type
+                            :passenger-transportation gen-passenger-transportation
+                            :parking gen-parking)]
+    (assoc common
+           ::t-service/type service-type
+           (case service-type
+             :passenger-transportation ::t-service/passenger-transportation
+             :parking ::t-service/parking) type-specific)))
+
+(def gen-transport-service
+  (gen/frequency
+   [[50 (service-type-generator :passenger-transportation)]
+    [50 (service-type-generator :parking)]]))

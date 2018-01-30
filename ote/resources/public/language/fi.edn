@@ -188,6 +188,7 @@
    :ote.db.transport-service/to                        "Kiinnimenoaika"
    :ote.db.transport-service/all-day                   "24h"
    :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
+   :maximum-stay-limited "Pysäköintiaika rajoitettu"
    }
 
 
