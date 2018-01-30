@@ -105,8 +105,7 @@
                         {:name  ::t-service/license
                          :type  :string
                          :width "20%"
-                         :full-width? true
-                         }
+                         :full-width? true}
                         {:name      ::t-service/external-service-description
                          :type      :localized-text
                          :width     "20%"
