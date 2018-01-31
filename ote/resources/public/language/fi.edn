@@ -500,8 +500,8 @@
 
  :rentals-page
  {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
-  :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
-  :header-service-info                     "Vuokrauspalvelun perustiedot"
+  :header-new-rentals                      "Lisää ajoneuvojen vuokrauspalveluihin tai kaupallisiin yhteiskäyttöpalveluihin liittyvät tiedot"
+  :header-service-info                     "Palvelun perustiedot"
   :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
   :header-usage-area                       "Maarajoitukset"
   :header-restrictions-payments            "Rajoitukset ja maksutavat"
