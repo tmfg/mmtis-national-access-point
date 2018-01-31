@@ -14,5 +14,5 @@ psql -c "CREATE DATABASE temp OWNER napotetest;" -U postgres && \
 psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO napotetest;" -U postgres && \
 psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO napote;" -U postgres  && \
 psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ckan;" -U postgres && \
-psql -c "CREATE EXTENSION postgis" -U postgres napotetest && \
-psql -c "CREATE EXTENSION postgis_topology" -U postgres napotetest
+psql -c "CREATE EXTENSION postgis" -U postgres napote && \
+psql -c "CREATE EXTENSION postgis_topology" -U postgres napote

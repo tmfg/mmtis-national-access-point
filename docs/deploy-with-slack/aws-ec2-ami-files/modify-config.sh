@@ -1,9 +1,10 @@
 #!/bin/bash
 
-
 set -e
 
+sed -r -e 's/(:dev-mode?)([^}]*)/\1 false/g' \
+-e '/.*:log.*/d' \
+-e '/.*:ga.*/d' \
+config.edn > config.edn.tmp && \
 
-#sed -r -e 's/(:db)([^}]*)/\1 {:url "jdbc:postgresql://localhost:5432/napotetest"/g' config.edn
-sed 's/.*:log.*//' config.edn
-sed 's/.*:ga.*//' config.edn
+mv config.edn.tmp config.edn

@@ -22,8 +22,8 @@ runcmd:
   - mv ote-$BRANCH-config.edn config.edn
   - ./modify-config.sh
   - ./setup-db.sh
-  - sudo zcat "ote-${branch_ref}-pgdump.gz" | sudo -u postgres psql napote
-  - ./add-gisdata-into-db.sh napotetest
+  - sudo zcat "ote-$BRANCH-pgdump.gz" | sudo -u postgres psql napote
+  - ./add-gisdata-into-db.sh napote
   - ./start-ote.sh $BRANCH $RESPONSE_URL
 '''
 
