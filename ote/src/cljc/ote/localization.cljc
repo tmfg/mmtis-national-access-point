@@ -8,9 +8,10 @@
   (:require #?@(:cljs [[reagent.core :as r]
                        [ote.communication :as comm]]
                 :clj  [[clojure.java.io :as io]])
-                       [clojure.spec.alpha :as s]
-                       [clojure.string :as str]
-                       [taoensso.timbre :as log]))
+            [clojure.spec.alpha :as s]
+            [clojure.string :as str]
+            [taoensso.timbre :as log]
+            [ote.transit :as transit]))
 
 (def supported-languages ["fi" "sv" "en"])
 
@@ -121,3 +122,11 @@
    (tr-tree #?(:clj *language* :cljs @selected-language) tree-path))
   ([language tree-path]
    (get-in (get @loaded-languages language) tree-path)))
+
+#?(:cljs
+   (defn load-embedded-translations! []
+     (let [elt (.getElementById js/document "ote-translations")
+           {:keys [language translations]} (transit/transit->clj (.-innerText elt))]
+       ;;(.removeChild (.-parentNode elt) elt)
+       (swap! loaded-languages assoc language translations)
+       (reset! selected-language language))))

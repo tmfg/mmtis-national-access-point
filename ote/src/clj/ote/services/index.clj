@@ -8,7 +8,8 @@
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
             [ote.tools.git :refer [current-revision-sha]]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [ote.transit :as transit]))
 
 (def supported-languages #{"fi" "sv" "en"})
 (def default-language "fi")
@@ -34,6 +35,12 @@
    {:rel "mask-icon" :href "/ote/favicon/safari-pinned-tab.svg?v=E6jNQXq6yK" :color "#5bbad5"}
    {:rel "shortcut icon" :href "/ote/favicon/favicon.ico?v=E6jNQXq6yK"}])
 
+(defn translations [language]
+  [:script#ote-translations {:type "x-ote-translations"}
+   (transit/clj->transit
+    {:language language
+     :translations (localization/translations language)})])
+
 (defn index-page [config]
   (let [dev-mode? (:dev-mode? config)
         ga-conf (:ga config)
@@ -56,6 +63,7 @@
                         {:integrity integrity}))])
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
+      (translations localization/*language*)
       [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
       (when (not dev-mode?)
         (javascript-tag
@@ -84,7 +92,7 @@
   (let [lang (or (some supported-languages accepted-languages) default-language)]
     (localization/with-language lang
       {:status 200
-       :headers {"Content-Type" "text/html"}
+       :headers {"Content-Type" "text/html; charset=UTF-8"}
        :body (html (index-page dev-mode?))})))
 
 (defrecord Index [dev-mode?]

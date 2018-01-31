@@ -26,15 +26,12 @@
         "finap_lang" "fi"))
 
 (defn ^:export main []
-  (localization/load-language!
-   (language)
-   (fn [lang _]
-     (reset! localization/selected-language lang)
-     (stylefy/init)
-     (routes/start! fp-controller/->GoToUrl)
-     (state/windowresize-handler nil) ;; Calculate window width
-     (r/render-component [tuck/tuck state/app main/ote-application]
-                         (.getElementById js/document "oteapp")))))
+  (localization/load-embedded-translations!)
+  (stylefy/init)
+  (routes/start! fp-controller/->GoToUrl)
+  (state/windowresize-handler nil) ;; Calculate window width
+  (r/render-component [tuck/tuck state/app main/ote-application]
+                      (.getElementById js/document "oteapp")))
 
 (defn ^:export reload-hook []
   (r/force-update-all))
