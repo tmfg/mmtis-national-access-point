@@ -4,8 +4,8 @@
   :services "Palvelukatalogi"
   :operators "Palveluntuottajat"
   :own-services "Omat palvelutiedot"
-  :admin "Ylläpitopaneeli"
-  }
+  :admin "Ylläpitopaneeli"}
+
 
  ;; Labels for database fields
  :field-labels
@@ -62,22 +62,25 @@
    :ote.db.transport-service/location                  "Sijainti"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Ulkoiset rajapinnat"
-   :ote.db.transport-service/external-service-description "Rajapinnan kuvaus lyhyesti"
-   :ote.db.transport-service/external-service-url "Rajapinnan verkko-osoite"
+   :ote.db.transport-service/external-interfaces "Ulkoiset koneluettavat rajapinnat"
+   :ote.db.transport-service/data-content "Tietosisältö"
+   :ote.db.transport-service/external-service-description "Lisätietoja"
+   :ote.db.transport-service/external-service-url "Web-osoite"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
-   :ote.db.transport-service/format "Rajapinnan muoto (esim. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format "Formaatti"
    :ote.db.transport-service/format-short "Muoto"
    :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
    :ote.db.transport-service/companies-csv-url "Yrityslistan osoite"
-   :ote.db.transport-service/license "Lisenssi / käyttöehdot (esim. lisenssin nimi tai verkko-osoite)"
-   :ote.db.transport-service/license-url "Lisenssin tai käyttöehtojen kuvaus (esim. verkko-osoite)"
+   :ote.db.transport-service/license "Lisenssi"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
-   :ote.db.transport-service/service-hours-info "Lisätiedot"
-   }
+
+
+   ;; Service hours
+   :ote.db.transport-service/service-hours-info "Lisätiedot"}
+
 
   ;; Service exception
   :service-exception
@@ -107,8 +110,8 @@
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-description-taxi "Hinnoittelun kuvaus. Esim. valtioneuvoston taksa-asetuksen mukainen hinnasto."
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
-   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
-   }
+   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"}
+
 
   ;; Terminal fields
   :terminal
@@ -126,8 +129,8 @@
    :ote.db.transport-service/assistance-url         "Tee varaus osoitteesta (www)"
    :ote.db.transport-service/assistance-description "Avustuspalveluja koskeva kuvaus"
    :ote.db.transport-service/assistance-place-description "Avustuspalvelujen sijaintien kuvaus"
-   :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."
-   }
+   :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."}
+
 
   ;; Rental fields
   :rentals
@@ -148,8 +151,8 @@
    :ote.db.transport-service/additional-service-type   "Palvelu"
    :ote.db.transport-service/additional-service-price  "Hinta (€)"
    :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
-   }
+   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."}
+
 
   ;; Parking fields
   :parking
@@ -188,7 +191,7 @@
    :ote.db.transport-service/to                        "Kiinnimenoaika"
    :ote.db.transport-service/all-day                   "24h"
    :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
-   }
+   :maximum-stay-limited "Pysäköintiaika rajoitettu"}
 
 
   :transport-service
@@ -214,8 +217,8 @@
    :ote.db.transport-service/available-from "Saatavilla alkaen"
    :ote.db.transport-service/available-to "Saatavilla asti"
    :ote.db.transport-service/available-from-nil "Heti"
-   :ote.db.transport-service/available-to-nil "Toistaiseksi"
-   }
+   :ote.db.transport-service/available-to-nil "Toistaiseksi"}
+
 
   ;; Common fields
   :ote.db.common/street                               "Osoite"
@@ -223,8 +226,8 @@
   :ote.db.common/postal_code                          "Postinumero"
 
   :login {:email "Sähköpostiosoite"
-          :password "Salasana"}
-  }
+          :password "Salasana"}}
+
 
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -251,15 +254,15 @@
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
-  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
-  }
+  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."}
+
 
  ;; CSV parsing
  :csv
  {:url-parse-failed "Tarkista antamasi tiedoston osoite."
   :csv-parse-failed ".csv-tiedoston parsiminen epäonnistui."
-  :parsing-success ["Antamastasi tiedostosta löydettiin  " :count " yritystä."]
-  }
+  :parsing-success ["Antamastasi tiedostosta löydettiin  " :count " yritystä."]}
+
 
  ;; Action buttons
  :buttons
@@ -290,8 +293,8 @@
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
   :add-new-transport-operator "Lisää uusi palveluntuottaja"
-  :add-new-member "Lisää käyttäjä"
-  }
+  :add-new-member "Lisää käyttäjä"}
+
 
 
 
@@ -351,8 +354,8 @@
    :visual-displays "Visuaaliset näytöt"
    :displays-for-visually-impaired "Näytöt näkövammaisille (taktiili)"
    :large-print-timetables "Suuret kirjasimet aikatauluissa"
-   :other "Muu"
-   }
+   :other "Muu"}
+
 
   :ote.db.transport-service/accessibility
   {:lift "Hissi"
@@ -392,8 +395,8 @@
    :suitable-for-stretchers "Paarikuljetus"
    :boarding-assistance "Kyytiin nousun avustus"
    :assistance-dog-space "Tila avustuskoiralle"
-   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"
-  }
+   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"}
+
 
   :ote.db.transport-service/parking-facility
   {:unknown "Tuntematon"
@@ -404,7 +407,21 @@
    :rental-car-park "Vuokra-autot"
    :coach-park "Linja-autot"
    :disabled-park "Invapaikat"}
- }
+
+  :ote.db.transport-service/interface-data-content
+  {:route-and-schedule "Reitti- ja aikataulutiedot"
+   :luggage-restrictions "Matkatavararajoitukset"
+   :realtime-interface "Reaaliaikarajapinta"
+   :booking-interface "Varausrajapinta"
+   :accessibility-services "Esteettömyyspalvelut"
+   :other-services "Muut palvelut"
+   :pricing "Hintatiedot"
+   :service-hours "Palveluajat"
+   :disruptions "Häiriötilanteet"
+   :payment-interface "Lippu- ja myyntirajapinta"
+   :other "Muu"}}
+  ;; ENUMS end
+
 
  ;; Per feature/page localization keys
  :place-search {:name                "Paikan nimi"
@@ -453,8 +470,8 @@
   :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
    :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
    :to-add-new-operator-tab " välilehdestä."
-   :operator-dont-have-any-services "Et ole vielä lisännyt tarjoamiesi liikkumispalveluiden tietoja NAP-palvelukatalogiin."
-  }
+   :operator-dont-have-any-services "Et ole vielä lisännyt tarjoamiesi liikkumispalveluiden tietoja NAP-palvelukatalogiin."}
+
 
  :organization-page
  {:contact-types            "Yhteystavat"
@@ -466,8 +483,8 @@
   :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
   :help-desc-5-linklabel    "jäsenet sivulla"
-  :help-desc-6 "\nPalveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."
-  }
+  :help-desc-6 "\nPalveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."}
+
 
  :passenger-transportation-page
  {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
@@ -478,8 +495,8 @@
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
-  :header-pick-up-locations "Toimipisteet"
-  }
+  :header-pick-up-locations "Toimipisteet"}
+
 
  :rentals-page
  {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
@@ -492,8 +509,8 @@
   :header-accessibility                    "Esteettömyys"
   :header-additional-services              "Lisäpalvelut"
   :open-service-hours-and-exceptions       "Palveluajat"
-  :open-rental-prices                      "Hintatiedot"
-  }
+  :open-rental-prices                      "Hintatiedot"}
+
 
  :terminal-page
  {:header-service-info                "Palvelun perustiedot"
@@ -502,8 +519,8 @@
   :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance                  "Avustuspalveluiden tiedot"
   :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
-  :header-checkboxlist-accessibility  "Esteettömyys"
-  }
+  :header-checkboxlist-accessibility  "Esteettömyys"}
+
 
  :parking-page
  {:header-new-parking                       "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
@@ -517,18 +534,18 @@
   :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
   :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
   :header-charging-points                   "Latauspisteet"
-  :header-service-hours                     "Palveluajat ja pysäköintiaika"
-  }
+  :header-service-hours                     "Palveluajat ja pysäköintiaika"}
+
 
  :price-dialog
  {:header-dialog "Ajoneuvon hintatiedot"
-  :close-dialog  "Sulje"
-  }
+  :close-dialog  "Sulje"}
+
 
  :opening-hours-dialog
  {:close-dialog "Sulje"
-  :header-dialog "Toimipisteen aukioloajat"
-  }
+  :header-dialog "Toimipisteen aukioloajat"}
+
 
  :select-service-type-page
  {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
@@ -593,8 +610,8 @@
   :language                                   "Kieli"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"
-  }
+  :minutes-placeholder "mm"}
+
 
  :dialog
  {:delete-transport-service
@@ -606,6 +623,19 @@
    :stay "Jää"
    :leave "Poistu"
    :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
+
+ :operators
+ {:title "Palveluntuottajat"
+  :filter "Hae nimellä tai nimen osalla"
+  :loading "Haetaan palveluntuottajia..."
+  :result-service-count-single "1 julkaistu palvelu"
+  :result-service-count [:service-count " julkaistua palvelua"]
+  :result-no-services "Ei julkaistuja palveluita"
+  :description-read-more "Lue koko kuvaus"
+  :no-results "Hakuehdoilla ei löytynyt palveluntuottajia"
+  :result-count ["Hakuehdoilla löytyi " :total-count " palveluntuottajaa"]
+  :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
+  }
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
@@ -741,17 +771,32 @@
                    "FRI" "Pe"
                    "SAT" "La"
                    "SUN" "Su"
-                   }
+
+                   ;; Data content
+                   "route-and-schedule" "Reitti- ja aikataulutiedot"
+                   "luggage-restrictions" "Matkatavararajoitukset"
+                   "realtime-interface" "Reaaliaikarajapinta"
+                   "booking-interface" "Varausrajapinta"
+                   "accessibility-services" "Esteettömyyspalvelut"
+                   "other-services" "Muut palvelut"
+                   "pricing" "Hintatiedot"
+                   "service-hours" "Palveluajat"
+                   "disruptions" "Häiriötilanteet"
+                   "payment-interface" "Lippu- ja myyntirajapinta"}
+
+
+          ;; External interfaces
+          "external-interfaces" "Ulkoiset rajapinnat"
+          "data-content" "Tietosisältö"
+          "license" "Lisenssi/käyttöehdot"
+          "format" "Muoto"
+          "external-interface" "Ulkoinen rajapinta"
+
           ;; accessibility
           "accessibility" "Esteettömyys"
           "information-service-accessibility" "Infopalveluiden esteettömyys"
           "brokerage?" "Välityspalvelu?"
           "companies" "Palvelun tuottamiseen osallistuvat yritykset"
-          "external-interfaces" "Ulkoiset rajapinnat"
-          "license" "Lisenssi/käyttöehdot"
-          "format" "Muoto"
-          "license-url" "Lisenssi/käyttöehdot URL"
-          "external-interface" "Ulkoinen rajapinta"
           "accessibility-info-url" "Esteettömyyspalveluiden kuvaus (WWW)"
           "guaranteed-accessibility-description" "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
           "guaranteed-info-service-accessibility" "Infopalveluiden esteettömyys (taattu saatavuus)"
@@ -761,6 +806,7 @@
           "limited-info-service-accessibility" "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
           "limited-transportable-aid" "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
           "limited-vehicle-accessibility" "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
+
           "payment-method-description" "Maksutapojen lisätiedot"
           "pricing" "Hinnoittelu"
           "service-exceptions" "Toiminta-aikojen poikkeukset"
@@ -772,6 +818,7 @@
           "to-date" "Päättyen (pvm)"
           "sub-type" "Alityyppi"
           "terminal" " "
+
           ;; Assistance
           "assistance" "Avustuspalvelut"
           "assistance-place-description" "Sijainti"
@@ -785,18 +832,22 @@
  :service-search
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
-  :text-search "Haku"
+  :text-search "Palvelun nimi"
+  :operators "Palveluntuottajat"
   :text-search-placeholder "Hae nimellä tai sen osalla"
+  :operator-search "Palveluntuottaja"
+  :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
-  :no-results "Hakuehdoilla ei löytynyt palveluita"
-  :one-result "Hakuehdoilla löytyi yksi palvelu"
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :no-results "Hakuehdoilla ei löytynyt palveluita."
+  :one-result "Hakuehdoilla löytyi yksi palvelu."
+  :many-results ["Hakuehdoilla löytyi " :count " palvelua."]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
   :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
   :fetching-more "Haetaan lisää palveluita..."
-  }
+  :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
+  :operator-no-services "Palveluntuottajalla ei ole palveluita."}
 
  :login
  {:label "Kirjautumistiedot"
@@ -811,13 +862,13 @@
   :forgot-password-button "Aseta salasana uudelleen"
 
   :error {:no-such-user "Tuntematon käyttäjä"
-          :incorrect-password "Väärä salasana"}
-  }
+          :incorrect-password "Väärä salasana"}}
+
 
  :leaflet
  {:zoom-in "Lähennä"
-  :zoom-out "Loitonna"
-  }
+  :zoom-out "Loitonna"}
+
 
  :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"
                                       :polygon   "Piirrä monikulmio"
@@ -841,5 +892,5 @@
                             :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
                             :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
                                      :radius "Säde"}
-                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
- }
+                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}}
+

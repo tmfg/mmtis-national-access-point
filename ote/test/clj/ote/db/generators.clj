@@ -84,3 +84,31 @@
    ::common/street (string-of-max-length 100 (s/gen ::common/street))
    ::common/postal_code gen-postal-code
    ::common/post_office (s/gen ::common/post_office)))
+
+(def gen-payment-methods
+  (gen/vector (s/gen ::t-service/payment_method) 1 7))
+
+(def gen-interval
+  (gen/let [amount (gen/choose 0 200)
+            unit (gen/elements [:minutes :hours :days])]
+    (time/interval amount unit)))
+
+(def gen-accessibility-facility-array
+  (gen/vector (s/gen ::t-service/accessibility_facility) 0 10))
+
+(def gen-service-exception
+  (gen/hash-map
+   ::t-service/from-date (s/gen ::t-service/from-date)
+   ::t-service/to-date (s/gen ::t-service/to-date)
+   ::t-service/description gen-localized-text-array))
+
+(def gen-service-exceptions-array
+  (gen/vector gen-service-exception 0 10))
+
+(def gen-parking-capacity
+  (gen/hash-map
+   ::t-service/parking-facility (s/gen ::t-service/parking_facility)
+   ::t-service/capacity (gen/choose 0 10000)))
+
+(def gen-parking-capacity-array
+  (gen/vector gen-parking-capacity 0 10))

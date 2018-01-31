@@ -96,9 +96,8 @@
 
 (defn fetch-transport-service-external-interfaces [db id]
   (fetch db ::t-service/external-interface-description
-         #{::t-service/external-interface ::t-service/format
-           ::t-service/license ::t-service/license-url
-           ::t-service/ckan-resource-id ::t-service/id}
+         #{::t-service/external-interface ::t-service/data-content ::t-service/format
+           ::t-service/license ::t-service/ckan-resource-id ::t-service/id}
          {::t-service/transport-service-id id}))
 
 (defn delete-resources-from-published-service!
@@ -124,9 +123,9 @@
         external-interfaces (fetch-transport-service-external-interfaces db transport-service-id)
         external-resources
         (mapv (fn [{external-interface ::t-service/external-interface
+                    data-content       ::t-service/interface-data-content
                     fmt                ::t-service/format
                     lic                ::t-service/license
-                    lic-url            ::t-service/license-url
                     resource-id        ::t-service/ckan-resource-id}]
                 (verify-ckan-response
                   (ckan/add-or-update-dataset-resource!

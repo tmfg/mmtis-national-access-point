@@ -156,7 +156,9 @@
       ;;
 
       {:name ::t-service/maximum-stay
-       :type :interval})))
+       :type :interval
+       :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
+       :container-style style-form/full-width})))
 
 (defn capacities [e!]
   (form/group

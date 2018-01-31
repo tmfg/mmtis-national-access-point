@@ -203,23 +203,23 @@
                  (if error error warning)]]])]]])))
 
 
-(defmethod field :selection [{:keys [update! table? label name style show-option options form? error warning auto-width? disabled?] :as field}
+(defmethod field :selection [{:keys [update! table? label name style show-option options form?
+                                     error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-idx (zipmap options (range))]
     [ui/select-field
      (merge
       {:auto-width (boolean auto-width?)
-                      :style style
-                      :floating-label-text (when-not table? label)
-                      :floating-label-fixed true
-                      :value (option-idx data)
-                      :on-change #(update! (nth options %2))
-                      :error-text        (or error warning "") ;; Show error text or warning text or empty string
-                      :error-style       (if error             ;; Error is more critical than required - showing it first
-                                           style-base/error-element
-                                           style-base/required-element)
-                      }
+       :style style
+       :floating-label-text (when-not table? label)
+       :floating-label-fixed true
+       :value (option-idx data)
+       :on-change #(update! (nth options %2))
+       :error-text        (or error warning "") ;; Show error text or warning text or empty string
+       :error-style       (if error             ;; Error is more critical than required - showing it first
+                            style-base/error-element
+                            style-base/required-element)}
       (when disabled?
         {:disabled true}))
      (doall
@@ -369,27 +369,58 @@
       (or minutes-text (gstr/format "%02d" minutes)))]
 
    (when warning
-     [:div (stylefy/use-style style-base/error-element) warning])
-   ])
+     [:div (stylefy/use-style style-base/error-element) warning])])
 
-(defmethod field :interval [{:keys [update!] :as opts} data]
-  (let [[unit amount] (or (some (fn [[unit amount]]
-                                  (when (not (zero? amount)) [unit amount])) data) [:hours 0])]
-    [:div
-     [field (assoc opts
-              :update! (fn [num]
-                         (update! (time/interval (or num 0) unit)))
-              :type :number) (unit data)]
-     [field (assoc opts
-              :update! (fn [unit]
-                         (update! (time/interval amount unit)))
-              :label (tr [:common-texts :time-unit])
-              :name :maximum-stay-unit
-              :type :selection
-              :show-option (tr-key [:common-texts :time-units])
-              ;; TODO: Days not supported yet in ote.time
-              :options [:minutes :hours])
-      unit]]))
+(def time-unit-order [:minutes :hours :days])
+
+(defn- normalize-interval [{:keys [minutes hours days] :as interval}]
+  (cond
+    (and minutes (not= 0 minutes))
+    [:minutes (+ minutes (* 60 (or hours 0)) (* 60 24 (or days 0)))]
+
+    (and hours (not= 0 hours))
+    [:hours (+ hours (* 24 (or days 0)))]
+
+    days
+    [:days days]))
+
+(defmethod field :interval [{:keys [update! enabled-label] :as opts} data]
+  (let [[unit amount] (or (normalize-interval data) [:hours 0])]
+    [:div {:style {:width "100%" :padding-top "0.5em"}}
+     [ui/toggle {:label enabled-label
+                 :label-position "right"
+                 :toggled (not (nil? data))
+                 :on-toggle #(update!
+                              (if data
+                                nil
+                                (time/interval 0 :days)))}]
+     (when-not (nil? data)
+       [:div
+        [field (assoc opts
+                      :update! (fn [num]
+                                 (let [unit (or (::preferred-unit data) unit)]
+                                   (update!
+                                    (assoc (if (str/blank? num)
+                                             (time/interval 0 unit)
+                                             (time/interval (js/parseInt num) unit))
+                                           ::preferred-unit unit))))
+                      :placeholder (tr [:common-texts :time-unlimited])
+                      :type :string
+                      :regex #"\d{0,4}"
+                      :style {:width 200}) amount]
+        [field (assoc opts
+                      :update! (fn [unit]
+                                 (assoc (update! (time/interval amount unit))
+                                        ::preferred-unit unit))
+                      :label (tr [:common-texts :time-unit])
+                      :name :maximum-stay-unit
+                      :type :selection
+                      :show-option (tr-key [:common-texts :time-units])
+                      :options [:minutes :hours :days]
+                      :style {:width 150
+                              :position "relative"
+                              :top 15})
+         (or (::preferred-unit data) unit)]])]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
   (let [time-picker-time (if (= nil? data) default-time data)]
