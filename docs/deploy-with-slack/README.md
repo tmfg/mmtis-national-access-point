@@ -61,6 +61,7 @@ In short you could:
       name: Deploy build artifacts
       command: |
         mkdir deploy
+        ln ote/config.edn deploy/ote-${CIRCLE_BRANCH}-config.edn
         ln /tmp/ote/ote.jar deploy/ote-${CIRCLE_BRANCH}.jar
         pg_dump -h localhost -p 5432 -U postgres -Z 1 napotetest > deploy/ote-${CIRCLE_BRANCH}-pgdump.gz
         aws s3 cp deploy s3://napote-circleci/build-artifacts --recursive
@@ -68,6 +69,12 @@ In short you could:
     
     We have created a custom CircleCI docker image that included all the dependencies needed for our build tasks.  
     You can check it out at [Docker Hub](https://hub.docker.com/r/solita/napote-circleci/) or in this [repo](../../.circleci/Dockerfile).
+    
+    
+**Final touches**
+You might want to add a Lifecycle rule for your build-artifacts directory to remove old build artifacts from your bucket.
+This can be easily done by navigating into your S3 bucket in the Amazon S3 dashboard, and then choosing the 
+"Management"-tab. Here you can add a Lifecycle-rule. The Expiration-setting manages when objects are deleted from your S3-bucket.
 
 ## Create a custom Slack App
 https://api.slack.com/apps
