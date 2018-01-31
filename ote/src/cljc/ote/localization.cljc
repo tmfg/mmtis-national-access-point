@@ -127,6 +127,6 @@
    (defn load-embedded-translations! []
      (let [elt (.getElementById js/document "ote-translations")
            {:keys [language translations]} (transit/transit->clj (.-innerText elt))]
-       ;;(.removeChild (.-parentNode elt) elt)
+       (.removeChild (.-parentNode elt) elt)
        (swap! loaded-languages assoc language translations)
        (reset! selected-language language))))
