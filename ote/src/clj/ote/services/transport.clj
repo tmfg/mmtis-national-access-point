@@ -97,7 +97,7 @@
                  (delete! db ::t-service/transport-service {::t-service/id id}))))
            ;; Otherwise delete from transport-service table
            (delete! db ::t-service/transport-service {::t-service/id id}))
-         (http/transit-response id)))))
+         id))))
 
 
 (defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
@@ -335,7 +335,8 @@
 
    (GET "/transport-service/delete/:id" {{id :id} :params
                                          user :user}
-        (delete-transport-service! nap-config db user (Long/parseLong id)))))
+        (http/transit-response
+         (delete-transport-service! nap-config db user (Long/parseLong id))))))
 
 (defn- transport-routes
   "Unauthenticated routes"

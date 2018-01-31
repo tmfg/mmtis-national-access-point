@@ -53,14 +53,16 @@
 
   ConfirmDeleteTransportService
   (process-event [{id :id} app]
-    (comm/get! (str "admin/transport-service/delete/" id)
-               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)
-                :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
+    (comm/post! "admin/transport-service/delete"
+                {:id id}
+                {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)
+                 :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
     app)
 
 
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
+    (.log js/console "RESPONSE: " (pr-str response))
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get-in app [:service-search :results]))]
       (-> app
           (assoc-in [:service-search :results] filtered-map)
