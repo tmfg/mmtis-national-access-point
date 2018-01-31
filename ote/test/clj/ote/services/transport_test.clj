@@ -205,7 +205,7 @@
       (is (= id (get-in fetch-response [:transit ::t-service/id]))))
 
     ;; Delete
-    (let [delete-response (http-post "normaluser" (str "transport-service/delete/" id) nil)]
+    (let [delete-response (http-post "normaluser" "transport-service/delete" {:id id})]
       (is (= (:transit delete-response) id)))
 
     ;; Try to fetch now and it does not exist
