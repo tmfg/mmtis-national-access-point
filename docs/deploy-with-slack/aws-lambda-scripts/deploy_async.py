@@ -15,10 +15,15 @@ runcmd:
   - cd /home/centos/
   - echo "Start PostgreSQL 9.6";
   - sudo systemctl start postgresql-9.6;
-  - sudo wget https://<your_s3_bucket_path>/ote-$BRANCH-pgdump.gz;
-  - sudo wget https://<your_s3_bucket_path>/ote-$BRANCH.jar;
-  - ./setup-db.sh $BRANCH
   - sudo systemctl start nginx
+  - sudo wget https://s3.eu-central-1.amazonaws.com/napote-circleci/build-artifacts/ote-$BRANCH-pgdump.gz;
+  - sudo wget https://s3.eu-central-1.amazonaws.com/napote-circleci/build-artifacts/ote-$BRANCH.jar;
+  - sudo wget https://s3.eu-central-1.amazonaws.com/napote-circleci/build-artifacts/ote-$BRANCH-config.edn;
+  - mv ote-$BRANCH-config.edn config.edn
+  - ./modify-config.sh
+  - ./setup-db.sh
+  - sudo zcat "ote-${branch_ref}-pgdump.gz" | sudo -u postgres psql napote
+  - ./add-gisdata-into-db.sh napotetest
   - ./start-ote.sh $BRANCH $RESPONSE_URL
 '''
 

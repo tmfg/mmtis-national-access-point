@@ -63,7 +63,7 @@ In short you could:
         mkdir deploy
         ln ote/config.edn deploy/ote-${CIRCLE_BRANCH}-config.edn
         ln /tmp/ote/ote.jar deploy/ote-${CIRCLE_BRANCH}.jar
-        pg_dump -h localhost -p 5432 -U postgres -Z 1 napotetest > deploy/ote-${CIRCLE_BRANCH}-pgdump.gz
+        pg_dump -h localhost -p 5432 -U postgres -Z 1 napote > deploy/ote-${CIRCLE_BRANCH}-pgdump.gz
         aws s3 cp deploy s3://napote-circleci/build-artifacts --recursive
     ```
     
