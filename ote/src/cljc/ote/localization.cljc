@@ -13,7 +13,7 @@
             [taoensso.timbre :as log]
             [ote.transit :as transit]))
 
-(def supported-languages ["fi" "sv" "en"])
+(def supported-languages #{"fi" "sv" "en"})
 
 (defonce loaded-languages (atom {}))
 

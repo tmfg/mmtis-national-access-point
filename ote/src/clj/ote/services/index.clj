@@ -11,9 +11,6 @@
             [clojure.string :as s]
             [ote.transit :as transit]))
 
-(def supported-languages #{"fi" "sv" "en"})
-(def default-language "fi")
-
 (def stylesheets [{:href "css/bootstrap_style_grid.css"}
                   {:href "css/nprogress.css"}
                   {:href "css/styles.css"}
@@ -88,12 +85,10 @@
 
       [:script {:type "text/javascript"} "goog.require('ote.main');"]]]]))
 
-(defn index [dev-mode? accepted-languages]
-  (let [lang (or (some supported-languages accepted-languages) default-language)]
-    (localization/with-language lang
-      {:status 200
-       :headers {"Content-Type" "text/html; charset=UTF-8"}
-       :body (html (index-page dev-mode?))})))
+(defn index [dev-mode?]
+  {:status 200
+   :headers {"Content-Type" "text/html; charset=UTF-8"}
+   :body (html (index-page dev-mode?))})
 
 (defrecord Index [dev-mode?]
   component/Lifecycle
@@ -102,7 +97,7 @@
            (http/publish!
             http {:authenticated? false}
             (routes
-             (GET "/" {lang :accept-language} (index dev-mode? lang))
+             (GET "/" req (index dev-mode?))
              (GET "/index.html" {lang :accept-language} (index dev-mode? lang))))))
   (stop [{stop ::stop :as this}]
     (stop)
