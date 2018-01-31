@@ -61,16 +61,16 @@
 (defn get-transport-service
   "Get single transport service by id"
   [db id]
-  (-> db
-      (fetch ::t-service/transport-service
-             (conj (specql/columns ::t-service/transport-service)
-                   ;; join external interfaces
-                   [::t-service/external-interfaces
-                    (specql/columns ::t-service/external-interface-description)])
-             {::t-service/id id})
-      first
-      (assoc ::t-service/operation-area
-             (places/fetch-transport-service-operation-area db id))))
+  (let [ts (first (fetch db ::t-service/transport-service
+                         (conj (specql/columns ::t-service/transport-service)
+                               ;; join external interfaces
+                               [::t-service/external-interfaces
+                                (specql/columns ::t-service/external-interface-description)])
+                         {::t-service/id id}))]
+    (if ts
+      (assoc ts ::t-service/operation-area
+             (places/fetch-transport-service-operation-area db id))
+      nil)))
 
 (defn delete-transport-service!
   "Delete single transport service by id"
@@ -312,7 +312,10 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-        (http/no-cache-transit-response (get-transport-service db (Long/parseLong id))))
+        (let [ts (get-transport-service db (Long/parseLong id))]
+          (if-not ts
+            {:status 404}
+            (http/no-cache-transit-response ts))))
 
    (POST "/transport-operator/group" {user :user}
      (http/transit-response
