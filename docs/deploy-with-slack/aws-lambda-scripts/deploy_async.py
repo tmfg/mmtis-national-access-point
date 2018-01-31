@@ -20,7 +20,7 @@ runcmd:
   - sudo wget https://s3.eu-central-1.amazonaws.com/napote-circleci/build-artifacts/ote-$BRANCH.jar;
   - sudo wget https://s3.eu-central-1.amazonaws.com/napote-circleci/build-artifacts/ote-$BRANCH-config.edn;
   - mv ote-$BRANCH-config.edn config.edn
-  - ./modify-config.sh
+  - sed -r -e "s/(:dev-mode?)([^}]*)/\\1 false/g" -e "/.*:log.*/d" -e "/.*:ga.*/d" config.edn > config.edn.tmp && mv config.edn.tmp config.edn
   - ./setup-db.sh
   - sudo zcat "ote-$BRANCH-pgdump.gz" | sudo -u postgres psql napote
   - ./add-gisdata-into-db.sh napote
