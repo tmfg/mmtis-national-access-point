@@ -206,7 +206,7 @@
 
     ;; Delete
     (let [delete-response (http-post "normaluser" (str "transport-service/delete/" id) nil)]
-      (is (= (:transit delete-response) 1)))
+      (is (= (:transit delete-response) id)))
 
     ;; Try to fetch now and it does not exist
     (is (thrown-with-msg?
