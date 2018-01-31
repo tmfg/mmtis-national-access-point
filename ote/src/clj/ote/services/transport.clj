@@ -333,7 +333,7 @@
                                user :user}
          (save-transport-service-handler nap-config db user (http/transit-request form-data)))
 
-   (GET "/transport-service/delete/:id" {{id :id} :params
+   (POST "/transport-service/delete/:id" {{id :id} :params
                                          user :user}
         (http/transit-response
          (delete-transport-service! nap-config db user (Long/parseLong id))))))
