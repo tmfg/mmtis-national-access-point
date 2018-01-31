@@ -32,6 +32,7 @@
   ["brokerage_service_type" ::brokerage_service_type]
   ["transportable_aid" ::transportable-aid (specql.transform/transform (specql.transform/to-keyword))]
   ["vehicle_accessibility" ::vehicle-accessibility (specql.transform/transform (specql.transform/to-keyword))]
+  ["interface_data_content" ::interface-data-content (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -73,6 +74,10 @@
 
 ;; Create order for transport_type
 (def passenger-transportation-sub-types [:taxi :request :other :schedule])
+
+(def interface-data-contents [:route-and-schedule :luggage-restrictions :realtime-interface :booking-interface
+                             :accessibility-services :other-services :pricing :service-hours :disruptions
+                             :payment-interface :other])
 
 ;; Create order for payment_method
 (def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])

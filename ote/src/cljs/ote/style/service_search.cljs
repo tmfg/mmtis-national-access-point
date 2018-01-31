@@ -5,7 +5,7 @@
 (def divider-color "lightGray")
 (def subtitle-color "#A4A4A4")
 
-(def result-card {:margin-top "1em" :padding "1em" :padding-bottom "1.5em"})
+(def result-card {:margin "1em 0em 0em 0em" :padding "1em 1em 1.5em 1em"})
 
 (def right-divider {:padding-right "0.5em"
                     :margin-right "0.5em"
@@ -35,6 +35,16 @@
 
 (def result-header {:width "100%" :display "block"
                     :margin-bottom "0.5em"})
+
+(def operator-result-header {:width "100%" :display "block"
+                    :padding "10px"
+                    :background-color "#0088ce"})
+
+(def operator-result-header-link {:color "white"
+                         :font-weight 600})
+
+(def operator-description {:padding "5px 10px 10px 10px" :font-size "15px" :color "#666"})
+(def service-link  {:color "#2D75B4" :text-decoration "none"})
 
 (def data-items
   (merge base/item-list-container
