@@ -327,7 +327,6 @@
 
    (POST "/transport-operator" {form-data :body
                                 user :user}
-         ;(log/info "USER: " user)
          (http/transit-response
           (save-transport-operator nap-config db user
                                    (http/transit-request form-data))))
