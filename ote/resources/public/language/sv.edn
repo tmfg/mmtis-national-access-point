@@ -496,8 +496,8 @@
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"
-  :header-new-rentals                      "Lägg till uppgifter gällande uthyrning"
-  :header-service-info                     "Uthyrningstjänstens basinformation"
+  :header-new-rentals                      "Lägg till uppgifter gällande färdmedelsuthyrning eller kommersiella samanvändningstjänster"
+  :header-service-info                     "Tjänstens basinformation"
   :header-rental-service                   "Komplettera uppgifterna gällande uthyrning."
   :header-usage-area                       "Landbegränsning"
   :header-restrictions-payments            "Begränsningar och betalsätt"
