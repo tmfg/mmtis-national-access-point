@@ -838,6 +838,12 @@
   :operator-search "Palveluntuottaja"
   :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+
+  :result-count ["Hakuehdoille "
+                 (:plural :count
+                          "ei löytynyt palveluita"
+                          "löytyi yksi palvelu"
+                          ["löytyi " :count " palvelua"]) "."]
   :no-results "Hakuehdoilla ei löytynyt palveluita."
   :one-result "Hakuehdoilla löytyi yksi palvelu."
   :many-results ["Hakuehdoilla löytyi " :count " palvelua."]
@@ -893,4 +899,3 @@
                             :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
                                      :radius "Säde"}
                             :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}}
-

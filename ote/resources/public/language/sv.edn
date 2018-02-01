@@ -828,9 +828,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :operator-search "Tjänsteproducent"
   :operator-search-placeholder "Sök med namn"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
-  :no-results "Inga resultat"
-  :one-result "Hittades en tjänst"
-  :many-results ["Hittades " :count " tjänster"]
+  :result-count (:plural :count
+                         "Inga resultat"
+                         "Hittades en tjänst"
+                         ["Hittades " :count " tjänster"])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
@@ -884,4 +885,3 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}}
-

@@ -160,10 +160,7 @@
              :count filter-service-count})
         (tr [:service-search (if empty-filters?
                                :showing-latest-services
-                               (case filter-service-count
-                                 0 :no-results
-                                 1 :one-result
-                                 :many-results))]
+                               :result-count)]
             {:count filter-service-count}))
       " "
       (tr [:service-search :total-services] {:total-service-count total-service-count})]
