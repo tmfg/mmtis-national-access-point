@@ -84,8 +84,14 @@
     (str part)))
 
 (defn- message [message-definition parameters]
-  (if (string? message-definition)
+  (cond
+    (string? message-definition)
     message-definition
+
+    (list? message-definition)
+    (evaluate-list message-definition parameters)
+
+    :default
     (reduce (fn [acc part]
               (str acc (message-part part parameters)))
             ""
