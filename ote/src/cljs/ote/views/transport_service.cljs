@@ -104,10 +104,10 @@
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
    (case type
-     :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app)]
-     :terminal [terminal/terminal e! (:transport-service app)]
-     :rentals [rental/rental e! (:transport-service app)]
-     :parking [parking/parking e! (:transport-service app)])])
+     :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app) app]
+     :terminal [terminal/terminal e! (:transport-service app) app]
+     :rentals [rental/rental e! (:transport-service app) app]
+     :parking [parking/parking e! (:transport-service app) app])])
 
 (defn edit-service-by-id [e! app]
   (e! (ts/->ModifyTransportService (get-in app [:params :id])))
@@ -136,10 +136,13 @@
               [:p (stylefy/use-style style-form/subheader)
                 (tr [:enums :ote.db.transport-service/sub-type
                      (get-in app [:transport-service ::t-service/sub-type])])])
-            [:h2 (get-in app [:transport-operator ::t-operator/name])]
+           ;; Show service owner name only for service owners
+           (when (ts/is-service-owner? app)
+             [:h2 (get-in app [:transport-operator ::t-operator/name])])
+            ;; Render the form
             [edit-service e! (::t-service/type service) app]])))}))
 
-(defn edit-new-service [e! app]
+(defn create-new-service [e! app]
   "Render container and headers for empty service form"
   (e! (ts/->SetNewServiceType app))
   (fn [e! app]

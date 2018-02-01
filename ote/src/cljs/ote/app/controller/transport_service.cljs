@@ -402,3 +402,12 @@
               (dissoc s key)))
           service
           service-level-keys))
+
+(defn is-service-owner?
+  "Admin can see services that they don't own. So we need to know, if user is a service owner"
+  [app]
+  (let [service-operator-id (get-in app [:transport-service ::t-service/transport-operator-id])
+        is-owner? (some (fn [item]
+                          (if (= service-operator-id (get-in item [:transport-operator ::t-operator/id])) true false))
+                        (get app :transport-operators-with-services))]
+    (if is-owner? true false)))

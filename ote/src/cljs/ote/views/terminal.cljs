@@ -17,14 +17,14 @@
             [ote.style.form :as style-form]
             [ote.ui.validation :as validation]))
 
-(defn terminal-form-options [e! schemas]
+(defn terminal-form-options [e! schemas app]
   {:name->label (tr-key [:field-labels :terminal]
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data schemas])})
+                  [ts-common/footer e! data schemas app])})
 
 (defn- indoor-map-group []
   (ts-common/service-url
@@ -123,7 +123,7 @@
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
     :options     t-service/information-service-accessibility}))
 
-(defn terminal [e! {form-data ::t-service/terminal}]
+(defn terminal [e! {form-data ::t-service/terminal} app]
   (r/with-let [groups [(ts-common/name-group (tr [:terminal-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
@@ -132,6 +132,6 @@
                        (indoor-map-group)
                        (assistance-service-group)
                        (accessibility-and-other-services-group)]
-               options (terminal-form-options e! groups)]
+               options (terminal-form-options e! groups app)]
     [:div.row
       [form/form options groups form-data]]))

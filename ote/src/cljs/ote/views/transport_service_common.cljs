@@ -2,6 +2,7 @@
   "View parts that are common to all transport service forms."
   (:require [tuck.core :as tuck]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
@@ -239,28 +240,30 @@
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
-  [e! {published? ::t-service/published? :as data} schemas]
+  [e! {published? ::t-service/published? :as data} schemas app]
   (let [name-missing? (str/blank? (::t-service/name data))]
-    [:div.row
-     (when (not (form/can-save? data))
-       [ui/card {:style {:margin-bottom "1em"}}
-        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
-     (if published?
-       ;; True
-       [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                      :disabled (not (form/can-save? data))}
-        (tr [:buttons :save-updated])]
-       ;; False
-       [:span
-        [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                       :disabled (not (form/can-save? data))}
-         (tr [:buttons :save-and-publish])]
-        [buttons/save  {:on-click #(e! (ts/->SaveTransportService schemas false))
-                        :disabled name-missing?}
-         (tr [:buttons :save-as-draft])]])
-     [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
-      (tr [:buttons :discard])]]))
+    (when (ts/is-service-owner? app)
+      [:div.row
+       (when (not (form/can-save? data))
+         [ui/card {:style {:margin-bottom "1em"}}
+          [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+
+       (if published?
+         ;; True
+         [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                        :disabled (not (form/can-save? data))}
+          (tr [:buttons :save-updated])]
+         ;; False
+         [:span
+          [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                         :disabled (not (form/can-save? data))}
+           (tr [:buttons :save-and-publish])]
+          [buttons/save  {:on-click #(e! (ts/->SaveTransportService schemas false))
+                          :disabled name-missing?}
+           (tr [:buttons :save-as-draft])]])
+       [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+        (tr [:buttons :discard])]])))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group
