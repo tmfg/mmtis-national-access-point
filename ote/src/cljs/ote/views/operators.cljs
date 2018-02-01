@@ -89,8 +89,7 @@
       ^{:key (str "operator-" id)}
       [:div {:class "col-md-6" :style {:padding "10px 10px 0px 0px"}}
       [ui/paper {:z-depth 1
-                 :style {:min-height "155px"}
-                 }
+                 :style {:min-height "155px"}}
        [:div (stylefy/use-style style-service-search/operator-result-header)
          [:a
           {:href "#"
