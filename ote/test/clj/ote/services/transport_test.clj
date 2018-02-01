@@ -190,3 +190,25 @@
     (is (thrown-with-msg?
           clojure.lang.ExceptionInfo #"status 403"
           (http-post "normaluser" "transport-service" problematic-terminal-service)))))
+
+(deftest delete-transport-service
+  (let [service (assoc (gen/generate s-generators/gen-transport-service)
+                       ::t-service/transport-operator-id 2)
+        save-response (http-post "normaluser" "transport-service" service)
+        id (get-in save-response [:transit ::t-service/id])]
+    ;; Saved ok
+    (is (pos? id))
+
+    ;; Fetch and it exists
+    (let [fetch-response (http-get "normaluser" (str "transport-service/" id))]
+      (is (= 200 (:status fetch-response)))
+      (is (= id (get-in fetch-response [:transit ::t-service/id]))))
+
+    ;; Delete
+    (let [delete-response (http-post "normaluser" "transport-service/delete" {:id id})]
+      (is (= (:transit delete-response) id)))
+
+    ;; Try to fetch now and it does not exist
+    (is (thrown-with-msg?
+         clojure.lang.ExceptionInfo #"status 404"
+         (http-get "normaluser" (str "transport-service/" id))))))
