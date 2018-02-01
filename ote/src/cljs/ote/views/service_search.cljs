@@ -22,7 +22,9 @@
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:span
-   [ui/icon-button {:href "/ote/#/services" :on-click #(e! (admin/->DeleteTransportService id))}
+   [ui/icon-button {:href "#" :on-click #(do
+                                           (.preventDefault %)
+                                           (e! (admin/->DeleteTransportService id)))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
