@@ -241,9 +241,12 @@
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
   [e! {published? ::t-service/published? :as data} schemas app]
-  (let [name-missing? (str/blank? (::t-service/name data))]
-
-    (when (ts/is-service-owner? app)
+  (let [name-missing? (str/blank? (::t-service/name data))
+        show-footer? (if (get-in app [:transport-service ::t-service/id])
+                       (ts/is-service-owner? app)
+                       true)]
+    
+    (when show-footer?
       [:div.row
        (when (not (form/can-save? data))
          [ui/card {:style {:margin-bottom "1em"}}

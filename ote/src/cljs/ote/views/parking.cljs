@@ -28,7 +28,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data schemas])})
+                  [ts-common/footer e! data schemas app])})
 
 (defn pricing-group [e!]
   (form/group
