@@ -36,8 +36,9 @@
     (specql/fetch db ::t-operator/transport-operator
                   operator-listing-columns
                   (if (str/blank? filter)
-                    {}
-                    {::t-operator/name (op/ilike (str "%" filter "%"))})
+                    {::t-operator/deleted? false}
+                    {::t-operator/name (op/ilike (str "%" filter "%"))
+                     ::t-operator/deleted? false})
                   {:specql.core/order-by ::t-operator/name
                    :specql.core/order-direction :asc
                    :specql.core/limit (or limit 25)
