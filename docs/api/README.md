@@ -89,9 +89,9 @@ The URL for the GeoJSON can be formed with the `transport-operator-id` and `id` 
 service-search API response `result` objects.
 
 The format is:
-> `https://finap.fi/ote/export/geojson/<transport-service-id>/<id>`
+> `https://finap.fi/ote/export/geojson/<transport-operator-id>/<id>`
 
-Substitute `<transport-service-id>` and `<id>` with the values from the JSON result.
+Substitute `<transport-operator-id>` and `<id>` with the values from the JSON result.
 
 ### Example GeoJSON output
 
