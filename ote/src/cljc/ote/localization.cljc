@@ -79,7 +79,6 @@
     (list? part)
     (evaluate-list part parameters)
 
-    ;; PENDING: tässä voitaisiin tehdä Date formatointi yms tyypin mukaista
     :default
     (str part)))
 
