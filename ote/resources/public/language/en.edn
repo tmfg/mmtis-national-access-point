@@ -837,7 +837,7 @@
   :result-count (:plural :count
                          "No services found."
                          "Found one service."
-                         "Found " :count " services.")
+                         ["Found " :count " services."])
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "No search filters. Showing latest modified services."
