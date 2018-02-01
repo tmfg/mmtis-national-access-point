@@ -118,6 +118,19 @@
      :results results
      :filter-service-count (count ids)}))
 
+(defn- parse-query-parameters [params]
+  {:operation-area (some-> (params "operation_area")
+                           (str/split #","))
+   :text (params "text")
+   :sub-type (when-let [st (some-> (params "sub_types")
+                                   (str/split #","))]
+               (into #{} (map keyword st)))
+   :operators (map #(Long/parseLong %)
+                   (some-> "operators" params
+                           (str/split #",")))
+   :limit (some-> "limit" params (Integer/parseInt))
+   :offset (some-> "offset" params (Integer/parseInt))})
+
 (defn- service-search-routes [db]
   (routes
    (GET "/operator-completions/:term" [term]
@@ -132,18 +145,7 @@
         (http/with-no-cache-headers
           (http/api-response
            req
-           (search db
-                   {:operation-area (some-> (params "operation_area")
-                                            (str/split #","))
-                    :text (params "text")
-                    :sub-type (when-let [st (some-> (params "sub_types")
-                                                    (str/split #","))]
-                                (into #{} (map keyword st)))
-                    :operators (map #(Long/parseLong %)
-                                    (some-> "operators" params
-                                            (str/split #",")))
-                    :limit (some-> "limit" params (Integer/parseInt))
-                    :offset (some-> "offset" params (Integer/parseInt))}))))))
+           (search db (parse-query-parameters params)))))))
 
 (defrecord ServiceSearch []
   component/Lifecycle
