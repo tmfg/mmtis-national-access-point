@@ -773,7 +773,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "pricing" "Prisinformation"
                    "service-hours" "Betjäningstider"
                    "disruptions" "Störningsinformation"
-                   "payment-interface" "Biljett- och försäljningsgränssnit"}
+                   "payment-interface" "Biljett- och försäljningsgränssnit"
+
+                   ;; rentals
+                   "pick-up" "Avhämtning"
+                   "return" "Returnering"
+                   "pick-up-return" "Avhämtning och returnering"}
 
           ;; External interfaces
           "external-interfaces" "Externa maskinläsbara gränssnitt"
@@ -884,4 +889,3 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}}
-

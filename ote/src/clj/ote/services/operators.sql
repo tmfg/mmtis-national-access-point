@@ -7,8 +7,21 @@ GROUP BY t."transport-operator-id"
 
 -- name: count-matching-operators
 -- single?: true
-SELECT COUNT(id) FROM "transport-operator" WHERE name ILIKE :name
+SELECT COUNT(id)
+  FROM "transport-operator" o
+ WHERE o.name ILIKE :name
+   AND o."deleted?" = FALSE
+
 
 -- name: count-all-operators
 -- single?: true
-SELECT COUNT(id) FROM "transport-operator"
+SELECT COUNT(id)
+  FROM "transport-operator" o
+ WHERE o."deleted?" = FALSE
+
+-- name: get-ckan-operator
+-- single? true
+SELECT id
+FROM "group" g
+WHERE g.id = :ckanoperatorid
+AND g.state = 'active'
