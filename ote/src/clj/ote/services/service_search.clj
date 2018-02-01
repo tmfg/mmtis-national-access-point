@@ -129,19 +129,22 @@
          (search-facets db)))
 
    (GET "/service-search" {params :query-params}
-        (http/no-cache-transit-response ;; IE caches all responses too aggressively, so set caches off
-         (search db
-                 {:operation-area (some-> (params "operation_area")
-                                          (str/split #","))
-                  :text (params "text")
-                  :sub-type (when-let [st (some-> (params "sub_types")
-                                                  (str/split #","))]
-                              (into #{} (map keyword st)))
-                  :operators (map #(Long/parseLong %)
-                                  (some-> "operators" params
-                                          (str/split #",")))
-                  :limit (some-> "limit" params (Integer/parseInt))
-                  :offset (some-> "offset" params (Integer/parseInt))})))))
+        (http/with-no-cache-headers
+          ((if (= "json" (params "format"))
+             http/json-response
+             http/transit-response)
+           (search db
+                   {:operation-area (some-> (params "operation_area")
+                                            (str/split #","))
+                    :text (params "text")
+                    :sub-type (when-let [st (some-> (params "sub_types")
+                                                    (str/split #","))]
+                                (into #{} (map keyword st)))
+                    :operators (map #(Long/parseLong %)
+                                    (some-> "operators" params
+                                            (str/split #",")))
+                    :limit (some-> "limit" params (Integer/parseInt))
+                    :offset (some-> "offset" params (Integer/parseInt))}))))))
 
 (defrecord ServiceSearch []
   component/Lifecycle
