@@ -152,8 +152,8 @@
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."}
-
+   :rentals-pricing-info                               "Fyll i tabellen prisuppgifter och/eller uppgifter om grunderna för hur priset bestäms."
+   }
 
   ;; Parking fields
   :parking
@@ -253,7 +253,7 @@
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
-  :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
+  :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."}
 
@@ -389,7 +389,7 @@
    :step-free-access "Inga trappsteg"
    :accessible-vehicle "Fordon utan hinder (esteetön)"
    :suitable-for-wheelchairs "Lämplig för rullstol"
-   :suitable-for-stretchers "Paarikuljetus"
+   :suitable-for-stretchers "Bårtransport"
    :boarding-assistance "Assistans vid ombordstigning"
    :assistance-dog-space "Plats för assistenshund"
    :disability-adapted-vehicle "Fordon lämpat för rörelsehindrade"}
@@ -496,8 +496,8 @@
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"
-  :header-new-rentals                      "Lägg till uppgifter gällande uthyrning"
-  :header-service-info                     "Uthyrningstjänstens basinformation"
+  :header-new-rentals                      "Lägg till uppgifter gällande färdmedelsuthyrning eller kommersiella samanvändningstjänster"
+  :header-service-info                     "Tjänstens basinformation"
   :header-rental-service                   "Komplettera uppgifterna gällande uthyrning."
   :header-usage-area                       "Landbegränsning"
   :header-restrictions-payments            "Begränsningar och betalsätt"
@@ -648,8 +648,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "email" "E-post"
           "phone" "Telefonnr"
 
-
-          "passenger-transportation" "Persontransporttjänstens uppgifter"
+          "passenger-transportation" "Tjänstespecifika uppgifter"
+          "parking" "Tjänstespecifika uppgifter"
+          "rentals" "Tjänstespecifika uppgifter"
           "accessibility-description" "Beskrivning av tillgänglighet"
           "accessibility-tool" "Redskap"
           "additional-services" "Tilläggstjänster"
@@ -668,19 +669,30 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "luggage-restrictions" "Begränsningar gällande resgods"
 
           "url" "WWW-adress"
+          "companies-csv-url" "Företagslistans tekniska address"
+          "service-hours-info" "Tilläggsinfo"
+          "indoor-map" "Inomhuskarta www-sidor"
+          "pick-up-locations" "Verksamhetsställen"
+          "rental-additional-services" "Övriga tjänster"
+          "usage-area" "Tillåtna länder"
+          "vehicle-classes" "Fordon som uthyres"
+
+          "additional-service-links" "Andra tjänster"
+          "charging-points" "Beskriving av laddningspunkterna"
+          "parking-capacities" "Antalet parkeringsplatser"
 
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
                    false "Nej"
 
                    ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-                   "request" "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+                   "taxi" "Taxitjänst (persontransport)"
+                   "request" "Abbonerad trafik, buss (persontransport)"
                    ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-                   "terminal"                 "Asemat, satamat ja muut terminaalit"
-                   "rentals"                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                   "parking"                  "Yleiset kaupalliset pysäköintipalvelut"
+                   "schedule" "Regelbunden ruttbaserad trafik (persontransport)"
+                   "terminal"                 "Stationer, hamnar och övriga terminaler"
+                   "rentals"                  "Fordonsuthyrning och komersiella samanvändningstjänster"
+                   "parking"                  "Allmänna kommersiella parkeringstjänster"
 
                    ;; accessibility tools
                    "wheelchair" "Rullstol"
@@ -704,7 +716,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "escalator" "Rulltrappor"
                    "lift" "Hiss"
                    "narrow-entrance" "Smal ingång"
-                   "pallet-access-low-floor" "Låggolv (Kuormalavalinjan matala lattia)"
+                   "pallet-access-low-floor" "Låggolv"
                    "barrier" "Bom"
                    "travelator" "Rullband"
                    "ramp" "Ramp"
@@ -718,11 +730,21 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "displays-for-visually-impaired" "Taktila skyltar (taktiili)"
                    "audio-information" "Utrop"
                    "audio-for-hearing-impaired" "Ljudförstärkning för hörselskadade"
+                   "disability-adapted-vehicle" "Fordon lämpat för rörelsehindrade"
 
                    ;; additional services
                    "animal-transport" "Djurtransport tillåten"
                    "child-seat"       "Barnstol"
 
+                   ;; parking types
+                   "unknown" "Okänd"
+                   "car-park" "Bilplatser"
+                   "park-and-ride-park" "Infartsparkering"
+                   "motorcycle-park" "Motorcyklar"
+                   "cycle-park" "Cyklar"
+                   "rental-car-park" "Hyrbilar"
+                   "coach-park" "Bussar"
+                   "disabled-park" "Invaplatser"
 
                    ;; payment methods
                    "debit-card" "Bankkort"
