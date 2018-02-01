@@ -15,10 +15,10 @@ sub_types | Comma separated list, matches services of the listed type (see servi
 operators | List of operator ids (see operator search), matches any service created by the given operators | `4,8,15,16,23,42`
 limit | Max number of results to return | `25`
 offset | Where to start returning results (for paging) | `0`
-format | Output format (defaults to transit) | `json`
+response_format | Output format (defaults to transit) | `json`
 
 All parameters are optional. If no parameters are specified the search will return the latest services.
-The default output format is Transit but can be changed to JSON with the `format` query parameter.
+The default output format is Transit but can be changed to JSON with the `response_format` query parameter.
 
 ## Service types
 
