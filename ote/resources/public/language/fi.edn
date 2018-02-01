@@ -782,7 +782,12 @@
                    "pricing" "Hintatiedot"
                    "service-hours" "Palveluajat"
                    "disruptions" "Häiriötilanteet"
-                   "payment-interface" "Lippu- ja myyntirajapinta"}
+                   "payment-interface" "Lippu- ja myyntirajapinta"
+
+                   ;; rentals
+                   "pick-up" "Nouto"
+                   "return" "Palautus"
+                   "pick-up-return" "Nouto ja palautus"}
 
 
           ;; External interfaces
@@ -893,4 +898,3 @@
                             :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
                                      :radius "Säde"}
                             :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}}
-
