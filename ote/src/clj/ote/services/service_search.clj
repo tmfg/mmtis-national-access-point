@@ -120,12 +120,13 @@
 
 (defn- service-search-routes [db]
   (routes
-    (GET "/operator-completions/:term" [term]
-      (http/transit-response
-        (operator-completions db term)))
+   (GET "/operator-completions/:term" [term]
+        (http/no-cache-transit-response
+         (operator-completions db term)))
 
-    (GET "/service-search/facets" []
-        (http/transit-response (search-facets db)))
+   (GET "/service-search/facets" []
+        (http/no-cache-transit-response
+         (search-facets db)))
 
    (GET "/service-search" {params :query-params}
         (http/no-cache-transit-response ;; IE caches all responses too aggressively, so set caches off

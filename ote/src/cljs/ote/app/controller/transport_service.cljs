@@ -297,9 +297,9 @@
 
   ConfirmDeleteTransportService
   (process-event [{id :id} app]
-    (comm/get! (str "transport-service/delete/" id)
-               {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)
-                :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
+    (comm/post! "transport-service/delete" {:id id}
+                {:on-success (tuck/send-async! ->DeleteTransportServiceResponse)
+                 :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
     app)
 
   DeleteTransportServiceResponse

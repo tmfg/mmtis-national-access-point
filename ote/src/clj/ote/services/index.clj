@@ -8,11 +8,8 @@
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
             [ote.tools.git :refer [current-revision-sha]]
-            [ring.middleware.anti-forgery :as anti-forgery]))
-
-
-(def supported-languages #{"fi" "sv" "en"})
-(def default-language "fi")
+            [ring.middleware.anti-forgery :as anti-forgery]
+            [ote.transit :as transit]))
 
 (def stylesheets [{:href "css/bootstrap_style_grid.css"}
                   {:href "css/nprogress.css"}
@@ -48,6 +45,12 @@
    {:rel "mask-icon" :href "/ote/favicon/safari-pinned-tab.svg?v=E6jNQXq6yK" :color "#5bbad5"}
    {:rel "shortcut icon" :href "/ote/favicon/favicon.ico?v=E6jNQXq6yK"}])
 
+(defn translations [language]
+  [:script#ote-translations {:type "x-ote-translations"}
+   (transit/clj->transit
+    {:language language
+     :translations (localization/translations language)})])
+
 (defn index-page [config]
   (let [dev-mode? (:dev-mode? config)
         ga-conf (:ga config)
@@ -70,6 +73,8 @@
                         {:integrity integrity}))])
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
+      (translations localization/*language*)
+
       (when (not dev-mode?)
         (google-analytics-scripts ga-conf))]
 
@@ -86,12 +91,10 @@
       [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
       [:script {:type "text/javascript"} "goog.require('ote.main');"]]]))
 
-(defn index [dev-mode? accepted-languages]
-  (let [lang (or (some supported-languages accepted-languages) default-language)]
-    (localization/with-language lang
-      {:status 200
-       :headers {"Content-Type" "text/html"}
-       :body (html (index-page dev-mode?))})))
+(defn index [dev-mode?]
+  {:status 200
+   :headers {"Content-Type" "text/html; charset=UTF-8"}
+   :body (html (index-page dev-mode?))})
 
 (defrecord Index [dev-mode?]
   component/Lifecycle
@@ -100,8 +103,8 @@
            (http/publish!
             http {:authenticated? false}
             (routes
-             (GET "/" {lang :accept-language} (index dev-mode? lang))
-             (GET "/index.html" {lang :accept-language} (index dev-mode? lang))))))
+             (GET "/" req (index dev-mode?))
+             (GET "/index.html" req (index dev-mode?))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

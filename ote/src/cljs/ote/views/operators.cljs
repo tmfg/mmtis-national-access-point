@@ -21,23 +21,16 @@
         operator-id (::t-operator/id operator)
         operator-name (::t-operator/name operator)]
   [:p {:style {:font-weight "600" :font-size "14px"}}
-   (cond
-     (= 0 service-count)
+   (if (zero? service-count)
      (tr [:operators :result-no-services])
-     (= 1 service-count)
-      [:a
+     [:a
        {:style style-service-search/service-link
         :href "#"
         :on-click #(do (.preventDefault %)
                           (e! (operators-controller/->ShowOperatorServices operator)))}
-      (tr [:operators :result-service-count-single])]
-     :else
-     [:a
-      {:style style-service-search/service-link
-       :href "#"
-       :on-click #(do (.preventDefault %)
-                         (e! (fp-controller/->ChangePage :services {:operator operator-id})))}
-     (tr [:operators :result-service-count] {:service-count service-count})])]))
+      (tr [:operators (if (= 1 service-count)
+                        :result-service-count-single
+                        :result-service-count)] {:service-count service-count})])]))
 
 (defn operator-row [label data]
   (let [data (if (= 0 (count data))
