@@ -39,15 +39,24 @@
                         %)
                      results))))
 
+(defn- search [{{name :name :as place-search} :place-search :as app}]
+  (when-let [timeout (:timeout place-search)]
+    (.clearTimeout js/window timeout))
+  (if (> (count name) 2)
+    (let [on-success (tuck/send-async! ->PlaceCompletionsResponse name)]
+      (assoc-in
+       app [:place-search :timeout]
+       (.setTimeout js/window
+                    #(comm/get! (str "place-completions/" name)
+                                {:on-success on-success})
+                    500)))
+    app))
+
 (extend-protocol tuck/Event
 
   SetPlaceName
   (process-event [{name :name} app]
-    (let [app (assoc-in app [:place-search :name] name)]
-      (when (>= (count name) 2)
-        (comm/get! (str "place-completions/" name)
-                   {:on-success (tuck/send-async! ->PlaceCompletionsResponse name)}))
-      app))
+    (search (assoc-in app [:place-search :name] name)))
 
   PlaceCompletionsResponse
   (process-event [{:keys [completions name]} app]

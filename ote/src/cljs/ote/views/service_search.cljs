@@ -22,7 +22,9 @@
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:span
-   [ui/icon-button {:href "/ote/#/services" :on-click #(e! (admin/->DeleteTransportService id))}
+   [ui/icon-button {:href "#" :on-click #(do
+                                           (.preventDefault %)
+                                           (e! (admin/->DeleteTransportService id)))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -63,14 +65,13 @@
 
 (def external-interface-table-columns
   ;; [label width value-fn]
-  [[::t-service/external-service-description "21%"
-    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
-   [::t-service/external-service-url "21%"
+  [[::t-service/external-service-url "21%"
     (comp #(linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
+   [::t-service/data-content "21%" ::t-service/data-content]
    [::t-service/format-short "16%" ::t-service/format]
    [::t-service/license "21%" ::t-service/license]
-   [::t-service/license-url "21%" (comp #(when-not (str/blank? %)
-                                           (linkify % % {:target "_blank"})) ::t-service/license-url)]])
+   [::t-service/external-service-description "21%"
+    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]

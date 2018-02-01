@@ -63,16 +63,16 @@
 (defn get-transport-service
   "Get single transport service by id"
   [db id]
-  (-> db
-      (fetch ::t-service/transport-service
-             (conj (specql/columns ::t-service/transport-service)
-                   ;; join external interfaces
-                   [::t-service/external-interfaces
-                    (specql/columns ::t-service/external-interface-description)])
-             {::t-service/id id})
-      first
-      (assoc ::t-service/operation-area
-             (places/fetch-transport-service-operation-area db id))))
+  (let [ts (first (fetch db ::t-service/transport-service
+                         (conj (specql/columns ::t-service/transport-service)
+                               ;; join external interfaces
+                               [::t-service/external-interfaces
+                                (specql/columns ::t-service/external-interface-description)])
+                         {::t-service/id id}))]
+    (if ts
+      (assoc ts ::t-service/operation-area
+             (places/fetch-transport-service-operation-area db id))
+      nil)))
 
 (defn delete-transport-service!
   "Delete single transport service by id"
@@ -99,7 +99,7 @@
                  (delete! db ::t-service/transport-service {::t-service/id id}))))
            ;; Otherwise delete from transport-service table
            (delete! db ::t-service/transport-service {::t-service/id id}))
-         (http/transit-response id)))))
+         id))))
 
 (defn get-user-transport-operators-with-services [db groups user]
   (let [operators (map #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
@@ -302,7 +302,10 @@
   (routes
 
    (GET "/transport-service/:id" [id]
-        (http/no-cache-transit-response (get-transport-service db (Long/parseLong id))))
+        (let [ts (get-transport-service db (Long/parseLong id))]
+          (if-not ts
+            {:status 404}
+            (http/no-cache-transit-response ts))))
 
    (POST "/transport-operator/group" {user :user}
      (http/transit-response
@@ -313,7 +316,7 @@
            (get-user-transport-operators-with-services db (:groups user) (:user user))))
 
    (POST "/transport-operator" {form-data :body
-                                user :user}      
+                                user :user}
          (http/transit-response
           (save-transport-operator nap-config db user
                                    (http/transit-request form-data))))
@@ -322,9 +325,11 @@
                                user :user}
          (save-transport-service-handler nap-config db user (http/transit-request form-data)))
 
-   (GET "/transport-service/delete/:id" {{id :id} :params
-                                         user :user}
-        (delete-transport-service! nap-config db user (Long/parseLong id)))))
+   (POST "/transport-service/delete" {form-data :body
+                                      user :user}
+        (http/transit-response
+         (delete-transport-service! nap-config db user
+                                    (:id (http/transit-request form-data)))))))
 
 (defn- transport-routes
   "Unauthenticated routes"

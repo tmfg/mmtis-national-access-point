@@ -95,7 +95,7 @@ describe('Add a new service', function () {
 
         it('should delete the test service', function () {
             cy.server();
-            cy.route('/ote/transport-service/delete/*').as('deleteService');
+            cy.route('POST','/ote/transport-service/delete').as('deleteService');
 
             cy.visit('/ote/#/own-services');
 

@@ -46,7 +46,8 @@
         modified-service (assoc generated-service ::t-service/transport-operator-id 2)
         response (http-post "normaluser" "transport-service" modified-service)
         parsed-response (:transit response)
-        deleted-response  (http-get "admin" (str "admin/transport-service/delete/" (get parsed-response ::t-service/id)))
+        id (::t-service/id parsed-response)
+        deleted-response  (http-post "admin" (str "admin/transport-service/delete") {:id id})
         auditlog (first (fetch
                    (:db ote.test/*ote*)
                    ::auditlog/auditlog

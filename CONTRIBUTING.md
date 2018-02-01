@@ -13,6 +13,9 @@
    * Fixed problem 1
    * Another problem fixed
    
+   # Datamodel
+   * Change to DB migrations.
+   
    # Environment
    * Changes to CI environment
    * Builds now 200% faster with change X!

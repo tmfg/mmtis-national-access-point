@@ -9,29 +9,22 @@
             [taoensso.timbre :as log]
             [clojure.string :as str]
             [ring.middleware.params :as params]
-            [ring.middleware.gzip :as gzip]))
+            [ring.middleware.gzip :as gzip]
+            [ote.localization :as localization]
+            [ring.middleware.cookies :as cookies]))
 
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
 
-(defn- parse-accept-language [accept-language]
-  ;; Parse accept language and return a vector of language codes in the order they appear.
-  ;; Doesn't take weights into account and removes other locale information (like 'en-US' vs 'en-GB').
-  (vec
-   (distinct
-    (for [language (str/split accept-language #",")
-          :when (>= (count language) 2)
-          :let [lang (subs language 0 2)]]
-      lang))))
 
-(defn wrap-accept-language [handler]
-  (fn [{{accept-language "accept-language"} :headers :as req}]
-    (handler
-     (if-not accept-language
-       ;; No "Accept-Language" header specified, return request as is
-       req
-       ;; Parse header and assoc a :accept-language key to the request
-       (assoc req :accept-language (parse-accept-language accept-language))))))
+(defn wrap-language [handler]
+  (fn [{cookies :cookies :as req}]
+    (let [cookie-lang (get-in cookies ["finap_lang" :value])
+          lang (or (and (localization/supported-languages cookie-lang)
+                        (keyword cookie-lang))
+                   :fi)]
+      (localization/with-language
+        lang (handler req)))))
 
 (defn wrap-strip-prefix [strip-prefix handler]
   (fn [{uri :uri :as req}]
@@ -42,11 +35,12 @@
 (defn wrap-middleware [strip-prefix handler & extra-middleware]
   (gzip/wrap-gzip
    (params/wrap-params
-    (wrap-accept-language
-     (reduce (fn [handler middleware]
-               (middleware handler))
-             (wrap-strip-prefix strip-prefix handler)
-             extra-middleware)))))
+    (cookies/wrap-cookies
+     (wrap-language
+      (reduce (fn [handler middleware]
+                (middleware handler))
+              (wrap-strip-prefix strip-prefix handler)
+              extra-middleware))))))
 
 (defn wrap-security-exception [handler]
   (fn [req]
