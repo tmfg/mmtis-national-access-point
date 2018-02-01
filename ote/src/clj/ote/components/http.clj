@@ -136,6 +136,15 @@
    :headers {"Content-Type" "application/json"}
    :body (cheshire/encode data {:key-fn name})})
 
+(defn api-response
+  "Helper for API responses that are used both by OTE app and public.
+  If \"format\" query parameter is \"json\", returns a JSON response.
+  Otherwise returns a transit response."
+  [{{format "format"} :query-params} data]
+  (let [format (and format (str/lower-case format))]
+    (if (= format "json")
+      (json-response data)
+      (transit-response data))))
 
 
 (defn transit-request

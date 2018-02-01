@@ -128,11 +128,10 @@
         (http/no-cache-transit-response
          (search-facets db)))
 
-   (GET "/service-search" {params :query-params}
+   (GET "/service-search" {params :query-params :as req}
         (http/with-no-cache-headers
-          ((if (= "json" (params "format"))
-             http/json-response
-             http/transit-response)
+          (http/api-response
+           req
            (search db
                    {:operation-area (some-> (params "operation_area")
                                             (str/split #","))
