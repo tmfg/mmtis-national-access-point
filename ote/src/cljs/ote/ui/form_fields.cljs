@@ -471,18 +471,27 @@
                [{}]
                data)]
     [:div
-     [ui/table
+     ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper.
+     [ui/table {:wrapperStyle {:overflow "visible"}}
       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
                               {:style style-form/table-header-style})
        [ui/table-row (merge {:selectable false}
                             {:style style-form/table-header-style})
         (doall
-         (for [{:keys [name label width] :as tf} table-fields]
+         (for [{:keys [name label width tooltip tooltip-pos tooltip-len] :as tf} table-fields]
            ^{:key name}
            [ui/table-header-column {:style
                                     (merge {:width width :white-space "pre-wrap"}
                                            style-form/table-header-style)}
-            label]))
+            label
+            (when tooltip
+              [:span {:style {:margin-left 8}
+                      :data-balloon tooltip
+                      :data-balloon-pos (or tooltip-pos "up")
+                      :data-balloon-length (or tooltip-len "medium")}
+               [ic/action-help {:style {:width 16 :height 16
+                                        :vertical-align "middle"
+                                        :color "gray"}}]])]))
         (when delete?
           [ui/table-header-column {:style (merge {:width "70px"} style-form/table-header-style)}
            (tr [:buttons :delete])])]]
