@@ -118,7 +118,9 @@
      :results results
      :filter-service-count (count ids)}))
 
-(defn- parse-query-parameters [params]
+(defn- service-search-parameters
+  "Extract service search parameters from query parameters."
+  [params]
   {:operation-area (some-> (params "operation_area")
                            (str/split #","))
    :text (params "text")
@@ -145,7 +147,7 @@
         (http/with-no-cache-headers
           (http/api-response
            req
-           (search db (parse-query-parameters params)))))))
+           (search db (service-search-parameters params)))))))
 
 (defrecord ServiceSearch []
   component/Lifecycle
