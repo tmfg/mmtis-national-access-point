@@ -407,7 +407,9 @@
   "Admin can see services that they don't own. So we need to know, if user is a service owner"
   [app]
   (let [service-operator-id (get-in app [:transport-service ::t-service/transport-operator-id])
-        is-owner? (some (fn [item]
-                          (if (= service-operator-id (get-in item [:transport-operator ::t-operator/id])) true false))
-                        (get app :transport-operators-with-services))]
-    (if is-owner? true false)))
+        first-matching-item (some
+                              #(= service-operator-id (get-in % [:transport-operator ::t-operator/id]))
+                              (get app :transport-operators-with-services))]
+    (if (not (nil? first-matching-item))
+      true
+      false)))

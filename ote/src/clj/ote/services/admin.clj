@@ -50,7 +50,9 @@
     (= :NO (:published-type query)) {::t-service/published? false}
     :else nil))
 
-(defn- list-services [db user query]
+(defn- list-services
+  "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
+  [db user query]
   (let [q (if (nil? (:query query))
             nil
             {::t-service/name (op/ilike (str "%" (:query query) "%"))})
