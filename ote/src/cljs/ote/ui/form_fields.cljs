@@ -91,17 +91,9 @@
   (let [komponentti (:component skeema)]
     [komponentti data]))
 
-(defn tooltip-wrapper [component & [wrapper-opts]]
-  (fn [data {:keys [text pos len] :as opts}]
-    [:span (merge {:data-balloon        text
-                   :data-balloon-pos    (or pos "up")
-                   :data-balloon-length (or len "medium")}
-                  wrapper-opts)
-     (component data)]))
-
 (def tooltip-icon
   "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
     (fn [opts]
       [wrapped {:style {:width          16 :height 16
                         :vertical-align "middle"

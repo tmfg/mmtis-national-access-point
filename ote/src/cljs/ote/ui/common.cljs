@@ -1,11 +1,14 @@
 (ns ote.ui.common
   "Common small UI utilities"
   (:require [cljs-react-material-ui.icons :as ic]
+            [cljs-react-material-ui.reagent :as ui]
+            [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.form :as style-form]
             [reagent.core :as r]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [reagent.core :as reagent]))
 
 (def mobile?
   (let [ua (str/lower-case js/window.navigator.userAgent)]
@@ -27,6 +30,34 @@
                    url
                    (str "http://" url))]
          [:a (merge {:href url} a-props) label])))))
+
+
+(defn tooltip-wrapper
+  "Wrap any ui component with balloon.css tooltip bindings."
+  [component & [wrapper-opts]]
+  (fn [data {:keys [text pos len] :as opts}]
+    [:span (merge {:data-balloon        text
+                   :data-balloon-pos    (or pos "up")
+                   :data-balloon-length (or len "medium")}
+                  wrapper-opts)
+     (component data)]))
+
+(defn dialog
+  "Creates a dialog with a link trigger. The body can be in hiccup format."
+  [link-label title body]
+  (reagent/with-let
+    [open? (reagent/atom false)]
+    [:div
+     [:a {:href "#" :on-click #(do (.preventDefault %)
+                                   (reset! open? true))} link-label]
+     [ui/dialog
+      {:open @open?
+       :auto-scroll-body-content true
+       :title (or title "")
+       :actions [(reagent/as-element [ui/flat-button {:label (tr [:buttons :close])
+                                                      :on-click #(reset! open? false)}])]
+       :on-request-close #(reset! open? false)}
+      body]]))
 
 (defn help [help]
   [:div.help (stylefy/use-style style-base/help)
