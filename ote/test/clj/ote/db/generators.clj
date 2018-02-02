@@ -17,6 +17,8 @@
                %)
             generator))
 
+(def gen-name gen/string-alphanumeric)
+
 (def gen-us-letter (gen/elements "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 
 (def gen-language
