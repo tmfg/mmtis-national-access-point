@@ -70,7 +70,6 @@
                   #{::t-service/id ::t-service/notice-external-interfaces? ::t-service/published?}))
 
 (defn- export-geojson [db transport-operator-id transport-service-id]
-  (println "EXPORT: operator: " transport-operator-id ", SERVICE: " transport-service-id)
   (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       transport-operator-properties-columns
