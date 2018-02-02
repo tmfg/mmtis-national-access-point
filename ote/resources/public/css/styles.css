@@ -1,9 +1,12 @@
 /* Tänne kaikki Material UI:ta muuttavat css muutokset - hox korvataan varmaan jossain vaiheessa less/sass tiedostoilla */
-/* Reset all attributes in css */
-* {
-  margin: 0;
-  padding: 0;
+
+html {
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
+    min-height: 100%;
 }
+
 body {
     margin: 0;
     padding: 0;
@@ -12,52 +15,57 @@ body {
     padding-bottom: 176px;
     font-size: 16px;
 }
-#oteapp, .ote-sovellus {
-    height: 100%;
-    min-height: 100%;
-    padding: 0px;
 
-}
-.wrapper {
-    padding: 20px 0px 20px 0px;
-    min-height: 100%;
-}
-.grey-wrapper {
-    background-color: #f1f1f1;
-}
-
-@media only screen and (min-width: 1170px) {
-    .container-fluid {
-        padding-left: 0px;
-        padding-right: 0px;
-        width: 1170px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-html {
-    font-family: 'Roboto', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    height: 100%;
-        min-height: 100%;
-}
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
-  margin-bottom: 1rem;
- }
+    margin-bottom: 1rem;
+}
+
 h1 {
-  font-weight: 400;
-  font-size: 180%;
+    font-weight: 400;
+    font-size: 180%;
 }
 h2 {
     font-weight: 400;
     font-size: 120%;
 }
+
 p {
     line-height: 21px;
 }
+
+#oteapp, .ote-sovellus {
+    height: 100%;
+    min-height: 100%;
+    padding: 0px;
+}
+
+/* ul has margin-top:1em by default. 1em is equal to current font-size (16px by default).
+In order to our OTE menu to render correctly work, we need to reset margin and padding for ul elements.
+*/
+#oteapp ul {
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper {
+    padding: 20px 0px 20px 0px;
+    min-height: 100%;
+}
+
+/* Disable top margin for h1 inside wrapper, we do not need top margin for these, as they are our titles.
+   The needed margin comes from .wrapper class.
+ */
+.wrapper h1 {
+    margin-top: 0;
+}
+
+.grey-wrapper {
+    background-color: #f1f1f1;
+}
+
+
 /* Global link color */
 .wrapper a {
     color: #2D75B4;
@@ -70,6 +78,18 @@ p {
 .background-color {
     background: #3db7e4
 }
+
+@media only screen and (min-width: 1170px) {
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+        width: 1170px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+
 
 .leaflet-container {
     width: 100%;
@@ -142,6 +162,7 @@ footer {
 .footer-links .logo > img {
     height: 70px;
 }
+
 ul.unstyled, ol.unstyled {
     margin-left: 0;
     list-style: none;

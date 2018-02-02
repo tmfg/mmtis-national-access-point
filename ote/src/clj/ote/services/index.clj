@@ -11,7 +11,8 @@
             [ring.middleware.anti-forgery :as anti-forgery]
             [ote.transit :as transit]))
 
-(def stylesheets [{:href "css/bootstrap_style_grid.css"}
+(def stylesheets [{:href "css/normalize.css"}               ;; Normalize css on wide range of browsers
+                  {:href "css/bootstrap_style_grid.css"}
                   {:href "css/nprogress.css"}
                   {:href "css/balloon.css"}
                   {:href "css/styles.css"}
