@@ -283,7 +283,7 @@
   (with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
                      (ts-common/contact-info-group)
                      (ts-common/place-search-group e! ::t-service/rentals)
-                     (ts-common/external-interfaces)
+                     (ts-common/external-interfaces e!)
                      (vehicle-group)
                      (luggage-restrictions-groups)
                      (accessibility-group)
@@ -293,6 +293,6 @@
                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                       ::t-service/booking-service)
                      (pick-up-locations e!)]
-                     options (rental-form-options e! groups)]
+             options (rental-form-options e! groups)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))

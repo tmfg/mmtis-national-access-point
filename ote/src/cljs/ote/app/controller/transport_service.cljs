@@ -77,6 +77,10 @@
 (defrecord EnsureCsvFileResponse [response])
 (defrecord FailedCsvFileResponse [response])
 
+(defrecord EnsureUrl [url])
+(defrecord EnsureUrlResponse [response url])
+(defrecord FailedUrlResponse [])
+
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
 
@@ -109,7 +113,7 @@
                         pick-up-locations)
                    ))
       (update-in [::t-service/rentals ::t-service/vehicle-classes]
-                 (fn [vehicle-classes]               
+                 (fn [vehicle-classes]
                    (mapv (fn [{prices-and-units :price-group :as price-group}]
                           (as-> price-group price
                             (if-let [prices (::t-service/price-classes prices-and-units)]
@@ -144,7 +148,7 @@
                    (mapv (fn [{price-classes ::t-service/price-classes
                                :as vehicle-class}]
                            (-> vehicle-class
-                               (assoc :price-group 
+                               (assoc :price-group
                                       {::t-service/price-classes price-classes})
                                (dissoc ::t-service/price-classes)))
                          vehicle-classes)))))
@@ -252,6 +256,28 @@
     (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response)
     )
 
+  EnsureUrl
+  (process-event [{url :url} app]
+    (comm/post! (str "check-external-api") {:url url}
+                {:on-success (tuck/send-async! ->EnsureUrlResponse url)
+                 :on-failure (tuck/send-async! ->FailedUrlResponse)})
+    app)
+
+  EnsureUrlResponse
+  (process-event [{url :url response :response :as e} app]
+    (update-in app [:transport-service (t-service/service-key-by-type (::t-service/type (:transport-service app)))
+                    ::t-service/external-interfaces]
+               (fn [external-interfaces]
+                 (mapv (fn [{eif ::t-service/external-interface :as external-interface}]
+                         (if (= (::t-service/url eif) url)
+                           (assoc external-interface ::t-service/external-interface
+                                  (assoc eif :url-status response))
+                           external-interface))
+                       external-interfaces))))
+
+  FailedUrlResponse
+  (process-event [{response :response} app]
+    app)
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage

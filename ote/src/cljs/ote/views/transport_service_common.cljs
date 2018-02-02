@@ -16,7 +16,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.validation :as validation]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -65,7 +66,7 @@
 
 (defn external-interfaces
   "Creates a form group for external services."
-  [& [rae-info?]]
+  [& [e! rae-info?]]
   (form/group
     {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
@@ -91,9 +92,22 @@
                         {:name      ::t-service/external-service-url
                          :type :string
                          :width "18%"
+                         :on-blur #(e! (ts/->EnsureUrl (-> % .-target .-value)))
                          :read      (comp ::t-service/url ::t-service/external-interface)
                          :write     #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
                          :required? true}
+
+                        {:name      :ext-validation
+                         :type      :component
+                         :component (fn [{{status :status} :data}]
+                                      (if-not status
+                                        [:span]
+                                        (if (= :success  status)
+                                          [:div {:title (tr [:field-labels :transport-service-common :external-interfaces-ok])} [ic/action-done {:style {:width 24 :height 24 :color "green"}}]]
+                                          [:div {:title (tr [:field-labels :transport-service-common :external-interfaces-warning])} [ic/alert-warning {:style {:width 24 :height 24 :color "#cccc00"}}]])))
+                         :read (comp :url-status ::t-service/external-interface)
+                         :width "5%"}
+
                         {:name      ::t-service/format
                          :type :string
                          :width "12%"

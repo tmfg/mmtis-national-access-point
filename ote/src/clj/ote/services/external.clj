@@ -47,17 +47,27 @@
        :error :url-parse-failed
        :http-status (:status response)})))
 
+(defn- check-external-api
+  [url-data]
+  (let [url (ensure-url (get url-data :url))
+        response @(httpkit/get url {:as :text
+                                    :timeout 30000})]
+    (if (= 200 (:status response))
+      {:status :success}
+      {:status :failed})))
+
 (defn- external-routes-auth
   "Routes that require authentication"
-
   [db nap-config]
   (routes
-
-    (POST  "/check-company-csv"  {url-data :body}
+   (POST  "/check-company-csv" {url-data :body}
           (http/transit-response
-            (check-csv
-              (http/transit-request url-data ))))))
-
+           (check-csv
+            (http/transit-request url-data ))))
+   (POST  "/check-external-api" {url-data :body}
+          (http/transit-response
+           (check-external-api
+            (http/transit-request url-data ))))))
 
 (defrecord External [nap-config]
   component/Lifecycle
