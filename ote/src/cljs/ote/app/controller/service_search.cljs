@@ -71,6 +71,10 @@
                       operator))))
 
 
+(defn- operator-in-list? [operator list]
+  "Return nil if operator is not in given list"
+  (some #(= (::t-operator/id operator) (::t-operator/id %)) list))
+
 (extend-protocol tuck/Event
 
   InitServiceSearch
@@ -151,14 +155,18 @@
   SetOperatorName
   (process-event [{name :name} app]
     (let [app (assoc-in app [:service-search :filters :operators :name] name)]
-      (when (>= (count name) 3) ;; Search after three (3) chars is given
+      (when (>= (count name) 2) ;; Search after two (2) chars is given
         (comm/get! (str "operator-completions/" name)
                    {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
-      app))
+      (assoc-in app [:service-search :filters :operators :results] [])))
 
   OperatorCompletionsResponse
   (process-event [result app]
-    (assoc-in app [:service-search :filters :operators :results] (:completions result)))
+    ;; Remove existing result from the list
+    (let [clean-response (filter
+                           #(nil? (operator-in-list? % (get-in app [:service-search :filters :operators :chip-results])))
+                           (:completions result))]
+      (assoc-in app [:service-search :filters :operators :results] clean-response)))
 
   AddOperator
   (process-event [{id :id} app]
