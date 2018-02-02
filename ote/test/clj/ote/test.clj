@@ -9,7 +9,8 @@
              [clj-http.client :as http-client]
              [taoensso.timbre :as log]
              [ote.nap.cookie :as nap-cookie]
-             [ote.transit :as transit])
+             [ote.transit :as transit]
+             [cheshire.core :as cheshire])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
@@ -104,19 +105,24 @@
          (getComment [_] nil)
          (getCommentURL [_] nil))])))
 
-(defn- read-transit-response [res]
+(defn- read-response [res]
   (if (= (:status res) 200)
-    (assoc res :transit (transit/transit->clj (:body res)))
+    (case (get-in res [:headers "Content-Type"])
+      "application/json+transit"
+      (assoc res :transit (transit/transit->clj (:body res)))
+
+      ("application/json" "application/vnd.geo+json")
+      (assoc res :json (cheshire/decode (:body res) keyword)))
     res))
 
 (defn http-get [user path]
   (-> path
       url-for-path
       (http-client/get {:cookie-store (cookie-store-for-user user)})
-      read-transit-response))
+      read-response))
 
 (defn http-post [user path payload]
   (-> path url-for-path
       (http-client/post {:body (transit/clj->transit payload)
                          :cookie-store (cookie-store-for-user user)})
-      read-transit-response))
+      read-response))
