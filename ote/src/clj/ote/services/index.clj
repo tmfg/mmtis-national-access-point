@@ -8,7 +8,7 @@
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
             [ote.tools.git :refer [current-revision-sha]]
-            [clojure.string :as s]
+            [ring.middleware.anti-forgery :as anti-forgery]
             [ote.transit :as transit]))
 
 (def stylesheets [{:href "css/bootstrap_style_grid.css"}
@@ -24,6 +24,19 @@
        (when-not dev-mode?
          (str "-" (:current-revision-sha (current-revision-sha))))
        ".js"))
+
+(defn google-analytics-scripts [ga-conf]
+  (list
+   [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
+   (javascript-tag
+    (str "var host = window.location.hostname; "
+         "window.dataLayer = window.dataLayer || []; "
+         "function gtag(){dataLayer.push(arguments);} "
+         "gtag('js', new Date()); "
+         "gtag('config','" (:tracking-code ga-conf) "'); "
+         "if (host === 'localhost' || host.indexOf('testi') !== -1) { "
+         "  window['ga-disable-" (:tracking-code ga-conf) "'] = true; "
+         "}"))))
 
 (def favicons
   [{:rel "apple-touch-icon" :sizes "180x180" :href "/ote/favicon/apple-touch-icon.png?v=E6jNQXq6yK"}
@@ -62,29 +75,22 @@
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
       (translations localization/*language*)
-      [:script {:async nil :src (str "https://www.googletagmanager.com/gtag/js?id=" (:tracking-code ga-conf))}]
+
       (when (not dev-mode?)
-        (javascript-tag
-          (str "var host = window.location.hostname;
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config','" (:tracking-code ga-conf) "');
+        (google-analytics-scripts ga-conf))]
 
-          if (host === 'localhost' || host.indexOf('testi') !== -1) {
-            window['ga-disable-" (:tracking-code ga-conf) "'] = true;
-          }")))
-
-      [:body {:id           "main-body"
-              :onload       "ote.main.main();"
-              :features     flags
+     [:body (merge
+             {:id "main-body"
+              :onload "ote.main.main();"
+              :features flags
               :data-language localization/*language*}
+             (when (bound? #'anti-forgery/*anti-forgery-token*)
+               {:data-anti-csrf-token anti-forgery/*anti-forgery-token*}))
       [:div#oteapp]
       (when dev-mode?
         [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
       [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
-
-      [:script {:type "text/javascript"} "goog.require('ote.main');"]]]]))
+      [:script {:type "text/javascript"} "goog.require('ote.main');"]]]))
 
 (defn index [dev-mode?]
   {:status 200
@@ -99,7 +105,7 @@
             http {:authenticated? false}
             (routes
              (GET "/" req (index dev-mode?))
-             (GET "/index.html" {lang :accept-language} (index dev-mode? lang))))))
+             (GET "/index.html" req (index dev-mode?))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

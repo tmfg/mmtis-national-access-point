@@ -9,7 +9,11 @@
              [clj-http.client :as http-client]
              [taoensso.timbre :as log]
              [ote.nap.cookie :as nap-cookie]
-             [ote.transit :as transit])
+             [ote.transit :as transit]
+             [ring.middleware.session.cookie :as session-cookie]
+             [ring.middleware.anti-forgery :as anti-forgery]
+             [cheshire.core :as cheshire]
+             [clojure.string :as str])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
@@ -65,6 +69,8 @@
       (finally (.close s)))))
 
 (def auth-tkt-config {:shared-secret "test" :max-age-in-seconds 60})
+(def anti-csrf-token "forge me not")
+(def session-key "cookie0123456789")
 
 (defn system-fixture [& system-map-entries]
   (fn [tests]
@@ -74,7 +80,8 @@
                               :db (db/database test-db-config)
                               :http (component/using
                                      (http/http-server {:port (port)
-                                                        :auth-tkt auth-tkt-config})
+                                                        :auth-tkt auth-tkt-config
+                                                        :session {:key session-key}})
                                      [:db])
                               system-map-entries))]
         (tests)
@@ -83,40 +90,74 @@
 (defn- url-for-path [path]
   (str "http://localhost:" (get-in *ote* [:http :config :port]) "/" path))
 
+(defn- cookie [name value]
+  (reify Cookie
+    (getName [_] name)
+    (getValue [_] (java.net.URLEncoder/encode value))
+    (getDomain [_] "localhost")
+    (isExpired [_ _] false)
+    (getPath [_] "/")
+    (getPorts [_] (int-array [(get-in *ote* [:http :config :port])]))
+    (getVersion [_] 2)
+    (isPersistent [_] true)
+    (isSecure [_] false)
+    (getComment [_] nil)
+    (getCommentURL [_] nil)))
+
 (defn- cookie-store-for-user [user]
   (reify CookieStore
     (getCookies [_]
-      [(reify Cookie
-         (getName [_] "auth_tkt")
-         (getValue [_]
-           (nap-cookie/unparse "0.0.0.0" "test"
-                               {:digest-algorithm "MD5"
-                                :timestamp (java.util.Date.)
-                                :user-id user
-                                :user-data ""}))
-         (getDomain [_] "localhost")
-         (isExpired [_ _] false)
-         (getPath [_] "/")
-         (getPorts [_] (int-array [(get-in *ote* [:http :config :port])]))
-         (getVersion [_] 2)
-         (isPersistent [_] true)
-         (isSecure [_] false)
-         (getComment [_] nil)
-         (getCommentURL [_] nil))])))
+      [(cookie "auth_tkt"
+               (nap-cookie/unparse "0.0.0.0" "test"
+                                   {:digest-algorithm "MD5"
+                                    :timestamp (java.util.Date.)
+                                    :user-id user
+                                    :user-data ""}))
+       (cookie "ote-session"
+               (#'session-cookie/seal (.getBytes session-key)
+                                      {::anti-forgery/anti-forgery-token anti-csrf-token}))])
+    (addCookie [_ c]
+      (println "Adding cookie: " c))))
 
-(defn- read-transit-response [res]
+(defn- read-response [res]
   (if (= (:status res) 200)
-    (assoc res :transit (transit/transit->clj (:body res)))
+    (case (get-in res [:headers "Content-Type"])
+      "application/json+transit"
+      (assoc res :transit (transit/transit->clj (:body res)))
+
+      ("application/json" "application/vnd.geo+json")
+      (assoc res :json (cheshire/decode (:body res) keyword)))
     res))
 
-(defn http-get [user path]
-  (-> path
-      url-for-path
-      (http-client/get {:cookie-store (cookie-store-for-user user)})
-      read-transit-response))
+(defn http-get
+  "Helper for HTTP GET requests to the test system. If user is specified the request
+  contains an authentication cookie and anti-CSRF token.
+  If no user is specified, the request is done unauthenticated."
+  ([path] (http-get nil path))
+  ([user path]
+   (-> path
+       url-for-path
+       (http-client/get (if user
+                          {:headers {"X-CSRF-Token" anti-csrf-token}
+                           :cookie-store (cookie-store-for-user user)}
+                          {}))
+       read-response)))
 
-(defn http-post [user path payload]
-  (-> path url-for-path
-      (http-client/post {:body (transit/clj->transit payload)
-                         :cookie-store (cookie-store-for-user user)})
-      read-transit-response))
+(defn http-post
+  "Helper for HTTP POST requests to the test system. The payload is sent as transit."
+  ([path payload] (http-post nil path payload))
+  ([user path payload]
+   (-> path url-for-path
+       (http-client/post (merge
+                          {:body (transit/clj->transit payload)}
+                          (when user
+                            {:headers {"X-CSRF-Token" anti-csrf-token}
+                             :cookie-store (cookie-store-for-user user)})))
+       read-response)))
+
+(defn sql-query [& sql-string-parts]
+  (jdbc/query (:dn *ote*) [(str/join sql-string-parts)]))
+
+(defn sql-execute! [& sql-string-parts]
+  (jdbc/execute! (:db *ote*)
+                 [(str/join sql-string-parts)]))

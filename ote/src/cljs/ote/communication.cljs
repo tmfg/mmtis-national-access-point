@@ -34,6 +34,9 @@
 (defn- request-url [url]
   (str @base-url url))
 
+(defn- anti-csrf-token-header []
+  {"X-CSRF-Token" (.getAttribute js/document.body "data-anti-csrf-token")})
+
 (defn get!
   "Make a GET request to the given URL.
   URL parameters can be given with the `:params` key.
@@ -44,7 +47,8 @@
   (progress/start)
   (swap! query-counter inc)
   (GET (request-url url)
-       {:params          params
+       {:headers (anti-csrf-token-header)
+        :params          params
         :cache           false
         :handler         (response-handler! on-success)
         :error-handler   (response-handler! on-failure)
@@ -60,7 +64,8 @@
   (progress/start)
   (swap! query-counter inc)
   (POST (request-url url)
-        {:params          body
+        {:headers (anti-csrf-token-header)
+         :params          body
          :handler         (response-handler! on-success)
          :error-handler   (response-handler! on-failure)
          :format          (transit-request-format)

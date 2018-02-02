@@ -52,7 +52,6 @@
                        {::t-service/id (op/not (op/in stored))}))))
 
   (doseq [{::places/keys [id namefin type] :as place} places]
-    (println "id:" id "; namefin: " namefin "; type: " type)
     (case type
       "drawn"
       (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id

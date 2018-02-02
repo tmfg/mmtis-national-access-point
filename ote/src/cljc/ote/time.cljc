@@ -3,7 +3,8 @@
   (:require
    #?@(:clj [[specql.impl.composite :as specql-composite]
              [clj-time.format :as format]
-             [clj-time.coerce :as coerce]]
+             [clj-time.coerce :as coerce]
+             [cheshire.generate :as cheshire-generate]]
        :cljs [[goog.string :as gstr]
               [cljs-time.core :as cljs-time]
               [cljs-time.format :as format]
@@ -181,3 +182,9 @@
      [timestamp]
      (format/unparse (format/formatters :date-hour-minute-second)
                      (coerce/from-sql-time timestamp))))
+
+#?(:clj
+   (cheshire-generate/add-encoder
+    org.postgresql.util.PGInterval
+    (fn [interval json-generator]
+      (cheshire-generate/encode-map (pginterval->interval interval) json-generator))))
