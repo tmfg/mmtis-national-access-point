@@ -13,7 +13,7 @@ more information about the service.
 Service search is available at `https://finap.fi/ote/service-search`.
 
 Example call with [curl](https://curl.haxx.se/) tool to fetch all taxi services:
-> # curl "https://finap.fi/ote/service-search?sub_type=taxi&response_format=json"
+`# curl "https://finap.fi/ote/service-search?sub_type=taxi&response_format=json"`
 
 
 ### Parameters
