@@ -843,9 +843,12 @@
   :operator-search "Palveluntuottaja"
   :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
-  :no-results "Hakuehdoilla ei löytynyt palveluita."
-  :one-result "Hakuehdoilla löytyi yksi palvelu."
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua."]
+
+  :result-count ["Hakuehdoille "
+                 (:plural :count
+                          "ei löytynyt palveluita"
+                          "löytyi yksi palvelu"
+                          ["löytyi " :count " palvelua"]) "."]
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."

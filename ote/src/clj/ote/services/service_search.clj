@@ -118,30 +118,36 @@
      :results results
      :filter-service-count (count ids)}))
 
+(defn- service-search-parameters
+  "Extract service search parameters from query parameters."
+  [params]
+  {:operation-area (some-> (params "operation_area")
+                           (str/split #","))
+   :text (params "text")
+   :sub-type (when-let [st (some-> (params "sub_types")
+                                   (str/split #","))]
+               (into #{} (map keyword st)))
+   :operators (map #(Long/parseLong %)
+                   (some-> "operators" params
+                           (str/split #",")))
+   :limit (some-> "limit" params (Integer/parseInt))
+   :offset (some-> "offset" params (Integer/parseInt))})
+
 (defn- service-search-routes [db]
   (routes
-   (GET "/operator-completions/:term" [term]
-        (http/no-cache-transit-response
-         (operator-completions db term)))
+   (GET "/operator-completions/:term" {{term :term} :params :as req}
+        (http/api-response req
+                           (operator-completions db term)))
 
    (GET "/service-search/facets" []
         (http/no-cache-transit-response
          (search-facets db)))
 
-   (GET "/service-search" {params :query-params}
-        (http/no-cache-transit-response ;; IE caches all responses too aggressively, so set caches off
-         (search db
-                 {:operation-area (some-> (params "operation_area")
-                                          (str/split #","))
-                  :text (params "text")
-                  :sub-type (when-let [st (some-> (params "sub_types")
-                                                  (str/split #","))]
-                              (into #{} (map keyword st)))
-                  :operators (map #(Long/parseLong %)
-                                  (some-> "operators" params
-                                          (str/split #",")))
-                  :limit (some-> "limit" params (Integer/parseInt))
-                  :offset (some-> "offset" params (Integer/parseInt))})))))
+   (GET "/service-search" {params :query-params :as req}
+        (http/with-no-cache-headers
+          (http/api-response
+           req
+           (search db (service-search-parameters params)))))))
 
 (defrecord ServiceSearch []
   component/Lifecycle

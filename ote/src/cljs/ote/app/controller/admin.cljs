@@ -12,9 +12,14 @@
                     %)
                  results))))
 
-(defrecord UpdateUserFilter [filter])
+(defrecord UpdateUserFilter [user-filter])
+(defrecord UpdateServiceFilter [service-filter])
+(defrecord UpdateOperatorFilter [operator-filter])
 (defrecord SearchUsers [])
+(defrecord SearchServices [])
+(defrecord SearchServicesByOperator [])
 (defrecord SearchUsersResponse [response])
+(defrecord SearchServicesResponse [response])
 (defrecord GetBusinessIdReport [])
 (defrecord GetBusinessIdReportResponse [response])
 (defrecord DeleteTransportService [id])
@@ -27,12 +32,20 @@
 (extend-protocol tuck/Event
 
   UpdateUserFilter
-  (process-event [{f :filter} app]
-    (update-in app [:admin :user-listing] assoc :filter f))
+  (process-event [{f :user-filter} app]
+    (update-in app [:admin :user-listing] assoc :user-filter f))
+
+  UpdateServiceFilter
+  (process-event [{f :service-filter} app]
+    (update-in app [:admin :service-listing] assoc :service-filter f))
+
+  UpdateOperatorFilter
+  (process-event [{f :operator-filter} app]
+    (update-in app [:admin :service-listing] assoc :operator-filter f))
 
   SearchUsers
   (process-event [_ app]
-    (comm/post! "admin/users" (get-in app [:admin :user-listing :filter])
+    (comm/post! "admin/users" (get-in app [:admin :user-listing :user-filter])
                 {:on-success (tuck/send-async! ->SearchUsersResponse)})
     (assoc-in app [:admin :user-listing :loading?] true))
 
@@ -51,6 +64,24 @@
   GetBusinessIdReportResponse
   (process-event [{response :response} app]
     (update-in app [:admin :business-id-report] assoc
+               :loading? false
+               :results response))
+
+  SearchServices
+  (process-event [_ app]
+    (comm/post! "admin/transport-services" (get-in app [:admin :service-listing :service-filter])
+                {:on-success (tuck/send-async! ->SearchServicesResponse)})
+    (assoc-in app [:admin :service-listing :loading?] true))
+
+  SearchServicesByOperator
+  (process-event [_ app]
+    (comm/post! "admin/transport-services-by-operator" (get-in app [:admin :service-listing :operator-filter])
+                {:on-success (tuck/send-async! ->SearchServicesResponse)})
+    (assoc-in app [:admin :service-listing :loading?] true))
+
+  SearchServicesResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :service-listing] assoc
                :loading? false
                :results response))
 
@@ -89,5 +120,6 @@
     (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
   ChangeAdminTab
-  (process-event [{tab :tab} app]
-        (assoc-in app [:params :admin-page] tab)))
+    (process-event [{tab :tab} app]
+      (assoc-in app [:params :admin-page] tab)))
+

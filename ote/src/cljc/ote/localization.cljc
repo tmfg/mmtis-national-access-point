@@ -57,18 +57,40 @@
                           (binding [*language* language#]
                             ~@body))))))
 
+(declare message)
+(defmulti evaluate-list (fn [[operator & args] parameters] operator))
+
+(defmethod evaluate-list :plural [[_ param-name zero one many] parameters]
+  (let [count (get parameters param-name)]
+    (cond
+      (nil? count) (str "{{missing count parameter " param-name "}}")
+      (zero? count) (message zero parameters)
+      (= 1 count) (message one parameters)
+      :else (message many parameters))))
+
+(defmethod evaluate-list :default [[op & _] _]
+  (str "{{unknown translation operation " op "}}"))
+
 (defn- message-part [part parameters]
   (cond
     (keyword? part)
     (message-part (get parameters part) parameters)
 
-    ;; PENDING: tässä voitaisiin tehdä Date formatointi yms tyypin mukaista
+    (list? part)
+    (evaluate-list part parameters)
+
     :default
     (str part)))
 
 (defn- message [message-definition parameters]
-  (if (string? message-definition)
+  (cond
+    (string? message-definition)
     message-definition
+
+    (list? message-definition)
+    (evaluate-list message-definition parameters)
+
+    :default
     (reduce (fn [acc part]
               (str acc (message-part part parameters)))
             ""
