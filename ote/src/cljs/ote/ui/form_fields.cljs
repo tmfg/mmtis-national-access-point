@@ -92,6 +92,17 @@
     [komponentti data]))
 
 
+(defn tooltip-icon
+  "A tooltip icon that shows balloon.css tooltip on hover."
+  [text pos len]
+  [:span {:style               {:margin-left 8}
+          :data-balloon        text
+          :data-balloon-pos    (or pos "up")
+          :data-balloon-length (or len "medium")}
+   [ic/action-help {:style {:width          16 :height 16
+                            :vertical-align "middle"
+                            :color          "gray"}}]])
+
 (defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
   (or placeholder
       (and placeholder-fn (placeholder-fn row))
@@ -485,13 +496,7 @@
                                            style-form/table-header-style)}
             label
             (when tooltip
-              [:span {:style {:margin-left 8}
-                      :data-balloon tooltip
-                      :data-balloon-pos (or tooltip-pos "up")
-                      :data-balloon-length (or tooltip-len "medium")}
-               [ic/action-help {:style {:width 16 :height 16
-                                        :vertical-align "middle"
-                                        :color "gray"}}]])]))
+              [tooltip-icon tooltip tooltip-pos tooltip-len])]))
         (when delete?
           [ui/table-header-column {:style (merge {:width "70px"} style-form/table-header-style)}
            (tr [:buttons :delete])])]]
