@@ -82,16 +82,18 @@
      :type             :table
      :prepare-for-save values/without-empty-rows
      :table-fields     [{:name ::t-service/data-content
+                         :type :multiselect-selection
+                         :tooltip (tr [:form-help :external-interfaces-tooltips :data-content])
                          :width "20%"
                          :auto-width? true
                          :full-width? true
-                         :type :multiselect-selection
                          :options t-service/interface-data-contents
                          :show-option (tr-key [:enums ::t-service/interface-data-content])
                          :required? true
                          :is-empty? validation/empty-enum-dropdown?}
                         {:name      ::t-service/external-service-url
                          :type      :string
+                         :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
                          :width     "20%"
                          :full-width? true
                          :read      (comp ::t-service/url ::t-service/external-interface)
@@ -99,20 +101,23 @@
                          :required? true}
                         {:name      ::t-service/format
                          :type      :string
+                         :tooltip (tr [:form-help :external-interfaces-tooltips :format])
                          :width     "20%"
                          :full-width? true
                          :required? true}
                         {:name  ::t-service/license
                          :type  :string
+                         :tooltip (tr [:form-help :external-interfaces-tooltips :license])
                          :width "20%"
                          :full-width? true}
                         {:name      ::t-service/external-service-description
                          :type      :localized-text
+                         :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
                          :width     "20%"
                          :full-width? true
                          :read      (comp ::t-service/description ::t-service/external-interface)
                          :write     #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
-                         :required? true
+                         :required? false
                          :is-empty? validation/empty-localized-text?}]
      :delete?          true
      :add-label        (tr [:buttons :add-external-interface])}
