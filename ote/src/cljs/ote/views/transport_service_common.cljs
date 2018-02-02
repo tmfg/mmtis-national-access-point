@@ -5,7 +5,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [linkify dialog]]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.views.place-search :as place-search]
@@ -63,6 +63,8 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-service-link])}))
 
+
+
 (defn external-interfaces
   "Creates a form group for external services."
   [& [rae-info?]]
@@ -73,13 +75,18 @@
     (form/info
      [:div
       [:p (tr [:form-help :external-interfaces])]
+      [dialog
+       (tr [:form-help :external-interfaces-read-more :link])
+       (tr [:form-help :external-interfaces-read-more :dialog-title])
+       [:div (tr [:form-help :external-interfaces-read-more :dialog-text])]]
+
       (when rae-info?
         [:p (tr [:form-help :external-interfaces-eg-rae])
          [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
           {:target "_blank"}]])])
 
-    {:name             ::t-service/external-interfaces
-     :type             :table
+    {:name ::t-service/external-interfaces
+     :type :table
      :prepare-for-save values/without-empty-rows
      :table-fields     [{:name ::t-service/data-content
                          :type :multiselect-selection
@@ -121,10 +128,6 @@
                          :is-empty? validation/empty-localized-text?}]
      :delete?          true
      :add-label        (tr [:buttons :add-external-interface])}
-
-    (form/info
-     [:div
-      [:p (tr [:form-help :external-interfaces-end])]])
 
     {:name ::t-service/notice-external-interfaces?
      :type :checkbox
