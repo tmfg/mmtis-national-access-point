@@ -379,7 +379,7 @@
                 ;; Routes for the service form, one for editing an existing one by id
                 ;; and another when creating a new service
                 :edit-service [t-service/edit-service-by-id e! app]
-                :new-service [t-service/edit-new-service e! app]
+                :new-service [t-service/create-new-service e! app]
 
                 :services [service-search/service-search e! app]
 

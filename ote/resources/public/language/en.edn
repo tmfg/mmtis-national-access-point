@@ -781,7 +781,12 @@
                    "pricing" "Hintatiedot"
                    "service-hours" "Palveluajat"
                    "disruptions" "Häiriötilanteet"
-                   "payment-interface" "Lippu- ja myyntirajapinta"}
+                   "payment-interface" "Lippu- ja myyntirajapinta"
+
+                   ;; rentals
+                   "pick-up" "Nouto"
+                   "return" "Palautus"
+                   "pick-up-return" "Nouto ja palautus"}
 
           ;; External interfaces
           "external-interfaces" "External interfaces"
@@ -834,9 +839,10 @@
   :operator-search "Transport operator"
   :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
-  :no-results "Hakuehdoilla ei löytynyt palveluita"
-  :one-result "Hakuehdoilla löytyi yksi palvelu"
-  :many-results ["Hakuehdoilla löytyi " :count " palvelua"]
+  :result-count (:plural :count
+                         "No services found."
+                         "Found one service."
+                         ["Found " :count " services."])
   :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "No search filters. Showing latest modified services."
@@ -891,5 +897,3 @@
                             :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
 
  }
-
-

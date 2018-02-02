@@ -11,7 +11,8 @@
              [ote.nap.cookie :as nap-cookie]
              [ote.transit :as transit]
              [ring.middleware.session.cookie :as session-cookie]
-             [ring.middleware.anti-forgery :as anti-forgery])
+             [ring.middleware.anti-forgery :as anti-forgery]
+             [cheshire.core :as cheshire])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
@@ -117,9 +118,14 @@
     (addCookie [_ c]
       (println "Adding cookie: " c))))
 
-(defn- read-transit-response [res]
+(defn- read-response [res]
   (if (= (:status res) 200)
-    (assoc res :transit (transit/transit->clj (:body res)))
+    (case (get-in res [:headers "Content-Type"])
+      "application/json+transit"
+      (assoc res :transit (transit/transit->clj (:body res)))
+
+      ("application/json" "application/vnd.geo+json")
+      (assoc res :json (cheshire/decode (:body res) keyword)))
     res))
 
 (defn http-get [user path]
@@ -127,11 +133,11 @@
       url-for-path
       (http-client/get {:headers {"X-CSRF-Token" anti-csrf-token}
                         :cookie-store (cookie-store-for-user user)})
-      read-transit-response))
+      read-response))
 
 (defn http-post [user path payload]
   (-> path url-for-path
       (http-client/post {:headers {"X-CSRF-Token" anti-csrf-token}
                          :body (transit/clj->transit payload)
                          :cookie-store (cookie-store-for-user user)})
-      read-transit-response))
+      read-response))

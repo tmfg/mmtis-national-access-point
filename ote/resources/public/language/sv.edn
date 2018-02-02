@@ -62,14 +62,14 @@
    :ote.db.transport-service/location                  "Plats"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "Externa maskinläsbara gränssnitt" ;; NOTE: Check translation context
-   :ote.db.transport-service/data-content "Informationsinnehåll" ;; NOTE: Check translation context
-   :ote.db.transport-service/external-service-description "Tilläggsuppgifter" ;; NOTE: Check translation context
-   :ote.db.transport-service/external-service-url "WWW-adress" ;; NOTE: Check translation context
+   :ote.db.transport-service/external-interfaces "Externa maskinläsbara gränssnitt"
+   :ote.db.transport-service/data-content "Informationsinnehåll"
+   :ote.db.transport-service/external-service-description "Tilläggsuppgifter"
+   :ote.db.transport-service/external-service-url "WWW-adress"
    :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
    :ote.db.transport-service/rental-service            "Hyrtjänstens adress"
-   :ote.db.transport-service/format "Form"
-   :ote.db.transport-service/format-short "Form"
+   :ote.db.transport-service/format "Format"
+   :ote.db.transport-service/format-short "Format"
    :ote.db.transport-service/companies "De företag som producerar tjänsten"
    :ote.db.transport-service/company-name "Företagts namn"
    :ote.db.transport-service/business-id "Företagets FO-nummer"
@@ -405,16 +405,16 @@
    :disabled-park "Invaplatser"}
 
   :ote.db.transport-service/interface-data-content
-  {:route-and-schedule "Rutt- och tidtabellsinformation" ;; NOTE: Check translation context
-   :luggage-restrictions "Resgodsbegränsningar" ;; NOTE: Check translation context
-   :realtime-interface "Realtidsgränssitt" ;; NOTE: Check translation context
-   :booking-interface "Bokningsgränssnitt" ;; NOTE: Check translation context
-   :accessibility-services "Tillgänglighetstjänster" ;; NOTE: Check translation context
-   :other-services "Övriga tjänster" ;; NOTE: Check translation context
-   :pricing "Prisinformation" ;; NOTE: Check translation context
-   :service-hours "Betjäningstider" ;; NOTE: Check translation context
-   :disruptions "Störningsinformation" ;; NOTE: Check translation context
-   :payment-interface "Biljett- och försäljningsgränssnitt" ;; NOTE: Check translation context
+  {:route-and-schedule "Rutt- och tidtabellsinformation"
+   :luggage-restrictions "Resgodsbegränsningar"
+   :realtime-interface "Realtidsgränssnitt"
+   :booking-interface "Bokningsgränssnitt"
+   :accessibility-services "Tillgänglighetstjänster"
+   :other-services "Övriga tjänster"
+   :pricing "Prisinformation"
+   :service-hours "Betjäningstider"
+   :disruptions "Störningsinformation"
+   :payment-interface "Biljett- och försäljningsgränssnitt"
    :other "Övrigt"}}
 
 
@@ -764,21 +764,26 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "SUN" "Sö"
 
                    ;; Data content
-                   "route-and-schedule" "Rutt- och tidtabellsinformation" ;; NOTE: Check translation context
-                   "luggage-restrictions" "Resgodsbegränsningar" ;; NOTE: Check translation context
-                   "realtime-interface" "Realtidsgränssitt" ;; NOTE: Check translation context
-                   "booking-interface" "Bokningsgränssnitt" ;; NOTE: Check translation context
-                   "accessibility-services" "Tillgänglighetstjänster" ;; NOTE: Check translation context
-                   "other-services" "Övriga tjänster" ;; NOTE: Check translation context
-                   "pricing" "Prisinformation" ;; NOTE: Check translation context
-                   "service-hours" "Betjäningstider" ;; NOTE: Check translation context
-                   "disruptions" "Störningsinformation" ;; NOTE: Check translation context
-                   "payment-interface" "Biljett- och försäljningsgränssnit"} ;; NOTE: Check translation context
+                   "route-and-schedule" "Rutt- och tidtabellsinformation"
+                   "luggage-restrictions" "Resgodsbegränsningar"
+                   "realtime-interface" "Realtidsgränssnitt"
+                   "booking-interface" "Bokningsgränssnitt"
+                   "accessibility-services" "Tillgänglighetstjänster"
+                   "other-services" "Övriga tjänster"
+                   "pricing" "Prisinformation"
+                   "service-hours" "Betjäningstider"
+                   "disruptions" "Störningsinformation"
+                   "payment-interface" "Biljett- och försäljningsgränssnit"
+
+                   ;; rentals
+                   "pick-up" "Avhämtning"
+                   "return" "Returnering"
+                   "pick-up-return" "Avhämtning och returnering"}
 
           ;; External interfaces
-          "external-interfaces" "Externa maskinläsbara gränssnitt" ;; NOTE: Check translation context
+          "external-interfaces" "Externa maskinläsbara gränssnitt"
           "license" "Licens"
-          "data-content" "Informationsinnehåll" ;; NOTE: Check translation context
+          "data-content" "Informationsinnehåll"
           "format" "Format"
           "external-interface" "Yttre gränssnitt"
 
@@ -828,9 +833,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :operator-search "Tjänsteproducent"
   :operator-search-placeholder "Sök med namn"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
-  :no-results "Inga resultat"
-  :one-result "Hittades en tjänst"
-  :many-results ["Hittades " :count " tjänster"]
+  :result-count (:plural :count
+                         "Inga resultat"
+                         "Hittades en tjänst"
+                         ["Hittades " :count " tjänster"])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
@@ -884,4 +890,3 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}}
-

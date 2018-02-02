@@ -27,13 +27,15 @@
 
 (defqueries "ote/services/places.sql")
 (defqueries "ote/services/transport.sql")
+(defqueries "ote/services/operators.sql")
 
 (def transport-operator-columns
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
     ::t-operator/name})
 
-(defn get-transport-operator [db where]
-  (let [operator (first (fetch db ::t-operator/transport-operator
+(defn get-transport-operator [db where-parameter]
+  (let [where  (merge  {::t-operator/deleted? false} where-parameter)
+        operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
                                where {::specql/limit 1}))]
     (when operator
@@ -99,31 +101,18 @@
            (delete! db ::t-service/transport-service {::t-service/id id}))
          id))))
 
-
-(defn- ensure-transport-operator-for-group [db {:keys [title id] :as ckan-group}]
-  ;; FIXME: this should be middleware, not relying on client to make a POST request
-  (tx/with-transaction db
-    (let [operator (get-transport-operator db {::t-operator/ckan-group-id id})]
-      (or operator
-          (and id
-          ;; FIXME: what if name changed in CKAN, we should update?
-          (insert! db ::t-operator/transport-operator
-                   {::t-operator/name title
-                    ::t-operator/ckan-group-id id}))))))
-
-
 (defn get-user-transport-operators-with-services [db groups user]
-  (let [operators (map #(ensure-transport-operator-for-group db %) groups)
+  (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (get-transport-services db {::t-service/transport-operator-id (op/in operator-ids)})]
     (map (fn [{id ::t-operator/id :as operator}]
-            {:transport-operator operator
-             :transport-service-vector (vec (filter #(= id (::t-service/transport-operator-id %)) operator-services))
-             :user (dissoc user :apikey :email :id)})
-          operators)))
+           {:transport-operator       operator
+            :transport-service-vector (vec (filter #(= id (::t-service/transport-operator-id %)) operator-services))
+            :user                     (dissoc user :apikey :email :id)})
+    operators)))
 
 (defn get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
-  (let [transport-operator (ensure-transport-operator-for-group db ckan-group)
+  (let [transport-operator (get-transport-operator db {::t-operator/ckan-group-id (:id ckan-group)})
         transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::t-operator/id transport-operator)})
         ;; Clean up user data
         cleaned-user (dissoc user
@@ -319,7 +308,7 @@
 
    (POST "/transport-operator/group" {user :user}
      (http/transit-response
-       (ensure-transport-operator-for-group db (-> user :groups first))))
+       (get-transport-operator db {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
 
    (POST "/transport-operator/data" {user :user}
          (http/transit-response

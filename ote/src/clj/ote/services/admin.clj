@@ -3,13 +3,32 @@
   (:require [ote.components.http :as http]
             [com.stuartsierra.component :as component]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
+            [specql.op :as op]
             [taoensso.timbre :as log]
             [compojure.core :refer [routes GET POST DELETE]]
             [ote.nap.users :as nap-users]
             [specql.core :as specql]
             [ote.db.auditlog :as auditlog]
             [ote.db.transport-service :as t-service]
+            [ote.db.modification :as modification]
             [ote.services.transport :as transport]))
+
+
+(def service-search-result-columns
+  #{::t-service/contact-email
+    ::t-service/sub-type
+    ::t-service/id
+    ::t-service/contact-gsm
+    ::t-service/contact-address
+    ::t-service/name
+    ::t-service/type
+    ::modification/created
+    ::t-service/published?
+    ::t-service/transport-operator-id
+    ::t-service/contact-phone
+
+    ;; Information JOINed from other tables
+    ::t-service/operator-name})
 
 (defn- require-admin-user [route user]
   (when (not (:admin? user))
@@ -24,6 +43,22 @@
 (defn- list-users [db user query]
   (nap-users/list-users db {:email (str "%" query "%")
                             :name (str "%" query "%")}))
+
+(defn- list-services
+  "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
+  [db user query]
+  (fetch db ::t-service/transport-service-search-result
+         service-search-result-columns
+         (if (nil? query)
+           nil
+           {::t-service/name (op/ilike (str "%" query "%"))})
+         {:specql.core/order-by ::t-service/name}))
+
+(defn- list-services-by-operator [db user query]
+  (fetch db ::t-service/transport-service-search-result
+         service-search-result-columns
+         {::t-service/operator-name (op/ilike (str "%" query "%"))}
+         {:specql.core/order-by ::t-service/operator-name}))
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
@@ -41,10 +76,15 @@
 
 (defn- admin-routes [db http nap-config]
   (routes
-   (POST "/admin/users" req (admin-service "users" req db #'list-users))
-   (POST "/admin/transport-service/delete" req
-         (admin-service "transport-service/delete" req db
-                        (partial admin-delete-transport-service! nap-config)))))
+    (POST "/admin/users" req (admin-service "users" req db #'list-users))
+
+    (POST "/admin/transport-services" req (admin-service "services" req db #'list-services))
+
+    (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
+
+    (POST "/admin/transport-service/delete" req
+      (admin-service "transport-service/delete" req db
+                     (partial admin-delete-transport-service! nap-config)))))
 
 (defrecord Admin [nap-config]
   component/Lifecycle
