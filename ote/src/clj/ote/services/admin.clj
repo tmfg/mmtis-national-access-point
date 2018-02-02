@@ -9,7 +9,10 @@
             [specql.core :as specql]
             [ote.db.auditlog :as auditlog]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.services.transport :as transport]))
+
+;(defqueries "ote/services/admin.sql")
 
 (defn- require-admin-user [route user]
   (when (not (:admin? user))
@@ -24,6 +27,20 @@
 (defn- list-users [db user query]
   (nap-users/list-users db {:email (str "%" query "%")
                             :name (str "%" query "%")}))
+
+(defn- business-id-report [db user query]
+  (let [s-business-ids (specql/fetch db ::t-service/transport-service
+                                   #{::t-service/companies ::t-service/transport-operator-id}
+                                   {}
+                                   {})
+        o-business-ids (specql/fetch db ::t-operator/transport-operator
+                                  #{::t-operator/id ::t-operator/name ::t-operator/business-id}
+                                  {}
+                                  {})
+        report (keep #(get % ::t-operator/business-id) o-business-ids)  ]
+    (println "************ s-business-ids " (pr-str s-business-ids))
+    (println "************ o-business-ids " (pr-str o-business-ids))
+    report))
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
@@ -44,7 +61,9 @@
    (POST "/admin/users" req (admin-service "users" req db #'list-users))
    (POST "/admin/transport-service/delete" req
          (admin-service "transport-service/delete" req db
-                        (partial admin-delete-transport-service! nap-config)))))
+                        (partial admin-delete-transport-service! nap-config)))
+   (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
+   ))
 
 (defrecord Admin [nap-config]
   component/Lifecycle

@@ -15,11 +15,14 @@
 (defrecord UpdateUserFilter [filter])
 (defrecord SearchUsers [])
 (defrecord SearchUsersResponse [response])
+(defrecord GetBusinessIdReport [])
+(defrecord GetBusinessIdReportResponse [response])
 (defrecord DeleteTransportService [id])
 (defrecord CancelDeleteTransportService [id])
 (defrecord ConfirmDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
 (defrecord FailedDeleteTransportServiceResponse [response])
+(defrecord ChangeAdminTab [tab])
 
 (extend-protocol tuck/Event
 
@@ -36,6 +39,18 @@
   SearchUsersResponse
   (process-event [{response :response} app]
     (update-in app [:admin :user-listing] assoc
+               :loading? false
+               :results response))
+
+  GetBusinessIdReport
+  (process-event [_ app]
+    (comm/post! "admin/business-id-report" {}
+                {:on-success (tuck/send-async! ->GetBusinessIdReportResponse)})
+    (assoc-in app [:admin :business-id-report :loading?] true))
+
+  GetBusinessIdReportResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :business-id-report] assoc
                :loading? false
                :results response))
 
@@ -73,4 +88,6 @@
   (process-event [{response :response} app]
     (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
-  )
+  ChangeAdminTab
+  (process-event [{tab :tab} app]
+        (assoc-in app [:params :admin-page] tab)))

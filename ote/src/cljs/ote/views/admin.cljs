@@ -41,9 +41,44 @@
               [ui/table-row-column email]
               [ui/table-row-column groups]]))]]])]))
 
+(defn business-id-report [e! app]
+  (let [{:keys [loading? results]} (get-in app [:admin :business-id-report])]
+    [:div
+
+     [ui/raised-button {:primary true
+                        :disabled (str/blank? filter)
+                        :on-click #(e! (admin-controller/->GetBusinessIdReport))}
+      "Hae raportti"]
+
+     (when loading?
+       [:span "Ladataan raporttia..."])
+
+     (when results
+       [:span
+        [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
+        [ui/table {:selectable false}
+         [ui/table-header {:adjust-for-checkbox false
+                           :display-select-all false}
+          [ui/table-row
+           [ui/table-header-column "Palveluntuottaja"]
+           [ui/table-header-column "Palvelun nimi"]
+           [ui/table-header-column "Y-Tunnus"]
+           [ui/table-header-column "GSM"]]]
+         [ui/table-body {:display-row-checkbox false}
+          (doall
+            (for [{:keys [operator-name service-name business-id gsm]} results]
+              [ui/table-row {:selectable false}
+               [ui/table-row-column operator-name]
+               [ui/table-row-column service-name]
+               [ui/table-row-column business-id]
+               [ui/table-row-column gsm]]))]]])]))
+
+
 (defn admin-panel [e! app]
   (let [selected-tab (or (get-in app [:params :admin-page]) "users")]
     [ui/tabs {:value selected-tab
-              :on-change :D}
+              :on-change #(e! (admin-controller/->ChangeAdminTab %))}
      [ui/tab {:label "Käyttäjät" :value "users"}
-      [user-listing e! app]]]))
+      [user-listing e! app]]
+     [ui/tab {:label "Välityspalvelut" :value "brokerage"}
+      [business-id-report e! app]]]))
