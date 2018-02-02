@@ -19,8 +19,9 @@
 (deftest export-geojson-with-interval
   (let [service (assoc (gen/generate (service-generators/service-type-generator :parking))
                        ::t-service/operation-area
-                       [{::places/id "finnish-municipality-564"
-                         ::places/namefin "Oulu"}])
+                       [{::places/type "drawn"
+                         ::places/namefin "Toriportti"
+                         :geojson "{\"type\":\"Point\",\"coordinates\":[25.468116,65.012489]}"}])
         response (http-post "admin" "transport-service" service)
         id (get-in response [:transit ::t-service/id])]
 
