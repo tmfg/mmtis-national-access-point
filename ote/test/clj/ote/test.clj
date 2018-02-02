@@ -12,7 +12,8 @@
              [ote.transit :as transit]
              [ring.middleware.session.cookie :as session-cookie]
              [ring.middleware.anti-forgery :as anti-forgery]
-             [cheshire.core :as cheshire])
+             [cheshire.core :as cheshire]
+             [clojure.string :as str])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)))
 
@@ -128,16 +129,35 @@
       (assoc res :json (cheshire/decode (:body res) keyword)))
     res))
 
-(defn http-get [user path]
-  (-> path
-      url-for-path
-      (http-client/get {:headers {"X-CSRF-Token" anti-csrf-token}
-                        :cookie-store (cookie-store-for-user user)})
-      read-response))
+(defn http-get
+  "Helper for HTTP GET requests to the test system. If user is specified the request
+  contains an authentication cookie and anti-CSRF token.
+  If no user is specified, the request is done unauthenticated."
+  ([path] (http-get nil path))
+  ([user path]
+   (-> path
+       url-for-path
+       (http-client/get (if user
+                          {:headers {"X-CSRF-Token" anti-csrf-token}
+                           :cookie-store (cookie-store-for-user user)}
+                          {}))
+       read-response)))
 
-(defn http-post [user path payload]
-  (-> path url-for-path
-      (http-client/post {:headers {"X-CSRF-Token" anti-csrf-token}
-                         :body (transit/clj->transit payload)
-                         :cookie-store (cookie-store-for-user user)})
-      read-response))
+(defn http-post
+  "Helper for HTTP POST requests to the test system. The payload is sent as transit."
+  ([path payload] (http-post nil path payload))
+  ([user path payload]
+   (-> path url-for-path
+       (http-client/post (merge
+                          {:body (transit/clj->transit payload)}
+                          (when user
+                            {:headers {"X-CSRF-Token" anti-csrf-token}
+                             :cookie-store (cookie-store-for-user user)})))
+       read-response)))
+
+(defn sql-query [& sql-string-parts]
+  (jdbc/query (:dn *ote*) [(str/join sql-string-parts)]))
+
+(defn sql-execute! [& sql-string-parts]
+  (jdbc/execute! (:db *ote*)
+                 [(str/join sql-string-parts)]))
