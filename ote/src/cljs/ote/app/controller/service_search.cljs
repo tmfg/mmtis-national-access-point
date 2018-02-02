@@ -71,9 +71,13 @@
                       operator))))
 
 
-(defn- operator-in-list? [operator list]
+(defn- operator-in-list?
   "Return nil if operator is not in given list"
-  (some #(= (::t-operator/id operator) (::t-operator/id %)) list))
+  [operator list]
+  (let [first-item (some #(= (::t-operator/id operator) (::t-operator/id %)) list)]
+    (if (nil? first-item)
+      false
+      true)))
 
 (extend-protocol tuck/Event
 
@@ -164,7 +168,7 @@
   (process-event [result app]
     ;; Remove existing result from the list
     (let [clean-response (filter
-                           #(nil? (operator-in-list? % (get-in app [:service-search :filters :operators :chip-results])))
+                           #(not (operator-in-list? % (get-in app [:service-search :filters :operators :chip-results])))
                            (:completions result))]
       (assoc-in app [:service-search :filters :operators :results] clean-response)))
 
