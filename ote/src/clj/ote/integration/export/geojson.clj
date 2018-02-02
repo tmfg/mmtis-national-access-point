@@ -11,7 +11,10 @@
             [cheshire.core :as cheshire]
             [ote.db.modification :as modification]
             [clojure.set :as set]
-            [ote.integration.export.transform :as transform]))
+            [ote.integration.export.transform :as transform]
+
+            ;; Require time which extends PGInterval JSON generation
+            [ote.time]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
@@ -67,6 +70,7 @@
                   #{::t-service/id ::t-service/notice-external-interfaces? ::t-service/published?}))
 
 (defn- export-geojson [db transport-operator-id transport-service-id]
+  (println "EXPORT: operator: " transport-operator-id ", SERVICE: " transport-service-id)
   (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       transport-operator-properties-columns
