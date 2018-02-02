@@ -47,7 +47,7 @@
   [link-label title body]
   (reagent/with-let
     [open? (reagent/atom false)]
-    [:div
+    [:span
      [:a {:href "#" :on-click #(do (.preventDefault %)
                                    (reset! open? true))} link-label]
      [ui/dialog
