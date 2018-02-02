@@ -57,7 +57,6 @@
             nil
             {::t-service/name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
-    (println "list services search " search-params)
     (fetch db ::t-service/transport-service-search-result
          service-search-result-columns
          search-params
@@ -68,7 +67,6 @@
             nil
             {::t-service/operator-name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
-    (println "list services search " search-params)
     (fetch db ::t-service/transport-service-search-result
          service-search-result-columns
          search-params
