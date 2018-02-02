@@ -44,10 +44,14 @@
   (nap-users/list-users db {:email (str "%" query "%")
                             :name (str "%" query "%")}))
 
-(defn- list-services [db user query]
+(defn- list-services
+  "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
+  [db user query]
   (fetch db ::t-service/transport-service-search-result
          service-search-result-columns
-         (if (nil? query) nil {::t-service/name (op/ilike (str "%" query "%"))})
+         (if (nil? query)
+           nil
+           {::t-service/name (op/ilike (str "%" query "%"))})
          {:specql.core/order-by ::t-service/name}))
 
 (defn- list-services-by-operator [db user query]
