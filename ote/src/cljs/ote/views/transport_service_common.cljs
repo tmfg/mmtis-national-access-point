@@ -71,26 +71,27 @@
   [& [type sub-type]]
   (let [type (or type :other)
         sub-type (or sub-type :other)]
+
     (form/group
       {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
        :columns 3}
 
       (form/info
         [:div
-         [:p
-          [:span [:b (if (= :schedule sub-type)
-                       [:span (str (tr [:form-help :external-interfaces-intro-rae]) " ")
-                        [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-link-text])
-                         {:target "_blank"}]]
-                       (tr [:form-help :external-interfaces-intro]))]]]
-         [:p (tr [:form-help :external-interfaces])
-          [:br]
-          [dialog
-           (tr [:form-help :external-interfaces-read-more :link])
-           (tr [:form-help :external-interfaces-read-more :dialog-title])
-           [:div (tr [:form-help :external-interfaces-read-more :dialog-text])]]]
+         [:div {:style {:margin-bottom "5px"}}
+          [:b (if (= :schedule sub-type)
+                [:span (str (tr [:form-help :external-interfaces-intro-rae]) " ")
+                 [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-link-text])
+                  {:target "_blank"}]]
+                (tr [:form-help :external-interfaces-intro]))]]
+         [:div (tr [:form-help :external-interfaces])]
+         [dialog
+          (tr [:form-help :external-interfaces-read-more :link])
+          (tr [:form-help :external-interfaces-read-more :dialog-title])
+          [:div
+           (tr [:form-help :external-interfaces-read-more :dialog-text])]]
          (when (= :passenger-transportation type)
-           [:p [:br]
+           [:div {:style {:margin-top "20px"}}
             [:b (tr [:form-help :external-interfaces-payment-systems])]])])
 
       {:name ::t-service/external-interfaces
