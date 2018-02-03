@@ -1,0 +1,14 @@
+{
+ :string "Basic string"
+ :vec ["This " "is " "a " "vector"]
+ :markdown (:md
+             "## Being bold"
+             "This is **bold**")
+ :plural ["Got "
+          (:plural :count
+            "no results"
+            "one result"
+            [:count " results"])]
+
+ :unsupported-op (:no-op "Does not compute")
+ }
