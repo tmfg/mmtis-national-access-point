@@ -96,7 +96,7 @@
     :default
     (str part)))
 
-(defn- message [message-definition parameters & [op]]
+(defn- message [message-definition parameters]
   (cond
     (string? message-definition)
     message-definition
