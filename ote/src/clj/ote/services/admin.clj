@@ -6,6 +6,7 @@
             [specql.op :as op]
             [taoensso.timbre :as log]
             [compojure.core :refer [routes GET POST DELETE]]
+            [jeesql.core :refer [defqueries]]
             [ote.nap.users :as nap-users]
             [specql.core :as specql]
             [ote.db.auditlog :as auditlog]
@@ -14,6 +15,7 @@
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]))
 
+(defqueries "ote/services/admin.sql")
 
 (def service-search-result-columns
   #{::t-service/contact-email
@@ -62,17 +64,9 @@
          {:specql.core/order-by ::t-service/operator-name}))
 
 (defn- business-id-report [db user query]
-  (let [s-business-ids (specql/fetch db ::t-service/transport-service
-                                     #{::t-service/companies ::t-service/transport-operator-id}
-                                     {}
-                                     {})
-        o-business-ids (specql/fetch db ::t-operator/transport-operator
-                                     #{::t-operator/id ::t-operator/name ::t-operator/business-id}
-                                     {}
-                                     {})
-        report (keep #(get % ::t-operator/business-id) o-business-ids)  ]
-    (println "************ s-business-ids " (pr-str s-business-ids))
-    (println "************ o-business-ids " (pr-str o-business-ids))
+  (let [operator-business-ids (fetch-operator-business-ids db)
+        service-business-ids (fetch-service-business-ids db)
+        report (merge operator-business-ids service-business-ids)]
     report))
 
 (defn- admin-delete-transport-service!
