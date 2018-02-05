@@ -68,7 +68,8 @@
    ::t-service/service-exceptions generators/gen-service-exceptions-array
    ::t-service/accessibility-info-url generators/gen-url
    ::t-service/parking-capacities generators/gen-parking-capacity-array
-   ::t-service/service-hours generators/gen-service-hours-array))
+   ::t-service/service-hours generators/gen-service-hours-array
+   ::t-service/pricing generators/gen-service-link))
 
 (def gen-transport-service-common
   (gen/hash-map
