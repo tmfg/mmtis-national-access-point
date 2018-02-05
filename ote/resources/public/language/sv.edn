@@ -553,6 +553,9 @@
   :transport-service-type-selection-help-example "Exempel: Tjänsteproducenten \"RapidBus Oy\" har två olika tjänster \"Rapidbus Tilausbussit\" och \"Rapidbus Taksipalvelu\"
 Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Beställningstrafik med buss\" och en andra blankett \"Taxitjänst\"."}
 
+ :admin-page
+ {:published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+
  :common-texts
  {:front-page-help-text                       "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä

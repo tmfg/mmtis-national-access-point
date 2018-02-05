@@ -561,6 +561,9 @@
   :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
   liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
 
+ :admin-page
+ {:published-types {:YES "Published" :NO "Not published" :ALL "All"}}
+
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä

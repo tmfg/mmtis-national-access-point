@@ -561,6 +561,9 @@
      tyyppiä.
      Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
 
+ :admin-page
+ {:published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
