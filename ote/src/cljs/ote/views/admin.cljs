@@ -11,6 +11,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.time :as time]))
 
+(def id-filter-type [:operators :services :ALL])
+
 (defn user-listing [e! app]
   (let [{:keys [loading? results user-filter]} (get-in app [:admin :user-listing])]
     [:div
@@ -47,39 +49,53 @@
               [ui/table-row-column groups]]))]]])]))
 
 (defn business-id-report [e! app]
-  (let [{:keys [loading? results]} (get-in app [:admin :business-id-report])]
+  (let [{:keys [loading? business-id-filter results]} (get-in app [:admin :business-id-report])]
     [:div
-     (.log js/console "business-id-report" (clj->js results))
-     [ui/raised-button {:primary true
-                        :disabled (str/blank? filter)
-                        :on-click #(e! (admin-controller/->GetBusinessIdReport))}
-      "Hae raportti"]
+      [:div.row
+       [:h1 "Y-tunnus raportti"]
+       [:p "Listataan joko Palveluntuottajien y-tunnukset, palveluihin lisättyjen yritysten y-tunnukset tai molemmat."]]
+      [:div.row
+       [form-fields/field {:type :selection
+                           :label "Y-tunnuksen lähde"
+                           :options id-filter-type
+                           :show-option (tr-key [:admin-page :business-id-filter])
+                           :update! #(e! (admin-controller/->UpdateBusinessIdFilter %))}
+        business-id-filter]
+       [ui/raised-button {:primary true
+                          :disabled (str/blank? filter)
+                          :on-click #(e! (admin-controller/->GetBusinessIdReport))}
+        "Hae raportti"]]
 
-     (when loading?
-       [:span "Ladataan raporttia..."])
+       (when loading?
+         [:div.row "Ladataan raporttia..."])
 
-     (when results
-       [:span
-        [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
-        [ui/table {:selectable false}
-         [ui/table-header {:adjust-for-checkbox false
-                           :display-select-all false}
-          [ui/table-row
-            [ui/table-header-column "Yritys"]
-            [ui/table-header-column "Y-tunnus"]
-            [ui/table-header-column "Puhelin"]
-            [ui/table-header-column "Sähköposti"]]]
-    [ui/table-body {:display-row-checkbox false}
-     (doall
-       (for [{:keys [operator business-id phone email]} results]
-         [ui/table-row {:selectable false}
-          [ui/table-row-column operator]
-          [ui/table-row-column business-id]
-          [ui/table-row-column phone]
-          [ui/table-row-column email]
+       (if results
+         [:div.row
+          [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
+          [ui/table {:selectable false}
+           [ui/table-header {:adjust-for-checkbox false
+                             :display-select-all false}
+            [ui/table-row
+              [ui/table-header-column "Yritys"]
+              [ui/table-header-column "Y-tunnus"]
+              [ui/table-header-column "Puhelin"]
+              [ui/table-header-column "Sähköposti"]]]
+          [ui/table-body {:display-row-checkbox false}
+           (doall
+             (for [{:keys [operator business-id phone email]} results]
+               [ui/table-row {:selectable false}
+                [ui/table-row-column operator]
+                [ui/table-row-column business-id]
+                [ui/table-row-column phone]
+                [ui/table-row-column email]
+                ]
+               ))
+           ]
+           ]
           ]
-         ))
-     ]]])]))
+         [:div "Hakuehdoilla ei löydy yrityksiä"]
+         )
+    ]))
 
 (defn service-listing [e! app]
   (let [{:keys [loading? results service-filter operator-filter]} (get-in app [:admin :service-listing])]
