@@ -693,6 +693,14 @@
           "available-from" "Available from"
           "available-to" "Available to"
 
+          "maximum-stay" "Maximum parking time"
+          "seconds" "Seconds"
+          "minutes" "Minutes"
+          "hours" "Hours"
+          "days" "Days"
+          "months" "Months"
+          "years" "Years"
+
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
                    false "Ei"
