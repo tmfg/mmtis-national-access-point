@@ -80,8 +80,7 @@
                           :options published-types
                           :show-option (tr-key [:admin-page :published-types])
                           :update! #(e! (admin-controller/->UpdatePublishedFilter %))}
-       published-filter]
-      ]
+       published-filter]]
      [:div.row
      (when loading?
        [:span "Ladataan palveluita..."])
@@ -112,9 +111,7 @@
                [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/type (keyword type)])]
                [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/sub-type (keyword sub-type)])]
                [ui/table-row-column {:style {:width "5%"}} (if published? "Kyllä" "Ei") ]
-               [ui/table-row-column {:style {:width "15%"}}  (time/format-timestamp-for-ui created)]]))]]])]])
-
-  )
+               [ui/table-row-column {:style {:width "15%"}}  (time/format-timestamp-for-ui created)]]))]]])]]))
 
 (defn admin-panel [e! app]
   (let [selected-tab (or (get-in app [:params :admin-page]) "users")]
