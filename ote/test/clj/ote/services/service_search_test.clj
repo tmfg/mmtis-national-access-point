@@ -1,0 +1,72 @@
+(ns ote.services.service-search-test
+  (:require [ote.services.service-search :as sut]
+            [clojure.test :as t :refer [deftest is testing use-fixtures]]
+            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute!]]
+            [com.stuartsierra.component :as component]
+            [clojure.test.check.generators :as gen]
+            [ote.db.service-generators :as service-generators]
+            [ote.db.transport-service :as t-service]
+            [ote.services.transport :as transport-service]
+            [clojure.string :as str]))
+
+(use-fixtures :each
+  (system-fixture
+   :transport-service
+   (component/using (transport-service/->Transport nil) [:http :db])
+
+   :service-search
+   (component/using (sut/->ServiceSearch) [:http :db])))
+
+(defn- generate-services []
+   (take 10 (repeatedly
+             #(gen/generate
+               service-generators/gen-transport-service))))
+
+(deftest service-search-test
+
+  (let [services (generate-services)
+        saved-services (mapv (comp :transit
+                                   (partial http-post "admin" "transport-service"))
+                             services)]
+
+    ;; Make all generated test services public (and the generated)
+    ;; so that we can verify query results
+    (sql-execute! "UPDATE \"transport-service\" SET \"published?\" = FALSE")
+    (sql-execute!
+     "UPDATE \"transport-service\" SET \"published?\" = TRUE WHERE id IN ("
+     (str/join "," (map ::t-service/id saved-services))
+     ")")
+
+    (testing "Searching by exact name returns it"
+      (let [{name ::t-service/name :as s} (first services)
+            result (http-get (str "service-search?text="
+                                  name
+                                  "&response_format=json"))]
+        (is (= 200 (:status result)))
+        (is (pos? (count (:results (:json result)))))
+        (is (some #(= name (:name %))
+                  (:results (:json result))))))
+
+    (testing "Search by subtype"
+      (testing "Searching by subtype find correct amount"
+        (let [types (group-by ::t-service/sub-type services)]
+          (doseq [[t services] types
+                  :let [result (http-get (str "service-search?sub_types=" (name t) "&response_format=json"))]]
+            (is (= (count services)
+                   (count (:results (:json result))))))))
+
+      (testing "Search by all sub-types returns all results"
+        (is (= (count services)
+               (count
+                (:results
+                 (:json
+                  (http-get (str "service-search?sub-types="
+                                 (str/join "," (into #{} (map ::t-service/sub-type) services))
+                                 "&response_format=json"))))))))))
+
+  (testing "Operator search returns matching company"
+    (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
+      (is (= 200 (:status result)))
+      (is (pos? (count (:json result))))
+      (is (some #(= "Ajopalvelu Testinen Oy" (:name %))
+                (:json result))))))

@@ -10,6 +10,9 @@
             [clojure.string :as str]
             [ring.middleware.params :as params]
             [ring.middleware.gzip :as gzip]
+            [ring.middleware.anti-forgery :as anti-forgery]
+            [ring.middleware.session :as session]
+            [ring.middleware.session.cookie :as session-cookie]
             [ote.localization :as localization]
             [ring.middleware.cookies :as cookies]
             [cheshire.core :as cheshire]))
@@ -41,7 +44,8 @@
       (reduce (fn [handler middleware]
                 (middleware handler))
               (wrap-strip-prefix strip-prefix handler)
-              extra-middleware))))))
+              (remove nil? extra-middleware)))))))
+
 
 (defn wrap-security-exception [handler]
   (fn [req]
@@ -52,6 +56,19 @@
         {:status 403
          :headers {}
          :body ""}))))
+
+(defn wrap-session [{session :session} handler]
+  (if-not session
+    ;; No session config, return handler as is
+    handler
+
+    ;; Session config defined, add session and anti CSRF
+    (session/wrap-session
+     (anti-forgery/wrap-anti-forgery handler)
+     {:store (session-cookie/cookie-store {:key (:key session)})
+      :cookie-name "ote-session"
+      :cookie-attrs {:http-only true}})))
+
 
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
@@ -64,14 +81,16 @@
 
           ;; Handler for routes that don't require authenticated user
           public-handler
-          (wrap-middleware strip-prefix #(serve-request @public-handlers %))
+          (wrap-middleware strip-prefix #(serve-request @public-handlers %)
+                           (partial wrap-session config))
 
           ;; Handler for routes that require authentication
           handler
           (wrap-middleware strip-prefix #(serve-request @handlers %)
                            wrap-security-exception
                            (partial nap-users/wrap-user-info db)
-                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config)))]
+                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config))
+                           (partial wrap-session config))]
       (assoc this ::stop
              (server/run-server
               (fn [req]

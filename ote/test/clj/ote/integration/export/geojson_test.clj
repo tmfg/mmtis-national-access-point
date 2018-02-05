@@ -15,6 +15,12 @@
    :transport (component/using (transport-service/->Transport nil) [:http :db])
    :export-geojson (component/using (geojson/->GeoJSONExport) [:db :http])))
 
+(defn interval-value [{:keys [years months days hours minutes seconds]}]
+  [years months
+   (+ seconds
+      (* 60 minutes)
+      (* 60 60 hours)
+      (* 60 60 24 days))])
 
 (deftest export-geojson-with-interval
   (let [service (assoc (gen/generate (service-generators/service-type-generator :parking))
@@ -41,5 +47,5 @@
       (let [maximum-stay (get-in json-response [:json :features 0 :properties :transport-service
                                                 :parking :maximum-stay])
             interval-fields (juxt :years :months :days :hours :minutes :seconds)]
-        (is (= (interval-fields maximum-stay)
-               (interval-fields (get-in service [::t-service/parking ::t-service/maximum-stay]))))))))
+        (is (= (interval-value maximum-stay)
+               (interval-value (get-in service [::t-service/parking ::t-service/maximum-stay]))))))))

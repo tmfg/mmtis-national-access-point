@@ -5,7 +5,9 @@
         :strip-prefix "/ote"
         :auth-tkt {:shared-secret "{{auth_shared_secret}}"
                    :max-age-in-seconds 36000
-                   :digest-algorithm "MD5"}}
+                   :digest-algorithm "MD5"}
+        ;;:session {:key "{{ote_cookie_key}}"}
+        }
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"

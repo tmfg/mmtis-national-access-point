@@ -193,7 +193,7 @@
               (ts-common/contact-info-group)
               (ts-common/companies-group e!)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
-              (ts-common/external-interfaces (= :schedule (get service ::t-service/sub-type)))
+              (ts-common/external-interfaces e! (= :schedule (get service ::t-service/sub-type)))
               (luggage-restrictions-group)
               (ts-common/service-url
                (tr [:field-labels :passenger-transportation ::t-service/real-time-information])

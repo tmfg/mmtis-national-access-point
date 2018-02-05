@@ -68,12 +68,13 @@
    ::t-service/service-exceptions generators/gen-service-exceptions-array
    ::t-service/accessibility-info-url generators/gen-url
    ::t-service/parking-capacities generators/gen-parking-capacity-array
-   ::t-service/service-hours generators/gen-service-hours-array))
+   ::t-service/service-hours generators/gen-service-hours-array
+   ::t-service/pricing generators/gen-service-link))
 
 (def gen-transport-service-common
   (gen/hash-map
+   ::t-service/name generators/gen-name
    ::t-service/transport-operator-id (gen/return 1)
-   ::t-service/type (gen/return :passenger-transportation)
    ::t-service/contact-address generators/gen-address
    ::t-service/contact-phone (s/gen ::t-service/contact-phone)
    ::t-service/brokerage? (s/gen boolean?)))
@@ -82,9 +83,13 @@
   (gen/let [common gen-transport-service-common
             type-specific (case service-type
                             :passenger-transportation gen-passenger-transportation
-                            :parking gen-parking)]
+                            :parking gen-parking)
+            sub-type (if (= :passenger-transportation service-type)
+                       (gen/elements t-service/passenger-transportation-sub-types)
+                       (gen/return service-type))]
     (assoc common
            ::t-service/type service-type
+           ::t-service/sub-type sub-type
            (case service-type
              :passenger-transportation ::t-service/passenger-transportation
              :parking ::t-service/parking) type-specific)))
