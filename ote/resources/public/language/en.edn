@@ -690,6 +690,9 @@
           "charging-points" "Kuvaus latauspisteistä"
           "parking-capacities" "Parkkipaikkojen määrä"
 
+          "available-from" "Available from"
+          "available-to" "Available to"
+
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
                    false "Ei"
