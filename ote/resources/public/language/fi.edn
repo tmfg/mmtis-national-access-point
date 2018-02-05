@@ -233,8 +233,8 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
  {:name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
-  :external-interfaces-intro "Mikäli liikkumispalvelustasi ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
-  :external-interfaces-intro-rae "Täytä tähän osioon vähintää tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
+  :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
+  :external-interfaces-intro-rae "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
   :external-interfaces "Koneluettava rajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa (esim. muodossa csv, xml, json tai gtfs). Ulkoiset rajapinnat on tarkoitettu yhteistyökumppaneille ja kehittäjille, jotka voivat käyttää niitä lisenssi- ja sopimusehtojen mukaisesti omissa palveluissaan."
   :external-interfaces-read-more {:link "Lue lisää NAP-katalogin koneluettavista rajapinnoista."
                                   :dialog-title "Koneluettavat rajapinnat NAP-katalogissa"
