@@ -74,10 +74,7 @@
 (defn- operator-in-list?
   "Return nil if operator is not in given list"
   [operator list]
-  (let [first-item (some #(= (::t-operator/id operator) (::t-operator/id %)) list)]
-    (if (nil? first-item)
-      false
-      true)))
+    (some #(= (::t-operator/id operator) (::t-operator/id %)) list))
 
 (extend-protocol tuck/Event
 
