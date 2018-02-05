@@ -17,6 +17,15 @@
 (def action-button-container (merge inline-block
                                     {:margin-right "1em"}))
 
+(def icon-small {:width 16 :height 16
+                 :vertical-align "middle"})
+
+(def icon-medium {:width 24 :height 24
+                  :vertical-align "middle"})
+
+(def icon-large {:width 32 :height 32
+                 :vertical-align "middle"})
+
 (def base-button {:padding-left "1.1em"
                   :padding-right "1.1em"
                   :text-transform "uppercase"

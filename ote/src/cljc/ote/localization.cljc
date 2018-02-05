@@ -6,7 +6,8 @@
   On the frontend a global `selected-language` atom is used.
   On the backend the language can be dynamically bound with `*language*`."
   (:require #?@(:cljs [[reagent.core :as r]
-                       [ote.communication :as comm]]
+                       [ote.communication :as comm]
+                       [cljsjs.marked]]
                 :clj  [[clojure.java.io :as io]])
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
@@ -67,6 +68,19 @@
       (zero? count) (message zero parameters)
       (= 1 count) (message one parameters)
       :else (message many parameters))))
+
+(defmethod evaluate-list :md [[operator & args] parameters]
+  #?(:cljs
+     ;; Not really so dangerous, because we are sanitizing the markdown. But, still we'll have to be careful when
+     ;; serving the edn files to prevent any possible injection vectors.
+     ;; NOTE: We make sure here, that the result of the parsing is stored in a node, so it can be safely
+     ;; used anywhere in a ui component.
+     [:span {:dangerouslySetInnerHTML
+             ;; We are converting args list to vector to trigger message default behaviour (=reduce)
+             {:__html (js/marked (message (vec args) parameters) #js {:sanitize true})}}]
+
+     :clj
+     (throw (ex-info "Markdown formatted translations not supported." {operator args}))))
 
 (defmethod evaluate-list :default [[op & _] _]
   (str "{{unknown translation operation " op "}}"))

@@ -236,10 +236,36 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
  {:name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
-  :external-interfaces "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning . Ifall gränssnitten är bristfälliga (jfr statsrådets förordning nr 643/2017) eller inte existerar var vänlig fyll i alla eller delvis punkterna nedan i blanketten."
-  :external-interfaces-eg-rae "Obs. Linjetrafik kan sparas i Trafikverkets RAE-verktyg: "
-  :external-interfaces-end "Fyll härnedan i alla formulärets uppgifter ifall du inte lagt till ett enda maskinläsbart externt gränssnitt. Ifall du uppgett gränssitt som inte uppfyller alla krav var vänlig fyll i formuläret till den del gränssnitten ovan bör kompletteras."
-  :RAE-tool "Se info om RAE"
+  ;; Needs a new translation
+  :external-interfaces-intro "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning (jfr statsrådets förordning nr 643/2017). Lämna tomt ifall dylika maskinläsbara gränssnitt inte finns att tillgå."
+  ;; Needs a new translation
+  :external-interfaces-intro-rae "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
+  ;; Needs a new translation
+  :external-interfaces "Ett maskinläsbart gränssnitt erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON) som kan vidarebehandlas av en dator. Dessa gränssnitt är ämnade för tjänsteutvecklare, som kan använda gränssnittet enligt de användarvillkor som uppgetts."
+  ;; Needs a new translation
+  :external-interfaces-payment-systems "Sådana tjänsteproducenter inom vägtrafiken eller den spårbundna trafiken som använder ett biljett- och betalningssystem, ska dessutom öppna ett gränssnitt för bokningar och enkelbiljetter."
+  ;; Needs a new translation
+  :external-interfaces-read-more {:link "Läs mera om maskinläsbara gränssnitt."
+                                  :dialog-title "Maskinläsbara gränssnitt i NAP-katalogen"
+                                  :dialog-text (:md
+                                                 "## Allmänt\n"
+                                                 "Tjänsteproducentens eller samarbetspartens maskinläsbara gränssnitt gällande tjänsten är avsedda för dem som utvecklar till exempel ruttguider och andra digitala mobilitetstjänster. Det maskinläsbara gränssnittet erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON). I den här sektionen ska man inte lägga till länkar till färdiga applikationer avsedda för vanliga användare (t.ex. webbaserade ruttguider och webbutiker för biljettförsäljning)."
+                                                 "\n\n## Gränssnittens data och funktioner\n"
+                                                 "Gränssnitten kan innehålla samma uppgifter, som man kan meddela på denna blankett (väsentliga uppgifter om mobilitetstjänsten). I så fall är det frivilligt att fylla i motsvarande uppgifter i den senare delen av blanketten. Det lönar sig ändå att fylla i uppgifterna, eftersom detta gör det lättare att hitta uppgifterna med NAP-tjänstens sökfunktioner."
+                                                 "\n\nSådana tjänsteproducenter inom vägtrafiken eller den spårbundna trafiken som använder ett biljett- och betalningssystem, ska dessutom öppna ett försäljningsgränssnitt så att det är möjlighet att åtminstone köpa en engångsbiljett."
+                                                 "\n\nEnligt förordningen är det möjligt, men inte obligatoriskt, att skapa övriga gränssnitt (t.ex. försäljningsgränssnitt som är mer omfattande än gränssnittet för enkelbiljetter, gränssnitt som förmedlar fordonens realtidsdata). Genom att öppna sådana gränssnitt kan tjänsteproducenten dra nytta av de affärsmöjligheter som de nya digitala mobilitetstjänsterna medför."
+                                                 "\n\n## Licensuppgifter\n"
+                                                 "De som använder gränssnitten behöver få information om villkoren för att använda gränssnitten och uppgifterna som dessa innehåller."
+                                                 "\n\nDen som erbjuder ett gränssnitt kan välja vilken licens som används eller ställa egna villkor, men all väsentlig information om mobilitetstjänsten ska ändå vara fritt tillgänglig (öppet gränssnitt) och gränssnitten för minimitjänster ska erbjudas åt alla på samma rättvisa, rimliga och icke-diskriminerande villkor. Med gränssnitt för minimitjänster avses gränssnitt för bokningar och enkelbiljetter och dessa gäller sådana producenter inom vägtrafik och spårbunden trafik, som använder ett biljett- och betalningssystem."
+                                                 "\n\nOm gränssnittet består av information som kan laddas ner, till exempel ett GTFS-paket som beskriver rutter och tidtabeller, är det ofta ändamålsenligt att använda någon allmän licens för öppna data. En sådan licens är till exempel Creative Commons Erkännande 4.0 Internationell (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fi), som är mycket tillåtande vad gäller att sprida, använda, bearbeta, kombinera och dela material, också i kommersiellt syfte. Ifrågavarande licens förutsätter dock att källan nämns samt att eventuella förändringar och förändringshistorik sparas.")}
+
+  ;; Needs a new translation
+  :external-interfaces-tooltips {:data-content "Välj typ av innehåll. Du kan välja flera typer samtidigt för samma gränssnitt. Ifall lämpligt alternativ saknas välj ”Övrigt” och beskriv innehållet i ”Tilläggsuppgifter”."
+                                 :external-service-url "Ange i första hand ett direkt maskinläsbart gränssnitt. Om detta inte är ändamålsenligt ange då en webbadress för mera information om gränssnittet och dess användning."
+                                 :format "Välj ett format i listan. Du kan vid behov välja flera format för samma gränssnitt. Ifall lämpligt format saknas, fyll då i det själv."
+                                 :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
+                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare. Du kan även uppge en webbadress med tilläggsuppgifter."}
+  :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
   :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här. Dock endast den aktör som koordinerar tjänsten (tex. taxicentral eller beställande myndighet) fyller i denna punkt. Den som tillhör tex en taxicentral fyller inte i dessa uppgifter."
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
   :csv-file-example "Här finns en modell för listan"
