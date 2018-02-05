@@ -76,7 +76,8 @@
    :ote.db.transport-service/companies-csv-url "Yrityslistan osoite"
    :ote.db.transport-service/license "Lisenssi"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
-
+   :external-interfaces-warning "Annettuun osoitteeseen ei saada yhteyttä"
+   :external-interfaces-ok "Annettuun osoitteeseen saatiin yhteys"
 
    ;; Service hours
    :ote.db.transport-service/service-hours-info "Lisätiedot"}

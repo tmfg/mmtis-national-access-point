@@ -20,7 +20,7 @@
             [ote.ui.validation :as validation])
   (:require-macros [reagent.core :refer [with-let]]))
 
-(defn rental-form-options [e! schemas]
+(defn rental-form-options [e! schemas app]
   {:name->label (tr-key [:field-labels :rentals]
                         [:field-labels :transport-service]
                         [:field-labels :transport-service-common]
@@ -28,7 +28,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data schemas])})
+                  [ts-common/footer e! data schemas app])})
 
 (defn price-group []
   (form/group
@@ -279,11 +279,11 @@
       :delete? true
       :add-label (tr [:buttons :add-new-pick-up-location])})))
 
-(defn rental [e! service]
+(defn rental [e! service app]
   (with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
                      (ts-common/contact-info-group)
                      (ts-common/place-search-group e! ::t-service/rentals)
-                     (ts-common/external-interfaces)
+                     (ts-common/external-interfaces e!)
                      (vehicle-group)
                      (luggage-restrictions-groups)
                      (accessibility-group)
@@ -293,6 +293,6 @@
                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                       ::t-service/booking-service)
                      (pick-up-locations e!)]
-                     options (rental-form-options e! groups)]
+                     options (rental-form-options e! groups app)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))

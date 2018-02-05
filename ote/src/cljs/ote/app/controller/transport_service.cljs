@@ -77,6 +77,10 @@
 (defrecord EnsureCsvFileResponse [response])
 (defrecord FailedCsvFileResponse [response])
 
+(defrecord EnsureExternalInterfaceUrl [url])
+(defrecord EnsureExternalInterfaceUrlResponse [response url])
+(defrecord FailedExternalInterfaceUrlResponse [])
+
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
 
@@ -256,6 +260,28 @@
     (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response)
     )
 
+  EnsureExternalInterfaceUrl
+  (process-event [{url :url} app]
+    (comm/post! (str "check-external-api") {:url url}
+                {:on-success (tuck/send-async! ->EnsureExternalInterfaceUrlResponse url)
+                 :on-failure (tuck/send-async! ->FailedExternalInterfaceUrlResponse)})
+    app)
+
+  EnsureExternalInterfaceUrlResponse
+  (process-event [{url :url response :response :as e} app]
+    (update-in app [:transport-service (t-service/service-key-by-type (::t-service/type (:transport-service app)))
+                    ::t-service/external-interfaces]
+               (fn [external-interfaces]
+                 (mapv (fn [{eif ::t-service/external-interface :as external-interface}]
+                         (if (= (::t-service/url eif) url)
+                           (assoc external-interface ::t-service/external-interface
+                                  (assoc eif :url-status response))
+                           external-interface))
+                       external-interfaces))))
+
+  FailedExternalInterfaceUrlResponse
+  (process-event [{response :response} app]
+    app)
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage
@@ -402,3 +428,14 @@
               (dissoc s key)))
           service
           service-level-keys))
+
+(defn is-service-owner?
+  "Admin can see services that they don't own. So we need to know, if user is a service owner"
+  [app]
+  (let [service-operator-id (get-in app [:transport-service ::t-service/transport-operator-id])
+        first-matching-item (some
+                              #(= service-operator-id (get-in % [:transport-operator ::t-operator/id]))
+                              (get app :transport-operators-with-services))]
+    (if (not (nil? first-matching-item))
+      true
+      false)))

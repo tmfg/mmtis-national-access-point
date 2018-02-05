@@ -10,8 +10,12 @@
             [clojure.string :as str]
             [ring.middleware.params :as params]
             [ring.middleware.gzip :as gzip]
+            [ring.middleware.anti-forgery :as anti-forgery]
+            [ring.middleware.session :as session]
+            [ring.middleware.session.cookie :as session-cookie]
             [ote.localization :as localization]
-            [ring.middleware.cookies :as cookies]))
+            [ring.middleware.cookies :as cookies]
+            [cheshire.core :as cheshire]))
 
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
@@ -40,7 +44,8 @@
       (reduce (fn [handler middleware]
                 (middleware handler))
               (wrap-strip-prefix strip-prefix handler)
-              extra-middleware))))))
+              (remove nil? extra-middleware)))))))
+
 
 (defn wrap-security-exception [handler]
   (fn [req]
@@ -51,6 +56,19 @@
         {:status 403
          :headers {}
          :body ""}))))
+
+(defn wrap-session [{session :session} handler]
+  (if-not session
+    ;; No session config, return handler as is
+    handler
+
+    ;; Session config defined, add session and anti CSRF
+    (session/wrap-session
+     (anti-forgery/wrap-anti-forgery handler)
+     {:store (session-cookie/cookie-store {:key (:key session)})
+      :cookie-name "ote-session"
+      :cookie-attrs {:http-only true}})))
+
 
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
@@ -63,14 +81,16 @@
 
           ;; Handler for routes that don't require authenticated user
           public-handler
-          (wrap-middleware strip-prefix #(serve-request @public-handlers %))
+          (wrap-middleware strip-prefix #(serve-request @public-handlers %)
+                           (partial wrap-session config))
 
           ;; Handler for routes that require authentication
           handler
           (wrap-middleware strip-prefix #(serve-request @handlers %)
                            wrap-security-exception
                            (partial nap-users/wrap-user-info db)
-                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config)))]
+                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config))
+                           (partial wrap-session config))]
       (assoc this ::stop
              (server/run-server
               (fn [req]
@@ -113,6 +133,11 @@
              (fn [handlers]
                (filterv (partial not= handler) handlers))))))
 
+(def no-cache-headers  {"Cache-Control" "no-cache, no-store"})
+
+(defn with-no-cache-headers [response]
+  (update response :headers merge no-cache-headers))
+
 (defn transit-response
   "Return the given Clojure `data` as a Transit response with status code 200."
   [data]
@@ -123,7 +148,23 @@
 (defn no-cache-transit-response
   "Return the given Clojure `data` as a Transit response with status code 200 and no-cache headers."
   [data]
-  (update (transit-response data) :headers merge {"Cache-Control" "no-cache, no-store"}))
+  (with-no-cache-headers (transit-response data)))
+
+(defn json-response [data]
+  {:status 200
+   :headers {"Content-Type" "application/json"}
+   :body (cheshire/encode data {:key-fn name})})
+
+(defn api-response
+  "Helper for API responses that are used both by OTE app and public.
+  If \"response_format\" query parameter is \"json\", returns a JSON response.
+  Otherwise returns a transit response."
+  [{{format "response_format"} :query-params} data]
+  (let [format (and format (str/lower-case format))]
+    (if (= format "json")
+      (json-response data)
+      (transit-response data))))
+
 
 (defn transit-request
   "Parse HTTP POST body as Transit data."

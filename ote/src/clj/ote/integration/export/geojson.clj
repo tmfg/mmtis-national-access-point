@@ -11,7 +11,10 @@
             [cheshire.core :as cheshire]
             [ote.db.modification :as modification]
             [clojure.set :as set]
-            [ote.integration.export.transform :as transform]))
+            [ote.integration.export.transform :as transform]
+
+            ;; Require time which extends PGInterval JSON generation
+            [ote.time]))
 
 (defqueries "ote/integration/export/geojson.sql")
 

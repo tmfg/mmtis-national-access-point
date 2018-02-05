@@ -2,6 +2,7 @@
   "View parts that are common to all transport service forms."
   (:require [tuck.core :as tuck]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
@@ -16,7 +17,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.validation :as validation]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -65,7 +67,7 @@
 
 (defn external-interfaces
   "Creates a form group for external services."
-  [& [rae-info?]]
+  [& [e! rae-info?]]
   (form/group
     {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
     :columns 3}
@@ -93,13 +95,29 @@
                         {:name      ::t-service/external-service-url
                          :type      :string
                          :width     "20%"
+                         :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value)))
                          :full-width? true
                          :read      (comp ::t-service/url ::t-service/external-interface)
                          :write     #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
                          :required? true}
+                        {:name      :ext-validation
+                         :type      :component
+                         :component (fn [{{status :status} :data}]
+                                      (if-not status
+                                        [:span]
+                                        (if (= :success  status)
+                                          [:div
+                                           {:title (tr [:field-labels :transport-service-common :external-interfaces-ok])}
+                                           [ic/action-done {:style {:width 24 :height 24 :color "green"}}]]
+                                          [:div
+                                           {:title (tr [:field-labels :transport-service-common :external-interfaces-warning])}
+                                           [ic/alert-warning {:style {:width 24 :height 24 :color "#cccc00"}}]])))
+                         :read (comp :url-status ::t-service/external-interface)
+                         :width "5%"
+                         }
                         {:name      ::t-service/format
                          :type      :string
-                         :width     "20%"
+                         :width     "15%"
                          :full-width? true
                          :required? true}
                         {:name  ::t-service/license
@@ -239,28 +257,33 @@
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
-  [e! {published? ::t-service/published? :as data} schemas]
-  (let [name-missing? (str/blank? (::t-service/name data))]
-    [:div.row
-     (when (not (form/can-save? data))
-       [ui/card {:style {:margin-bottom "1em"}}
-        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+  [e! {published? ::t-service/published? :as data} schemas app]
+  (let [name-missing? (str/blank? (::t-service/name data))
+        show-footer? (if (get-in app [:transport-service ::t-service/id])
+                       (ts/is-service-owner? app)
+                       true)]
 
-     (if published?
-       ;; True
-       [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                      :disabled (not (form/can-save? data))}
-        (tr [:buttons :save-updated])]
-       ;; False
-       [:span
-        [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                       :disabled (not (form/can-save? data))}
-         (tr [:buttons :save-and-publish])]
-        [buttons/save  {:on-click #(e! (ts/->SaveTransportService schemas false))
-                        :disabled name-missing?}
-         (tr [:buttons :save-as-draft])]])
-     [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
-      (tr [:buttons :discard])]]))
+    (when show-footer?
+      [:div.row
+       (when (not (form/can-save? data))
+         [ui/card {:style {:margin-bottom "1em"}}
+          [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+
+       (if published?
+         ;; True
+         [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                        :disabled (not (form/can-save? data))}
+          (tr [:buttons :save-updated])]
+         ;; False
+         [:span
+          [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                         :disabled (not (form/can-save? data))}
+           (tr [:buttons :save-and-publish])]
+          [buttons/save  {:on-click #(e! (ts/->SaveTransportService schemas false))
+                          :disabled name-missing?}
+           (tr [:buttons :save-as-draft])]])
+       [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+        (tr [:buttons :discard])]])))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group

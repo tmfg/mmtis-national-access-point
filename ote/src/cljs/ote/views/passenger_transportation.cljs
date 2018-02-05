@@ -23,12 +23,12 @@
              [reagent.core :as r])
   (:require-macros [reagent.core :refer [with-let]]))
 
-(defn transportation-form-options [e! schemas]
+(defn transportation-form-options [e! schemas app]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data schemas])})
+                  [ts-common/footer e! data schemas app])})
 
 
 
@@ -187,15 +187,13 @@
     :read (comp ::t-service/url ::t-service/pricing)
     })))
 
-
-
-(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service}]
+(defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service} app]
   (with-let [form-groups
              [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group e!)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
-              (ts-common/external-interfaces (= :schedule (get service ::t-service/sub-type)))
+              (ts-common/external-interfaces e! (= :schedule (get service ::t-service/sub-type)))
               (luggage-restrictions-group)
               (ts-common/service-url
                (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
@@ -206,6 +204,6 @@
               (accessibility-group)
               (pricing-group (get service ::t-service/sub-type))
               (ts-common/service-hours-group)]
-             form-options (transportation-form-options e! form-groups)]
+             form-options (transportation-form-options e! form-groups app)]
     [:div.row
      [form/form form-options form-groups form-data]]))

@@ -20,7 +20,7 @@
             [ote.util.values :as values]
             [ote.ui.validation :as validation]))
 
-(defn form-options [e! schemas]
+(defn form-options [e! schemas app]
   {:name->label (tr-key [:field-labels :parking]
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service]
@@ -28,7 +28,7 @@
    :update!     #(e! (ts/->EditTransportService %))
    :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
-                  [ts-common/footer e! data schemas])})
+                  [ts-common/footer e! data schemas app])})
 
 (defn pricing-group [e!]
   (form/group
@@ -224,11 +224,11 @@
      :container-class "col-md-5"
      :full-width?     true}))
 
-(defn parking [e! {form-data ::t-service/parking}]
+(defn parking [e! {form-data ::t-service/parking} app]
   (r/with-let [groups [(ts-common/name-group (tr [:parking-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/parking)
-                       (ts-common/external-interfaces)
+                       (ts-common/external-interfaces e!)
                        (ts-common/service-url
                          (tr [:field-labels :parking ::t-service/real-time-information])
                          ::t-service/real-time-information)
@@ -243,7 +243,7 @@
                        (pricing-group e!)
                        (accessibility-group)
                        (service-hours-group e!)]
-               options (form-options e! groups)]
+               options (form-options e! groups app)]
               [:div.row
                 [form/form options groups (merge
                                             {:maximum-stay-unit :hours}
