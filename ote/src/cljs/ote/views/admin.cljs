@@ -49,7 +49,7 @@
 (defn business-id-report [e! app]
   (let [{:keys [loading? results]} (get-in app [:admin :business-id-report])]
     [:div
-
+     (.log js/console "business-id-report" (clj->js results))
      [ui/raised-button {:primary true
                         :disabled (str/blank? filter)
                         :on-click #(e! (admin-controller/->GetBusinessIdReport))}
@@ -61,18 +61,25 @@
      (when results
        [:span
         [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
-        [ui/table-header-column "Palveluntuottaja"]
-        [ui/table-header-column "Palvelun nimi"]
-        [ui/table-header-column "Y-Tunnus"]
-        [ui/table-header-column "GSM"]]
+        [ui/table {:selectable false}
+         [ui/table-header {:adjust-for-checkbox false
+                           :display-select-all false}
+          [ui/table-row
+            [ui/table-header-column "Yritys"]
+            [ui/table-header-column "Y-tunnus"]
+            [ui/table-header-column "Puhelin"]
+            [ui/table-header-column "Sähköposti"]]]
     [ui/table-body {:display-row-checkbox false}
      (doall
-       (for [{:keys [operator-name service-name business-id gsm]} results]
+       (for [{:keys [operator business-id phone email]} results]
          [ui/table-row {:selectable false}
-          [ui/table-row-column operator-name]
-          [ui/table-row-column service-name]
+          [ui/table-row-column operator]
           [ui/table-row-column business-id]
-          [ui/table-row-column gsm]]))])]))
+          [ui/table-row-column phone]
+          [ui/table-row-column email]
+          ]
+         ))
+     ]]])]))
 
 (defn service-listing [e! app]
   (let [{:keys [loading? results service-filter operator-filter]} (get-in app [:admin :service-listing])]
@@ -136,5 +143,5 @@
       [user-listing e! app]]
      [ui/tab {:label "Palvelut" :value "serivces"}
       [service-listing e! app]]
-     [ui/tab {:label "Välityspalvelut" :value "brokerage"}
+     [ui/tab {:label "Y-tunnus raportti" :value "businessid"}
       [business-id-report e! app]]]))
