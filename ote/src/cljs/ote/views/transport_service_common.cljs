@@ -6,7 +6,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
-            [ote.ui.common :refer [linkify dialog]]
+            [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.views.place-search :as place-search]
@@ -115,18 +115,20 @@
                        :read (comp ::t-service/url ::t-service/external-interface)
                        :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
                        :required? true}
-                      {:name      :ext-validation
-                       :type      :component
+                      {:name :ext-validation
+                       :type :component
                        :component (fn [{{status :status} :data}]
                                     (if-not status
                                       [:span]
-                                      (if (= :success  status)
-                                        [:div
-                                         {:title (tr [:field-labels :transport-service-common :external-interfaces-ok])}
-                                         [ic/action-done {:style {:width 24 :height 24 :color "green"}}]]
-                                        [:div
-                                         {:title (tr [:field-labels :transport-service-common :external-interfaces-warning])}
-                                         [ic/alert-warning {:style {:width 24 :height 24 :color "#cccc00"}}]])))
+                                      (if (= :success status)
+                                        [(tooltip-wrapper ic/action-done) {:style {:width 24 :height 24
+                                                                                     :vertical-align "middle"
+                                                                                     :color "green"}}
+                                         {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
+                                        [(tooltip-wrapper ic/alert-warning) {:style {:width 24 :height 24
+                                                                                     :vertical-align "middle"
+                                                                                     :color "#cccc00"}}
+                                         {:text (tr [:field-labels :transport-service-common :external-interfaces-warning])}])))
                        :read (comp :url-status ::t-service/external-interface)
                        :width "5%"
                        }

@@ -479,8 +479,8 @@
                [{}]
                data)]
     [:div
-     ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper.
-     [ui/table {:wrapperStyle {:overflow "visible"}}
+     ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
+     [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
                               {:style style-form/table-header-style})
        [ui/table-row (merge {:selectable false}
@@ -520,7 +520,7 @@
                                          #(assoc-in data [i name] %))
                              value ((or read name) row)]]
                    ^{:key name}
-                   [ui/table-row-column {:style {:width width}}
+                   [ui/table-row-column {:style {:width width :overflow "visible"}}
                     (if (= :component type)
                       (component {:update-form! #(update! (update-fn %))
                                   :data value})
@@ -533,7 +533,7 @@
                                       {:error field-error}))
                        value])]))
                 (when delete?
-                  [ui/table-row-column {:style {:width "70px"}}
+                  [ui/table-row-column {:style {:width "70px" :overflow "visible"}}
                  [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
                                                                      (take i data))
                                                                    (drop (inc i) data))))}
