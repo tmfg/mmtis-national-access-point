@@ -76,6 +76,8 @@
    :ote.db.transport-service/companies-csv-url "Företagslistans tekniska address"
    :ote.db.transport-service/license "Licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
+   :external-interfaces-warning "Kontakt fås inte till den angivna adressen"
+   :external-interfaces-ok "Kontakten till den angivna adressen fungerar"
 
    ;; Service hours
    :ote.db.transport-service/service-hours-info "Tilläggsinfo"}

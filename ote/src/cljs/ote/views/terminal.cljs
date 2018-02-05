@@ -127,7 +127,7 @@
   (r/with-let [groups [(ts-common/name-group (tr [:terminal-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
-                       (ts-common/external-interfaces)
+                       (ts-common/external-interfaces e!)
                        (ts-common/service-hours-group)
                        (indoor-map-group)
                        (assistance-service-group)
