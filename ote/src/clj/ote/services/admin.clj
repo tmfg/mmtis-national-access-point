@@ -63,11 +63,35 @@
          {::t-service/operator-name (op/ilike (str "%" query "%"))}
          {:specql.core/order-by ::t-service/operator-name}))
 
+(defn distinct-by [f coll]
+  (let [groups (group-by f coll)]
+    (map #(first (groups %)) (distinct (map f coll)))))
+
 (defn- business-id-report [db user query]
-  (let [operator-business-ids (fetch-operator-business-ids db)
-        service-business-ids (fetch-service-business-ids db)
-        report (merge operator-business-ids service-business-ids)]
-    report))
+  (let [services (if
+                   (or
+                     (nil? (:business-id-filter query))
+                     (= :ALL (:business-id-filter query))
+                     (= :services (:business-id-filter query)))
+                   (fetch-service-business-ids db)
+                   nil)
+        operators (if
+                   (or
+                     (nil? (:business-id-filter query))
+                     (= :ALL (:business-id-filter query))
+                     (= :operators (:business-id-filter query)))
+                    (fetch-operator-business-ids db)
+                   nil)
+
+        report (cond
+                 (and (not (empty? services)) (not (empty? operators)))
+                  (concat services operators)
+                 (and (not (empty? services)) (empty? operators))
+                  services
+                 (and (not (empty? operators)) (empty? services))
+                  operators
+                 :else nil)]
+    (distinct-by :business-id report)))
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
@@ -94,6 +118,7 @@
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db
                      (partial admin-delete-transport-service! nap-config)))
+
     (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))))
 
 (defrecord Admin [nap-config]
