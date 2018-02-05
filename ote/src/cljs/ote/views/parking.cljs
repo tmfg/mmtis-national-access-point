@@ -227,7 +227,7 @@
   (r/with-let [groups [(ts-common/name-group (tr [:parking-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/parking)
-                       (ts-common/external-interfaces)
+                       (ts-common/external-interfaces e!)
                        (ts-common/service-url
                          (tr [:field-labels :parking ::t-service/real-time-information])
                          ::t-service/real-time-information)

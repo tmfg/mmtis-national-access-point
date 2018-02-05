@@ -17,7 +17,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.validation :as validation]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
@@ -64,11 +65,9 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-service-link])}))
 
-
-
 (defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
-  [& [type sub-type]]
+  [& [e! type sub-type]]
   (let [type (or type :other)
         sub-type (or sub-type :other)]
 
@@ -112,13 +111,29 @@
                        :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
                        :width "20%"
                        :full-width? true
+                       :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value)))
                        :read (comp ::t-service/url ::t-service/external-interface)
                        :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
                        :required? true}
+                      {:name      :ext-validation
+                       :type      :component
+                       :component (fn [{{status :status} :data}]
+                                    (if-not status
+                                      [:span]
+                                      (if (= :success  status)
+                                        [:div
+                                         {:title (tr [:field-labels :transport-service-common :external-interfaces-ok])}
+                                         [ic/action-done {:style {:width 24 :height 24 :color "green"}}]]
+                                        [:div
+                                         {:title (tr [:field-labels :transport-service-common :external-interfaces-warning])}
+                                         [ic/alert-warning {:style {:width 24 :height 24 :color "#cccc00"}}]])))
+                       :read (comp :url-status ::t-service/external-interface)
+                       :width "5%"
+                       }
                       {:name ::t-service/format
                        :type :string
                        :tooltip (tr [:form-help :external-interfaces-tooltips :format])
-                       :width "20%"
+                       :width "15%"
                        :full-width? true
                        :required? true}
                       {:name ::t-service/license
@@ -261,7 +276,7 @@
         show-footer? (if (get-in app [:transport-service ::t-service/id])
                        (ts/is-service-owner? app)
                        true)]
-    
+
     (when show-footer?
       [:div.row
        (when (not (form/can-save? data))
