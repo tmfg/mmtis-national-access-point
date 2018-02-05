@@ -121,13 +121,11 @@
                                     (if-not status
                                       [:span]
                                       (if (= :success status)
-                                        [(tooltip-wrapper ic/action-done) {:style {:width 24 :height 24
-                                                                                     :vertical-align "middle"
-                                                                                     :color "green"}}
+                                        [(tooltip-wrapper ic/action-done) {:style (merge style-base/icon-medium
+                                                                                         {:color "green"})}
                                          {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
-                                        [(tooltip-wrapper ic/alert-warning) {:style {:width 24 :height 24
-                                                                                     :vertical-align "middle"
-                                                                                     :color "#cccc00"}}
+                                        [(tooltip-wrapper ic/alert-warning) {:style (merge style-base/icon-medium
+                                                                                           {:color "cccc00"})}
                                          {:text (tr [:field-labels :transport-service-common :external-interfaces-warning])}])))
                        :read (comp :url-status ::t-service/external-interface)
                        :width "5%"
