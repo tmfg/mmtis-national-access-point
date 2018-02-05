@@ -45,23 +45,36 @@
 
 (defn- list-users [db user query]
   (nap-users/list-users db {:email (str "%" query "%")
-                            :name (str "%" query "%")}))
+                            :name  (str "%" query "%")}))
+(defn- published-search-param [query]
+  (case (:published-type query)
+    nil? nil
+    :ALL nil
+    :YES {::t-service/published? true}
+    :NO {::t-service/published? false}
+    nil))
 
 (defn- list-services
   "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
   [db user query]
-  (fetch db ::t-service/transport-service-search-result
+  (let [q (if (nil? (:query query))
+            nil
+            {::t-service/name (op/ilike (str "%" (:query query) "%"))})
+        search-params (merge q (published-search-param query))]
+    (fetch db ::t-service/transport-service-search-result
          service-search-result-columns
-         (if (nil? query)
-           nil
-           {::t-service/name (op/ilike (str "%" query "%"))})
-         {:specql.core/order-by ::t-service/name}))
+         search-params
+         {:specql.core/order-by ::t-service/name})))
 
 (defn- list-services-by-operator [db user query]
-  (fetch db ::t-service/transport-service-search-result
+  (let [q (if (nil? (:query query))
+            nil
+            {::t-service/operator-name (op/ilike (str "%" (:query query) "%"))})
+        search-params (merge q (published-search-param query))]
+    (fetch db ::t-service/transport-service-search-result
          service-search-result-columns
-         {::t-service/operator-name (op/ilike (str "%" query "%"))}
-         {:specql.core/order-by ::t-service/operator-name}))
+         search-params
+         {:specql.core/order-by ::t-service/operator-name})))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]

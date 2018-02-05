@@ -562,7 +562,9 @@
   liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
 
  :admin-page
- {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}}
+ {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
+  :published-types {:YES "Published" :NO "Not published" :ALL "All"}}
+
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.

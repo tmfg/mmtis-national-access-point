@@ -12,6 +12,7 @@
             [ote.time :as time]))
 
 (def id-filter-type [:operators :services :ALL])
+(def published-types [:YES :NO :ALL])
 
 (defn user-listing [e! app]
   (let [{:keys [loading? results user-filter]} (get-in app [:admin :user-listing])]
@@ -98,26 +99,38 @@
     ]))
 
 (defn service-listing [e! app]
-  (let [{:keys [loading? results service-filter operator-filter]} (get-in app [:admin :service-listing])]
-    [:div
-     [form-fields/field {:type :string :label "Palvelun nimi"
+  (let [{:keys [loading? results service-filter operator-filter published-filter]} (get-in app [:admin :service-listing])]
+    [:div.row
+     [:div.row.col-md-5
+     [form-fields/field {:type :string :label "Hae palvelun nimellä tai sen osalla"
                          :update! #(e! (admin-controller/->UpdateServiceFilter %))}
       service-filter]
 
      [ui/raised-button {:primary true
                         :disabled (str/blank? filter)
                         :on-click #(e! (admin-controller/->SearchServices))}
-      "Hae palveluita"]
+      "Hae"]
+      ]
+     [:div.col-md-5
 
-     [form-fields/field {:type :string :label "Palveluntuottajan nimi"
+     [form-fields/field {:type :string :label "Hae palveluntuottajan nimellä tai sen osalla"
                          :update! #(e! (admin-controller/->UpdateOperatorFilter %))}
       operator-filter]
 
      [ui/raised-button {:primary true
                         :disabled (str/blank? filter)
                         :on-click #(e! (admin-controller/->SearchServicesByOperator))}
-      "Hae palveluita"]
+      "Hae"]
+      ]
 
+     [:div.row.col-md-2
+      [form-fields/field {:type :selection
+                          :label "Julkaistu?"
+                          :options published-types
+                          :show-option (tr-key [:admin-page :published-types])
+                          :update! #(e! (admin-controller/->UpdatePublishedFilter %))}
+       published-filter]]
+     [:div.row
      (when loading?
        [:span "Ladataan palveluita..."])
 
@@ -147,9 +160,7 @@
                [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/type (keyword type)])]
                [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/sub-type (keyword sub-type)])]
                [ui/table-row-column {:style {:width "5%"}} (if published? "Kyllä" "Ei") ]
-               [ui/table-row-column {:style {:width "15%"}}  (time/format-timestamp-for-ui created)]]))]]])])
-
-  )
+               [ui/table-row-column {:style {:width "15%"}}  (time/format-timestamp-for-ui created)]]))]]])]]))
 
 (defn admin-panel [e! app]
   (let [selected-tab (or (get-in app [:params :admin-page]) "users")]
@@ -157,7 +168,7 @@
               :on-change #(e! (admin-controller/->ChangeAdminTab %))}
      [ui/tab {:label "Käyttäjät" :value "users"}
       [user-listing e! app]]
-     [ui/tab {:label "Palvelut" :value "serivces"}
+     [ui/tab {:label "Palvelut" :value "services"}
       [service-listing e! app]]
      [ui/tab {:label "Y-tunnus raportti" :value "businessid"}
       [business-id-report e! app]]]))

@@ -15,6 +15,7 @@
 (defrecord UpdateUserFilter [user-filter])
 (defrecord UpdateServiceFilter [service-filter])
 (defrecord UpdateOperatorFilter [operator-filter])
+(defrecord UpdatePublishedFilter [published-filter])
 (defrecord SearchUsers [])
 (defrecord SearchServices [])
 (defrecord SearchServicesByOperator [])
@@ -48,6 +49,10 @@
    (process-event [{f :business-id-filter} app]
           (update-in app [:admin :business-id-report] assoc :business-id-filter f))
 
+  UpdatePublishedFilter
+  (process-event [{f :published-filter} app]
+    (update-in app [:admin :service-listing] assoc :published-filter f))
+
   SearchUsers
   (process-event [_ app]
     (comm/post! "admin/users" (get-in app [:admin :user-listing :user-filter])
@@ -74,13 +79,17 @@
 
   SearchServices
   (process-event [_ app]
-    (comm/post! "admin/transport-services" (get-in app [:admin :service-listing :service-filter])
+    (comm/post! "admin/transport-services"
+                {:query (get-in app [:admin :service-listing :service-filter])
+                :published-type (get-in app [:admin :service-listing :published-filter])}
                 {:on-success (tuck/send-async! ->SearchServicesResponse)})
     (assoc-in app [:admin :service-listing :loading?] true))
 
   SearchServicesByOperator
   (process-event [_ app]
-    (comm/post! "admin/transport-services-by-operator" (get-in app [:admin :service-listing :operator-filter])
+    (comm/post! "admin/transport-services-by-operator"
+                {:query (get-in app [:admin :service-listing :operator-filter])
+                 :published-type (get-in app [:admin :service-listing :published-filter])}
                 {:on-success (tuck/send-async! ->SearchServicesResponse)})
     (assoc-in app [:admin :service-listing :loading?] true))
 
@@ -127,4 +136,3 @@
   ChangeAdminTab
     (process-event [{tab :tab} app]
       (assoc-in app [:params :admin-page] tab)))
-
