@@ -44,11 +44,12 @@
   (nap-users/list-users db {:email (str "%" query "%")
                             :name  (str "%" query "%")}))
 (defn- published-search-param [query]
-  (cond
-    (or (nil? (:published-type query)) (= :ALL (:published-type query))) nil
-    (= :YES (:published-type query)) {::t-service/published? true}
-    (= :NO (:published-type query)) {::t-service/published? false}
-    :else nil))
+  (case (:published-type query)
+    nil? nil
+    :ALL nil
+    :YES {::t-service/published? true}
+    :NO {::t-service/published? false}
+    nil))
 
 (defn- list-services
   "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
