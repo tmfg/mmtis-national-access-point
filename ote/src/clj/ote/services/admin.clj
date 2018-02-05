@@ -91,7 +91,7 @@
                  (and (not (empty? operators)) (empty? services))
                   operators
                  :else nil)]
-    (distinct-by :business-id report)))
+    (sort-by :operator (distinct-by :business-id report))))
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
