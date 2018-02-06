@@ -6,7 +6,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
             [ote.views.place-search :as place-search]
@@ -66,84 +66,98 @@
      :add-label    (tr [:buttons :add-new-service-link])}))
 
 (defn external-interfaces
-  "Creates a form group for external services."
-  [& [e! rae-info?]]
-  (form/group
-    {:label  (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
-    :columns 3}
+  "Creates a form group for external services. Displays help texts conditionally by transport operator type."
+  [& [e! type sub-type]]
+  (let [type (or type :other)
+        sub-type (or sub-type :other)]
 
-    (form/info
-     [:div
-      [:p (tr [:form-help :external-interfaces])]
-      (when rae-info?
-        [:p (tr [:form-help :external-interfaces-eg-rae])
-         [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-tool])
-          {:target "_blank"}]])])
+    (form/group
+      {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
+       :columns 3}
 
-    {:name             ::t-service/external-interfaces
-     :type             :table
-     :prepare-for-save values/without-empty-rows
-     :table-fields     [{:name ::t-service/data-content
-                         :width "20%"
-                         :auto-width? true
-                         :full-width? true
-                         :type :multiselect-selection
-                         :options t-service/interface-data-contents
-                         :show-option (tr-key [:enums ::t-service/interface-data-content])
-                         :required? true
-                         :is-empty? validation/empty-enum-dropdown?}
-                        {:name      ::t-service/external-service-url
-                         :type      :string
-                         :width     "20%"
-                         :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value)))
-                         :full-width? true
-                         :read      (comp ::t-service/url ::t-service/external-interface)
-                         :write     #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
-                         :required? true}
-                        {:name      :ext-validation
-                         :type      :component
-                         :component (fn [{{status :status} :data}]
-                                      (if-not status
-                                        [:span]
-                                        (if (= :success  status)
-                                          [:div
-                                           {:title (tr [:field-labels :transport-service-common :external-interfaces-ok])}
-                                           [ic/action-done {:style {:width 24 :height 24 :color "green"}}]]
-                                          [:div
-                                           {:title (tr [:field-labels :transport-service-common :external-interfaces-warning])}
-                                           [ic/alert-warning {:style {:width 24 :height 24 :color "#cccc00"}}]])))
-                         :read (comp :url-status ::t-service/external-interface)
-                         :width "5%"
-                         }
-                        {:name      ::t-service/format
-                         :type      :string
-                         :width     "15%"
-                         :full-width? true
-                         :required? true}
-                        {:name  ::t-service/license
-                         :type  :string
-                         :width "20%"
-                         :full-width? true}
-                        {:name      ::t-service/external-service-description
-                         :type      :localized-text
-                         :width     "20%"
-                         :full-width? true
-                         :read      (comp ::t-service/description ::t-service/external-interface)
-                         :write     #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
-                         :required? true
-                         :is-empty? validation/empty-localized-text?}]
-     :delete?          true
-     :add-label        (tr [:buttons :add-external-interface])}
+      (form/info
+        [:div
+         [:div {:style {:margin-bottom "5px"}}
+          [:b (if (= :schedule sub-type)
+                [:span (str (tr [:form-help :external-interfaces-intro-rae]) " ")
+                 [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-link-text])
+                  {:target "_blank"}]]
+                (tr [:form-help :external-interfaces-intro]))]]
+         [:div (tr [:form-help :external-interfaces])]
+         [dialog
+          (tr [:form-help :external-interfaces-read-more :link])
+          (tr [:form-help :external-interfaces-read-more :dialog-title])
+          [:div
+           (tr [:form-help :external-interfaces-read-more :dialog-text])]]
+         (when (= :passenger-transportation type)
+           [:div {:style {:margin-top "20px"}}
+            [:b (tr [:form-help :external-interfaces-payment-systems])]])])
 
-    (form/info
-     [:div
-      [:p (tr [:form-help :external-interfaces-end])]])
+      {:name ::t-service/external-interfaces
+       :type :table
+       :prepare-for-save values/without-empty-rows
+       :table-fields [{:name ::t-service/data-content
+                       :type :multiselect-selection
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :data-content])
+                       :width "20%"
+                       :auto-width? true
+                       :full-width? true
+                       :options t-service/interface-data-contents
+                       :show-option (tr-key [:enums ::t-service/interface-data-content])
+                       :required? true
+                       :is-empty? validation/empty-enum-dropdown?}
+                      {:name ::t-service/external-service-url
+                       :type :string
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
+                       :width "20%"
+                       :full-width? true
+                       :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value)))
+                       :read (comp ::t-service/url ::t-service/external-interface)
+                       :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
+                       :required? true}
+                      {:name :ext-validation
+                       :type :component
+                       :component (fn [{{status :status} :data}]
+                                    (if-not status
+                                      [:span]
+                                      (if (= :success status)
+                                        [(tooltip-wrapper ic/action-done) {:style (merge style-base/icon-medium
+                                                                                         {:color "green"})}
+                                         {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
+                                        [(tooltip-wrapper ic/alert-warning) {:style (merge style-base/icon-medium
+                                                                                           {:color "cccc00"})}
+                                         {:text (tr [:field-labels :transport-service-common :external-interfaces-warning])}])))
+                       :read (comp :url-status ::t-service/external-interface)
+                       :width "5%"
+                       }
+                      {:name ::t-service/format
+                       :type :string
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :format])
+                       :width "15%"
+                       :full-width? true
+                       :required? true}
+                      {:name ::t-service/license
+                       :type :string
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :license])
+                       :width "20%"
+                       :full-width? true}
+                      {:name ::t-service/external-service-description
+                       :type :localized-text
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
+                       :width "20%"
+                       :full-width? true
+                       :read (comp ::t-service/description ::t-service/external-interface)
+                       :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
+                       :required? false
+                       :is-empty? validation/empty-localized-text?}]
+       :delete? true
+       :add-label (tr [:buttons :add-external-interface])}
 
-    {:name ::t-service/notice-external-interfaces?
-     :type :checkbox
-     :required? true
-     :style style-form/padding-top
-     :validate [[:checked?]]}))
+      {:name ::t-service/notice-external-interfaces?
+       :type :checkbox
+       :required? true
+       :style style-form/padding-top
+       :validate [[:checked?]]})))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."

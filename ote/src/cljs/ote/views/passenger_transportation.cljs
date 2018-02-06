@@ -141,8 +141,7 @@
     :layout :row}
 
    (form/info
-     [:div
-      [:p (tr [:form-help :pricing-info])]])
+     [:div (tr [:form-help :pricing-info])])
 
    {:container-class "col-xs-12"
     :name         ::t-service/price-classes
@@ -193,7 +192,7 @@
               (ts-common/contact-info-group)
               (ts-common/companies-group e!)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
-              (ts-common/external-interfaces e! (= :schedule (get service ::t-service/sub-type)))
+              (ts-common/external-interfaces e! (get service ::t-service/type) (get service ::t-service/sub-type))
               (luggage-restrictions-group)
               (ts-common/service-url
                (tr [:field-labels :passenger-transportation ::t-service/real-time-information])

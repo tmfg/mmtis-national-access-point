@@ -91,6 +91,14 @@
   (let [komponentti (:component skeema)]
     [komponentti data]))
 
+(def tooltip-icon
+  "A tooltip icon that shows balloon.css tooltip on hover."
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+    (fn [opts]
+      [wrapped {:style {:width          16 :height 16
+                        :vertical-align "middle"
+                        :color          "gray"}}
+       opts])))
 
 (defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
   (or placeholder
@@ -471,18 +479,21 @@
                [{}]
                data)]
     [:div
-     [ui/table
+     ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
+     [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
                               {:style style-form/table-header-style})
        [ui/table-row (merge {:selectable false}
                             {:style style-form/table-header-style})
         (doall
-         (for [{:keys [name label width] :as tf} table-fields]
+         (for [{:keys [name label width tooltip tooltip-pos tooltip-len] :as tf} table-fields]
            ^{:key name}
            [ui/table-header-column {:style
                                     (merge {:width width :white-space "pre-wrap"}
                                            style-form/table-header-style)}
-            label]))
+            label
+            (when tooltip
+              [tooltip-icon {:text tooltip :pos  tooltip-pos :len tooltip-len}])]))
         (when delete?
           [ui/table-header-column {:style (merge {:width "70px"} style-form/table-header-style)}
            (tr [:buttons :delete])])]]
@@ -509,7 +520,7 @@
                                          #(assoc-in data [i name] %))
                              value ((or read name) row)]]
                    ^{:key name}
-                   [ui/table-row-column {:style {:width width}}
+                   [ui/table-row-column {:style {:width width :overflow "visible"}}
                     (if (= :component type)
                       (component {:update-form! #(update! (update-fn %))
                                   :data value})
@@ -522,7 +533,7 @@
                                       {:error field-error}))
                        value])]))
                 (when delete?
-                  [ui/table-row-column {:style {:width "70px"}}
+                  [ui/table-row-column {:style {:width "70px" :overflow "visible"}}
                  [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
                                                                      (take i data))
                                                                    (drop (inc i) data))))}

@@ -37,8 +37,7 @@
      :layout  :row}
 
     (form/info
-     [:div
-      [:p (tr [:form-help :pricing-info])]])
+     [:div (tr [:form-help :pricing-info])])
 
     {:name         ::t-service/price-classes
      :type         :table

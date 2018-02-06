@@ -19,7 +19,7 @@
 
 ;; Don't log debugs to tests
 (log/merge-config!
- {:appenders {:println {:min-level :info}}})
+ {:appenders {:println {:min-level :warn}}})
 
 ;; Current db for tests
 (defonce ^:dynamic *db* nil)
