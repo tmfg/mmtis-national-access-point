@@ -252,23 +252,26 @@
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
-  [:div
+  [:div.login-form
    (when failed?
      [:div (stylefy/use-style style-base/error-element)
       (tr [:login :error error])])
    [form/form {:name->label (tr-key [:field-labels :login])
                :update! #(e! (login/->UpdateLoginCredentials %))
                :footer-fn (fn [data]
-                            [ui/raised-button {:primary true
-                                               :on-click #(e! (login/->Login))
-                                               :label (tr [:login :login-button])}])}
+                            [:span.login-dialog-footer
+                             [ui/raised-button {:primary true
+                                                :on-click #(e! (login/->Login))
+                                                :label (tr [:login :login-button])}]])}
     [(form/group
       {:label (tr [:login :label]) :expandable? false
        :columns 3}
       {:name :email
-       :type :string}
+       :type :string
+       :on-enter #(e! (login/->Login))}
       {:name :password
-       :type :string :password? true})]
+       :type :string :password? true
+       :on-enter #(e! (login/->Login))})]
     credentials]])
 
 (defn login-action-cards []
