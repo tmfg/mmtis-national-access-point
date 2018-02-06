@@ -107,7 +107,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style password?]
+                                  style input-style hint-style password? on-enter]
                            :as   field} data]
   [text-field
    (merge
@@ -137,7 +137,10 @@
     (when input-style
       {:input-style input-style})
     (when password?
-      {:type "password"}))])
+      {:type "password"})
+    (when on-enter
+      {:on-key-press #(when (= "Enter" (.-key %))
+                        (on-enter))}))])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error]
                               :as   field} data]
