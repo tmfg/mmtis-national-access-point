@@ -714,6 +714,17 @@
           "charging-points" "Kuvaus latauspisteistä"
           "parking-capacities" "Parkkipaikkojen määrä"
 
+          "available-from" "Saatavilla alkaen"
+          "available-to" "Saatavilla asti"
+
+          "maximum-stay" "Maksimi pysäköintiaika"
+          "seconds" "Sekuntia"
+          "minutes" "Minuuttia"
+          "hours" "Tuntia"
+          "days" "Päivää"
+          "months" "Kuukautta"
+          "years" "Vuotta"
+
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
                    false "Ei"

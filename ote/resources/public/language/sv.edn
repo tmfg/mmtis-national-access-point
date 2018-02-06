@@ -712,6 +712,17 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "charging-points" "Beskriving av laddningspunkterna"
           "parking-capacities" "Antalet parkeringsplatser"
 
+          "available-from" "Startdatum"
+          "available-to" "Slutdatum"
+
+          "maximum-stay" "Max parkeringstid"
+          "seconds" "Sekunder"
+          "minutes" "Minuter"
+          "hours" "Timmar"
+          "days" "Dagar"
+          "months" "Månader"
+          "years" "År"
+
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
                    false "Nej"
