@@ -88,15 +88,8 @@
                 [ui/table-row-column operator]
                 [ui/table-row-column business-id]
                 [ui/table-row-column phone]
-                [ui/table-row-column email]
-                ]
-               ))
-           ]
-           ]
-          ]
-         [:div "Hakuehdoilla ei löydy yrityksiä"]
-         )
-    ]))
+                [ui/table-row-column email]]))]]]
+         [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
   (let [{:keys [loading? results service-filter operator-filter published-filter]} (get-in app [:admin :service-listing])]

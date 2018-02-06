@@ -57,8 +57,7 @@
 (defn- list-services
   "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
   [db user query]
-  (let [q (if (nil? (:query query))
-            nil
+  (let [q (when (not (nil? (:query query)))
             {::t-service/name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
@@ -67,8 +66,7 @@
          {:specql.core/order-by ::t-service/name})))
 
 (defn- list-services-by-operator [db user query]
-  (let [q (if (nil? (:query query))
-            nil
+  (let [q (when (not (nil? (:query query)))
             {::t-service/operator-name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
@@ -81,29 +79,20 @@
     (map #(first (groups %)) (distinct (map f coll)))))
 
 (defn- business-id-report [db user query]
-  (let [services (if
+  (let [services (when
                    (or
                      (nil? (:business-id-filter query))
                      (= :ALL (:business-id-filter query))
                      (= :services (:business-id-filter query)))
-                   (fetch-service-business-ids db)
-                   nil)
-        operators (if
+                   (fetch-service-business-ids db))
+        operators (when
                    (or
                      (nil? (:business-id-filter query))
                      (= :ALL (:business-id-filter query))
                      (= :operators (:business-id-filter query)))
-                    (fetch-operator-business-ids db)
-                   nil)
+                    (fetch-operator-business-ids db))
 
-        report (cond
-                 (and (not (empty? services)) (not (empty? operators)))
-                  (concat services operators)
-                 (and (not (empty? services)) (empty? operators))
-                  services
-                 (and (not (empty? operators)) (empty? services))
-                  operators
-                 :else nil)]
+        report (concat services operators)]
     (sort-by :operator (distinct-by :business-id report))))
 
 (defn- admin-delete-transport-service!
