@@ -152,7 +152,7 @@
 
 (defn json-response [data]
   {:status 200
-   :headers {"Content-Type" "application/json"}
+   :headers {"Content-Type" "application/json; charset=UTF-8"}
    :body (cheshire/encode data {:key-fn name})})
 
 (defn api-response
