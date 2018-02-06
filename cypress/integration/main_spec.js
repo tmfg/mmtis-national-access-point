@@ -30,6 +30,44 @@ describe('NAP Main', function () {
     });
 });
 
+describe('OTE login dialog', () => {
+
+    beforeEach(() => {
+        cy.server();
+        cy.route('POST','/ote/login').as('login');
+        cy.visit('/ote/#/services')
+    });
+
+    var login = (username, password, click) => {
+        cy.contains('Kirjaudu sisään').click();
+        cy.get('input[id*="email--Shkpostiosoite"]').type(username);
+        cy.get('input[id*="password--Salasana"]').type(password);
+
+        if(click)
+            cy.get('.login-dialog-footer button').click();
+        cy.wait('@login');
+    };
+
+    it('should warn about unknown user', () => {
+        login('this user does not exist', 'adasd',true);
+        cy.contains('Tuntematon käyttäjä');
+    });
+
+    it('should warn about wrong password', () => {
+        login(Cypress.env('NAP_LOGIN'), 'this is not the correct password', true);
+        cy.contains('Väärä salasana');
+    });
+
+    it('should login properly with correct credentials', () => {
+        login(Cypress.env('NAP_LOGIN'), Cypress.env('NAP_PASSWORD'), true);
+        cy.contains('Kirjauduit sisään onnistuneesti!');
+    });
+
+    it('should login by pressing enter', () => {
+        login(Cypress.env('NAP_LOGIN'), Cypress.env('NAP_PASSWORD')+'{enter}', false);
+        cy.contains('Kirjauduit sisään onnistuneesti!');
+    });
+});
 
 describe('Header - Logged Out', function () {
     it('CKAN should have proper header links', function () {
