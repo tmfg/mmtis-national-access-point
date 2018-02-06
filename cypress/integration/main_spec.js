@@ -38,7 +38,7 @@ describe('OTE login dialog', () => {
         cy.visit('/ote/#/services')
     });
 
-    var login = (username, password, click) => {
+    const login = (username, password, click) => {
         cy.contains('Kirjaudu sisään').click();
         cy.get('input[id*="email--Shkpostiosoite"]').type(username);
         cy.get('input[id*="password--Salasana"]').type(password);
