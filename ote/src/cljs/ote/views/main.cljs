@@ -267,9 +267,11 @@
       {:label (tr [:login :label]) :expandable? false
        :columns 3}
       {:name :email
-       :type :string}
+       :type :string
+       :on-enter #(e! (login/->Login))}
       {:name :password
-       :type :string :password? true})]
+       :type :string :password? true
+       :on-enter #(e! (login/->Login))})]
     credentials]])
 
 (defn login-action-cards []
