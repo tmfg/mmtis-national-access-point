@@ -43,8 +43,9 @@ describe('OTE login dialog', () => {
         cy.get('input[id*="email--Shkpostiosoite"]').type(username);
         cy.get('input[id*="password--Salasana"]').type(password);
 
-        if(click)
+        if(click) {
             cy.get('.login-dialog-footer button').click();
+        }
         cy.wait('@login');
     };
 
