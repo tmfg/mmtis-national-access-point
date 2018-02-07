@@ -26,8 +26,8 @@
         (if (= (:page app) :transport-operator)
           (assoc app
                  :transport-operator {:new? true}
-                   :services-changed? true)
-            app))
+                 :services-changed? true)
+          app))
 
         ;; Get services from response.
         ;; Use selected operator if possible, if not, use the first one from the response.
@@ -71,7 +71,6 @@
   (process-event [{response :response} app]
     (if (:success? response)
       (-> app
-          (assoc :user (:user response))
           (dissoc :login)
           (update-transport-operator-data (:session-data response))
           (assoc :flash-message (tr [:common-texts :logged-in])))
