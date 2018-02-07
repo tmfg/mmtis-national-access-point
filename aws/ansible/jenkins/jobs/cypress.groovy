@@ -1,4 +1,4 @@
-job('Cypress e2e tests') {
+job('Cypress-e2e-tests') {
     logRotator {
         daysToKeep(3)
     }
@@ -24,6 +24,10 @@ job('Cypress e2e tests') {
         }
 
         shell('npm i cypress@1.x && $(npm bin)/cypress verify')
-        shell('CYPRESS_RECORD_KEY=${vault_cypress_record_key} $(npm bin)/cypress run --browser chrome --record --spec cypress/integration/smoke/ote_spec.js')
+        shell('CYPRESS_RECORD_KEY=${vault_cypress_record_key} '+
+              'CYPRESS_NAP_LOGIN=${vault_cypress_nap_username} '+
+              'CYPRESS_NAP_PASSWORD=${vault_cypress_nap_password} '+
+              '$(npm bin)/cypress run --browser chrome --record '+
+              '--spec cypress/integration/smoke/ote_spec.js')
     }
 }
