@@ -77,7 +77,7 @@ describe('Header - Logged Out', function () {
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
             cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/organization');
+            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/ote/#/operators');
             cy.contains('Kirjaudu sisään').should('have.attr', 'href').and('eq', '/user/login');
             cy.contains('Rekisteröidy').should('have.attr', 'href').and('eq', '/user/register');
             cy.contains('Käyttöohje');
@@ -115,7 +115,7 @@ describe('Header - Logged In', function () {
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
             cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/organization');
+            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/ote/#/operators');
             cy.contains('Omat palvelutiedot').should('have.attr', 'href').and('eq', '/ote/#/own-services');
             cy.contains('Käyttöohje');
 
