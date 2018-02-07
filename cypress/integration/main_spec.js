@@ -120,7 +120,7 @@ describe('Header - Logged In', function () {
             cy.contains('Käyttöohje');
 
             cy.get('.section-right').within($el => {
-                cy.contains('Test user');
+                cy.get('.authed');
 
                 // Dropdown menu links
                 cy.contains('Yhteenveto');
