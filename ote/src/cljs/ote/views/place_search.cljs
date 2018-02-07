@@ -135,14 +135,13 @@
                 (second (get-in coordinate  [:coordinates  :coordinates]))]}]])
 
 (defn- completions [completions]
-  (let [sorted-completions  (sort-by ::places/namefin completions)]
   (apply array
          (map (fn [{::places/keys [id namefin type]}]
                 #js {:text namefin
                      :id id
                      :value (r/as-element
                              [ui/menu-item {:primary-text namefin}])})
-              sorted-completions))))
+              completions)))
 
 (defn place-search [e! place-search]
   (let [results (:results place-search)]
