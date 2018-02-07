@@ -11,6 +11,9 @@ job('Cypress-e2e-tests') {
     }
 
     wrappers {
+        xvfb('default') {
+            screen('1920x1080x24')
+        }
         nodejs('nodejs-8.x-cypress')
         toolenv('nodejs-8.x-cypress')
     }
@@ -27,7 +30,6 @@ job('Cypress-e2e-tests') {
         shell('CYPRESS_RECORD_KEY=${vault_cypress_record_key} '+
               'CYPRESS_NAP_LOGIN=${vault_cypress_nap_username} '+
               'CYPRESS_NAP_PASSWORD=${vault_cypress_nap_password} '+
-              '$(npm bin)/cypress run --browser chrome --record '+
-              '--spec cypress/integration/smoke/ote_spec.js')
+              '$(npm bin)/cypress run --browser chrome --record')
     }
 }
