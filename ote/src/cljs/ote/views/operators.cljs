@@ -95,7 +95,7 @@
           {:href "#"
            :on-click #(do (.preventDefault %)
                           (e! (operators-controller/->OpenOperatorModal id)))}
-               [:p (stylefy/use-style  style-service-search/operator-result-header-link) name]]]
+               [:span (stylefy/use-style  style-service-search/operator-result-header-link) name]]]
         [:div (stylefy/use-style style-service-search/operator-description)
          [:div
           (if (< 120 (count (::t-operator/description ckan-group)))
@@ -114,7 +114,7 @@
   (e! (operators-controller/->Init))
   (fn [e! {operators :operators :as app}]
     [:div.operators
-     [:h3 (tr [:operators :title])]
+     [:h1 (tr [:operators :title])]
      [:div.row.form-field {:class "col-xs-12 col-md-6"}
       [form-fields/field {:type :string
 

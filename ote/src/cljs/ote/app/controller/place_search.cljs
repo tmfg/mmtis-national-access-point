@@ -42,7 +42,7 @@
 (defn- search [{{name :name :as place-search} :place-search :as app}]
   (when-let [timeout (:timeout place-search)]
     (.clearTimeout js/window timeout))
-  (if (> (count name) 2)
+  (if (>= (count name) 2)
     (let [on-success (tuck/send-async! ->PlaceCompletionsResponse name)]
       (assoc-in
        app [:place-search :timeout]
