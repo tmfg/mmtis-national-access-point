@@ -20,7 +20,7 @@
   (let [service-count (::t-operator/service-count operator)
         operator-id (::t-operator/id operator)
         operator-name (::t-operator/name operator)]
-  [:p {:style {:font-weight "600" :font-size "14px"}}
+  [:span {:style {:font-weight "600" :font-size "14px"}}
    (if (zero? service-count)
      (tr [:operators :result-no-services])
      [:a
@@ -49,9 +49,9 @@
     (operator-row (tr [:field-labels ::t-operator/gsm]) (::t-operator/gsm operator))
     (operator-row (tr [:field-labels ::t-operator/email]) (::t-operator/email operator))
 
-    (operator-row (tr [:field-labels :ote.db.common/street]) (get-in operator [::t-operator/visiting-address :t-operator/street]))
-    (operator-row (tr [:field-labels :ote.db.common/postal_code]) (get-in operator [::t-operator/visiting-address :t-operator/postal_code]))
-    (operator-row (tr [:field-labels :ote.db.common/post_office]) (get-in operator [::t-operator/visiting-address :t-operator/post_office]))
+    (operator-row (tr [:field-labels :ote.db.common/street]) (get-in operator [::t-operator/visiting-address :ote.db.common/street]))
+    (operator-row (tr [:field-labels :ote.db.common/postal_code]) (get-in operator [::t-operator/visiting-address :ote.db.common/postal_code]))
+    (operator-row (tr [:field-labels :ote.db.common/post_office]) (get-in operator [::t-operator/visiting-address :ote.db.common/post_office]))
     (operator-row (tr [:field-labels ::t-operator/homepage]) (::t-operator/homepage operator))]
 
    [:div.row {:style {:padding-top "50px"}}
@@ -99,7 +99,7 @@
         [:div (stylefy/use-style style-service-search/operator-description)
          [:div
           (if (< 120 (count (::t-operator/description ckan-group)))
-            [:p (str (subs (::t-operator/description ckan-group) 0 120) "...")
+            [:span (str (subs (::t-operator/description ckan-group) 0 120) "...")
               [:br]
               [:a {:href "#/operators"
                    :on-click #(do (.preventDefault %)
