@@ -6,8 +6,18 @@
     gpgkey: https://dl-ssl.google.com/linux/linux_signing_key.pub
     gpgcheck: yes
 
-- name: Install Xvfb
-  yum: name=xorg-x11-server-Xvfb state=installed
-
-- name: Install Chrome
-  yum: name=google-chrome state=installed
+- name: Install depencies
+  yum: name={{item}} state=installed
+  with_items:
+    - xorg-x11-server-Xvfb
+    - google-chrome
+    - gtk2
+    - libXtst
+    - GConf2
+    - alsa-lib
+    - freetype
+    - liberation-fonts-common
+    - liberation-mono-fonts
+    - liberation-narrow-fonts
+    - liberation-sans-fonts
+    - liberation-serif-fonts
