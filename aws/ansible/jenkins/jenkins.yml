@@ -4,6 +4,7 @@
   tasks:
     - include: tasks/java8.yml
     - include: tasks/leiningen.yml
+    - include: tasks/cypress-deps.yml
 
 
 - hosts: jenkins

@@ -1,0 +1,13 @@
+- name: Add repository
+  yum_repository:
+    name: chrome
+    description: Google Chrome
+    baseurl: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+    gpgkey: https://dl-ssl.google.com/linux/linux_signing_key.pub
+    gpgcheck: yes
+
+- name: Install Xvfb
+  yum: name=xorg-x11-server-Xvfb state=installed
+
+- name: Install Chrome
+  yum: name=google-chrome state=installed
