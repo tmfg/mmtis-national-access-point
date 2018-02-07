@@ -121,7 +121,7 @@
 
 (defn- read-response [res]
   (if (= (:status res) 200)
-    (case (get-in res [:headers "Content-Type"])
+    (case (first (str/split (get-in res [:headers "Content-Type"]) #";"))
       "application/json+transit"
       (assoc res :transit (transit/transit->clj (:body res)))
 
