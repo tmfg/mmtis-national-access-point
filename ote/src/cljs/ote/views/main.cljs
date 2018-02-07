@@ -249,7 +249,7 @@
 
 
 
-(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
