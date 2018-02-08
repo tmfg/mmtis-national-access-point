@@ -156,7 +156,7 @@
        read-response)))
 
 (defn sql-query [& sql-string-parts]
-  (jdbc/query (:dn *ote*) [(str/join sql-string-parts)]))
+  (jdbc/query (:db *ote*) [(str/join sql-string-parts)]))
 
 (defn sql-execute! [& sql-string-parts]
   (jdbc/execute! (:db *ote*)

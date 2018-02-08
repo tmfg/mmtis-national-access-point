@@ -6,13 +6,16 @@
             [specql.op :as op]
             [taoensso.timbre :as log]
             [compojure.core :refer [routes GET POST DELETE]]
+            [jeesql.core :refer [defqueries]]
             [ote.nap.users :as nap-users]
             [specql.core :as specql]
             [ote.db.auditlog :as auditlog]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]))
 
+(defqueries "ote/services/admin.sql")
 
 (def service-search-result-columns
   #{::t-service/contact-email
@@ -54,8 +57,7 @@
 (defn- list-services
   "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
   [db user query]
-  (let [q (if (nil? (:query query))
-            nil
+  (let [q (when (not (nil? (:query query)))
             {::t-service/name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
@@ -64,14 +66,34 @@
          {:specql.core/order-by ::t-service/name})))
 
 (defn- list-services-by-operator [db user query]
-  (let [q (if (nil? (:query query))
-            nil
+  (let [q (when (not (nil? (:query query)))
             {::t-service/operator-name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
          service-search-result-columns
          search-params
          {:specql.core/order-by ::t-service/operator-name})))
+
+(defn distinct-by [f coll]
+  (let [groups (group-by f coll)]
+    (map #(first (groups %)) (distinct (map f coll)))))
+
+(defn- business-id-report [db user query]
+  (let [services (when
+                   (or
+                     (nil? (:business-id-filter query))
+                     (= :ALL (:business-id-filter query))
+                     (= :services (:business-id-filter query)))
+                   (fetch-service-business-ids db))
+        operators (when
+                   (or
+                     (nil? (:business-id-filter query))
+                     (= :ALL (:business-id-filter query))
+                     (= :operators (:business-id-filter query)))
+                    (fetch-operator-business-ids db))
+
+        report (concat services operators)]
+    (sort-by :operator (distinct-by :business-id report))))
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
@@ -97,7 +119,9 @@
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db
-                     (partial admin-delete-transport-service! nap-config)))))
+                     (partial admin-delete-transport-service! nap-config)))
+
+    (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))))
 
 (defrecord Admin [nap-config]
   component/Lifecycle

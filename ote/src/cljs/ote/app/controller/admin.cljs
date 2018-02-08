@@ -21,6 +21,9 @@
 (defrecord SearchServicesByOperator [])
 (defrecord SearchUsersResponse [response])
 (defrecord SearchServicesResponse [response])
+(defrecord GetBusinessIdReport [])
+(defrecord GetBusinessIdReportResponse [response])
+(defrecord UpdateBusinessIdFilter [business-id-filter])
 (defrecord DeleteTransportService [id])
 (defrecord CancelDeleteTransportService [id])
 (defrecord ConfirmDeleteTransportService [id])
@@ -42,10 +45,13 @@
   (process-event [{f :operator-filter} app]
     (update-in app [:admin :service-listing] assoc :operator-filter f))
 
+  UpdateBusinessIdFilter
+   (process-event [{f :business-id-filter} app]
+          (update-in app [:admin :business-id-report] assoc :business-id-filter f))
+
   UpdatePublishedFilter
   (process-event [{f :published-filter} app]
     (update-in app [:admin :service-listing] assoc :published-filter f))
-
 
   SearchUsers
   (process-event [_ app]
@@ -56,6 +62,18 @@
   SearchUsersResponse
   (process-event [{response :response} app]
     (update-in app [:admin :user-listing] assoc
+               :loading? false
+               :results response))
+
+  GetBusinessIdReport
+  (process-event [_ app]
+    (comm/post! "admin/business-id-report"  {:business-id-filter (get-in app [:admin :business-id-report :business-id-filter])}
+                {:on-success (tuck/send-async! ->GetBusinessIdReportResponse)})
+    (assoc-in app [:admin :business-id-report :loading?] true))
+
+  GetBusinessIdReportResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :business-id-report] assoc
                :loading? false
                :results response))
 
