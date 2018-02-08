@@ -244,6 +244,7 @@
         [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
        [:li
         [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
+       [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
        [:li
         [language-selection e! style-base/language-selection-footer nil true]]]]]]])
 
