@@ -1,6 +1,7 @@
 ### Clojure ###
 
 ote/resources/public/js
+tools/dashboard/resources/public/js
 
 #pom.xml
 pom.xml.asc
