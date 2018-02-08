@@ -67,7 +67,8 @@
 
   ["external_interface_search_result" ::external-interface-search-result]
   ["transport_service_search_result" ::transport-service-search-result
-   ote.db.modification/modification-fields])
+   ote.db.modification/modification-fields]
+  ["service_company" ::service-company])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking])
@@ -141,3 +142,6 @@
 
 (def rental-transportable-aid
   [:wheelchair])
+
+(def service-company-soure
+  [:FILE :CSV :URL])
