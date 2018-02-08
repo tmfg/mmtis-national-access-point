@@ -247,17 +247,41 @@
                        (filter (comp (complement from-ui) ::t-service/id) from-db))]
     to-delete))
 
+(defn- delete-external-companies
+  "User might remove url from service, so we delete all service-companies from db"
+  [db transport-service]
+    (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
+
+(defn- save-external-companies
+  "Service can contain an url that contains company nmes and business-id. Sevice can also contain an imported csv file
+  with company names and business-ids."
+  [db transport-service]
+  (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
+                            {::t-service/transport-service-id (::t-service/id transport-service)}))
+        companies (into [] (:companies (ote.services.external/check-csv db {:url (get transport-service ::t-service/companies-csv-url)
+                                                                            :ts-id (get transport-service ::t-service/id)})))
+        new-data (if (empty? current-data)
+                      {::t-service/companies            companies
+                       ::t-service/transport-service-id (get transport-service ::t-service/id)
+                       ::t-service/source               "URL"}
+                      (assoc current-data ::t-service/companies companies))]
+
+    (ote.services.external/save-companies db new-data)
+  ))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [nap-config db user {places ::t-service/operation-area
                        external-interfaces ::t-service/external-interfaces
+                       service-company ::t-service/service-company
                        :as data}]
   ;(println "DATA: " (pr-str data))
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
-                         (dissoc ::t-service/external-interfaces))
+                         (dissoc ::t-service/external-interfaces)
+                         (dissoc ::t-service/service-company))
 
         resources-from-db (publish/fetch-transport-service-external-interfaces db (::t-service/id data))
         removed-resources (removable-resources resources-from-db external-interfaces)
@@ -272,6 +296,13 @@
 
             ;; Save operation areas
             (places/save-transport-service-operation-area! db transport-service-id places)
+
+            ;; Save companies
+            (if (::t-service/companies-csv-url transport-service)
+              ;; Update companies
+              (save-external-companies db transport-service)
+              ;; If url is empty, delete remaining data
+              (delete-external-companies db transport-service))
 
             transport-service))]
 
