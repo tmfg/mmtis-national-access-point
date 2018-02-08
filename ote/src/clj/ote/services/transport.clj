@@ -13,6 +13,7 @@
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
+            [ote.services.external :as external]
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
             [cheshire.core :as cheshire]
@@ -258,7 +259,7 @@
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
                             {::t-service/transport-service-id (::t-service/id transport-service)}))
-        companies (into [] (:companies (ote.services.external/check-csv db {:url (get transport-service ::t-service/companies-csv-url)
+        companies (into [] (:companies (external/check-csv db {:url (get transport-service ::t-service/companies-csv-url)
                                                                             :ts-id (get transport-service ::t-service/id)})))
         new-data (if (empty? current-data)
                       {::t-service/companies            companies
@@ -266,7 +267,7 @@
                        ::t-service/source               "URL"}
                       (assoc current-data ::t-service/companies companies))]
 
-    (ote.services.external/save-companies db new-data)
+    (external/save-companies db new-data)
   ))
 
 (defn- save-transport-service
