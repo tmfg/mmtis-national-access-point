@@ -95,10 +95,11 @@
           {::t-service/id id})))
 
 (defn fetch-transport-service-external-interfaces [db id]
-  (fetch db ::t-service/external-interface-description
-         #{::t-service/external-interface ::t-service/data-content ::t-service/format
-           ::t-service/license ::t-service/ckan-resource-id ::t-service/id}
-         {::t-service/transport-service-id id}))
+  (when id
+    (fetch db ::t-service/external-interface-description
+           #{::t-service/external-interface ::t-service/data-content ::t-service/format
+             ::t-service/license ::t-service/ckan-resource-id ::t-service/id}
+           {::t-service/transport-service-id id})))
 
 (defn delete-resources-from-published-service!
   [{:keys [api export-base-url] :as nap-config} user removed-resources]
