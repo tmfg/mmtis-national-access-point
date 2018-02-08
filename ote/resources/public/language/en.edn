@@ -275,7 +275,7 @@
 
   :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
   :description-why-contact-info "Fill in contact information, so that customers can contact you."
-  :pricing-info "Fill in price information and/or the basis for pricing in to the table.\nIf the table is not suitable for price announcment, you can tell about pricing in the field \"price determination\". \nIf all the price information is already in a website (WWW), you can simpy just fill in the WWW-address into the field "Price information WWW-address"."
+  :pricing-info "Fill in price information and/or the basis for pricing in to the table.\nIf the table is not suitable for price announcment, you can tell about pricing in the field \"price determination\". \nIf all the price information is already in a website (WWW), you can simpy just fill in the WWW-address into the field \"Price information WWW-address\"."
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
@@ -823,7 +823,7 @@
                    ;; rentals
                    "pick-up" "Pick up"
                    "return" "Return"
-                   "pick-up-and-return" "Pick up and return"
+                   "pick-up-return" "Pick up and return"
                    }
 
           ;; External interfaces
