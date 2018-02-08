@@ -582,7 +582,8 @@
      Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
 
  :admin-page
- {:published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+ {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
+  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.

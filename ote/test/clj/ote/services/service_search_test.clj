@@ -1,11 +1,12 @@
 (ns ote.services.service-search-test
   (:require [ote.services.service-search :as sut]
             [clojure.test :as t :refer [deftest is testing use-fixtures]]
-            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute!]]
+            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute! sql-query]]
             [com.stuartsierra.component :as component]
             [clojure.test.check.generators :as gen]
             [ote.db.service-generators :as service-generators]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.services.transport :as transport-service]
             [clojure.string :as str]))
 
@@ -62,11 +63,40 @@
                  (:json
                   (http-get (str "service-search?sub-types="
                                  (str/join "," (into #{} (map ::t-service/sub-type) services))
-                                 "&response_format=json"))))))))))
+                                 "&response_format=json")))))))))
+
+    (testing "Search operators by name"
+      (let [operator-names (sql-query
+                             "SELECT * FROM \"transport-operator\" WHERE id IN ("
+                             (str/join "," (map ::t-service/transport-operator-id saved-services))
+                             ")")
+            name (subs (:name (first operator-names)) 0 5)
+            get-url (str "operator-completions/" name)
+            result (http-get get-url)
+            transit-result (:transit result)]
+
+        (is (= 200 (:status result)))
+        (is (pos? (count transit-result)))
+        (is (some #(= (:name (first operator-names)) (::t-operator/name %))
+                  transit-result))))
+
+    (testing "Search by operator"
+      (let [{op-id ::t-service/transport-operator-id :as s} (first services)
+            result (http-get (str "service-search?operators=" op-id "&response_format=json"))]
+        (is (= 200 (:status result)))
+        (is (pos? (count (:results (:json result)))))
+        (is (some #(= op-id (:transport-operator-id %))
+                  (:results (:json result)))))))
 
   (testing "Operator search returns matching company"
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
       (is (= 200 (:status result)))
       (is (pos? (count (:json result))))
       (is (some #(= "Ajopalvelu Testinen Oy" (:name %))
-                (:json result))))))
+                (:json result)))))
+
+  (testing "Operator search does not return deleted companies"
+    (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")
+    (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
+      (is (= 200 (:status result)))
+      (is (zero? (count (:json result)))))))
