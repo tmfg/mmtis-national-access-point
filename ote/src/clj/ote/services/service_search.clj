@@ -87,7 +87,8 @@
   (into []
         (specql/fetch db ::t-operator/transport-operator
                       #{::t-operator/name ::t-operator/id}
-                      {::t-operator/name (op/ilike (str "%" term "%"))}
+                      {::t-operator/name (op/ilike (str "%" term "%"))
+                       ::t-operator/deleted? false}
                       {::specql/order-by ::t-operator/name})))
 
 (defn- search [db {:keys [operation-area sub-type text operators offset limit]
