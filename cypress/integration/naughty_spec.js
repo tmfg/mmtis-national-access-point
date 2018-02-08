@@ -2,14 +2,14 @@ import { randomName } from '../support/util';
 import { genNaughtyString } from "../support/generators";
 
 /**
- * NOTE: We are using a lot of invoke('val', ...).trigger('change') stuff here, because we cant use ".type()" for special
+ * NOTE: We are using a lot of .typeRaw() instead of .type() here, because we cant use ".type()" for special
  * characters. Also, we do not need to waste time for typing the input, because actual user input simulation is tested
  * in other specs. This tests just how we handle string naughtiness.
  */
 
 
 
-describe('Add a new service', () => {
+describe('Naughty form fill', () => {
     before(() => {
         cy.login();
     });
@@ -44,8 +44,8 @@ describe('Add a new service', () => {
             cy.get('input[id*="name--Palvelunnimi"]').typeRaw(serviceName);
 
             cy.get('@service').then(service => {
-                cy.get('input[name="street"]').typeRaw(genNaughtyString(50));
-                cy.get('input[name="postal_code"]').type(90570);
+                cy.get('input[name="street"]').typeRaw(genNaughtyString(20));
+                cy.get('input[name="postal_code"]').typeRaw(service.contact.postal_code);
                 cy.get('input[name="post_office"]').typeRaw(genNaughtyString(20));
 
                 cy.get('input[id*="-Haepaikkanimell"]').as('areaInput');
@@ -105,6 +105,4 @@ describe('Add a new service', () => {
             cy.wait('@deleteService');
         });
     });
-
 });
-

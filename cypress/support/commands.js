@@ -90,11 +90,13 @@ Cypress.Commands.add("typeRaw", { prevSubject: true }, ($subj, text) => {
     const event = new Event('input', {
         bubbles: true,
         cancelable: true,
-        simulated: true,
     });
 
     event.simulated = true;
 
     $subj[0].value += text;
     $subj[0].dispatchEvent(event);
+
+    // We'll have to wait a bit or our app won't keep up
+    cy.wait(100);
 });
