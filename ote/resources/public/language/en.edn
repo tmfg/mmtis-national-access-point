@@ -1,10 +1,10 @@
 {
  :document-title
- {:default "NAP - service catalog"
-  :services "Services"
-  :operators "Operators"
-  :own-services "Own services"
-  :admin "Admin"}
+ {:default "NAP - transport service catalog"
+  :services "Transport service catalog"
+  :operators "Transport operators"
+  :own-services "Own transport services"
+  :admin "Adminstration panel"}
 
  ;; Labels for database fields
  :field-labels
@@ -16,7 +16,7 @@
   :ote.db.transport-operator/gsm                      "Phone (GSM)"
   :ote.db.transport-operator/email                    "Email address"
   :ote.db.transport-operator/homepage                 "WWW-address"
-  :ote.db.transport-operator/visiting-address         "Visiting address"
+  :ote.db.transport-operator/visiting-address         "Postal address"
   :ote.db.transport-operator/billing-address          "Billing address"
 
   :ote.db.transport-operator/facebook "Facebook"
@@ -24,7 +24,7 @@
   :ote.db.transport-operator/instant-message "Instant message"
 
   ;; Transport service fields
-  :transport-service-type-subtype "Select transport service type"
+  :transport-service-type-subtype "Select mode of transport service"
   :select-transport-operator      "Select transport operator"
 
   :transport-service-common
@@ -41,10 +41,10 @@
    :ote.db.transport-service/guaranteed-info-service-accessibility "Info service accessibility (guaranteed availability)"
    :ote.db.transport-service/limited-info-service-accessibility "Info service accessibility (limited availability)"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "Always available accessibilityvälineet"
-   :ote.db.transport-service/guaranteed-accessibility-description "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
-   :ote.db.transport-service/limited-accessibility-tool        "Limited availability accessibility"
-   :ote.db.transport-service/limited-accessibility-description "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
+   :ote.db.transport-service/guaranteed-accessibility-tool        "Always available accessibility tools"
+   :ote.db.transport-service/guaranteed-accessibility-description "Describe more information about always available accessibility tools when needed"
+   :ote.db.transport-service/limited-accessibility-tool        "Limited available accessibility tools"
+   :ote.db.transport-service/limited-accessibility-description "Describe more information about limited available accessibility tools when needed"
 
    :ote.db.transport-service/guaranteed-transportable-aid "Transportable aid (guaranteed availability)"
    :ote.db.transport-service/limited-transportable-aid "Transportable aid (limited availability)"
@@ -55,31 +55,32 @@
    :ote.db.transport-service/contact-address          "Address"
    :ote.db.transport-service/contact-phone             "Phone"
    :ote.db.transport-service/contact-email             "Email"
-   :ote.db.transport-service/homepage                  "Homepage"
+   :ote.db.transport-service/homepage                  "WWW-address"
 
-   :ote.db.transport-service/operation-area            "Operation area"
+   :ote.db.transport-service/operation-area            "Operating area"
    :ote.db.transport-service/location                  "Location"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "External machine readable interfaces"
+   :ote.db.transport-service/external-interfaces "External computer-readable interfaces"
    :ote.db.transport-service/data-content "Data content"
-   :ote.db.transport-service/external-service-description "More info"
-   :ote.db.transport-service/external-service-url "Interface URL address"
+   :ote.db.transport-service/external-service-description "More information"
+   :ote.db.transport-service/external-service-url "Interface WWW-address"
    :ote.db.transport-service/booking-service "Booking service address"
    :ote.db.transport-service/rental-service "Rental service address"
-   :ote.db.transport-service/format "External interface format (eg. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format "External interface format (e.g. GTFS, NeTEx, GeoJSON)"
    :ote.db.transport-service/format-short "Format"
-   :ote.db.transport-service/companies "Companies that produce the service"
+   :ote.db.transport-service/companies "Other companies producing the service"
    :ote.db.transport-service/company-name "Company name"
    :ote.db.transport-service/business-id "Company business ID"
-   :ote.db.transport-service/companies-csv-url "Välitettävien yritysten sisältämä .csv-tiedoston osoite (www)"
+   :ote.db.transport-service/companies-csv-url "WWW-address that includes a .csv-file about the other companies producing the service"
    :ote.db.transport-service/license "License / terms of use"
-   :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
-   :external-interfaces-warning "Annettuun osoitteeseen ei saada yhteyttä"
-   :external-interfaces-ok "Annettuun osoitteeseen saatiin yhteys"
+   :ote.db.transport-service/notice-external-interfaces? "I have read all the information labels and filled in information about computer-readable interfaces that contain essential data about my service."
+   :external-interfaces-warning "Connection to address failed"
+   :external-interfaces-ok "Connecting to address succeeded"
+
 
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Lisätiedot"}
+   :ote.db.transport-service/service-hours-info "Additional information"}
 
 
   ;; Service exception
@@ -91,42 +92,42 @@
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
-   :ote.db.transport-service/real-time-information     "Realtime information web-address"
-   :ote.db.transport-service/booking-service           "Booking service web-address"
-   :ote.db.transport-service/payment-methods           "Select payment methods"
+   :ote.db.transport-service/real-time-information     "Realtime information WWW-address"
+   :ote.db.transport-service/booking-service           "Booking service WWW-address"
+   :ote.db.transport-service/payment-methods           "Accepted payment methods"
    :ote.db.transport-service/price-class               "Pricing"
    :ote.db.transport-service/service-hours             "Service hours"
-   :ote.db.transport-service/operation-area            "Operation area"
+   :ote.db.transport-service/operation-area            "Operating area"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name-taxi     "Product"
+   :ote.db.transport-service/price-class-name-taxi     "Price class"
    :ote.db.transport-service/price-class-name-other    "Price class"
    :ote.db.transport-service/price-class-name-request  "Price class"
    :ote.db.transport-service/price-class-name-schedule "Price class"
    :ote.db.transport-service/price-per-unit            "Price per unit (€)"
-   :ote.db.transport-service/unit                      "Unit"
+   :ote.db.transport-service/unit                      "Unit (zone, ride, €/km, €/mile)"
    :ote.db.transport-service/currency                  "Currency"
 
-   :ote.db.transport-service/pricing-description "Pricing description"
-   :ote.db.transport-service/pricing-description-taxi "Pricing description"
-   :ote.db.transport-service/pricing-url "Pricing web-address"
-   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"}
+   :ote.db.transport-service/pricing-description "Price description"
+   :ote.db.transport-service/pricing-description-taxi "Price description, e.g. government mandated prices"
+   :ote.db.transport-service/pricing-url "Price information WWW-address"
+   :ote.db.transport-service/payment-method-description "Additional information about payment methods"}
 
 
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Indoor map"
-   :ote.db.transport-service/url                       "Service web-address"
+   :ote.db.transport-service/url                       "Service WWW-address"
    :ote.db.transport-service/description               "Service description"
    :ote.db.transport-service/information-service-accessibility "Information service accessibility"
    :ote.db.transport-service/accessibility     "Accessibility"
 
 
    ;; assistance_notification_requirement fields
-   :ote.db.transport-service/hours-before           "Service requires notification hours before"
-   :ote.db.transport-service/telephone              "Notification telephonenumber"
-   :ote.db.transport-service/email                  "Notification email"
-   :ote.db.transport-service/assistance-url         "Notificaiton web-page"
+   :ote.db.transport-service/hours-before           "Service requires reservation (hours) before"
+   :ote.db.transport-service/telephone              "Reservation phone number"
+   :ote.db.transport-service/email                  "Reservation email"
+   :ote.db.transport-service/assistance-url         "Reservation WWW-address"
    :ote.db.transport-service/assistance-description "Assistance service description"
    :ote.db.transport-service/assistance-place-description "Assistance service location"
    :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."}
@@ -134,84 +135,84 @@
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/usage-area                "Sallitut maat"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
-   :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
-   :ote.db.transport-service/license-required          "Ajokorttiluokka"
-   :ote.db.transport-service/minimum-age               "Alaikäraja"
-   :ote.db.transport-service/price-per-unit            "Hinta (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
-   :ote.db.transport-service/price-classes             "Hinta"
-   :ote.db.transport-service/pick-up-name              "Toimipisteen nimi"
-   :ote.db.transport-service/pick-up-type              "Tyyppi"
-   :ote.db.transport-service/rental-additional-services "Muut palvelut"
-   :ote.db.transport-service/additional-service-type   "Palvelu"
-   :ote.db.transport-service/additional-service-price  "Hinta (€)"
-   :ote.db.transport-service/additional-service-unit   "Yksikkö"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."}
+  {:ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
+   :ote.db.transport-service/payment-methods           "Accepted payment methods"
+   :ote.db.transport-service/usage-area                "Usage area restrictions (country limitations)"
+   :ote.db.transport-service/booking-service           "Booking service address"
+   :ote.db.transport-service/vehicle-classes           "Rental vehicles"
+   :ote.db.transport-service/vehicle-type              "Vehicle type"
+   :ote.db.transport-service/license-required          "Required driving licence"
+   :ote.db.transport-service/minimum-age               "Mininmum driving age"
+   :ote.db.transport-service/price-per-unit            "Price (€)"
+   :ote.db.transport-service/unit                      "Unit (e.g. day, €/km, €/mile)"
+   :ote.db.transport-service/price-classes             "Price information"
+   :ote.db.transport-service/pick-up-name              "Service point name"
+   :ote.db.transport-service/pick-up-type              "Service point type"
+   :ote.db.transport-service/rental-additional-services "Additional services"
+   :ote.db.transport-service/additional-service-type   "Service"
+   :ote.db.transport-service/additional-service-price  "Price (€)"
+   :ote.db.transport-service/additional-service-unit   "Unit (f.e day, €/km, €/mile)"
+   :rentals-pricing-info                               "Fill in specified price information."}
 
 
   ;; Parking fields
   :parking
   {:parking-areas  "Parking area locations"
-   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
-   :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/additional-service-links  "Muut palvelut"
-   :ote.db.transport-service/price-class               "Hinnoittelu"
-   :ote.db.transport-service/service-hours             "Palveluajat"
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
+   :ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
+   :ote.db.transport-service/url                       "Service WWW-address"
+   :ote.db.transport-service/description               "Service description"
+   :ote.db.transport-service/real-time-information     "Realtime information WWW-address"
+   :ote.db.transport-service/booking-service           "Booking service WWW-address"
+   :ote.db.transport-service/payment-methods           "Accepted payment methods"
+   :ote.db.transport-service/additional-service-links  "Additional services"
+   :ote.db.transport-service/price-class               "Pricing and payment methods"
+   :ote.db.transport-service/service-hours             "Service hours and parking time"
+   :ote.db.transport-service/operation-area            "Operating area"
 
    ;; Parking facilities and capacity
-   :ote.db.transport-service/parking-facility          "Pysäköintipaikan tyyppi"
-   :ote.db.transport-service/capacity                  "Paikkojen määrä"
+   :ote.db.transport-service/parking-facility          "Parking space type"
+   :ote.db.transport-service/capacity                  "Number of parking spaces"
 
    ;; Charging point fields
-   :ote.db.transport-service/charging-points           "Kuvaus latauspisteistä"
+   :ote.db.transport-service/charging-points           "Charging points description"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Yksikkö"
-   :ote.db.transport-service/currency                  "Valuutta"
+   :ote.db.transport-service/price-class-name          "Price class name"
+   :ote.db.transport-service/price-per-unit            "Price per unit (€)"
+   :ote.db.transport-service/unit                      "Unit (e.g. hour, date, month)"
+   :ote.db.transport-service/currency                  "Currency"
 
-   :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
-   :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
-   :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
+   :ote.db.transport-service/pricing-description       "Price description"
+   :ote.db.transport-service/pricing-url               "Price information WWW-address"
+   :ote.db.transport-service/payment-method-description "Additional information about payment methods"
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Viikonpäivät"
-   :ote.db.transport-service/from                      "Aukeamisaika"
-   :ote.db.transport-service/to                        "Kiinnimenoaika"
-   :ote.db.transport-service/all-day                   "24h"
-   :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
-   :maximum-stay-limited "Maximum stay time limited"}
+   :ote.db.transport-service/week-days                 "Day of the week"
+   :ote.db.transport-service/from                      "Opening time"
+   :ote.db.transport-service/to                        "Closing time"
+   :ote.db.transport-service/all-day                   "24 hours"
+   :ote.db.transport-service/maximum-stay              "Maximum duration for parking"
+   :maximum-stay-limited "Duration for parking is limited"}
 
 
   :transport-service
-  {:ote.db.transport-service/name                "Palvelun name"
-   :ote.db.transport-service/additional-services "Muut palvelut"
-   :ote.db.transport-service/url                 "Palvelun verkko-address"
-   :ote.db.transport-service/description         "Palvelun kuvaus"
-   :ote.db.transport-service/type                "Liikkumispalvelun tyyppi"
-   :ote.db.transport-service/sub-type            "Liikkumispalvelun alatyyppi"
-   :ote.db.transport-service/published?          "NAP-tila"
-   :ote.db.transport-service/published?-values   {true  "Julkaistu"
-                                                  false "Ei julkaistu"}
+  {:ote.db.transport-service/name                "Service name"
+   :ote.db.transport-service/additional-services "Additional services"
+   :ote.db.transport-service/url                 "Service WWW-address"
+   :ote.db.transport-service/description         "Transport service description"
+   :ote.db.transport-service/type                "Transport service mode"
+   :ote.db.transport-service/sub-type            "Transport service sub mode"
+   :ote.db.transport-service/published?          "NAP-status"
+   :ote.db.transport-service/published?-values   {true  "Published"
+                                                  false "Not published"}
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days           "Viikonpäivät"
-   :ote.db.transport-service/from                "Aukeamisaika"
-   :ote.db.transport-service/to                  "Kiinnimenoaika"
-   :ote.db.transport-service/all-day             "24h"
+   :ote.db.transport-service/week-days           "Day of the week"
+   :ote.db.transport-service/from                "Opening time"
+   :ote.db.transport-service/to                  "Closing time"
+   :ote.db.transport-service/all-day             "24 hours"
 
-   :ote.db.transport-service/brokerage?  "Välityspalvelu"
+   :ote.db.transport-service/brokerage?  "The transport service announced is a brokering service which will also be reported to The Finnish Transport Safety Agency - Trafi."
 
    :ote.db.transport-service/available-from-and-to-title "Service availability date"
    :ote.db.transport-service/available-from "Available from"
@@ -221,9 +222,9 @@
 
 
   ;; Common fields
-  :ote.db.common/street                               "Address"
-  :ote.db.common/post_office                          "Postitoimipaikka"
-  :ote.db.common/postal_code                          "Postinumber"
+  :ote.db.common/street                               "Street address"
+  :ote.db.common/post_office                          "Post office"
+  :ote.db.common/postal_code                          "Postal code"
 
   :login {:email "Email"
           :password "Password"}}
@@ -232,88 +233,92 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
-  :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
-  :external-interfaces-intro-rae "Täytä tähän osioon vähintää tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
-  :external-interfaces "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita.\nKoneluettava rajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa (esim. muodossa csv, xml, json tai gtfs). Ulkoiset rajapinnat on tarkoitettu yhteistyökumppaneille ja kehittäjille, jotka voivat käyttää niitä lisenssi- ja sopimusehtojen mukaisesti omissa palveluissaan."
-  :external-interfaces-read-more {:link "Lue lisää NAP-katalogin koneluettavista rajapinnoista."
-                                  :dialog-title "Koneluettavat rajapinnat NAP-katalogissa"
+ {:name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
+  :external-interfaces-intro "If your service does not have machine readable interfaces leave this section empty and move to the next section."
+  :external-interfaces-intro-rae "Fill in at least machine readable route and timetable information. If you do not have the means to produce machine readable route and timetable infromation, you can do so in FTA's "
+  :external-interfaces "If your service does not have machine readable interfaces leave this section empty and move to the next section.\nMachine readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
+  :external-interfaces-read-more {:link "Read more about NAP catalog machine readable interfaces."
+                                  :dialog-title "Machine readable interfaces in the NAP catalog"
                                   :dialog-text (:md
-                                                 "## Yleistä\n"
-                                                 "Palveluun liittyvät palveluntuottajan tai yhteistyöyrityksen koneluettavat rajapinnat on tarkoitettu esimerkiksi reittioppaiden ja muiden digitaalisten liikkumisen palveluiden kehittäjille. Ne tarjoavat tietoa tai toimintoja teknisessä, koneen ymmärtämässä formaatissa (esim. GTFS, GTFS-Realtime, NeTEx, SIRI, tai REST/XML/JSON). Tässä osiossa ei tarkoitus lisätä linkkejä ihmiskäyttäjille tarjottaviin valmiisiin sovelluksiin (esim. web-reittiopas ja web-lippukauppa)."
-                                                 "\n\n## Rajapintojen tiedot ja toiminnot\n"
-                                                 "Rajapinnat saattavat sisältää samoja tietoja, jotka voi ilmoittaa tällä lomakkeella (liikkumispalvelun olennaisia tietoja). Tässä tapauksessa vastaavien tietojen täyttäminen lomakkeelle on vapaaehtoista. Täyttäminen kuitenkin usein kannattaa, koska se edesauttaa tietojen löytymistä palvelun hakutoiminnoilla."
-                                                 "\n\nSellaisten tie- ja raideliikenteen toimijoiden, joilla on käytössään lippu- ja maksujärjestelmä, tulee avata lisäksi varaus- ja myyntirajapintansa niin, että vähintään kertalipun ostaminen on mahdollista."
-                                                 "\n\nMuut rajapinnat (esim. kertalippurajapintaa laajempi myyntirajapinta, ajoneuvojen reaaliaikatietoja välittävä rajapinta) ovat asetuksen mukaan mahdollisia, mutta eivät pakollisia. Sellaisia avaamalla palveluntarjoaja voi hyötyä uusien digitaalisten liikkumisen palveluiden tuomista liiketoimintamahdollisuuksista."
-                                                 "\n\n## Lisenssitiedot\n"
-                                                 "Rajapintojen hyödyntäjät tarvitsevat tiedon siitä, millä ehdoilla he voivat käyttää rajapintoja ja niiden sisältämiä tietoja."
-                                                 "\n\nRajapinnan tarjoaja voi valita käyttämänsä lisenssin tai muotoilla omat ehtonsa, mutta kaikki liikkumispalvelua koskevat olennaiset tiedot on kuitenkin tarjottava vapaasti käytettäväksi (avoin rajapinta) ja lisäksi minimipalvelurajapinnat on tarjottava kaikille oikeudenmukaisin, kohtuullisin ja syrjimättömin ehdoin. Minimipalvelurajapinnoilla tarkoitetaan tilaus- ja kertalippurajapintoja ja ne koskevat sellaisia tie- ja raideliikenteen toimijoita, joilla on käytössään lippu- ja maksujärjestelmä."
-                                                 "\n\nJos rajapinta on vain ladattavaksi tarjottavaa tietoa, esimerkiksi reittejä ja aikatauluja kuvaava GTFS-paketti, on usein tarkoituksenmukaista käyttää jotakin yleistä avoimen datan lisenssiä. Tällainen on esim. Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fi), joka on hyvin salliva aineiston levittämisen, hyödyntämisen, muuntelun, yhdistämisen ja jakelun suhteen - myös kaupallisesti. Ko. lisenssi edellyttää kuitenkin lähteen mainitsemista, muuntelun merkitsemistä ja muutoshistorian säilyttämistä.")}
+                                                "## General\n"
+                                                "External interfaces of services are meant for example for routing information and other digital transportation service developers. They provide information or services in a technical machine readable format (for examlpe GTFS, GTFS-Realtime, NeTEx, SIRI or REST/XML/JSON). This section is not meant for links to human readable services or information sites (like web schedule information or ticket sales site)."
+                                                "\n\n## Interface information and services\n"
+                                                "External interfaces may contain the same information as other other sections of this form. In this case filling out the sections is question is optional. It is recommended to also fill out the form in full because it helps developers find your service with the search functionality."
+                                                "\n\nRoad and rail operators that have an electronic ticket/payment system must open their system so that at least a single trip ticket can be purchased via an interface."
+                                                "\n\nOther interfaces (like a more comprehensive ticket sales API or vehicle realtime locations API) are possible but not mandatory. Opening up more comprehensive APIs can bring new business opportunities in new mobility services."
+                                                "\n\n## License\n"
+                                                "In order to take advantage of the interfaces, developers need to know the API license and terms of use of your service."
+                                                "\n\nYou can select an existing or use your own but the information mandated by the MMTIS directive must be open and the minimum level service interfaces must be licensed in a reasonable and nondiscriminatory way. Minimum service interfaces means single use ticket sales for road and rail operators that have an electronic ticket/payment system."
+                                                "\n\nIf the interface contains just downloadable information (eg. routes and timetables GTFS package) it is appropriate to use some open data license. These include for example Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/deed.en) which is a very permissive license that allows dissemination, use, derivative works, combination and distribution even commercially. The license requires mentioning the original source of the data and keeping a change history.")}
 
-  :external-interfaces-payment-systems "Sellaisten tie- ja raideliikenteen toimijoiden, joilla on käytössään lippu- ja maksujärjestelmä, tulee lisäksi ilmoittaa tässä osiossa koneluettavan tilaus- ja kertalippurajapinnan tiedot."
-  :external-interfaces-tooltips {:data-content "Valitse millaisia tietoja koneluettava rajapinta tarjoaa. Voit valita listalta useita vaihtoehtoja. Mikäli valintalistalta ei löydy sopivia vaihtoehtoja, valitse “muu” ja kerro tietosisällöistä “Lisätietoja”-kentässä."
-                                 :external-service-url "Ilmoita ensisijaisesti suora osoite koneluettavaan rajapintaan. Voit vaihtoehtoisesti ilmoittaa web-osoitteen, jossa kerrotaan tietoja rajapinnasta tai sen käytöstä.\nFormaatti: Valitse listalta tietosisällön formaatti. "
-                                 :format "Valitse listalta tietosisällön formaatti. Mikäli rajapintasi välittää tietoa useassa formaatissa, valitse listalta kaikki oleelliset vaihtoehdot. Jos listalla ei ole käyttämääsi formaattia, voit lisätä sen kirjoittamalla."
-                                 :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
-                                 :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille. Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
-  :RAE-link-text "Rae-työkalu"
-  :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
-  :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
-  :csv-file-example "Katso tästä esimerkkitiedosto."
-  :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
+  :external-interfaces-payment-systems "Road and rail operators that have an electronic ticket/sales system must fill information about their machine readable interface to it."
+  :external-interfaces-tooltips {:data-content "Select the type of information this machine readable interface provides. You can choose multiple options. If no selection is appropriate, choose \"other\" and fill in additional information."
+                                 :external-service-url "Direct URI to machine readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use. \nFormat: Select the data format. "
+                                 :format "Select the data format. Choose all that apply. If the list does not have a format, you can add it by writing it in."
+                                 :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
+                                 :external-service-description "Specify additional information about the interface that may be useful for developers. You may add a web-address that contains further information."}
 
-  :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden accessibilityominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
-  :limited-vehicle-accessibility "Ilmoita tässä rajoitetusti saatavilla olevat palvelun liikennevälineiden accessibilityominaisuudet. Tässä tarkoitetaan sellaisia ominaisuuksia, jotka pitää esimerkiksi erikseen tilata tai varata tai jotka koskevat vain osaa liikennevälineistä."
+  :RAE-link-text "RAE-software"
 
-  :brokerage? "Välityspalvelu välittää korvausta vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsota sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta."
-  :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
+  :companies-main-info "If there are other companies involved conducting the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Obs! Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
+  :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
+  :csv-file-example "Download an example file from here."
+  :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
 
-  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+  :guaranteed-vehicle-accessibility "Here you can write about all the accessibility tools which are allways available in the service conducted and which do not require making a reservation beforehand. The accessibility tools announced have to be valid for all the vehicles."
+  :limited-vehicle-accessibility "Here you can make an announcement about all the limited available accessibility tools. Limited in this part means that the accessibility tools announced are only available when making a reservation beforehand, or which are available only in some of the trasportation vehicles."
 
-  :available-from-and-to "Set date range when this service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
-  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
-  :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
+  :brokerage? "A brokering service is a service that brokers single rides for other companies for remuneration. (Remuneration can be money or other benefits.) A brokering service can also broke its own rides at the same time. An example of a brokering service is a taxi centre. If a company only brokes its own rides to other companies with no remuneration, the company is not a brokering service."
+  :brokerage-link "Read more about the obligations of a brogering services starting from 1st July 2018"
 
-  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."}
+  :operation-area "In this section you can add the operating area of your service by writing the name of the area or the target into the text field called \"Search for a place with a name\" and by choosing the area wanted from the opening list (you can search by using region, community, postal code or Finland). You can add more districts with the same way.\nYou can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Taxistand of Espoo\"."
+
+  :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
+  :description-why-contact-info "Fill in contact information, so that customers can contact you."
+  :pricing-info "Fill in price information and/or the basis for pricing in to the table.\nIf the table is not suitable for price announcment, you can tell about pricing in the field \"price determination\". \nIf all the price information is already in a website (WWW), you can simpy just fill in the WWW-address into the field "Price information WWW-address"."
+
+  :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
+
+  }
 
 
  ;; CSV parsing
  :csv
- {:url-parse-failed "Please, check given url."
+ {:url-parse-failed "Please, check the given url."
   :csv-parse-failed "Failed to parse .csv file."
   :parsing-success ["Found  " :count " companies."]}
 
 
  ;; Action buttons
  :buttons
- {:save "Tallenna"
-  :cancel "Peruuta"
-  :delete "Poista"
-  :close "Sulje"
-  :publish "Julkaise"
-  :edit-service "Muokkaa palvelun tietoja"
-  :edit "Muokkaa"
+ {:save "Save"
+  :cancel "Cancel"
+  :delete "Delete"
+  :close "Close"
+  :publish "Publish"
+  :edit-service "Edit service"
+  :edit "Edit"
 
-  :save-and-publish "Tallenna ja julkaise"
-  :save-as-draft "Tallenna luonnoksena"
-  :save-updated "Tallenna päivitetyt tiedot"
-  :add-new-parking-capacity "Lisää rivi"
-  :add-new-price-class "Lisää rivi"
-  :add-new-service-hour "Lisää rivi"
-  :add-new-service-exception "Lisää rivi"
-  :add-new-company "Lisää rivi"
-  :discard "Peruuta"
+  :save-and-publish "Save and publish"
+  :save-as-draft "Save a draft"
+  :save-updated "Save updated information"
+  :add-new-parking-capacity "Add a new row"
+  :add-new-price-class "Add a new row"
+  :add-new-service-hour "Add a new row"
+  :add-new-service-exception "Add a new row"
+  :add-new-company "Add a new row"
+  :discard "Cancel"
 
-  :next "Jatka"
-  :add-transport-service  "Lisää uusi palvelu"
-  :add-external-interface "Lisää rivi"
-  :add-new-service-link "Lisää rivi"
-  :add-add-new-row         "Lisää uusi rivi"
-  :add-new-pick-up-location "Lisää rivi"
-  :add-new-additional-service "Lisää rivi"
-  :add-new-vehicle "Lisää rivi"
-  :add-new-transport-operator "Lisää uusi palveluntuottaja"
-  :add-new-member "Lisää käyttäjä"}
+  :next "Next"
+  :add-transport-service  "Add a new transport service"
+  :add-external-interface "Add a new row"
+  :add-new-service-link "Add a new row"
+  :add-add-new-row         "Add a new row"
+  :add-new-pick-up-location "Add a new row"
+  :add-new-additional-service "Add a new row"
+  :add-new-vehicle "Add a new row"
+  :add-new-transport-operator "Create a new transport operator"
+  :add-new-member "Add a new member"}
 
 
 
@@ -321,159 +326,159 @@
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/type
-  {:terminal                 "Asemat, satamat ja muut terminaalit"
-   :passenger-transportation "Henkilöiden kuljetuspalvelut"
-   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-   :brokerage                "Välityspalvelut"}
+  {:terminal                 "Stations, ports and other terminals"
+   :passenger-transportation "Passenger transportation"
+   :rentals                  "Vehicle rentals and commercial shared vehicle solutions"
+   :parking                  "General commercial parking services"
+   :brokerage                "Brokering service companies"}
 
   :ote.db.transport-service/sub-type
-  {:terminal      "Asemat, satamat ja muut terminaalit"
-   :taxi          "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-   :request       "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-   :other         "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-   :schedule      "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-   :rentals       "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking       "Yleiset kaupalliset pysäköintipalvelut"}
+  {:terminal      "Stations, ports and other terminals"
+   :taxi          "Taxi service (passenger transportation)"
+   :request       "Charter traffic, busses (passenger transportation)"
+   :other         "Other charter traffic (passenger trasportation)"
+   :schedule      "Regular scheduled traffic (passenger transportation)"
+   :rentals       "Vehicle rentals and commercial shared vehicle solutions"
+   :parking       "General commercial parking services"}
 
   :ote.db.transport-service/payment-methods
-  {:cash                "Käteinen"
-   :debit-card          "Pankkikortti"
-   :credit-card         "Luottokortti"
-   :mobilepay           "Mobiilimaksu"
-   :contactless-payment "Lähimaksu"
-   :invoice             "Lasku"
-   :other               "Muu"}
+  {:cash                "Cash"
+   :debit-card          "Debit-card"
+   :credit-card         "Credit-card"
+   :mobilepay           "Mobilepay"
+   :contactless-payment "Contactless payment"
+   :invoice             "Invoice"
+   :other               "Other"}
 
   :ote.db.transport-service/additional-services
-  {:child-seat       "Lastenistuin"
-   :animal-transport "Eläinkuljetus"
-   :other            "Muu"}
+  {:child-seat       "Child safety seat"
+   :animal-transport "Animal transport"
+   :other            "Other"}
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair       "Pyörätuoli"
-   :walkingstick     "Kävelykeppi"
-   :audio-navigator  "Ääniopastus"
-   :visual-navigator "Visuaaliset opasteet"
+  {:wheelchair       "Wheelchair"
+   :walkingstick     "Walking stick"
+   :audio-navigator  "Audio navigation"
+   :visual-navigator "Visual navigation"
    :passenger-cart   "Henkilökuljetuskärryt"
    :pushchair        "Lastenrattaat"
    :umbrella         "Sateenvarjo"
    :buggy            "Lastenvaunut"
-   :other            "Muu"}
+   :other            "Other"}
 
   :ote.db.transport-service/day
-  {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
-   :full {:ALL "Select all" :MON "Maanantai" :TUE "Tiistai" :WED "Keskiviikko" :THU "Torstai"
-          :FRI "Perjantai" :SAT "Lauantai" :SUN "Sunnuntai"}}
+  {:short {:MON "Mon" :TUE "Tue" :WED "Wed" :THU "Thu" :FRI "Fri" :SAT "Sat" :SUN "Sun"}
+   :full {:ALL "Select all" :MON "Monday" :TUE "Tuesday" :WED "Wednesday" :THU "Thursday"
+          :FRI "Friday" :SAT "Saturday" :SUN "Sunday"}}
 
   :ote.db.transport-service/information-service-accessibility
-  {:audio-for-hearing-impaired "Äänivahvistimet huonokuuloisille"
-   :audio-information "Kuulutukset"
-   :visual-displays "Visuaaliset näytöt"
-   :displays-for-visually-impaired "Näytöt näkövammaisille (taktiili)"
-   :large-print-timetables "Suuret kirjasimet aikatauluissa"
-   :other "Muu"}
+  {:audio-for-hearing-impaired "Audio for hearing impaired"
+   :audio-information "Audio information"
+   :visual-displays "Visual displays"
+   :displays-for-visually-impaired "Displays for visual impaired (tactiles)"
+   :large-print-timetables "Large print timetables"
+   :other "Other"}
 
 
   :ote.db.transport-service/accessibility
-  {:lift "Hissi"
-   :escalator "Liukuportaat"
-   :travelator "Liikkuva kävelytie"
-   :ramp "Ramppi"
-   :stairs "Portaat"
-   :shuttle "Sukkulaliikenne"
-   :narrow-entrance "Kapea sisäänkäynti"
-   :barrier "Puomi"
-   :pallet-access-low-floor "Matala lattia"
-   :wheelchair-access-toilet "Inva WC"
+  {:lift "Elevator"
+   :escalator "Escalator"
+   :travelator "Travelator"
+   :ramp "Ramp"
+   :stairs "Stairs"
+   :shuttle "Shuttle traffic"
+   :narrow-entrance "Narrow entrance"
+   :barrier "Barrier"
+   :pallet-access-low-floor "Low-floor vehicle"
+   :wheelchair-access-toilet "Accessible toilet"
 
-   :step-free-access "Portaaton pääsy"
-   :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
-   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other  "Muu"}
+   :step-free-access "Step-free access"
+   :suitable-for-wheelchairs "Suitable for wheelchair"
+   :tactile-platform-edges  "Tactile platform edges"
+   :tactile-guiding-strips "Tactile guiding strips"
+   :other  "Other"}
 
   :ote.db.transport-service/transportable-aid
-  {:wheelchair "Pyörätuoli"
-   :walking-stick "Kävelykeppi"
-   :assistance-dog "Avustuskoira"
+  {:wheelchair "Wheelchair"
+   :walking-stick "Walking stick"
+   :assistance-dog "Place for an assistance dog"
    :crutches "Kainalosauvat"
-   :walker "Rollaattori"}
+   :walker "Walker"}
 
   :ote.db.transport-service/pick-up-type
-  {:pick-up "Nouto"
-   :return "Palautus"
-   :pick-up-return "Nouto ja palautus"}
+  {:pick-up "Pick-up point"
+   :return "Returning point"
+   :pick-up-return "Pick-up and returning point"}
 
   :ote.db.transport-service/vehicle-accessibility
-  {:low-floor "Matalalattia"
-   :step-free-access "Portaaton pääsy"
-   :accessible-vehicle "Esteetön kulkuneuvo"
-   :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :suitable-for-stretchers "Paarikuljetus"
-   :boarding-assistance "Kyytiin nousun avustus"
-   :assistance-dog-space "Tila avustuskoiralle"
-   :disability-adapted-vehicle "Käsihallintalaitteilla varustettuja autoja"}
+  {:low-floor "Low-floor vehicle"
+   :step-free-access "Step-free access"
+   :accessible-vehicle "Accessible vehicle"
+   :suitable-for-wheelchairs "Suitable for wheelchair"
+   :suitable-for-stretchers "Strecther transportation"
+   :boarding-assistance "Boarding assistance"
+   :assistance-dog-space "Place for an assistance dog"
+   :disability-adapted-vehicle "Cars with handicap hand controls"}
 
 
   :ote.db.transport-service/parking-facility
-  {:unknown "Tuntematon"
-   :car-park "Autopaikat"
-   :park-and-ride-park "Liityntäpysäköinti"
-   :motorcycle-park "Moottoripyörät"
-   :cycle-park "Polkupyörät"
-   :rental-car-park "Vuokra-autot"
-   :coach-park "Linja-autot"
-   :disabled-park "Invapaikat"}
+  {:unknown "Unknown"
+   :car-park "Parking spaces"
+   :park-and-ride-park "Park and ride"
+   :motorcycle-park "Motorcycles"
+   :cycle-park "Cycles"
+   :rental-car-park "Rental cars"
+   :coach-park "Busses"
+   :disabled-park "Disabled parking"}
 
   :ote.db.transport-service/interface-data-content
-  {:route-and-schedule "Reitti- ja aikataulutiedot"
-   :luggage-restrictions "Matkatavararajoitukset"
-   :realtime-interface "Reaaliaikarajapinta"
-   :booking-interface "Varausrajapinta"
-   :accessibility-services "Esteettömyyspalvelut"
-   :other-services "Muut palvelut"
-   :pricing "Hintatiedot"
-   :service-hours "Palveluajat"
-   :disruptions "Häiriötilanteet"
-   :payment-interface "Lippu- ja myyntirajapinta"
-   :other "Muu"}}
+  {:route-and-schedule "Route and schedule information"
+   :luggage-restrictions "Luggage restrictions"
+   :realtime-interface "Real time interface"
+   :booking-interface "Booking interface"
+   :accessibility-services "Accessibility services"
+   :other-services "Other services"
+   :pricing "Pricing"
+   :service-hours "Service hours"
+   :disruptions "Fault situations"
+   :payment-interface "Payment and sales interface"
+   :other "Other"}}
 
 
   ;; ENUMS end
 
 
  ;; Per feature/page localization keys
- :place-search {:name                "Paikan name"
-                :place-auto-complete "Hae paikka nimellä"
-                :rename-place "Anna uusi name (Enter hyväksyy)"}
+ :place-search {:name                "Place name"
+                :place-auto-complete "Search place by name"
+                :rename-place "Rename (Use Enter for saving)"}
 
- :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
-          :passenger-transportation "Henkilöiden kuljetuspalvelut"
-          :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-          :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-          :brokerage                "Välityspalvelut"}
+ :titles {:terminal                 "Stations, ports and other terminals"
+          :passenger-transportation "Passenger transportation"
+          :rentals                  "Vehicle rentals and commercial shared vehicle solutions"
+          :parking                  "General commerial parking services"
+          :brokerage                "Brokering service companies"}
 
  :front-page
- {:table-header-service-name      "Palvelun name"
-  :table-header-service-url       "Palvelun verkko-address"
-  :table-header-NAP-status        "NAP tila"
-  :table-header-modified          "Muokattu"
-  :table-header-created           "Luotu"
-  :table-header-actions           "Toiminnot"
-  :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
-  :header-explain-more            "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page          "Siirry omat palvelutiedot -näkymään"
-  :move-to-organizations-page     "Siirry palveluntuottajat-näkymään"
-  :hello                          "Hei "
-  :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
-    päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
-  :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
-     julkaistu myös julkisessa NAP -palvelukatalogissa."
-  :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
-  :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
-     sillä niitä hyödynnetään lomakenäkymissä."
+ {:table-header-service-name      "Service name"
+  :table-header-service-url       "Service WWW-address"
+  :table-header-NAP-status        "NAP-status"
+  :table-header-modified          "Modified"
+  :table-header-created           "Created"
+  :table-header-actions           "Functions"
+  :do-you-want-to-publish-service "You already have an own, self mantained interface (e.g. in GTFS-form), which you want to publish."
+  :header-explain-more            "Now I don´t understand, can you be more specific?"
+  :move-to-services-page          "Move to own transport services - page"
+  :move-to-organizations-page     "Move to transport operators page"
+  :hello                          "Hey"
+  :NAP-service-short-description  "In the NAP-service, you register and mantain essential data about your transport service,
+    and also publish the data in NAP - transport service catalog."
+  :own-services-short-description " -view you can see, what services you have registered so far and which of the data has been
+    published also in the public NAP-transport service catalog."
+  :right-corner-description       "From the \"Own transport services\"-view, by choosing \"modify\", you can transport "
+  :service-operator-short-description " -to a view, where you can make changes to the basic information of your transport operator. Basic information should always be up to date,
+    because it is used in service view for utilisers."
   :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
   :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
@@ -482,156 +487,151 @@
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
-  :header-no-operator "Käyttäjätilisi ei kuulu vielä yhdenkään palveluntuottajan alle"
-  :desc-to-add-new-operator "Voidaksesi lisätä liikkumispalveluita, tulee sinun olla jonkin palveluntuottajan edustaja."
-  :desc-to-add-new-operator-2 "Onko edustamasi palveluntuottaja (esim. yritys, yhteisö tai muu organisaatio) jo lisätty NAP-palveluun?"
-  :desc-to-add-new-operator-3 "Voit tarkistaa sen palveluntuottajat-näkymässä."
-  :desc-to-add-new-operator-4 "Mikäli löysit edustamasi organisaation, pyydä sen
-         hallinnoijaa lisäämään sinut kyseisen organisaation edustajaksi. Edustajat voivat hallita kyseisen organisaation liikkumispalveluita tästä näkymästä."
-  :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
+  :header-no-operator "Your account is not yet united with any transport operator"
+  :desc-to-add-new-operator "In order to create new transport services, first you have to be a member of a transport operator."
+  :desc-to-add-new-operator-2 "Is the transport operator (e.g. company, community or other organization) already added to NAP-service?"
+  :desc-to-add-new-operator-3 "You can check that in transport operators - view."
+  :desc-to-add-new-operator-4 "If you found the organization you are a member at, you can
+         ask the administrator of the company to add you as a member in NAP. The members can mantain the transport services of the specific company in this view."
+  :desc-to-add-new-operator-5 "Did you not find the transport operator you were looking for or are you the main user of the organization, company or community you are representing?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
-   :to-add-new-operator-tab " välilehdestä."
-   :operator-dont-have-any-services "Et ole vielä lisännyt tarjoamiesi liikkumispalveluiden tietoja NAP-palvelukatalogiin."}
+  :to-add-new-operator-tab " välilehdestä."
+  :operator-dont-have-any-services "You have not added information about your transport services to NAP-catalog so far."}
 
 
  :organization-page
- {:contact-types            "Yhteystavat"
-  :organization-form-title  "Palveluntuottajan tiedot"
-  :organization-new-title   "Create new transport operator"
-  :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
-  :help-desc-2              "Täytä "
-  :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
-  :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
-  :help-desc-5-linklabel    "jäsenet sivulla"
-  :help-desc-6 "\nPalveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."}
+ {:contact-types            "Phone and email"
+  :organization-form-title  "Basic information"
+  :organization-new-title   "Create a new transport operator"
+  :help-desc-1              "This information will be seen in the public pages of NAP-service."
+  :help-desc-2              "Fill in to "
+  :help-desc-3              " -section information about the company, community or organization you are representing."
+  :help-desc-4              " -sections information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
+  :help-desc-5              "You can add and delete members to the transport operator in the"
+  :help-desc-5-linklabel    "members-page"
+  :help-desc-6 "\nThe purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."}
 
 
  :passenger-transportation-page
- {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
-  :header-edit-passenger-transportation    "Muokkaa henkilöiden kuljetuspalvelua"
-  :header-service-info                     "Palvelun perustiedot"
-  :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
-  :header-contact-details                  "Palvelun yhteystiedot"
-  :header-other-services-and-accessibility "Accessibility ja muut palvelut"
-  :header-price-information                "Hintatiedot"
-  :header-service-hours                    "Palveluajat"
-  :header-pick-up-locations "Toimipisteet"}
+ {:header-new-passenger-transportation     "Add a new transport service"
+  :header-edit-passenger-transportation    "Edit transport service"
+  :header-service-info                     "Service information"
+  :header-restrictions                     "Luggage restrictions"
+  :header-contact-details                  "Contact information"
+  :header-other-services-and-accessibility "Accessibility and additional services"
+  :header-price-information                "Price information"
+  :header-service-hours                    "Service hours"
+  :header-pick-up-locations "Pick-up and returning points"}
 
 
  :rentals-page
- {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
-  :header-new-rentals                      "Lisää vuokraukseen liittyvät tiedot"
-  :header-service-info                     "Vuokrauspalvelun perustiedot"
-  :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
-  :header-usage-area                       "Maarajoitukset"
-  :header-restrictions-payments            "Rajoitukset ja maksutavat"
-  :header-vehicles                         "Vuokrattavat ajoneuvot"
-  :header-accessibility                    "Esteettömyys"
-  :header-additional-services              "Lisäpalvelut"
-  :open-service-hours-and-exceptions       "Palveluajat"
-  :open-rental-prices                      "Hintatiedot"}
+ {:header-edit-rentals                     "Edit rental information"
+  :header-new-rentals                      "Add information about vehicle rental services or commercial shared vehicle solutions"
+  :header-service-info                     "Service information"
+  :header-rental-service                   "Fill in information about rental service."
+  :header-usage-area                       "Usage area restrictions (country limitations)"
+  :header-restrictions-payments            "Luggage restrictions and payment methods"
+  :header-vehicles                         "Rental vehicles"
+  :header-accessibility                    "Accessibility"
+  :header-additional-services              "Additional services"
+  :open-service-hours-and-exceptions       "Service hours"
+  :open-rental-prices                      "Rental prices"}
 
 
  :terminal-page
- {:header-service-info                "Palvelun perustiedot"
-  :header-contact-details             "Palvelun yhteystiedot"
-  :header-new-terminal                "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
-  :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
-  :header-assistance                  "Avustuspalvelun tilauksen tiedot"
-  :header-accessibility               "Palvelun saavutettavuus ja accessibility"
-  :header-checkboxlist-accessibility  "Esteettömyys"}
+ {:header-service-info                "Service information"
+  :header-contact-details             "Contact information"
+  :header-new-terminal                "Add information about station, port or other terminal"
+  :header-edit-terminal               "Edit information about station, port or other terminal"
+  :header-assistance                  "Assistance service information"
+  :header-accessibility               "Accessibility and information service accessibility"
+  :header-checkboxlist-accessibility  "Accessibility"}
 
 
  :parking-page
- {:header-new-parking                       "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
-  :header-edit-parking                      "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
-  :header-service-info                      "Palvelun perustiedot"
-  :header-contact-details                   "Palvelun yhteystiedot"
-  :header-payment-methods                   "Maksutavat"
-  :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
-  :header-accessibility                     "Palvelun saavutettavuus ja esteettömyys"
-  :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
-  :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
-  :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
-  :header-charging-points                   "Latauspisteet"
-  :header-service-hours                     "Palveluajat ja pysäköintiaika"}
+ {:header-new-parking                       "Add information about general commercial parking"
+  :header-edit-parking                      "Edit information about general commercial parking"
+  :header-service-info                      "Service information"
+  :header-contact-details                   "Contact information"
+  :header-payment-methods                   "Accepted payment methods"
+  :header-add-new-parking                   "Add information about general commercial parking."
+  :header-accessibility                     "Accessibility and information service accessibility"
+  :header-accessibility-description         "Accessibility description"
+  :header-price-and-payment-methods         "Pricing and payment methods"
+  :header-facilities-and-capacities         "Parking capacity"
+  :header-charging-points                   "Charging points"
+  :header-service-hours                     "Service hours and maximum parking time"}
 
 
  :price-dialog
- {:header-dialog "Ajoneuvon hintatiedot"
-  :close-dialog  "Sulje"}
+ {:header-dialog "Vehicle price information"
+  :close-dialog  "Close"}
 
 
  :opening-hours-dialog
- {:close-dialog "Sulje"
-  :header-dialog "Toimipisteen aukioloajat"}
+ {:close-dialog "Close"
+  :header-dialog "Service hours"}
 
 
  :select-service-type-page
- {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
-  :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
-                ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
-                Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
-  :transport-service-type-selection-help-example "Esimerkki: Palveluntuottajana on yritys nimeltä \"RapidBus Oy\",
-     jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
-     Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
-     tyyppiä.
-     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."
-  :transport-service-type-brokerage-help-text "Mikäli olet välityspalvelun tarjoaja, valitse alla olevasta listasta
-  liikkumispalvelutyyppi, joka kuvaa välittämääsi palvelua."}
+ {:title-required-data               "Start creating a new transport service by choosing the mode of the transport service"
+  :transport-service-type-selection-help-text "You can save the essential data of your transport service by first choosing the mode of the transport service and the transport operator, and after that by filling the form that opens up to your screen. If you provide many types of transport services, fill up an own form from each service."
+  :transport-service-type-selection-help-example "Example: There is a transpor operator \"Example Bus Ltd.\", which provides two different transport services, \"Example Bus Charter Traffic\" in Tampere and \"Example Bus Taxi Service\" in Helsinki. The company has to fill up a separate form from each of the services.
+
+ In this example the company should fill forms named \"Charter traffic, busses\" ja \"Taxi service\"."
+  :transport-service-type-brokerage-help-text "If you are a brokering service, choose from the list below
+ the mode of transport service, which relates to the service brokered."}
 
  :admin-page
- {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
+ {:business-id-filter {:operators "Transport operators" :services "Services" :ALL "All"}
   :published-types {:YES "Published" :NO "Not published" :ALL "All"}}
 
-
  :common-texts
- {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
-        Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
-        Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
-  :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
-  :link-add-new-api                           "Lisää uusi palvelu"
-  :own-api-list                               "Omat palvelutiedot"
-  :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
-  :api-name                                   "Rajapinnan name"
-  :api-url                                    "Rajapinnan verkko-address"
-  :finap-status                               "NAP tila"
-  :header-nap-official-name                   "Palvelukatalogi"
-  :navigation-own-service-list                "Omat palvelutiedot"
-  :navigation-front-page                      "Etusivu"
-  :navigation-organizations                   "Palveluntuottajat"
-  :navigation-dataset                         "Palvelukatalogi"
-  :navigation-give-feedback                   "Anna palautetta palautetta"
-  :navigation-login                           "Kirjaudu sisään"
+ {:front-page-help-text                       "You have not yet registered any transport services to NAP-service catalog.
+        You can register an external interface about your service or essential data about your service by using
+        the NAP-service which Finnish Transport Aggency has developed for this purpose."
+  :front-page-start-ote-query-header          "Do you want to register essential data of your transport service?"
+  :link-add-new-api                           "Add a new service"
+  :own-api-list                               "Service information"
+  :passenger-transportation-service-text      "Passenger transportation"
+  :api-name                                   "Interface name"
+  :api-url                                    "Interface WWW-address"
+  :finap-status                               "NAP-status"
+  :header-nap-official-name                   "Transport service catalog"
+  :navigation-own-service-list                "Own transport services"
+  :navigation-front-page                      "Front page"
+  :navigation-organizations                   "Transport operator"
+  :navigation-dataset                         "Transport service catalog"
+  :navigation-give-feedback                   "Give feedback"
+  :navigation-login                           "Login"
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
-  :user-menu-service-guide                    "Ohje"
-  :user-menu-service-operator                 "Palveluntuottajan perustiedot"
-  :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Käyttäjätilin muokkaus"
-  :user-menu-summary                          "Yhteenveto"
-  :user-menu-nap-help                         "Käyttöohje"
-  :title-operator-basic-details               "Perustiedot"
-  :data-not-found                             "Tietoja ei löytynyt"
-  :required-field                             "Tieto vaaditaan"
-  :invalid-postal-code                        "Tarkista postinumber (5 numbera)"
-  :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
-  :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
-  :footer-livi-logo                           "Liikennevirasto Logo"
-  :footer-livi-url                            "Liikennevirasto.fi"
-  :footer-ckan-software                       "CKAN-ohjelmistolla"
-  :footer-made-width                          "Toteutettu"
-  :no-such-page                               "Valittua sivua ei löydy: "
-  :time-unit                                  "Aikayksikkö"
-  :time-units {:minutes  "Minuuttia"
-               :hours    "Tuntia"
-               :days     "Päivää"
-               :seconds  "Sekuntia"}
-  :save-failed                                "Tallennettaessa sattui virhe. Jos ongelma toistuu "
-  :delete-service-success                     "Palvelu poistettiin onnistuneesti."
-  :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
-  :logged-in                                  "Kirjauduit sisään onnistuneesti!"
+  :user-menu-service-guide                    "User guide"
+  :user-menu-service-operator                 "Edit transport operator"
+  :user-menu-log-out                          "Log out"
+  :user-menu-profile                          "Edit user account"
+  :user-menu-summary                          "Summary"
+  :user-menu-nap-help                         "User guide"
+  :title-operator-basic-details               "Basic information"
+  :data-not-found                             "Data is not found"
+  :required-field                             "Required field"
+  :invalid-postal-code                        "Please, check the postalcode (5 numbers)"
+  :transport-service-saved                    "Transport service information has been saved!"
+  :transport-operator-saved                   "Transport operator information has been saved!"
+  :footer-livi-logo                           "Finnish Transport Aggency Logo"
+  :footer-livi-url                            "Fta.fi"
+  :footer-ckan-software                       "CKAN-software"
+  :footer-made-width                          "Made with"
+  :no-such-page                               "Page not found: "
+  :time-unit                                  "Time unit"
+  :time-units {:minutes  "Minutes"
+               :hours    "Hours"
+               :days     "Days"
+               :seconds  "Seconds"}
+  :save-failed                                "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
+  :delete-service-success                     "The service was deleted successfully."
+  :delete-service-error                       "Deleting the service has failed. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
+  :logged-in                                  "You were logged in successfully!"
   :loading                                    "Loading"
   :language                                   "Language"
 
@@ -641,81 +641,81 @@
 
  :dialog
  {:delete-transport-service
-  {:title "Poista liikkumispalvelun tiedot?"
-   :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}
+  {:title "Want to delete a transport service?"
+   :confirm ["Are you sure you want to delete service named \"" :name "\" permanently?"]}
 
   :navigation-prompt
   {:title "Confirm navigation"
    :stay "Stay on this page"
-   :leave "Leave page"
-   :unsaved-data "Form contains unsaved data. Do you really want to leave the page?"}}
+   :leave "Leave this page"
+   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}}
 
  :operators
  {:title "Transport operators"
   :filter "Search by name"
   :loading "Fetching transport operators..."
-  :result-service-count-single "one service"
-  :result-service-count [:service-count " services"]
+  :result-service-count-single "one published service"
+  :result-service-count [:service-count " published services"]
   :result-no-services "No published services."
   :description-read-more "See more."
-  :no-results "No transport operators found for search term"
-  :result-count ["Found " :total-count " transport operators with search term"]
+  :no-results "No transport operators were found with the search term"
+  :result-count ["Found " :total-count " transport operators"]
   :result-count-all ["Total " :total-count " transport operators"]}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
- :viewer {"transport-operator" "Palveluntuottaja"
-          "transport-service" "Liikkumispalvelun tiedot"
-          "contact-address" "Address"
-          "contact-email" "Emailaddress"
-          "homepage" "Kotisivu"
-          "post_office" "Postitoimipaikka"
-          "postal_code" "Postinumber"
-          "street" "Katuaddress"
+ :viewer {"transport-operator" "Transport operator"
+          "transport-service" "Transport service information"
+          "contact-address" "Contact address"
+          "contact-email" "Email"
+          "homepage" "Web page"
+          "post_office" "Post office"
+          "postal_code" "Postal code"
+          "street" "Street address"
           "contact-phone" "Phonenumber"
-          "id" "Tunnistenumber"
+          "id" "Business ID"
           "name" "Name"
-          "published?" "Julkaistu?"
-          "transport-operator-id" "Palveluntuottajan tunnistenumber"
-          "type" "Palvelun tyyppi"
+          "published?" "Published?"
+          "transport-operator-id" "Transport operator ID"
+          "type" "Service mode"
           "email" "Email"
           "phone" "Phone"
 
-          "passenger-transportation" "Palvelukohtaiset tiedot"
-          "parking" "Palvelukohtaiset tiedot"
-          "rentals" "Palvelukohtaiset tiedot"
-          "accessibility-description" "Kuvaus saavutettavuudesta"
-          "accessibility-tool" "Saavutettavuusvälineet"
-          "additional-services" "Lisäpalvelut"
-          "payment-methods" "Maksuvälineet"
-          "price-classes" "Hintaluokat"
-          "currency" "Rahayksikkö"
-          "price-per-unit" "yksikköhinta"
-          "unit" "yksikkö"
+          "passenger-transportation" "Service relaited information"
+          "parking" "Service relaited information"
+          "rentals" "Service relaited information"
+          "accessibility-description" "Accessibility description"
+          "accessibility-tool" "Accessibility tools"
+          "additional-services" "Additional services"
+          "payment-methods" "Accepted payment methods"
+          "price-classes" "Price classes"
+          "currency" "Currency"
+          "price-per-unit" "Price per unit"
+          "unit" "Unit"
 
-          "lang" "Kieli"
-          "text" "Teksti"
+          "lang" "Language"
+          "text" "Text"
 
-          "description" "Kuvaus"
-          "real-time-information" "Reaaliaikaiset palvelutiedot"
-          "booking-service" "Varauspalvelu"
-          "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
+          "description" "Description"
+          "real-time-information" "Real time service information"
+          "booking-service" "Booking service"
+          "luggage-restrictions" "Luggage restrictions"
 
           "url" "WWW-address"
-          "companies-csv-url" "Yrityslistan osoite"
-          "service-hours-info" "Lisätiedot"
-          "indoor-map" "Sisätilakartan osoitetiedot"
-          "pick-up-locations" "Toimipisteet"
-          "rental-additional-services" "Muut palvelut"
-          "usage-area" "Sallitut maat"
-          "vehicle-classes" "Vuokrattavat ajoneuvot"
+          "companies-csv-url" "WWW-address containing .csv file about companies involved"
+          "service-hours-info" "Additional information"
+          "indoor-map" "Indoor map WWW-address"
+          "pick-up-locations" "Pick-up and returning points"
+          "rental-additional-services" "Additional services"
+          "usage-area" "Usage area restrictions (country limitations)"
+          "vehicle-classes" "Rental vehicles"
 
-          "additional-service-links" "Muut palvelut"
-          "charging-points" "Kuvaus latauspisteistä"
-          "parking-capacities" "Parkkipaikkojen määrä"
+          "additional-service-links" "Additional services"
+          "charging-points" "Charging points description"
+          "parking-capacities" "Parking capacity"
 
-          "available-from" "Available from"
+                    "available-from" "Available from"
           "available-to" "Available to"
 
           "maximum-stay" "Maximum parking time"
@@ -726,78 +726,78 @@
           "months" "Months"
           "years" "Years"
 
-          :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
-                   true "Kyllä"
-                   false "Ei"
+          :values {"passenger-transportation" "Passenger transportation"
+                   true "Yes"
+                   false "No"
 
-                   ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-                   "request" "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-                   ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-                   "terminal"                 "Asemat, satamat ja muut terminaalit"
-                   "rentals"                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                   "parking"                  "Yleiset kaupalliset pysäköintipalvelut"
+                   ;; Subtypes and types - HOX "Other" is translated as "Other" so we need to change something to get it to work properly
+                   "taxi" "Taxi service (passenger transportation)"
+                   "request" "Charter traffic, busses (passenger transportation)"
+                   ;"other" "Other charter traffic (passenger transportation)"
+                   "schedule" "Regular scheduled traffic (passenger transportation)"
+                   "terminal"                 "Stations, ports and other terminals"
+                   "rentals"                  "Vehicle rentals and commercial shared vehicle solutions"
+                   "parking"                  "General commercial parking services"
 
                    ;; accessibility tools
-                   "wheelchair" "Pyörätuoli"
-                   "walkingstick" "Kävelykeppi"
-                   "audio-navigator" "Ääniopastus"
-                   "visual-navigator" "Visuaaliset opasteet"
+                   "wheelchair" "Wheelchair"
+                   "walkingstick" "Walking stick"
+                   "audio-navigator" "Audio navigation"
+                   "visual-navigator" "Visual navigation"
                    "passenger-cart" "Henkilökuljetuskärryt"
                    "pushchair" "Lastenrattaat"
                    "umbrella" "Sateenvarjo"
                    "buggy" "Lastenvaunut"
-                   "other" "Muu"
+                   "other" "Other"
                    "boarding-assistance" "Boarding assistance"
                    "low-floor" "Low floor"
                    "accessible-vehicle" "Accessible vehicle"
-                   "escalator" "Liukuportaat"
-                   "lift" "Hissi"
-                   "narrow-entrance" "Kapea sisäänkäynti"
-                   "pallet-access-low-floor" "Matala lattia"
-                   "barrier" "Puomi"
-                   "travelator" "Liikkuva kävelytie"
-                   "ramp" "Ramppi"
-                   "stairs" "Portaat"
-                   "shuttle" "Sukkulaliikenne"
+                   "escalator" "Escalator"
+                   "lift" "Lift"
+                   "narrow-entrance" "Narrow entrance"
+                   "pallet-access-low-floor" "Low floor vehicle"
+                   "barrier" "Barrier"
+                   "travelator" "Travelator"
+                   "ramp" "Ramp"
+                   "stairs" "Stairs"
+                   "shuttle" "Shuttle traffic"
                    "step-free-access" "Step free access"
                    "suitable-for-wheelchairs" "Suitable for wheelchairs"
-                   "assistance-dog-space" "Place for assistance dog"
+                   "assistance-dog-space" "Place for an assistance dog"
                    "crutches" "Crutches"
                    "walker" "Walker"
                    "walking-stick" "Walking stick"
-                   "tactile-guiding-strips" "Kosketukseen perustuvat ohjausliuskat"
-                   "tactile-platform-edges" "Kosketukseen perustuva varoitus laiturin reunassa"
-                   "wheelchair-access-toilet" "Inva WC"
+                   "tactile-guiding-strips" "Tactile guiding strips"
+                   "tactile-platform-edges" "Tactile platform edges"
+                   "wheelchair-access-toilet" "Accessible toilet"
                    "visual-displays" "Visual display"
                    "large-print-timetables" "Large print timetables"
                    "displays-for-visually-impaired" "Displays for visually impaired (tactile)"
                    "audio-information" "Audio information"
                    "audio-for-hearing-impaired" "Audio for hearing impaired"
-                   "disability-adapted-vehicle" "Käsihallintalaitteilla varustettuja autoja"
+                   "disability-adapted-vehicle" "Cars with handicap hand controls"
 
                    ;; additional services
-                   "animal-transport" "Eläinkuljetus"
-                   "child-seat"       "Lastenistuin"
+                   "animal-transport" "Animal transport"
+                   "child-seat"       "Child safety seat"
 
                    ;; parking types
-                   "unknown" "Tuntematon"
-                   "car-park" "Autopaikat"
-                   "park-and-ride-park" "Liityntäpysäköinti"
-                   "motorcycle-park" "Moottoripyörät"
-                   "cycle-park" "Polkupyörät"
-                   "rental-car-park" "Vuokra-autot"
-                   "coach-park" "Linja-autot"
-                   "disabled-park" "Invapaikat"
+                   "unknown" "Unknown"
+                   "car-park" "Cars"
+                   "park-and-ride-park" "Park and ride"
+                   "motorcycle-park" "Motorcycles"
+                   "cycle-park" "Cycles"
+                   "rental-car-park" "Rental cars"
+                   "coach-park" "Busses"
+                   "disabled-park" "Disabled parking"
 
                    ;; payment methods
-                   "debit-card" "Pankkikortti"
-                   "credit-card" "Luottokortti"
-                   "cash" "Käteinen"
-                   "contactless-payment" "Lähimaksu"
-                   "mobilepay" "Mobiilimaksu"
-                   "invoice" "Lasku"
+                   "debit-card" "Debit-card"
+                   "credit-card" "Credit-card"
+                   "cash" "Cash"
+                   "contactless-payment" "Contactless payment"
+                   "mobilepay" "Mobilepay"
+                   "invoice" "Invoice"
 
                    ;; week days
                    "MON" "Mon"
@@ -809,44 +809,45 @@
                    "SUN" "Sun"
 
                    ;; Data content
-                   "route-and-schedule" "Reitti- ja aikataulutiedot"
-                   "luggage-restrictions" "Matkatavararajoitukset"
-                   "realtime-interface" "Reaaliaikarajapinta"
-                   "booking-interface" "Varausrajapinta"
-                   "accessibility-services" "Esteettömyyspalvelut"
-                   "other-services" "Muut palvelut"
-                   "pricing" "Hintatiedot"
-                   "service-hours" "Palveluajat"
-                   "disruptions" "Häiriötilanteet"
-                   "payment-interface" "Lippu- ja myyntirajapinta"
+                   "route-and-schedule" "Route and schedule information"
+                   "luggage-restrictions" "Luggage restrictions"
+                   "realtime-interface" "Real time interface"
+                   "booking-interface" "Booking interface"
+                   "accessibility-services" "Accessibility services"
+                   "other-services" "Other services"
+                   "pricing" "Pricing"
+                   "service-hours" "Service hours"
+                   "disruptions" "Fault situations"
+                   "payment-interface" "Payment and sales interface"
 
                    ;; rentals
-                   "pick-up" "Nouto"
-                   "return" "Palautus"
-                   "pick-up-return" "Nouto ja palautus"}
+                   "pick-up" "Pick up"
+                   "return" "Return"
+                   "pick-up-and-return" "Pick up and return"
+                   }
 
           ;; External interfaces
           "external-interfaces" "External interfaces"
           "license" "License/terms of use"
-          "data-content" "Tietosisältö"
+          "data-content" "Data content"
           "format" "Format"
           "external-interface" "External interface"
 
           ;; accessibility
-          "accessibility" "Esteettömyys"
-          "information-service-accessibility" "Infopalveluiden esteettömyys"
-          "brokerage?" "Brokerage service?"
-          "companies" "Companies that produce the service"
-          "accessibility-info-url" "Accessibility description (WWW)"
-          "guaranteed-accessibility-description" "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
+          "accessibility" "Accessibility"
+          "information-service-accessibility" "Info service accessibility"
+          "brokerage?" "Brokering service?"
+          "companies" "Companies providing the service"
+          "accessibility-info-url" "Accessibility description WWW-address"
+          "guaranteed-accessibility-description" "Describe more information about always available accessibility tools when needed"
           "guaranteed-info-service-accessibility" "Guaranteed info service accessibility"
           "guaranteed-transportable-aid" "Guaranteed transportable aid"
           "guaranteed-vehicle-accessibility" "Guaranteed vehicle accessibility"
-          "limited-accessibility-description" "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
-          "limited-info-service-accessibility" "Limited availability info service accessibility"
-          "limited-transportable-aid" "Limited availability transportable aid"
-          "limited-vehicle-accessibility" "Limited availability vehicle accessibility"
-          "payment-method-description" "Payment method description"
+          "limited-accessibility-description" "Describe more information about limited available accessibility tools when needed"
+          "limited-info-service-accessibility" "Limited available info service accessibility"
+          "limited-transportable-aid" "Limited available transportable aid"
+          "limited-vehicle-accessibility" "Limited available vehicle accessibility"
+          "payment-method-description" "Accepted payment methods"
           "pricing" "Pricing"
           "service-exceptions" "Service hour exceptions"
           "service-hours" "Service hours"
@@ -856,32 +857,32 @@
           "from-date" "From date"
           "to-date" "To date"
           "sub-type" "Sub type"
-          "terminal" " "
+          "terminal" "Terminal"
 
           ;; Assistance
-          "assistance" "Avustuspalvelut"
-          "assistance-place-description" "Sijainti"
-          "assistance-by-reservation-only" "Varattava etukäteen"
-          "notification-requirements" "Varausta koskevat vaatimukset"
-          "hours-before" "Palvelu varattava (tuntia) ennen"
-          "telephone" "Puhelin"}
+          "assistance" "Assistance service"
+          "assistance-place-description" "Assistance service location"
+          "assistance-by-reservation-only" "The assistance service must be reserved in advance"
+          "notification-requirements" "Reservation requirements"
+          "hours-before" "Service requires reservation (hours) before"
+          "telephone" "Phone"}
 
 
  :service-search
- {:label "Liikkumispalvelukatalogi"
-  :filters-label "Hakuehdot"
-  :text-search "Haku"
-  :operators "Palveluntuottajat"
-  :text-search-placeholder "Hae nimellä tai sen osalla"
+ {:label "Transport service catalog"
+  :filters-label "Search criteria"
+  :text-search "Search"
+  :operators "Transport operator"
+  :text-search-placeholder "Search by name"
   :operator-search "Transport operator"
-  :operator-search-placeholder "Hae nimellä tai sen osalla"
-  :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+  :operator-search-placeholder "Search by name"
+  :no-filters "Search for services by adding search criteria above"
   :result-count (:plural :count
-                         "No services found."
-                         "Found one service."
-                         ["Found " :count " services."])
-  :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
-  :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
+                         "No services found"
+                         "One service found"
+                         [:count " services found"])
+  :nap-interface ["An interface containing essential data saved in NAP-service: "]
+  :external-interfaces ["External interfaces mantained by transport operator"]
   :showing-latest-services "No search filters. Showing latest modified services."
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."
@@ -894,7 +895,7 @@
 
   :no-account? "Need an account?"
   :no-account-help "Register, it will only take a moment."
-  :no-account-button "Create account"
+  :no-account-button "Create an account"
 
   :forgot-password? "Forgot password?"
   :forgot-password-help "No problem, use the password reset form."
@@ -909,28 +910,28 @@
   :zoom-out "Zoom Out"}
 
 
- :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"
-                                      :polygon   "Piirrä monikulmio"
-                                      :rectangle "Piirrä neliö"
-                                      :marker    "Lisää piste"}
-                            :actions {:title "Peruuta piirros"
-                                      :text  "Peruuta"}
-                            :finish  {:title "Lopeta piirtäminen"
-                                      :text  "Lopeta"}
-                            :undo    {:title "Poista viimeksi piirretty piste"
-                                      :text  "Poista viimeisin piste"}}
-                 :handlers {:marker      {:tooltip {:start "Klikkaa karttaa lisääksesi pisteen."}}
-                            :polygon     {:tooltip {:start "Klikkaa aloittaaksesi monikulmion piirtäminen."
-                                                    :cont  "Klikkaa jatkaaksesi monikulmion piirtämistä."
-                                                    :end   "Klikkaa ensimmäistä pistettä sulkeaksesi monikulmion."}}
-                            :polyline    {:error   "<strong>Virhe:</strong> viivat eivät saa ylittää toisiaan!"
-                                          :tooltip {:start "Klikkaa aloittaaksesi viivan piirtäminen."
-                                                    :cont  "Klikkaa jatkaaksesi viivan piirtämistä."
-                                                    :end   "Klikkaa viimeistä pistettä piirtämisen lopettamiseksi."}}
-                            :rectangle   {:tooltip {:start "Klikkaa ja raahaa piirtääksesi neliön."}}
-                            :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
-                            :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
-                                     :radius "Säde"}
-                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
+ :leaflet-draw  {:toolbar  {:buttons {:polyline  "Draw a line"
+                                      :polygon   "Draw a polygon"
+                                      :rectangle "Draw a rectangle"
+                                      :marker    "Draw a marker"}
+                            :actions {:title "Cancel drawing"
+                                      :text  "Cancel"}
+                            :finish  {:title "Finish drawing"
+                                      :text  "Finish"}
+                            :undo    {:title "Delete last drawing"
+                                      :text  "Delete last drawing"}}
+                 :handlers {:marker      {:tooltip {:start "Click map to insert a point."}}
+                            :polygon     {:tooltip {:start "Click to start the drawing of a polygon."
+                                                    :cont  "Click to continue the drawing of the polygon."
+                                                    :end   "Click the starting point to finnish the drawing of the polygon."}}
+                            :polyline    {:error   "<strong>Error:</strong> the lines drawn cannot cross each other!"
+                                          :tooltip {:start "Click to start drawing a line."
+                                                    :cont  "Click to continue line drawing."
+                                                    :end   "Click last point to finnish line drawing."}}
+                            :rectangle   {:tooltip {:start "Click and drag to draw a rectangle."}}
+                            :simpleshape {:tooltip {:end "Release mouse button to finnish drawing."}}
+                            :circle {:tooltip {:start "Click and drag to draw a circle."}
+                                     :radius "Radius"}
+                            :circlemarker {:tooltip {:start "Click map to set a circle marker."}}}}
 
  }
