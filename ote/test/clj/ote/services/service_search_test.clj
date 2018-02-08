@@ -86,13 +86,17 @@
         (is (= 200 (:status result)))
         (is (pos? (count (:results (:json result)))))
         (is (some #(= op-id (:transport-operator-id %))
-                  (:results (:json result))))))
-
-    )
+                  (:results (:json result)))))))
 
   (testing "Operator search returns matching company"
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
       (is (= 200 (:status result)))
       (is (pos? (count (:json result))))
       (is (some #(= "Ajopalvelu Testinen Oy" (:name %))
-                (:json result))))))
+                (:json result)))))
+
+  (testing "Operator search does not return deleted companies"
+    (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")
+    (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
+      (is (= 200 (:status result)))
+      (is (zero? (count (:json result)))))))
