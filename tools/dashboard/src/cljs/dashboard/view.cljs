@@ -31,7 +31,20 @@
    [:div.highlight {:style {:font-size "250%"}}
     service-count]])
 
+(defn load-percentage [label {:keys [minimum maximum average]}]
+  [:div.load-percentage {:style (merge radiator-item-style
+                                       {:height 75 :width 150 :text-align "center"})}
+   [:div [:b label] " (5 min)"]
+   (when average
+     [:div {:style {:font-size "200%"}}  (str (.toFixed average 1) "%")])
+   [:div {:style {:font-size "85%"}}
+    (when minimum
+      [:span "MIN: " (str (.toFixed minimum 1) "%")])
+    " / "
+    (when maximum
+      [:span "MAX: " (str (.toFixed maximum 1) "%")])]])
 (defn dashboard-view [e! app]
   [:div.dashboard {:style {:display "flex" :flex-direction "row"}}
    [jenkins-jobs (:jenkins app)]
-   [published-services (:published-services app)]])
+   [published-services (:published-services app)]
+   [load-percentage "DB Load" (:db-load app)]])
