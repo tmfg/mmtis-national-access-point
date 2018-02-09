@@ -8,7 +8,8 @@
 (defn fetch [app]
   (ajax/GET "/dashboard"
             {:handler (tuck/send-async! ->FetchDashboardResponse)
-             :response-format (ajax/transit-response-format)}))
+             :response-format (ajax/transit-response-format)})
+  app)
 
 (def poll-interval 10000)
 
@@ -19,6 +20,5 @@
 
   FetchDashboardResponse
   (process-event [{response :response} app]
-    (.log js/console "RESPONSE: " response)
     (.setTimeout js/window (tuck/send-async! ->FetchDashboard) poll-interval)
     response))

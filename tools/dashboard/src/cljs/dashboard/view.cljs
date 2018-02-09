@@ -19,12 +19,13 @@
    [:div "Jenkins build status"]
    (doall
     (for [{:keys [name lastBuild] :as job} jobs]
+      ^{:key name}
       [:div {:style (job-style (:result lastBuild))}
        [:div name]
        [:div (.toLocaleString (js/Date. (:timestamp lastBuild)))]]))])
 
 (defn published-services [service-count]
-  [:div {:style (merge radiator-item-style {:width 300 :height 150})}
+  [:div {:style (merge radiator-item-style {:width 200 :height 75 :text-align "center"})}
    "Published service count"
    [:div {:style {:font-size "250%"}}
     service-count]])
@@ -32,5 +33,4 @@
 (defn dashboard-view [e! app]
   [:div.dashboard {:style {:display "flex" :flex-direction "row"}}
    [jenkins-jobs (:jenkins app)]
-   [published-services (:published-services app)]
-   [:div (pr-str app)]])
+   [published-services (:published-services app)]])
