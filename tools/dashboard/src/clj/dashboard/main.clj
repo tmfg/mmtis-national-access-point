@@ -2,9 +2,10 @@
   (:require [compojure.core :refer [GET POST routes]]
             [compojure.route :as route]
             [org.httpkit.server :as http-server]
-            [org.httpkit.client :as http-client]
             [cognitect.transit :as t]
-            [cheshire.core :as cheshire])
+
+            [dashboard.data.finap-services :as data-finap-services]
+            [dashboard.data.jenkins :as data-jenkins])
   (:import (java.util.concurrent Executors TimeUnit))
   (:gen-class))
 
@@ -27,33 +28,31 @@
    (GET "/dashboard" req (dashboard-data req))
    (route/resources "/")))
 
-(defn ^{:interval 20 ;; 900
-        :key :published-services}
-  finap-published-service-count! []
-  (-> "https://finap.fi/ote/service-search?response_format=json"
-      http-client/get deref :body (cheshire/decode keyword)
-      :total-service-count))
-
-(def tasks [#'finap-published-service-count!])
+(def tasks [{:interval 900 :key :published-services
+             :task #'data-finap-services/fetch-published-service-count}
+            {:interval 10 :key :jenkins
+             :task #'data-jenkins/jobs}])
 
 (defn start-tasks []
-  (doseq [t tasks
-          :let [{:keys [interval key name]} (meta t)]]
+  (doseq [{:keys [interval key task]} tasks]
     (.scheduleAtFixedRate executor
                           (fn []
                             (try
-                              (swap! dashboard assoc key (t))
+                              (swap! dashboard assoc key (task))
                               (catch Exception e
-                                (println "Failed to execute task, name=" name "; interval=" interval
+                                (println "Failed to execute task"
+                                         "; name=" (:name (meta task))
+                                         "; interval=" interval
                                          "; exception=" (.getName (type e)) (.getMessage e)))))
-                          interval interval TimeUnit/SECONDS)))
+                          0 interval TimeUnit/SECONDS)))
 
 (defn start []
   (alter-var-root
    #'server
    (fn [_]
      (start-tasks)
-     (http-server/run-server (dashboard-routes) {:port 3001}))) (println "Jeejee"))
+     (http-server/run-server (dashboard-routes) {:port 3001})))
+  (println "NAPOTE dashboard is up: http://localhost:3001/index.html"))
 
 (defn -main []
   (start))
