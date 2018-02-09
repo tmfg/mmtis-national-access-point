@@ -2,6 +2,19 @@
   <head>
     <title>Dashboard</title>
 
+    <style>
+
+      div.highlight {
+        animation-name: highlight-animation;
+        animation-duration: 1s;
+      }
+
+      @keyframes highlight-animation {
+          0% { color: black; font-size: 250%; }
+         50% { color: green; font-size: 300%; }
+        100% { color: black; font-size: 250%; }
+      }
+    </style>
   </head>
  <body onload="dashboard.main.main();">
    <div id="dashboard-app"></div>

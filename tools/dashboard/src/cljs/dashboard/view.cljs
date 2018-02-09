@@ -25,9 +25,10 @@
        [:div (.toLocaleString (js/Date. (:timestamp lastBuild)))]]))])
 
 (defn published-services [service-count]
+  ^{:key service-count} ;; needed to force new DOM node when data changes (to retrigger animation)
   [:div {:style (merge radiator-item-style {:width 200 :height 75 :text-align "center"})}
    "Published service count"
-   [:div {:style {:font-size "250%"}}
+   [:div.highlight {:style {:font-size "250%"}}
     service-count]])
 
 (defn dashboard-view [e! app]
