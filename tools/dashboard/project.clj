@@ -4,6 +4,7 @@
                  [http-kit "2.2.0"]
                  [compojure "1.6.0"]
                  [cheshire "5.8.0"]
+                 [amazonica "0.3.118"]
 
                  [reagent "0.8.0-alpha2"]
                  [figwheel "0.5.13"]
@@ -12,6 +13,10 @@
                   :exclusions [org.apache.httpcomponents/httpasyncclient]]
                  [com.cognitect/transit-clj "0.8.300"]
                  [com.cognitect/transit-cljs "0.8.243"]]
+
+  :profiles {:dev {:dependencies [[figwheel-sidecar "0.5.13"]
+                                  [com.cemerick/piggieback "0.2.2"]
+                                  [org.clojure/tools.nrepl "0.2.12"]]}}
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.13"]]
