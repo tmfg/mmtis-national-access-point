@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2018-01-22 15:31+0200\n"
+"PO-Revision-Date: 2018-02-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language: fi\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 2.0.5\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #: ckanext/napote_theme/controller.py:70
 #, python-format
@@ -259,7 +259,7 @@ msgstr ""
 "<h2>NAP-palvelun rakenne</h2>\n"
 "<a href=\"/ote/#/services\">Palvelukatalogi</a>-sivulla voit tarkastella ja hakea palvelussa julkaistuja "
 "rajapintoja.<br />\n"
-"<a href=\"/organization\">Palveluntuottajat</a>-sivulla on listattuna palveluun rekisteröityneet "
+"<a href=\"/ote/#/operators\">Palveluntuottajat</a>-sivulla on listattuna palveluun rekisteröityneet "
 "organisaatiot."
 
 #: ckanext/napote_theme/templates/organization/edit_base.html:10
@@ -944,8 +944,7 @@ msgstr "Oma nimi"
 #: ckan/logic/validators.py:343
 msgid "Must be purely lowercase alphanumeric (ascii) characters and these symbols: -_"
 msgstr ""
-"Sallittuja merkkejä ovat pienet kirjaimet yhteenkirjoitettuna. Erikoismerkeistä sallittuja ovat - ja _ . \n"
-"Huom! Käyttäjätunnus ei voi olla sähköpostiosoite."
+"Sallittuja merkkejä ovat pienet kirjaimet yhteenkirjoitettuna. Erikoismerkeistä sallittuja ovat - ja _ . "
 
 #~ msgid "Heading/NAP home page logged in main heading"
 #~ msgstr "Liikkumispalveluiden tallennus ja julkaisu"
