@@ -1,0 +1,3 @@
+{:url "https://somejenkinsinstance"
+ :user "jenkins user"
+ :api-token "jenkins user api token"}
