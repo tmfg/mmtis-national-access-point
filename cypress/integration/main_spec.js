@@ -1,3 +1,5 @@
+import { genNaughtyString } from '../support/generators';
+
 // Please read "Introduction to Cypress"
 // https://on.cypress.io/introduction-to-cypress
 
@@ -34,7 +36,7 @@ describe('OTE login dialog', () => {
 
     beforeEach(() => {
         cy.server();
-        cy.route('POST','/ote/login').as('login');
+        cy.route('POST', '/ote/login').as('login');
         cy.visit('/ote/#/services')
     });
 
@@ -43,19 +45,19 @@ describe('OTE login dialog', () => {
         cy.get('input[id*="email--Shkpostiosoite"]').type(username);
         cy.get('input[id*="password--Salasana"]').type(password);
 
-        if(click) {
+        if (click) {
             cy.get('.login-dialog-footer button').click();
         }
         cy.wait('@login');
     };
 
     it('should warn about unknown user', () => {
-        login('this user does not exist', 'adasd',true);
+        login(genNaughtyString(20), genNaughtyString(20), true);
         cy.contains('Tuntematon käyttäjä');
     });
 
     it('should warn about wrong password', () => {
-        login(Cypress.env('NAP_LOGIN'), 'this is not the correct password', true);
+        login(Cypress.env('NAP_LOGIN'), genNaughtyString(20), true);
         cy.contains('Väärä salasana');
     });
 
@@ -65,7 +67,7 @@ describe('OTE login dialog', () => {
     });
 
     it('should login by pressing enter', () => {
-        login(Cypress.env('NAP_LOGIN'), Cypress.env('NAP_PASSWORD')+'{enter}', false);
+        login(Cypress.env('NAP_LOGIN'), Cypress.env('NAP_PASSWORD') + '{enter}', false);
         cy.contains('Kirjauduit sisään onnistuneesti!');
     });
 });
