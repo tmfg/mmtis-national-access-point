@@ -5,7 +5,8 @@
             [cognitect.transit :as t]
 
             [dashboard.data.finap-services :as data-finap-services]
-            [dashboard.data.jenkins :as data-jenkins])
+            [dashboard.data.jenkins :as data-jenkins]
+            [dashboard.data.cloudwatch :as data-cloudwatch])
   (:import (java.util.concurrent Executors TimeUnit))
   (:gen-class))
 
@@ -31,7 +32,9 @@
 (def tasks [{:interval 900 :key :published-services
              :task #'data-finap-services/fetch-published-service-count}
             {:interval 10 :key :jenkins
-             :task #'data-jenkins/jobs}])
+             :task #'data-jenkins/jobs}
+            {:interval 60 :key :db-load
+             :task #'data-cloudwatch/finap-db-load}])
 
 (defn start-tasks []
   (doseq [{:keys [interval key task]} tasks]
