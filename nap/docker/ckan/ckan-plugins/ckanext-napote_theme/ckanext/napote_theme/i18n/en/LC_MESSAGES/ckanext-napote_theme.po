@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2017-12-19 13:42+0200\n"
+"PO-Revision-Date: 2018-02-09 15:32+0200\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #: ckanext/napote_theme/controller.py:70
 #, python-format
@@ -97,22 +97,22 @@ msgstr ""
 #: ckanext/napote_theme/plugin.py:305 ckanext/napote_theme/plugin.py:316
 #: ckanext/napote_theme/templates/package/read.html:9
 msgid "Transport Service Type"
-msgstr ""
+msgstr "Transport service type"
 
 #: ckanext/napote_theme/plugin.py:378
 msgid "Transport Service View"
-msgstr ""
+msgstr "Transport service view"
 
 #: ckanext/napote_theme/templates/footer.html:15
 #: ckanext/napote_theme/templates/header.html:113
 #: ckanext/napote_theme/templates/header.html:114
 msgid "Give feedback"
-msgstr ""
+msgstr "Give feedback"
 
 #: ckanext/napote_theme/templates/footer.html:16
 #: ckanext/napote_theme/templates/header.html:119
 msgid "NAP user guide label"
-msgstr ""
+msgstr "User guide"
 
 #: ckanext/napote_theme/templates/footer.html:24
 msgid ""
@@ -123,7 +123,7 @@ msgstr ""
 #: ckanext/napote_theme/templates/header.html:40
 #: ckanext/napote_theme/templates/header.html:41
 msgid "Home"
-msgstr ""
+msgstr "Front page"
 
 #: ckan/templates/group/read_base.html:17
 #: ckan/templates/group/snippets/info.html:36 ckan/templates/header.html:103
@@ -142,7 +142,7 @@ msgstr ""
 #: ckanext/napote_theme/templates/header.html:45
 #: ckanext/napote_theme/templates/header.html:46
 msgid "Datasets"
-msgstr ""
+msgstr "Transport service catalog"
 
 #: ckan/controllers/group.py:305 ckan/controllers/home.py:61
 #: ckan/controllers/package.py:240 ckan/lib/helpers.py:833
@@ -158,18 +158,18 @@ msgstr ""
 #: ckanext/napote_theme/templates/header.html:54
 #: ckanext/napote_theme/templates/user/list.html:18
 msgid "Organizations"
-msgstr ""
+msgstr "Transport operators"
 
 #: ckanext/napote_theme/templates/header.html:60
 #: ckanext/napote_theme/templates/header.html:61
 msgid "My services"
-msgstr ""
+msgstr "Own transport services"
 
 #: ckanext/napote_theme/templates/header.html:80
 #: ckanext/napote_theme/templates/header.html:107
 #: ckanext/napote_theme/templates/header.html:108
 msgid "View profile"
-msgstr ""
+msgstr "Edit user account"
 
 #: ckanext/napote_theme/templates/header.html:90
 msgid "Sysadmin settings"
@@ -226,35 +226,75 @@ msgstr ""
 #: ckanext/napote_theme/templates/home/layout1.html:6
 #, python-format
 msgid "User greeting %(user)s"
-msgstr ""
+msgstr "Hello %(user)s"
 
 #: ckanext/napote_theme/templates/home/layout1.html:20
 msgid "NAP home page organizations infobox"
 msgstr ""
+"To publish transport service data, your user account must be associated with "
+"some transport operator.\n"
+"You can 1) create a new transport operator into NAP-system or 2) ask some "
+"existing transport operator administrator to give your personal account "
+"access to the transport operator data.<br />\n"
+"You can do these things in the  <a href=\"/ote/#/own-services\"><b>Own "
+"transport services</b></a>-page. \n"
+"<br /><br />\n"
+"The term \"transport operator\" means, for example, a community or a company "
+"you represent."
 
 #: ckanext/napote_theme/templates/home/layout1.html:44
 msgid "To digitize and publish services login is required"
-msgstr ""
+msgstr "To digitize and publish a transport service login is required."
 
 #: ckanext/napote_theme/templates/home/layout1.html:57
 msgid "New user"
-msgstr ""
+msgstr "New user"
 
 #: ckanext/napote_theme/templates/home/snippets/header.html:7
 msgid "NAP home page hero text"
-msgstr ""
+msgstr "Transport service catalog."
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:9
 msgid "NAP home page publishing services info text"
 msgstr ""
+"<h2>How to publish your own service information?</h2>\n"
+"You can easily save, publish and update your essential service information "
+"at  <a href=\"/ote/index.html#/own-services\">Own transport services</a>-"
+"page."
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:12
 msgid "Heading/NAP home page intro heading"
-msgstr ""
+msgstr "What is NAP?"
 
 #: ckanext/napote_theme/templates/home/snippets/promoted.html:15
 msgid "NAP home page info text"
 msgstr ""
+"NAP transport service catalog is an open national access point (National "
+"Access Point, NAP), in where <b>transport operators</b> must deliver "
+"information about their digital <b>essential</b> machine readable "
+"interfaces.\n"
+"NAP-service is an important part of bigger picture, which aims to create, as "
+"much as possible, new and easily utilizable combined transport services and "
+"info services.\n"
+"\n"
+" <h2>What is a transport service?</h2>\n"
+"A transport service can be: <br />\n"
+"1) a personnel transport service (e.g. taxi or bus transportation)<br />\n"
+"2) a stop, a port or a terminal<br />\n"
+"3) a parking facility<br />\n"
+"4) a vehicle rental service or a commercial vehicle sharing service<br />\n"
+"5) a proxy service<br />\n"
+"<br />\n"
+"<h2>What is essential information?</h2>\n"
+"Essential information is for example a service area, routes, time tables, "
+"prices and accessibility information. NAP-service is not meant for end users "
+"or travelers, it is for transport operators and developers.\n"
+"<br />\n"
+"<h2>NAP-service site map</h2>\n"
+"At <a href=\"/ote/#/services\">Transport service catalog</a>-page you can "
+"browse and search for new published machine readable interfaces.<br />\n"
+"At <a href=\"/ote/#/operators\">Transport operators</a>-page you can find "
+"all the organizations registed in the service."
 
 #: ckanext/napote_theme/templates/organization/edit_base.html:10
 msgid "Edit"
@@ -277,7 +317,7 @@ msgstr ""
 #: ckanext/napote_theme/templates/organization/snippets/help.html:4
 #: ckanext/napote_theme/templates/organization/snippets/helper.html:4
 msgid "HEADING/What are service providers?"
-msgstr ""
+msgstr "What are transport operators?"
 
 #: ckanext/napote_theme/templates/organization/snippets/help.html:7
 msgid "Service providers info text"
@@ -286,6 +326,21 @@ msgstr ""
 #: ckanext/napote_theme/templates/organization/snippets/helper.html:8
 msgid "Service providers short info text"
 msgstr ""
+"Palveluntuottajia ovat yritykset, yhteisöt ja organisaatiot, joiden "
+"palvelutarjontaan kuuluu jotain seuraavista: <br /><br />1) henkilöiden "
+"kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)<br />2) asemia, "
+"satamia ja terminaaleja<br />3) pysäköintilaitoksia<br />4) "
+"liikennevälineiden vuokrauspalveluita ja kaupallisia "
+"yhteistyökäyttöpalveluita<br />5) välityspalveluita<br />\n"
+"\n"
+"Transport operators are for examples companies, communities and "
+"organizations who provide some of the following services:\n"
+"<br /><br />\n"
+"1) Personne transport services (e.g. taxi and bus traffic)<br />2) stops, "
+"ports and terminals <br />\n"
+"3) parking facilities<br />4)vehicle rental services and commercial shared "
+"vehicle usage services<br />\n"
+"5) proxy services<br />"
 
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:6
 msgid "Name"
@@ -295,6 +350,8 @@ msgstr ""
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:6
 msgid "My Organization"
 msgstr ""
+"Write here your transport operator name (company, official or other "
+"community)"
 
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:16
 msgid "Description"
@@ -303,18 +360,18 @@ msgstr ""
 #: ckan/templates/organization/snippets/organization_form.html:20
 #: ckanext/napote_theme/templates/organization/snippets/organization_form.html:16
 msgid "A little information about my organization..."
-msgstr ""
+msgstr "Write here a description of the transport operator..."
 
 #: ckanext/napote_theme/templates/package/read.html:15
 msgid "Operation Areas"
-msgstr ""
+msgstr "Operation areas"
 
 #: ckan/logic/converters.py:146 ckan/logic/validators.py:149
 #: ckan/logic/validators.py:191 ckan/templates/package/read_base.html:19
 #: ckanext/napote_theme/templates/package/read_base.html:9
 #: ckanext/stats/templates/ckanext/stats/index.html:89
 msgid "Dataset"
-msgstr ""
+msgstr "Service"
 
 #: ckanext/napote_theme/templates/package/read_base.html:11
 msgid "Activity Stream"
@@ -330,7 +387,7 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/package/resource_read.html:12
 msgid "Go to resource"
-msgstr ""
+msgstr "Go to interface view"
 
 #: ckanext/napote_theme/templates/package/resource_read.html:14
 msgid "Download"
@@ -339,15 +396,15 @@ msgstr ""
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:5
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:6
 msgid "Service Type"
-msgstr ""
+msgstr "Type of service "
 
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:11
 msgid "Operation Area"
-msgstr ""
+msgstr "Operation area"
 
 #: ckanext/napote_theme/templates/package/snippets/package_basic_fields.html:12
 msgid "Operation area"
-msgstr ""
+msgstr "Operation area"
 
 #: ckanext/napote_theme/templates/package/snippets/package_form.html:5
 msgid "License disclaimer for service"
@@ -405,7 +462,7 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/package/snippets/resource_view.html:26
 msgid "Download resource"
-msgstr ""
+msgstr "Download interface description"
 
 #: ckanext/napote_theme/templates/package/snippets/resource_view.html:49
 msgid "Your browser does not support iframes."
@@ -413,7 +470,7 @@ msgstr ""
 
 #: ckanext/napote_theme/templates/package/snippets/resource_view.html:56
 msgid "Embed resource view"
-msgstr ""
+msgstr "Embed interface view"
 
 #: ckanext/napote_theme/templates/package/snippets/resource_view.html:59
 msgid ""
@@ -445,14 +502,14 @@ msgstr ""
 #: ckan/templates/user/dashboard_datasets.html:12
 #: ckanext/napote_theme/templates/user/dashboard.html:9
 msgid "My Datasets"
-msgstr ""
+msgstr "Own transport services"
 
 #: ckan/templates/user/dashboard.html:21
 #: ckan/templates/user/dashboard_organizations.html:12
 #: ckanext/napote_theme/templates/user/dashboard.html:10
 #: ckanext/napote_theme/templates/user/dashboard_organizations.html:6
 msgid "My Organizations"
-msgstr ""
+msgstr "Transport operators represented by me"
 
 #: ckanext/napote_theme/templates/user/dashboard.html:11
 msgid "News feed"
@@ -461,7 +518,7 @@ msgstr ""
 #: ckan/templates/user/dashboard_organizations.html:21
 #: ckanext/napote_theme/templates/user/dashboard_organizations.html:15
 msgid "You are not a member of any organizations."
-msgstr ""
+msgstr "You are not a member of any transport operator."
 
 #: ckanext/napote_theme/templates/user/dashboard_organizations.html:18
 #: ckanext/napote_theme/templates/user/dashboard_organizations.html:19
@@ -475,6 +532,12 @@ msgstr ""
 #: ckanext/napote_theme/templates/user/new.html:9
 msgid "why sign up info text"
 msgstr ""
+"You'll have to create a personal account to create and publish transport "
+"services and related machine readable interfaces.<br />\n"
+"Do not create a new account for NAP if you are not a transport operator, but "
+"a utilizer of the NAP data.  In that case, go directly in the Service "
+"Catalog\n"
+"<hr/>If you have already registered, log in at here."
 
 #: ckanext/napote_theme/templates/user/new.html:10
 #: ckanext/napote_theme/templates/user/snippets/login_form.html:28
@@ -488,7 +551,7 @@ msgstr ""
 #: ckanext/napote_theme/templates/user/request_reset.html:10
 #: ckanext/napote_theme/templates/user/snippets/login_form.html:20
 msgid "Username or email"
-msgstr ""
+msgstr "Username or email"
 
 #: ckanext/napote_theme/templates/user/request_reset.html:13
 msgid "Request reset"
@@ -507,36 +570,36 @@ msgstr ""
 # # Datasets
 #: ckan/templates/package/snippets/resources_list.html:13
 msgid "Data and Resources"
-msgstr ""
+msgstr "Interfaces"
 
 #: ckan/templates/package/base_form_page.html:22
 msgid "What are datasets?"
-msgstr ""
+msgstr "What are services?"
 
 #: ckan/templates/package/edit_base.html:16
 msgid "View dataset"
-msgstr ""
+msgstr "View service"
 
 #: ckan/templates/snippets/license.html:28
 msgid "This dataset satisfies the Open Definition."
-msgstr ""
+msgstr "This service satisfies the Open Definition."
 
 #: ckan/templates/snippets/package_item.html:57
 msgid "This dataset has no description"
-msgstr ""
+msgstr "This service has no description"
 
 #: ckan/templates/home/snippets/stats.html:11
 msgid "dataset"
-msgstr ""
+msgstr "service"
 
 #: ckan/templates/home/snippets/stats.html:11
 msgid "datasets"
-msgstr ""
+msgstr "service catalog"
 
 #: ckan/controllers/revision.py:110
 #, python-format
 msgid "Datasets affected: %s.\n"
-msgstr ""
+msgstr "Services affected: %s\n"
 
 #: ckan/templates/group/snippets/group_item.html:32
 #: ckan/templates/organization/snippets/organization_item.html:31
@@ -544,15 +607,15 @@ msgstr ""
 #: ckanext/example_theme_docs/v11_HTML_and_CSS/templates/snippets/example_theme_most_popular_groups.html:22
 msgid "{num} Dataset"
 msgid_plural "{num} Datasets"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} service"
+msgstr[1] "{num} services"
 
 #: ckan/templates/group/snippets/group_item.html:34
 #: ckan/templates/organization/snippets/organization_item.html:33
 #: ckanext/example_theme_docs/v10_custom_snippet/templates/snippets/example_theme_most_popular_groups.html:25
 #: ckanext/example_theme_docs/v11_HTML_and_CSS/templates/snippets/example_theme_most_popular_groups.html:24
 msgid "0 Datasets"
-msgstr ""
+msgstr "0 services"
 
 #: ckan/templates/header.html:116
 msgid "Search Datasets"
@@ -608,7 +671,7 @@ msgstr ""
 
 #: ckan/controllers/package.py:444
 msgid "CKAN Dataset Revision History"
-msgstr ""
+msgstr "NAP Service Revision History"
 
 #: ckan/controllers/package.py:447
 msgid "Recent changes to CKAN Dataset: "
@@ -616,11 +679,11 @@ msgstr ""
 
 #: ckan/controllers/package.py:503
 msgid "Unauthorized to create a package"
-msgstr ""
+msgstr "Unauthorized to create a service"
 
 #: ckan/controllers/package.py:644
 msgid "Unauthorized to update dataset"
-msgstr ""
+msgstr "Unauthorized to update service"
 
 #: ckan/controllers/package.py:646 ckan/controllers/package.py:683
 #: ckan/controllers/package.py:709
@@ -675,7 +738,7 @@ msgstr ""
 # # Resources
 #: ckan/logic/validators.py:200
 msgid "Resource"
-msgstr ""
+msgstr "Interface"
 
 #: ckan/lib/helpers.py:1403
 msgid "Edited resources."
@@ -697,7 +760,7 @@ msgstr ""
 
 #: ckan/lib/activity_streams.py:69
 msgid "{actor} updated the dataset {dataset}"
-msgstr ""
+msgstr "{actor} updated the service {dataset}"
 
 #: ckan/lib/activity_streams.py:72
 msgid "{actor} changed the extra {extra} of the dataset {dataset}"
@@ -705,11 +768,11 @@ msgstr ""
 
 #: ckan/lib/activity_streams.py:75
 msgid "{actor} updated the resource {resource} in the dataset {dataset}"
-msgstr ""
+msgstr "{actor} updated the interface {resource} in the service {dataset}"
 
 #: ckan/lib/activity_streams.py:87
 msgid "{actor} deleted the dataset {dataset}"
-msgstr ""
+msgstr "{actor} deleted the service {dataset}"
 
 #: ckan/lib/activity_streams.py:90
 msgid "{actor} deleted the extra {extra} from the dataset {dataset}"
@@ -717,11 +780,11 @@ msgstr ""
 
 #: ckan/lib/activity_streams.py:93
 msgid "{actor} deleted the resource {resource} from the dataset {dataset}"
-msgstr ""
+msgstr "{actor} deleted the interface {resource} from the service {dataset}"
 
 #: ckan/lib/activity_streams.py:103
 msgid "{actor} created the dataset {dataset}"
-msgstr ""
+msgstr "{actor} created the service {dataset}"
 
 #: ckan/lib/activity_streams.py:106
 msgid "{actor} added the extra {extra} to the dataset {dataset}"
@@ -729,7 +792,7 @@ msgstr ""
 
 #: ckan/lib/activity_streams.py:109
 msgid "{actor} added the resource {resource} to the dataset {dataset}"
-msgstr ""
+msgstr "{actor} added the interface {resource} to the service {dataset}"
 
 #: ckan/lib/activity_streams.py:115
 msgid "{actor} removed the tag {tag} from the dataset {dataset}"
@@ -741,65 +804,65 @@ msgstr ""
 
 #: ckan/lib/activity_streams.py:66
 msgid "{actor} updated the organization {organization}"
-msgstr ""
+msgstr "{actor} updated the transport operator {organization}"
 
 #: ckan/lib/activity_streams.py:84
 msgid "{actor} deleted the organization {organization}"
-msgstr ""
+msgstr "{actor} deleted the transport operator {organization}"
 
 #: ckan/lib/activity_streams.py:100
 msgid "{actor} created the organization {organization}"
-msgstr ""
+msgstr "{actor} created the transport operator {organization}"
 
 # # Organizations
 #: ckan/templates/package/snippets/package_basic_fields.html:70
 #: ckan/templates/snippets/organization.html:23
 msgid "Organization"
-msgstr ""
+msgstr "Transport operator"
 
 #: ckan/lib/mailer.py:127 ckan/templates/home/snippets/stats.html:17
 msgid "organization"
-msgstr ""
+msgstr "Transport operator"
 
 #: ckan/templates/home/snippets/stats.html:17
 msgid "organizations"
-msgstr ""
+msgstr "Transport operators"
 
 #: ckan/templates/package/snippets/package_basic_fields.html:74
 msgid "No organization"
-msgstr ""
+msgstr "No transport operators"
 
 #: ckan/templates/organization/snippets/organization_form.html:18
 msgid "my-organization"
-msgstr ""
+msgstr "My transport operators"
 
 #: ckan/templates/snippets/organization.html:48
 msgid "There is no description for this organization"
-msgstr ""
+msgstr "There is no description for this transport operator"
 
 #: ckan/templates/organization/base_form_page.html:5
 msgid "Organization Form"
-msgstr ""
+msgstr "Transport Operator Form"
 
 #: ckan/templates/organization/bulk_process.html:88
 msgid "This organization has no datasets associated to it"
-msgstr ""
+msgstr "This transport operator has no services associated to it"
 
 #: ckan/logic/validators.py:33 ckan/logic/validators.py:42
 msgid "An organization must be provided"
-msgstr ""
+msgstr "A transport operator must be provided"
 
 #: ckan/logic/validators.py:47
 msgid "Organization does not exist"
-msgstr ""
+msgstr "Transport operator does not exist"
 
 #: ckan/controllers/feed.py:244 ckan/logic/action/create.py:1396
 msgid "Organization not found"
-msgstr ""
+msgstr "Transport operator not found"
 
 #: ckan/controllers/group.py:620
 msgid "Organization has been deleted."
-msgstr ""
+msgstr "Transport operator has been deleted."
 
 #: ckan/logic/validators.py:52
 msgid "You cannot add a dataset to this organization"
@@ -818,11 +881,13 @@ msgstr ""
 msgid ""
 "Ask a system administrator to create an organization before you can continue."
 msgstr ""
+"Ask a system administrator to create a transport operator before you can "
+"continue."
 
 #: ckan/logic/auth/create.py:129
 #, python-format
 msgid "User %s not authorized to create organizations"
-msgstr ""
+msgstr "User %s not authorized to create transport operators"
 
 #: ckan/logic/auth/delete.py:103
 #, python-format
@@ -837,11 +902,11 @@ msgstr ""
 #: ckan/logic/auth/update.py:128
 #, python-format
 msgid "User %s not authorized to edit organization %s"
-msgstr ""
+msgstr "User %s not authorized to edit transport operator %s"
 
 #: ckan/logic/action/update.py:1059
 msgid "Organization was not found."
-msgstr ""
+msgstr "Transport operators was not found."
 
 #: ckan/templates/organization/confirm_delete.html:11
 msgid "Are you sure you want to delete organization - {name}?"
@@ -851,12 +916,12 @@ msgstr ""
 #: ckan/templates/organization/snippets/info.html:13
 #: ckan/templates/organization/snippets/info.html:16
 msgid "Edit Organization"
-msgstr ""
+msgstr "Edit transport operator"
 
 #: ckan/templates/organization/index.html:13
 #: ckan/templates/user/dashboard_organizations.html:7
 msgid "Add Organization"
-msgstr ""
+msgstr "Add transport operator"
 
 #: ckan/templates/organization/index.html:20
 msgid "Search organizations..."
@@ -871,27 +936,27 @@ msgstr ""
 #: ckan/templates/organization/new.html:7
 #: ckan/templates/organization/new.html:12
 msgid "Create an Organization"
-msgstr ""
+msgstr "Create a transport operator"
 
 #: ckan/templates/organization/new_organization_form.html:17
 msgid "Update Organization"
-msgstr ""
+msgstr "Update transport operator"
 
 #: ckan/templates/organization/new_organization_form.html:19
 msgid "Create Organization"
-msgstr ""
+msgstr "Create transport operator"
 
 #: ckan/templates/organization/snippets/organization_form.html:63
 msgid "Save Organization"
-msgstr ""
+msgstr "Save transport operator"
 
 #: ckan/templates/package/snippets/cannot_create_package.html:13
 msgid "Create a new organization"
-msgstr ""
+msgstr "Create a new transport operator"
 
 #: ckan/templates/organization/snippets/feeds.html:3
 msgid "Datasets in organization: {group}"
-msgstr ""
+msgstr "Service in transport operator: {group}"
 
 #: ckan/templates/organization/snippets/organization_form.html:60
 msgid ""
@@ -927,18 +992,24 @@ msgid ""
 "strong> Can view the organization's private datasets, but not add new "
 "datasets.</p> "
 msgstr ""
+" <p><strong>Admin:</strong> Can add/edit and delete services, as well as "
+"manage transport operator members.</p> <p><strong>Editor:</strong> Can add "
+"and edit services, but not manage transport operator members.</p> "
+"<p><strong>Member:</strong> Can view the transport operator's private "
+"services, but not add new services.</p> "
 
 #: ckan/templates/user/edit_user_form.html:10
 msgid "Full name"
-msgstr ""
+msgstr "Full name"
 
 #: ckan/templates/user/new_user_form.html:6
 msgid "Full Name"
-msgstr ""
+msgstr "Full name"
 
 #: ckan/logic/validators.py:343
 msgid ""
-"Must be purely lowercase alphanumeric (ascii) characters and these symbols: "
-"-_"
+"Must be purely lowercase alphanumeric (ascii) characters and these symbols: -"
+"_"
 msgstr ""
-
+"Allowed characters are small letters written together. Special symbols "
+"allowed are: - and _."
