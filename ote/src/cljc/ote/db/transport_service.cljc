@@ -144,4 +144,4 @@
   [:wheelchair])
 
 (def service-company-soure
-  [:FILE :CSV :URL])
+  [:file :csv :url])

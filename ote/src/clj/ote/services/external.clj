@@ -20,8 +20,7 @@
 
 (defn valid-business-id? [value]
   (let [pattern  #"\d{7}-\d"]
-  (if  (re-matches pattern value)
-    true false)))
+    (boolean (re-matches pattern value))))
 
 (defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
@@ -40,10 +39,9 @@
                              {::t-service/business-id business-id
                               ::t-service/name name})
                             (rest csv-data)))
-        validated-data (filter #(valid-business-id? (::t-service/business-id %)) parsed-data)
-        filtered-data  (map #(dissoc % :remove) validated-data )]
-    {:result filtered-data
-     :failed-count (- (count parsed-data) (count filtered-data))}))
+        validated-data (filter #(valid-business-id? (::t-service/business-id %)) parsed-data)]
+    {:result validated-data
+     :failed-count (- (count parsed-data) (count validated-data))}))
 
 (defn save-companies
   "Save business-ids, company names to db"
@@ -58,9 +56,8 @@
 (defn check-csv
   "Fetch csv file from given url, parse it and return status map that contains information about the count of companies
   in the file."
-  [db url-data]
+  [url-data]
   (let [url (ensure-url (get url-data :url))
-        transport-service-id (get url-data :ts-id)
         response @(httpkit/get url {:as :text
                                     :timeout 30000})]
     (if (= 200 (:status response))
@@ -96,8 +93,7 @@
   (routes
    (POST  "/check-company-csv" {url-data :body}
           (http/transit-response
-           (check-csv db
-            (http/transit-request url-data ))))
+           (check-csv (http/transit-request url-data ))))
    (POST  "/check-external-api" {url-data :body}
           (http/transit-response
            (check-external-api

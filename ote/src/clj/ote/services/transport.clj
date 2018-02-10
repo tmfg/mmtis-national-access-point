@@ -259,16 +259,14 @@
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
                             {::t-service/transport-service-id (::t-service/id transport-service)}))
-        companies (into [] (:companies (external/check-csv db {:url (get transport-service ::t-service/companies-csv-url)
-                                                                            :ts-id (get transport-service ::t-service/id)})))
+        companies (into [] (:companies (external/check-csv {:url (::t-service/companies-csv-url transport-service)})))
         new-data (if (empty? current-data)
                       {::t-service/companies            companies
-                       ::t-service/transport-service-id (get transport-service ::t-service/id)
+                       ::t-service/transport-service-id (::t-service/id transport-service)
                        ::t-service/source               "URL"}
                       (assoc current-data ::t-service/companies companies))]
 
-    (external/save-companies db new-data)
-  ))
+    (external/save-companies db new-data)))
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
@@ -281,8 +279,8 @@
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
-                         (dissoc ::t-service/external-interfaces)
-                         (dissoc ::t-service/service-company))
+                         (dissoc ::t-service/external-interfaces
+                                 ::t-service/service-company))
 
         resources-from-db (publish/fetch-transport-service-external-interfaces db (::t-service/id data))
         removed-resources (removable-resources resources-from-db external-interfaces)
