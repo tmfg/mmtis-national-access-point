@@ -23,7 +23,7 @@
 
 (defmethod transform ::t-service/maximum-stay [_ value]
   (when value
-    (time/interval->iso-8601-period value)))
+    (time/interval->iso-8601-period (time/pginterval->interval value))))
 
 (defmethod transform :default [_ value] value)
 

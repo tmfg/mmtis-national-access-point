@@ -11,7 +11,8 @@
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]
             [ote.db.generators :as generators]
-            [ote.integration.export.transform :as transform]))
+            [ote.integration.export.transform :as transform]
+            [ote.time :as time]))
 
 (use-fixtures :each
   (system-fixture
@@ -94,7 +95,7 @@
   50
   (prop/for-all
    [{:keys [years months days hours minutes seconds] :as maximum-stay} generators/gen-interval]
-   (let [transformed (transform/transform-deep {::t-service/maximum-stay maximum-stay})
+   (let [transformed (transform/transform-deep {::t-service/maximum-stay (time/->PGInterval maximum-stay)})
          parsed (org.joda.time.Period/parse (::t-service/maximum-stay transformed))]
      ;; Check that the ISO-8601 period strings we generate are parsed back by Joda library and
      ;; contain the same field values
