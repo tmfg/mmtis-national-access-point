@@ -109,7 +109,7 @@
           {:palette   {;; primary nav color - Also Focus color in text fields
                        :primary1-color (color :blue700)
 
-                       ;; Hint color in text fields
+                       ;; label, hint and disabled color in text fields
                        :disabledColor  (color :grey900)
 
                        ;; Main text color
@@ -119,6 +119,9 @@
            :button    {:labelColor "#fff"}
            ;; Change drop down list items selected color
            :menu-item {:selected-text-color (color :blue700)}
+
+           ;; Custom hint text color for all textfields
+           :textField {:hintColor "rgba(0, 0, 0, 0.25)"}
 
            ;; This determines the width of dialogs (12 * desktop-keyline-increment)
            ;; original value is 64
