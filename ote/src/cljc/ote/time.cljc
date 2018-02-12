@@ -174,6 +174,18 @@
              :minutes (Integer/parseInt m)
              :seconds (Double/parseDouble s)})))))))
 
+(defn interval->iso-8601-period [{:keys [years months days
+                                         hours minutes seconds]}]
+  (let [defined? #(and % (not (zero? %)))]
+    (str "P"
+         (when (defined? years) (str years "Y"))
+         (when (defined? months) (str months "Y"))
+         (when (defined? days) (str days "D"))
+         (when (some defined? [hours minutes seconds])
+           (str "T"
+                (when (defined? hours) (str hours "H"))
+                (when (defined? minutes) (str minutes "M"))
+                (when (defined? seconds) (str seconds "M")))))))
 
 #?(:clj
    (defn pgtimestamp->ckan-timestring
