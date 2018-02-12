@@ -174,6 +174,8 @@
              :minutes (Integer/parseInt m)
              :seconds (Double/parseDouble s)})))))))
 
+(def iso-8601-period-pattern #"^P(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?$")
+
 (defn interval->iso-8601-period [{:keys [years months days
                                          hours minutes seconds]}]
   (let [defined? #(and % (not (zero? %)))]
