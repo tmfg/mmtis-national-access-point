@@ -1,13 +1,18 @@
 (ns ote.integration.export.geojson-test
   (:require [ote.integration.export.geojson :as geojson]
             [clojure.test :as t :refer [use-fixtures deftest is testing]]
+            [clojure.test.check.clojure-test :refer [defspec]]
+            [clojure.test.check.properties :as prop]
             [ote.test :refer [system-fixture *ote* http-post http-get sql-execute!]]
             [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
             [ote.db.service-generators :as service-generators]
             [clojure.test.check.generators :as gen]
             [ote.db.transport-service :as t-service]
-            [ote.db.places :as places]))
+            [ote.db.places :as places]
+            [ote.db.generators :as generators]
+            [ote.integration.export.transform :as transform]
+            [ote.time :as time]))
 
 (use-fixtures :each
   (system-fixture
@@ -51,16 +56,8 @@
       (let [maximum-stay (get-in geojson [:features 0 :properties :transport-service
                                           :parking :maximum-stay])
             interval-fields (juxt :years :months :days :hours :minutes :seconds)]
-        (is (= (interval-value maximum-stay)
+        (is (= (interval-value (time/iso-8601-period->interval maximum-stay))
                (interval-value (get-in service [::t-service/parking ::t-service/maximum-stay]))))))))
-
-(def week-day-number {"MON" 0
-                      "TUE" 1
-                      "WED" 2
-                      "THU" 3
-                      "FRI" 4
-                      "SAT" 5
-                      "SUN" 6})
 
 (deftest service-hours-export
   (testing "Service hours are exported properly and weekdays are sorted"
@@ -81,7 +78,24 @@
                 (is (= (into #{} (map name) (::t-service/week-days generated-value))
                        (into #{} (:week-days geojson-value)))
                     "generated and exported have the same week days")
-                (is (apply <= (map week-day-number (:week-days geojson-value)))
+                (is (apply <= (map (comp t-service/week-day-order keyword) (:week-days geojson-value)))
                     "weekdays are in order (monday first, sunday last)"))
               generated-values
               geojson-values))))))
+
+(defspec maximum-stay-iso-8601-transform
+  50
+  (prop/for-all
+   [{:keys [years months days hours minutes seconds] :as maximum-stay} generators/gen-interval]
+   (let [transformed (transform/transform-deep {::t-service/maximum-stay (time/->PGInterval maximum-stay)})
+         parsed (org.joda.time.Period/parse (::t-service/maximum-stay transformed))]
+     ;; Check that the ISO-8601 period strings we generate are parsed back by Joda library and
+     ;; contain the same field values
+     (and
+      (= years (.getYears parsed))
+      (= months (.getMonths parsed))
+      (= days (.getDays parsed))
+      (= hours (.getHours parsed))
+      (= minutes (.getMinutes parsed))
+      ;; Joda period has separate field for milliseconds, so cast to int
+      (= (int seconds) (.getSeconds parsed))))))
