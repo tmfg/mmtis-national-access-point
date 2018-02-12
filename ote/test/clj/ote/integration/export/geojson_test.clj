@@ -2,7 +2,6 @@
   (:require [ote.integration.export.geojson :as geojson]
             [clojure.test :as t :refer [use-fixtures deftest is testing]]
             [ote.test :refer [system-fixture *ote* http-post http-get sql-execute!]]
-            [clojure.java.jdbc :as jdbc]
             [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
             [ote.db.service-generators :as service-generators]
@@ -26,7 +25,7 @@
   (is id "saved service has id")
   (is transport-operator-id "saved service has a transport-operator id")
   ;; Make it public so that GeoJSON export can return it
-  (jdbc/execute! (:db *ote*) ["UPDATE \"transport-service\" SET \"published?\" = true where id = ?" id])
+  (sql-execute! "UPDATE \"transport-service\" SET \"published?\" = true where id = " id)
   (let [geojson-url (str "export/geojson/" transport-operator-id "/" id)
         _ (println "URL: " geojson-url)
         json-response (http-get "admin" geojson-url)]
