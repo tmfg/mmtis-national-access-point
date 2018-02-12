@@ -94,6 +94,7 @@
 
 (def days [:ALL :MON :TUE :WED :THU :FRI :SAT :SUN])
 
+(def week-day-order {:MON 0 :TUE 1 :WED 2 :THU 3 :FRI 4 :SAT 5 :SUN 6})
 
 ;; Create order for accessibility-facility
 (def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
