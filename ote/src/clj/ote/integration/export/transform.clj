@@ -18,6 +18,9 @@
   (when value
     (time/format-date-iso-8601 value)))
 
+(defmethod transform ::t-service/week-days [_ value]
+  (vec (sort-by t-service/week-day-order value)))
+
 (defmethod transform :default [_ value] value)
 
 (defn transform-deep [data]
