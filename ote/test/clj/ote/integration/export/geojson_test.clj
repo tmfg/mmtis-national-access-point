@@ -56,7 +56,7 @@
       (let [maximum-stay (get-in geojson [:features 0 :properties :transport-service
                                           :parking :maximum-stay])
             interval-fields (juxt :years :months :days :hours :minutes :seconds)]
-        (is (= (interval-value maximum-stay)
+        (is (= (interval-value (time/iso-8601-period->interval maximum-stay))
                (interval-value (get-in service [::t-service/parking ::t-service/maximum-stay]))))))))
 
 (deftest service-hours-export
