@@ -36,16 +36,13 @@
 
 (defmethod transform-value "maximum-stay" [_ value]
   (when value
-    (let [[_ years months days _ hours minutes seconds] (re-matches time/iso-8601-period-pattern value)]
+    (let [interval (time/iso-8601-period->interval value)]
       (apply str
-             (for [[value tr-key] [[years "years"]
-                                   [months "months"]
-                                   [days "days"]
-                                   [hours "hours"]
-                                   [minutes "minutes"]
-                                   [seconds "seconds"]]]
-               (when value
-                 (str (subs value 0 (dec (count value))) " " (tr [:viewer tr-key]) " ")))))))
+             (for [key [:years :months :days
+                        :hours :minutes :seconds]
+                   :let [value (get interval key)]]
+               (when (and value (not (zero? value)))
+                 (str value " " (tr [:viewer (name key)]) " ")))))))
 
 (defn lang-name-for [lang]
   ;; Show unicode country flags for supported languages, otherwise show language code
