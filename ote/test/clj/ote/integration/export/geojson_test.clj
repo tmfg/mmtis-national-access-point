@@ -59,14 +59,6 @@
         (is (= (interval-value maximum-stay)
                (interval-value (get-in service [::t-service/parking ::t-service/maximum-stay]))))))))
 
-(def week-day-number {"MON" 0
-                      "TUE" 1
-                      "WED" 2
-                      "THU" 3
-                      "FRI" 4
-                      "SAT" 5
-                      "SUN" 6})
-
 (deftest service-hours-export
   (testing "Service hours are exported properly and weekdays are sorted"
     (doseq [[type path] [[:passenger-transportation [::t-service/passenger-transportation ::t-service/service-hours]]
@@ -86,7 +78,7 @@
                 (is (= (into #{} (map name) (::t-service/week-days generated-value))
                        (into #{} (:week-days geojson-value)))
                     "generated and exported have the same week days")
-                (is (apply <= (map week-day-number (:week-days geojson-value)))
+                (is (apply <= (map (comp t-service/week-day-order keyword) (:week-days geojson-value)))
                     "weekdays are in order (monday first, sunday last)"))
               generated-values
               geojson-values))))))
