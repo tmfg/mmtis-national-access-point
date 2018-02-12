@@ -13,7 +13,7 @@ describe('Operator search page basic tests', function () {
        cy.route('POST', '/ote/operators/list').as('getOperators');
        cy.visit('/ote/#/operators');
        cy.wait('@getOperators');
-       cy.get('.c_operator-list').find('.c_operator').should('have.length.above', 0)
+       cy.get('.operator-list').find('.operator').should('have.length.above', 0)
     });
 
     it('search and find operator', () => {
@@ -28,7 +28,7 @@ describe('Operator search page basic tests', function () {
         cy.wait('@getOperators');
 
         // Ensure that result is correct
-        cy.get('.c_operator-list').find('.c_operator').should('have.length.above', 0)
+        cy.get('.operator-list').find('.operator').should('have.length.above', 0)
     });
 
     it('search and dont find operator', () => {
@@ -56,13 +56,13 @@ describe('Operator search page modal tests', function () {
         cy.visit('/ote/#/operators');
         cy.wait('@getOperators');
 
-        // Find only one instance
+        // Give search term
         cy.get('input[id*="-Haenimelltainimenosalla-"]').as('operatorName');
         cy.get('@operatorName').type("Ajopalvelu");
-        cy.wait('@getOperators')
+        cy.wait('@getOperators');
 
         // Open Modal
-        cy.get('.c_operator-list').find('a[href="#"]').click();
+        cy.get('.operator-list').find('.operator').first().find('a[href="#"]').click();
         // Check business-id
         cy.contains('1234567-8');
 

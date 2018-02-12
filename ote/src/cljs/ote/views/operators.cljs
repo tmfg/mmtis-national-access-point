@@ -81,16 +81,16 @@
 
 
 (defn operators-list [e! operators]
-  [:div.row.c_operator-list
+  [:div.row.operator-list
    (doall
     (for [{::t-operator/keys [id name business-id homepage email
                               phone gsm visiting-address service-count
                               ckan-group] :as operator} operators]
       ^{:key (str "operator-" id)}
-      [:div {:class "col-md-6 c_operator" :style {:padding "10px 10px 0px 0px"}}
+      [:div {:class "col-md-6 operator" :style {:padding "10px 10px 0px 0px"}}
       [ui/paper {:z-depth 1
                  :style {:min-height "155px"}}
-       [:div.c_operator-header (stylefy/use-style style-service-search/operator-result-header)
+       [:div.operator-header (stylefy/use-style style-service-search/operator-result-header)
          [:a
           {:href "#"
            :on-click #(do (.preventDefault %)
@@ -101,10 +101,9 @@
           (if (< 120 (count (::t-operator/description ckan-group)))
             [:span (str (subs (::t-operator/description ckan-group) 0 120) "...")
               [:br]
-              [:a {:class "operator-link"
-                   :href "#/operators"
-                   :on-click #(do (.preventDefault %)
-                                  (e! (operators-controller/->OpenOperatorModal id)))}
+              [:a.operator-link {:href "#/operators"
+                                 :on-click #(do (.preventDefault %)
+                                            (e! (operators-controller/->OpenOperatorModal id)))}
                (tr [:operators :description-read-more])]]
             (::t-operator/description ckan-group))]
          (operator-modal e! operator)
