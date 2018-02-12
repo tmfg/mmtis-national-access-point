@@ -83,7 +83,7 @@
                 (is (= (into #{} (map name) (::t-service/week-days generated-value))
                        (into #{} (:week-days geojson-value)))
                     "generated and exported have the same week days")
-                (is (apply < (map week-day-number (:week-days geojson-value)))
+                (is (apply <= (map week-day-number (:week-days geojson-value)))
                     "weekdays are in order (monday first, sunday last)"))
               generated-values
               geojson-values))))))
