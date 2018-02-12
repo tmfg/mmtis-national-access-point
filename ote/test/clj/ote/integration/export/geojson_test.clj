@@ -27,7 +27,6 @@
   ;; Make it public so that GeoJSON export can return it
   (sql-execute! "UPDATE \"transport-service\" SET \"published?\" = true where id = " id)
   (let [geojson-url (str "export/geojson/" transport-operator-id "/" id)
-        _ (println "URL: " geojson-url)
         json-response (http-get "admin" geojson-url)]
     (is (= 200 (:status json-response)))
     (is (:json json-response))
