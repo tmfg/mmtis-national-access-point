@@ -68,7 +68,8 @@
   ["external_interface_search_result" ::external-interface-search-result]
   ["transport_service_search_result" ::transport-service-search-result
    ote.db.modification/modification-fields]
-  ["service_company" ::service-company])
+  ["service_company" ::service-company
+   ote.db.modification/modification-fields])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking])
