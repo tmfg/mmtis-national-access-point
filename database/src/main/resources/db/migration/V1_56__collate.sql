@@ -4,8 +4,8 @@
 -- just create a dummy with the fi_FI name
 CREATE FUNCTION create_fi_FI_collation () RETURNS VOID AS $$
 BEGIN
-  IF (SELECT COUNT(collname) FROM pg_collation WHERE collname='fi_FI') = 0 THEN
-    EXECUTE 'CREATE COLLATION fi_FI FROM ucs_basic';
+  IF (SELECT COUNT(collname) FROM pg_collation WHERE collname='fi_FI.utf8') = 0 THEN
+    EXECUTE 'CREATE COLLATION "fi_FI.utf8" FROM ucs_basic';
   END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -18,10 +18,10 @@ DROP FUNCTION create_fi_FI_collation ();
 DROP VIEW transport_service_search_result;
 
 ALTER TABLE "transport-operator"
-ALTER COLUMN name TYPE VARCHAR(200) COLLATE fi_FI;
+ALTER COLUMN name TYPE VARCHAR(200) COLLATE "fi_FI.utf8";
 
 ALTER TABLE "transport-service"
-ALTER COLUMN name TYPE VARCHAR(200) COLLATE fi_FI;
+ALTER COLUMN name TYPE VARCHAR(200) COLLATE "fi_FI.utf8";
 
 -- Recreate transport_service_search_result
 CREATE VIEW transport_service_search_result AS
