@@ -33,6 +33,20 @@
 (defmethod transform-value "homepage" [_ value] (linkify value value {:target "_blank"}))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
+
+(defmethod transform-value "maximum-stay" [_ value]
+  (when value
+    (let [[_ years months days _ hours minutes seconds] (re-matches time/iso-8601-period-pattern value)]
+      (apply str
+             (for [[value tr-key] [[years "years"]
+                                   [months "months"]
+                                   [days "days"]
+                                   [hours "hours"]
+                                   [minutes "minutes"]
+                                   [seconds "seconds"]]]
+               (when value
+                 (str (subs value 0 (dec (count value))) " " (tr [:viewer tr-key]) " ")))))))
+
 (defn lang-name-for [lang]
   ;; Show unicode country flags for supported languages, otherwise show language code
   (case lang
