@@ -22,11 +22,11 @@
   (let [angle (- (* 180.0 (/ percentage 100.0)) 90)
         cx 50
         cy 50
-        r 40]
+        r 40
+        [needle-x needle-y] (polar->cartesian cx cy (- r 5) angle)]
     [:svg {:width 100 :height 80}
      [arc cx cy r -90 90 "lightGray" 10]
      [arc cx cy r -90 angle "red" 5]
-     (let [[x y] (polar->cartesian cx cy (- r 5) angle)]
-       [:line {:x1 cx :y1 cy :x2 x :y2 y :style {:stroke "black" :stroke-width 2}}])
+     [:line {:x1 cx :y1 cy :x2 needle-x :y2 needle-y :style {:stroke "black" :stroke-width 2}}]
      [:text {:text-anchor "middle" :x cx :y (+ cy 20) :style {:font-size 20}}
       (str (.toFixed percentage 1) "%")]]))
