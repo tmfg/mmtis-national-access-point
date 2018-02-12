@@ -1,13 +1,17 @@
 (ns ote.integration.export.geojson-test
   (:require [ote.integration.export.geojson :as geojson]
             [clojure.test :as t :refer [use-fixtures deftest is testing]]
+            [clojure.test.check.clojure-test :refer [defspec]]
+            [clojure.test.check.properties :as prop]
             [ote.test :refer [system-fixture *ote* http-post http-get sql-execute!]]
             [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
             [ote.db.service-generators :as service-generators]
             [clojure.test.check.generators :as gen]
             [ote.db.transport-service :as t-service]
-            [ote.db.places :as places]))
+            [ote.db.places :as places]
+            [ote.db.generators :as generators]
+            [ote.integration.export.transform :as transform]))
 
 (use-fixtures :each
   (system-fixture
@@ -85,3 +89,20 @@
                     "weekdays are in order (monday first, sunday last)"))
               generated-values
               geojson-values))))))
+
+(defspec maximum-stay-iso-8601-transform
+  50
+  (prop/for-all
+   [{:keys [years months days hours minutes seconds] :as maximum-stay} generators/gen-interval]
+   (let [transformed (transform/transform-deep {::t-service/maximum-stay maximum-stay})
+         parsed (org.joda.time.Period/parse (::t-service/maximum-stay transformed))]
+     ;; Check that the ISO-8601 period strings we generate are parsed back by Joda library and
+     ;; contain the same field values
+     (and
+      (= years (.getYears parsed))
+      (= months (.getMonths parsed))
+      (= days (.getDays parsed))
+      (= hours (.getHours parsed))
+      (= minutes (.getMinutes parsed))
+      ;; Joda period has separate field for milliseconds, so cast to int
+      (= (int seconds) (.getSeconds parsed))))))

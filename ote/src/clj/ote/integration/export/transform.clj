@@ -21,6 +21,10 @@
 (defmethod transform ::t-service/week-days [_ value]
   (vec (sort-by t-service/week-day-order value)))
 
+(defmethod transform ::t-service/maximum-stay [_ value]
+  (when value
+    (time/interval->iso-8601-period value)))
+
 (defmethod transform :default [_ value] value)
 
 (defn transform-deep [data]
