@@ -46,11 +46,7 @@
 (defn save-companies
   "Save business-ids, company names to db"
   [db data]
-   (let [data (if (nil? (::t-service/id data))
-               ;; Add created at the first time
-               (assoc data ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis)))
-               ;; And modified for the rest
-               (assoc data ::t-service/modified (java.sql.Timestamp. (System/currentTimeMillis))))]
+   (let [data (modification/with-modification-fields data ::t-service/id)]
     (specql/upsert! db ::t-service/service-company data)))
 
 (defn check-csv
