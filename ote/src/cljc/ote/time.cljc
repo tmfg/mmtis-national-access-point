@@ -111,18 +111,20 @@
 
 (defrecord Interval [years months days hours minutes seconds])
 
+(def empty-interval {:years 0
+                     :months 0
+                     :days 0
+                     :hours 0
+                     :minutes 0
+                     :seconds 0.0})
+
 (defn interval
   "Returns an interval of the given amount and unit.
   Example:
   `(interval 2 :hours)` returns an Interval record with
   hours set to 2 and all other fields set to zero."
   [amount unit]
-  (map->Interval (merge {:years 0
-                         :months 0
-                         :days 0
-                         :hours 0
-                         :minutes 0
-                         :seconds 0.0}
+  (map->Interval (merge empty-interval
                         {unit amount})))
 
 #?(:clj
@@ -174,7 +176,7 @@
              :minutes (Integer/parseInt m)
              :seconds (Double/parseDouble s)})))))))
 
-(def iso-8601-period-pattern #"^P(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?$")
+(def iso-8601-period-pattern #"^P(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$")
 
 (defn interval->iso-8601-period [{:keys [years months days
                                          hours minutes seconds]}]
@@ -188,6 +190,21 @@
                 (when (defined? hours) (str hours "H"))
                 (when (defined? minutes) (str minutes "M"))
                 (when (defined? seconds) (str seconds "M")))))))
+
+(defn iso-8601-period->interval [period]
+  (let [[_ years months days _ hours minutes seconds] (re-matches iso-8601-period-pattern period)]
+    (map->Interval
+     (merge empty-interval
+            (into {}
+                  (remove nil?)
+                  (for [[value key] [[years :years] [months :months] [days :days]
+                                     [hours :hours] [minutes :minutes] [seconds :seconds]]
+                        :let [value (when value
+                                      (subs value 0 (dec (count value))))]]
+                    (when value
+                      [key (if (= key :seconds)
+                             (#?(:clj Double/parseDouble :cljs js/parseFloat) value)
+                             (#?(:clj Integer/parseInt :cljs js/parseInt) value))])))))))
 
 #?(:clj
    (defn pgtimestamp->ckan-timestring
