@@ -106,7 +106,7 @@
      :columns 1}
 
     {:name ::t-operator/phone :type :string :regex ui-validation/phone-number-regex}
-    {:name ::t-operator/gsm :type :string}
+    {:name ::t-operator/gsm :type :string :regex ui-validation/phone-number-regex}
     {:name ::t-operator/email :type :string})])
 
 (defn- operator-form-options [e!]
