@@ -253,7 +253,7 @@
 
   :external-interfaces-payment-systems "Road and rail operators that have an electronic ticket/sales system must fill information about their machine readable interface to it."
   :external-interfaces-tooltips {:data-content "Select the type of information this machine readable interface provides. You can choose multiple options. If no selection is appropriate, choose \"other\" and fill in additional information."
-                                 :external-service-url "Direct URI to machine readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use. \nFormat: Select the data format. "
+                                 :external-service-url "Direct URI to machine readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use."
                                  :format "Select the data format. Choose all that apply. If the list does not have a format, you can add it by writing it in."
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
                                  :external-service-description "Specify additional information about the interface that may be useful for developers. You may add a web-address that contains further information."}

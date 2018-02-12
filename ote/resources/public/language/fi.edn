@@ -253,7 +253,7 @@
 
   :external-interfaces-payment-systems "Sellaisten tie- ja raideliikenteen toimijoiden, joilla on käytössään lippu- ja maksujärjestelmä, tulee lisäksi ilmoittaa tässä osiossa koneluettavan tilaus- ja kertalippurajapinnan tiedot."
   :external-interfaces-tooltips {:data-content "Valitse millaisia tietoja koneluettava rajapinta tarjoaa. Voit valita listalta useita vaihtoehtoja. Mikäli valintalistalta ei löydy sopivia vaihtoehtoja, valitse “muu” ja kerro tietosisällöistä “Lisätietoja”-kentässä."
-                                 :external-service-url "Ilmoita ensisijaisesti suora osoite koneluettavaan rajapintaan. Voit vaihtoehtoisesti ilmoittaa web-osoitteen, jossa kerrotaan tietoja rajapinnasta tai sen käytöstä.\nFormaatti: Valitse listalta tietosisällön formaatti. "
+                                 :external-service-url "Ilmoita ensisijaisesti suora osoite koneluettavaan rajapintaan. Voit vaihtoehtoisesti ilmoittaa web-osoitteen, jossa kerrotaan tietoja rajapinnasta tai sen käytöstä."
                                  :format "Valitse listalta tietosisällön formaatti. Mikäli rajapintasi välittää tietoa useassa formaatissa, valitse listalta kaikki oleelliset vaihtoehdot. Jos listalla ei ole käyttämääsi formaattia, voit lisätä sen kirjoittamalla."
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
                                  :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille. Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
