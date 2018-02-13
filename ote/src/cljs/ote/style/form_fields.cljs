@@ -1,10 +1,6 @@
 (ns ote.style.form-fields
   (:require [stylefy.core :as stylefy]))
 
-(def localized-text-wrapper
-  ;; Push localized text field down for table-row-column top padding amount.
-  {:margin-top "15px"})
-
 (def localized-text-language-container
   {:height "20px"
    :font-size "12px"

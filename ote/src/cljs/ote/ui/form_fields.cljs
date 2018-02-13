@@ -165,8 +165,10 @@
           language @selected-language
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
-      [:div {:style (merge style-form-fields/localized-text-wrapper
-                           (when full-width? style-form/full-width))}
+      [:div {:style (merge
+                      ;; Push localized text field down for table-row-column top padding amount when in table column.
+                      (when table? {:margin-top "15px"})
+                      (when full-width? style-form/full-width))}
        [text-field
         (merge
           {:name name
