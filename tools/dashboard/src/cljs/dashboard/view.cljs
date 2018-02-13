@@ -5,14 +5,16 @@
   {:border "solid 1px black"
    :border-radius 5
    :margin 5
-   :padding 3})
+   :padding 3
+   :text-align "center"
+   :background-color "white"})
 
 (defn job-style [result]
   (merge radiator-item-style
          {:width 175 :height 50
           :background (case result
                         "FAILURE" "red"
-                        "SUCCESS" "green"
+                        "SUCCESS" "lightgreen"
                         "wheat")}))
 
 (defn jenkins-jobs [jobs]
