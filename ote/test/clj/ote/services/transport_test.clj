@@ -175,6 +175,12 @@
    [transport-service (s-generators/service-type-generator :parking)]
    (save-and-fetch-compare transport-service ::t-service/parking)))
 
+(defspec save-and-fetch-generated-rental-service
+  50
+  (prop/for-all
+   [transport-service (s-generators/service-type-generator :rentals)]
+    (save-and-fetch-compare transport-service ::t-service/rentals)))
+
 (deftest save-terminal-service-to-wrong-operator
   (let [generated-terminal-service (gen/generate s-generators/gen-terminal-service)
         modified-terminal-service (assoc generated-terminal-service ::t-service/transport-operator-id 2)
