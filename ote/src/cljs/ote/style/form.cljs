@@ -55,6 +55,5 @@
 (def help-text-element {:padding "0" :line-height "21px"})
 
 (def organization-padding {:padding-top "20px"})
-(def table-header-style {:overflow "visible" :vertical-align "center" :border-bottom "0px solid white" :color "black"})
 
 (def padding-top {:padding-top "20px"})
