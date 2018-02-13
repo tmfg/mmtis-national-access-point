@@ -73,6 +73,11 @@
       (if component component [:span " "])
    ])
 
+(defn shortened-description [desc max-length]
+  (if (< max-length (count desc))
+    [:span (str (subs desc 0 max-length) "...")]
+    [:span desc]))
+
 (defn table2 [& items]
   [:table
    [:tbody
