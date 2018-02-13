@@ -67,6 +67,8 @@
 
   ["external_interface_search_result" ::external-interface-search-result]
   ["transport_service_search_result" ::transport-service-search-result
+   ote.db.modification/modification-fields]
+  ["service_company" ::service-company
    ote.db.modification/modification-fields])
 
 ;; Create order for transport_type
@@ -94,6 +96,7 @@
 
 (def days [:ALL :MON :TUE :WED :THU :FRI :SAT :SUN])
 
+(def week-day-order {:MON 0 :TUE 1 :WED 2 :THU 3 :FRI 4 :SAT 5 :SUN 6})
 
 ;; Create order for accessibility-facility
 (def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
@@ -141,3 +144,6 @@
 
 (def rental-transportable-aid
   [:wheelchair])
+
+(def service-company-soure
+  [:file :csv :url])

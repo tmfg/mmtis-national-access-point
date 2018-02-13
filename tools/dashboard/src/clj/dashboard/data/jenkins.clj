@@ -16,4 +16,7 @@
       (throw (ex-info "Jenkins Call failed" {:url call-url
                                              :response response})))))
 (defn jobs []
-  (:jobs (jenkins-get "json?tree=jobs[name,lastBuild[result,number,duration,timestamp]]")))
+  (let [skip-jobs (or (:skip-jobs @config) #{})
+        job-filter (complement (comp skip-jobs :name))]
+    (filter job-filter
+            (:jobs (jenkins-get "json?tree=jobs[name,lastBuild[result,number,duration,timestamp]]")))))

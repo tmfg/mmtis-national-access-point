@@ -24,5 +24,5 @@
   (let [csv-file (io/reader "test/resources/testcsv.csv")
         data (csv/read-csv csv-file)
         csv-map (external-service/parse-response->csv data)
-        company-count (count csv-map)]
+        company-count (count (:result csv-map))]
     (is (= company-count 4))))

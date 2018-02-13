@@ -91,7 +91,8 @@
       (when dev-mode?
         [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
       [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
-      [:script {:type "text/javascript"} "goog.require('ote.main');"]]]))
+      (when dev-mode?
+        [:script {:type "text/javascript"} "goog.require('ote.main');"])]]))
 
 (defn index [dev-mode?]
   {:status 200
