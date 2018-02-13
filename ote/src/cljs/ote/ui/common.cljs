@@ -68,10 +68,9 @@
    as a parameter."
   [help-text help-link-text help-link component]
   [:div.help (stylefy/use-style style-base/help)
-      [:div (stylefy/use-style style-form/help-text-element) help-text]
-      [:div {:style {:margin-top "10px"}} (linkify help-link help-link-text {:target "_blank"}) ]
-      (when component component)
-   ])
+   [:div (stylefy/use-style style-form/help-text-element) help-text]
+   [:div {:style {:margin-top "10px"}} (linkify help-link help-link-text {:target "_blank"})]
+   component])
 
 (defn table2 [& items]
   [:table
