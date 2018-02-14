@@ -244,31 +244,35 @@
         [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
        [:li
         [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
+       [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
        [:li
         [language-selection e! style-base/language-selection-footer nil true]]]]]]])
 
 
 
-(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service})
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
-  [:div
+  [:div.login-form
    (when failed?
      [:div (stylefy/use-style style-base/error-element)
       (tr [:login :error error])])
    [form/form {:name->label (tr-key [:field-labels :login])
                :update! #(e! (login/->UpdateLoginCredentials %))
                :footer-fn (fn [data]
-                            [ui/raised-button {:primary true
-                                               :on-click #(e! (login/->Login))
-                                               :label (tr [:login :login-button])}])}
+                            [:span.login-dialog-footer
+                             [ui/raised-button {:primary true
+                                                :on-click #(e! (login/->Login))
+                                                :label (tr [:login :login-button])}]])}
     [(form/group
       {:label (tr [:login :label]) :expandable? false
        :columns 3}
       {:name :email
-       :type :string}
+       :type :string
+       :on-enter #(e! (login/->Login))}
       {:name :password
-       :type :string :password? true})]
+       :type :string :password? true
+       :on-enter #(e! (login/->Login))})]
     credentials]])
 
 (defn login-action-cards []

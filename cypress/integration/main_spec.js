@@ -1,3 +1,5 @@
+import { genNaughtyString } from '../support/generators';
+
 // Please read "Introduction to Cypress"
 // https://on.cypress.io/introduction-to-cypress
 
@@ -30,6 +32,45 @@ describe('NAP Main', function () {
     });
 });
 
+describe('OTE login dialog', () => {
+
+    beforeEach(() => {
+        cy.server();
+        cy.route('POST', '/ote/login').as('login');
+        cy.visit('/ote/#/services')
+    });
+
+    const login = (username, password, click) => {
+        cy.contains('Kirjaudu sisään').click();
+        cy.get('input[id*="email--Shkpostiosoite"]').type(username);
+        cy.get('input[id*="password--Salasana"]').type(password);
+
+        if (click) {
+            cy.get('.login-dialog-footer button').click();
+        }
+        cy.wait('@login');
+    };
+
+    it('should warn about unknown user', () => {
+        login(genNaughtyString(20), genNaughtyString(20), true);
+        cy.contains('Tuntematon käyttäjä');
+    });
+
+    it('should warn about wrong password', () => {
+        login(Cypress.env('NAP_LOGIN'), genNaughtyString(20), true);
+        cy.contains('Väärä salasana');
+    });
+
+    it('should login properly with correct credentials', () => {
+        login(Cypress.env('NAP_LOGIN'), Cypress.env('NAP_PASSWORD'), true);
+        cy.contains('Kirjauduit sisään onnistuneesti!');
+    });
+
+    it('should login by pressing enter', () => {
+        login(Cypress.env('NAP_LOGIN'), Cypress.env('NAP_PASSWORD') + '{enter}', false);
+        cy.contains('Kirjauduit sisään onnistuneesti!');
+    });
+});
 
 describe('Header - Logged Out', function () {
     it('CKAN should have proper header links', function () {
@@ -38,7 +79,7 @@ describe('Header - Logged Out', function () {
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
             cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/organization');
+            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/ote/#/operators');
             cy.contains('Kirjaudu sisään').should('have.attr', 'href').and('eq', '/user/login');
             cy.contains('Rekisteröidy').should('have.attr', 'href').and('eq', '/user/register');
             cy.contains('Käyttöohje');
@@ -76,12 +117,12 @@ describe('Header - Logged In', function () {
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
             cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/organization');
+            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/ote/#/operators');
             cy.contains('Omat palvelutiedot').should('have.attr', 'href').and('eq', '/ote/#/own-services');
             cy.contains('Käyttöohje');
 
             cy.get('.section-right').within($el => {
-                cy.contains('Test user');
+                cy.get('.authed');
 
                 // Dropdown menu links
                 cy.contains('Yhteenveto');

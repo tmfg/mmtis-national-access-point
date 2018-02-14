@@ -33,6 +33,17 @@
 (defmethod transform-value "homepage" [_ value] (linkify value value {:target "_blank"}))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
+
+(defmethod transform-value "maximum-stay" [_ value]
+  (when value
+    (let [interval (time/iso-8601-period->interval value)]
+      (apply str
+             (for [key [:years :months :days
+                        :hours :minutes :seconds]
+                   :let [value (get interval key)]]
+               (when (and value (not (zero? value)))
+                 (str value " " (tr [:viewer (name key)]) " ")))))))
+
 (defn lang-name-for [lang]
   ;; Show unicode country flags for supported languages, otherwise show language code
   (case lang

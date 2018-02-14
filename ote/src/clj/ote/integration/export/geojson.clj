@@ -67,7 +67,7 @@
                                                                ::t-service/id
                                                                ::t-service/transport-service-id)])
                   modification/modification-field-keys
-                  #{::t-service/id ::t-service/notice-external-interfaces? ::t-service/published?}))
+                  #{::t-service/id ::t-service/notice-external-interfaces? ::t-service/published? ::t-service/companies}))
 
 (defn- export-geojson [db transport-operator-id transport-service-id]
   (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})

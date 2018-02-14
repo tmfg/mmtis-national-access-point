@@ -11,7 +11,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.time :as time]))
 
-
+(def id-filter-type [:operators :services :ALL])
 (def published-types [:YES :NO :ALL])
 
 (defn user-listing [e! app]
@@ -48,6 +48,48 @@
               [ui/table-row-column name]
               [ui/table-row-column email]
               [ui/table-row-column groups]]))]]])]))
+
+(defn business-id-report [e! app]
+  (let [{:keys [loading? business-id-filter results]} (get-in app [:admin :business-id-report])]
+    [:div
+      [:div.row
+       [:h1 "Y-tunnus raportti"]
+       [:p "Listataan joko Palveluntuottajien y-tunnukset, palveluihin lisättyjen yritysten y-tunnukset tai molemmat."]]
+      [:div.row
+       [form-fields/field {:type :selection
+                           :label "Y-tunnuksen lähde"
+                           :options id-filter-type
+                           :show-option (tr-key [:admin-page :business-id-filter])
+                           :update! #(e! (admin-controller/->UpdateBusinessIdFilter %))}
+        business-id-filter]
+       [ui/raised-button {:primary true
+                          :disabled (str/blank? filter)
+                          :on-click #(e! (admin-controller/->GetBusinessIdReport))}
+        "Hae raportti"]]
+
+       (when loading?
+         [:div.row "Ladataan raporttia..."])
+
+       (if results
+         [:div.row
+          [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
+          [ui/table {:selectable false}
+           [ui/table-header {:adjust-for-checkbox false
+                             :display-select-all false}
+            [ui/table-row
+              [ui/table-header-column "Yritys"]
+              [ui/table-header-column "Y-tunnus"]
+              [ui/table-header-column "Puhelin"]
+              [ui/table-header-column "Sähköposti"]]]
+          [ui/table-body {:display-row-checkbox false}
+           (doall
+             (for [{:keys [operator business-id phone email]} results]
+               [ui/table-row {:selectable false}
+                [ui/table-row-column operator]
+                [ui/table-row-column business-id]
+                [ui/table-row-column phone]
+                [ui/table-row-column email]]))]]]
+         [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
   (let [{:keys [loading? results service-filter operator-filter published-filter]} (get-in app [:admin :service-listing])]
@@ -119,5 +161,7 @@
               :on-change #(e! (admin-controller/->ChangeAdminTab %))}
      [ui/tab {:label "Käyttäjät" :value "users"}
       [user-listing e! app]]
-     [ui/tab {:label "Palvelut" :value "serivces"}
-      [service-listing e! app]]]))
+     [ui/tab {:label "Palvelut" :value "services"}
+      [service-listing e! app]]
+     [ui/tab {:label "Y-tunnus raportti" :value "businessid"}
+      [business-id-report e! app]]]))

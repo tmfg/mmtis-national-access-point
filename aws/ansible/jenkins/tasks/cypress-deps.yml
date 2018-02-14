@@ -1,0 +1,23 @@
+- name: Add repository
+  yum_repository:
+    name: chrome
+    description: Google Chrome
+    baseurl: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+    gpgkey: https://dl-ssl.google.com/linux/linux_signing_key.pub
+    gpgcheck: yes
+
+- name: Install depencies
+  yum: name={{item}} state=installed
+  with_items:
+    - xorg-x11-server-Xvfb
+    - google-chrome
+    - gtk2
+    - libXtst
+    - GConf2
+    - alsa-lib
+    - freetype
+    - liberation-fonts-common
+    - liberation-mono-fonts
+    - liberation-narrow-fonts
+    - liberation-sans-fonts
+    - liberation-serif-fonts

@@ -20,7 +20,7 @@
   (let [service-count (::t-operator/service-count operator)
         operator-id (::t-operator/id operator)
         operator-name (::t-operator/name operator)]
-  [:p {:style {:font-weight "600" :font-size "14px"}}
+  [:span {:style {:font-weight "600" :font-size "14px"}}
    (if (zero? service-count)
      (tr [:operators :result-no-services])
      [:a
@@ -49,9 +49,9 @@
     (operator-row (tr [:field-labels ::t-operator/gsm]) (::t-operator/gsm operator))
     (operator-row (tr [:field-labels ::t-operator/email]) (::t-operator/email operator))
 
-    (operator-row (tr [:field-labels :ote.db.common/street]) (get-in operator [::t-operator/visiting-address :t-operator/street]))
-    (operator-row (tr [:field-labels :ote.db.common/postal_code]) (get-in operator [::t-operator/visiting-address :t-operator/postal_code]))
-    (operator-row (tr [:field-labels :ote.db.common/post_office]) (get-in operator [::t-operator/visiting-address :t-operator/post_office]))
+    (operator-row (tr [:field-labels :ote.db.common/street]) (get-in operator [::t-operator/visiting-address :ote.db.common/street]))
+    (operator-row (tr [:field-labels :ote.db.common/postal_code]) (get-in operator [::t-operator/visiting-address :ote.db.common/postal_code]))
+    (operator-row (tr [:field-labels :ote.db.common/post_office]) (get-in operator [::t-operator/visiting-address :ote.db.common/post_office]))
     (operator-row (tr [:field-labels ::t-operator/homepage]) (::t-operator/homepage operator))]
 
    [:div.row {:style {:padding-top "50px"}}
@@ -81,29 +81,29 @@
 
 
 (defn operators-list [e! operators]
-  [:div.row
+  [:div.row.operator-list
    (doall
     (for [{::t-operator/keys [id name business-id homepage email
                               phone gsm visiting-address service-count
                               ckan-group] :as operator} operators]
       ^{:key (str "operator-" id)}
-      [:div {:class "col-md-6" :style {:padding "10px 10px 0px 0px"}}
+      [:div {:class "col-md-6 operator" :style {:padding "10px 10px 0px 0px"}}
       [ui/paper {:z-depth 1
                  :style {:min-height "155px"}}
-       [:div (stylefy/use-style style-service-search/operator-result-header)
+       [:div.operator-header (stylefy/use-style style-service-search/operator-result-header)
          [:a
           {:href "#"
            :on-click #(do (.preventDefault %)
                           (e! (operators-controller/->OpenOperatorModal id)))}
-               [:p (stylefy/use-style  style-service-search/operator-result-header-link) name]]]
+               [:span (stylefy/use-style  style-service-search/operator-result-header-link) name]]]
         [:div (stylefy/use-style style-service-search/operator-description)
          [:div
           (if (< 120 (count (::t-operator/description ckan-group)))
-            [:p (str (subs (::t-operator/description ckan-group) 0 120) "...")
+            [:span (str (subs (::t-operator/description ckan-group) 0 120) "...")
               [:br]
-              [:a {:href "#/operators"
-                   :on-click #(do (.preventDefault %)
-                                  (e! (operators-controller/->OpenOperatorModal id)))}
+              [:a.operator-link {:href "#/operators"
+                                 :on-click #(do (.preventDefault %)
+                                            (e! (operators-controller/->OpenOperatorModal id)))}
                (tr [:operators :description-read-more])]]
             (::t-operator/description ckan-group))]
          (operator-modal e! operator)
@@ -114,7 +114,7 @@
   (e! (operators-controller/->Init))
   (fn [e! {operators :operators :as app}]
     [:div.operators
-     [:h3 (tr [:operators :title])]
+     [:h1 (tr [:operators :title])]
      [:div.row.form-field {:class "col-xs-12 col-md-6"}
       [form-fields/field {:type :string
 

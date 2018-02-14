@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Dashboard</title>
+
+    <style>
+
+      body {
+      background-color: #182c41;
+      color: black;
+
+      }
+      div.highlight {
+        animation-name: highlight-animation;
+        animation-duration: 1s;
+      }
+
+      @keyframes highlight-animation {
+          0% { color: black; font-size: 250%; }
+         50% { color: green; font-size: 300%; }
+        100% { color: black; font-size: 250%; }
+      }
+    </style>
+  </head>
+ <body onload="dashboard.main.main();">
+   <div id="dashboard-app"></div>
+
+   <script src="js/out/goog/base.js" type="text/javascript"></script>
+   <script src="js/dashboard.js" type="text/javascript"></script>
+   <script type="text/javascript">goog.require("dashboard.main");</script>
+ </body>
+  </body>
+</head>

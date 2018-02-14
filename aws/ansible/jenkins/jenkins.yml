@@ -4,6 +4,7 @@
   tasks:
     - include: tasks/java8.yml
     - include: tasks/leiningen.yml
+    - include: tasks/cypress-deps.yml
 
 
 - hosts: jenkins
@@ -17,6 +18,9 @@
       - ansible
       - envinject
       - parameterized-trigger
+      - nodejs
+      - toolenv
+      - xvfb
     solita_jenkins_security_realm: jenkins
     solita_jenkins_users:
       - tatut

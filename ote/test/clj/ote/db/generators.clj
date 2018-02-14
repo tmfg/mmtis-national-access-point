@@ -12,11 +12,19 @@
             [ote.time :as time]
             [clojure.string :as str]))
 
+(defn load-edn [path]
+  (-> (slurp path)
+      read-string))
+
 (defn string-of-max-length [len generator]
   (gen/fmap #(if (> (count %) len)
                (subs % 0 len)
                %)
             generator))
+
+(def gen-naughty-string
+  (let [strings (load-edn "test/resources/naughty_strings.edn")]
+    (gen/elements strings)))
 
 (def gen-name gen/string-alphanumeric)
 

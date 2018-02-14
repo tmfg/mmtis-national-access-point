@@ -19,6 +19,19 @@
 
 (def form-group-container {:padding-bottom "1em"})
 
+(def form-card {:background-color "#fff"
+                      :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
+
+(def form-card-label {:padding "15px 15px"
+                       :font-size "1.125em"
+                       :font-weight "bold"
+                       :color "#fff"
+                       :background-color "#00A9DF"})
+
+(def form-card-body {:padding "15px 15px"
+                     :font-size "1em"
+                     :color "#000"})
+
 (def form-info-text {:display "inline-block"
                      :position "relative"
                      :top "-0.5em"})
@@ -39,9 +52,8 @@
                    :padding-right "20px"})
 
 (def help-icon-element {:padding "0px 0px 0px 10px"})
-(def help-text-element {:padding "5px 5px 5px 10px"})
+(def help-text-element {:padding "0" :line-height "21px"})
 
 (def organization-padding {:padding-top "20px"})
-(def table-header-style {:overflow "visible" :vertical-align "center" :border-bottom "0px solid white" :color "black"})
 
 (def padding-top {:padding-top "20px"})
