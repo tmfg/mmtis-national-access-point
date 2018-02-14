@@ -152,8 +152,8 @@
    :ote.db.transport-service/additional-service-type   "Service"
    :ote.db.transport-service/additional-service-price  "Price (€)"
    :ote.db.transport-service/additional-service-unit   "Unit (f.e day, €/km, €/mile)"
-   :rentals-pricing-info                               "Fill in specified price information."}
-
+   :rentals-pricing-info                               "Fill in specified price information."
+   :ote.db.transport-service/vehicle-price-url         "Vehicle and price info WWW address"}
 
   ;; Parking fields
   :parking
@@ -403,7 +403,7 @@
   {:wheelchair "Wheelchair"
    :walking-stick "Walking stick"
    :assistance-dog "Place for an assistance dog"
-   :crutches "Kainalosauvat"
+   :crutches "Crutches"
    :walker "Walker"}
 
   :ote.db.transport-service/pick-up-type
@@ -709,6 +709,7 @@
           "pick-up-locations" "Pick-up and returning points"
           "rental-additional-services" "Additional services"
           "usage-area" "Usage area restrictions (country limitations)"
+          "vehicle-price-url" "Vehicle and price info WWW address"
           "vehicle-classes" "Rental vehicles"
 
           "additional-service-links" "Additional services"

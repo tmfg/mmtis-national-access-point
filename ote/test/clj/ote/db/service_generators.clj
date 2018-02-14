@@ -71,19 +71,47 @@
    ::t-service/service-hours generators/gen-service-hours-array
    ::t-service/pricing generators/gen-service-link))
 
+(def gen-rentals
+  (gen/hash-map
+   ::t-service/vehicle-classes generators/gen-vehicle-class-array
+   ::t-service/vehicle-price-url generators/gen-url
+   ::t-service/booking-service generators/gen-service-link
+   ::t-service/luggage-restrictions generators/gen-localized-text-array
+   ::t-service/payment-methods generators/gen-payment-methods
+   ::t-service/guaranteed-vehicle-accessibility (s/gen ::t-service/guaranteed-vehicle-accessibility)
+   ::t-service/limited-vehicle-accessibility (s/gen ::t-service/limited-vehicle-accessibility)
+   ::t-service/guaranteed-transportable-aid (s/gen ::t-service/guaranteed-transportable-aid)
+   ::t-service/limited-transportable-aid (s/gen ::t-service/limited-transportable-aid)
+   ::t-service/guaranteed-accessibility-description generators/gen-localized-text-array
+   ::t-service/limited-accessibility-description generators/gen-localized-text-array
+   ::t-service/accessibility-info-url generators/gen-url
+   ::t-service/rental-additional-services generators/gen-additional-services-array
+   ::t-service/usage-area (generators/word-of-length 5 50)
+   ::t-service/pick-up-locations generators/gen-pick-up-locations-array))
+
 (def gen-transport-service-common
   (gen/hash-map
    ::t-service/name generators/gen-name
+   ::t-service/description generators/gen-description
+   ::t-service/available-from generators/gen-available-from
+   ::t-service/available-to generators/gen-available-to
    ::t-service/transport-operator-id (gen/return 1)
    ::t-service/contact-address generators/gen-address
+   ::t-service/contact-email generators/gen-email
    ::t-service/contact-phone (s/gen ::t-service/contact-phone)
-   ::t-service/brokerage? (s/gen boolean?)))
+   ::t-service/homepage generators/gen-url
+   ::t-service/brokerage? (s/gen boolean?)
+   ::t-service/operation-area (gen/vector generators/gen-operation-area 0 2)
+   ::t-service/external-interfaces generators/gen-external-interfaces-array
+   ::t-service/notice-external-interfaces? (s/gen boolean?)
+   ))
 
 (defn service-type-generator [service-type]
   (gen/let [common gen-transport-service-common
             type-specific (case service-type
                             :passenger-transportation gen-passenger-transportation
-                            :parking gen-parking)
+                            :parking gen-parking
+                            :rentals gen-rentals)
             sub-type (if (= :passenger-transportation service-type)
                        (gen/elements t-service/passenger-transportation-sub-types)
                        (gen/return service-type))]
@@ -92,9 +120,11 @@
            ::t-service/sub-type sub-type
            (case service-type
              :passenger-transportation ::t-service/passenger-transportation
-             :parking ::t-service/parking) type-specific)))
+             :parking ::t-service/parking
+             :rentals ::t-service/rentals) type-specific)))
 
 (def gen-transport-service
   (gen/frequency
-   [[50 (service-type-generator :passenger-transportation)]
-    [50 (service-type-generator :parking)]]))
+   [[3 (service-type-generator :passenger-transportation)]
+    [3 (service-type-generator :parking)]
+    [3 (service-type-generator :rentals)]]))

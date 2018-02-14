@@ -60,11 +60,12 @@ describe('Operator search page - modal tests', function () {
         cy.get('input[id*="-Haenimelltainimenosalla-"]').as('operatorName');
         cy.get('@operatorName').type("Oy");
         cy.wait('@getOperators');
-
+        cy.wait(100);
+        
         // Open Modal
         cy.get('.operator :first').within(() => {
             cy.get('.operator-header > a').click();
-        } );
+        });
         // Check that modal contains something
         cy.contains('Palveluntuottajan nimi');
 
