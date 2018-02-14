@@ -59,6 +59,11 @@
        :on-request-close #(reset! open? false)}
       body]]))
 
+;; Full width gray generic help box
+(defn generic-help [help]
+  [:div.help (stylefy/use-style style-base/generic-help)
+   [:div (stylefy/use-style style-form/help-text-element) help]])
+
 (defn help [help]
   [:div.help (stylefy/use-style style-base/help)
    [:div (stylefy/use-style style-form/help-text-element) help]])

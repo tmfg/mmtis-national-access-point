@@ -556,11 +556,12 @@
 
 (defmethod field :checkbox [{:keys [update! table? label warning error style extended-help]} checked?]
   (if extended-help
-    [common/extended-help
-     (:help-text extended-help)
-     (:help-link-text extended-help)
-     (:help-link extended-help)
-     (checkbox-container update! table? label warning error style checked?)]
+    [:div {:style {:margin-right (str "-" (:margin-right style-form/form-field))}}
+     [common/extended-help
+      (:help-text extended-help)
+      (:help-link-text extended-help)
+      (:help-link extended-help)
+      (checkbox-container update! table? label warning error style checked?)]]
     (checkbox-container update! table? label warning error style checked?)))
 
 (defmethod field :checkbox-group [{:keys [update! table? label show-option options help]} data]

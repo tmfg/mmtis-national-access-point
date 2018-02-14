@@ -20,13 +20,13 @@
 (def form-group-container {:padding-bottom "1em"})
 
 (def form-card {:background-color "#fff"
-                      :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
+                :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
 (def form-card-label {:padding "15px 15px"
-                       :font-size "1.125em"
-                       :font-weight "bold"
-                       :color "#fff"
-                       :background-color "#00A9DF"})
+                      :font-size "1.125em"
+                      :font-weight "bold"
+                      :color "#fff"
+                      :background-color "#00A9DF"})
 
 (def form-card-body {:padding "15px 15px"
                      :font-size "1em"
