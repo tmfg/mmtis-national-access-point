@@ -403,7 +403,7 @@
   {:wheelchair "Wheelchair"
    :walking-stick "Walking stick"
    :assistance-dog "Place for an assistance dog"
-   :crutches "Kainalosauvat"
+   :crutches "Crutches"
    :walker "Walker"}
 
   :ote.db.transport-service/pick-up-type
