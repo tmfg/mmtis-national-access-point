@@ -74,6 +74,7 @@
 (def gen-rentals
   (gen/hash-map
    ::t-service/vehicle-classes generators/gen-vehicle-class-array
+   ::t-service/vehicle-price-url generators/gen-url
    ::t-service/booking-service generators/gen-service-link
    ::t-service/luggage-restrictions generators/gen-localized-text-array
    ::t-service/payment-methods generators/gen-payment-methods
