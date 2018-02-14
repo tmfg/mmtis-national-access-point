@@ -8,7 +8,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
             [ote.ui.form :as form]
-            [ote.ui.common :refer [scroll-sensor linkify]]
+            [ote.ui.common :as common-ui]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.service-search :as ss]
@@ -21,43 +21,40 @@
             [tuck.core :as tuck]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
-  [:span
-   [ui/icon-button {:href "#" :on-click #(do
-                                           (.preventDefault %)
-                                           (e! (admin/->DeleteTransportService id)))}
-    [ic/action-delete]]
+  [:div {:style {:color "#fff"}}
+   [ui/icon-button {:href     "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin/->DeleteTransportService id)))}
+    [ic/action-delete {:class-name (:class (stylefy/use-style style/delete-icon))
+                       :style      {:color "rgba(255, 255, 255, 0,75)"}}]]
    (when show-delete-modal?
      [ui/dialog
-      {:open true
-       :title (tr [:dialog :delete-transport-service :title])
+      {:open    true
+       :title   (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
                    [ui/flat-button
-                    {:label (tr [:buttons :cancel])
-                     :primary true
+                    {:label    (tr [:buttons :cancel])
+                     :primary  true
                      :on-click #(e! (admin/->CancelDeleteTransportService id))}])
                  (r/as-element
                    [ui/raised-button
-                    {:label (tr [:buttons :delete])
-                     :icon (ic/action-delete-forever)
+                    {:label     (tr [:buttons :delete])
+                     :icon      (ic/action-delete-forever)
                      :secondary true
-                     :primary true
-                     :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
-
+                     :primary   true
+                     :on-click  #(e! (admin/->ConfirmDeleteTransportService id))}])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 
-(defn data-items [& icons-and-items]
+(defn data-item [icon item]
   [:div (stylefy/use-style style/data-items)
-   (doall
-    (keep-indexed
-     (fn [i [icon item]]
-       (when item
-         ^{:key i}
-         [:div (stylefy/use-style style-base/item-list-row-margin)
-          [:div (stylefy/use-style style/icon-div) icon ]
-          [:div (stylefy/use-style style-base/item-list-item)
-           item]]))
-      (partition 2 icons-and-items)))])
+   [:div (stylefy/use-style style-base/item-list-row-margin)
+    (when (and icon item)
+      [:div (stylefy/use-style style/icon-div) icon])
+    (when item
+      [:div (stylefy/use-style style-base/item-list-item)
+       item])]])
 
 (defn- format-address [{::common/keys [street postal_code post_office]}]
   (let [comma (if (not (empty? street)) ", " " ")]
@@ -65,86 +62,89 @@
 
 (def external-interface-table-columns
   ;; [label width value-fn]
-  [[::t-service/external-service-url "21%"
-    (comp #(linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
-   [::t-service/data-content "21%" ::t-service/data-content]
-   [::t-service/format-short "16%" ::t-service/format]
-   [::t-service/license "21%" ::t-service/license]
-   [::t-service/external-service-description "21%"
+  [[:table-header-external-interface "10%"
+    (comp #(common-ui/linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
+   [::t-service/format-short "10%" ::t-service/format]
+   [::t-service/license "10%" ::t-service/license]
+   [::t-service/external-service-description "10%"
     (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
-  [:div
-   [:div.nap-interface
-    [:span.search-card-title (tr [:service-search :nap-interface])]
-    (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
-      [linkify url url {:target "_blank"}])]
-   (when-not (empty? external-interface-links)
-     [:span
-      [:br]
-      [:span.search-card-title (tr [:service-search :external-interfaces])
-       [:table
-        [:thead (stylefy/use-style style/external-interface-header)
-         [:tr
-          (doall
-           (for [[k w _] external-interface-table-columns]
-             ^{:key k}
-             [:th {:style {:width w}}
-              (tr [:field-labels :transport-service-common k])]))]]
-        [:tbody (stylefy/use-style style/external-interface-body)
-         (doall
-          (map-indexed
+  (when-not (empty? external-interface-links)
+    [:div
+     [:span.search-card-title (tr [:service-search :external-interfaces])]
+     [:table {:style {:margin-top "10px"}}
+      [:thead (stylefy/use-style style/external-interface-header)
+       [:tr
+        (doall
+          (for [[k w _] external-interface-table-columns]
+            ^{:key k}
+            [:th {:style {:width w :height "20px"}}
+             (tr [:field-labels :transport-service-common k])]))]]
+      [:tbody (stylefy/use-style style/external-interface-body)
+       (doall
+         (map-indexed
            (fn [i row]
              ^{:key i}
-             [:tr {:selectable false}
+             [:tr {:selectable false :style {:height "20px"}}
               (doall
-               (for [[k w value-fn] external-interface-table-columns]
-                 ^{:key k}
-                 [:td {:style {:width w :font-size "14px"}}
-                  (value-fn row)]))])
-           external-interface-links))]]]])])
+                (for [[k w value-fn] external-interface-table-columns]
+                  ^{:key k}
+                  [:td {:style {:width w :font-size "14px"}}
+                   (value-fn row)]))])
+           external-interface-links))]]]))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
-                                       operation-area-description contact-phone contact-email
+                                       operation-area-description description contact-phone contact-email
                                        operator-name ckan-resource-id transport-operator-id]
-                     :as service}]
-  (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])]
-    [ui/paper {:z-depth 1
-               :style style/result-card}
-     [:div.result-title (stylefy/use-style style/result-header)
-      [:a {:href "#"
-           :on-click #(do
-                        (.preventDefault %)
-                        (e! (ss/->ShowServiceGeoJSON
+                     :as              service}]
+  (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
+        e-links [external-interface-links e! service]
+        service-desc (t-service/localized-text-for "FI" description)]
+    [:div.result-card {:style (merge style/result-card {:margin-top "20px"})}
+
+     [:a {:style    {:color "#FFF"}
+          :href     "#"
+          :on-click #(do
+                       (.preventDefault %)
+                       (e! (ss/->ShowServiceGeoJSON
                              (str js/document.location.protocol "//" js/document.location.host
                                   "/ote/export/geojson/" transport-operator-id "/" id))))}
-       name]
-      [data-items
+      [:div.result-title (stylefy/use-style style/result-card-label) name
+       [:span.small-text {:style {:font-size "12px" :font-weight "20" :padding-left "20px"}}
+        (sub-type-tr sub-type)]]]
 
-       [ic/action-home {:style style/contact-icon}]
-       (format-address contact-address)
+     (when admin?
+       [:div {:style {:float "right" :position "relative" :top "-50px"}}
+        [delete-service-action e! id name (get service :show-delete-modal?)]])
 
-       [ic/communication-phone {:style style/contact-icon}]
-       contact-phone
 
-       [ic/communication-email {:style style/contact-icon}]
-       contact-email]
+     [:div.result-body (stylefy/use-style style/result-card-body)
+      (when-not (empty? service-desc)
+        [:div.description {:style style/result-border}
+         (common-ui/shortened-description service-desc 270)])
+      [:div.nap-interface {:style style/result-border}
+       [:span.search-card-title (tr [:service-search :nap-interface])]
+       (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
+         [common-ui/linkify url url {:target "_blank"}])]
 
-      (when admin?
-        [:div {:style {:float "right"}}
-         [delete-service-action e! id name (get service :show-delete-modal?)]])]
+      (when-not (empty? (::t-service/external-interface-links service))
+        [:div.result-interfaces {:style style/result-border}
+         e-links])
+      [:div
+       [data-item nil operator-name]
 
-     [:div.result-subtitle (stylefy/use-style style/subtitle)
-      [:div (stylefy/use-style style/subtitle-operator-first)
-       operator-name]
-      [:div (stylefy/use-style style/subtitle-operator)
-      (sub-type-tr sub-type)]]
+       [data-item [ic/action-home {:style style/contact-icon}]
+        (format-address contact-address)]
 
-     [:div.result-interfaces
-      [external-interface-links e! service]]]))
+       [data-item [ic/communication-phone {:style style/contact-icon}]
+        contact-phone]
 
+       [data-item [ic/communication-email {:style style/contact-icon}]
+        contact-email]
+       ]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count
@@ -172,7 +172,7 @@
      (if fetching-more?
        [:span (tr [:service-search :fetching-more])]
        (when (> filter-service-count (count results))
-         [scroll-sensor #(e! (ss/->FetchMore))]))]))
+         [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]))
 
 (defn result-chips [e! chip-results]
   (fn [e! chip-results]
