@@ -82,8 +82,8 @@
    ::t-service/limited-vehicle-accessibility (s/gen ::t-service/limited-vehicle-accessibility)
    ::t-service/guaranteed-transportable-aid (s/gen ::t-service/guaranteed-transportable-aid)
    ::t-service/limited-transportable-aid (s/gen ::t-service/limited-transportable-aid)
-   ::t-service/guaranteed-accessibility-description (s/gen ::t-service/guaranteed-accessibility-description)
-   ::t-service/limited-accessibility-description (s/gen ::t-service/limited-accessibility-description)
+   ::t-service/guaranteed-accessibility-description generators/gen-localized-text-array
+   ::t-service/limited-accessibility-description generators/gen-localized-text-array
    ::t-service/accessibility-info-url generators/gen-url
    ::t-service/rental-additional-services generators/gen-additional-services-array
    ::t-service/usage-area (generators/word-of-length 5 50)
@@ -101,7 +101,7 @@
    ::t-service/contact-phone (s/gen ::t-service/contact-phone)
    ::t-service/homepage generators/gen-url
    ::t-service/brokerage? (s/gen boolean?)
-   ;;::t-service/operation-area (gen/vector  generators/gen-operation-area 0 2)
+   ::t-service/operation-area (gen/vector generators/gen-operation-area 0 2)
    ::t-service/external-interfaces generators/gen-external-interfaces-array
    ::t-service/notice-external-interfaces? (s/gen boolean?)
    ))

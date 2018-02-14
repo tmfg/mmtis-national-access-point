@@ -155,7 +155,6 @@
         service (:transit response)
         fetch-response (http-get "admin"
                                  (str "transport-service/" (::t-service/id service)))
-
         fetched (:transit fetch-response)]
 
     (and (= (:status response) (:status fetch-response) 200)
