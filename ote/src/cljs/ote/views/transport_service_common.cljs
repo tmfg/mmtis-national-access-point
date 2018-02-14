@@ -91,7 +91,8 @@
            (tr [:form-help :external-interfaces-read-more :dialog-text])]]
          (when (= :passenger-transportation type)
            [:div {:style {:margin-top "20px"}}
-            [:b (tr [:form-help :external-interfaces-payment-systems])]])])
+            [:b (tr [:form-help :external-interfaces-payment-systems])]])]
+        {:type :generic})
 
       {:name ::t-service/external-interfaces
        :type :table

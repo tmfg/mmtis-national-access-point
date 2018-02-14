@@ -90,6 +90,13 @@
            :align-items "center"
            :white-space "pre-wrap"})
 
+;; Full width generic help box
+(def generic-help (merge help
+                         {:background-color "#F5F5F5" :padding "15px"
+                          :margin-left "-15px"
+                          :margin-right "-15px"
+                          :margin-top "-15px"}))
+
 (def filters-form
   {:border "solid 1px #0046ad"})
 
