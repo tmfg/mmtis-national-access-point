@@ -155,7 +155,6 @@
         service (:transit response)
         fetch-response (http-get "admin"
                                  (str "transport-service/" (::t-service/id service)))
-
         fetched (:transit fetch-response)]
 
     (and (= (:status response) (:status fetch-response) 200)
@@ -174,6 +173,12 @@
   (prop/for-all
    [transport-service (s-generators/service-type-generator :parking)]
    (save-and-fetch-compare transport-service ::t-service/parking)))
+
+(defspec save-and-fetch-generated-rental-service
+  50
+  (prop/for-all
+   [transport-service (s-generators/service-type-generator :rentals)]
+    (save-and-fetch-compare transport-service ::t-service/rentals)))
 
 (deftest save-terminal-service-to-wrong-operator
   (let [generated-terminal-service (gen/generate s-generators/gen-terminal-service)

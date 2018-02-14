@@ -7,6 +7,7 @@
             [clojure.spec.test.alpha :as stest]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.places :as places]
             [ote.db.common :as common]
             [ote.time :as time]
             [clojure.string :as str]))
@@ -28,6 +29,14 @@
 (def gen-name gen/string-alphanumeric)
 
 (def gen-us-letter (gen/elements "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+
+(defn string-of-length [min-length max-length]
+  (gen/let [len (gen/choose min-length max-length)]
+    (apply str (take len (repeatedly #(gen/generate gen/char-alpha-numeric))))))
+
+(defn word-of-length [min-length max-length]
+  (gen/let [len (gen/choose min-length max-length)]
+    (apply str (take len (repeatedly #(gen/generate gen-us-letter))))))
 
 (def gen-language
   (gen/let [one gen-us-letter
@@ -122,3 +131,75 @@
 
 (def gen-parking-capacity-array
   (gen/vector gen-parking-capacity 0 10))
+
+(def gen-description gen-localized-text-array)
+
+(def gen-available-from (s/gen ::t-service/available-from))
+
+(def gen-available-to (s/gen ::t-service/available-to))
+
+(def gen-rental-price-group
+  (gen/vector (gen/hash-map
+               ::t-service/unit (gen/elements price-units)
+               ::t-service/price-per-unit (gen/double*
+                                           {:min 0.0 :max 100000.0
+                                            :infinite? false
+                                            :NaN? false}))
+              0 5))
+
+(def gen-vehicle-class
+  (gen/hash-map
+   ::t-service/vehicle-type (string-of-max-length 20 gen/string-alphanumeric)
+   ::t-service/license-required (string-of-max-length 10 gen/string-alphanumeric)
+   ::t-service/minimum-age (gen/choose 0 200)
+   ::t-service/price-classes gen-rental-price-group))
+
+(def gen-vehicle-class-array
+  (gen/vector gen-vehicle-class 0 5))
+
+(def gen-email
+  (gen/let [user (string-of-length 1 15)
+            domain (string-of-length 1 15)
+            domain-end (word-of-length 2 3)]
+    (str user "@" domain "." domain-end)))
+
+(def gen-external-interfaces-class
+  (gen/hash-map
+   ::t-service/data-content (gen/vector (gen/elements t-service/interface-data-contents) 1 11)
+   ::t-service/external-interface (gen/hash-map
+                                   ::t-service/url gen-url
+                                   ::t-service/description gen-localized-text-array)
+   ::t-service/format (string-of-max-length 20 gen/string-alphanumeric)
+   ::t-service/license (string-of-max-length 20 gen/string-alphanumeric) ))
+
+(def gen-external-interfaces-array
+  (gen/vector gen-external-interfaces-class 0 5))
+
+(def gen-operation-area
+  (gen/frequency
+   [[2 (gen/return {::places/id "finnish-municipality-564"
+                    ::places/namefin "Oulu"
+                    ::places/type "finnish-municipality"})]
+    [1 (gen/return {::places/type "drawn"
+                    ::places/namefin "Toriportti"
+                    :geojson "{\"type\":\"Point\",\"coordinates\":[25.468116,65.012489]}"})]]))
+
+(def gen-additional-services
+  (gen/hash-map
+   ::t-service/additional-service-type (gen/elements t-service/additional-services)
+   ::t-service/additional-service-price (gen/hash-map ::t-service/price-per-unit (gen/choose 1 200)
+                                                      ::t-service/unit (string-of-length 1 10))))
+
+(def gen-additional-services-array
+  (gen/vector gen-additional-services 0 5))
+
+(def gen-pick-up-locations
+  (gen/hash-map
+   ::t-service/pick-up-name (string-of-length 5 15)
+   ::t-service/pick-up-type (gen/elements t-service/pick-up-types)
+   ::t-service/pick-up-address gen-address
+   ::t-service/service-hours (gen/vector gen-service-hours 0 5)
+   ::t-service/service-exceptions (gen/vector gen-service-exception 0 5)))
+
+(def gen-pick-up-locations-array
+  (gen/vector gen-pick-up-locations 0 5))
