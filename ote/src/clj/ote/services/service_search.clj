@@ -54,7 +54,7 @@
     (ids ::search/transport-service-id
          (specql/fetch db ::search/operation-area-facet
                        #{::search/transport-service-id}
-                       {::search/operation-area (op/in (map str/capitalize operation-area))}))))
+                       {::search/operation-area (op/in (map str/lower-case operation-area))}))))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
