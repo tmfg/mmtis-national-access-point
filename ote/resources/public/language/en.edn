@@ -237,7 +237,7 @@
   :external-interfaces-intro "If your service does not have machine readable interfaces leave this section empty and move to the next section."
   :external-interfaces-intro-rae "Fill in at least machine readable route and timetable information. If you do not have the means to produce machine readable route and timetable infromation, you can do so in FTA's "
   :external-interfaces "If your service does not have machine readable interfaces leave this section empty and move to the next section.\nMachine readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
-  :external-interfaces-read-more {:link "Read more about the machine readable interfaces in NAP catalog."
+  :external-interfaces-read-more {:link "Read more about machine readable interfaces in NAP catalog."
                                   :dialog-title "Machine readable interfaces in the NAP catalog"
                                   :dialog-text (:md
                                                 "## General\n"
