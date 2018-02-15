@@ -21,11 +21,15 @@
   [:div.jenkins-jobs {:style {:display "flex" :flex-direction "column" :justify-content "center"}}
    [:div "Jenkins build status"]
    (doall
-    (for [{:keys [name lastBuild] :as job} jobs]
+    (for [{:keys [name lastBuild lastSuccessfulBuild progress] :as job} jobs]
       ^{:key name}
       [:div {:style (job-style (:result lastBuild))}
        [:div name]
-       [:div (.toLocaleString (js/Date. (:timestamp lastBuild)))]]))])
+       (if progress
+         [:progress {:style {:width 150}
+                     :value progress
+                     :max 100}]
+         [:div (.toLocaleString (js/Date. (:timestamp lastBuild)))])]))])
 
 (defn published-services [service-count]
   ^{:key service-count} ;; needed to force new DOM node when data changes (to retrigger animation)
