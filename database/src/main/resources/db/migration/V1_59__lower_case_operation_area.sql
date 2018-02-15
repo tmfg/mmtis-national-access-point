@@ -12,7 +12,6 @@ BEGIN
     INSERT
       INTO "operation-area-facet"
            ("transport-service-id", "operation-area")
-	   --("transport-service-id", "operation-area")
     SELECT NEW.id, LOWER(oad.text)
       FROM operation_area oa
       JOIN LATERAL unnest(oa.description) AS oad ON TRUE
