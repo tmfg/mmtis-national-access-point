@@ -106,11 +106,14 @@
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (get-transport-services db {::t-service/transport-operator-id (op/in operator-ids)})]
-    (map (fn [{id ::t-operator/id :as operator}]
-           {:transport-operator       operator
-            :transport-service-vector (vec (filter #(= id (::t-service/transport-operator-id %)) operator-services))
-            :user                     (dissoc user :apikey :email :id)})
-    operators)))
+    {:user (dissoc user :apikey :email :id)
+     :transport-operators
+     (map (fn [{id ::t-operator/id :as operator}]
+            {:transport-operator operator
+             :transport-service-vector (into []
+                                             (filter #(= id (::t-service/transport-operator-id %)))
+                                             operator-services)})
+          operators)}))
 
 (defn get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (get-transport-operator db {::t-operator/ckan-group-id (:id ckan-group)})
