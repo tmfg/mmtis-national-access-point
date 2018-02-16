@@ -19,6 +19,11 @@
         (http/get {:as :text :headers {"X-TrackerToken" token}})
         deref :body (cheshire/decode keyword))))
 
+(defn- search [query]
+  (-> (pivotal-get "projects/" (project-id) "/search?query="
+                   (java.net.URLEncoder/encode query))
+      :stories :stories))
+
 (defn to-html [markdown-string]
   (let [p (.build (Parser/builder))
         document (.parse p markdown-string)
@@ -26,17 +31,12 @@
     (.render renderer document)))
 
 (defn fetch-sprint-themes []
-  (-> (pivotal-get "projects/" (project-id) "/search?query=label%3Asprintin-tavoitteet")
-      (get-in [:stories :stories 0 :description])
-      to-html))
-
-(def story-stats-query "state:started OR state:finished OR (state:delivered AND label:test)")
+  (-> (search  "label:sprintin-tavoitteet")
+      first :description to-html))
 
 (defn fetch-story-stats []
-  (let [issues (-> (pivotal-get "projects/" (project-id) "/search?query="
-                                (java.net.URLEncoder/encode story-stats-query))
-                   :stories :stories)
-        by-state (group-by :current_state issues)]
+  (let [stories (search "state:started OR state:finished OR (state:delivered AND label:test)")
+        by-state (group-by :current_state stories)]
     {:issues-in-implementation (count (by-state "started"))
      :issues-waiting-review (count (by-state "finished"))
      :issues-waiting-test (count (by-state "delivered"))}))
