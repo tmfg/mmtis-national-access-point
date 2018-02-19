@@ -80,8 +80,13 @@
    :external-interfaces-ok "Annettuun osoitteeseen saatiin yhteys"
 
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Lisätiedot"}
+   :ote.db.transport-service/service-hours-info "Lisätiedot"
 
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Ennakkovaraus"
+   :ote.db.transport-service/no-advance "Palvelun käyttöön ei liity ennakkovarausta."
+   :ote.db.transport-service/possible-advance "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
+   :ote.db.transport-service/mandatory-advance "Palvelun ennakkovaraus on pakollista."}
 
   ;; Service exception
   :service-exception
@@ -131,7 +136,6 @@
    :ote.db.transport-service/assistance-description "Avustuspalveluja koskeva kuvaus"
    :ote.db.transport-service/assistance-place-description "Avustuspalvelujen sijaintien kuvaus"
    :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."}
-
 
   ;; Rental fields
   :rentals
@@ -276,8 +280,10 @@
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
-  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."}
+  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
+  :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
+   }
 
  ;; CSV parsing
  :csv

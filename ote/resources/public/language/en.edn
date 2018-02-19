@@ -78,10 +78,14 @@
    :external-interfaces-warning "Connection to address failed"
    :external-interfaces-ok "Connecting to address succeeded"
 
-
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Additional information"}
+   :ote.db.transport-service/service-hours-info "Additional information"
 
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Advance reservation"
+   :ote.db.transport-service/no-advance "Service does not have advance reservation."
+   :ote.db.transport-service/possible-advance "Service has advance reservation but is is not mandatory."
+   :ote.db.transport-service/mandatory-advance "Advance reservation is mandatory for this service."}
 
   ;; Service exception
   :service-exception
@@ -131,7 +135,6 @@
    :ote.db.transport-service/assistance-description "Assistance service description"
    :ote.db.transport-service/assistance-place-description "Assistance service location"
    :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."}
-
 
   ;; Rental fields
   :rentals
@@ -279,7 +282,7 @@
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
-  }
+  :advance-reservation-info "Here you can inform advance reservation requiremets of your service."}
 
 
  ;; CSV parsing
