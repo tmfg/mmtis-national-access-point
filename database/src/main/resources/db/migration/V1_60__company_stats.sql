@@ -12,7 +12,7 @@ VALUES ((SELECT current_date - 1),
                 (SELECT array_length(companies,1)
                    FROM service_company sc
                   WHERE sc."transport-service-id" = ts.id),
-                array_length(companies,1),
+                array_length(ts.companies,1),
                 0))
           FROM "transport-service" ts
          WHERE ts."published?" = TRUE))
