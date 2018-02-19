@@ -16,7 +16,8 @@ VALUES ((SELECT current_date - 1),
                 0))
           FROM "transport-service" ts
          WHERE ts."published?" = TRUE))
-ON CONFLICT DO NOTHING;
+ON CONFLICT ("date") DO
+UPDATE SET "count" =  EXCLUDED."count";
 $$ LANGUAGE SQL;
 
 
