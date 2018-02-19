@@ -18,3 +18,8 @@ VALUES ((SELECT current_date - 1),
          WHERE ts."published?" = TRUE))
 ON CONFLICT DO NOTHING;
 $$ LANGUAGE SQL;
+
+
+-- Add updated timestamp to service_company
+
+ALTER TABLE service_company ADD COLUMN updated TIMESTAMPTZ DEFAULT current_timestamp;
