@@ -41,7 +41,9 @@
                         :font-size        "1.125em"
                         :font-weight      "bold"
                         :color            "#fff"
-                        :background-color "#00A9DF"})
+                        :background-color "#00A9DF"
+                        ::stylefy/mode {:hover {:cursor          "pointer"
+                                                :text-decoration "underline"}}})
 
 (def result-card-small-label {:font-size "12px"
                               :font-weight "20"
