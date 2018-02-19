@@ -256,18 +256,18 @@
   [db transport-service]
     (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
 
-(defn- save-external-companies
+(defn save-external-companies
   "Service can contain an url that contains company nmes and business-id. Sevice can also contain an imported csv file
   with company names and business-ids."
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
-                            {::t-service/transport-service-id (::t-service/id transport-service)}))
+                                   {::t-service/transport-service-id (::t-service/id transport-service)}))
         companies (into [] (:companies (external/check-csv {:url (::t-service/companies-csv-url transport-service)})))
         new-data (if (empty? current-data)
-                      {::t-service/companies            companies
-                       ::t-service/transport-service-id (::t-service/id transport-service)
-                       ::t-service/source               "URL"}
-                      (assoc current-data ::t-service/companies companies))]
+                   {::t-service/companies            companies
+                    ::t-service/transport-service-id (::t-service/id transport-service)
+                    ::t-service/source               "URL"}
+                   (assoc current-data ::t-service/companies companies))]
 
     (external/save-companies db new-data)))
 
