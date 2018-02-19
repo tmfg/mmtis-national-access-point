@@ -33,7 +33,8 @@
                                :position      "relative"
                                :overflow      "hidden"})
 
-(def result-card {:background-color "#fff"
+(def result-card {:margin-top "20px"
+                  :background-color "#fff"
                   :box-shadow       "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
 (def result-card-label {:padding          "15px 15px"
@@ -42,13 +43,21 @@
                         :color            "#fff"
                         :background-color "#00A9DF"})
 
+(def result-card-small-label {:font-size "12px"
+                              :font-weight "20"
+                              :padding-left "20px"})
+
 (def result-card-body {:padding   "15px 15px"
                        :font-size "1em"
                        :color     "#000"})
 
+(def result-card-delete {:float "right"
+                         :position "relative"
+                         :top "-50px"})
+
 (def delete-icon {:color         "rgba(255, 255, 255, 0,75)"
-                  ;:color "white"
                   ::stylefy/mode {:hover {:color "rgba(255, 255, 255, 1) !important"}}})
+(def partly-visible-delete-icon {:color "rgba(255, 255, 255, 0,75)"})
 
 (def service-link {:color "#2D75B4" :text-decoration "none"})
 
@@ -63,8 +72,9 @@
   {:font-size  "80%"
    :text-align "left"})
 
-(def external-interface-body
-  {:font-weight "normal"})
+(def external-interface-body {:font-weight "normal"})
+
+(def external-table-row {:height "20px"})
 
 (def icon-div {:display  "inline-block"
                :position "relative"

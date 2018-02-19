@@ -27,7 +27,7 @@
                                  (.preventDefault %)
                                  (e! (admin/->DeleteTransportService id)))}
     [ic/action-delete {:class-name (:class (stylefy/use-style style/delete-icon))
-                       :style      {:color "rgba(255, 255, 255, 0,75)"}}]]
+                       :style      style/partly-visible-delete-icon}]]
    (when show-delete-modal?
      [ui/dialog
       {:open    true
@@ -87,7 +87,7 @@
          (map-indexed
            (fn [i row]
              ^{:key i}
-             [:tr {:selectable false :style {:height "20px"}}
+             [:tr {:selectable false :style style/external-table-row}
               (doall
                 (for [[k w value-fn] external-interface-table-columns]
                   ^{:key k}
@@ -103,21 +103,20 @@
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
         service-desc (t-service/localized-text-for "FI" description)]
-    [:div.result-card {:style (merge style/result-card {:margin-top "20px"})}
+    [:div.result-card (stylefy/use-style style/result-card)
 
-     [:a {:style    {:color "#FFF"}
-          :href     "#"
+     [:a {:href     "#"
           :on-click #(do
                        (.preventDefault %)
                        (e! (ss/->ShowServiceGeoJSON
                              (str js/document.location.protocol "//" js/document.location.host
                                   "/ote/export/geojson/" transport-operator-id "/" id))))}
       [:div.result-title (stylefy/use-style style/result-card-label) name
-       [:span.small-text {:style {:font-size "12px" :font-weight "20" :padding-left "20px"}}
+       [:span.small-text (stylefy/use-style style/result-card-small-label)
         (sub-type-tr sub-type)]]]
 
      (when admin?
-       [:div {:style {:float "right" :position "relative" :top "-50px"}}
+       [:div (stylefy/use-style style/result-card-delete)
         [delete-service-action e! id name (get service :show-delete-modal?)]])
 
 

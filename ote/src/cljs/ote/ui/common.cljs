@@ -79,7 +79,7 @@
 
 (defn shortened-description [desc max-length]
   (if (< max-length (count desc))
-    [:span (str (subs desc 0 max-length) "...")]
+    [:span (str (subs desc 0 max-length) "\u2026")]
     [:span desc]))
 
 (defn table2 [& items]
