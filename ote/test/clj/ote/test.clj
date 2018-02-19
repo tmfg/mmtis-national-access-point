@@ -13,9 +13,11 @@
              [ring.middleware.session.cookie :as session-cookie]
              [ring.middleware.anti-forgery :as anti-forgery]
              [cheshire.core :as cheshire]
-             [clojure.string :as str])
+             [clojure.string :as str]
+             [clojure.java.io :as io])
   (:import (org.apache.http.client CookieStore)
-           (org.apache.http.cookie Cookie)))
+           (org.apache.http.cookie Cookie)
+           (java.io File)))
 
 ;; Don't log debugs to tests
 (log/merge-config!
@@ -128,6 +130,11 @@
       ("application/json" "application/vnd.geo+json")
       (assoc res :json (cheshire/decode (:body res) keyword)))
     res))
+
+(defn with-http-resource [prefix suffix function]
+  (let [file (File/createTempFile prefix suffix (io/file "resources" "public"))]
+    (function file (url-for-path (.getName file)))
+    (.delete file)))
 
 (defn http-get
   "Helper for HTTP GET requests to the test system. If user is specified the request
