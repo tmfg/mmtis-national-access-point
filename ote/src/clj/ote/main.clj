@@ -17,6 +17,9 @@
             [ote.services.operators :as operators-service]
 
             [ote.integration.export.geojson :as export-geojson]
+
+            [ote.tasks.company :as tasks-company]
+
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling])
   (:gen-class))
@@ -62,7 +65,10 @@
            (admin-service/->Admin (:nap config))
            [:db :http])
 
-   :operators (component/using (operators-service/->Operators) [:db :http])))
+   :operators (component/using (operators-service/->Operators) [:db :http])
+
+   ;; Scheduled tasks
+   :tasks-company (component/using (tasks-company/company-tasks) [:db])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!
