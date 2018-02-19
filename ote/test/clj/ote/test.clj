@@ -133,8 +133,10 @@
 
 (defn with-http-resource [prefix suffix function]
   (let [file (File/createTempFile prefix suffix (io/file "resources" "public"))]
-    (function file (url-for-path (.getName file)))
-    (.delete file)))
+    (try
+      (function file (url-for-path (.getName file)))
+      (finally
+        (.delete file)))))
 
 (defn http-get
   "Helper for HTTP GET requests to the test system. If user is specified the request
