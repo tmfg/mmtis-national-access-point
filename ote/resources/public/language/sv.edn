@@ -156,7 +156,7 @@
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
    :rentals-pricing-info                               "Fyll i tabellen prisuppgifter och/eller uppgifter om grunderna för hur priset bestäms."
-   }
+   :ote.db.transport-service/vehicle-price-url         "Web-adress med uppgifter om fordon och priser"}
 
   ;; Parking fields
   :parking
@@ -708,6 +708,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
           "pick-up-locations" "Verksamhetsställen"
           "rental-additional-services" "Övriga tjänster"
           "usage-area" "Tillåtna länder"
+          "vehicle-price-url" "Web-adress med uppgifter om fordon och priser"
           "vehicle-classes" "Fordon som uthyres"
 
           "additional-service-links" "Andra tjänster"

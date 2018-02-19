@@ -6,7 +6,8 @@
 
             [dashboard.data.finap-services :as data-finap-services]
             [dashboard.data.jenkins :as data-jenkins]
-            [dashboard.data.cloudwatch :as data-cloudwatch])
+            [dashboard.data.cloudwatch :as data-cloudwatch]
+            [dashboard.data.pivotal :as data-pivotal])
   (:import (java.util.concurrent Executors TimeUnit))
   (:gen-class))
 
@@ -34,7 +35,11 @@
             {:interval 10 :key :jenkins
              :task #'data-jenkins/jobs}
             {:interval 60 :key :db-load
-             :task #'data-cloudwatch/finap-db-load}])
+             :task #'data-cloudwatch/finap-db-load}
+            {:interval (* 60 60 3) :key :sprint-themes
+             :task #'data-pivotal/fetch-sprint-themes}
+            {:interval 600 :key :pivotal-story-stats
+             :task #'data-pivotal/fetch-story-stats}])
 
 (defn start-tasks []
   (doseq [{:keys [interval key task]} tasks]

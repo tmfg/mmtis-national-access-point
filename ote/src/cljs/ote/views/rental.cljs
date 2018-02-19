@@ -93,7 +93,9 @@
                     :component (fn [{:keys [update-form! data]}]
                                  [price-classes update-form! data])}]
     :delete? true
-    :add-label (tr [:buttons :add-new-vehicle])})
+    :add-label (tr [:buttons :add-new-vehicle])}
+   {:name ::t-service/vehicle-price-url
+    :type :string})
   )
 
 (defn accessibility-group []

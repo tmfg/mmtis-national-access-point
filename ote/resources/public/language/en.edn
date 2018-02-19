@@ -153,8 +153,8 @@
    :ote.db.transport-service/additional-service-type   "Service"
    :ote.db.transport-service/additional-service-price  "Price (€)"
    :ote.db.transport-service/additional-service-unit   "Unit (f.e day, €/km, €/mile)"
-   :rentals-pricing-info                               "Fill in specified price information."}
-
+   :rentals-pricing-info                               "Fill in specified price information."
+   :ote.db.transport-service/vehicle-price-url         "Vehicle and price info WWW address"}
 
   ;; Parking fields
   :parking
@@ -238,7 +238,7 @@
   :external-interfaces-intro "If your service does not have machine readable interfaces leave this section empty and move to the next section."
   :external-interfaces-intro-rae "Fill in at least machine readable route and timetable information. If you do not have the means to produce machine readable route and timetable infromation, you can do so in FTA's "
   :external-interfaces "If your service does not have machine readable interfaces leave this section empty and move to the next section.\nMachine readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
-  :external-interfaces-read-more {:link "Read more about NAP catalog machine readable interfaces."
+  :external-interfaces-read-more {:link "Read more about the machine readable interfaces in NAP catalog."
                                   :dialog-title "Machine readable interfaces in the NAP catalog"
                                   :dialog-text (:md
                                                 "## General\n"
@@ -404,7 +404,7 @@
   {:wheelchair "Wheelchair"
    :walking-stick "Walking stick"
    :assistance-dog "Place for an assistance dog"
-   :crutches "Kainalosauvat"
+   :crutches "Crutches"
    :walker "Walker"}
 
   :ote.db.transport-service/pick-up-type
@@ -710,6 +710,7 @@
           "pick-up-locations" "Pick-up and returning points"
           "rental-additional-services" "Additional services"
           "usage-area" "Usage area restrictions (country limitations)"
+          "vehicle-price-url" "Vehicle and price info WWW address"
           "vehicle-classes" "Rental vehicles"
 
           "additional-service-links" "Additional services"

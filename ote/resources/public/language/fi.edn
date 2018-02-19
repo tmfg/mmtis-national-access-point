@@ -153,7 +153,8 @@
    :ote.db.transport-service/additional-service-type   "Palvelu"
    :ote.db.transport-service/additional-service-price  "Hinta (€)"
    :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."}
+   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
+   :ote.db.transport-service/vehicle-price-url         "Ajoneuvot ja hintatiedot (WWW-osoite)"}
 
 
   ;; Parking fields
@@ -709,6 +710,7 @@
           "indoor-map" "Sisätilakartan osoitetiedot"
           "pick-up-locations" "Toimipisteet"
           "rental-additional-services" "Muut palvelut"
+          "vehicle-price-url" "Ajoneuvot ja hintatiedot (WWW-osoite)"
           "usage-area" "Sallitut maat"
           "vehicle-classes" "Vuokrattavat ajoneuvot"
 

@@ -18,12 +18,16 @@
 
 (defn info
   "Create a new info form element that doesn't have any interaction, just shows a help text."
-  [text]
-  {:name (keyword (str "info" (swap! keyword-counter inc)))
-   :type :component
-   :container-style style-form/full-width
-   :component (fn [_]
-                [common/help text])})
+  [text & [options]]
+  (let [type (:type options)]
+    {:name (keyword (str "info" (swap! keyword-counter inc)))
+     :type :component
+     :container-style style-form/full-width
+     :component (fn [_]
+                  [(if (= :generic type)
+                     common/generic-help
+                     common/help)
+                   text])}))
 
 (defn info-with-link
   "Create a new info form element that doesn't have any interaction, just shows a help text."
@@ -316,7 +320,7 @@
                      style-form/form-group-row
                      style-form/form-group-column)
              container-style (:container-style options)
-             card-options (:card-options options)
+             card-style (:card-style options)
              group-component [group-ui
                               style
                               schemas
@@ -328,27 +332,18 @@
                               modified
                               errors warnings notices
                               update-form]
-             expandable? (get options :expandable? true)
              card? (get options :card? true)]
          [:div.form-group-container (merge (stylefy/use-style style-form/form-group-container
                                                               {::stylefy/with-classes classes})
                                            {:style container-style})
           (if-not card?
             group-component
-            [ui/card (merge {:z-depth          1
-                             :expanded         (not (closed-groups label))
-                             :on-expand-change #(update-form (update data ::closed-groups toggle label))}
-                            card-options)
+            [:div (merge (stylefy/use-style style-form/form-card)
+                         {:style card-style})
              (when label
-               [ui/card-header {:title                  label
-                                :style                  {:padding-bottom "10px"}
-                                :title-style            {:font-weight "bold"}
-                                :show-expandable-button expandable?}])
-             [ui/card-text {:style {:padding-top "0px"} :expandable true}
-              group-component]
-             (when-let [actions (and (not (closed-groups label)) (:actions options))]
-               [ui/card-actions
-                (r/as-element actions)])])]))}))
+               [:div (stylefy/use-style style-form/form-card-label) label])
+             [:div (stylefy/use-style style-form/form-card-body)
+              group-component]])]))}))
 
 (defn form
   "Generic form component that takes `options`, a vector of field `schemas` and the

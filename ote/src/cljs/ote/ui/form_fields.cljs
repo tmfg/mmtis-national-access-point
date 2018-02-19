@@ -165,53 +165,48 @@
           language @selected-language
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
-      [:div.table-responsive
-        [:table.table {:style (when full-width? style-form/full-width)}
-         [:tbody
-           [:tr
-            [:td
-             [text-field
-              (merge
-               {:name name
-                :floating-label-text (when-not table? label)
-                :floating-label-fixed true
-                :hintText          (placeholder field data)
-                :on-change         #(let [updated-language-data
-                                          {:ote.db.transport-service/lang language
-                                           :ote.db.transport-service/text %2}]
-                                      (update!
-                                       (if language-data
-                                         (mapv (fn [lang]
-                                                 (if (= (:ote.db.transport-service/lang lang) language)
-                                                   updated-language-data
-                                                   lang)) data)
-                                         (conj data updated-language-data))))
-                :value             (or (:ote.db.transport-service/text language-data) "")
-                :multi-line         true
-                :rows rows
-                :rows-max (or rows-max 200)
-                :error-text       (or error "")}
-               (when full-width?
-                 {:full-width true}))]]]
-           [:tr
-            [:td
-             [:div (stylefy/use-style style-form-fields/localized-text-language-container)
-             (doall
-              (for [lang languages]
-                ^{:key lang}
-                [:a  (merge
-                      (stylefy/use-style
-                         (if (= lang language)
-                           style-form-fields/localized-text-language-selected
-                           style-form-fields/localized-text-language))
-                      {:href "#" :on-click #(do (.preventDefault %)
-                                                (reset! selected-language lang))})
-                 lang]))]]]
-            (when (or error warning)
-              [:tr
-               [:td
-                [:div (stylefy/use-style style-base/required-element)
-                 (if error error warning)]]])]]])))
+      [:div {:style (merge
+                      ;; Push localized text field down for table-row-column top padding amount when in table column.
+                      (when table? {:margin-top "15px"})
+                      (when full-width? style-form/full-width))}
+       [text-field
+        (merge
+          {:name name
+           :floating-label-text (when-not table? label)
+           :floating-label-fixed true
+           :hintText (placeholder field data)
+           :on-change #(let [updated-language-data
+                             {:ote.db.transport-service/lang language
+                              :ote.db.transport-service/text %2}]
+                         (update!
+                           (if language-data
+                             (mapv (fn [lang]
+                                     (if (= (:ote.db.transport-service/lang lang) language)
+                                       updated-language-data
+                                       lang)) data)
+                             (conj data updated-language-data))))
+           :value (or (:ote.db.transport-service/text language-data) "")
+           :multi-line true
+           :rows rows
+           :rows-max (or rows-max 200)
+           :error-text (or error "")}
+          (when full-width?
+            {:full-width true}))]
+       [:div (stylefy/use-style style-form-fields/localized-text-language-container)
+        (doall
+          (for [lang languages]
+            ^{:key lang}
+            [:a (merge
+                  (stylefy/use-style
+                    (if (= lang language)
+                      style-form-fields/localized-text-language-selected
+                      style-form-fields/localized-text-language))
+                  {:href "#" :on-click #(do (.preventDefault %)
+                                            (reset! selected-language lang))})
+             lang]))]
+       (when (or error warning)
+         [:div (stylefy/use-style style-base/required-element)
+          (if error error warning)])])))
 
 
 (defmethod field :selection [{:keys [update! table? label name style show-option options form?
@@ -485,20 +480,20 @@
      ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
      [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
-                              {:style style-form/table-header-style})
+                              {:style style-form-fields/table-header})
        [ui/table-row (merge {:selectable false}
-                            {:style style-form/table-header-style})
+                            {:style style-form-fields/table-header-row})
         (doall
          (for [{:keys [name label width tooltip tooltip-pos tooltip-len] :as tf} table-fields]
            ^{:key name}
            [ui/table-header-column {:style
                                     (merge {:width width :white-space "pre-wrap"}
-                                           style-form/table-header-style)}
+                                           style-form-fields/table-header-column)}
             label
             (when tooltip
               [tooltip-icon {:text tooltip :pos  tooltip-pos :len tooltip-len}])]))
         (when delete?
-          [ui/table-header-column {:style (merge {:width "70px"} style-form/table-header-style)}
+          [ui/table-header-column {:style (merge {:width "70px"} style-form-fields/table-header-column)}
            (tr [:buttons :delete])])]]
 
       [ui/table-body {:display-row-checkbox false}
@@ -523,7 +518,8 @@
                                          #(assoc-in data [i name] %))
                              value ((or read name) row)]]
                    ^{:key name}
-                   [ui/table-row-column {:style {:width width :overflow "visible"}}
+                   [ui/table-row-column {:style (merge style-form-fields/table-row-column
+                                                       {:width width})}
                     (if (= :component type)
                       (component {:update-form! #(update! (update-fn %))
                                   :data value})
@@ -536,7 +532,7 @@
                                       {:error field-error}))
                        value])]))
                 (when delete?
-                  [ui/table-row-column {:style {:width "70px" :overflow "visible"}}
+                  [ui/table-row-column {:style (merge style-form-fields/table-row-column {:width "70px"})}
                  [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
                                                                      (take i data))
                                                                    (drop (inc i) data))))}
@@ -560,11 +556,12 @@
 
 (defmethod field :checkbox [{:keys [update! table? label warning error style extended-help]} checked?]
   (if extended-help
-    [common/extended-help
-     (:help-text extended-help)
-     (:help-link-text extended-help)
-     (:help-link extended-help)
-     (checkbox-container update! table? label warning error style checked?)]
+    [:div {:style {:margin-right (str "-" (:margin-right style-form/form-field))}}
+     [common/extended-help
+      (:help-text extended-help)
+      (:help-link-text extended-help)
+      (:help-link extended-help)
+      (checkbox-container update! table? label warning error style checked?)]]
     (checkbox-container update! table? label warning error style checked?)))
 
 (defmethod field :checkbox-group [{:keys [update! table? label show-option options help]} data]

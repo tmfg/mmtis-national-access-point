@@ -12,7 +12,8 @@
                  [cljs-ajax "0.7.2"
                   :exclusions [org.apache.httpcomponents/httpasyncclient]]
                  [com.cognitect/transit-clj "0.8.300"]
-                 [com.cognitect/transit-cljs "0.8.243"]]
+                 [com.cognitect/transit-cljs "0.8.243"]
+                 [com.atlassian.commonmark/commonmark "0.11.0"]]
 
   :profiles {:dev {:dependencies [[figwheel-sidecar "0.5.13"]
                                   [com.cemerick/piggieback "0.2.2"]

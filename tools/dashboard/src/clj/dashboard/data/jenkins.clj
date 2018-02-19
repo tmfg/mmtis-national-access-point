@@ -15,5 +15,15 @@
       (cheshire/decode body keyword)
       (throw (ex-info "Jenkins Call failed" {:url call-url
                                              :response response})))))
+
+(defn job-progress [{:keys [lastBuild] :as job}]
+  (if (:result lastBuild)
+    job
+    (assoc job :progress (double (* 100 (/ (- (System/currentTimeMillis) (:timestamp lastBuild))
+                                           (:estimatedDuration lastBuild)))))))
 (defn jobs []
-  (:jobs (jenkins-get "json?tree=jobs[name,lastBuild[result,number,duration,timestamp]]")))
+  (let [skip-jobs (or (:skip-jobs @config) #{})
+        job-filter (complement (comp skip-jobs :name))]
+    (map job-progress
+         (filter job-filter
+                 (:jobs (jenkins-get "json?tree=jobs[name,lastBuild[result,number,duration,timestamp,estimatedDuration]]"))))))

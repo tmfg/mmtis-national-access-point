@@ -41,7 +41,7 @@
                          :font-weight "bold"
                          :text-transform "uppercase"
                          :color "#FFFFFF"})
-(def button-add-row {:padding-top "20px"})
+(def button-add-row {:padding "15px 0"})
 
 ;; Form elements
 (def required-element { :color "#B71C1C"
@@ -85,10 +85,17 @@
 (def help {:border-radius "0.2em"
            :color "#666666"
            :background-color "#DAEDF7"
-           :padding "0.2em"
-           :margin "0.2em"
+           :padding "10px"
+           :margin-bottom "10px"
            :align-items "center"
            :white-space "pre-wrap"})
+
+;; Full width generic help box
+(def generic-help (merge help
+                         {:background-color "#F5F5F5" :padding "15px"
+                          :margin-left "-15px"
+                          :margin-right "-15px"
+                          :margin-top "-15px"}))
 
 (def filters-form
   {:border "solid 1px #0046ad"})
