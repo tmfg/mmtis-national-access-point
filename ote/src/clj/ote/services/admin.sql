@@ -2,7 +2,8 @@
    SELECT c.name as "operator", c."business-id" as "business-id",
           s."contact-phone" as "phone", s."contact-email" as "email"
      FROM "transport-service" s
-LEFT JOIN LATERAL unnest(s.companies) AS c ON TRUE
+          LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
+          LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
     WHERE c."business-id" IS NOT NULL
       AND s."published?" = TRUE;
 
