@@ -38,6 +38,9 @@
                  [com.cognitect/transit-clj "0.8.300"]
                  [com.cognitect/transit-cljs "0.8.239"]
 
+                 ;; Lightweight scheduler
+                 [jarohen/chime "0.2.2"]
+
 
                  [cljs-ajax "0.7.2"
                   :exclusions [org.apache.httpcomponents/httpasyncclient]]
