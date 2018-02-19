@@ -77,6 +77,11 @@
    [:div {:style {:margin-top "10px"}} (linkify help-link help-link-text {:target "_blank"})]
    component])
 
+(defn shortened-description [desc max-length]
+  (if (< max-length (count desc))
+    [:span (str (subs desc 0 max-length) "\u2026")]
+    [:span desc]))
+
 (defn table2 [& items]
   [:table
    [:tbody

@@ -78,6 +78,7 @@
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
    :external-interfaces-warning "Annettuun osoitteeseen ei saada yhteyttä"
    :external-interfaces-ok "Annettuun osoitteeseen saatiin yhteys"
+   :table-header-external-interface "Rajapinta"
 
    ;; Service hours
    :ote.db.transport-service/service-hours-info "Lisätiedot"}
@@ -887,7 +888,7 @@
                           "ei löytynyt palveluita"
                           "löytyi yksi palvelu"
                           ["löytyi " :count " palvelua"]) "."]
-  :nap-interface ["NAPissa tallennettujen tietojen rajapinta: "]
+  :nap-interface ["NAP-palvelussa tallennettujen tietojen koneluettava rajapinta: "]
   :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
   :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
