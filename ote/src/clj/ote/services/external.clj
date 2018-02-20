@@ -55,33 +55,24 @@
 (defn- read-csv
   "Read CSV from input stream. Guesses the separator from the first line."
   [input]
-  (with-open [in (io/reader input)]
-    (let [csv-content (StringBuilder.)]
-      (loop [separator nil
-             [l & lines] (line-seq in)]
-        (if (nil? l)
-          (csv/read-csv (str csv-content) :separator separator)
-          (do
-            (.append csv-content l)
-            (.append csv-content "\n")
-            (recur (or separator
-                       (if (str/includes? l ";")
-                         \;
-                         \,))
-                   lines)))))))
+  (let [separator (if (str/includes? (first (str/split-lines input)) ";")
+                    ;; First line contains a semicolon, use it as separator
+                    \;
+                    ;; Otherwise default to comma
+                    \,)]
+    (csv/read-csv input :separator separator)))
 
 (defn check-csv
   "Fetch csv file from given url, parse it and return status map that contains information about the count of companies
   in the file."
   [url-data]
   (let [url (ensure-url (get url-data :url))
-        response @(httpkit/get url {:as :stream
+        response @(httpkit/get url {:as :text
                                     :timeout 30000})]
     (if (= 200 (:status response))
       (try
         (let [data (when (= 200 (:status response))
-                     (with-open [in (:body response)]
-                       (read-csv in)))
+                     (read-csv (:body response)))
               parsed-data (parse-response->csv data)]
           ;; response to client application
           {:status :success
