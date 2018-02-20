@@ -271,6 +271,13 @@
 
     (external/save-companies db new-data)))
 
+(defn- handle-companies
+  "Companies can be added from url, csv or by hand in form. Clean up url if some other option is selected"
+  [data]
+  (if (not= :csv-url (get data ::t-service/company-source))
+    (assoc data ::t-service/companies-csv-url nil)
+    data))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [nap-config db user {places ::t-service/operation-area
@@ -283,7 +290,8 @@
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
                          (dissoc ::t-service/external-interfaces
-                                 ::t-service/service-company))
+                                 ::t-service/service-company)
+                         (handle-companies))
 
         resources-from-db (publish/fetch-transport-service-external-interfaces db (::t-service/id data))
         removed-resources (removable-resources resources-from-db external-interfaces)
