@@ -11,7 +11,8 @@
             [clojure.string :as str]
             [clojure.data.csv :as csv]
             [clojure.string :as s]
-            [specql.core :as specql]))
+            [specql.core :as specql]
+            [clojure.java.io :as io]))
 
 (defn valid-csv-header?
   "Ensure that there is at least 2 elements in header"
@@ -25,9 +26,10 @@
 (defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
   [url]
-  (if (not (s/includes? url "http"))
-     (str "http://" url)
-     url))
+  (str/replace (if (not (s/includes? url "http"))
+                  (str "http://" url)
+                  url)
+               #" " "%20"))
 
 (defn parse-response->csv
   "Convert given vector to map where map key is given in the first line of csv file."
@@ -35,9 +37,10 @@
   (let [headers (first csv-data)
         valid-header? (valid-csv-header? headers)
         parsed-data (when valid-header?
-                      (map (fn [[business-id name]]
-                             {::t-service/business-id business-id
-                              ::t-service/name name})
+                      (map (fn [cells]
+                             (let [[business-id name] (map str/trim cells)]
+                               {::t-service/business-id business-id
+                                ::t-service/name name}))
                             (rest csv-data)))
         validated-data (filter #(valid-business-id? (::t-service/business-id %)) parsed-data)]
     {:result validated-data
@@ -49,6 +52,16 @@
    (let [data (modification/with-modification-fields data ::t-service/id)]
     (specql/upsert! db ::t-service/service-company data)))
 
+(defn- read-csv
+  "Read CSV from input stream. Guesses the separator from the first line."
+  [input]
+  (let [separator (if (str/includes? (first (str/split-lines input)) ";")
+                    ;; First line contains a semicolon, use it as separator
+                    \;
+                    ;; Otherwise default to comma
+                    \,)]
+    (csv/read-csv input :separator separator)))
+
 (defn check-csv
   "Fetch csv file from given url, parse it and return status map that contains information about the count of companies
   in the file."
@@ -59,13 +72,13 @@
     (if (= 200 (:status response))
       (try
         (let [data (when (= 200 (:status response))
-                               (csv/read-csv (:body response)))
+                     (read-csv (:body response)))
               parsed-data (parse-response->csv data)]
           ;; response to client application
-            {:status :success
-             :count (count (:result parsed-data))
-             :failed-count (:failed-count parsed-data)
-             :companies (:result parsed-data)})
+          {:status :success
+           :count (count (:result parsed-data))
+           :failed-count (:failed-count parsed-data)
+           :companies (:result parsed-data)})
         (catch Exception e
           (log/info "CSV parsing failed: " e)
           {:status :failed
