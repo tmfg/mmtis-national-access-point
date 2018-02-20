@@ -26,9 +26,10 @@
 (defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
   [url]
-  (if (not (s/includes? url "http"))
-     (str "http://" url)
-     url))
+  (str/replace (if (not (s/includes? url "http"))
+                  (str "http://" url)
+                  url)
+               #" " "%20"))
 
 (defn parse-response->csv
   "Convert given vector to map where map key is given in the first line of csv file."
