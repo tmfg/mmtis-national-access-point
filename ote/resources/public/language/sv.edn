@@ -521,7 +521,8 @@
   :header-other-services-and-accessibility "Tillgänglighet"
   :header-price-information                "Prisinformation"
   :header-service-hours                    "Betjäningstider"
-  :header-pick-up-locations "Verksamhetsställen"}
+  :header-pick-up-locations "Verksamhetsställen"
+  :header-select-company-list-type  "Välj typ av meddelande"}
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"

@@ -522,7 +522,8 @@
   :header-other-services-and-accessibility "Accessibility and additional services"
   :header-price-information                "Price information"
   :header-service-hours                    "Service hours"
-  :header-pick-up-locations "Pick-up and returning points"}
+  :header-pick-up-locations                "Pick-up and returning points"
+  :header-select-company-list-type         "Select the type of notification"}
 
 
  :rentals-page

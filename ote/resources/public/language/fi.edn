@@ -518,7 +518,8 @@
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
-  :header-pick-up-locations "Toimipisteet"}
+  :header-pick-up-locations "Toimipisteet"
+  :header-select-company-list-type  "Valitse ilmoittamistapa"}
 
 
  :rentals-page

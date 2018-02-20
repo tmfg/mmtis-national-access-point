@@ -167,9 +167,7 @@
                  (if regex
                    (when (re-matches regex v)
                      (update! v))
-                   (update! v))))
-           }]
-  ])
+                   (update! v))))}]])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error]
                               :as   field} data]
@@ -626,7 +624,7 @@
                         "none")]
     [:div
      [:div.row
-      [:h3 "Valitse ilmoittamistapa"]]
+      [:h3 (tr [:passenger-transportation-page :header-select-company-list-type])]]
      [:div.row
       [ui/radio-button-group {:name (str "brokerage-companies-selection")
                               :value-selected selected-type}
