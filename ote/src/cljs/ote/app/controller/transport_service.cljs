@@ -2,6 +2,7 @@
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
+            [ote.util.csv :as csv-util]
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
@@ -456,10 +457,6 @@
     (str/trim
       (str/replace value "\"" ""))))
 
-(defn valid-business-id? [value]
-  (let [pattern  #"\d{7}-\d"]
-    (boolean (re-matches pattern value))))
-
 (defn parse-csv-response->company-map
   "Convert given vector to maps of business-id and company names."
   [csv-data]
@@ -468,7 +465,7 @@
            {::t-service/business-id (clean-up-csv-value business-id)
             ::t-service/name        (clean-up-csv-value name)})
          (rest csv-data))
-        valid-companies (filter #(valid-business-id? (::t-service/business-id %)) companies)]
+        valid-companies (filter #(csv-util/valid-business-id? (::t-service/business-id %)) companies)]
     valid-companies))
 
 (defn read-companies-csv! [e! file-input]
