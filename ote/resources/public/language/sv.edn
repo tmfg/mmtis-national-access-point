@@ -521,8 +521,12 @@
   :header-other-services-and-accessibility "Tillgänglighet"
   :header-price-information                "Prisinformation"
   :header-service-hours                    "Betjäningstider"
-  :header-pick-up-locations "Verksamhetsställen"
-  :header-select-company-list-type  "Välj typ av meddelande"}
+  :header-pick-up-locations                "Verksamhetsställen"
+  :header-select-company-list-type         "Välj typ av meddelande"
+  :radio-button-no-companies               "Det finns inga andra företag som är inblandade i att tillhandahålla denna tjänst."
+  :radio-button-url-companies              "Ange en webbadress från vilken affärsinformationen kan hittas som en .csv-fil."
+  :radio-button-csv-companies              "Hämta företagsinformation som en CSV-fil i formuläret."
+  :radio-button-form-companies             "Lägg till företagsinformation i formuläret med formulärfält."}
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"

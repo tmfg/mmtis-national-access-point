@@ -523,7 +523,12 @@
   :header-price-information                "Price information"
   :header-service-hours                    "Service hours"
   :header-pick-up-locations                "Pick-up and returning points"
-  :header-select-company-list-type         "Select the type of notification"}
+  :header-select-company-list-type         "Select the type of notification"
+  :radio-button-no-companies               "There are no other companies involved in providing this transport service."
+  :radio-button-url-companies              "Please provide a web address from which the company information can be found as a .csv file."
+  :radio-button-csv-companies              "Download business information as a csv file on the form."
+  :radio-button-form-companies             "Add business information to the form using form fields."
+  }
 
 
  :rentals-page
