@@ -11,8 +11,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.place-search :as place-search]
             [clojure.string :as str]
-            [testdouble.cljs.csv :as csv]
-            ))
+            [testdouble.cljs.csv :as csv]))
 
 (defn new-transport-service [app]
       (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type}))
@@ -291,13 +290,9 @@
 
   AddImportedCompaniesToService
   (process-event [{csv :csv} app]
-    (let [companies-list (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/companies])
-          new-list (if companies-list
-                     (concat companies-list csv)
-                     csv)]
       (-> app
         (assoc-in [:transport-service ::t-service/passenger-transportation ::t-service/companies] csv)
-        (assoc-in [:transport-service ::t-service/passenger-transportation :csv-imported] true))))
+        (assoc-in [:transport-service ::t-service/passenger-transportation :csv-imported] true)))
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage

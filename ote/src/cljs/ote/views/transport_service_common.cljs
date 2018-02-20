@@ -176,8 +176,7 @@
      :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
      :container-style style-form/full-width
      :on-file-selected #(ts/read-companies-csv! e! (.-target %))
-     :on-url-given #(e! (ts/->EnsureCsvFile))}
-    ))
+     :on-url-given #(e! (ts/->EnsureCsvFile))}))
 
 (defn brokerage-group
   "Creates a form group for brokerage selection."

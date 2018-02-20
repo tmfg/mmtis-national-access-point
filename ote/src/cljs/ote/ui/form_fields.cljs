@@ -1,8 +1,6 @@
 (ns ote.ui.form-fields
   "UI components for different form fields."
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :refer [put! chan <! >!]]
-            [reagent.core :as r]
+  (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
@@ -118,7 +116,7 @@
      :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
-     :hint-text         (if hint-text hint-text "")
+     :hint-text         (or hint-text "")
      :on-change         #(let [v %2]
                            (if regex
                              (when (re-matches regex v)
@@ -160,14 +158,7 @@
            "Lisää csv" ]
   [:input {:type "file"
            :name name
-           :on-change
-            (if on-change
-              on-change
-              #(let [v %2]
-                 (if regex
-                   (when (re-matches regex v)
-                     (update! v))
-                   (update! v))))}]])
+           :on-change on-change}]])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error]
                               :as   field} data]
@@ -379,7 +370,7 @@
                          (update! (assoc (time/->Time h minutes nil)
                                          :hours-text hour))))}
            (when (not hours)
-             {:placeholder (tr [:common-texts :hours-placeholder])}))
+             {:hint-text (tr [:common-texts :hours-placeholder])}))
     (if (not hours)
       ""
       (or hours-text (str hours)))]
@@ -396,7 +387,7 @@
                          (update! (assoc (time/->Time hours m nil)
                                          :minutes-text minute))))}
            (when (not minutes)
-             {:placeholder (tr [:common-texts :minutes-placeholder])}))
+             {:hint-text (tr [:common-texts :minutes-placeholder])}))
     (if (not minutes)
       ""
       (or minutes-text (gstr/format "%02d" minutes)))]
@@ -437,7 +428,7 @@
                                              (time/interval 0 unit)
                                              (time/interval (js/parseInt num) unit))
                                            ::preferred-unit unit))))
-                      :placeholder (tr [:common-texts :time-unlimited])
+                      :hint-text (tr [:common-texts :time-unlimited])
                       :type :string
                       :regex #"\d{0,4}"
                       :style {:width 200}) amount]
@@ -628,16 +619,16 @@
      [:div.row
       [ui/radio-button-group {:name (str "brokerage-companies-selection")
                               :value-selected selected-type}
-       [ui/radio-button {:label    "Tämän palvelun tuottamiseen ei osallistu muita yrityksiä."
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-no-companies])
                          :value    "none"
                          :on-click #(select-type :none)}]
-       [ui/radio-button {:label    "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona"
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-url-companies])
                          :value    "csv-url"
                          :on-click #(select-type :csv-url)}]
-       [ui/radio-button {:label    "Lataa yritysten tiedot csv-tiedostona lomakkeelle"
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-csv-companies])
                          :value    "csv-file"
                          :on-click #(select-type :csv-file)}]
-       [ui/radio-button {:label    "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
+       [ui/radio-button {:label   (tr [:passenger-transportation-page :radio-button-form-companies])
                          :value    "form"
                          :on-click #(select-type :form)}]]
 
