@@ -11,7 +11,8 @@
             [clojure.string :as str]
             [clojure.data.csv :as csv]
             [clojure.string :as s]
-            [specql.core :as specql]))
+            [specql.core :as specql]
+            [clojure.java.io :as io]))
 
 (defn valid-csv-header?
   "Ensure that there is at least 2 elements in header"
@@ -35,9 +36,10 @@
   (let [headers (first csv-data)
         valid-header? (valid-csv-header? headers)
         parsed-data (when valid-header?
-                      (map (fn [[business-id name]]
-                             {::t-service/business-id business-id
-                              ::t-service/name name})
+                      (map (fn [cells]
+                             (let [[business-id name] (map str/trim cells)]
+                               {::t-service/business-id business-id
+                                ::t-service/name name}))
                             (rest csv-data)))
         validated-data (filter #(valid-business-id? (::t-service/business-id %)) parsed-data)]
     {:result validated-data
@@ -49,23 +51,42 @@
    (let [data (modification/with-modification-fields data ::t-service/id)]
     (specql/upsert! db ::t-service/service-company data)))
 
+(defn- read-csv
+  "Read CSV from input stream. Guesses the separator from the first line."
+  [input]
+  (with-open [in (io/reader input)]
+    (let [csv-content (StringBuilder.)]
+      (loop [separator nil
+             [l & lines] (line-seq in)]
+        (if (nil? l)
+          (csv/read-csv (str csv-content) :separator separator)
+          (do
+            (.append csv-content l)
+            (.append csv-content "\n")
+            (recur (or separator
+                       (if (str/includes? l ";")
+                         \;
+                         \,))
+                   lines)))))))
+
 (defn check-csv
   "Fetch csv file from given url, parse it and return status map that contains information about the count of companies
   in the file."
   [url-data]
   (let [url (ensure-url (get url-data :url))
-        response @(httpkit/get url {:as :text
+        response @(httpkit/get url {:as :stream
                                     :timeout 30000})]
     (if (= 200 (:status response))
       (try
         (let [data (when (= 200 (:status response))
-                               (csv/read-csv (:body response)))
+                     (with-open [in (:body response)]
+                       (read-csv in)))
               parsed-data (parse-response->csv data)]
           ;; response to client application
-            {:status :success
-             :count (count (:result parsed-data))
-             :failed-count (:failed-count parsed-data)
-             :companies (:result parsed-data)})
+          {:status :success
+           :count (count (:result parsed-data))
+           :failed-count (:failed-count parsed-data)
+           :companies (:result parsed-data)})
         (catch Exception e
           (log/info "CSV parsing failed: " e)
           {:status :failed
