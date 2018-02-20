@@ -1,6 +1,8 @@
 (ns ote.ui.form-fields
   "UI components for different form fields."
-  (:require [reagent.core :as r]
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require [cljs.core.async :refer [put! chan <! >!]]
+            [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
@@ -13,6 +15,7 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
             [ote.style.form :as style-form]
+            [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
             [goog.string :as gstr]))
 
@@ -107,7 +110,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style password? on-enter]
+                                  style input-style hint-style password? on-enter hint-text]
                            :as   field} data]
   [text-field
    (merge
@@ -115,7 +118,7 @@
      :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
-     :hintText          (placeholder field data)
+     :hint-text         (if hint-text hint-text "")
      :on-change         #(let [v %2]
                            (if regex
                              (when (re-matches regex v)
@@ -142,18 +145,44 @@
       {:on-key-press #(when (= "Enter" (.-key %))
                         (on-enter))}))])
 
+(defmethod field :file [{:keys [update! label name max-length min-length regex
+                                 focus on-focus form? error warning table? full-width?
+                                 style input-style hint-style on-change]
+                          :as   field} data]
+[:div.upload-btn-wrapper
+ [:button {:style
+           {:padding "10px 20px 10px 20px"
+            :text-transform "uppercase"
+            :color "#FFFFFF"
+            :background-color "#1565C0"
+            :font-size "12px"
+            :font-weight "bold"}}
+           "Lisää csv" ]
+  [:input {:type "file"
+           :name name
+           :on-change
+            (if on-change
+              on-change
+              #(let [v %2]
+                 (if regex
+                   (when (re-matches regex v)
+                     (update! v))
+                   (update! v))))
+           }]
+  ])
+
 (defmethod field :text-area [{:keys [update! table? label name rows error]
                               :as   field} data]
   [text-field
-   {:name name
-    :floating-label-text (when-not table? label)
+   {:name                 name
+    :floating-label-text  (when-not table? label)
     :floating-label-fixed true
-    :hintText          (placeholder field data)
-    :on-change         #(update! %2)
-    :value             (or data "")
-    :multi-line        true
-    :rows              rows
-    :error-text        error}])
+    :hintText             (placeholder field data)
+    :on-change            #(update! %2)
+    :value                (or data "")
+    :multi-line           true
+    :rows                 rows
+    :error-text           error}])
 
 (def languages ["FI" "SV" "EN"])
 
@@ -471,12 +500,13 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields update! delete? add-label error-data] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label error-data] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
                data)]
     [:div
+     [:div.table-wrapper {:style table-wrapper-style}
      ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
      [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
@@ -537,7 +567,7 @@
                                                                      (take i data))
                                                                    (drop (inc i) data))))}
                   [ic/action-delete]]])]))
-         data))]]
+         data))]]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
         [buttons/save {:on-click #(update! (conj (or data []) {}))
@@ -561,7 +591,8 @@
       (:help-text extended-help)
       (:help-link-text extended-help)
       (:help-link extended-help)
-      (checkbox-container update! table? label warning error style checked?)]]
+      ]
+     (checkbox-container update! table? label warning error style checked?)]
     (checkbox-container update! table? label warning error style checked?)))
 
 (defmethod field :checkbox-group [{:keys [update! table? label show-option options help]} data]
@@ -579,3 +610,110 @@
                            :checked  checked?
                            :on-check #(update! ((if checked? disj conj) selected option))}]))
          options))]))
+
+(defn- csv-help-text []
+  [:div.row
+   [:div (stylefy/use-style style-base/link-icon-container)
+    [ic/action-get-app {:style style-base/link-icon}]]
+   [:div
+    (ote.ui.common/linkify "/ote/csv/palveluyritykset.csv"  (tr [:form-help :csv-file-example]) {:target "_blank"})]])
+
+(defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
+                                       {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
+  (let [select-type #(update! {::t-service/company-source %})
+        selected-type (if company-source
+                        (name company-source)
+                        "none")]
+    [:div
+     [:div.row
+      [:h3 "Valitse ilmoittamistapa"]]
+     [:div.row
+      [ui/radio-button-group {:name (str "brokerage-companies-selection")
+                              :value-selected selected-type}
+       [ui/radio-button {:label    "Tämän palvelun tuottamiseen ei osallistu muita yrityksiä."
+                         :value    "none"
+                         :on-click #(select-type :none)}]
+       [ui/radio-button {:label    "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona"
+                         :value    "csv-url"
+                         :on-click #(select-type :csv-url)}]
+       [ui/radio-button {:label    "Lataa yritysten tiedot csv-tiedostona lomakkeelle"
+                         :value    "csv-file"
+                         :on-click #(select-type :csv-file)}]
+       [ui/radio-button {:label    "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
+                         :value    "form"
+                         :on-click #(select-type :form)}]]
+
+      (when-not (nil? data)
+        (case company-source
+          :none [:div.row " "]
+          :csv-url [:div
+                    [:div.row (stylefy/use-style style-base/divider)]
+                    [:div.row
+                     (csv-help-text)
+                     [:div.col-md-6
+                     [field {:name            ::t-service/companies-csv-url
+                             :label           (tr [:field-labels :transport-service-common ::t-service/companies-csv-url])
+                             :hint-text       "https://finap.fi/ote/csv/palveluyritykset.csv"
+                             :full-width?  true
+                             :on-blur         on-url-given
+                             :update!         #(update! {::t-service/companies-csv-url %})
+                             :container-class "col-xs-12 col-sm-6 col-md-6"
+                             :type            :string}
+                      companies-csv-url]]]
+
+                     (let [success (if (= :success (get-in data [:csv-count :status]))
+                                     true
+                                     false)
+                           amount (if (get-in data [:csv-count :count])
+                                    (get-in data [:csv-count :count])
+                                    nil)]
+                       (cond
+                         (and data success) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]
+                         (and data (= false success)) [:div.row (stylefy/use-style style-base/required-element)
+                                                       (tr [:csv (get-in data [:csv-count :error])])]
+                         :else [:span]))]
+          :csv-file [:div
+                     [:div.row (stylefy/use-style style-base/divider)]
+                     [:div.row
+                      (csv-help-text)
+                      [:div.row {:style {:padding-top "20px"}}
+                       [field {:name      ::t-service/csv-file
+                               :type      :file
+                               :label     "Tiedosto"
+                               :accept    ".csv"
+                               :on-change on-file-selected
+                               }]]
+                      [:div.row
+                       (let [success (if (get data :csv-imported)
+                                       true
+                                       false)
+                             amount (if (get data ::t-service/companies)
+                                      (count (get data ::t-service/companies))
+                                      nil)]
+                         (when success
+                           [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]]
+          :form [:div.row
+                 [:div.row (stylefy/use-style style-base/divider)]
+                 [:div.row
+                  [field {:name                ::t-service/companies
+                          :type                :table
+                          :update!             #(update! {::t-service/companies %})
+                          :table-wrapper-style {:max-height "300px" :overflow "scroll"}
+                          :prepare-for-save    values/without-empty-rows
+                          :table-fields        [{:name      ::t-service/name
+                                                 :type      :string
+                                                 :label     (tr [:field-labels :transport-service-common ::t-service/company-name])
+                                                 :required? true
+                                                 }
+                                                {:name      ::t-service/business-id
+                                                 :type      :string
+                                                 :label     (tr [:field-labels :transport-service-common ::t-service/business-id])
+                                                 :validate  [[:business-id]]
+                                                 :required? true
+                                                 :regex     #"\d{0,7}(-\d?)?"}]
+                          :delete?             true
+                          :add-label           (tr [:buttons :add-new-company])
+                          :error-data          (::t-service/companies (:ote.ui.form/warnings data))}
+                   companies]]]
+          ""  ;; default
+          ))]]))
