@@ -44,7 +44,8 @@
       (let [ts (->  (s-generators/service-type-generator :passenger-transportation)
                     gen/generate
                     (dissoc ::t-service/companies)
-                    (assoc ::t-service/companies-csv-url url))
+                    (assoc ::t-service/companies-csv-url url
+                           ::t-service/company-source :csv-url))
             response (http-post "admin" "transport-service" ts)
             id (get-in response [:transit ::t-service/id])]
         (is (= 200 (:status response)))
