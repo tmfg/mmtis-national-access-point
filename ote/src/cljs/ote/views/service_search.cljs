@@ -73,14 +73,14 @@
                                                        transport-operator-id ckan-resource-id]}]
   (when-not (empty? external-interface-links)
     [:div
-     [:span.search-card-title (tr [:service-search :external-interfaces])]
+     [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
      [:table {:style {:margin-top "10px"}}
       [:thead (stylefy/use-style style/external-interface-header)
        [:tr
         (doall
           (for [[k w _] external-interface-table-columns]
             ^{:key k}
-            [:th {:style {:width w :height "20px"}}
+            [:th  {:style (merge {:width w} style/external-table-header) }
              (tr [:field-labels :transport-service-common k])]))]]
       [:tbody (stylefy/use-style style/external-interface-body)
        (doall
@@ -98,7 +98,7 @@
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
                                        operation-area-description description contact-phone contact-email
-                                       operator-name ckan-resource-id transport-operator-id]
+                                       operator-name business-id ckan-resource-id transport-operator-id]
                      :as              service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
@@ -133,7 +133,7 @@
         [:div.result-interfaces {:style style/result-border}
          e-links])
       [:div
-       [data-item nil operator-name]
+       [data-item nil (str operator-name " " business-id)]
 
        [data-item [ic/action-home {:style style/contact-icon}]
         (format-address contact-address)]

@@ -30,7 +30,7 @@
 
 (def form-card-body {:padding "15px 15px"
                      :font-size "1em"
-                     :color "#000"})
+                     :color "#444444"})
 
 (def form-info-text {:display "inline-block"
                      :position "relative"
