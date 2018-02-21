@@ -890,7 +890,7 @@
                          "One service found"
                          [:count " services found"])
   :nap-interface ["An interface containing essential data saved in NAP-service: "]
-  :external-interfaces ["External interfaces mantained by transport operator"]
+  :external-interfaces ["Other external interfaces"]
   :showing-latest-services "No search filters. Showing latest modified services."
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."

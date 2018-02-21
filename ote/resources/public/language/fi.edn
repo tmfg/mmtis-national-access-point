@@ -895,7 +895,7 @@
                           "löytyi yksi palvelu"
                           ["löytyi " :count " palvelua"]) "."]
   :nap-interface ["NAP-palvelussa tallennettujen tietojen koneluettava rajapinta: "]
-  :external-interfaces ["Palveluntuottajan itse tarjoamat rajapinnat"]
+  :external-interfaces ["Palvelun muut koneluettavat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
   :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
   :fetching-more "Haetaan lisää palveluita..."
