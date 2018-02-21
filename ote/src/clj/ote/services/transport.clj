@@ -106,11 +106,14 @@
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (get-transport-services db {::t-service/transport-operator-id (op/in operator-ids)})]
-    (map (fn [{id ::t-operator/id :as operator}]
-           {:transport-operator       operator
-            :transport-service-vector (vec (filter #(= id (::t-service/transport-operator-id %)) operator-services))
-            :user                     (dissoc user :apikey :email :id)})
-    operators)))
+    {:user (dissoc user :apikey :email :id)
+     :transport-operators
+     (map (fn [{id ::t-operator/id :as operator}]
+            {:transport-operator operator
+             :transport-service-vector (into []
+                                             (filter #(= id (::t-service/transport-operator-id %)))
+                                             operator-services)})
+          operators)}))
 
 (defn get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (get-transport-operator db {::t-operator/ckan-group-id (:id ckan-group)})
@@ -253,18 +256,18 @@
   [db transport-service]
     (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
 
-(defn- save-external-companies
+(defn save-external-companies
   "Service can contain an url that contains company nmes and business-id. Sevice can also contain an imported csv file
   with company names and business-ids."
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
-                            {::t-service/transport-service-id (::t-service/id transport-service)}))
+                                   {::t-service/transport-service-id (::t-service/id transport-service)}))
         companies (into [] (:companies (external/check-csv {:url (::t-service/companies-csv-url transport-service)})))
         new-data (if (empty? current-data)
-                      {::t-service/companies            companies
-                       ::t-service/transport-service-id (::t-service/id transport-service)
-                       ::t-service/source               "URL"}
-                      (assoc current-data ::t-service/companies companies))]
+                   {::t-service/companies            companies
+                    ::t-service/transport-service-id (::t-service/id transport-service)
+                    ::t-service/source               "URL"}
+                   (assoc current-data ::t-service/companies companies))]
 
     (external/save-companies db new-data)))
 

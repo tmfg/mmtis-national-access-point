@@ -14,12 +14,12 @@
 
 (defn update-transport-operator-data
   [{:keys [page ckan-organization-id transport-operator] :as app}
-   response]
+   {:keys [user transport-operators] :as response}]
 
   (let [app (assoc app
                    :transport-operator-data-loaded? true
-                   :user (:user (first response)))]
-    (if (and (nil? (:transport-operator (first response)))
+                   :user user)]
+    (if (and (empty? transport-operators)
              (not= :services page))
       ;; If page is :transport-operator and user has no operators, start creating a new one
       (do
@@ -38,11 +38,11 @@
                                                   (= ckan-organization-id
                                                      (get-in % [:transport-operator ::t-operator/ckan-group-id])))
                                           %)
-                                       response)
-                                 (first response))]
+                                       transport-operators)
+                                 (first transport-operators))]
 
           (assoc app
-                 :transport-operators-with-services response
+                 :transport-operators-with-services transport-operators
                  :transport-operator (:transport-operator selected-operator)
                  :transport-service-vector (:transport-service-vector selected-operator))))))
 

@@ -2,67 +2,86 @@
   (:require [stylefy.core :as stylefy]
             [ote.style.base :as base]))
 
-(def divider-color "lightGray")
-(def subtitle-color "#A4A4A4")
+(def result-header {:width         "100%"
+                    :display       "block"
+                    :margin-bottom "0.5em"
+                    ::stylefy/mode {:hover {:cursor          "pointer"
+                                            :text-decoration "underline"}}})
 
-(def result-card {:margin "1em 0em 0em 0em" :padding "1em 1em 1.5em 1em"})
+(def result-border {:padding-bottom "10px"
+                    :margin-bottom  "10px"
+                    :border-bottom  "1px solid #d9d9d9"})
 
-(def right-divider {:padding-right "0.5em"
-                    :margin-right "0.5em"
-                    :border-right (str "solid 2px " divider-color)})
+(def operator-result-header {:width            "100%"
+                             :display          "block"
+                             :padding          "10px"
+                             :background-color "#0088ce"})
 
-(def bottom-divider {:padding-bottom "1em"
-                     :margin-bottom "1em"
-                     :border-bottom (str "solid 2px " divider-color)})
+(def operator-result-header-link {:color       "white"
+                                  :font-weight 600})
 
-(def result-link
-  (merge
-   {:font-size "21px"
-    :font-weight 400
-    :color "#2D75B4"
-    ::stylefy/mode {:hover {:text-decoration "underline"}}
-    }
-   right-divider))
+(def operator-description {:padding   "5px 10px 10px 10px"
+                           :font-size "15px"
+                           :color     "#666"})
 
-(def subtitle (merge
-               {:color subtitle-color
-                :font-size "90%"}
-               bottom-divider))
+(def service-card-description {:display       "inline-block"
+                               :max-width     "100%"
+                               :padding-right "40px"
+                               :max-height    "21px"
+                               :line-height   "21px"
+                               :text-align    "justify"
+                               :position      "relative"
+                               :overflow      "hidden"})
 
-(def subtitle-operator  {:display "inline-block" :color "#666"})
-(def subtitle-operator-first (merge {:display "inline-block" :color "#666"}
-                              right-divider))
+(def result-card {:margin-top "20px"
+                  :background-color "#fff"
+                  :box-shadow       "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
-(def result-header {:width "100%" :display "block"
-                    :margin-bottom "0.5em"})
+(def result-card-label {:padding          "15px 15px"
+                        :font-size        "1.125em"
+                        :font-weight      "bold"
+                        :color            "#fff"
+                        :background-color "#00A9DF"
+                        ::stylefy/mode {:hover {:cursor          "pointer"
+                                                :text-decoration "underline"}}})
 
-(def operator-result-header {:width "100%" :display "block"
-                    :padding "10px"
-                    :background-color "#0088ce"})
+(def result-card-small-label {:font-size "12px"
+                              :font-weight "20"
+                              :padding-left "20px"})
 
-(def operator-result-header-link {:color "white"
-                         :font-weight 600})
+(def result-card-body {:padding   "15px 15px"
+                       :font-size "1em"
+                       :color     "#000"})
 
-(def operator-description {:padding "5px 10px 10px 10px" :font-size "15px" :color "#666"})
-(def service-link  {:color "#2D75B4" :text-decoration "none"})
+(def result-card-delete {:float "right"
+                         :position "relative"
+                         :top "-50px"})
+
+(def delete-icon {:color         "rgba(255, 255, 255, 0,75)"
+                  ::stylefy/mode {:hover {:color "rgba(255, 255, 255, 1) !important"}}})
+(def partly-visible-delete-icon {:color "rgba(255, 255, 255, 0,75)"})
+
+(def service-link {:color "#2D75B4" :text-decoration "none"})
 
 (def data-items
   (merge base/item-list-container
-         {:display "inline-flex"
-          :position "relative"
-          :font-size "14px"
-          :color "#666"}))
+         {:display   "inline-flex"
+          :position  "relative"
+          :font-size "13px"
+          :color     "#999999"}))
 
 (def external-interface-header
-  {:color subtitle-color
-   :font-size "80%"
+  {:font-size  "80%"
    :text-align "left"})
 
-(def external-interface-body
-  {:font-weight "normal"})
+(def external-interface-body {:font-weight "normal"})
 
-(def icon-div { :display "inline-block"
+(def external-table-row {:height "20px"})
+
+(def icon-div {:display  "inline-block"
                :position "relative"
-               :top "4px"})
+               :top      "4px"})
 
-(def contact-icon { :color "#777" :height 18 :width 18   })
+(def contact-icon {:color  "#999999"
+                   :height 16
+                   :width  16})

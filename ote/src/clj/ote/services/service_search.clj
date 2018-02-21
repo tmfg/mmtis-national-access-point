@@ -41,6 +41,7 @@
     ::t-service/type
     ::t-service/transport-operator-id
     ::t-service/contact-phone
+    ::t-service/description
 
     ;; Information JOINed from other tables
     ::t-service/external-interface-links
