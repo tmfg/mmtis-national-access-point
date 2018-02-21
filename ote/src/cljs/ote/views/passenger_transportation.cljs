@@ -30,8 +30,6 @@
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas app])})
 
-
-
 (defn luggage-restrictions-group []
   (form/group
     {:label (tr [:passenger-transportation-page :header-restrictions])
@@ -191,6 +189,7 @@
              [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group e!)
+              (ts-common/brokerage-group e!)
               (ts-common/place-search-group e! ::t-service/passenger-transportation)
               (ts-common/external-interfaces e! (get service ::t-service/type) (get service ::t-service/sub-type))
               (luggage-restrictions-group)

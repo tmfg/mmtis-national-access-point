@@ -12,6 +12,9 @@
 
 (def font {:font-family "'Roboto', sans-serif"})
 
+(def divider {:margin "20px 0px 15px 0px"
+              :border-top "1px solid rgb(217, 217, 217)"})
+
 (def inline-block {:display "inline-block"})
 
 (def action-button-container (merge inline-block
@@ -96,6 +99,10 @@
                           :margin-left "-15px"
                           :margin-right "-15px"
                           :margin-top "-15px"}))
+
+(def help-link-container {:padding "10px 0px 0px 0px"})
+(def link-icon-container {:float "left" :padding-right "10px"})
+(def link-icon {:color "#2D75B4" :height 18 :width 18})
 
 (def filters-form
   {:border "solid 1px #0046ad"})
