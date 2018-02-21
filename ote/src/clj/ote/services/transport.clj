@@ -271,12 +271,17 @@
 
     (external/save-companies db new-data)))
 
-(defn- maybe-clear-company-url
+(defn- maybe-clear-companies
   "Companies can be added from url, csv or by hand in form. Clean up url if some other option is selected"
   [transport-service]
-  (if (not= :csv-url (get transport-service ::t-service/company-source))
-    (assoc transport-service ::t-service/companies-csv-url nil)
-    transport-service))
+  (let [source (get transport-service ::t-service/company-source)]
+  (cond
+    (= :none source) (assoc transport-service ::t-service/companies-csv-url nil
+                                              ::t-service/companies {})
+    (= :form source) (assoc transport-service ::t-service/companies-csv-url nil)
+    (= :csv-file source) (assoc transport-service ::t-service/companies-csv-url nil)
+    (= :csv-url source) (assoc transport-service ::t-service/companies {})
+    :else transport-service)))
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
@@ -291,7 +296,7 @@
                          floats-to-bigdec
                          (dissoc ::t-service/external-interfaces
                                  ::t-service/service-company)
-                         (maybe-clear-company-url))
+                         (maybe-clear-companies))
 
         resources-from-db (publish/fetch-transport-service-external-interfaces db (::t-service/id data))
         removed-resources (removable-resources resources-from-db external-interfaces)

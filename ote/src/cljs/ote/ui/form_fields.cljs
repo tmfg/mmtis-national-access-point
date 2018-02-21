@@ -607,8 +607,84 @@
    [:div
     (ote.ui.common/linkify "/ote/csv/palveluyritykset.csv"  (tr [:form-help :csv-file-example]) {:target "_blank"})]])
 
+
+(defn company-csv-url-input [update! on-url-given companies-csv-url data]
+  [:div
+   [:div.row (stylefy/use-style style-base/divider)]
+   [:div.row
+    (csv-help-text)
+    [:div.col-md-6
+     [field {:name            ::t-service/companies-csv-url
+             :label           (tr [:field-labels :transport-service-common ::t-service/companies-csv-url])
+             :hint-text       "https://finap.fi/ote/csv/palveluyritykset.csv"
+             :full-width?     true
+             :on-blur         on-url-given
+             :update!         #(update! {::t-service/companies-csv-url %})
+             :container-class "col-xs-12 col-sm-6 col-md-6"
+             :type            :string}
+      companies-csv-url]]]
+
+   (let [success (if (= :success (get-in data [:csv-count :status]))
+                   true
+                   false)
+         amount (if (get-in data [:csv-count :count])
+                  (get-in data [:csv-count :count])
+                  nil)]
+     (cond
+       (and data success) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]
+       (and data (= false success)) [:div.row (stylefy/use-style style-base/required-element)
+                                     (tr [:csv (get-in data [:csv-count :error])])]
+       :else [:span]))])
+
+(defn company-csv-file-input [on-file-selected data]
+  [:div
+   [:div.row (stylefy/use-style style-base/divider)]
+   [:div.row
+    (csv-help-text)
+    [:div.row {:style {:padding-top "20px"}}
+     [field {:name      ::t-service/csv-file
+             :type      :file
+             :label     "Tiedosto"
+             :accept    ".csv"
+             :on-change on-file-selected
+             }]]
+    [:div.row
+     (let [success (if (get data :csv-imported)
+                     true
+                     false)
+           amount (if (get data ::t-service/companies)
+                    (count (get data ::t-service/companies))
+                    nil)]
+       (when success
+         [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]])
+
+(defn company-input-fields [update! companies data]
+  [:div.row
+   [:div.row (stylefy/use-style style-base/divider)]
+   [:div.row
+    [field {:name                ::t-service/companies
+            :type                :table
+            :update!             #(update! {::t-service/companies %})
+            :table-wrapper-style {:max-height "300px" :overflow "scroll"}
+            :prepare-for-save    values/without-empty-rows
+            :table-fields        [{:name      ::t-service/name
+                                   :type      :string
+                                   :label     (tr [:field-labels :transport-service-common ::t-service/company-name])
+                                   :required? true
+                                   }
+                                  {:name      ::t-service/business-id
+                                   :type      :string
+                                   :label     (tr [:field-labels :transport-service-common ::t-service/business-id])
+                                   :validate  [[:business-id]]
+                                   :required? true
+                                   :regex     #"\d{0,7}(-\d?)?"}]
+            :delete?             true
+            :add-label           (tr [:buttons :add-new-company])
+            :error-data          (::t-service/companies (:ote.ui.form/warnings data))}
+     companies]]])
+
 (defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
-                                       {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
+                                  {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
   (let [select-type #(update! {::t-service/company-source %})
         selected-type (if company-source
                         (name company-source)
@@ -617,7 +693,7 @@
      [:div.row
       [:h3 (tr [:passenger-transportation-page :header-select-company-list-type])]]
      [:div.row
-      [ui/radio-button-group {:name (str "brokerage-companies-selection")
+      [ui/radio-button-group {:name           (str "brokerage-companies-selection")
                               :value-selected selected-type}
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-no-companies])
                          :value    "none"
@@ -628,81 +704,15 @@
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-csv-companies])
                          :value    "csv-file"
                          :on-click #(select-type :csv-file)}]
-       [ui/radio-button {:label   (tr [:passenger-transportation-page :radio-button-form-companies])
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-form-companies])
                          :value    "form"
                          :on-click #(select-type :form)}]]
 
       (when-not (nil? data)
         (case company-source
           :none [:div.row " "]
-          :csv-url [:div
-                    [:div.row (stylefy/use-style style-base/divider)]
-                    [:div.row
-                     (csv-help-text)
-                     [:div.col-md-6
-                     [field {:name            ::t-service/companies-csv-url
-                             :label           (tr [:field-labels :transport-service-common ::t-service/companies-csv-url])
-                             :hint-text       "https://finap.fi/ote/csv/palveluyritykset.csv"
-                             :full-width?  true
-                             :on-blur         on-url-given
-                             :update!         #(update! {::t-service/companies-csv-url %})
-                             :container-class "col-xs-12 col-sm-6 col-md-6"
-                             :type            :string}
-                      companies-csv-url]]]
-
-                     (let [success (if (= :success (get-in data [:csv-count :status]))
-                                     true
-                                     false)
-                           amount (if (get-in data [:csv-count :count])
-                                    (get-in data [:csv-count :count])
-                                    nil)]
-                       (cond
-                         (and data success) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]
-                         (and data (= false success)) [:div.row (stylefy/use-style style-base/required-element)
-                                                       (tr [:csv (get-in data [:csv-count :error])])]
-                         :else [:span]))]
-          :csv-file [:div
-                     [:div.row (stylefy/use-style style-base/divider)]
-                     [:div.row
-                      (csv-help-text)
-                      [:div.row {:style {:padding-top "20px"}}
-                       [field {:name      ::t-service/csv-file
-                               :type      :file
-                               :label     "Tiedosto"
-                               :accept    ".csv"
-                               :on-change on-file-selected
-                               }]]
-                      [:div.row
-                       (let [success (if (get data :csv-imported)
-                                       true
-                                       false)
-                             amount (if (get data ::t-service/companies)
-                                      (count (get data ::t-service/companies))
-                                      nil)]
-                         (when success
-                           [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]]
-          :form [:div.row
-                 [:div.row (stylefy/use-style style-base/divider)]
-                 [:div.row
-                  [field {:name                ::t-service/companies
-                          :type                :table
-                          :update!             #(update! {::t-service/companies %})
-                          :table-wrapper-style {:max-height "300px" :overflow "scroll"}
-                          :prepare-for-save    values/without-empty-rows
-                          :table-fields        [{:name      ::t-service/name
-                                                 :type      :string
-                                                 :label     (tr [:field-labels :transport-service-common ::t-service/company-name])
-                                                 :required? true
-                                                 }
-                                                {:name      ::t-service/business-id
-                                                 :type      :string
-                                                 :label     (tr [:field-labels :transport-service-common ::t-service/business-id])
-                                                 :validate  [[:business-id]]
-                                                 :required? true
-                                                 :regex     #"\d{0,7}(-\d?)?"}]
-                          :delete?             true
-                          :add-label           (tr [:buttons :add-new-company])
-                          :error-data          (::t-service/companies (:ote.ui.form/warnings data))}
-                   companies]]]
-          ""  ;; default
-          ))]]))
+          :csv-url [company-csv-url-input update! on-url-given companies-csv-url data]
+          :csv-file [company-csv-file-input on-file-selected data]
+          :form [company-input-fields update! companies data]
+          ;; default
+          ""))]]))
