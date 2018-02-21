@@ -82,10 +82,7 @@
    :ote.db.transport-service/service-hours-info "Additional information"
 
    ;; Advance reservation
-   :ote.db.transport-service/advance-reservation "Advance reservation"
-   :ote.db.transport-service/no-advance "Service does not have advance reservation."
-   :ote.db.transport-service/possible-advance "Service has advance reservation but is is not mandatory."
-   :ote.db.transport-service/mandatory-advance "Advance reservation is mandatory for this service."}
+   :ote.db.transport-service/advance-reservation "Advance reservation"}
 
   ;; Service exception
   :service-exception
@@ -446,8 +443,12 @@
    :service-hours "Service hours"
    :disruptions "Fault situations"
    :payment-interface "Payment and sales interface"
-   :other "Other"}}
+   :other "Other"}
 
+  :ote.db.transport-service/advance-reservation
+  {:ote.db.transport-service/no "Service does not have advance reservation."
+   :ote.db.transport-service/possible "Service has advance reservation but is is not mandatory."
+   :ote.db.transport-service/mandatory "Advance reservation is mandatory for this service."}}
 
   ;; ENUMS end
 

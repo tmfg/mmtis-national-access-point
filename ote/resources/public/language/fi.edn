@@ -83,10 +83,7 @@
    :ote.db.transport-service/service-hours-info "Lisätiedot"
 
    ;; Advance reservation
-   :ote.db.transport-service/advance-reservation "Ennakkovaraus"
-   :ote.db.transport-service/no-advance "Palvelun käyttöön ei liity ennakkovarausta."
-   :ote.db.transport-service/possible-advance "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
-   :ote.db.transport-service/mandatory-advance "Palvelun ennakkovaraus on pakollista."}
+   :ote.db.transport-service/advance-reservation "Ennakkovaraus"}
 
   ;; Service exception
   :service-exception
@@ -447,7 +444,12 @@
    :service-hours "Palveluajat"
    :disruptions "Häiriötilanteet"
    :payment-interface "Lippu- ja myyntirajapinta"
-   :other "Muu"}}
+   :other "Muu"}
+
+  :ote.db.transport-service/advance-reservation
+  {:no "Palvelun käyttöön ei liity ennakkovarausta."
+   :possible "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
+   :mandatory "Palvelun ennakkovaraus on pakollista."}}
   ;; ENUMS end
 
 
