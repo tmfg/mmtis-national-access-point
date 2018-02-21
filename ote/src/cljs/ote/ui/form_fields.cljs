@@ -208,8 +208,25 @@
          [:div (stylefy/use-style style-base/required-element)
           (if error error warning)])])))
 
+(defn radio-selection [{:keys [update! label name show-option options] :as field}
+                       data]
+  (let [option-idx (zipmap options (map str (range)))]
+    [:div.radio
+     [ui/radio-button-group
+      {:value-selected (or (option-idx data) "")
+       :name (str name)
+       :on-change (fn [_ value]
+                    (let [option (some #(when (= (second %) value)
+                                          (first %)) option-idx)]
+                      (update! option)))}
+      (doall
+       (map (fn [option]
+              [ui/radio-button
+               {:label (show-option option)
+                :value (option-idx option)}])
+            options))]]))
 
-(defmethod field :selection [{:keys [update! table? label name style show-option options form?
+(defn field-selection [{:keys [update! table? label name style show-option options form?
                                      error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -238,6 +255,11 @@
            [ui/menu-item {:value i :primary-text (show-option option)}]))
        options))]))
 
+(defmethod field :selection [{radio? :radio? :as field} data]
+  (if radio?
+    [radio-selection field data]
+    [field-selection field data])
+  )
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
