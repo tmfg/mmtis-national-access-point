@@ -208,7 +208,7 @@
          [:div (stylefy/use-style style-base/required-element)
           (if error error warning)])])))
 
-(defn radio-selection [{:keys [update! label name show-option options] :as field}
+(defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
                        data]
   (let [option-idx (zipmap options (map str (range)))]
     [:div.radio
@@ -224,7 +224,10 @@
               [ui/radio-button
                {:label (show-option option)
                 :value (option-idx option)}])
-            options))]]))
+            options))]
+     (when (or error warning)
+       [:div (stylefy/use-style style-base/required-element)
+        (if error error warning)])]))
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
                                      error warning auto-width? disabled?] :as field}

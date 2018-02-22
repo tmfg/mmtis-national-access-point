@@ -36,6 +36,7 @@
     :show-option (tr-key [:enums ::t-service/advance-reservation])
     :options t-service/advance-reservation
     :radio? true
+    :required? true
     :container-class "col-md-12"}))
 
 (defn service-url
