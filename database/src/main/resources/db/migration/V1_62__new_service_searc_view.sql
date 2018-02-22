@@ -15,4 +15,4 @@ CREATE VIEW transport_service_search_result AS
      FROM "external-interface-description" ei
      WHERE ei."transport-service-id" = t.id)::external_interface_search_result[] AS "external-interface-links"
   FROM "transport-service" t
-   JOIN  "transport-operator" op ON op.id = t."tansport-operator-id";
+   JOIN  "transport-operator" op ON op.id = t."transport-operator-id";
