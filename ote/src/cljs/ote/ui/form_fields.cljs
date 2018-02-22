@@ -210,8 +210,8 @@
 
 
 (defmethod field :autocomplete [{:keys [update! label name max-length min-length regex
-                                        focus form? error warning table? full-width?
-                                        style input-style hint-style options filter
+                                        form? error warning table? full-width?
+                                        style hint-style suggestions filter
                                         open-on-focus max-results
                                         on-blur on-close on-new-request on-update-input] :as field}
                                 data]
@@ -219,7 +219,7 @@
   [ui/auto-complete
    (merge
      {:name name
-      :dataSource options
+      :dataSource suggestions
       :floating-label-text (when-not table? label)
       :floating-label-fixed true
       :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))

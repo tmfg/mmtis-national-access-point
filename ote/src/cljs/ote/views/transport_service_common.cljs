@@ -142,7 +142,7 @@
                        :tooltip (tr [:form-help :external-interfaces-tooltips :license])
                        :width "20%"
                        :full-width? true
-                       :options (tr-tree [:licenses :external-interfaces])}
+                       :suggestions (tr-tree [:licenses :external-interfaces])}
                       {:name ::t-service/external-service-description
                        :type :localized-text
                        :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
