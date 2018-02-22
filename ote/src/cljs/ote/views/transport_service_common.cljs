@@ -139,6 +139,7 @@
                        :required? true}
                       {:name ::t-service/license
                        :type :autocomplete
+                       :open-on-focus true
                        :tooltip (tr [:form-help :external-interfaces-tooltips :license])
                        :width "20%"
                        :full-width? true
