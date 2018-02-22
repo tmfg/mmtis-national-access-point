@@ -19,6 +19,9 @@
     ["/services/:operator" :services]
     ["/operators" :operators]
 
+    ;; Route based traffic
+    ["/route/new" :new-route]
+
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
 
