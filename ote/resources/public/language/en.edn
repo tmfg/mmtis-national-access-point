@@ -319,7 +319,11 @@
   :add-new-additional-service "Add a new row"
   :add-new-vehicle "Add a new row"
   :add-new-transport-operator "Create a new transport operator"
-  :add-new-member "Add a new member"}
+  :add-new-member "Add a new member"
+  :upload-csv "Add CSV"
+  :update-csv "Update CSV"
+  }
+
 
 
 
