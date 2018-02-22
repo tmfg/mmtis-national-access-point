@@ -2,6 +2,7 @@
   "UI components for different form fields."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
+            [ote.ui.mui-chip-input :refer [chip-input]]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
             [cljs-react-material-ui.icons :as ic]
@@ -209,30 +210,28 @@
           (if error error warning)])])))
 
 
-(defmethod field :autocomplete [{:keys [update! label name max-length min-length regex
-                                        form? error warning table? full-width?
-                                        style hint-style suggestions filter
-                                        open-on-focus max-results
-                                        on-blur on-close on-new-request on-update-input] :as field}
+(defmethod field :autocomplete [{:keys [update! label name error warning regex
+                                        max-length style hint-style
+                                        filter suggestions max-results
+                                        on-blur
+                                        form? table? full-width? open-on-focus?] :as field}
                                 data]
 
   [ui/auto-complete
    (merge
      {:name name
-      :dataSource suggestions
       :floating-label-text (when-not table? label)
       :floating-label-fixed true
+      :dataSource suggestions
       :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
       :max-search-results (or max-results 10)
-      :open-on-focus (or open-on-focus false)
-      :hintText (placeholder field data)
-      :on-blur on-blur
-      :on-new-request #(let [v %1]
-                         (if regex
-                           (when (re-matches regex v)
-                             (update! v))
-                           (update! v)))
+      :open-on-focus open-on-focus?
       :search-text (or data "")
+
+      :hintText (placeholder field data)
+      :full-width full-width?
+
+
       ;; Show error text or warning text or empty string
       :error-text (or error warning "")
       ;; Error is more critical than required - showing it first
@@ -240,19 +239,70 @@
                      style-base/error-element
                      style-base/required-element)
       :hint-style (merge style-base/placeholder
-                         hint-style)}
-     (when on-close
-       {:on-close on-close})
-     (when on-new-request
-       {:on-new-request on-new-request})
-     (when on-update-input
-       {:on-update-input on-update-input})
+                         hint-style)
+      :on-blur on-blur
+      :on-new-request #(let [v %1]
+                         (if regex
+                           (when (re-matches regex v)
+                             (update! v))
+                           (update! v)))}
      (when max-length
        {:max-length max-length})
-     (when full-width?
-       {:full-width true})
      (when style
        {:style style}))])
+
+(defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
+                                      max-length style hint-style
+                                      filter suggestions default-values max-results open-on-focus? clear-on-blur?
+                                      allow-duplicates? new-chip-key-codes
+                                      form? table? full-width? disabled?]
+                               :or {open-on-focus? true, clear-on-blur? true, allow-duplicates? false} :as field}
+                              data]
+
+  (let [vals (set (or data #{}))]
+    [chip-input
+     (merge
+       {:name name
+        :floating-label-text (when-not table? label)
+        :floating-label-fixed true
+        :hintText (placeholder field data)
+        :disabled disabled?
+        :value (clj->js vals)
+
+        ;; == Autocomplete options ==
+        :dataSource suggestions
+        :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
+        :max-search-results (or max-results 10)
+        :open-on-focus open-on-focus?
+        :clear-on-blur clear-on-blur?
+
+        ;; == Chip options ==
+        :allow-duplicates allow-duplicates?
+        ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
+        :new-chip-key-codes (or new-chip-key-codes [13])
+
+        ;; Show error text or warning text or empty string
+        :error-text (or error warning "")
+
+        ;; == Styling ==
+        :full-width full-width?
+        :full-width-input full-width?
+
+        ;; Error is more critical than required - showing it first
+        :error-style (if error
+                       style-base/error-element
+                       style-base/required-element)
+        :hint-style (merge style-base/placeholder
+                           hint-style)
+
+        ;; == Event handlers ==
+        :on-blur on-blur
+        :on-change #(update! (into #{} %))}
+
+       (when max-length
+         {:max-length max-length})
+       (when style
+         {:style style}))]))
 
 
 (defmethod field :selection [{:keys [update! table? label name style show-option options form?

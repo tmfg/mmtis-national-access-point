@@ -132,18 +132,22 @@
                        :width "5%"
                        }
                       {:name ::t-service/format
-                       :type :string
+                       :type :chip-input
+                       :open-on-focus? true
+                       :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
+                       :max-results 10
                        :tooltip (tr [:form-help :external-interfaces-tooltips :format])
                        :width "15%"
                        :full-width? true
                        :required? true}
                       {:name ::t-service/license
                        :type :autocomplete
-                       :open-on-focus true
+                       :open-on-focus? true
                        :tooltip (tr [:form-help :external-interfaces-tooltips :license])
                        :width "20%"
                        :full-width? true
-                       :suggestions (tr-tree [:licenses :external-interfaces])}
+                       :suggestions (tr-tree [:licenses :external-interfaces])
+                       :max-results 10}
                       {:name ::t-service/external-service-description
                        :type :localized-text
                        :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
