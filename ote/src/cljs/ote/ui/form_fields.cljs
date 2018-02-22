@@ -155,7 +155,7 @@
             :background-color "#1565C0"
             :font-size "12px"
             :font-weight "bold"}}
-           "Lisää csv" ]
+           label ]
   [:input {:type "file"
            :name name
            :on-change on-change}]])
@@ -644,11 +644,15 @@
     [:div.row {:style {:padding-top "20px"}}
      [field {:name      ::t-service/csv-file
              :type      :file
-             :label     "Tiedosto"
+             :label     (if (get data ::t-service/company-csv-filename)
+                          (tr [:buttons :update-csv])
+                          (tr [:buttons :upload-csv]))
              :accept    ".csv"
              :on-change on-file-selected
              }]]
-    [:div.row
+    (when (get data ::t-service/company-csv-filename)
+      [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
+    [:div.row {:style {:padding-top "20px"}}
      (let [success (if (get data :csv-imported)
                      true
                      false)
