@@ -447,9 +447,9 @@
    :other "Other"}
 
   :ote.db.transport-service/advance-reservation
-  {:ote.db.transport-service/no "Service does not have advance reservation."
-   :ote.db.transport-service/possible "Service has advance reservation but is is not mandatory."
-   :ote.db.transport-service/mandatory "Advance reservation is mandatory for this service."}}
+  {:no "Service does not have advance reservation."
+   :possible "Service has advance reservation but is is not mandatory."
+   :mandatory "Advance reservation is mandatory for this service."}}
 
   ;; ENUMS end
 
