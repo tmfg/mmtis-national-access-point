@@ -65,8 +65,8 @@ describe('Naughty form fill', () => {
                     cy.get('input[type="checkbox"]').check();
                 });
 
-
-            cy.get('input[id*="companies-csv-url--Yrityslistanosoite-"').typeRaw(genNaughtyString(100));
+            cy.get('#radio-company-csv-url').click();
+            cy.get('input[id*="companies-csv-url-"').typeRaw(genNaughtyString(100));
             cy.get('textarea[id*="luggage-restrictions--Matkatavaroitakoskevatrajoitukset-"')
                 .typeRaw(genNaughtyString(100));
 
