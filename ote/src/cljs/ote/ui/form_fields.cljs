@@ -209,6 +209,52 @@
           (if error error warning)])])))
 
 
+(defmethod field :autocomplete [{:keys [update! label name max-length min-length regex
+                                        focus form? error warning table? full-width?
+                                        style input-style hint-style options filter
+                                        open-on-focus max-results
+                                        on-blur on-close on-new-request on-update-input] :as field}
+                                data]
+
+  [ui/auto-complete
+   (merge
+     {:name name
+      :dataSource options
+      :floating-label-text (when-not table? label)
+      :floating-label-fixed true
+      :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
+      :max-search-results (or max-results 10)
+      :open-on-focus (or open-on-focus false)
+      :hintText (placeholder field data)
+      :on-blur on-blur
+      :on-new-request #(let [v %1]
+                         (if regex
+                           (when (re-matches regex v)
+                             (update! v))
+                           (update! v)))
+      :search-text (or data "")
+      ;; Show error text or warning text or empty string
+      :error-text (or error warning "")
+      ;; Error is more critical than required - showing it first
+      :error-style (if error
+                     style-base/error-element
+                     style-base/required-element)
+      :hint-style (merge style-base/placeholder
+                         hint-style)}
+     (when on-close
+       {:on-close on-close})
+     (when on-new-request
+       {:on-new-request on-new-request})
+     (when on-update-input
+       {:on-update-input on-update-input})
+     (when max-length
+       {:max-length max-length})
+     (when full-width?
+       {:full-width true})
+     (when style
+       {:style style}))])
+
+
 (defmethod field :selection [{:keys [update! table? label name style show-option options form?
                                      error warning auto-width? disabled?] :as field}
                              data]

@@ -3,7 +3,7 @@
   (:require [tuck.core :as tuck]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
             [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
@@ -138,10 +138,11 @@
                        :full-width? true
                        :required? true}
                       {:name ::t-service/license
-                       :type :string
+                       :type :autocomplete
                        :tooltip (tr [:form-help :external-interfaces-tooltips :license])
                        :width "20%"
-                       :full-width? true}
+                       :full-width? true
+                       :options (tr-tree [:licenses :external-interfaces])}
                       {:name ::t-service/external-service-description
                        :type :localized-text
                        :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
