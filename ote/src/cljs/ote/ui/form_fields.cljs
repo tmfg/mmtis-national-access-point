@@ -696,16 +696,20 @@
       [ui/radio-button-group {:name           (str "brokerage-companies-selection")
                               :value-selected selected-type}
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-no-companies])
+                         :id       "radio-company-none"
                          :value    "none"
                          :on-click #(select-type :none)}]
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-url-companies])
+                         :id       "radio-company-csv-url"
                          :value    "csv-url"
                          :on-click #(select-type :csv-url)}]
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-csv-companies])
+                         :id       "radio-company-csv-file"
                          :value    "csv-file"
                          :on-click #(select-type :csv-file)}]
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-form-companies])
                          :value    "form"
+                         :id       "radio-company-form"
                          :on-click #(select-type :form)}]]
 
       (when-not (nil? data)
