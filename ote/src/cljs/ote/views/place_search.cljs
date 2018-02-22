@@ -110,8 +110,7 @@
                       :center #js [65 25]
                       :zoomControl false
                       :zoom 5}
-         [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                             :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+         (leaflet/background-tile-map)
 
          ;[leaflet/FeatureGroup]
 
