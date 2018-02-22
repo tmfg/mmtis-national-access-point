@@ -236,7 +236,7 @@
 
          {:name :text-search
          :type :string
-         :placeholder (tr [:service-search :text-search-placeholder])}
+         :hint-text (tr [:service-search :text-search-placeholder])}
 
          {:name ::t-service/operation-area
          :type :multiselect-selection
