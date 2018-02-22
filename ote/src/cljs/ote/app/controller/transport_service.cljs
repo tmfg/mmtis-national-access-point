@@ -2,6 +2,7 @@
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
+            [ote.util.csv :as csv-util]
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
@@ -9,7 +10,9 @@
             [taoensso.timbre :as log]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
-            [ote.app.controller.place-search :as place-search]))
+            [ote.app.controller.place-search :as place-search]
+            [clojure.string :as str]
+            [testdouble.cljs.csv :as csv]))
 
 (defn new-transport-service [app]
       (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type}))
@@ -30,6 +33,7 @@
     ::t-service/available-to
     ::t-service/notice-external-interfaces?
     ::t-service/companies-csv-url
+    ::t-service/company-source
     :csv-count})
 
 (defn service-type-from-sub-type
@@ -80,6 +84,8 @@
 (defrecord EnsureExternalInterfaceUrl [url])
 (defrecord EnsureExternalInterfaceUrlResponse [response url])
 (defrecord FailedExternalInterfaceUrlResponse [])
+
+(defrecord AddImportedCompaniesToService [csv])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -283,6 +289,12 @@
   (process-event [{response :response} app]
     app)
 
+  AddImportedCompaniesToService
+  (process-event [{csv :csv} app]
+      (-> app
+        (assoc-in [:transport-service ::t-service/passenger-transportation ::t-service/companies] csv)
+        (assoc-in [:transport-service ::t-service/passenger-transportation :csv-imported] true)))
+
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage
   (process-event [{id :id} app]
@@ -439,3 +451,28 @@
     (if (not (nil? first-matching-item))
       true
       false)))
+
+(defn clean-up-csv-value [value]
+  (when-not (nil? value)
+    (str/trim
+      (str/replace value "\"" ""))))
+
+(defn parse-csv-response->company-map
+  "Convert given vector to maps of business-id and company names."
+  [csv-data]
+  (let [headers (first csv-data)
+        companies (map (fn [[business-id name]]
+           {::t-service/business-id (clean-up-csv-value business-id)
+            ::t-service/name        (clean-up-csv-value name)})
+         (rest csv-data))
+        valid-companies (filter #(csv-util/valid-business-id? (::t-service/business-id %)) companies)]
+    valid-companies))
+
+(defn read-companies-csv! [e! file-input]
+  (let [fr (js/FileReader.)]
+    (set! (.-onload fr)
+          (fn [e]
+            (let [txt (-> e .-target .-result)
+                  csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator ","))]
+              (e! (->AddImportedCompaniesToService csv)))))
+    (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))

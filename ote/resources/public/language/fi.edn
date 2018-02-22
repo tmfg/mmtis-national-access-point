@@ -260,9 +260,9 @@
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
                                  :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille. Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
   :RAE-link-text "Rae-työkalulla"
-  :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
+  :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa."
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
-  :csv-file-example "Katso tästä esimerkkitiedosto."
+  :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
@@ -518,7 +518,13 @@
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
-  :header-pick-up-locations "Toimipisteet"}
+  :header-pick-up-locations                "Toimipisteet"
+  :header-select-company-list-type         "Valitse ilmoittamistapa"
+  :radio-button-no-companies               "Tämän palvelun tuottamiseen ei osallistu muita yrityksiä."
+  :radio-button-url-companies              "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona."
+  :radio-button-csv-companies              "Lataa yritysten tiedot csv-tiedostona lomakkeelle."
+  :radio-button-form-companies             "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
+  }
 
 
  :rentals-page
