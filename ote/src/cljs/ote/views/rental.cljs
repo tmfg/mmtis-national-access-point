@@ -291,6 +291,7 @@
                      (accessibility-group)
                      (additional-services)
                      (usage-area)
+                     (ts-common/advance-reservation-group)
                      (ts-common/service-url
                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                       ::t-service/booking-service)

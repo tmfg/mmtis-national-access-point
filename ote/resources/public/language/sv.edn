@@ -81,7 +81,10 @@
    :table-header-external-interface "Gränssnitt"
 
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Tilläggsinfo"}
+   :ote.db.transport-service/service-hours-info "Tilläggsinfo"
+
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Förhandsbokning"}
 
 
   ;; Service exception
@@ -284,8 +287,9 @@
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
-  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."}
+  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
+  :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -328,7 +332,10 @@
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
   :add-new-transport-operator "Lägg till ny tjänsteproducent"
-  :add-new-member "Lägg till användare"}
+  :add-new-member "Lägg till användare"
+  :upload-csv "Lägg till CSV"
+  :update-csv "Uppdatera CSV"
+  }
 
 
  ;; Database enumeration values
@@ -449,8 +456,12 @@
    :service-hours "Betjäningstider"
    :disruptions "Störningsinformation"
    :payment-interface "Biljett- och försäljningsgränssnitt"
-   :other "Övrigt"}}
+   :other "Övrigt"}
 
+  :ote.db.transport-service/advance-reservation
+  {:no "Ingen förhandsbokning krävs."
+   :possible "Förhandsbokning möjlig men inte obligatorisk."
+   :mandatory "Obligatorisk förhandsbokning."}}
 
   ;; ENUMS end
 
@@ -526,7 +537,12 @@
   :header-other-services-and-accessibility "Tillgänglighet"
   :header-price-information                "Prisinformation"
   :header-service-hours                    "Betjäningstider"
-  :header-pick-up-locations "Verksamhetsställen"}
+  :header-pick-up-locations                "Verksamhetsställen"
+  :header-select-company-list-type         "Välj typ av meddelande"
+  :radio-button-no-companies               "Det finns inga andra företag som är inblandade i att tillhandahålla denna tjänst."
+  :radio-button-url-companies              "Ange en webbadress från vilken affärsinformationen kan hittas som en .csv-fil."
+  :radio-button-csv-companies              "Hämta företagsinformation som en CSV-fil i formuläret."
+  :radio-button-form-companies             "Lägg till företagsinformation i formuläret med formulärfält."}
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"

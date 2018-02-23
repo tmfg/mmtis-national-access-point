@@ -81,8 +81,10 @@
    :table-header-external-interface "Rajapinta"
 
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Lisätiedot"}
+   :ote.db.transport-service/service-hours-info "Lisätiedot"
 
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Ennakkovaraus"}
 
   ;; Service exception
   :service-exception
@@ -132,7 +134,6 @@
    :ote.db.transport-service/assistance-description "Avustuspalveluja koskeva kuvaus"
    :ote.db.transport-service/assistance-place-description "Avustuspalvelujen sijaintien kuvaus"
    :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."}
-
 
   ;; Rental fields
   :rentals
@@ -262,7 +263,7 @@
   :RAE-link-text "Rae-työkalulla"
   :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
-  :csv-file-example "Katso tästä esimerkkitiedosto."
+  :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
 
   :guaranteed-vehicle-accessibility "Ilmoita tässä sellaiset palvelun liikennevälineiden esteettömyysominaisuudet, jotka ovat aina saatavilla eikä niitä tarvitse esimerkiksi erikseen tilata tai varata tai jotka eivät koske vain osaa liikennevälineistä."
@@ -277,8 +278,10 @@
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
-  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."}
+  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
+  :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
+   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -320,7 +323,10 @@
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
   :add-new-transport-operator "Lisää uusi palveluntuottaja"
-  :add-new-member "Lisää käyttäjä"}
+  :add-new-member "Lisää käyttäjä"
+  :upload-csv "Lisää CSV"
+  :update-csv "Päivitä CSV"
+  }
 
 
 
@@ -446,7 +452,12 @@
    :service-hours "Palveluajat"
    :disruptions "Häiriötilanteet"
    :payment-interface "Lippu- ja myyntirajapinta"
-   :other "Muu"}}
+   :other "Muu"}
+
+  :ote.db.transport-service/advance-reservation
+  {:no "Palvelun käyttöön ei liity ennakkovarausta."
+   :possible "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
+   :mandatory "Palvelun ennakkovaraus on pakollista."}}
   ;; ENUMS end
 
 
@@ -522,7 +533,13 @@
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
   :header-price-information                "Hintatiedot"
   :header-service-hours                    "Palveluajat"
-  :header-pick-up-locations "Toimipisteet"}
+  :header-pick-up-locations                "Toimipisteet"
+  :header-select-company-list-type         "Valitse ilmoittamistapa"
+  :radio-button-no-companies               "Tämän palvelun tuottamiseen ei osallistu muita yrityksiä."
+  :radio-button-url-companies              "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona."
+  :radio-button-csv-companies              "Lataa yritysten tiedot csv-tiedostona lomakkeelle."
+  :radio-button-form-companies             "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
+  }
 
 
  :rentals-page

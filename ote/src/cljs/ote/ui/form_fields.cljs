@@ -14,6 +14,7 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
             [ote.style.form :as style-form]
+            [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
             [goog.string :as gstr]))
 
@@ -108,7 +109,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style password? on-enter]
+                                  style input-style hint-style password? on-enter hint-text]
                            :as   field} data]
   [text-field
    (merge
@@ -116,7 +117,7 @@
      :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
-     :hintText          (placeholder field data)
+     :hint-text         (or hint-text "")
      :on-change         #(let [v %2]
                            (if regex
                              (when (re-matches regex v)
@@ -143,18 +144,35 @@
       {:on-key-press #(when (= "Enter" (.-key %))
                         (on-enter))}))])
 
+(defmethod field :file [{:keys [update! label name max-length min-length regex
+                                 focus on-focus form? error warning table? full-width?
+                                 style input-style hint-style on-change]
+                          :as   field} data]
+[:div.upload-btn-wrapper
+ [:button {:style
+           {:padding "10px 20px 10px 20px"
+            :text-transform "uppercase"
+            :color "#FFFFFF"
+            :background-color "#1565C0"
+            :font-size "12px"
+            :font-weight "bold"}}
+           label ]
+  [:input {:type "file"
+           :name name
+           :on-change on-change}]])
+
 (defmethod field :text-area [{:keys [update! table? label name rows error]
                               :as   field} data]
   [text-field
-   {:name name
-    :floating-label-text (when-not table? label)
+   {:name                 name
+    :floating-label-text  (when-not table? label)
     :floating-label-fixed true
-    :hintText          (placeholder field data)
-    :on-change         #(update! %2)
-    :value             (or data "")
-    :multi-line        true
-    :rows              rows
-    :error-text        error}])
+    :hintText             (placeholder field data)
+    :on-change            #(update! %2)
+    :value                (or data "")
+    :multi-line           true
+    :rows                 rows
+    :error-text           error}])
 
 (def languages ["FI" "SV" "EN"])
 
@@ -208,7 +226,6 @@
        (when (or error warning)
          [:div (stylefy/use-style style-base/required-element)
           (if error error warning)])])))
-
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
                                         max-length style hint-style
@@ -264,10 +281,10 @@
 
   (let [chips (set (or data #{}))
         handle-add! #(let [v %]
-                      (if regex
-                        (when (re-matches regex v)
-                          (update! (conj chips %)))
-                        (update! (conj chips %))))]
+                       (if regex
+                         (when (re-matches regex v)
+                           (update! (conj chips %)))
+                         (update! (conj chips %))))]
     [chip-input
      (merge
        {:name name
@@ -316,8 +333,28 @@
        (when style
          {:style style}))]))
 
+(defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
+                       data]
+  (let [option-idx (zipmap options (map str (range)))]
+    [:div.radio
+     [ui/radio-button-group
+      {:value-selected (or (option-idx data) "")
+       :name (str name)
+       :on-change (fn [_ value]
+                    (let [option (some #(when (= (second %) value)
+                                          (first %)) option-idx)]
+                      (update! option)))}
+      (doall
+       (map (fn [option]
+              [ui/radio-button
+               {:label (show-option option)
+                :value (option-idx option)}])
+            options))]
+     (when (or error warning)
+       [:div (stylefy/use-style style-base/required-element)
+        (if error error warning)])]))
 
-(defmethod field :selection [{:keys [update! table? label name style show-option options form?
+(defn field-selection [{:keys [update! table? label name style show-option options form?
                                      error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -346,6 +383,11 @@
            [ui/menu-item {:value i :primary-text (show-option option)}]))
        options))]))
 
+(defmethod field :selection [{radio? :radio? :as field} data]
+  (if radio?
+    [radio-selection field data]
+    [field-selection field data])
+  )
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
@@ -460,7 +502,7 @@
                          (update! (assoc (time/->Time h minutes nil)
                                          :hours-text hour))))}
            (when (not hours)
-             {:placeholder (tr [:common-texts :hours-placeholder])}))
+             {:hint-text (tr [:common-texts :hours-placeholder])}))
     (if (not hours)
       ""
       (or hours-text (str hours)))]
@@ -477,7 +519,7 @@
                          (update! (assoc (time/->Time hours m nil)
                                          :minutes-text minute))))}
            (when (not minutes)
-             {:placeholder (tr [:common-texts :minutes-placeholder])}))
+             {:hint-text (tr [:common-texts :minutes-placeholder])}))
     (if (not minutes)
       ""
       (or minutes-text (gstr/format "%02d" minutes)))]
@@ -518,7 +560,7 @@
                                              (time/interval 0 unit)
                                              (time/interval (js/parseInt num) unit))
                                            ::preferred-unit unit))))
-                      :placeholder (tr [:common-texts :time-unlimited])
+                      :hint-text (tr [:common-texts :time-unlimited])
                       :type :string
                       :regex #"\d{0,4}"
                       :style {:width 200}) amount]
@@ -579,12 +621,13 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields update! delete? add-label error-data] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label error-data] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
                data)]
     [:div
+     [:div.table-wrapper {:style table-wrapper-style}
      ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
      [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
@@ -645,7 +688,7 @@
                                                                      (take i data))
                                                                    (drop (inc i) data))))}
                   [ic/action-delete]]])]))
-         data))]]
+         data))]]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
         [buttons/save {:on-click #(update! (conj (or data []) {}))
@@ -668,8 +711,8 @@
      [common/extended-help
       (:help-text extended-help)
       (:help-link-text extended-help)
-      (:help-link extended-help)
-      (checkbox-container update! table? label warning error style checked?)]]
+      (:help-link extended-help)]
+     (checkbox-container update! table? label warning error style checked?)]
     (checkbox-container update! table? label warning error style checked?)))
 
 (defmethod field :checkbox-group [{:keys [update! table? label show-option options help]} data]
@@ -687,3 +730,126 @@
                            :checked  checked?
                            :on-check #(update! ((if checked? disj conj) selected option))}]))
          options))]))
+
+(defn- csv-help-text []
+  [:div.row
+   [:div (stylefy/use-style style-base/link-icon-container)
+    [ic/action-get-app {:style style-base/link-icon}]]
+   [:div
+    (ote.ui.common/linkify "/ote/csv/palveluyritykset.csv"  (tr [:form-help :csv-file-example]) {:target "_blank"})]])
+
+
+(defn company-csv-url-input [update! on-url-given companies-csv-url data]
+  [:div
+   [:div.row (stylefy/use-style style-base/divider)]
+   [:div.row
+    (csv-help-text)
+    [:div.col-md-6
+     [field {:name            ::t-service/companies-csv-url
+             :label           (tr [:field-labels :transport-service-common ::t-service/companies-csv-url])
+             :hint-text       "https://finap.fi/ote/csv/palveluyritykset.csv"
+             :full-width?     true
+             :on-blur         on-url-given
+             :update!         #(update! {::t-service/companies-csv-url %})
+             :container-class "col-xs-12 col-sm-6 col-md-6"
+             :type            :string}
+      companies-csv-url]]]
+
+   (let [success (if (= :success (get-in data [:csv-count :status]))
+                   true
+                   false)
+         amount (if (get-in data [:csv-count :count])
+                  (get-in data [:csv-count :count])
+                  nil)]
+     (cond
+       (and data success) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]
+       (and data (= false success)) [:div.row (stylefy/use-style style-base/required-element)
+                                     (tr [:csv (get-in data [:csv-count :error])])]
+       :else [:span]))])
+
+(defn company-csv-file-input [on-file-selected data]
+  [:div
+   [:div.row (stylefy/use-style style-base/divider)]
+   [:div.row
+    (csv-help-text)
+    [:div.row {:style {:padding-top "20px"}}
+     [field {:name      ::t-service/csv-file
+             :type      :file
+             :label     (if (get data ::t-service/company-csv-filename)
+                          (tr [:buttons :update-csv])
+                          (tr [:buttons :upload-csv]))
+             :accept    ".csv"
+             :on-change on-file-selected
+             }]]
+    (when (get data ::t-service/company-csv-filename)
+      [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
+    [:div.row {:style {:padding-top "20px"}}
+     (let [success (boolean (:csv-imported data))
+           amount (if (get data ::t-service/companies)
+                    (count (get data ::t-service/companies))
+                    nil)]
+       (when success
+         [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]])
+
+(defn company-input-fields [update! companies data]
+  [:div.row
+   [:div.row (stylefy/use-style style-base/divider)]
+   [:div.row
+    [field {:name                ::t-service/companies
+            :type                :table
+            :update!             #(update! {::t-service/companies %})
+            :table-wrapper-style {:max-height "300px" :overflow "scroll"}
+            :prepare-for-save    values/without-empty-rows
+            :table-fields        [{:name      ::t-service/name
+                                   :type      :string
+                                   :label     (tr [:field-labels :transport-service-common ::t-service/company-name])
+                                   :required? true
+                                   }
+                                  {:name      ::t-service/business-id
+                                   :type      :string
+                                   :label     (tr [:field-labels :transport-service-common ::t-service/business-id])
+                                   :validate  [[:business-id]]
+                                   :required? true
+                                   :regex     #"\d{0,7}(-\d?)?"}]
+            :delete?             true
+            :add-label           (tr [:buttons :add-new-company])
+            :error-data          (::t-service/companies (:ote.ui.form/warnings data))}
+     companies]]])
+
+(defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
+                                  {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
+  (let [select-type #(update! {::t-service/company-source %})
+        selected-type (if company-source
+                        (name company-source)
+                        "none")]
+    [:div
+     [:div.row
+      [:h3 (tr [:passenger-transportation-page :header-select-company-list-type])]]
+     [:div.row
+      [ui/radio-button-group {:name           (str "brokerage-companies-selection")
+                              :value-selected selected-type}
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-no-companies])
+                         :id       "radio-company-none"
+                         :value    "none"
+                         :on-click #(select-type :none)}]
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-url-companies])
+                         :id       "radio-company-csv-url"
+                         :value    "csv-url"
+                         :on-click #(select-type :csv-url)}]
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-csv-companies])
+                         :id       "radio-company-csv-file"
+                         :value    "csv-file"
+                         :on-click #(select-type :csv-file)}]
+       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-form-companies])
+                         :value    "form"
+                         :id       "radio-company-form"
+                         :on-click #(select-type :form)}]]
+
+      (when-not (nil? data)
+        (case company-source
+          :none [:div.row " "]
+          :csv-url [company-csv-url-input update! on-url-given companies-csv-url data]
+          :csv-file [company-csv-file-input on-file-selected data]
+          :form [company-input-fields update! companies data]
+          ;; default
+          ""))]]))

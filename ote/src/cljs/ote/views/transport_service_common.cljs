@@ -20,6 +20,25 @@
             [ote.style.base :as style-base]
             [cljs-react-material-ui.icons :as ic]))
 
+(defn advance-reservation-group
+  "Creates a form group for in advance reservation.
+   Form displays header text and selection list by radio button group."
+  []
+  (form/group
+   {:label (tr [:field-labels :transport-service-common ::t-service/advance-reservation])
+    :columns 3
+    :layout :row}
+
+   (form/info (tr [:form-help :advance-reservation-info]))
+
+   {:name ::t-service/advance-reservation
+    :type :selection
+    :show-option (tr-key [:enums ::t-service/advance-reservation])
+    :options t-service/advance-reservation
+    :radio? true
+    :required? true
+    :container-class "col-md-12"}))
+
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
   [label service-url-field]
@@ -174,52 +193,31 @@
     {:label (tr [:field-labels :transport-service-common ::t-service/companies])
     :columns 3}
 
-    (form/info (tr [:form-help :companies-main-info]))
-    (form/info-with-link (tr [:form-help :csv-info]) "/ote/csv/palveluyritykset.csv" (tr [:form-help :csv-file-example]))
+    (form/info (tr [:form-help :companies-main-info]) {:type :generic})
 
-    {:name ::t-service/companies-csv-url
-    :full-width?  true
-    :on-blur #(e! (ts/->EnsureCsvFile))
-    :container-class "col-xs-12 col-sm-6 col-md-6"
-    :type :string}
+    {:name ::t-service/company-source
+     :read identity
+     :write #(merge %1 %2)
+     :type :company-source
+     :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
+     :container-style style-form/full-width
+     :on-file-selected #(ts/read-companies-csv! e! (.-target %))
+     :on-url-given #(e! (ts/->EnsureCsvFile))}))
 
-    {:name      :csv-count
-     :type      :component
-     :component (fn [data]
-                  (let [success (if (= :success (get-in data [:data :status]))
-                                  true
-                                  false)
-                        count (if (get-in data [:data :count])
-                                (get-in data [:data :count])
-                                nil)]
+(defn brokerage-group
+  "Creates a form group for brokerage selection."
+  [e!]
+  (form/group
+    {:label   (tr [:field-labels :transport-service-common ::t-service/companies])
+     :columns 3}
 
-                    (cond
-                      (and data success) [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count count})]
-                      (and data (= false success)) [:span (stylefy/use-style style-base/required-element) (tr [:csv (get-in data [:data :error])])]
-                      :defalt [:span]
-                      )))}
-
-    (form/info (tr [:form-help :companies-info]))
-
-    {:name ::t-service/companies
-    :type :table
-    :prepare-for-save values/without-empty-rows
-    :table-fields [{:name ::t-service/name :type :string
-                    :label (tr [:field-labels :transport-service-common ::t-service/company-name])
-                    :required? true}
-                   {:name ::t-service/business-id :type :string
-                    :validate [[:business-id]]
-                    :required? true
-                    :regex #"\d{0,7}(-\d?)?"}]
-    :delete? true
-    :add-label (tr [:buttons :add-new-company])}
-
-    {:name ::t-service/brokerage?
-     :style style-form/padding-top
+    {:name          ::t-service/brokerage?
+     :style         style-form/padding-top
      :extended-help {:help-text      (tr [:form-help :brokerage?])
                      :help-link-text (tr [:form-help :brokerage-link])
                      :help-link      "https://www.trafi.fi/tieliikenne/ammattiliikenne/liikenneluvat_trafiin/valitys-_ja_yhdistamispalvelut"}
-     :type :checkbox}))
+     :type          :checkbox}))
+
 
 (defn contact-info-group []
   (form/group

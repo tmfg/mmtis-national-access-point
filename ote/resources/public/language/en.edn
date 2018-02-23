@@ -79,10 +79,11 @@
    :external-interfaces-ok "Connecting to address succeeded"
    :table-header-external-interface "Interface"
 
-
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Additional information"}
+   :ote.db.transport-service/service-hours-info "Additional information"
 
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Advance reservation"}
 
   ;; Service exception
   :service-exception
@@ -132,7 +133,6 @@
    :ote.db.transport-service/assistance-description "Assistance service description"
    :ote.db.transport-service/assistance-place-description "Assistance service location"
    :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."}
-
 
   ;; Rental fields
   :rentals
@@ -261,7 +261,7 @@
 
   :RAE-link-text "RAE-software"
 
-  :companies-main-info "If there are other companies involved conducting the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Obs! Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
+  :companies-main-info "If there are other companies involved conducting the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
   :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
@@ -280,7 +280,7 @@
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
-  }
+  :advance-reservation-info "Here you can inform advance reservation requiremets of your service."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -322,7 +322,11 @@
   :add-new-additional-service "Add a new row"
   :add-new-vehicle "Add a new row"
   :add-new-transport-operator "Create a new transport operator"
-  :add-new-member "Add a new member"}
+  :add-new-member "Add a new member"
+  :upload-csv "Add CSV"
+  :update-csv "Update CSV"
+  }
+
 
 
 
@@ -447,8 +451,12 @@
    :service-hours "Service hours"
    :disruptions "Fault situations"
    :payment-interface "Payment and sales interface"
-   :other "Other"}}
+   :other "Other"}
 
+  :ote.db.transport-service/advance-reservation
+  {:no "Service does not have advance reservation."
+   :possible "Service has advance reservation but is is not mandatory."
+   :mandatory "Advance reservation is mandatory for this service."}}
 
   ;; ENUMS end
 
@@ -525,7 +533,13 @@
   :header-other-services-and-accessibility "Accessibility and additional services"
   :header-price-information                "Price information"
   :header-service-hours                    "Service hours"
-  :header-pick-up-locations "Pick-up and returning points"}
+  :header-pick-up-locations                "Pick-up and returning points"
+  :header-select-company-list-type         "Select the type of notification"
+  :radio-button-no-companies               "There are no other companies involved in providing this transport service."
+  :radio-button-url-companies              "Please provide a web address from which the company information can be found as a .csv file."
+  :radio-button-csv-companies              "Download business information as a csv file on the form."
+  :radio-button-form-companies             "Add business information to the form using form fields."
+  }
 
 
  :rentals-page

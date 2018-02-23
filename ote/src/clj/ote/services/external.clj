@@ -2,6 +2,7 @@
   "CKAN-integration tasks. Functions to invoke CKAN API calls from OTE."
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
+            [ote.util.csv :as csv-util]
             [ote.db.transport-service :as t-service]
             [ote.db.modification :as modification]
             [org.httpkit.client :as httpkit]
@@ -13,15 +14,6 @@
             [clojure.string :as s]
             [specql.core :as specql]
             [clojure.java.io :as io]))
-
-(defn valid-csv-header?
-  "Ensure that there is at least 2 elements in header"
-  [header]
-  (>= (count header) 2))
-
-(defn valid-business-id? [value]
-  (let [pattern  #"\d{7}-\d"]
-    (boolean (re-matches pattern value))))
 
 (defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
@@ -35,14 +27,14 @@
   "Convert given vector to map where map key is given in the first line of csv file."
   [csv-data]
   (let [headers (first csv-data)
-        valid-header? (valid-csv-header? headers)
+        valid-header? (csv-util/valid-csv-header? headers)
         parsed-data (when valid-header?
                       (map (fn [cells]
                              (let [[business-id name] (map str/trim cells)]
                                {::t-service/business-id business-id
                                 ::t-service/name name}))
                             (rest csv-data)))
-        validated-data (filter #(valid-business-id? (::t-service/business-id %)) parsed-data)]
+        validated-data (filter #(csv-util/valid-business-id? (::t-service/business-id %)) parsed-data)]
     {:result validated-data
      :failed-count (- (count parsed-data) (count validated-data))}))
 
@@ -55,11 +47,7 @@
 (defn- read-csv
   "Read CSV from input stream. Guesses the separator from the first line."
   [input]
-  (let [separator (if (str/includes? (first (str/split-lines input)) ";")
-                    ;; First line contains a semicolon, use it as separator
-                    \;
-                    ;; Otherwise default to comma
-                    \,)]
+  (let [separator (csv-util/csv-separator input)]
     (csv/read-csv input :separator separator)))
 
 (defn check-csv

@@ -68,13 +68,20 @@
   [:div.help (stylefy/use-style style-base/help)
    [:div (stylefy/use-style style-form/help-text-element) help]])
 
+(defn- extended-help-link [help-link help-link-text]
+  [:div (stylefy/use-style style-base/help-link-container)
+   [:div (stylefy/use-style style-base/link-icon-container)
+    [ic/action-open-in-new {:style style-base/link-icon}]]
+   [:div
+    (linkify help-link help-link-text {:target "_blank"})]])
+
 (defn extended-help
   "Used currently only in passenger transportation form. Give help-text link-text, link address and one form element
    as a parameter."
   [help-text help-link-text help-link component]
-  [:div.help (stylefy/use-style style-base/help)
+  [:div.help (stylefy/use-style style-base/generic-help)
    [:div (stylefy/use-style style-form/help-text-element) help-text]
-   [:div {:style {:margin-top "10px"}} (linkify help-link help-link-text {:target "_blank"})]
+   [:div (extended-help-link help-link help-link-text)]
    component])
 
 (defn shortened-description [desc max-length]

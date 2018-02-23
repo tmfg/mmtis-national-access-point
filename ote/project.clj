@@ -1,6 +1,10 @@
 (defproject ote "0.1-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
+                 ;; CSV parser for backend
+                 [org.clojure/data.csv "0.1.4"]
+                 ;; CSV parser for frontend
+                 [testdouble/clojurescript.csv "0.3.0"]
 
                  ;; Komponenttikirjasto
                  [com.stuartsierra/component "0.3.2"]
@@ -17,7 +21,7 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
-                 [specql "0.7.0-alpha16"]
+                 [specql "0.7.0-alpha17"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
