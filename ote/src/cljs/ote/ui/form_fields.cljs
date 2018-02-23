@@ -323,7 +323,7 @@
         ;; == Event handlers ==
         :on-blur (fn [event]
                    (let [val (.. event -target -value)]
-                     (when (and add-on-blur? (not-empty val))
+                     (when (and add-on-blur? (not (str/blank? val)))
                        (handle-add! val)))
                    (when on-blur (on-blur event)))
         :on-request-add handle-add!
