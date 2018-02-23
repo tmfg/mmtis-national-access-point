@@ -139,6 +139,7 @@
                        :tooltip (tr [:form-help :external-interfaces-tooltips :format])
                        :width "15%"
                        :full-width? true
+                       :full-width-input? true
                        :required? true}
                       {:name ::t-service/license
                        :type :autocomplete

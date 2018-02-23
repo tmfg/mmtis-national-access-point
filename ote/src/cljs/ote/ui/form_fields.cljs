@@ -256,7 +256,7 @@
                                       max-length style hint-style
                                       filter suggestions default-values max-results open-on-focus? clear-on-blur?
                                       allow-duplicates? new-chip-key-codes
-                                      form? table? full-width? disabled?]
+                                      form? table? full-width? full-width-input? disabled?]
                                :or {open-on-focus? true, clear-on-blur? true, allow-duplicates? false} :as field}
                               data]
 
@@ -280,14 +280,14 @@
         ;; == Chip options ==
         :allow-duplicates allow-duplicates?
         ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
-        :new-chip-key-codes (or new-chip-key-codes [13])
+        :new-chip-key-codes (or new-chip-key-codes [13 32])
 
         ;; Show error text or warning text or empty string
         :error-text (or error warning "")
 
         ;; == Styling ==
         :full-width full-width?
-        :full-width-input full-width?
+        :full-width-input full-width-input?
 
         ;; Error is more critical than required - showing it first
         :error-style (if error
