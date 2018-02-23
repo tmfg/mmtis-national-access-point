@@ -132,14 +132,14 @@
                   (ckan/add-or-update-dataset-resource!
                     c (merge
                         {:ckan/package-id (:ckan/id dataset)
-                         :ckan/name       (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
-                                            (-> external-interface ::t-service/description first ::t-service/text)
-                                            "Rajapinta")
-                         :ckan/url        (if (not (nil? (::t-service/url external-interface)))
-                                            (::t-service/url external-interface)
-                                            "Osoite puuttuu")
-                         :ckan/format     (if (nil? fmt) "" fmt)
-                         :ckan/license    lic}
+                         :ckan/name (if (not (nil? (-> external-interface ::t-service/description first ::t-service/text)))
+                                      (-> external-interface ::t-service/description first ::t-service/text)
+                                      "Rajapinta")
+                         :ckan/url (if (not (nil? (::t-service/url external-interface)))
+                                     (::t-service/url external-interface)
+                                     "Osoite puuttuu")
+                         :ckan/format (if (nil? fmt) "" (str/join ", " fmt))
+                         :ckan/license lic}
 
                         (when resource-id
                           {:ckan/id resource-id})
