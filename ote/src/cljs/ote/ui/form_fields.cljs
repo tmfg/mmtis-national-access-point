@@ -678,9 +678,7 @@
     (when (get data ::t-service/company-csv-filename)
       [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
     [:div.row {:style {:padding-top "20px"}}
-     (let [success (if (get data :csv-imported)
-                     true
-                     false)
+     (let [success (boolean (:csv-imported data))
            amount (if (get data ::t-service/companies)
                     (count (get data ::t-service/companies))
                     nil)]
