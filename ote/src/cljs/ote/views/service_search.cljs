@@ -70,17 +70,13 @@
     (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])
 
 (defn parse-content-value [value-array]
-  (let [data-content-value #(str (tr [:enums ::t-service/interface-data-content %]) ", ")
-        value-str (apply str (map #(data-content-value %) value-array))
-        return-value (if (< 45 (count value-str))
-                       (str (subs value-str 0 45) "...")
-                       value-str)]
+  (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
+        value-str (str/join ", " (map #(data-content-value %) value-array))
+        return-value (common-ui/maybe-shorten-text-to 45 value-str)]
     return-value))
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
-  (let [data-content-value #(str (tr [:enums ::t-service/interface-data-content %]) ", ")]
-
     (when-not (empty? external-interface-links)
       [:div
        [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
@@ -97,7 +93,7 @@
            (map-indexed
              (fn [i {::t-service/keys [data-content external-interface format license description] :as row}]
                ^{:key (str "external-table-row-" i)}
-               [:tr {:selectable false :style style/external-table-row}
+               [:tr {:style style/external-table-row}
                 ^{:key (str "external-interface-" i)}
                 [:td {:style {:width "20%" :font-size "14px"}}
                  (common-ui/linkify
@@ -108,7 +104,7 @@
                 [:td {:style {:width "10%" :font-size "14px"}} license]
                 [:td {:style {:width "10%" :font-size "14px"}}
                  (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
-             external-interface-links))]]])))
+             external-interface-links))]]]))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
