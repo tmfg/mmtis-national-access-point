@@ -47,11 +47,7 @@
 (defn- read-csv
   "Read CSV from input stream. Guesses the separator from the first line."
   [input]
-  (let [separator (if (str/includes? (first (str/split-lines input)) ";")
-                    ;; First line contains a semicolon, use it as separator
-                    \;
-                    ;; Otherwise default to comma
-                    \,)]
+  (let [separator (csv-util/csv-separator input)]
     (csv/read-csv input :separator separator)))
 
 (defn check-csv
