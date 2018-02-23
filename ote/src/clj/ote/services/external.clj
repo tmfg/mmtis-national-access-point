@@ -87,11 +87,15 @@
 
 (defn- check-external-api
   [url-data]
-  (let [url (ensure-url (get url-data :url))
-        response @(httpkit/get url {:as :text
-                                    :timeout 30000})]
-    (if (= 200 (:status response))
-      {:status :success}
+  (try
+    (let [url (ensure-url (get url-data :url))
+          response (http-client/get url {:as "UTF-8"
+                                         :socket-timeout 30000
+                                         :conn-timeout 10000})]
+      (if (= 200 (:status response))
+        {:status :success}
+        {:status :failed}))
+    (catch Exception e
       {:status :failed})))
 
 (defn- external-routes-auth
