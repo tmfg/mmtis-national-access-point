@@ -169,7 +169,7 @@
    ::t-service/external-interface (gen/hash-map
                                    ::t-service/url gen-url
                                    ::t-service/description gen-localized-text-array)
-   ::t-service/format (gen/vector (string-of-max-length 20 gen/string-alphanumeric) 1 5)
+   ::t-service/format (gen/vector (string-of-length 1 20) 1 5)
    ::t-service/license (string-of-max-length 20 gen/string-alphanumeric) ))
 
 (def gen-external-interfaces-array
