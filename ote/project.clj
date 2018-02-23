@@ -27,7 +27,7 @@
                  [http-kit "2.2.0"]
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-anti-forgery "1.1.0"]
-
+                 [clj-http "3.7.0"]
 
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
@@ -93,8 +93,7 @@
 
                        ;; Prevent uberjar from cleaning cljs generated files
                        :auto-clean false}
-             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]
-                                  [clj-http "3.7.0"]]
+             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]]
                    :test-paths ["test/clj"]}}
 
   :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]

@@ -5,7 +5,7 @@
             [ote.util.csv :as csv-util]
             [ote.db.transport-service :as t-service]
             [ote.db.modification :as modification]
-            [org.httpkit.client :as httpkit]
+            [clj-http.client :as http-client]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [ote.authorization :as authorization]
@@ -58,26 +58,32 @@
   "Fetch csv file from given url, parse it and return status map that contains information about the count of companies
   in the file."
   [url-data]
-  (let [url (ensure-url (get url-data :url))
-        response @(httpkit/get url {:as :text
-                                    :timeout 30000})]
-    (if (= 200 (:status response))
-      (try
-        (let [data (when (= 200 (:status response))
-                     (read-csv (:body response)))
-              parsed-data (parse-response->csv data)]
-          ;; response to client application
-          {:status :success
-           :count (count (:result parsed-data))
-           :failed-count (:failed-count parsed-data)
-           :companies (:result parsed-data)})
-        (catch Exception e
-          (log/info "CSV parsing failed: " e)
-          {:status :failed
-           :error :csv-parse-failed}))
+  (try
+    (let [url (ensure-url (get url-data :url))
+          response (http-client/get url {:as "UTF-8"
+                                         :socket-timeout 30000
+                                         :conn-timeout 10000})]
+      (if (= 200 (:status response))
+        (try
+          (let [data (when (= 200 (:status response))
+                       (read-csv (:body response)))
+                parsed-data (parse-response->csv data)]
+            ;; response to client application
+            {:status :success
+             :count (count (:result parsed-data))
+             :failed-count (:failed-count parsed-data)
+             :companies (:result parsed-data)})
+          (catch Exception e
+            (log/warn "CSV check failed due to Exception in parsing: " e)
+            {:status :failed
+             :error :csv-parse-failed}))
+        {:status :failed
+         :error :url-parse-failed
+         :http-status (:status response)}))
+    (catch Exception e
+      (log/warn "CSV check failed due to Exception in HTTP connection" e)
       {:status :failed
-       :error :url-parse-failed
-       :http-status (:status response)})))
+       :error :url-parse-failed})))
 
 (defn- check-external-api
   [url-data]
