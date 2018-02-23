@@ -247,6 +247,8 @@
                            hint-style)
         :on-update-input handle-change!
         :on-new-request handle-change!}
+       (when on-blur
+         {:on-blur on-blur})
        (when max-length
          {:max-length max-length})
        (when style
@@ -255,12 +257,17 @@
 (defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
                                       max-length style hint-style
                                       filter suggestions default-values max-results open-on-focus? clear-on-blur?
-                                      allow-duplicates? new-chip-key-codes
+                                      allow-duplicates? add-on-blur? new-chip-key-codes
                                       form? table? full-width? full-width-input? disabled?]
-                               :or {open-on-focus? true, clear-on-blur? true, allow-duplicates? false} :as field}
+                               :or {open-on-focus? true, clear-on-blur? true, full-width-input? true} :as field}
                               data]
 
-  (let [chips (set (or data #{}))]
+  (let [chips (set (or data #{}))
+        handle-add! #(let [v %]
+                      (if regex
+                        (when (re-matches regex v)
+                          (update! (conj chips %)))
+                        (update! (conj chips %))))]
     [chip-input
      (merge
        {:name name
@@ -280,7 +287,7 @@
         ;; == Chip options ==
         :allow-duplicates allow-duplicates?
         ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
-        :new-chip-key-codes (or new-chip-key-codes [13 32])
+        :new-chip-key-codes (or new-chip-key-codes [13])
 
         ;; Show error text or warning text or empty string
         :error-text (or error warning "")
@@ -297,14 +304,13 @@
                            hint-style)
 
         ;; == Event handlers ==
-        :on-blur on-blur
-        :on-request-add #(let [v %]
-                           (if regex
-                             (when (re-matches regex v)
-                               (update! (conj chips %)))
-                             (update! (conj chips %))))
+        :on-blur (fn [event]
+                   (let [val (.. event -target -value)]
+                     (when (and add-on-blur? (not-empty val))
+                       (handle-add! val)))
+                   (when on-blur (on-blur event)))
+        :on-request-add handle-add!
         :on-request-delete #(update! (disj chips %))}
-
        (when max-length
          {:max-length max-length})
        (when style
