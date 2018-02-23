@@ -81,7 +81,10 @@
    :table-header-external-interface "Gränssnitt"
 
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Tilläggsinfo"}
+   :ote.db.transport-service/service-hours-info "Tilläggsinfo"
+
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Förhandsbokning"}
 
 
   ;; Service exception
@@ -284,8 +287,9 @@
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
-  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."}
+  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
+  :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."}
 
  ;; CSV parsing
  :csv
@@ -447,8 +451,12 @@
    :service-hours "Betjäningstider"
    :disruptions "Störningsinformation"
    :payment-interface "Biljett- och försäljningsgränssnitt"
-   :other "Övrigt"}}
+   :other "Övrigt"}
 
+  :ote.db.transport-service/advance-reservation
+  {:no "Ingen förhandsbokning krävs."
+   :possible "Förhandsbokning möjlig men inte obligatorisk."
+   :mandatory "Obligatorisk förhandsbokning."}}
 
   ;; ENUMS end
 

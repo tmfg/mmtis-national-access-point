@@ -91,6 +91,7 @@ describe('Add a new service', () => {
                     cy.get('input[type="checkbox"]').check();
                 });
 
+	    cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
             cy.contains('Tallenna ja julkaise').click();
         });
 

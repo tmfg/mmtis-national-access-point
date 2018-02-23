@@ -79,10 +79,11 @@
    :external-interfaces-ok "Connecting to address succeeded"
    :table-header-external-interface "Interface"
 
-
    ;; Service hours
-   :ote.db.transport-service/service-hours-info "Additional information"}
+   :ote.db.transport-service/service-hours-info "Additional information"
 
+   ;; Advance reservation
+   :ote.db.transport-service/advance-reservation "Advance reservation"}
 
   ;; Service exception
   :service-exception
@@ -132,7 +133,6 @@
    :ote.db.transport-service/assistance-description "Assistance service description"
    :ote.db.transport-service/assistance-place-description "Assistance service location"
    :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."}
-
 
   ;; Rental fields
   :rentals
@@ -280,7 +280,7 @@
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
-  }
+  :advance-reservation-info "Here you can inform advance reservation requiremets of your service."}
 
 
  ;; CSV parsing
@@ -448,8 +448,12 @@
    :service-hours "Service hours"
    :disruptions "Fault situations"
    :payment-interface "Payment and sales interface"
-   :other "Other"}}
+   :other "Other"}
 
+  :ote.db.transport-service/advance-reservation
+  {:no "Service does not have advance reservation."
+   :possible "Service has advance reservation but is is not mandatory."
+   :mandatory "Advance reservation is mandatory for this service."}}
 
   ;; ENUMS end
 
