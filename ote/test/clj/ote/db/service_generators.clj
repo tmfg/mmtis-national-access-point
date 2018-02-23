@@ -48,7 +48,8 @@
     ::t-service/luggage-restrictions generators/gen-localized-text-array
     ::t-service/pricing generators/gen-service-link
     ::t-service/payment-method-description generators/gen-localized-text-array
-    ::t-service/service-hours-info generators/gen-localized-text-array))
+    ::t-service/service-hours-info generators/gen-localized-text-array
+    ::t-service/advance-reservation generators/gen-advance-reservation))
 
 (def gen-parking
   (gen/hash-map
@@ -69,7 +70,8 @@
    ::t-service/accessibility-info-url generators/gen-url
    ::t-service/parking-capacities generators/gen-parking-capacity-array
    ::t-service/service-hours generators/gen-service-hours-array
-   ::t-service/pricing generators/gen-service-link))
+   ::t-service/pricing generators/gen-service-link
+   ::t-service/advance-reservation generators/gen-advance-reservation))
 
 (def gen-rentals
   (gen/hash-map
@@ -87,6 +89,7 @@
    ::t-service/accessibility-info-url generators/gen-url
    ::t-service/rental-additional-services generators/gen-additional-services-array
    ::t-service/usage-area (generators/word-of-length 5 50)
+   ::t-service/advance-reservation generators/gen-advance-reservation
    ::t-service/pick-up-locations generators/gen-pick-up-locations-array))
 
 (def gen-transport-service-common
@@ -103,8 +106,7 @@
    ::t-service/brokerage? (s/gen boolean?)
    ::t-service/operation-area (gen/vector generators/gen-operation-area 0 2)
    ::t-service/external-interfaces generators/gen-external-interfaces-array
-   ::t-service/notice-external-interfaces? (s/gen boolean?)
-   ))
+   ::t-service/notice-external-interfaces? (s/gen boolean?)))
 
 (defn service-type-generator [service-type]
   (gen/let [common gen-transport-service-common
