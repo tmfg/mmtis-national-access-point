@@ -217,39 +217,40 @@
                                         form? table? full-width? open-on-focus?] :as field}
                                 data]
 
-  [ui/auto-complete
-   (merge
-     {:name name
-      :floating-label-text (when-not table? label)
-      :floating-label-fixed true
-      :dataSource suggestions
-      :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
-      :max-search-results (or max-results 10)
-      :open-on-focus open-on-focus?
-      :search-text (or data "")
+  (let [handle-change! #(let [v %1]
+                          (if regex
+                            (when (re-matches regex v)
+                              (update! v))
+                            (update! v)))]
+    [ui/auto-complete
+     (merge
+       {:name name
+        :floating-label-text (when-not table? label)
+        :floating-label-fixed true
+        :dataSource suggestions
+        :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
+        :max-search-results (or max-results 10)
+        :open-on-focus open-on-focus?
+        :search-text (or data "")
 
-      :hintText (placeholder field data)
-      :full-width full-width?
+        :hintText (placeholder field data)
+        :full-width full-width?
 
 
-      ;; Show error text or warning text or empty string
-      :error-text (or error warning "")
-      ;; Error is more critical than required - showing it first
-      :error-style (if error
-                     style-base/error-element
-                     style-base/required-element)
-      :hint-style (merge style-base/placeholder
-                         hint-style)
-      :on-blur on-blur
-      :on-new-request #(let [v %1]
-                         (if regex
-                           (when (re-matches regex v)
-                             (update! v))
-                           (update! v)))}
-     (when max-length
-       {:max-length max-length})
-     (when style
-       {:style style}))])
+        ;; Show error text or warning text or empty string
+        :error-text (or error warning "")
+        ;; Error is more critical than required - showing it first
+        :error-style (if error
+                       style-base/error-element
+                       style-base/required-element)
+        :hint-style (merge style-base/placeholder
+                           hint-style)
+        :on-update-input handle-change!
+        :on-new-request handle-change!}
+       (when max-length
+         {:max-length max-length})
+       (when style
+         {:style style}))]))
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
                                       max-length style hint-style
@@ -259,7 +260,7 @@
                                :or {open-on-focus? true, clear-on-blur? true, allow-duplicates? false} :as field}
                               data]
 
-  (let [vals (set (or data #{}))]
+  (let [chips (set (or data #{}))]
     [chip-input
      (merge
        {:name name
@@ -267,7 +268,7 @@
         :floating-label-fixed true
         :hintText (placeholder field data)
         :disabled disabled?
-        :value (clj->js vals)
+        :value chips
 
         ;; == Autocomplete options ==
         :dataSource suggestions
@@ -297,7 +298,12 @@
 
         ;; == Event handlers ==
         :on-blur on-blur
-        :on-change #(update! (into #{} %))}
+        :on-request-add #(let [v %]
+                           (if regex
+                             (when (re-matches regex v)
+                               (update! (conj chips %)))
+                             (update! (conj chips %))))
+        :on-request-delete #(update! (disj chips %))}
 
        (when max-length
          {:max-length max-length})
