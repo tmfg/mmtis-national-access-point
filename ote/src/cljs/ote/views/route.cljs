@@ -47,6 +47,35 @@
                                           [c2 c1]) :coordinates) stop-sequence))
         :color "red"}])]])
 
+(defn- route-times [e! stop-sequence]
+  [:div {:style {:width "50%"}}
+   [:table
+    [:thead
+     [:tr
+      [:th "Satama"]
+      [:th "Saapumisaika"]
+      [:th "Lähtöaika"]]]
+    [:tbody
+     (doall
+      (map-indexed
+       (fn [i {:keys [port-id port-name arrival-time departure-time]}]
+         ^{:key port-id}
+         [:tr
+          [:td port-name]
+          [:td (if (zero? i)
+                 "-"
+                 [form-fields/field
+                  {:type :time
+                   :update! #(e! (rc/->UpdateStop i {:arrival-time %}))}
+                  arrival-time])]
+          [:td (if (= (inc i) (count stop-sequence))
+                 "-"
+                 [form-fields/field
+                  {:type :time
+                   :update! #(e! (rc/->UpdateStop i {:departure-time %}))}
+                  departure-time])]])
+       stop-sequence))]]])
+
 (defn new-route [e! _]
   (e! (rc/->LoadStops))
   (fn [e! {route :route :as app}]
@@ -54,19 +83,4 @@
      [route-stepper]
      [:div {:style {:display "flex" :flex-direction "row"}}
       [route-map e! app]
-      [:div {:style {:width "50%"}}
-       [form-fields/field
-        {:name :stop-sequence
-         :type :table
-         :update! #(e! (rc/->UpdateStops %))
-         :table-fields [{:label "Satama"
-                         :name :port-name
-                         :type :component
-                         :component (fn [{name :data}] [:span name])}
-                        {:label "Saapumisaika"
-                         :name :arrival-time
-                         :type :time}
-                        {:label "Lähtöaika"
-                         :name :departure-time
-                         :type :time}]}
-        (:stop-sequence route)]]]]))
+      [route-times e! (:stop-sequence route)]]]))

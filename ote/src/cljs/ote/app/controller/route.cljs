@@ -7,7 +7,7 @@
 (defrecord LoadStopsResponse [response])
 
 (defrecord AddStop [feature])
-(defrecord UpdateStops [stops])
+(defrecord UpdateStop [idx stop])
 
 (extend-protocol tuck/Event
   LoadStops
@@ -39,6 +39,17 @@
                      (conj (or port-ids #{})
                            (aget feature "properties" "port-id"))))))
 
-  UpdateStops
-  (process-event [{stops :stops} app]
-    (assoc-in app [:route :stop-sequence] stops)))
+  UpdateStop
+  (process-event [{idx :idx stop :stop :as e} app]
+    (update-in app [:route :stop-sequence idx]
+               (fn [{old-arrival :arrival-time
+                     old-departure :departure-time
+                     :as old-stop}]
+                 (let [new-stop (merge old-stop stop)]
+                   ;; If old departure time is same as arrival and arrival
+                   ;; was changed, also change departure time.
+                   (if (and (= old-departure old-arrival)
+                            (contains? stop :arrival-time))
+                     (assoc new-stop
+                            :departure-time (:arrival-time new-stop))
+                     new-stop))))))
