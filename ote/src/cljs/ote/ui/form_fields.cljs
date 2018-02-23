@@ -155,7 +155,7 @@
             :background-color "#1565C0"
             :font-size "12px"
             :font-weight "bold"}}
-           "Lisää csv" ]
+           label ]
   [:input {:type "file"
            :name name
            :on-change on-change}]])
@@ -226,8 +226,28 @@
          [:div (stylefy/use-style style-base/required-element)
           (if error error warning)])])))
 
+(defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
+                       data]
+  (let [option-idx (zipmap options (map str (range)))]
+    [:div.radio
+     [ui/radio-button-group
+      {:value-selected (or (option-idx data) "")
+       :name (str name)
+       :on-change (fn [_ value]
+                    (let [option (some #(when (= (second %) value)
+                                          (first %)) option-idx)]
+                      (update! option)))}
+      (doall
+       (map (fn [option]
+              [ui/radio-button
+               {:label (show-option option)
+                :value (option-idx option)}])
+            options))]
+     (when (or error warning)
+       [:div (stylefy/use-style style-base/required-element)
+        (if error error warning)])]))
 
-(defmethod field :selection [{:keys [update! table? label name style show-option options form?
+(defn field-selection [{:keys [update! table? label name style show-option options form?
                                      error warning auto-width? disabled?] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -256,6 +276,11 @@
            [ui/menu-item {:value i :primary-text (show-option option)}]))
        options))]))
 
+(defmethod field :selection [{radio? :radio? :as field} data]
+  (if radio?
+    [radio-selection field data]
+    [field-selection field data])
+  )
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
@@ -644,14 +669,16 @@
     [:div.row {:style {:padding-top "20px"}}
      [field {:name      ::t-service/csv-file
              :type      :file
-             :label     "Tiedosto"
+             :label     (if (get data ::t-service/company-csv-filename)
+                          (tr [:buttons :update-csv])
+                          (tr [:buttons :upload-csv]))
              :accept    ".csv"
              :on-change on-file-selected
              }]]
-    [:div.row
-     (let [success (if (get data :csv-imported)
-                     true
-                     false)
+    (when (get data ::t-service/company-csv-filename)
+      [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
+    [:div.row {:style {:padding-top "20px"}}
+     (let [success (boolean (:csv-imported data))
            amount (if (get data ::t-service/companies)
                     (count (get data ::t-service/companies))
                     nil)]
@@ -696,16 +723,20 @@
       [ui/radio-button-group {:name           (str "brokerage-companies-selection")
                               :value-selected selected-type}
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-no-companies])
+                         :id       "radio-company-none"
                          :value    "none"
                          :on-click #(select-type :none)}]
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-url-companies])
+                         :id       "radio-company-csv-url"
                          :value    "csv-url"
                          :on-click #(select-type :csv-url)}]
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-csv-companies])
+                         :id       "radio-company-csv-file"
                          :value    "csv-file"
                          :on-click #(select-type :csv-file)}]
        [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-form-companies])
                          :value    "form"
+                         :id       "radio-company-form"
                          :on-click #(select-type :form)}]]
 
       (when-not (nil? data)

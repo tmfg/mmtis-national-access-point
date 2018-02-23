@@ -20,6 +20,25 @@
             [ote.style.base :as style-base]
             [cljs-react-material-ui.icons :as ic]))
 
+(defn advance-reservation-group
+  "Creates a form group for in advance reservation.
+   Form displays header text and selection list by radio button group."
+  []
+  (form/group
+   {:label (tr [:field-labels :transport-service-common ::t-service/advance-reservation])
+    :columns 3
+    :layout :row}
+
+   (form/info (tr [:form-help :advance-reservation-info]))
+
+   {:name ::t-service/advance-reservation
+    :type :selection
+    :show-option (tr-key [:enums ::t-service/advance-reservation])
+    :options t-service/advance-reservation
+    :radio? true
+    :required? true
+    :container-class "col-md-12"}))
+
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
   [label service-url-field]
