@@ -34,6 +34,7 @@
   ["vehicle_accessibility" ::vehicle-accessibility (specql.transform/transform (specql.transform/to-keyword))]
   ["interface_data_content" ::interface-data-content (specql.transform/transform (specql.transform/to-keyword))]
   ["company_sources" ::company_sources (specql.transform/transform (specql.transform/to-keyword))]
+  ["advance_reservation" ::advance_reservation (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -148,3 +149,6 @@
 
 (def service-company-soure
   [:file :csv :url])
+
+(def advance-reservation
+  [:no :possible :mandatory])

@@ -196,6 +196,7 @@
               (ts-common/service-url
                (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
                ::t-service/real-time-information)
+              (ts-common/advance-reservation-group)
               (ts-common/service-url
                (tr [:field-labels :transport-service-common ::t-service/booking-service])
                ::t-service/booking-service)

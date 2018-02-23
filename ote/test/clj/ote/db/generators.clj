@@ -203,3 +203,6 @@
 
 (def gen-pick-up-locations-array
   (gen/vector gen-pick-up-locations 0 5))
+
+(def gen-advance-reservation
+  (gen/elements t-service/advance-reservation))
