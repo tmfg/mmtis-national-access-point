@@ -2,6 +2,7 @@
   "UI components for different form fields."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
+            [ote.ui.mui-chip-input :refer [chip-input]]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
             [cljs-react-material-ui.icons :as ic]
@@ -225,6 +226,112 @@
        (when (or error warning)
          [:div (stylefy/use-style style-base/required-element)
           (if error error warning)])])))
+
+(defmethod field :autocomplete [{:keys [update! label name error warning regex
+                                        max-length style hint-style
+                                        filter suggestions max-results
+                                        on-blur
+                                        form? table? full-width? open-on-focus?] :as field}
+                                data]
+
+  (let [handle-change! #(let [v %1]
+                          (if regex
+                            (when (re-matches regex v)
+                              (update! v))
+                            (update! v)))]
+    [ui/auto-complete
+     (merge
+       {:name name
+        :floating-label-text (when-not table? label)
+        :floating-label-fixed true
+        :dataSource suggestions
+        :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
+        :max-search-results (or max-results 10)
+        :open-on-focus open-on-focus?
+        :search-text (or data "")
+
+        :hintText (placeholder field data)
+        :full-width full-width?
+
+
+        ;; Show error text or warning text or empty string
+        :error-text (or error warning "")
+        ;; Error is more critical than required - showing it first
+        :error-style (if error
+                       style-base/error-element
+                       style-base/required-element)
+        :hint-style (merge style-base/placeholder
+                           hint-style)
+        :on-update-input handle-change!
+        :on-new-request handle-change!}
+       (when on-blur
+         {:on-blur on-blur})
+       (when max-length
+         {:max-length max-length})
+       (when style
+         {:style style}))]))
+
+(defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
+                                      max-length style hint-style
+                                      filter suggestions default-values max-results open-on-focus? clear-on-blur?
+                                      allow-duplicates? add-on-blur? new-chip-key-codes
+                                      form? table? full-width? full-width-input? disabled?]
+                               :or {open-on-focus? true, clear-on-blur? true, full-width-input? true} :as field}
+                              data]
+
+  (let [chips (set (or data #{}))
+        handle-add! #(let [v %]
+                       (if regex
+                         (when (re-matches regex v)
+                           (update! (conj chips %)))
+                         (update! (conj chips %))))]
+    [chip-input
+     (merge
+       {:name name
+        :floating-label-text (when-not table? label)
+        :floating-label-fixed true
+        :hintText (placeholder field data)
+        :disabled disabled?
+        :value chips
+
+        ;; == Autocomplete options ==
+        :dataSource suggestions
+        :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
+        :max-search-results (or max-results 10)
+        :open-on-focus open-on-focus?
+        :clear-on-blur clear-on-blur?
+
+        ;; == Chip options ==
+        :allow-duplicates allow-duplicates?
+        ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
+        :new-chip-key-codes (or new-chip-key-codes [13])
+
+        ;; Show error text or warning text or empty string
+        :error-text (or error warning "")
+
+        ;; == Styling ==
+        :full-width full-width?
+        :full-width-input full-width-input?
+
+        ;; Error is more critical than required - showing it first
+        :error-style (if error
+                       style-base/error-element
+                       style-base/required-element)
+        :hint-style (merge style-base/placeholder
+                           hint-style)
+
+        ;; == Event handlers ==
+        :on-blur (fn [event]
+                   (let [val (.. event -target -value)]
+                     (when (and add-on-blur? (not (str/blank? val)))
+                       (handle-add! val)))
+                   (when on-blur (on-blur event)))
+        :on-request-add handle-add!
+        :on-request-delete #(update! (disj chips %))}
+       (when max-length
+         {:max-length max-length})
+       (when style
+         {:style style}))]))
 
 (defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
                        data]
@@ -604,8 +711,7 @@
      [common/extended-help
       (:help-text extended-help)
       (:help-link-text extended-help)
-      (:help-link extended-help)
-      ]
+      (:help-link extended-help)]
      (checkbox-container update! table? label warning error style checked?)]
     (checkbox-container update! table? label warning error style checked?)))
 
