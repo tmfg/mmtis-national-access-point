@@ -4,7 +4,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.leaflet :as leaflet]
             [ote.app.controller.route :as rc]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn route-stepper []
   [ui/stepper {:active-step 1}
@@ -18,17 +19,21 @@
       [ui/step
        [ui/step-label s]]))])
 
+(def stop-marker-style
+  #js {:radius 8
+       :fillColor "green"
+       :opacity 1
+       :fillOpacity 0.65})
+
 (defn- stop-marker [e! point lat-lng]
-  (let [marker
-        (js/L.circleMarker
-         lat-lng
-         #js {:radius 8
-              :fillColor "green"
-              :opacity 1
-              :fillOpacity 0.65})]
-    (.on marker "click"
-         (fn [_]
-           (e! (rc/->AddStop point))))))
+  (-> lat-lng
+      (js/L.circleMarker stop-marker-style)
+      (.on  "click"
+            (fn [_]
+              (e! (rc/->AddStop point))))))
+
+(defn- flip-coords [[c1 c2]]
+  [c2 c1])
 
 (defn- route-map [e! {route :route :as app}]
   [:div.stops-map {:style {:width "50%"}}
@@ -43,8 +48,7 @@
                         :pointToLayer (partial stop-marker e!)}])
     (when-let [stop-sequence (seq (:stop-sequence route))]
       [leaflet/Polyline
-       {:positions (clj->js (mapv (comp (fn [[c1 c2]]
-                                          [c2 c1]) :coordinates) stop-sequence))
+       {:positions (clj->js (mapv (comp flip-coords :coordinates) stop-sequence))
         :color "red"}])]])
 
 (defn- route-times [e! stop-sequence]
@@ -54,7 +58,8 @@
      [:tr
       [:th "Satama"]
       [:th "Saapumisaika"]
-      [:th "Lähtöaika"]]]
+      [:th "Lähtöaika"]
+      [:th ""]]]
     [:tbody
      (doall
       (map-indexed
@@ -73,7 +78,9 @@
                  [form-fields/field
                   {:type :time
                    :update! #(e! (rc/->UpdateStop i {:departure-time %}))}
-                  departure-time])]])
+                  departure-time])]
+          [:td [ui/icon-button {:on-click #(e! (rc/->DeleteStop i))}
+                [ic/action-delete]]]])
        stop-sequence))]]])
 
 (defn new-route [e! _]

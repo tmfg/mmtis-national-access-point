@@ -8,6 +8,7 @@
 
 (defrecord AddStop [feature])
 (defrecord UpdateStop [idx stop])
+(defrecord DeleteStop [idx])
 
 (extend-protocol tuck/Event
   LoadStops
@@ -52,4 +53,11 @@
                             (contains? stop :arrival-time))
                      (assoc new-stop
                             :departure-time (:arrival-time new-stop))
-                     new-stop))))))
+                     new-stop)))))
+
+  DeleteStop
+  (process-event [{idx :idx} app]
+    (update-in app [:route :stop-sequence]
+               (fn [stops]
+                 (into (subvec stops 0 idx)
+                       (subvec stops (inc idx)))))))
