@@ -6,6 +6,8 @@
              [clj-time.coerce :as coerce]
              [cheshire.generate :as cheshire-generate]]
        :cljs [[goog.string :as gstr]
+              [goog.date.Date]
+              [goog.date.DateTime]
               [cljs-time.core :as cljs-time]
               [cljs-time.format :as format]
               [cljs-time.local :as local]
@@ -81,6 +83,14 @@
       ::hours (.getHours this)
       ::minutes (.getMinutes this)
       ::seconds (.getSeconds this)}))
+
+#?(:cljs
+   (extend-protocol DateFields
+     goog.date.Date
+     (date-fields [this]
+       {::date (.getDate this)
+        ::month (.getMonth this)
+        ::year (.getYear this)})))
 
 (defn format-date
   "Format given date in human readable format."
