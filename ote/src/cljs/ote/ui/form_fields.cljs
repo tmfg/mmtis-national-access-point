@@ -273,18 +273,22 @@
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
                                       max-length style hint-style
-                                      filter suggestions default-values max-results open-on-focus? clear-on-blur?
+                                      filter suggestions suggestions-config default-values max-results
+                                      open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
                                       form? table? full-width? full-width-input? disabled?]
                                :or {open-on-focus? true, clear-on-blur? true, full-width-input? true} :as field}
                               data]
 
   (let [chips (set (or data #{}))
-        handle-add! #(let [v %]
+        handle-add! #(let [v (js->clj % :keywordize-keys true)]
                        (if regex
                          (when (re-matches regex v)
-                           (update! (conj chips %)))
-                         (update! (conj chips %))))]
+                           (update! (conj chips v)))
+                         (update! (conj chips v))))
+        handle-del! (fn [_ idx] (let [chips (vec chips)
+                                      chips (concat (subvec chips 0 idx) (subvec chips (inc idx)))]
+                                  (update! chips)))]
     [chip-input
      (merge
        {:name name
@@ -327,7 +331,9 @@
                        (handle-add! val)))
                    (when on-blur (on-blur event)))
         :on-request-add handle-add!
-        :on-request-delete #(update! (disj chips %))}
+        :on-request-delete handle-del!}
+       (when suggestions-config
+         {:dataSourceConfig suggestions-config})
        (when max-length
          {:max-length max-length})
        (when style
