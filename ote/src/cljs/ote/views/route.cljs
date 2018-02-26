@@ -5,7 +5,9 @@
             [ote.ui.leaflet :as leaflet]
             [ote.app.controller.route :as rc]
             [ote.ui.form-fields :as form-fields]
-            [cljs-react-material-ui.icons :as ic]))
+            [cljs-react-material-ui.icons :as ic]
+            [ote.ui.service-calendar :as service-calendar]
+            [ote.time :as time]))
 
 (defn route-stepper []
   [ui/stepper {:active-step 1}
@@ -90,4 +92,10 @@
      [route-stepper]
      [:div {:style {:display "flex" :flex-direction "row"}}
       [route-map e! app]
-      [route-times e! (:stop-sequence route)]]]))
+      [route-times e! (:stop-sequence route)]]
+     [service-calendar/service-calendar
+      {:selected-date? (fn [d]
+                         (let [selected (or (:dates route) #{})
+                               df (time/date-fields d)]
+                           (selected df)))
+       :on-select #(e! (rc/->ToggleDate %))}]]))

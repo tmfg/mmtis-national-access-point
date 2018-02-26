@@ -1,7 +1,8 @@
 (ns ote.app.controller.route
   "Route based traffic controller"
   (:require [tuck.core :as tuck]
-            [ote.communication :as comm]))
+            [ote.communication :as comm]
+            [ote.time :as time]))
 
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
@@ -9,6 +10,7 @@
 (defrecord AddStop [feature])
 (defrecord UpdateStop [idx stop])
 (defrecord DeleteStop [idx])
+(defrecord ToggleDate [date])
 
 (extend-protocol tuck/Event
   LoadStops
@@ -60,4 +62,14 @@
     (update-in app [:route :stop-sequence]
                (fn [stops]
                  (into (subvec stops 0 idx)
-                       (subvec stops (inc idx)))))))
+                       (subvec stops (inc idx))))))
+
+  ToggleDate
+  (process-event [{date :date} app]
+    (update-in app [:route :dates]
+               (fn [dates]
+                 (let [date (time/date-fields date)
+                       selected-dates (or dates #{})]
+                   (if (selected-dates date)
+                     (disj selected-dates date)
+                     (conj selected-dates date)))))))
