@@ -229,7 +229,7 @@
 (defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
                        data]
   (let [option-idx (zipmap options (map str (range)))]
-    [:div.radio
+    [:div.radio (stylefy/use-style style-form-fields/radio-selection)
      [ui/radio-button-group
       {:value-selected (or (option-idx data) "")
        :name (str name)
@@ -244,7 +244,8 @@
                 :value (option-idx option)}])
             options))]
      (when (or error warning)
-       [:div (stylefy/use-style style-base/required-element)
+       [:div
+        (stylefy/use-sub-style style-form-fields/radio-selection :required)
         (if error error warning)])]))
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
