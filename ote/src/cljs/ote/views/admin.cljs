@@ -90,7 +90,7 @@
                 [ui/table-row-column business-id]
                 [ui/table-row-column phone]
                 [ui/table-row-column email]
-                [ui/table-row-column (if (= 1 source) "Palvelu" "Palveluntuottaja")]]))]]]
+                [ui/table-row-column (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]
          [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
