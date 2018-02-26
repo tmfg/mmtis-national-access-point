@@ -4,13 +4,23 @@
             [ote.communication :as comm]
             [ote.time :as time]))
 
+;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
 
+;; Edit route basic info
+(defrecord EditRoute [form-data])
+
+;; Events to edit the route's stop sequence
 (defrecord AddStop [feature])
 (defrecord UpdateStop [idx stop])
 (defrecord DeleteStop [idx])
+
+;; Event to set service calendar
 (defrecord ToggleDate [date])
+
+(defrecord PreviousStep [])
+(defrecord NextStep [])
 
 (extend-protocol tuck/Event
   LoadStops
@@ -23,8 +33,11 @@
 
   LoadStopsResponse
   (process-event [{response :response} app]
-    (.log js/console "GOT:" response)
     (assoc-in app [:route :stops] response))
+
+  EditRoute
+  (process-event [{form-data :form-data} app]
+    (update app :route merge form-data))
 
   AddStop
   (process-event [{feature :feature} app]
@@ -72,4 +85,13 @@
                        selected-dates (or dates #{})]
                    (if (selected-dates date)
                      (disj selected-dates date)
-                     (conj selected-dates date)))))))
+                     (conj selected-dates date))))))
+
+
+  PreviousStep
+  (process-event [_ app]
+    (update-in app [:route :page] dec))
+
+  NextStep
+  (process-event [_ app]
+    (update-in app [:route :page] (fnil inc 0))))
