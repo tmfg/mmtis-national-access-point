@@ -16,10 +16,19 @@
 (defrecord UpdateStop [idx stop])
 (defrecord DeleteStop [idx])
 
+;; Edit times
+(defrecord NewStartTime [time])
+(defrecord AddRouteTime [])
+
+
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
 
 (defrecord GoToStep [step])
+
+(defn route-times [{:keys [stop-sequence times]}]
+  (into [{:stops stop-sequence}]
+        times))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -89,4 +98,30 @@
 
   GoToStep
   (process-event [{step :step} app]
-    (assoc-in app [:route :step] step)))
+    (assoc-in app [:route :step] step))
+
+
+  NewStartTime
+  (process-event [{time :time} app]
+    (assoc-in app [:route :new-start-time] time))
+
+  AddRouteTime
+  (process-event [_ {route :route :as app}]
+    (let [time (last (route-times route))
+          start-time (time/minutes-from-midnight (:departure-time (first (:stops time))))
+          new-start-time (time/minutes-from-midnight (:new-start-time route))
+          time-from-new-start #(when %
+                                 (-> %
+                                     time/minutes-from-midnight
+                                     (- start-time)
+                                     (+ new-start-time)
+                                     time/minutes-from-midnight->time))
+          update-times-from-new-start
+          #(-> %
+               (update :arrival-time time-from-new-start)
+               (update :departure-time time-from-new-start))]
+      (update-in app [:route :times]
+                 (fn [times]
+                   (conj (or times [])
+                         {:stops (mapv update-times-from-new-start
+                                       (:stops time))}))))))
