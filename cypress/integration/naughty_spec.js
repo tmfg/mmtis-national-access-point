@@ -86,6 +86,8 @@ describe('Naughty form fill', () => {
                     cy.get('textarea[id*="description--Palvelunkuvaus"]').typeRaw(genNaughtyString(100));
                 });
 
+            cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
+
             cy.contains('Tallenna ja julkaise').click();
         });
 
