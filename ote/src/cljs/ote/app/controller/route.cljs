@@ -19,8 +19,7 @@
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
 
-(defrecord PreviousStep [])
-(defrecord NextStep [])
+(defrecord GoToStep [step])
 
 (extend-protocol tuck/Event
   LoadStops
@@ -88,10 +87,6 @@
                      (conj selected-dates date))))))
 
 
-  PreviousStep
-  (process-event [_ app]
-    (update-in app [:route :page] dec))
-
-  NextStep
-  (process-event [_ app]
-    (update-in app [:route :page] (fnil inc 0))))
+  GoToStep
+  (process-event [{step :step} app]
+    (assoc-in app [:route :step] step)))
