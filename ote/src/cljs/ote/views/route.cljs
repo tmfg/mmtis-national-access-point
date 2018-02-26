@@ -12,17 +12,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.ui.common :as common]))
 
-(defn route-stepper [page]
-  [ui/stepper {:active-step page}
-   (doall
-    (for [s ["Reitin nimi"
-             "Reittipysäkit"
-             "Vuorot"
-             "Kalenteri"
-             "Reitin tallennus"]]
-      ^{:key s}
-      [ui/step
-       [ui/step-label s]]))])
+
 
 (def stop-marker-style
   #js {:radius 8
@@ -95,10 +85,12 @@
         [:td {:colSpan 4}
          [common/help "Valitse reitin pysäkkiketju klikkaamalla pysäkkejä kartalta."]]]])]])
 
-(defn route-basic-info [e! route operators]
+(defn route-basic-info [e! app]
   ;; Initially select the first operator
-  (e! (rc/->EditRoute {:transport-operator (first operators)}))
-  (fn [e! route operators]
+  (e! (rc/->EditRoute
+       {:transport-operator (:transport-operator
+                             (first (:transport-operators-with-services app)))}))
+  (fn [e! {route :route :as app}]
     [:div.route-basic-info
      [form/form {:update! #(e! (rc/->EditRoute %))}
       [(form/group
@@ -112,19 +104,35 @@
         {:name :transport-operator
          :type :selection
          :label "Palveluntuottaja"
-         :options operators
+         :options (map :transport-operator
+                       (:transport-operators-with-services app))
          :show-option ::t-operator/name})]
       route]]))
 
-(defn route-stop-sequence [e! route]
+(defn route-stop-sequence [e! {route :route :as app}]
   [:div {:style {:display "flex" :flex-direction "row"}}
    [route-map e! route]
    [route-stop-times e! (:stop-sequence route)]])
 
-(defn route-times [e! route]
-  [:div "tässä vuorot"])
+(defn route-times [e! {route :route :as app}]
+  (let [stop-sequence (:stop-sequence route)
+        first-departure (:departure-time (first stop-sequence))
+        first-arrival (:arrival-time (last stop-sequence))
+        route-duration (time/minutes-elapsed
+                        first-departure
+                        first-arrival)]
 
-(defn route-service-calendar [e! route]
+    [:div.route-times
+     [:table
+      [:thead
+       [:tr [:th "Lähtöaika"] [:th "Saapumisaika"]]]
+      [:tbody
+       [:tr
+        [:td (time/format-time first-departure)]
+        [:td (time/format-time first-arrival)]]]]
+     [:div "tässä vuorot, kestää " route-duration " minuuttia"]]))
+
+(defn route-service-calendar [e! {route :route :as route}]
   [service-calendar/service-calendar
    {:selected-date? (fn [d]
                       (let [selected (or (:dates route) #{})
@@ -132,28 +140,71 @@
                         (selected df)))
     :on-select #(e! (rc/->ToggleDate %))}])
 
-(defn route-save [e! route]
+(defn route-save [e! {route :route :as app}]
   [:div "tässä tallennellaan"])
+
+(defn- valid-stop-sequence? [{:keys [stop-sequence]}]
+  (and (not (empty? stop-sequence))
+       (:departure-time (first stop-sequence))
+       (:arrival-time (last stop-sequence))))
+
+(def wizard-steps
+  [{:name :basic-info :label "Reitin nimi" :component route-basic-info :validate form/valid?}
+   {:name :stop-sequence :label "Reittipysäkit" :component route-stop-sequence :validate valid-stop-sequence?}
+   {:name :times :label "Vuorot" :component route-times}
+   {:name :calendar :label "Kalenteri" :component route-service-calendar}
+   {:name :save :label "Reitin tallennus" :component route-save}])
+
+(defn- route-wizard [e! wizard-steps {route :route :as app}]
+  (let [step (or (:step route) (:name (first wizard-steps)))
+
+        [i {:keys [component validate] :as current-step}]
+        (first (keep-indexed
+                (fn [i s]
+                  (when (= step (:name s))
+                    [i s]))
+                wizard-steps))
+        validate (or validate (constantly true))
+
+        previous-step (some (fn [[prev current]]
+                              (when (= step (:name current))
+                                (:name prev)))
+                            (partition-all 2 1 wizard-steps))
+        next-step (some (fn [[current next]]
+                          (when (= step (:name current))
+                            (:name next)))
+                        (partition-all 2 1 wizard-steps))]
+    [:div.route
+     [ui/stepper {:active-step i}
+      (doall
+       (for [{label :label} wizard-steps]
+         ^{:key label}
+         [ui/step
+          [ui/step-label label]]))]
+
+     [component e! app]
+
+     [:div.route-wizard-navigation
+      {:style {:display "flex"
+               :justify-content "space-between"}}
+      (if (= step (:name (first wizard-steps)))
+        [:span]
+        [ui/flat-button {:primary true
+                         :on-click #(e! (rc/->GoToStep previous-step))
+                         :icon (ic/navigation-arrow-back)
+                         :label-position "before"}
+         "Edellinen"])
+      (when (not= step (:name (last wizard-steps)))
+        [ui/flat-button {:primary true
+                         :disabled (not (validate route))
+                         :on-click #(e! (rc/->GoToStep next-step))
+                         :icon (ic/navigation-arrow-forward)}
+         "Seuraava"])]]))
 
 (defn new-route [e! _]
   (e! (rc/->LoadStops))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
-      [:div.route
-       [route-stepper page]
-       (case page
-         0 [route-basic-info e! route (map :transport-operator
-                                           (:transport-operators-with-services app))]
-         1 [route-stop-sequence e! route]
-         2 [route-times e! route]
-         3 [route-service-calendar e! route]
-         4 [route-save e! route])
-       [:div.route-wizard-navigation
-        (when (pos? page)
-          [ui/raised-button {:primary true
-                             :on-click #(e! (rc/->PreviousStep))}
-           "Edellinen"])
-        (when (< page 4)
-          [ui/raised-button {:primary true
-                             :on-click #(e! (rc/->NextStep))}
-           "Seuraava"])]])))
+      [route-wizard
+       e! wizard-steps
+       app])))
