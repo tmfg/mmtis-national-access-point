@@ -229,3 +229,15 @@
     org.postgresql.util.PGInterval
     (fn [interval json-generator]
       (cheshire-generate/encode-map (pginterval->interval interval) json-generator))))
+
+(defn minutes-from-midnight [{:keys [minutes hours] :as time}]
+  (+ (* 60 hours) minutes))
+
+(defn minutes-from-midnight->time [minutes]
+  (let [hours (int (/ minutes 60))
+        minutes (- minutes (* 60 hours))]
+    (->Time hours minutes 0)))
+
+(defn minutes-elapsed [t1 t2]
+  (- (minutes-from-midnight t2)
+     (minutes-from-midnight t1)))
