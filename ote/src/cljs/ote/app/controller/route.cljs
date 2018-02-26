@@ -125,3 +125,11 @@
                    (conj (or times [])
                          {:stops (mapv update-times-from-new-start
                                        (:stops time))}))))))
+
+(defn valid-stop-sequence?
+  "Check if given stop seqeunce is valid. A stop sequence is valid
+  if it is not empty and the first and last stops have a departure and arrival time respectively."
+  [{:keys [stop-sequence] :as route}]
+  (and (not (empty? stop-sequence))
+       (:departure-time (first stop-sequence))
+       (:arrival-time (last stop-sequence))))
