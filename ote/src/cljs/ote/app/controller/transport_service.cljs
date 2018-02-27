@@ -34,6 +34,7 @@
     ::t-service/notice-external-interfaces?
     ::t-service/companies-csv-url
     ::t-service/company-source
+    ::t-service/company-csv-filename
     :csv-count})
 
 (defn service-type-from-sub-type
@@ -85,7 +86,7 @@
 (defrecord EnsureExternalInterfaceUrlResponse [response url])
 (defrecord FailedExternalInterfaceUrlResponse [])
 
-(defrecord AddImportedCompaniesToService [csv])
+(defrecord AddImportedCompaniesToService [csv filename])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -290,9 +291,10 @@
     app)
 
   AddImportedCompaniesToService
-  (process-event [{csv :csv} app]
+  (process-event [{csv :csv filename :filename} app]
       (-> app
         (assoc-in [:transport-service ::t-service/passenger-transportation ::t-service/companies] csv)
+        (assoc-in [:transport-service ::t-service/passenger-transportation ::t-service/company-csv-filename] filename)
         (assoc-in [:transport-service ::t-service/passenger-transportation :csv-imported] true)))
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
@@ -472,7 +474,9 @@
   (let [fr (js/FileReader.)]
     (set! (.-onload fr)
           (fn [e]
-            (let [txt (-> e .-target .-result)
-                  csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator ","))]
-              (e! (->AddImportedCompaniesToService csv)))))
+            (let [filename (-> (aget (.-files file-input) 0) .-name)
+                  txt (-> e .-target .-result)
+                  separator (csv-util/csv-separator txt)
+                  csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator separator))]
+              (e! (->AddImportedCompaniesToService csv filename)))))
     (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))

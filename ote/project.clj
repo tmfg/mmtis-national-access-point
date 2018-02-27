@@ -21,13 +21,13 @@
                  [com.zaxxer/HikariCP "2.6.1"]
                  [org.clojure/java.jdbc "0.7.1"]
                  [webjure/jeesql "0.4.7"]
-                 [specql "0.7.0-alpha16"]
+                 [specql "0.7.0-alpha17"]
 
                  ;; http-kit HTTP server (and client)
                  [http-kit "2.2.0"]
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-anti-forgery "1.1.0"]
-
+                 [clj-http "3.7.0"]
 
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
@@ -55,6 +55,7 @@
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
                  [cljs-react-material-ui "0.2.48"]
+                 [cljsjs/material-ui-chip-input "0.17.2-0"]
                  [figwheel "0.5.13"]
                  [cljsjs/react-leaflet "1.6.5-0" :exclusions [cljsjs/leaflet]]
                  [cljsjs/leaflet "1.2.0-0"]
@@ -93,8 +94,7 @@
 
                        ;; Prevent uberjar from cleaning cljs generated files
                        :auto-clean false}
-             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]
-                                  [clj-http "3.7.0"]]
+             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]]
                    :test-paths ["test/clj"]}}
 
   :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]

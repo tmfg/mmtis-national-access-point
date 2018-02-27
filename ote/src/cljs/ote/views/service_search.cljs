@@ -64,7 +64,7 @@
   ;; [label width value-fn]
   [[:table-header-external-interface "10%"
     (comp #(common-ui/linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
-   [::t-service/format-short "10%" ::t-service/format]
+   [::t-service/format-short "10%" (comp #(str/join ", " %) ::t-service/format)]
    [::t-service/license "10%" ::t-service/license]
    [::t-service/external-service-description "10%"
     (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])

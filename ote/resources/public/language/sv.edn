@@ -270,7 +270,7 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare. Du kan även uppge en webbadress med tilläggsuppgifter."}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
-  :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
+  :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här. Dock endast den aktör som koordinerar tjänsten (tex. taxicentral eller beställande myndighet) fyller i denna punkt. Den som tillhör tex en taxicentral fyller inte i dessa uppgifter."
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
   :csv-file-example "Här finns en modell för listan"
   :companies-info "Om du inte har en lista i .csv-format, fyll då i de deltagande företagens namn och FO-nummer här."
@@ -290,6 +290,11 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."}
+
+ ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
+ :licenses
+ {:external-interfaces ["Creative Commons 4.0" "CC0 1.0" "AGPL"]}
+
 
  ;; CSV parsing
  :csv
@@ -327,7 +332,10 @@
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
   :add-new-transport-operator "Lägg till ny tjänsteproducent"
-  :add-new-member "Lägg till användare"}
+  :add-new-member "Lägg till användare"
+  :upload-csv "Lägg till CSV"
+  :update-csv "Uppdatera CSV"
+  }
 
 
  ;; Database enumeration values

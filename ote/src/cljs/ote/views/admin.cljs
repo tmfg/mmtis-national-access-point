@@ -80,15 +80,17 @@
               [ui/table-header-column "Yritys"]
               [ui/table-header-column "Y-tunnus"]
               [ui/table-header-column "Puhelin"]
-              [ui/table-header-column "Sähköposti"]]]
+              [ui/table-header-column "Sähköposti"]
+              [ui/table-header-column "Lähde"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{:keys [operator business-id phone email]} results]
+             (for [{:keys [operator business-id phone email source]} results]
                [ui/table-row {:selectable false}
                 [ui/table-row-column operator]
                 [ui/table-row-column business-id]
                 [ui/table-row-column phone]
-                [ui/table-row-column email]]))]]]
+                [ui/table-row-column email]
+                [ui/table-row-column (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]
          [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
