@@ -2,7 +2,8 @@
   "Route based traffic controller"
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [clojure.string :as str]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -134,9 +135,15 @@
     (update-in app [:route :times time-idx :stops stop-idx] merge form-data)))
 
 (defn valid-stop-sequence?
-  "Check if given stop seqeunce is valid. A stop sequence is valid
+  "Check if given route's stop sequence is valid. A stop sequence is valid
   if it is not empty and the first and last stops have a departure and arrival time respectively."
   [{:keys [stop-sequence] :as route}]
   (and (not (empty? stop-sequence))
        (:departure-time (first stop-sequence))
        (:arrival-time (last stop-sequence))))
+
+(defn valid-basic-info?
+  "Check if given route's has a name and an operator."
+  [{:keys [name transport-operator]}]
+  (and (not (str/blank? name))
+       transport-operator))

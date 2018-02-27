@@ -14,11 +14,16 @@
       (fn [i {:keys [port-id port-name]}]
         ^{:key port-id}
         [:th {:colSpan 2
-              :style {:vertical-align "top"}} port-name
+              :style {:vertical-align "top"}}
+         [:div {:style {:display "inline-block"
+                        :width "160px"
+                        :overflow-x "hidden"
+                        :white-space "pre"}} port-name]
          [:div {:style {:display "inline-block"
                         :float "right"
                         :position "relative"
-                        :left 14}}
+                        :left 14
+                        :top -20}}
           (when (< i (dec (count stop-sequence)))
             [ic/navigation-chevron-right])]])
       stop-sequence))]

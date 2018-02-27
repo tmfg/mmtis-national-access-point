@@ -33,7 +33,7 @@
   [{:name :basic-info
     :label "Reitin nimi"
     :component route-basic-info/basic-info
-    :validate form/valid?}
+    :validate  rc/valid-basic-info?}
    {:name :stop-sequence
     :label "Reittipysäkit"
     :component route-stop-sequence/stop-sequence
