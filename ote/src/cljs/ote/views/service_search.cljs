@@ -62,43 +62,54 @@
 
 (def external-interface-table-columns
   ;; [label width value-fn]
-  [[:table-header-external-interface "10%"
+  [[:table-header-external-interface "20%"
     (comp #(common-ui/linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
    [::t-service/format-short "10%" (comp #(str/join ", " %) ::t-service/format)]
    [::t-service/license "10%" ::t-service/license]
    [::t-service/external-service-description "10%"
     (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])
 
+(defn parse-content-value [value-array]
+  (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
+        value-str (str/join ", " (map #(data-content-value %) value-array))
+        return-value (common-ui/maybe-shorten-text-to 45 value-str)]
+    return-value))
+
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
-  (when-not (empty? external-interface-links)
-    [:div
-     [:span.search-card-title (tr [:service-search :external-interfaces])]
-     [:table {:style {:margin-top "10px"}}
-      [:thead (stylefy/use-style style/external-interface-header)
-       [:tr
-        (doall
-          (for [[k w _] external-interface-table-columns]
-            ^{:key k}
-            [:th {:style {:width w :height "20px"}}
-             (tr [:field-labels :transport-service-common k])]))]]
-      [:tbody (stylefy/use-style style/external-interface-body)
-       (doall
-         (map-indexed
-           (fn [i row]
-             ^{:key i}
-             [:tr {:selectable false :style style/external-table-row}
-              (doall
-                (for [[k w value-fn] external-interface-table-columns]
-                  ^{:key k}
-                  [:td {:style {:width w :font-size "14px"}}
-                   (value-fn row)]))])
-           external-interface-links))]]]))
+    (when-not (empty? external-interface-links)
+      [:div
+       [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
+       [:table {:style {:margin-top "10px"}}
+        [:thead (stylefy/use-style style/external-interface-header)
+         [:tr
+          (doall
+            (for [[k w _] external-interface-table-columns]
+              ^{:key k}
+              [:th {:style (merge {:width w} style/external-table-header)}
+               (tr [:field-labels :transport-service-common k])]))]]
+        [:tbody (stylefy/use-style style/external-interface-body)
+         (doall
+           (map-indexed
+             (fn [i {::t-service/keys [data-content external-interface format license description] :as row}]
+               ^{:key (str "external-table-row-" i)}
+               [:tr {:style style/external-table-row}
+                ^{:key (str "external-interface-" i)}
+                [:td {:style {:width "20%" :font-size "14px"}}
+                 (common-ui/linkify
+                   (::t-service/url external-interface)
+                   (parse-content-value data-content)
+                   {:target "_blank"})]
+                [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
+                [:td {:style {:width "10%" :font-size "14px"}} license]
+                [:td {:style {:width "10%" :font-size "14px"}}
+                 (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
+             external-interface-links))]]]))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
                                        operation-area-description description contact-phone contact-email
-                                       operator-name ckan-resource-id transport-operator-id]
+                                       operator-name business-id ckan-resource-id transport-operator-id]
                      :as              service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
@@ -133,7 +144,7 @@
         [:div.result-interfaces {:style style/result-border}
          e-links])
       [:div
-       [data-item nil operator-name]
+       [data-item nil (str operator-name " " business-id)]
 
        [data-item [ic/action-home {:style style/contact-icon}]
         (format-address contact-address)]

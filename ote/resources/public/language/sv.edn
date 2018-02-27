@@ -904,7 +904,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                          "Hittades en tjänst"
                          ["Hittades " :count " tjänster"])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
-  :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
+  :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."

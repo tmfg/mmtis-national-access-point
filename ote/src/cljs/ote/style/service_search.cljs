@@ -8,14 +8,14 @@
                     ::stylefy/mode {:hover {:cursor          "pointer"
                                             :text-decoration "underline"}}})
 
-(def result-border {:padding-bottom "10px"
+(def result-border {:padding "0.5em 0em 1em 0em"
                     :margin-bottom  "10px"
                     :border-bottom  "1px solid #d9d9d9"})
 
 (def operator-result-header {:width            "100%"
                              :display          "block"
                              :padding          "10px"
-                             :background-color "#0088ce"})
+                             :background-color "#00A9DF"})
 
 (def operator-result-header-link {:color       "white"
                                   :font-weight 600})
@@ -45,21 +45,21 @@
                         ::stylefy/mode {:hover {:cursor          "pointer"
                                                 :text-decoration "underline"}}})
 
-(def result-card-small-label {:font-size "12px"
+(def result-card-small-label {:font-size "14px"
                               :font-weight "20"
                               :padding-left "20px"})
 
 (def result-card-body {:padding   "15px 15px"
                        :font-size "1em"
-                       :color     "#000"})
+                       :color     "#444444"})
 
 (def result-card-delete {:float "right"
                          :position "relative"
                          :top "-50px"})
 
-(def delete-icon {:color         "rgba(255, 255, 255, 0,75)"
-                  ::stylefy/mode {:hover {:color "rgba(255, 255, 255, 1) !important"}}})
-(def partly-visible-delete-icon {:color "rgba(255, 255, 255, 0,75)"})
+(def delete-icon {:color         "rgba(0, 0, 0, 0,75)"
+                  ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})
+(def partly-visible-delete-icon {:color "rgba(0, 0, 0, 0,75)"})
 
 (def service-link {:color "#2D75B4" :text-decoration "none"})
 
@@ -71,8 +71,12 @@
           :color     "#999999"}))
 
 (def external-interface-header
-  {:font-size  "80%"
+  {:color "#444444"
+   :font-size  "14px"
+   :font-weight 500
    :text-align "left"})
+
+(def external-table-header {:height "20px" :font-weight 500})
 
 (def external-interface-body {:font-weight "normal"})
 
