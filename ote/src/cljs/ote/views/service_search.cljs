@@ -100,7 +100,7 @@
                    (::t-service/url external-interface)
                    (parse-content-value data-content)
                    {:target "_blank"})]
-                [:td {:style {:width "10%" :font-size "14px"}} format]
+                [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
                 [:td {:style {:width "10%" :font-size "14px"}} license]
                 [:td {:style {:width "10%" :font-size "14px"}}
                  (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
