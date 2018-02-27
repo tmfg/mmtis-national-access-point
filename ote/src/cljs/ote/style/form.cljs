@@ -30,7 +30,7 @@
 
 (def form-card-body {:padding "15px 15px"
                      :font-size "1em"
-                     :color "#000"})
+                     :color "#444444"})
 
 (def form-info-text {:display "inline-block"
                      :position "relative"
@@ -43,8 +43,7 @@
 (def subtitle-h {:margin "0"})
 
 (def subheader {:color "#666"
-                :margin-top "-10px"
-                :padding-bottom "10px"})
+                :margin-top "-10px"})
 
 (def border-color "#C4C4C4")
 (def border-right {:border-right (str "solid 2px " border-color)

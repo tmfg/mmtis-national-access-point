@@ -14,6 +14,7 @@ body {
     min-height: 100%;
     padding-bottom: 176px;
     font-size: 16px;
+    color: #444444;
 }
 
 
@@ -33,6 +34,8 @@ h2 {
 
 p {
     line-height: 21px;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
 }
 
 #oteapp, .ote-sovellus {
