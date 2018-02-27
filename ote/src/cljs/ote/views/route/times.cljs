@@ -3,15 +3,25 @@
   (:require [ote.app.controller.route :as rc]
             [ote.time :as time]
             [ote.ui.form-fields :as form-fields]
-            [cljs-react-material-ui.reagent :as ui]))
+            [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn route-times-header [stop-sequence]
   [:thead
    [:tr
     (doall
-     (for [{:keys [port-id port-name]} stop-sequence]
-       ^{:key port-id}
-       [:th {:colSpan 2} port-name]))]
+     (map-indexed
+      (fn [i {:keys [port-id port-name]}]
+        ^{:key port-id}
+        [:th {:colSpan 2
+              :style {:vertical-align "top"}} port-name
+         [:div {:style {:display "inline-block"
+                        :float "right"
+                        :position "relative"
+                        :left 14}}
+          (when (< i (dec (count stop-sequence)))
+            [ic/navigation-chevron-right])]])
+      stop-sequence))]
    [:tr
     (doall
      (for [{:keys [port-id port-name]} stop-sequence]
