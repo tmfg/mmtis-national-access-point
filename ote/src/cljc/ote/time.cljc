@@ -53,6 +53,8 @@
   (or (nil? hours)
       (nil? minutes)))
 
+(def valid-time? (complement empty-time?))
+
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)

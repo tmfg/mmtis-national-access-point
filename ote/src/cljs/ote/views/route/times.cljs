@@ -84,6 +84,6 @@
         [form-fields/field {:type :time
                             :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
         [ui/raised-button {:primary true
-                           :disabled (not (:new-start-time route))
+                           :disabled (time/empty-time? (:new-start-time route))
                            :on-click #(e! (rc/->AddRouteTime))}
          "Lisää vuoro"]]])))

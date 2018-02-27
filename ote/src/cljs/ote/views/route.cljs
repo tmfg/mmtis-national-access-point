@@ -40,7 +40,8 @@
     :validate rc/valid-stop-sequence?}
    {:name :times
     :label "Vuorot"
-    :component route-times/times}
+    :component route-times/times
+    :validate rc/valid-stop-times?}
    {:name :calendar
     :label "Kalenteri"
     :component route-service-calendar}

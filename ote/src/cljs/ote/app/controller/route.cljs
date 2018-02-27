@@ -123,11 +123,13 @@
           #(-> %
                (update :arrival-time time-from-new-start)
                (update :departure-time time-from-new-start))]
-      (update-in app [:route :times]
-                 (fn [times]
-                   (conj (or times [])
-                         {:stops (mapv update-times-from-new-start
-                                       (:stops time))})))))
+      (-> app
+          (assoc-in [:route :new-start-time] nil)
+          (update-in [:route :times]
+                     (fn [times]
+                       (conj (or times [])
+                             {:stops (mapv update-times-from-new-start
+                                           (:stops time))}))))))
 
   EditStopTime
   (process-event [{:keys [time-idx stop-idx form-data]} app]
@@ -143,7 +145,23 @@
        (:arrival-time (last stop-sequence))))
 
 (defn valid-basic-info?
-  "Check if given route's has a name and an operator."
+  "Check if given route has a name and an operator."
   [{:keys [name transport-operator]}]
   (and (not (str/blank? name))
        transport-operator))
+
+(defn valid-stop-times?
+  "Check if given route's stop times are valid.
+  The first stop must have a departure time and the last stop must
+  have an arrival time. All other stops must have both the arrival
+  and the departure time."
+  [{:keys [times]}]
+  (every? (fn [{:keys [stops]}]
+            (let [first-stop (first stops)
+                  last-stop (last stops)
+                  other-stops (rest (butlast stops))]
+              (and (time/valid-time? (:departure-time first-stop))
+                   (time/valid-time? (:arrival-time last-stop))
+                   (every? #(and (time/valid-time? (:departure-time %))
+                                 (time/valid-time? (:arrival-time %))) other-stops))))
+          times))
