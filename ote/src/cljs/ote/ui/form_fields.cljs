@@ -276,8 +276,7 @@
                                       filter suggestions suggestions-config default-values max-results
                                       open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
-                                      form? table? full-width? full-width-input? disabled?]
-                               :or {open-on-focus? true, clear-on-blur? true, full-width-input? true} :as field}
+                                      form? table? full-width? full-width-input? disabled?] :as field}
                               data]
 
   (let [chips (set (or data #{}))
