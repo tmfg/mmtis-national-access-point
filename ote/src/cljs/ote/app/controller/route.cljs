@@ -17,18 +17,15 @@
 (defrecord DeleteStop [idx])
 
 ;; Edit times
+(defrecord InitRouteTimes []) ; initialize route times based on stop sequence
 (defrecord NewStartTime [time])
 (defrecord AddRouteTime [])
-
+(defrecord EditStopTime [time-idx stop-idx form-data])
 
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
 
 (defrecord GoToStep [step])
-
-(defn route-times [{:keys [stop-sequence times]}]
-  (into [{:stops stop-sequence}]
-        times))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -101,13 +98,18 @@
     (assoc-in app [:route :step] step))
 
 
+  InitRouteTimes
+  (process-event [_ app]
+    (assoc-in app [:route :times]
+              [{:stops (get-in app [:route :stop-sequence])}]))
+
   NewStartTime
   (process-event [{time :time} app]
     (assoc-in app [:route :new-start-time] time))
 
   AddRouteTime
   (process-event [_ {route :route :as app}]
-    (let [time (last (route-times route))
+    (let [time (last (:times route))
           start-time (time/minutes-from-midnight (:departure-time (first (:stops time))))
           new-start-time (time/minutes-from-midnight (:new-start-time route))
           time-from-new-start #(when %
@@ -124,7 +126,12 @@
                  (fn [times]
                    (conj (or times [])
                          {:stops (mapv update-times-from-new-start
-                                       (:stops time))}))))))
+                                       (:stops time))})))))
+
+  EditStopTime
+  (process-event [{:keys [time-idx stop-idx form-data]} app]
+
+    (update-in app [:route :times time-idx :stops stop-idx] merge form-data)))
 
 (defn valid-stop-sequence?
   "Check if given stop seqeunce is valid. A stop sequence is valid
