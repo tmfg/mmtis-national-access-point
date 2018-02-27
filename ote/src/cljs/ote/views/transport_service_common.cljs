@@ -3,7 +3,7 @@
   (:require [tuck.core :as tuck]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.ui.form :as form]
             [ote.db.common :as common]
             [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
@@ -151,16 +151,23 @@
                        :width "5%"
                        }
                       {:name ::t-service/format
-                       :type :string
+                       :type :chip-input
+                       :open-on-focus? true
+                       :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
+                       :max-results 10
                        :tooltip (tr [:form-help :external-interfaces-tooltips :format])
                        :width "15%"
                        :full-width? true
+                       :add-on-blur? true
                        :required? true}
                       {:name ::t-service/license
-                       :type :string
+                       :type :autocomplete
+                       :open-on-focus? true
                        :tooltip (tr [:form-help :external-interfaces-tooltips :license])
                        :width "20%"
-                       :full-width? true}
+                       :full-width? true
+                       :suggestions (tr-tree [:licenses :external-interfaces])
+                       :max-results 10}
                       {:name ::t-service/external-service-description
                        :type :localized-text
                        :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])

@@ -1,5 +1,6 @@
 (ns ote.style.form-fields
-  (:require [stylefy.core :as stylefy]))
+  (:require [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
 (def localized-text-language-container
   {:height "20px"
@@ -31,3 +32,5 @@
 (def table-header-row {:overflow "visible" :color "black" :border-bottom "0px solid white"})
 (def table-header-column {:overflow "visible" :color "black" :padding "15px 10px 0 0"})
 (def table-row-column {:color "black" :overflow "visible" :padding "0 10px 15px 0"})
+(def radio-selection {::stylefy/sub-styles
+                      {:required (merge style-base/required-element {:margin-top "15px"})}})
