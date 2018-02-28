@@ -539,6 +539,7 @@
   :header-service-hours                    "Betjäningstider"
   :header-pick-up-locations                "Verksamhetsställen"
   :header-select-company-list-type         "Välj typ av meddelande"
+  :header-brokerage                        "Välityspalvelua koskevat tiedot"
   :radio-button-no-companies               "Det finns inga andra företag som är inblandade i att tillhandahålla denna tjänst."
   :radio-button-url-companies              "Ange en webbadress från vilken affärsinformationen kan hittas som en .csv-fil."
   :radio-button-csv-companies              "Hämta företagsinformation som en CSV-fil i formuläret."
