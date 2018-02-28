@@ -3,7 +3,9 @@
   (:require [ote.util.zip :as zip]
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [ote.time :as time]
+            [goog.date.Date]))
 
 (defn- agency-txt [{:keys [transport-operator]}]
   [{:gtfs/agency-id 1 ;; always just one agency
@@ -28,7 +30,6 @@
 (defn- routes-txt [{:keys [name] :as route}]
   [{:gtfs/route-id 1
     :gtfs/route-short-name name
-    :gtfs/route-long-name name
     :gtfs/route-type "4" ;; PENDING: hardcoded to 4 (ferry)
     :gtfs/agency-id 1}])
 
@@ -58,11 +59,21 @@
          (mapcat identity))
         times))
 
-(def files [["agency.txt" agency-txt gtfs-spec/agency-txt-fields]
-            ["stops.txt" stops-txt gtfs-spec/stops-txt-fields]
-            ["routes.txt" routes-txt gtfs-spec/routes-txt-fields]
-            ["trips.txt" trips-txt gtfs-spec/trips-txt-fields]
-            ["stop_times.txt" stop-times-txt gtfs-spec/stop-times-txt-fields]])
+(defn- calendar-dates-txt [{:keys [dates]}]
+  (mapv (fn [{::time/keys [year month date]}]
+          {:gtfs/service-id 1
+           :gtfs/date (goog.date.Date. year (dec month) date)
+           :gtfs/exception-type 1}) dates))
+
+(def files [["agency.txt" agency-txt :gtfs/agency-txt]
+            ["stops.txt" stops-txt :gtfs/stops-txt]
+            ["routes.txt" routes-txt :gtfs/routes-txt]
+            ["trips.txt" trips-txt :gtfs/trips-txt]
+            ["stop_times.txt" stop-times-txt :gtfs/stop-times-txt]
+
+            ;; Our calendar is not rule-based, so omit calendar.txt
+            ;; and specify calendar_dates.txt with every selected date
+            ["calendar_dates.txt" calendar-dates-txt :gtfs/calendar-dates-txt]])
 
 (defn save-gtfs [route file-name]
   (zip/write-zip (mapv (fn [[name generate-function fields]]

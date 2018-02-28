@@ -38,6 +38,8 @@
   [:gtfs/agency-id :gtfs/agency-name :gtfs/agency-url :gtfs/agency-timezone
    :gtfs/agency-lang :gtfs/agency-phone :gtfs/agency-fare-url :gtfs/agency-email])
 
+  (def agency-txt-header "agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url,agency_email")
+
 ;; TODO: specs for individual agency fields
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -66,6 +68,8 @@
    :gtfs/stop-lat :gtfs/stop-lon :gtfs/zone-id :gtfs/stop-url :gtfs/location-type
    :gtfs/parent-station :gtfs/stop-timezone :gtfs/wheelchair-boarding])
 
+(def stops-txt-header "stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding")
+
 (s/def :gtfs/wheelchair-boarding #{"0" "1" "2"})
 
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,6 +96,7 @@
    :gtfs/route-desc :gtfs/route-type :gtfs/route-url :gtfs/route-color
    :gtfs/route-text-color :gtfs/route-sort-order])
 
+(def routes-txt-header "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order")
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for trips.txt
@@ -123,6 +128,8 @@
    :gtfs/shape-id
    :gtfs/wheelchair-accessible
    :gtfs/bikes-allowed])
+
+(def trips-txt-header "route_id,service_id,trip_id,trip_headsign,trip_short_name,direction_id,block_id,shape_id,wheelchair_accessible,bikes_allowed")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for stop_times.txt
@@ -158,6 +165,7 @@
    :gtfs/shape-dist-traveled
    :gtfs/timepoint])
 
+(def stop-times-txt-header "trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled,timepoint")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for calendar.txt
@@ -190,6 +198,8 @@
    :gtfs/start-date
    :gtfs/end-date])
 
+(def calendar-txt-header "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date")
+
 (s/def :gtfs/monday boolean?)
 (s/def :gtfs/tuesday boolean?)
 (s/def :gtfs/wednesday boolean?)
@@ -201,9 +211,27 @@
 (defn date? [dt]
   (satisfies? time/DateFields dt))
 
-(s/def :gtfs/date #(instance? java.time.LocalDate %))
 (s/def :gtfs/start-date date?)
 (s/def :gtfs/end-date date?)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Spec for calendar_dates.txt
+
+(s/def :gtfs/calendar-dates-txt
+  (s/coll-of :gtfs/calendar-date))
+
+(s/def :gtfs/calendar-date
+  (s/keys :req [:gtfs/service-id
+                :gtfs/date
+                :gtfs/exception-type]))
+
+(s/def :gtfs/date date?)
+
+(def calendar-dates-txt-fields
+  [:gtfs/service-id :gtfs/date :gtfs/exception-type])
+
+(def calendar-dates-txt-header "service_id,date,exception_type")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; FIXME: support optional files as well

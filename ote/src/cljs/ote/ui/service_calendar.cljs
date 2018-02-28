@@ -13,7 +13,8 @@
                 :height 30
                 :text-align "center"
                 :border "solid 1px black"
-                :cursor "pointer"})
+                :cursor "pointer"
+                :user-select "none"})
 
 (def no-day-style (merge day-style
                          {:background-color "lightGray"}))

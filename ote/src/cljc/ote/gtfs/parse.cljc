@@ -2,6 +2,7 @@
   "Parse GTFS text files into Clojure data and back"
   (:require #?(:cljs [testdouble.cljs.csv :as csv]
                :clj [clojure.data.csv :as csv])
+            [ote.gtfs.spec :as gtfs-spec]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [ote.time :as time]
@@ -51,29 +52,48 @@ This is only called with GTFS field names and cannot grow unbounded."}
                  :clj Exception) e
          field)))))
 
-(defn parse-gtfs-file [fields content]
-  (mapv
-   (fn [line]
-     (into {}
-           (remove nil?)
-           (map (fn [field value]
-                  (when-not (str/blank? value)
-                    [field (gtfs->clj (field-spec-description field) value)]))
-                fields line)))
-   (csv/read-csv content)))
-
 (defn- csv->string [rows]
   #?(:cljs (csv/write-csv rows)
      :clj (with-out-str
             (csv/write-csv *out* rows))))
 
-(defn unparse-gtfs-file [fields content]
-  (csv->string
-   (mapv (fn [row]
-           (mapv #(clj->gtfs (field-spec-description %) (get row %))
-                 fields))
-         content)))
+(def file-info
+  {:gtfs/agency-txt {:header gtfs-spec/agency-txt-header
+                     :fields gtfs-spec/agency-txt-fields}
+   :gtfs/stops-txt {:header gtfs-spec/stops-txt-header
+                    :fields gtfs-spec/stops-txt-fields}
+   :gtfs/routes-txt {:header gtfs-spec/routes-txt-header
+                     :fields gtfs-spec/routes-txt-fields}
+   :gtfs/trips-txt {:header gtfs-spec/trips-txt-header
+                    :fields gtfs-spec/trips-txt-fields}
+   :gtfs/stop-times-txt {:header gtfs-spec/stop-times-txt-header
+                         :fields gtfs-spec/stop-times-txt-fields}
+   :gtfs/calendar-txt {:header gtfs-spec/calendar-txt-header
+                       :fields gtfs-spec/calendar-txt-fields}
+   :gtfs/calendar-dates-txt {:header gtfs-spec/calendar-dates-txt-header
+                             :fields gtfs-spec/calendar-dates-txt-fields}})
 
-;; (unparse-gtfs-file  ote.gtfs.spec/agency-txt-fields (parse-gtfs-file ote.gtfs.spec/agency-txt-fields "1,foo,urli,Europe/Helsinki,FI,123123,,tatu@emxapl.com"))
+(comment
+  ;; PENDING: this requires more work, this assumes all fields
+  ;; are present in the same order we output them.
+  (defn parse-gtfs-file [gtfs-file-type content]
+    (let [{:keys [fields]} (file-info gtfs-file-type)]
+      (mapv
+       (fn [line]
+         (into {}
+               (remove nil?)
+               (map (fn [field value]
+                      (when-not (str/blank? value)
+                        [field (gtfs->clj (field-spec-description field) value)]))
+                    fields line)))
+       (rest (csv/read-csv content))))))
 
-#_(unparse-gtfs-file  ote.gtfs.spec/calendar-txt-fields (parse-gtfs-file ote.gtfs.spec/calendar-txt-fields "1,1,0,1,0,0,1,1,20180101,20180228"))
+
+(defn unparse-gtfs-file [gtfs-file-type content]
+  (let [{:keys [header fields]} (file-info gtfs-file-type)]
+    (str header "\n"
+         (csv->string
+          (mapv (fn [row]
+                  (mapv #(clj->gtfs (field-spec-description %) (get row %))
+                        fields))
+                content)))))
