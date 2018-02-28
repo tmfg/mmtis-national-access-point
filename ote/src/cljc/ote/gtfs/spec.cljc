@@ -1,6 +1,7 @@
 (ns ote.gtfs.spec
   "Define clojure.spec for GTFS data. All GTFS keys are under :gtfs namespace."
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [ote.time :as time :refer [time?]]))
 
 (s/def :gtfs/gtfs (s/keys :req [:gtfs/agency-txt
                                 :gtfs/stops-txt
@@ -141,6 +142,9 @@
                  :gtfs/shape-dist-traveled
                  :gtfs/timepoint]))
 
+(s/def :gtfs/arrival-time time?)
+(s/def :gtfs/departure-time time?)
+
 (def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file"}
   stop-times-txt-fields
   [:gtfs/trip-id
@@ -173,7 +177,7 @@
                 :gtfs/start-date
                 :gtfs/end-date]))
 
-(def ^{:doc "Defines the order of the CSV fields in a calendar.txt fiel"}
+(def ^{:doc "Defines the order of the CSV fields in a calendar.txt file"}
   calendar-txt-fields
   [:gtfs/service-id
    :gtfs/monday
@@ -193,6 +197,13 @@
 (s/def :gtfs/friday boolean?)
 (s/def :gtfs/saturday boolean?)
 (s/def :gtfs/sunday boolean?)
+
+(defn date? [dt]
+  (satisfies? time/DateFields dt))
+
+(s/def :gtfs/date #(instance? java.time.LocalDate %))
+(s/def :gtfs/start-date date?)
+(s/def :gtfs/end-date date?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; FIXME: support optional files as well
