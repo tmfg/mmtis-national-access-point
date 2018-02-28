@@ -245,7 +245,7 @@
           :suggestions-config {:text :text :value :text}
           :suggestions (::t-service/operation-area facets)
           :new-chip-key-codes []                            ;; Prevent adding a custom value by disabling 'enter'
-          :full-width true}
+          :full-width? true}
 
          {:name ::t-service/sub-type
           :type :multiselect-selection

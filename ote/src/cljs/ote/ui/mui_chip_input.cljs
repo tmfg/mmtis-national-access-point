@@ -3,6 +3,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [reagent.core :as r]))
 
+;; FIXME: Chips are always placed above input field in form group. Suspecting that flexbox set in the form-group is affecting this somehow.
+;;        Correct behaviour is: place chips inside the input field until there is no horizontal space left, after that create a new line.
 (def chip-input
   (let [component (r/adapt-react-class (aget js/window "MaterialUIChipInput"))
         default-props {:floating-label-fixed true
@@ -20,7 +22,7 @@
 
                        ;; == Styling ==
                        :full-width false
-                       :full-width-input true
+                       :full-width-input false
                        ; Modify original style
                        ; FIXME: For some reason, the text input underline is misplaced compared to other original mui-textfields.
                        ;        This change fixes those problems, in combination with conditional chipContainerStyle change.
