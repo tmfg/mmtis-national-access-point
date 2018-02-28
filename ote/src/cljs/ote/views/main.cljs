@@ -68,7 +68,7 @@
 
 (def selectable-languages [["fi" "suomi"]
                            ["sv" "svenska"]
-                           #_["en" "english"]])
+                           ["en" "english"]])
 
 (defn- language-selection [e! style link-style show-label?]
   (let [current-language @localization/selected-language]

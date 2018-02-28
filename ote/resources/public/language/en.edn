@@ -61,20 +61,20 @@
    :ote.db.transport-service/location                  "Location"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "External computer-readable interfaces"
+   :ote.db.transport-service/external-interfaces "External machine-readable interfaces"
    :ote.db.transport-service/data-content "Data content"
-   :ote.db.transport-service/external-service-description "More information"
-   :ote.db.transport-service/external-service-url "Interface WWW-address"
+   :ote.db.transport-service/external-service-description "More info"
+   :ote.db.transport-service/external-service-url "WWW-address"
    :ote.db.transport-service/booking-service "Booking service address"
    :ote.db.transport-service/rental-service "Rental service address"
-   :ote.db.transport-service/format "External interface format (e.g. GTFS, NeTEx, GeoJSON)"
+   :ote.db.transport-service/format "Format"
    :ote.db.transport-service/format-short "Format"
-   :ote.db.transport-service/companies "Other companies producing the service"
+   :ote.db.transport-service/companies "Other companies providing the service"
    :ote.db.transport-service/company-name "Company name"
    :ote.db.transport-service/business-id "Company business ID"
-   :ote.db.transport-service/companies-csv-url "WWW-address that includes a .csv-file about the other companies producing the service"
-   :ote.db.transport-service/license "License / terms of use"
-   :ote.db.transport-service/notice-external-interfaces? "I have read all the information labels and filled in information about computer-readable interfaces that contain essential data about my service."
+   :ote.db.transport-service/companies-csv-url "WWW-address to a .csv-file of the companies producing the service"
+   :ote.db.transport-service/license "License"
+   :ote.db.transport-service/notice-external-interfaces? "I have read all the information labels and filled in information about machine-readable interfaces that contain essential data about my service."
    :external-interfaces-warning "Connection to address failed"
    :external-interfaces-ok "Connecting to address succeeded"
    :table-header-external-interface "Interface"
@@ -200,7 +200,7 @@
   {:ote.db.transport-service/name                "Service name"
    :ote.db.transport-service/additional-services "Additional services"
    :ote.db.transport-service/url                 "Service WWW-address"
-   :ote.db.transport-service/description         "Transport service description"
+   :ote.db.transport-service/description         "Service description"
    :ote.db.transport-service/type                "Transport service mode"
    :ote.db.transport-service/sub-type            "Transport service sub mode"
    :ote.db.transport-service/published?          "NAP-status"
@@ -235,33 +235,34 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
  {:name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
-  :external-interfaces-intro "If your service does not have machine readable interfaces leave this section empty and move to the next section."
-  :external-interfaces-intro-rae "Fill in at least machine readable route and timetable information. If you do not have the means to produce machine readable route and timetable infromation, you can do so in FTA's "
-  :external-interfaces "If your service does not have machine readable interfaces leave this section empty and move to the next section.\nMachine readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
-  :external-interfaces-read-more {:link "Read more about the machine readable interfaces in NAP catalog."
-                                  :dialog-title "Machine readable interfaces in the NAP catalog"
+  :external-interfaces-intro "If your service does not have machine-readable interfaces leave this section empty and move to the next section."
+  :external-interfaces-intro-rae "Fill in at least machine-readable route and timetable information. If you do not have the means to produce machine-readable route and timetable infromation, you can do so in FTA's "
+  :external-interfaces "If your service does not have machine-readable interfaces leave this section empty and move to the next section.\nMachine-readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
+  :external-interfaces-read-more {:link "Read more about the machine-readable interfaces in NAP catalog."
+                                  :dialog-title "Machine-readable interfaces in the NAP catalog"
                                   :dialog-text (:md
                                                 "## General\n"
-                                                "External interfaces of services are meant for example for routing information and other digital transportation service developers. They provide information or services in a technical machine readable format (for examlpe GTFS, GTFS-Realtime, NeTEx, SIRI or REST/XML/JSON). This section is not meant for links to human readable services or information sites (like web schedule information or ticket sales site)."
-                                                "\n\n## Interface information and services\n"
-                                                "External interfaces may contain the same information as other other sections of this form. In this case filling out the sections is question is optional. It is recommended to also fill out the form in full because it helps developers find your service with the search functionality."
-                                                "\n\nRoad and rail operators that have an electronic ticket/payment system must open their system so that at least a single trip ticket can be purchased via an interface."
-                                                "\n\nOther interfaces (like a more comprehensive ticket sales API or vehicle realtime locations API) are possible but not mandatory. Opening up more comprehensive APIs can bring new business opportunities in new mobility services."
-                                                "\n\n## License\n"
-                                                "In order to take advantage of the interfaces, developers need to know the API license and terms of use of your service."
-                                                "\n\nYou can select an existing or use your own but the information mandated by the MMTIS directive must be open and the minimum level service interfaces must be licensed in a reasonable and nondiscriminatory way. Minimum service interfaces means single use ticket sales for road and rail operators that have an electronic ticket/payment system."
-                                                "\n\nIf the interface contains just downloadable information (eg. routes and timetables GTFS package) it is appropriate to use some open data license. These include for example Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/deed.en) which is a very permissive license that allows dissemination, use, derivative works, combination and distribution even commercially. The license requires mentioning the original source of the data and keeping a change history.")}
+                                                "Service-related machine-readable interfaces are meant e.g. for developers of journey planners and other digital transport services. They provide information or functions in a technical machina-readable format (e.g. GTFS, GTFS-Realtime, NeTEx, SIRI or REST/XML/JSON). Please note: This section of the NAP form is not meant for adding links to human readable application or information sites (e.g. web-based journey planner application or ticket sales site)."
 
-  :external-interfaces-payment-systems "Road and rail operators that have an electronic ticket/sales system must fill information about their machine readable interface to it."
-  :external-interfaces-tooltips {:data-content "Select the type of information this machine readable interface provides. You can choose multiple options. If no selection is appropriate, choose \"other\" and fill in additional information."
-                                 :external-service-url "Direct URI to machine readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use."
+                                                "\n\n## Interface information and services\n"
+                                                "External machine-readable interfaces may contain the same essential information as other sections of the NAP form. In this case filling in this information in the following sections is optional. It is however beneficial to also fill in the following sections because it helps finding the service with the search functionality in the NAP catalog."
+                                                "\n\nRoad and railway operators who have an electronic ticket/payment system also have to open their system so that at least a single trip ticket can be purchased via an interface."
+                                                "\n\nListing other interfaces (like a more comprehensive ticket sales API or vehicle realtime locations API) is possible but not mandatory. Opening up more comprehensive APIs can bring new business opportunities of new digital mobility services."
+                                                "\n\n## License information\n"
+                                                "In order to use the listed interfaces or the information they provide, developers need to know the license or the terms of use."
+                                                "\n\nYou can select an existing license or use your own but the information mandated by the MMTIS directive must be open and the minimum level service interfaces must be licensed with reasonable and nondiscriminatory terms. Minimum service interfaces include single ticket sales interfaces of road and railway operators who have an electronic ticket/payment system."
+                                                "\n\nIf the interface only contains downloadable information (e.g. routes and timetables as a GTFS package) it is often appropriate to use an open data license, for example CC BY 4.0 (Creative Commons Attribution 4.0 International, https://creativecommons.org/licenses/by/4.0/deed.en). CC BY 4.0 is a very permissive license that allows dissemination, use, derivative works, combination and distribution of the data - even commercially. It also requires mentioning the original source of the data and maintaining a change history.")}
+
+  :external-interfaces-payment-systems "Road and rail operators who have an electronic ticket/sales system must fill information about their machine-readable sales and ticket interface."
+  :external-interfaces-tooltips {:data-content "Select the type of information this machine-readable interface provides. You can choose multiple options. If no selection is appropriate, choose \"other\" and fill in additional information."
+                                 :external-service-url "Direct URL to machine-readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use."
                                  :format "Select the data format. Choose all that apply. If the list does not have a format, you can add it by writing it in."
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
                                  :external-service-description "Specify additional information about the interface that may be useful for developers. You may add a web-address that contains further information."}
 
   :RAE-link-text "RAE-software"
 
-  :companies-main-info "If there are other companies involved conducting the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
+  :companies-main-info "If there are other companies involved in providing the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
   :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
@@ -272,7 +273,7 @@
   :brokerage? "A brokering service is a service that brokers single rides for other companies for remuneration. (Remuneration can be money or other benefits.) A brokering service can also broke its own rides at the same time. An example of a brokering service is a taxi centre. If a company only brokes its own rides to other companies with no remuneration, the company is not a brokering service."
   :brokerage-link "Read more about the obligations of a brogering services starting from 1st July 2018"
 
-  :operation-area "In this section you can add the operating area of your service by writing the name of the area or the target into the text field called \"Search for a place with a name\" and by choosing the area wanted from the opening list (you can search by using region, community, postal code or Finland). You can add more districts with the same way.\nYou can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Taxistand of Espoo\"."
+  :operation-area "In this section you can add the operating area of your service by writing the name of the area or the target into the text field called \"Search place by name\" and by choosing the area wanted from the opening list (you can search by using region, community, postal code or Finland). You can add more districts with the same way.\nYou can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Taxistand of Espoo\"."
 
   :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
   :description-why-contact-info "Fill in contact information, so that customers can contact you."
@@ -314,7 +315,7 @@
   :discard "Cancel"
 
   :next "Next"
-  :add-transport-service  "Add a new transport service"
+  :add-transport-service  "Add a new service"
   :add-external-interface "Add a new row"
   :add-new-service-link "Add a new row"
   :add-add-new-row         "Add a new row"
@@ -322,7 +323,7 @@
   :add-new-additional-service "Add a new row"
   :add-new-vehicle "Add a new row"
   :add-new-transport-operator "Create a new transport operator"
-  :add-new-member "Add a new member"
+  :add-new-member "Add member"
   :upload-csv "Add CSV"
   :update-csv "Update CSV"
   }
@@ -432,7 +433,7 @@
 
   :ote.db.transport-service/parking-facility
   {:unknown "Unknown"
-   :car-park "Parking spaces"
+   :car-park "Cars"
    :park-and-ride-park "Park and ride"
    :motorcycle-park "Motorcycles"
    :cycle-park "Cycles"
@@ -455,7 +456,7 @@
 
   :ote.db.transport-service/advance-reservation
   {:no "Service does not have advance reservation."
-   :possible "Service has advance reservation but is is not mandatory."
+   :possible "Service has advance reservation but it is not mandatory."
    :mandatory "Advance reservation is mandatory for this service."}}
 
   ;; ENUMS end
@@ -535,10 +536,11 @@
   :header-service-hours                    "Service hours"
   :header-pick-up-locations                "Pick-up and returning points"
   :header-select-company-list-type         "Select the type of notification"
+  :header-brokerage                        "Brokering service information"
   :radio-button-no-companies               "There are no other companies involved in providing this transport service."
-  :radio-button-url-companies              "Please provide a web address from which the company information can be found as a .csv file."
-  :radio-button-csv-companies              "Download business information as a csv file on the form."
-  :radio-button-form-companies             "Add business information to the form using form fields."
+  :radio-button-url-companies              "Enter a web address from which the company information can be found as a .csv file."
+  :radio-button-csv-companies              "Load a .csv file from your computer with the company information."
+  :radio-button-form-companies             "Add company information manually using the form."
   }
 
 
