@@ -13,8 +13,7 @@
   [language-name]
   {:status 302
    :headers {"Location" "/"}
-   :cookies {"finap_lang" {:path "/" :value language-name}}
-   :body "Setting a cookie."})
+   :cookies {"finap_lang" {:path "/" :value language-name}}})
 
 (defrecord Localization []
   component/Lifecycle
