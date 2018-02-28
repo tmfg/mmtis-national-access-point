@@ -3,7 +3,8 @@
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
             [ote.time :as time]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.app.controller.route.gtfs :as route-gtfs]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -26,7 +27,12 @@
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
 
+
+;; Save route as GTFS
+(defrecord SaveAsGTFS [])
+
 (defrecord GoToStep [step])
+
 
 (extend-protocol tuck/Event
   LoadStops
@@ -134,7 +140,12 @@
   EditStopTime
   (process-event [{:keys [time-idx stop-idx form-data]} app]
 
-    (update-in app [:route :times time-idx :stops stop-idx] merge form-data)))
+    (update-in app [:route :times time-idx :stops stop-idx] merge form-data))
+
+  SaveAsGTFS
+  (process-event [_ {route :route :as app}]
+    (route-gtfs/save-gtfs route (str (:name route) ".zip"))
+    app))
 
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid

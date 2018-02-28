@@ -25,7 +25,9 @@
     :on-select #(e! (rc/->ToggleDate %))}])
 
 (defn route-save [e! {route :route :as app}]
-  [:div "tässä tallennellaan"])
+  [ui/raised-button {:primary true
+                     :on-click #(e! (rc/->SaveAsGTFS))}
+   "Tallenna GTFS"])
 
 
 
