@@ -47,6 +47,9 @@
                            (cljs-time/today-at hours minutes seconds)))))))
 
 
+(defn time? [x]
+  (instance? Time x))
+
 (defn empty-time?
   "Check if time is empty. Requires both hours and minutes to be set."
   [{:keys [hours minutes]}]
@@ -58,7 +61,7 @@
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)
-   "%02d:%02d:%02d" hours minutes seconds))
+   "%02d:%02d:%02d" hours minutes (or seconds 0)))
 
 (defn format-time [{:keys [hours minutes seconds] :as time}]
   (if (and seconds (not= 0 seconds))
@@ -91,7 +94,14 @@
      goog.date.Date
      (date-fields [this]
        {::date (.getDate this)
-        ::month (.getMonth this)
+        ::month (inc (.getMonth this))
+        ::year (.getYear this)}))
+   :clj
+   (extend-protocol DateFields
+     java.time.LocalDate
+     (date-fields [this]
+       {::date (.getDayOfMonth this)
+        ::month (.getMonthValue this)
         ::year (.getYear this)})))
 
 (defn format-date
