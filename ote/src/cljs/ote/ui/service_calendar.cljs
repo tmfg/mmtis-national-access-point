@@ -12,8 +12,9 @@
 (def day-style {:width 30
                 :height 30
                 :text-align "center"
-                :border "solid 1px black;"
+                :border "solid 1px black"
                 :cursor "pointer"})
+
 (def no-day-style (merge day-style
                          {:background-color "lightGray"}))
 
