@@ -208,7 +208,7 @@
   "Creates a form group for brokerage selection."
   [e!]
   (form/group
-    {:label   (tr [:field-labels :transport-service-common ::t-service/companies])
+    {:label   (tr [:passenger-transportation-page :header-brokerage])
      :columns 3}
 
     {:name          ::t-service/brokerage?

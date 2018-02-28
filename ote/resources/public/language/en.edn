@@ -536,6 +536,7 @@
   :header-service-hours                    "Service hours"
   :header-pick-up-locations                "Pick-up and returning points"
   :header-select-company-list-type         "Select the type of notification"
+  :header-brokerage                        "Brokering service information"
   :radio-button-no-companies               "There are no other companies involved in providing this transport service."
   :radio-button-url-companies              "Enter a web address from which the company information can be found as a .csv file."
   :radio-button-csv-companies              "Load a .csv file from your computer with the company information."
