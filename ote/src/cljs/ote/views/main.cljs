@@ -27,7 +27,8 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.admin :as admin]
-            [ote.views.operators :as operators]))
+            [ote.views.operators :as operators]
+            [ote.views.route :as route]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -390,6 +391,8 @@
                 :admin [admin/admin-panel e! app]
 
                 :operators [operators/operators e! app]
+
+                :new-route [route/new-route e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
