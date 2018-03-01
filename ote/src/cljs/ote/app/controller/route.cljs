@@ -92,13 +92,14 @@
 
   ToggleDate
   (process-event [{date :date} app]
-    (update-in app [:route :dates]
-               (fn [dates]
-                 (let [date (time/date-fields date)
-                       selected-dates (or dates #{})]
-                   (if (selected-dates date)
-                     (disj selected-dates date)
-                     (conj selected-dates date))))))
+    (update-in
+     app [:route :dates]
+     (fn [dates]
+       (let [date (time/date-fields date)
+             selected-dates (or dates #{})]
+         (if (selected-dates date)
+           (disj selected-dates date)
+           (conj selected-dates date))))))
 
   EditServiceCalendarRules
   (process-event [{rules :rules} app]
