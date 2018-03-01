@@ -17,7 +17,9 @@
                      :user-select "none"})
 
 (def no-day-style (merge base-day-style
-                         {:background-color "lightGray"}))
+                         {:font-size "75%"
+                          :color "gray"
+                          :background-color "lightGray"}))
 
 (def selected-day-style (merge base-day-style
                                {:background-color "wheat"
