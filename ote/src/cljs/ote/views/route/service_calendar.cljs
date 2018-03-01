@@ -2,10 +2,17 @@
   (:require [ote.app.controller.route :as rc]
             [ote.time :as time]
             [ote.ui.form :as form]
-            [ote.ui.service-calendar :as service-calendar]))
+            [ote.ui.service-calendar :as service-calendar]
+            [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn service-calendar [e! {route :route :as route}]
   [:div.route-service-calendar
+   [ui/raised-button {:secondary true
+                      :icon (ic/action-delete)
+                      :style {:float "right" :margin-bottom "0.5em"}
+                      :on-click #(e! (rc/->ClearServiceCalendar))}
+    "Tyhjennä kalenteri"]
    [form/form {:name "Reittikalenteri"
                :update! #(e! (rc/->EditServiceCalendarRules %))}
     [(form/group

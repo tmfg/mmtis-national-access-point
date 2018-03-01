@@ -27,6 +27,7 @@
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
 (defrecord EditServiceCalendarRules [rules])
+(defrecord ClearServiceCalendar [])
 
 ;; Save route as GTFS
 (defrecord SaveAsGTFS [])
@@ -116,6 +117,11 @@
       (-> app
           (assoc-in [:route :calendar-rules] rules)
           (assoc-in [:route :rule-dates] rule-dates))))
+
+  ClearServiceCalendar
+  (process-event [_ app]
+    (update app :route dissoc
+            :dates :calendar-rules :rule-dates))
 
   GoToStep
   (process-event [{step :step} app]
