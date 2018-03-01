@@ -261,7 +261,7 @@
 (defn date-range [start end]
   (lazy-seq
    (cons start
-         (when-not (t/after? start end)
+         (when (t/before? start end)
            (date-range (t/plus start (t/days 1)) end)))))
 
 (def week-days [:monday :tuesday :wednesday :thursday :friday :saturday :sunday])
