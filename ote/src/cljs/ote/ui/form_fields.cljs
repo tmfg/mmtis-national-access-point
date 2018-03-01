@@ -274,7 +274,7 @@
 (defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
                                       max-length style hint-style
                                       filter suggestions suggestions-config default-values max-results
-                                      open-on-focus? clear-on-blur?
+                                      auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
                                       form? table? full-width? full-width-input? disabled?] :as field}
                               data]
@@ -303,6 +303,7 @@
         :max-search-results (or max-results 10)
         :open-on-focus open-on-focus?
         :clear-on-blur clear-on-blur?
+        :auto-select? auto-select?
 
         ;; == Chip options ==
         :allow-duplicates allow-duplicates?

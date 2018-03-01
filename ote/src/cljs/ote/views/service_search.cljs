@@ -244,7 +244,8 @@
           :max-results 10
           :suggestions-config {:text :text :value :text}
           :suggestions (::t-service/operation-area facets)
-          :new-chip-key-codes []                            ;; Prevent adding a custom value by disabling 'enter'
+          ;; Select first match from autocomplete filter result list after pressing enter
+          :auto-select? true
           :full-width? true}
 
          {:name ::t-service/sub-type
