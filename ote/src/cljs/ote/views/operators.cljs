@@ -14,7 +14,8 @@
             [ote.views.service-search :as service-search]
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.common :as common]
-            [ote.app.controller.front-page :as fp-controller]))
+            [ote.app.controller.front-page :as fp-controller]
+            [ote.ui.common :as common-ui]))
 
 (defn show-service-count-link [e! operator]
   (let [service-count (::t-operator/service-count operator)
@@ -83,32 +84,32 @@
 (defn operators-list [e! operators]
   [:div.row.operator-list
    (doall
-    (for [{::t-operator/keys [id name business-id homepage email
-                              phone gsm visiting-address service-count
-                              ckan-group] :as operator} operators]
-      ^{:key (str "operator-" id)}
-      [:div {:class "col-md-6 operator" :style {:padding "10px 10px 0px 0px"}}
-      [ui/paper {:z-depth 1
-                 :style {:min-height "155px"}}
-       [:div.operator-header (stylefy/use-style style-service-search/operator-result-header)
-         [:a
-          {:href "#"
-           :on-click #(do (.preventDefault %)
-                          (e! (operators-controller/->OpenOperatorModal id)))}
-               [:span (stylefy/use-style  style-service-search/operator-result-header-link) name]]]
-        [:div (stylefy/use-style style-service-search/operator-description)
-         [:div
-          (if (< 120 (count (::t-operator/description ckan-group)))
-            [:span (str (subs (::t-operator/description ckan-group) 0 120) "...")
+     (for [{::t-operator/keys [id name business-id homepage email
+                               phone gsm visiting-address service-count
+                               ckan-group] :as operator} operators]
+       ^{:key (str "operator-" id)}
+       [:div {:class "col-md-6 operator" :style {:padding "10px 10px 0px 0px"}}
+        [ui/paper {:z-depth 1
+                   :style   {:min-height "155px"}}
+         [:div.operator-header (stylefy/use-style style-service-search/operator-result-header)
+          [:a
+           {:href     "#"
+            :on-click #(do (.preventDefault %)
+                           (e! (operators-controller/->OpenOperatorModal id)))}
+           [:span (stylefy/use-style style-service-search/operator-result-header-link) name]]]
+         [:div (stylefy/use-style style-service-search/operator-description)
+          [:div
+           (if (< 120 (count (::t-operator/description ckan-group)))
+             [:span (common-ui/shorten-text-to 120 (::t-operator/description ckan-group))
               [:br]
-              [:a.operator-link {:href "#/operators"
+              [:a.operator-link {:href     "#/operators"
                                  :on-click #(do (.preventDefault %)
-                                            (e! (operators-controller/->OpenOperatorModal id)))}
+                                                (e! (operators-controller/->OpenOperatorModal id)))}
                (tr [:operators :description-read-more])]]
-            (::t-operator/description ckan-group))]
-         (operator-modal e! operator)
-         [:div {:style {:position "absolute" :bottom "5px" }}
-          (show-service-count-link e! operator)]]]]))])
+             (::t-operator/description ckan-group))]
+          (operator-modal e! operator)
+          [:div {:style {:position "absolute" :bottom "5px"}}
+           (show-service-count-link e! operator)]]]]))])
 
 (defn operators [e! _]
   (e! (operators-controller/->Init))

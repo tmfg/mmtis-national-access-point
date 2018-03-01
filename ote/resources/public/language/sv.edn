@@ -270,9 +270,9 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare. Du kan även uppge en webbadress med tilläggsuppgifter."}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
-  :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här. Dock endast den aktör som koordinerar tjänsten (tex. taxicentral eller beställande myndighet) fyller i denna punkt. Den som tillhör tex en taxicentral fyller inte i dessa uppgifter."
+  :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
-  :csv-file-example "Här finns en modell för listan"
+  :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
   :companies-info "Om du inte har en lista i .csv-format, fyll då i de deltagande företagens namn och FO-nummer här."
 
   :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Garanterad = behöver inte beställas separat."
@@ -538,11 +538,12 @@
   :header-price-information                "Prisinformation"
   :header-service-hours                    "Betjäningstider"
   :header-pick-up-locations                "Verksamhetsställen"
-  :header-select-company-list-type         "Välj typ av meddelande"
-  :radio-button-no-companies               "Det finns inga andra företag som är inblandade i att tillhandahålla denna tjänst."
-  :radio-button-url-companies              "Ange en webbadress från vilken affärsinformationen kan hittas som en .csv-fil."
-  :radio-button-csv-companies              "Hämta företagsinformation som en CSV-fil i formuläret."
-  :radio-button-form-companies             "Lägg till företagsinformation i formuläret med formulärfält."}
+  :header-select-company-list-type         "Välj meddelandesätt"
+  :header-brokerage                        "Förmedlingstjänst"
+  :radio-button-no-companies               "Inga andra företag deltar i tillhandahållandet av denna tjänst."
+  :radio-button-url-companies              "Ange en web-adress för .csv-filen."
+  :radio-button-csv-companies              "Ladda upp .csv-filen."
+  :radio-button-form-companies             "Lägg till uppgifter om företagen i formuläret."}
 
  :rentals-page
  {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"
@@ -904,7 +905,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                          "Hittades en tjänst"
                          ["Hittades " :count " tjänster"])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
-  :external-interfaces ["Tjänsteproducentens egna tekniska gränssnitt"]
+  :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services ["Katalog har total " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."

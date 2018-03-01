@@ -14,6 +14,7 @@
 (def LayerGroup (r/adapt-react-class js/ReactLeaflet.LayerGroup))
 (def FeatureGroup (r/adapt-react-class js/ReactLeaflet.FeatureGroup))
 (def GeoJSON (r/adapt-react-class js/ReactLeaflet.GeoJSON))
+(def Polyline (r/adapt-react-class js/ReactLeaflet.Polyline))
 
 (defmulti geometry (fn [opts geometry] (:type geometry)))
 
@@ -85,3 +86,7 @@
   m (aget this "refs" "leaflet" "leafletElement")
         zoom (new js/L.control.zoom (clj->js opts))]
     (.addControl m zoom)))
+
+(defn background-tile-map []
+  [TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+              :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}])

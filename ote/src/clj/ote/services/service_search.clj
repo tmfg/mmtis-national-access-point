@@ -27,8 +27,6 @@
          (map #(update % :sub-type keyword))
          (sub-type-facet db))})
 
-
-
 (def search-result-columns
   #{::t-service/contact-email
     ::t-service/sub-type
@@ -45,7 +43,8 @@
 
     ;; Information JOINed from other tables
     ::t-service/external-interface-links
-    ::t-service/operator-name})
+    ::t-service/operator-name
+    ::t-service/business-id})
 
 (defn- ids [key query-result]
   (into #{} (map key) query-result))

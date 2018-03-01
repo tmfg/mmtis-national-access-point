@@ -89,6 +89,7 @@
   ShowOperatorServices
   (process-event [{operator :operator} app]
     (let [filtered-operator {::t-operator/name (::t-operator/name operator)
-          ::t-operator/id (::t-operator/id operator)}]
+                             ::t-operator/id (::t-operator/id operator)}
+          app (assoc-in app [:service-search :filters :text-search] "")]
       (routes/navigate! :services)
     (ss/add-operator-to-chip-list app filtered-operator true))))

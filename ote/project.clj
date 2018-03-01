@@ -27,7 +27,7 @@
                  [http-kit "2.2.0"]
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-anti-forgery "1.1.0"]
-
+                 [clj-http "3.7.0"]
 
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
@@ -82,20 +82,22 @@
                  [org.geotools/gt-xml "16.1"]
                  [org.geotools/gt-geojson "16.1"]
 
+                 ;; Data/file formats and file handling
                  ;; JSON
                  [cheshire "5.8.0"]
                  ;; CSV
                  [org.clojure/data.csv "0.1.4"]
+                 [cljsjs/jszip "3.1.3-0"]
+                 [cljsjs/filesaverjs "1.3.3-0"]
 
-                 ;; jostain tulee vanha guava, ylikirjoitetaan
+                 ;; override old guava version from deps
                  [com.google.guava/guava "21.0"]]
 
   :profiles {:uberjar {:aot :all
 
                        ;; Prevent uberjar from cleaning cljs generated files
                        :auto-clean false}
-             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]
-                                  [clj-http "3.7.0"]]
+             :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]]
                    :test-paths ["test/clj"]}}
 
   :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]
