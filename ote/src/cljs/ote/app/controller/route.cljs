@@ -26,7 +26,7 @@
 
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
-
+(defrecord EditServiceCalendarRules [rules])
 
 ;; Save route as GTFS
 (defrecord SaveAsGTFS [])
@@ -99,6 +99,23 @@
                      (disj selected-dates date)
                      (conj selected-dates date))))))
 
+  EditServiceCalendarRules
+  (process-event [{rules :rules} app]
+    (let [rule-dates (into #{}
+                           (mapcat
+                            (fn [{:keys [from to] :as rule}]
+                              (let [week-days (into #{}
+                                                    (keep #(when (get rule %) %))
+                                                    time/week-days)]
+                                (when (and from to (not (empty? week-days)))
+                                  (for [d (time/date-range (time/js->date-time from)
+                                                           (time/js->date-time to))
+                                        :when (week-days (time/day-of-week d))]
+                                    (time/date-fields d))))))
+                           (:rules rules))]
+      (-> app
+          (assoc-in [:route :calendar-rules] rules)
+          (assoc-in [:route :rule-dates] rule-dates))))
 
   GoToStep
   (process-event [{step :step} app]
