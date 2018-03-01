@@ -239,33 +239,37 @@
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]
                                       [:field-labels :transport-service])}
-       [(form/group
-          {:label (tr [:service-search :filters-label])
-           :columns 3
-           :layout :row
-           :card-style style-base/filters-form}
+      [(form/group
+         {:label (tr [:service-search :filters-label])
+          :columns 3
+          :layout :row
+          :card-style style-base/filters-form}
 
          {:name :text-search
-         :type :string
-         :hint-text (tr [:service-search :text-search-placeholder])}
+          :type :string
+          :hint-text (tr [:service-search :text-search-placeholder])}
 
          {:name ::t-service/operation-area
-         :type :multiselect-selection
-         :show-option #(:text %)
-         :options (::t-service/operation-area facets)
-         :auto-width? true}
+          :type :chip-input
+          :open-on-focus? true
+          :max-results 10
+          :suggestions-config {:text :text :value :text}
+          :suggestions (::t-service/operation-area facets)
+          ;; Select first match from autocomplete filter result list after pressing enter
+          :auto-select? true
+          :full-width? true}
 
          {:name ::t-service/sub-type
-         :type :multiselect-selection
-         :show-option #(str (sub-type (:sub-type %)))
-         :options (::t-service/sub-type facets)
-         :auto-width? true}
+          :type :multiselect-selection
+          :show-option #(str (sub-type (:sub-type %)))
+          :options (::t-service/sub-type facets)
+          :auto-width? true}
 
-         {:type      :component
-          :name      :operators
+         {:type :component
+          :name :operators
           :component (fn [{data :data}]
                        [:span [operator-search e! data]])})]
-         filters]]))
+      filters]]))
 
 (defn service-search [e! app]
   (e! (ss/->InitServiceSearch))
