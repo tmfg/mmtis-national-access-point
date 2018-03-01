@@ -9,17 +9,17 @@
             [stylefy.core :as stylefy]
             [ote.time :as time]))
 
-(def day-style {:width 30
-                :height 30
-                :text-align "center"
-                :border "solid 1px black"
-                :cursor "pointer"
-                :user-select "none"})
+(def base-day-style {:width 30
+                     :height 30
+                     :text-align "center"
+                     :border "solid 1px black"
+                     :cursor "pointer"
+                     :user-select "none"})
 
-(def no-day-style (merge day-style
+(def no-day-style (merge base-day-style
                          {:background-color "lightGray"}))
 
-(def selected-day-style (merge day-style
+(def selected-day-style (merge base-day-style
                                {:background-color "wheat"
                                 :font-weight "bold"}))
 
@@ -96,53 +96,59 @@
     11 "Marras"
     12 "Joulu"))
 
-(defn- service-calendar-year [{:keys [selected-date? on-select]} year]
-  [:div.service-calendar-year
-   [:h3 year]
-   [:table
+(defn- service-calendar-year [{:keys [selected-date? on-select
+                                      day-style]} year]
+  (let [day-style (or day-style (constantly nil))]
+    [:div.service-calendar-year
+     [:h3 year]
+     [:table
 
-    [week-days-header]
+      [week-days-header]
 
-    [:tbody
-     (doall
-      (for [month (range 1 13)
-            :let [start-date (t/first-day-of-the-month year month)
-                  fill-days-before (dec (t/day-of-week start-date))
-                  fill-days-after (- 37 (t/number-of-days-in-the-month year month)
-                                     (dec (t/day-of-week start-date))) ]]
-        ^{:key month}
-        [:tr
-         [:td (month-name (t/month start-date))]
+      [:tbody
+       (doall
+        (for [month (range 1 13)
+              :let [start-date (t/first-day-of-the-month year month)
+                    fill-days-before (dec (t/day-of-week start-date))
+                    fill-days-after (- 37 (t/number-of-days-in-the-month year month)
+                                       (dec (t/day-of-week start-date))) ]]
+          ^{:key month}
+          [:tr
+           [:td (month-name (t/month start-date))]
 
-         ;; Fill days, so that first week days align
-         (fill-days (t/minus start-date (t/days fill-days-before))
-                    fill-days-before)
+           ;; Fill days, so that first week days align
+           (fill-days (t/minus start-date (t/days fill-days-before))
+                      fill-days-before)
 
-         ;; Cell for each day in the month
-         (doall
-          (map-indexed
-           (fn [i day]
-             (if (= ::week-separator day)
-               ^{:key i}
-               [:td.week-separator (stylefy/use-style week-separator-style)]
-               ^{:key i}
-               [:td.day (merge
-                         (stylefy/use-style (if (selected-date? day)
-                                              selected-day-style
-                                              day-style))
-                         {:on-mouse-down #(do
-                                            (.preventDefault %)
-                                            (on-select day))
-                          :on-mouse-over #(do
-                                            (.preventDefault %)
-                                            (when (pos? (.-buttons %))
-                                              (on-select day)))})
-                (t/day day)]))
-           (separate-weeks (month-days year month))))
+           ;; Cell for each day in the month
+           (doall
+            (map-indexed
+             (fn [i day]
+               (if (= ::week-separator day)
+                 ^{:key i}
+                 [:td.week-separator (stylefy/use-style week-separator-style)]
+                 ^{:key i}
+                 [:td.day
+                  (let [selected? (selected-date? day)]
+                    (merge
+                     (stylefy/use-style
+                      (merge (if selected?
+                               selected-day-style
+                               base-day-style)
+                             (day-style day selected?)))
+                     {:on-mouse-down #(do
+                                        (.preventDefault %)
+                                        (on-select day))
+                      :on-mouse-over #(do
+                                        (.preventDefault %)
+                                        (when (pos? (.-buttons %))
+                                          (on-select day)))}))
+                  (t/day day)]))
+             (separate-weeks (month-days year month))))
 
-         ;; Fill days to fill out table
-         (fill-days (t/plus (t/last-day-of-the-month year month) (t/days 1))
-                    fill-days-after)]))]]])
+           ;; Fill days to fill out table
+           (fill-days (t/plus (t/last-day-of-the-month year month) (t/days 1))
+                      fill-days-after)]))]]]))
 
 (defn service-calendar
   "Service calendar component."
