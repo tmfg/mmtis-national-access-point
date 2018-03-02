@@ -47,8 +47,15 @@
                    (if @auto-select?
                      (let [autocomplete (aget @ref "autoComplete")
                            ;; RequestLists contains filtered suggestions from AutoComplete
-                           requests (aget autocomplete "requestsList")
-                           chip (first requests)]
+                           first-match (first (js->clj (aget autocomplete "requestsList") :keywordize-keys true))
+                           suggestions (js->clj (aget @ref "props" "dataSource") :keywordize-keys true)
+
+                           ;; Note: Suggestion can contain map or plain string.
+                           ;; RequestsList will be empty if there is only one suggestion. Pick the first suggestion in that case.
+                           chip (first (if first-match
+                                         (filter #(= (or (:text %) %) (:text first-match)) suggestions)
+                                         suggestions))]
+
                        ;; Call the original ChipInput.handleAddChip function
                        (when chip (.call handleAddChip* c chip)))
                      (.call handleAddChip* c val))))))
