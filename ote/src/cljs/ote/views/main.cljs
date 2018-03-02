@@ -28,14 +28,11 @@
             [ote.ui.form-fields :as form-fields]
             [ote.views.admin :as admin]
             [ote.views.operators :as operators]
+            [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
-
-(defn- is-topnav-active [give-page nav-page]
-  (when (= give-page nav-page)
-    "active"))
 
 (defn- is-user-menu-active [app]
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
@@ -64,7 +61,9 @@
 
            (when (:admin? (:user app))
              {:page :admin
-              :label [:common-texts :navigation-admin]})])))
+              :label [:common-texts :navigation-admin]}
+             {:page :routes
+              :label [:common-texts :navigation-route]})])))
 
 (def selectable-languages [["fi" "suomi"]
                            ["sv" "svenska"]
@@ -392,6 +391,8 @@
 
                 :operators [operators/operators e! app]
 
+
+                :routes [route-list/routes e! app]
                 :new-route [route/new-route e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
