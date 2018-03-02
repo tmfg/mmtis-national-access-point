@@ -72,7 +72,7 @@
    :ote.db.transport-service/companies "Other companies providing the service"
    :ote.db.transport-service/company-name "Company name"
    :ote.db.transport-service/business-id "Company business ID"
-   :ote.db.transport-service/companies-csv-url "WWW-address to a .csv-file of the companies producing the service"
+   :ote.db.transport-service/companies-csv-url "WWW-address to a .csv-file of the companies providing the service"
    :ote.db.transport-service/license "License"
    :ote.db.transport-service/notice-external-interfaces? "I have read all the information labels and filled in information about machine-readable interfaces that contain essential data about my service."
    :external-interfaces-warning "Connection to address failed"
@@ -256,9 +256,9 @@
   :external-interfaces-payment-systems "Road and rail operators who have an electronic ticket/sales system must fill information about their machine-readable sales and ticket interface."
   :external-interfaces-tooltips {:data-content "Select the type of information this machine-readable interface provides. You can choose multiple options. If no selection is appropriate, choose \"other\" and fill in additional information."
                                  :external-service-url "Direct URL to machine-readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use."
-                                 :format "Select the data format. Choose all that apply. If the list does not have a format, you can add it by writing it in."
+                                 :format "Select the data format. If the list does not have a format, you can add it by writing it in."
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
-                                 :external-service-description "Specify additional information about the interface that may be useful for developers. You may add a web-address that contains further information."}
+                                 :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."}
 
   :RAE-link-text "RAE-software"
 
@@ -285,7 +285,7 @@
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
- {:external-interfaces ["Creative Commons 4.0" "CC0 1.0" "AGPL"]}
+ {:external-interfaces ["Creative Commons 4.0" "CC0 1.0"]}
 
  ;; CSV parsing
  :csv

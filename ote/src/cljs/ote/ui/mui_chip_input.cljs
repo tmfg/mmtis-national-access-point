@@ -33,30 +33,35 @@
 (def chip-input* (r/adapt-react-class (aget js/window "MaterialUIChipInput")))
 
 (defn chip-input [props]
-  (let [ref (atom nil)
-        auto-select? (atom false)]
+  (let [ref (atom nil)]
     (r/create-class
       {:component-did-mount
        (fn [this]
          (let [c (reset! ref (aget this "refs" "chip-input"))
-               handleAddChip* (aget c "handleAddChip")]
+               handleAddChip* (aget c "handleAddChip")
+               auto-select? (:auto-select? props)]
            ;; Autoselect first matching suggestion if :auto-select prop is true after pressing :new-chip-key-code key.
            ;; This will override the normal handleAddChip member function of chip-input with our custom function.
            (aset @ref "handleAddChip"
                  (fn [val]
-                   (if @auto-select?
+                   (if auto-select?
                      (let [autocomplete (aget @ref "autoComplete")
                            ;; RequestLists contains filtered suggestions from AutoComplete
-                           requests (aget autocomplete "requestsList")
-                           chip (first requests)]
+                           first-match (first (js->clj (aget autocomplete "requestsList") :keywordize-keys true))
+                           suggestions (js->clj (aget @ref "props" "dataSource") :keywordize-keys true)
+
+                           ;; Note: Suggestion can contain map or plain string.
+                           ;; RequestsList will be empty if there is only one suggestion. Pick the first suggestion in that case.
+                           chip (first (if first-match
+                                         (filter #(= (or (:text %) %) (:text first-match)) suggestions)
+                                         suggestions))]
+
                        ;; Call the original ChipInput.handleAddChip function
                        (when chip (.call handleAddChip* c chip)))
                      (.call handleAddChip* c val))))))
 
        :reagent-render
        (fn [props]
-         (reset! auto-select? (:auto-select? props))
-
          [chip-input* (merge
                         default-props
                         ; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).

@@ -332,6 +332,11 @@
                    (when on-blur (on-blur event)))
         :on-request-add handle-add!
         :on-request-delete handle-del!}
+       ;; Define suggestions data element format.
+       ;; Will be used internally like:
+       ;;   dataSourceConfig: {:value :key}
+       ;;   dataSource element: {:key 2}
+       ;;   ((:value dataSourceConfig) {:key 2}) -> 2
        (when suggestions-config
          {:dataSourceConfig suggestions-config})
        (when max-length

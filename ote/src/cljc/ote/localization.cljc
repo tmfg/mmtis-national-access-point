@@ -75,9 +75,11 @@
      ;; serving the edn files to prevent any possible injection vectors.
      ;; NOTE: We make sure here, that the result of the parsing is stored in a node, so it can be safely
      ;; used anywhere in a ui component.
-     [:span {:dangerouslySetInnerHTML
-             ;; We are converting args list to vector to trigger message default behaviour (=reduce)
-             {:__html (js/marked (message (vec args) parameters) #js {:sanitize true})}}]
+     [:span
+      {:class "translation-markdown"                        ;; Defined in styles.css
+       :dangerouslySetInnerHTML
+       ;; We are converting args list to vector to trigger message default behaviour (=reduce)
+       {:__html (js/marked (message (vec args) parameters) #js {:sanitize true})}}]
 
      :clj
      (throw (ex-info "Markdown formatted translations not supported." {operator args}))))
