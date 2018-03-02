@@ -266,9 +266,9 @@
   ;; Needs a new translation
   :external-interfaces-tooltips {:data-content "Välj typ av innehåll. Du kan välja flera typer samtidigt för samma gränssnitt. Ifall lämpligt alternativ saknas välj ”Övrigt” och beskriv innehållet i ”Tilläggsuppgifter”."
                                  :external-service-url "Ange i första hand ett direkt maskinläsbart gränssnitt. Om detta inte är ändamålsenligt ange då en webbadress för mera information om gränssnittet och dess användning."
-                                 :format "Välj ett format i listan. Du kan vid behov välja flera format för samma gränssnitt. Ifall lämpligt format saknas, fyll då i det själv."
+                                 :format "Välj ett format i listan. Ifall lämpligt format saknas, fyll då i det själv."
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
-                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare. Du kan även uppge en webbadress med tilläggsuppgifter."}
+                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
   :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
@@ -293,8 +293,7 @@
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
- {:external-interfaces ["Creative Commons 4.0" "CC0 1.0" "AGPL"]}
-
+ {:external-interfaces ["Creative Commons 4.0" "CC0 1.0"]}
 
  ;; CSV parsing
  :csv
