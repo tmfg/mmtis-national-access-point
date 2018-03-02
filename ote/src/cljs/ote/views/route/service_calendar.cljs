@@ -40,16 +40,23 @@
                               :width "6%"}))
        :delete? true
        :add-label "Lisää säännöllinen aikataulu"})]
-    (:calendar-rules route)]
+    (get-in route [:service-calendar :rules])]
 
-   (let [rule-dates (or (:rule-dates route) #{})]
+   (let [rule-dates (or (get-in route [:service-calendar :rule-dates]) #{})
+         removed-dates (or (get-in route [:service-calendar :removed-dates]) #{})
+         added-dates (or (get-in route [:service-calendar :added-dates]) #{})]
      [service-calendar/service-calendar
-      {:selected-date? (fn [d]
-                         (let [selected (or (:dates route) #{})
-                               df (time/date-fields d)]
-                           (selected df)))
+      {:selected-date? (constantly false)
        :on-select #(e! (rc/->ToggleDate %))
        :day-style (fn [day selected?]
-                    (when (and (rule-dates (time/date-fields day))
-                               (not selected?))
-                      {:background-color "lightblue"}))}])])
+                    (let [day (time/date-fields day)]
+                      (cond
+                        (removed-dates day)
+                        {:background-color "#c27272"
+                         :text-decoration "line-through"}
+
+                        (rule-dates day)
+                        {:background-color "lightblue"}
+
+                        (added-dates day)
+                        {:background-color "wheat"})))}])])
