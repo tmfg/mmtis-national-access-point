@@ -16,7 +16,7 @@
    [form/form {:name "Reittikalenteri"
                :update! #(e! (rc/->EditServiceCalendarRules %))}
     [(form/group
-      {:label "Säännöllinen aikataulu" :columns 3}
+      {:label "Ajopäiväkalenteri" :columns 3}
       {:type :table
        :name :rules
        :table-fields (into [{:type :date-picker
@@ -39,7 +39,7 @@
                               :label label
                               :width "6%"}))
        :delete? true
-       :add-label "Lisää säännöllinen aikataulu"})]
+       :add-label "Lisää uusi ajojakso kalenteriin"})]
     (get-in route [:service-calendar :rules])]
 
    (let [rule-dates (or (get-in route [:service-calendar :rule-dates]) #{})
