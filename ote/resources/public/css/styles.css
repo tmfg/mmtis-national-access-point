@@ -32,10 +32,12 @@ h2 {
     font-size: 120%;
 }
 
-p {
-    line-height: 21px;
-    -webkit-margin-before: 0;
-    -webkit-margin-after: 0;
+
+/* Rendered translations are wrapped with <p> by Marked JS library.
+   Remove the margins of the first P-element */
+.translation-markdown > p{
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 #oteapp, .ote-sovellus {
