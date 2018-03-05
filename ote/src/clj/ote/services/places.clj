@@ -56,7 +56,8 @@
       "drawn"
       (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id
                                                  :name namefin
-                                                 :geojson (:geojson place)})
+                                                 :geojson (:geojson place)
+                                                 :primary? primary?})
 
 
       ;; Stored geometry, update name
