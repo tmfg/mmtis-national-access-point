@@ -469,7 +469,8 @@
  ;; Per feature/page localization keys
  :place-search {:primary-name                "Platsnamn"
                 :secondary-name                "Platsnamn"
-                :place-auto-complete "Sök plats"
+                :place-auto-complete-primary "Sök plats"
+                :place-auto-complete-secondary "Sök plats"
                 :rename-place "Ange nytt namn (Enter godkänn)"
                 :primary-header "Ensisijainen toiminta-alue"
                 :secondary-header "Toissijainen toiminta-alue"

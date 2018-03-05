@@ -72,7 +72,7 @@ describe('Add a new service', () => {
                 cy.get('input[name="postal_code"]').type(service.contact.postal_code);
                 cy.get('input[name="post_office"]').type(service.contact.post_office);
 
-                cy.get('input[id*="-Haepaikkanimell"]').as('areaInput');
+		cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
 
                 cy.wrap(service.areas).each(area => {
                     cy.get('@areaInput').type(area);

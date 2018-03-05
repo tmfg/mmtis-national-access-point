@@ -165,7 +165,8 @@
       [:h3 [:span (tr [:place-search :primary-header])] [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
       [result-chips e! primary-results true]
-      [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+      [ui/auto-complete {:name :place-auto-complete-primary
+                         :floating-label-text (tr [:place-search :place-auto-complete-primary])
                          :filter (constantly true) ;; no filter, backend returns what we want
                          :dataSource (completions (:completions place-search))
                          :maxSearchResults 12
@@ -175,7 +176,8 @@
       [:h3 [:span (tr [:place-search :secondary-header])] [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
       [result-chips e! secondary-results false]
-      [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
+      [ui/auto-complete {:name :place-auto-complete-secondary
+                         :floating-label-text (tr [:place-search :place-auto-complete-secondary])
                          :filter (constantly true) ;; no filter, backend returns what we want
                          :dataSource (completions (:completions place-search))
                          :maxSearchResults 12
