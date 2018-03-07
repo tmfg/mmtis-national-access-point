@@ -162,7 +162,7 @@
          secondary-results false} (group-by (comp ::places/primary? :place) (:results place-search))]
     [:div.place-search (stylefy/use-style (style-base/flex-container "row"))
      [:div {:style {:width "30%"}}
-      [:h3 [:span (tr [:place-search :primary-header])] [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
+      [:div {:style {:font-weight "bold"}} [:span (tr [:place-search :primary-header])] [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
       [result-chips e! primary-results true]
       [ui/auto-complete {:name :place-auto-complete-primary
@@ -173,7 +173,7 @@
                          :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
                          :search-text (or (:name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}]
-      [:h3 [:span (tr [:place-search :secondary-header])] [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
+      [:div {:style {:font-weight "bold" :margin-top "60px"}} [:span (tr [:place-search :secondary-header])] [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
       [result-chips e! secondary-results false]
       [ui/auto-complete {:name :place-auto-complete-secondary

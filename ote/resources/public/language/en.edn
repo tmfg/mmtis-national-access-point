@@ -469,7 +469,7 @@
                 :place-auto-complete-secondary "Hae paikka nimellä"
                 :rename-place "Anna uusi nimi (Enter hyväksyy)"
                 :primary-header "Ensisijainen toiminta-alue"
-                :secondary-header "Toissijainen toiminta-alue"
+                :secondary-header "Toissijainen toiminta-alue (vapaaehtoinen)"
                 :primary-tooltip "Pääasiallinen toiminta-alue on alue, jonka sisällä palvelu pääsääntöisesti toimii, ja jossa se on normaalisti palveluaikojen puitteissa saatavilla. (Huom. Tieto palvelee mm. tarjonnan alueellisesta seurantaa.)"
                 :secondary-tooltip "Toissijaisella toiminta-alueella palvelu voi olla saatavilla esimerkiksi sopimuksen mukaan, ennakkotilauksella tai muuten pääasiallista toiminta-aluetta rajoitetummin."}
 

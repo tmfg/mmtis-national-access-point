@@ -25,6 +25,7 @@
 (defn- add-place
   "Return app with a new place added."
   [app place geojson]
+  (.log js/console "add-place")
   (update-in app [:place-search :results]
              #(conj (or % [])
                     {:place place
@@ -60,6 +61,7 @@
 
   SetPrimaryPlaceName
   (process-event [{name :name} app]
+    (.log js/console "SetPrimaryPlaceName")
     (search (assoc-in app [:place-search :primary-name] name) true))
 
   SetSecondaryPlaceName
@@ -68,6 +70,7 @@
 
   PlaceCompletionsResponse
   (process-event [{:keys [completions name primary?]} app ]
+    (.log js/console "PlaceCompletionsResponse")
     (if-not (= name (get-in app [:place-search (if primary?
                                                  :primary-name
                                                  :secondary-name)]))
@@ -81,6 +84,7 @@
 
   AddPlace
   (process-event [{:keys [id primary?]} app]
+    (.log js/console "AddPlace")
     (if (some #(= id (::places/id (:place %)))
               (get-in app [:place-search :results]))
       ;; This name has already been added, don't do it again
@@ -90,6 +94,8 @@
         (do
           (comm/get! (str "place/" id)
                      {:on-success (tuck/send-async! ->FetchPlaceResponse (assoc place ::places/primary? primary?))})
+          (.log js/console "AddPlace primary name " (get-in app :place-search :primary-name))
+          (.log js/console "AddPlace secondary name " (get-in app :place-search :secondary-name))
           (-> app
               (assoc-in [:place-search (if primary?
                                                  :primary-name
