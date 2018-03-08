@@ -17,8 +17,8 @@
    [ui/table-header {:adjust-for-checkbox false
                      :display-select-all  false}
     [ui/table-row {:selectable false}
-     [ui/table-header-column "Id"]
-     [ui/table-header-column "Nimi"]
+     [ui/table-header-column {:style {:width "3%"}} "Id"]
+     [ui/table-header-column {:style {:width "25%"}} "Nimi"]
      [ui/table-header-column "Ensimmäinen pysäkki"]
      [ui/table-header-column "Viimeinen pysäkki"]
      [ui/table-header-column "Voimassa lähtien"]
@@ -34,8 +34,8 @@
           ^{:key (str "route-" i)}
           (.log js/console "row: " (clj->js row) " name " name)
           [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
-           [ui/table-row-column id]
-           [ui/table-row-column name]
+           [ui/table-row-column {:style {:width "3%"}} id]
+           [ui/table-row-column {:style {:width "25%"}} name]
            [ui/table-row-column first-stop]
            [ui/table-row-column last-stop]
            [ui/table-row-column available-from]
