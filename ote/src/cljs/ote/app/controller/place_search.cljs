@@ -124,7 +124,8 @@
           (update :drawn-geometry-idx (fnil inc 1))
           (add-place {::places/namefin (str type " " (or drawn-geometry-idx 1))
                       ::places/type "drawn"
-                      ::places/id (str "drawn" (or drawn-geometry-idx 1))}
+                      ::places/id (str "drawn" (or drawn-geometry-idx 1))
+                      ::places/primary? true}
                      geojson))))
 
   EditDrawnGeometryName
