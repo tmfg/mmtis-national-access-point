@@ -35,7 +35,7 @@ h2 {
 
 /* Rendered translations are wrapped with <p> by Marked JS library.
    Remove the margins of the first P-element */
-.translation-markdown > p {
+.translation-markdown > :first p {
     margin-top: 0;
     margin-bottom: 0;
 }
