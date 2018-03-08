@@ -157,7 +157,8 @@
             :font-size "12px"
             :font-weight "bold"}}
            label ]
-  [:input {:type "file"
+  [:input {:id "hidden-file-input"
+           :type "file"
            :name name
            :on-change on-change}]])
 
@@ -358,7 +359,8 @@
       (doall
        (map (fn [option]
               [ui/radio-button
-               {:label (show-option option)
+               {:id (str "radio-" name)
+                :label (show-option option)
                 :value (option-idx option)}])
             options))]
      (when (or error warning)
