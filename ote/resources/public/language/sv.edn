@@ -293,7 +293,7 @@
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
- {:external-interfaces ["Creative Commons 4.0" "CC0 1.0"]}
+ {:external-interfaces ["CC BY 4.0" "CC0 1.0 Universal" "AGPL"]}
 
  ;; CSV parsing
  :csv
