@@ -243,7 +243,8 @@
   ;; Needs a new translation
   :external-interfaces-intro "Här uppger du eventuella maskinläsbara externa gränssnitt omfattande tex rutter och tidtabeller, bokning, försäljning (jfr statsrådets förordning nr 643/2017). Lämna tomt ifall dylika maskinläsbara gränssnitt inte finns att tillgå."
   ;; Needs a new translation
-  :external-interfaces-intro-rae "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
+  :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
+  :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulut voit luoda NAP-palvelun omalla"
   ;; Needs a new translation
   :external-interfaces "Ett maskinläsbart gränssnitt erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON) som kan vidarebehandlas av en dator. Dessa gränssnitt är ämnade för tjänsteutvecklare, som kan använda gränssnittet enligt de användarvillkor som uppgetts."
   ;; Needs a new translation
@@ -270,6 +271,7 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare. Du kan även uppge en webbadress med tilläggsuppgifter."}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
+  :SEA-ROUTE-link-text "Meriliikenteen reittieditorilla"
   :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
   :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
@@ -321,6 +323,7 @@
   :add-new-service-hour "Lägg till betjäningstid"
   :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
   :add-new-company "Lägg till företag"
+  :add-new-route "Lisää uusi merireitti"
   :discard "Ångra"
 
   :next "Fortsätt"
@@ -583,6 +586,9 @@
   :header-charging-points                   "Laddningspunkter"
   :header-service-hours                     "Tjänstens öppettider och parkeringstid"}
 
+ :route-list-page
+ {:header-route-list "Omat meriliikenteen reitti- ja aikataulutietot"
+  }
 
  :price-dialog
  {:header-dialog "Fordonspris"
@@ -626,6 +632,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-login                           "Logga in"
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
+  :navigation-route                           "Omat reitit"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"
