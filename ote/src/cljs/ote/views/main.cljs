@@ -61,9 +61,7 @@
 
            (when (:admin? (:user app))
              {:page :admin
-              :label [:common-texts :navigation-admin]}
-             {:page :routes
-              :label [:common-texts :navigation-route]})])))
+              :label [:common-texts :navigation-admin]})])))
 
 (def selectable-languages [["fi" "suomi"]
                            ["sv" "svenska"]
@@ -95,6 +93,11 @@
      :target-origin {:horizontal "right" :vertical "top"}
      :selection-renderer (constantly name)}
 
+     (when (flags/enabled? :sea-routes)
+      [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (tr [:common-texts :navigation-route])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->ChangePage :routes nil)))}])
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-summary])
                     :on-click #(do (.preventDefault %)
@@ -250,7 +253,7 @@
 
 
 
-(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators})
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
@@ -390,7 +393,6 @@
                 :admin [admin/admin-panel e! app]
 
                 :operators [operators/operators e! app]
-
 
                 :routes [route-list/routes e! app]
                 :new-route [route/new-route e! app]

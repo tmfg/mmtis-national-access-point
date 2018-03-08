@@ -19,5 +19,5 @@
  :ga {:tracking-code "UA-113014221-1"}
 
   ;; add features to the set to enable them in production
- :enabled-features #{:ote-login :ote-operators-list}
+ :enabled-features #{:ote-login :ote-operators-list :sea-routes}
  }
