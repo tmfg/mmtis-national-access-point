@@ -59,7 +59,8 @@
                     :on-request-delete #(e! (ps/->RemovePlaceById id))}
           (if editing?
             [ui/text-field
-             {:value namefin
+             {:id (str "result-" namefin)
+              :value namefin
               :floating-label-text (tr [:place-search :rename-place])
               :on-key-press #(when (= "Enter" (.-key %1))
                                (e! (ps/->EditDrawnGeometryName id)))
@@ -164,24 +165,26 @@
       [:div {:style {:font-weight "bold"}} [:span (tr [:place-search :primary-header])] [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
       [result-chips e! primary-results true]
-      [ui/auto-complete {:name :place-auto-complete-primary
+      [ui/auto-complete {:id :place-auto-complete-primary
+                         :name :place-auto-complete-primary
                          :floating-label-text (tr [:place-search :place-auto-complete-primary])
                          :filter (constantly true) ;; no filter, backend returns what we want
                          :dataSource (completions (:completions place-search))
                          :maxSearchResults 12
                          :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
-                         :search-text (or (:name place-search) "")
+                         :search-text (or (:primary-name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}]
       [:div {:style {:font-weight "bold" :margin-top "60px"}} [:span (tr [:place-search :secondary-header])] [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
       [result-chips e! secondary-results false]
-      [ui/auto-complete {:name :place-auto-complete-secondary
+      [ui/auto-complete {:id :place-auto-complete-secondary
+                         :name :place-auto-complete-secondary
                          :floating-label-text (tr [:place-search :place-auto-complete-secondary])
                          :filter (constantly true) ;; no filter, backend returns what we want
                          :dataSource (completions (:completions place-search))
                          :maxSearchResults 12
                          :on-update-input #(e! (ps/->SetSecondaryPlaceName %))
-                         :search-text (or (:name place-search) "")
+                         :search-text (or (:secondary-name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}]]
      [:div {:style {:width "70%"}}
        [places-map e! (:results place-search)]]]))
