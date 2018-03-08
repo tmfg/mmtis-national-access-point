@@ -463,11 +463,11 @@
 
 
  ;; Per feature/page localization keys
- :place-search {:primary-name                "Paikan nimi"
-                :secondary-name                "Paikan nimi"
-                :place-auto-complete-primary "Hae paikka nimellä"
-                :place-auto-complete-secondary "Hae paikka nimellä"
-                :rename-place "Anna uusi nimi (Enter hyväksyy)"
+ :place-search {:primary-name                "Place name"
+                :secondary-name                "Place name"
+                :place-auto-complete-primary "Search place by name"
+                :place-auto-complete-secondary "Search place by name"
+                :rename-place "Rename (Use Enter for saving)"
                 :primary-header "Primary operating area"
                 :secondary-header "Secondary operating area (optional)"
                 :primary-tooltip "The primary operating area is an area in which the service is normally available according to service hours. (Note: This information serves e.g. monitoring of regional supply.)"
