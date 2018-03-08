@@ -179,10 +179,12 @@
   (gen/frequency
    [[2 (gen/return {::places/id "finnish-municipality-564"
                     ::places/namefin "Oulu"
-                    ::places/type "finnish-municipality"})]
+                    ::places/type "finnish-municipality"
+                    ::places/primary? true})]
     [1 (gen/return {::places/type "drawn"
                     ::places/namefin "Toriportti"
-                    :geojson "{\"type\":\"Point\",\"coordinates\":[25.468116,65.012489]}"})]]))
+                    :geojson "{\"type\":\"Point\",\"coordinates\":[25.468116,65.012489]}"
+                    ::places/primary? true})]]))
 
 (def gen-additional-services
   (gen/hash-map

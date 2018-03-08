@@ -466,9 +466,15 @@
 
 
  ;; Per feature/page localization keys
- :place-search {:name                "Platsnamn"
-                :place-auto-complete "Sök plats"
-                :rename-place "Ange nytt namn (Enter godkänn)"}
+ :place-search {:primary-name                "Platsnamn"
+                :secondary-name                "Platsnamn"
+                :place-auto-complete-primary "Sök plats"
+                :place-auto-complete-secondary "Sök plats"
+                :rename-place "Ange nytt namn (Enter godkänn)"
+                :primary-header "Huvudsakligt verksamhetsområde"
+                :secondary-header "Sekundärt verksamhetsområde (frivilligt)"
+                :primary-tooltip "Huvudsakligt verksamhetsområde – det område där tjänsten i huvudsak erbjuds under normala verksamhetstide. (Obs: Denna information används vid uppföljningen av tjänsteutbudet.)"
+                :secondary-tooltip "Sekundärt verksamhetsområde – det område där tjänsten erbjuds tex. enligt särskild överenskommelse, på beställning eller med begränsad servicenivå jämfört med huvudsakligt område"}
 
  :titles {:terminal                 "Stationer, hamnar och övriga terminaler"
           :passenger-transportation "Persontransporttjänster"

@@ -463,9 +463,15 @@
 
 
  ;; Per feature/page localization keys
- :place-search {:name                "Place name"
-                :place-auto-complete "Search place by name"
-                :rename-place "Rename (Use Enter for saving)"}
+ :place-search {:primary-name                "Paikan nimi"
+                :secondary-name                "Paikan nimi"
+                :place-auto-complete-primary "Hae paikka nimellä"
+                :place-auto-complete-secondary "Hae paikka nimellä"
+                :rename-place "Anna uusi nimi (Enter hyväksyy)"
+                :primary-header "Pääasiallinen toiminta-alue"
+                :secondary-header "Toissijainen toiminta-alue (vapaaehtoinen)"
+                :primary-tooltip "Pääasiallinen toiminta-alue on alue, jonka sisällä palvelu pääsääntöisesti toimii, ja jossa se on normaalisti palveluaikojen puitteissa saatavilla. (Huom. Tieto palvelee mm. tarjonnan alueellisesta seurantaa.)"
+                :secondary-tooltip "Toissijaisella toiminta-alueella palvelu voi olla saatavilla esimerkiksi sopimuksen mukaan, ennakkotilauksella tai muuten pääasiallista toiminta-aluetta rajoitetummin."}
 
  :titles {:terminal                 "Stations, ports and other terminals"
           :passenger-transportation "Passenger transportation"

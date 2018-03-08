@@ -13,7 +13,7 @@ VALUES (:transport-service-id,
         (SELECT "location"
            FROM places
           WHERE id = :place-id),
-        true);
+        :primary?);
 
 -- name: fetch-operation-area-geojson
 SELECT id, "transport-service-id", ST_AsGeoJSON(location)
@@ -26,4 +26,4 @@ INSERT INTO operation_area ("transport-service-id", "location", "description", "
 VALUES (:transport-service-id,
         ST_GeomFromGeoJSON(:geojson),
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
-        true);
+        :primary?);
