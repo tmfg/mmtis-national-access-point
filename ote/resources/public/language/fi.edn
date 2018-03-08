@@ -257,9 +257,9 @@
   :external-interfaces-payment-systems "Sellaisten tie- ja raideliikenteen toimijoiden, joilla on käytössään lippu- ja maksujärjestelmä, tulee lisäksi ilmoittaa tässä osiossa koneluettavan tilaus- ja kertalippurajapinnan tiedot."
   :external-interfaces-tooltips {:data-content "Valitse millaisia tietoja koneluettava rajapinta tarjoaa. Voit valita listalta useita vaihtoehtoja. Mikäli valintalistalta ei löydy sopivia vaihtoehtoja, valitse “muu” ja kerro tietosisällöistä “Lisätietoja”-kentässä."
                                  :external-service-url "Ilmoita ensisijaisesti suora osoite koneluettavaan rajapintaan. Voit vaihtoehtoisesti ilmoittaa web-osoitteen, jossa kerrotaan tietoja rajapinnasta tai sen käytöstä."
-                                 :format "Valitse listalta tietosisällön formaatti. Mikäli rajapintasi välittää tietoa useassa formaatissa, valitse listalta kaikki oleelliset vaihtoehdot. Jos listalla ei ole käyttämääsi formaattia, voit lisätä sen kirjoittamalla."
+                                 :format "Valitse listalta tietosisällön formaatti. Jos listalla ei ole käyttämääsi formaattia, voit lisätä sen kirjoittamalla."
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
-                                 :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille. Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
+                                 :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille (esim. lisenssistä). Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
   :RAE-link-text "Rae-työkalulla"
   :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
@@ -286,7 +286,7 @@
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
- {:external-interfaces ["Creative Commons 4.0" "CC0 1.0" "AGPL"]}
+ {:external-interfaces ["Creative Commons 4.0" "CC0 1.0"]}
 
  ;; CSV parsing
  :csv

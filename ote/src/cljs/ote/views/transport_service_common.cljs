@@ -117,13 +117,27 @@
        :type :table
        :prepare-for-save values/without-empty-rows
        :table-fields [{:name ::t-service/data-content
-                       :type :multiselect-selection
+                       :type :chip-input
                        :tooltip (tr [:form-help :external-interfaces-tooltips :data-content])
                        :width "20%"
-                       :auto-width? true
                        :full-width? true
-                       :options t-service/interface-data-contents
-                       :show-option (tr-key [:enums ::t-service/interface-data-content])
+                       :auto-select? true
+                       :open-on-focus? true
+                       ;; Translate visible suggestion text, but keep the value intact.
+                       :suggestions (mapv (fn [val]
+                                            {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
+                                          t-service/interface-data-contents)
+                       :suggestions-config {:text :text :value :value}
+                       :write (fn [data vals]
+                                (assoc-in data [::t-service/data-content]
+                                          ;; Values loose their keyword status inside the component, so we'll make
+                                          ;; sure that they will be keywords in the state.
+                                          (mapv (comp keyword :value) vals)))
+                       :read #(as-> % data
+                                    (get-in data [::t-service/data-content])
+                                    (mapv (fn [val]
+                                            {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
+                                          data))
                        :required? true
                        :is-empty? validation/empty-enum-dropdown?}
                       {:name ::t-service/external-service-url
@@ -151,15 +165,17 @@
                        :width "5%"
                        }
                       {:name ::t-service/format
-                       :type :chip-input
+                       :type :autocomplete
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :format])
                        :open-on-focus? true
                        :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
                        :max-results 10
-                       :tooltip (tr [:form-help :external-interfaces-tooltips :format])
                        :width "15%"
                        :full-width? true
-                       :add-on-blur? true
-                       :required? true}
+                       :required? true
+                       ;; Wrap value with vector to support current type of format field in the database.
+                       :write #(assoc-in %1 [::t-service/format] #{%2})
+                       :read #(first (get-in % [::t-service/format]))}
                       {:name ::t-service/license
                        :type :autocomplete
                        :open-on-focus? true

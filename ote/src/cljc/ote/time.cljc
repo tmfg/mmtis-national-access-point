@@ -6,6 +6,8 @@
              [clj-time.coerce :as coerce]
              [cheshire.generate :as cheshire-generate]]
        :cljs [[goog.string :as gstr]
+              [goog.date.Date]
+              [goog.date.DateTime]
               [cljs-time.core :as cljs-time]
               [cljs-time.format :as format]
               [cljs-time.local :as local]
@@ -45,16 +47,21 @@
                            (cljs-time/today-at hours minutes seconds)))))))
 
 
+(defn time? [x]
+  (instance? Time x))
+
 (defn empty-time?
   "Check if time is empty. Requires both hours and minutes to be set."
   [{:keys [hours minutes]}]
   (or (nil? hours)
       (nil? minutes)))
 
+(def valid-time? (complement empty-time?))
+
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)
-   "%02d:%02d:%02d" hours minutes seconds))
+   "%02d:%02d:%02d" hours minutes (or seconds 0)))
 
 (defn format-time [{:keys [hours minutes seconds] :as time}]
   (if (and seconds (not= 0 seconds))
@@ -81,6 +88,21 @@
       ::hours (.getHours this)
       ::minutes (.getMinutes this)
       ::seconds (.getSeconds this)}))
+
+#?(:cljs
+   (extend-protocol DateFields
+     goog.date.Date
+     (date-fields [this]
+       {::date (.getDate this)
+        ::month (inc (.getMonth this))
+        ::year (.getYear this)}))
+   :clj
+   (extend-protocol DateFields
+     java.time.LocalDate
+     (date-fields [this]
+       {::date (.getDayOfMonth this)
+        ::month (.getMonthValue this)
+        ::year (.getYear this)})))
 
 (defn format-date
   "Format given date in human readable format."
@@ -219,3 +241,15 @@
     org.postgresql.util.PGInterval
     (fn [interval json-generator]
       (cheshire-generate/encode-map (pginterval->interval interval) json-generator))))
+
+(defn minutes-from-midnight [{:keys [minutes hours] :as time}]
+  (+ (* 60 hours) minutes))
+
+(defn minutes-from-midnight->time [minutes]
+  (let [hours (int (/ minutes 60))
+        minutes (- minutes (* 60 hours))]
+    (->Time hours minutes 0)))
+
+(defn minutes-elapsed [t1 t2]
+  (- (minutes-from-midnight t2)
+     (minutes-from-midnight t1)))

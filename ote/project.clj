@@ -82,12 +82,15 @@
                  [org.geotools/gt-xml "16.1"]
                  [org.geotools/gt-geojson "16.1"]
 
+                 ;; Data/file formats and file handling
                  ;; JSON
                  [cheshire "5.8.0"]
                  ;; CSV
                  [org.clojure/data.csv "0.1.4"]
+                 [cljsjs/jszip "3.1.3-0"]
+                 [cljsjs/filesaverjs "1.3.3-0"]
 
-                 ;; jostain tulee vanha guava, ylikirjoitetaan
+                 ;; override old guava version from deps
                  [com.google.guava/guava "21.0"]]
 
   :profiles {:uberjar {:aot :all
