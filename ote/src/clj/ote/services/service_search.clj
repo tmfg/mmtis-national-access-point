@@ -136,9 +136,8 @@
 
 (defn- service-search-routes [db]
   (routes
-   (GET "/operator-completions/:term" {{term :term} :params :as req}
-        (http/api-response req
-                           (operator-completions db term)))
+    (GET ["/operator-completions/:term", :term #".+"] {{term :term} :params :as req}
+      (http/api-response req (operator-completions db term)))
 
    (GET "/service-search/facets" []
         (http/no-cache-transit-response

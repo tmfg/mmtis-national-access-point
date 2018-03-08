@@ -1,7 +1,8 @@
 (ns ote.ui.mui-chip-input
   (:require material-ui-chip-input
             [cljs-react-material-ui.reagent :as ui]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [clojure.string :as str]))
 
 ;; TODO: Todo implement custom cljs version of mui chip-input component mirroring the amazing features of the component.
 
@@ -32,31 +33,44 @@
 
 (def chip-input* (r/adapt-react-class (aget js/window "MaterialUIChipInput")))
 
+(defn- auto-select [c orig-chip search-str js-handleAddChip]
+
+  (let [autocomplete (aget c "autoComplete")
+        ;; RequestLists contains filtered suggestions from AutoComplete
+        first-match (first (js->clj (aget autocomplete "requestsList") :keywordize-keys true))
+        suggestions (js->clj (aget c "props" "dataSource") :keywordize-keys true)
+
+        ;; Pass original chip if we find a perfect match from suggestions. This enables chip add by clicking on the suggestion menu.
+        ;; Otherwise, match first item from the filter requestList and try to find a match from suggestions.
+        ;; RequestList does not contain chip :value, so we have to find our real Chip from the suggestions vector.
+        chip (if (some #(= search-str (or (:text %) %)) suggestions)
+               orig-chip
+               (first (filter #(= (or (:text %) %) (:text first-match)) suggestions)))]
+
+    ;; Call the original ChipInput.handleAddChip function
+    (when chip (.call js-handleAddChip c chip))))
+
 (defn chip-input [props]
-  (let [ref (atom nil)
-        auto-select? (atom false)]
+  (let [ref (atom nil)]
     (r/create-class
       {:component-did-mount
        (fn [this]
          (let [c (reset! ref (aget this "refs" "chip-input"))
-               handleAddChip* (aget c "handleAddChip")]
+               js-handleAddChip (aget c "handleAddChip")
+               auto-select? (:auto-select? props)]
            ;; Autoselect first matching suggestion if :auto-select prop is true after pressing :new-chip-key-code key.
            ;; This will override the normal handleAddChip member function of chip-input with our custom function.
-           (aset @ref "handleAddChip"
-                 (fn [val]
-                   (if @auto-select?
-                     (let [autocomplete (aget @ref "autoComplete")
-                           ;; RequestLists contains filtered suggestions from AutoComplete
-                           requests (aget autocomplete "requestsList")
-                           chip (first requests)]
-                       ;; Call the original ChipInput.handleAddChip function
-                       (when chip (.call handleAddChip* c chip)))
-                     (.call handleAddChip* c val))))))
+           (aset c "handleAddChip"
+                 (fn [js-chip]
+                   (let [chip (js->clj js-chip :keywordize-keys true)
+                         search-str (or (:text chip) chip)]
+                     (cond
+                       (str/blank? search-str) nil
+                       auto-select? (auto-select c chip search-str js-handleAddChip)
+                       :else (.call js-handleAddChip c chip)))))))
 
        :reagent-render
        (fn [props]
-         (reset! auto-select? (:auto-select? props))
-
          [chip-input* (merge
                         default-props
                         ; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).

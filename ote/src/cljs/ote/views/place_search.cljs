@@ -13,6 +13,8 @@
             [goog.object :as gobj]
             cljsjs.leaflet
             [stylefy.core :as stylefy]
+            [ote.ui.common :as common]
+            [cljs-react-material-ui.icons :as ic]
             [ote.style.base :as style-base]
             [clojure.string :as str]))
 
@@ -35,7 +37,7 @@
                      (old event))))
            (aset chip "__backspace_monkey_patch" true)))))))
 
-(defn result-chips [e! results]
+(defn result-chips [e! results primary?]
   (r/create-class
    {:component-did-mount monkey-patch-chip-backspace
     :component-did-update monkey-patch-chip-backspace
@@ -46,8 +48,8 @@
          ^{:key id}
          [:span
           [ui/chip {:ref id
-                    :style {:margin 4}
-
+                    :style {:margin 4 :background-color (if primary? "green" "orange") }
+                    :labelStyle {:color "white" :font-weight "bold"}
                     ;; Toggle edit mode when clicking (for hand drawn geometries)
                     :on-click
                     (if (and (= "drawn" type) (not editing?))
@@ -117,7 +119,9 @@
          (for [{:keys [place geojson]} results]
            ^{:key (::places/id place)}
            [leaflet/GeoJSON {:data geojson
-                             :style {:color "green"}}])])}))
+                             :style {:color (if (::places/primary? place)
+                                              "green"
+                                              "orange")}}])])}))
 
 
 (defn marker-map [e! coordinate]
@@ -142,23 +146,45 @@
                              [ui/menu-item {:primary-text namefin}])})
               completions)))
 
+
+(def tooltip-icon
+  "A tooltip icon that shows balloon.css tooltip on hover."
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+    (fn [opts]
+      [wrapped {:style {:width          16 :height 16
+                        :vertical-align "middle"
+                        :color          "gray"}}
+       opts])))
+
 (defn place-search [e! place-search]
-  (let [results (:results place-search)]
-    [:div.place-search
+  (let [{primary-results true
+         secondary-results false} (group-by (comp ::places/primary? :place) (:results place-search))]
+    [:div.place-search (stylefy/use-style (style-base/flex-container "row"))
+     [:div {:style {:width "30%"}}
+      [:div {:style {:font-weight "bold"}} [:span (tr [:place-search :primary-header])] [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
-     [:div.col-xs-12.col-md-3
-     [result-chips e! results]
+      [result-chips e! primary-results true]
+      [ui/auto-complete {:name :place-auto-complete-primary
+                         :floating-label-text (tr [:place-search :place-auto-complete-primary])
+                         :filter (constantly true) ;; no filter, backend returns what we want
+                         :dataSource (completions (:completions place-search))
+                         :maxSearchResults 12
+                         :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
+                         :search-text (or (:name place-search) "")
+                         :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}]
+      [:div {:style {:font-weight "bold" :margin-top "60px"}} [:span (tr [:place-search :secondary-header])] [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
-     [ui/auto-complete {:floating-label-text (tr [:place-search :place-auto-complete])
-
-                        :filter (constantly true) ;; no filter, backend returns what we want
-                        :dataSource (completions (:completions place-search))
-                        :maxSearchResults 12
-                        :on-update-input #(e! (ps/->SetPlaceName %))
-                        :search-text (or (:name place-search) "")
-                        :on-new-request #(e! (ps/->AddPlace (aget % "id")))}]]
-    [:div.col-xs-12.col-md-8
-     [places-map e! results]]]))
+      [result-chips e! secondary-results false]
+      [ui/auto-complete {:name :place-auto-complete-secondary
+                         :floating-label-text (tr [:place-search :place-auto-complete-secondary])
+                         :filter (constantly true) ;; no filter, backend returns what we want
+                         :dataSource (completions (:completions place-search))
+                         :maxSearchResults 12
+                         :on-update-input #(e! (ps/->SetSecondaryPlaceName %))
+                         :search-text (or (:name place-search) "")
+                         :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}]]
+     [:div {:style {:width "70%"}}
+       [places-map e! (:results place-search)]]]))
 
 (defn place-search-form-group [e! label name]
   (let [empty-places? (comp empty? :results :place-search)]

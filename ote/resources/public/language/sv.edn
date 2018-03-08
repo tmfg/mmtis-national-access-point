@@ -267,9 +267,9 @@
   ;; Needs a new translation
   :external-interfaces-tooltips {:data-content "Välj typ av innehåll. Du kan välja flera typer samtidigt för samma gränssnitt. Ifall lämpligt alternativ saknas välj ”Övrigt” och beskriv innehållet i ”Tilläggsuppgifter”."
                                  :external-service-url "Ange i första hand ett direkt maskinläsbart gränssnitt. Om detta inte är ändamålsenligt ange då en webbadress för mera information om gränssnittet och dess användning."
-                                 :format "Välj ett format i listan. Du kan vid behov välja flera format för samma gränssnitt. Ifall lämpligt format saknas, fyll då i det själv."
+                                 :format "Välj ett format i listan. Ifall lämpligt format saknas, fyll då i det själv."
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
-                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare. Du kan även uppge en webbadress med tilläggsuppgifter."}
+                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
   :SEA-ROUTE-link-text "Meriliikenteen reittieditorilla"
   :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
@@ -295,8 +295,7 @@
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
- {:external-interfaces ["Creative Commons 4.0" "CC0 1.0" "AGPL"]}
-
+ {:external-interfaces ["CC BY 4.0" "CC0 1.0 Universal" "AGPL"]}
 
  ;; CSV parsing
  :csv
@@ -470,9 +469,15 @@
 
 
  ;; Per feature/page localization keys
- :place-search {:name                "Platsnamn"
-                :place-auto-complete "Sök plats"
-                :rename-place "Ange nytt namn (Enter godkänn)"}
+ :place-search {:primary-name                "Platsnamn"
+                :secondary-name                "Platsnamn"
+                :place-auto-complete-primary "Sök plats"
+                :place-auto-complete-secondary "Sök plats"
+                :rename-place "Ange nytt namn (Enter godkänn)"
+                :primary-header "Huvudsakligt verksamhetsområde"
+                :secondary-header "Sekundärt verksamhetsområde (frivilligt)"
+                :primary-tooltip "Huvudsakligt verksamhetsområde – det område där tjänsten i huvudsak erbjuds under normala verksamhetstide. (Obs: Denna information används vid uppföljningen av tjänsteutbudet.)"
+                :secondary-tooltip "Sekundärt verksamhetsområde – det område där tjänsten erbjuds tex. enligt särskild överenskommelse, på beställning eller med begränsad servicenivå jämfört med huvudsakligt område"}
 
  :titles {:terminal                 "Stationer, hamnar och övriga terminaler"
           :passenger-transportation "Persontransporttjänster"

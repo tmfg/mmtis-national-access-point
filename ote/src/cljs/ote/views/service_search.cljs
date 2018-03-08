@@ -161,7 +161,7 @@
                 filter-service-count fetching-more?]} service-search
         operator (:operator (:params app))]
     [:div.col-xs-12.col-md-12.col-lg-12
-     [:p
+     [:span
       (if operator
         (tr (if (zero? filter-service-count)
               [:service-search :operator-no-services]
