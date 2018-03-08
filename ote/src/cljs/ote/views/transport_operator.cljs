@@ -37,7 +37,7 @@
                         (::t-operator/name %))
         :update!   #(if (nil? %)
                       (e! (to/->CreateTransportOperator))
-                      (e! (to/->SelectOperator %)))
+                      (e! (to/->SelectOperatorForService %)))
         :options     (into (mapv :transport-operator operators)
                            [:divider nil])
         :auto-width? true}

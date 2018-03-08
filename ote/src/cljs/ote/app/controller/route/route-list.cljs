@@ -28,7 +28,8 @@
     (.log js/console "response " (pr-str response))
     (.log js/console "response " (clj->js response))
 
-    (assoc app :route-list response ))
+    (assoc app :route-list response
+               :routes-vector (get (first response) :routes)))
 
   CreateNewRoute
   (process-event [_ app]

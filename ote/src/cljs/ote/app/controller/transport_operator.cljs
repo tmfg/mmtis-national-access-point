@@ -7,7 +7,8 @@
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]))
 
-(defrecord SelectOperator [data])
+(defrecord SelectOperatorForService [data])
+(defrecord SelectOperatorForTransit [data])
 (defrecord EditTransportOperatorState [data])
 (defrecord SaveTransportOperator [])
 (defrecord SaveTransportOperatorResponse [data])
@@ -30,15 +31,26 @@
            :transport-operator {:new? true}
            :services-changed? true))
 
-  SelectOperator
+  SelectOperatorForService
   (process-event [{data :data} app]
     (let [id  (get data ::t-operator/id)
-          selected (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
+          selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
                             %)
                          (:transport-operators-with-services app))]
       (assoc app
-             :transport-operator (:transport-operator selected)
-             :transport-service-vector (:transport-service-vector selected))))
+             :transport-operator (:transport-operator selected-operator)
+             :transport-service-vector (:transport-service-vector selected-operator))))
+
+  SelectOperatorForTransit
+  (process-event [{data :data} app]
+    (.log js/console " SelectOperatorForTransit data " (clj->js data))
+    (let [id  (get data ::t-operator/id)
+          selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
+                                     %)
+                                  (:route-list app))]
+      (assoc app
+        :transport-operator (:transport-operator selected-operator)
+        :routes-vector (:routes selected-operator))))
 
   EditTransportOperatorState
   (process-event [{data :data} app]
