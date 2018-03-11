@@ -157,7 +157,8 @@
             :font-size "12px"
             :font-weight "bold"}}
            label ]
-  [:input {:type "file"
+  [:input {:id "hidden-file-input"
+           :type "file"
            :name name
            :on-change on-change}]])
 
@@ -332,6 +333,11 @@
                    (when on-blur (on-blur event)))
         :on-request-add handle-add!
         :on-request-delete handle-del!}
+       ;; Define suggestions data element format.
+       ;; Will be used internally like:
+       ;;   dataSourceConfig: {:value :key}
+       ;;   dataSource element: {:key 2}
+       ;;   ((:value dataSourceConfig) {:key 2}) -> 2
        (when suggestions-config
          {:dataSourceConfig suggestions-config})
        (when max-length
@@ -353,7 +359,8 @@
       (doall
        (map (fn [option]
               [ui/radio-button
-               {:label (show-option option)
+               {:id (str "radio-" name)
+                :label (show-option option)
                 :value (option-idx option)}])
             options))]
      (when (or error warning)

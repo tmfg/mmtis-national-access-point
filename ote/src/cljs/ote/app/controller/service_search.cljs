@@ -1,10 +1,11 @@
 (ns ote.app.controller.service-search
   "Service search controller"
-  (:require [tuck.core :as tuck]
+  (:require [clojure.string :as str]
+            [tuck.core :as tuck]
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [clojure.string :as str]))
+            [ote.util.url :as url-util]))
 
 
 (defrecord UpdateSearchFilters [filters])
@@ -157,7 +158,7 @@
   (process-event [{name :name} app]
     (let [app (assoc-in app [:service-search :filters :operators :name] name)]
       (when (>= (count name) 2) ;; Search after two (2) chars is given
-        (comm/get! (str "operator-completions/" name)
+        (comm/get! (str "operator-completions/" (url-util/encode-url-component name))
                    {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
       (assoc-in app [:service-search :filters :operators :results] [])))
 
@@ -188,5 +189,4 @@
                (fn [results]
                  (filterv
                    (fn [x] (not= id (get x ::t-operator/id)))
-                   results))))
-  )
+                   results)))))

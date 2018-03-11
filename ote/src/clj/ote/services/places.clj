@@ -51,12 +51,13 @@
                      (when-not (empty? stored)
                        {::t-service/id (op/not (op/in stored))}))))
 
-  (doseq [{::places/keys [id namefin type] :as place} places]
+  (doseq [{::places/keys [id namefin type primary?] :as place} places]
     (case type
       "drawn"
       (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id
                                                  :name namefin
-                                                 :geojson (:geojson place)})
+                                                 :geojson (:geojson place)
+                                                 :primary? primary?})
 
 
       ;; Stored geometry, update name
@@ -69,7 +70,8 @@
       ;; default, link new geometry by reference
       (link-transport-service-place! db {:transport-service-id transport-service-id
                                          :place-id id
-                                         :name namefin}))))
+                                         :name namefin
+                                         :primary? primary?}))))
 
 (defn fetch-transport-service-operation-area
   "Fetch operation area for the given transport service id."

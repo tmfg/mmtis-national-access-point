@@ -8,11 +8,12 @@
             [taoensso.timbre :as log]
             [ote.db.transport-service :as t-service]))
 
-(defrecord SetPlaceName [name])
-(defrecord AddPlace [id])
+(defrecord SetPrimaryPlaceName [name])
+(defrecord SetSecondaryPlaceName [name])
+(defrecord AddPlace [id primary?])
 (defrecord FetchPlaceResponse [response place])
 (defrecord RemovePlaceById [id])
-(defrecord PlaceCompletionsResponse [completions name])
+(defrecord PlaceCompletionsResponse [completions name primary?])
 
 (defrecord SetMarker [event])
 
@@ -39,28 +40,37 @@
                         %)
                      results))))
 
-(defn- search [{{name :name :as place-search} :place-search :as app}]
+(defn- search [{place-search :place-search :as app} primary?]
   (when-let [timeout (:timeout place-search)]
     (.clearTimeout js/window timeout))
-  (if (>= (count name) 2)
-    (let [on-success (tuck/send-async! ->PlaceCompletionsResponse name)]
+  (let [name (if primary?
+               (:primary-name place-search)
+               (:secondary-name place-search))
+        on-success (tuck/send-async! ->PlaceCompletionsResponse name primary?)]
+    (if (>= (count name) 2)
       (assoc-in
        app [:place-search :timeout]
        (.setTimeout js/window
                     #(comm/get! (str "place-completions/" name)
                                 {:on-success on-success})
-                    500)))
-    app))
+                    500))
+      app)))
 
 (extend-protocol tuck/Event
 
-  SetPlaceName
+  SetPrimaryPlaceName
   (process-event [{name :name} app]
-    (search (assoc-in app [:place-search :name] name)))
+    (search (assoc-in app [:place-search :primary-name] name) true))
+
+  SetSecondaryPlaceName
+  (process-event [{name :name} app]
+    (search (assoc-in app [:place-search :secondary-name] name) false))
 
   PlaceCompletionsResponse
-  (process-event [{:keys [completions name]} app]
-    (if-not (= name (get-in app [:place-search :name]))
+  (process-event [{:keys [completions name primary?]} app ]
+    (if-not (= name (get-in app [:place-search (if primary?
+                                                 :primary-name
+                                                 :secondary-name)]))
       ;; Received stale completions (name is not what was searched for), ignore
       app
       (assoc-in app [:place-search :completions]
@@ -70,7 +80,7 @@
                            completions)))))
 
   AddPlace
-  (process-event [{id :id} app]
+  (process-event [{:keys [id primary?]} app]
     (if (some #(= id (::places/id (:place %)))
               (get-in app [:place-search :results]))
       ;; This name has already been added, don't do it again
@@ -79,9 +89,11 @@
                            (get-in app [:place-search :completions]))]
         (do
           (comm/get! (str "place/" id)
-                     {:on-success (tuck/send-async! ->FetchPlaceResponse place)})
+                     {:on-success (tuck/send-async! ->FetchPlaceResponse (assoc place ::places/primary? primary?))})
           (-> app
-              (assoc-in [:place-search :name] "")
+              (assoc-in [:place-search (if primary?
+                                                 :primary-name
+                                                 :secondary-name)] "")
               (assoc-in [:place-search :completions] nil)))
         app)))
 
@@ -100,8 +112,8 @@
   (process-event [{event :event} app]
     (let [lat (-> event .-latlng .-lat)
           lng (-> event .-latlng .-lng)]
-    ;(.log js/console "SetMarker function " (-> event .-latlng .-lat) )
-    ;(.log js/console "SetMarker function " (-> event .-latlng .-lng) )
+                                        ;(.log js/console "SetMarker function " (-> event .-latlng .-lat) )
+                                        ;(.log js/console "SetMarker function " (-> event .-latlng .-lng) )
 
       (assoc app :coordinates [ lat lng ] )))
 
@@ -112,7 +124,8 @@
           (update :drawn-geometry-idx (fnil inc 1))
           (add-place {::places/namefin (str type " " (or drawn-geometry-idx 1))
                       ::places/type "drawn"
-                      ::places/id (str "drawn" (or drawn-geometry-idx 1))}
+                      ::places/id (str "drawn" (or drawn-geometry-idx 1))
+                      ::places/primary? true}
                      geojson))))
 
   EditDrawnGeometryName
@@ -154,6 +167,7 @@
                                                (::t-service/text %))
                                             description)
                      ::places/id id ;; FIXME: this needs to be a reference
-                     ::places/type "stored"}
+                     ::places/type "stored"
+                     ::places/primary? primary?}
              :geojson (js/JSON.parse location-geojson)})
           operation-areas)}})

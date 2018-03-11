@@ -39,6 +39,7 @@
 
 (def test-operation-area [{::places/type "drawn"
                            ::places/namefin "Toriportti"
+                           ::places/primary? true
                            :geojson "{\"type\":\"Point\",\"coordinates\":[25.468116,65.012489]}"}])
 
 (deftest export-geojson-with-interval

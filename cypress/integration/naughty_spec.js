@@ -48,10 +48,8 @@ describe('Naughty form fill', () => {
                 cy.get('input[name="postal_code"]').typeRaw(service.contact.postal_code);
                 cy.get('input[name="post_office"]').typeRaw(genNaughtyString(20));
 
-                cy.get('input[id*="-Haepaikkanimell"]').as('areaInput');
-
+		cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
                 cy.get('@areaInput').type(service.areas[0]);
-
                 return cy.wait('@placeCompletion')
                     .then(() => {
                         cy.contains(service.areas[0]).click();

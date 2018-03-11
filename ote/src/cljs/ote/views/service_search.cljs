@@ -22,28 +22,28 @@
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
-   [ui/icon-button {:href     "#"
+   [ui/icon-button {:href "#"
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (admin/->DeleteTransportService id)))}
     [ic/action-delete {:class-name (:class (stylefy/use-style style/delete-icon))
-                       :style      style/partly-visible-delete-icon}]]
+                       :style style/partly-visible-delete-icon}]]
    (when show-delete-modal?
      [ui/dialog
-      {:open    true
-       :title   (tr [:dialog :delete-transport-service :title])
+      {:open true
+       :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
                    [ui/flat-button
-                    {:label    (tr [:buttons :cancel])
-                     :primary  true
+                    {:label (tr [:buttons :cancel])
+                     :primary true
                      :on-click #(e! (admin/->CancelDeleteTransportService id))}])
                  (r/as-element
                    [ui/raised-button
-                    {:label     (tr [:buttons :delete])
-                     :icon      (ic/action-delete-forever)
+                    {:label (tr [:buttons :delete])
+                     :icon (ic/action-delete-forever)
                      :secondary true
-                     :primary   true
-                     :on-click  #(e! (admin/->ConfirmDeleteTransportService id))}])]}
+                     :primary true
+                     :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 
@@ -58,7 +58,7 @@
 
 (defn- format-address [{::common/keys [street postal_code post_office]}]
   (let [comma (if (not (empty? street)) ", " " ")]
-  (str street comma postal_code " " post_office)))
+    (str street comma postal_code " " post_office)))
 
 (def external-interface-table-columns
   ;; [label width value-fn]
@@ -77,46 +77,46 @@
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
-    (when-not (empty? external-interface-links)
-      [:div
-       [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
-       [:table {:style {:margin-top "10px"}}
-        [:thead (stylefy/use-style style/external-interface-header)
-         [:tr
-          (doall
-            (for [[k w _] external-interface-table-columns]
-              ^{:key k}
-              [:th {:style (merge {:width w} style/external-table-header)}
-               (tr [:field-labels :transport-service-common k])]))]]
-        [:tbody (stylefy/use-style style/external-interface-body)
-         (doall
-           (map-indexed
-             (fn [i {::t-service/keys [data-content external-interface format license description] :as row}]
-               ^{:key (str "external-table-row-" i)}
-               [:tr {:style style/external-table-row}
-                ^{:key (str "external-interface-" i)}
-                [:td {:style {:width "20%" :font-size "14px"}}
-                 (common-ui/linkify
-                   (::t-service/url external-interface)
-                   (parse-content-value data-content)
-                   {:target "_blank"})]
-                [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
-                [:td {:style {:width "10%" :font-size "14px"}} license]
-                [:td {:style {:width "10%" :font-size "14px"}}
-                 (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
-             external-interface-links))]]]))
+  (when-not (empty? external-interface-links)
+    [:div
+     [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
+     [:table {:style {:margin-top "10px"}}
+      [:thead (stylefy/use-style style/external-interface-header)
+       [:tr
+        (doall
+          (for [[k w _] external-interface-table-columns]
+            ^{:key k}
+            [:th {:style (merge {:width w} style/external-table-header)}
+             (tr [:field-labels :transport-service-common k])]))]]
+      [:tbody (stylefy/use-style style/external-interface-body)
+       (doall
+         (map-indexed
+           (fn [i {::t-service/keys [data-content external-interface format license description] :as row}]
+             ^{:key (str "external-table-row-" i)}
+             [:tr {:style style/external-table-row}
+              ^{:key (str "external-interface-" i)}
+              [:td {:style {:width "20%" :font-size "14px"}}
+               (common-ui/linkify
+                 (::t-service/url external-interface)
+                 (parse-content-value data-content)
+                 {:target "_blank"})]
+              [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
+              [:td {:style {:width "10%" :font-size "14px"}} license]
+              [:td {:style {:width "10%" :font-size "14px"}}
+               (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
+           external-interface-links))]]]))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
                                        operation-area-description description contact-phone contact-email
                                        operator-name business-id ckan-resource-id transport-operator-id]
-                     :as              service}]
+                     :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
         service-desc (t-service/localized-text-for "FI" description)]
     [:div.result-card (stylefy/use-style style/result-card)
 
-     [:a {:href     "#"
+     [:a {:href "#"
           :on-click #(do
                        (.preventDefault %)
                        (e! (ss/->ShowServiceGeoJSON
@@ -161,7 +161,7 @@
                 filter-service-count fetching-more?]} service-search
         operator (:operator (:params app))]
     [:div.col-xs-12.col-md-12.col-lg-12
-     [:p
+     [:span
       (if operator
         (tr (if (zero? filter-service-count)
               [:service-search :operator-no-services]
@@ -175,9 +175,9 @@
       " "
       (tr [:service-search :total-services] {:total-service-count total-service-count})]
      (doall
-      (for [result results]
-        ^{:key (::t-service/id result)}
-        [result-card e! (:admin? user) result]))
+       (for [result results]
+         ^{:key (::t-service/id result)}
+         [result-card e! (:admin? user) result]))
 
      (if fetching-more?
        [:span (tr [:service-search :fetching-more])]
@@ -187,45 +187,53 @@
 (defn result-chips [e! chip-results]
   (fn [e! chip-results]
     [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-    (for [{::t-operator/keys [name id] :as result} chip-results]
-      ^{:key (str "transport-operator-" id)}
-      [:span
-       [ui/chip {:ref               id
-                 :style             {:margin 4}
-                 :on-request-delete #(do
-                                       (e! (ss/->RemoveOperatorById id))
-                                       (e! (ss/->UpdateSearchFilters nil)))}
-        name]])]))
+     (for [{::t-operator/keys [name id] :as result} chip-results]
+       ^{:key (str "transport-operator-" id)}
+       [:span
+        [ui/chip {:ref id
+                  :style {:margin 4}
+                  :on-request-delete #(do
+                                        (e! (ss/->RemoveOperatorById id))
+                                        (e! (ss/->UpdateSearchFilters nil)))}
+         name]])]))
 
 
 (defn- parse-operator-data-source [completions]
   (into-array
-         (map (fn [{::t-operator/keys [id name]}]
-                #js {:text  name
-                     :id    id
-                     :value (r/as-element
-                              [ui/menu-item {:primary-text name}])})
-              completions)))
+    (map (fn [{::t-operator/keys [id name]}]
+           #js {:text name
+                :id id
+                :value (r/as-element
+                         [ui/menu-item {:primary-text name}])})
+         completions)))
 
 (defn operator-search [e! data]
   (let [results (:results data)
         chip-results (:chip-results data)]
-  [:div
-   [:div.col-xs-12.col-md-3
-     [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
-                        :floating-label-fixed true
-                        :hintText  (tr [:service-search :operator-search-placeholder])
-                        :hint-style style-base/placeholder
-                        :filter (constantly true) ;; no filter, backend returns what we want
-                        :maxSearchResults 12
-                        :dataSource (parse-operator-data-source results )
-                        :on-update-input #(e! (ss/->SetOperatorName %))
-                        :search-text (or (:name data) "")
-                        :on-new-request #(do
+    [:div
+     [:div.col-xs-12.col-md-3
+      [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
+                         :floating-label-fixed true
+                         :hintText (tr [:service-search :operator-search-placeholder])
+                         :hint-style style-base/placeholder
+                         :filter (constantly true)          ;; no filter, backend returns what we want
+                         :maxSearchResults 12
+                         :dataSource (parse-operator-data-source results)
+                         :on-update-input #(e! (ss/->SetOperatorName %))
+                         :search-text (or (:name data) "")
+                         :on-new-request #(do
                                             (e! (ss/->AddOperator (aget % "id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
       [result-chips e! chip-results]]]))
+
+(defn- sort-places [places]
+  (let [names (filter #(re-matches #"^\D+$" (:text %)) places)
+        ;; Place names starting with a number, like postal code areas
+        numeric (filter #(re-matches #"^\d.*" (:text %)) places)]
+    (concat
+      (sort-by :text names)
+      (sort-by :text numeric))))
 
 (defn filters-form [e! {filters :filters
                         facets :facets
@@ -251,10 +259,18 @@
 
          {:name ::t-service/operation-area
           :type :chip-input
+          :filter (fn [query, key]
+                    (let [k (str/lower-case key)
+                          q (str/lower-case query)]
+                      (when (> (count q) 1)
+                        (if (re-matches #"^\D+" q)
+                          (str/starts-with?
+                            (second (re-matches #"(?:[0-9]+\s*)?(.*)$" k)) q)
+                          (str/starts-with? k q)))))
           :open-on-focus? true
           :max-results 10
           :suggestions-config {:text :text :value :text}
-          :suggestions (::t-service/operation-area facets)
+          :suggestions (sort-places (::t-service/operation-area facets))
           ;; Select first match from autocomplete filter result list after pressing enter
           :auto-select? true
           :full-width? true}
@@ -273,28 +289,28 @@
 
 (defn service-search [e! app]
   (e! (ss/->InitServiceSearch))
-  (fn [e! {{results             :results
+  (fn [e! {{results :results
             total-service-count :total-service-count
-            empty-filters?      :empty-filters?
-            resource            :resource
-            geojson             :geojson
-            loading-geojson?    :loading-geojson?
-            :as                 service-search} :service-search
-           params                               :params
-           :as                                  app}]
+            empty-filters? :empty-filters?
+            resource :resource
+            geojson :geojson
+            loading-geojson? :loading-geojson?
+            :as service-search} :service-search
+           params :params
+           :as app}]
     [:div.service-search
      (when (or geojson loading-geojson?)
-       [ui/dialog {:title                    (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
-                   :open                     true
-                   :modal                    false
+       [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
+                   :open true
+                   :modal false
                    :auto-scroll-body-content true
-                   :on-request-close         #(e! (ss/->CloseServiceGeoJSON))
-                   :actions                  [(r/as-element
-                                                [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
-                                                                 :primary  true}
-                                                 (tr [:buttons :close])])]}
+                   :on-request-close #(e! (ss/->CloseServiceGeoJSON))
+                   :actions [(r/as-element
+                               [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
+                                                :primary true}
+                                (tr [:buttons :close])])]}
         [ckan-service-viewer/viewer e! {:resource resource
-                                        :geojson  geojson
+                                        :geojson geojson
                                         :loading? loading-geojson?}]])
      [filters-form e! service-search]
      (if (nil? results)
