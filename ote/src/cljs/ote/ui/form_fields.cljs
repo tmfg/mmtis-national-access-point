@@ -369,10 +369,12 @@
         (if error error warning)])]))
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
-                                     error warning auto-width? disabled?] :as field}
+                               error warning auto-width? disabled?
+                               option-value] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
-  (let [option-idx (zipmap options (range))]
+  (let [option-value (or option-value identity)
+        option-idx (zipmap (map option-value options) (range))]
     [ui/select-field
      (merge
       {:auto-width (boolean auto-width?)
@@ -380,7 +382,7 @@
        :floating-label-text (when-not table? label)
        :floating-label-fixed true
        :value (option-idx data)
-       :on-change #(update! (nth options %2))
+       :on-change #(update! (option-value (nth options %2)))
        :error-text        (or error warning "") ;; Show error text or warning text or empty string
        :error-style       (if error             ;; Error is more critical than required - showing it first
                             style-base/error-element
@@ -400,8 +402,7 @@
 (defmethod field :selection [{radio? :radio? :as field} data]
   (if radio?
     [radio-selection field data]
-    [field-selection field data])
-  )
+    [field-selection field data]))
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
