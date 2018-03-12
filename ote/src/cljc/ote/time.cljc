@@ -4,11 +4,12 @@
    #?@(:clj [[specql.impl.composite :as specql-composite]
              [clj-time.format :as format]
              [clj-time.coerce :as coerce]
-             [cheshire.generate :as cheshire-generate]]
+             [cheshire.generate :as cheshire-generate]
+             [clj-time.core :as t]]
        :cljs [[goog.string :as gstr]
               [goog.date.Date]
               [goog.date.DateTime]
-              [cljs-time.core :as cljs-time]
+              [cljs-time.core :as t]
               [cljs-time.format :as format]
               [cljs-time.local :as local]
               [cljs-time.coerce :as coerce]])
@@ -26,7 +27,7 @@
   (if  (nil? time)
     " " ;: if nil - print empty string
     (->> time
-         cljs-time/to-default-time-zone
+         t/to-default-time-zone
          (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
 
 #?(:cljs
@@ -34,7 +35,7 @@
      (if  (nil? time)
        "" ;: if nil - print empty string
        (->> time
-            cljs-time/to-default-time-zone
+            t/to-default-time-zone
             (format/unparse (format/formatter "HH:mm:ss"))))))
 
 #?(:cljs
@@ -44,7 +45,7 @@
            seconds (get db-time :seconds)]
        (js/Date.
          (coerce/to-long (local/to-local-date-time
-                           (cljs-time/today-at hours minutes seconds)))))))
+                           (t/today-at hours minutes seconds)))))))
 
 
 (defn time? [x]
@@ -103,6 +104,9 @@
        {::date (.getDayOfMonth this)
         ::month (.getMonthValue this)
         ::year (.getYear this)})))
+
+(defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
+  (t/date-time year month date hours minutes seconds))
 
 (defn format-date
   "Format given date in human readable format."
@@ -253,3 +257,31 @@
 (defn minutes-elapsed [t1 t2]
   (- (minutes-from-midnight t2)
      (minutes-from-midnight t1)))
+
+(defn date-range [start end]
+  (lazy-seq
+   (cons start
+         (when (t/before? start end)
+           (date-range (t/plus start (t/days 1)) end)))))
+
+(def week-days [:monday :tuesday :wednesday :thursday :friday :saturday :sunday])
+
+(defn day-of-week [dt]
+  (case (t/day-of-week dt)
+    1 :monday
+    2 :tuesday
+    3 :wednesday
+    4 :thursday
+    5 :friday
+    6 :saturday
+    7 :sunday))
+
+#?(:cljs
+   (defn js->date-time
+     "Convert a JS Date object to cljs-time. Takes into account that
+the JS date objects for timezones added to UTC (like Finnish UTC+2/+3) the date
+part is the previous day.
+
+For example: midnight 27 Feb 2018 => 26 Feb 2018 22:00"
+     [js]
+     (date-fields->date-time (date-fields js))))
