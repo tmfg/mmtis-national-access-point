@@ -11,53 +11,26 @@
             [compojure.core :refer [routes GET POST DELETE]]
             [ote.geo :as geo]
             [ote.time :as time]
-            [taoensso.timbre :as log])
+            [taoensso.timbre :as log]
+            [specql.op :as op])
   (:import (org.postgis PGgeometry Point Geometry)))
+
+(def route-list-columns  #{::transit/id
+                           ::transit/transport-operator-id
+                           ::transit/name
+                           ::transit/available-from ::transit/available-to
+                           ::transit/departure-point-name ::transit/destination-point-name
+                           ::modification/created ::modification/modified})
 
 (defn get-user-routes [db groups user]
   (let [operators (keep #(transport/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
-        routes
-        [
-         {:id                               1
-          ::t-service/transport-operator-id 1
-          :name                             "Oulu - Hailuoto"
-          :available-from                   "2018-01-01"
-          :available-to                     "2018-10-01"
-          :first-stop                       "Oulu"
-          :last-stop                        "Hailuoto"
-          :modified                         "2018-01-01"
-          :created                          "2018-01-01"}
-         {:id                               2
-          ::t-service/transport-operator-id 1
-          :name                             "Oulu - Liminka"
-          :available-from                   "2018-01-01"
-          :available-to                     "2018-10-01"
-          :first-stop                       "Oulu"
-          :last-stop                        "Liminka"
-          :modified                         "2018-01-01"
-          :created                          "2018-01-01"}
-         {:id                               3
-          ::t-service/transport-operator-id 1
-          :name                             "Liminka - Kokkola"
-          :available-from                   "2018-01-01"
-          :available-to                     "2018-10-01"
-          :first-stop                       "Liminka"
-          :last-stop                        "Kokkola"
-          :modified                         "2018-01-01"
-          :created                          "2018-01-01"}
-         {:id                               4
-          ::t-service/transport-operator-id 3
-          :name                             "Haukipudas - Vantaa"
-          :available-from                   "2018-01-01"
-          :available-to                     "2018-10-01"
-          :first-stop                       "Haukipudas"
-          :last-stop                        "Vantaa"
-          :modified                         "2018-01-01"
-          :created                          "2018-01-01"}]]
+        routes (fetch db ::transit/route route-list-columns
+                      {::transit/transport-operator-id (op/in (map ::t-operator/id operators))})]
+
     (map (fn [{id ::t-operator/id :as operator}]
            {:transport-operator operator
             :routes             (into []
-                                      (filter #(= id (::t-service/transport-operator-id %)))
+                                      (filter #(= id (::transit/transport-operator-id %)))
                                       routes)})
          operators)))
 
