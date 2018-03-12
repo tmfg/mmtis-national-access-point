@@ -3,7 +3,8 @@
   (:require [ote.ui.form :as form]
             [ote.app.controller.route :as rc]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.transit :as transit]))
+            [ote.db.transit :as transit]
+            [cljs-react-material-ui.reagent :as ui]))
 
 (defn basic-info [e! app]
   ;; Initially select the first operator
@@ -27,7 +28,11 @@
          :option-value ::t-operator/id
          :type :selection
          :label "Palveluntuottaja"
-         :options (map :transport-operator
-                       (:transport-operators-with-services app))
+         :options (mapv :transport-operator (:transport-operators-with-services app))
          :show-option ::t-operator/name})]
-      route]]))
+      route]
+
+     [ui/raised-button {:primary  true
+                        :on-click #(e! (rc/->SaveToDb))}
+      "Tallenna Tietokantaan"]
+     ]))
