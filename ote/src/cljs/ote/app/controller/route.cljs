@@ -35,6 +35,9 @@
 
 (defrecord GoToStep [step])
 
+;; Save route to database
+(defrecord SaveToDb [])
+
 (defn rule-dates
   "Evaluate a recurring schedule rule. Returns a sequence of dates."
   [{:keys [from to] :as rule}]
