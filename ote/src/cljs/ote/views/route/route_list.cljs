@@ -1,14 +1,17 @@
 (ns ote.views.route.route-list
   "List own routes"
   (:require
-    [ote.localization :refer [tr tr-key]]
-    [cljs-react-material-ui.reagent :as ui]
-    [ote.app.controller.route.route-list :as route-list]
-    [cljs-react-material-ui.icons :as ic]
-    [ote.views.transport-operator :as t-operator-view]
-    [ote.app.controller.transport-operator :as to]
-    [ote.db.transport-operator :as t-operator]
-    [ote.ui.form-fields :as form-fields]))
+   [ote.localization :refer [tr tr-key]]
+   [cljs-react-material-ui.reagent :as ui]
+   [ote.app.controller.route.route-list :as route-list]
+   [cljs-react-material-ui.icons :as ic]
+   [ote.views.transport-operator :as t-operator-view]
+   [ote.app.controller.transport-operator :as to]
+   [ote.db.transport-operator :as t-operator]
+   [ote.ui.form-fields :as form-fields]
+   [ote.db.transit :as transit]
+   [ote.db.modification :as modification]
+   [ote.time :as time]))
 
 (defn list-routes [e! routes]
   [:div
@@ -18,30 +21,29 @@
                       :display-select-all  false}
      [ui/table-row {:selectable false}
       [ui/table-header-column {:style {:width "3%"}} "Id"]
-      [ui/table-header-column {:style {:width "25%"}} "Nimi"]
-      [ui/table-header-column "Ensimmäinen pysäkki"]
-      [ui/table-header-column "Viimeinen pysäkki"]
+      [ui/table-header-column {:style {:width "20%"}} "Nimi"]
+      [ui/table-header-column "Lähtöpaikka"]
+      [ui/table-header-column "Määränpää"]
       [ui/table-header-column "Voimassa lähtien"]
       [ui/table-header-column "Voimassa asti"]
-      [ui/table-header-column "Muokattu"]
-      [ui/table-header-column "Luotu"]
-      [ui/table-header-column "Toiminnot"]
-      ]]
+      [ui/table-header-column "Luotu / Muokattu"]
+      [ui/table-header-column "Toiminnot"]]]
     [ui/table-body {:display-row-checkbox false}
      (doall
        (map-indexed
-         (fn [i {:keys [id name available-from available-to first-stop last-stop modified created] :as row}]
+        (fn [i {::transit/keys [id name available-from available-to
+                                departure-point-name destination-point-name]
+                ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
            (.log js/console "row: " (clj->js row) " name " name)
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
             [ui/table-row-column {:style {:width "3%"}} id]
-            [ui/table-row-column {:style {:width "25%"}} name]
-            [ui/table-row-column first-stop]
-            [ui/table-row-column last-stop]
-            [ui/table-row-column available-from]
-            [ui/table-row-column available-to]
-            [ui/table-row-column modified]
-            [ui/table-row-column created]
+            [ui/table-row-column {:style {:width "20%"}} name]
+            [ui/table-row-column departure-point-name]
+            [ui/table-row-column destination-point-name]
+            [ui/table-row-column (when available-from (time/format-date available-from))]
+            [ui/table-row-column (when available-to (time/format-date available-to))]
+            [ui/table-row-column (time/format-timestamp-for-ui (or modified created))]
             [ui/table-row-column "poista"]])
          routes))]]])
 

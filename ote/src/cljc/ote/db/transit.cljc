@@ -2,6 +2,7 @@
   "Datamodel for route based transit"
   (:require [clojure.spec.alpha :as s]
             #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            #?(:clj [specql.postgis])
             [specql.rel :as rel]
             [specql.transform :as xf]
             [specql.impl.registry]
