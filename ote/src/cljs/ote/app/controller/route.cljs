@@ -223,7 +223,7 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
-    app)
+    (dissoc app :route))
 
   SaveRouteFailure
   (process-event [{response :response} app]
