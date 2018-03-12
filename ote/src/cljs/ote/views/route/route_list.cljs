@@ -12,43 +12,40 @@
 
 (defn list-routes [e! routes]
   [:div
-  (.log js/console "list-routes routes: " (clj->js routes))
-  [ui/table                                                 ;(stylefy/use-style style-base/front-page-service-table)
-   [ui/table-header {:adjust-for-checkbox false
-                     :display-select-all  false}
-    [ui/table-row {:selectable false}
-     [ui/table-header-column {:style {:width "3%"}} "Id"]
-     [ui/table-header-column {:style {:width "25%"}} "Nimi"]
-     [ui/table-header-column "Ensimmäinen pysäkki"]
-     [ui/table-header-column "Viimeinen pysäkki"]
-     [ui/table-header-column "Voimassa lähtien"]
-     [ui/table-header-column "Voimassa asti"]
-     [ui/table-header-column "Muokattu"]
-     [ui/table-header-column "Luotu"]
-     [ui/table-header-column "Toiminnot"]
-     ]]
-   [ui/table-body {:display-row-checkbox false}
-    (doall
-      (map-indexed
-        (fn [i {:keys [id name available-from available-to first-stop last-stop modified created] :as row}]
-          ^{:key (str "route-" i)}
-          (.log js/console "row: " (clj->js row) " name " name)
-          [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
-           [ui/table-row-column {:style {:width "3%"}} id]
-           [ui/table-row-column {:style {:width "25%"}} name]
-           [ui/table-row-column first-stop]
-           [ui/table-row-column last-stop]
-           [ui/table-row-column available-from]
-           [ui/table-row-column available-to]
-           [ui/table-row-column modified]
-           [ui/table-row-column created]
-           [ui/table-row-column "poista"]])
-        routes))]]])
+   (.log js/console "list-routes routes: " (clj->js routes))
+   [ui/table
+    [ui/table-header {:adjust-for-checkbox false
+                      :display-select-all  false}
+     [ui/table-row {:selectable false}
+      [ui/table-header-column {:style {:width "3%"}} "Id"]
+      [ui/table-header-column {:style {:width "25%"}} "Nimi"]
+      [ui/table-header-column "Ensimmäinen pysäkki"]
+      [ui/table-header-column "Viimeinen pysäkki"]
+      [ui/table-header-column "Voimassa lähtien"]
+      [ui/table-header-column "Voimassa asti"]
+      [ui/table-header-column "Muokattu"]
+      [ui/table-header-column "Luotu"]
+      [ui/table-header-column "Toiminnot"]
+      ]]
+    [ui/table-body {:display-row-checkbox false}
+     (doall
+       (map-indexed
+         (fn [i {:keys [id name available-from available-to first-stop last-stop modified created] :as row}]
+           ^{:key (str "route-" i)}
+           (.log js/console "row: " (clj->js row) " name " name)
+           [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
+            [ui/table-row-column {:style {:width "3%"}} id]
+            [ui/table-row-column {:style {:width "25%"}} name]
+            [ui/table-row-column first-stop]
+            [ui/table-row-column last-stop]
+            [ui/table-row-column available-from]
+            [ui/table-row-column available-to]
+            [ui/table-row-column modified]
+            [ui/table-row-column created]
+            [ui/table-row-column "poista"]])
+         routes))]]])
 
 (defn list-operators [e! app]
-  (.log js/console " my app " (clj->js app))
-  (.log js/console " my operators " (clj->js (into (mapv :transport-operator (:route-list app))
-                                                   [:divider nil])))
   [:div
    [:div {:class "col-md-12"}
     [form-fields/field
@@ -64,10 +61,7 @@
       :options     (into (mapv :transport-operator (:route-list app))
                          [:divider nil])
       :auto-width? true}
-     (:transport-operator app)]]
-
-    (.log js/console " (:routes-vector app) " (clj->js (:routes-vector app)))
-    ])
+     (:transport-operator app)]]])
 
 (defn routes [e! app]
   (e! (route-list/->LoadRoutes))
@@ -87,9 +81,5 @@
 
      [:div.row
       [list-operators e! app]]
-      (when (:routes-vector app)
-        (.log js/console " route list pitäis löytyä")
-        [list-routes e! (:routes-vector app)]
-        )
-
-      ]))
+     (when (:routes-vector app)
+       [list-routes e! (:routes-vector app)])]))

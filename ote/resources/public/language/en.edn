@@ -313,7 +313,7 @@
   :add-new-service-hour "Add a new row"
   :add-new-service-exception "Add a new row"
   :add-new-company "Add a new row"
-  :add-new-route "Lisää uusi merireitti"
+  :add-new-route "Add new route"
   :discard "Cancel"
 
   :next "Next"
