@@ -3,8 +3,11 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [ote.services.transport :as transport]
+            [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.transit :as transit]
+            [ote.db.modification :as modification]
             [compojure.core :refer [routes GET POST DELETE]]))
 
 (defn get-user-routes [db groups user]
@@ -54,13 +57,23 @@
                                       routes)})
          operators)))
 
+(defn save-route [nap-config db user route]
+  (println "************ route " (pr-str route))
+  (let [r (modification/with-modification-fields route ::transit/id user)]
+    (upsert! db ::transit/route r)))
+
 (defn- routes-auth
   "Routes that require authentication"
   [db nap-config]
   (routes
     (POST "/routes/routes" {user :user}
       (http/transit-response
-        (get-user-routes db (:groups user) (:user user))))))
+        (get-user-routes db (:groups user) (:user user))))
+
+    (POST "/routes/new" {form-data :body
+                         user      :user}
+      (http/transit-response
+        (save-route nap-config db user (http/transit-request form-data))))))
 
 (defrecord Routes [nap-config]
   component/Lifecycle
