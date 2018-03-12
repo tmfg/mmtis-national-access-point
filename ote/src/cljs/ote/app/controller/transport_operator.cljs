@@ -33,18 +33,17 @@
 
   SelectOperatorForService
   (process-event [{data :data} app]
-    (let [id  (get data ::t-operator/id)
+    (let [id (get data ::t-operator/id)
           selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
-                            %)
-                         (:transport-operators-with-services app))]
+                                     %)
+                                  (:transport-operators-with-services app))]
       (assoc app
-             :transport-operator (:transport-operator selected-operator)
-             :transport-service-vector (:transport-service-vector selected-operator))))
+        :transport-operator (:transport-operator selected-operator)
+        :transport-service-vector (:transport-service-vector selected-operator))))
 
   SelectOperatorForTransit
   (process-event [{data :data} app]
-    (.log js/console " SelectOperatorForTransit data " (clj->js data))
-    (let [id  (get data ::t-operator/id)
+    (let [id (get data ::t-operator/id)
           selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
                                      %)
                                   (:route-list app))]
