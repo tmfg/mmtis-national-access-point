@@ -28,14 +28,11 @@
             [ote.ui.form-fields :as form-fields]
             [ote.views.admin :as admin]
             [ote.views.operators :as operators]
+            [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
-
-(defn- is-topnav-active [give-page nav-page]
-  (when (= give-page nav-page)
-    "active"))
 
 (defn- is-user-menu-active [app]
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
@@ -96,6 +93,11 @@
      :target-origin {:horizontal "right" :vertical "top"}
      :selection-renderer (constantly name)}
 
+     (when (flags/enabled? :sea-routes)
+      [ui/menu-item {:style {:color "#FFFFFF"}
+                    :primary-text (tr [:common-texts :navigation-route])
+                    :on-click #(do (.preventDefault %)
+                                   (e! (fp-controller/->ChangePage :routes nil)))}])
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-summary])
                     :on-click #(do (.preventDefault %)
@@ -251,7 +253,7 @@
 
 
 
-(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators})
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
@@ -392,6 +394,7 @@
 
                 :operators [operators/operators e! app]
 
+                :routes [route-list/routes e! app]
                 :new-route [route/new-route e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])

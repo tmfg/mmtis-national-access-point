@@ -72,7 +72,7 @@
               {:label (tr [:field-labels :select-transport-operator])
                :name        :select-transport-operator
                :type        :selection
-               :update!     #(e! (to/->SelectOperator %))
+               :update!     #(e! (to/->SelectOperatorForService %))
                :show-option ::t-operator/name
                :options     (mapv :transport-operator (:transport-operators-with-services state))
                :auto-width? true}

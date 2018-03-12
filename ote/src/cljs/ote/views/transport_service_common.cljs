@@ -18,7 +18,8 @@
             [ote.ui.validation :as validation]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
-            [cljs-react-material-ui.icons :as ic]))
+            [cljs-react-material-ui.icons :as ic]
+            [ote.app.controller.flags :as flags]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -98,9 +99,13 @@
         [:div
          [:div {:style {:margin-bottom "5px"}}
           [:b (if (= :schedule sub-type)
-                [:span (str (tr [:form-help :external-interfaces-intro-rae]) " ")
-                 [linkify "https://liikennevirasto.fi/rae" (tr [:form-help :RAE-link-text])
-                  {:target "_blank"}]]
+                [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
+                 [linkify "https://liikennevirasto.fi/rae" (str (tr [:form-help :RAE-link-text]) ". ")
+                  {:target "_blank"}]
+                 (when (flags/enabled? :sea-routes)
+                  (str (tr [:form-help :external-interfaces-intro-2]) " ")
+                    [linkify "/ote/#/routes" (tr [:form-help :SEA-ROUTE-link-text])
+                      {:target "_blank"}])]
                 (tr [:form-help :external-interfaces-intro]))]]
          [:div (tr [:form-help :external-interfaces])]
          [dialog

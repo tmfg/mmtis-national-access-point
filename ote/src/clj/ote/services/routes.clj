@@ -1,0 +1,74 @@
+(ns ote.services.routes
+  "Routes api."
+  (:require [com.stuartsierra.component :as component]
+            [ote.components.http :as http]
+            [ote.services.transport :as transport]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
+            [compojure.core :refer [routes GET POST DELETE]]))
+
+(defn get-user-routes [db groups user]
+  (let [operators (keep #(transport/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
+        routes
+        [
+         {:id                               1
+          ::t-service/transport-operator-id 1
+          :name                             "Oulu - Hailuoto"
+          :available-from                   "2018-01-01"
+          :available-to                     "2018-10-01"
+          :first-stop                       "Oulu"
+          :last-stop                        "Hailuoto"
+          :modified                         "2018-01-01"
+          :created                          "2018-01-01"}
+         {:id                               2
+          ::t-service/transport-operator-id 1
+          :name                             "Oulu - Liminka"
+          :available-from                   "2018-01-01"
+          :available-to                     "2018-10-01"
+          :first-stop                       "Oulu"
+          :last-stop                        "Liminka"
+          :modified                         "2018-01-01"
+          :created                          "2018-01-01"}
+         {:id                               3
+          ::t-service/transport-operator-id 1
+          :name                             "Liminka - Kokkola"
+          :available-from                   "2018-01-01"
+          :available-to                     "2018-10-01"
+          :first-stop                       "Liminka"
+          :last-stop                        "Kokkola"
+          :modified                         "2018-01-01"
+          :created                          "2018-01-01"}
+         {:id                               4
+          ::t-service/transport-operator-id 3
+          :name                             "Haukipudas - Vantaa"
+          :available-from                   "2018-01-01"
+          :available-to                     "2018-10-01"
+          :first-stop                       "Haukipudas"
+          :last-stop                        "Vantaa"
+          :modified                         "2018-01-01"
+          :created                          "2018-01-01"}]]
+    (map (fn [{id ::t-operator/id :as operator}]
+           {:transport-operator operator
+            :routes             (into []
+                                      (filter #(= id (::t-service/transport-operator-id %)))
+                                      routes)})
+         operators)))
+
+(defn- routes-auth
+  "Routes that require authentication"
+  [db nap-config]
+  (routes
+    (POST "/routes/routes" {user :user}
+      (http/transit-response
+        (get-user-routes db (:groups user) (:user user))))))
+
+(defrecord Routes [nap-config]
+  component/Lifecycle
+  (start [{:keys [db http] :as this}]
+    (assoc
+      this ::stop
+           [(http/publish! http (routes-auth db nap-config))]))
+  (stop [{stop ::stop :as this}]
+    (doseq [s stop]
+      (s))
+    (dissoc this ::stop)))
