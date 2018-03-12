@@ -10,7 +10,8 @@
             [ote.db.modification :as modification]
             [compojure.core :refer [routes GET POST DELETE]]
             [ote.geo :as geo]
-            [ote.time :as time])
+            [ote.time :as time]
+            [taoensso.timbre :as log])
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defn get-user-routes [db groups user]
@@ -77,11 +78,11 @@
          ::transit/service-added-dates (map service-date->inst service-added-dates)))
 
 (defn save-route [nap-config db user route]
-  (println "************ route " (pr-str route))
   (let [r (-> route
               (modification/with-modification-fields ::transit/id user)
               (update ::transit/stops #(mapv stop-location-geometry %))
               (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
+    (log/debug "Save route: " r)
     (upsert! db ::transit/route r)))
 
 (defn- routes-auth
