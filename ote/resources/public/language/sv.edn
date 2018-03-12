@@ -280,7 +280,8 @@
   :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Garanterad = behöver inte beställas separat."
   :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Beställes = finns inte garanterat i alla fordon, skäl att beställa i förväg."
 
-  :brokerage? "Om även andra företag bidrar till att producera tjänsten eller om flera företags tjänster förmedlas via tjänsten, ska dessa företags namn och FO-nummer meddelas i den här sektionen. Den här punkten ska bara fyllas i av de instanser som koordinerar tjänsteproduktionen (t.ex. taxiförmedlingscentraler eller en beställande myndighet). Punkten fylls inte i av enskilda företag som anlitas av förmedlingstjänsten."
+  :brokerage? (:md "**Fyll inte i denna punkt i formuläret om du tillhör en förmedlingstjänst. Endast själva förmedlingstjänsten fyller i uppgifterna!** \n"
+                "En förmedlingstjänst **förmedlar mot ersättning** andra aktörers enskilda resor. Förmedlingstjänsten kan dessutom också förmedla det egna företagets resor. En beställningscentral för taxiresor är ett exempel på en förmedlingstjänst. Ett företag som förmedlar en beställning till ett annat företag utan ersättning betraktas inte som en förmedlingstjänst.")
   :brokerage-link "Läs mer om skyldigheterna gällande förmedlingstjänster från och med 1.7.2018."
 
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, Suomi). Området kan även uppges med kartans ritverktyg och därefter namnges tex \"Borgå torg taxistation\"."
