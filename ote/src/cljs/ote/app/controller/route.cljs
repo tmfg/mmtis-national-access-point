@@ -26,13 +26,25 @@
 
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
-
+(defrecord EditServiceCalendarRules [rules])
+(defrecord ClearServiceCalendar [])
 
 ;; Save route as GTFS
 (defrecord SaveAsGTFS [])
 
 (defrecord GoToStep [step])
 
+(defn rule-dates
+  "Evaluate a recurring schedule rule. Returns a sequence of dates."
+  [{:keys [from to] :as rule}]
+  (let [week-days (into #{}
+                        (keep #(when (get rule %) %))
+                        time/week-days)]
+    (when (and from to (not (empty? week-days)))
+      (for [d (time/date-range (time/js->date-time from)
+                               (time/js->date-time to))
+            :when (week-days (time/day-of-week d))]
+        (time/date-fields d)))))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -91,14 +103,40 @@
 
   ToggleDate
   (process-event [{date :date} app]
-    (update-in app [:route :dates]
-               (fn [dates]
-                 (let [date (time/date-fields date)
-                       selected-dates (or dates #{})]
-                   (if (selected-dates date)
-                     (disj selected-dates date)
-                     (conj selected-dates date))))))
+    (update-in app [:route :service-calendar]
+               (fn [{:keys [added-dates removed-dates rules] :as service-calendar}]
+                 (let [added-dates (or added-dates #{})
+                       removed-dates (or removed-dates #{})
+                       date (time/date-fields date)]
+                   (cond
+                     ;; This date is in added dates, remove it
+                     (added-dates date)
+                     (assoc service-calendar :added-dates (disj added-dates date))
 
+                     ;; This date is in removed dates, remove it
+                     (removed-dates date)
+                     (assoc service-calendar :removed-dates (disj removed-dates date))
+
+                     ;; This date matches a rule, add it to removed dates
+                     (some #(some (partial = date) (rule-dates %)) (:rules rules))
+                     (assoc service-calendar :removed-dates (conj removed-dates date))
+
+                     ;; Otherwise add this to added dates
+                     :default
+                     (assoc service-calendar :added-dates (conj added-dates date)))))))
+
+  EditServiceCalendarRules
+  (process-event [{rules :rules} app]
+    (let [rule-dates (into #{}
+                           (mapcat rule-dates)
+                           (:rules rules))]
+      (-> app
+          (assoc-in [:route :service-calendar :rules] rules)
+          (assoc-in [:route :service-calendar :rule-dates] rule-dates))))
+
+  ClearServiceCalendar
+  (process-event [_ app]
+    (assoc-in app [:route :service-calendar] {}))
 
   GoToStep
   (process-event [{step :step} app]
