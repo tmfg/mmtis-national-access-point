@@ -5,24 +5,17 @@
             [ote.ui.leaflet :as leaflet]
             [ote.app.controller.route :as rc]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.service-calendar :as service-calendar]
             [ote.time :as time]
             [ote.ui.form :as form]
 
             ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
-            [ote.views.route.times :as route-times]))
+            [ote.views.route.times :as route-times]
+            [ote.views.route.service-calendar :as route-service-calendar]))
 
 
 
-(defn route-service-calendar [e! {route :route :as route}]
-  [service-calendar/service-calendar
-   {:selected-date? (fn [d]
-                      (let [selected (or (:dates route) #{})
-                            df (time/date-fields d)]
-                        (selected df)))
-    :on-select #(e! (rc/->ToggleDate %))}])
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
@@ -46,7 +39,7 @@
     :validate rc/valid-stop-times?}
    {:name :calendar
     :label "Kalenteri"
-    :component route-service-calendar}
+    :component route-service-calendar/service-calendar}
    {:name :save
     :label "Reitin tallennus"
     :component route-save}])

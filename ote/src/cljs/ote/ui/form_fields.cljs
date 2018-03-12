@@ -713,7 +713,7 @@
 (defn- checkbox-container [update! table? label warning error style checked?]
   [:div (when error (stylefy/use-style style-base/required-element))
    [ui/checkbox {:label    (when-not table? label)
-                 :checked  checked?
+                 :checked  (boolean checked?)
                  :on-check #(update! (not checked?))
                  :style    style}]
    (when error
