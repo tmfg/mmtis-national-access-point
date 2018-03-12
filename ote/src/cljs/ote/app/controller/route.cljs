@@ -6,7 +6,8 @@
             [clojure.string :as str]
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.db.transit :as transit]
-            [ote.ui.form :as form]))
+            [ote.ui.form :as form]
+            [ote.app.routes :as routes]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -214,7 +215,6 @@
     (let [route (-> app :route form/without-form-metadata
                     (update ::transit/service-calendars #(mapv form/without-form-metadata %))
                     (dissoc :step :stops :new-start-time))]
-      (.log js/console "ROUTE: " (pr-str route))
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)}))
@@ -222,13 +222,14 @@
 
   SaveRouteResponse
   (process-event [{response :response} app]
-    (.log js/console "JEEJEE " (pr-str response))
+    (routes/navigate! :routes)
     app)
 
   SaveRouteFailure
   (process-event [{response :response} app]
-    (.log js/console "NONONO" (pr-str response))
-    app))
+    (.error js/console "Save route failed:" (pr-str response))
+    (assoc app
+           :flash-message-error "Reitin tallennus epäonnistui")))
 
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid
