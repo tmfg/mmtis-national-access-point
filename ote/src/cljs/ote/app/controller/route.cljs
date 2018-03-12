@@ -4,7 +4,8 @@
             [ote.communication :as comm]
             [ote.time :as time]
             [clojure.string :as str]
-            [ote.app.controller.route.gtfs :as route-gtfs]))
+            [ote.app.controller.route.gtfs :as route-gtfs]
+            [ote.db.transit :as transit]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -195,9 +196,9 @@
 
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
-  [{:keys [name transport-operator]}]
+  [{::transit/keys [name transport-operator-id]}]
   (and (not (str/blank? name))
-       transport-operator))
+       transport-operator-id))
 
 (defn valid-stop-times?
   "Check if given route's stop times are valid.
