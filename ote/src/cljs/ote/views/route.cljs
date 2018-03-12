@@ -11,7 +11,7 @@
             ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
-            [ote.views.route.times :as route-times]
+            [ote.views.route.trips :as route-trips]
             [ote.views.route.service-calendar :as route-service-calendar]))
 
 
@@ -35,8 +35,8 @@
     :validate rc/valid-stop-sequence?}
    {:name :times
     :label "Vuorot"
-    :component route-times/times
-    :validate rc/valid-stop-times?}
+    :component route-trips/trips
+    :validate rc/valid-trips?}
    {:name :calendar
     :label "Kalenteri"
     :component route-service-calendar/service-calendar}
@@ -92,8 +92,13 @@
 
 (defn new-route [e! _]
   (e! (rc/->LoadStops))
+  (e! (rc/->InitRoute))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
-      [route-wizard
-       e! wizard-steps
-       app])))
+      [:span
+       [route-wizard
+        e! wizard-steps
+        app]
+       [ui/raised-button {:primary  true
+                          :on-click #(e! (rc/->SaveToDb))}
+        "Tallenna Tietokantaan"]])))

@@ -108,6 +108,10 @@
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
 
+(defn date-fields->date [{::keys [year date month]}]
+  #?(:clj (java.time.LocalDate/of year month date)
+     :cljs (goog.date.Date. year month date)))
+
 (defn format-date
   "Format given date in human readable format."
   [date]

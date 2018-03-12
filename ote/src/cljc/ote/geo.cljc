@@ -7,7 +7,8 @@
   (:require [clojure.spec.alpha :as s])
   #?(:clj
      (:import (com.vividsolutions.jts.geom MultiPolygon Polygon Point LineString)
-              (org.postgis PGgeometry))))
+              (org.postgis
+               PGgeometry))))
 
 
 ;;; clojure.spec definitions for geometry data

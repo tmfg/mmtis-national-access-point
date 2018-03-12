@@ -4,11 +4,17 @@
             [ote.communication :as comm]
             [ote.time :as time]
             [clojure.string :as str]
-            [ote.app.controller.route.gtfs :as route-gtfs]))
+            [ote.app.controller.route.gtfs :as route-gtfs]
+            [ote.db.transit :as transit]
+            [ote.ui.form :as form]
+            [ote.app.routes :as routes]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
+
+;; Initialize editing a new route
+(defrecord InitRoute [])
 
 ;; Edit route basic info
 (defrecord EditRoute [form-data])
@@ -21,8 +27,8 @@
 ;; Edit times
 (defrecord InitRouteTimes []) ; initialize route times based on stop sequence
 (defrecord NewStartTime [time])
-(defrecord AddRouteTime [])
-(defrecord EditStopTime [time-idx stop-idx form-data])
+(defrecord AddTrip [])
+(defrecord EditStopTime [trip-idx stop-idx form-data])
 
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
@@ -34,15 +40,20 @@
 
 (defrecord GoToStep [step])
 
+;; Save route to database
+(defrecord SaveToDb [])
+(defrecord SaveRouteResponse [response])
+(defrecord SaveRouteFailure [response])
+
 (defn rule-dates
   "Evaluate a recurring schedule rule. Returns a sequence of dates."
-  [{:keys [from to] :as rule}]
+  [{::transit/keys [from-date to-date] :as rule}]
   (let [week-days (into #{}
-                        (keep #(when (get rule %) %))
+                        (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
                         time/week-days)]
-    (when (and from to (not (empty? week-days)))
-      (for [d (time/date-range (time/js->date-time from)
-                               (time/js->date-time to))
+    (when (and from-date to-date (not (empty? week-days)))
+      (for [d (time/date-range (time/js->date-time from-date)
+                               (time/js->date-time to-date))
             :when (week-days (time/day-of-week d))]
         (time/date-fields d)))))
 
@@ -59,6 +70,14 @@
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
+  InitRoute
+  (process-event [_ app]
+    (update app :route assoc
+            ::transit/stops []
+            ::transit/trips []
+            ::transit/service-calendars []
+            ::transit/route-type :ferry))
+
   EditRoute
   (process-event [{form-data :form-data} app]
     (update app :route merge form-data))
@@ -67,72 +86,73 @@
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
     (-> app
-        (update-in [:route :stop-sequence]
+        (update-in [:route ::transit/stops]
                    (fn [stop-sequence]
                      (conj (or stop-sequence [])
                            (merge (into {}
-                                        (map #(update % 0 keyword))
+                                        (map #(update % 0 (partial keyword "ote.db.transit")))
                                         (js->clj (aget feature "properties")))
-                                  {:coordinates (vec (aget feature "geometry" "coordinates"))}))))
-        (update-in [:route :selected-port-ids]
-                   (fn [port-ids]
-                     (conj (or port-ids #{})
-                           (aget feature "properties" "port-id"))))))
+                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
-    (update-in app [:route :stop-sequence idx]
-               (fn [{old-arrival :arrival-time
-                     old-departure :departure-time
+    (update-in app [:route ::transit/stops idx]
+               (fn [{old-arrival ::transit/arrival-time
+                     old-departure ::transit/departure-time
                      :as old-stop}]
                  (let [new-stop (merge old-stop stop)]
                    ;; If old departure time is same as arrival and arrival
                    ;; was changed, also change departure time.
                    (if (and (= old-departure old-arrival)
-                            (contains? stop :arrival-time))
+                            (contains? stop ::transit/arrival-time))
                      (assoc new-stop
-                            :departure-time (:arrival-time new-stop))
+                            ::transit/departure-time (::transit/arrival-time new-stop))
                      new-stop)))))
 
   DeleteStop
   (process-event [{idx :idx} app]
-    (update-in app [:route :stop-sequence]
+    (update-in app [:route ::transit/stops]
                (fn [stops]
                  (into (subvec stops 0 idx)
                        (subvec stops (inc idx))))))
 
   ToggleDate
   (process-event [{date :date} app]
-    (update-in app [:route :service-calendar]
-               (fn [{:keys [added-dates removed-dates rules] :as service-calendar}]
-                 (let [added-dates (or added-dates #{})
-                       removed-dates (or removed-dates #{})
+    (update-in app [:route ::transit/service-calendars 0]
+               (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
+                     :as service-calendar}]
+                 (let [service-added-dates (or service-added-dates #{})
+                       service-removed-dates (or service-removed-dates #{})
                        date (time/date-fields date)]
                    (cond
                      ;; This date is in added dates, remove it
-                     (added-dates date)
-                     (assoc service-calendar :added-dates (disj added-dates date))
+                     (service-added-dates date)
+                     (assoc service-calendar ::transit/service-added-dates
+                            (disj service-added-dates date))
 
                      ;; This date is in removed dates, remove it
-                     (removed-dates date)
-                     (assoc service-calendar :removed-dates (disj removed-dates date))
+                     (service-removed-dates date)
+                     (assoc service-calendar ::transit/service-removed-dates
+                            (disj service-removed-dates date))
 
                      ;; This date matches a rule, add it to removed dates
-                     (some #(some (partial = date) (rule-dates %)) (:rules rules))
-                     (assoc service-calendar :removed-dates (conj removed-dates date))
+                     (some #(some (partial = date) (rule-dates %)) service-rules)
+                     (assoc service-calendar ::transit/service-removed-dates
+                            (conj service-removed-dates date))
 
                      ;; Otherwise add this to added dates
                      :default
-                     (assoc service-calendar :added-dates (conj added-dates date)))))))
+                     (assoc service-calendar ::transit/service-added-dates
+                            (conj service-added-dates date)))))))
 
   EditServiceCalendarRules
   (process-event [{rules :rules} app]
     (let [rule-dates (into #{}
                            (mapcat rule-dates)
-                           (:rules rules))]
+                           (::transit/service-rules rules))]
       (-> app
-          (assoc-in [:route :service-calendar :rules] rules)
-          (assoc-in [:route :service-calendar :rule-dates] rule-dates))))
+          (update-in [:route ::transit/service-calendars 0] merge rules)
+          (assoc-in [:route ::transit/service-calendars 0 :rule-dates] rule-dates))))
 
   ClearServiceCalendar
   (process-event [_ app]
@@ -145,17 +165,23 @@
 
   InitRouteTimes
   (process-event [_ app]
-    (assoc-in app [:route :times]
-              [{:stops (get-in app [:route :stop-sequence])}]))
+    (assoc-in app [:route ::transit/trips]
+              [{::transit/stop-times (vec (map-indexed
+                                           (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
+                                             {::transit/stop-idx stop-idx
+                                              ::transit/arrival-time arrival-time
+                                              ::transit/departure-time departure-time})
+                                           (get-in app [:route ::transit/stops])))}]))
 
   NewStartTime
   (process-event [{time :time} app]
     (assoc-in app [:route :new-start-time] time))
 
-  AddRouteTime
+  AddTrip
   (process-event [_ {route :route :as app}]
-    (let [time (last (:times route))
-          start-time (time/minutes-from-midnight (:departure-time (first (:stops time))))
+    (let [trip (last (::transit/trips route))
+          start-time (time/minutes-from-midnight (::transit/departure-time
+                                                  (first (::transit/stop-times trip))))
           new-start-time (time/minutes-from-midnight (:new-start-time route))
           time-from-new-start #(when %
                                  (-> %
@@ -165,52 +191,72 @@
                                      time/minutes-from-midnight->time))
           update-times-from-new-start
           #(-> %
-               (update :arrival-time time-from-new-start)
-               (update :departure-time time-from-new-start))]
+               (update ::transit/arrival-time time-from-new-start)
+               (update ::transit/departure-time time-from-new-start))]
       (-> app
           (assoc-in [:route :new-start-time] nil)
-          (update-in [:route :times]
+          (update-in [:route ::transit/trips]
                      (fn [times]
                        (conj (or times [])
-                             {:stops (mapv update-times-from-new-start
-                                           (:stops time))}))))))
+                             {::transit/stop-times (mapv update-times-from-new-start
+                                                         (::transit/stop-times trip))}))))))
 
   EditStopTime
-  (process-event [{:keys [time-idx stop-idx form-data]} app]
-
-    (update-in app [:route :times time-idx :stops stop-idx] merge form-data))
+  (process-event [{:keys [trip-idx stop-idx form-data]} app]
+    (update-in app [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data))
 
   SaveAsGTFS
   (process-event [_ {route :route :as app}]
     (route-gtfs/save-gtfs route (str (:name route) ".zip"))
-    app))
+    app)
+
+  SaveToDb
+  (process-event [_ app]
+    (let [route (-> app :route form/without-form-metadata
+                    (update ::transit/service-calendars #(mapv form/without-form-metadata %))
+                    (dissoc :step :stops :new-start-time))]
+      (comm/post! "routes/new" route
+                  {:on-success (tuck/send-async! ->SaveRouteResponse)
+                   :on-failure (tuck/send-async! ->SaveRouteFailure)}))
+    app)
+
+  SaveRouteResponse
+  (process-event [{response :response} app]
+    (routes/navigate! :routes)
+    app)
+
+  SaveRouteFailure
+  (process-event [{response :response} app]
+    (.error js/console "Save route failed:" (pr-str response))
+    (assoc app
+           :flash-message-error "Reitin tallennus epäonnistui")))
 
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid
   if it is not empty and the first and last stops have a departure and arrival time respectively."
-  [{:keys [stop-sequence] :as route}]
-  (and (not (empty? stop-sequence))
-       (:departure-time (first stop-sequence))
-       (:arrival-time (last stop-sequence))))
+  [{::transit/keys [stops] :as route}]
+  (and (not (empty? stops))
+       (::transit/departure-time (first stops))
+       (::transit/arrival-time (last stops))))
 
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
-  [{:keys [name transport-operator]}]
+  [{::transit/keys [name transport-operator-id]}]
   (and (not (str/blank? name))
-       transport-operator))
+       transport-operator-id))
 
-(defn valid-stop-times?
-  "Check if given route's stop times are valid.
+(defn valid-trips?
+  "Check if given route's trip stop times are valid.
   The first stop must have a departure time and the last stop must
   have an arrival time. All other stops must have both the arrival
   and the departure time."
-  [{:keys [times]}]
-  (every? (fn [{:keys [stops]}]
+  [{::transit/keys [trips]}]
+  (every? (fn [{stops ::transit/stop-times}]
             (let [first-stop (first stops)
                   last-stop (last stops)
                   other-stops (rest (butlast stops))]
-              (and (time/valid-time? (:departure-time first-stop))
-                   (time/valid-time? (:arrival-time last-stop))
-                   (every? #(and (time/valid-time? (:departure-time %))
-                                 (time/valid-time? (:arrival-time %))) other-stops))))
-          times))
+              (and (time/valid-time? (::transit/departure-time first-stop))
+                   (time/valid-time? (::transit/arrival-time last-stop))
+                   (every? #(and (time/valid-time? (::transit/departure-time %))
+                                 (time/valid-time? (::transit/arrival-time %))) other-stops))))
+          trips))
