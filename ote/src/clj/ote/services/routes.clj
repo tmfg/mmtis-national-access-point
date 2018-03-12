@@ -9,7 +9,8 @@
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [compojure.core :refer [routes GET POST DELETE]]
-            [ote.geo :as geo])
+            [ote.geo :as geo]
+            [ote.time :as time])
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defn get-user-routes [db groups user]
@@ -59,16 +60,28 @@
                                       routes)})
          operators)))
 
+(defn- service-date->inst [date]
+  (-> date
+      time/date-fields->date
+      (.atStartOfDay (java.time.ZoneId/of "Europe/Helsinki"))
+      .toInstant
+      java.util.Date/from))
+
 (defn- stop-location-geometry [{[lat lng] ::transit/location :as stop}]
-  (println "location: " (::transit/location stop) ": lat: " lat ", lng: "lng)
   (assoc stop
          ::transit/location (PGgeometry. (Point. lat lng))))
+
+(defn- service-calendar-dates [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
+  (assoc cal
+         ::transit/service-removed-dates (map service-date->inst service-removed-dates)
+         ::transit/service-added-dates (map service-date->inst service-added-dates)))
 
 (defn save-route [nap-config db user route]
   (println "************ route " (pr-str route))
   (let [r (-> route
               (modification/with-modification-fields ::transit/id user)
-              (update ::transit/stops #(mapv stop-location-geometry %)))]
+              (update ::transit/stops #(mapv stop-location-geometry %))
+              (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
     (upsert! db ::transit/route r)))
 
 (defn- routes-auth
