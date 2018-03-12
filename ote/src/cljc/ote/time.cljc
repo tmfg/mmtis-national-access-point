@@ -134,7 +134,8 @@
 
 #?(:clj
    (defmethod specql-composite/stringify-value "time" [_ time]
-     (format-time time)))
+     (when time
+       (format-time time))))
 
 ;; Define a record that models a Postgres interval type on the frontend
 ;; Units less than second are expressed as fractional seconds (as in postgres)
