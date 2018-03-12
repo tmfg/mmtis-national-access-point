@@ -29,5 +29,21 @@
          :type :selection
          :label "Palveluntuottaja"
          :options (mapv :transport-operator (:transport-operators-with-services app))
-         :show-option ::t-operator/name})]
+         :show-option ::t-operator/name}
+
+        ;; Departure and destination
+        {:name ::transit/departure-point-name
+         :type :string
+         :label "Lähtöpaikka"}
+        {:name ::transit/destination-point-name
+         :type :string
+         :label "Määränpää"}
+
+        ;; Availability of this route
+        {:name ::transit/available-from
+         :type :date-picker
+         :label "Voimassa alkaen"}
+        {:name ::transit/available-to
+         :type :date-picker
+         :label "Voimassa asti"})]
       route]]))
