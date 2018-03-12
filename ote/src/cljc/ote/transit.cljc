@@ -1,7 +1,8 @@
 (ns ote.transit
   "Application specific extensions to transit"
   (:require [cognitect.transit :as t]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.geo :as geo]))
 
 (def write-options
   {:handlers
@@ -12,7 +13,11 @@
     #?@(:clj
         [org.postgresql.util.PGInterval
          (t/write-handler (constantly "interval")
-                          time/pginterval->interval)])}})
+                          time/pginterval->interval)
+
+         org.postgis.PGgeometry
+         (t/write-handler (constantly "geo")
+                          geo/to-clj)])}})
 
 (def read-options
   {:handlers {"time"

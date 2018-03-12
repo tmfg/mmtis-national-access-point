@@ -5,7 +5,8 @@
             [ote.ui.form-fields :as form-fields]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.db.transit :as transit]))
 
 
 (def stop-marker-style
@@ -35,9 +36,9 @@
       [leaflet/GeoJSON {:data stops
                         :style {:color "green"}
                         :pointToLayer (partial stop-marker e!)}])
-    (when-let [stop-sequence (seq (:stop-sequence route))]
+    (when-let [stop-sequence (seq (::transit/stops route))]
       [leaflet/Polyline
-       {:positions (clj->js (mapv (comp flip-coords :coordinates) stop-sequence))
+       {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
         :color "red"}])]])
 
 (defn- route-stop-times [e! stop-sequence]
@@ -52,23 +53,23 @@
     [:tbody {:style {:text-align "left"}}
      (doall
       (map-indexed
-       (fn [i {:keys [port-id port-name arrival-time departure-time]}]
-         ^{:key port-id}
+       (fn [i {::transit/keys [code name arrival-time departure-time]}]
+         ^{:key code}
          [:tr {:style {:border-bottom "solid 1px black"}}
-          [:td port-name]
+          [:td name]
           [:td {:style {:text-align "center"}}
            (if (zero? i)
              "-"
              [form-fields/field
               {:type :time
-               :update! #(e! (rc/->UpdateStop i {:arrival-time %}))}
+               :update! #(e! (rc/->UpdateStop i {::transit/arrival-time %}))}
               arrival-time])]
           [:td {:style {:text-align "center"}}
            (if (= (inc i) (count stop-sequence))
                  "-"
                  [form-fields/field
                   {:type :time
-                   :update! #(e! (rc/->UpdateStop i {:departure-time %}))}
+                   :update! #(e! (rc/->UpdateStop i {::transit/departure-time %}))}
                   departure-time])]
           [:td [ui/icon-button {:on-click #(e! (rc/->DeleteStop i))}
                 [ic/action-delete]]]])
@@ -82,4 +83,4 @@
 (defn stop-sequence [e! {route :route :as app}]
   [:div {:style {:display "flex" :flex-direction "row"}}
    [route-map e! route]
-   [route-stop-times e! (:stop-sequence route)]])
+   [route-stop-times e! (::transit/stops route)]])

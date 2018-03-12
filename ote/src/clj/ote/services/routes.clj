@@ -8,7 +8,9 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
-            [compojure.core :refer [routes GET POST DELETE]]))
+            [compojure.core :refer [routes GET POST DELETE]]
+            [ote.geo :as geo])
+  (:import (org.postgis PGgeometry Point Geometry)))
 
 (defn get-user-routes [db groups user]
   (let [operators (keep #(transport/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
@@ -57,9 +59,16 @@
                                       routes)})
          operators)))
 
+(defn- stop-location-geometry [{[lat lng] ::transit/location :as stop}]
+  (println "location: " (::transit/location stop) ": lat: " lat ", lng: "lng)
+  (assoc stop
+         ::transit/location (PGgeometry. (Point. lat lng))))
+
 (defn save-route [nap-config db user route]
   (println "************ route " (pr-str route))
-  (let [r (modification/with-modification-fields route ::transit/id user)]
+  (let [r (-> route
+              (modification/with-modification-fields ::transit/id user)
+              (update ::transit/stops #(mapv stop-location-geometry %)))]
     (upsert! db ::transit/route r)))
 
 (defn- routes-auth
@@ -73,7 +82,7 @@
     (POST "/routes/new" {form-data :body
                          user      :user}
       (http/transit-response
-        (save-route nap-config db user (http/transit-request form-data))))))
+       (save-route nap-config db user (http/transit-request form-data))))))
 
 (defrecord Routes [nap-config]
   component/Lifecycle

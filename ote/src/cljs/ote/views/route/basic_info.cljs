@@ -30,9 +30,4 @@
          :label "Palveluntuottaja"
          :options (mapv :transport-operator (:transport-operators-with-services app))
          :show-option ::t-operator/name})]
-      route]
-
-     [ui/raised-button {:primary  true
-                        :on-click #(e! (rc/->SaveToDb))}
-      "Tallenna Tietokantaan"]
-     ]))
+      route]]))
