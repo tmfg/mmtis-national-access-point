@@ -12,7 +12,8 @@
             [ote.geo :as geo]
             [ote.time :as time]
             [taoensso.timbre :as log]
-            [specql.op :as op])
+            [specql.op :as op]
+            [ote.authorization :as authorization])
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (def route-list-columns  #{::transit/id
@@ -51,12 +52,15 @@
          ::transit/service-added-dates (map service-date->inst service-added-dates)))
 
 (defn save-route [nap-config db user route]
-  (let [r (-> route
-              (modification/with-modification-fields ::transit/id user)
-              (update ::transit/stops #(mapv stop-location-geometry %))
-              (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
-    (log/debug "Save route: " r)
-    (upsert! db ::transit/route r)))
+  (authorization/with-transport-operator-check
+    db user (::transit/transport-operator-id route)
+    (fn []
+      (let [r (-> route
+                  (modification/with-modification-fields ::transit/id user)
+                  (update ::transit/stops #(mapv stop-location-geometry %))
+                  (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
+        (log/debug "Save route: " r)
+        (upsert! db ::transit/route r)))))
 
 (defn- routes-auth
   "Routes that require authentication"
