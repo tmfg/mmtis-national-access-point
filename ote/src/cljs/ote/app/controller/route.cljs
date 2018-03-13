@@ -42,6 +42,7 @@
 
 ;; Save route to database
 (defrecord SaveToDb [])
+(defrecord CancelRoute [])
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
 
@@ -229,7 +230,12 @@
   (process-event [{response :response} app]
     (.error js/console "Save route failed:" (pr-str response))
     (assoc app
-           :flash-message-error "Reitin tallennus epäonnistui")))
+      :flash-message-error "Reitin tallennus epäonnistui"))
+
+  CancelRoute
+  (process-event [_ app]
+    (routes/navigate! :routes)
+    (dissoc app :route)))
 
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid
@@ -260,3 +266,13 @@
                    (every? #(and (time/valid-time? (::transit/departure-time %))
                                  (time/valid-time? (::transit/arrival-time %))) other-stops))))
           trips))
+
+(defn validate-all-steps
+  "To be able to select step in wizard that is valid for the form, we call to all wizard-step validate functions.
+  Route is the complete form object for sea-routes, step-name is clicked wizard step and wizard-step contains all steps."
+  [route step-name wizard-steps]
+  (every? (fn [{validate :validate}]
+            (if validate
+              (validate route)
+              true))
+            (take-while #(not= step-name (:name %)) wizard-steps)))
