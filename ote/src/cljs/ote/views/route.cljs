@@ -70,11 +70,12 @@
      [ui/stepper {:active-step i
                   :connector (r/as-element [ic/navigation-arrow-forward])}
       (doall
-        (for [{label :label current-step :name} wizard-steps]
+        (for [{label :label current-step :name} wizard-steps
+              :let [prev-valid? (rc/validate-previous-steps route current-step wizard-steps)]]
           ^{:key label}
-          [ui/step (when (rc/validate-all-steps route current-step wizard-steps)
+          [ui/step (when prev-valid?
                      (stylefy/use-style style-route/stepper))
-           [ui/step-label {:on-click (when (rc/validate-all-steps route current-step wizard-steps)
+           [ui/step-label {:on-click (when prev-valid?
                                        #(e! (rc/->GoToStep current-step)))}
             [:span label]]]))]
 

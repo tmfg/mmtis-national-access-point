@@ -267,9 +267,8 @@
                                  (time/valid-time? (::transit/arrival-time %))) other-stops))))
           trips))
 
-(defn validate-all-steps
-  "To be able to select step in wizard that is valid for the form, we call to all wizard-step validate functions.
-  Route is the complete form object for sea-routes, step-name is clicked wizard step and wizard-step contains all steps."
+(defn validate-previous-steps
+  "To be able to select a step in wizard that is valid, we call all previous validate functions."
   [route step-name wizard-steps]
   (every? (fn [{validate :validate}]
             (if validate
