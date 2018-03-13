@@ -70,9 +70,12 @@
   SetDrawControl
   (process-event [{show? :show? primary? :primary?} app]
     (if (nil? primary?)
-      (assoc-in (update-in app [:place-search] dissoc :primary?) [:place-search :show?] show?)
-      (assoc-in (assoc-in app [:place-search :primary?] primary?) [:place-search :show?] show?)))
-
+      (-> app
+          (assoc-in [:place-search :show?] show?)
+          (update-in [:place-search] dissoc :primary?))
+      (-> app
+          (assoc-in [:place-search :primary?] primary?)
+          (assoc-in [:place-search :show?] show?))))
 
   PlaceCompletionsResponse
   (process-event [{:keys [completions name primary?]} app ]

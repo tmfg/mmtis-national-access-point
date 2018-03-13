@@ -108,7 +108,7 @@
       :component-did-update leaflet/update-bounds-from-layers
 
       :component-will-receive-props (fn [this [_ _ _ show?]]
-                                      (let [m (aget this "refs" "leaflet" "leafletElement")]
+                                      (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
                                         (if show?
                                           (.addControl m @dc)
                                           (.removeControl m @dc))))
