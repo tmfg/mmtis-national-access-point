@@ -157,7 +157,7 @@
 
   ClearServiceCalendar
   (process-event [_ app]
-    (assoc-in app [:route :service-calendar] {}))
+    (assoc-in app [:route ::transit/service-calendars 0] {}))
 
   GoToStep
   (process-event [{step :step} app]
@@ -224,7 +224,7 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
-    app)
+    (dissoc app :route))
 
   SaveRouteFailure
   (process-event [{response :response} app]
