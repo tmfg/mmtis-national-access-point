@@ -18,6 +18,7 @@
             [ote.services.operators :as operators-service]
 
             [ote.integration.export.geojson :as export-geojson]
+            [ote.integration.export.gtfs :as export-gtfs]
 
             [ote.tasks.company :as tasks-company]
 
@@ -56,8 +57,9 @@
                     (service-search/->ServiceSearch)
                     [:http :db])
 
-   ;; Integration: export GeoJSON
+   ;; Integration: export GeoJSON and GTFS
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
+   :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
