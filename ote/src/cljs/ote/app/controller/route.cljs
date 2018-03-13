@@ -211,7 +211,15 @@
                      (fn [times]
                        (conj (or times [])
                              {::transit/stop-times (mapv update-times-from-new-start
-                                                         (::transit/stop-times trip))}))))))
+                                                         (::transit/stop-times trip))})))
+          (update-in [:route ::transit/service-calendars]
+                     (fn [calendars]
+                       (let [trip-idx (count (::transit/trips route))
+                             prev-calendar (get-in calendars [(dec trip-idx)] nil)
+                             calendar (get-in calendars [trip-idx] nil)]
+                         (if (and (not calendar) prev-calendar)
+                           (assoc calendars trip-idx prev-calendar)
+                           calendars)))))))
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
