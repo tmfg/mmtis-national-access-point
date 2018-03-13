@@ -10,7 +10,8 @@
             [ring.util.io :as ring-io]
             [ote.util.zip :refer [write-zip]]
             [ote.db.transport-operator :as t-operator]
-            [ote.gtfs.transform :as gtfs-transform]))
+            [ote.gtfs.transform :as gtfs-transform]
+            [taoensso.timbre :as log]))
 
 (declare export-gtfs)
 
@@ -33,7 +34,7 @@
   (let [now (java.util.Date.)]
     (fetch db ::transit/route
            #{::transit/id ::transit/name ::transit/stops ::transit/trips
-             ::transit/service-calendars}
+             ::transit/route-type ::transit/service-calendars}
            {::transit/transport-operator-id transport-operator-id
             ::transit/available-from (op/or op/null?
                                             (op/< now))
@@ -42,8 +43,11 @@
 
 (defn routes-gtfs-zip
   [transport-operator routes output-stream]
-  (write-zip (gtfs-transform/routes-gtfs transport-operator routes)
-             output-stream))
+  (try
+    (write-zip (gtfs-transform/routes-gtfs transport-operator routes)
+               output-stream)
+    (catch Exception e
+      (log/warn "Exception while generating GTFS zip" e))))
 
 (def ^:private transport-operator-columns #{::t-operator/id ::t-operator/name
                                             ::t-operator/homepage ::t-operator/phone
