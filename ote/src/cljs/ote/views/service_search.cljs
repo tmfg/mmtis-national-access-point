@@ -98,7 +98,9 @@
               [:td {:style {:width "20%" :font-size "14px"}}
                (common-ui/linkify
                  (::t-service/url external-interface)
-                 (parse-content-value data-content)
+                 (if (nil? data-content)
+                   (::t-service/url external-interface)
+                   (parse-content-value data-content))
                  {:target "_blank"})]
               [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
               [:td {:style {:width "10%" :font-size "14px"}} license]
