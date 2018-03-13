@@ -31,9 +31,11 @@
 (defrecord EditStopTime [trip-idx stop-idx form-data])
 
 ;; Event to set service calendar
-(defrecord ToggleDate [date])
-(defrecord EditServiceCalendarRules [rules])
-(defrecord ClearServiceCalendar [])
+(defrecord EditServiceCalendar [trip-idx])
+(defrecord CloseServiceCalendar [])
+(defrecord ToggleDate [date trip-idx])
+(defrecord EditServiceCalendarRules [rules trip-idx])
+(defrecord ClearServiceCalendar [trip-idx])
 
 ;; Save route as GTFS
 (defrecord SaveAsGTFS [])
@@ -116,9 +118,18 @@
                  (into (subvec stops 0 idx)
                        (subvec stops (inc idx))))))
 
+
+  EditServiceCalendar
+  (process-event [{trip-idx :trip-idx} app]
+    (assoc-in app [:route :edit-service-calendar] trip-idx))
+
+  CloseServiceCalendar
+  (process-event [_ app]
+    (update-in app [:route] dissoc :edit-service-calendar))
+
   ToggleDate
-  (process-event [{date :date} app]
-    (update-in app [:route ::transit/service-calendars 0]
+  (process-event [{date :date trip-idx :trip-idx} app]
+    (update-in app [:route ::transit/service-calendars trip-idx]
                (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
                      :as service-calendar}]
                  (let [service-added-dates (or service-added-dates #{})
@@ -146,17 +157,17 @@
                             (conj service-added-dates date)))))))
 
   EditServiceCalendarRules
-  (process-event [{rules :rules} app]
+  (process-event [{rules :rules trip-idx :trip-idx} app]
     (let [rule-dates (into #{}
                            (mapcat rule-dates)
                            (::transit/service-rules rules))]
       (-> app
-          (update-in [:route ::transit/service-calendars 0] merge rules)
-          (assoc-in [:route ::transit/service-calendars 0 :rule-dates] rule-dates))))
+          (update-in [:route ::transit/service-calendars trip-idx] merge rules)
+          (assoc-in [:route ::transit/service-calendars trip-idx :rule-dates] rule-dates))))
 
   ClearServiceCalendar
-  (process-event [_ app]
-    (assoc-in app [:route ::transit/service-calendars 0] {}))
+  (process-event [{trip-idx :trip-idx} app]
+    (assoc-in app [:route ::transit/service-calendars trip-idx] {}))
 
   GoToStep
   (process-event [{step :step} app]

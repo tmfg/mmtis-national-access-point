@@ -11,8 +11,7 @@
             ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
-            [ote.views.route.trips :as route-trips]
-            [ote.views.route.service-calendar :as route-service-calendar]))
+            [ote.views.route.trips :as route-trips]))
 
 
 
@@ -37,9 +36,6 @@
     :label "Vuorot"
     :component route-trips/trips
     :validate rc/valid-trips?}
-   {:name :calendar
-    :label "Kalenteri"
-    :component route-service-calendar/service-calendar}
    {:name :save
     :label "Reitin tallennus"
     :component route-save}])
