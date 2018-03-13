@@ -471,7 +471,10 @@
                 :primary-header "Primary operating area"
                 :secondary-header "Secondary operating area (optional)"
                 :primary-tooltip "The primary operating area is an area in which the service is normally available according to service hours. (Note: This information serves e.g. monitoring of regional supply.)"
-                :secondary-tooltip "In the secondary operating area the service can e.g be available according to agreement, on  advance order or availability can otherwise be more limited than in the primary operating area."}
+                :secondary-tooltip "In the secondary operating area the service can e.g be available according to agreement, on  advance order or availability can otherwise be more limited than in the primary operating area."
+                :draw-primary "Add primary operating area by drawing"
+                :draw-secondary "Add secondary operating area by drawing"
+                :hide-draw-tools "Stop using drawing tools"}
 
  :titles {:terminal                 "Stations, ports and other terminals"
           :passenger-transportation "Passenger transportation"
