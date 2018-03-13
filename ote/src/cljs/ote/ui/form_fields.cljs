@@ -361,7 +361,8 @@
               [ui/radio-button
                {:id (str "radio-" name)
                 :label (show-option option)
-                :value (option-idx option)}])
+                :value (option-idx option)
+                :key (str "radio-" (option-idx option))}])
             options))]
      (when (or error warning)
        [:div
