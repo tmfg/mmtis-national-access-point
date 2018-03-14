@@ -177,13 +177,16 @@
 
   InitRouteTimes
   (process-event [_ app]
-    (assoc-in app [:route ::transit/trips]
-              [{::transit/stop-times (vec (map-indexed
-                                           (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
-                                             {::transit/stop-idx stop-idx
-                                              ::transit/arrival-time arrival-time
-                                              ::transit/departure-time departure-time})
-                                           (get-in app [:route ::transit/stops])))}]))
+    (-> app
+        (assoc-in [:route ::transit/trips]
+                  [{::transit/stop-times (vec (map-indexed
+                                                (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
+                                                  {::transit/stop-idx stop-idx
+                                                   ::transit/arrival-time arrival-time
+                                                   ::transit/departure-time departure-time})
+                                                (get-in app [:route ::transit/stops])))}])
+        ;; Make sure that we have an empty associated calendar for the trip
+        (assoc-in [:route ::transit/service-calendars] [{}])))
 
   NewStartTime
   (process-event [{time :time} app]
@@ -217,9 +220,10 @@
                        (let [trip-idx (count (::transit/trips route))
                              prev-calendar (get-in calendars [(dec trip-idx)] nil)
                              calendar (get-in calendars [trip-idx] nil)]
-                         (if (and (not calendar) prev-calendar)
-                           (assoc calendars trip-idx prev-calendar)
-                           calendars)))))))
+                         (cond
+                           (and (not calendar) prev-calendar) (assoc calendars trip-idx prev-calendar)
+                           (not calendar) (assoc calendars trip-idx {})
+                           :else calendars)))))))
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
