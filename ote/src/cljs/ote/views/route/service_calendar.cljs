@@ -7,16 +7,21 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.db.transit :as transit]))
 
-(defn service-calendar [e! {route :route :as route}]
-  (let [calendar (get-in route [::transit/service-calendars 0])]
+(defn service-calendar [e! {{trip-idx :edit-service-calendar :as route} :route :as app}]
+  (let [calendar (get-in route [::transit/service-calendars trip-idx])]
     [:div.route-service-calendar
+     [ui/raised-button {:primary true
+                        :icon (ic/navigation-arrow-back)
+                        :style {:float "left" :margin-bottom "0.5em"}
+                        :on-click #(e! (rc/->CloseServiceCalendar))
+                        :label "Takaisin vuorolistaan"}]
      [ui/raised-button {:secondary true
                         :icon (ic/action-delete)
                         :style {:float "right" :margin-bottom "0.5em"}
-                        :on-click #(e! (rc/->ClearServiceCalendar))}
-      "Tyhjennä kalenteri"]
+                        :on-click #(e! (rc/->ClearServiceCalendar trip-idx))
+                        :label "Tyhjennä kalenteri"}]
      [form/form {:name "Reittikalenteri"
-                 :update! #(e! (rc/->EditServiceCalendarRules %))}
+                 :update! #(e! (rc/->EditServiceCalendarRules % trip-idx))}
       [(form/group
         {:label "Ajopäiväkalenteri" :columns 3}
         {:type :table
@@ -49,7 +54,7 @@
            added-dates (or (::transit/service-added-dates calendar) #{})]
        [service-calendar/service-calendar
         {:selected-date? (constantly false)
-         :on-select #(e! (rc/->ToggleDate %))
+         :on-select #(e! (rc/->ToggleDate % trip-idx))
          :day-style (fn [day selected?]
                       (let [day (time/date-fields day)]
                         (cond
