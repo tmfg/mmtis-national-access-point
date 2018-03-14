@@ -45,17 +45,7 @@
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
 
-(defn rule-dates
-  "Evaluate a recurring schedule rule. Returns a sequence of dates."
-  [{::transit/keys [from-date to-date] :as rule}]
-  (let [week-days (into #{}
-                        (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
-                        time/week-days)]
-    (when (and from-date to-date (not (empty? week-days)))
-      (for [d (time/date-range (time/js->date-time from-date)
-                               (time/js->date-time to-date))
-            :when (week-days (time/day-of-week d))]
-        (time/date-fields d)))))
+
 
 (extend-protocol tuck/Event
   LoadStops
@@ -136,7 +126,7 @@
                             (disj service-removed-dates date))
 
                      ;; This date matches a rule, add it to removed dates
-                     (some #(some (partial = date) (rule-dates %)) service-rules)
+                     (some #(some (partial = date) (transit/rule-dates %)) service-rules)
                      (assoc service-calendar ::transit/service-removed-dates
                             (conj service-removed-dates date))
 
@@ -148,7 +138,7 @@
   EditServiceCalendarRules
   (process-event [{rules :rules} app]
     (let [rule-dates (into #{}
-                           (mapcat rule-dates)
+                           (mapcat transit/rule-dates)
                            (::transit/service-rules rules))]
       (-> app
           (update-in [:route ::transit/service-calendars 0] merge rules)

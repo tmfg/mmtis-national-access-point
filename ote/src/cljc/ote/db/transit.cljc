@@ -8,7 +8,8 @@
             [specql.impl.registry]
             [specql.data-types]
             [ote.db.common]
-            [ote.db.modification])
+            [ote.db.modification]
+            [ote.time :as time])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -24,3 +25,20 @@
   ["transit_trip" ::trip]
   ["transit_route" ::route
    ote.db.modification/modification-fields])
+
+(def rule-week-days [::monday ::tuesday ::wednesday ::thursday
+                     ::friday ::saturday ::sunday])
+
+(defn rule-dates
+  "Evaluate a recurring schedule rule. Returns a sequence of dates."
+  [{::keys [from-date to-date] :as rule}]
+  (let [week-days (into #{}
+                        (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
+                        time/week-days)]
+    (when (and from-date to-date (not (empty? week-days)))
+      (for [d (time/date-range (time/native->date-time from-date)
+                               (time/native->date-time to-date))
+            :when (week-days (time/day-of-week d))]
+        (select-keys
+         (time/date-fields d)
+         #{::time/year ::time/month ::time/date})))))
