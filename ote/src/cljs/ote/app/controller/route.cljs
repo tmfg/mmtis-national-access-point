@@ -29,6 +29,7 @@
 (defrecord NewStartTime [time])
 (defrecord AddTrip [])
 (defrecord EditStopTime [trip-idx stop-idx form-data])
+(defrecord ShowStopException [stop-type stop-idx icon-type])
 
 ;; Event to set service calendar
 (defrecord ToggleDate [date])
@@ -45,6 +46,19 @@
 (defrecord CancelRoute [])
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
+
+(defn- update-stop-by-idx [route stop-idx update-fn & args]
+  (let [data (mapv
+               (fn [t]
+                 (update t ::transit/stop-times
+                         (fn [stops]
+                           (mapv #(if (= (::transit/stop-idx %) stop-idx)
+                                    (apply update-fn % args)
+                                    %)
+                                 stops))))
+
+               (get route ::transit/trips))]
+    data))
 
 (defn rule-dates
   "Evaluate a recurring schedule rule. Returns a sequence of dates."
@@ -205,6 +219,16 @@
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
     (update-in app [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data))
+
+  ShowStopException
+  (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type} app]
+    (let [icon-key (if (= "arrival" stop-type)
+                     (keyword "pickup-type")
+                     (keyword "drop-off-type"))]
+    (assoc-in app [:route ::transit/trips]
+              (update-stop-by-idx
+                (get app :route) stop-idx
+                assoc icon-key icon-type))))
 
   SaveAsGTFS
   (process-event [_ {route :route :as app}]
