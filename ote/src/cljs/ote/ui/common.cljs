@@ -129,3 +129,14 @@
       :reagent-render
       (fn [_]
         [:span {:ref "sensor"}])})))
+
+(defn copy-to-clipboard [text-to-copy]
+  (let [id (name (gensym "ctc"))]
+    [:div {:style {:display "inline-block"}}
+     [:input {:id id
+              :readonly true
+              :value text-to-copy}]
+     [ui/flat-button {:icon (ic/content-content-copy)
+                      :on-click #(let [elt (.getElementById js/document id)]
+                                   (.select elt)
+                                   (.execCommand js/document "Copy"))}]]))
