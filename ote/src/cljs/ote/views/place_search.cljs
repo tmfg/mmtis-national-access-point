@@ -74,22 +74,21 @@
    [leaflet/Popup [:div name]]])
 
 (defn install-draw-control!
-  "Install Leaflet draw plugin to to places-map component."
-  [e! this]
+   "Install Leaflet draw plugin to to places-map component."
+  [e! dc this]
 
   (set! (.-draw js/L.drawLocal) (clj->js (tr-tree [:leaflet-draw])))
 
   (let [^js/L.map
         m (aget this "refs" "leaflet" "leafletElement")
-
-        fg (new js/L.FeatureGroup)
-        dc (new js/L.Control.Draw #js {:draw #js {:circlemarker false
-                                                  :circle false}
-                                       :edit #js {:featureGroup fg
-                                                  :remove false
-                                                  :edit false}})]
+        fg (new js/L.FeatureGroup)]
+    (reset! dc (new js/L.Control.Draw #js {:draw #js {:polyline false
+                                                      :circlemarker false
+                                                      :circle false}
+                                           :edit #js {:featureGroup fg
+                                                      :remove false
+                                                      :edit false}}))
     (.addLayer m fg)
-    (.addControl m dc)
     (.on m (aget js/L "Draw" "Event" "CREATED")
          #(let [^js/L.Path
                 layer (aget % "layer")
@@ -97,32 +96,37 @@
             ;;(aset js/window "the_geom" geojson)
             (e! (ps/->AddDrawnGeometry geojson))))))
 
-
-(defn places-map [e! results]
-   (r/create-class
+(defn places-map [e! results show?]
+  (let [dc (atom nil)]
+    (r/create-class
      {:component-did-mount #(do
                               (leaflet/customize-zoom-controls e! % {:zoomInTitle (tr [:leaflet :zoom-in])
                                                                      :zoomOutTitle (tr [:leaflet :zoom-out])})
-                              (install-draw-control! e! %)
+                              (install-draw-control! e! dc %)
                               (leaflet/update-bounds-from-layers %))
+
       :component-did-update leaflet/update-bounds-from-layers
+
+      :component-will-receive-props (fn [this [_ _ _ show?]]
+                                      (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
+                                        (if show?
+                                          (.addControl m @dc)
+                                          (.removeControl m @dc))))
       :reagent-render
-      (fn [e! results]
-        [leaflet/Map {;;:prefer-canvas true
+      (fn [e! results show?]
+        [leaflet/Map { ;;:prefer-canvas true
                       :ref "leaflet"
                       :center #js [65 25]
                       :zoomControl false
                       :zoom 5}
          (leaflet/background-tile-map)
 
-         ;[leaflet/FeatureGroup]
-
          (for [{:keys [place geojson]} results]
            ^{:key (::places/id place)}
            [leaflet/GeoJSON {:data geojson
                              :style {:color (if (::places/primary? place)
                                               "green"
-                                              "orange")}}])])}))
+                                              "orange")}}])])})))
 
 
 (defn marker-map [e! coordinate]
@@ -157,12 +161,14 @@
                         :color          "gray"}}
        opts])))
 
-(defn place-search [e! place-search]
+(defn  place-search [e! place-search]
   (let [{primary-results true
          secondary-results false} (group-by (comp ::places/primary? :place) (:results place-search))]
     [:div.place-search (stylefy/use-style (style-base/flex-container "row"))
      [:div {:style {:width "30%"}}
-      [:div {:style {:font-weight "bold"}} [:span (tr [:place-search :primary-header])] [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
+      [:div {:style {:font-weight "bold"}}
+       [:span (tr [:place-search :primary-header])]
+       [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
       [result-chips e! primary-results true]
       [ui/auto-complete {:id :place-auto-complete-primary
@@ -174,7 +180,9 @@
                          :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
                          :search-text (or (:primary-name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}]
-      [:div {:style {:font-weight "bold" :margin-top "60px"}} [:span (tr [:place-search :secondary-header])] [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
+      [:div {:style {:font-weight "bold" :margin-top "60px"}}
+       [:span (tr [:place-search :secondary-header])]
+       [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
       [result-chips e! secondary-results false]
       [ui/auto-complete {:id :place-auto-complete-secondary
@@ -186,8 +194,30 @@
                          :on-update-input #(e! (ps/->SetSecondaryPlaceName %))
                          :search-text (or (:secondary-name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}]]
+
      [:div {:style {:width "70%"}}
-       [places-map e! (:results place-search)]]]))
+       [places-map e! (:results place-search) (:show? place-search)]
+
+      [:span
+       (if (:show? place-search)
+         [:span.hide-draw-buttons
+          [ui/flat-button {:id :hide-draw-tools
+                           :primary true
+                           :label (tr [:place-search :hide-draw-tools])
+                           :name :hide-draw-tools
+                           :on-click #(e! (ps/->SetDrawControl false nil))}]]
+         [:span.draw-buttons
+          [ui/flat-button {:id :draw-primary
+                           :primary true
+                           :label (tr [:place-search :draw-primary])
+                           :name :draw-primary
+                           :on-click #(e! (do
+                                            (ps/->SetDrawControl true true)))}]
+          [ui/flat-button {:id :draw-secondary
+                           :primary true
+                           :label (tr [:place-search :draw-secondary])
+                           :name :draw-secondary
+                           :on-click #(e! (ps/->SetDrawControl true false))}]])]]]))
 
 (defn place-search-form-group [e! label name]
   (let [empty-places? (comp empty? :results :place-search)]
@@ -206,6 +236,9 @@
                     (when (empty-places? data)
                       [:div (stylefy/use-style style-base/required-element)
                        (tr [:common-texts :required-field])])
+                    ;; Meta-key helps to avoid map re-rendering.
+                    ;; Component knows this way that same element is in use.
+                    ^{:key "place-search"}
                     [place-search e! (:place-search data)]])})))
 
 

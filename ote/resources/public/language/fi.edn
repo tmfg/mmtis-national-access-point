@@ -473,7 +473,10 @@
                 :primary-header "Pääasiallinen toiminta-alue"
                 :secondary-header "Toissijainen toiminta-alue (vapaaehtoinen)"
                 :primary-tooltip "Pääasiallinen toiminta-alue on alue, jonka sisällä palvelu pääsääntöisesti toimii, ja jossa se on normaalisti palveluaikojen puitteissa saatavilla. (Huom. Tieto palvelee mm. tarjonnan alueellisesta seurantaa.)"
-                :secondary-tooltip "Toissijaisella toiminta-alueella palvelu voi olla saatavilla esimerkiksi sopimuksen mukaan, ennakkotilauksella tai muuten pääasiallista toiminta-aluetta rajoitetummin."}
+                :secondary-tooltip "Toissijaisella toiminta-alueella palvelu voi olla saatavilla esimerkiksi sopimuksen mukaan, ennakkotilauksella tai muuten pääasiallista toiminta-aluetta rajoitetummin."
+                :draw-primary "Lisää pääasiallinen toiminta-alue piirtämällä"
+                :draw-secondary "Lisää toissijainen toiminta-alue piirtämällä"
+                :hide-draw-tools "Lopeta piirtotyökalujen käyttäminen"}
 
  :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
           :passenger-transportation "Henkilöiden kuljetuspalvelut"

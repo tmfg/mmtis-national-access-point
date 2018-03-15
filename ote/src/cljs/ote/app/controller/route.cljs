@@ -31,9 +31,11 @@
 (defrecord EditStopTime [trip-idx stop-idx form-data])
 
 ;; Event to set service calendar
-(defrecord ToggleDate [date])
-(defrecord EditServiceCalendarRules [rules])
-(defrecord ClearServiceCalendar [])
+(defrecord EditServiceCalendar [trip-idx])
+(defrecord CloseServiceCalendar [])
+(defrecord ToggleDate [date trip-idx])
+(defrecord EditServiceCalendarRules [rules trip-idx])
+(defrecord ClearServiceCalendar [trip-idx])
 
 ;; Save route as GTFS
 (defrecord SaveAsGTFS [])
@@ -42,6 +44,7 @@
 
 ;; Save route to database
 (defrecord SaveToDb [])
+(defrecord CancelRoute [])
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
 
@@ -106,9 +109,18 @@
                  (into (subvec stops 0 idx)
                        (subvec stops (inc idx))))))
 
+
+  EditServiceCalendar
+  (process-event [{trip-idx :trip-idx} app]
+    (assoc-in app [:route :edit-service-calendar] trip-idx))
+
+  CloseServiceCalendar
+  (process-event [_ app]
+    (update-in app [:route] dissoc :edit-service-calendar))
+
   ToggleDate
-  (process-event [{date :date} app]
-    (update-in app [:route ::transit/service-calendars 0]
+  (process-event [{date :date trip-idx :trip-idx} app]
+    (update-in app [:route ::transit/service-calendars trip-idx]
                (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
                      :as service-calendar}]
                  (let [service-added-dates (or service-added-dates #{})
@@ -136,17 +148,17 @@
                             (conj service-added-dates date)))))))
 
   EditServiceCalendarRules
-  (process-event [{rules :rules} app]
+  (process-event [{rules :rules trip-idx :trip-idx} app]
     (let [rule-dates (into #{}
                            (mapcat transit/rule-dates)
                            (::transit/service-rules rules))]
       (-> app
-          (update-in [:route ::transit/service-calendars 0] merge rules)
-          (assoc-in [:route ::transit/service-calendars 0 :rule-dates] rule-dates))))
+          (update-in [:route ::transit/service-calendars trip-idx] merge rules)
+          (assoc-in [:route ::transit/service-calendars trip-idx :rule-dates] rule-dates))))
 
   ClearServiceCalendar
-  (process-event [_ app]
-    (assoc-in app [:route ::transit/service-calendars 0] {}))
+  (process-event [{trip-idx :trip-idx} app]
+    (assoc-in app [:route ::transit/service-calendars trip-idx] {}))
 
   GoToStep
   (process-event [{step :step} app]
@@ -155,13 +167,17 @@
 
   InitRouteTimes
   (process-event [_ app]
-    (assoc-in app [:route ::transit/trips]
-              [{::transit/stop-times (vec (map-indexed
-                                           (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
-                                             {::transit/stop-idx stop-idx
-                                              ::transit/arrival-time arrival-time
-                                              ::transit/departure-time departure-time})
-                                           (get-in app [:route ::transit/stops])))}]))
+    (-> app
+        (assoc-in [:route ::transit/trips]
+                  [{::transit/stop-times (vec (map-indexed
+                                                (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
+                                                  {::transit/stop-idx stop-idx
+                                                   ::transit/arrival-time arrival-time
+                                                   ::transit/departure-time departure-time})
+                                                (get-in app [:route ::transit/stops])))
+                    ::transit/service-calendar-idx 0}])
+        ;; Make sure that we have an empty associated calendar for the trip
+        (assoc-in [:route ::transit/service-calendars] [{}])))
 
   NewStartTime
   (process-event [{time :time} app]
@@ -189,7 +205,17 @@
                      (fn [times]
                        (conj (or times [])
                              {::transit/stop-times (mapv update-times-from-new-start
-                                                         (::transit/stop-times trip))}))))))
+                                                         (::transit/stop-times trip))
+                              ::transit/service-calendar-idx (count (::transit/trips route))})))
+          (update-in [:route ::transit/service-calendars]
+                     (fn [calendars]
+                       (let [trip-idx (count (::transit/trips route))
+                             prev-calendar (get-in calendars [(dec trip-idx)] nil)
+                             calendar (get-in calendars [trip-idx] nil)]
+                         (cond
+                           (and (not calendar) prev-calendar) (assoc calendars trip-idx prev-calendar)
+                           (not calendar) (assoc calendars trip-idx {})
+                           :else calendars)))))))
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
@@ -202,8 +228,19 @@
 
   SaveToDb
   (process-event [_ app]
-    (let [route (-> app :route form/without-form-metadata
-                    (update ::transit/service-calendars #(mapv form/without-form-metadata %))
+    (let [calendars (mapv form/without-form-metadata (get-in app [:route ::transit/service-calendars]))
+          deduped-cals (into [] (distinct calendars))
+          cals-indices (mapv #(first (keep-indexed
+                                       (fn [i cal] (when (= cal %1) i))
+                                       deduped-cals)) calendars)
+          route (-> app :route form/without-form-metadata
+                    (assoc ::transit/service-calendars deduped-cals)
+                    (update ::transit/trips
+                               (fn [trips]
+                                 ;; Update service-calendar indexes
+                                 (mapv #(assoc % ::transit/service-calendar-idx
+                                                 (nth cals-indices (::transit/service-calendar-idx %)))
+                                       trips)))
                     (dissoc :step :stops :new-start-time))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
@@ -219,7 +256,12 @@
   (process-event [{response :response} app]
     (.error js/console "Save route failed:" (pr-str response))
     (assoc app
-           :flash-message-error "Reitin tallennus epäonnistui")))
+      :flash-message-error "Reitin tallennus epäonnistui"))
+
+  CancelRoute
+  (process-event [_ app]
+    (routes/navigate! :routes)
+    (dissoc app :route)))
 
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid
@@ -250,3 +292,12 @@
                    (every? #(and (time/valid-time? (::transit/departure-time %))
                                  (time/valid-time? (::transit/arrival-time %))) other-stops))))
           trips))
+
+(defn validate-previous-steps
+  "To be able to select a step in wizard that is valid, we call all previous validate functions."
+  [route step-name wizard-steps]
+  (every? (fn [{validate :validate}]
+            (if validate
+              (validate route)
+              true))
+            (take-while #(not= step-name (:name %)) wizard-steps)))

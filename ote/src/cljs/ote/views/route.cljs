@@ -7,12 +7,15 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.time :as time]
             [ote.ui.form :as form]
+            [ote.style.route :as style-route]
 
             ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
             [ote.views.route.trips :as route-trips]
-            [ote.views.route.service-calendar :as route-service-calendar]))
+            [ote.views.route.service-calendar :as route-service-calendar]
+            [stylefy.core :as stylefy]
+            [ote.ui.buttons :as buttons]))
 
 
 
@@ -37,9 +40,6 @@
     :label "Vuorot"
     :component route-trips/trips
     :validate rc/valid-trips?}
-   {:name :calendar
-    :label "Kalenteri"
-    :component route-service-calendar/service-calendar}
    {:name :save
     :label "Reitin tallennus"
     :component route-save}])
@@ -64,12 +64,17 @@
                             (:name next)))
                         (partition-all 2 1 wizard-steps))]
     [:div.route
-     [ui/stepper {:active-step i}
+     [ui/stepper {:active-step i
+                  :connector (r/as-element [ic/navigation-arrow-forward])}
       (doall
-       (for [{label :label} wizard-steps]
-         ^{:key label}
-         [ui/step
-          [ui/step-label label]]))]
+        (for [{label :label current-step :name} wizard-steps
+              :let [prev-valid? (rc/validate-previous-steps route current-step wizard-steps)]]
+          ^{:key label}
+          [ui/step (when prev-valid?
+                     (stylefy/use-style style-route/stepper))
+           [ui/step-label {:on-click (when prev-valid?
+                                       #(e! (rc/->GoToStep current-step)))}
+            [:span label]]]))]
 
      [component e! app]
 
@@ -99,6 +104,13 @@
        [route-wizard
         e! wizard-steps
         app]
-       [ui/raised-button {:primary  true
-                          :on-click #(e! (rc/->SaveToDb))}
-        "Tallenna Tietokantaan"]])))
+       [:div.col-xs-12.col-sm-6.col-md-6
+        [buttons/save {:disabled false
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (rc/->SaveToDb)))}
+         "Tallenna Tietokantaan"]
+        [buttons/cancel {:on-click #(do
+                                      (.preventDefault %)
+                                      (e! (rc/->CancelRoute)))}
+         "Peruuta"]]])))

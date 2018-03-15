@@ -10,6 +10,7 @@
 
 (defrecord SetPrimaryPlaceName [name])
 (defrecord SetSecondaryPlaceName [name])
+(defrecord SetDrawControl [show? primary?])
 (defrecord AddPlace [id primary?])
 (defrecord FetchPlaceResponse [response place])
 (defrecord RemovePlaceById [id])
@@ -65,6 +66,16 @@
   SetSecondaryPlaceName
   (process-event [{name :name} app]
     (search (assoc-in app [:place-search :secondary-name] name) false))
+
+  SetDrawControl
+  (process-event [{show? :show? primary? :primary?} app]
+    (if (nil? primary?)
+      (-> app
+          (assoc-in [:place-search :show?] show?)
+          (update-in [:place-search] dissoc :primary?))
+      (-> app
+          (assoc-in [:place-search :primary?] primary?)
+          (assoc-in [:place-search :show?] show?))))
 
   PlaceCompletionsResponse
   (process-event [{:keys [completions name primary?]} app ]
@@ -125,7 +136,7 @@
           (add-place {::places/namefin (str type " " (or drawn-geometry-idx 1))
                       ::places/type "drawn"
                       ::places/id (str "drawn" (or drawn-geometry-idx 1))
-                      ::places/primary? true}
+                      ::places/primary? (get-in app [:place-search :primary?])}
                      geojson))))
 
   EditDrawnGeometryName
