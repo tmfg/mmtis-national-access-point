@@ -184,7 +184,8 @@
                                                   {::transit/stop-idx stop-idx
                                                    ::transit/arrival-time arrival-time
                                                    ::transit/departure-time departure-time})
-                                                (get-in app [:route ::transit/stops])))}])
+                                                (get-in app [:route ::transit/stops])))
+                    ::transit/service-calendar-idx 0}])
         ;; Make sure that we have an empty associated calendar for the trip
         (assoc-in [:route ::transit/service-calendars] [{}])))
 
@@ -214,7 +215,8 @@
                      (fn [times]
                        (conj (or times [])
                              {::transit/stop-times (mapv update-times-from-new-start
-                                                         (::transit/stop-times trip))})))
+                                                         (::transit/stop-times trip))
+                              ::transit/service-calendar-idx (count (::transit/trips route))})))
           (update-in [:route ::transit/service-calendars]
                      (fn [calendars]
                        (let [trip-idx (count (::transit/trips route))
