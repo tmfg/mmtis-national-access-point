@@ -1,14 +1,18 @@
 (ns ote.views.route.trips
   "Route wizard: route trips table"
-  (:require [ote.app.controller.route :as rc]
-            [ote.time :as time]
-            [ote.ui.form-fields :as form-fields]
-            [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.db.transit :as transit]
-            [stylefy.core :as stylefy]
-            [ote.style.route :as style-route]
-            [reagent.core :as r]))
+  (:require
+    [ote.app.controller.route :as rc]
+    [ote.time :as time]
+    [ote.ui.form-fields :as form-fields]
+    [cljs-react-material-ui.reagent :as ui]
+    [cljs-react-material-ui.icons :as ic]
+    [ote.db.transit :as transit]
+    [stylefy.core :as stylefy]
+    [ote.style.route :as style-route]
+    [reagent.core :as r]
+
+    ;; Calendar subview
+    [ote.views.route.service-calendar :as route-service-calendar]))
 
 (defn exception-icon [e! stop-type drop-off-type pickup-type stop-idx]
   [:span
@@ -57,6 +61,7 @@
 (defn route-times-header [stop-sequence]
   [:thead
    [:tr
+    [:th ""]
     (doall
      (map-indexed
       (fn [i {::transit/keys [code name]}]
@@ -64,9 +69,10 @@
         [:th {:colSpan 2
               :style {:vertical-align "top"}}
          [:div {:style {:display "inline-block"
-                        :width "160px"
+                        :width "200px"
                         :overflow-x "hidden"
-                        :white-space "pre"}} name]
+                        :white-space "pre"
+                        :text-overflow "ellipsis"}} name]
          [:div {:style {:display "inline-block"
                         :float "right"
                         :position "relative"
@@ -76,6 +82,7 @@
             [ic/navigation-chevron-right])]])
       stop-sequence))]
    [:tr
+    [:th ""]
     (doall
      (for [{::transit/keys [code name]} stop-sequence]
        (list
@@ -89,6 +96,8 @@
   [e! stop-count i {stops ::transit/stop-times :as trip}]
   ^{:key i}
   [:tr
+   [:td [:div [ui/raised-button {:on-click #(e! (rc/->EditServiceCalendar i))
+                                 :label "Ajopäiväkalenteri"}]]]
    (map-indexed
      (fn [j {::transit/keys [arrival-time departure-time stop-idx]
              :keys          [pickup-type drop-off-type stop-type] :as stop}]
@@ -119,23 +128,29 @@
               (exception-icon e! "departure" pickup-type drop-off-type stop-idx)]))))
      stops)])
 
+(defn trips-list [e! route]
+  (let [stop-sequence (::transit/stops route)
+        stop-count (count stop-sequence)
+        trips (::transit/trips route)]
+
+    [:div.route-times
+     [:table {:style {:text-align "center"}}
+      [route-times-header stop-sequence]
+      [:tbody
+       (doall (map-indexed (partial trip-row e! stop-count) trips))]]
+     [:div
+      "Uuden vuoron lähtöaika: "
+      [form-fields/field {:type :time
+                          :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
+      [ui/raised-button {:style {:margin-left "5px"}
+                         :primary true
+                         :disabled (time/empty-time? (:new-start-time route))
+                         :on-click #(e! (rc/->AddTrip))
+                         :label "Lisää vuoro"}]]]))
+
 (defn trips [e! _]
   (e! (rc/->InitRouteTimes))
   (fn [e! {route :route :as app}]
-    (let [stop-sequence (::transit/stops route)
-          stop-count (count stop-sequence)
-          trips (::transit/trips route)]
-
-      [:div.route-times
-       [:table {:style {:text-align "center"}}
-        [route-times-header stop-sequence]
-        [:tbody
-         (doall (map-indexed (partial trip-row e! stop-count) trips))]]
-       [:div
-        "Uuden vuoron lähtöaika: "
-        [form-fields/field {:type :time
-                            :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
-        [ui/raised-button {:primary true
-                           :disabled (time/empty-time? (:new-start-time route))
-                           :on-click #(e! (rc/->AddTrip))}
-         "Lisää vuoro"]]])))
+    (if (:edit-service-calendar route)
+      [route-service-calendar/service-calendar e! app]
+      (trips-list e! route))))
