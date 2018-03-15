@@ -238,8 +238,19 @@
 
   SaveToDb
   (process-event [_ app]
-    (let [route (-> app :route form/without-form-metadata
-                    (update ::transit/service-calendars #(mapv form/without-form-metadata %))
+    (let [calendars (mapv form/without-form-metadata (get-in app [:route ::transit/service-calendars]))
+          deduped-cals (into [] (distinct calendars))
+          cals-indices (mapv #(first (keep-indexed
+                                       (fn [i cal] (when (= cal %1) i))
+                                       deduped-cals)) calendars)
+          route (-> app :route form/without-form-metadata
+                    (assoc ::transit/service-calendars deduped-cals)
+                    (update ::transit/trips
+                               (fn [trips]
+                                 ;; Update service-calendar indexes
+                                 (mapv #(assoc % ::transit/service-calendar-idx
+                                                 (nth cals-indices (::transit/service-calendar-idx %)))
+                                       trips)))
                     (dissoc :step :stops :new-start-time))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
