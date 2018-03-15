@@ -184,7 +184,8 @@
                                                   {::transit/stop-idx stop-idx
                                                    ::transit/arrival-time arrival-time
                                                    ::transit/departure-time departure-time})
-                                                (get-in app [:route ::transit/stops])))}])
+                                                (get-in app [:route ::transit/stops])))
+                    ::transit/service-calendar-idx 0}])
         ;; Make sure that we have an empty associated calendar for the trip
         (assoc-in [:route ::transit/service-calendars] [{}])))
 
@@ -214,7 +215,8 @@
                      (fn [times]
                        (conj (or times [])
                              {::transit/stop-times (mapv update-times-from-new-start
-                                                         (::transit/stop-times trip))})))
+                                                         (::transit/stop-times trip))
+                              ::transit/service-calendar-idx (count (::transit/trips route))})))
           (update-in [:route ::transit/service-calendars]
                      (fn [calendars]
                        (let [trip-idx (count (::transit/trips route))
@@ -236,8 +238,19 @@
 
   SaveToDb
   (process-event [_ app]
-    (let [route (-> app :route form/without-form-metadata
-                    (update ::transit/service-calendars #(mapv form/without-form-metadata %))
+    (let [calendars (mapv form/without-form-metadata (get-in app [:route ::transit/service-calendars]))
+          deduped-cals (into [] (distinct calendars))
+          cals-indices (mapv #(first (keep-indexed
+                                       (fn [i cal] (when (= cal %1) i))
+                                       deduped-cals)) calendars)
+          route (-> app :route form/without-form-metadata
+                    (assoc ::transit/service-calendars deduped-cals)
+                    (update ::transit/trips
+                               (fn [trips]
+                                 ;; Update service-calendar indexes
+                                 (mapv #(assoc % ::transit/service-calendar-idx
+                                                 (nth cals-indices (::transit/service-calendar-idx %)))
+                                       trips)))
                     (dissoc :step :stops :new-start-time))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
