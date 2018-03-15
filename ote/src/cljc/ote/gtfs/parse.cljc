@@ -91,9 +91,11 @@ This is only called with GTFS field names and cannot grow unbounded."}
 
 (defn unparse-gtfs-file [gtfs-file-type content]
   (let [{:keys [header fields]} (file-info gtfs-file-type)]
+    (println "HEADER: " header ", FIELDS: " fields)
     (str header "\n"
          (csv->string
           (mapv (fn [row]
+                  (println "ROW: " (pr-str row))
                   (mapv #(clj->gtfs (field-spec-description %) (get row %))
                         fields))
                 content)))))
