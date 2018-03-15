@@ -15,48 +15,48 @@
     [ote.views.route.service-calendar :as route-service-calendar]))
 
 (defn exception-icon [e! stop-type drop-off-type pickup-type stop-idx]
-  [:span
+  [:div
    [ui/icon-menu
     {:icon-button-element (r/as-element
                             [ui/icon-button
-                             {:style      {:padding 8
+                             {:style      {:padding 4
                                            :width   24
                                            :height  24}
                               :icon-style {:height 24
                                            :width  24}}
                              (cond
                                (and (nil? drop-off-type) (nil? pickup-type))
-                               [ic/maps-pin-drop {:style style-route/exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type "reqular")) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type "reqular")) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type "not-available")) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type "not-available")) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type "phone-agency")) [ic/communication-call {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type "phone-agency")) [ic/communication-call {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type "coordinate-with-driver")) [ic/social-people {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type "coordinate-with-driver")) [ic/social-people {:style style-route/selected-exception-icon}]
-                               :else [ic/maps-pin-drop {:style style-route/exception-icon}])
+                               [ic/communication-call {:style style-route/exception-icon}]
+                               (and (= "arrival" stop-type) (= drop-off-type :reqular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
+                               (and (= "departure" stop-type) (= pickup-type :reqular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
+                               (and (= "arrival" stop-type) (= drop-off-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
+                               (and (= "departure" stop-type) (= pickup-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
+                               (and (= "arrival" stop-type) (= drop-off-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
+                               (and (= "departure" stop-type) (= pickup-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
+                               (and (= "arrival" stop-type) (= drop-off-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
+                               (and (= "departure" stop-type) (= pickup-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
+                               :else [ic/communication-call {:style style-route/exception-icon}])
                              ])}
     [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Poistumismahdollisuus oletuksena" "Nousu mahdollista oletuksena")
                    :left-icon    (ic/maps-pin-drop)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx "reqular")))}]
+                                    (e! (rc/->ShowStopException stop-type stop-idx :reqular)))}]
     [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Ei poistumismahdollisuutta" "Ei nousumahdollisuutta")
                    :left-icon    (ic/notification-do-not-disturb)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx "not-available")))}]
+                                    (e! (rc/->ShowStopException stop-type stop-idx :not-available)))}]
     [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Poistumisesta sovittava palveluntuottajan kanssa" "Nousemisesta sovittava palveluntuottajan kanssa")
                    :left-icon    (ic/communication-call)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx "phone-agency")))}]
+                                    (e! (rc/->ShowStopException stop-type stop-idx :phone-agency)))}]
     [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Poistumisesta sovittava kuljettajan kanssa" "Noususta sovittava kuljettajan kanssa")
                    :left-icon    (ic/social-people)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx "coordinate-with-driver")))}]]])
+                                    (e! (rc/->ShowStopException stop-type stop-idx :coordinate-with-driver)))}]]])
 
 (defn route-times-header [stop-sequence]
   [:thead
@@ -99,8 +99,7 @@
    [:td [:div [ui/raised-button {:on-click #(e! (rc/->EditServiceCalendar i))
                                  :label "Ajopäiväkalenteri"}]]]
    (map-indexed
-     (fn [j {::transit/keys [arrival-time departure-time stop-idx]
-             :keys          [pickup-type drop-off-type stop-type] :as stop}]
+     (fn [j {::transit/keys [arrival-time departure-time stop-idx pickup-type drop-off-type] :as stop}]
        (let [update! #(e! (rc/->EditStopTime i j %))
              style {:style {:padding-left     "5px"
                             :padding-right    "5px"
@@ -114,18 +113,23 @@
              [:td style " - "]
              ^{:key (str j "-arr")}
              [:td style
-              [form-fields/field {:type    :time
-                                  :update! #(update! {::transit/arrival-time %})}
-               arrival-time]
-              (exception-icon e! "arrival" pickup-type drop-off-type stop-idx)])
+              [:div.col-md-11
+                [form-fields/field {:type    :time
+                                    :update! #(update! {::transit/arrival-time %})}
+               arrival-time]]
+              [:div.col-md-1 {:style {:margin-left "-10px"}}
+                (exception-icon e! "arrival" pickup-type drop-off-type stop-idx)]])
            (if (= j (dec stop-count))
              ^{:key (str j "-last")}
              [:td style " - "]
              ^{:key (str j "-dep")}
-             [:td style [form-fields/field {:type    :time
-                                            :update! #(update! {::transit/departure-time %})}
-                         departure-time]
-              (exception-icon e! "departure" pickup-type drop-off-type stop-idx)]))))
+             [:td style
+              [:div.col-md-11
+                [form-fields/field {:type    :time
+                                    :update! #(update! {::transit/departure-time %})}
+                         departure-time]]
+              [:div.col-md-1 {:style {:margin-left "-10px"}}
+                (exception-icon e! "departure" pickup-type drop-off-type stop-idx)]]))))
      stops)])
 
 (defn trips-list [e! route]

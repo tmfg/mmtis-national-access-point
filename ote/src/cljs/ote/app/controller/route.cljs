@@ -246,8 +246,8 @@
   ShowStopException
   (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type} app]
     (let [icon-key (if (= "arrival" stop-type)
-                     (keyword "pickup-type")
-                     (keyword "drop-off-type"))]
+                     (keyword "ote.db.transit/pickup-type")
+                     (keyword "ote.db.transit/drop-off-type"))]
     (assoc-in app [:route ::transit/trips]
               (update-stop-by-idx
                 (get app :route) stop-idx
