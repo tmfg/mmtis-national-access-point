@@ -387,9 +387,7 @@
    :audio-information "Audio information"
    :visual-displays "Visual displays"
    :displays-for-visually-impaired "Displays for visual impaired (tactiles)"
-   :large-print-timetables "Large print timetables"
-   :other "Other"}
-
+   :large-print-timetables "Large print timetables"}
 
   :ote.db.transport-service/accessibility
   {:lift "Elevator"
@@ -397,17 +395,14 @@
    :travelator "Travelator"
    :ramp "Ramp"
    :stairs "Stairs"
-   :shuttle "Shuttle traffic"
    :narrow-entrance "Narrow entrance"
    :barrier "Barrier"
-   :pallet-access-low-floor "Low-floor vehicle"
    :wheelchair-access-toilet "Accessible toilet"
 
    :step-free-access "Step-free access"
    :suitable-for-wheelchairs "Suitable for wheelchair"
    :tactile-platform-edges  "Tactile platform edges"
-   :tactile-guiding-strips "Tactile guiding strips"
-   :other  "Other"}
+   :tactile-guiding-strips "Tactile guiding strips"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Wheelchair"
@@ -790,12 +785,10 @@
                    "escalator" "Escalator"
                    "lift" "Lift"
                    "narrow-entrance" "Narrow entrance"
-                   "pallet-access-low-floor" "Low floor vehicle"
                    "barrier" "Barrier"
                    "travelator" "Travelator"
                    "ramp" "Ramp"
                    "stairs" "Stairs"
-                   "shuttle" "Shuttle traffic"
                    "step-free-access" "Step free access"
                    "suitable-for-wheelchairs" "Suitable for wheelchairs"
                    "assistance-dog-space" "Place for an assistance dog"

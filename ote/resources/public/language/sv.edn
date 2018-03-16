@@ -393,9 +393,7 @@
    :audio-information "Utrop"
    :visual-displays "Visuella displays"
    :displays-for-visually-impaired "Tavlor för synskadade (taktil)"
-   :large-print-timetables "Stora tidtabellsskyltar"
-   :other "Annat"}
-
+   :large-print-timetables "Stora tidtabellsskyltar"}
 
   :ote.db.transport-service/accessibility
   {:lift "Hiss"
@@ -403,16 +401,13 @@
    :travelator "Rullband"
    :ramp "Ramp"
    :stairs "Trappor"
-   :shuttle "Skytteltransport"
    :narrow-entrance "Smal ingång"
    :barrier "Bom"
-   :pallet-access-low-floor "Låggolv (Kuormalavalinjan matala lattia)"
    :wheelchair-access-toilet "Inva WC"
    :step-free-access "Inga trappsteg"
    :suitable-for-wheelchairs "Lämplig för rullstol"
    :tactile-platform-edges  "Varning vid perrongkanten"
-   :tactile-guiding-strips "Beröringstyrda följlinjer"
-   :other  "Annat"}
+   :tactile-guiding-strips "Beröringstyrda följlinjer"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Rullstol"
@@ -797,12 +792,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "escalator" "Rulltrappor"
                    "lift" "Hiss"
                    "narrow-entrance" "Smal ingång"
-                   "pallet-access-low-floor" "Låggolv"
                    "barrier" "Bom"
                    "travelator" "Rullband"
                    "ramp" "Ramp"
                    "stairs" "Trappor"
-                   "shuttle" "Skytteltransport"
                    "tactile-guiding-strips" "Beröringstyrda följlinjer"
                    "tactile-platform-edges" "Varning vid perrongkanten"
                    "wheelchair-access-toilet" "Inva WC"
