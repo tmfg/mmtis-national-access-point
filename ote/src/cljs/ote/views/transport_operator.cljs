@@ -77,7 +77,8 @@
 
     {:name ::t-operator/business-id
      :type :string
-     :validate [[:business-id]]}
+     :validate [[:business-id]]
+     :required? true}
 
     {:name ::common/street
      :type :string
