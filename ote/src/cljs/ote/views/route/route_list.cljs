@@ -36,7 +36,6 @@
                                 departure-point-name destination-point-name]
                 ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
-           (.log js/console "row: " (clj->js row) " name " name)
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
             [ui/table-row-column {:style {:width "3%"}} id]
             [ui/table-row-column {:style {:width "20%"}} name]
