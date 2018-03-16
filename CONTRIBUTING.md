@@ -13,6 +13,9 @@
    * Fixed problem 1
    * Another problem fixed
    
+   # Changed
+   * Changed existing feature.
+   
    # Datamodel
    * Change to DB migrations.
    
