@@ -66,14 +66,19 @@
 (defn- operator-form-groups []
   [(form/group
     {:label (tr [:common-texts :title-operator-basic-details])
-     :columns 1}
+     :columns 1
+     :tooltip (tr [:organization-page :basic-info-tooltip])
+     :tooltip-length "large"}
     {:name ::t-operator/name
      :type :string
      :required? true}
 
     {:name ::t-operator/ckan-description
      :type :text-area
-     :rows 2}
+     :rows 2
+     :tooltip (tr [:organization-page :ckan-description-tooltip])
+     :tooltip-length "large"
+    }
 
     {:name ::t-operator/business-id
      :type :string
@@ -103,7 +108,9 @@
 
    (form/group
     {:label (tr [:organization-page :contact-types])
-     :columns 1}
+     :columns 1
+     :tooltip (tr [:organization-page :contact-types-tooltip])
+     :tooltip-length "large"}
 
     {:name ::t-operator/phone :type :string :regex ui-validation/phone-number-regex}
     {:name ::t-operator/gsm :type :string :regex ui-validation/phone-number-regex}
@@ -133,17 +140,7 @@
       [:p
        (tr [:organization-page :help-desc-1])]
       [:p
-       (tr [:organization-page :help-desc-2])
-       [:b (tr [:common-texts :title-operator-basic-details])]
-       (tr [:organization-page :help-desc-3])]
-      [:p
-       [:b (tr [:organization-page :contact-types]) ]
-       (tr [:organization-page :help-desc-4])]
-      [:p (str (tr [:organization-page :help-desc-5]) " ")
-       [ui-common/linkify (str "/organization/members/transport-operator-" (::t-operator/id operator))
-        (str (tr [:organization-page :help-desc-5-linklabel]) ".")]]
-      [:p (tr [:organization-page :help-desc-6])]]
-     [:br]
+       (tr [:organization-page :help-desc-2])]]
 
        [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
 
