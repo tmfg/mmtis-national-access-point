@@ -523,17 +523,16 @@
  :organization-page
  {:contact-types            "Kontaktalternativ"
   :organization-form-title  "Tjänsteproducentens uppgifter"
-  :organization-new-title "Lägg till tjänsteproducent"
-  :help-desc-1              "Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen."
-  :help-desc-2              "Skriv i formulärets "
-  :help-desc-3              " -del uppgifter om företaget, samfundet eller annan organsiation."
-  :help-desc-4              " -delens uppgifter är tillägnade tjänsteutvecklare och andta profesionella NAP-användare, inte resenär eller annan slutkund."
-  :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
-  :help-desc-5-linklabel    "jäsenet sivulla"
-  :help-desc-6 "\nBeskrivningen ska ge NAP-användaren en uppfattning om vilken typ av tjänsteproducent det är fråga om."}
+  :organization-new-title   "Lägg till tjänsteproducent"
+  :help-desc-1              "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
+  :help-desc-2              (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
+  :basic-info-tooltip       "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
+  :contact-types-tooltip    "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
+  :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  }
 
 
- :passenger-transportation-page
+  :passenger-transportation-page
  {:header-new-passenger-transportation     "Lägg till persontransporttjänst"
   :header-edit-passenger-transportation    "Redigera persontransporttjänst"
   :header-service-info                     "Tjänstens basinfo"

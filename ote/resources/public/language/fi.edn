@@ -519,17 +519,15 @@
 
 
  :organization-page
- {:contact-types            "Yhteystavat"
-  :organization-form-title  "Palveluntuottajan tiedot"
-  :organization-new-title "Lisää palveluntuottaja"
-  :help-desc-1              "Tiedot tulevat näkyviin NAP-palvelun julkisille sivuille."
-  :help-desc-2              "Täytä "
-  :help-desc-3              " -osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :help-desc-4              " -osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
-  :help-desc-5              "Voit lisätä ja poistaa palveluntuottajan edustajia"
-  :help-desc-5-linklabel    "jäsenet sivulla"
-  :help-desc-6 "\nPalveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö."}
-
+ {:contact-types           "Yhteystavat"
+  :organization-form-title "Palveluntuottajan tiedot"
+  :organization-new-title  "Lisää palveluntuottaja"
+  :help-desc-1             "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
+  :help-desc-2             (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
+  :basic-info-tooltip      "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
+  :contact-types-tooltip   "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
+  :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  }
 
  :passenger-transportation-page
  {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"

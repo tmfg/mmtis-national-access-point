@@ -518,17 +518,15 @@
 
 
  :organization-page
- {:contact-types            "Phone and email"
-  :organization-form-title  "Basic information"
-  :organization-new-title   "Create a new transport operator"
-  :help-desc-1              "This information will be seen in the public pages of NAP-service."
-  :help-desc-2              "Fill in to "
-  :help-desc-3              " -section information about the company, community or organization you are representing."
-  :help-desc-4              " -sections information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
-  :help-desc-5              "You can add and delete members to the transport operator in the"
-  :help-desc-5-linklabel    "members-page"
-  :help-desc-6 "\nThe purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."}
-
+ {:contact-types           "Phone and email"
+  :organization-form-title "Basic information"
+  :organization-new-title  "Create a new transport operator"
+  :help-desc-1             "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
+  :help-desc-2             (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
+  :basic-info-tooltip      "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
+  :contact-types-tooltip   "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
+  :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  }
 
  :passenger-transportation-page
  {:header-new-passenger-transportation     "Add a new transport service"
