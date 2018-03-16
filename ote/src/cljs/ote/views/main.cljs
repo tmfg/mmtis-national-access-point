@@ -99,10 +99,6 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->ChangePage :routes nil)))}])
      [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:common-texts :user-menu-summary])
-                    :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl "/dashboard/datasets")))}]
-     [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
