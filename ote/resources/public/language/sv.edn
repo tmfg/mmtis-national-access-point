@@ -649,6 +649,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :transport-operator-saved                   "Uppgifterna sparade!"
   :footer-livi-logo                           "Liikennevirasto Logo"
   :footer-livi-url                            "Liikennevirasto.fi"
+  :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
   :no-such-page                               "Valda sidan hittas ej: "
