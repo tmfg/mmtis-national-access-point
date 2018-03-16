@@ -22,7 +22,8 @@
             [ote.tasks.company :as tasks-company]
 
             [taoensso.timbre :as log]
-            [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling])
+            [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
+            [jeesql.autoreload :as autoreload])
   (:gen-class))
 
 (defonce ^{:doc "Handle for OTE-system"}
@@ -85,6 +86,8 @@
    (fn [_]
      (let [config (read-string (slurp "config.edn"))]
        (configure-logging (:log config))
+       (when (:dev-mode? config)
+         (autoreload/start-autoreload))
        (component/start-system (ote-system config))))))
 
 (defn stop []

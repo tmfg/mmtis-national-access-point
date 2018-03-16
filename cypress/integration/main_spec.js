@@ -125,7 +125,6 @@ describe('Header - Logged In', function () {
                 cy.get('.authed');
 
                 // Dropdown menu links
-                cy.contains('Yhteenveto');
                 cy.contains('Käyttäjätilin muokkaus');
                 cy.contains('Anna palautetta palvelusta');
                 cy.contains('Kirjaudu ulos');

@@ -59,11 +59,16 @@
 - bar function no longer throws NPE
 - delete button now works
 
+# Changed
+- Changed an existing feature.
+- Removed unused menu item.
+
 # Environment
 - added jenkins job to do something"})
-;; => {"Added" "- foo-page now has sorting options\n\n",
-;;     "Fixed" "- bar function no longer throws NPE\n- delete button now works\n\n",
-;;     "Environment" "- added jenkins job to do something\n"}
+  ;; => {"Added" "- foo-page now has sorting options\n\n",
+  ;;     "Fixed" "- bar function no longer throws NPE\n- delete button now works\n\n",
+  ;;     "Changed" "- Changed an existing feature.\n- Removed unused menu item.\n\n",
+  ;;     "Environment" "- added jenkins job to do something\n"}
 )
 
 (defn merge-day [pr]
@@ -88,6 +93,7 @@
          (str "\n\n# " day "\n"
               (format-section "Added" (get all-sections "Added"))
               (format-section "Fixed" (get all-sections "Fixed"))
+              (format-section "Changed" (get all-sections "Changed"))
               (format-section "Datamodel" (get all-sections "Datamodel"))
               (format-section "Environment" (get all-sections "Environment"))))))))
 
