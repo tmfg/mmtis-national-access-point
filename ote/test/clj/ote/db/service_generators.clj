@@ -90,7 +90,8 @@
    ::t-service/rental-additional-services generators/gen-additional-services-array
    ::t-service/usage-area (generators/word-of-length 5 50)
    ::t-service/advance-reservation generators/gen-advance-reservation
-   ::t-service/pick-up-locations generators/gen-pick-up-locations-array))
+   ::t-service/pick-up-locations generators/gen-pick-up-locations-array
+   ::t-service/real-time-information generators/gen-service-link))
 
 (def gen-transport-service-common
   (gen/hash-map

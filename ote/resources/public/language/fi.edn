@@ -140,6 +140,7 @@
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/usage-area                "Sallitut maat"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
    :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
