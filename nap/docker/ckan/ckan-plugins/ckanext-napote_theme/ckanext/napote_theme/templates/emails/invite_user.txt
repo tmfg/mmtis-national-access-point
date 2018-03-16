@@ -1,5 +1,5 @@
-Hyvä vastaanottaja,  
-Teidät on kutsuttu käyttämään NAP-liikkumispalvelukatalogia. 
+Hyvä vastaanottaja,
+Teidät on kutsuttu käyttämään NAP-liikkumispalvelukatalogia.
 Teille on jo luotu käyttäjätunnus nimellä {{ user_name }}.
 Voitte vaihtaa käyttäjänimen myöhemmin palvelussa.
 Mikäli hyväksytte kutsun, klikatkaa alla olevaa linkkiä ja käykää asettamassa itsellenne salasana:
@@ -17,7 +17,7 @@ Godkänn denna inbjudan genom att återställa ditt lösenord här:
 ---------
 
 Dear recipient,
-You have been invited to use the NAP service catalog. 
+You have been invited to use the NAP service catalog.
 A user account has already been created for you with the username {{ user_name }}.
 You can change it later.
 To accept this invite, please reset your password at:
