@@ -424,7 +424,7 @@
   :ote.db.transport-service/vehicle-accessibility
   {:low-floor "Låggolv"
    :step-free-access "Inga trappsteg"
-   :accessible-vehicle "Fordon utan hinder (esteetön)"
+   :accessible-vehicle "Fordon utan hinder"
    :suitable-for-wheelchairs "Lämplig för rullstol"
    :suitable-for-stretchers "Bårtransport"
    :boarding-assistance "Assistans vid ombordstigning"
