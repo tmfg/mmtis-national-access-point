@@ -1,4 +1,4 @@
 -- name: fetch-login-info
 SELECT name, email, password, fullname
   FROM "user"
- WHERE email = :email and state = 'active';
+ WHERE (name = :email OR email = :email) and state = 'active';
