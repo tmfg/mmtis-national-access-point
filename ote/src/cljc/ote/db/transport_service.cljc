@@ -101,22 +101,20 @@
 (def week-day-order {:MON 0 :TUE 1 :WED 2 :THU 3 :FRI 4 :SAT 5 :SUN 6})
 
 ;; Create order for accessibility-facility
-(def accessibility [:lift :escalator :travelator :ramp :stairs :shuttle :narrow-entrance :barrier
-                    :pallet-access-low-floor :wheelchair-access-toilet
-                    :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips
-                    :other])
+(def accessibility [:lift :escalator :travelator :ramp :stairs :narrow-entrance :barrier
+                    :wheelchair-access-toilet :step-free-access :suitable-for-wheelchairs
+                    :tactile-platform-edges :tactile-guiding-strips])
 
 ;; Create order for accessibility-info-facility
 (def information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
-                                        :displays-for-visually-impaired :large-print-timetables :other])
+                                        :displays-for-visually-impaired :large-print-timetables])
 
 ;; Create order for accessibility-facility for parking services
 (def parking-accessibility [:lift :ramp :stairs :narrow-entrance :barrier :wheelchair-access-toilet
-                            :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips
-                            :other])
+                            :step-free-access :suitable-for-wheelchairs :tactile-platform-edges :tactile-guiding-strips])
 
 (def parking-information-service-accessibility [:audio-for-hearing-impaired :audio-information :visual-displays
-                                                :displays-for-visually-impaired :other])
+                                                :displays-for-visually-impaired])
 
 (defn service-key-by-type
   "Returns the service column keyword for the given type enum value."

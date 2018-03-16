@@ -389,9 +389,7 @@
    :audio-information "Kuulutukset"
    :visual-displays "Visuaaliset näytöt"
    :displays-for-visually-impaired "Näytöt näkövammaisille (taktiili)"
-   :large-print-timetables "Suuret kirjasimet aikatauluissa"
-   :other "Muu"}
-
+   :large-print-timetables "Suuret kirjasimet aikatauluissa"}
 
   :ote.db.transport-service/accessibility
   {:lift "Hissi"
@@ -399,17 +397,14 @@
    :travelator "Liikkuva kävelytie"
    :ramp "Ramppi"
    :stairs "Portaat"
-   :shuttle "Sukkulaliikenne"
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
-   :pallet-access-low-floor "Matala lattia"
    :wheelchair-access-toilet "Inva WC"
 
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
-   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other  "Muu"}
+   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Pyörätuoli"
@@ -797,12 +792,10 @@
                    "escalator" "Liukuportaat"
                    "lift" "Hissi"
                    "narrow-entrance" "Kapea sisäänkäynti"
-                   "pallet-access-low-floor" "Kuormalavalinjan matala lattia"
                    "barrier" "Puomi"
                    "travelator" "Liikkuva kävelytie"
                    "ramp" "Ramppi"
                    "stairs" "Portaat"
-                   "shuttle" "Sukkulaliikenne"
                    "step-free-access" "Portaaton pääsy"
                    "suitable-for-wheelchairs" "Sopii pyörätuolille"
                    "assistance-dog-space" "Tila avustuskoiralle"
