@@ -29,6 +29,7 @@
 (defrecord NewStartTime [time])
 (defrecord AddTrip [])
 (defrecord EditStopTime [trip-idx stop-idx form-data])
+(defrecord ShowStopException [stop-type stop-idx icon-type trip-idx])
 
 ;; Event to set service calendar
 (defrecord EditServiceCalendar [trip-idx])
@@ -48,7 +49,13 @@
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
 
-
+(defn- update-stop-by-idx [route stop-idx trip-idx update-fn & args]
+  (update (get-in route [::transit/trips trip-idx]) ::transit/stop-times
+          (fn [stops]
+            (mapv #(if (= (::transit/stop-idx %) stop-idx)
+                     (apply update-fn % args)
+                     %)
+                  stops))))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -220,6 +227,16 @@
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
     (update-in app [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data))
+
+  ShowStopException
+  (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx} app]
+    (let [icon-key (if (= "arrival" stop-type)
+                     (keyword "ote.db.transit/pickup-type")
+                     (keyword "ote.db.transit/drop-off-type"))]
+    (assoc-in app [:route ::transit/trips trip-idx]
+              (update-stop-by-idx
+                (get app :route) stop-idx trip-idx
+                assoc icon-key icon-type))))
 
   SaveAsGTFS
   (process-event [_ {route :route :as app}]
