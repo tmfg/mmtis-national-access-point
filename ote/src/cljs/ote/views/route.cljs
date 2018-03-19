@@ -95,9 +95,10 @@
                          :icon (ic/navigation-arrow-forward)}
          "Seuraava"])]]))
 
-(defn new-route [e! _]
-  (e! (rc/->LoadStops))
-  (e! (rc/->InitRoute))
+(defn new-route [e! app]
+  (when (not (:route app))
+    (e! (rc/->LoadStops))
+    (e! (rc/->InitRoute)))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
       [:span
