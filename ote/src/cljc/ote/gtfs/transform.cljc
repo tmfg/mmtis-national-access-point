@@ -168,13 +168,15 @@
       (map-indexed
        (fn [i {stop-times ::transit/stop-times :as trip}]
          (for [{::transit/keys [stop-idx arrival-time departure-time
-                                pickup-type drop-off-type]} stop-times]
+                                pickup-type drop-off-type]
+                idx :idx} (index-key :idx identity stop-times)]
            {:gtfs/trip-id (str id "_" i)
             :gtfs/stop-id (::transit/code (nth stops stop-idx))
             :gtfs/arrival-time (or arrival-time departure-time)
             :gtfs/departure-time (or departure-time arrival-time)
             :gtfs/pickup-type (stopping-type pickup-type)
-            :gtfs/drop-off-type (stopping-type drop-off-type)}))
+            :gtfs/drop-off-type (stopping-type drop-off-type)
+            :gtfs/stop-sequence idx}))
        trips)))
    routes))
 
