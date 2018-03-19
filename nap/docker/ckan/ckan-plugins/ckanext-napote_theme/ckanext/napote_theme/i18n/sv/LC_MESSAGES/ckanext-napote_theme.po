@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2018-02-09 13:58+0200\n"
+"PO-Revision-Date: 2018-03-19 09:32+0200\n"
 "Last-Translator: \n"
 "Language: sv\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 2.0.5\n"
 
 #: ckanext/napote_theme/controller.py:70
 #, python-format
@@ -104,7 +104,7 @@ msgstr "Ge respons"
 
 #: ckanext/napote_theme/templates/footer.html:16 ckanext/napote_theme/templates/header.html:119
 msgid "NAP user guide label"
-msgstr "Käyttöohje"
+msgstr "Hjälp"
 
 #: ckanext/napote_theme/templates/footer.html:24
 msgid "<strong>Powered by</strong> <a class=\"hide-text ckan-footer-logo\" href=\"http://ckan.org\">CKAN</a>"
