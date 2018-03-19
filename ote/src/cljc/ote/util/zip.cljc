@@ -4,7 +4,7 @@
      (:require [cljsjs.jszip]
                [cljsjs.filesaverjs]))
   #?(:clj
-     (:import (java.util.zip ZipOutputStream))))
+     (:import (java.util.zip ZipOutputStream ZipEntry))))
 
 (defn write-zip
   "Write a zip file. Content is a sequence of file descriptors.
@@ -18,5 +18,8 @@
              (-> zip
                  (.generateAsync #js {:type "blob"})
                  (.then #(js/saveAs % to))))
-     :clj (doseq [{:keys [name data]} content]
-            (println "saving " name))))
+     :clj (with-open [out (ZipOutputStream. to)]
+            (doseq [{:keys [name data]} content]
+              (.putNextEntry out (ZipEntry. name))
+              (.write out (.getBytes data "UTF-8"))
+              (.closeEntry out)))))
