@@ -94,7 +94,6 @@ This is only called with GTFS field names and cannot grow unbounded."}
     (str header "\n"
          (csv->string
           (mapv (fn [row]
-                  (println "ROW: " (pr-str row))
                   (mapv #(clj->gtfs (field-spec-description %) (get row %))
                         fields))
                 content)))))
