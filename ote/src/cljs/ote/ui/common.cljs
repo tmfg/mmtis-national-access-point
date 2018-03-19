@@ -131,12 +131,14 @@
         [:span {:ref "sensor"}])})))
 
 (defn copy-to-clipboard [text-to-copy]
-  (let [id (name (gensym "ctc"))]
+  (let [id (name (gensym "ctc"))
+        copy! #(let [elt (.getElementById js/document id)]
+                 (.select elt)
+                 (.execCommand js/document "Copy"))]
     [:div {:style {:display "inline-block"}}
      [:input {:id id
               :readonly true
+              :on-focus copy!
               :value text-to-copy}]
      [ui/flat-button {:icon (ic/content-content-copy)
-                      :on-click #(let [elt (.getElementById js/document id)]
-                                   (.select elt)
-                                   (.execCommand js/document "Copy"))}]]))
+                      :on-click copy!}]]))
