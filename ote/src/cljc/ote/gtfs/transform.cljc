@@ -60,6 +60,7 @@
    (fn [services date]
      (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
            service-idx (index-of #((:rule-dates %) df) services)]
+       ;; PENDING: what if multiple services have the same date
        (if-not service-idx
          services
          (update-in services [service-idx :removed-dates] (fnil conj #{}) (time/date-fields->date df)))))
@@ -76,7 +77,8 @@
    services dates))
 
 (defn route-services
-  "Generate service ids from service calendars."
+  "Generate GTFS services from service calendars. One service calendar can be
+  expanded to multiple services."
   [{::transit/keys [service-calendars id]}]
   (for [{::transit/keys [service-rules service-added-dates service-removed-dates]
          service-calendar-id :service-calendar-id}
@@ -145,6 +147,35 @@
       services))
    routes))
 
+(defn- stopping-type
+  "GTFS pickup/drop off type for a database stopping-type enum value."
+  [t]
+  (case t
+    :regular "0"
+    :not-available "1"
+    :phone-agency "2"
+    :coordinate-with-driver "3"
+    ;; Defaults to regular
+    "0"))
+
+(defn- stop-times-txt [routes]
+  (mapcat
+   (fn [{::transit/keys [id trips stops]}]
+     (reduce
+      concat
+      (map-indexed
+       (fn [i {stop-times ::transit/stop-times :as trip}]
+         (for [{::transit/keys [stop-idx arrival-time departure-time
+                                pickup-type drop-off-type]} stop-times]
+           {:gtfs/trip-id (str id "_" i)
+            :gtfs/stop-id (::transit/code (nth stops stop-idx))
+            :gtfs/arrival-time (or arrival-time departure-time)
+            :gtfs/departure-time (or departure-time arrival-time)
+            :gtfs/pickup-type (stopping-type pickup-type)
+            :gtfs/drop-off-type (stopping-type drop-off-type)}))
+       trips)))
+   routes))
+
 (defn routes-gtfs
   "Generate all supported GTFS files form given transport operator and route list"
   [transport-operator routes]
@@ -158,6 +189,10 @@
         :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt (agency-txt transport-operator))}
        {:name "stops.txt"
         :data (gtfs-parse/unparse-gtfs-file :gtfs/stops-txt (stops-txt stops-by-code))}
+       {:name "stop_times.txt"
+        :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt
+                                            (stop-times-txt routes))}
+
 
        {:name "routes.txt"
         :data (gtfs-parse/unparse-gtfs-file
@@ -177,5 +212,4 @@
                :gtfs/calendar-dates-txt
                (calendar-dates-txt routes))}]
       (catch #?(:cljs js/Object :clj Exception) e
-        (.printStackTrace e)
         (log/warn "Error generating GTFS file content" e)))))
