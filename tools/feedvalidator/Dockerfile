@@ -15,4 +15,7 @@ RUN cd transitfeed && pip install transitfeed
 
 RUN sed -i "s|/usr/bin/python2.5|/usr/bin/python|g" transitfeed/feedvalidator.py
 
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ENTRYPOINT ["/transitfeed/feedvalidator.py", "-o", "/data/output.html", "/data/gtfs.zip"]
