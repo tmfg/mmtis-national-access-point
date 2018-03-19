@@ -59,11 +59,13 @@
   (reduce
    (fn [services date]
      (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
-           service-idx (index-of #((:rule-dates %) df) services)]
-       ;; PENDING: what if multiple services have the same date
-       (if-not service-idx
-         services
-         (update-in services [service-idx :removed-dates] (fnil conj #{}) (time/date-fields->date df)))))
+           removed-date (time/date-fields->date df)]
+       (mapv
+        (fn [{rule-dates :rule-dates :as service}]
+          (if (rule-dates df)
+            (update service :removed-dates (fnil conj #{}) removed-date)
+            service))
+        services)))
    services dates))
 
 (defn- services-with-added-dates
