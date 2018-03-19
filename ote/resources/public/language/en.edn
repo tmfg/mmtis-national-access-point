@@ -139,6 +139,7 @@
   {:ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
    :ote.db.transport-service/payment-methods           "Accepted payment methods"
    :ote.db.transport-service/usage-area                "Usage area restrictions (country limitations)"
+   :ote.db.transport-service/real-time-information     "Realtime information WWW-address"
    :ote.db.transport-service/booking-service           "Booking service address"
    :ote.db.transport-service/vehicle-classes           "Rental vehicles"
    :ote.db.transport-service/vehicle-type              "Vehicle type"

@@ -103,7 +103,16 @@
      (date-fields [this]
        {::date (.getDayOfMonth this)
         ::month (.getMonthValue this)
-        ::year (.getYear this)})))
+        ::year (.getYear this)})
+
+     org.joda.time.DateTime
+     (date-fields [this]
+       {::date (.getDayOfMonth this)
+        ::month (.getMonthOfYear this)
+        ::year (.getYear this)
+        ::hours (.getHourOfDay this)
+        ::minutes (.getMinuteOfHour this)
+        ::seconds (.getSecondOfMinute this)})))
 
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
@@ -281,12 +290,11 @@
     6 :saturday
     7 :sunday))
 
-#?(:cljs
-   (defn js->date-time
-     "Convert a JS Date object to cljs-time. Takes into account that
-the JS date objects for timezones added to UTC (like Finnish UTC+2/+3) the date
-part is the previous day.
+(defn native->date-time
+  "Convert a platform native Date object to clj(s)-time.
+  Takes into account that the JS date objects for timezones added
+  to UTC (like Finnish UTC+2/+3) the date part is the previous day.
 
-For example: midnight 27 Feb 2018 => 26 Feb 2018 22:00"
-     [js]
-     (date-fields->date-time (date-fields js))))
+  For example: midnight 27 Feb 2018 => 26 Feb 2018 22:00"
+   [native-date]
+   (date-fields->date-time (date-fields native-date)))
