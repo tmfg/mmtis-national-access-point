@@ -24,7 +24,9 @@
   ["transit_stop_time" ::stop-time]
   ["transit_trip" ::trip]
   ["transit_route" ::route
-   ote.db.modification/modification-fields])
+   ote.db.modification/modification-fields]
+
+  ["finnish_ports" ::finnish-ports])
 
 (def rule-week-days [::monday ::tuesday ::wednesday ::thursday
                      ::friday ::saturday ::sunday])

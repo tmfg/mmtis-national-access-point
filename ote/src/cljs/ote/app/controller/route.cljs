@@ -61,7 +61,7 @@
   LoadStops
   (process-event [_ app]
     (let [on-success (tuck/send-async! ->LoadStopsResponse)]
-      (comm/get! "finnish-ports.geojson"
+      (comm/get! "transit/stops.json"
                  {:on-success on-success
                   :response-format :json})
       app))

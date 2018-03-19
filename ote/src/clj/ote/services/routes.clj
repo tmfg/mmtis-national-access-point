@@ -13,7 +13,8 @@
             [ote.time :as time]
             [taoensso.timbre :as log]
             [specql.op :as op]
-            [ote.authorization :as authorization])
+            [ote.authorization :as authorization]
+            [cheshire.core :as cheshire])
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (def route-list-columns  #{::transit/id
@@ -75,12 +76,35 @@
       (http/transit-response
        (save-route nap-config db user (http/transit-request form-data))))))
 
+(defn- stops-geojson [db]
+  (cheshire/encode
+   {:type "FeatureCollection"
+    :features (for [{::transit/keys [code name location]}
+                    (fetch db ::transit/finnish-ports
+                           #{::transit/code ::transit/name ::transit/location}
+                           {})]
+                {:type "Feature"
+                 :geometry {:type "Point"
+                            :coordinates [(.-x (.getGeometry location))
+                                          (.-y (.getGeometry location))]}
+                 :properties {:code code :name name}})}))
+
+(defn- public-routes
+  "Routes that are public (don't require authentication)"
+  [db]
+  (routes
+   (GET "/transit/stops.json" _
+        {:status 200
+         :headers {"Content-Type" "application/vnd.geo+json"}
+         :body (stops-geojson db)})))
+
 (defrecord Routes [nap-config]
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
       this ::stop
-           [(http/publish! http (routes-auth db nap-config))]))
+      [(http/publish! http (routes-auth db nap-config))
+       (http/publish! http {:authenticated? false} (public-routes db))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]
       (s))
