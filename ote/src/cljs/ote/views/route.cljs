@@ -97,7 +97,6 @@
 
 (defn new-route [e! app]
   (when (not (:route app))
-    (e! (rc/->LoadStops))
     (e! (rc/->InitRoute)))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]

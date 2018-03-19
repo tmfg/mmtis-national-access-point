@@ -10,12 +10,11 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]))
 
-;; Load available stops from server (GeoJSON)
-(defrecord LoadStops [])
-(defrecord LoadStopsResponse [response])
 
-;; Initialize editing a new route
+
+;; Initialize editing a new route and load available stops from server (GeoJSON)
 (defrecord InitRoute [])
+(defrecord LoadStopsResponse [response])
 
 ;; Edit route basic info
 (defrecord EditRoute [form-data])
@@ -59,29 +58,26 @@
                   stops))))
 
 (extend-protocol tuck/Event
-  LoadStops
+  InitRoute
   (process-event [_ app]
     (let [on-success (tuck/send-async! ->LoadStopsResponse)]
       (comm/get! "finnish-ports.geojson"
                  {:on-success on-success
                   :response-format :json})
-      app))
+      (update app :route assoc
+              ::transit/stops []
+              ::transit/trips []
+              ::transit/service-calendars []
+              ::transit/route-type :ferry
+              ::transit/transport-operator-id
+              (::t-operator/id
+                (:transport-operator
+                  (first (:transport-operators-with-services app)))))))
 
   LoadStopsResponse
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
-  InitRoute
-  (process-event [_ app]
-    (update app :route assoc
-            ::transit/stops []
-            ::transit/trips []
-            ::transit/service-calendars []
-            ::transit/route-type :ferry
-            ::transit/transport-operator-id
-            (::t-operator/id
-              (:transport-operator
-                (first (:transport-operators-with-services app))))))
 
   EditRoute
   (process-event [{form-data :form-data} app]
