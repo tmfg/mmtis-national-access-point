@@ -137,7 +137,6 @@
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)]
-
     [:div.route-times
      [:table {:style {:text-align "center"}}
       [route-times-header stop-sequence]
@@ -149,7 +148,8 @@
                           :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
       [ui/raised-button {:style {:margin-left "5px"}
                          :primary true
-                         :disabled (time/empty-time? (:new-start-time route))
+                         :disabled (or (time/empty-time? (:new-start-time route))
+                                        (empty? (first (:ote.db.transit/service-calendars route))))
                          :on-click #(e! (rc/->AddTrip))
                          :label "Lisää vuoro"}]]]))
 
