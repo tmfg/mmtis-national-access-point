@@ -65,7 +65,7 @@
     (doall
      (map-indexed
       (fn [i {::transit/keys [code name]}]
-        ^{:key code}
+        ^{:key (str code "_" i)}
         [:th {:colSpan 2
               :style {:vertical-align "top"}}
          [:div {:style {:display "inline-block"
