@@ -1,6 +1,7 @@
 (ns ote.services.routes
   "Routes api."
   (:require [com.stuartsierra.component :as component]
+            [jeesql.core :refer [defqueries]]
             [ote.components.http :as http]
             [ote.services.transport :as transport]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
@@ -43,10 +44,11 @@
       java.util.Date/from))
 
 (defn- stop-location-geometry [{[lat lng] ::transit/location :as stop}]
+  ;(println "********* stop-location-geometry " (pr-str stop))
   (assoc stop
          ::transit/location (PGgeometry. (Point. lat lng))))
 
-(defn- service-calendar-dates [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
+(defn- service-calendar-dates->db [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
   (assoc cal
          ::transit/service-removed-dates (map service-date->inst service-removed-dates)
          ::transit/service-added-dates (map service-date->inst service-added-dates)))
@@ -58,9 +60,18 @@
       (let [r (-> route
                   (modification/with-modification-fields ::transit/id user)
                   (update ::transit/stops #(mapv stop-location-geometry %))
-                  (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
+                  (update ::transit/service-calendars #(mapv service-calendar-dates->db %)))]
         (log/debug "Save route: " r)
         (upsert! db ::transit/route r)))))
+
+(defn get-route
+  "Get single route by id"
+  [db id]
+  (let [route (first (fetch db ::transit/route
+                         (specql/columns ::transit/route)
+                         {::transit/id id}))]
+    (println "**************** route" (pr-str route))
+    route))
 
 (defn- routes-auth
   "Routes that require authentication"
@@ -73,7 +84,14 @@
     (POST "/routes/new" {form-data :body
                          user      :user}
       (http/transit-response
-       (save-route nap-config db user (http/transit-request form-data))))))
+       (save-route nap-config db user (http/transit-request form-data))))
+
+    (GET "/routes/:id" [id]
+      (let [route (get-route db (Long/parseLong id))]
+        (if-not route
+          {:status 404}
+          (http/no-cache-transit-response route))))
+          ))
 
 (defrecord Routes [nap-config]
   component/Lifecycle
