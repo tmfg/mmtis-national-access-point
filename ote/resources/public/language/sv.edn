@@ -13,8 +13,8 @@
   :ote.db.transport-operator/name                     "Tjästeproducentens namn"
   :ote.db.transport-operator/ckan-description "Tjänsteproducentens beskrivning"
   :ote.db.transport-operator/business-id              "FO-nummer"
-  :ote.db.transport-operator/phone                    "Telefon (kontor)"
-  :ote.db.transport-operator/gsm                      "Telefon (GSM)"
+  :ote.db.transport-operator/phone                    "Telefon 1"
+  :ote.db.transport-operator/gsm                      "Telefon 2"
   :ote.db.transport-operator/email                    "E-post"
   :ote.db.transport-operator/homepage                 "WWW-adress"
   :ote.db.transport-operator/visiting-address         "Besöksadress"
@@ -144,8 +144,9 @@
    :ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resgods"
    :ote.db.transport-service/payment-methods           "Väl betalsätt"
    :ote.db.transport-service/usage-area                "Tillåtna länder"
+   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
    :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
-    :ote.db.transport-service/vehicle-classes           "Fordon som uthyres"
+   :ote.db.transport-service/vehicle-classes           "Fordon som uthyres"
    :ote.db.transport-service/vehicle-type              "Fordonstyp"
    :ote.db.transport-service/license-required          "Körkortskategori"
    :ote.db.transport-service/minimum-age               "Undre åldersgräns "
@@ -154,7 +155,7 @@
    :ote.db.transport-service/price-classes             "Pris"
    :ote.db.transport-service/pick-up-name              "Verksamhetsställes namn"
    :ote.db.transport-service/pick-up-type              "Typ"
-      :ote.db.transport-service/rental-additional-services "Övriga tjänster"
+   :ote.db.transport-service/rental-additional-services "Övriga tjänster"
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
@@ -393,9 +394,7 @@
    :audio-information "Utrop"
    :visual-displays "Visuella displays"
    :displays-for-visually-impaired "Tavlor för synskadade (taktil)"
-   :large-print-timetables "Stora tidtabellsskyltar"
-   :other "Annat"}
-
+   :large-print-timetables "Stora tidtabellsskyltar"}
 
   :ote.db.transport-service/accessibility
   {:lift "Hiss"
@@ -403,16 +402,13 @@
    :travelator "Rullband"
    :ramp "Ramp"
    :stairs "Trappor"
-   :shuttle "Skytteltransport"
    :narrow-entrance "Smal ingång"
    :barrier "Bom"
-   :pallet-access-low-floor "Låggolv (Kuormalavalinjan matala lattia)"
    :wheelchair-access-toilet "Inva WC"
    :step-free-access "Inga trappsteg"
    :suitable-for-wheelchairs "Lämplig för rullstol"
    :tactile-platform-edges  "Varning vid perrongkanten"
-   :tactile-guiding-strips "Beröringstyrda följlinjer"
-   :other  "Annat"}
+   :tactile-guiding-strips "Beröringstyrda följlinjer"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Rullstol"
@@ -429,7 +425,7 @@
   :ote.db.transport-service/vehicle-accessibility
   {:low-floor "Låggolv"
    :step-free-access "Inga trappsteg"
-   :accessible-vehicle "Fordon utan hinder (esteetön)"
+   :accessible-vehicle "Fordon utan hinder"
    :suitable-for-wheelchairs "Lämplig för rullstol"
    :suitable-for-stretchers "Bårtransport"
    :boarding-assistance "Assistans vid ombordstigning"
@@ -654,6 +650,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :transport-operator-saved                   "Uppgifterna sparade!"
   :footer-livi-logo                           "Liikennevirasto Logo"
   :footer-livi-url                            "Liikennevirasto.fi"
+  :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
   :no-such-page                               "Valda sidan hittas ej: "
@@ -797,12 +794,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    "escalator" "Rulltrappor"
                    "lift" "Hiss"
                    "narrow-entrance" "Smal ingång"
-                   "pallet-access-low-floor" "Låggolv"
                    "barrier" "Bom"
                    "travelator" "Rullband"
                    "ramp" "Ramp"
                    "stairs" "Trappor"
-                   "shuttle" "Skytteltransport"
                    "tactile-guiding-strips" "Beröringstyrda följlinjer"
                    "tactile-platform-edges" "Varning vid perrongkanten"
                    "wheelchair-access-toilet" "Inva WC"

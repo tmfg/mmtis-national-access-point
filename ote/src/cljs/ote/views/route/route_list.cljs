@@ -1,18 +1,19 @@
 (ns ote.views.route.route-list
   "List own routes"
   (:require
-    [ote.localization :refer [tr tr-key]]
-    [cljs-react-material-ui.reagent :as ui]
-    [ote.app.controller.route.route-list :as route-list]
-    [cljs-react-material-ui.icons :as ic]
-    [ote.views.transport-operator :as t-operator-view]
-    [ote.app.controller.transport-operator :as to]
-    [ote.db.transport-operator :as t-operator]
-    [ote.ui.form-fields :as form-fields]
-    [ote.db.transit :as transit]
-    [ote.db.modification :as modification]
-    [ote.time :as time]
-    [ote.app.controller.front-page :as fp]))
+   [ote.localization :refer [tr tr-key]]
+   [cljs-react-material-ui.reagent :as ui]
+   [ote.app.controller.route.route-list :as route-list]
+   [cljs-react-material-ui.icons :as ic]
+   [ote.views.transport-operator :as t-operator-view]
+   [ote.app.controller.transport-operator :as to]
+   [ote.db.transport-operator :as t-operator]
+   [ote.ui.form-fields :as form-fields]
+   [ote.db.transit :as transit]
+   [ote.db.modification :as modification]
+   [ote.time :as time]
+   [ote.app.controller.front-page :as fp]
+   [ote.ui.common :as common]))
 
 (defn list-routes [e! routes]
   [:div
@@ -72,7 +73,7 @@
 
 (defn routes [e! app]
   (e! (route-list/->LoadRoutes))
-  (fn [e! app]
+  (fn [e! {routes :routes-vector operator :transport-operator :as app}]
     [:div
      [:div.row
       [:div.col-xs-12.col-sm-6.col-md-9
@@ -88,5 +89,19 @@
 
      [:div.row
       [list-operators e! app]]
-     (when (:routes-vector app)
-       [list-routes e! (:routes-vector app)])]))
+     (when routes
+       [list-routes e! routes])
+     (when routes
+       (let [loc (.-location js/document)
+             url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
+                      "export/gtfs/" (::t-operator/id operator))]
+         [:span
+          [:br]
+          [common/help
+           [:span
+            [:div
+             "Palveluntuottajan voimassaolevat reitit: "
+             [common/linkify url "GTFS Zip tiedosto"]]
+            [:div
+             "Kopioi osoite: "
+             [common/copy-to-clipboard url]]]]]))]))

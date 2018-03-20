@@ -99,10 +99,6 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->ChangePage :routes nil)))}])
      [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:common-texts :user-menu-summary])
-                    :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl "/dashboard/datasets")))}]
-     [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
@@ -242,7 +238,8 @@
      [:div.col-md-2.footer-links
       [:ul.unstyled
        [:li
-        [linkify "https://www.liikennevirasto.fi/nap" (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
+        [linkify (tr [:common-texts :footer-livi-url-link])
+         (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
        [:li
         [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
        [:li

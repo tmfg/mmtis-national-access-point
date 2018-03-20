@@ -6,6 +6,7 @@
             [clojure.string :as str]
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [clojure.set :as set]))
@@ -62,19 +63,6 @@
                      %)
                   stops))))
 
-(defn- update-stop-times [stops trips]
-  (let [departured-stops (map-indexed
-                 (fn [idx item]
-                     (assoc item ::transit/departure-time
-                                  (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])))
-                 stops)
-        updated-stops (map-indexed
-                 (fn [idx item]
-                   (assoc item ::transit/arrival-time
-                                (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
-                 departured-stops)]
-    updated-stops))
-
 (defn rule-dates
   "Evaluate a recurring schedule rule. Returns a sequence of dates."
   [{::transit/keys [from-date to-date] :as rule}]
@@ -86,35 +74,6 @@
                                (time/js->date-time to-date))
             :when (week-days (time/day-of-week d))]
         (time/date-fields d)))))
-
-(defn update-trips-calendar
-  "In database one service-calendar can be linked to all trips, but in front-end we need to copy or multiply
-  service-calendars according to trips service-calendar-idx"
-  [trips service-calendars]
-  (let [new-calendars
-        (mapv
-          (fn [trip]
-            (if (empty? service-calendars)
-              {::transit/service-added-dates #{}
-               ::transit/service-removed-dates #{}
-               ::transit/service-rules []
-               :rule-dates #{}}
-
-              (let [cal-idx (::transit/service-calendar-idx trip)
-                  cal (nth service-calendars cal-idx)
-                  rule-dates (into #{}
-                                   (mapcat rule-dates)
-                                   (::transit/service-rules cal))]
-              (->  cal
-                  (assoc :rule-dates rule-dates)
-                   (assoc ::transit/service-added-dates (into #{}
-                                                                 (map #(time/date-fields-from-timestamp %)
-                                                                 (::transit/service-added-dates cal))))
-                   (assoc ::transit/service-removed-dates (into #{}
-                                                                   (map #(time/date-fields-from-timestamp %)
-                                                                   (::transit/service-removed-dates cal))))))))
-          trips)]
-    new-calendars))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -129,34 +88,17 @@
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
-  LoadRoute
-  (process-event [{id :id} app]
-    (let [on-success (tuck/send-async! ->LoadRouteResponse)]
-      (comm/get! (str "routes/" id)
-                 {:on-success on-success})
-      app))
-
-  LoadRouteResponse
-  (process-event [{response :response} app]
-    (let [trips (::transit/trips response)
-          service-calendars (update-trips-calendar trips (::transit/service-calendars response))
-          stop-coordinates (mapv #(update % ::transit/location (fn [stop] (:coordinates stop)) ) (::transit/stops response))
-          stops (update-stop-times stop-coordinates trips)
-          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
-
-      (-> app
-        (assoc :route response)
-        (assoc-in [:route ::transit/stops] stops)
-        (assoc-in [:route ::transit/trips] trips)
-        (assoc-in [:route ::transit/service-calendars] service-calendars))))
-
   InitRoute
   (process-event [_ app]
     (update app :route assoc
             ::transit/stops []
             ::transit/trips []
             ::transit/service-calendars []
-            ::transit/route-type :ferry))
+            ::transit/route-type :ferry
+            ::transit/transport-operator-id
+            (::t-operator/id
+              (:transport-operator
+                (first (:transport-operators-with-services app)))))))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -165,41 +107,44 @@
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (let [current-stops (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
-          new-stop (dissoc (merge (into {}
-                                  (map #(update % 0 (partial keyword "ote.db.transit")))
-                                  (js->clj (aget feature "properties")))
-                            {::transit/location (vec (aget feature "geometry" "coordinates"))})
-                             ::transit/country
-                             ::transit/country-code
-                             ::transit/unlocode
-                             ::transit/port-type
-                             ::transit/port-type-name
-                             ::transit/type)
-          new-vector (conj current-stops new-stop)]
-    (assoc-in app [:route ::transit/stops] new-vector)))
+    (-> app
+        (update-in [:route ::transit/stops]
+                   (fn [stop-sequence]
+                     (conj (or stop-sequence [])
+                           (merge (into {}
+                                        (map #(update % 0 (partial keyword "ote.db.transit")))
+                                        (js->clj (aget feature "properties")))
+                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
-    (update-in app [:route ::transit/stops idx]
-               (fn [{old-arrival ::transit/arrival-time
-                     old-departure ::transit/departure-time
-                     :as old-stop}]
-                 (let [new-stop (merge old-stop stop)]
-                   ;; If old departure time is same as arrival and arrival
-                   ;; was changed, also change departure time.
-                   (if (and (= old-departure old-arrival)
-                            (contains? stop ::transit/arrival-time))
-                     (assoc new-stop
-                            ::transit/departure-time (::transit/arrival-time new-stop))
-                     new-stop)))))
+    (-> app
+        (update-in [:route ::transit/stops idx]
+                   (fn [{old-arrival ::transit/arrival-time
+                         old-departure ::transit/departure-time
+                         :as old-stop}]
+                     (let [new-stop (merge old-stop stop)]
+                       ;; If old departure time is same as arrival and arrival
+                       ;; was changed, also change departure time.
+                       (if (and (= old-departure old-arrival)
+                                (contains? stop ::transit/arrival-time))
+                         (assoc new-stop
+                           ::transit/departure-time (::transit/arrival-time new-stop))
+                         new-stop))))
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])))
 
   DeleteStop
   (process-event [{idx :idx} app]
-    (update-in app [:route ::transit/stops]
-               (fn [stops]
-                 (into (subvec stops 0 idx)
-                       (subvec stops (inc idx))))))
+    (-> app
+        (update-in [:route ::transit/stops]
+                   (fn [stops]
+                     (into (subvec stops 0 idx)
+                           (subvec stops (inc idx)))))
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])))
 
 
   EditServiceCalendar
@@ -230,7 +175,7 @@
                             (disj service-removed-dates date))
 
                      ;; This date matches a rule, add it to removed dates
-                     (some #(some (partial = date) (rule-dates %)) service-rules)
+                     (some #(some (partial = date) (transit/rule-dates %)) service-rules)
                      (assoc service-calendar ::transit/service-removed-dates
                             (conj service-removed-dates date))
 
@@ -242,7 +187,7 @@
   EditServiceCalendarRules
   (process-event [{rules :rules trip-idx :trip-idx} app]
     (let [rule-dates (into #{}
-                           (mapcat rule-dates)
+                           (mapcat transit/rule-dates)
                            (::transit/service-rules rules))]
       (-> app
           (update-in [:route ::transit/service-calendars trip-idx] merge rules)
@@ -343,7 +288,7 @@
                                  (mapv #(assoc % ::transit/service-calendar-idx
                                                  (nth cals-indices (::transit/service-calendar-idx %)))
                                        trips)))
-                    (dissoc :step :stops :new-start-time))]
+                    (dissoc :step :stops :new-start-time :edit-service-calendar))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)}))
@@ -352,7 +297,7 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
-    (dissoc app :route))
+    (assoc (dissoc app :route) :page :routes))
 
   SaveRouteFailure
   (process-event [{response :response} app]

@@ -153,8 +153,9 @@
                          :on-click #(e! (rc/->AddTrip))
                          :label "Lisää vuoro"}]]]))
 
-(defn trips [e! _]
-  (e! (rc/->InitRouteTimes))
+(defn trips [e! {route :route :as app}]
+  (when (empty? (::transit/trips route))
+    (e! (rc/->InitRouteTimes)))
   (fn [e! {route :route :as app}]
     (if (:edit-service-calendar route)
       [route-service-calendar/service-calendar e! app]

@@ -13,8 +13,8 @@
   :ote.db.transport-operator/name                     "Palveluntuottajan nimi"
   :ote.db.transport-operator/ckan-description "Palveluntuottajan kuvaus"
   :ote.db.transport-operator/business-id              "Y-tunnus"
-  :ote.db.transport-operator/phone                    "Puhelin (toimisto)"
-  :ote.db.transport-operator/gsm                      "Puhelin (GSM)"
+  :ote.db.transport-operator/phone                    "Puhelinnumero 1"
+  :ote.db.transport-operator/gsm                      "Puhelinnumero 2"
   :ote.db.transport-operator/email                    "Sähköpostiosoite"
   :ote.db.transport-operator/homepage                 "WWW-osoite"
   :ote.db.transport-operator/visiting-address         "Käyntiosoite"
@@ -140,6 +140,7 @@
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/usage-area                "Sallitut maat"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
    :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
@@ -389,9 +390,7 @@
    :audio-information "Kuulutukset"
    :visual-displays "Visuaaliset näytöt"
    :displays-for-visually-impaired "Näytöt näkövammaisille (taktiili)"
-   :large-print-timetables "Suuret kirjasimet aikatauluissa"
-   :other "Muu"}
-
+   :large-print-timetables "Suuret kirjasimet aikatauluissa"}
 
   :ote.db.transport-service/accessibility
   {:lift "Hissi"
@@ -399,17 +398,14 @@
    :travelator "Liikkuva kävelytie"
    :ramp "Ramppi"
    :stairs "Portaat"
-   :shuttle "Sukkulaliikenne"
    :narrow-entrance "Kapea sisäänkäynti"
    :barrier "Puomi"
-   :pallet-access-low-floor "Matala lattia"
    :wheelchair-access-toilet "Inva WC"
 
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
    :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
-   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"
-   :other  "Muu"}
+   :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"}
 
   :ote.db.transport-service/transportable-aid
   {:wheelchair "Pyörätuoli"
@@ -660,6 +656,7 @@
   :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo                           "Liikennevirasto Logo"
   :footer-livi-url                            "Liikennevirasto.fi"
+  :footer-livi-url-link "https://www.liikennevirasto.fi/nap"
   :footer-ckan-software                       "CKAN-ohjelmistolla"
   :footer-made-width                          "Toteutettu"
   :no-such-page                               "Valittua sivua ei löydy: "
@@ -797,12 +794,10 @@
                    "escalator" "Liukuportaat"
                    "lift" "Hissi"
                    "narrow-entrance" "Kapea sisäänkäynti"
-                   "pallet-access-low-floor" "Kuormalavalinjan matala lattia"
                    "barrier" "Puomi"
                    "travelator" "Liikkuva kävelytie"
                    "ramp" "Ramppi"
                    "stairs" "Portaat"
-                   "shuttle" "Sukkulaliikenne"
                    "step-free-access" "Portaaton pääsy"
                    "suitable-for-wheelchairs" "Sopii pyörätuolille"
                    "assistance-dog-space" "Tila avustuskoiralle"

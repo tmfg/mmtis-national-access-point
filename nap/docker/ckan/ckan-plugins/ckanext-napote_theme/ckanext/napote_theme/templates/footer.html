@@ -10,8 +10,16 @@
         <div class="span7 footer-links">
             {% block footer_nav %}
                 <ul class="unstyled">
-                    {% block footer_links %}
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/nap">Liikennevirasto.fi</a></li>
+                  {% block footer_links %}
+
+                  {% if c.language == 'en' %}
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/web/en/transport-system/nap">Liikennevirasto.fi</a></li>
+                  {% elif c.language == 'sv' %}
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap">Liikennevirasto.fi</a></li>
+                  {% else %}
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/nap">Liikennevirasto.fi</a></li>
+                  {% endif %}
+
                     <li><a target="_blank" rel="noopener noreferrer" href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf">{{_('NAP user guide label')}}</a></li>
                     <li><a target="_blank" rel="noopener noreferrer" href="http://bit.ly/nap-palaute">{{ _('Give feedback') }}</a></li>
                     <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md">Developers</a></li>

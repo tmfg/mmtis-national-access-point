@@ -220,7 +220,7 @@
                            :on-click #(e! (ps/->SetDrawControl true false))}]])]]]))
 
 (defn place-search-form-group [e! label name]
-  (let [empty-places? (comp empty? :results :place-search)]
+  (let [empty-places? #(not-any? (comp ::places/primary? :place) (get-in % [:place-search :results]))]
     (form/group
      {:label label
       :columns 3}
