@@ -173,7 +173,7 @@
                                              :custom true})
                                      clj->js)))))
        (update-in app [:route :custom-stops] (comp vec butlast)))
-     (assoc-in [:route :custom-stop-dialog] false)))
+     (update :route dissoc :custom-stop-dialog)))
 
   RemoveCustomStop
   (process-event [{id :id} app]
