@@ -162,18 +162,24 @@
            :name name
            :on-change on-change}]])
 
-(defmethod field :text-area [{:keys [update! table? label name rows error]
+(defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length]
                               :as   field} data]
-  [text-field
-   {:name                 name
-    :floating-label-text  (when-not table? label)
-    :floating-label-fixed true
-    :hintText             (placeholder field data)
-    :on-change            #(update! %2)
-    :value                (or data "")
-    :multi-line           true
-    :rows                 rows
-    :error-text           error}])
+  [:span
+   (when tooltip
+     [:div {:style {:padding-top "10px"}}
+      [:span (stylefy/use-style style-form-fields/compensatory-label) label]
+      (r/as-element [tooltip-icon {:text tooltip :len (or tooltip-length "medium")}])])
+   [:div
+    [text-field
+     {:name                 name
+      :floating-label-text  (when-not (or table? tooltip) label)
+      :floating-label-fixed true
+      :hintText             (placeholder field data)
+      :on-change            #(update! %2)
+      :value                (or data "")
+      :multi-line           true
+      :rows                 rows
+      :error-text           error}]]])
 
 (def languages ["FI" "SV" "EN"])
 

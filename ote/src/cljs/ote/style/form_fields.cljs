@@ -34,3 +34,5 @@
 (def table-row-column {:color "black" :overflow "visible" :padding "0 10px 15px 0"})
 (def radio-selection {::stylefy/sub-styles
                       {:required (merge style-base/required-element {:margin-top "15px"})}})
+
+(def compensatory-label {:font-size "12px" :color "rgb(33, 33, 33)"})
