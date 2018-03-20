@@ -24,6 +24,16 @@
 (defrecord UpdateStop [idx stop])
 (defrecord DeleteStop [idx])
 
+;; create, edit and remove custom stops
+(defrecord CreateCustomStop [id geojson])
+(defrecord UpdateCustomStop [stop])
+(defrecord CloseCustomStopDialog [save?])
+(defrecord UpdateCustomStopGeometry [id geojson])
+(defrecord RemoveCustomStop [id])
+
+;; add custom stop to stop sequence
+(defrecord AddCustomStop [id])
+
 ;; Edit times
 (defrecord InitRouteTimes []) ; initialize route times based on stop sequence
 (defrecord NewStartTime [time])
@@ -93,6 +103,74 @@
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
                                         (js->clj (aget feature "properties")))
                                   {::transit/location (vec (aget feature "geometry" "coordinates"))}))))))
+
+  AddCustomStop
+  (process-event [{id :id} {route :route :as app}]
+    ;; Add stop to current stop sequence
+    (let [{feature :geojson :as custom-stop}
+          (first (keep #(when (= (:id %) id) %) (:custom-stops route)))]
+      (.log js/console "custom-stop:" (pr-str custom-stop))
+      (-> app
+          (update-in [:route ::transit/stops]
+                     (fn [stop-sequence]
+                       (conj (or stop-sequence [])
+                             (merge (into {}
+                                          (map #(update % 0 (partial keyword "ote.db.transit")))
+                                          (js->clj (aget feature "properties")))
+                                    {::transit/location (vec (aget feature "geometry" "coordinates"))})))))))
+
+  CreateCustomStop
+  (process-event [{id :id geojson :geojson} app]
+    (-> app
+        (update-in [:route :custom-stops]
+                   (fnil conj [])
+                   {:id id
+                    :geojson geojson})
+        (assoc-in [:route :custom-stop-dialog] true)))
+
+  UpdateCustomStop
+  (process-event [{stop :stop} app]
+    (let [idx (dec (count (:custom-stops (:route app))))]
+      (update-in app [:route :custom-stops idx] merge stop)))
+
+  UpdateCustomStopGeometry
+  (process-event [{id :id geojson :geojson} app]
+    ;; FIXME: update usages in stop sequence
+    (update-in app [:route :custom-stops]
+               (fn [stops]
+                 (mapv (fn [{stop-id :id :as stop}]
+                         (if (= id stop-id)
+                           (update stop :geojson
+                                   #(-> %
+                                        js->clj
+                                        (assoc :geometry (get (js->clj geojson) "geometry"))
+                                        clj->js))
+                           stop))
+                       stops))))
+
+  CloseCustomStopDialog
+  (process-event [{save? :save?} {route :route :as app}]
+    (->
+     (if save?
+       (update-in app [:route :custom-stops (dec (count (:custom-stops route)))]
+                  (fn [stop]
+                    (-> stop
+                        (update :geojson
+                                #(-> %
+                                     js->clj
+                                     (assoc :properties
+                                            {:name (:name stop)
+                                             :code (:id stop)
+                                             :custom true})
+                                     clj->js)))))
+       (update-in app [:route :custom-stops] (comp vec butlast)))
+     (assoc-in [:route :custom-stop-dialog] false)))
+
+  RemoveCustomStop
+  (process-event [{id :id} app]
+    (update-in app [:route :custom-stops]
+               (fn [stops]
+                 (filterv #(not= (:id %) id) stops))))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]

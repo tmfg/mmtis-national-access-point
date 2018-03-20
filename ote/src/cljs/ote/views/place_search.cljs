@@ -85,8 +85,8 @@
                               (leaflet-draw/install-draw-control!
                                   %
                                   {:on-control-created (partial reset! dc)
-                                   :on-create (fn [geojson]
-                                                (e! (ps/->AddDrawnGeometry geojson)))})
+                                   :on-create (fn [^js/L.Path layer]
+                                                (e! (ps/->AddDrawnGeometry (.toGeoJSON layer))))})
                               (leaflet/update-bounds-from-layers %))
 
       :component-did-update leaflet/update-bounds-from-layers
