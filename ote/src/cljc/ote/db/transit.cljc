@@ -26,7 +26,8 @@
   ["transit_route" ::route
    ote.db.modification/modification-fields]
 
-  ["finnish_ports" ::finnish-ports])
+  ["finnish_ports" ::finnish-ports
+   ote.db.modification/modification-fields])
 
 (def rule-week-days [::monday ::tuesday ::wednesday ::thursday
                      ::friday ::saturday ::sunday])
