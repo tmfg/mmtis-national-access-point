@@ -63,17 +63,20 @@
                      %)
                   stops))))
 
-(defn- update-stop-times [stops trips]
+(defn- update-stop-times
+  "Copy departure and arrival time for stops from first trip. Stops can't have departure time in db, but in
+  ui they can."
+  [stops trips]
   (let [departured-stops (map-indexed
-                 (fn [idx item]
-                     (assoc item ::transit/departure-time
-                                  (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])))
-                 stops)
+                           (fn [idx item]
+                             (assoc item ::transit/departure-time
+                                         (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])))
+                           stops)
         updated-stops (map-indexed
-                 (fn [idx item]
-                   (assoc item ::transit/arrival-time
-                                (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
-                 departured-stops)]
+                        (fn [idx item]
+                          (assoc item ::transit/arrival-time
+                                      (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
+                        departured-stops)]
     updated-stops))
 
 (defn update-trips-calendar
@@ -101,8 +104,7 @@
                                                                  (::transit/service-added-dates cal))))
                    (assoc ::transit/service-removed-dates (into #{}
                                                                    (map #(time/date-fields-from-timestamp %)
-                                                                   (::transit/service-removed-dates cal)))))
-            )))
+                                                                   (::transit/service-removed-dates cal))))))))
           trips)]
     new-calendars))
 
