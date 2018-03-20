@@ -8,7 +8,8 @@
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
             [ote.ui.form :as form]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.util.fn :refer [flip]]))
 
 
 
@@ -23,6 +24,16 @@
 (defrecord AddStop [feature])
 (defrecord UpdateStop [idx stop])
 (defrecord DeleteStop [idx])
+
+;; create, edit and remove custom stops
+(defrecord CreateCustomStop [id geojson])
+(defrecord UpdateCustomStop [stop])
+(defrecord CloseCustomStopDialog [])
+(defrecord UpdateCustomStopGeometry [id geojson])
+(defrecord RemoveCustomStop [id])
+
+;; add custom stop to stop sequence
+(defrecord AddCustomStop [id])
 
 ;; Edit times
 (defrecord InitRouteTimes []) ; initialize route times based on stop sequence
@@ -61,7 +72,7 @@
   InitRoute
   (process-event [_ app]
     (let [on-success (tuck/send-async! ->LoadStopsResponse)]
-      (comm/get! "finnish-ports.geojson"
+      (comm/get! "transit/stops.json"
                  {:on-success on-success
                   :response-format :json})
       (update app :route assoc
@@ -96,6 +107,79 @@
                                   {::transit/location (vec (aget feature "geometry" "coordinates"))}))))
         (assoc-in [:route ::transit/trips] [])
         (assoc-in [:route ::transit/service-calendars] [])))
+
+  AddCustomStop
+  (process-event [{id :id} {route :route :as app}]
+    ;; Add stop to current stop sequence
+    (let [{feature :geojson :as custom-stop}
+          (first (keep #(when (= (:id %) id) %) (:custom-stops route)))]
+      (-> app
+          (update-in [:route ::transit/stops]
+                     (fn [stop-sequence]
+                       (conj (or stop-sequence [])
+                             (merge (into {}
+                                          (map #(update % 0 (partial keyword "ote.db.transit")))
+                                          (js->clj (aget feature "properties")))
+                                    {::transit/location (vec (aget feature "geometry" "coordinates"))})))))))
+
+  CreateCustomStop
+  (process-event [{id :id geojson :geojson} app]
+    (-> app
+        (update-in [:route :custom-stops]
+                   (fnil conj [])
+                   {:id id
+                    :geojson geojson})
+        (assoc-in [:route :custom-stop-dialog] true)))
+
+  UpdateCustomStop
+  (process-event [{stop :stop} app]
+    (let [idx (dec (count (:custom-stops (:route app))))]
+      (update-in app [:route :custom-stops idx] merge stop)))
+
+  UpdateCustomStopGeometry
+  (process-event [{id :id geojson :geojson} app]
+    (-> app
+        (update-in [:route :custom-stops] (flip mapv)
+                   (fn [{stop-id :id :as stop}]
+                     (if (= id stop-id)
+                       (update stop :geojson
+                               #(-> %
+                                    js->clj
+                                    (assoc :geometry (get (js->clj geojson) "geometry"))
+                                    clj->js))
+                       stop)))
+        (update-in [:route ::transit/stops] (flip mapv)
+                   (fn [{::transit/keys [custom code] :as stop}]
+                     (if (and custom (= code id))
+                       (assoc stop ::transit/location
+                              (get-in (js->clj geojson) ["geometry" "coordinates"]))
+                       stop)))))
+
+  CloseCustomStopDialog
+  (process-event [_ {route :route :as app}]
+    (-> app
+        (update-in [:route :custom-stops (dec (count (:custom-stops route)))]
+                   (fn [stop]
+                     (-> stop
+                         (update :geojson
+                                 #(-> %
+                                      js->clj
+                                      (assoc :properties
+                                             {:name (:name stop)
+                                              :code (:id stop)
+                                              :custom true})
+                                      clj->js)))))
+        (update :route dissoc :custom-stop-dialog)))
+
+  RemoveCustomStop
+  (process-event [{id :id} app]
+    (-> app
+        (update-in [:route :custom-stops]
+                   (flip filterv) #(not= (:id %) id))
+        (update-in [:route ::transit/stops]
+                   (flip filterv)
+                   (fn [{::transit/keys [code custom]}]
+                     (not (and custom (= code id)))))))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
