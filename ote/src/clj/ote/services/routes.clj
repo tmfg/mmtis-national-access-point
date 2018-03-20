@@ -81,7 +81,7 @@
                              #{::transit/transport-operator-id}
                              {::transit/id id}))]
     (authorization/with-transport-operator-check
-      db user (::transit/transport-operator-id route)
+      db user transport-operator-id
         #(do
            (delete! db ::transit/route {::transit/id id})
            id))))

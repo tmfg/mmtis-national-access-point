@@ -131,7 +131,9 @@
     (let [trips (::transit/trips response)
           service-calendars (update-trips-calendar trips (::transit/service-calendars response))
           stop-coordinates (mapv #(update % ::transit/location (fn [stop] (:coordinates stop)) ) (::transit/stops response))
-          stops (update-stop-times stop-coordinates trips)
+          stops (if (empty? trips)
+                  stop-coordinates
+                  (update-stop-times stop-coordinates trips))
           trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
 
       (-> app
@@ -159,16 +161,22 @@
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (-> app
-        (update-in [:route ::transit/stops]
-                   (fn [stop-sequence]
-                     (conj (or stop-sequence [])
-                           (merge (into {}
+    (let [current-stops (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+          new-stop (dissoc (merge (into {}
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
                                         (js->clj (aget feature "properties")))
-                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))
+                                  {::transit/location (vec (aget feature "geometry" "coordinates"))})
+                           ::transit/country
+                           ::transit/country-code
+                           ::transit/unlocode
+                           ::transit/port-type
+                           ::transit/port-type-name
+                           ::transit/type)
+          new-vector (conj current-stops new-stop)]
+      (-> app
+        (assoc-in [:route ::transit/stops] new-vector)
         (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+        (assoc-in [:route ::transit/service-calendars] []))))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
@@ -334,18 +342,16 @@
                                        deduped-cals)) calendars)
           route (-> app :route form/without-form-metadata
                     (assoc ::transit/service-calendars deduped-cals)
-                    (update ::transit/stops (fn [stop] (do
-                                                                      (.log js/console " poistetaan jotain " (clj->js stop))
-                                                                      (map #(dissoc % ::transit/departure-time) stop))))
+                    (update ::transit/stops (fn [stop] (map #(dissoc % ::transit/departure-time) stop)))
                     (update ::transit/stops (fn [stop] (map #(dissoc % ::transit/arrival-time) stop)))
                     (update ::transit/trips
-                               (fn [trips]
-                                 ;; Update service-calendar indexes
-                                 (mapv #(assoc % ::transit/service-calendar-idx
-                                                 (nth cals-indices (::transit/service-calendar-idx %)))
-                                       trips)))
+                            (fn [trips]
+                              ;; Update service-calendar indexes
+                              (mapv
+                                #(assoc % ::transit/service-calendar-idx
+                                          (nth cals-indices (::transit/service-calendar-idx %)))
+                                trips)))
                     (dissoc :step :stops :new-start-time :edit-service-calendar))]
-      (.log js/console "*********** route " (clj->js route))
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)}))
