@@ -17,12 +17,12 @@
             [ote.authorization :as authorization])
   (:import (org.postgis PGgeometry Point Geometry)))
 
-(def route-list-columns  #{::transit/id
-                           ::transit/transport-operator-id
-                           ::transit/name
-                           ::transit/available-from ::transit/available-to
-                           ::transit/departure-point-name ::transit/destination-point-name
-                           ::modification/created ::modification/modified})
+(def route-list-columns #{::transit/id
+                          ::transit/transport-operator-id
+                          ::transit/name
+                          ::transit/available-from ::transit/available-to
+                          ::transit/departure-point-name ::transit/destination-point-name
+                          ::modification/created ::modification/modified})
 
 (defn get-user-routes [db groups user]
   (let [operators (keep #(transport/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
@@ -44,14 +44,13 @@
       java.util.Date/from))
 
 (defn- stop-location-geometry [{[lat lng] ::transit/location :as stop}]
-  ;(println "********* stop-location-geometry " (pr-str stop))
   (assoc stop
-         ::transit/location (PGgeometry. (Point. lat lng))))
+    ::transit/location (PGgeometry. (Point. lat lng))))
 
 (defn- service-calendar-dates->db [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
   (assoc cal
-         ::transit/service-removed-dates (map service-date->inst service-removed-dates)
-         ::transit/service-added-dates (map service-date->inst service-added-dates)))
+    ::transit/service-removed-dates (map service-date->inst service-removed-dates)
+    ::transit/service-added-dates (map service-date->inst service-added-dates)))
 
 (defn save-route [nap-config db user route]
   (authorization/with-transport-operator-check
@@ -68,10 +67,24 @@
   "Get single route by id"
   [db id]
   (let [route (first (fetch db ::transit/route
-                         (specql/columns ::transit/route)
-                         {::transit/id id}))]
-    (println "**************** route" (pr-str route))
+                            (specql/columns ::transit/route)
+                            {::transit/id id}))]
+    (log/debug  "**************** route" (pr-str route))
     route))
+
+(defn delete-route!
+  "Delete single route by id"
+  [nap-config db user id]
+  (log/debug  "***************** deleting route id " id)
+  (let [{::transit/keys [transport-operator-id]}
+        (first (specql/fetch db ::transit/route
+                             #{::transit/transport-operator-id}
+                             {::transit/id id}))]
+    (authorization/with-transport-operator-check
+      db user (::transit/transport-operator-id route)
+        #(do
+           (delete! db ::transit/route {::transit/id id})
+           id))))
 
 (defn- routes-auth
   "Routes that require authentication"
@@ -84,14 +97,20 @@
     (POST "/routes/new" {form-data :body
                          user      :user}
       (http/transit-response
-       (save-route nap-config db user (http/transit-request form-data))))
+        (save-route nap-config db user (http/transit-request form-data))))
 
     (GET "/routes/:id" [id]
       (let [route (get-route db (Long/parseLong id))]
         (if-not route
           {:status 404}
           (http/no-cache-transit-response route))))
-          ))
+
+    (POST "/routes/delete" {form-data :body
+                            user      :user}
+      (http/transit-response
+        (delete-route! nap-config db user
+                       (:id (http/transit-request form-data)))))
+    ))
 
 (defrecord Routes [nap-config]
   component/Lifecycle

@@ -1,19 +1,52 @@
 (ns ote.views.route.route-list
   "List own routes"
   (:require
-   [ote.localization :refer [tr tr-key]]
-   [cljs-react-material-ui.reagent :as ui]
-   [ote.app.controller.route.route-list :as route-list]
-   [cljs-react-material-ui.icons :as ic]
-   [ote.views.transport-operator :as t-operator-view]
-   [ote.app.controller.transport-operator :as to]
-   [ote.db.transport-operator :as t-operator]
-   [ote.ui.form-fields :as form-fields]
-   [ote.db.transit :as transit]
-   [ote.db.modification :as modification]
-   [ote.time :as time]
-   [ote.app.controller.front-page :as fp]
-   [ote.ui.common :as common]))
+    [ote.localization :refer [tr tr-key]]
+    [cljs-react-material-ui.reagent :as ui]
+    [ote.app.controller.route.route-list :as route-list]
+    [cljs-react-material-ui.icons :as ic]
+    [ote.views.transport-operator :as t-operator-view]
+    [ote.app.controller.transport-operator :as to]
+    [ote.db.transport-operator :as t-operator]
+    [ote.ui.form-fields :as form-fields]
+    [ote.db.transit :as transit]
+    [ote.db.modification :as modification]
+    [ote.time :as time]
+    [ote.app.controller.front-page :as fp]
+    [ote.ui.common :as common]
+    [reagent.core :as r]))
+
+(defn- delete-route-action [e! {::transit/keys [id name]
+                                  :keys [show-delete-modal?]
+                                  :as route}]
+  [:span
+   [ui/icon-button {:href "#" :on-click #(do
+                                           (.preventDefault %)
+                                           (e! (route-list/->OpenDeleteRouteModal id)))}
+    [ic/action-delete]]
+   (when show-delete-modal?
+     [ui/dialog
+      {:open    true
+       :title   "Haluatko poistaa merireitin?"
+       :actions [(r/as-element
+                   [ui/flat-button
+                    {:label    (tr [:buttons :cancel])
+                     :primary  true
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (route-list/->CancelDeleteRoute id)))}])
+                 (r/as-element
+                   [ui/raised-button
+                    {:label     (tr [:buttons :delete])
+                     :icon      (ic/action-delete-forever)
+                     :secondary true
+                     :primary   true
+                     :on-click  #(do
+                                   (.preventDefault %)
+                                   (e! (route-list/->ConfirmDeleteRoute id)))}])]}
+
+      (str "Poistetaan reitti " name)])])
+
 
 (defn list-routes [e! routes]
   [:div
@@ -50,7 +83,7 @@
                                                      (.preventDefault %)
                                                      (e! (fp/->ChangePage :edit-route {:id id})))}
               [ic/content-create]]
-             "poista"]])
+             [delete-route-action e! row]]])
          routes))]]])
 
 (defn list-operators [e! app]
