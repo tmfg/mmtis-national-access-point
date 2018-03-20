@@ -35,10 +35,8 @@ def send_slack_msg(msg, response_url):
     except Exception, e:
         print 'error sending Slack response: ' + str(e)
 
-
-def find_pr(branch_name):
-    req = urllib2.Request(
-        'https://api.github.com/search/issues?q=repo:finnishtransportagency/mmtis-national-access-point+type:pr+head:' + branch_name)
+def find_pr(query):
+    req = urllib2.Request('https://api.github.com/search/issues?q=repo:finnishtransportagency/mmtis-national-access-point+type:pr+' + query)
 
     try:
         res = urllib2.urlopen(req)
@@ -129,10 +127,17 @@ def start_instance(branch_ref, response_url):
 
 #### Lambda handler ####
 def lambda_handler(event, context):
-    query = event['branch']
+    # Replace spaces with +, to allow raw github search api queries
+    query = event['branch'].replace(' ', '+')
 
-    # Find branch by ticket id or name. If ticked id is used, remove hash symbol
-    pull_reqs = find_pr(re.sub(r'^#', '', query))
+    # Allow raw github search API queries, otherwise search branches by default
+    if query.startswith('raw:'):
+        query = re.sub(r'^raw:', '', query)
+        # Find branch by ticket id or name. If ticked id is used, remove hash symbol
+    else:
+        query = 'head:' + re.sub(r'^#', '', query)
+
+    pull_reqs = find_pr(query)
 
     pr_titles = [x["title"] for x in pull_reqs]
 

@@ -144,8 +144,9 @@
    :ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resgods"
    :ote.db.transport-service/payment-methods           "Väl betalsätt"
    :ote.db.transport-service/usage-area                "Tillåtna länder"
+   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
    :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
-    :ote.db.transport-service/vehicle-classes           "Fordon som uthyres"
+   :ote.db.transport-service/vehicle-classes           "Fordon som uthyres"
    :ote.db.transport-service/vehicle-type              "Fordonstyp"
    :ote.db.transport-service/license-required          "Körkortskategori"
    :ote.db.transport-service/minimum-age               "Undre åldersgräns "
@@ -154,7 +155,7 @@
    :ote.db.transport-service/price-classes             "Pris"
    :ote.db.transport-service/pick-up-name              "Verksamhetsställes namn"
    :ote.db.transport-service/pick-up-type              "Typ"
-      :ote.db.transport-service/rental-additional-services "Övriga tjänster"
+   :ote.db.transport-service/rental-additional-services "Övriga tjänster"
    :ote.db.transport-service/additional-service-type   "Tjänst"
    :ote.db.transport-service/additional-service-price  "Pris (€)"
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
@@ -290,7 +291,8 @@
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
-  :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."}
+  :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
+  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses

@@ -140,6 +140,7 @@
   {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
    :ote.db.transport-service/payment-methods           "Valitse maksutavat"
    :ote.db.transport-service/usage-area                "Sallitut maat"
+   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
    :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
@@ -283,7 +284,7 @@
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
-   }
+  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses

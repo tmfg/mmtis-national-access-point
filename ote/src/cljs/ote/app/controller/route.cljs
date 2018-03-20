@@ -6,15 +6,15 @@
             [clojure.string :as str]
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]))
 
-;; Load available stops from server (GeoJSON)
-(defrecord LoadStops [])
-(defrecord LoadStopsResponse [response])
 
-;; Initialize editing a new route
+
+;; Initialize editing a new route and load available stops from server (GeoJSON)
 (defrecord InitRoute [])
+(defrecord LoadStopsResponse [response])
 
 ;; Edit route basic info
 (defrecord EditRoute [form-data])
@@ -57,38 +57,27 @@
                      %)
                   stops))))
 
-(defn rule-dates
-  "Evaluate a recurring schedule rule. Returns a sequence of dates."
-  [{::transit/keys [from-date to-date] :as rule}]
-  (let [week-days (into #{}
-                        (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
-                        time/week-days)]
-    (when (and from-date to-date (not (empty? week-days)))
-      (for [d (time/date-range (time/js->date-time from-date)
-                               (time/js->date-time to-date))
-            :when (week-days (time/day-of-week d))]
-        (time/date-fields d)))))
-
 (extend-protocol tuck/Event
-  LoadStops
+  InitRoute
   (process-event [_ app]
     (let [on-success (tuck/send-async! ->LoadStopsResponse)]
       (comm/get! "finnish-ports.geojson"
                  {:on-success on-success
                   :response-format :json})
-      app))
+      (update app :route assoc
+              ::transit/stops []
+              ::transit/trips []
+              ::transit/service-calendars []
+              ::transit/route-type :ferry
+              ::transit/transport-operator-id
+              (::t-operator/id
+                (:transport-operator
+                  (first (:transport-operators-with-services app)))))))
 
   LoadStopsResponse
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
-  InitRoute
-  (process-event [_ app]
-    (update app :route assoc
-            ::transit/stops []
-            ::transit/trips []
-            ::transit/service-calendars []
-            ::transit/route-type :ferry))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -104,29 +93,37 @@
                            (merge (into {}
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
                                         (js->clj (aget feature "properties")))
-                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))))
+                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
-    (update-in app [:route ::transit/stops idx]
-               (fn [{old-arrival ::transit/arrival-time
-                     old-departure ::transit/departure-time
-                     :as old-stop}]
-                 (let [new-stop (merge old-stop stop)]
-                   ;; If old departure time is same as arrival and arrival
-                   ;; was changed, also change departure time.
-                   (if (and (= old-departure old-arrival)
-                            (contains? stop ::transit/arrival-time))
-                     (assoc new-stop
-                            ::transit/departure-time (::transit/arrival-time new-stop))
-                     new-stop)))))
+    (-> app
+        (update-in [:route ::transit/stops idx]
+                   (fn [{old-arrival ::transit/arrival-time
+                         old-departure ::transit/departure-time
+                         :as old-stop}]
+                     (let [new-stop (merge old-stop stop)]
+                       ;; If old departure time is same as arrival and arrival
+                       ;; was changed, also change departure time.
+                       (if (and (= old-departure old-arrival)
+                                (contains? stop ::transit/arrival-time))
+                         (assoc new-stop
+                           ::transit/departure-time (::transit/arrival-time new-stop))
+                         new-stop))))
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])))
 
   DeleteStop
   (process-event [{idx :idx} app]
-    (update-in app [:route ::transit/stops]
-               (fn [stops]
-                 (into (subvec stops 0 idx)
-                       (subvec stops (inc idx))))))
+    (-> app
+        (update-in [:route ::transit/stops]
+                   (fn [stops]
+                     (into (subvec stops 0 idx)
+                           (subvec stops (inc idx)))))
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])))
 
 
   EditServiceCalendar
@@ -157,7 +154,7 @@
                             (disj service-removed-dates date))
 
                      ;; This date matches a rule, add it to removed dates
-                     (some #(some (partial = date) (rule-dates %)) service-rules)
+                     (some #(some (partial = date) (transit/rule-dates %)) service-rules)
                      (assoc service-calendar ::transit/service-removed-dates
                             (conj service-removed-dates date))
 
@@ -169,7 +166,7 @@
   EditServiceCalendarRules
   (process-event [{rules :rules trip-idx :trip-idx} app]
     (let [rule-dates (into #{}
-                           (mapcat rule-dates)
+                           (mapcat transit/rule-dates)
                            (::transit/service-rules rules))]
       (-> app
           (update-in [:route ::transit/service-calendars trip-idx] merge rules)
@@ -270,7 +267,7 @@
                                  (mapv #(assoc % ::transit/service-calendar-idx
                                                  (nth cals-indices (::transit/service-calendar-idx %)))
                                        trips)))
-                    (dissoc :step :stops :new-start-time))]
+                    (dissoc :step :stops :new-start-time :edit-service-calendar))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)}))
@@ -279,7 +276,7 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
-    (dissoc app :route))
+    (assoc (dissoc app :route) :page :routes))
 
   SaveRouteFailure
   (process-event [{response :response} app]

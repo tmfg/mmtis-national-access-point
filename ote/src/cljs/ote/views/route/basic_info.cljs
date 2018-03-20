@@ -7,12 +7,6 @@
             [cljs-react-material-ui.reagent :as ui]))
 
 (defn basic-info [e! app]
-  ;; Initially select the first operator
-  (e! (rc/->EditRoute
-       {::transit/transport-operator-id
-        (::t-operator/id
-         (:transport-operator
-          (first (:transport-operators-with-services app))))}))
   (fn [e! {route :route :as app}]
     [:div.route-basic-info
      [form/form {:update! #(e! (rc/->EditRoute %))}
