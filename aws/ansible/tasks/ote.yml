@@ -7,7 +7,7 @@
   command: >
     aws elbv2 describe-target-groups
      --names "{{vault_ote_target_group_name}}"
-    register: target_group
+  register: target_group
 
 - name: Set instance id
   set_fact: instance_id="{{ansible_ec2_instance_id}}"
