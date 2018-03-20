@@ -22,6 +22,7 @@
     ;; Route based traffic
     ["/routes" :routes]
     ["/route/new" :new-route]
+    ["/edit-route/:id" :edit-route]
 
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
