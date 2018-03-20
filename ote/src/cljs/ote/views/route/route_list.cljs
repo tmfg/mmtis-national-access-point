@@ -55,12 +55,12 @@
     [ui/table-header {:adjust-for-checkbox false
                       :display-select-all  false}
      [ui/table-row {:selectable false}
-      [ui/table-header-column {:style {:width "10%"}} "Id"]
+      [ui/table-header-column {:style {:width "7%"}} "Id"]
       [ui/table-header-column {:style {:width "20%"}} "Nimi"]
       [ui/table-header-column "Lähtöpaikka"]
       [ui/table-header-column "Määränpää"]
-      [ui/table-header-column "Voimassa lähtien"]
-      [ui/table-header-column "Voimassa asti"]
+      [ui/table-header-column {:style {:width "10%"}}" Voimassa lähtien"]
+      [ui/table-header-column {:style {:width "10%"}} "Voimassa asti"]
       [ui/table-header-column "Luotu / Muokattu"]
       [ui/table-header-column "Toiminnot"]]]
     [ui/table-body {:display-row-checkbox false}
@@ -71,12 +71,14 @@
                 ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
-            [ui/table-row-column {:style {:width "10%"}} id]
-            [ui/table-row-column {:style {:width "20%"}} name]
+            [ui/table-row-column {:style {:width "7%"}} id]
+            [ui/table-row-column {:style {:width "20%"}} [:a {:href "#" :on-click  #(do
+                                                                                      (.preventDefault %)
+                                                                                      (e! (fp/->ChangePage :edit-route {:id id})))} name]]
             [ui/table-row-column departure-point-name]
             [ui/table-row-column destination-point-name]
-            [ui/table-row-column (when available-from (time/format-date available-from))]
-            [ui/table-row-column (when available-to (time/format-date available-to))]
+            [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
+            [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column (time/format-timestamp-for-ui (or modified created))]
             [ui/table-row-column
              [ui/icon-button {:href "#" :on-click #(do
