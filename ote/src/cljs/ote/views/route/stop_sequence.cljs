@@ -54,7 +54,7 @@
      (doall
       (map-indexed
        (fn [i {::transit/keys [code name arrival-time departure-time]}]
-         ^{:key code}
+         ^{:key (str code "_" i)}
          [:tr {:style {:border-bottom "solid 1px black"}}
           [:td name]
           [:td {:style {:text-align "center"}}

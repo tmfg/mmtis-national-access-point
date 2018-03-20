@@ -303,6 +303,18 @@
            (and (not new-closed)
                 (not= old-group-data new-group-data))))))))
 
+(def balloon-header-tooltip
+  "A tooltip icon that shows balloon.css tooltip on hover."
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8
+                                                                :position "relative"
+                                                                :top "-2"}})]
+    (fn [opts]
+      [wrapped {:style {:width          19
+                        :height         19
+                        :vertical-align "middle"
+                        :color          "white"}}
+       opts])))
+
 (defn form-group-ui [form-options group]
   (r/create-class
     {:should-component-update
@@ -314,6 +326,8 @@
           {:keys [label schemas options] :as group}]
        (let [{::keys [modified errors warnings notices]} data
              columns (or (:columns options) 1)
+             tooltip (:tooltip options)
+             tooltip-length (or (:tooltip-length options) "medium")
              classes (get col-classes columns)
              schemas (with-automatic-labels name->label schemas)
              style (if (= :row (:layout options))
@@ -341,7 +355,9 @@
             [:div (merge (stylefy/use-style style-form/form-card)
                          {:style card-style})
              (when label
-               [:div (stylefy/use-style style-form/form-card-label) label])
+               [:div (stylefy/use-style style-form/form-card-label) label
+                (when tooltip
+                  [balloon-header-tooltip {:text tooltip :len tooltip-length}])])
              [:div (stylefy/use-style style-form/form-card-body)
               group-component]])]))}))
 
