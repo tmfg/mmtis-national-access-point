@@ -89,11 +89,15 @@
     (-> app
         (update-in [:route ::transit/stops]
                    (fn [stop-sequence]
-                     (conj (or stop-sequence [])
-                           (merge (into {}
-                                        (map #(update % 0 (partial keyword "ote.db.transit")))
-                                        (js->clj (aget feature "properties")))
-                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))
+                     (let [properties (js->clj (aget feature "properties"))]
+                       ;; Two same stops are not possible to be next to each other
+                       (if (= (::transit/code (last stop-sequence)) (get  properties "code"))
+                         stop-sequence
+                         (conj (or stop-sequence [])
+                               (merge (into {}
+                                            (map #(update % 0 (partial keyword "ote.db.transit")))
+                                            properties)
+                                      {::transit/location (vec (aget feature "geometry" "coordinates"))}))))))
         (assoc-in [:route ::transit/trips] [])
         (assoc-in [:route ::transit/service-calendars] [])))
 
