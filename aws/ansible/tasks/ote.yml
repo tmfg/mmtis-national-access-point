@@ -54,6 +54,13 @@
   service: name=ote state=restarted
   tags: configuration,deploy
 
+- name: Wait for service search URL to respond 200
+  uri: url="http://localhost:3000/service-search?offset=0&limit=0" status_code=200
+  register: result
+  until: result.status == 200
+  retries: 30
+  delay: 10
+
 - name: Register to ALB
   delegate_to: 127.0.0.1
   become: false
