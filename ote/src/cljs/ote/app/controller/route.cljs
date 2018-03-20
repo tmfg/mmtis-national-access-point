@@ -113,7 +113,6 @@
     ;; Add stop to current stop sequence
     (let [{feature :geojson :as custom-stop}
           (first (keep #(when (= (:id %) id) %) (:custom-stops route)))]
-      (.log js/console "custom-stop:" (pr-str custom-stop))
       (-> app
           (update-in [:route ::transit/stops]
                      (fn [stop-sequence]
@@ -151,7 +150,6 @@
                        stop)))
         (update-in [:route ::transit/stops] (flip mapv)
                    (fn [{::transit/keys [custom code] :as stop}]
-                     (.log js/console id " == " code "?" (= code id))
                      (if (and custom (= code id))
                        (assoc stop ::transit/location
                               (get-in (js->clj geojson) ["geometry" "coordinates"]))
