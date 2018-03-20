@@ -38,18 +38,18 @@
       :title "Lisää uusi satama tai laituri"
       :actions [(r/as-element
                  [ui/flat-button
-                  {:label "Tallenna"
+                  {:label "Lisää"
                    :primary true
-                   :on-click #(e! (rc/->CloseCustomStopDialog true))}])
-                (r/as-element
-                 [ui/flat-button
-                  {:label "Peruuta"
-                   :secondary true
-                   :on-click #(e! (rc/->CloseCustomStopDialog false))}])]}
-     [form-fields/field {:type :string
-                         :label "Nimi"
-                         :update! #(e! (rc/->UpdateCustomStop {:name %}))}
-      (-> route :custom-stops last :name)]]))
+                   :on-click #(e! (rc/->CloseCustomStopDialog))}])]}
+     [:span
+      [form-fields/field {:type :string
+                          :label "Nimi"
+                          :update! #(e! (rc/->UpdateCustomStop {:name %}))
+                          :on-enter #(e! (rc/->CloseCustomStopDialog))}
+       (-> route :custom-stops last :name)]
+      [common/help
+       "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla.
+Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."]]]))
 
 (defn- route-map [e! route]
   (r/create-class

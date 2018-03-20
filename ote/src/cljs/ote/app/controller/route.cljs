@@ -28,7 +28,7 @@
 ;; create, edit and remove custom stops
 (defrecord CreateCustomStop [id geojson])
 (defrecord UpdateCustomStop [stop])
-(defrecord CloseCustomStopDialog [save?])
+(defrecord CloseCustomStopDialog [])
 (defrecord UpdateCustomStopGeometry [id geojson])
 (defrecord RemoveCustomStop [id])
 
@@ -158,22 +158,20 @@
                        stop)))))
 
   CloseCustomStopDialog
-  (process-event [{save? :save?} {route :route :as app}]
-    (->
-     (if save?
-       (update-in app [:route :custom-stops (dec (count (:custom-stops route)))]
-                  (fn [stop]
-                    (-> stop
-                        (update :geojson
-                                #(-> %
-                                     js->clj
-                                     (assoc :properties
-                                            {:name (:name stop)
-                                             :code (:id stop)
-                                             :custom true})
-                                     clj->js)))))
-       (update-in app [:route :custom-stops] (comp vec butlast)))
-     (update :route dissoc :custom-stop-dialog)))
+  (process-event [_ {route :route :as app}]
+    (-> app
+        (update-in [:route :custom-stops (dec (count (:custom-stops route)))]
+                   (fn [stop]
+                     (-> stop
+                         (update :geojson
+                                 #(-> %
+                                      js->clj
+                                      (assoc :properties
+                                             {:name (:name stop)
+                                              :code (:id stop)
+                                              :custom true})
+                                      clj->js)))))
+        (update :route dissoc :custom-stop-dialog)))
 
   RemoveCustomStop
   (process-event [{id :id} app]
