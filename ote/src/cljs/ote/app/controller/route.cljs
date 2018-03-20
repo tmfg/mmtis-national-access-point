@@ -63,17 +63,48 @@
                      %)
                   stops))))
 
-(defn rule-dates
-  "Evaluate a recurring schedule rule. Returns a sequence of dates."
-  [{::transit/keys [from-date to-date] :as rule}]
-  (let [week-days (into #{}
-                        (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
-                        time/week-days)]
-    (when (and from-date to-date (not (empty? week-days)))
-      (for [d (time/date-range (time/js->date-time from-date)
-                               (time/js->date-time to-date))
-            :when (week-days (time/day-of-week d))]
-        (time/date-fields d)))))
+(defn- update-stop-times [stops trips]
+  (let [departured-stops (map-indexed
+                 (fn [idx item]
+                     (assoc item ::transit/departure-time
+                                  (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])))
+                 stops)
+        updated-stops (map-indexed
+                 (fn [idx item]
+                   (assoc item ::transit/arrival-time
+                                (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
+                 departured-stops)]
+    updated-stops))
+
+(defn update-trips-calendar
+  "In database one service-calendar can be linked to all trips, but in front-end we need to copy or multiply
+  service-calendars according to trips service-calendar-idx"
+  [trips service-calendars]
+  (let [new-calendars
+        (mapv
+          (fn [trip]
+            (if (empty? service-calendars)
+              {::transit/service-added-dates #{}
+               ::transit/service-removed-dates #{}
+               ::transit/service-rules []
+               :rule-dates #{}}
+
+              (let [cal-idx (::transit/service-calendar-idx trip)
+                  cal (nth service-calendars cal-idx)
+                  rule-dates (into #{}
+                                   (mapcat transit/rule-dates)
+                                   (::transit/service-rules cal))]
+              (->  cal
+                  (assoc :rule-dates rule-dates)
+                   (assoc ::transit/service-added-dates (into #{}
+                                                                 (map #(time/date-fields-from-timestamp %)
+                                                                 (::transit/service-added-dates cal))))
+                   (assoc ::transit/service-removed-dates (into #{}
+                                                                   (map #(time/date-fields-from-timestamp %)
+                                                                   (::transit/service-removed-dates cal)))))
+            )))
+          trips)]
+    new-calendars))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -88,6 +119,27 @@
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
+  LoadRoute
+  (process-event [{id :id} app]
+    (let [on-success (tuck/send-async! ->LoadRouteResponse)]
+      (comm/get! (str "routes/" id)
+                 {:on-success on-success})
+      app))
+
+  LoadRouteResponse
+  (process-event [{response :response} app]
+    (let [trips (::transit/trips response)
+          service-calendars (update-trips-calendar trips (::transit/service-calendars response))
+          stop-coordinates (mapv #(update % ::transit/location (fn [stop] (:coordinates stop)) ) (::transit/stops response))
+          stops (update-stop-times stop-coordinates trips)
+          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
+
+      (-> app
+        (assoc :route response)
+        (assoc-in [:route ::transit/stops] stops)
+        (assoc-in [:route ::transit/trips] trips)
+        (assoc-in [:route ::transit/service-calendars] service-calendars))))
+
   InitRoute
   (process-event [_ app]
     (update app :route assoc
@@ -98,7 +150,7 @@
             ::transit/transport-operator-id
             (::t-operator/id
               (:transport-operator
-                (first (:transport-operators-with-services app)))))))
+                (first (:transport-operators-with-services app))))))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -214,7 +266,7 @@
                                                 (get-in app [:route ::transit/stops])))
                     ::transit/service-calendar-idx 0}])
         ;; Make sure that we have an empty associated calendar for the trip
-        #_ (assoc-in [:route ::transit/service-calendars] [{}])))
+         (assoc-in [:route ::transit/service-calendars] [{}])))
 
   NewStartTime
   (process-event [{time :time} app]
@@ -282,6 +334,10 @@
                                        deduped-cals)) calendars)
           route (-> app :route form/without-form-metadata
                     (assoc ::transit/service-calendars deduped-cals)
+                    (update ::transit/stops (fn [stop] (do
+                                                                      (.log js/console " poistetaan jotain " (clj->js stop))
+                                                                      (map #(dissoc % ::transit/departure-time) stop))))
+                    (update ::transit/stops (fn [stop] (map #(dissoc % ::transit/arrival-time) stop)))
                     (update ::transit/trips
                                (fn [trips]
                                  ;; Update service-calendar indexes
@@ -289,6 +345,7 @@
                                                  (nth cals-indices (::transit/service-calendar-idx %)))
                                        trips)))
                     (dissoc :step :stops :new-start-time :edit-service-calendar))]
+      (.log js/console "*********** route " (clj->js route))
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)}))
