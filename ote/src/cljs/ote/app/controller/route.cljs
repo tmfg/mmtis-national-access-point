@@ -7,7 +7,8 @@
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.db.transit :as transit]
             [ote.ui.form :as form]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.util.fn :refer [flip]]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -135,18 +136,23 @@
 
   UpdateCustomStopGeometry
   (process-event [{id :id geojson :geojson} app]
-    ;; FIXME: update usages in stop sequence
-    (update-in app [:route :custom-stops]
-               (fn [stops]
-                 (mapv (fn [{stop-id :id :as stop}]
-                         (if (= id stop-id)
-                           (update stop :geojson
-                                   #(-> %
-                                        js->clj
-                                        (assoc :geometry (get (js->clj geojson) "geometry"))
-                                        clj->js))
-                           stop))
-                       stops))))
+    (-> app
+        (update-in [:route :custom-stops] (flip mapv)
+                   (fn [{stop-id :id :as stop}]
+                     (if (= id stop-id)
+                       (update stop :geojson
+                               #(-> %
+                                    js->clj
+                                    (assoc :geometry (get (js->clj geojson) "geometry"))
+                                    clj->js))
+                       stop)))
+        (update-in [:route ::transit/stops] (flip mapv)
+                   (fn [{::transit/keys [custom code] :as stop}]
+                     (.log js/console id " == " code "?" (= code id))
+                     (if (and custom (= code id))
+                       (assoc stop ::transit/location
+                              (get-in (js->clj geojson) ["geometry" "coordinates"]))
+                       stop)))))
 
   CloseCustomStopDialog
   (process-event [{save? :save?} {route :route :as app}]
