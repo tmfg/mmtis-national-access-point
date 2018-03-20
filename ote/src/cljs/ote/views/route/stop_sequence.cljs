@@ -97,11 +97,6 @@ Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."]]]))
           [leaflet/GeoJSON {:data stops
                             :style {:color "green"}
                             :pointToLayer (partial stop-marker e!)}])
-        #_(for [s (:custom-stops route)]
-          ^{:key (:id s)}
-          [leaflet/GeoJSON {:data (:geojson s)
-                            :style {:color "green"}
-                            :pointToLayer (partial stop-marker e!)}])
 
         (when-let [stop-sequence (seq (::transit/stops route))]
           [leaflet/Polyline
