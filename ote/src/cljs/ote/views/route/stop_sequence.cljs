@@ -55,27 +55,35 @@
   (r/create-class
    {:component-did-mount
     (fn [this]
-      (leaflet-draw/install-draw-control!
-          this
-        {:add? true
-         :ref-name "stops-map"
-         ;; Disable all other geometry types
-         :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
-         :on-create (fn [^js/L.Path layer]
-                      (let [id (leaflet-draw/layer-id layer)]
-                        (.on layer "click"
-                             (fn [_]
-                               (e! (rc/->AddCustomStop id))))
-                        (e! (rc/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
-         :on-remove #(e! (rc/->RemoveCustomStop (leaflet-draw/layer-id %)))
-         :on-edit #(e! (rc/->UpdateCustomStopGeometry
-                        (leaflet-draw/layer-id %)
-                        (leaflet-draw/layer-geojson %)))
-         :on-click #(e! (rc/->AddCustomStop (leaflet-draw/layer-id %)))
+      (let [deleting? (atom false)
+            ^js/L.Map
+            m (aget this "refs" "stops-map" "leafletElement")]
 
-         :add-features? true
-         :localization {:toolbar {:buttons {:marker "Lisää uusi satama/laituri"}}
-                        :handlers {:marker {:tooltip {:start "Klikkaa karttaa lisätäksesi satama/laituri"}}}}}))
+        ;; Keep track if we are in delete mode
+        (.on m "draw:deletestart" #(reset! deleting? true))
+        (.on m "draw:deletestop" #(reset! deleting? false))
+
+        (leaflet-draw/install-draw-control!
+            this
+          {:add? true
+           :ref-name "stops-map"
+           ;; Disable all other geometry types
+           :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
+           :on-create (fn [^js/L.Path layer]
+                        (let [id (leaflet-draw/layer-id layer)]
+                          (.on layer "click"
+                               (fn [_]
+                                 (when-not @deleting?
+                                   (e! (rc/->AddCustomStop id)))))
+                          (e! (rc/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
+           :on-remove #(e! (rc/->RemoveCustomStop (leaflet-draw/layer-id %)))
+           :on-edit #(e! (rc/->UpdateCustomStopGeometry
+                          (leaflet-draw/layer-id %)
+                          (leaflet-draw/layer-geojson %)))
+
+           :add-features? true
+           :localization {:toolbar {:buttons {:marker "Lisää uusi satama/laituri"}}
+                          :handlers {:marker {:tooltip {:start "Klikkaa karttaa lisätäksesi satama/laituri"}}}}})))
     :reagent-render
     (fn [e! route]
       [:div.stops-map {:style {:width "50%"}}

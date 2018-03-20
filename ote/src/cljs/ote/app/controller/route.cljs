@@ -174,9 +174,13 @@
 
   RemoveCustomStop
   (process-event [{id :id} app]
-    (update-in app [:route :custom-stops]
-               (fn [stops]
-                 (filterv #(not= (:id %) id) stops))))
+    (-> app
+        (update-in [:route :custom-stops]
+                   (flip filterv) #(not= (:id %) id))
+        (update-in [:route ::transit/stops]
+                   (flip filterv)
+                   (fn [{::transit/keys [code custom]}]
+                     (not (and custom (= code id)))))))
 
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
