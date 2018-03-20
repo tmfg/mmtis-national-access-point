@@ -66,15 +66,17 @@
 (defn- next-stop-code [db]
   (str "OTE" (next-stop-sequence-number db)))
 
-(defn save-custom-stops [route db]
+(defn save-custom-stops [route db user]
   (let [custom-stops
         (into {}
               (map (fn [{:keys [id geojson]}]
                      [id (specql/insert!
                           db ::transit/finnish-ports
-                          {::transit/code (next-stop-code db)
-                           ::transit/name (get-in geojson ["properties" "name"])
-                           ::transit/location (point-geometry (get-in geojson ["geometry" "coordinates"]))})]))
+                          (modification/with-modification-fields
+                            {::transit/code (next-stop-code db)
+                             ::transit/name (get-in geojson ["properties" "name"])
+                             ::transit/location (point-geometry (get-in geojson ["geometry" "coordinates"]))}
+                            ::transit/id user))]))
               (:custom-stops route))]
     (-> route
         (dissoc :custom-stops)
@@ -88,7 +90,7 @@
     (fn []
       (tx/with-transaction db
         (let [r (-> route
-                    (save-custom-stops db)
+                    (save-custom-stops db user)
                     (modification/with-modification-fields ::transit/id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))
                     (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
