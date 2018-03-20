@@ -81,6 +81,10 @@
          [common/help "Valitse reitin pysäkkiketju klikkaamalla pysäkkejä kartalta."]]]])]])
 
 (defn stop-sequence [e! {route :route :as app}]
-  [:div {:style {:display "flex" :flex-direction "row"}}
-   [route-map e! route]
-   [route-stop-times e! (::transit/stops route)]])
+  (e! (rc/->LoadStops))
+  (fn [e! {route :route :as app}]
+    (if (nil? (get route :stops))
+      [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+      [:div {:style {:display "flex" :flex-direction "row"}}
+        [route-map e! route]
+        [route-stop-times e! (::transit/stops route)]])))
