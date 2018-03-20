@@ -523,11 +523,11 @@
  {:contact-types           "Phone and email"
   :organization-form-title "Basic information"
   :organization-new-title  "Create a new transport operator"
-  :help-desc-1             "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
-  :help-desc-2             (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
-  :basic-info-tooltip      "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :contact-types-tooltip   "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
-  :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  :help-desc-1             "The information given in this form will seen in the public pages of NAP-service."
+  :help-desc-2             (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
+  :basic-info-tooltip      "Fill in to Basic information -section information about the company, community or organization you are representing."
+  :contact-types-tooltip   "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
+  :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
   }
 
  :passenger-transportation-page
