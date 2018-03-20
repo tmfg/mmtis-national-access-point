@@ -139,7 +139,7 @@
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
-        empty-calendar? (empty? (first (:ote.db.transit/service-calendars route)))]
+        empty-calendar? (empty? (first (::transit/service-calendars route)))]
     [:div.route-times
      [:table {:style {:text-align "center"}}
       [route-times-header stop-sequence]
@@ -147,7 +147,7 @@
        (doall (map-indexed (partial trip-row e! stop-count) trips))]]
 
      (when empty-calendar?
-       [:div {:style {:margin-left "25px" :margin-right "25px" :margin-top "10px"}}
+       [:div {:style {:margin-top "10px"}}
         [common/help (tr [:form-help :trip-editor-no-calendar])]])
 
      [:div
