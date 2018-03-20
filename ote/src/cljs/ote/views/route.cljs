@@ -114,3 +114,22 @@
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}
          "Peruuta"]]])))
+
+(defn edit-route-by-id [e! app]
+  (e! (rc/->LoadRoute (get-in app [:params :id])))
+  (fn [e! {route :route :as app}]
+    (let [page (or (:page route) 0)]
+      [:span
+       [route-wizard
+        e! wizard-steps
+        app]
+       [:div.col-xs-12.col-sm-6.col-md-6
+        [buttons/save {:disabled false
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (rc/->SaveToDb)))}
+         "Tallenna Tietokantaan"]
+        [buttons/cancel {:on-click #(do
+                                      (.preventDefault %)
+                                      (e! (rc/->CancelRoute)))}
+         "Peruuta"]]])))
