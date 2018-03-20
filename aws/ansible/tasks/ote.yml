@@ -1,3 +1,25 @@
+- name: Gathering ec2 facts
+  action: ec2_facts
+
+- name: Fetch ALB Target group ARN
+  delegate_to: 127.0.0.1
+  become: false
+  command: >
+    aws elbv2 describe-target-groups
+     --names "{{vault_ote_target_group_name}}"
+    register: target_group
+
+- name: Set instance id
+  set_fact: instance_id="{{ansible_ec2_instance_id}}"
+
+- name: De-register from ALB
+  delegate_to: 127.0.0.1
+  become: false
+  command: >
+    aws elbv2 deregister-targets
+    --target-group-arn "{{(target_group.stdout | from_json).TargetGroups[0].TargetGroupArn}}"
+    --targets Id="{{instance_id}}",Port="3000"
+
 - name: Install required packages
   yum: name={{item}} state=installed
   with_items:
@@ -31,3 +53,11 @@
 - name: Restart OTE service
   service: name=ote state=restarted
   tags: configuration,deploy
+
+- name: Register to ALB
+  delegate_to: 127.0.0.1
+  become: false
+  command: >
+    aws elbv2 register-targets
+    --target-group-arn "{{(target_group.stdout | from_json).TargetGroups[0].TargetGroupArn}}"
+    --targets Id="{{instance_id}}",Port="3000"
