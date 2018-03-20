@@ -10,6 +10,8 @@
     [stylefy.core :as stylefy]
     [ote.style.route :as style-route]
     [reagent.core :as r]
+    [ote.ui.common :as common]
+    [ote.localization :refer [tr tr-key]]
 
     ;; Calendar subview
     [ote.views.route.service-calendar :as route-service-calendar]))
@@ -136,20 +138,25 @@
 (defn trips-list [e! route]
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
-        trips (::transit/trips route)]
-
+        trips (::transit/trips route)
+        empty-calendar? (empty? (first (::transit/service-calendars route)))]
     [:div.route-times
      [:table {:style {:text-align "center"}}
       [route-times-header stop-sequence]
       [:tbody
        (doall (map-indexed (partial trip-row e! stop-count) trips))]]
+
+     (when empty-calendar?
+       [:div {:style {:margin-top "10px"}}
+        [common/help (tr [:form-help :trip-editor-no-calendar])]])
+
      [:div
       "Uuden vuoron lähtöaika: "
       [form-fields/field {:type :time
                           :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
       [ui/raised-button {:style {:margin-left "5px"}
                          :primary true
-                         :disabled (time/empty-time? (:new-start-time route))
+                         :disabled (or (time/empty-time? (:new-start-time route)) empty-calendar?)
                          :on-click #(e! (rc/->AddTrip))
                          :label "Lisää vuoro"}]]]))
 
