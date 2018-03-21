@@ -32,7 +32,9 @@
               ;; JS equivalent, for now we simply map it to parseFloat in JS as we are not doing
               ;; calculations with money
               "f" #?(:clj (t/read-handler #(BigDecimal. %))
-                     :cljs js/parseFloat)}})
+                     :cljs js/parseFloat)
+              "geo" #?(:clj (t/read-handler identity)
+                       :cljs identity)}})
 
 (defn clj->transit
   "Convert given Clojure `data` to transit+json string."

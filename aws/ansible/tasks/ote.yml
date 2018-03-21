@@ -20,6 +20,9 @@
     --target-group-arn "{{(target_group.stdout | from_json).TargetGroups[0].TargetGroupArn}}"
     --targets Id="{{instance_id}}",Port="3000"
 
+- pause:
+    seconds: 10
+
 - name: Install required packages
   yum: name={{item}} state=installed
   with_items:
@@ -68,3 +71,6 @@
     aws elbv2 register-targets
     --target-group-arn "{{(target_group.stdout | from_json).TargetGroups[0].TargetGroupArn}}"
     --targets Id="{{instance_id}}",Port="3000"
+
+- pause:
+    seconds: 10

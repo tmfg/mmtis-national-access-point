@@ -664,6 +664,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :save-failed "Ett fel inträffade"
   :delete-service-success "Tjänsten borttagen."
   :delete-service-error "Tjänsten gick inte att ta bort "
+  :delete-route-success                       "Reitti poistettiin onnistuneesti."
+  :delete-route-error                         "Reitin poisto epäonnistui. Jos ongelma toistuu "
   :logged-in "Inloggningen lyckades!"
   :loading "Ladda"
   :language "Språk"

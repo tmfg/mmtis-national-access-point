@@ -1,6 +1,7 @@
 (ns ote.services.routes
   "Routes api."
   (:require [com.stuartsierra.component :as component]
+            [jeesql.core :refer [defqueries]]
             [ote.util.fn :refer [flip]]
             [ote.components.http :as http]
             [ote.services.transport :as transport]
@@ -58,10 +59,10 @@
   (assoc stop
          ::transit/location (point-geometry loc)))
 
-(defn- service-calendar-dates [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
+(defn- service-calendar-dates->db [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
   (assoc cal
-         ::transit/service-removed-dates (map service-date->inst service-removed-dates)
-         ::transit/service-added-dates (map service-date->inst service-added-dates)))
+    ::transit/service-removed-dates (map service-date->inst service-removed-dates)
+    ::transit/service-added-dates (map service-date->inst service-added-dates)))
 
 (defn- next-stop-code [db]
   (str "OTE" (next-stop-sequence-number db)))
@@ -93,9 +94,32 @@
                     (save-custom-stops db user)
                     (modification/with-modification-fields ::transit/id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))
-                    (update ::transit/service-calendars #(mapv service-calendar-dates %)))]
+                    (update ::transit/service-calendars #(mapv service-calendar-dates->db %)))]
           (log/debug "Save route: " r)
           (upsert! db ::transit/route r))))))
+
+(defn get-route
+  "Get single route by id"
+  [db id]
+  (let [route (first (fetch db ::transit/route
+                            (specql/columns ::transit/route)
+                            {::transit/id id}))]
+    (log/debug  "**************** route" (pr-str route))
+    route))
+
+(defn delete-route!
+  "Delete single route by id"
+  [db user id]
+  (log/debug  "***************** deleting route id " id)
+  (let [{::transit/keys [transport-operator-id]}
+        (first (specql/fetch db ::transit/route
+                             #{::transit/transport-operator-id}
+                             {::transit/id id}))]
+    (authorization/with-transport-operator-check
+      db user transport-operator-id
+        #(do
+           (delete! db ::transit/route {::transit/id id})
+           id))))
 
 (defn- routes-auth
   "Routes that require authentication"
@@ -108,7 +132,19 @@
     (POST "/routes/new" {form-data :body
                          user      :user}
       (http/transit-response
-       (save-route nap-config db user (http/transit-request form-data))))))
+        (save-route nap-config db user (http/transit-request form-data))))
+
+    (GET "/routes/:id" [id]
+      (let [route (get-route db (Long/parseLong id))]
+        (if-not route
+          {:status 404}
+          (http/no-cache-transit-response route))))
+
+    (POST "/routes/delete" {form-data :body
+                            user      :user}
+      (http/transit-response
+        (delete-route! db user
+                       (:id (http/transit-request form-data)))))))
 
 (defn- stops-geojson [db]
   (cheshire/encode

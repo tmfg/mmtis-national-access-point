@@ -663,6 +663,8 @@
   :save-failed                                "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
   :delete-service-success                     "The service was deleted successfully."
   :delete-service-error                       "Deleting the service has failed. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
+  :delete-route-success                       "Reitti poistettiin onnistuneesti."
+  :delete-route-error                         "Reitin poisto epäonnistui. Jos ongelma toistuu "
   :logged-in                                  "You were logged in successfully!"
   :loading                                    "Loading"
   :language                                   "Language"

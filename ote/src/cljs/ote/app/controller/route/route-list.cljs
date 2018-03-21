@@ -2,17 +2,35 @@
   "Route lsit controller"
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
+            [ote.db.transit :as transit]
+            [ote.localization :refer [tr tr-key]]
             [ote.app.routes :as routes]))
 
 ;; Load users own routes
 (defrecord LoadRoutes [])
 (defrecord LoadRoutesResponse [response])
 
+;; Delete
+(defrecord OpenDeleteRouteModal [id])
+(defrecord CancelDeleteRoute [id])
+(defrecord ConfirmDeleteRoute [id])
+(defrecord DeleteRouteResponse [response])
+(defrecord DeleteRouteResponseFailed [response])
+
+
 ;; Edit route
 ;(defrecord EditRoute [id]);
 
 ;; Create new route
 (defrecord CreateNewRoute [])
+
+(defn- update-route-by-id [app id update-fn & args]
+  (update app :routes-vector
+          (fn [services]
+            (map #(if (= (::transit/id %) id)
+                    (apply update-fn % args)
+                    %)
+                 services))))
 
 (extend-protocol tuck/Event
   LoadRoutes
@@ -30,4 +48,35 @@
   CreateNewRoute
   (process-event [_ app]
     (routes/navigate! :new-route)
-    app))
+    app)
+
+  OpenDeleteRouteModal
+  (process-event [{id :id} app]
+    (update-route-by-id
+      app id
+      assoc :show-delete-modal? true))
+
+  CancelDeleteRoute
+  (process-event [{id :id} app]
+    (update-route-by-id
+      app id
+      dissoc :show-delete-modal?))
+
+  ConfirmDeleteRoute
+  (process-event [{id :id} app]
+    (comm/post! "routes/delete" {:id id}
+                {:on-success (tuck/send-async! ->DeleteRouteResponse)
+                 :on-failure (tuck/send-async! ->DeleteRouteResponseFailed)})
+    app)
+
+  DeleteRouteResponse
+  (process-event [{response :response} app]
+    (let [filtered-map (filter #(not= (::transit/id %) (int response)) (get app :routes-vector))]
+      (assoc app :routes-vector filtered-map
+                 :page :routes
+                 :flash-message (tr [:common-texts :delete-route-success])
+                 :routes-changed? true)))
+
+  DeleteRouteResponseFailed
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error (tr [:common-texts :delete-route-error]))))

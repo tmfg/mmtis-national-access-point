@@ -9,13 +9,19 @@
             [ote.db.transport-operator :as t-operator]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
-            [ote.util.fn :refer [flip]]))
+            [ote.util.fn :refer [flip]]
+            [clojure.set :as set]))
 
-
-
-;; Initialize editing a new route and load available stops from server (GeoJSON)
-(defrecord InitRoute [])
+;; Load available stops from server (GeoJSON)
+(defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
+
+;; Initialize editing a new route
+(defrecord InitRoute [])
+
+;; Load existing route
+(defrecord LoadRoute [id])
+(defrecord LoadRouteResponse [response])
 
 ;; Edit route basic info
 (defrecord EditRoute [form-data])
@@ -68,27 +74,94 @@
                      %)
                   stops))))
 
+(defn- update-stop-times
+  "Copy departure and arrival time for stops from first trip. Stops can't have departure time in db, but in
+  ui they can."
+  [stops trips]
+    (map-indexed
+      (fn [idx item]
+        (assoc item ::transit/departure-time
+                    (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])
+                    ::transit/arrival-time
+                    (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
+      stops))
+
+(defn update-trips-calendar
+  "In database one service-calendar can be linked to all trips, but in front-end we need to copy or multiply
+  service-calendars according to trips service-calendar-idx"
+  [trips service-calendars]
+  (let [new-calendars
+        (mapv
+          (fn [trip]
+            (if (empty? service-calendars)
+              {::transit/service-added-dates   #{}
+               ::transit/service-removed-dates #{}
+               ::transit/service-rules         []
+               :rule-dates                     #{}}
+
+              (let [cal-idx (::transit/service-calendar-idx trip)
+                    cal (nth service-calendars cal-idx)
+                    rule-dates (into #{}
+                                     (mapcat transit/rule-dates)
+                                     (::transit/service-rules cal))]
+                (-> cal
+                    (assoc :rule-dates rule-dates)
+                    (assoc ::transit/service-added-dates (into #{}
+                                                               (map #(time/date-fields-from-timestamp %)
+                                                                    (::transit/service-added-dates cal))))
+                    (assoc ::transit/service-removed-dates (into #{}
+                                                                 (map #(time/date-fields-from-timestamp %)
+                                                                      (::transit/service-removed-dates cal))))))))
+          trips)]
+    new-calendars))
+
 (extend-protocol tuck/Event
-  InitRoute
+  LoadStops
   (process-event [_ app]
     (let [on-success (tuck/send-async! ->LoadStopsResponse)]
       (comm/get! "transit/stops.json"
                  {:on-success on-success
                   :response-format :json})
-      (update app :route assoc
-              ::transit/stops []
-              ::transit/trips []
-              ::transit/service-calendars []
-              ::transit/route-type :ferry
-              ::transit/transport-operator-id
-              (::t-operator/id
-                (:transport-operator
-                  (first (:transport-operators-with-services app)))))))
+      app))
 
   LoadStopsResponse
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
+  LoadRoute
+  (process-event [{id :id} app]
+    (let [on-success (tuck/send-async! ->LoadRouteResponse)]
+      (comm/get! (str "routes/" id)
+                 {:on-success on-success})
+      app))
+
+  LoadRouteResponse
+  (process-event [{response :response} app]
+    (let [trips (::transit/trips response)
+          service-calendars (update-trips-calendar trips (::transit/service-calendars response))
+          stop-coordinates (mapv #(update % ::transit/location (fn [stop] (:coordinates stop)) ) (::transit/stops response))
+          stops (if (empty? trips)
+                  stop-coordinates
+                  (update-stop-times stop-coordinates trips))
+          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
+
+      (-> app
+        (assoc :route response)
+        (assoc-in [:route ::transit/stops] stops)
+        (assoc-in [:route ::transit/trips] trips)
+        (assoc-in [:route ::transit/service-calendars] service-calendars))))
+
+  InitRoute
+  (process-event [_ app]
+    (update app :route assoc
+            ::transit/stops []
+            ::transit/trips []
+            ::transit/service-calendars []
+            ::transit/route-type :ferry
+            ::transit/transport-operator-id
+            (::t-operator/id
+              (:transport-operator
+                (first (:transport-operators-with-services app))))))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -97,16 +170,25 @@
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (-> app
-        (update-in [:route ::transit/stops]
-                   (fn [stop-sequence]
-                     (conj (or stop-sequence [])
-                           (merge (into {}
+    (let [properties (js->clj (aget feature "properties"))
+          stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+          new-stop (dissoc (merge (into {}
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
-                                        (js->clj (aget feature "properties")))
-                                  {::transit/location (vec (aget feature "geometry" "coordinates"))}))))
+                                        properties)
+                                  {::transit/location (vec (aget feature "geometry" "coordinates"))})
+                           ::transit/country
+                           ::transit/country-code
+                           ::transit/unlocode
+                           ::transit/port-type
+                           ::transit/port-type-name
+                           ::transit/type)
+          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get  properties "code"))
+                              stop-sequence
+                              (conj stop-sequence new-stop))]
+      (-> app
+        (assoc-in [:route ::transit/stops] new-stop-sequence)
         (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+        (assoc-in [:route ::transit/service-calendars] []))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -116,11 +198,14 @@
       (-> app
           (update-in [:route ::transit/stops]
                      (fn [stop-sequence]
-                       (conj (or stop-sequence [])
-                             (merge (into {}
-                                          (map #(update % 0 (partial keyword "ote.db.transit")))
-                                          (js->clj (aget feature "properties")))
-                                    {::transit/location (vec (aget feature "geometry" "coordinates"))})))))))
+                       (let [geometry (vec (aget feature "geometry" "coordinates"))]
+                         (if (= geometry (::transit/location (last stop-sequence)))
+                           stop-sequence
+                           (conj (or stop-sequence [])
+                                 (merge (into {}
+                                              (map #(update % 0 (partial keyword "ote.db.transit")))
+                                              (js->clj (aget feature "properties")))
+                                        {::transit/location geometry})))))))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
@@ -345,12 +430,17 @@
                                        deduped-cals)) calendars)
           route (-> app :route form/without-form-metadata
                     (assoc ::transit/service-calendars deduped-cals)
+                    (update ::transit/stops (fn [stop]
+                                              (map
+                                                #(dissoc % ::transit/departure-time ::transit/arrival-time)
+                                                stop)))
                     (update ::transit/trips
-                               (fn [trips]
-                                 ;; Update service-calendar indexes
-                                 (mapv #(assoc % ::transit/service-calendar-idx
-                                                 (nth cals-indices (::transit/service-calendar-idx %)))
-                                       trips)))
+                            (fn [trips]
+                              ;; Update service-calendar indexes
+                              (mapv
+                                #(assoc % ::transit/service-calendar-idx
+                                          (nth cals-indices (::transit/service-calendar-idx %)))
+                                trips)))
                     (dissoc :step :stops :new-start-time :edit-service-calendar))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
