@@ -717,6 +717,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Omat reitit"
+  :navigation-privacy-policy "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"
@@ -734,6 +735,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
+  :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
   :time-units {:minutes  "Minuter"

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2018-03-13 13:05+0200\n"
+"PO-Revision-Date: 2018-03-21 12:09+0200\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #: ckanext/napote_theme/controller.py:70
 #, python-format
@@ -567,6 +567,20 @@ msgstr ""
 #: ckanext/napote_theme/templates/user/snippets/login_form.html:24
 msgid "Remember me"
 msgstr ""
+
+#: ckanext/napote_theme/templates/footer.html
+msgid "Privacy Policy"
+msgstr "Privacy Policy"
+
+#: ckanext/napote_theme/templates/footer.html
+msgid "NAP license declaration"
+msgstr ""
+"Finap.fi-service, made by <a target=\"_blank\" rel=\"noopener noreferrer\" "
+"href=\"https://www.liikennevirasto.fi\">Liikennevirasto</a>, is licensed "
+"with \n"
+"<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"http://"
+"creativecommons.org/licenses/by/4.0/\">Attribution 4.0 International (CC BY "
+"4.0)</a> -license."
 
 # ### CKAN DEFAULT TRANSLATION OVERRIDES ####
 # ### NOTE: Add new translation overrides here manually ###

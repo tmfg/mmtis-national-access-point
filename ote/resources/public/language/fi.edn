@@ -722,6 +722,7 @@
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
+  :navigation-privacy-policy "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
   :user-menu-log-out                          "Kirjaudu ulos"
@@ -739,6 +740,7 @@
   :footer-livi-url-link "https://www.liikennevirasto.fi/nap"
   :footer-ckan-software                       "CKAN-ohjelmistolla"
   :footer-made-width                          "Toteutettu"
+  :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
   :no-such-page                               "Valittua sivua ei löydy: "
   :time-unit                                  "Aikayksikkö"
   :time-units {:minutes  "Minuuttia"

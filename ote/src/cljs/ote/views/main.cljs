@@ -245,9 +245,16 @@
        [:li
         [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
+       [:li [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/Tietosuojaseloste_NAP.pdf"
+             (tr [:common-texts :navigation-privacy-policy])
+             {:target "_blank"}]]
        [:li
-        [language-selection e! style-base/language-selection-footer nil true]]]]]]])
-
+        [language-selection e! style-base/language-selection-footer nil true]]]]
+     [:div.col-md-12 (stylefy/use-style style-base/footer-copyright)
+      [linkify "http://creativecommons.org/licenses/by/4.0/"
+       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/cc.svg"})]
+       {:target "_blank"}]
+      [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
 
 
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes})

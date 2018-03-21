@@ -716,6 +716,7 @@
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
+  :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"
   :user-menu-log-out                          "Log out"
@@ -733,6 +734,7 @@
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/en/transport-system/nap"
   :footer-ckan-software                       "CKAN-software"
   :footer-made-width                          "Made with"
+  :footer-copyright-disclaimer (:md "Finap.fi-service, made by  [Liikennevirasto](https://www.liikennevirasto.fi/), is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
   :no-such-page                               "Page not found: "
   :time-unit                                  "Time unit"
   :time-units {:minutes  "Minutes"
