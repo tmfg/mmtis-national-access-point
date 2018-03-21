@@ -10,19 +10,32 @@
         <div class="span7 footer-links">
             {% block footer_nav %}
                 <ul class="unstyled">
-                  {% block footer_links %}
+                    {% block footer_links %}
 
-                  {% if c.language == 'en' %}
-                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/web/en/transport-system/nap">Liikennevirasto.fi</a></li>
-                  {% elif c.language == 'sv' %}
-                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap">Liikennevirasto.fi</a></li>
-                  {% else %}
-                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/nap">Liikennevirasto.fi</a></li>
-                  {% endif %}
+                        {% if c.language == 'en' %}
+                            <li><a target="_blank" rel="noopener noreferrer"
+                                   href="https://www.liikennevirasto.fi/web/en/transport-system/nap">Liikennevirasto.fi</a>
+                            </li>
+                        {% elif c.language == 'sv' %}
+                            <li><a target="_blank" rel="noopener noreferrer"
+                                   href="https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap">Liikennevirasto.fi</a>
+                            </li>
+                        {% else %}
+                            <li><a target="_blank" rel="noopener noreferrer" href="https://www.liikennevirasto.fi/nap">Liikennevirasto.fi</a>
+                            </li>
+                        {% endif %}
 
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf">{{_('NAP user guide label')}}</a></li>
-                    <li><a target="_blank" rel="noopener noreferrer" href="http://bit.ly/nap-palaute">{{ _('Give feedback') }}</a></li>
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md">Developers</a></li>
+                        <li><a target="_blank" rel="noopener noreferrer"
+                               href="https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf">{{ _('NAP user guide label') }}</a>
+                        </li>
+                        <li><a target="_blank" rel="noopener noreferrer"
+                               href="http://bit.ly/nap-palaute">{{ _('Give feedback') }}</a></li>
+                        <li><a target="_blank" rel="noopener noreferrer"
+                               href="https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md">Developers</a>
+                        </li>
+                        <li><a target="_blank" rel="noopener noreferrer"
+                               href="https://s3.eu-central-1.amazonaws.com/ote-assets/Tietosuojaseloste_NAP.pdf">{{ _('Privacy Policy') }}</a>
+                        </li>
 
                         <ul class="unstyled finap-lang">
                             <li>{{ _('Language') }}:</li>
@@ -43,6 +56,7 @@
                 </ul>
             {% endblock %}
         </div>
+
         <div class="span3 attribution">
             {% block footer_attribution %}
                 <p>
@@ -50,7 +64,13 @@
                         <a class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{% endtrans %}
                 </p>
             {% endblock %}
-            </ul>
+        </div>
+        <div class="span12 copyright">
+            <a target="_blank" rel="noopener noreferrer" href="http://creativecommons.org/licenses/by/4.0/">
+                <img class="copyright__logo" alt="Creative Commons -lisenssi" src="/cc.svg"></a>
+            <div>
+                {% trans %}NAP license declaration{% endtrans %}
+            </div>
         </div>
     </div>
 {% endblock %}

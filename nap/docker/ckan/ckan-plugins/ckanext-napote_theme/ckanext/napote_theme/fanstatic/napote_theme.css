@@ -770,6 +770,7 @@ nav.section.navigation.section-right > form {
 .site-footer {
     background: #444444; /** LIVI lisäväri, harmaat 5. **/
     color: #ffffff;
+    padding: 20px 20px 0 20px;
 }
 .footer-links .logo > img {
     height: 70px;
@@ -920,6 +921,8 @@ div.napote-organization-form div.slug-preview {
     padding-right: 10px !important;
 }
 
+/** FOOTER **/
+
 .site-footer ul.finap-lang  {
     display: inline-block;
     border-top: solid 1px white;
@@ -932,4 +935,16 @@ div.napote-organization-form div.slug-preview {
 .site-footer .finap-lang > li {
     display: inline-block !important;
     margin-right: 10px !important;
+}
+
+.site-footer .copyright {
+    text-align: center;
+    margin-top: 24px; /* half copyright__logo height */
+    margin-bottom: 48px; /* copyright__logo height */
+}
+
+.site-footer .copyright__logo {
+    height: 48px;
+    width: 48px;
+    margin-bottom: 8px;
 }

@@ -503,6 +503,15 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
+#: ckanext/napote_theme/templates/footer.html
+msgid "Privacy Policy"
+msgstr ""
+
+#: ckanext/napote_theme/templates/footer.html
+msgid "NAP license declaration"
+msgstr ""
+
+
 # ### CKAN DEFAULT TRANSLATION OVERRIDES ####
 # ### NOTE: Add new translation overrides here manually ###
 # # Datasets
