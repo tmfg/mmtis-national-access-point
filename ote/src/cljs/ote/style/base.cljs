@@ -1,7 +1,7 @@
 (ns ote.style.base
   "Base styles for OTE application. Everything that affects the overall look and feel of the app."
   (:require
-  [stylefy.core :as stylefy :refer [use-style use-sub-style]]))
+    [stylefy.core :as stylefy :refer [use-style use-sub-style]]))
 
 (def body {:margin 0
            :padding 0})
@@ -47,11 +47,11 @@
 (def button-add-row {:padding "15px 0"})
 
 ;; Form elements
-(def required-element { :color "#B71C1C"
+(def required-element {:color "#B71C1C"
                        :font-size 14
-                       :font-weight "600"}) ;; currently same as error
+                       :font-weight "600"})                 ;; currently same as error
 
-(def error-element { :color "#B71C1C"
+(def error-element {:color "#B71C1C"
                     :font-weight "600"})
 
 ;; Front page
@@ -109,7 +109,7 @@
 
 (def language-selection-dropdown
   {:border-top "solid 1px white"
-   :font-size  "12px"
+   :font-size "12px"
    :margin-top "5px"
    :color "#fff"
    :padding-top "5px"
@@ -129,3 +129,12 @@
 (def section-margin {:margin-top "1em"})
 
 (def placeholder {:color "#a0a0a0"})
+
+(def footer-copyright {:text-align "center"
+                       :margin-top "24px"
+                       ;; Decrement footer bottom padding from logo height
+                       :margin-bottom (str (- 48 20) "px")
+                       ::stylefy/sub-styles
+                       {:logo {:height "48px"
+                               :width "48px"
+                               :margin-bottom "8px"}}})
