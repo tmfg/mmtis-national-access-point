@@ -39,22 +39,30 @@
                                (and (= "departure" stop-type) (= pickup-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
                                :else [ic/communication-call {:style style-route/exception-icon}])
                              ])}
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Poistumismahdollisuus oletuksena" "Nousu mahdollista oletuksena")
+    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
+                                   (tr [:route-wizard-page :trip-stop-arrival-exception-default])
+                                   (tr [:route-wizard-page :trip-stop-departure-exception-default]))
                    :left-icon    (ic/maps-pin-drop)
                    :on-click     #(do
                                     (.preventDefault %)
                                     (e! (rc/->ShowStopException stop-type stop-idx :regular trip-idx)))}]
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Ei poistumismahdollisuutta" "Ei nousumahdollisuutta")
+    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
+                                   (tr [:route-wizard-page :trip-stop-arrival-exception-no])
+                                   (tr [:route-wizard-page :trip-stop-departure-exception-no]))
                    :left-icon    (ic/notification-do-not-disturb)
                    :on-click     #(do
                                     (.preventDefault %)
                                     (e! (rc/->ShowStopException stop-type stop-idx :not-available trip-idx)))}]
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Poistumisesta sovittava palveluntuottajan kanssa" "Nousemisesta sovittava palveluntuottajan kanssa")
+    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
+                                   (tr [:route-wizard-page :trip-stop-arrival-exception-agency])
+                                   (tr [:route-wizard-page :trip-stop-departure-exception-agency]))
                    :left-icon    (ic/communication-call)
                    :on-click     #(do
                                     (.preventDefault %)
                                     (e! (rc/->ShowStopException stop-type stop-idx :phone-agency trip-idx)))}]
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type) "Poistumisesta sovittava kuljettajan kanssa" "Noususta sovittava kuljettajan kanssa")
+    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
+                                   (tr [:route-wizard-page :trip-stop-arrival-exception-driver])
+                                   (tr [:route-wizard-page :trip-stop-departure-exception-driver]))
                    :left-icon    (ic/social-people)
                    :on-click     #(do
                                     (.preventDefault %)
@@ -89,9 +97,11 @@
      (for [{::transit/keys [code name]} stop-sequence]
        (list
         ^{:key (str code "-arr")}
-        [:th {:style {:font-size "80%" :font-variant "small-caps"}} "tulo"]
+        [:th {:style {:font-size "80%" :font-variant "small-caps"}}
+         (tr [:route-wizard-page :trip-stop-arrival-header])]
         ^{:key (str code "-dep")}
-        [:th {:style {:font-size "80%" :font-variant "small-caps"}} "lähtö"])))]])
+        [:th {:style {:font-size "80%" :font-variant "small-caps"}}
+         (tr [:route-wizard-page :trip-stop-departure-header])])))]])
 
 (defn trip-row
   "Render a single row of stop times."
@@ -99,10 +109,9 @@
   ^{:key row-idx}
   [:tr
    [:td [:div [ui/raised-button {:on-click #(e! (rc/->EditServiceCalendar row-idx))
-                                 :label "Ajopäiväkalenteri"}]]]
+                                 :label (tr [:route-wizard-page :trip-stop-calendar])}]]]
    (map-indexed
      (fn [j {::transit/keys [arrival-time departure-time stop-idx pickup-type drop-off-type] :as stop}]
-       (.log js/console "stop " (pr-str stop))
        (let [update! #(e! (rc/->EditStopTime row-idx j %))
              style {:style {:padding-left     "5px"
                             :padding-right    "5px"
@@ -121,7 +130,7 @@
                                     :update! #(update! {::transit/arrival-time %})}
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                (exception-icon e! "arrival" pickup-type drop-off-type stop-idx row-idx)]])
+                [exception-icon e! "arrival" pickup-type drop-off-type stop-idx row-idx]]])
            (if (= j (dec stop-count))
              ^{:key (str j "-last")}
              [:td style " - "]
@@ -132,7 +141,7 @@
                                     :update! #(update! {::transit/departure-time %})}
                          departure-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                (exception-icon e! "departure" pickup-type drop-off-type stop-idx row-idx)]]))))
+                [exception-icon e! "departure" pickup-type drop-off-type stop-idx row-idx]]]))))
      stops)])
 
 (defn trips-list [e! route]
@@ -151,14 +160,14 @@
         [common/help (tr [:form-help :trip-editor-no-calendar])]])
 
      [:div
-      "Uuden vuoron lähtöaika: "
+      (tr [:route-wizard-page :trip-schedule-new-trip])
       [form-fields/field {:type :time
                           :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
       [ui/raised-button {:style {:margin-left "5px"}
                          :primary true
                          :disabled (or (time/empty-time? (:new-start-time route)) empty-calendar?)
                          :on-click #(e! (rc/->AddTrip))
-                         :label "Lisää vuoro"}]]]))
+                         :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
 (defn trips [e! {route :route :as app}]
   (when (empty? (::transit/trips route))
@@ -166,4 +175,4 @@
   (fn [e! {route :route :as app}]
     (if (:edit-service-calendar route)
       [route-service-calendar/service-calendar e! app]
-      (trips-list e! route))))
+      [trips-list e! route])))

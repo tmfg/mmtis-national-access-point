@@ -20,14 +20,15 @@
                                   :keys [show-delete-modal?]
                                   :as route}]
   [:span
-   [ui/icon-button {:href "#" :on-click #(do
-                                           (.preventDefault %)
-                                           (e! (route-list/->OpenDeleteRouteModal id)))}
+   [ui/icon-button {:href     "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (route-list/->OpenDeleteRouteModal id)))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
       {:open    true
-       :title   "Haluatko poistaa merireitin?"
+       :title   (tr [:route-list-page :delete-dialog-header])
        :actions [(r/as-element
                    [ui/flat-button
                     {:label    (tr [:buttons :cancel])
@@ -45,7 +46,7 @@
                                    (.preventDefault %)
                                    (e! (route-list/->ConfirmDeleteRoute id)))}])]}
 
-      (str "Poistetaan reitti " name)])])
+      (str (tr [:route-list-page :delete-dialog-remove-route]) name)])])
 
 
 (defn list-routes [e! routes]
@@ -55,34 +56,36 @@
                       :display-select-all  false}
      [ui/table-row {:selectable false}
       [ui/table-header-column {:style {:width "7%"}} "Id"]
-      [ui/table-header-column {:style {:width "20%"}} "Nimi"]
-      [ui/table-header-column "Lähtöpaikka"]
-      [ui/table-header-column "Määränpää"]
-      [ui/table-header-column {:style {:width "10%"}}" Voimassa lähtien"]
-      [ui/table-header-column {:style {:width "10%"}} "Voimassa asti"]
-      [ui/table-header-column "Luotu / Muokattu"]
-      [ui/table-header-column "Toiminnot"]]]
+      [ui/table-header-column {:style {:width "20%"}} (tr [:route-list-page :route-list-table-name])]
+      [ui/table-header-column (tr [:route-list-page :route-list-table-starting-point])]
+      [ui/table-header-column (tr [:route-list-page :route-list-table-destination-point])]
+      [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-from])]
+      [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-to])]
+      [ui/table-header-column (tr [:route-list-page :route-list-table-created-modified])]
+      [ui/table-header-column (tr [:route-list-page :route-list-table-actions])]]]
     [ui/table-body {:display-row-checkbox false}
      (doall
        (map-indexed
-        (fn [i {::transit/keys [id name available-from available-to
-                                departure-point-name destination-point-name]
-                ::modification/keys [created modified] :as row}]
+         (fn [i {::transit/keys      [id name available-from available-to
+                                      departure-point-name destination-point-name]
+                 ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
             [ui/table-row-column {:style {:width "7%"}} id]
-            [ui/table-row-column {:style {:width "20%"}} [:a {:href "#" :on-click  #(do
-                                                                                      (.preventDefault %)
-                                                                                      (e! (fp/->ChangePage :edit-route {:id id})))} name]]
+            [ui/table-row-column {:style {:width "20%"}} [:a {:href     "#"
+                                                              :on-click #(do
+                                                                           (.preventDefault %)
+                                                                           (e! (fp/->ChangePage :edit-route {:id id})))} name]]
             [ui/table-row-column departure-point-name]
             [ui/table-row-column destination-point-name]
             [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
             [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column (time/format-timestamp-for-ui (or modified created))]
             [ui/table-row-column
-             [ui/icon-button {:href "#" :on-click #(do
-                                                     (.preventDefault %)
-                                                     (e! (fp/->ChangePage :edit-route {:id id})))}
+             [ui/icon-button {:href     "#"
+                              :on-click #(do
+                                           (.preventDefault %)
+                                           (e! (fp/->ChangePage :edit-route {:id id})))}
               [ic/content-create]]
              [delete-route-action e! row]]])
          routes))]]])
@@ -133,9 +136,8 @@
           [:br]
           [common/help
            [:span
+            [:div (tr [:route-list-page :route-list-active-routes])
+             [common/linkify url (tr [:route-list-page :route-list-gtfs-zip-file])]]
             [:div
-             "Palveluntuottajan voimassaolevat reitit: "
-             [common/linkify url "GTFS Zip tiedosto"]]
-            [:div
-             "Kopioi osoite: "
+             (tr [:route-list-page :route-list-copy-link])
              [common/copy-to-clipboard url]]]]]))]))

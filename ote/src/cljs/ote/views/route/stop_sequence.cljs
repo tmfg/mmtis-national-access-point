@@ -9,7 +9,8 @@
             [ote.db.transit :as transit]
             [reagent.core :as r]
             [ote.ui.leaflet-draw :as leaflet-draw]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.localization :refer [tr tr-key]]))
 
 
 (def stop-marker-style
@@ -20,7 +21,6 @@
 
 (defn- stop-marker [e! point lat-lng]
   (-> lat-lng
-      #_(js/L.circleMarker stop-marker-style)
       (js/L.marker #js {:opacity 0.7
                         :title (aget point "properties" "name")})
       (.on  "click"
@@ -35,21 +35,20 @@
     [ui/dialog
      {:open true
       :modal true
-      :title "Lisää uusi satama tai laituri"
+      :title (tr [:route-wizard-page :stop-sequence-custom-dialog-title])
       :actions [(r/as-element
                  [ui/flat-button
-                  {:label "Lisää"
+                  {:label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
                    :primary true
+                   :disabled (constantly true) ;; TODO: Custom-stop name can be empty now, and we don't want to save empty names to db.
                    :on-click #(e! (rc/->CloseCustomStopDialog))}])]}
      [:span
       [form-fields/field {:type :string
-                          :label "Nimi"
+                          :label (tr [:route-wizard-page :stop-sequence-custom-dialog-name])
                           :update! #(e! (rc/->UpdateCustomStop {:name %}))
                           :on-enter #(e! (rc/->CloseCustomStopDialog))}
        (-> route :custom-stops last :name)]
-      [common/help
-       "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla.
-Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."]]]))
+      [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]]))
 
 (defn- route-map [e! route]
   (r/create-class
@@ -82,8 +81,8 @@ Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."]]]))
                           (leaflet-draw/layer-geojson %)))
 
            :add-features? true
-           :localization {:toolbar {:buttons {:marker "Lisää uusi satama/laituri"}}
-                          :handlers {:marker {:tooltip {:start "Klikkaa karttaa lisätäksesi satama/laituri"}}}}})))
+           :localization {:toolbar {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
+                          :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}})))
     :reagent-render
     (fn [e! route]
       [:div.stops-map {:style {:width "50%"}}
@@ -108,9 +107,9 @@ Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."]]]))
    [:table {:style {:width "100%"}}
     [:thead {:style {:text-align "left"}}
      [:tr
-      [:th {:style {:width "50%"}} "Satama"]
-      [:th {:style {:width "20%" :text-align "center"}} "Saapumisaika"]
-      [:th {:style {:width "20%" :text-align "center"}} "Lähtöaika"]
+      [:th {:style {:width "50%"}} (tr [:route-wizard-page :stop-sequence-port-header])]
+      [:th {:style {:width "20%" :text-align "center"}} (tr [:route-wizard-page :stop-sequence-arrival-header])]
+      [:th {:style {:width "20%" :text-align "center"}} (tr [:route-wizard-page :stop-sequence-departure-header])]
       [:th {:style {:width "10%"}} ""]]]
     [:tbody {:style {:text-align "left"}}
      (doall
@@ -140,7 +139,7 @@ Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."]]]))
       [:tbody
        [:tr
         [:td {:colSpan 4}
-         [common/help "Valitse reitin pysäkkiketju klikkaamalla pysäkkejä kartalta."]]]])]])
+         [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])]])
 
 (defn stop-sequence [e! {route :route :as app}]
   (e! (rc/->LoadStops))

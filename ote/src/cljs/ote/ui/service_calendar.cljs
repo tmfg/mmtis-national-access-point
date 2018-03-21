@@ -85,18 +85,18 @@
 (defn- month-name [month]
   ;; FIXME: use translation
   (case month
-    1 "Tammi"
-    2 "Helmi"
-    3 "Maalis"
-    4 "Huhti"
-    5 "Touko"
-    6 "Kesä"
-    7 "Heinä"
-    8 "Elo"
-    9 "Syys"
-    10 "Loka"
-    11 "Marras"
-    12 "Joulu"))
+    1 (tr [:route-wizard-page :short-month-names :JAN])
+    2 (tr [:route-wizard-page :short-month-names :FEB])
+    3 (tr [:route-wizard-page :short-month-names :MAR])
+    4 (tr [:route-wizard-page :short-month-names :APR])
+    5 (tr [:route-wizard-page :short-month-names :MAY])
+    6 (tr [:route-wizard-page :short-month-names :JUN])
+    7 (tr [:route-wizard-page :short-month-names :JUL])
+    8 (tr [:route-wizard-page :short-month-names :AUG])
+    9 (tr [:route-wizard-page :short-month-names :SEP])
+    10 (tr [:route-wizard-page :short-month-names :OCT])
+    11 (tr [:route-wizard-page :short-month-names :NOV])
+    12 (tr [:route-wizard-page :short-month-names :DEC])))
 
 (defn- service-calendar-year [{:keys [selected-date? on-select
                                       day-style]} year]
