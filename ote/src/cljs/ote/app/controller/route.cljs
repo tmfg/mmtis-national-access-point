@@ -120,11 +120,14 @@
       (-> app
           (update-in [:route ::transit/stops]
                      (fn [stop-sequence]
-                       (conj (or stop-sequence [])
-                             (merge (into {}
-                                          (map #(update % 0 (partial keyword "ote.db.transit")))
-                                          (js->clj (aget feature "properties")))
-                                    {::transit/location (vec (aget feature "geometry" "coordinates"))})))))))
+                       (let [geometry (vec (aget feature "geometry" "coordinates"))]
+                         (if (= geometry (::transit/location (last stop-sequence)))
+                           stop-sequence
+                           (conj (or stop-sequence [])
+                                 (merge (into {}
+                                              (map #(update % 0 (partial keyword "ote.db.transit")))
+                                              (js->clj (aget feature "properties")))
+                                        {::transit/location geometry})))))))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
