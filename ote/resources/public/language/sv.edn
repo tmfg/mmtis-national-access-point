@@ -654,7 +654,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
-  :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
+  :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
   :time-units {:minutes  "Minuter"

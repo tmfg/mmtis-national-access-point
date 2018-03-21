@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2018-03-21 12:11+0200\n"
+"PO-Revision-Date: 2018-03-21 16:14+0200\n"
 "Last-Translator: \n"
 "Language: sv\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -526,10 +526,10 @@ msgstr "Registerbeskrivning"
 #: ckanext/napote_theme/templates/footer.html
 msgid "NAP license declaration"
 msgstr ""
-"Finap.fi-sivusto, jonka tekijä on <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www."
-"liikennevirasto.fi\">Liikennevirasto</a>, on lisensoitu \n"
+"Webbplatsen finap.fi som <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www."
+"liikennevirasto.fi\">Trafikverket</a>  upprätthåller, publiceras med licensen \n"
 "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"http://creativecommons.org/licenses/by/4.0/"
-"\">Creative Commons Nimeä 4.0 Kansainvälinen</a> -lisenssillä."
+"\">Creative Commons Erkännande 4.0 Internationell</a>."
 
 # ### CKAN DEFAULT TRANSLATION OVERRIDES ####
 # ### NOTE: Add new translation overrides here manually ###
