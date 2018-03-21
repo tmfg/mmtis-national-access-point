@@ -17,6 +17,15 @@
                                 :gtfs/transfers-txt
                                 :gtfs/feed-info-txt]))
 
+(def name->keyword
+  {"agency.txt" :gtfs/agency-txt
+   "stops.txt" :gtfs/stops.txt
+   "routes.txt" :gtfs/routes-txt
+   "trips.txt" :gtfs/trips.txt
+   "stop_times.txt" :gtfs/stop-times-txt
+   "calendar.txt" :gtfs/calendar-txt
+   "calendar_dates.txt" :gtfs/calendar-dates-txt})
+
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for agency.txt
 
