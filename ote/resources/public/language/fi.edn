@@ -666,6 +666,8 @@
   :save-failed                                "Tallennettaessa sattui virhe. Jos ongelma toistuu "
   :delete-service-success                     "Palvelu poistettiin onnistuneesti."
   :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
+  :delete-route-success                       "Reitti poistettiin onnistuneesti."
+  :delete-route-error                         "Reitin poisto epäonnistui. Jos ongelma toistuu "
   :logged-in                                  "Kirjauduit sisään onnistuneesti!"
   :loading                                    "Lataa"
   :language                                   "Kieli"

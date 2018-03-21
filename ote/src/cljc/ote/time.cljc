@@ -17,6 +17,9 @@
    [clojure.spec.alpha :as s]
    [clojure.string :as str]))
 
+(defprotocol DateFields
+  (date-fields [this] "Return date fields as a map of data."))
+
 ;; Record for wall clock time (hours, minutes and seconds)
 (defrecord Time [hours minutes seconds])
 
@@ -29,6 +32,14 @@
     (->> time
          t/to-default-time-zone
          (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
+
+#?(:cljs
+   (defn date-fields-from-timestamp [timestamp]
+     (if  (nil? timestamp)
+       nil
+       (->> timestamp
+            t/to-default-time-zone
+            (date-fields)))))
 
 #?(:cljs
    (defn format-js-time [time]
@@ -76,9 +87,6 @@
                           :cljs js/parseInt) %)
                      (str/split string #":"))]
     (->Time h m s)))
-
-(defprotocol DateFields
-  (date-fields [this] "Return date fields as a map of data."))
 
 (extend-protocol DateFields
    #?(:cljs js/Date :clj java.util.Date)

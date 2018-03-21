@@ -1,32 +1,65 @@
 (ns ote.views.route.route-list
   "List own routes"
   (:require
-   [ote.localization :refer [tr tr-key]]
-   [cljs-react-material-ui.reagent :as ui]
-   [ote.app.controller.route.route-list :as route-list]
-   [cljs-react-material-ui.icons :as ic]
-   [ote.views.transport-operator :as t-operator-view]
-   [ote.app.controller.transport-operator :as to]
-   [ote.db.transport-operator :as t-operator]
-   [ote.ui.form-fields :as form-fields]
-   [ote.db.transit :as transit]
-   [ote.db.modification :as modification]
-   [ote.time :as time]
-   [ote.ui.common :as common]))
+    [ote.localization :refer [tr tr-key]]
+    [cljs-react-material-ui.reagent :as ui]
+    [ote.app.controller.route.route-list :as route-list]
+    [cljs-react-material-ui.icons :as ic]
+    [ote.views.transport-operator :as t-operator-view]
+    [ote.app.controller.transport-operator :as to]
+    [ote.db.transport-operator :as t-operator]
+    [ote.ui.form-fields :as form-fields]
+    [ote.db.transit :as transit]
+    [ote.db.modification :as modification]
+    [ote.time :as time]
+    [ote.app.controller.front-page :as fp]
+    [ote.ui.common :as common]
+    [reagent.core :as r]))
+
+(defn- delete-route-action [e! {::transit/keys [id name]
+                                  :keys [show-delete-modal?]
+                                  :as route}]
+  [:span
+   [ui/icon-button {:href "#" :on-click #(do
+                                           (.preventDefault %)
+                                           (e! (route-list/->OpenDeleteRouteModal id)))}
+    [ic/action-delete]]
+   (when show-delete-modal?
+     [ui/dialog
+      {:open    true
+       :title   "Haluatko poistaa merireitin?"
+       :actions [(r/as-element
+                   [ui/flat-button
+                    {:label    (tr [:buttons :cancel])
+                     :primary  true
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (route-list/->CancelDeleteRoute id)))}])
+                 (r/as-element
+                   [ui/raised-button
+                    {:label     (tr [:buttons :delete])
+                     :icon      (ic/action-delete-forever)
+                     :secondary true
+                     :primary   true
+                     :on-click  #(do
+                                   (.preventDefault %)
+                                   (e! (route-list/->ConfirmDeleteRoute id)))}])]}
+
+      (str "Poistetaan reitti " name)])])
+
 
 (defn list-routes [e! routes]
   [:div
-   (.log js/console "list-routes routes: " (clj->js routes))
    [ui/table
     [ui/table-header {:adjust-for-checkbox false
                       :display-select-all  false}
      [ui/table-row {:selectable false}
-      [ui/table-header-column {:style {:width "3%"}} "Id"]
+      [ui/table-header-column {:style {:width "7%"}} "Id"]
       [ui/table-header-column {:style {:width "20%"}} "Nimi"]
       [ui/table-header-column "Lähtöpaikka"]
       [ui/table-header-column "Määränpää"]
-      [ui/table-header-column "Voimassa lähtien"]
-      [ui/table-header-column "Voimassa asti"]
+      [ui/table-header-column {:style {:width "10%"}}" Voimassa lähtien"]
+      [ui/table-header-column {:style {:width "10%"}} "Voimassa asti"]
       [ui/table-header-column "Luotu / Muokattu"]
       [ui/table-header-column "Toiminnot"]]]
     [ui/table-body {:display-row-checkbox false}
@@ -37,14 +70,21 @@
                 ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
-            [ui/table-row-column {:style {:width "3%"}} id]
-            [ui/table-row-column {:style {:width "20%"}} name]
+            [ui/table-row-column {:style {:width "7%"}} id]
+            [ui/table-row-column {:style {:width "20%"}} [:a {:href "#" :on-click  #(do
+                                                                                      (.preventDefault %)
+                                                                                      (e! (fp/->ChangePage :edit-route {:id id})))} name]]
             [ui/table-row-column departure-point-name]
             [ui/table-row-column destination-point-name]
-            [ui/table-row-column (when available-from (time/format-date available-from))]
-            [ui/table-row-column (when available-to (time/format-date available-to))]
+            [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
+            [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column (time/format-timestamp-for-ui (or modified created))]
-            [ui/table-row-column "poista"]])
+            [ui/table-row-column
+             [ui/icon-button {:href "#" :on-click #(do
+                                                     (.preventDefault %)
+                                                     (e! (fp/->ChangePage :edit-route {:id id})))}
+              [ic/content-create]]
+             [delete-route-action e! row]]])
          routes))]]])
 
 (defn list-operators [e! app]

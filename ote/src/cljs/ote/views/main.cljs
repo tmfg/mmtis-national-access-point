@@ -393,6 +393,7 @@
 
                 :routes [route-list/routes e! app]
                 :new-route [route/new-route e! app]
+                :edit-route [route/edit-route-by-id e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
