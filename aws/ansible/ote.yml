@@ -2,6 +2,7 @@
 
 - name: Install OTE
   hosts: ote
+  serial: 1
   become: true
   tasks:
     - include: tasks/napote_group_and_user.yml

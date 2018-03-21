@@ -282,7 +282,8 @@
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
-  :advance-reservation-info "Here you can inform advance reservation requiremets of your service."}
+  :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
+  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -519,17 +520,15 @@
 
 
  :organization-page
- {:contact-types            "Phone and email"
-  :organization-form-title  "Basic information"
-  :organization-new-title   "Create a new transport operator"
-  :help-desc-1              "This information will be seen in the public pages of NAP-service."
-  :help-desc-2              "Fill in to "
-  :help-desc-3              " -section information about the company, community or organization you are representing."
-  :help-desc-4              " -sections information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
-  :help-desc-5              "You can add and delete members to the transport operator in the"
-  :help-desc-5-linklabel    "members-page"
-  :help-desc-6 "\nThe purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."}
-
+ {:contact-types           "Phone and email"
+  :organization-form-title "Basic information"
+  :organization-new-title  "Create a new transport operator"
+  :help-desc-1             "The information given in this form will seen in the public pages of NAP-service."
+  :help-desc-2             (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
+  :basic-info-tooltip      "Fill in to Basic information -section information about the company, community or organization you are representing."
+  :contact-types-tooltip   "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
+  :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
+  }
 
  :passenger-transportation-page
  {:header-new-passenger-transportation     "Add a new transport service"

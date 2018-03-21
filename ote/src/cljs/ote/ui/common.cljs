@@ -137,7 +137,7 @@
                  (.execCommand js/document "Copy"))]
     [:div {:style {:display "inline-block"}}
      [:input {:id id
-              :readonly true
+              :readOnly true
               :on-focus copy!
               :value text-to-copy}]
      [ui/flat-button {:icon (ic/content-content-copy)

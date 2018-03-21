@@ -5,6 +5,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
             [ote.ui.leaflet :as leaflet]
+            [ote.ui.leaflet-draw :as leaflet-draw]
             [ote.ui.form :as form]
             [ote.localization :refer [tr tr-tree]]
             [cljs-react-material-ui.reagent :as ui]
@@ -73,28 +74,7 @@
                       :dashArray "5,5"} location]
    [leaflet/Popup [:div name]]])
 
-(defn install-draw-control!
-   "Install Leaflet draw plugin to to places-map component."
-  [e! dc this]
 
-  (set! (.-draw js/L.drawLocal) (clj->js (tr-tree [:leaflet-draw])))
-
-  (let [^js/L.map
-        m (aget this "refs" "leaflet" "leafletElement")
-        fg (new js/L.FeatureGroup)]
-    (reset! dc (new js/L.Control.Draw #js {:draw #js {:polyline false
-                                                      :circlemarker false
-                                                      :circle false}
-                                           :edit #js {:featureGroup fg
-                                                      :remove false
-                                                      :edit false}}))
-    (.addLayer m fg)
-    (.on m (aget js/L "Draw" "Event" "CREATED")
-         #(let [^js/L.Path
-                layer (aget % "layer")
-                geojson (.toGeoJSON layer)]
-            ;;(aset js/window "the_geom" geojson)
-            (e! (ps/->AddDrawnGeometry geojson))))))
 
 (defn places-map [e! results show?]
   (let [dc (atom nil)]
@@ -102,7 +82,11 @@
      {:component-did-mount #(do
                               (leaflet/customize-zoom-controls e! % {:zoomInTitle (tr [:leaflet :zoom-in])
                                                                      :zoomOutTitle (tr [:leaflet :zoom-out])})
-                              (install-draw-control! e! dc %)
+                              (leaflet-draw/install-draw-control!
+                                  %
+                                  {:on-control-created (partial reset! dc)
+                                   :on-create (fn [^js/L.Path layer]
+                                                (e! (ps/->AddDrawnGeometry (.toGeoJSON layer))))})
                               (leaflet/update-bounds-from-layers %))
 
       :component-did-update leaflet/update-bounds-from-layers
