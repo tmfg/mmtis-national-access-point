@@ -78,17 +78,13 @@
   "Copy departure and arrival time for stops from first trip. Stops can't have departure time in db, but in
   ui they can."
   [stops trips]
-  (let [departured-stops (map-indexed
-                           (fn [idx item]
-                             (assoc item ::transit/departure-time
-                                         (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])))
-                           stops)
-        updated-stops (map-indexed
-                        (fn [idx item]
-                          (assoc item ::transit/arrival-time
-                                      (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
-                        departured-stops)]
-    updated-stops))
+    (map-indexed
+      (fn [idx item]
+        (assoc item ::transit/departure-time
+                    (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])
+                    ::transit/arrival-time
+                    (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
+      stops))
 
 (defn update-trips-calendar
   "In database one service-calendar can be linked to all trips, but in front-end we need to copy or multiply
@@ -98,24 +94,24 @@
         (mapv
           (fn [trip]
             (if (empty? service-calendars)
-              {::transit/service-added-dates #{}
+              {::transit/service-added-dates   #{}
                ::transit/service-removed-dates #{}
-               ::transit/service-rules []
-               :rule-dates #{}}
+               ::transit/service-rules         []
+               :rule-dates                     #{}}
 
               (let [cal-idx (::transit/service-calendar-idx trip)
-                  cal (nth service-calendars cal-idx)
-                  rule-dates (into #{}
-                                   (mapcat transit/rule-dates)
-                                   (::transit/service-rules cal))]
-              (->  cal
-                  (assoc :rule-dates rule-dates)
-                   (assoc ::transit/service-added-dates (into #{}
+                    cal (nth service-calendars cal-idx)
+                    rule-dates (into #{}
+                                     (mapcat transit/rule-dates)
+                                     (::transit/service-rules cal))]
+                (-> cal
+                    (assoc :rule-dates rule-dates)
+                    (assoc ::transit/service-added-dates (into #{}
+                                                               (map #(time/date-fields-from-timestamp %)
+                                                                    (::transit/service-added-dates cal))))
+                    (assoc ::transit/service-removed-dates (into #{}
                                                                  (map #(time/date-fields-from-timestamp %)
-                                                                 (::transit/service-added-dates cal))))
-                   (assoc ::transit/service-removed-dates (into #{}
-                                                                   (map #(time/date-fields-from-timestamp %)
-                                                                   (::transit/service-removed-dates cal))))))))
+                                                                      (::transit/service-removed-dates cal))))))))
           trips)]
     new-calendars))
 
@@ -192,7 +188,7 @@
       (-> app
         (assoc-in [:route ::transit/stops] new-stop-sequence)
         (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+        (assoc-in [:route ::transit/service-calendars] []))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -431,8 +427,10 @@
                                        deduped-cals)) calendars)
           route (-> app :route form/without-form-metadata
                     (assoc ::transit/service-calendars deduped-cals)
-                    (update ::transit/stops (fn [stop] (map #(dissoc % ::transit/departure-time) stop)))
-                    (update ::transit/stops (fn [stop] (map #(dissoc % ::transit/arrival-time) stop)))
+                    (update ::transit/stops (fn [stop]
+                                              (map
+                                                #(dissoc % ::transit/departure-time ::transit/arrival-time)
+                                                stop)))
                     (update ::transit/trips
                             (fn [trips]
                               ;; Update service-calendar indexes

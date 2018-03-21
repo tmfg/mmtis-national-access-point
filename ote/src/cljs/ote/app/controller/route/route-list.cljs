@@ -71,7 +71,6 @@
 
   DeleteRouteResponse
   (process-event [{response :response} app]
-    (.log js/console " Route poistettiin, response " (pr-str response))
     (let [filtered-map (filter #(not= (::transit/id %) (int response)) (get app :routes-vector))]
       (assoc app :routes-vector filtered-map
                  :page :routes

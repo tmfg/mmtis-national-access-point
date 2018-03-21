@@ -25,17 +25,11 @@
                          {:status 403 :body "Forbidden"})]
     (cond
       (nil? transport-operator-id)
-        (do
-          (log/debug "ACCESS Denied for user " (pr-str user) " operator-id " transport-operator-id)
-          (access-denied)
-        )
+        (access-denied)
 
       (and (not is-admin?)
            (not (contains? allowed-operators transport-operator-id)))
-      (do
-        (log/debug "ACCESS Denied for user " (pr-str user) " operator-id " transport-operator-id)
         (access-denied)
-        )
 
       :else
       (body-fn))))

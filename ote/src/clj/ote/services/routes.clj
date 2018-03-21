@@ -109,7 +109,7 @@
 
 (defn delete-route!
   "Delete single route by id"
-  [nap-config db user id]
+  [db user id]
   (log/debug  "***************** deleting route id " id)
   (let [{::transit/keys [transport-operator-id]}
         (first (specql/fetch db ::transit/route
@@ -143,9 +143,8 @@
     (POST "/routes/delete" {form-data :body
                             user      :user}
       (http/transit-response
-        (delete-route! nap-config db user
-                       (:id (http/transit-request form-data)))))
-    ))
+        (delete-route! db user
+                       (:id (http/transit-request form-data)))))))
 
 (defn- stops-geojson [db]
   (cheshire/encode

@@ -36,7 +36,7 @@
 #?(:cljs
    (defn date-fields-from-timestamp [timestamp]
      (if  (nil? timestamp)
-       " " ;: if nil - print empty string
+       nil
        (->> timestamp
             t/to-default-time-zone
             (date-fields)))))

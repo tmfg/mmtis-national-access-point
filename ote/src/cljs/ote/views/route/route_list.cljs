@@ -50,7 +50,6 @@
 
 (defn list-routes [e! routes]
   [:div
-   (.log js/console "list-routes routes: " (clj->js routes))
    [ui/table
     [ui/table-header {:adjust-for-checkbox false
                       :display-select-all  false}
