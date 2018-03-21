@@ -338,6 +338,11 @@
   :add-new-member "Lägg till användare"
   :upload-csv "Lägg till CSV"
   :update-csv "Uppdatera CSV"
+  :save-as-gtfs "Tallenna GTFS"
+  :previous-step "Edellinen"
+  :next-step "Fortsätt"
+  :route-calendar-back-to-trips "Takaisin vuorolistaan"
+  :route-calendar-clear "Tyhjennä kalenteri"
   }
 
 
@@ -591,6 +596,82 @@
 
  :route-list-page
  {:header-route-list "Omat meriliikenteen reitti- ja aikataulutietot"
+  :delete-dialog-header "Haluatko poistaa merireitin?"
+  :delete-dialog-remove-route "Poistetaan reitti "
+  :route-list-table-name "Nimi"
+  :route-list-table-starting-point "Lähtöpaikka"
+  :route-list-table-destination-point "Määränpää"
+  :route-list-table-valid-from "Voimassa lähtien"
+  :route-list-table-valid-to "Voimassa asti"
+  :route-list-table-created-modified "Luotu / Muokattu"
+  :route-list-table-actions "Toiminnot"
+  :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
+  :route-list-gtfs-zip-file "GTFS Zip tiedosto"
+  :route-list-copy-link "Kopioi osoite: "
+  }
+
+ :route-wizard-page
+ {:trip-stop-arrival-exception-default "Poistumismahdollisuus oletuksena"
+  :trip-stop-arrival-exception-no "Ei poistumismahdollisuutta"
+  :trip-stop-arrival-exception-agency "Poistumisesta sovittava palveluntuottajan kanssa"
+  :trip-stop-arrival-exception-driver "Poistumisesta sovittava kuljettajan kanssa"
+
+  :trip-stop-departure-exception-default "Nousu mahdollista oletuksena"
+  :trip-stop-departure-exception-no "Ei nousumahdollisuutta"
+  :trip-stop-departure-exception-agency "Nousemisesta sovittava palveluntuottajan kanssa"
+  :trip-stop-departure-exception-driver "Noususta sovittava kuljettajan kanssa"
+
+  :trip-stop-arrival-header "tulo"
+  :trip-stop-departure-header "lähtö"
+
+  :trip-stop-calendar "Ajopäiväkalenteri"
+  :trip-schedule-new-trip "Uuden vuoron lähtöaika: "
+  :trip-add-new-trip "Lisää vuoro"
+
+  :stop-sequence-custom-dialog-title "Lisää uusi satama tai laituri"
+  :stop-sequence-custom-dialog-add "Lisää"
+  :stop-sequence-custom-dialog-name "Nimi"
+  :stop-sequence-custom-dialog-help  "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla. Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."
+  :stop-sequence-leaflet-button-marker "Lisää uusi satama/laituri"
+  :stop-sequence-leaflet-button-start "Klikkaa karttaa lisätäksesi satama/laituri"
+  :stop-sequence-port-header "Satama"
+  :stop-sequence-arrival-header "Saapumisaika"
+  :stop-sequence-departure-header "Lähtöaika"
+  :stop-sequence-map-help  "Valitse reitin pysäkkiketju klikkaamalla pysäkkejä kartalta."
+
+  :wizard-step-basic-info "Reitin nimi"
+  :wizard-step-stop-sequence "Reittipysäkit"
+  :wizard-step-times "Vuorot"
+  :wizard-step-save "Reitin tallennus"
+
+  :basic-info-header "Reitin nimi ja palveluntuottaja"
+  :basic-info-route-name "Reitin nimi"
+  :basic-info-transport-operator "Palveluntuottaja"
+  :basic-info-departure-point-name "Lähtöpaikka"
+  :basic-info-destination-point-name "Määränpää"
+  :basic-info-available-from "Voimassa alkaen"
+  :basic-info-available-to "Voimassa asti"
+
+  :route-calendar-name "Reittikalenteri"
+  :route-calendar-group-name "Ajopäiväkalenteri"
+  :route-calendar-from-date "Alkaen"
+  :route-calendar-to-date "Päättyen"
+  :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
+
+  :short-month-names
+  {:JAN "Jan"
+   :FEB "Feb"
+   :MAR "March"
+   :APR "April"
+   :MAY "May"
+   :JUN "June"
+   :JUL "July"
+   :AUG "Aug"
+   :SEP "Sept"
+   :OCT "Oct"
+   :NOV "Nov"
+   :DEC "Dec"
+   }
   }
 
  :price-dialog
