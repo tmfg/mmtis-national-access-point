@@ -526,11 +526,11 @@
  {:contact-types            "Kontaktalternativ"
   :organization-form-title  "Tjänsteproducentens uppgifter"
   :organization-new-title   "Lägg till tjänsteproducent"
-  :help-desc-1              "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
-  :help-desc-2              (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
-  :basic-info-tooltip       "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :contact-types-tooltip    "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
-  :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  :help-desc-1              "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
+  :help-desc-2              (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
+  :basic-info-tooltip       "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
+  :contact-types-tooltip    "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
+  :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
   }
 
 
