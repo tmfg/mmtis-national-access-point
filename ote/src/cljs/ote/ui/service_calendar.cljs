@@ -84,19 +84,7 @@
 
 (defn- month-name [month]
   (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
-    (case month
-      1 (.toLocaleString (doto (js/Date.) (.setMonth 0)) lang #js {:month "short"})
-      2 (.toLocaleString (doto (js/Date.) (.setMonth 1)) lang #js {:month "short"})
-      3 (.toLocaleString (doto (js/Date.) (.setMonth 2)) lang #js {:month "short"})
-      4 (.toLocaleString (doto (js/Date.) (.setMonth 3)) lang #js {:month "short"})
-      5 (.toLocaleString (doto (js/Date.) (.setMonth 4)) lang #js {:month "short"})
-      6 (.toLocaleString (doto (js/Date.) (.setMonth 5)) lang #js {:month "short"})
-      7 (.toLocaleString (doto (js/Date.) (.setMonth 6)) lang #js {:month "short"})
-      8 (.toLocaleString (doto (js/Date.) (.setMonth 7)) lang #js {:month "short"})
-      9 (.toLocaleString (doto (js/Date.) (.setMonth 8)) lang #js {:month "short"})
-      10 (.toLocaleString (doto (js/Date.) (.setMonth 9)) lang #js {:month "short"})
-      11 (.toLocaleString (doto (js/Date.) (.setMonth 10)) lang #js {:month "short"})
-      12 (.toLocaleString (doto (js/Date.) (.setMonth 11)) lang #js {:month "short"}))))
+    (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 (defn- service-calendar-year [{:keys [selected-date? on-select
                                       day-style]} year]
