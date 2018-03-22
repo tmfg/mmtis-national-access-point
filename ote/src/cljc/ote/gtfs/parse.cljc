@@ -41,6 +41,10 @@
 (defmethod clj->gtfs 'time? [_ value]
   (time/format-time-full value))
 
+(defmethod gtfs->clj 'nat-int? [_ value]
+  (#?(:cljs js/parseInt
+      :clj Integer/parseInt) value))
+
 (def ^{:private true
        :doc "Memoized function for looking up a GTFS field spec (which may not exist).
 This is only called with GTFS field names and cannot grow unbounded."}
@@ -80,7 +84,9 @@ This is only called with GTFS field names and cannot grow unbounded."}
         allowed-fields (into #{} fields)
         content-fields (into []
                              (map #(keyword "gtfs"
-                                            (str/replace % #"_" "-")))
+                                            (-> %
+                                                (str/replace #"\uFEFF" "")
+                                                (str/replace #"_" "-"))))
                              header)]
     (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
       (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields))

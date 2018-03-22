@@ -19,9 +19,9 @@
 
 (def name->keyword
   {"agency.txt" :gtfs/agency-txt
-   "stops.txt" :gtfs/stops.txt
+   "stops.txt" :gtfs/stops-txt
    "routes.txt" :gtfs/routes-txt
-   "trips.txt" :gtfs/trips.txt
+   "trips.txt" :gtfs/trips-txt
    "stop_times.txt" :gtfs/stop-times-txt
    "calendar.txt" :gtfs/calendar-txt
    "calendar_dates.txt" :gtfs/calendar-dates-txt})
@@ -160,6 +160,7 @@
 
 (s/def :gtfs/arrival-time time?)
 (s/def :gtfs/departure-time time?)
+(s/def :gtfs/stop-sequence nat-int?)
 
 (def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file"}
   stop-times-txt-fields
