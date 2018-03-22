@@ -1,7 +1,9 @@
 (ns ote.app.routes
   "Routes for the frontend app."
   (:require [bide.core :as r]
-            [ote.app.state :as state]))
+            [ote.app.state :as state]
+            [tuck.core :as tuck]
+            [ote.util.fn :refer [flip]]))
 
 (def ote-router
   (r/router
@@ -24,9 +26,14 @@
     ["/route/new" :new-route]
     ["/edit-route/:id" :edit-route]
 
+    ["/routes/view-gtfs" :view-gtfs]
+
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
 
+(defmulti on-navigate-event :page)
+
+(defmethod on-navigate-event :default [_] nil)
 
 (defn- on-navigate [go-to-url-event name params query]
   (swap! state/app
@@ -42,10 +49,17 @@
                       :navigation-prompt-open? true
                       :navigation-confirm (go-to-url-event new-url)))
 
-             (merge app {:page name
-                         :params params
-                         :query query
-                         :url js/window.location.href})))))
+             (let [navigation-data {:page name
+                                    :params params
+                                    :query query
+                                    :url js/window.location.href}
+                   event (on-navigate-event navigation-data)
+                   app (merge app navigation-data)]
+               (if event
+                 (binding [tuck/*current-send-function*
+                           #(swap! state/app (flip tuck/process-event) %)]
+                   (tuck/process-event event app))
+                 app))))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :own-services
