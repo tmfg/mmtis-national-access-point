@@ -236,9 +236,10 @@
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
  {:name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
+  :external-interfaces-intro "If your service does not have machine-readable interfaces leave this section empty and move to the next section."
   :external-interfaces-intro-1 "Fill in at least machine-readable route and timetable information. If you do not have the means to produce machine-readable route and timetable infromation, you can do so in FTA's"
-  :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulut voit luoda NAP-palvelun omalla"
-  :external-interfaces "If your service does not have machine-readable interfaces leave this section empty and move to the next section.\nMachine-readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
+  :external-interfaces-intro-2 "Sea traffic route schedules can be made using this"
+  :external-interfaces "Machine-readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
   :external-interfaces-read-more {:link "Read more about the machine-readable interfaces in NAP catalog."
                                   :dialog-title "Machine-readable interfaces in the NAP catalog"
                                   :dialog-text (:md
@@ -262,7 +263,7 @@
                                  :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."}
 
   :RAE-link-text "RAE-software"
-  :SEA-ROUTE-link-text "Meriliikenteen reittieditorilla"
+  :SEA-ROUTE-link-text "Sea route traffic editor"
   :companies-main-info "If there are other companies involved in providing the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
