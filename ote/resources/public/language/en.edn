@@ -314,7 +314,7 @@
   :add-new-service-hour "Add a new row"
   :add-new-service-exception "Add a new row"
   :add-new-company "Add a new row"
-  :add-new-route "Add new route"
+  :add-new-route "Add a new sea traffic route"
   :discard "Cancel"
 
   :next "Next"
@@ -329,6 +329,11 @@
   :add-new-member "Add member"
   :upload-csv "Add CSV"
   :update-csv "Update CSV"
+  :save-as-gtfs "Save gtfs"
+  :previous-step "Previous"
+  :next-step "Next"
+  :route-calendar-back-to-trips "Back to the list of departures"
+  :route-calendar-clear "Clear calendar"
   }
 
 
@@ -588,7 +593,68 @@
   :header-service-hours                     "Service hours and maximum parking time"}
 
  :route-list-page
- {:header-route-list "Omat meriliikenteen reitti- ja aikataulutietot"
+ {:header-route-list "Own sea traffic route and timetable information"
+  :delete-dialog-header "Want to remove traffic route?"
+  :delete-dialog-remove-route "Removing route "
+  :route-list-table-name "Name"
+  :route-list-table-starting-point "Starting point"
+  :route-list-table-destination-point "Destination point"
+  :route-list-table-valid-from "Valid from"
+  :route-list-table-valid-to "Valid to"
+  :route-list-table-created-modified "Created / Modified"
+  :route-list-table-actions "Functions"
+  :route-list-active-routes "Transport operator’s valid routes: "
+  :route-list-gtfs-zip-file "GTFS.Zip file"
+  :route-list-copy-link "Copy address: "
+  }
+
+ :route-wizard-page
+ {:trip-stop-arrival-exception-default "Drop off always available"
+  :trip-stop-arrival-exception-no "Drop off not available"
+  :trip-stop-arrival-exception-agency "Drop off has to be arranged with the transport operator"
+  :trip-stop-arrival-exception-driver "Drop off has to be arranged with the driver"
+
+  :trip-stop-departure-exception-default "Pick up always available"
+  :trip-stop-departure-exception-no "Pick up not available"
+  :trip-stop-departure-exception-agency "Pick up has to arranged with the transport operator"
+  :trip-stop-departure-exception-driver "Pick up has to be arranged with the driver"
+
+  :trip-stop-arrival-header "Arrival"
+  :trip-stop-departure-header "Departure"
+
+  :trip-stop-calendar "Driving days calendar"
+  :trip-schedule-new-trip "Time of the new departure: "
+  :trip-add-new-trip "Add a new departure"
+
+  :stop-sequence-custom-dialog-title "Add new port"
+  :stop-sequence-custom-dialog-add "Add"
+  :stop-sequence-custom-dialog-name "Name"
+  :stop-sequence-custom-dialog-help  "You can change location of the port or remove it using map tools. When port is saved it cannot be changed or removed."
+  :stop-sequence-leaflet-button-marker "Add new port"
+  :stop-sequence-leaflet-button-start "Click to add a new port."
+  :stop-sequence-port-header "Port"
+  :stop-sequence-arrival-header "Arrival time"
+  :stop-sequence-departure-header "Departure time"
+  :stop-sequence-map-help "Make a new route by selecting stops from the map with a mouse click."
+
+  :wizard-step-basic-info "Route name"
+  :wizard-step-stop-sequence "Route stops"
+  :wizard-step-times "Departures"
+  :wizard-step-save "Save your route"
+
+  :basic-info-header "Route name and transport operator"
+  :basic-info-route-name "Route name"
+  :basic-info-transport-operator "Transport operator"
+  :basic-info-departure-point-name "Starting point"
+  :basic-info-destination-point-name "Destination"
+  :basic-info-available-from "Valid from"
+  :basic-info-available-to "Valid to"
+
+  :route-calendar-name "Reittikalenteri"
+  :route-calendar-group-name "Driving days calendar"
+  :route-calendar-from-date "Valid from"
+  :route-calendar-to-date "Valid to"
+  :route-calendar-add-new-period "Add a new period to driving days calendar"
   }
 
  :price-dialog
@@ -634,7 +700,7 @@
   :navigation-login                           "Login"
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
-  :navigation-route                           "Omat reitit"
+  :navigation-route                           "Sea traffic route and timetable editor"
   :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"

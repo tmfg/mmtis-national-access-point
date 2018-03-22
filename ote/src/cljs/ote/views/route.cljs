@@ -8,40 +8,36 @@
             [ote.time :as time]
             [ote.ui.form :as form]
             [ote.style.route :as style-route]
+            [stylefy.core :as stylefy]
+            [ote.ui.buttons :as buttons]
+            [ote.localization :refer [tr tr-key]]
 
             ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
             [ote.views.route.trips :as route-trips]
-            [ote.views.route.service-calendar :as route-service-calendar]
-            [stylefy.core :as stylefy]
-            [ote.ui.buttons :as buttons]))
-
-
-
+            [ote.views.route.service-calendar :as route-service-calendar]))
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
                      :on-click #(e! (rc/->SaveAsGTFS))}
-   "Tallenna GTFS"])
-
-
+   (tr [:buttons :save-as-gtfs])])
 
 (def wizard-steps
   [{:name :basic-info
-    :label "Reitin nimi"
+    :label :wizard-step-basic-info
     :component route-basic-info/basic-info
     :validate  rc/valid-basic-info?}
    {:name :stop-sequence
-    :label "Reittipysäkit"
+    :label :wizard-step-stop-sequence
     :component route-stop-sequence/stop-sequence
     :validate rc/valid-stop-sequence?}
    {:name :times
-    :label "Vuorot"
+    :label :wizard-step-times
     :component route-trips/trips
     :validate rc/valid-trips?}
    {:name :save
-    :label "Reitin tallennus"
+    :label :wizard-step-save
     :component route-save}])
 
 (defn- route-wizard [e! wizard-steps {route :route :as app}]
@@ -74,7 +70,7 @@
                      (stylefy/use-style style-route/stepper))
            [ui/step-label {:on-click (when prev-valid?
                                        #(e! (rc/->GoToStep current-step)))}
-            [:span label]]]))]
+            [:span (tr [:route-wizard-page label])]]]))]
 
      [component e! app]
 
@@ -87,13 +83,13 @@
                          :on-click #(e! (rc/->GoToStep previous-step))
                          :icon (ic/navigation-arrow-back)
                          :label-position "before"}
-         "Edellinen"])
+         (tr [:buttons :previous-step])])
       (when (not= step (:name (last wizard-steps)))
         [ui/flat-button {:primary true
                          :disabled (not (validate route))
                          :on-click #(e! (rc/->GoToStep next-step))
                          :icon (ic/navigation-arrow-forward)}
-         "Seuraava"])]]))
+         (tr [:buttons :next-step])])]]))
 
 (defn new-route [e! app]
   (when (not (:route app))
@@ -109,11 +105,11 @@
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rc/->SaveToDb)))}
-         "Tallenna Tietokantaan"]
+         (tr [:buttons :save])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}
-         "Peruuta"]]])))
+         (tr [:buttons :cancel])]]])))
 
 (defn edit-route-by-id [e! app]
   (e! (rc/->LoadRoute (get-in app [:params :id])))
@@ -128,8 +124,8 @@
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rc/->SaveToDb)))}
-         "Tallenna Tietokantaan"]
+         (tr [:buttons :save])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}
-         "Peruuta"]]])))
+         (tr [:buttons :cancel])]]])))
