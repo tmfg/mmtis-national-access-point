@@ -103,9 +103,10 @@
                  [linkify "https://liikennevirasto.fi/rae" (str (tr [:form-help :RAE-link-text]) ". ")
                   {:target "_blank"}]
                  (when (flags/enabled? :sea-routes)
-                  (str (tr [:form-help :external-interfaces-intro-2]) " ")
+                  [:span
+                   (str (tr [:form-help :external-interfaces-intro-2]) " ")
                     [linkify "/ote/#/routes" (tr [:form-help :SEA-ROUTE-link-text])
-                      {:target "_blank"}])]
+                      {:target "_blank"}]])]
                 (tr [:form-help :external-interfaces-intro]))]]
          [:div (tr [:form-help :external-interfaces])]
          [dialog
