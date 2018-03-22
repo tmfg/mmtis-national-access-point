@@ -115,6 +115,15 @@
           trips)]
     new-calendars))
 
+(defn- set-saved-transfer-operator
+  [app route]
+  (assoc app :transport-operator
+         (:transport-operator
+          (some #(when (= (::transit/transport-operator-id route)
+                          (get-in % [:transport-operator ::t-operator/id]))
+                   %)
+                (:transport-operators-with-services app)))))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -158,10 +167,7 @@
             ::transit/trips []
             ::transit/service-calendars []
             ::transit/route-type :ferry
-            ::transit/transport-operator-id
-            (::t-operator/id
-              (:transport-operator
-                (first (:transport-operators-with-services app))))))
+            ::transit/transport-operator-id (get-in app [:transport-operator ::t-operator/id])))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -444,8 +450,8 @@
                     (dissoc :step :stops :new-start-time :edit-service-calendar))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
-                   :on-failure (tuck/send-async! ->SaveRouteFailure)}))
-    app)
+                   :on-failure (tuck/send-async! ->SaveRouteFailure)})
+      (set-saved-transfer-operator app route)))
 
   SaveRouteResponse
   (process-event [{response :response} app]
