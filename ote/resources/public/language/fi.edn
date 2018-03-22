@@ -239,7 +239,7 @@
  :form-help
  {:name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
   :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
-  :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulut voit luoda NAP-palvelun omalla"
+  :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulut voit luoda NAP-palvelun"
   :external-interfaces "Koneluettava rajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa (esim. muodossa csv, xml, json tai gtfs). Ulkoiset rajapinnat on tarkoitettu yhteistyökumppaneille ja kehittäjille, jotka voivat käyttää niitä lisenssi- ja sopimusehtojen mukaisesti omissa palveluissaan."
   :external-interfaces-read-more {:link "Lue lisää NAP-katalogin koneluettavista rajapinnoista."
                                   :dialog-title "Koneluettavat rajapinnat NAP-katalogissa"
