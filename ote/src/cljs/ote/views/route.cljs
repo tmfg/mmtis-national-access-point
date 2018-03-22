@@ -92,8 +92,7 @@
          (tr [:buttons :next-step])])]]))
 
 (defn new-route [e! app]
-  (when (not (:route app))
-    (e! (rc/->InitRoute)))
+  (e! (rc/->InitRoute))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
       [:span

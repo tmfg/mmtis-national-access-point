@@ -4,7 +4,8 @@
             [ote.communication :as comm]
             [ote.db.transit :as transit]
             [ote.localization :refer [tr tr-key]]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.db.transport-operator :as t-operator]))
 
 ;; Load users own routes
 (defrecord LoadRoutes [])
@@ -32,6 +33,12 @@
                     %)
                  services))))
 
+(defn- get-routes-for-operator
+  [app response]
+  (:routes (some #(when (= (get-in app [:transport-operator ::t-operator/id])
+                           (get-in % [:transport-operator ::t-operator/id])) %)
+                 response)))
+
 (extend-protocol tuck/Event
   LoadRoutes
   (process-event [_ app]
@@ -43,7 +50,7 @@
   LoadRoutesResponse
   (process-event [{response :response} app]
     (assoc app :route-list response
-               :routes-vector (get (first response) :routes)))
+               :routes-vector (get-routes-for-operator app response)))
 
   CreateNewRoute
   (process-event [_ app]
