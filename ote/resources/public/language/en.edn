@@ -283,7 +283,8 @@
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
-  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."}
+  :trip-editor-no-calendar  "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
+  }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -616,14 +617,14 @@
 
   :trip-stop-departure-exception-default "Pick up always available"
   :trip-stop-departure-exception-no "Pick up not available"
-  :trip-stop-departure-exception-agency "Pick up has to arranged with the transport operator"
+  :trip-stop-departure-exception-agency "Pick up has to be arranged with the transport operator"
   :trip-stop-departure-exception-driver "Pick up has to be arranged with the driver"
 
   :trip-stop-arrival-header "Arrival"
   :trip-stop-departure-header "Departure"
 
   :trip-stop-calendar "Driving days calendar"
-  :trip-schedule-new-trip "Time of the new departure: "
+  :trip-schedule-new-trip "Time of a new departure: "
   :trip-add-new-trip "Add a new departure"
 
   :stop-sequence-custom-dialog-title "Add new port"
