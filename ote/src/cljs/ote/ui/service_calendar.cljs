@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-time.core :as t]
             [cljs-time.format :as time-format]
-            [ote.localization :refer [tr]]
+            [ote.localization :as lang]
             [ote.db.transport-service :as t-service]
             [stylefy.core :as stylefy]
             [ote.time :as time]))
@@ -75,7 +75,7 @@
 
           ;; Normal week day
           ^{:key i}
-          [:th (tr [:enums ::t-service/day :short week-day])]))
+          [:th (lang/tr [:enums ::t-service/day :short week-day])]))
 
       ;; Add week separators to repeating list of week days
       (apply concat
@@ -83,20 +83,20 @@
                          (repeat '(::week-separator))))))]])
 
 (defn- month-name [month]
-  ;; FIXME: use translation
-  (case month
-    1 (tr [:route-wizard-page :short-month-names :JAN])
-    2 (tr [:route-wizard-page :short-month-names :FEB])
-    3 (tr [:route-wizard-page :short-month-names :MAR])
-    4 (tr [:route-wizard-page :short-month-names :APR])
-    5 (tr [:route-wizard-page :short-month-names :MAY])
-    6 (tr [:route-wizard-page :short-month-names :JUN])
-    7 (tr [:route-wizard-page :short-month-names :JUL])
-    8 (tr [:route-wizard-page :short-month-names :AUG])
-    9 (tr [:route-wizard-page :short-month-names :SEP])
-    10 (tr [:route-wizard-page :short-month-names :OCT])
-    11 (tr [:route-wizard-page :short-month-names :NOV])
-    12 (tr [:route-wizard-page :short-month-names :DEC])))
+  (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
+    (case month
+      1 (.toLocaleString (doto (js/Date.) (.setMonth 0)) lang #js {:month "short"})
+      2 (.toLocaleString (doto (js/Date.) (.setMonth 1)) lang #js {:month "short"})
+      3 (.toLocaleString (doto (js/Date.) (.setMonth 2)) lang #js {:month "short"})
+      4 (.toLocaleString (doto (js/Date.) (.setMonth 3)) lang #js {:month "short"})
+      5 (.toLocaleString (doto (js/Date.) (.setMonth 4)) lang #js {:month "short"})
+      6 (.toLocaleString (doto (js/Date.) (.setMonth 5)) lang #js {:month "short"})
+      7 (.toLocaleString (doto (js/Date.) (.setMonth 6)) lang #js {:month "short"})
+      8 (.toLocaleString (doto (js/Date.) (.setMonth 7)) lang #js {:month "short"})
+      9 (.toLocaleString (doto (js/Date.) (.setMonth 8)) lang #js {:month "short"})
+      10 (.toLocaleString (doto (js/Date.) (.setMonth 9)) lang #js {:month "short"})
+      11 (.toLocaleString (doto (js/Date.) (.setMonth 10)) lang #js {:month "short"})
+      12 (.toLocaleString (doto (js/Date.) (.setMonth 11)) lang #js {:month "short"}))))
 
 (defn- service-calendar-year [{:keys [selected-date? on-select
                                       day-style]} year]
@@ -116,7 +116,8 @@
                                        (dec (t/day-of-week start-date))) ]]
           ^{:key month}
           [:tr
-           [:td (month-name (t/month start-date))]
+           [:td {:style {:text-transform "capitalize"}}
+            (month-name (t/month start-date))]
 
            ;; Fill days, so that first week days align
            (fill-days (t/minus start-date (t/days fill-days-before))

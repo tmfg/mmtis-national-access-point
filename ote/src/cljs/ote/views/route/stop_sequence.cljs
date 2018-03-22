@@ -40,7 +40,6 @@
                  [ui/flat-button
                   {:label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
                    :primary true
-                   :disabled (constantly true) ;; TODO: Custom-stop name can be empty now, and we don't want to save empty names to db.
                    :on-click #(e! (rc/->CloseCustomStopDialog))}])]}
      [:span
       [form-fields/field {:type :string

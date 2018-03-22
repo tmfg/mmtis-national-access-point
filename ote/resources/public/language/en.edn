@@ -655,21 +655,6 @@
   :route-calendar-from-date "Valid from"
   :route-calendar-to-date "Valid to"
   :route-calendar-add-new-period "Add a new period to driving days calendar"
-
-  :short-month-names
-  {:JAN "Jan"
-   :FEB "Feb"
-   :MAR "March"
-   :APR "April"
-   :MAY "May"
-   :JUN "June"
-   :JUL "July"
-   :AUG "Aug"
-   :SEP "Sept"
-   :OCT "Oct"
-   :NOV "Nov"
-   :DEC "Dec"
-   }
   }
 
  :price-dialog

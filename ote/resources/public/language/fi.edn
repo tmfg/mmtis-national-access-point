@@ -657,21 +657,6 @@
   :route-calendar-from-date "Alkaen"
   :route-calendar-to-date "Päättyen"
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
-
-  :short-month-names
-  {:JAN "Tammi"
-   :FEB "Helmi"
-   :MAR "Maalis"
-   :APR "Huhti"
-   :MAY "Touko"
-   :JUN "Kesä"
-   :JUL "Heinä"
-   :AUG "Elo"
-   :SEP "Syys"
-   :OCT "Loka"
-   :NOV "Marras"
-   :DEC "Joulu"
-   }
   }
 
  :price-dialog
