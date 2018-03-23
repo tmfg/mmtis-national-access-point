@@ -4,7 +4,8 @@
             [ote.communication :as comm]
             [ote.db.transit :as transit]
             [ote.localization :refer [tr tr-key]]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.app.controller.route.route-wizard :as route-wizard]))
 
 ;; Load users own routes
 (defrecord LoadRoutes [])
@@ -48,7 +49,7 @@
   CreateNewRoute
   (process-event [_ app]
     (routes/navigate! :new-route)
-    app)
+    (route-wizard/init-route app))
 
   OpenDeleteRouteModal
   (process-event [{id :id} app]
