@@ -322,10 +322,14 @@
     (-> app
         (update-in [:route ::transit/stops]
                    (fn [stops]
-                     (into (subvec stops 0 idx)
-                           (subvec stops (inc idx)))))
-        #_ (assoc-in [:route ::transit/trips] [])
-        #_ (assoc-in [:route ::transit/service-calendars] [])))
+                     (into (subvec (vec stops) 0 idx)
+                           (subvec (vec stops) (inc idx)))))
+        (update-in [:route ::transit/trips] (flip mapv)
+          (fn [trip]
+            (update trip ::transit/stop-times
+                    (fn [stop-times]
+                      (into (subvec (vec stop-times) 0 idx)
+                            (subvec (vec stop-times) (inc idx)))))))))
 
 
   EditServiceCalendar
