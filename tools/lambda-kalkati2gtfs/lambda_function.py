@@ -1,19 +1,23 @@
 # coding=utf-8
 
 import logging
-import urllib
-import boto3
+import urllib2
 import zipfile
 import io
 import os
 import datetime
+import json
+import boto3
+from botocore.client import Config
+
 
 from kalkati2gtfs import convert
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client('s3')
+s3 = boto3.client('s3', config=Config(signature_version='s3v4'))
+
 
 def zip_files(path, zipfile_path):
     zipf = zipfile.ZipFile(zipfile_path, mode='w')
@@ -25,16 +29,19 @@ def zip_files(path, zipfile_path):
 
 
 ### Lambda handler ###
+## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
-    bucket_name = event['Records'][0]['s3']['bucket']['name']
-    file_key = urllib.unquote_plus(event['Records'][0]['s3']['object']['key'].encode('utf8'))
+    file_url = json.loads(event['body'])
 
-    logger.info('Reading {} from {}'.format(file_key, bucket_name))
+    logger.info(file_url)
 
     try:
-        obj = s3.get_object(Bucket=bucket_name, Key=file_key)
+        logger.info('Downloading {}'.format(file_url))
 
-        with io.BytesIO(obj["Body"].read()) as tf:
+        opener = urllib2.build_opener()
+        response = opener.open(file_url)
+
+        with io.BytesIO(response.read()) as tf:
             # rewind the file
             tf.seek(0)
 
@@ -47,15 +54,28 @@ def lambda_handler(event, context):
         zip_files('/tmp/gtfs', '/tmp/gtfs.zip')
 
     except Exception as e:
-        logger.error('Error while loading {} from bucket {}: {}'.format(file_key, bucket_name, e))
+        logger.error('Error while processing file {}: {}'.format(file_url, e))
+
+        raise e
+
+    file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+    try:
+        s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=open('/tmp/gtfs.zip'))
+
+    except Exception as e:
+        logger.error('Error while uploading {} to bucket {}: {}'.format(file_key, 'kalkati2gtfs', e))
 
         raise e
 
     try:
-        file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        s3.put_object(Bucket=bucket_name, Key=file_key, Body=open('/tmp/gtfs.zip'))
+        # Create temporary url for downloading the generated zip file (expires in 10 minutes)
+        signed_url = s3.generate_presigned_url(ClientMethod='get_object', Params={'Bucket': 'kalkati2gtfs', 'Key': file_key}, ExpiresIn=10*60)
+
+        return {"statusCode": 303,
+                "headers": {"Location": signed_url}}
 
     except Exception as e:
-        logger.error('Error while uploading {} to bucket {}: {}'.format(file_key, bucket_name, e))
+        logger.error('Error while uploading {} to bucket {}: {}'.format(file_key, 'kalkati2gtfs', e))
 
         raise e
