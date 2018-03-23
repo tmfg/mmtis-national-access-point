@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-time.core :as t]
             [cljs-time.format :as time-format]
-            [ote.localization :refer [tr]]
+            [ote.localization :as lang]
             [ote.db.transport-service :as t-service]
             [stylefy.core :as stylefy]
             [ote.time :as time]))
@@ -75,7 +75,7 @@
 
           ;; Normal week day
           ^{:key i}
-          [:th (tr [:enums ::t-service/day :short week-day])]))
+          [:th (lang/tr [:enums ::t-service/day :short week-day])]))
 
       ;; Add week separators to repeating list of week days
       (apply concat
@@ -83,20 +83,8 @@
                          (repeat '(::week-separator))))))]])
 
 (defn- month-name [month]
-  ;; FIXME: use translation
-  (case month
-    1 "Tammi"
-    2 "Helmi"
-    3 "Maalis"
-    4 "Huhti"
-    5 "Touko"
-    6 "Kesä"
-    7 "Heinä"
-    8 "Elo"
-    9 "Syys"
-    10 "Loka"
-    11 "Marras"
-    12 "Joulu"))
+  (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
+    (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 (defn- service-calendar-year [{:keys [selected-date? on-select
                                       day-style]} year]
@@ -116,7 +104,8 @@
                                        (dec (t/day-of-week start-date))) ]]
           ^{:key month}
           [:tr
-           [:td (month-name (t/month start-date))]
+           [:td {:style {:text-transform "capitalize"}}
+            (month-name (t/month start-date))]
 
            ;; Fill days, so that first week days align
            (fill-days (t/minus start-date (t/days fill-days-before))

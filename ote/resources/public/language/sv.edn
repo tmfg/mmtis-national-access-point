@@ -242,6 +242,7 @@
  :form-help
  {:name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
   ;; Needs a new translation
+  :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
   :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
   :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulut voit luoda NAP-palvelun omalla"
   ;; Needs a new translation
@@ -338,6 +339,11 @@
   :add-new-member "Lägg till användare"
   :upload-csv "Lägg till CSV"
   :update-csv "Uppdatera CSV"
+  :save-as-gtfs "Tallenna GTFS"
+  :previous-step "Edellinen"
+  :next-step "Fortsätt"
+  :route-calendar-back-to-trips "Takaisin vuorolistaan"
+  :route-calendar-clear "Tyhjennä kalenteri"
   }
 
 
@@ -526,11 +532,11 @@
  {:contact-types            "Kontaktalternativ"
   :organization-form-title  "Tjänsteproducentens uppgifter"
   :organization-new-title   "Lägg till tjänsteproducent"
-  :help-desc-1              "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
-  :help-desc-2              (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
-  :basic-info-tooltip       "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :contact-types-tooltip    "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
-  :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  :help-desc-1              "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
+  :help-desc-2              (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
+  :basic-info-tooltip       "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
+  :contact-types-tooltip    "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
+  :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
   }
 
 
@@ -591,6 +597,67 @@
 
  :route-list-page
  {:header-route-list "Omat meriliikenteen reitti- ja aikataulutietot"
+  :delete-dialog-header "Haluatko poistaa merireitin?"
+  :delete-dialog-remove-route "Poistetaan reitti "
+  :route-list-table-name "Nimi"
+  :route-list-table-starting-point "Lähtöpaikka"
+  :route-list-table-destination-point "Määränpää"
+  :route-list-table-valid-from "Voimassa lähtien"
+  :route-list-table-valid-to "Voimassa asti"
+  :route-list-table-created-modified "Luotu / Muokattu"
+  :route-list-table-actions "Toiminnot"
+  :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
+  :route-list-gtfs-zip-file "GTFS Zip tiedosto"
+  :route-list-copy-link "Kopioi osoite: "
+  }
+
+ :route-wizard-page
+ {:trip-stop-arrival-exception-default "Poistumismahdollisuus oletuksena"
+  :trip-stop-arrival-exception-no "Ei poistumismahdollisuutta"
+  :trip-stop-arrival-exception-agency "Poistumisesta sovittava palveluntuottajan kanssa"
+  :trip-stop-arrival-exception-driver "Poistumisesta sovittava kuljettajan kanssa"
+
+  :trip-stop-departure-exception-default "Nousu mahdollista oletuksena"
+  :trip-stop-departure-exception-no "Ei nousumahdollisuutta"
+  :trip-stop-departure-exception-agency "Nousemisesta sovittava palveluntuottajan kanssa"
+  :trip-stop-departure-exception-driver "Noususta sovittava kuljettajan kanssa"
+
+  :trip-stop-arrival-header "tulo"
+  :trip-stop-departure-header "lähtö"
+
+  :trip-stop-calendar "Ajopäiväkalenteri"
+  :trip-schedule-new-trip "Uuden vuoron lähtöaika: "
+  :trip-add-new-trip "Lisää vuoro"
+
+  :stop-sequence-custom-dialog-title "Lisää uusi satama tai laituri"
+  :stop-sequence-custom-dialog-add "Lisää"
+  :stop-sequence-custom-dialog-name "Nimi"
+  :stop-sequence-custom-dialog-help  "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla. Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."
+  :stop-sequence-leaflet-button-marker "Lisää uusi satama/laituri"
+  :stop-sequence-leaflet-button-start "Klikkaa karttaa lisätäksesi satama/laituri"
+  :stop-sequence-port-header "Satama"
+  :stop-sequence-arrival-header "Saapumisaika"
+  :stop-sequence-departure-header "Lähtöaika"
+  :stop-sequence-map-help  "Valitse reitin pysäkkiketju klikkaamalla pysäkkejä kartalta."
+
+  :wizard-step-basic-info "Reitin nimi"
+  :wizard-step-stop-sequence "Reittipysäkit"
+  :wizard-step-times "Vuorot"
+  :wizard-step-save "Reitin tallennus"
+
+  :basic-info-header "Reitin nimi ja palveluntuottaja"
+  :basic-info-route-name "Reitin nimi"
+  :basic-info-transport-operator "Palveluntuottaja"
+  :basic-info-departure-point-name "Lähtöpaikka"
+  :basic-info-destination-point-name "Määränpää"
+  :basic-info-available-from "Voimassa alkaen"
+  :basic-info-available-to "Voimassa asti"
+
+  :route-calendar-name "Reittikalenteri"
+  :route-calendar-group-name "Ajopäiväkalenteri"
+  :route-calendar-from-date "Alkaen"
+  :route-calendar-to-date "Päättyen"
+  :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
   }
 
  :price-dialog
@@ -654,7 +721,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
-  :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
+  :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
   :time-units {:minutes  "Minuter"
