@@ -1,7 +1,7 @@
 (ns ote.views.route.basic-info
   "Route wizard: basic info form"
   (:require [ote.ui.form :as form]
-            [ote.app.controller.route :as rc]
+            [ote.app.controller.route.route-wizard :as rw]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transit :as transit]
             [cljs-react-material-ui.reagent :as ui]
@@ -10,7 +10,7 @@
 (defn basic-info [e! app]
   (fn [e! {route :route :as app}]
     [:div.route-basic-info
-     [form/form {:update! #(e! (rc/->EditRoute %))}
+     [form/form {:update! #(e! (rw/->EditRoute %))}
       [(form/group
         {:label (tr [:route-wizard-page :basic-info-header])
          :columns 2

@@ -1,5 +1,5 @@
 (ns ote.views.route.service-calendar
-  (:require [ote.app.controller.route :as rc]
+  (:require [ote.app.controller.route.route-wizard :as rw]
             [ote.time :as time]
             [ote.ui.form :as form]
             [ote.ui.service-calendar :as service-calendar]
@@ -14,15 +14,15 @@
      [ui/raised-button {:primary true
                         :icon (ic/navigation-arrow-back)
                         :style {:float "left" :margin-bottom "0.5em"}
-                        :on-click #(e! (rc/->CloseServiceCalendar))
+                        :on-click #(e! (rw/->CloseServiceCalendar))
                         :label (tr [:buttons :route-calendar-back-to-trips])}]
      [ui/raised-button {:secondary true
                         :icon (ic/action-delete)
                         :style {:float "right" :margin-bottom "0.5em"}
-                        :on-click #(e! (rc/->ClearServiceCalendar trip-idx))
+                        :on-click #(e! (rw/->ClearServiceCalendar trip-idx))
                         :label (tr [:buttons :route-calendar-clear])}]
      [form/form {:name (tr [:route-wizard-page :route-calendar-name])
-                 :update! #(e! (rc/->EditServiceCalendarRules % trip-idx))}
+                 :update! #(e! (rw/->EditServiceCalendarRules % trip-idx))}
       [(form/group
         {:label   (tr [:route-wizard-page :route-calendar-group-name])
          :columns 3}
@@ -56,7 +56,7 @@
            added-dates (or (::transit/service-added-dates calendar) #{})]
        [service-calendar/service-calendar
         {:selected-date? (constantly false)
-         :on-select #(e! (rc/->ToggleDate % trip-idx))
+         :on-select #(e! (rw/->ToggleDate % trip-idx))
          :day-style (fn [day selected?]
                       (let [day (time/date-fields day)]
                         (cond

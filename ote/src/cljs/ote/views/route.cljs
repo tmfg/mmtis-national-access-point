@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.leaflet :as leaflet]
-            [ote.app.controller.route :as rc]
+            [ote.app.controller.route.route-wizard :as rw]
             [cljs-react-material-ui.icons :as ic]
             [ote.time :as time]
             [ote.ui.form :as form]
@@ -20,22 +20,22 @@
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
-                     :on-click #(e! (rc/->SaveAsGTFS))}
+                     :on-click #(e! (rw/->SaveAsGTFS))}
    (tr [:buttons :save-as-gtfs])])
 
 (def wizard-steps
   [{:name :basic-info
     :label :wizard-step-basic-info
     :component route-basic-info/basic-info
-    :validate  rc/valid-basic-info?}
+    :validate  rw/valid-basic-info?}
    {:name :stop-sequence
     :label :wizard-step-stop-sequence
     :component route-stop-sequence/stop-sequence
-    :validate rc/valid-stop-sequence?}
+    :validate rw/valid-stop-sequence?}
    {:name :times
     :label :wizard-step-times
     :component route-trips/trips
-    :validate rc/valid-trips?}
+    :validate rw/valid-trips?}
    {:name :save
     :label :wizard-step-save
     :component route-save}])
@@ -64,12 +64,12 @@
                   :connector (r/as-element [ic/navigation-arrow-forward])}
       (doall
         (for [{label :label current-step :name} wizard-steps
-              :let [prev-valid? (rc/validate-previous-steps route current-step wizard-steps)]]
+              :let [prev-valid? (rw/validate-previous-steps route current-step wizard-steps)]]
           ^{:key label}
           [ui/step (when prev-valid?
                      (stylefy/use-style style-route/stepper))
            [ui/step-label {:on-click (when prev-valid?
-                                       #(e! (rc/->GoToStep current-step)))}
+                                       #(e! (rw/->GoToStep current-step)))}
             [:span (tr [:route-wizard-page label])]]]))]
 
      [component e! app]
@@ -80,20 +80,20 @@
       (if (= step (:name (first wizard-steps)))
         [:span]
         [ui/flat-button {:primary true
-                         :on-click #(e! (rc/->GoToStep previous-step))
+                         :on-click #(e! (rw/->GoToStep previous-step))
                          :icon (ic/navigation-arrow-back)
                          :label-position "before"}
          (tr [:buttons :previous-step])])
       (when (not= step (:name (last wizard-steps)))
         [ui/flat-button {:primary true
                          :disabled (not (validate route))
-                         :on-click #(e! (rc/->GoToStep next-step))
+                         :on-click #(e! (rw/->GoToStep next-step))
                          :icon (ic/navigation-arrow-forward)}
          (tr [:buttons :next-step])])]]))
 
 (defn new-route [e! app]
   (when (not (:route app))
-    (e! (rc/->InitRoute)))
+    (e! (rw/->InitRoute)))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
       [:span
@@ -104,15 +104,15 @@
         [buttons/save {:disabled false
                        :on-click #(do
                                     (.preventDefault %)
-                                    (e! (rc/->SaveToDb)))}
+                                    (e! (rw/->SaveToDb)))}
          (tr [:buttons :save])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
-                                      (e! (rc/->CancelRoute)))}
+                                      (e! (rw/->CancelRoute)))}
          (tr [:buttons :cancel])]]])))
 
 (defn edit-route-by-id [e! app]
-  (e! (rc/->LoadRoute (get-in app [:params :id])))
+  (e! (rw/->LoadRoute (get-in app [:params :id])))
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
       [:span
@@ -123,9 +123,9 @@
         [buttons/save {:disabled false
                        :on-click #(do
                                     (.preventDefault %)
-                                    (e! (rc/->SaveToDb)))}
+                                    (e! (rw/->SaveToDb)))}
          (tr [:buttons :save])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
-                                      (e! (rc/->CancelRoute)))}
+                                      (e! (rw/->CancelRoute)))}
          (tr [:buttons :cancel])]]])))

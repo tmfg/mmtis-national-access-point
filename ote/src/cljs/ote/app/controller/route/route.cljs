@@ -1,4 +1,4 @@
-(ns ote.app.controller.route
+(ns ote.app.controller.route.route-wizard
   "Route based traffic controller"
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
@@ -43,6 +43,7 @@
 
 ;; Edit times
 (defrecord InitRouteTimes []) ; initialize route times based on stop sequence
+(defrecord CalculateRouteTimes [])
 (defrecord NewStartTime [time])
 (defrecord AddTrip [])
 (defrecord EditStopTime [trip-idx stop-idx form-data])
@@ -115,6 +116,21 @@
           trips)]
     new-calendars))
 
+(defn calculate-trip-sequence
+  "User can add a new stop for the route after trips and calendars are created. In these situations, we
+  need to add that new stop at the end of every trip and calculate arrival time."
+  [stop-idx new-stop trips]
+  (if (empty? trips)
+    []                                                      ;; Return empty array
+    (vec (map
+           (fn [trip]
+             (assoc trip ::transit/stop-times
+                         (conj (::transit/stop-times trip)
+                               {::transit/stop-idx       stop-idx
+                                ::transit/arrival-time   (::transit/arrival-time new-stop)
+                                ::transit/departure-time (::transit/departure-time new-stop)})))
+           trips))))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -172,6 +188,8 @@
     ;; Add stop to current stop sequence
     (let [properties (js->clj (aget feature "properties"))
           stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+          is-stop-added? (or (= (::transit/code (last stop-sequence)) (get properties "code")) false)
+          new-stop-idx (count stop-sequence)
           new-stop (dissoc (merge (into {}
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
                                         properties)
@@ -182,13 +200,15 @@
                            ::transit/port-type
                            ::transit/port-type-name
                            ::transit/type)
-          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get  properties "code"))
+          new-stop-sequence (if is-stop-added?
                               stop-sequence
-                              (conj stop-sequence new-stop))]
+                              (conj stop-sequence new-stop))
+          new-trip-sequence (if is-stop-added?
+                              (get-in app [:route ::transit/trips])
+                              (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
       (-> app
-        (assoc-in [:route ::transit/stops] new-stop-sequence)
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] []))))
+          (assoc-in [:route ::transit/stops] new-stop-sequence)
+          (assoc-in [:route ::transit/trips] new-trip-sequence))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -280,9 +300,7 @@
                                 (contains? stop ::transit/arrival-time))
                          (assoc new-stop
                            ::transit/departure-time (::transit/arrival-time new-stop))
-                         new-stop))))
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+                         new-stop))))))
 
   DeleteStop
   (process-event [{idx :idx} app]
@@ -363,6 +381,23 @@
                     ::transit/service-calendar-idx 0}])
         ;; Make sure that we have an empty associated calendar for the trip
         (assoc-in [:route ::transit/service-calendars] [{}])))
+
+  CalculateRouteTimes
+  (process-event [_ app]
+    (let [trip-sequence (get-in app [:route ::transit/trips])
+          last-stop (last (get-in app [:route ::transit/stops]))]
+      (update-in app [:route ::transit/trips] (flip mapv)
+                 (fn [trip]
+                   (update trip ::transit/stop-times
+                           (fn [stop-times]
+                             (vec
+                               (map-indexed
+                                 (fn [stop-idx {::transit/keys [arrival-time departure-time] :as stop-time}]
+                                   {::transit/arrival-time   (or arrival-time
+                                                                 (get-in app [:route ::transit/stops stop-idx ::transit/arrival-time]))
+                                    ::transit/departure-time (or departure-time
+                                                                 (get-in app [:route ::transit/stops stop-idx ::transit/arrival-time]))})
+                                 stop-times))))))))
 
   NewStartTime
   (process-event [{time :time} app]
