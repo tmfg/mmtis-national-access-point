@@ -638,7 +638,7 @@
   :stop-sequence-port-header "Satama"
   :stop-sequence-arrival-header "Saapumisaika"
   :stop-sequence-departure-header "Lähtöaika"
-  :stop-sequence-map-help  "Valitse reitin pysäkkiketju klikkaamalla pysäkkejä kartalta."
+  :stop-sequence-map-help  "Muodosta reitti valitsemalla kohteita/pysähdyspaikkoja kartalta."
 
   :wizard-step-basic-info "Reitin nimi"
   :wizard-step-stop-sequence "Reittipysäkit"
