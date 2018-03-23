@@ -131,6 +131,29 @@
                                 ::transit/departure-time (::transit/departure-time new-stop)})))
            trips))))
 
+(declare calc-new-stop-time)
+
+(defn init-route
+  "App state must be cleaned up when user wants to create new route"
+  [app]
+  (-> app
+      (update :route assoc
+              :step :basic-info
+              ::transit/stops []
+              ::transit/trips []
+              ::transit/service-calendars []
+              ::transit/route-type :ferry
+              ::transit/transport-operator-id
+              (::t-operator/id
+                (:transport-operator
+                  (first (:transport-operators-with-services app)))))
+      (dissoc ::transit/create nil
+              ::transit/created-by nil
+              ::transit/modified nil
+              ::transit/modified-by nil
+              ::transit/name nil
+              ::transit/id nil)))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -169,15 +192,7 @@
 
   InitRoute
   (process-event [_ app]
-    (update app :route assoc
-            ::transit/stops []
-            ::transit/trips []
-            ::transit/service-calendars []
-            ::transit/route-type :ferry
-            ::transit/transport-operator-id
-            (::t-operator/id
-              (:transport-operator
-                (first (:transport-operators-with-services app))))))
+    (init-route app))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -309,8 +324,8 @@
                    (fn [stops]
                      (into (subvec stops 0 idx)
                            (subvec stops (inc idx)))))
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+        #_ (assoc-in [:route ::transit/trips] [])
+        #_ (assoc-in [:route ::transit/service-calendars] [])))
 
 
   EditServiceCalendar
@@ -384,8 +399,7 @@
 
   CalculateRouteTimes
   (process-event [_ app]
-    (let [trip-sequence (get-in app [:route ::transit/trips])
-          last-stop (last (get-in app [:route ::transit/stops]))]
+    (let [first-departure-time (::transit/departure-time (first (::transit/stop-times (first (get-in app [:route ::transit/trips])))))]
       (update-in app [:route ::transit/trips] (flip mapv)
                  (fn [trip]
                    (update trip ::transit/stop-times
@@ -394,9 +408,9 @@
                                (map-indexed
                                  (fn [stop-idx {::transit/keys [arrival-time departure-time] :as stop-time}]
                                    {::transit/arrival-time   (or arrival-time
-                                                                 (get-in app [:route ::transit/stops stop-idx ::transit/arrival-time]))
+                                                                 (calc-new-stop-time app stop-idx first-departure-time trip ::transit/arrival-time))
                                     ::transit/departure-time (or departure-time
-                                                                 (get-in app [:route ::transit/stops stop-idx ::transit/arrival-time]))})
+                                                                 (calc-new-stop-time app stop-idx first-departure-time trip ::transit/departure-time))})
                                  stop-times))))))))
 
   NewStartTime
@@ -497,6 +511,21 @@
   (process-event [_ app]
     (routes/navigate! :routes)
     (dissoc app :route)))
+
+(defn calc-new-stop-time
+  "Calculate new stop time based on trip start time."
+  [app stop-idx first-departure-time current-trip key]
+  (let [current-start-time (time/minutes-from-midnight (::transit/departure-time
+                                           (first (::transit/stop-times current-trip))))
+        new-start-time (time/minutes-from-midnight first-departure-time)
+        calc-from-new-start (fn [stop-time]
+                              (when stop-time
+                               (-> stop-time
+                                   time/minutes-from-midnight
+                                   (- new-start-time)
+                                   (+ current-start-time)
+                                   time/minutes-from-midnight->time)))]
+    (calc-from-new-start (get-in app [:route ::transit/stops stop-idx key]))))
 
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid
