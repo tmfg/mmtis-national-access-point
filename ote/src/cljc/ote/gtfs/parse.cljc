@@ -45,6 +45,10 @@
   (#?(:cljs js/parseInt
       :clj Integer/parseInt) value))
 
+(defmethod gtfs->clj 'double? [_ value]
+  (#?(:cljs js/parseFloat
+      :clj Double/parseDouble) value))
+
 (def ^{:private true
        :doc "Memoized function for looking up a GTFS field spec (which may not exist).
 This is only called with GTFS field names and cannot grow unbounded."}
@@ -76,7 +80,9 @@ This is only called with GTFS field names and cannot grow unbounded."}
    :gtfs/calendar-txt {:header gtfs-spec/calendar-txt-header
                        :fields gtfs-spec/calendar-txt-fields}
    :gtfs/calendar-dates-txt {:header gtfs-spec/calendar-dates-txt-header
-                             :fields gtfs-spec/calendar-dates-txt-fields}})
+                             :fields gtfs-spec/calendar-dates-txt-fields}
+   :gtfs/shapes-txt {:header gtfs-spec/shapes-txt-header
+                     :fields gtfs-spec/shapes-txt-fields}})
 
 (defn parse-gtfs-file [gtfs-file-type content]
   (let [[header & rows] (csv/read-csv content)

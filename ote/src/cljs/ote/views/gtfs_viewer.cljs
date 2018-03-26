@@ -15,7 +15,7 @@
         trips-by-route (group-by :gtfs/route-id trips-txt)]
     [table/table {:height "200px"
                   :name->label #(case %
-                                  :agency "Liikennöijä"
+                                  :agency "Liikennöitsijä"
                                   :name "Linja"
                                   :trips "Vuoroja")
                   :key-fn :gtfs/route-id
@@ -45,10 +45,13 @@
                   (concat (take 3 stop-times)
                           [:ellipsis]
                           (reverse (take 3 (reverse stop-times))))
-                  stop-times)]
+                  stop-times)
+             :let [time (time/format-time st)]]
          (if (= :ellipsis st)
+           ^{:key "ellipsis"}
            [:ul "\u22ee"]
-           [:ul (time/format-time st)])))]]))
+           ^{:key time}
+           [:ul time])))]]))
 
 (defn trips-map [_ _]
   (r/create-class
@@ -58,7 +61,8 @@
       [leaflet/Map {:ref "leaflet"
                     :center #js [65 25]
                     :zoomControl true
-                    :zoom 5}
+                    :zoom 5
+                    :style {:height 600}}
        (leaflet/background-tile-map)
 
        ;; Show polyline for each stop sequence

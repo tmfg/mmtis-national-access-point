@@ -32,19 +32,27 @@
    :app gtfs}
   (let [route-id (:gtfs/route-id route)
         trips (gq/route-trips gtfs route-id)
-        stop-sequences (gq/stop-sequences-for-trips gtfs trips)]
+        shape-ids (into #{} (map :gtfs/shape-id) trips)
+        stop-sequences (gq/stop-sequences-for-trips gtfs trips)
+        color (if (str/blank? (:gtfs/route-color route))
+                "#000000"
+                (str "#" (:gtfs/route-color route)))]
     (assoc gtfs :selected-route
            {:route route
             :trips (gq/distinct-trips-times gtfs trips)
             :stop-sequences stop-sequences
             :stops (distinct (mapcat val stop-sequences))
-            :lines (for [stop-sequence (gq/distinct-stop-sequences stop-sequences)]
-                     {:positions (clj->js (map (juxt :gtfs/stop-lat :gtfs/stop-lon)
-                                               stop-sequence))
-                      :color (let [c (:gtfs/route-color route)]
-                               (if (str/blank? c)
-                                 "#000000"
-                                 (str "#" c)))})})))
+            :lines (if (seq shape-ids)
+                     ;; We have shapes, use them
+                     (for [[_ shapes] (gq/shapes-for-ids gtfs shape-ids)]
+                       {:positions (clj->js (map (juxt :gtfs/shape-pt-lat :gtfs/shape-pt-lon) shapes))
+                        :color color})
+
+                     ;; No shapes, draw line through stop sequence
+                     (for [stop-sequence (gq/distinct-stop-sequences stop-sequences)]
+                       {:positions (clj->js (map (juxt :gtfs/stop-lat :gtfs/stop-lon)
+                                                 stop-sequence))
+                        :color color}))})))
 
 (defmethod routes/on-navigate-event :view-gtfs [_]
   (->StartViewer))

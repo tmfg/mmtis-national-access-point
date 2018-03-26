@@ -37,3 +37,12 @@
    (for [[[name headsign] trips] (group-by (juxt :gtfs/trip-short-name :gtfs/trip-headsign) trips)]
      {:name name
       :headsign headsign})))
+
+(defn shapes-for-ids [{shapes-txt :gtfs/shapes-txt} shape-ids]
+  (fmap (partial sort-by :gtfs/shape-pt-sequence)
+        (reduce
+         (fn [lines {:gtfs/keys [shape-id] :as shape}]
+           (if (shape-ids shape-id)
+             (update lines shape-id (fnil conj []) shape)
+             lines))
+         {} shapes-txt)))
