@@ -34,9 +34,8 @@
          (let [entry (.getNextEntry in)]
            (if-not entry
              files
-             (do (println "READING " (.getName entry))
-               (recur (conj files
-                              {:name (.getName entry)
-                               :data (with-open [out (java.io.ByteArrayOutputStream.)]
-                                       (io/copy in out)
-                                       (String. (.toByteArray out) "UTF-8"))})))))))))
+             (recur (conj files
+                          {:name (.getName entry)
+                           :data (with-open [out (java.io.ByteArrayOutputStream.)]
+                                   (io/copy in out)
+                                   (String. (.toByteArray out) "UTF-8"))}))))))))
