@@ -28,7 +28,8 @@
   :select-transport-operator      "Select transport operator"
 
   :transport-service-common
-  {:ote.db.transport-service/name "Service name"
+  {:ote.db.transport-service/transport-type "Palvelun liikennemuoto"
+   :ote.db.transport-service/name "Service name"
    :ote.db.transport-service/accessibility-tool        "Accessibility tools"
    :ote.db.transport-service/accessibility-description "Accessibility description"
 
@@ -235,7 +236,8 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
+ {:transport-type-info "Ilmoita tässä osiossa liikkumispalvelusi liikennemuoto tai liikennemuodot. Tätä tietoa hyödynnetään Palvelukatalogi-sivun hakutoiminnoissa."
+  :name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
   :external-interfaces-intro "If your service does not have machine-readable interfaces leave this section empty and move to the next section."
   :external-interfaces-intro-1 "Fill in at least machine-readable route and timetable information. If you do not have the means to produce machine-readable route and timetable infromation, you can do so in FTA's"
   :external-interfaces-intro-2 "Sea traffic route schedules can be made using this"
@@ -344,7 +346,13 @@
 
  ;; Database enumeration values
  :enums
- {:ote.db.transport-service/type
+ {:ote.db.transport-service/transport-type
+  {:road      "Tieliikenne"
+   :rail      "Rautatieliikenne"
+   :sea       "Merenkulku"
+   :aviation  "Ilmailu"}
+
+  :ote.db.transport-service/type
   {:terminal                 "Stations, ports and other terminals"
    :passenger-transportation "Passenger transportation"
    :rentals                  "Vehicle rentals and commercial shared vehicle solutions"
