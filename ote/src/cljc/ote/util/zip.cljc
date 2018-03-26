@@ -28,7 +28,6 @@
      "Read a zip file. Returns a sequence of file descriptors.
   Each file descriptor is a map containing the name and data."
      [input]
-     (println "read from " input)
      (with-open [in (ZipInputStream. input)]
        (loop [files []]
          (let [entry (.getNextEntry in)]
