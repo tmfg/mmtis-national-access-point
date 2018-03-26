@@ -150,3 +150,5 @@
 
 (def advance-reservation
   [:no :possible :mandatory])
+
+(def transport-type [:road :rail :sea :aviation])

@@ -737,21 +737,26 @@
      (checkbox-container update! table? label warning error style checked?)]
     (checkbox-container update! table? label warning error style checked?)))
 
-(defmethod field :checkbox-group [{:keys [update! table? label show-option options help]} data]
+(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header?]} data]
   (let [selected (set (or data #{}))]
     [:div.checkbox-group
-     [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label]
+     (when header?
+       [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
      (when help
        [common/help help])
      (doall
-       (map-indexed
-         (fn [i option]
-           (let [checked? (boolean (selected option))]
-             [ui/checkbox {:key      i
-                           :label    (when-not table? (show-option option))
-                           :checked  checked?
-                           :on-check #(update! ((if checked? disj conj) selected option))}]))
-         options))]))
+      (map-indexed
+       (fn [i option]
+         (let [checked? (boolean (selected option))]
+           [ui/checkbox {:key      i
+                         :label    (when-not table? (show-option option))
+                         :checked  checked?
+                         :on-check #(update! ((if checked? disj conj) selected option))}]))
+       options))
+     (when (or error warning)
+       [:div
+        (stylefy/use-sub-style style-form-fields/radio-selection :required)
+        (if error error warning)])]))
 
 (defn- csv-help-text []
   [:div.row

@@ -441,3 +441,20 @@
     :show-clear? true
     :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}))
+
+(defn transport-type
+  []
+  (form/group
+   {:label (tr [:field-labels :transport-service-common ::t-service/transport-type])
+    :columns 3
+    :layout :row}
+
+   (form/info (tr [:form-help :transport-type-info]))
+
+   {:name ::t-service/transport-type
+    :type :checkbox-group
+    :header? false
+    :required? true
+    :options t-service/transport-type
+    :show-option (tr-key [:enums ::t-service/transport-type])}
+   ))
