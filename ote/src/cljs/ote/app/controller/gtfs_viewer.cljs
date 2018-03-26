@@ -4,7 +4,8 @@
             [ote.app.routes :as routes]
             [ote.communication :as comm]
             [ote.gtfs.query :as gq]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.util.fn :refer [flip]]))
 
 (declare ->LoadGTFSResponse ->LoadGTFSFailure)
 
@@ -17,7 +18,9 @@
 
 (define-event LoadGTFSResponse [response]
   {:path [:gtfs-viewer]}
-  response)
+  (update response :gtfs/routes-txt
+          (flip sort-by) (juxt :gtfs/route-short-name
+                               :gtfs/route-long-name)))
 
 (define-event LoadGTFSFailure [response]
   {}
