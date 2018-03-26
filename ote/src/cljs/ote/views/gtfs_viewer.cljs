@@ -98,17 +98,7 @@
                                       :html (str "<div style=\"transform: translateY(-12px) rotate(" bearing "deg);\">^</div>")})}])
          (:bearing-markers selected-route)))])}))
 
-#_(defn trips-table [e! {selected-route :selected-route}]
-  [table/table {:height "200px"
-                :name->label str}
-   [{:name :name}
-    {:name :headsign}
-    {:name :departures
-     :read #(str/join ", " (:departures %))}]
-   (:trips selected-route)])
-
 (defn gtfs-viewer [e! {gtfs :gtfs-viewer}]
   [:div.gtfs-viewer
    [routes-table e! gtfs]
-   [trips-map e! gtfs]
-   #_[trips-table e! gtfs]])
+   [trips-map e! gtfs]])

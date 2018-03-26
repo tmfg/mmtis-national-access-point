@@ -50,8 +50,7 @@
            ;; No shapes, draw line through stop sequence
            (for [stop-sequence (gq/distinct-stop-sequences stop-sequences)]
              (map (juxt :gtfs/stop-lat :gtfs/stop-lon)
-                  stop-sequence))))
-]
+                  stop-sequence))))]
     (assoc gtfs :selected-route
            {:route route
             :trips (gq/distinct-trips-times gtfs trips)
