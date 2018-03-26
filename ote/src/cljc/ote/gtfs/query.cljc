@@ -93,7 +93,6 @@
   [shape min-distance]
   (let [shape (filter :gtfs/shape-dist-traveled shape)
         pos (juxt :gtfs/shape-pt-lat :gtfs/shape-pt-lon)]
-    (println "shapes with dist: " (pr-str shape))
     (loop [markers []
            last-position (pos (first shape))
            last-marker-distance 0
