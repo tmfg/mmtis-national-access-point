@@ -104,7 +104,6 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name-taxi     "Price class"
-   :ote.db.transport-service/price-class-name-other    "Price class"
    :ote.db.transport-service/price-class-name-request  "Price class"
    :ote.db.transport-service/price-class-name-schedule "Price class"
    :ote.db.transport-service/price-per-unit            "Price per unit (€)"
@@ -363,7 +362,6 @@
   {:terminal      "Stations, ports and other terminals"
    :taxi          "Taxi service (passenger transportation)"
    :request       "Charter traffic, busses (passenger transportation)"
-   :other         "Other charter traffic (passenger trasportation)"
    :schedule      "Regular scheduled traffic (passenger transportation)"
    :rentals       "Vehicle rentals and commercial shared vehicle solutions"
    :parking       "General commercial parking services"}

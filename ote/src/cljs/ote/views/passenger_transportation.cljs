@@ -126,7 +126,6 @@
   (let [price-class-name-label
           (cond
             (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
-            (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
             (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
             (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
             :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))

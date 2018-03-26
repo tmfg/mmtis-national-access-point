@@ -88,8 +88,7 @@
 (defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
   [& [e! type sub-type]]
-  (let [type (or type :other)
-        sub-type (or sub-type :other)]
+  (let [type (or type :other)]
 
     (form/group
       {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])

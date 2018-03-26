@@ -77,7 +77,7 @@
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking])
 
 ;; Create order for transport_type
-(def passenger-transportation-sub-types [:taxi :request :other :schedule])
+(def passenger-transportation-sub-types [:taxi :request :schedule])
 
 (def interface-data-contents [:route-and-schedule :luggage-restrictions :realtime-interface :booking-interface
                              :accessibility-services :other-services :pricing :service-hours :disruptions

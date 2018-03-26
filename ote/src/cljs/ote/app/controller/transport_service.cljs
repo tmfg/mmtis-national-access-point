@@ -43,7 +43,6 @@
       (case type
             :taxi :passenger-transportation
             :request :passenger-transportation
-            :other :passenger-transportation
             :schedule :passenger-transportation
             :terminal :terminal
             :rentals :rentals

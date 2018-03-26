@@ -105,7 +105,6 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name-taxi     "Tuote"
-   :ote.db.transport-service/price-class-name-other    "Hintaryhmä"
    :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
    :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
    :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
@@ -354,17 +353,16 @@
   :ote.db.transport-service/type
   {:terminal                 "Asemat, satamat ja muut terminaalit"
    :passenger-transportation "Henkilöiden kuljetuspalvelut"
-   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :rentals                  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
 
   :ote.db.transport-service/sub-type
   {:terminal     "Asemat, satamat ja muut terminaalit"
-   :taxi         "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-   :request      "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-   :other        "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-   :schedule     "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-   :rentals      "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :taxi         "Taksiliikenne (tieliikenne)"
+   :request      "Tilausajoliikenne ja muu kutsuun perustuva liikenne"
+   :schedule     "Säännöllinen aikataulun mukainen liikenne"
+   :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking      "Yleiset kaupalliset pysäköintipalvelut"}
 
 
@@ -848,13 +846,13 @@
                    false "Ei"
 
                    ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-                   "request" "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
+                   "taxi"     "Taksiliikenne (tieliikenne)"
+                   "request"  "Tilausajoliikenne ja muu kutsuun perustuva liikenne"
                    ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-                   "terminal"                 "Asemat, satamat ja muut terminaalit"
-                    "rentals"                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                    "parking"                  "Yleiset kaupalliset pysäköintipalvelut"
+                   "schedule" "Säännöllinen aikataulun mukainen liikenne"
+                   "terminal" "Asemat, satamat ja muut terminaalit"
+                   "rentals"  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+                   "parking"  "Yleiset kaupalliset pysäköintipalvelut"
 
                    ;; accessibility tools
                    "wheelchair" "Pyörätuoli"

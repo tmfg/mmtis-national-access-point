@@ -106,7 +106,6 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name-taxi     "Produkt"
-   :ote.db.transport-service/price-class-name-other    "Priskategori"
    :ote.db.transport-service/price-class-name-request  "Priskategori"
    :ote.db.transport-service/price-class-name-schedule "Priskategori"
    :ote.db.transport-service/price-per-unit            "Pris per enhet"
@@ -368,7 +367,6 @@
   {:terminal    "Stationer, hamnar och övriga terminaler"
    :taxi        "Taxitjänst (persontransport)"
    :request     "Abbonerad trafik, buss (persontransport)"
-   :other       "Beställtrafik (persontransport)"
    :schedule    "Regelbunden ruttbaserad trafik (persontransport)"
    :rentals     "Fordonsuthyrning och komersiella samanvändningstjänster"
    :parking     "Allmänna kommersiella parkeringstjänster"}
