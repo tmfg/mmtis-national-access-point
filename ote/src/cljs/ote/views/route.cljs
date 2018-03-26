@@ -94,7 +94,7 @@
 (defn new-route [e! app]
   (e! (rw/->InitRoute))
   (fn [e! {route :route :as app}]
-    (let [page (or (:page route) 0)]
+  (let [page (or (:page route) 0)]
       [:span
        [route-wizard
         e! wizard-steps

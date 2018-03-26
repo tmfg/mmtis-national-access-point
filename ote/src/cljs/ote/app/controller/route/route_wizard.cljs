@@ -131,25 +131,6 @@
                                 ::transit/departure-time (::transit/departure-time new-stop)})))
            trips))))
 
-(defn init-route
-  "App state must be cleaned up when user wants to create new route"
-  [app]
-  (-> app
-      (update :route assoc
-              :step :basic-info
-              ::transit/stops []
-              ::transit/trips []
-              ::transit/service-calendars []
-              ::transit/route-type :ferry
-              ::transit/transport-operator-id
-              ::transit/transport-operator-id (get-in app [:transport-operator ::t-operator/id]))
-      (dissoc ::transit/create nil
-              ::transit/created-by nil
-              ::transit/modified nil
-              ::transit/modified-by nil
-              ::transit/name nil
-              ::transit/id nil)))
-
 (defn- set-saved-transfer-operator
   [app route]
   (assoc app :transport-operator
@@ -159,7 +140,7 @@
                         %)
                      (:transport-operators-with-services app)))))
 
-(declare calc-new-stop-time)
+(declare new-stop-time)
 
 (extend-protocol tuck/Event
   LoadStops
@@ -199,7 +180,16 @@
 
   InitRoute
   (process-event [_ app]
-    (init-route app))
+    (-> app
+        (assoc-in [:route :step] :basic-info)
+        (assoc-in [:route ::transit/stops] [])
+        (assoc-in [:route ::transit/trips] [])
+        (assoc-in [:route ::transit/service-calendars] [])
+        (assoc-in [:route ::transit/route-type] :ferry)
+        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))
+        (update-in [:route] dissoc :ote.db.modification/created :ote.db.modification/created-by
+                   :ote.db.modification/modified :ote.db.modification/modified-by
+                   ::transit/name ::transit/id)))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -419,9 +409,9 @@
                                (map-indexed
                                  (fn [stop-idx {::transit/keys [arrival-time departure-time] :as stop-time}]
                                    {::transit/arrival-time   (or arrival-time
-                                                                 (calc-new-stop-time app stop-idx first-departure-time trip ::transit/arrival-time))
+                                                                 (new-stop-time app stop-idx first-departure-time trip ::transit/arrival-time))
                                     ::transit/departure-time (or departure-time
-                                                                 (calc-new-stop-time app stop-idx first-departure-time trip ::transit/departure-time))})
+                                                                 (new-stop-time app stop-idx first-departure-time trip ::transit/departure-time))})
                                  stop-times))))))))
 
   NewStartTime
@@ -523,7 +513,7 @@
     (routes/navigate! :routes)
     (dissoc app :route)))
 
-(defn calc-new-stop-time
+(defn new-stop-time
   "Calculate new stop time based on trip start time."
   [app stop-idx first-departure-time current-trip key]
   (let [current-start-time (time/minutes-from-midnight (::transit/departure-time

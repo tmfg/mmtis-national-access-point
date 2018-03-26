@@ -56,7 +56,7 @@
   CreateNewRoute
   (process-event [_ app]
     (routes/navigate! :new-route)
-    (route-wizard/init-route app))
+    app)
 
   OpenDeleteRouteModal
   (process-event [{id :id} app]
