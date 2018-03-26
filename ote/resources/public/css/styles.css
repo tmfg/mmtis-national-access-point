@@ -218,3 +218,9 @@ span.search-card-title {
   top: 0;
   opacity: 0;
 }
+
+.route-stop-icon {
+    border-style: solid;
+    border-color: blue;
+    border-radius: 6px;
+}

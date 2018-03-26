@@ -79,7 +79,8 @@
           [leaflet/FeatureGroup
            [leaflet/Marker
             {:position [stop-lat stop-lon]
-             :title stop-name}]
+             :title stop-name
+             :icon (js/L.divIcon #js {:className "route-stop-icon"})}]
            [leaflet/Popup {}
             [stop-popup stop-id stop-name gtfs]]]))])}))
 
