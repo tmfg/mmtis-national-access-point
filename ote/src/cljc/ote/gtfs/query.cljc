@@ -46,3 +46,68 @@
              (update lines shape-id (fnil conj []) shape)
              lines))
          {} shapes-txt)))
+
+
+;;;;;;;;;;;;;;;,
+;; lat/lon calculation utils
+;; see: https://www.movable-type.co.uk/scripts/latlong.html
+;; PENDING: eventually move these to better namespace
+;; or even a separate library.
+
+(def ^:const pi Math/PI)
+(def ^:const R 6371e3)
+
+(defn- to-rad [deg]
+  (/ (* deg pi) 180))
+
+(defn- to-deg [rad]
+  (/ (* rad 180) pi))
+
+(defn haversine-dist [[lat1 lon1] [lat2 lon2]]
+  (let [o1 (to-rad lat1)
+        o2 (to-rad lat2)
+        dlat (to-rad (- lat2 lat1))
+        dlon (to-rad (- lon2 lon1))
+        a (+ (Math/pow (Math/sin (/ dlat 2)) 2)
+             (* (Math/cos o1) (Math/cos o2)
+                (Math/pow (Math/sin (/ dlon 2)) 2)))
+        c (* 2 (Math/atan2 (Math/sqrt a)
+                           (Math/sqrt (- 1 a))))]
+    (* R c)))
+
+(defn bearing
+  "Initial bearing (forward azimuth)."
+  [[lat1 lon1] [lat2 lon2]]
+  (let [o1 (to-rad lat1)
+        o2 (to-rad lat2)
+        dlon (to-rad (- lon2 lon1))
+        y (* (Math/sin dlon) (Math/cos o2))
+        x (- (* (Math/cos o1) (Math/sin o2))
+             (* (Math/sin o1) (Math/cos o2) (Math/cos dlon)))]
+    (to-deg (Math/atan2 y x))))
+
+
+(defn bearing-markers
+  "Create bearing markers for shape. Shape is an ordered sequence
+  of GTFS shape maps."
+  [shape min-distance]
+  (let [shape (filter :gtfs/shape-dist-traveled shape)
+        pos (juxt :gtfs/shape-pt-lat :gtfs/shape-pt-lon)]
+    (println "shapes with dist: " (pr-str shape))
+    (loop [markers []
+           last-position (pos (first shape))
+           last-marker-distance 0
+           [{dist :gtfs/shape-dist-traveled
+             :as point} & points] (rest shape)]
+      (if-not point
+        markers
+        (let [cur-pos (pos point)
+              add? (>= dist (+ last-marker-distance min-distance))]
+
+          (recur (if add?
+                   (conj markers {:position last-position
+                                  :bearing (bearing last-position cur-pos)})
+                   markers)
+                 cur-pos
+                 (if add? dist last-marker-distance)
+                 points))))))

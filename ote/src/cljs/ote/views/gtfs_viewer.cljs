@@ -86,7 +86,17 @@
              :title stop-name
              :icon (js/L.divIcon #js {:className "route-stop-icon"})}]
            [leaflet/Popup {}
-            [stop-popup stop-id stop-name gtfs]]]))])}))
+            [stop-popup stop-id stop-name gtfs]]]))
+
+       (doall
+        (map-indexed
+         (fn [i {:keys [position bearing]}]
+           ^{:key i}
+           [leaflet/Marker
+            {:position (clj->js position)
+             :icon (js/L.divIcon #js {:className "route-bearing"
+                                      :html (str "<div style=\"transform: translateY(-12px) rotate(" bearing "deg);\">^</div>")})}])
+         (:bearing-markers selected-route)))])}))
 
 #_(defn trips-table [e! {selected-route :selected-route}]
   [table/table {:height "200px"
