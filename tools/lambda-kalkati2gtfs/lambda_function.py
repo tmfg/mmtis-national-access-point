@@ -10,7 +10,6 @@ import json
 import boto3
 from botocore.client import Config
 
-
 from kalkati2gtfs import convert
 
 logger = logging.getLogger()
@@ -31,51 +30,56 @@ def zip_files(path, zipfile_path):
 ### Lambda handler ###
 ## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
-    file_url = json.loads(event['body'])
-
-    logger.info(file_url)
-
     try:
-        logger.info('Downloading {}'.format(file_url))
+        try:
+            file_url = json.loads(event['body'])
+        except ValueError as e:
+            raise ValueError('Invalid Kalkati URL: ' + str(e))
 
-        opener = urllib2.build_opener()
-        response = opener.open(file_url)
+        try:
+            logger.info('Trying to fetch a kalkati zip-file from URL: {}'.format(file_url))
 
-        with io.BytesIO(response.read()) as tf:
-            # rewind the file
-            tf.seek(0)
+            opener = urllib2.build_opener()
+            response = opener.open(file_url)
 
-            # Read the file as a zipfile and process the members
-            with zipfile.ZipFile(tf, mode='r') as zipf:
-                for file in zipf.infolist():
-                    path = zipf.extract(file, '/tmp/kalkati/')
-                    convert(path, '/tmp/gtfs/')
+            with io.BytesIO(response.read()) as tf:
+                # rewind the file
+                tf.seek(0)
 
-        zip_files('/tmp/gtfs', '/tmp/gtfs.zip')
+                # Read the file as a zipfile and process the members
+                with zipfile.ZipFile(tf, mode='r') as zipf:
+                    for file in zipf.infolist():
+                        path = zipf.extract(file, '/tmp/kalkati/')
+                        convert(path, '/tmp/gtfs/')
+
+            zip_files('/tmp/gtfs', '/tmp/gtfs.zip')
+
+        except Exception as e:
+            raise RuntimeError('Error while processing file {}: {}'.format(file_url, str(e)))
+
+        file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+
+        try:
+            s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=open('/tmp/gtfs.zip'))
+            # Create temporary url for downloading the generated zip file (expires in 10 minutes)
+            signed_url = s3.generate_presigned_url(ClientMethod='get_object',
+                                                   Params={'Bucket': 'kalkati2gtfs', 'Key': file_key},
+                                                   ExpiresIn=10 * 60)
+
+            return {
+                'statusCode': 303,
+                'headers': {'Location': signed_url}
+            }
+
+        except Exception as e:
+            raise RuntimeError('Error while uploading {} to bucket {}: {}'.format(file_key, 'kalkati2gtfs', str(e)))
 
     except Exception as e:
-        logger.error('Error while processing file {}: {}'.format(file_url, e))
+        logger.error(str(e))
 
-        raise e
-
-    file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-
-    try:
-        s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=open('/tmp/gtfs.zip'))
-
-    except Exception as e:
-        logger.error('Error while uploading {} to bucket {}: {}'.format(file_key, 'kalkati2gtfs', e))
-
-        raise e
-
-    try:
-        # Create temporary url for downloading the generated zip file (expires in 10 minutes)
-        signed_url = s3.generate_presigned_url(ClientMethod='get_object', Params={'Bucket': 'kalkati2gtfs', 'Key': file_key}, ExpiresIn=10*60)
-
-        return {"statusCode": 303,
-                "headers": {"Location": signed_url}}
-
-    except Exception as e:
-        logger.error('Error while uploading {} to bucket {}: {}'.format(file_key, 'kalkati2gtfs', e))
-
-        raise e
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'error': str(e)
+            })
+        }
