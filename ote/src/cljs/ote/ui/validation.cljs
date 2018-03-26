@@ -17,14 +17,9 @@
 (def phone-number-regex #"^((\+?\d{0,15})|(\d{0,16}))$")
 
 (defn empty-value? [val]
-  ;; empty? function call fails for following types.
-  ;; Therefore a specific type check needed.
-  (if (or (boolean? val)
-          (keyword? val))
-    false
-    (or (nil? val)
-        (str/blank? val)
-        (empty? val))))
+  (or (nil? val)
+      (str/blank? val)
+      (and (coll? val) (empty? val))))
 
 (defn empty-localized-text? [value]
   (let [text-value (get (first value) :ote.db.transport-service/text)]

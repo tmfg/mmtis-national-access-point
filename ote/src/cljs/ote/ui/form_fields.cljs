@@ -738,9 +738,11 @@
     (checkbox-container update! table? label warning error style checked?)))
 
 (defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header?]} data]
+  ;; Options:
+  ;; :header? Show or hide the header element above the checkbox-group. Default: true.
   (let [selected (set (or data #{}))]
     [:div.checkbox-group
-     (when header?
+     (when (not (false? header?))
        [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
      (when help
        [common/help help])

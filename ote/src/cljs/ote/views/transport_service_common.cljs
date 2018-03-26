@@ -456,5 +456,4 @@
     :header? false
     :required? true
     :options t-service/transport-type
-    :show-option (tr-key [:enums ::t-service/transport-type])}
-   ))
+    :show-option (tr-key [:enums ::t-service/transport-type])}))
