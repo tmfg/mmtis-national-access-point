@@ -14,9 +14,12 @@
   (let [agency-by-id (into {} (map (juxt :gtfs/agency-id identity)) agency-txt)
         trips-by-route (group-by :gtfs/route-id trips-txt)]
     [table/table {:height "200px"
-                  :name->label str
+                  :name->label #(case %
+                                  :agency "Liikennöijä"
+                                  :name "Linja"
+                                  :trips "Vuoroja")
                   :key-fn :gtfs/route-id
-                  :row-selected? #(= selected-route %)
+                  :row-selected? #(= (:route selected-route) %)
                   :on-select #(when (seq %)
                                 (e! (gc/->SelectRoute (first %))))}
      [{:name :agency
@@ -77,10 +80,10 @@
            [leaflet/Marker
             {:position [stop-lat stop-lon]
              :title stop-name}]
-           [leaflet/Popup {:on-open #(.log js/console "AVAA")}
+           [leaflet/Popup {}
             [stop-popup stop-id stop-name gtfs]]]))])}))
 
-(defn trips-table [e! {selected-route :selected-route}]
+#_(defn trips-table [e! {selected-route :selected-route}]
   [table/table {:height "200px"
                 :name->label str}
    [{:name :name}
@@ -93,4 +96,4 @@
   [:div.gtfs-viewer
    [routes-table e! gtfs]
    [trips-map e! gtfs]
-   [trips-table e! gtfs]])
+   #_[trips-table e! gtfs]])
