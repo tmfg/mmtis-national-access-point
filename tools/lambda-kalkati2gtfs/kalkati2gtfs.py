@@ -96,7 +96,12 @@ class KalkatiHandler(ContentHandler):
         for name in gtfs_files:
             self.write_values(name, getattr(self, '%s_fields' % name))
 
+    # Converts Kalkati <Station> to GTFS stop
     def add_stop(self, attrs):
+        if (not ('Y' in attrs or 'X' in attrs)):
+            raise KeyError('<Station> is missing X or Y coordinates. StationId: ' + attrs['StationId'])
+
+        # In Kalkati, Station coordinates ar in KKJ3 format. Convert them into WGS84.
         KKJNorthing = float(attrs['Y'])
         KKJEasting = float(attrs['X'])
         KKJLoc = {'P': KKJNorthing, 'I': KKJEasting}
