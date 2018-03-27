@@ -309,6 +309,7 @@
  ;; Action buttons
  :buttons
  {:save "Spara"
+  :save-exit "Spara och stäng"
   :cancel "Ångra"
   :delete "Ta bort"
   :close "Stäng"

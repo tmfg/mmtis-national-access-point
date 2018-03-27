@@ -301,6 +301,7 @@
  ;; Action buttons
  :buttons
  {:save "Tallenna"
+  :save-exit "Tallenna ja poistu"
   :cancel "Peruuta"
   :delete "Poista"
   :close "Sulje"
