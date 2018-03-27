@@ -103,8 +103,13 @@
         [buttons/save {:disabled false
                        :on-click #(do
                                     (.preventDefault %)
-                                    (e! (rc/->SaveToDb)))}
+                                    (e! (rc/->SaveToDb false)))}
          (tr [:buttons :save])]
+        [buttons/save {:disabled false
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (rc/->SaveToDb true)))}
+         (tr [:buttons :save-exit])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}
@@ -122,8 +127,13 @@
         [buttons/save {:disabled false
                        :on-click #(do
                                     (.preventDefault %)
-                                    (e! (rc/->SaveToDb)))}
+                                    (e! (rc/->SaveToDb false)))}
          (tr [:buttons :save])]
+        [buttons/save {:disabled false
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (rc/->SaveToDb true)))}
+         (tr [:buttons :save-exit])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}

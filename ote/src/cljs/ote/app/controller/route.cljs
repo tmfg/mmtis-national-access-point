@@ -10,7 +10,8 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.localization :refer [tr tr-key]]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -61,7 +62,7 @@
 (defrecord GoToStep [step])
 
 ;; Save route to database
-(defrecord SaveToDb [])
+(defrecord SaveToDb [exit-wizard?])
 (defrecord CancelRoute [])
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
@@ -198,20 +199,27 @@
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
-    ;; Add stop to current stop sequence
-    (let [{feature :geojson :as custom-stop}
-          (first (keep #(when (= (:id %) id) %) (:custom-stops route)))]
+    ;; Add stop to current route stop sequence (:route ::transit/stops)
+    ;; And add stop to current map marker stop sequence (:route :stops "feature")
+    (let [stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+          {feature :geojson :as custom-stop}
+          (first (keep #(when (= (:id %) id) %) (:custom-stops route)))
+          geometry (vec (aget feature "geometry" "coordinates"))
+          properties (js->clj (aget feature "properties"))
+          new-custom-stop (merge (into {}
+                                       (map #(update % 0 (partial keyword "ote.db.transit")))
+                                       properties)
+                                 {::transit/location geometry})
+          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get properties "code"))
+                              stop-sequence
+                              (conj stop-sequence new-custom-stop))
+          new-stop {"geometry"   {"type" "Point", "coordinates" geometry}
+                    "properties" properties
+                    "type"       "Feature"}
+          stops (get-in app [:route :stops "features"])]
       (-> app
-          (update-in [:route ::transit/stops]
-                     (fn [stop-sequence]
-                       (let [geometry (vec (aget feature "geometry" "coordinates"))]
-                         (if (= geometry (::transit/location (last stop-sequence)))
-                           stop-sequence
-                           (conj (or stop-sequence [])
-                                 (merge (into {}
-                                              (map #(update % 0 (partial keyword "ote.db.transit")))
-                                              (js->clj (aget feature "properties")))
-                                        {::transit/location geometry})))))))))
+          (assoc-in [:route :stops "features"] (conj stops new-stop))
+          (assoc-in [:route ::transit/stops] new-stop-sequence))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
@@ -428,7 +436,7 @@
     app)
 
   SaveToDb
-  (process-event [_ app]
+  (process-event [{exit-wizard? :exit-wizard?} app]
     (let [calendars (mapv form/without-form-metadata (get-in app [:route ::transit/service-calendars]))
           deduped-cals (into [] (distinct calendars))
           cals-indices (mapv #(first (keep-indexed
@@ -447,22 +455,32 @@
                                 #(assoc % ::transit/service-calendar-idx
                                           (nth cals-indices (::transit/service-calendar-idx %)))
                                 trips)))
-                    (dissoc :step :stops :new-start-time :edit-service-calendar))]
+                    (dissoc :step :stops :new-start-time :edit-service-calendar :exit-wizard?))]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
-      (set-saved-transfer-operator app route)))
+      (-> app
+        (set-saved-transfer-operator route)
+        (assoc-in [:route :exit-wizard?] exit-wizard?))))
 
   SaveRouteResponse
   (process-event [{response :response} app]
-    (routes/navigate! :routes)
-    (assoc (dissoc app :route) :page :routes))
+    (let [exit-wizard? (get-in app [:route :exit-wizard?])
+          app (assoc app :flash-message (tr [:route-wizard-page :save-success]))
+          app (if exit-wizard?
+               (dissoc app :route)
+               app)]
+      (if exit-wizard?
+        (do
+          (routes/navigate! :routes)
+          (assoc app :page :routes))
+        app)))
 
   SaveRouteFailure
   (process-event [{response :response} app]
     (.error js/console "Save route failed:" (pr-str response))
     (assoc app
-      :flash-message-error "Reitin tallennus epäonnistui"))
+      :flash-message-error (tr [:route-wizard-page :save-failure])))
 
   CancelRoute
   (process-event [_ app]
