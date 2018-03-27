@@ -29,7 +29,8 @@
             [ote.views.admin :as admin]
             [ote.views.operators :as operators]
             [ote.views.route.route-list :as route-list]
-            [ote.views.route :as route]))
+            [ote.views.route :as route]
+            [ote.views.gtfs-viewer :as gtfs-viewer]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -401,6 +402,8 @@
                 :routes [route-list/routes e! app]
                 :new-route [route/new-route e! app]
                 :edit-route [route/edit-route-by-id e! app]
+
+                :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 

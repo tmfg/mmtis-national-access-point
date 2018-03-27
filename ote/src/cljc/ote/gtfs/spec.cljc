@@ -17,6 +17,16 @@
                                 :gtfs/transfers-txt
                                 :gtfs/feed-info-txt]))
 
+(def name->keyword
+  {"agency.txt" :gtfs/agency-txt
+   "stops.txt" :gtfs/stops-txt
+   "routes.txt" :gtfs/routes-txt
+   "trips.txt" :gtfs/trips-txt
+   "stop_times.txt" :gtfs/stop-times-txt
+   "calendar.txt" :gtfs/calendar-txt
+   "calendar_dates.txt" :gtfs/calendar-dates-txt
+   "shapes.txt" :gtfs/shapes-txt})
+
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for agency.txt
 
@@ -71,6 +81,9 @@
 (def stops-txt-header "stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding")
 
 (s/def :gtfs/wheelchair-boarding #{"0" "1" "2"})
+
+(s/def :gtfs/stop-lat double?)
+(s/def :gtfs/stop-lon double?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for routes.txt
@@ -151,6 +164,7 @@
 
 (s/def :gtfs/arrival-time time?)
 (s/def :gtfs/departure-time time?)
+(s/def :gtfs/stop-sequence nat-int?)
 
 (def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file"}
   stop-times-txt-fields
@@ -232,6 +246,31 @@
   [:gtfs/service-id :gtfs/date :gtfs/exception-type])
 
 (def calendar-dates-txt-header "service_id,date,exception_type")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;; Spec for shapes.txt
+
+(s/def :gtfs/shapes-txt
+  (s/coll-of :gtfs/shape))
+
+(s/def :gtfs/shape
+  (s/keys :req [:gtfs/shape-id
+                :gtfs/shape-pt-lat
+                :gtfs/shape-pt-lon
+                :gtfs/shape-pt-sequence]
+          :opt [:gtfs/shape-dist-traveled]))
+
+(s/def :gtfs/shape-pt-lat double?)
+(s/def :gtfs/shape-pt-lon double?)
+(s/def :gtfs/shape-pt-sequence nat-int?)
+(s/def :gtfs/shape-dist-traveled double?)
+
+(def shapes-txt-fields
+  [:gtfs/shape-id :gtfs/shape-pt-lat :gtfs/shape-pt-lon
+   :gtfs/shape-pt-sequence :gtfs/shape-idst-traveled])
+
+(def shapes-txt-header "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_idst_traveled")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; FIXME: support optional files as well
