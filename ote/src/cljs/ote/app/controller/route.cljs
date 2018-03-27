@@ -10,7 +10,8 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.localization :refer [tr tr-key]]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
