@@ -2,7 +2,11 @@
   "Application specific extensions to transit"
   (:require [cognitect.transit :as t]
             [ote.time :as time]
-            [ote.geo :as geo]))
+            [ote.geo :as geo]
+            #?(:cljs [goog.date]))
+  #?(:clj
+     (:import (java.time.format DateTimeFormatter)
+              (java.time LocalDate))))
 
 (def write-options
   {:handlers
@@ -17,7 +21,12 @@
 
          org.postgis.PGgeometry
          (t/write-handler (constantly "geo")
-                          geo/to-clj)])}})
+                          geo/to-clj)
+
+         java.time.LocalDate
+         (t/write-handler (constantly "localdate")
+                          (fn [^java.time.LocalDate d]
+                            (.format DateTimeFormatter/ISO_LOCAL_DATE d)))])}})
 
 (def read-options
   {:handlers {"time"
@@ -34,7 +43,11 @@
               "f" #?(:clj (t/read-handler #(BigDecimal. %))
                      :cljs js/parseFloat)
               "geo" #?(:clj (t/read-handler identity)
-                       :cljs identity)}})
+                       :cljs identity)
+
+              "localdate" #?(:clj (t/read-handler #(LocalDate/from
+                                                    (.parse DateTimeFormatter/ISO_LOCAL_DATE %)))
+                             :cljs goog.date/fromIsoString)}})
 
 (defn clj->transit
   "Convert given Clojure `data` to transit+json string."

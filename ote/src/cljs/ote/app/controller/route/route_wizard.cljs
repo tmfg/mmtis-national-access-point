@@ -528,13 +528,21 @@
                                    time/minutes-from-midnight->time)))]
     (calc-from-new-start (get-in app [:route ::transit/stops stop-idx key]))))
 
+(defn validate-stop-times [first-stop last-stop other-stops]
+  (and (time/valid-time? (::transit/departure-time first-stop))
+       (time/valid-time? (::transit/arrival-time last-stop))
+       (every? #(and (time/valid-time? (::transit/departure-time %))
+                     (time/valid-time? (::transit/arrival-time %))) other-stops)))
+
 (defn valid-stop-sequence?
   "Check if given route's stop sequence is valid. A stop sequence is valid
-  if it is not empty and the first and last stops have a departure and arrival time respectively."
+  if it is not empty and the first and last stops have a departure and arrival time respectively. And all other
+  stops have valid arrival and departure times."
   [{::transit/keys [stops] :as route}]
-  (and (not (empty? stops))
-       (::transit/departure-time (first stops))
-       (::transit/arrival-time (last stops))))
+  (let [first-stop (first stops)
+        last-stop (last stops)
+        other-stops (rest (butlast stops))]
+    (validate-stop-times first-stop last-stop other-stops)))
 
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
@@ -552,10 +560,7 @@
             (let [first-stop (first stops)
                   last-stop (last stops)
                   other-stops (rest (butlast stops))]
-              (and (time/valid-time? (::transit/departure-time first-stop))
-                   (time/valid-time? (::transit/arrival-time last-stop))
-                   (every? #(and (time/valid-time? (::transit/departure-time %))
-                                 (time/valid-time? (::transit/arrival-time %))) other-stops))))
+              (validate-stop-times first-stop last-stop other-stops)))
           trips))
 
 (defn validate-previous-steps

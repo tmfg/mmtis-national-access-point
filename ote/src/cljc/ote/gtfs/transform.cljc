@@ -26,7 +26,8 @@
 (defn- routes-txt [transport-operator-id routes]
   (for [{::transit/keys [id name route-type]} routes]
     {:gtfs/route-id id
-     :gtfs/route-short-name name
+     :gtfs/route-short-name ""
+     :gtfs/route-long-name name
      :gtfs/route-type (case route-type
                         :light-rail "0"
                         :subway "1"
