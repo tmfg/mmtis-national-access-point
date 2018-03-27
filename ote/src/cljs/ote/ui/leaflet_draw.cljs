@@ -12,6 +12,25 @@
 (defn layer-geojson [^js/L.Path layer]
   (.toGeoJSON layer))
 
+(defn install-map-event-handlers! [^js/L.Map m {:keys [add-features? on-create on-remove on-edit feature-group]}]
+  (.on m "draw:created"
+       #(let [^js/L.Path
+              layer (aget % "layer")]
+          (set-layer-id! layer)
+          (when add-features?
+            (.addLayer feature-group layer))
+          (on-create layer)))
+  (when on-remove
+    (.on m "draw:deleted"
+         #(let [^js/L.LayerGroup
+                layers (aget % "layers")]
+            (.eachLayer layers on-remove))))
+  (when on-edit
+    (.on m "draw:edited"
+         #(let [^js/L.LayerGroup
+                layers (aget % "layers")]
+            (.eachLayer layers on-edit)))))
+
 (defn install-draw-control!
    "Install Leaflet draw plugin to `this` map component.
 
@@ -44,10 +63,14 @@
   :on-edit    Called when a feature is edited.
               If not specified, editing is disabled.
 
+  :feature-group
+              An instance of L.FeatureGroup for features.
+              If nil, a new one will be created.
   "
   [this {:keys [on-create disabled-geometry-types ref-name
                 on-control-created add? localization
-                on-remove add-features? on-edit]}]
+                on-remove add-features? on-edit
+                feature-group] :as opts}]
 
   (set! (.-draw js/L.drawLocal)
         (clj->js (merge-with merge
@@ -56,7 +79,7 @@
 
   (let [^js/L.map
         m (aget this "refs" (or ref-name "leaflet") "leafletElement")
-        fg (new js/L.FeatureGroup)
+        fg (or feature-group (new js/L.FeatureGroup))
         draw-opts (clj->js
                    (into {}
                          (zipmap (or disabled-geometry-types
@@ -76,20 +99,4 @@
     (when add?
       (.addControl m draw-control))
     (.addLayer m fg)
-    (.on m "draw:created"
-         #(let [^js/L.Path
-                layer (aget % "layer")]
-            (set-layer-id! layer)
-            (when add-features?
-              (.addLayer fg layer))
-            (on-create layer)))
-    (when on-remove
-      (.on m "draw:deleted"
-           #(let [^js/L.LayerGroup
-                  layers (aget % "layers")]
-              (.eachLayer layers on-remove))))
-    (when on-edit
-      (.on m "draw:edited"
-           #(let [^js/L.LayerGroup
-                  layers (aget % "layers")]
-              (.eachLayer layers on-edit))))))
+    (install-map-event-handlers! m (assoc opts :feature-group fg))))
