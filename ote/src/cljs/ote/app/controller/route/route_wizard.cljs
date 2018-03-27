@@ -121,15 +121,15 @@
   need to add that new stop at the end of every trip and calculate arrival time."
   [stop-idx new-stop trips]
   (if (empty? trips)
-    []                                                      ;; Return empty array
-    (vec (map
-           (fn [trip]
-             (assoc trip ::transit/stop-times
-                         (conj (::transit/stop-times trip)
-                               {::transit/stop-idx       stop-idx
-                                ::transit/arrival-time   (::transit/arrival-time new-stop)
-                                ::transit/departure-time (::transit/departure-time new-stop)})))
-           trips))))
+    []
+    (mapv
+      (fn [trip]
+        (assoc trip ::transit/stop-times
+                    (conj (::transit/stop-times trip)
+                          {::transit/stop-idx       stop-idx
+                           ::transit/arrival-time   (::transit/arrival-time new-stop)
+                           ::transit/departure-time (::transit/departure-time new-stop)})))
+      trips)))
 
 (defn- set-saved-transfer-operator
   [app route]
@@ -181,15 +181,10 @@
   InitRoute
   (process-event [_ app]
     (-> app
+        (dissoc :route)
         (assoc-in [:route :step] :basic-info)
-        (assoc-in [:route ::transit/stops] [])
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])
         (assoc-in [:route ::transit/route-type] :ferry)
-        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))
-        (update-in [:route] dissoc :ote.db.modification/created :ote.db.modification/created-by
-                   :ote.db.modification/modified :ote.db.modification/modified-by
-                   ::transit/name ::transit/id)))
+        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -200,7 +195,7 @@
     ;; Add stop to current stop sequence
     (let [properties (js->clj (aget feature "properties"))
           stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
-          is-stop-added? (or (= (::transit/code (last stop-sequence)) (get properties "code")) false)
+          stop-exist-in-sequence? (or (= (::transit/code (last stop-sequence)) (get properties "code")) false)
           new-stop-idx (count stop-sequence)
           new-stop (dissoc (merge (into {}
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
@@ -212,10 +207,10 @@
                            ::transit/port-type
                            ::transit/port-type-name
                            ::transit/type)
-          new-stop-sequence (if is-stop-added?
+          new-stop-sequence (if stop-exist-in-sequence?
                               stop-sequence
                               (conj stop-sequence new-stop))
-          new-trip-sequence (if is-stop-added?
+          new-trip-sequence (if stop-exist-in-sequence?
                               (get-in app [:route ::transit/trips])
                               (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
       (-> app
