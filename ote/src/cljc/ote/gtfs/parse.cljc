@@ -6,7 +6,8 @@
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [ote.time :as time]
-            #?(:cljs [goog.string :as gstr])))
+            #?(:cljs [goog.string :as gstr])
+            [taoensso.timbre :as log]))
 
 (defmulti gtfs->clj (fn [spec-description value]
                       spec-description))
@@ -40,6 +41,14 @@
 (defmethod clj->gtfs 'time? [_ value]
   (time/format-time-full value))
 
+(defmethod gtfs->clj 'nat-int? [_ value]
+  (#?(:cljs js/parseInt
+      :clj Integer/parseInt) value))
+
+(defmethod gtfs->clj 'double? [_ value]
+  (#?(:cljs js/parseFloat
+      :clj Double/parseDouble) value))
+
 (def ^{:private true
        :doc "Memoized function for looking up a GTFS field spec (which may not exist).
 This is only called with GTFS field names and cannot grow unbounded."}
@@ -71,22 +80,31 @@ This is only called with GTFS field names and cannot grow unbounded."}
    :gtfs/calendar-txt {:header gtfs-spec/calendar-txt-header
                        :fields gtfs-spec/calendar-txt-fields}
    :gtfs/calendar-dates-txt {:header gtfs-spec/calendar-dates-txt-header
-                             :fields gtfs-spec/calendar-dates-txt-fields}})
+                             :fields gtfs-spec/calendar-dates-txt-fields}
+   :gtfs/shapes-txt {:header gtfs-spec/shapes-txt-header
+                     :fields gtfs-spec/shapes-txt-fields}})
 
-(comment
-  ;; PENDING: this requires more work, this assumes all fields
-  ;; are present in the same order we output them.
-  (defn parse-gtfs-file [gtfs-file-type content]
-    (let [{:keys [fields]} (file-info gtfs-file-type)]
-      (mapv
-       (fn [line]
-         (into {}
-               (remove nil?)
-               (map (fn [field value]
-                      (when-not (str/blank? value)
-                        [field (gtfs->clj (field-spec-description field) value)]))
-                    fields line)))
-       (rest (csv/read-csv content))))))
+(defn parse-gtfs-file [gtfs-file-type content]
+  (let [[header & rows] (csv/read-csv content)
+        {fields :fields} (file-info gtfs-file-type)
+        allowed-fields (into #{} fields)
+        content-fields (into []
+                             (map #(keyword "gtfs"
+                                            (-> %
+                                                (str/replace #"\uFEFF" "")
+                                                (str/replace #"_" "-"))))
+                             header)]
+    (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
+      (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields))
+    (mapv
+     (fn [line]
+       (into {}
+             (remove nil?
+                     (map (fn [field value]
+                             (when-not (str/blank? value)
+                               [field (gtfs->clj (field-spec-description field) value)]))
+                           content-fields line))))
+     (rest rows))))
 
 
 (defn unparse-gtfs-file [gtfs-file-type content]
