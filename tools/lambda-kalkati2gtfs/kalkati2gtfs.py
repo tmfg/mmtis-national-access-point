@@ -96,7 +96,12 @@ class KalkatiHandler(ContentHandler):
         for name in gtfs_files:
             self.write_values(name, getattr(self, '%s_fields' % name))
 
+    # Converts Kalkati <Station> to GTFS stop
     def add_stop(self, attrs):
+        if (not ('Y' in attrs or 'X' in attrs)):
+            raise KeyError('<Station> is missing X or Y coordinates. StationId: ' + attrs['StationId'])
+
+        # In Kalkati, Station coordinates ar in KKJ3 format. Convert them into WGS84.
         KKJNorthing = float(attrs['Y'])
         KKJEasting = float(attrs['X'])
         KKJLoc = {'P': KKJNorthing, 'I': KKJEasting}
@@ -214,15 +219,18 @@ class KalkatiHandler(ContentHandler):
             self.synonym = True
 
     def endElement(self, name):
+        route_id_prefix = 'route_'
+
         if name == 'Synonym':
             self.synonym = False
         elif name == 'Service':
             route_seq = '-'.join(self.stop_sequence)
+
             if route_seq in self.routes:
                 route_id = self.routes[route_seq]
             else:
                 self.route_count += 1
-                route_id = str(self.route_count)
+                route_id = route_id_prefix + str(self.route_count)
                 self.routes[route_seq] = route_id
                 self.add_route(route_id)
             self.add_trip(route_id)
