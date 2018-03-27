@@ -80,9 +80,11 @@ class KalkatiHandler(ContentHandler):
     delivery = {}
     synonym = False
     stop_sequence = None
-    trip_id = None
+    kal_service_id = None
+    trips = None
     route_agency_id = None
-    route_name = None
+    route_short_name = None
+    route_long_name = None
     service_validities = None
     service_mode = None
     transmodes = {}
@@ -153,38 +155,52 @@ class KalkatiHandler(ContentHandler):
                           (fd, ed))
 
     def add_stop_time(self, attrs):
-        self.stop_sequence.append(attrs['StationId'])
+        for trip in self.trips:
+            station_idx = int(attrs['Ix'])
+            first_stop = trip['Firststop']
+            last_stop = trip['Laststop']
 
-        departure_time = None
-        arrival_time = None
+            if (first_stop and (station_idx < int(first_stop))) or (last_stop and (station_idx > int(last_stop))):
+                continue
 
-        if 'Departure' in attrs:
-            departure_time = ':'.join((attrs['Departure'][:2],
-                                       attrs['Departure'][2:], '00'))
+            self.stop_sequence.append(attrs['StationId'])
 
-        # Arrival (optional) defines the arrival time (in local time) to the stop. If arrival is not set, it is expected to be the same as departure time.
-        if 'Arrival' in attrs:
-            arrival_time = ':'.join((attrs['Arrival'][:2],
-                                     attrs['Arrival'][2:], '00'))
-        else:
-            arrival_time = departure_time
+            departure_time = None
+            arrival_time = None
 
-        self.write_values('stop_times', (self.trip_id, arrival_time,
-                                         departure_time, attrs['StationId'], attrs['Ix']))
+            if 'Departure' in attrs:
+                departure_time = ':'.join((attrs['Departure'][:2],
+                                           attrs['Departure'][2:], '00'))
+
+            # Arrival (optional) defines the arrival time (in local time) to the stop.
+            # If arrival is not set, it is expected to be the same as departure time.
+            if 'Arrival' in attrs:
+                arrival_time = ':'.join((attrs['Arrival'][:2],
+                                         attrs['Arrival'][2:], '00'))
+            else:
+                arrival_time = departure_time
+
+            self.write_values('stop_times', (trip['id'], arrival_time,
+                                             departure_time, attrs['StationId'], attrs['Ix']))
 
     def add_route(self, route_id):
         route_type = '3'  # fallback is bus
+
         if self.service_mode in self.transmodes:
             trans_mode = self.transmodes[self.service_mode]
+
             if trans_mode in KALKATI_MODE_TO_GTFS_MODE:
                 route_type = KALKATI_MODE_TO_GTFS_MODE[trans_mode]
 
-        self.write_values('routes', (route_id, self.route_agency_id,
-                                     '', self.route_name.replace(',', '.'), route_type))
+        self.write_values('routes', (route_id,
+                                     self.route_agency_id,
+                                     self.route_short_name.replace(',', '.'),
+                                     self.route_long_name.replace(',', '.'),
+                                     route_type))
 
     def add_trip(self, route_id):
-        for service_id in self.service_validities:
-            self.write_values('trips', (route_id, service_id, self.trip_id,))
+        for service_id, trip in zip(self.service_validities, self.trips):
+            self.write_values('trips', (route_id, service_id, trip['id']))
 
     def startElement(self, name, attrs):
         if not self.synonym and name == 'Delivery':
@@ -202,16 +218,26 @@ class KalkatiHandler(ContentHandler):
         elif name == 'Footnote':
             self.add_calendar(attrs)
         elif name == 'Service':
+            self.kal_service_id = attrs['ServiceId']
             self.service_count += 1
-            self.trip_id = attrs['ServiceId']
+            self.trips = []
             self.service_validities = []
             self.stop_sequence = []
         elif name == 'ServiceNbr':
             self.route_agency_id = attrs['CompanyId']
-            self.route_name = attrs.get('Name', 'Unnamed')
+            self.route_short_name = attrs.get('Variant')
+            self.route_long_name = attrs.get('Name', 'Unnamed')
         elif name == 'ServiceValidity':
             self.service_validities.append(attrs['FootnoteId'])
+            self.trips.append({
+                'id': 't_%s_%s' % (str(self.kal_service_id), str(len(self.trips))),
+                'Firststop': attrs.get('Firststop'),
+                'Laststop': attrs.get('Laststop')
+            })
         elif name == 'ServiceTrnsmode':
+            # Kalkati allows changing transport modes between stations in one route.
+            # vs. GTFS allows only one transmode per route.
+            # So, we'll have to assume that there is only one transmode defined in the Kalkati file and use it.
             self.service_mode = attrs['TrnsmodeId']
         elif name == 'Stop':
             self.add_stop_time(attrs)
@@ -219,8 +245,6 @@ class KalkatiHandler(ContentHandler):
             self.synonym = True
 
     def endElement(self, name):
-        route_id_prefix = 'route_'
-
         if name == 'Synonym':
             self.synonym = False
         elif name == 'Service':
@@ -230,14 +254,17 @@ class KalkatiHandler(ContentHandler):
                 route_id = self.routes[route_seq]
             else:
                 self.route_count += 1
-                route_id = route_id_prefix + str(self.route_count)
+                route_id = 'r_' + str(self.route_count)
                 self.routes[route_seq] = route_id
                 self.add_route(route_id)
+
             self.add_trip(route_id)
-            self.trip_id = None
+            self.kal_service_id = None
+            self.trips = None
             self.stop_sequence = None
             self.route_agency_id = None
-            self.route_name = None
+            self.route_short_name = None
+            self.route_long_name = None
             self.service_validities = None
             self.service_mode = None
 
