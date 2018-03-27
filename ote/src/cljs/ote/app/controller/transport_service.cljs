@@ -35,7 +35,8 @@
     ::t-service/companies-csv-url
     ::t-service/company-source
     ::t-service/company-csv-filename
-    :csv-count})
+    :csv-count
+    ::t-service/transport-type})
 
 (defn service-type-from-sub-type
       "Returns service type keyword based on sub-type."

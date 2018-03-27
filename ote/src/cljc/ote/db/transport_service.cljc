@@ -20,6 +20,7 @@
 
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_provider_type" ::transport_provider_type (specql.transform/transform (specql.transform/to-keyword))]
+  ["transport_type" ::transport_type (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_service_subtype" ::transport_service_subtype (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_tool" ::accessibility_tool (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_info_facility" ::accessibility_info_facility (specql.transform/transform (specql.transform/to-keyword))]
