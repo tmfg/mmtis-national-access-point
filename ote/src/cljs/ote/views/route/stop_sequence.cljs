@@ -49,39 +49,76 @@
        (-> route :custom-stops last :name)]
       [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]]))
 
+;;;;;;
+;; Unfortunately controlling a stateful Leaflet Draw control is difficult.
+;; We need to reuse an instance if the map is unmounted and a new map created.
+;; Keep track of things here, we don't want this in the app state.
+(def leaflet-draw-control (atom nil))
+(def deleting? (atom false))
+
 (defn- route-map [e! route]
   (r/create-class
    {:component-did-mount
     (fn [this]
-      (let [deleting? (atom false)
-            ^js/L.Map
-            m (aget this "refs" "stops-map" "leafletElement")]
+      (let [^js/L.Map
+            m (aget this "refs" "stops-map" "leafletElement")
+
+            fg (js/L.FeatureGroup.)
+
+            draw-opts
+            {:add? true
+             :ref-name "stops-map"
+             :feature-group fg
+             :on-control-created
+             #(do (reset! leaflet-draw-control
+                          {:control %
+                           :feature-group fg})
+                  (swap! rw/clear-ui-state conj
+                         (fn []
+                           ;; Clear on init route so that draw control is recreated
+                           ;; when a new route is being edited.
+                           (reset! leaflet-draw-control nil))))
+
+             ;; Disable all other geometry types
+             :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
+             :on-create (fn [^js/L.Path layer]
+                          (let [id (leaflet-draw/layer-id layer)]
+                            (.on layer "click"
+                                 (fn [_]
+                                   (when-not @deleting?
+                                     (e! (rw/->AddCustomStop id)))))
+                            (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
+             :on-remove #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
+             :on-edit #(e! (rw/->UpdateCustomStopGeometry
+                            (leaflet-draw/layer-id %)
+                            (leaflet-draw/layer-geojson %)))
+
+             :add-features? true
+             :localization {:toolbar {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
+                            :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}}]
 
         ;; Keep track if we are in delete mode
         (.on m "draw:deletestart" #(reset! deleting? true))
         (.on m "draw:deletestop" #(reset! deleting? false))
 
-        (leaflet-draw/install-draw-control!
-            this
-          {:add? true
-           :ref-name "stops-map"
-           ;; Disable all other geometry types
-           :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
-           :on-create (fn [^js/L.Path layer]
-                        (let [id (leaflet-draw/layer-id layer)]
-                          (.on layer "click"
-                               (fn [_]
-                                 (when-not @deleting?
-                                   (e! (rw/->AddCustomStop id)))))
-                          (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
-           :on-remove #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
-           :on-edit #(e! (rw/->UpdateCustomStopGeometry
-                          (leaflet-draw/layer-id %)
-                          (leaflet-draw/layer-geojson %)))
+        (if-let [dc @leaflet-draw-control]
+          ;; Reuse existing
+          (do
+            (.addLayer m (:feature-group dc))
+            (.addControl m (:control dc))
+            (leaflet-draw/install-map-event-handlers! m draw-opts))
 
-           :add-features? true
-           :localization {:toolbar {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
-                          :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}})))
+          ;; Create and install a new control
+          (leaflet-draw/install-draw-control! this draw-opts))))
+
+    :component-will-unmount
+    (fn [this]
+      (let [^js/L.Map
+            m (aget this "refs" "stops-map" "leafletElement")
+            {:keys [control feature-group]} @leaflet-draw-control]
+        (.removeControl m control)
+        (.removeLayer m feature-group)))
+
     :reagent-render
     (fn [e! route]
       [:div.stops-map {:style {:width "50%"}}
