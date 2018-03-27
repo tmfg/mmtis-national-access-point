@@ -1,7 +1,7 @@
 (ns ote.views.route.stop-sequence
   "Route wizard: defining a stop sequence"
   (:require [ote.ui.leaflet :as leaflet]
-            [ote.app.controller.route :as rc]
+            [ote.app.controller.route.route-wizard :as rw]
             [ote.ui.form-fields :as form-fields]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
@@ -25,7 +25,7 @@
                         :title (aget point "properties" "name")})
       (.on  "click"
             (fn [_]
-              (e! (rc/->AddStop point))))))
+              (e! (rw/->AddStop point))))))
 
 (defn- flip-coords [[c1 c2]]
   [c2 c1])
@@ -40,12 +40,12 @@
                  [ui/flat-button
                   {:label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
                    :primary true
-                   :on-click #(e! (rc/->CloseCustomStopDialog))}])]}
+                   :on-click #(e! (rw/->CloseCustomStopDialog))}])]}
      [:span
       [form-fields/field {:type :string
                           :label (tr [:route-wizard-page :stop-sequence-custom-dialog-name])
-                          :update! #(e! (rc/->UpdateCustomStop {:name %}))
-                          :on-enter #(e! (rc/->CloseCustomStopDialog))}
+                          :update! #(e! (rw/->UpdateCustomStop {:name %}))
+                          :on-enter #(e! (rw/->CloseCustomStopDialog))}
        (-> route :custom-stops last :name)]
       [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]]))
 
@@ -72,10 +72,10 @@
                           (.on layer "click"
                                (fn [_]
                                  (when-not @deleting?
-                                   (e! (rc/->AddCustomStop id)))))
-                          (e! (rc/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
-           :on-remove #(e! (rc/->RemoveCustomStop (leaflet-draw/layer-id %)))
-           :on-edit #(e! (rc/->UpdateCustomStopGeometry
+                                   (e! (rw/->AddCustomStop id)))))
+                          (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
+           :on-remove #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
+           :on-edit #(e! (rw/->UpdateCustomStopGeometry
                           (leaflet-draw/layer-id %)
                           (leaflet-draw/layer-geojson %)))
 
@@ -122,16 +122,16 @@
              "-"
              [form-fields/field
               {:type :time
-               :update! #(e! (rc/->UpdateStop i {::transit/arrival-time %}))}
+               :update! #(e! (rw/->UpdateStop i {::transit/arrival-time %}))}
               arrival-time])]
           [:td {:style {:text-align "center"}}
            (if (= (inc i) (count stop-sequence))
                  "-"
                  [form-fields/field
                   {:type :time
-                   :update! #(e! (rc/->UpdateStop i {::transit/departure-time %}))}
+                   :update! #(e! (rw/->UpdateStop i {::transit/departure-time %}))}
                   departure-time])]
-          [:td [ui/icon-button {:on-click #(e! (rc/->DeleteStop i))}
+          [:td [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
                 [ic/action-delete]]]])
        stop-sequence))]
     (when (empty? stop-sequence)
@@ -141,7 +141,7 @@
          [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])]])
 
 (defn stop-sequence [e! {route :route :as app}]
-  (e! (rc/->LoadStops))
+  (e! (rw/->LoadStops))
   (fn [e! {route :route :as app}]
     (if (nil? (get route :stops))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]

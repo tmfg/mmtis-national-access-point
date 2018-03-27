@@ -1,4 +1,4 @@
-(ns ote.app.controller.route
+(ns ote.app.controller.route.route-wizard
   "Route based traffic controller"
   (:require [tuck.core :as tuck]
             [ote.communication :as comm]
@@ -43,6 +43,7 @@
 
 ;; Edit times
 (defrecord InitRouteTimes []) ; initialize route times based on stop sequence
+(defrecord CalculateRouteTimes [])
 (defrecord NewStartTime [time])
 (defrecord AddTrip [])
 (defrecord EditStopTime [trip-idx stop-idx form-data])
@@ -115,14 +116,31 @@
           trips)]
     new-calendars))
 
+(defn calculate-trip-sequence
+  "User can add a new stop for the route after trips and calendars are created. In these situations, we
+  need to add that new stop at the end of every trip and calculate arrival time."
+  [stop-idx new-stop trips]
+  (if (empty? trips)
+    []
+    (mapv
+      (fn [trip]
+        (assoc trip ::transit/stop-times
+                    (conj (::transit/stop-times trip)
+                          {::transit/stop-idx       stop-idx
+                           ::transit/arrival-time   (::transit/arrival-time new-stop)
+                           ::transit/departure-time (::transit/departure-time new-stop)})))
+      trips)))
+
 (defn- set-saved-transfer-operator
   [app route]
   (assoc app :transport-operator
-         (:transport-operator
-          (some #(when (= (::transit/transport-operator-id route)
-                          (get-in % [:transport-operator ::t-operator/id]))
-                   %)
-                (:transport-operators-with-services app)))))
+             (:transport-operator
+               (some #(when (= (::transit/transport-operator-id route)
+                               (get-in % [:transport-operator ::t-operator/id]))
+                        %)
+                     (:transport-operators-with-services app)))))
+
+(declare new-stop-time)
 
 (extend-protocol tuck/Event
   LoadStops
@@ -162,12 +180,11 @@
 
   InitRoute
   (process-event [_ app]
-    (update app :route assoc
-            ::transit/stops []
-            ::transit/trips []
-            ::transit/service-calendars []
-            ::transit/route-type :ferry
-            ::transit/transport-operator-id (get-in app [:transport-operator ::t-operator/id])))
+    (-> app
+        (dissoc :route)
+        (assoc-in [:route :step] :basic-info)
+        (assoc-in [:route ::transit/route-type] :ferry)
+        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
 
   EditRoute
   (process-event [{form-data :form-data} app]
@@ -178,6 +195,8 @@
     ;; Add stop to current stop sequence
     (let [properties (js->clj (aget feature "properties"))
           stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+          stop-exist-in-sequence? (or (= (::transit/code (last stop-sequence)) (get properties "code")) false)
+          new-stop-idx (count stop-sequence)
           new-stop (dissoc (merge (into {}
                                         (map #(update % 0 (partial keyword "ote.db.transit")))
                                         properties)
@@ -188,13 +207,15 @@
                            ::transit/port-type
                            ::transit/port-type-name
                            ::transit/type)
-          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get  properties "code"))
+          new-stop-sequence (if stop-exist-in-sequence?
                               stop-sequence
-                              (conj stop-sequence new-stop))]
+                              (conj stop-sequence new-stop))
+          new-trip-sequence (if stop-exist-in-sequence?
+                              (get-in app [:route ::transit/trips])
+                              (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
       (-> app
-        (assoc-in [:route ::transit/stops] new-stop-sequence)
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] []))))
+          (assoc-in [:route ::transit/stops] new-stop-sequence)
+          (assoc-in [:route ::transit/trips] new-trip-sequence))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -286,19 +307,21 @@
                                 (contains? stop ::transit/arrival-time))
                          (assoc new-stop
                            ::transit/departure-time (::transit/arrival-time new-stop))
-                         new-stop))))
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+                         new-stop))))))
 
   DeleteStop
   (process-event [{idx :idx} app]
     (-> app
         (update-in [:route ::transit/stops]
                    (fn [stops]
-                     (into (subvec stops 0 idx)
-                           (subvec stops (inc idx)))))
-        (assoc-in [:route ::transit/trips] [])
-        (assoc-in [:route ::transit/service-calendars] [])))
+                     (into (subvec (vec stops) 0 idx)
+                           (subvec (vec stops) (inc idx)))))
+        (update-in [:route ::transit/trips] (flip mapv)
+          (fn [trip]
+            (update trip ::transit/stop-times
+                    (fn [stop-times]
+                      (into (subvec (vec stop-times) 0 idx)
+                            (subvec (vec stop-times) (inc idx)))))))))
 
 
   EditServiceCalendar
@@ -369,6 +392,22 @@
                     ::transit/service-calendar-idx 0}])
         ;; Make sure that we have an empty associated calendar for the trip
         (assoc-in [:route ::transit/service-calendars] [{}])))
+
+  CalculateRouteTimes
+  (process-event [_ app]
+    (let [first-departure-time (::transit/departure-time (first (::transit/stop-times (first (get-in app [:route ::transit/trips])))))]
+      (update-in app [:route ::transit/trips] (flip mapv)
+                 (fn [trip]
+                   (update trip ::transit/stop-times
+                           (fn [stop-times]
+                             (vec
+                               (map-indexed
+                                 (fn [stop-idx {::transit/keys [arrival-time departure-time] :as stop-time}]
+                                   {::transit/arrival-time   (or arrival-time
+                                                                 (new-stop-time app stop-idx first-departure-time trip ::transit/arrival-time))
+                                    ::transit/departure-time (or departure-time
+                                                                 (new-stop-time app stop-idx first-departure-time trip ::transit/departure-time))})
+                                 stop-times))))))))
 
   NewStartTime
   (process-event [{time :time} app]
@@ -468,6 +507,21 @@
   (process-event [_ app]
     (routes/navigate! :routes)
     (dissoc app :route)))
+
+(defn new-stop-time
+  "Calculate new stop time based on trip start time."
+  [app stop-idx first-departure-time current-trip key]
+  (let [current-start-time (time/minutes-from-midnight (::transit/departure-time
+                                           (first (::transit/stop-times current-trip))))
+        new-start-time (time/minutes-from-midnight first-departure-time)
+        calc-from-new-start (fn [stop-time]
+                              (when stop-time
+                               (-> stop-time
+                                   time/minutes-from-midnight
+                                   (- new-start-time)
+                                   (+ current-start-time)
+                                   time/minutes-from-midnight->time)))]
+    (calc-from-new-start (get-in app [:route ::transit/stops stop-idx key]))))
 
 (defn validate-stop-times [first-stop last-stop other-stops]
   (and (time/valid-time? (::transit/departure-time first-stop))
