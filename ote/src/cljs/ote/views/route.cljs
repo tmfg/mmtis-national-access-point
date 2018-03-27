@@ -109,7 +109,7 @@
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rc/->SaveToDb true)))}
-         "Tallenna ja poistu"]
+         (tr [:buttons :save-exit])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}
@@ -133,7 +133,7 @@
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rc/->SaveToDb true)))}
-         "Tallenna ja poistu"]
+         (tr [:buttons :save-exit])]
         [buttons/cancel {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rc/->CancelRoute)))}
