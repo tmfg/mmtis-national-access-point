@@ -206,19 +206,19 @@
           geometry (vec (aget feature "geometry" "coordinates"))
           properties (js->clj (aget feature "properties"))
           new-custom-stop (merge (into {}
-                            (map #(update % 0 (partial keyword "ote.db.transit")))
-                            properties)
-                            {::transit/location geometry})
-          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get  properties "code"))
+                                       (map #(update % 0 (partial keyword "ote.db.transit")))
+                                       properties)
+                                 {::transit/location geometry})
+          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get properties "code"))
                               stop-sequence
                               (conj stop-sequence new-custom-stop))
-          new-stop {"geometry" {"type" "Point", "coordinates" geometry}
-                    "properties"		properties
-                    "type"		"Feature"}
+          new-stop {"geometry"   {"type" "Point", "coordinates" geometry}
+                    "properties" properties
+                    "type"       "Feature"}
           stops (get-in app [:route :stops "features"])]
       (-> app
           (assoc-in [:route :stops "features"] (conj stops new-stop))
-          (assoc-in  [:route ::transit/stops] new-stop-sequence))))
+          (assoc-in [:route ::transit/stops] new-stop-sequence))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
@@ -465,7 +465,7 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (let [exit-wizard? (get-in app [:route :exit-wizard?])
-          app (assoc app :flash-message "Merireitti tallennettu")
+          app (assoc app :flash-message (tr [:route-wizard-page :save-success]))
           app (if exit-wizard?
                (dissoc app :route)
                app)]
@@ -479,7 +479,7 @@
   (process-event [{response :response} app]
     (.error js/console "Save route failed:" (pr-str response))
     (assoc app
-      :flash-message-error "Reitin tallennus epäonnistui"))
+      :flash-message-error (tr [:route-wizard-page :save-failure])))
 
   CancelRoute
   (process-event [_ app]

@@ -660,6 +660,8 @@
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
+  :save-success "Reitin tallennus onnistui."
+  :save-failure "Reitin tallennus epäonnistui"
   }
 
  :price-dialog
