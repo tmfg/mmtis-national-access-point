@@ -339,9 +339,6 @@
   :route-calendar-clear "Tyhjennä kalenteri"
   }
 
-
-
-
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
@@ -360,7 +357,7 @@
   :ote.db.transport-service/sub-type
   {:terminal     "Asemat, satamat ja muut terminaalit"
    :taxi         "Taksiliikenne (tieliikenne)"
-   :request      "Tilausajoliikenne ja muu kutsuun perustuva liikenne"
+   :request      "Tilausliikenne ja muu kutsuun perustuva liikenne"
    :schedule     "Säännöllinen aikataulun mukainen liikenne"
    :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking      "Yleiset kaupalliset pysäköintipalvelut"}
@@ -687,7 +684,7 @@
      jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
      Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
      tyyppiä.
-     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausliikenne ja muu kutsuun perustuva\" ja \"Taksiliikenne\"."}
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
@@ -845,10 +842,8 @@
                    true "Kyllä"
                    false "Ei"
 
-                   ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
                    "taxi"     "Taksiliikenne (tieliikenne)"
-                   "request"  "Tilausajoliikenne ja muu kutsuun perustuva liikenne"
-                   ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
+                   "request"  "Tilausliikenne ja muu kutsuun perustuva liikenne"
                    "schedule" "Säännöllinen aikataulun mukainen liikenne"
                    "terminal" "Asemat, satamat ja muut terminaalit"
                    "rentals"  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"

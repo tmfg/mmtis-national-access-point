@@ -28,7 +28,7 @@
   :select-transport-operator      "Select transport operator"
 
   :transport-service-common
-  {:ote.db.transport-service/transport-type "Palvelun liikennemuoto"
+  {:ote.db.transport-service/transport-type "Transport type"
    :ote.db.transport-service/name "Service name"
    :ote.db.transport-service/accessibility-tool        "Accessibility tools"
    :ote.db.transport-service/accessibility-description "Accessibility description"
@@ -235,7 +235,7 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:transport-type-info "Ilmoita tässä osiossa liikkumispalvelusi liikennemuoto tai liikennemuodot. Tätä tietoa hyödynnetään Palvelukatalogi-sivun hakutoiminnoissa."
+ {:transport-type-info "Select here the type or types of your transport service. This information is used for a service catalog page search functionality."
   :name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
   :external-interfaces-intro "If your service does not have machine-readable interfaces leave this section empty and move to the next section."
   :external-interfaces-intro-1 "Fill in at least machine-readable route and timetable information. If you do not have the means to produce machine-readable route and timetable infromation, you can do so in FTA's"
@@ -339,17 +339,13 @@
   :route-calendar-clear "Clear calendar"
   }
 
-
-
-
-
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
-  {:road      "Tieliikenne"
-   :rail      "Rautatieliikenne"
-   :sea       "Merenkulku"
-   :aviation  "Ilmailu"}
+  {:road      "Road traffic"
+   :rail      "Rail traffic"
+   :sea       "Sea traffic"
+   :aviation  "Air traffic"}
 
   :ote.db.transport-service/type
   {:terminal                 "Stations, ports and other terminals"
@@ -360,9 +356,9 @@
 
   :ote.db.transport-service/sub-type
   {:terminal      "Stations, ports and other terminals"
-   :taxi          "Taxi service (passenger transportation)"
-   :request       "Charter traffic, busses (passenger transportation)"
-   :schedule      "Regular scheduled traffic (passenger transportation)"
+   :taxi          "Taxi service (road traffic)"
+   :request       "Charter traffic and other request based traffic"
+   :schedule      "Regular scheduled traffic"
    :rentals       "Vehicle rentals and commercial shared vehicle solutions"
    :parking       "General commercial parking services"}
 
@@ -680,7 +676,7 @@
   :transport-service-type-selection-help-text "You can save the essential data of your transport service by first choosing the mode of the transport service and the transport operator, and after that by filling the form that opens up to your screen. If you provide many types of transport services, fill up an own form from each service."
   :transport-service-type-selection-help-example "Example: There is a transpor operator \"Example Bus Ltd.\", which provides two different transport services, \"Example Bus Charter Traffic\" in Tampere and \"Example Bus Taxi Service\" in Helsinki. The company has to fill up a separate form from each of the services.
 
- In this example the company should fill forms named \"Charter traffic, busses\" ja \"Taxi service\"."
+ In this example the company should fill forms named \"Charter traffic and other request based traffic\" ja \"Taxi service\"."
   :transport-service-type-brokerage-help-text "If you are a brokering service, choose from the list below
  the mode of transport service, which relates to the service brokered."}
 
@@ -839,14 +835,12 @@
                    true "Yes"
                    false "No"
 
-                   ;; Subtypes and types - HOX "Other" is translated as "Other" so we need to change something to get it to work properly
-                   "taxi" "Taxi service (passenger transportation)"
-                   "request" "Charter traffic, busses (passenger transportation)"
-                   ;"other" "Other charter traffic (passenger transportation)"
+                   "taxi" "Taxi service (road traffic)"
+                   "request" "Charter traffic and other request based traffic"
                    "schedule" "Regular scheduled traffic (passenger transportation)"
-                   "terminal"                 "Stations, ports and other terminals"
-                   "rentals"                  "Vehicle rentals and commercial shared vehicle solutions"
-                   "parking"                  "General commercial parking services"
+                   "terminal" "Stations, ports and other terminals"
+                   "rentals" "Vehicle rentals and commercial shared vehicle solutions"
+                   "parking" "General commercial parking services"
 
                    ;; accessibility tools
                    "wheelchair" "Wheelchair"

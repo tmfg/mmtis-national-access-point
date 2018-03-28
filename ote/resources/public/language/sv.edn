@@ -29,7 +29,7 @@
   :select-transport-operator      "Välj tjänsteproducent"
 
   :transport-service-common
-  {:ote.db.transport-service/transport-type "Palvelun liikennemuoto"
+  {:ote.db.transport-service/transport-type "Trafikslag"
    :ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/accessibility-tool        "Tillgänglighetsredskap"
    :ote.db.transport-service/accessibility-description "Beskrivning av tjänstens tillgänglighet"
@@ -240,7 +240,7 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:transport-type-info "Ilmoita tässä osiossa liikkumispalvelusi liikennemuoto tai liikennemuodot. Tätä tietoa hyödynnetään Palvelukatalogi-sivun hakutoiminnoissa."
+ {:transport-type-info "I denna sektion anges mobilitetstjänstens trafikslag. Trafikslagsinformationen används i NAP-katalogens sökfunktion."
   :name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
   ;; Needs a new translation
   :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
@@ -347,14 +347,13 @@
   :route-calendar-clear "Tyhjennä kalenteri"
   }
 
-
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
-  {:road      "Tieliikenne"
-   :rail      "Rautatieliikenne"
-   :sea       "Merenkulku"
-   :aviation  "Ilmailu"}
+  {:road      "Vägtrafik"
+   :rail      "Tågtrafik"
+   :sea       "Sjötrafik"
+   :aviation  "Luftfart"}
 
   :ote.db.transport-service/type
   {:terminal                 "Stationer, hamnar och övriga terminaler"
@@ -365,10 +364,10 @@
 
   :ote.db.transport-service/sub-type
   {:terminal    "Stationer, hamnar och övriga terminaler"
-   :taxi        "Taxitjänst (persontransport)"
-   :request     "Abbonerad trafik, buss (persontransport)"
-   :schedule    "Regelbunden ruttbaserad trafik (persontransport)"
-   :rentals     "Fordonsuthyrning och komersiella samanvändningstjänster"
+   :taxi        "Taxitjänst (i vägtrafik)"
+   :request     "Abbonerad trafik eller annan anropsstyrd trafik"
+   :schedule    "Regelbunden ruttbaserad trafik"
+   :rentals     "Fordonsuthyrning och kommersiella samanvändningstjänster"
    :parking     "Allmänna kommersiella parkeringstjänster"}
 
   :ote.db.transport-service/payment-methods
@@ -682,7 +681,7 @@
                 Fyll i en ny blankett för varje tjänst."
   :transport-service-type-brokerage-help-text "Gör på samma sätt om du erbjuder en förmedlingstjänst."
   :transport-service-type-selection-help-example "Exempel: Tjänsteproducenten \"RapidBus Oy\" har två olika tjänster \"Rapidbus Tilausbussit\" och \"Rapidbus Taksipalvelu\"
-Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Beställningstrafik med buss\" och en andra blankett \"Taxitjänst\"."}
+Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Abbonerad trafik eller annan anropsstyrd trafik\" och en andra blankett \"Taxitjänst\"."}
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
@@ -840,14 +839,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    true "Ja"
                    false "Nej"
 
-                   ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taxitjänst (persontransport)"
-                   "request" "Abbonerad trafik, buss (persontransport)"
-                   ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Regelbunden ruttbaserad trafik (persontransport)"
-                   "terminal"                 "Stationer, hamnar och övriga terminaler"
-                   "rentals"                  "Fordonsuthyrning och komersiella samanvändningstjänster"
-                   "parking"                  "Allmänna kommersiella parkeringstjänster"
+                   "taxi" "Taxitjänst (i vägtrafik)"
+                   "request" "Abbonerad trafik eller annan anropsstyrd trafik"
+                   "schedule" "Regelbunden ruttbaserad trafik"
+                   "terminal" "Stationer, hamnar och övriga terminaler"
+                   "rentals" "Fordonsuthyrning och komersiella samanvändningstjänster"
+                   "parking" "Allmänna kommersiella parkeringstjänster"
 
                    ;; accessibility tools
                    "wheelchair" "Rullstol"
