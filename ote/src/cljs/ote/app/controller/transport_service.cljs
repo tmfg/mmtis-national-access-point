@@ -15,7 +15,14 @@
             [testdouble.cljs.csv :as csv]))
 
 (defn new-transport-service [app]
-      (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type}))
+  (let [app (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type})
+        sub-type (get-in app[:transport-service ::t-service/sub-type])
+        pre-set-transport-type (fn [app service-type options]
+                                 (assoc-in app [:transport-service service-type ::t-service/transport-type] options))]
+    (cond
+      (= sub-type :taxi) (pre-set-transport-type app ::t-service/passenger-transportation #{:road})
+      (= sub-type :parking) (pre-set-transport-type app ::t-service/parking #{:road})
+      :else app)))
 
 (def service-level-keys
   #{::t-service/contact-address

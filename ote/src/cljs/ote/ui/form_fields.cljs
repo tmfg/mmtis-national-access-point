@@ -737,10 +737,12 @@
      (checkbox-container update! table? label warning error style checked?)]
     (checkbox-container update! table? label warning error style checked?)))
 
-(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header?]} data]
+(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled?]} data]
   ;; Options:
   ;; :header? Show or hide the header element above the checkbox-group. Default: true.
-  (let [selected (set (or data #{}))]
+  ;; :option-enabled? Is option checkable. Default: true
+  (let [selected (set (or data #{}))
+        option-enabled? (or option-enabled? (constantly true))]
     [:div.checkbox-group
      (when (not (false? header?))
        [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
@@ -753,6 +755,9 @@
            [ui/checkbox {:key      i
                          :label    (when-not table? (show-option option))
                          :checked  checked?
+                         :disabled (not (option-enabled? option))
+                         :labelStyle (when (not (option-enabled? option))
+                                       style-base/disabled-color)
                          :on-check #(update! ((if checked? disj conj) selected option))}]))
        options))
      (when (or error warning)
