@@ -17,7 +17,15 @@
     [ote.views.route.service-calendar :as route-service-calendar]
     [ote.style.form :as style-form]))
 
-(defn exception-icon [e! stop-type drop-off-type pickup-type stop-idx trip-idx]
+(defn- icon-for-type [type]
+  (case type
+    :regular [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
+    :not-available [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
+    :phone-agent [ic/communication-call {:style style-route/selected-exception-icon}]
+    :coordinate-with-driver [ic/social-people {:style style-route/selected-exception-icon}]
+    [ic/maps-pin-drop {:style style-route/exception-icon}]))
+
+(defn exception-icon [e! stop-type type stop-idx trip-idx]
   [:div
    [ui/icon-menu
     {:icon-button-element (r/as-element
@@ -27,19 +35,7 @@
                                            :height  24}
                               :icon-style {:height 24
                                            :width  24}}
-                             (cond
-                               (and (nil? drop-off-type) (nil? pickup-type))
-                               [ic/communication-call {:style style-route/exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :regular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :regular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
-                               :else [ic/communication-call {:style style-route/exception-icon}])
-                             ])}
+                             (icon-for-type type)])}
     [ui/menu-item {:primary-text (if (= "arrival" stop-type)
                                    (tr [:route-wizard-page :trip-stop-arrival-exception-default])
                                    (tr [:route-wizard-page :trip-stop-departure-exception-default]))
@@ -147,7 +143,7 @@
                                     :update! #(update! {::transit/arrival-time %})}
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                [exception-icon e! "arrival" pickup-type drop-off-type stop-idx row-idx]]])
+                [exception-icon e! "arrival" drop-off-type stop-idx row-idx]]])
            (if (= stop-idx (dec stop-count))
              ^{:key (str stop-idx "-last")}
              [:td style " - "]
@@ -158,7 +154,7 @@
                                     :update! #(update! {::transit/departure-time %})}
                          departure-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                [exception-icon e! "departure" pickup-type drop-off-type stop-idx row-idx]]]))))
+                [exception-icon e! "departure" pickup-type stop-idx row-idx]]]))))
      stops)])
 
 (defn trips-list [e! route app]
