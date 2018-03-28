@@ -13,7 +13,7 @@
      [form/form {:update! #(e! (rw/->EditRoute %))}
       [(form/group
         {:label (tr [:route-wizard-page :basic-info-header])
-         :columns 2
+         :columns 3
          :layout :row}
         {:name ::transit/name
          :type :string
