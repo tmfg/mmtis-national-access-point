@@ -285,6 +285,7 @@
 
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
   :trip-editor-no-calendar  "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
+  :trip-editor-no-stop-sequence "Please add stop sequence."
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)

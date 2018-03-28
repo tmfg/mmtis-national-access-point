@@ -199,6 +199,6 @@
      [:div (stylefy/use-style style-form/form-card)
       [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
       [:div (merge (stylefy/use-style style-form/form-card-body))
-       [trips-list e! route app]
-       ]]
-     ]))
+       (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))
+         [trips-list e! route app]
+         [common/help (tr [:form-help :trip-editor-no-stop-sequence])])]]]))
