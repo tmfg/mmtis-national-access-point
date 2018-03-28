@@ -552,14 +552,9 @@
                      (time/valid-time? (::transit/arrival-time %))) other-stops)))
 
 (defn valid-stop-sequence?
-  "Check if given route's stop sequence is valid. A stop sequence is valid
-  if it is not empty and the first and last stops have a departure and arrival time respectively. And all other
-  stops have valid arrival and departure times."
+  "Check that a stop sequence has at least 2 stops."
   [{::transit/keys [stops] :as route}]
-  (let [first-stop (first stops)
-        last-stop (last stops)
-        other-stops (rest (butlast stops))]
-    (validate-stop-times first-stop last-stop other-stops)))
+  (> (count stops) 1))
 
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
@@ -580,11 +575,9 @@
               (validate-stop-times first-stop last-stop other-stops)))
           trips))
 
-(defn validate-previous-steps
-  "To be able to select a step in wizard that is valid, we call all previous validate functions."
-  [route step-name wizard-steps]
-  (every? (fn [{validate :validate}]
-            (if validate
-              (validate route)
-              true))
-            (take-while #(not= step-name (:name %)) wizard-steps)))
+
+(defn valid? [route]
+  (boolean
+   (and (valid-basic-info? route)
+        (valid-stop-sequence? route)
+        (valid-trips? route))))

@@ -10,16 +10,12 @@
    button])
 
 (defn save [opts label]
-  ;; Render different button if button is disabled (one or more fields are required or other errors in the form)
-  (let [button (if (= (get opts :disabled) false)
-                 [ui/raised-button
-                   (merge {:button-style style-base/base-button} opts)
-                   label]
-                 [ui/raised-button
-                   (merge {:button-style style-base/disabled-button :disabled true} opts)
-                   label])]
-    ;; Render button
-    [button-container button ]))
+  [button-container [ui/raised-button
+                     (merge opts
+                            (if (:disabled opts)
+                              {:button-style style-base/disabled-button :disabled true}
+                              {:button-style style-base/base-button}))
+                     label]])
 
 (defn cancel [opts label]
   [button-container
