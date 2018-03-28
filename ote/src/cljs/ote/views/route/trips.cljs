@@ -29,7 +29,7 @@
                                            :width  24}}
                              (cond
                                (and (nil? drop-off-type) (nil? pickup-type))
-                               [ic/communication-call {:style style-route/exception-icon}]
+                               [ic/maps-pin-drop {:style style-route/exception-icon}]
                                (and (= "arrival" stop-type) (= drop-off-type :regular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
                                (and (= "departure" stop-type) (= pickup-type :regular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
                                (and (= "arrival" stop-type) (= drop-off-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
@@ -38,7 +38,7 @@
                                (and (= "departure" stop-type) (= pickup-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
                                (and (= "arrival" stop-type) (= drop-off-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
                                (and (= "departure" stop-type) (= pickup-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
-                               :else [ic/communication-call {:style style-route/exception-icon}])
+                               :else [ic/maps-pin-drop {:style style-route/exception-icon}])
                              ])}
     [ui/menu-item {:primary-text (if (= "arrival" stop-type)
                                    (tr [:route-wizard-page :trip-stop-arrival-exception-default])

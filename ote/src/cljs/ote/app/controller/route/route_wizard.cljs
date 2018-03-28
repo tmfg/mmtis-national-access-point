@@ -130,6 +130,8 @@
         (assoc trip ::transit/stop-times
                     (conj (::transit/stop-times trip)
                           {::transit/stop-idx       stop-idx
+                           ::transit/drop-off-type :regular
+                           ::transit/pickup-type :regular
                            ::transit/arrival-time   (::transit/arrival-time new-stop)
                            ::transit/departure-time (::transit/departure-time new-stop)})))
       trips)))
