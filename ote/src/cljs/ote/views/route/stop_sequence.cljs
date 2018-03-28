@@ -86,7 +86,7 @@
                           :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}})))
     :reagent-render
     (fn [e! route]
-      [:div.stops-map {:style {:width "50%"}}
+      [:div.stops-map {:style {:width "70%"}}
        [custom-stop-dialog e! route]
        [leaflet/Map {:ref "stops-map"
                      :center #js [65 25]
@@ -104,13 +104,12 @@
             :color "red"}])]])}))
 
 (defn- route-stop-times [e! stop-sequence]
-  [:div {:style {:width "50%" :margin "1em"}}
+  [:div {:style {:width "30%" :margin "1em"}}
    [:table {:style {:width "100%"}}
     [:thead {:style {:text-align "left"}}
      [:tr
       [:th {:style {:width "50%"}} (tr [:route-wizard-page :stop-sequence-port-header])]
-      [:th {:style {:width "20%" :text-align "center"}} (tr [:route-wizard-page :stop-sequence-arrival-header])]
-      [:th {:style {:width "20%" :text-align "center"}} (tr [:route-wizard-page :stop-sequence-departure-header])]
+
       [:th {:style {:width "10%"}} ""]]]
     [:tbody {:style {:text-align "left"}}
      (doall
@@ -119,20 +118,6 @@
          ^{:key (str code "_" i)}
          [:tr {:style {:border-bottom "solid 1px black"}}
           [:td name]
-          [:td {:style {:text-align "center"}}
-           (if (zero? i)
-             "-"
-             [form-fields/field
-              {:type :time
-               :update! #(e! (rw/->UpdateStop i {::transit/arrival-time %}))}
-              arrival-time])]
-          [:td {:style {:text-align "center"}}
-           (if (= (inc i) (count stop-sequence))
-                 "-"
-                 [form-fields/field
-                  {:type :time
-                   :update! #(e! (rw/->UpdateStop i {::transit/departure-time %}))}
-                  departure-time])]
           [:td [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
                 [ic/action-delete]]]])
        stop-sequence))]

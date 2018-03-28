@@ -335,7 +335,9 @@
 
   EditServiceCalendar
   (process-event [{trip-idx :trip-idx} app]
-    (assoc-in app [:route :edit-service-calendar] trip-idx))
+    (if (= trip-idx (get-in app [:route :edit-service-calendar]))
+      (update-in app [:route] dissoc :edit-service-calendar)
+      (assoc-in app [:route :edit-service-calendar] trip-idx)))
 
   CloseServiceCalendar
   (process-event [_ app]

@@ -88,6 +88,7 @@
                         :float "right"
                         :position "relative"
                         :left "16px"
+                        :top -20
                         :padding-right "5px"
                         :padding-left "5px"}}
           (when (< i (dec (count stop-sequence)))
@@ -107,7 +108,7 @@
 
 (defn trip-row
   "Render a single row of stop times."
-  [e! stop-count row-idx {stops ::transit/stop-times :as trip}]
+  [e! stop-count edit-service-calendar row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
   [:tr
    [:td [:div
@@ -115,11 +116,17 @@
                  :data-balloon-pos    "right"
                  :data-balloon-length "medium"
                  :style {:overflow "visible"}}
-           [ui/icon-button {:href     "#"
+          [ui/icon-button {
+                           :style (if (= edit-service-calendar row-idx)
+                                    {:border-radius "25px" :background-color "#b3b3b3"}
+                                    {})
+                           :href     "#"
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (rw/->EditServiceCalendar row-idx)))}
-             [ic/action-today]]]]]
+           (if (= edit-service-calendar row-idx)
+             [ic/action-today]
+             [ic/action-today])]]]]
    (map-indexed
      (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
        (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
@@ -154,16 +161,20 @@
                 [exception-icon e! "departure" pickup-type drop-off-type stop-idx row-idx]]]))))
      stops)])
 
-(defn trips-list [e! route]
+(defn trips-list [e! route app]
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
         empty-calendar? (empty? (first (::transit/service-calendars route)))]
     [:div.route-times
+     [:div {:style {:overflow "auto"}}
      [:table {:style {:text-align "center"}}
       [route-times-header stop-sequence]
       [:tbody
-       (doall (map-indexed (partial trip-row e! stop-count) trips))]]
+       (doall (map-indexed (partial trip-row e! stop-count (get-in app [:route :edit-service-calendar])) trips))]]]
+
+     (when (:edit-service-calendar route)
+       [route-service-calendar/service-calendar e! app])
 
      (when empty-calendar?
        [:div {:style {:margin-top "10px"}}
@@ -184,9 +195,10 @@
     (e! (rw/->InitRouteTimes))
     (e! (rw/->CalculateRouteTimes)))
   (fn [e! {route :route :as app}]
-    (if (:edit-service-calendar route)
-      [route-service-calendar/service-calendar e! app]
-      [:div (stylefy/use-style style-form/form-card)
-       [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
-       [:div (merge (stylefy/use-style style-form/form-card-body) {:style {:overflow "auto"}})
-        [trips-list e! route]]])))
+    [:div {:style {:padding-top "20px"}}
+     [:div (stylefy/use-style style-form/form-card)
+      [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
+      [:div (merge (stylefy/use-style style-form/form-card-body))
+       [trips-list e! route app]
+       ]]
+     ]))
