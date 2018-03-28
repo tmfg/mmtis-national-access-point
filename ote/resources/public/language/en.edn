@@ -612,15 +612,15 @@
   }
 
  :route-wizard-page
- {:trip-stop-arrival-exception-default "Drop off always available"
-  :trip-stop-arrival-exception-no "Drop off not available"
-  :trip-stop-arrival-exception-agency "Drop off has to be arranged with the transport operator"
-  :trip-stop-arrival-exception-driver "Drop off has to be arranged with the driver"
-
-  :trip-stop-departure-exception-default "Pick up always available"
-  :trip-stop-departure-exception-no "Pick up not available"
-  :trip-stop-departure-exception-agency "Pick up has to be arranged with the transport operator"
-  :trip-stop-departure-exception-driver "Pick up has to be arranged with the driver"
+ {:trip-stop-exception
+  {:arrival {:default "Drop off always available"
+             :no "Drop off not available"
+             :agency "Drop off has to be arranged with the transport operator"
+             :driver "Drop off has to be arranged with the driver"}
+   :departure {:default "Pick up always available"
+               :no "Pick up not available"
+               :agency "Pick up has to be arranged with the transport operator"
+               :driver "Pick up has to be arranged with the driver"}}
 
   :trip-stop-arrival-header "Arrival"
   :trip-stop-departure-header "Departure"

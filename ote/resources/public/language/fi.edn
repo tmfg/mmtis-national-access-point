@@ -613,15 +613,15 @@
   }
 
  :route-wizard-page
- {:trip-stop-arrival-exception-default "Poistumismahdollisuus oletuksena"
-  :trip-stop-arrival-exception-no "Ei poistumismahdollisuutta"
-  :trip-stop-arrival-exception-agency "Poistumisesta sovittava palveluntuottajan kanssa"
-  :trip-stop-arrival-exception-driver "Poistumisesta sovittava kuljettajan kanssa"
-
-  :trip-stop-departure-exception-default "Nousu mahdollista oletuksena"
-  :trip-stop-departure-exception-no "Ei nousumahdollisuutta"
-  :trip-stop-departure-exception-agency "Nousemisesta sovittava palveluntuottajan kanssa"
-  :trip-stop-departure-exception-driver "Noususta sovittava kuljettajan kanssa"
+ {:trip-stop-exception
+  {:arrival {:default "Poistumismahdollisuus oletuksena"
+             :no "Ei poistumismahdollisuutta"
+             :agency "Poistumisesta sovittava palveluntuottajan kanssa"
+             :driver "Poistumisesta sovittava kuljettajan kanssa"}
+   :departure {:default "Nousu mahdollista oletuksena"
+               :no "Ei nousumahdollisuutta"
+               :agency "Nousemisesta sovittava palveluntuottajan kanssa"
+               :driver "Noususta sovittava kuljettajan kanssa"}}
 
   :trip-stop-arrival-header "tulo"
   :trip-stop-departure-header "lähtö"

@@ -613,15 +613,15 @@
   }
 
  :route-wizard-page
- {:trip-stop-arrival-exception-default "Avstigning möjlig (standard)"
-  :trip-stop-arrival-exception-no "Avstigning inte möjlig"
-  :trip-stop-arrival-exception-agency "Avstigning enligt överenskommelse med tjänsteproducenten"
-  :trip-stop-arrival-exception-driver "Avstigning enligt överenskommelse med skepparen"
-
-  :trip-stop-departure-exception-default "Ombordstigning möjlig (standard)"
-  :trip-stop-departure-exception-no "Ombordstigning inte möjlig"
-  :trip-stop-departure-exception-agency "Ombordstigning enligt överenskommelse med tjänsteproducenten"
-  :trip-stop-departure-exception-driver "Ombordstigning enligt överenskommelse med skepparen"
+ {:trip-stop-exception
+  {:arrival {:default "Avstigning möjlig (standard)"
+             :no "Avstigning inte möjlig"
+             :agency "Avstigning enligt överenskommelse med tjänsteproducenten"
+             :driver "Avstigning enligt överenskommelse med skepparen"}
+   :departure {:default "Ombordstigning möjlig (standard)"
+               :no "Ombordstigning inte möjlig"
+               :agency "Ombordstigning enligt överenskommelse med tjänsteproducenten"
+               :driver "Ombordstigning enligt överenskommelse med skepparen"}}
 
   :trip-stop-arrival-header "ankomst"
   :trip-stop-departure-header "avgång"

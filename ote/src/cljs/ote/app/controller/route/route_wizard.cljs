@@ -11,7 +11,8 @@
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [taoensso.timbre :as log]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -470,10 +471,10 @@
     (update-in app [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data))
 
   ShowStopException
-  (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx} app]
-    (let [icon-key (if (= "arrival" stop-type)
-                     (keyword "ote.db.transit/pickup-type")
-                     (keyword "ote.db.transit/drop-off-type"))
+  (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx :as evt} app]
+    (let [icon-key (if (= :arrival stop-type)
+                     :ote.db.transit/drop-off-type
+                     :ote.db.transit/pickup-type)
           changed-stops (update-stop-by-idx
                           (get app :route) stop-idx trip-idx
                           assoc icon-key icon-type)]
