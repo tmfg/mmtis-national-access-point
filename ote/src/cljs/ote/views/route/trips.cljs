@@ -14,7 +14,8 @@
     [ote.localization :refer [tr tr-key]]
 
     ;; Calendar subview
-    [ote.views.route.service-calendar :as route-service-calendar]))
+    [ote.views.route.service-calendar :as route-service-calendar]
+    [ote.style.form :as style-form]))
 
 (defn exception-icon [e! stop-type drop-off-type pickup-type stop-idx trip-idx]
   [:div
@@ -79,15 +80,16 @@
         [:th {:colSpan 2
               :style {:vertical-align "top"}}
          [:div {:style {:display "inline-block"
-                        :width "200px"
+                        :width "180px"
                         :overflow-x "hidden"
                         :white-space "pre"
                         :text-overflow "ellipsis"}} name]
          [:div {:style {:display "inline-block"
                         :float "right"
                         :position "relative"
-                        :left 14
-                        :top -20}}
+                        :left "16px"
+                        :padding-right "5px"
+                        :padding-left "5px"}}
           (when (< i (dec (count stop-sequence)))
             [ic/navigation-chevron-right])]])
       stop-sequence))]
@@ -108,22 +110,30 @@
   [e! stop-count row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
   [:tr
-   [:td [:div [ui/raised-button {:on-click #(e! (rw/->EditServiceCalendar row-idx))
-                                 :label (tr [:route-wizard-page :trip-stop-calendar])}]]]
+   [:td [:div
+         [:span {:data-balloon        (tr [:route-wizard-page :trip-stop-calendar])
+                 :data-balloon-pos    "right"
+                 :data-balloon-length "medium"
+                 :style {:overflow "visible"}}
+           [ui/icon-button {:href     "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (rw/->EditServiceCalendar row-idx)))}
+             [ic/action-today]]]]]
    (map-indexed
-     (fn [j {::transit/keys [arrival-time departure-time stop-idx pickup-type drop-off-type] :as stop}]
-       (let [update! #(e! (rw/->EditStopTime row-idx j %))
+     (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
+       (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
              style {:style {:padding-left     "5px"
                             :padding-right    "5px"
                             :width            "125px"
-                            :background-color (if (even? j)
+                            :background-color (if (even? stop-idx)
                                                 "#f4f4f4"
                                                 "#fafafa")}}]
          (list
-           (if (zero? j)
-             ^{:key (str j "-first")}
+           (if (zero? stop-idx)
+             ^{:key (str stop-idx "-first")}
              [:td style " - "]
-             ^{:key (str j "-arr")}
+             ^{:key (str stop-idx "-arr")}
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
@@ -131,10 +141,10 @@
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
                 [exception-icon e! "arrival" pickup-type drop-off-type stop-idx row-idx]]])
-           (if (= j (dec stop-count))
-             ^{:key (str j "-last")}
+           (if (= stop-idx (dec stop-count))
+             ^{:key (str stop-idx "-last")}
              [:td style " - "]
-             ^{:key (str j "-dep")}
+             ^{:key (str stop-idx "-dep")}
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
@@ -176,4 +186,7 @@
   (fn [e! {route :route :as app}]
     (if (:edit-service-calendar route)
       [route-service-calendar/service-calendar e! app]
-      [trips-list e! route])))
+      [:div (stylefy/use-style style-form/form-card)
+       [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
+       [:div (merge (stylefy/use-style style-form/form-card-body) {:style {:overflow "auto"}})
+        [trips-list e! route]]])))

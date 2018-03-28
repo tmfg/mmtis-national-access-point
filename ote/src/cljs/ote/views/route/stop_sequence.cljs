@@ -10,7 +10,9 @@
             [reagent.core :as r]
             [ote.ui.leaflet-draw :as leaflet-draw]
             [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [ote.style.form :as style-form]
+            [stylefy.core :as stylefy]))
 
 
 (def stop-marker-style
@@ -145,6 +147,9 @@
   (fn [e! {route :route :as app}]
     (if (nil? (get route :stops))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-      [:div {:style {:display "flex" :flex-direction "row"}}
-        [route-map e! route]
-        [route-stop-times e! (::transit/stops route)]])))
+      [:div (stylefy/use-style style-form/form-card)
+       [:div (stylefy/use-style style-form/form-card-label) "Reittipysäkit"]
+       [:div (stylefy/use-style style-form/form-card-body)
+        [:div {:style {:display "flex" :flex-direction "row"}}
+         [route-map e! route]
+         [route-stop-times e! (::transit/stops route)]]]])))

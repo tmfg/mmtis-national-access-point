@@ -70,22 +70,24 @@
 (defn- update-stop-by-idx [route stop-idx trip-idx update-fn & args]
   (update (get-in route [::transit/trips trip-idx]) ::transit/stop-times
           (fn [stops]
-            (mapv #(if (= (::transit/stop-idx %) stop-idx)
-                     (apply update-fn % args)
-                     %)
-                  stops))))
+              (vec (map-indexed
+                     (fn [i stop]
+                       (if (= i stop-idx)
+                         (apply update-fn stop args)
+                         stop))
+                     stops)))))
 
 (defn- update-stop-times
   "Copy departure and arrival time for stops from first trip. Stops can't have departure time in db, but in
   ui they can."
   [stops trips]
-    (map-indexed
+  (vec (map-indexed
       (fn [idx item]
         (assoc item ::transit/departure-time
                     (get-in (first trips) [::transit/stop-times idx ::transit/departure-time])
                     ::transit/arrival-time
                     (get-in (first trips) [::transit/stop-times idx ::transit/arrival-time])))
-      stops))
+      stops)))
 
 (defn update-trips-calendar
   "In database one service-calendar can be linked to all trips, but in front-end we need to copy or multiply
@@ -219,20 +221,27 @@
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
-    ;; Add stop to current stop sequence
-    (let [{feature :geojson :as custom-stop}
-          (first (keep #(when (= (:id %) id) %) (:custom-stops route)))]
+    ;; Add stop to current route stop sequence (:route ::transit/stops)
+    ;; And add stop to current map marker stop sequence (:route :stops "feature")
+    (let [stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+          {feature :geojson :as custom-stop}
+          (first (keep #(when (= (:id %) id) %) (:custom-stops route)))
+          geometry (vec (aget feature "geometry" "coordinates"))
+          properties (js->clj (aget feature "properties"))
+          new-custom-stop (merge (into {}
+                                       (map #(update % 0 (partial keyword "ote.db.transit")))
+                                       properties)
+                                 {::transit/location geometry})
+          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get properties "code"))
+                              stop-sequence
+                              (conj stop-sequence new-custom-stop))
+          new-stop {"geometry"   {"type" "Point", "coordinates" geometry}
+                    "properties" properties
+                    "type"       "Feature"}
+          stops (get-in app [:route :stops "features"])]
       (-> app
-          (update-in [:route ::transit/stops]
-                     (fn [stop-sequence]
-                       (let [geometry (vec (aget feature "geometry" "coordinates"))]
-                         (if (= geometry (::transit/location (last stop-sequence)))
-                           stop-sequence
-                           (conj (or stop-sequence [])
-                                 (merge (into {}
-                                              (map #(update % 0 (partial keyword "ote.db.transit")))
-                                              (js->clj (aget feature "properties")))
-                                        {::transit/location geometry})))))))))
+          (assoc-in [:route :stops "features"] (conj stops new-stop))
+          (assoc-in [:route ::transit/stops] new-stop-sequence))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
@@ -387,7 +396,9 @@
                                                 (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
                                                   {::transit/stop-idx stop-idx
                                                    ::transit/arrival-time arrival-time
-                                                   ::transit/departure-time departure-time})
+                                                   ::transit/departure-time departure-time
+                                                   ::transit/drop-off-type :regular
+                                                   ::transit/pickup-type :regular})
                                                 (get-in app [:route ::transit/stops])))
                     ::transit/service-calendar-idx 0}])
         ;; Make sure that we have an empty associated calendar for the trip
@@ -402,8 +413,10 @@
                            (fn [stop-times]
                              (vec
                                (map-indexed
-                                 (fn [stop-idx {::transit/keys [arrival-time departure-time] :as stop-time}]
-                                   {::transit/arrival-time   (or arrival-time
+                                 (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop-time}]
+                                   {::transit/pickup-type pickup-type
+                                    ::transit/drop-off-type drop-off-type
+                                    ::transit/arrival-time   (or arrival-time
                                                                  (new-stop-time app stop-idx first-departure-time trip ::transit/arrival-time))
                                     ::transit/departure-time (or departure-time
                                                                  (new-stop-time app stop-idx first-departure-time trip ::transit/departure-time))})
@@ -455,11 +468,11 @@
   (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx} app]
     (let [icon-key (if (= "arrival" stop-type)
                      (keyword "ote.db.transit/pickup-type")
-                     (keyword "ote.db.transit/drop-off-type"))]
-    (assoc-in app [:route ::transit/trips trip-idx]
-              (update-stop-by-idx
-                (get app :route) stop-idx trip-idx
-                assoc icon-key icon-type))))
+                     (keyword "ote.db.transit/drop-off-type"))
+          changed-stops (update-stop-by-idx
+                          (get app :route) stop-idx trip-idx
+                          assoc icon-key icon-type)]
+    (assoc-in app [:route ::transit/trips trip-idx] changed-stops)))
 
   SaveAsGTFS
   (process-event [_ {route :route :as app}]

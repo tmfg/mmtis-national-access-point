@@ -76,7 +76,8 @@
 
      [:div.route-wizard-navigation
       {:style {:display "flex"
-               :justify-content "space-between"}}
+               :justify-content "space-between"
+               :padding-top "20px"}}
       (if (= step (:name (first wizard-steps)))
         [:span]
         [ui/flat-button {:primary true
@@ -99,7 +100,7 @@
        [route-wizard
         e! wizard-steps
         app]
-       [:div.col-xs-12.col-sm-6.col-md-6
+       [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
         [buttons/save {:disabled false
                        :on-click #(do
                                     (.preventDefault %)
@@ -115,10 +116,11 @@
   (fn [e! {route :route :as app}]
     (let [page (or (:page route) 0)]
       [:span
+       [:h1 (tr [:common-texts :navigation-route])]
        [route-wizard
         e! wizard-steps
         app]
-       [:div.col-xs-12.col-sm-6.col-md-6
+       [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
         [buttons/save {:disabled false
                        :on-click #(do
                                     (.preventDefault %)
