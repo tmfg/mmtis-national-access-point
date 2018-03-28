@@ -149,20 +149,20 @@
                 [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
      stops)])
 
-(defn trips-list [e! route app]
+(defn trips-list [e! route]
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
         empty-calendar? (empty? (first (::transit/service-calendars route)))]
     [:div.route-times
      [:div {:style {:overflow "auto"}}
-     [:table {:style {:text-align "center"}}
-      [route-times-header stop-sequence]
-      [:tbody
-       (doall (map-indexed (partial trip-row e! stop-count (get-in app [:route :edit-service-calendar])) trips))]]]
+      [:table {:style {:text-align "center"}}
+       [route-times-header stop-sequence]
+       [:tbody
+        (doall (map-indexed (partial trip-row e! stop-count (:edit-service-calendar route)) trips))]]]
 
      (when (:edit-service-calendar route)
-       [route-service-calendar/service-calendar e! app])
+       [route-service-calendar/service-calendar e! route])
 
      (when empty-calendar?
        [:div {:style {:margin-top "10px"}}
@@ -188,5 +188,5 @@
       [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
       [:div (merge (stylefy/use-style style-form/form-card-body))
        (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))
-         [trips-list e! route app]
+         [trips-list e! route]
          [common/help (tr [:form-help :trip-editor-no-stop-sequence])])]]]))

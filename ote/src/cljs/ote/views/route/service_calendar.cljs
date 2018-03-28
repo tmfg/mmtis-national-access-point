@@ -57,7 +57,7 @@
           (added-dates day)
           {:background-color "wheat"})))))
 
-(defn service-calendar [e! {{trip-idx :edit-service-calendar :as route} :route :as app}]
+(defn service-calendar [e! {trip-idx :edit-service-calendar :as route}]
   (let [calendar (get-in route [::transit/service-calendars trip-idx])]
     [:div.route-service-calendar {:style {:padding-top "20px"}}
      [:div (stylefy/use-style style-form/form-card)
