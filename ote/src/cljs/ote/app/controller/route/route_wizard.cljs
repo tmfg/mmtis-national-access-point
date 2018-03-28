@@ -67,6 +67,9 @@
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
 
+;; Keep track of handlers that the UI can register for clearing the state
+(def clear-ui-state (atom []))
+
 (defn- update-stop-by-idx [route stop-idx trip-idx update-fn & args]
   (update (get-in route [::transit/trips trip-idx]) ::transit/stop-times
           (fn [stops]
@@ -180,6 +183,9 @@
 
   InitRoute
   (process-event [_ app]
+    (doseq [clear-fn @clear-ui-state]
+      (clear-fn))
+    (reset! clear-ui-state [])
     (-> app
         (dissoc :route)
         (assoc-in [:route :step] :basic-info)
