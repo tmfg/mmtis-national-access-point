@@ -1,7 +1,7 @@
 (ns ote.views.route.trips
   "Route wizard: route trips table"
   (:require
-    [ote.app.controller.route :as rc]
+    [ote.app.controller.route.route-wizard :as rw]
     [ote.time :as time]
     [ote.ui.form-fields :as form-fields]
     [cljs-react-material-ui.reagent :as ui]
@@ -14,7 +14,8 @@
     [ote.localization :refer [tr tr-key]]
 
     ;; Calendar subview
-    [ote.views.route.service-calendar :as route-service-calendar]))
+    [ote.views.route.service-calendar :as route-service-calendar]
+    [ote.style.form :as style-form]))
 
 (defn exception-icon [e! stop-type drop-off-type pickup-type stop-idx trip-idx]
   [:div
@@ -45,28 +46,28 @@
                    :left-icon    (ic/maps-pin-drop)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx :regular trip-idx)))}]
+                                    (e! (rw/->ShowStopException stop-type stop-idx :regular trip-idx)))}]
     [ui/menu-item {:primary-text (if (= "arrival" stop-type)
                                    (tr [:route-wizard-page :trip-stop-arrival-exception-no])
                                    (tr [:route-wizard-page :trip-stop-departure-exception-no]))
                    :left-icon    (ic/notification-do-not-disturb)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx :not-available trip-idx)))}]
+                                    (e! (rw/->ShowStopException stop-type stop-idx :not-available trip-idx)))}]
     [ui/menu-item {:primary-text (if (= "arrival" stop-type)
                                    (tr [:route-wizard-page :trip-stop-arrival-exception-agency])
                                    (tr [:route-wizard-page :trip-stop-departure-exception-agency]))
                    :left-icon    (ic/communication-call)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx :phone-agency trip-idx)))}]
+                                    (e! (rw/->ShowStopException stop-type stop-idx :phone-agency trip-idx)))}]
     [ui/menu-item {:primary-text (if (= "arrival" stop-type)
                                    (tr [:route-wizard-page :trip-stop-arrival-exception-driver])
                                    (tr [:route-wizard-page :trip-stop-departure-exception-driver]))
                    :left-icon    (ic/social-people)
                    :on-click     #(do
                                     (.preventDefault %)
-                                    (e! (rc/->ShowStopException stop-type stop-idx :coordinate-with-driver trip-idx)))}]]])
+                                    (e! (rw/->ShowStopException stop-type stop-idx :coordinate-with-driver trip-idx)))}]]])
 
 (defn route-times-header [stop-sequence]
   [:thead
@@ -79,15 +80,17 @@
         [:th {:colSpan 2
               :style {:vertical-align "top"}}
          [:div {:style {:display "inline-block"
-                        :width "200px"
+                        :width "180px"
                         :overflow-x "hidden"
                         :white-space "pre"
                         :text-overflow "ellipsis"}} name]
          [:div {:style {:display "inline-block"
                         :float "right"
                         :position "relative"
-                        :left 14
-                        :top -20}}
+                        :left "16px"
+                        :top -20
+                        :padding-right "5px"
+                        :padding-left "5px"}}
           (when (< i (dec (count stop-sequence)))
             [ic/navigation-chevron-right])]])
       stop-sequence))]
@@ -105,25 +108,39 @@
 
 (defn trip-row
   "Render a single row of stop times."
-  [e! stop-count row-idx {stops ::transit/stop-times :as trip}]
+  [e! stop-count edit-service-calendar row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
   [:tr
-   [:td [:div [ui/raised-button {:on-click #(e! (rc/->EditServiceCalendar row-idx))
-                                 :label (tr [:route-wizard-page :trip-stop-calendar])}]]]
+   [:td [:div
+         [:span {:data-balloon        (tr [:route-wizard-page :trip-stop-calendar])
+                 :data-balloon-pos    "right"
+                 :data-balloon-length "medium"
+                 :style {:overflow "visible"}}
+          [ui/icon-button {
+                           :style (if (= edit-service-calendar row-idx)
+                                    {:border-radius "25px" :background-color "#b3b3b3"}
+                                    {})
+                           :href     "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (rw/->EditServiceCalendar row-idx)))}
+           (if (= edit-service-calendar row-idx)
+             [ic/action-today]
+             [ic/action-today])]]]]
    (map-indexed
-     (fn [j {::transit/keys [arrival-time departure-time stop-idx pickup-type drop-off-type] :as stop}]
-       (let [update! #(e! (rc/->EditStopTime row-idx j %))
+     (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
+       (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
              style {:style {:padding-left     "5px"
                             :padding-right    "5px"
                             :width            "125px"
-                            :background-color (if (even? j)
+                            :background-color (if (even? stop-idx)
                                                 "#f4f4f4"
                                                 "#fafafa")}}]
          (list
-           (if (zero? j)
-             ^{:key (str j "-first")}
+           (if (zero? stop-idx)
+             ^{:key (str stop-idx "-first")}
              [:td style " - "]
-             ^{:key (str j "-arr")}
+             ^{:key (str stop-idx "-arr")}
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
@@ -131,10 +148,10 @@
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
                 [exception-icon e! "arrival" pickup-type drop-off-type stop-idx row-idx]]])
-           (if (= j (dec stop-count))
-             ^{:key (str j "-last")}
+           (if (= stop-idx (dec stop-count))
+             ^{:key (str stop-idx "-last")}
              [:td style " - "]
-             ^{:key (str j "-dep")}
+             ^{:key (str stop-idx "-dep")}
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
@@ -144,16 +161,20 @@
                 [exception-icon e! "departure" pickup-type drop-off-type stop-idx row-idx]]]))))
      stops)])
 
-(defn trips-list [e! route]
+(defn trips-list [e! route app]
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
         empty-calendar? (empty? (first (::transit/service-calendars route)))]
     [:div.route-times
+     [:div {:style {:overflow "auto"}}
      [:table {:style {:text-align "center"}}
       [route-times-header stop-sequence]
       [:tbody
-       (doall (map-indexed (partial trip-row e! stop-count) trips))]]
+       (doall (map-indexed (partial trip-row e! stop-count (get-in app [:route :edit-service-calendar])) trips))]]]
+
+     (when (:edit-service-calendar route)
+       [route-service-calendar/service-calendar e! app])
 
      (when empty-calendar?
        [:div {:style {:margin-top "10px"}}
@@ -162,17 +183,22 @@
      [:div
       (tr [:route-wizard-page :trip-schedule-new-trip])
       [form-fields/field {:type :time
-                          :update! #(e! (rc/->NewStartTime %))} (:new-start-time route)]
+                          :update! #(e! (rw/->NewStartTime %))} (:new-start-time route)]
       [ui/raised-button {:style {:margin-left "5px"}
                          :primary true
                          :disabled (or (time/empty-time? (:new-start-time route)) empty-calendar?)
-                         :on-click #(e! (rc/->AddTrip))
+                         :on-click #(e! (rw/->AddTrip))
                          :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
 (defn trips [e! {route :route :as app}]
-  (when (empty? (::transit/trips route))
-    (e! (rc/->InitRouteTimes)))
+  (if (empty? (::transit/trips route))
+    (e! (rw/->InitRouteTimes))
+    (e! (rw/->CalculateRouteTimes)))
   (fn [e! {route :route :as app}]
-    (if (:edit-service-calendar route)
-      [route-service-calendar/service-calendar e! app]
-      [trips-list e! route])))
+    [:div {:style {:padding-top "20px"}}
+     [:div (stylefy/use-style style-form/form-card)
+      [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
+      [:div (merge (stylefy/use-style style-form/form-card-body))
+       [trips-list e! route app]
+       ]]
+     ]))

@@ -146,6 +146,6 @@
   [{:keys [selected-date? on-select] :as options}]
   (let [current-year (t/year (t/now))
         next-year (inc current-year)]
-    [:div.service-calendar
+    [:div.service-calendar {:style {:padding "20px"}}
      [service-calendar-year options current-year]
      [service-calendar-year options next-year]]))

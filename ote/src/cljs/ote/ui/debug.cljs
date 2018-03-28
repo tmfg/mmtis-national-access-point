@@ -70,7 +70,7 @@
 (def debug-style {:position "fixed"
                   :left "0"
                   :bottom "0"
-                  :max-height "200"
+                  :max-height "300px"
                   :overflow-y "scroll"
                   :background-color "wheat"
                   :z-index "9999"
