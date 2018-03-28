@@ -142,3 +142,18 @@
               :value text-to-copy}]
      [ui/flat-button {:icon (ic/content-content-copy)
                       :on-click copy!}]]))
+
+(defn should-component-update?
+  "Helper function to create a :should-component-update lifecycle function.
+  Uses get-in to fetch the given accessor paths from both the old and the new
+  arguments and returns true if any path's values differ.
+
+  For example if the component has arguments: [e! my-thing foo]
+  the path to access key :name from my-thing is: [0 :name]."
+  [& accessor-paths]
+  (fn [_ old-argv new-argv]
+    (let [old-argv  (subvec old-argv 1)
+          new-argv (subvec new-argv 1)]
+      (boolean
+       (some #(not= (get-in old-argv %) (get-in new-argv %))
+             accessor-paths)))))
