@@ -28,7 +28,7 @@
     [:span
      [route-components e! app]
      [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
-      [buttons/save {:disabled false
+      [buttons/save {:disabled (not (rw/valid? (:route app)))
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb)))}
