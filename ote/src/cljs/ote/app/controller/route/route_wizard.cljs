@@ -10,7 +10,8 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.localization :refer [tr tr-key]]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -510,13 +511,16 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
-    (assoc (dissoc app :route) :page :routes))
+    (-> app
+        (assoc :flash-message (tr [:route-wizard-page :save-success]))
+        (dissoc :route)
+        (assoc :page :routes)))
 
   SaveRouteFailure
   (process-event [{response :response} app]
     (.error js/console "Save route failed:" (pr-str response))
     (assoc app
-      :flash-message-error "Reitin tallennus epäonnistui"))
+      :flash-message-error (tr [:route-wizard-page :save-failure])))
 
   CancelRoute
   (process-event [_ app]

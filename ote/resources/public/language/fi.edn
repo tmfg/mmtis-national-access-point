@@ -659,6 +659,9 @@
   :route-calendar-from-date "Alkaen"
   :route-calendar-to-date "Päättyen"
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
+  :save-success "Reitin tallennus onnistui."
+  :save-failure "Reitin tallennus epäonnistui"
+
   }
 
  :price-dialog
