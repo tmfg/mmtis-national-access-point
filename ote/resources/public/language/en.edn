@@ -602,6 +602,9 @@
   :delete-dialog-header "Want to remove traffic route?"
   :delete-dialog-remove-route "Removing route "
   :route-list-table-name "Name"
+  :route-list-published? "Route status"
+  :route-list-published?-values   {true  "Published"
+                                   false "Not published"}
   :route-list-table-starting-point "Starting point"
   :route-list-table-destination-point "Destination point"
   :route-list-table-valid-from "Valid from"
