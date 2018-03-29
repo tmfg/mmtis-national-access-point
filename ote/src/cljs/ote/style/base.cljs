@@ -138,3 +138,5 @@
                        {:logo {:height "48px"
                                :width "48px"
                                :margin-bottom "8px"}}})
+
+(def disabled-color {:color "rgba(0, 0, 0, 0.247059)"})

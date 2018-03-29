@@ -126,7 +126,6 @@
   (let [price-class-name-label
           (cond
             (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
-            (= :other sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other])
             (= :request sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-request])
             (= :schedule sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-schedule])
             :else (tr [:field-labels :passenger-transportation ::t-service/price-class-name-other]))
@@ -186,7 +185,8 @@
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service} app]
   (with-let [form-groups
-             [(ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
+             [(ts-common/transport-type (::t-service/sub-type service))
+              (ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
               (ts-common/contact-info-group)
               (ts-common/companies-group e!)
               (ts-common/brokerage-group e!)

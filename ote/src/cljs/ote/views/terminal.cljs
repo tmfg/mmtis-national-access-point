@@ -124,7 +124,8 @@
     :options     t-service/information-service-accessibility}))
 
 (defn terminal [e! {form-data ::t-service/terminal} app]
-  (r/with-let [groups [(ts-common/name-group (tr [:terminal-page :header-service-info]))
+  (r/with-let [groups [(ts-common/transport-type ::t-service/terminal)
+                       (ts-common/name-group (tr [:terminal-page :header-service-info]))
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group e! ::t-service/terminal)
                        (ts-common/external-interfaces e!)

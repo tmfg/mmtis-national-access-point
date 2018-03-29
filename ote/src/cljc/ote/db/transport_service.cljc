@@ -20,6 +20,7 @@
 
   ["payment_method" ::payment_method (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_provider_type" ::transport_provider_type (specql.transform/transform (specql.transform/to-keyword))]
+  ["transport_type" ::transport_type (specql.transform/transform (specql.transform/to-keyword))]
   ["transport_service_subtype" ::transport_service_subtype (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_tool" ::accessibility_tool (specql.transform/transform (specql.transform/to-keyword))]
   ["accessibility_info_facility" ::accessibility_info_facility (specql.transform/transform (specql.transform/to-keyword))]
@@ -77,7 +78,7 @@
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking])
 
 ;; Create order for transport_type
-(def passenger-transportation-sub-types [:taxi :request :other :schedule])
+(def passenger-transportation-sub-types [:taxi :request :schedule])
 
 (def interface-data-contents [:route-and-schedule :luggage-restrictions :realtime-interface :booking-interface
                              :accessibility-services :other-services :pricing :service-hours :disruptions
@@ -150,3 +151,5 @@
 
 (def advance-reservation
   [:no :possible :mandatory])
+
+(def transport-type [:road :rail :sea :aviation])

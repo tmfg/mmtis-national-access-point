@@ -282,7 +282,8 @@
       :add-label (tr [:buttons :add-new-pick-up-location])})))
 
 (defn rental [e! service app]
-  (with-let [groups [(ts-common/name-group (tr [:rentals-page :header-service-info]))
+  (with-let [groups [(ts-common/transport-type ::t-service/rentals)
+                     (ts-common/name-group (tr [:rentals-page :header-service-info]))
                      (ts-common/contact-info-group)
                      (ts-common/place-search-group e! ::t-service/rentals)
                      (ts-common/external-interfaces e!)

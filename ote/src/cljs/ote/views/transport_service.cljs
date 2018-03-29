@@ -29,7 +29,6 @@
   ;; Create order for service type selection dropdown
   [:taxi
    :request
-   :other
    :schedule
    :terminal
    :rentals
