@@ -14,8 +14,10 @@ from dateutil import parser as dparser
 import os
 import sys
 import xml.sax
-from xml.sax.handler import ContentHandler
+import tempfile
+import shutil
 
+from xml.sax.handler import ContentHandler
 from coordinates import KKJxy_to_WGS84lalo
 
 timezone = 'Europe/Helsinki'
@@ -269,21 +271,43 @@ class KalkatiHandler(ContentHandler):
             self.service_mode = None
 
 
-def convert(filename, directory):
+def init_gtfs_files():
     names = ['stops', 'agency', 'calendar', 'stop_times', 'trips', 'routes']
     files = {}
+    MB = 1 << 20
 
+    for name in names:
+        files[name] = tempfile.SpooledTemporaryFile(max_size=500 * MB, mode='w+b')
+
+    return files
+
+
+def convert_in_memory(kalkati_file):
+    gtfs_files = init_gtfs_files()
+    handler = KalkatiHandler(gtfs_files)
+    xml.sax.parse(kalkati_file, handler)
+
+    for name, file in gtfs_files.iteritems():
+        file.seek(0)
+
+    return gtfs_files
+
+
+def write_to_disk(files, directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    for name in names:
-        files[name] = file(os.path.join(directory, '%s.txt' % name), 'w')
+    for name, file in files.iteritems():
+        file.seek(0)
 
-    handler = KalkatiHandler(files)
-    xml.sax.parse(filename, handler)
+        with open (os.path.join(directory, name + '.txt'), 'w') as target_file:
+            shutil.copyfileobj(file, target_file)
+            target_file.close()
 
-    for name in names:
-        files[name].close()
+
+def main(filename, directory):
+    files = convert_in_memory(filename)
+    write_to_disk(files, directory)
 
 
 if __name__ == '__main__':
@@ -293,4 +317,4 @@ if __name__ == '__main__':
     except IndexError:
         sys.stderr.write('Usage: %s kalkati_xml_file output_directory\n' % sys.argv[0])
         sys.exit(1)
-    convert(filename, output)
+    main(filename, output)

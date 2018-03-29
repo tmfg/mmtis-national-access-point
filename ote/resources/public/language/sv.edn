@@ -992,12 +992,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :result-count (:plural :count
                          "Inga resultat"
-                         "Hittades en tjänst"
-                         ["Hittades " :count " tjänster"])
+                         "Hittades en tjänst."
+                         ["Hittades " :count " tjänst."])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
-  :total-services ["Katalog har total " :total-service-count " tjänster."]
+  :total-services [" Katalogen innehåller totalt " :total-service-count " tjänster."]
   :fetching-more "Fetching more services..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
   :operator-no-services "Tjänsteproducenten har inga tjänster."}
