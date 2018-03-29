@@ -56,8 +56,6 @@ def kalkati_zip_to_gtfs_zip(zip_buf):
 ## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
     try:
-        zipf = None
-
         try:
             file_url = json.loads(event['body'])
         except ValueError as e:

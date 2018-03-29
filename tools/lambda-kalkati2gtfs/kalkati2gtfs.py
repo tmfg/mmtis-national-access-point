@@ -126,6 +126,7 @@ class KalkatiHandler(ContentHandler):
         '''
 
         service_id = attrs.getValue('FootnoteId')
+
         # If there is no value for this attribute the start date of the vector is the Firstdate of the Delivery element.
         first = attrs.get('Firstdate', self.delivery.get('Firstday'))
         first_date = dparser.parse(first).date()
@@ -167,7 +168,6 @@ class KalkatiHandler(ContentHandler):
             self.stop_sequence.append(attrs['StationId'])
 
             departure_time = None
-            arrival_time = None
 
             if 'Departure' in attrs:
                 departure_time = ':'.join((attrs['Departure'][:2],
@@ -209,25 +209,32 @@ class KalkatiHandler(ContentHandler):
                              'Lastday': attrs.get('Lastday'),
                              'CompanyId': attrs.getValue('CompanyId'),
                              'Version': attrs.getValue('Version')}
+
         elif not self.synonym and name == 'Company':
             self.add_agency(attrs)
+
         elif not self.synonym and name == 'Station':
             self.add_stop(attrs)
+
         elif not self.synonym and name == 'Trnsmode':
             if 'Modetype' in attrs:
                 self.transmodes[attrs['TrnsmodeId']] = attrs['Modetype']
+
         elif name == 'Footnote':
             self.add_calendar(attrs)
+
         elif name == 'Service':
             self.kal_service_id = attrs['ServiceId']
             self.service_count += 1
             self.trips = []
             self.service_validities = []
             self.stop_sequence = []
+
         elif name == 'ServiceNbr':
             self.route_agency_id = attrs['CompanyId']
             self.route_short_name = attrs.get('Variant')
             self.route_long_name = attrs.get('Name', 'Unnamed')
+
         elif name == 'ServiceValidity':
             self.service_validities.append(attrs['FootnoteId'])
             self.trips.append({
@@ -235,13 +242,16 @@ class KalkatiHandler(ContentHandler):
                 'Firststop': attrs.get('Firststop'),
                 'Laststop': attrs.get('Laststop')
             })
+
         elif name == 'ServiceTrnsmode':
             # Kalkati allows changing transport modes between stations in one route.
             # vs. GTFS allows only one transmode per route.
             # So, we'll have to assume that there is only one transmode defined in the Kalkati file and use it.
             self.service_mode = attrs['TrnsmodeId']
+
         elif name == 'Stop':
             self.add_stop_time(attrs)
+
         elif name == 'Synonym':
             self.synonym = True
 
@@ -312,4 +322,5 @@ if __name__ == '__main__':
     except IndexError:
         sys.stderr.write('Usage: %s kalkati_xml_file output_directory\n' % sys.argv[0])
         sys.exit(1)
+
     main(filename, output)
