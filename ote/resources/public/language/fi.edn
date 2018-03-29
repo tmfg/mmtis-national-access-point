@@ -29,7 +29,8 @@
   :select-transport-operator      "Valitse palveluntuottaja"
 
   :transport-service-common
-  {:ote.db.transport-service/name "Palvelun nimi"
+  {:ote.db.transport-service/transport-type "Palvelun liikennemuoto"
+   :ote.db.transport-service/name "Palvelun nimi"
    :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Kuvaus palvelun esteettömyydestä"
 
@@ -104,7 +105,6 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name-taxi     "Tuote"
-   :ote.db.transport-service/price-class-name-other    "Hintaryhmä"
    :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
    :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
    :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
@@ -237,7 +237,8 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
+ {:transport-type-info "Ilmoita tässä osiossa liikkumispalvelusi liikennemuoto tai liikennemuodot. Tätä tietoa hyödynnetään Palvelukatalogi-sivun hakutoiminnoissa."
+  :name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
   :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
   :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
   :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulutiedot voit luoda NAP-palvelun"
@@ -339,25 +340,27 @@
   :route-calendar-clear "Tyhjennä kalenteri"
   }
 
-
-
-
  ;; Database enumeration values
  :enums
- {:ote.db.transport-service/type
+ {:ote.db.transport-service/transport-type
+  {:road      "Tieliikenne"
+   :rail      "Rautatieliikenne"
+   :sea       "Merenkulku"
+   :aviation  "Ilmailu"}
+
+  :ote.db.transport-service/type
   {:terminal                 "Asemat, satamat ja muut terminaalit"
    :passenger-transportation "Henkilöiden kuljetuspalvelut"
-   :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :rentals                  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking                  "Yleiset kaupalliset pysäköintipalvelut"
    :brokerage                "Välityspalvelut"}
 
   :ote.db.transport-service/sub-type
   {:terminal     "Asemat, satamat ja muut terminaalit"
-   :taxi         "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-   :request      "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-   :other        "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-   :schedule     "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-   :rentals      "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :taxi         "Taksiliikenne (tieliikenne)"
+   :request      "Tilausliikenne ja muu kutsuun perustuva liikenne"
+   :schedule     "Säännöllinen aikataulun mukainen liikenne"
+   :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking      "Yleiset kaupalliset pysäköintipalvelut"}
 
 
@@ -685,7 +688,7 @@
      jolla on kaksi erillistä palvelua nimeltä \"Rapidbus Tilausbussit\" Oulussa ja \"Rapidbus Taksipalvelu\"
      Kanta-Hämeessä. Kummallekin liikkumispalvelulle täytyy täyttää oma erillinen lomakkeensa, joka vastaa palvelun
      tyyppiä.
-     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausajoliikenne, linja-auto\" ja \"Taksiliikenne\"."}
+     Tässä esimerkissä täytyisi täyttää lomakkeet \"Tilausliikenne ja muu kutsuun perustuva\" ja \"Taksiliikenne\"."}
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
@@ -843,14 +846,12 @@
                    true "Kyllä"
                    false "Ei"
 
-                   ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taksiliikenne (henkilöiden kuljetuspalvelut)"
-                   "request" "Tilausajoliikenne, linja-auto (henkilöiden kuljetuspalvelut)"
-                   ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Säännöllinen aikataulun mukainen liikenne (henkilöiden kuljetuspalvelut)"
-                   "terminal"                 "Asemat, satamat ja muut terminaalit"
-                    "rentals"                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                    "parking"                  "Yleiset kaupalliset pysäköintipalvelut"
+                   "taxi"     "Taksiliikenne (tieliikenne)"
+                   "request"  "Tilausliikenne ja muu kutsuun perustuva liikenne"
+                   "schedule" "Säännöllinen aikataulun mukainen liikenne"
+                   "terminal" "Asemat, satamat ja muut terminaalit"
+                   "rentals"  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+                   "parking"  "Yleiset kaupalliset pysäköintipalvelut"
 
                    ;; accessibility tools
                    "wheelchair" "Pyörätuoli"

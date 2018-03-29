@@ -69,9 +69,10 @@
     (->Group (:label options)
              (merge {:layout :default}
                     options)
-             schemas)
+             (filter #(not (nil? %)) schemas))
     (->Group label-or-options
-             {:layout :default} schemas)))
+             {:layout :default}
+             (filter #(not (nil? %)) schemas))))
 
 (defn row
   "Creates an unlabeled group with all fields side-by-side in a row."

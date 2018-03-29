@@ -29,7 +29,8 @@
   :select-transport-operator      "Välj tjänsteproducent"
 
   :transport-service-common
-  {:ote.db.transport-service/name "Tjänstens namn"
+  {:ote.db.transport-service/transport-type "Trafikslag"
+   :ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/accessibility-tool        "Tillgänglighetsredskap"
    :ote.db.transport-service/accessibility-description "Beskrivning av tjänstens tillgänglighet"
 
@@ -105,7 +106,6 @@
 
    ;; Price Class fields
    :ote.db.transport-service/price-class-name-taxi     "Produkt"
-   :ote.db.transport-service/price-class-name-other    "Priskategori"
    :ote.db.transport-service/price-class-name-request  "Priskategori"
    :ote.db.transport-service/price-class-name-schedule "Priskategori"
    :ote.db.transport-service/price-per-unit            "Pris per enhet"
@@ -240,7 +240,8 @@
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
- {:name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
+ {:transport-type-info "I denna sektion anges mobilitetstjänstens trafikslag. Trafikslagsinformationen används i NAP-katalogens sökfunktion."
+  :name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
   ;; Needs a new translation
   :external-interfaces-intro "Om det inte finns gränssnitt i maskinläsbarform för din mobilitetstjänst, lämna den här sektionen tom och fyll i stället i de andra sektionerna i blanketten."
   :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
@@ -347,10 +348,15 @@
   :route-calendar-clear "Töm kalendern"
   }
 
-
  ;; Database enumeration values
  :enums
- {:ote.db.transport-service/type
+ {:ote.db.transport-service/transport-type
+  {:road      "Vägtrafik"
+   :rail      "Tågtrafik"
+   :sea       "Sjötrafik"
+   :aviation  "Luftfart"}
+
+  :ote.db.transport-service/type
   {:terminal                 "Stationer, hamnar och övriga terminaler"
    :passenger-transportation "Persontransporttjänster"
    :rentals                  "Fordonsuthyrning och kommersiella samanvändningstjänster"
@@ -359,11 +365,10 @@
 
   :ote.db.transport-service/sub-type
   {:terminal    "Stationer, hamnar och övriga terminaler"
-   :taxi        "Taxitjänst (persontransport)"
-   :request     "Abbonerad trafik, buss (persontransport)"
-   :other       "Beställtrafik (persontransport)"
-   :schedule    "Regelbunden ruttbaserad trafik (persontransport)"
-   :rentals     "Fordonsuthyrning och komersiella samanvändningstjänster"
+   :taxi        "Taxitjänst (i vägtrafik)"
+   :request     "Abbonerad trafik eller annan anropsstyrd trafik"
+   :schedule    "Regelbunden ruttbaserad trafik"
+   :rentals     "Fordonsuthyrning och kommersiella samanvändningstjänster"
    :parking     "Allmänna kommersiella parkeringstjänster"}
 
   :ote.db.transport-service/payment-methods
@@ -680,7 +685,7 @@
                 Fyll i en ny blankett för varje tjänst."
   :transport-service-type-brokerage-help-text "Gör på samma sätt om du erbjuder en förmedlingstjänst."
   :transport-service-type-selection-help-example "Exempel: Tjänsteproducenten \"RapidBus Oy\" har två olika tjänster \"Rapidbus Tilausbussit\" och \"Rapidbus Taksipalvelu\"
-Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Beställningstrafik med buss\" och en andra blankett \"Taxitjänst\"."}
+Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Abbonerad trafik eller annan anropsstyrd trafik\" och en andra blankett \"Taxitjänst\"."}
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
@@ -838,14 +843,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
                    true "Ja"
                    false "Nej"
 
-                   ;; Subtypes and types - HOX "Other" is translated as "Muu" so we need to change something to get it to work properly
-                   "taxi" "Taxitjänst (persontransport)"
-                   "request" "Abbonerad trafik, buss (persontransport)"
-                   ;"other" "Muu kutsuun perustuva liikenne (henkilöiden kuljetuspalvelut)"
-                   "schedule" "Regelbunden ruttbaserad trafik (persontransport)"
-                   "terminal"                 "Stationer, hamnar och övriga terminaler"
-                   "rentals"                  "Fordonsuthyrning och komersiella samanvändningstjänster"
-                   "parking"                  "Allmänna kommersiella parkeringstjänster"
+                   "taxi" "Taxitjänst (i vägtrafik)"
+                   "request" "Abbonerad trafik eller annan anropsstyrd trafik"
+                   "schedule" "Regelbunden ruttbaserad trafik"
+                   "terminal" "Stationer, hamnar och övriga terminaler"
+                   "rentals" "Fordonsuthyrning och komersiella samanvändningstjänster"
+                   "parking" "Allmänna kommersiella parkeringstjänster"
 
                    ;; accessibility tools
                    "wheelchair" "Rullstol"

@@ -14,8 +14,18 @@
             [clojure.string :as str]
             [testdouble.cljs.csv :as csv]))
 
+(defn- pre-set-transport-type [app]
+  (let [sub-type (get-in app[:transport-service ::t-service/sub-type])
+        set-transport-type (fn [app service-type options]
+                                 (assoc-in app [:transport-service service-type ::t-service/transport-type] options))]
+    (cond
+      (= sub-type :taxi) (set-transport-type app ::t-service/passenger-transportation #{:road})
+      (= sub-type :parking) (set-transport-type app ::t-service/parking #{:road})
+      :else app)))
+
 (defn new-transport-service [app]
-      (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type}))
+  (pre-set-transport-type
+   (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type})))
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -35,7 +45,8 @@
     ::t-service/companies-csv-url
     ::t-service/company-source
     ::t-service/company-csv-filename
-    :csv-count})
+    :csv-count
+    ::t-service/transport-type})
 
 (defn service-type-from-sub-type
       "Returns service type keyword based on sub-type."
@@ -43,7 +54,6 @@
       (case type
             :taxi :passenger-transportation
             :request :passenger-transportation
-            :other :passenger-transportation
             :schedule :passenger-transportation
             :terminal :terminal
             :rentals :rentals
@@ -416,7 +426,8 @@
     (let [sub-type (keyword (get-in app [:params :sub-type]))]
       (-> app
         (assoc-in [:transport-service ::t-service/sub-type] sub-type)
-        (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type) )))))
+        (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type))
+        (pre-set-transport-type)))))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the
