@@ -17,6 +17,25 @@
     [ote.views.route.service-calendar :as route-service-calendar]
     [ote.style.form :as style-form]))
 
+(defn badge-content [service-calendars row-idx]
+  (if (or (empty? (get-in service-calendars [row-idx]))
+          (and
+            (empty? (get-in service-calendars [row-idx :rule-dates]))
+            (empty? (get-in service-calendars [row-idx ::transit/service-removed-dates]))
+            (empty? (get-in service-calendars [row-idx ::transit/service-rules]))))
+    {:badge-content "!"
+     :secondary true
+     :badgeStyle {:width 15
+                  :height 15
+                  :top 0
+                  :right 0
+                  :fontSize 12
+                  :padding "3px 3px 3px 3px"
+                  :background-color "#ed0000"
+                  :color "#fff"}
+     :style {:padding "0px 5px 0px 5px"}}
+    {:style {:padding "0px 5px 0px 5px"}}))
+
 (defn- icon-for-type [type]
   (case type
     :regular [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
@@ -96,14 +115,16 @@
 
 (defn trip-row
   "Render a single row of stop times."
-  [e! stop-count edit-service-calendar row-idx {stops ::transit/stop-times :as trip}]
+  [e! stop-count edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
-  [:tr
+  [:tr {:style {:max-height "40px"}}
    [:td [:div
          [:span {:data-balloon        (tr [:route-wizard-page :trip-stop-calendar])
                  :data-balloon-pos    "right"
                  :data-balloon-length "medium"
                  :style {:overflow "visible"}}
+          [ui/badge
+           (badge-content service-calendars row-idx)
           [ui/icon-button {
                            :style (if (= edit-service-calendar row-idx)
                                     {:border-radius "25px" :background-color "#b3b3b3"}
@@ -112,9 +133,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (rw/->EditServiceCalendar row-idx)))}
-           (if (= edit-service-calendar row-idx)
-             [ic/action-today]
-             [ic/action-today])]]]]
+             [ic/action-today]]]]]]
    (map-indexed
      (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
        (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
@@ -159,7 +178,9 @@
       [:table {:style {:text-align "center"}}
        [route-times-header stop-sequence]
        [:tbody
-        (doall (map-indexed (partial trip-row e! stop-count (:edit-service-calendar route)) trips))]]]
+        (doall (map-indexed (partial trip-row e! stop-count
+                                     (:edit-service-calendar route)
+                                     (::transit/service-calendars route)) trips))]]]
 
      (when (:edit-service-calendar route)
        [route-service-calendar/service-calendar e! route])
