@@ -233,7 +233,8 @@
   [:footer.site-footer
    [:div.container-fluid
     [:div.row
-     [:img {:src "/ote/img/EU-logo.png" :style {:float "right"}}]
+     [:img {:src "/ote/img/EU-logo.png" :style {:float "right"
+                                                :transform "scale(0.5, 0.5);"}}]
      [:div.col-md-2.footer-links
       [:a.logo {:href "#" }
        [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
