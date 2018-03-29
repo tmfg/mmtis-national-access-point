@@ -294,7 +294,8 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
-  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."}
+  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
+  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -617,15 +618,15 @@
   }
 
  :route-wizard-page
- {:trip-stop-arrival-exception-default "Avstigning möjlig (standard)"
-  :trip-stop-arrival-exception-no "Avstigning inte möjlig"
-  :trip-stop-arrival-exception-agency "Avstigning enligt överenskommelse med tjänsteproducenten"
-  :trip-stop-arrival-exception-driver "Avstigning enligt överenskommelse med skepparen"
-
-  :trip-stop-departure-exception-default "Ombordstigning möjlig (standard)"
-  :trip-stop-departure-exception-no "Ombordstigning inte möjlig"
-  :trip-stop-departure-exception-agency "Ombordstigning enligt överenskommelse med tjänsteproducenten"
-  :trip-stop-departure-exception-driver "Ombordstigning enligt överenskommelse med skepparen"
+ {:trip-stop-exception
+  {:arrival {:default "Avstigning möjlig (standard)"
+             :no "Avstigning inte möjlig"
+             :agency "Avstigning enligt överenskommelse med tjänsteproducenten"
+             :driver "Avstigning enligt överenskommelse med skepparen"}
+   :departure {:default "Ombordstigning möjlig (standard)"
+               :no "Ombordstigning inte möjlig"
+               :agency "Ombordstigning enligt överenskommelse med tjänsteproducenten"
+               :driver "Ombordstigning enligt överenskommelse med skepparen"}}
 
   :trip-stop-arrival-header "ankomst"
   :trip-stop-departure-header "avgång"
@@ -664,6 +665,8 @@
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
+  :save-success "Reitin tallennus onnistui."
+  :save-failure "Reitin tallennus epäonnistui"
   }
 
  :price-dialog

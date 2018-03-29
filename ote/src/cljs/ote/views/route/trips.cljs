@@ -17,57 +17,64 @@
     [ote.views.route.service-calendar :as route-service-calendar]
     [ote.style.form :as style-form]))
 
-(defn exception-icon [e! stop-type drop-off-type pickup-type stop-idx trip-idx]
-  [:div
-   [ui/icon-menu
-    {:icon-button-element (r/as-element
-                            [ui/icon-button
-                             {:style      {:padding 4
-                                           :width   24
-                                           :height  24}
-                              :icon-style {:height 24
-                                           :width  24}}
-                             (cond
-                               (and (nil? drop-off-type) (nil? pickup-type))
-                               [ic/communication-call {:style style-route/exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :regular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :regular)) [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :not-available)) [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :phone-agency)) [ic/communication-call {:style style-route/selected-exception-icon}]
-                               (and (= "arrival" stop-type) (= drop-off-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
-                               (and (= "departure" stop-type) (= pickup-type :coordinate-with-driver)) [ic/social-people {:style style-route/selected-exception-icon}]
-                               :else [ic/communication-call {:style style-route/exception-icon}])
-                             ])}
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
-                                   (tr [:route-wizard-page :trip-stop-arrival-exception-default])
-                                   (tr [:route-wizard-page :trip-stop-departure-exception-default]))
-                   :left-icon    (ic/maps-pin-drop)
-                   :on-click     #(do
-                                    (.preventDefault %)
-                                    (e! (rw/->ShowStopException stop-type stop-idx :regular trip-idx)))}]
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
-                                   (tr [:route-wizard-page :trip-stop-arrival-exception-no])
-                                   (tr [:route-wizard-page :trip-stop-departure-exception-no]))
-                   :left-icon    (ic/notification-do-not-disturb)
-                   :on-click     #(do
-                                    (.preventDefault %)
-                                    (e! (rw/->ShowStopException stop-type stop-idx :not-available trip-idx)))}]
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
-                                   (tr [:route-wizard-page :trip-stop-arrival-exception-agency])
-                                   (tr [:route-wizard-page :trip-stop-departure-exception-agency]))
-                   :left-icon    (ic/communication-call)
-                   :on-click     #(do
-                                    (.preventDefault %)
-                                    (e! (rw/->ShowStopException stop-type stop-idx :phone-agency trip-idx)))}]
-    [ui/menu-item {:primary-text (if (= "arrival" stop-type)
-                                   (tr [:route-wizard-page :trip-stop-arrival-exception-driver])
-                                   (tr [:route-wizard-page :trip-stop-departure-exception-driver]))
-                   :left-icon    (ic/social-people)
-                   :on-click     #(do
-                                    (.preventDefault %)
-                                    (e! (rw/->ShowStopException stop-type stop-idx :coordinate-with-driver trip-idx)))}]]])
+(defn badge-content [service-calendars row-idx]
+  (if (or (empty? (get-in service-calendars [row-idx]))
+          (and
+            (empty? (get-in service-calendars [row-idx :rule-dates]))
+            (empty? (get-in service-calendars [row-idx ::transit/service-removed-dates]))
+            (empty? (get-in service-calendars [row-idx ::transit/service-rules]))))
+    {:badge-content "!"
+     :secondary true
+     :badgeStyle {:width 15
+                  :height 15
+                  :top 0
+                  :right 0
+                  :fontSize 12
+                  :padding "3px 3px 3px 3px"
+                  :background-color "#ed0000"
+                  :color "#fff"}
+     :style {:padding "0px 5px 0px 5px"}}
+    {:style {:padding "0px 5px 0px 5px"}}))
+
+(defn- icon-for-type [type]
+  (case type
+    :regular [ic/maps-pin-drop {:style style-route/selected-exception-icon}]
+    :not-available [ic/notification-do-not-disturb {:style style-route/selected-exception-icon}]
+    :phone-agency [ic/communication-call {:style style-route/selected-exception-icon}]
+    :coordinate-with-driver [ic/social-people {:style style-route/selected-exception-icon}]
+    [ic/maps-pin-drop {:style style-route/exception-icon}]))
+
+(defn exception-icon [e! stop-type type stop-idx trip-idx]
+  (let [set-exception! (fn [to-type]
+                         #(do
+                            (.preventDefault %)
+                            (e! (rw/->ShowStopException stop-type stop-idx to-type trip-idx))))]
+    [:div
+     [ui/icon-menu
+      {:icon-button-element (r/as-element
+                             [ui/icon-button
+                              {:style      {:padding 4
+                                            :width   24
+                                            :height  24}
+                               :icon-style {:height 24
+                                            :width  24}}
+                              (icon-for-type type)])}
+      [ui/menu-item
+       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :default])
+        :left-icon    (ic/maps-pin-drop)
+        :on-click     (set-exception! :regular)}]
+      [ui/menu-item
+       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :no])
+        :left-icon    (ic/notification-do-not-disturb)
+        :on-click     (set-exception! :not-available)}]
+      [ui/menu-item
+       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :agency])
+        :left-icon    (ic/communication-call)
+        :on-click     (set-exception! :phone-agency)}]
+      [ui/menu-item
+       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :driver])
+        :left-icon    (ic/social-people)
+        :on-click     (set-exception! :coordinate-with-driver)}]]]))
 
 (defn route-times-header [stop-sequence]
   [:thead
@@ -108,14 +115,16 @@
 
 (defn trip-row
   "Render a single row of stop times."
-  [e! stop-count edit-service-calendar row-idx {stops ::transit/stop-times :as trip}]
+  [e! stop-count edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
-  [:tr
+  [:tr {:style {:max-height "40px"}}
    [:td [:div
          [:span {:data-balloon        (tr [:route-wizard-page :trip-stop-calendar])
                  :data-balloon-pos    "right"
                  :data-balloon-length "medium"
                  :style {:overflow "visible"}}
+          [ui/badge
+           (badge-content service-calendars row-idx)
           [ui/icon-button {
                            :style (if (= edit-service-calendar row-idx)
                                     {:border-radius "25px" :background-color "#b3b3b3"}
@@ -124,9 +133,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (rw/->EditServiceCalendar row-idx)))}
-           (if (= edit-service-calendar row-idx)
-             [ic/action-today]
-             [ic/action-today])]]]]
+             [ic/action-today]]]]]]
    (map-indexed
      (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
        (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
@@ -144,10 +151,11 @@
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
+                                    :required? true
                                     :update! #(update! {::transit/arrival-time %})}
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                [exception-icon e! "arrival" pickup-type drop-off-type stop-idx row-idx]]])
+                [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
            (if (= stop-idx (dec stop-count))
              ^{:key (str stop-idx "-last")}
              [:td style " - "]
@@ -155,26 +163,29 @@
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
+                                    :required? true
                                     :update! #(update! {::transit/departure-time %})}
                          departure-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                [exception-icon e! "departure" pickup-type drop-off-type stop-idx row-idx]]]))))
+                [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
      stops)])
 
-(defn trips-list [e! route app]
+(defn trips-list [e! route]
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
         empty-calendar? (empty? (first (::transit/service-calendars route)))]
     [:div.route-times
      [:div {:style {:overflow "auto"}}
-     [:table {:style {:text-align "center"}}
-      [route-times-header stop-sequence]
-      [:tbody
-       (doall (map-indexed (partial trip-row e! stop-count (get-in app [:route :edit-service-calendar])) trips))]]]
+      [:table {:style {:text-align "center"}}
+       [route-times-header stop-sequence]
+       [:tbody
+        (doall (map-indexed (partial trip-row e! stop-count
+                                     (:edit-service-calendar route)
+                                     (::transit/service-calendars route)) trips))]]]
 
      (when (:edit-service-calendar route)
-       [route-service-calendar/service-calendar e! app])
+       [route-service-calendar/service-calendar e! route])
 
      (when empty-calendar?
        [:div {:style {:margin-top "10px"}}
@@ -199,6 +210,6 @@
      [:div (stylefy/use-style style-form/form-card)
       [:div (stylefy/use-style style-form/form-card-label) "Vuorot"]
       [:div (merge (stylefy/use-style style-form/form-card-body))
-       [trips-list e! route app]
-       ]]
-     ]))
+       (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))
+         [trips-list e! route]
+         [common/help (tr [:form-help :trip-editor-no-stop-sequence])])]]]))

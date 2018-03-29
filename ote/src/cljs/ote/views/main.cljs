@@ -277,9 +277,12 @@
        :columns 3}
       {:name :email
        :type :string
+       :autocomplete "email"
        :on-enter #(e! (login/->Login))}
       {:name :password
-       :type :string :password? true
+       :autocomplete "passoword"
+       :type :string
+       :password? true
        :on-enter #(e! (login/->Login))})]
     credentials]])
 

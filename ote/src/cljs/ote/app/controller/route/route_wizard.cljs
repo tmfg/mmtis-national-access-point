@@ -10,7 +10,9 @@
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.localization :refer [tr tr-key]]
+            [taoensso.timbre :as log]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -129,6 +131,8 @@
         (assoc trip ::transit/stop-times
                     (conj (::transit/stop-times trip)
                           {::transit/stop-idx       stop-idx
+                           ::transit/drop-off-type :regular
+                           ::transit/pickup-type :regular
                            ::transit/arrival-time   (::transit/arrival-time new-stop)
                            ::transit/departure-time (::transit/departure-time new-stop)})))
       trips)))
@@ -467,10 +471,10 @@
     (update-in app [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data))
 
   ShowStopException
-  (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx} app]
-    (let [icon-key (if (= "arrival" stop-type)
-                     (keyword "ote.db.transit/pickup-type")
-                     (keyword "ote.db.transit/drop-off-type"))
+  (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx :as evt} app]
+    (let [icon-key (if (= :arrival stop-type)
+                     :ote.db.transit/drop-off-type
+                     :ote.db.transit/pickup-type)
           changed-stops (update-stop-by-idx
                           (get app :route) stop-idx trip-idx
                           assoc icon-key icon-type)]
@@ -510,13 +514,16 @@
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
-    (assoc (dissoc app :route) :page :routes))
+    (-> app
+        (assoc :flash-message (tr [:route-wizard-page :save-success]))
+        (dissoc :route)
+        (assoc :page :routes)))
 
   SaveRouteFailure
   (process-event [{response :response} app]
     (.error js/console "Save route failed:" (pr-str response))
     (assoc app
-      :flash-message-error "Reitin tallennus epäonnistui"))
+      :flash-message-error (tr [:route-wizard-page :save-failure])))
 
   CancelRoute
   (process-event [_ app]
@@ -545,14 +552,9 @@
                      (time/valid-time? (::transit/arrival-time %))) other-stops)))
 
 (defn valid-stop-sequence?
-  "Check if given route's stop sequence is valid. A stop sequence is valid
-  if it is not empty and the first and last stops have a departure and arrival time respectively. And all other
-  stops have valid arrival and departure times."
+  "Check that a stop sequence has at least 2 stops."
   [{::transit/keys [stops] :as route}]
-  (let [first-stop (first stops)
-        last-stop (last stops)
-        other-stops (rest (butlast stops))]
-    (validate-stop-times first-stop last-stop other-stops)))
+  (> (count stops) 1))
 
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
@@ -573,11 +575,9 @@
               (validate-stop-times first-stop last-stop other-stops)))
           trips))
 
-(defn validate-previous-steps
-  "To be able to select a step in wizard that is valid, we call all previous validate functions."
-  [route step-name wizard-steps]
-  (every? (fn [{validate :validate}]
-            (if validate
-              (validate route)
-              true))
-            (take-while #(not= step-name (:name %)) wizard-steps)))
+
+(defn valid? [route]
+  (boolean
+   (and (valid-basic-info? route)
+        (valid-stop-sequence? route)
+        (valid-trips? route))))

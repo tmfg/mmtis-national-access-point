@@ -286,7 +286,8 @@
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
-  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."}
+  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
+  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -615,15 +616,15 @@
   }
 
  :route-wizard-page
- {:trip-stop-arrival-exception-default "Poistumismahdollisuus oletuksena"
-  :trip-stop-arrival-exception-no "Ei poistumismahdollisuutta"
-  :trip-stop-arrival-exception-agency "Poistumisesta sovittava palveluntuottajan kanssa"
-  :trip-stop-arrival-exception-driver "Poistumisesta sovittava kuljettajan kanssa"
-
-  :trip-stop-departure-exception-default "Nousu mahdollista oletuksena"
-  :trip-stop-departure-exception-no "Ei nousumahdollisuutta"
-  :trip-stop-departure-exception-agency "Nousemisesta sovittava palveluntuottajan kanssa"
-  :trip-stop-departure-exception-driver "Noususta sovittava kuljettajan kanssa"
+ {:trip-stop-exception
+  {:arrival {:default "Poistumismahdollisuus oletuksena"
+             :no "Ei poistumismahdollisuutta"
+             :agency "Poistumisesta sovittava palveluntuottajan kanssa"
+             :driver "Poistumisesta sovittava kuljettajan kanssa"}
+   :departure {:default "Nousu mahdollista oletuksena"
+               :no "Ei nousumahdollisuutta"
+               :agency "Nousemisesta sovittava palveluntuottajan kanssa"
+               :driver "Noususta sovittava kuljettajan kanssa"}}
 
   :trip-stop-arrival-header "tulo"
   :trip-stop-departure-header "lähtö"
@@ -641,7 +642,7 @@
   :stop-sequence-port-header "Satama"
   :stop-sequence-arrival-header "Saapumisaika"
   :stop-sequence-departure-header "Lähtöaika"
-  :stop-sequence-map-help  "Muodosta reitti valitsemalla kohteita/pysähdyspaikkoja kartalta."
+  :stop-sequence-map-help  "Muodosta reitti valitsemalla pysähdyspaikkoja kartalta. Voit tarvittaessa lisätä pysähdyspaikkoja myös itse."
 
   :wizard-step-basic-info "Reitin nimi"
   :wizard-step-stop-sequence "Reittipysäkit"
@@ -661,6 +662,9 @@
   :route-calendar-from-date "Alkaen"
   :route-calendar-to-date "Päättyen"
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
+  :save-success "Reitin tallennus onnistui."
+  :save-failure "Reitin tallennus epäonnistui"
+
   }
 
  :price-dialog
