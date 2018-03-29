@@ -638,7 +638,7 @@
   :stop-sequence-port-header "Port"
   :stop-sequence-arrival-header "Arrival time"
   :stop-sequence-departure-header "Departure time"
-  :stop-sequence-map-help "Make a new route by selecting stops from the map with a mouse click."
+  :stop-sequence-map-help "Make a new route by selecting stops from the map with a mouse click. You can also add your own stops if you need to."
 
   :wizard-step-basic-info "Route name"
   :wizard-step-stop-sequence "Route stops"

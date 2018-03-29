@@ -151,6 +151,7 @@
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
+                                    :required? true
                                     :update! #(update! {::transit/arrival-time %})}
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
@@ -162,6 +163,7 @@
              [:td style
               [:div.col-md-11
                 [form-fields/field {:type    :time
+                                    :required? true
                                     :update! #(update! {::transit/departure-time %})}
                          departure-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
