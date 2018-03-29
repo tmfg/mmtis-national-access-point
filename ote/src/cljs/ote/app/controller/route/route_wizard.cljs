@@ -64,7 +64,7 @@
 (defrecord GoToStep [step])
 
 ;; Save route to database
-(defrecord SaveToDb [])
+(defrecord SaveToDb [published?])
 (defrecord CancelRoute [])
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
@@ -333,8 +333,9 @@
           (fn [trip]
             (update trip ::transit/stop-times
                     (fn [stop-times]
-                      (into (subvec (vec stop-times) 0 idx)
-                            (subvec (vec stop-times) (inc idx)))))))))
+                      (let [first-part (subvec (vec stop-times) 0 idx)
+                            last-part (if (> idx 0) (subvec (vec stop-times) (inc idx)) [])]
+                      (into first-part last-part))))))))
 
 
   EditServiceCalendar
@@ -486,7 +487,7 @@
     app)
 
   SaveToDb
-  (process-event [_ app]
+  (process-event [{published? :published?} app]
     (let [calendars (mapv form/without-form-metadata (get-in app [:route ::transit/service-calendars]))
           deduped-cals (into [] (distinct calendars))
           cals-indices (mapv #(first (keep-indexed
@@ -494,6 +495,7 @@
                                        deduped-cals)) calendars)
           route (-> app :route form/without-form-metadata
                     (assoc ::transit/service-calendars deduped-cals)
+                    (assoc ::transit/published? (or published? false))
                     (update ::transit/stops (fn [stop]
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
@@ -562,22 +564,36 @@
   (and (not (str/blank? name))
        transport-operator-id))
 
+(defn valid-calendar? [route-calendar]
+  (let [result (if (or (empty? route-calendar)
+                       (and
+                         (empty? (get route-calendar :rule-dates))
+                         (empty? (get route-calendar ::transit/service-removed-dates))
+                         (empty? (get route-calendar ::transit/service-rules)))) false true)]
+    result))
+
 (defn valid-trips?
   "Check if given route's trip stop times are valid.
   The first stop must have a departure time and the last stop must
   have an arrival time. All other stops must have both the arrival
   and the departure time."
-  [{::transit/keys [trips]}]
-  (every? (fn [{stops ::transit/stop-times}]
-            (let [first-stop (first stops)
-                  last-stop (last stops)
-                  other-stops (rest (butlast stops))]
-              (validate-stop-times first-stop last-stop other-stops)))
-          trips))
+  [route]
+  (let [trips (vec (::transit/trips route))]
+    (every?
+      (fn [trip]
+        (let [stops (::transit/stop-times trip)
+              service-calendar-idx (::transit/service-calendar-idx trip)
+              first-stop (first stops)
+              last-stop (last stops)
+              other-stops (rest (butlast stops))
+              calendar? (valid-calendar? (get-in route [::transit/service-calendars service-calendar-idx]))]
+          (and calendar? (validate-stop-times first-stop last-stop other-stops)))
+        )
+      trips)))
 
 
-(defn valid? [route]
+(defn valid-route? [route]
   (boolean
-   (and (valid-basic-info? route)
-        (valid-stop-sequence? route)
-        (valid-trips? route))))
+    (and (valid-basic-info? route)
+         (valid-stop-sequence? route)
+         (valid-trips? route))))
