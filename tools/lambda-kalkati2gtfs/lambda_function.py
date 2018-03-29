@@ -2,15 +2,16 @@
 
 import logging
 import urllib2
-import zipfile
 import io
 import os
 import datetime
 import json
 import boto3
-from botocore.client import Config
 
-from kalkati2gtfs import convert
+from StringIO import StringIO
+from zipfile import ZipFile, ZIP_DEFLATED
+from botocore.client import Config
+from kalkati2gtfs import convert_in_memory
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -18,19 +19,46 @@ logger.setLevel(logging.INFO)
 s3 = boto3.client('s3', config=Config(signature_version='s3v4'))
 
 
-def zip_files(path, zipfile_path):
-    zipf = zipfile.ZipFile(zipfile_path, mode='w')
+def extract_zip(buf):
+    # Rewind the buffer
+    buf.seek(0)
+    zipf = ZipFile(buf, mode='r')
 
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            zipf.write(os.path.join(root, file), arcname=file)
-            os.remove(os.path.join(root, file))
+    files = [zipf.open(name) for name in zipf.namelist()]
+
+    zipf.close()
+
+    return files
+
+
+def zip_files(files):
+    buf = io.BytesIO()
+    zipf = ZipFile(buf, 'w', ZIP_DEFLATED)
+
+    for name, file in files.iteritems():
+        zipf.writestr(name + '.txt', file.read())
+
+    zipf.close()
+
+    buf.seek(0)
+
+    return buf
+
+
+# NOTE: We assume that there is only one Kalkati LVM.xml file in the provided zip, as should be.
+def kalkati_zip_to_gtfs_zip(zip_buf):
+    kalkati_files = extract_zip(zip_buf)
+    gtfs_files = convert_in_memory(kalkati_files[0])
+
+    return zip_files(gtfs_files)
 
 
 ### Lambda handler ###
 ## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
     try:
+        zipf = None
+
         try:
             file_url = json.loads(event['body'])
         except ValueError as e:
@@ -43,16 +71,7 @@ def lambda_handler(event, context):
             response = opener.open(file_url)
 
             with io.BytesIO(response.read()) as tf:
-                # rewind the file
-                tf.seek(0)
-
-                # Read the file as a zipfile and process the members
-                with zipfile.ZipFile(tf, mode='r') as zipf:
-                    for file in zipf.infolist():
-                        path = zipf.extract(file, '/tmp/kalkati/')
-                        convert(path, '/tmp/gtfs/')
-
-            zip_files('/tmp/gtfs', '/tmp/gtfs.zip')
+                zipf = kalkati_zip_to_gtfs_zip(tf)
 
         except Exception as e:
             raise RuntimeError('Error while processing file {}: {}'.format(file_url, str(e)))
@@ -60,7 +79,8 @@ def lambda_handler(event, context):
         file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 
         try:
-            s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=open('/tmp/gtfs.zip'))
+            s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=zipf)
+
             # Create temporary url for downloading the generated zip file (expires in 10 minutes)
             signed_url = s3.generate_presigned_url(ClientMethod='get_object',
                                                    Params={'Bucket': 'kalkati2gtfs', 'Key': file_key},
