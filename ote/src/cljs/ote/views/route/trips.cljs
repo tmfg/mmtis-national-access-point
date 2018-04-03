@@ -174,7 +174,7 @@
     stops)
    (when can-delete?
      [:td
-      [common/tooltip {:text "poistappa vuoro"}
+      [common/tooltip {:text (tr [:route-wizard-page :trip-delete])}
        [ui/icon-button {:on-click #(e! (rw/->DeleteTrip row-idx))}
         [ic/action-delete]]]])])
 
