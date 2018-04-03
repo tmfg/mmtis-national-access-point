@@ -645,7 +645,7 @@
   :stop-sequence-arrival-header "Ankomsttid"
   :stop-sequence-departure-header "Avgångstid"
   :stop-sequence-map-help  "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
-
+  :stop-sequence-delete "Poista pysäkki ketjusta"
 
   :wizard-step-basic-info "Reitin nimi"
   :wizard-step-stop-sequence "Reittipysäkit"

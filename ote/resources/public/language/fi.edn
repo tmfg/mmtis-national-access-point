@@ -643,6 +643,7 @@
   :stop-sequence-arrival-header "Saapumisaika"
   :stop-sequence-departure-header "Lähtöaika"
   :stop-sequence-map-help  "Muodosta reitti valitsemalla pysähdyspaikkoja kartalta. Voit tarvittaessa lisätä pysähdyspaikkoja myös itse."
+  :stop-sequence-delete "Poista pysäkki ketjusta"
 
   :wizard-step-basic-info "Reitin nimi"
   :wizard-step-stop-sequence "Reittipysäkit"
