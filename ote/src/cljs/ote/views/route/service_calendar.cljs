@@ -65,7 +65,9 @@
        "Ajopäiväkalenteri"]
       [ui/raised-button {:secondary true
                          :icon (ic/action-delete)
-                         :style {:float "right" :margin-bottom "0.5em"}
+                         :style {:float "right"
+                                 :margin-top "0.5em"
+                                 :margin-right "0.5em"}
                          :on-click #(e! (rw/->ClearServiceCalendar trip-idx))
                          :label (tr [:buttons :route-calendar-clear])}]
 
