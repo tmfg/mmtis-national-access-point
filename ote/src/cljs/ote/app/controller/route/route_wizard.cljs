@@ -587,10 +587,8 @@
               last-stop (last stops)
               other-stops (rest (butlast stops))
               calendar? (valid-calendar? (get-in route [::transit/service-calendars service-calendar-idx]))]
-          (and calendar? (validate-stop-times first-stop last-stop other-stops)))
-        )
+          (and calendar? (validate-stop-times first-stop last-stop other-stops))))
       trips)))
-
 
 (defn valid-route? [route]
   (boolean
