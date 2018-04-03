@@ -148,6 +148,31 @@
 
 (declare new-stop-time)
 
+(defn add-stop-to-sequence [app location properties]
+  ;; Add stop to current stop sequence
+  (let [stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
+        stop-exist-in-sequence? (or (= (::transit/code (last stop-sequence)) (get properties "code")) false)
+        new-stop-idx (count stop-sequence)
+        new-stop (dissoc (merge (into {}
+                                      (map #(update % 0 (partial keyword "ote.db.transit")))
+                                      properties)
+                                {::transit/location location})
+                         ::transit/country
+                         ::transit/country-code
+                         ::transit/unlocode
+                         ::transit/port-type
+                         ::transit/port-type-name
+                         ::transit/type)
+        new-stop-sequence (if stop-exist-in-sequence?
+                            stop-sequence
+                            (conj stop-sequence new-stop))
+        new-trip-sequence (if stop-exist-in-sequence?
+                            (get-in app [:route ::transit/trips])
+                            (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
+    (-> app
+        (assoc-in [:route ::transit/stops] new-stop-sequence)
+        (assoc-in [:route ::transit/trips] new-trip-sequence))))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -199,53 +224,17 @@
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (let [properties (js->clj (aget feature "properties"))
-          stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
-          stop-exist-in-sequence? (or (= (::transit/code (last stop-sequence)) (get properties "code")) false)
-          new-stop-idx (count stop-sequence)
-          new-stop (dissoc (merge (into {}
-                                        (map #(update % 0 (partial keyword "ote.db.transit")))
-                                        properties)
-                                  {::transit/location (vec (aget feature "geometry" "coordinates"))})
-                           ::transit/country
-                           ::transit/country-code
-                           ::transit/unlocode
-                           ::transit/port-type
-                           ::transit/port-type-name
-                           ::transit/type)
-          new-stop-sequence (if stop-exist-in-sequence?
-                              stop-sequence
-                              (conj stop-sequence new-stop))
-          new-trip-sequence (if stop-exist-in-sequence?
-                              (get-in app [:route ::transit/trips])
-                              (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
-      (-> app
-          (assoc-in [:route ::transit/stops] new-stop-sequence)
-          (assoc-in [:route ::transit/trips] new-trip-sequence))))
+    (add-stop-to-sequence app
+                          (vec (aget feature "geometry" "coordinates"))
+                          (js->clj (aget feature "properties"))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
-    ;; Add stop to current route stop sequence (:route ::transit/stops)
-    ;; And add stop to current map marker stop sequence (:route :stops "feature")
-    (let [stop-sequence (into [] (get-in app [:route ::transit/stops])) ;; Ensure, that we use vector and not list
-          {feature :geojson :as custom-stop}
+    (let [{feature :geojson :as custom-stop}
           (first (keep #(when (= (:id %) id) %) (:custom-stops route)))
-          geometry (vec (aget feature "geometry" "coordinates"))
-          properties (js->clj (aget feature "properties"))
-          new-custom-stop (merge (into {}
-                                       (map #(update % 0 (partial keyword "ote.db.transit")))
-                                       properties)
-                                 {::transit/location geometry})
-          new-stop-sequence (if (= (::transit/code (last stop-sequence)) (get properties "code"))
-                              stop-sequence
-                              (conj stop-sequence new-custom-stop))
-          new-stop {"geometry"   {"type" "Point", "coordinates" geometry}
-                    "properties" properties
-                    "type"       "Feature"}
-          stops (get-in app [:route :stops "features"])]
-      (-> app
-          (assoc-in [:route :stops "features"] (conj stops new-stop))
-          (assoc-in [:route ::transit/stops] new-stop-sequence))))
+          location (vec (aget feature "geometry" "coordinates"))
+          properties (js->clj (aget feature "properties"))]
+      (add-stop-to-sequence app location properties)))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
