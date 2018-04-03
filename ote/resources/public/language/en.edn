@@ -615,11 +615,13 @@
 
  :route-wizard-page
  {:trip-stop-exception
-  {:arrival {:default "Drop off always available"
+  {:arrival {:tooltip "Change drop off"
+             :default "Drop off always available"
              :no "Drop off not available"
              :agency "Drop off has to be arranged with the transport operator"
              :driver "Drop off has to be arranged with the driver"}
-   :departure {:default "Pick up always available"
+   :departure {:tooltip "Change pick up"
+               :default "Pick up always available"
                :no "Pick up not available"
                :agency "Pick up has to be arranged with the transport operator"
                :driver "Pick up has to be arranged with the driver"}}
@@ -641,6 +643,7 @@
   :stop-sequence-arrival-header "Arrival time"
   :stop-sequence-departure-header "Departure time"
   :stop-sequence-map-help "Make a new route by selecting stops from the map with a mouse click. You can also add your own stops if you need to."
+  :stop-sequence-delete "Remove stop from sequence"
 
   :wizard-step-basic-info "Route name"
   :wizard-step-stop-sequence "Route stops"

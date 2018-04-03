@@ -62,10 +62,12 @@
     [:div.route-service-calendar {:style {:padding-top "20px"}}
      [:div (stylefy/use-style style-form/form-card)
       [:div (stylefy/use-style style-form/form-card-label)
-       "Ajopäiväkalenteri"]
+       (tr [:route-wizard-page :route-calendar-group-name])]
       [ui/raised-button {:secondary true
                          :icon (ic/action-delete)
-                         :style {:float "right" :margin-bottom "0.5em"}
+                         :style {:float "right"
+                                 :margin-top "0.5em"
+                                 :margin-right "0.5em"}
                          :on-click #(e! (rw/->ClearServiceCalendar trip-idx))
                          :label (tr [:buttons :route-calendar-clear])}]
 

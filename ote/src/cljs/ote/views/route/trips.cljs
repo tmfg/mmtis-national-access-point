@@ -50,31 +50,33 @@
                             (.preventDefault %)
                             (e! (rw/->ShowStopException stop-type stop-idx to-type trip-idx))))]
     [:div
-     [ui/icon-menu
-      {:icon-button-element (r/as-element
-                             [ui/icon-button
-                              {:style      {:padding 4
-                                            :width   24
-                                            :height  24}
-                               :icon-style {:height 24
-                                            :width  24}}
-                              (icon-for-type type)])}
-      [ui/menu-item
-       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :default])
-        :left-icon    (ic/maps-pin-drop)
-        :on-click     (set-exception! :regular)}]
-      [ui/menu-item
-       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :no])
-        :left-icon    (ic/notification-do-not-disturb)
-        :on-click     (set-exception! :not-available)}]
-      [ui/menu-item
-       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :agency])
-        :left-icon    (ic/communication-call)
-        :on-click     (set-exception! :phone-agency)}]
-      [ui/menu-item
-       {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :driver])
-        :left-icon    (ic/social-people)
-        :on-click     (set-exception! :coordinate-with-driver)}]]]))
+     [common/tooltip {:text (tr [:route-wizard-page :trip-stop-exception stop-type :tooltip])
+                      :pos "up"}
+      [ui/icon-menu
+       {:icon-button-element (r/as-element
+                              [ui/icon-button
+                               {:style      {:padding 4
+                                             :width   24
+                                             :height  24}
+                                :icon-style {:height 24
+                                             :width  24}}
+                               (icon-for-type type)])}
+       [ui/menu-item
+        {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :default])
+         :left-icon    (ic/maps-pin-drop)
+         :on-click     (set-exception! :regular)}]
+       [ui/menu-item
+        {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :no])
+         :left-icon    (ic/notification-do-not-disturb)
+         :on-click     (set-exception! :not-available)}]
+       [ui/menu-item
+        {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :agency])
+         :left-icon    (ic/communication-call)
+         :on-click     (set-exception! :phone-agency)}]
+       [ui/menu-item
+        {:primary-text (tr [:route-wizard-page :trip-stop-exception stop-type :driver])
+         :left-icon    (ic/social-people)
+         :on-click     (set-exception! :coordinate-with-driver)}]]]]))
 
 (defn route-times-header [stop-sequence]
   [:thead
@@ -155,7 +157,7 @@
                                     :update! #(update! {::transit/arrival-time %})}
                arrival-time]]
               [:div.col-md-1 {:style {:margin-left "-10px"}}
-                [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
+               [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
            (if (= stop-idx (dec stop-count))
              ^{:key (str stop-idx "-last")}
              [:td style " - "]

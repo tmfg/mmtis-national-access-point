@@ -103,7 +103,7 @@
            {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
             :color "red"}])]])}))
 
-(defn- route-stop-times [e! stop-sequence]
+(defn- route-stops [e! stop-sequence]
   [:div {:style {:width "30%" :margin "1em"}}
    [:table {:style {:width "100%"}}
     [:thead {:style {:text-align "left"}}
@@ -118,8 +118,9 @@
          ^{:key (str code "_" i)}
          [:tr {:style {:border-bottom "solid 1px black"}}
           [:td name]
-          [:td [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
-                [ic/action-delete]]]])
+          [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])}
+                [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
+                 [ic/action-delete]]]]])
        stop-sequence))]
     (when (empty? stop-sequence)
       [:tbody
@@ -137,4 +138,4 @@
        [:div (stylefy/use-style style-form/form-card-body)
         [:div {:style {:display "flex" :flex-direction "row"}}
          [route-map e! route]
-         [route-stop-times e! (::transit/stops route)]]]])))
+         [route-stops e! (::transit/stops route)]]]])))

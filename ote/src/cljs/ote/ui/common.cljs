@@ -42,6 +42,14 @@
                   wrapper-opts)
      (component data)]))
 
+(defn tooltip
+  "Render child-component with tooltip"
+  [{:keys [text pos len]} child-component]
+  [:span {:data-balloon text
+          :data-balloon-pos (or pos "up")
+          :data-balloon-length (or len "medium")}
+   child-component])
+
 (defn dialog
   "Creates a dialog with a link trigger. The body can be in hiccup format."
   [link-label title body]
