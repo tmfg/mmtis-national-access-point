@@ -619,11 +619,13 @@
 
  :route-wizard-page
  {:trip-stop-exception
-  {:arrival {:default "Avstigning möjlig (standard)"
+  {:arrival {:tooltip "Muuta poistumismahdollisuutta"
+             :default "Avstigning möjlig (standard)"
              :no "Avstigning inte möjlig"
              :agency "Avstigning enligt överenskommelse med tjänsteproducenten"
              :driver "Avstigning enligt överenskommelse med skepparen"}
-   :departure {:default "Ombordstigning möjlig (standard)"
+   :departure {:tooltip "Muuta nousumahdollisuutta"
+               :default "Ombordstigning möjlig (standard)"
                :no "Ombordstigning inte möjlig"
                :agency "Ombordstigning enligt överenskommelse med tjänsteproducenten"
                :driver "Ombordstigning enligt överenskommelse med skepparen"}}

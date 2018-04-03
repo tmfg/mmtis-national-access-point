@@ -617,11 +617,13 @@
 
  :route-wizard-page
  {:trip-stop-exception
-  {:arrival {:default "Poistumismahdollisuus oletuksena"
+  {:arrival {:tooltip "Muuta poistumismahdollisuutta"
+             :default "Poistumismahdollisuus oletuksena"
              :no "Ei poistumismahdollisuutta"
              :agency "Poistumisesta sovittava palveluntuottajan kanssa"
              :driver "Poistumisesta sovittava kuljettajan kanssa"}
-   :departure {:default "Nousu mahdollista oletuksena"
+   :departure {:tooltip "Muuta nousumahdollisuutta"
+               :default "Nousu mahdollista oletuksena"
                :no "Ei nousumahdollisuutta"
                :agency "Nousemisesta sovittava palveluntuottajan kanssa"
                :driver "Noususta sovittava kuljettajan kanssa"}}
