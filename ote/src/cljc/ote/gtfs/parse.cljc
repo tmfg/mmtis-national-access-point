@@ -109,14 +109,9 @@ This is only called with GTFS field names and cannot grow unbounded."}
 
 (defn unparse-gtfs-file [gtfs-file-type content]
   (let [{:keys [header fields]} (file-info gtfs-file-type)]
-    (try
-      (str header "\n"
-           (csv->string
-             (mapv (fn [row]
-                     (mapv #(clj->gtfs (field-spec-description %) (get row %))
-                           fields))
-                   content)))
-      (catch #?(:cljs js/Object :clj Exception) e
-        (log/warn "Error generating GTFS - unparse-gtfs-file error " e)
-        (log/warn "Error generating GTFS - unparse-gtfs-file file type" gtfs-file-type)
-        (log/warn "Error generating GTFS - unparse-gtfs-file content" content)))))
+    (str header "\n"
+         (csv->string
+          (mapv (fn [row]
+                  (mapv #(clj->gtfs (field-spec-description %) (get row %))
+                        fields))
+                content)))))
