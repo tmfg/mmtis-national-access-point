@@ -346,6 +346,7 @@
   :next-step "Fortsätt"
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
+  :back-to-draft  "Muuta luonnokseksi"
   }
 
  ;; Database enumeration values
@@ -606,6 +607,9 @@
   :delete-dialog-header "Vill du ta bort sjörutten?"
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
+  :route-list-published? "Reitin tila"
+  :route-list-published?-values    {true  "Publicerad"
+                                    false "Ej publicerad"}
   :route-list-table-starting-point "Avgångsplats"
   :route-list-table-destination-point "Destination"
   :route-list-table-valid-from "Gäller från och med"

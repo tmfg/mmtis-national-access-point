@@ -26,6 +26,7 @@
 (def route-list-columns  #{::transit/id
                            ::transit/transport-operator-id
                            ::transit/name
+                           ::transit/published?
                            ::transit/available-from ::transit/available-to
                            ::transit/departure-point-name ::transit/destination-point-name
                            ::modification/created ::modification/modified})

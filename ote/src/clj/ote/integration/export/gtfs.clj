@@ -36,6 +36,7 @@
            #{::transit/id ::transit/name ::transit/stops ::transit/trips
              ::transit/route-type ::transit/service-calendars}
            {::transit/transport-operator-id transport-operator-id
+            ::transit/published? true
             ::transit/available-from (op/or op/null?
                                             (op/< now))
             ::transit/available-to (op/or op/null?

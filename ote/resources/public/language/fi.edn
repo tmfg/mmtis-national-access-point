@@ -338,6 +338,7 @@
   :next-step "Seuraava"
   :route-calendar-back-to-trips "Takaisin vuorolistaan"
   :route-calendar-clear "Tyhjennä kalenteri"
+  :back-to-draft  "Muuta luonnokseksi"
   }
 
  ;; Database enumeration values
@@ -603,6 +604,9 @@
   :delete-dialog-header "Haluatko poistaa merireitin?"
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
+  :route-list-published? "Reitin tila"
+  :route-list-published?-values   {true  "Julkaistu"
+                                   false "Ei julkaistu"}
   :route-list-table-starting-point "Lähtöpaikka"
   :route-list-table-destination-point "Määränpää"
   :route-list-table-valid-from "Voimassa lähtien"
