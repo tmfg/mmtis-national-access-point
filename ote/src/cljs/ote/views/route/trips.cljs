@@ -34,7 +34,8 @@
                   :background-color "#ed0000"
                   :color "#fff"}
      :style {:padding "0px 5px 0px 5px"}}
-    {:style {:padding "0px 5px 0px 5px"}}))
+    {:badge-content ""
+     :style {:padding "0px 5px 0px 5px"}}))
 
 (defn- icon-for-type [type]
   (case type
