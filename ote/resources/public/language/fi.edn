@@ -638,6 +638,7 @@
   :trip-stop-calendar "Ajopäiväkalenteri"
   :trip-schedule-new-trip "Uuden vuoron lähtöaika: "
   :trip-add-new-trip "Lisää vuoro"
+  :trip-delete "Poista vuoro"
 
   :stop-sequence-custom-dialog-title "Lisää uusi satama tai laituri"
   :stop-sequence-custom-dialog-add "Lisää"

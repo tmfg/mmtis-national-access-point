@@ -49,6 +49,8 @@
 (defrecord CalculateRouteTimes [])
 (defrecord NewStartTime [time])
 (defrecord AddTrip [])
+(defrecord DeleteTrip [trip-idx])
+
 (defrecord EditStopTime [trip-idx stop-idx form-data])
 (defrecord ShowStopException [stop-type stop-idx icon-type trip-idx])
 
@@ -449,6 +451,10 @@
                            (and (not calendar) prev-calendar) (assoc calendars trip-idx prev-calendar)
                            (not calendar) (assoc calendars trip-idx {})
                            :else calendars)))))))
+
+  DeleteTrip
+  (process-event [{:keys [trip-idx]} app]
+    (update-in app [:route ::transit/trips] collections/remove-by-index trip-idx))
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
