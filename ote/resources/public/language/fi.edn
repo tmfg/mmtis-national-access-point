@@ -338,6 +338,7 @@
   :next-step "Seuraava"
   :route-calendar-back-to-trips "Takaisin vuorolistaan"
   :route-calendar-clear "Tyhjennä kalenteri"
+  :back-to-draft  "Muuta luonnokseksi"
   }
 
  ;; Database enumeration values

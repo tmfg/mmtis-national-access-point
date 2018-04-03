@@ -133,7 +133,7 @@
     (if (nil? (get route :stops))
       [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
       [:div (stylefy/use-style style-form/form-card)
-       [:div (stylefy/use-style style-form/form-card-label) "Reittipysäkit"]
+       [:div (stylefy/use-style style-form/form-card-label) (tr [:route-wizard-page :wizard-step-stop-sequence])]
        [:div (stylefy/use-style style-form/form-card-body)
         [:div {:style {:display "flex" :flex-direction "row"}}
          [route-map e! route]

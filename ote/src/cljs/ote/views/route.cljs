@@ -63,7 +63,7 @@
          [buttons/save {:on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb false)))}
-          "Muuta luonnokseksi"]]
+          (tr [:buttons :back-to-draft])]]
         [:span
          [buttons/save {:disabled (not (rw/valid-route? (:route app)))
                         :on-click #(do

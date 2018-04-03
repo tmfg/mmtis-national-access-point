@@ -338,6 +338,7 @@
   :next-step "Next"
   :route-calendar-back-to-trips "Back to the list of departures"
   :route-calendar-clear "Clear calendar"
+  :back-to-draft  "Change back to draft"
   }
 
  ;; Database enumeration values

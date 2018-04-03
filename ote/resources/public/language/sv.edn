@@ -346,6 +346,7 @@
   :next-step "Fortsätt"
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
+  :back-to-draft  "Muuta luonnokseksi"
   }
 
  ;; Database enumeration values
