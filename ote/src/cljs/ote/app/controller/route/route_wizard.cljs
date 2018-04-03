@@ -12,7 +12,8 @@
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
             [ote.localization :refer [tr tr-key]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.util.collections :as collections]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -314,17 +315,10 @@
   DeleteStop
   (process-event [{idx :idx} app]
     (-> app
-        (update-in [:route ::transit/stops]
-                   (fn [stops]
-                     (into (subvec (vec stops) 0 idx)
-                           (subvec (vec stops) (inc idx)))))
+        (update-in [:route ::transit/stops] collections/remove-by-index idx)
         (update-in [:route ::transit/trips] (flip mapv)
           (fn [trip]
-            (update trip ::transit/stop-times
-                    (fn [stop-times]
-                      (let [first-part (subvec (vec stop-times) 0 idx)
-                            last-part (if (> idx 0) (subvec (vec stop-times) (inc idx)) [])]
-                      (into first-part last-part))))))))
+            (update trip ::transit/stop-times collections/remove-by-index idx)))))
 
 
   EditServiceCalendar
