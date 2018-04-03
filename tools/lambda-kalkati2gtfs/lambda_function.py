@@ -3,12 +3,10 @@
 import logging
 import urllib2
 import io
-import os
 import datetime
 import json
 import boto3
 
-from StringIO import StringIO
 from zipfile import ZipFile, ZIP_DEFLATED
 from botocore.client import Config
 from kalkati2gtfs import convert_in_memory
@@ -22,23 +20,21 @@ s3 = boto3.client('s3', config=Config(signature_version='s3v4'))
 def extract_zip(buf):
     # Rewind the buffer
     buf.seek(0)
-    zipf = ZipFile(buf, mode='r')
-
-    files = [zipf.open(name) for name in zipf.namelist()]
-
-    zipf.close()
-
-    return files
+    with ZipFile(buf, mode='r') as zipf:
+        return [zipf.open(name) for name in zipf.namelist()]
 
 
 def zip_files(files):
     buf = io.BytesIO()
-    zipf = ZipFile(buf, 'w', ZIP_DEFLATED)
 
-    for name, file in files.iteritems():
-        zipf.writestr(name + '.txt', file.read())
+    with ZipFile(buf, 'w', ZIP_DEFLATED, False) as zipf:
+        for name, file in files.iteritems():
+            zipf.writestr(name + '.txt', file.read())
+            if name is "routes":
+                print(file.read())
 
-    zipf.close()
+            # Free file buffer
+            file.close()
 
     buf.seek(0)
 
@@ -50,6 +46,9 @@ def kalkati_zip_to_gtfs_zip(zip_buf):
     kalkati_files = extract_zip(zip_buf)
     gtfs_files = convert_in_memory(kalkati_files[0])
 
+    for file in kalkati_files:
+        file.close()
+
     return zip_files(gtfs_files)
 
 
@@ -57,8 +56,6 @@ def kalkati_zip_to_gtfs_zip(zip_buf):
 ## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
     try:
-        zipf = None
-
         try:
             file_url = json.loads(event['body'])
         except ValueError as e:
@@ -71,7 +68,7 @@ def lambda_handler(event, context):
             response = opener.open(file_url)
 
             with io.BytesIO(response.read()) as tf:
-                zipf = kalkati_zip_to_gtfs_zip(tf)
+                zipf_buf = kalkati_zip_to_gtfs_zip(tf)
 
         except Exception as e:
             raise RuntimeError('Error while processing file {}: {}'.format(file_url, str(e)))
@@ -79,7 +76,8 @@ def lambda_handler(event, context):
         file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 
         try:
-            s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=zipf)
+            s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=zipf_buf)
+            zipf_buf.close()
 
             # Create temporary url for downloading the generated zip file (expires in 10 minutes)
             signed_url = s3.generate_presigned_url(ClientMethod='get_object',

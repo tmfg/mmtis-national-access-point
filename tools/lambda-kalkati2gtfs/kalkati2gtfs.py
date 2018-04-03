@@ -14,9 +14,9 @@ from dateutil import parser as dparser
 import os
 import sys
 import xml.sax
-import tempfile
 import shutil
 
+from StringIO import StringIO
 from xml.sax.handler import ContentHandler
 from coordinates import KKJxy_to_WGS84lalo
 
@@ -64,37 +64,36 @@ KALKATI_MODE_TO_GTFS_MODE = {
 
 class KalkatiHandler(ContentHandler):
     agency_fields = (u'agency_id', u'agency_name', u'agency_url',
-                     u'agency_timezone',)
+                     u'agency_timezone')
     stops_fields = (u'stop_id', u'stop_name', u'stop_lat', u'stop_lon',)
     routes_fields = (u'route_id', u'agency_id', u'route_short_name',
-                     u'route_long_name', u'route_type',)
-    trips_fields = (u'route_id', u'service_id', u'trip_id',)
+                     u'route_long_name', u'route_type')
+    trips_fields = (u'route_id', u'service_id', u'trip_id')
     stop_times_fields = (u'trip_id', u'arrival_time', u'departure_time',
-                         u'stop_id', u'stop_sequence',)
+                         u'stop_id', u'stop_sequence')
     calendar_fields = (u'service_id', u'monday', u'tuesday', u'wednesday',
                        u'thursday', u'friday', u'saturday', u'sunday', u'start_date',
-                       u'end_date',)
-
-    route_count = 0
-    service_count = 0
-    routes = {}
-
-    delivery = {}
-    synonym = False
-    stop_sequence = None
-    kal_service_id = None
-    trips = None
-    route_agency_id = None
-    route_short_name = None
-    route_long_name = None
-    service_validities = None
-    service_mode = None
-    transmodes = {}
+                       u'end_date')
 
     def write_values(self, name, values):
         self.files[name].write((u','.join(values) + u'\n').encode('utf-8'))
 
     def __init__(self, gtfs_files):
+        self.route_count = 0
+        self.service_count = 0
+        self.routes = {}
+        self.transmodes = {}
+        self.delivery = {}
+        self.synonym = False
+        self.stop_sequence = None
+        self.kal_service_id = None
+        self.trips = None
+        self.route_agency_id = None
+        self.route_short_name = None
+        self.route_long_name = None
+        self.service_validities = None
+        self.service_mode = None
+
         self.files = gtfs_files
 
         for name in gtfs_files:
@@ -127,6 +126,7 @@ class KalkatiHandler(ContentHandler):
         '''
 
         service_id = attrs.getValue('FootnoteId')
+
         # If there is no value for this attribute the start date of the vector is the Firstdate of the Delivery element.
         first = attrs.get('Firstdate', self.delivery.get('Firstday'))
         first_date = dparser.parse(first).date()
@@ -168,7 +168,6 @@ class KalkatiHandler(ContentHandler):
             self.stop_sequence.append(attrs['StationId'])
 
             departure_time = None
-            arrival_time = None
 
             if 'Departure' in attrs:
                 departure_time = ':'.join((attrs['Departure'][:2],
@@ -210,25 +209,32 @@ class KalkatiHandler(ContentHandler):
                              'Lastday': attrs.get('Lastday'),
                              'CompanyId': attrs.getValue('CompanyId'),
                              'Version': attrs.getValue('Version')}
+
         elif not self.synonym and name == 'Company':
             self.add_agency(attrs)
+
         elif not self.synonym and name == 'Station':
             self.add_stop(attrs)
+
         elif not self.synonym and name == 'Trnsmode':
             if 'Modetype' in attrs:
                 self.transmodes[attrs['TrnsmodeId']] = attrs['Modetype']
+
         elif name == 'Footnote':
             self.add_calendar(attrs)
+
         elif name == 'Service':
             self.kal_service_id = attrs['ServiceId']
             self.service_count += 1
             self.trips = []
             self.service_validities = []
             self.stop_sequence = []
+
         elif name == 'ServiceNbr':
             self.route_agency_id = attrs['CompanyId']
             self.route_short_name = attrs.get('Variant')
             self.route_long_name = attrs.get('Name', 'Unnamed')
+
         elif name == 'ServiceValidity':
             self.service_validities.append(attrs['FootnoteId'])
             self.trips.append({
@@ -236,13 +242,16 @@ class KalkatiHandler(ContentHandler):
                 'Firststop': attrs.get('Firststop'),
                 'Laststop': attrs.get('Laststop')
             })
+
         elif name == 'ServiceTrnsmode':
             # Kalkati allows changing transport modes between stations in one route.
             # vs. GTFS allows only one transmode per route.
             # So, we'll have to assume that there is only one transmode defined in the Kalkati file and use it.
             self.service_mode = attrs['TrnsmodeId']
+
         elif name == 'Stop':
             self.add_stop_time(attrs)
+
         elif name == 'Synonym':
             self.synonym = True
 
@@ -261,6 +270,7 @@ class KalkatiHandler(ContentHandler):
                 self.add_route(route_id)
 
             self.add_trip(route_id)
+
             self.kal_service_id = None
             self.trips = None
             self.stop_sequence = None
@@ -271,19 +281,13 @@ class KalkatiHandler(ContentHandler):
             self.service_mode = None
 
 
-def init_gtfs_files():
+def convert_in_memory(kalkati_file):
     names = ['stops', 'agency', 'calendar', 'stop_times', 'trips', 'routes']
-    files = {}
-    MB = 1 << 20
+    gtfs_files = {}
 
     for name in names:
-        files[name] = tempfile.SpooledTemporaryFile(max_size=500 * MB, mode='w+b')
+        gtfs_files[name] = StringIO()
 
-    return files
-
-
-def convert_in_memory(kalkati_file):
-    gtfs_files = init_gtfs_files()
     handler = KalkatiHandler(gtfs_files)
     xml.sax.parse(kalkati_file, handler)
 
@@ -300,13 +304,14 @@ def write_to_disk(files, directory):
     for name, file in files.iteritems():
         file.seek(0)
 
-        with open (os.path.join(directory, name + '.txt'), 'w') as target_file:
+        with open(os.path.join(directory, name + '.txt'), 'w') as target_file:
             shutil.copyfileobj(file, target_file)
             target_file.close()
+            file.close()
 
 
 def main(filename, directory):
-    files = convert_in_memory(filename)
+    files = convert_in_memory(open(filename))
     write_to_disk(files, directory)
 
 
@@ -317,4 +322,5 @@ if __name__ == '__main__':
     except IndexError:
         sys.stderr.write('Usage: %s kalkati_xml_file output_directory\n' % sys.argv[0])
         sys.exit(1)
+
     main(filename, output)
