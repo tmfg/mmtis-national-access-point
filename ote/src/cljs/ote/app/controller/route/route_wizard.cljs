@@ -207,10 +207,12 @@
           trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
 
       (-> app
-        (assoc :route response)
-        (assoc-in [:route ::transit/stops] stops)
-        (assoc-in [:route ::transit/trips] trips)
-        (assoc-in [:route ::transit/service-calendars] service-calendars))))
+          (assoc :route response)
+          ;; make sure we don't overwrite loaded stops
+          (assoc-in [:route :stops] (get-in app [:route :stops]))
+          (assoc-in [:route ::transit/stops] stops)
+          (assoc-in [:route ::transit/trips] trips)
+          (assoc-in [:route ::transit/service-calendars] service-calendars))))
 
   InitRoute
   (process-event [_ app]
