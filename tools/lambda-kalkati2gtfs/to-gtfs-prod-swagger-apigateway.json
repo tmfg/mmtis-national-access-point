@@ -1,11 +1,11 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2018-03-23T22:34:01Z",
-    "title": "togtfs"
+    "version": "2018-04-03T09:35:08Z",
+    "title": "to-gtfs"
   },
   "host": "<censored>.execute-api.eu-central-1.amazonaws.com",
-  "basePath": "/deployed",
+  "basePath": "/prod",
   "schemes": [
     "https"
   ],
@@ -24,12 +24,12 @@
           }
         },
         "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:096441735385:function:kalkati_to_gtfs/invocations",
           "responses": {
             "default": {
               "statusCode": "200"
             }
           },
-          "uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:569803746255:function:kalkati_to_gtfs/invocations",
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "contentHandling": "CONVERT_TO_TEXT",
@@ -43,8 +43,5 @@
       "type": "object",
       "title": "Empty Schema"
     }
-  },
-  "x-amazon-apigateway-binary-media-types": [
-    "application/zip"
-  ]
+  }
 }

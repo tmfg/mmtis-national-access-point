@@ -52,6 +52,10 @@ def kalkati_zip_to_gtfs_zip(zip_buf):
     return zip_files(gtfs_files)
 
 
+s3_bucket = 'napote-gtfs'
+s3_folder = 'kalkati2gtfs'
+
+
 ### Lambda handler ###
 ## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
@@ -73,15 +77,15 @@ def lambda_handler(event, context):
         except Exception as e:
             raise RuntimeError('Error while processing file {}: {}'.format(file_url, str(e)))
 
-        file_key = 'gtfs/gtfs-%s.zip' % datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        file_key = '%s/gtfs-%s.zip' % (s3_folder, datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
 
         try:
-            s3.put_object(Bucket='kalkati2gtfs', Key=file_key, Body=zipf_buf)
+            s3.put_object(Bucket=s3_bucket, Key=file_key, Body=zipf_buf)
             zipf_buf.close()
 
             # Create temporary url for downloading the generated zip file (expires in 10 minutes)
             signed_url = s3.generate_presigned_url(ClientMethod='get_object',
-                                                   Params={'Bucket': 'kalkati2gtfs', 'Key': file_key},
+                                                   Params={'Bucket': s3_bucket, 'Key': file_key},
                                                    ExpiresIn=10 * 60)
 
             return {
@@ -90,7 +94,7 @@ def lambda_handler(event, context):
             }
 
         except Exception as e:
-            raise RuntimeError('Error while uploading {} to bucket {}: {}'.format(file_key, 'kalkati2gtfs', str(e)))
+            raise RuntimeError('Error while uploading {} to bucket {}: {}'.format(file_key, s3_bucket, str(e)))
 
     except Exception as e:
         logger.error(str(e))
