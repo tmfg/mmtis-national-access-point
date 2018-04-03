@@ -12,7 +12,8 @@
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
             [ote.localization :refer [tr tr-key]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.util.collections :as collections]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -48,6 +49,8 @@
 (defrecord CalculateRouteTimes [])
 (defrecord NewStartTime [time])
 (defrecord AddTrip [])
+(defrecord DeleteTrip [trip-idx])
+
 (defrecord EditStopTime [trip-idx stop-idx form-data])
 (defrecord ShowStopException [stop-type stop-idx icon-type trip-idx])
 
@@ -314,17 +317,10 @@
   DeleteStop
   (process-event [{idx :idx} app]
     (-> app
-        (update-in [:route ::transit/stops]
-                   (fn [stops]
-                     (into (subvec (vec stops) 0 idx)
-                           (subvec (vec stops) (inc idx)))))
+        (update-in [:route ::transit/stops] collections/remove-by-index idx)
         (update-in [:route ::transit/trips] (flip mapv)
           (fn [trip]
-            (update trip ::transit/stop-times
-                    (fn [stop-times]
-                      (let [first-part (subvec (vec stop-times) 0 idx)
-                            last-part (if (> idx 0) (subvec (vec stop-times) (inc idx)) [])]
-                      (into first-part last-part))))))))
+            (update trip ::transit/stop-times collections/remove-by-index idx)))))
 
 
   EditServiceCalendar
@@ -455,6 +451,10 @@
                            (and (not calendar) prev-calendar) (assoc calendars trip-idx prev-calendar)
                            (not calendar) (assoc calendars trip-idx {})
                            :else calendars)))))))
+
+  DeleteTrip
+  (process-event [{:keys [trip-idx]} app]
+    (update-in app [:route ::transit/trips] collections/remove-by-index trip-idx))
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]

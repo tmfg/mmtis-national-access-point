@@ -640,6 +640,7 @@
   :trip-stop-calendar "Trafikeringskalender"
   :trip-schedule-new-trip "Avgångstid för en ny tur: "
   :trip-add-new-trip "Lägg till en tur"
+  :trip-delete "Ta bort tur"
 
   :stop-sequence-custom-dialog-title "Lägg till en ny hamn eller kaj"
   :stop-sequence-custom-dialog-add "Lägg till"

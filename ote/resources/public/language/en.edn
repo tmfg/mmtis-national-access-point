@@ -636,6 +636,7 @@
   :trip-stop-calendar "Driving days calendar"
   :trip-schedule-new-trip "Time of a new departure: "
   :trip-add-new-trip "Add a new departure"
+  :trip-delete "Delete departure"
 
   :stop-sequence-custom-dialog-title "Add new port"
   :stop-sequence-custom-dialog-add "Add"
