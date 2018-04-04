@@ -248,7 +248,7 @@
           properties (js->clj (aget feature "properties"))]
       (-> app
           (route-updated)
-          (add-stop-to-sequence location properties)))
+          (add-stop-to-sequence location properties))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
