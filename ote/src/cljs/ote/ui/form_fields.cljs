@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.mui-chip-input :refer [chip-input]]
             [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :as localization :refer [tr tr-key]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
@@ -634,7 +634,11 @@
                     :format-date time/format-date
                     :ok-label (or ok-label (tr [:buttons :save]))
                     :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                    :locale "fi-FI"
+                    :locale (case @localization/selected-language
+                              :fi "fi-FI"
+                              :sv "sv-SE"
+                              :en "en-UK"
+                              "fi-FI")
                     :Date-time-format js/Intl.DateTimeFormat}]
    (when show-clear?
      [ui/icon-button {:on-click #(update! nil)
