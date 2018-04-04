@@ -174,7 +174,9 @@
         (assoc-in [:route ::transit/stops] new-stop-sequence)
         (assoc-in [:route ::transit/trips] new-trip-sequence))))
 
-(defn route-updated [app-state]
+(defn route-updated
+  "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
+  [app-state]
   (assoc app-state :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))
 
 (extend-protocol tuck/Event
@@ -225,17 +227,18 @@
 
   EditBasicInfo
   (process-event [{form-data :form-data} app]
-    (update
-      (route-updated app)
-      :route merge form-data))
+    (-> app
+        (route-updated)
+        (update :route merge form-data)))
 
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (add-stop-to-sequence
-      (route-updated app)
-        (vec (aget feature "geometry" "coordinates"))
-        (js->clj (aget feature "properties"))))
+    (-> app
+        (route-updated)
+        (add-stop-to-sequence
+          (vec (aget feature "geometry" "coordinates"))
+          (js->clj (aget feature "properties")))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -243,9 +246,9 @@
           (first (keep #(when (= (:id %) id) %) (:custom-stops route)))
           location (vec (aget feature "geometry" "coordinates"))
           properties (js->clj (aget feature "properties"))]
-      (add-stop-to-sequence
-        (route-updated app)
-        location properties)))
+      (-> app
+          (route-updated)
+          (add-stop-to-sequence location properties)))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
