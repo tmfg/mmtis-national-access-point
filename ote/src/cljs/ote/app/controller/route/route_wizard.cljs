@@ -527,7 +527,9 @@
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
-      (set-saved-transfer-operator app route)))
+      (-> app
+          (dissoc :before-unload-message)
+          (set-saved-transfer-operator route))))
 
   SaveRouteResponse
   (process-event [{response :response} app]
