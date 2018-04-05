@@ -28,13 +28,17 @@
   (fn [e! app]
     [:span
      [route-components e! app]
+     (when (not (rw/valid-route? (:route app)))
+       [ui/card {:style {:margin "1em 0em 1em 0em"}}
+        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])
      [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
       [buttons/save {:disabled (not (rw/valid-route? (:route app)))
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb true)))}
        (tr [:buttons :save-and-publish])]
-      [buttons/save {:on-click #(do
+      [buttons/save {:disabled (rw/valid-name (:route app))
+                     :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb false)))}
        (tr [:buttons :save-as-draft])]
@@ -51,7 +55,7 @@
      [route-components e! app]
      (when (not (rw/valid-route? (:route app)))
        [ui/card {:style {:margin "1em 0em 1em 0em"}}
-        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])
      [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
       (if (get-in app [:route ::transit/published?])
         [:span
@@ -60,7 +64,8 @@
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb true)))}
           (tr [:buttons :save])]
-         [buttons/save {:on-click #(do
+         [buttons/save {:disabled (not (rw/valid-name (:route app)))
+                        :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb false)))}
           (tr [:buttons :back-to-draft])]]
@@ -70,7 +75,8 @@
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb true)))}
           (tr [:buttons :save-and-publish])]
-         [buttons/save {:on-click #(do
+         [buttons/save {:disabled (not (rw/valid-name (:route app)))
+                        :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb false)))}
            (tr [:buttons :save-as-draft])]])
