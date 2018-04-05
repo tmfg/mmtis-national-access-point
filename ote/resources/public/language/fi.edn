@@ -635,7 +635,7 @@
   :trip-stop-arrival-header "tulo"
   :trip-stop-departure-header "lähtö"
 
-  :trip-stop-calendar "Ajopäiväkalenteri"
+  :trip-stop-calendar "Liikennöintikalenteri"
   :trip-schedule-new-trip "Uuden vuoron lähtöaika: "
   :trip-add-new-trip "Lisää vuoro"
   :trip-delete "Poista vuoro"
