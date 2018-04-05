@@ -59,10 +59,11 @@
           {:background-color "wheat"})))))
 
 (defn service-calendar [e! {trip-idx :edit-service-calendar
-                            trips ::transit/trips :as route}]
+                            trips ::transit/trips
+                            stops ::transit/stops :as route}]
   (let [times (get-in trips [trip-idx ::transit/stop-times])
-        departure (::transit/departure-time (first times))
-        arrival (::transit/arrival-time (last times))]
+        departure-time (::transit/departure-time (first times))
+        departure-stop (::transit/name (first stops))]
     [ui/dialog
      {:open true
       :content-style {:width "95%" :max-width js/document.body.clientWidth}
@@ -70,8 +71,8 @@
       :auto-scroll-body-content true
       :title   (r/as-element
                 [:div (tr [:route-wizard-page :route-calendar-group-name]
-                          {:departure (and departure (time/format-time departure))
-                           :arrival (and arrival (time/format-time arrival))})
+                          {:departure-time (and departure-time (time/format-time departure-time))
+                           :departure-stop departure-stop})
                  [ui/raised-button {:secondary true
                                     :icon (ic/action-delete)
                                     :style {:float "right"}

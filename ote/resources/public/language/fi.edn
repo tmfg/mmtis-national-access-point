@@ -666,7 +666,7 @@
   :basic-info-available-to "Voimassa asti"
 
   :route-calendar-name "Reittikalenteri"
-  :route-calendar-group-name ["Ajopäiväkalenteri vuorolle. Lähtöaika: " :departure ", Tuloaika: " :arrival]
+  :route-calendar-group-name ["Liikennöintikalenteri (Lähtöpaikka: " :departure-stop ", lähtöaika: " :departure-time ")"]
   :route-calendar-from-date "Alkaen"
   :route-calendar-to-date "Päättyen"
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"

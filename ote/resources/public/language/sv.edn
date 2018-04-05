@@ -668,7 +668,7 @@
   :basic-info-available-to "Gäller till"
 
   :route-calendar-name "Ruttkalender"
-  :route-calendar-group-name ["Trafikeringskalender för tur. Avgångstid: " :departure ". Ankomsttid: " :arrival]
+  :route-calendar-group-name ["Trafikeringskalender (Avgångsplats: " :departure-stop ", avgångstid: " :departure-time ")"]
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
