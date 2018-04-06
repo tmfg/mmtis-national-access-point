@@ -52,7 +52,11 @@
   CreateNewRoute
   (process-event [_ app]
     (routes/navigate! :new-route)
-    app)
+    (-> app
+        (dissoc :route)
+        (assoc-in [:route :step] :basic-info)
+        (assoc-in [:route ::transit/route-type] :ferry)
+        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
 
   OpenDeleteRouteModal
   (process-event [{id :id} app]

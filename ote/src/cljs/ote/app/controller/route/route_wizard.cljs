@@ -19,9 +19,6 @@
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
 
-;; Initialize editing a new route
-(defrecord InitRoute [])
-
 ;; Load existing route
 (defrecord LoadRoute [id])
 (defrecord LoadRouteResponse [response])
@@ -225,14 +222,6 @@
           (assoc-in [:route ::transit/stops] stops)
           (assoc-in [:route ::transit/trips] trips)
           (assoc-in [:route ::transit/service-calendars] service-calendars))))
-
-  InitRoute
-  (process-event [_ app]
-    (-> app
-        (dissoc :route)
-        (assoc-in [:route :step] :basic-info)
-        (assoc-in [:route ::transit/route-type] :ferry)
-        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
 
   EditBasicInfo
   (process-event [{form-data :form-data} app]
