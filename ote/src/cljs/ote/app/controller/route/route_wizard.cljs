@@ -157,7 +157,9 @@
 
 (declare new-stop-time)
 
-
+(defn ensure-service-calendars [app]
+  (update-in app [:route ::transit/service-calendars]
+             #(or % [{}])))
 
 (defn add-stop-to-sequence [app location properties]
   ;; Add stop to current stop sequence
@@ -177,6 +179,7 @@
     (if stop-exist-in-sequence?
       app
       (-> app
+          ensure-service-calendars
           (update-in [:route ::transit/stops] conj new-stop)
           (calculate-trip-sequence new-stop-idx new-stop)))))
 
