@@ -547,8 +547,12 @@
 
   CancelRoute
   (process-event [_ app]
+    (let [stops (get-in app [:route :stops])]
     (routes/navigate! :routes)
-    (dissoc app :route)))
+    (-> app
+        (dissoc app :transport-service :before-unload-message)
+        (dissoc app :route)
+        (assoc-in [:route :stops] stops)))))
 
 (defn new-stop-time
   "Calculate new stop time based on trip start time."
@@ -612,3 +616,6 @@
     (and (valid-basic-info? route)
          (valid-stop-sequence? route)
          (valid-trips? route))))
+
+(defn valid-name [route]
+  (empty? (get route ::transit/name)))

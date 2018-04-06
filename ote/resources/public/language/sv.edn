@@ -674,6 +674,7 @@
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
+  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   }
 
  :price-dialog

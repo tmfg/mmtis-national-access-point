@@ -672,6 +672,7 @@
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
+  :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   }
 
