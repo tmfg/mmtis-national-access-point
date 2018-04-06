@@ -95,13 +95,6 @@
                            :ote.db.transit/service-calendar-idx 0}
                           {:ote.db.transit/stop-times [{:ote.db.transit/stop-idx 0, :ote.db.transit/drop-off-type :regular, :ote.db.transit/pickup-type :regular, :ote.db.transit/arrival-time nil, :ote.db.transit/departure-time #ote.time.Time{:hours 23, :minutes 30, :seconds nil}} {:ote.db.transit/stop-idx 1, :ote.db.transit/drop-off-type :regular, :ote.db.transit/pickup-type :regular, :ote.db.transit/arrival-time #ote.time.Time{:hours 26, :minutes 30, :seconds nil}, :ote.db.transit/departure-time nil}], :ote.db.transit/service-calendar-idx 0}], :ote.db.transit/published? false, :ote.db.transit/route-type :ferry, :ote.db.transit/transport-operator-id 1, :ote.db.transit/stops [{:ote.db.transit/code "FIKJO-C", :ote.db.transit/name "KALAJOKI: Itäkenttä", :ote.db.transit/location #object[org.postgis.PGgeometry 0x67908422 "POINT(23.710541798098134 64.22124510154973)"]} {:ote.db.transit/code "FIRAA-RR", :ote.db.transit/name "RAAHE: Rautaruukki", :ote.db.transit/location #object[org.postgis.PGgeometry 0x24eb70dd "POINT(24.407513182926373 64.65296589847007)"]}], :ote.db.modification/created #inst "2018-04-06T09:38:57.251000000-00:00", :ote.db.modification/created-by "401139db-8f3e-4371-8233-5d51d4c4c8b6"})
 
-(defn- trip-stop-times-to-24h [trip]
-  (update trip ::transit/stop-times (flip mapv)
-          (fn [st]
-            (-> st
-                (update ::transit/arrival-time #(when % (transit/time-to-24h %)))
-                (update ::transit/departure-time #(when % (transit/time-to-24h %)))))))
-
 (defn save-route [nap-config db user route]
   (authorization/with-transport-operator-check
     db user (::transit/transport-operator-id route)
@@ -112,7 +105,7 @@
                     (modification/with-modification-fields ::transit/id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))
                     (update ::transit/service-calendars #(mapv service-calendar-dates->db %))
-                    (update ::transit/trips (flip mapv) trip-stop-times-to-24h))]
+                    (update ::transit/trips (flip mapv) transit/trip-stop-times-to-24h))]
           (log/debug "Save route: " r)
           (upsert! db ::transit/route r))))))
 
@@ -123,7 +116,8 @@
                             (specql/columns ::transit/route)
                             {::transit/id id}))]
     (log/debug  "**************** route" (pr-str route))
-    route))
+    (-> route
+        (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))))
 
 (defn delete-route!
   "Delete single route by id"
