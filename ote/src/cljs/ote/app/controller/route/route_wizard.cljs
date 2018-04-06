@@ -7,13 +7,15 @@
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
             [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
-            [ote.util.collections :as collections]))
+            [ote.util.collections :as collections]
+            [clojure.set :as set]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -247,7 +249,11 @@
         (route-updated)
         (add-stop-to-sequence
           (vec (aget feature "geometry" "coordinates"))
-          (js->clj (aget feature "properties")))))
+          (update (js->clj (aget feature "properties")) "name"
+                  (fn [name]
+                    (mapv #(set/rename-keys % {"ote.db.transport-service/lang" ::t-service/lang
+                                               "ote.db.transport-service/text" ::t-service/text})
+                          name))))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
