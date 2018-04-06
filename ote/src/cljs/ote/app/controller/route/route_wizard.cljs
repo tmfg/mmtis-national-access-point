@@ -610,4 +610,4 @@
          (valid-trips? route))))
 
 (defn valid-name [route]
-  (empty? (get route ::transit/name)))
+  (if (empty? (get route ::transit/name)) false true))
