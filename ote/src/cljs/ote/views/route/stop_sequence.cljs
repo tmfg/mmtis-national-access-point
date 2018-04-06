@@ -33,23 +33,26 @@
   [c2 c1])
 
 (defn- custom-stop-dialog [e! route]
-  (when (:custom-stop-dialog route)
-    [ui/dialog
-     {:open true
-      :modal true
-      :title (tr [:route-wizard-page :stop-sequence-custom-dialog-title])
-      :actions [(r/as-element
-                 [ui/flat-button
-                  {:label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
-                   :primary true
-                   :on-click #(e! (rw/->CloseCustomStopDialog))}])]}
-     [:span
-      [form-fields/field {:type :string
-                          :label (tr [:route-wizard-page :stop-sequence-custom-dialog-name])
-                          :update! #(e! (rw/->UpdateCustomStop {:name %}))
-                          :on-enter #(e! (rw/->CloseCustomStopDialog))}
-       (-> route :custom-stops last :name)]
-      [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]]))
+  (let [name (-> route :custom-stops last :name)]
+    (when (:custom-stop-dialog route)
+      [ui/dialog
+       {:open true
+        :modal true
+        :title (tr [:route-wizard-page :stop-sequence-custom-dialog-title])
+        :actions [(r/as-element
+                   [ui/flat-button
+                    {:disabled (str/blank? name)
+                     :label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
+                     :primary true
+                     :on-click #(e! (rw/->CloseCustomStopDialog))}])]}
+       [:span
+        [form-fields/field {:type :string
+                            :label (tr [:route-wizard-page :stop-sequence-custom-dialog-name])
+                            :update! #(e! (rw/->UpdateCustomStop {:name %}))
+                            :on-enter #(when (not (str/blank? name))
+                                         (e! (rw/->CloseCustomStopDialog)))}
+         name]
+        [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]])))
 
 (defn- route-map [e! route]
   (r/create-class

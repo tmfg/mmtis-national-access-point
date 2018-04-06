@@ -89,20 +89,22 @@
         ^{:key (str code "_" i)}
         [:th {:colSpan 2
               :style {:vertical-align "top"}}
-         [:div {:style {:display "inline-block"
-                        :width "180px"
+         [:div {:style {:display "inline-block" :width "170px"}}
+         [:div {:style {:font-size "14px"
+                        :display "inline-block"
+                        :width "155px"
                         :overflow-x "hidden"
                         :white-space "pre"
                         :text-overflow "ellipsis"}} name]
-         [:div {:style {:display "inline-block"
+         [:div {:style {:width "8px"
+                        :margin-right "7px"
+                        :display "inline-block"
                         :float "right"
                         :position "relative"
-                        :left "16px"
-                        :top -20
-                        :padding-right "5px"
-                        :padding-left "5px"}}
+                        :margin-top "-4px"
+                        }}
           (when (< i (dec (count stop-sequence)))
-            [ic/navigation-chevron-right])]])
+            [ic/navigation-chevron-right])]]])
       stop-sequence))]
    [:tr
     [:th ""]
@@ -128,8 +130,7 @@
                  :style {:overflow "visible"}}
           [ui/badge
            (badge-content service-calendars row-idx)
-          [ui/icon-button {
-                           :style (if (= edit-service-calendar row-idx)
+          [ui/icon-button {:style (if (= edit-service-calendar row-idx)
                                     {:border-radius "25px" :background-color "#b3b3b3"}
                                     {})
                            :href     "#"
@@ -155,6 +156,7 @@
             [:div.col-md-11
              [form-fields/field {:type    :time
                                  :required? true
+                                 :unrestricted-hours? (> stop-idx 0)
                                  :update! #(update! {::transit/arrival-time %})}
               arrival-time]]
             [:div.col-md-1 {:style {:margin-left "-10px"}}
@@ -167,6 +169,7 @@
             [:div.col-md-11
              [form-fields/field {:type    :time
                                  :required? true
+                                 :unrestricted-hours? (> stop-idx 0)
                                  :update! #(update! {::transit/departure-time %})}
               departure-time]]
             [:div.col-md-1 {:style {:margin-left "-10px"}}
