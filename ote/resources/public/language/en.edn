@@ -664,7 +664,7 @@
   :basic-info-available-to "Valid to"
 
   :route-calendar-name "Reittikalenteri"
-  :route-calendar-group-name "Driving days calendar"
+  :route-calendar-group-name ["Service calendar (Departs from " :departure-stop " at " :departure-time ")"]
   :route-calendar-from-date "Valid from"
   :route-calendar-to-date "Valid to"
   :route-calendar-add-new-period "Add a new period to driving days calendar"
