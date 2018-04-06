@@ -37,7 +37,7 @@
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb true)))}
        (tr [:buttons :save-and-publish])]
-      [buttons/save {:disabled (rw/valid-name (:route app))
+      [buttons/save {:disabled (not (rw/valid-name (:route app)))
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb false)))}
