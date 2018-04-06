@@ -121,22 +121,30 @@
           trips)]
     new-calendars))
 
+(defn new-trips
+  "Return a new trips vector with one trip"
+  [app]
+  [{::transit/stop-times []
+    ::transit/service-calendar-idx 0}])
+
 (defn calculate-trip-sequence
   "User can add a new stop for the route after trips and calendars are created. In these situations, we
   need to add that new stop at the end of every trip and calculate arrival time."
-  [stop-idx new-stop trips]
-  (if (empty? trips)
-    []
-    (mapv
-      (fn [trip]
-        (assoc trip ::transit/stop-times
-                    (conj (::transit/stop-times trip)
-                          {::transit/stop-idx       stop-idx
-                           ::transit/drop-off-type :regular
-                           ::transit/pickup-type :regular
-                           ::transit/arrival-time   (::transit/arrival-time new-stop)
-                           ::transit/departure-time (::transit/departure-time new-stop)})))
-      trips)))
+  [app stop-idx new-stop]
+  (update-in app [:route ::transit/trips]
+             (fn [trips]
+               (mapv
+                (fn [trip]
+                  (assoc trip ::transit/stop-times
+                         (conj (::transit/stop-times trip)
+                               {::transit/stop-idx       stop-idx
+                                ::transit/drop-off-type :regular
+                                ::transit/pickup-type :regular
+                                ::transit/arrival-time   (::transit/arrival-time new-stop)
+                                ::transit/departure-time (::transit/departure-time new-stop)})))
+                (if (seq trips)
+                  trips
+                  (new-trips app))))))
 
 (defn- set-saved-transfer-operator
   [app route]
@@ -148,6 +156,8 @@
                      (:transport-operators-with-services app)))))
 
 (declare new-stop-time)
+
+
 
 (defn add-stop-to-sequence [app location properties]
   ;; Add stop to current stop sequence
@@ -163,16 +173,12 @@
                          ::transit/unlocode
                          ::transit/port-type
                          ::transit/port-type-name
-                         ::transit/type)
-        new-stop-sequence (if stop-exist-in-sequence?
-                            stop-sequence
-                            (conj stop-sequence new-stop))
-        new-trip-sequence (if stop-exist-in-sequence?
-                            (get-in app [:route ::transit/trips])
-                            (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
-    (-> app
-        (assoc-in [:route ::transit/stops] new-stop-sequence)
-        (assoc-in [:route ::transit/trips] new-trip-sequence))))
+                         ::transit/type)]
+    (if stop-exist-in-sequence?
+      app
+      (-> app
+          (update-in [:route ::transit/stops] conj new-stop)
+          (calculate-trip-sequence new-stop-idx new-stop)))))
 
 (defn route-updated
   "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
@@ -400,21 +406,7 @@
   (process-event [{trip-idx :trip-idx} app]
     (assoc-in app [:route ::transit/service-calendars trip-idx] {}))
 
-  InitRouteTimes
-  (process-event [_ app]
-    (-> app
-        (assoc-in [:route ::transit/trips]
-                  [{::transit/stop-times (vec (map-indexed
-                                                (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
-                                                  {::transit/stop-idx stop-idx
-                                                   ::transit/arrival-time arrival-time
-                                                   ::transit/departure-time departure-time
-                                                   ::transit/drop-off-type :regular
-                                                   ::transit/pickup-type :regular})
-                                                (get-in app [:route ::transit/stops])))
-                    ::transit/service-calendar-idx 0}])
-        ;; Make sure that we have an empty associated calendar for the trip
-        (assoc-in [:route ::transit/service-calendars] [{}])))
+
 
   CalculateRouteTimes
   (process-event [_ app]
