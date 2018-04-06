@@ -507,16 +507,20 @@
 ;; Matches empty or any valid hour (0 (or 00) - 23)
 (def hour-regex #"^(^$|0?[0-9]|1[0-9]|2[0-3])$")
 
+(def unrestricted-hour-regex #"\d*")
+
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! error warning required?] :as opts}
+(defmethod field :time [{:keys [update! error warning required? unrestricted-hours?] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
            {:type :string
             :name "hours"
-            :regex hour-regex
+            :regex (if unrestricted-hours?
+                     unrestricted-hour-regex
+                     hour-regex)
             :warning (when
                        (and required? (empty? data))
                        true)

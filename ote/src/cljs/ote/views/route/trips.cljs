@@ -129,8 +129,7 @@
                  :style {:overflow "visible"}}
           [ui/badge
            (badge-content service-calendars row-idx)
-          [ui/icon-button {
-                           :style (if (= edit-service-calendar row-idx)
+          [ui/icon-button {:style (if (= edit-service-calendar row-idx)
                                     {:border-radius "25px" :background-color "#b3b3b3"}
                                     {})
                            :href     "#"
@@ -156,6 +155,7 @@
             [:div.col-md-11
              [form-fields/field {:type    :time
                                  :required? true
+                                 :unrestricted-hours? (> stop-idx 0)
                                  :update! #(update! {::transit/arrival-time %})}
               arrival-time]]
             [:div.col-md-1 {:style {:margin-left "-10px"}}
@@ -168,6 +168,7 @@
             [:div.col-md-11
              [form-fields/field {:type    :time
                                  :required? true
+                                 :unrestricted-hours? (> stop-idx 0)
                                  :update! #(update! {::transit/departure-time %})}
               departure-time]]
             [:div.col-md-1 {:style {:margin-left "-10px"}}
