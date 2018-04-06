@@ -45,3 +45,8 @@
         (select-keys
          (time/date-fields d)
          #{::time/year ::time/month ::time/date})))))
+
+(defn time-to-24h
+  "Convert a time entry to stay within 24h (stop times may be greater)."
+  [time]
+  (update time :hours mod 24))
