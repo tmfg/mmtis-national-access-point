@@ -19,10 +19,6 @@
 (defrecord DeleteRouteResponse [response])
 (defrecord DeleteRouteResponseFailed [response])
 
-
-;; Edit route
-;(defrecord EditRoute [id]);
-
 ;; Create new route
 (defrecord CreateNewRoute [])
 

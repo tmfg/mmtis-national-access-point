@@ -10,7 +10,7 @@
 (defn basic-info [e! app]
   (fn [e! {route :route :as app}]
     [:div.route-basic-info
-     [form/form {:update! #(e! (rw/->EditRoute %))}
+     [form/form {:update! #(e! (rw/->EditBasicInfo %))}
       [(form/group
         {:label (tr [:route-wizard-page :basic-info-header])
          :columns 3

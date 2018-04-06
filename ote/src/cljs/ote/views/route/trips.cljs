@@ -213,9 +213,6 @@
                          :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
 (defn trips [e! {route :route :as app}]
-  (if (empty? (::transit/trips route))
-    (e! (rw/->InitRouteTimes))
-    (e! (rw/->CalculateRouteTimes)))
   (fn [e! {route :route :as app}]
     [:div {:style {:padding-top "20px"}}
      [:div (stylefy/use-style style-form/form-card)

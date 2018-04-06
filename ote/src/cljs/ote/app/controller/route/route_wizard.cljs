@@ -27,7 +27,7 @@
 (defrecord LoadRouteResponse [response])
 
 ;; Edit route basic info
-(defrecord EditRoute [form-data])
+(defrecord EditBasicInfo [form-data])
 
 ;; Events to edit the route's stop sequence
 (defrecord AddStop [feature])
@@ -63,8 +63,6 @@
 
 ;; Save route as GTFS
 (defrecord SaveAsGTFS [])
-
-(defrecord GoToStep [step])
 
 ;; Save route to database
 (defrecord SaveToDb [published?])
@@ -123,22 +121,30 @@
           trips)]
     new-calendars))
 
+(defn new-trips
+  "Return a new trips vector with one trip"
+  [app]
+  [{::transit/stop-times []
+    ::transit/service-calendar-idx 0}])
+
 (defn calculate-trip-sequence
   "User can add a new stop for the route after trips and calendars are created. In these situations, we
   need to add that new stop at the end of every trip and calculate arrival time."
-  [stop-idx new-stop trips]
-  (if (empty? trips)
-    []
-    (mapv
-      (fn [trip]
-        (assoc trip ::transit/stop-times
-                    (conj (::transit/stop-times trip)
-                          {::transit/stop-idx       stop-idx
-                           ::transit/drop-off-type :regular
-                           ::transit/pickup-type :regular
-                           ::transit/arrival-time   (::transit/arrival-time new-stop)
-                           ::transit/departure-time (::transit/departure-time new-stop)})))
-      trips)))
+  [app stop-idx new-stop]
+  (update-in app [:route ::transit/trips]
+             (fn [trips]
+               (mapv
+                (fn [trip]
+                  (assoc trip ::transit/stop-times
+                         (conj (::transit/stop-times trip)
+                               {::transit/stop-idx       stop-idx
+                                ::transit/drop-off-type :regular
+                                ::transit/pickup-type :regular
+                                ::transit/arrival-time   (::transit/arrival-time new-stop)
+                                ::transit/departure-time (::transit/departure-time new-stop)})))
+                (if (seq trips)
+                  trips
+                  (new-trips app))))))
 
 (defn- set-saved-transfer-operator
   [app route]
@@ -150,6 +156,10 @@
                      (:transport-operators-with-services app)))))
 
 (declare new-stop-time)
+
+(defn ensure-service-calendars [app]
+  (update-in app [:route ::transit/service-calendars]
+             #(or % [{}])))
 
 (defn add-stop-to-sequence [app location properties]
   ;; Add stop to current stop sequence
@@ -165,16 +175,18 @@
                          ::transit/unlocode
                          ::transit/port-type
                          ::transit/port-type-name
-                         ::transit/type)
-        new-stop-sequence (if stop-exist-in-sequence?
-                            stop-sequence
-                            (conj stop-sequence new-stop))
-        new-trip-sequence (if stop-exist-in-sequence?
-                            (get-in app [:route ::transit/trips])
-                            (calculate-trip-sequence new-stop-idx new-stop (get-in app [:route ::transit/trips])))]
-    (-> app
-        (assoc-in [:route ::transit/stops] new-stop-sequence)
-        (assoc-in [:route ::transit/trips] new-trip-sequence))))
+                         ::transit/type)]
+    (if stop-exist-in-sequence?
+      app
+      (-> app
+          ensure-service-calendars
+          (update-in [:route ::transit/stops] conj new-stop)
+          (calculate-trip-sequence new-stop-idx new-stop)))))
+
+(defn route-updated
+  "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
+  [app-state]
+  (assoc app-state :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -222,16 +234,20 @@
         (assoc-in [:route ::transit/route-type] :ferry)
         (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
 
-  EditRoute
+  EditBasicInfo
   (process-event [{form-data :form-data} app]
-    (update app :route merge form-data))
+    (-> app
+        (route-updated)
+        (update :route merge form-data)))
 
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (add-stop-to-sequence app
-                          (vec (aget feature "geometry" "coordinates"))
-                          (js->clj (aget feature "properties"))))
+    (-> app
+        (route-updated)
+        (add-stop-to-sequence
+          (vec (aget feature "geometry" "coordinates"))
+          (js->clj (aget feature "properties")))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -239,11 +255,14 @@
           (first (keep #(when (= (:id %) id) %) (:custom-stops route)))
           location (vec (aget feature "geometry" "coordinates"))
           properties (js->clj (aget feature "properties"))]
-      (add-stop-to-sequence app location properties)))
+      (-> app
+          (route-updated)
+          (add-stop-to-sequence location properties))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
     (-> app
+        (route-updated)
         (update-in [:route :custom-stops]
                    (fnil conj [])
                    {:id id
@@ -253,11 +272,14 @@
   UpdateCustomStop
   (process-event [{stop :stop} app]
     (let [idx (dec (count (:custom-stops (:route app))))]
-      (update-in app [:route :custom-stops idx] merge stop)))
+      (-> app
+          (route-updated)
+          (update-in [:route :custom-stops idx] merge stop))))
 
   UpdateCustomStopGeometry
   (process-event [{id :id geojson :geojson} app]
     (-> app
+        (route-updated)
         (update-in [:route :custom-stops] (flip mapv)
                    (fn [{stop-id :id :as stop}]
                      (if (= id stop-id)
@@ -293,6 +315,7 @@
   RemoveCustomStop
   (process-event [{id :id} app]
     (-> app
+        (route-updated)
         (update-in [:route :custom-stops]
                    (flip filterv) #(not= (:id %) id))
         (update-in [:route ::transit/stops]
@@ -303,6 +326,7 @@
   UpdateStop
   (process-event [{idx :idx stop :stop :as e} app]
     (-> app
+        (route-updated)
         (update-in [:route ::transit/stops idx]
                    (fn [{old-arrival ::transit/arrival-time
                          old-departure ::transit/departure-time
@@ -319,6 +343,7 @@
   DeleteStop
   (process-event [{idx :idx} app]
     (-> app
+        (route-updated)
         (update-in [:route ::transit/stops] collections/remove-by-index idx)
         (update-in [:route ::transit/trips] (flip mapv)
           (fn [trip]
@@ -328,8 +353,12 @@
   EditServiceCalendar
   (process-event [{trip-idx :trip-idx} app]
     (if (= trip-idx (get-in app [:route :edit-service-calendar]))
-      (update-in app [:route] dissoc :edit-service-calendar)
-      (assoc-in app [:route :edit-service-calendar] trip-idx)))
+      (-> app
+          (route-updated)
+          (update-in [:route] dissoc :edit-service-calendar))
+      (-> app
+          (route-updated)
+          (assoc-in [:route :edit-service-calendar] trip-idx))))
 
   CloseServiceCalendar
   (process-event [_ app]
@@ -337,7 +366,9 @@
 
   ToggleDate
   (process-event [{date :date trip-idx :trip-idx} app]
-    (update-in app [:route ::transit/service-calendars trip-idx]
+    (update-in
+      (route-updated app)
+      [:route ::transit/service-calendars trip-idx]
                (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
                      :as service-calendar}]
                  (let [service-added-dates (or service-added-dates #{})
@@ -370,6 +401,7 @@
                            (mapcat transit/rule-dates)
                            (::transit/service-rules rules))]
       (-> app
+          (route-updated)
           (update-in [:route ::transit/service-calendars trip-idx] merge rules)
           (assoc-in [:route ::transit/service-calendars trip-idx :rule-dates] rule-dates))))
 
@@ -377,26 +409,7 @@
   (process-event [{trip-idx :trip-idx} app]
     (assoc-in app [:route ::transit/service-calendars trip-idx] {}))
 
-  GoToStep
-  (process-event [{step :step} app]
-    (assoc-in app [:route :step] step))
 
-
-  InitRouteTimes
-  (process-event [_ app]
-    (-> app
-        (assoc-in [:route ::transit/trips]
-                  [{::transit/stop-times (vec (map-indexed
-                                                (fn [stop-idx {::transit/keys [arrival-time departure-time]}]
-                                                  {::transit/stop-idx stop-idx
-                                                   ::transit/arrival-time arrival-time
-                                                   ::transit/departure-time departure-time
-                                                   ::transit/drop-off-type :regular
-                                                   ::transit/pickup-type :regular})
-                                                (get-in app [:route ::transit/stops])))
-                    ::transit/service-calendar-idx 0}])
-        ;; Make sure that we have an empty associated calendar for the trip
-        (assoc-in [:route ::transit/service-calendars] [{}])))
 
   CalculateRouteTimes
   (process-event [_ app]
@@ -437,6 +450,7 @@
                (update ::transit/arrival-time time-from-new-start)
                (update ::transit/departure-time time-from-new-start))]
       (-> app
+          (route-updated)
           (assoc-in [:route :new-start-time] nil)
           (update-in [:route ::transit/trips]
                      (fn [times]
@@ -456,11 +470,15 @@
 
   DeleteTrip
   (process-event [{:keys [trip-idx]} app]
-    (update-in app [:route ::transit/trips] collections/remove-by-index trip-idx))
+    (-> app
+        (route-updated)
+        (update-in [:route ::transit/trips] collections/remove-by-index trip-idx)))
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
-    (update-in app [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data))
+    (-> app
+        (route-updated)
+        (update-in [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data)))
 
   ShowStopException
   (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx :as evt} app]
@@ -470,7 +488,9 @@
           changed-stops (update-stop-by-idx
                           (get app :route) stop-idx trip-idx
                           assoc icon-key icon-type)]
-    (assoc-in app [:route ::transit/trips trip-idx] changed-stops)))
+      (-> app
+          (route-updated)
+          (assoc-in [:route ::transit/trips trip-idx] changed-stops))))
 
   SaveAsGTFS
   (process-event [_ {route :route :as app}]
@@ -502,7 +522,9 @@
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
-      (set-saved-transfer-operator app route)))
+      (-> app
+          (dissoc :before-unload-message)
+          (set-saved-transfer-operator route))))
 
   SaveRouteResponse
   (process-event [{response :response} app]
@@ -520,8 +542,12 @@
 
   CancelRoute
   (process-event [_ app]
+    (let [stops (get-in app [:route :stops])]
     (routes/navigate! :routes)
-    (dissoc app :route)))
+    (-> app
+        (dissoc app :transport-service :before-unload-message)
+        (dissoc app :route)
+        (assoc-in [:route :stops] stops)))))
 
 (defn new-stop-time
   "Calculate new stop time based on trip start time."
@@ -585,3 +611,6 @@
     (and (valid-basic-info? route)
          (valid-stop-sequence? route)
          (valid-trips? route))))
+
+(defn valid-name [route]
+  (if (empty? (get route ::transit/name)) false true))
