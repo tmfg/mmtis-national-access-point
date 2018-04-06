@@ -180,7 +180,7 @@
       app
       (-> app
           ensure-service-calendars
-          (update-in [:route ::transit/stops] conj new-stop)
+          (update-in [:route ::transit/stops] (fnil conj []) new-stop)
           (calculate-trip-sequence new-stop-idx new-stop)))))
 
 (defn route-updated
