@@ -198,7 +198,9 @@
       (tr [:route-wizard-page :trip-schedule-new-trip])
       [form-fields/field {:type :time
                           :update! #(e! (rw/->NewStartTime %))} (:new-start-time route)]
-      [ui/raised-button {:style {:margin-left "5px"}
+      [ui/raised-button {:id "add-route-button"
+                         :name (tr [:route-wizard-page :trip-add-new-trip])
+                         :style {:margin-left "5px"}
                          :primary true
                          :disabled (or (time/empty-time? (:new-start-time route)) empty-calendar?)
                          :on-click #(e! (rw/->AddTrip))
