@@ -30,7 +30,7 @@ CREATE TABLE transit_route (
 -- Convert finnish port names to localized_text[] type --
 CREATE OR REPLACE FUNCTION text_to_localized_text(TEXT)
   RETURNS localized_text[] AS $$
-SELECT ARRAY [ROW ('FI', $1) :: localized_text] :: localized_text [];
+SELECT ARRAY[ROW('FI', $1)::localized_text]::localized_text[];
 $$ LANGUAGE SQL;
 
 ALTER TABLE finnish_ports

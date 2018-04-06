@@ -9,12 +9,15 @@
             [specql.data-types]
             [ote.db.common]
             [ote.db.modification]
+            [ote.db.transport-service]
             [ote.time :as time])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
 (define-tables
-  ["transit_agency" ::agency]
+  ["localized_text" :ote.db.transport-service/localized_text]
+  ["transit_agency" ::agency
+   {"name" ::agency-name}]
   ["transit_stop_type" ::stop-type-enum (specql.transform/transform (specql.transform/to-keyword))]
   ["transit_route_type" ::route-type-enum (specql.transform/transform (specql.transform/to-keyword))]
   ["transit_stop" ::stop]
