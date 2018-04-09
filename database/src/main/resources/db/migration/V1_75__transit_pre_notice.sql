@@ -13,10 +13,6 @@ CREATE TYPE notice_effective_date AS (
 
 CREATE SEQUENCE pre_notice_attachment_number;
 
-CREATE TYPE pre_notice_attachment AS (
-  "attachment-file-name" TEXT,
-  "attachment-number" INTEGER -- represents S3 file
-);
 
 CREATE TABLE pre_notice (
   id SERIAL PRIMARY KEY,
@@ -38,9 +34,15 @@ CREATE TABLE pre_notice (
   regions CHARACTER(2)[], -- references finnish regions by region number
 
   -- URL and attachments
-  url VARCHAR(1024),
-  attachments pre_notice_attachment[]
+  url VARCHAR(1024)
+);
 
+CREATE TABLE pre_notice_attachment (
+  id SERIAL PRIMARY KEY,
+  "pre-notice-id" INTEGER REFERENCES pre_notice (id),
+  "attachment-file-name" TEXT,
+  created timestamp with time zone DEFAULT NOW(),
+  "created-by" TEXT REFERENCES "user" (id),
 );
 
 COMMENT ON TABLE pre_notice IS
