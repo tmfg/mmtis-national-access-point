@@ -252,7 +252,13 @@
           properties (js->clj (aget feature "properties"))]
       (-> app
           (route-updated)
-          (add-stop-to-sequence location properties))))
+          (add-stop-to-sequence
+            location
+            (update properties "name"
+                    (fn [name]
+                      (mapv #(set/rename-keys % {"lang" ::t-service/lang
+                                                 "text" ::t-service/text})
+                            name)))))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]
