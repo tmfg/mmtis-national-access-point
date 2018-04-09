@@ -615,3 +615,20 @@
 
 (defn valid-name [route]
   (if (empty? (get route ::transit/name)) false true))
+
+(defn valid-calendar-rule-dates? [data]
+  (every?
+    (fn [rule]
+      (if (and
+            (not (str/blank? (get rule ::transit/from-date)))
+            (not (str/blank? (get rule ::transit/to-date)))
+            )
+        true false))
+    (::transit/service-rules data)))
+
+(defn valid-calendar-from-tro-dates? [data]
+  (if (and
+        (not (str/blank? (get data ::transit/from-date)))
+        (not (str/blank? (get data ::transit/to-date)))
+        )
+    true false))
