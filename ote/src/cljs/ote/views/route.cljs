@@ -24,7 +24,6 @@
    [route-trips/trips e! app]])
 
 (defn new-route [e! app]
-  (e! (rw/->InitRoute))
   (fn [e! app]
     [:span
      [route-components e! app]
