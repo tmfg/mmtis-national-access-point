@@ -660,7 +660,7 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label error-data] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-validate error-data] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -733,26 +733,29 @@
         [buttons/save {:on-click #(update! (conj (or data []) {}))
                        :label add-label
                        :label-style style-base/button-label-style
-                       :disabled (values/effectively-empty? (last data))}]])]))
+                       :disabled (if add-label-validate
+                                   (not (add-label-validate (last data)))
+                                   (values/effectively-empty? (last data)))}]])]))
 
-(defn- checkbox-container [update! table? label warning error style checked?]
+(defn- checkbox-container [update! table? label warning error style checked? disabled?]
   [:div (when error (stylefy/use-style style-base/required-element))
    [ui/checkbox {:label    (when-not table? label)
                  :checked  (boolean checked?)
                  :on-check #(update! (not checked?))
+                 :disabled disabled?
                  :style    style}]
    (when error
      (tr [:common-texts :required-field]))])
 
-(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help]} checked?]
+(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help disabled?]} checked?]
   (if extended-help
     [:div {:style {:margin-right (str "-" (:margin-right style-form/form-field))}}
      [common/extended-help
       (:help-text extended-help)
       (:help-link-text extended-help)
       (:help-link extended-help)]
-     (checkbox-container update! table? label warning error style checked?)]
-    (checkbox-container update! table? label warning error style checked?)))
+     (checkbox-container update! table? label warning error style checked? disabled?)]
+    (checkbox-container update! table? label warning error style checked? disabled?)))
 
 (defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled?]} data]
   ;; Options:
