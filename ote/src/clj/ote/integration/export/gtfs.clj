@@ -12,7 +12,9 @@
             [ote.db.transport-operator :as t-operator]
             [ote.gtfs.transform :as gtfs-transform]
             [taoensso.timbre :as log]
-            [ote.util.fn :refer [flip]]))
+            [ote.util.fn :refer [flip]]
+            [ote.db.transport-service :as t-service]
+            [ote.localization :refer [*language*]]))
 
 (declare export-gtfs)
 
@@ -59,7 +61,9 @@
   (let [transport-operator (first (fetch db ::t-operator/transport-operator
                                          transport-operator-columns
                                          {::t-operator/id transport-operator-id}))
-        routes (map #(update % ::transit/trips (flip mapv) transit/trip-stop-times-from-24h)
+        routes (map #(-> %
+                       (update ::transit/name (flip t-service/localized-text-for) *language*)
+                       (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))
                     (current-routes db transport-operator-id))]
     {:status 200
      :headers {"Content-Type" "application/zip"

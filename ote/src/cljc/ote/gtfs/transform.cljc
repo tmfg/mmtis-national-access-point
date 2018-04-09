@@ -4,6 +4,8 @@
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
+            [ote.localization :as localization]
             [taoensso.timbre :as log]
             [ote.time :as time]))
 
@@ -19,7 +21,8 @@
 (defn- stops-txt [stops]
   (for [[id {::transit/keys [name location stop-type]}] stops]
     {:gtfs/stop-id id
-     :gtfs/stop-name name
+     :gtfs/stop-name (t-service/localized-text-for #?(:cljs @localization/selected-language
+                                                      :clj localization/*language*) name)
      :gtfs/stop-lat (.-x (.getGeometry location))
      :gtfs/stop-lon (.-y (.getGeometry location))}))
 

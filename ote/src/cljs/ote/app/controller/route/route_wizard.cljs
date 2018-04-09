@@ -7,20 +7,19 @@
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
             [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
-            [ote.util.collections :as collections]))
+            [ote.util.collections :as collections]
+            [clojure.set :as set]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
-
-;; Initialize editing a new route
-(defrecord InitRoute [])
 
 ;; Load existing route
 (defrecord LoadRoute [id])
@@ -226,14 +225,6 @@
           (assoc-in [:route ::transit/trips] trips)
           (assoc-in [:route ::transit/service-calendars] service-calendars))))
 
-  InitRoute
-  (process-event [_ app]
-    (-> app
-        (dissoc :route)
-        (assoc-in [:route :step] :basic-info)
-        (assoc-in [:route ::transit/route-type] :ferry)
-        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
-
   EditBasicInfo
   (process-event [{form-data :form-data} app]
     (-> app
@@ -247,7 +238,11 @@
         (route-updated)
         (add-stop-to-sequence
           (vec (aget feature "geometry" "coordinates"))
-          (js->clj (aget feature "properties")))))
+          (update (js->clj (aget feature "properties")) "name"
+                  (fn [name]
+                    (mapv #(set/rename-keys % {"ote.db.transport-service/lang" ::t-service/lang
+                                               "ote.db.transport-service/text" ::t-service/text})
+                          name))))))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -257,7 +252,13 @@
           properties (js->clj (aget feature "properties"))]
       (-> app
           (route-updated)
-          (add-stop-to-sequence location properties))))
+          (add-stop-to-sequence
+            location
+            (update properties "name"
+                    (fn [name]
+                      (mapv #(set/rename-keys % {"lang" ::t-service/lang
+                                                 "text" ::t-service/text})
+                            name)))))))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]

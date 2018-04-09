@@ -14,6 +14,8 @@
     [ote.time :as time]
     [ote.app.controller.front-page :as fp]
     [ote.ui.common :as common]
+    [ote.db.transport-service :as t-service]
+    [ote.localization :refer [selected-language]]
     [reagent.core :as r]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
@@ -46,7 +48,7 @@
                                    (.preventDefault %)
                                    (e! (route-list/->ConfirmDeleteRoute id)))}])]}
 
-      (str (tr [:route-list-page :delete-dialog-remove-route]) name)])])
+      (str (tr [:route-list-page :delete-dialog-remove-route]) (t-service/localized-text-for @selected-language name))])])
 
 
 (defn list-routes [e! routes]
@@ -77,10 +79,10 @@
              [:a {:href     "#"
                   :on-click #(do
                                (.preventDefault %)
-                               (e! (fp/->ChangePage :edit-route {:id id})))} name]]
+                               (e! (fp/->ChangePage :edit-route {:id id})))} (t-service/localized-text-for @selected-language name)]]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "10%"}} (tr [:route-list-page :route-list-published?-values published?])]
-            [ui/table-row-column {:style {:width "10%"}} departure-point-name]
-            [ui/table-row-column {:style {:width "10%"}} destination-point-name]
+            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-for @selected-language departure-point-name)]
+            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-for @selected-language destination-point-name)]
             [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
             [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]

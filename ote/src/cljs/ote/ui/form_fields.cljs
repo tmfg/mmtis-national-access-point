@@ -185,7 +185,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width?]
+(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width? style]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -196,7 +196,8 @@
       [:div {:style (merge
                       ;; Push localized text field down for table-row-column top padding amount when in table column.
                       (when table? {:margin-top "15px"})
-                      (when full-width? style-form/full-width))}
+                      (when full-width? style-form/full-width)
+                      style)}
        [text-field
         (merge
           {:name name
