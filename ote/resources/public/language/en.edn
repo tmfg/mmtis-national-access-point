@@ -636,6 +636,7 @@
   :trip-stop-calendar "Driving days calendar"
   :trip-schedule-new-trip "Time of a new departure: "
   :trip-add-new-trip "Add a new departure"
+  :trip-delete "Delete departure"
 
   :stop-sequence-custom-dialog-title "Add new port"
   :stop-sequence-custom-dialog-add "Add"
@@ -663,12 +664,13 @@
   :basic-info-available-to "Valid to"
 
   :route-calendar-name "Reittikalenteri"
-  :route-calendar-group-name "Driving days calendar"
+  :route-calendar-group-name ["Service calendar (Departs from " :departure-stop " at " :departure-time ")"]
   :route-calendar-from-date "Valid from"
   :route-calendar-to-date "Valid to"
   :route-calendar-add-new-period "Add a new period to driving days calendar"
   :save-success "Route information has been saved!"
   :save-failure "Route information save failed"
+  :publish-missing-required "You cannot publish the route because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
   }
 
  :price-dialog

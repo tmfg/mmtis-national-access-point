@@ -10,13 +10,13 @@
 (defn basic-info [e! app]
   (fn [e! {route :route :as app}]
     [:div.route-basic-info
-     [form/form {:update! #(e! (rw/->EditRoute %))}
+     [form/form {:update! #(e! (rw/->EditBasicInfo %))}
       [(form/group
         {:label (tr [:route-wizard-page :basic-info-header])
          :columns 3
          :layout :row}
         {:name ::transit/name
-         :type :string
+         :type :localized-text
          :label (tr [:route-wizard-page :basic-info-route-name])
          :required? true}
         {:name ::transit/transport-operator-id
@@ -28,10 +28,10 @@
 
         ;; Departure and destination
         {:name ::transit/departure-point-name
-         :type :string
+         :type :localized-text
          :label (tr [:route-wizard-page :basic-info-departure-point-name])}
         {:name ::transit/destination-point-name
-         :type :string
+         :type :localized-text
          :label (tr [:route-wizard-page :basic-info-destination-point-name])}
 
         ;; Availability of this route

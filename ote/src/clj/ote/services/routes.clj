@@ -95,7 +95,8 @@
                     (save-custom-stops db user)
                     (modification/with-modification-fields ::transit/id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))
-                    (update ::transit/service-calendars #(mapv service-calendar-dates->db %)))]
+                    (update ::transit/service-calendars #(mapv service-calendar-dates->db %))
+                    (update ::transit/trips (flip mapv) transit/trip-stop-times-to-24h))]
           (log/debug "Save route: " r)
           (upsert! db ::transit/route r))))))
 
@@ -106,7 +107,8 @@
                             (specql/columns ::transit/route)
                             {::transit/id id}))]
     (log/debug  "**************** route" (pr-str route))
-    route))
+    (-> route
+        (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))))
 
 (defn delete-route!
   "Delete single route by id"

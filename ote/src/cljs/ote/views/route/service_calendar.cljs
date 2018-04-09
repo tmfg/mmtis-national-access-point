@@ -1,5 +1,6 @@
 (ns ote.views.route.service-calendar
-  (:require [ote.app.controller.route.route-wizard :as rw]
+  (:require [reagent.core :as r]
+            [ote.app.controller.route.route-wizard :as rw]
             [ote.time :as time]
             [ote.ui.service-calendar :as service-calendar]
             [cljs-react-material-ui.reagent :as ui]
@@ -8,7 +9,9 @@
             [ote.localization :refer [tr tr-key]]
             [ote.style.form :as style-form]
             [stylefy.core :as stylefy]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.db.transport-service :as t-service]
+            [ote.localization :refer [tr selected-language]]))
 
 (def rule-fields
   (delay (into [{:type :date-picker
@@ -57,23 +60,39 @@
           (added-dates day)
           {:background-color "wheat"})))))
 
-(defn service-calendar [e! {trip-idx :edit-service-calendar :as route}]
-  (let [calendar (get-in route [::transit/service-calendars trip-idx])]
-    [:div.route-service-calendar {:style {:padding-top "20px"}}
-     [:div (stylefy/use-style style-form/form-card)
-      [:div (stylefy/use-style style-form/form-card-label)
-       (tr [:route-wizard-page :route-calendar-group-name])]
-      [ui/raised-button {:secondary true
-                         :icon (ic/action-delete)
-                         :style {:float "right"
-                                 :margin-top "0.5em"
-                                 :margin-right "0.5em"}
-                         :on-click #(e! (rw/->ClearServiceCalendar trip-idx))
-                         :label (tr [:buttons :route-calendar-clear])}]
+(defn service-calendar [e! {trip-idx :edit-service-calendar
+                            trips ::transit/trips
+                            stops ::transit/stops :as route}]
+  (let [times (get-in trips [trip-idx ::transit/stop-times])
+        departure-time (::transit/departure-time (first times))
+        departure-stop (::transit/name (first stops))]
+    [ui/dialog
+     {:open true
+      :content-style {:width "95%" :max-width js/document.body.clientWidth}
+      :modal false
+      :auto-scroll-body-content true
+      :title (r/as-element
+               [:div (tr [:route-wizard-page :route-calendar-group-name]
+                         {:departure-time (and departure-time (time/format-time departure-time))
+                          :departure-stop (t-service/localized-text-for @selected-language departure-stop)})
+                [ui/raised-button {:secondary true
+                                   :icon (ic/action-delete)
+                                   :style {:float "right"}
+                                   :on-click #(e! (rw/->ClearServiceCalendar trip-idx))
+                                   :label (tr [:buttons :route-calendar-clear])}]])
+      :actions [(r/as-element
+                  [ui/flat-button
+                   {:label (tr [:buttons :close])
+                    :secondary true
+                    :primary true
+                    :on-click #(e! (rw/->CloseServiceCalendar))}])]}
+     (let [calendar (get-in route [::transit/service-calendars trip-idx])]
+       [:div.route-service-calendar {:style {:padding-top "20px"}}
 
-      [rules-table e! trip-idx calendar]
 
-      [service-calendar/service-calendar
-       {:selected-date? (constantly false)
-        :on-select #(e! (rw/->ToggleDate % trip-idx))
-        :day-style (day-style-fn calendar)}]]]))
+        [rules-table e! trip-idx calendar]
+
+        [service-calendar/service-calendar
+         {:selected-date? (constantly false)
+          :on-select #(e! (rw/->ToggleDate % trip-idx))
+          :day-style (day-style-fn calendar)}]])]))

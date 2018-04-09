@@ -272,7 +272,7 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
-  :SEA-ROUTE-link-text "Meriliikenteen reittieditorilla"
+  :SEA-ROUTE-link-text " (Öppna rutteditorn för sjötrafik här)"
   :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
   :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
@@ -326,7 +326,7 @@
   :add-new-service-hour "Lägg till betjäningstid"
   :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
   :add-new-company "Lägg till företag"
-  :add-new-route "Lisää uusi merireitti"
+  :add-new-route "Lägg till ny sjörutt"
   :discard "Ångra"
 
   :next "Fortsätt"
@@ -346,7 +346,7 @@
   :next-step "Fortsätt"
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
-  :back-to-draft  "Muuta luonnokseksi"
+  :back-to-draft  "Ändra status till utkast"
   }
 
  ;; Database enumeration values
@@ -607,7 +607,7 @@
   :delete-dialog-header "Vill du ta bort sjörutten?"
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
-  :route-list-published? "Reitin tila"
+  :route-list-published? "Ruttens status"
   :route-list-published?-values    {true  "Publicerad"
                                     false "Ej publicerad"}
   :route-list-table-starting-point "Avgångsplats"
@@ -640,6 +640,7 @@
   :trip-stop-calendar "Trafikeringskalender"
   :trip-schedule-new-trip "Avgångstid för en ny tur: "
   :trip-add-new-trip "Lägg till en tur"
+  :trip-delete "Ta bort tur"
 
   :stop-sequence-custom-dialog-title "Lägg till en ny hamn eller kaj"
   :stop-sequence-custom-dialog-add "Lägg till"
@@ -653,10 +654,10 @@
   :stop-sequence-map-help  "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
   :stop-sequence-delete "Poista pysäkki ketjusta"
 
-  :wizard-step-basic-info "Reitin nimi"
-  :wizard-step-stop-sequence "Reittipysäkit"
-  :wizard-step-times "Vuorot"
-  :wizard-step-save "Reitin tallennus"
+  :wizard-step-basic-info "Ruttens namn"
+  :wizard-step-stop-sequence "Ruttens hamnar"
+  :wizard-step-times "Avgångar"
+  :wizard-step-save "Spara rutten"
 
   :basic-info-header "Ruttens namn och tjänsteproducent"
   :basic-info-route-name "Ruttens namn"
@@ -667,12 +668,13 @@
   :basic-info-available-to "Gäller till"
 
   :route-calendar-name "Ruttkalender"
-  :route-calendar-group-name "Trafikeringskalender"
+  :route-calendar-group-name ["Trafikeringskalender (Avgångsplats: " :departure-stop ", avgångstid: " :departure-time ")"]
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
-  :save-success "Reitin tallennus onnistui."
-  :save-failure "Reitin tallennus epäonnistui"
+  :save-success "Rutten sparades"
+  :save-failure "Rutten kunde inte sparas"
+  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   }
 
  :price-dialog
@@ -717,7 +719,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-login                           "Logga in"
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
-  :navigation-route                           "Egna rutter"
+  :navigation-route                           "Kartverktyg för sjötrafik"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"

@@ -11,11 +11,12 @@
     [ote.style.route :as style-route]
     [reagent.core :as r]
     [ote.ui.common :as common]
-    [ote.localization :refer [tr tr-key]]
+    [ote.localization :refer [tr tr-key selected-language]]
 
     ;; Calendar subview
     [ote.views.route.service-calendar :as route-service-calendar]
-    [ote.style.form :as style-form]))
+    [ote.style.form :as style-form]
+    [ote.db.transport-service :as t-service]))
 
 (defn badge-content [service-calendars row-idx]
   (if (or (empty? (get-in service-calendars [row-idx]))
@@ -89,20 +90,22 @@
         ^{:key (str code "_" i)}
         [:th {:colSpan 2
               :style {:vertical-align "top"}}
-         [:div {:style {:display "inline-block"
-                        :width "180px"
+         [:div {:style {:display "inline-block" :width "170px"}}
+         [:div {:style {:font-size "14px"
+                        :display "inline-block"
+                        :width "155px"
                         :overflow-x "hidden"
                         :white-space "pre"
-                        :text-overflow "ellipsis"}} name]
-         [:div {:style {:display "inline-block"
+                        :text-overflow "ellipsis"}} (t-service/localized-text-for @selected-language name)]
+         [:div {:style {:width "8px"
+                        :margin-right "7px"
+                        :display "inline-block"
                         :float "right"
                         :position "relative"
-                        :left "16px"
-                        :top -20
-                        :padding-right "5px"
-                        :padding-left "5px"}}
+                        :margin-top "-4px"
+                        }}
           (when (< i (dec (count stop-sequence)))
-            [ic/navigation-chevron-right])]])
+            [ic/navigation-chevron-right])]]])
       stop-sequence))]
    [:tr
     [:th ""]
@@ -118,7 +121,7 @@
 
 (defn trip-row
   "Render a single row of stop times."
-  [e! stop-count edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
+  [e! stop-count can-delete? edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
   [:tr {:style {:max-height "40px"}}
    [:td [:div
@@ -138,40 +141,47 @@
                                          (e! (rw/->EditServiceCalendar row-idx)))}
              [ic/action-today]]]]]]
    (map-indexed
-     (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
-       (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
-             style {:style {:padding-left     "5px"
-                            :padding-right    "5px"
-                            :width            "125px"
-                            :background-color (if (even? stop-idx)
-                                                "#f4f4f4"
-                                                "#fafafa")}}]
-         (list
-           (if (zero? stop-idx)
-             ^{:key (str stop-idx "-first")}
-             [:td style " - "]
-             ^{:key (str stop-idx "-arr")}
-             [:td style
-              [:div.col-md-11
-                [form-fields/field {:type    :time
-                                    :required? true
-                                    :update! #(update! {::transit/arrival-time %})}
-               arrival-time]]
-              [:div.col-md-1 {:style {:margin-left "-10px"}}
-               [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
-           (if (= stop-idx (dec stop-count))
-             ^{:key (str stop-idx "-last")}
-             [:td style " - "]
-             ^{:key (str stop-idx "-dep")}
-             [:td style
-              [:div.col-md-11
-                [form-fields/field {:type    :time
-                                    :required? true
-                                    :update! #(update! {::transit/departure-time %})}
-                         departure-time]]
-              [:div.col-md-1 {:style {:margin-left "-10px"}}
-                [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
-     stops)])
+    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
+      (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
+            style {:style {:padding-left     "5px"
+                           :padding-right    "5px"
+                           :width            "125px"
+                           :background-color (if (even? stop-idx)
+                                               "#f4f4f4"
+                                               "#fafafa")}}]
+        (list
+         (if (zero? stop-idx)
+           ^{:key (str stop-idx "-first")}
+           [:td style " - "]
+           ^{:key (str stop-idx "-arr")}
+           [:td style
+            [:div.col-md-11
+             [form-fields/field {:type    :time
+                                 :required? true
+                                 :unrestricted-hours? (> stop-idx 0)
+                                 :update! #(update! {::transit/arrival-time %})}
+              arrival-time]]
+            [:div.col-md-1 {:style {:margin-left "-10px"}}
+             [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
+         (if (= stop-idx (dec stop-count))
+           ^{:key (str stop-idx "-last")}
+           [:td style " - "]
+           ^{:key (str stop-idx "-dep")}
+           [:td style
+            [:div.col-md-11
+             [form-fields/field {:type    :time
+                                 :required? true
+                                 :unrestricted-hours? (> stop-idx 0)
+                                 :update! #(update! {::transit/departure-time %})}
+              departure-time]]
+            [:div.col-md-1 {:style {:margin-left "-10px"}}
+             [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
+    stops)
+   (when can-delete?
+     [:td
+      [common/tooltip {:text (tr [:route-wizard-page :trip-delete])}
+       [ui/icon-button {:on-click #(e! (rw/->DeleteTrip row-idx))}
+        [ic/action-delete]]]])])
 
 (defn trips-list [e! route]
   (let [stop-sequence (::transit/stops route)
@@ -183,9 +193,12 @@
       [:table {:style {:text-align "center"}}
        [route-times-header stop-sequence]
        [:tbody
-        (doall (map-indexed (partial trip-row e! stop-count
-                                     (:edit-service-calendar route)
-                                     (::transit/service-calendars route)) trips))]]]
+        (doall
+         (map-indexed
+          (partial trip-row e! stop-count (> (count trips) 1)
+                   (:edit-service-calendar route)
+                   (::transit/service-calendars route))
+          trips))]]]
 
      (when (:edit-service-calendar route)
        [route-service-calendar/service-calendar e! route])
@@ -207,9 +220,6 @@
                          :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
 (defn trips [e! {route :route :as app}]
-  (if (empty? (::transit/trips route))
-    (e! (rw/->InitRouteTimes))
-    (e! (rw/->CalculateRouteTimes)))
   (fn [e! {route :route :as app}]
     [:div {:style {:padding-top "20px"}}
      [:div (stylefy/use-style style-form/form-card)

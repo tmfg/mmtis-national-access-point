@@ -1,6 +1,7 @@
 (ns ote.db.transport-service
   "Database configurations for Transport Services"
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.string :as str]
+            [clojure.spec.alpha :as s]
             #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
             [specql.rel :as rel]
             [specql.transform :as xf]
@@ -128,7 +129,7 @@
     :brokerage ::brokerage))
 
 (defn localized-text-for [language localized-text]
-  (some #(when (= (::lang %) language) (::text %)) localized-text))
+  (some #(when (= (::lang %) (str/upper-case (name language))) (::text %)) localized-text))
 
 (def transportable-aid
   [:wheelchair :walking-stick :crutches :walker])

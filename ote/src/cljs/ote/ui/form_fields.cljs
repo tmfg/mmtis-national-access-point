@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.mui-chip-input :refer [chip-input]]
             [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :as localization :refer [tr tr-key]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
@@ -185,7 +185,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width?]
+(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width? style]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -196,7 +196,8 @@
       [:div {:style (merge
                       ;; Push localized text field down for table-row-column top padding amount when in table column.
                       (when table? {:margin-top "15px"})
-                      (when full-width? style-form/full-width))}
+                      (when full-width? style-form/full-width)
+                      style)}
        [text-field
         (merge
           {:name name
@@ -506,16 +507,20 @@
 ;; Matches empty or any valid hour (0 (or 00) - 23)
 (def hour-regex #"^(^$|0?[0-9]|1[0-9]|2[0-3])$")
 
+(def unrestricted-hour-regex #"\d*")
+
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! error warning required?] :as opts}
+(defmethod field :time [{:keys [update! error warning required? unrestricted-hours?] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
            {:type :string
             :name "hours"
-            :regex hour-regex
+            :regex (if unrestricted-hours?
+                     unrestricted-hour-regex
+                     hour-regex)
             :warning (when
                        (and required? (empty? data))
                        true)
@@ -634,7 +639,11 @@
                     :format-date time/format-date
                     :ok-label (or ok-label (tr [:buttons :save]))
                     :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                    :locale "fi-FI"
+                    :locale (case @localization/selected-language
+                              :fi "fi-FI"
+                              :sv "sv-SE"
+                              :en "en-UK"
+                              "fi-FI")
                     :Date-time-format js/Intl.DateTimeFormat}]
    (when show-clear?
      [ui/icon-button {:on-click #(update! nil)
