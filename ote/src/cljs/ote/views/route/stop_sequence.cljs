@@ -10,9 +10,10 @@
             [reagent.core :as r]
             [ote.ui.leaflet-draw :as leaflet-draw]
             [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key selected-language]]
             [ote.style.form :as style-form]
-            [stylefy.core :as stylefy]))
+            [stylefy.core :as stylefy]
+            [ote.db.transport-service :as t-service]))
 
 
 (def stop-marker-style
@@ -24,7 +25,10 @@
 (defn- stop-marker [e! point lat-lng]
   (-> lat-lng
       (js/L.marker #js {:opacity 0.7
-                        :title (aget point "properties" "name")})
+                        :title (t-service/localized-text-for
+                                 @selected-language
+                                 (js->clj (aget point "properties" "name")
+                                          :keywordize-keys true))})
       (.on  "click"
             (fn [_]
               (e! (rw/->AddStop point))))))
@@ -33,7 +37,8 @@
   [c2 c1])
 
 (defn- custom-stop-dialog [e! route]
-  (let [name (-> route :custom-stops last :name)]
+  (let [name (-> route :custom-stops last :name)
+        name-str (t-service/localized-text-for @selected-language name)]
     (when (:custom-stop-dialog route)
       [ui/dialog
        {:open true
@@ -41,15 +46,16 @@
         :title (tr [:route-wizard-page :stop-sequence-custom-dialog-title])
         :actions [(r/as-element
                    [ui/flat-button
-                    {:disabled (str/blank? name)
+                    {:disabled (str/blank? name-str)
                      :label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
                      :primary true
                      :on-click #(e! (rw/->CloseCustomStopDialog))}])]}
        [:span
-        [form-fields/field {:type :string
+        [form-fields/field {:style {:margin-bottom "5px"}
+                            :type :localized-text
                             :label (tr [:route-wizard-page :stop-sequence-custom-dialog-name])
                             :update! #(e! (rw/->UpdateCustomStop {:name %}))
-                            :on-enter #(when (not (str/blank? name))
+                            :on-enter #(when (not (str/blank? name-str))
                                          (e! (rw/->CloseCustomStopDialog)))}
          name]
         [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]])))
@@ -120,7 +126,7 @@
        (fn [i {::transit/keys [code name arrival-time departure-time]}]
          ^{:key (str code "_" i)}
          [:tr {:style {:border-bottom "solid 1px black"}}
-          [:td name]
+          [:td (t-service/localized-text-for @selected-language name)]
           [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])}
                 [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
                  [ic/action-delete]]]]])

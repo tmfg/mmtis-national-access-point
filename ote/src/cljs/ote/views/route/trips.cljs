@@ -11,11 +11,12 @@
     [ote.style.route :as style-route]
     [reagent.core :as r]
     [ote.ui.common :as common]
-    [ote.localization :refer [tr tr-key]]
+    [ote.localization :refer [tr tr-key selected-language]]
 
     ;; Calendar subview
     [ote.views.route.service-calendar :as route-service-calendar]
-    [ote.style.form :as style-form]))
+    [ote.style.form :as style-form]
+    [ote.db.transport-service :as t-service]))
 
 (defn badge-content [service-calendars row-idx]
   (if (or (empty? (get-in service-calendars [row-idx]))
@@ -95,7 +96,7 @@
                         :width "155px"
                         :overflow-x "hidden"
                         :white-space "pre"
-                        :text-overflow "ellipsis"}} name]
+                        :text-overflow "ellipsis"}} (t-service/localized-text-for @selected-language name)]
          [:div {:style {:width "8px"
                         :margin-right "7px"
                         :display "inline-block"
