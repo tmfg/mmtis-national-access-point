@@ -128,14 +128,14 @@
                  :style {:overflow "visible"}}
           [ui/badge
            (badge-content service-calendars row-idx)
-          [ui/icon-button {
-                           :style (if (= edit-service-calendar row-idx)
-                                    {:border-radius "25px" :background-color "#b3b3b3"}
-                                    {})
-                           :href     "#"
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (rw/->EditServiceCalendar row-idx)))}
+           [ui/icon-button {:id (str "button_" row-idx)
+                            :style (if (= edit-service-calendar row-idx)
+                                     {:border-radius "25px" :background-color "#b3b3b3"}
+                                     {})
+                            :href     "#"
+                            :on-click #(do
+                                         (.preventDefault %)
+                                         (e! (rw/->EditServiceCalendar row-idx)))}
              [ic/action-today]]]]]]
    (map-indexed
      (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]

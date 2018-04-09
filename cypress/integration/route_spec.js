@@ -43,6 +43,6 @@ describe('Sea route tests', function () {
 		})
 	    });
 
-	//	cy.get('a[data-name="calendar-stop-button"]').first().click();
+	cy.get('a[id="button_0"]').first().click();
     })
 });
