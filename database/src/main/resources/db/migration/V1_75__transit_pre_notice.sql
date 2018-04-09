@@ -39,7 +39,7 @@ CREATE TABLE pre_notice_attachment (
   "pre-notice-id" INTEGER REFERENCES pre_notice (id),
   "attachment-file-name" TEXT,
   created timestamp with time zone DEFAULT NOW(),
-  "created-by" TEXT REFERENCES "user" (id),
+  "created-by" TEXT REFERENCES "user" (id)
 );
 
 COMMENT ON TABLE pre_notice IS
