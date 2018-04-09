@@ -14,7 +14,6 @@
             [ote.localization :refer [tr selected-language]]))
 
 (defn rule-fields [calendar]
-  ;(delay
     (into [{:type :date-picker
                  :name ::transit/from-date
                  :label (tr [:route-wizard-page :route-calendar-from-date])
@@ -34,7 +33,7 @@
                   :name name
                   :disabled? (not (rw/valid-calendar-rule-dates? calendar))
                   :label label
-                  :width "6%"})));)
+                  :width "6%"})))
 
 (defn- rules-table [e! trip-idx calendar]
   [:div.row {:style {:padding "20px"}}
