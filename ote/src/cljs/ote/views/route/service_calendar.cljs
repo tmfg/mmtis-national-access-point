@@ -11,8 +11,9 @@
             [stylefy.core :as stylefy]
             [ote.ui.form-fields :as form-fields]))
 
-(def rule-fields
-  (delay (into [{:type :date-picker
+(defn rule-fields [calendar]
+  ;(delay
+    (into [{:type :date-picker
                  :name ::transit/from-date
                  :label (tr [:route-wizard-page :route-calendar-from-date])
                  :width "29%"}
@@ -29,16 +30,18 @@
                                    [::transit/sunday (tr [:enums :ote.db.transport-service/day :short :SUN])]]]
                  {:type :checkbox
                   :name name
+                  :disabled? (not (rw/valid-calendar-rule-dates? calendar))
                   :label label
-                  :width "6%"}))))
+                  :width "6%"})));)
 
 (defn- rules-table [e! trip-idx calendar]
   [:div.row {:style {:padding "20px"}}
    [form-fields/field {:type :table
                        :update! #(e! (rw/->EditServiceCalendarRules {::transit/service-rules %} trip-idx))
-                       :table-fields @rule-fields
+                       :table-fields (rule-fields calendar)
                        :delete? true
-                       :add-label (tr [:route-wizard-page :route-calendar-add-new-period])}
+                       :add-label (tr [:route-wizard-page :route-calendar-add-new-period])
+                       :add-label-validate rw/valid-calendar-from-tro-dates?}
     (::transit/service-rules calendar)]])
 
 (defn day-style-fn [calendar]
