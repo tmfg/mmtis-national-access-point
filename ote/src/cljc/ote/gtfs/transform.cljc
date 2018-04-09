@@ -22,7 +22,7 @@
   (for [[id {::transit/keys [name location stop-type]}] stops]
     {:gtfs/stop-id id
      :gtfs/stop-name (t-service/localized-text-for #?(:cljs @localization/selected-language
-                                                      :clj *language*) name)
+                                                      :clj localization/*language*) name)
      :gtfs/stop-lat (.-x (.getGeometry location))
      :gtfs/stop-lon (.-y (.getGeometry location))}))
 
