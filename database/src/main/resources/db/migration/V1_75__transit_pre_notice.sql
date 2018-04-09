@@ -11,9 +11,6 @@ CREATE TYPE notice_effective_date AS (
  "effective-date-description" TEXT
 );
 
-CREATE SEQUENCE pre_notice_attachment_number;
-
-
 CREATE TABLE pre_notice (
   id SERIAL PRIMARY KEY,
   "transport-operator-id" INTEGER REFERENCES "transport-operator" (id) NOT NULL,
