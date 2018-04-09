@@ -585,6 +585,7 @@
   (if (or (empty? route-calendar)
           (and
             (empty? (get route-calendar :rule-dates))
+            (empty? (get route-calendar ::transit/service-added-dates))
             (empty? (get route-calendar ::transit/service-removed-dates))
             (empty? (get route-calendar ::transit/service-rules)))) false true))
 

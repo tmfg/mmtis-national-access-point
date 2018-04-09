@@ -22,6 +22,7 @@
           (and
             (empty? (get-in service-calendars [row-idx :rule-dates]))
             (empty? (get-in service-calendars [row-idx ::transit/service-removed-dates]))
+            (empty? (get-in service-calendars [row-idx ::transit/service-added-dates]))
             (empty? (get-in service-calendars [row-idx ::transit/service-rules]))))
     {:badge-content "!"
      :secondary true
