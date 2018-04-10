@@ -311,6 +311,7 @@
   :edit "Muokkaa"
 
   :save-and-publish "Tallenna ja julkaise"
+  :save-and-send "Tallenna ja lähetä"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
   :add-new-parking-capacity "Lisää rivi"
@@ -676,6 +677,13 @@
 
   }
 
+ :pre-notice-page
+ { :pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+
+
+  }
+
  :price-dialog
  {:header-dialog "Ajoneuvon hintatiedot"
   :close-dialog  "Sulje"}
@@ -724,6 +732,7 @@
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
+  :navigation-pre-notice                      "60pv ilmoitus"
   :navigation-privacy-policy "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
