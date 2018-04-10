@@ -71,12 +71,12 @@
 (defn save-custom-stops [route db user]
   (let [custom-stops
         (into {}
-              (map (fn [{:keys [id geojson]}]
+              (map (fn [{:keys [id geojson name]}]
                      [id (specql/insert!
                           db ::transit/finnish-ports
                           (modification/with-modification-fields
                             {::transit/code (next-stop-code db)
-                             ::transit/name (get-in geojson ["properties" "name"])
+                             ::transit/name name
                              ::transit/location (point-geometry (get-in geojson ["geometry" "coordinates"]))}
                             ::transit/id user))]))
               (:custom-stops route))]
