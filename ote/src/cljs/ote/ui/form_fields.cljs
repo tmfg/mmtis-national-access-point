@@ -625,26 +625,28 @@
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :date-picker [{:keys [update! table? label ok-label cancel-label
-                                       show-clear? hint-text] :as opts} data]
+                                       show-clear? hint-text id] :as opts} data]
   [:div (stylefy/use-style style-base/inline-block)
-   [ui/date-picker {:style {:display "inline-block"}
-                    :text-field-style {:width "150px"}
-                    :hint-text (or hint-text "")
-                    :floating-label-text (when-not table? label)
-                    :floating-label-fixed true
-                    :auto-ok true
-                    :value data
-                    :on-change (fn [_ date]
-                                 (update! date))
-                    :format-date time/format-date
-                    :ok-label (or ok-label (tr [:buttons :save]))
-                    :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                    :locale (case @localization/selected-language
-                              :fi "fi-FI"
-                              :sv "sv-SE"
-                              :en "en-UK"
-                              "fi-FI")
-                    :Date-time-format js/Intl.DateTimeFormat}]
+   [ui/date-picker (merge {:style {:display "inline-block"}
+                           :text-field-style {:width "150px"}
+                           :hint-text (or hint-text "")
+                           :floating-label-text (when-not table? label)
+                           :floating-label-fixed true
+                           :auto-ok true
+                           :value data
+                           :on-change (fn [_ date]
+                                        (update! date))
+                           :format-date time/format-date
+                           :ok-label (or ok-label (tr [:buttons :save]))
+                           :cancel-label (or cancel-label (tr [:buttons :cancel]))
+                           :locale (case @localization/selected-language
+                                     :fi "fi-FI"
+                                     :sv "sv-SE"
+                                     :en "en-UK"
+                                     "fi-FI")
+                           :Date-time-format js/Intl.DateTimeFormat}
+                          (when (not (nil? id))
+                            {:id (str "date-picker-" id)}))]
    (when show-clear?
      [ui/icon-button {:on-click #(update! nil)
                       :disabled (not data)
@@ -660,7 +662,7 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label error-data] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label error-data id] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -694,7 +696,8 @@
                                                                (< i (count error-data))
                                                                (nth error-data i))]
                ^{:key i}
-               [ui/table-row (merge {:selectable false :display-border false}
+             [ui/table-row (merge {:id (str "row_" i)
+                                   :selectable false :display-border false}
                                     ;; If there are errors or missing fields, make the
                                     ;; row taller to show error messages
                                     (when (or errors missing-required-fields)
@@ -730,10 +733,12 @@
          data))]]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
-        [buttons/save {:on-click #(update! (conj (or data []) {}))
-                       :label add-label
-                       :label-style style-base/button-label-style
-                       :disabled (values/effectively-empty? (last data))}]])]))
+        [buttons/save (merge {:on-click #(update! (conj (or data []) {}))
+                              :label add-label
+                              :label-style style-base/button-label-style
+                              :disabled (values/effectively-empty? (last data))}
+                             (when (not (nil? id))
+                               {:id (str id "-button")}))]])]))
 
 (defn- checkbox-container [update! table? label warning error style checked?]
   [:div (when error (stylefy/use-style style-base/required-element))
