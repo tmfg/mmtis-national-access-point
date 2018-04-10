@@ -21,7 +21,7 @@
 (defn- stops-txt [stops]
   (for [[id {::transit/keys [name location stop-type]}] stops]
     {:gtfs/stop-id id
-     :gtfs/stop-name (t-service/localized-text-for #?(:cljs @localization/selected-language
+     :gtfs/stop-name (t-service/localized-text-with-fallback #?(:cljs @localization/selected-language
                                                       :clj localization/*language*) name)
      :gtfs/stop-lat (.-x (.getGeometry location))
      :gtfs/stop-lon (.-y (.getGeometry location))}))
