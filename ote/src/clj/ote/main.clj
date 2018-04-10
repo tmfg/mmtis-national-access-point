@@ -16,6 +16,7 @@
             [ote.services.login :as login-service]
             [ote.services.admin :as admin-service]
             [ote.services.operators :as operators-service]
+            [ote.services.pre-notices :as pre-notices]
 
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
@@ -46,6 +47,7 @@
    :viewer (component/using (viewer/->Viewer) [:http])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
+   :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
 
    ;; Return localization information to frontend
    :localization (component/using

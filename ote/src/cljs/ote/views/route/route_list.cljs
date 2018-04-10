@@ -49,7 +49,7 @@
                                    (.preventDefault %)
                                    (e! (route-list/->ConfirmDeleteRoute id)))}])]}
 
-      (str (tr [:route-list-page :delete-dialog-remove-route]) (t-service/localized-text-for @selected-language name))])])
+      (str (tr [:route-list-page :delete-dialog-remove-route]) (t-service/localized-text-with-fallback @selected-language name))])])
 
 
 (defn list-routes [e! routes]
@@ -80,10 +80,10 @@
              [:a {:href     "#"
                   :on-click #(do
                                (.preventDefault %)
-                               (e! (fp/->ChangePage :edit-route {:id id})))} (t-service/localized-text-for @selected-language name)]]
+                               (e! (fp/->ChangePage :edit-route {:id id})))} (t-service/localized-text-with-fallback @selected-language name)]]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "10%"}} (tr [:route-list-page :route-list-published?-values published?])]
-            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-for @selected-language departure-point-name)]
-            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-for @selected-language destination-point-name)]
+            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-with-fallback @selected-language departure-point-name)]
+            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-with-fallback @selected-language destination-point-name)]
             [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
             [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]
