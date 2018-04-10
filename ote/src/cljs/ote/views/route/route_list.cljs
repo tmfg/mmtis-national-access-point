@@ -22,7 +22,8 @@
                                   :keys [show-delete-modal?]
                                   :as route}]
   [:span
-   [ui/icon-button {:href     "#"
+   [ui/icon-button {:id       (str "delete-route-" id)
+                    :href     "#"
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (route-list/->OpenDeleteRouteModal id)))}
