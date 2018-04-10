@@ -514,7 +514,7 @@
                                                 stop)))
                     (dissoc :step :stops :new-start-time :edit-service-calendar))
           ;; Update calendar indexes if user has added calendars
-          route (if (and (not (nil? calendars)) (not (empty? calendars)))
+          route (if (seq calendars)
                   (update route ::transit/trips
                           (fn [trips]
                             ;; Update service-calendar indexes
@@ -624,14 +624,13 @@
                      (and (not (empty? rule))
                           (not (str/blank? (get rule ::transit/from-date)))
                           (not (str/blank? (get rule ::transit/to-date)))))]
-    (if (empty? (::transit/service-rules data))
-      false
+    (and (seq (::transit/service-rules data))
       (every?
         #(check-rule %)
         (::transit/service-rules data)))))
 
-(defn empty-calendar-from-to-dates? [data]
+(defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or
-    (str/blank? (get data ::transit/from-date))
-    (str/blank? (get data ::transit/to-date))
+    (str/blank? from-date)
+    (str/blank? to-date)
     ))
