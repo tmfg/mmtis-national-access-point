@@ -25,7 +25,7 @@
 (defn- stop-marker [e! point lat-lng]
   (-> lat-lng
       (js/L.marker #js {:opacity 0.7
-                        :title (t-service/localized-text-for
+                        :title (t-service/localized-text-with-fallback
                                  @selected-language
                                  (js->clj (aget point "properties" "name")
                                           :keywordize-keys true))})
@@ -38,7 +38,7 @@
 
 (defn- custom-stop-dialog [e! route]
   (let [name (-> route :custom-stops last :name)
-        name-str (t-service/localized-text-for @selected-language name)]
+        name-str (t-service/localized-text-with-fallback @selected-language name)]
     (when (:custom-stop-dialog route)
       [ui/dialog
        {:open true
@@ -126,7 +126,7 @@
        (fn [i {::transit/keys [code name arrival-time departure-time]}]
          ^{:key (str code "_" i)}
          [:tr {:style {:border-bottom "solid 1px black"}}
-          [:td (t-service/localized-text-for @selected-language name)]
+          [:td (t-service/localized-text-with-fallback @selected-language name)]
           [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])}
                 [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
                  [ic/action-delete]]]]])

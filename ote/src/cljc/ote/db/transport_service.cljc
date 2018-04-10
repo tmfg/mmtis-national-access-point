@@ -131,6 +131,13 @@
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) (str/upper-case (name language))) (::text %)) localized-text))
 
+(defn localized-text-with-fallback [language localized-text]
+  (let [text (localized-text-for language localized-text)]
+    (if (str/blank? text)
+      (some #(when-not (str/blank? %) %)
+            (map #(localized-text-for % localized-text) ["EN" "FI" "SV"]))
+      text)))
+
 (def transportable-aid
   [:wheelchair :walking-stick :crutches :walker])
 

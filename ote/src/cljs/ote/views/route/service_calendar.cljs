@@ -74,7 +74,7 @@
       :title (r/as-element
                [:div (tr [:route-wizard-page :route-calendar-group-name]
                          {:departure-time (and departure-time (time/format-time departure-time))
-                          :departure-stop (t-service/localized-text-for @selected-language departure-stop)})
+                          :departure-stop (t-service/localized-text-with-fallback @selected-language departure-stop)})
                 [ui/raised-button {:secondary true
                                    :icon (ic/action-delete)
                                    :style {:float "right"}
