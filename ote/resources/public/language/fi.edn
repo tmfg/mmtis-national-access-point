@@ -759,7 +759,9 @@
   :language                                   "Kieli"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."}
 
 
  :dialog

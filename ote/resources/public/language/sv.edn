@@ -755,7 +755,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :language "Språk"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Error in server call. Contact support if the problem persists."}
 
 
  :dialog
