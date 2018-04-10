@@ -586,11 +586,11 @@
        transport-operator-id))
 
 (defn valid-calendar? [trip-calendar]
-  (if (or
+  (not (or
         (empty? trip-calendar)
         (and
           (empty? (get trip-calendar :rule-dates))
-          (empty? (get trip-calendar ::transit/service-added-dates)))) false true))
+          (empty? (get trip-calendar ::transit/service-added-dates))))))
 
 (defn valid-trips?
   "Check if given route's trip stop times are valid.
