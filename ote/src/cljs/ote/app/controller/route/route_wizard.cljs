@@ -512,14 +512,17 @@
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
                                                 stop)))
-                    (update ::transit/trips
-                            (fn [trips]
-                              ;; Update service-calendar indexes
-                              (mapv
-                                #(assoc % ::transit/service-calendar-idx
-                                          (nth cals-indices (::transit/service-calendar-idx %)))
-                                trips)))
-                    (dissoc :step :stops :new-start-time :edit-service-calendar))]
+                    (dissoc :step :stops :new-start-time :edit-service-calendar))
+          ;; Update calendar indexes if user has added calendars
+          route (if (seq calendars)
+                  (update route ::transit/trips
+                          (fn [trips]
+                            ;; Update service-calendar indexes
+                            (mapv
+                              #(assoc % ::transit/service-calendar-idx
+                                        (nth cals-indices (::transit/service-calendar-idx %)))
+                              trips)))
+                  route)]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
@@ -582,12 +585,12 @@
   (and (not (str/blank? name))
        transport-operator-id))
 
-(defn valid-calendar? [route-calendar]
-  (if (or (empty? route-calendar)
-          (and
-            (empty? (get route-calendar :rule-dates))
-            (empty? (get route-calendar ::transit/service-removed-dates))
-            (empty? (get route-calendar ::transit/service-rules)))) false true))
+(defn valid-calendar? [trip-calendar]
+  (if (or
+        (empty? trip-calendar)
+        (and
+          (empty? (get trip-calendar :rule-dates))
+          (empty? (get trip-calendar ::transit/service-added-dates)))) false true))
 
 (defn valid-trips?
   "Check if given route's trip stop times are valid.
@@ -615,3 +618,19 @@
 
 (defn valid-name [route]
   (if (empty? (get route ::transit/name)) false true))
+
+(defn valid-calendar-rule-dates? [data]
+  (let [check-rule (fn [rule]
+                     (and (not (empty? rule))
+                          (not (str/blank? (get rule ::transit/from-date)))
+                          (not (str/blank? (get rule ::transit/to-date)))))]
+    (and (seq (::transit/service-rules data))
+      (every?
+        #(check-rule %)
+        (::transit/service-rules data)))))
+
+(defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
+  (or
+    (str/blank? from-date)
+    (str/blank? to-date)
+    ))
