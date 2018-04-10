@@ -92,7 +92,7 @@
                         :width "155px"
                         :overflow-x "hidden"
                         :white-space "pre"
-                        :text-overflow "ellipsis"}} (t-service/localized-text-for @selected-language name)]
+                        :text-overflow "ellipsis"}} (t-service/localized-text-with-fallback @selected-language name)]
          [:div {:style {:width "8px"
                         :margin-right "7px"
                         :display "inline-block"
