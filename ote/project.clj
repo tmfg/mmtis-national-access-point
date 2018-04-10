@@ -93,7 +93,11 @@
                  [cljsjs/filesaverjs "1.3.3-0"]
 
                  ;; Amazon Web Services
-                 [amazonica "0.3.121"]
+                 [amazonica "0.3.121"
+                  :exclusions [com.amazonaws/aws-java-sdk
+                               com.amazonaws/amazon-kinesis-client]]
+                 [com.amazonaws/aws-java-sdk-core "1.11.312"]
+                 [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
 
                  ;; override old guava version from deps
                  [com.google.guava/guava "21.0"]]
