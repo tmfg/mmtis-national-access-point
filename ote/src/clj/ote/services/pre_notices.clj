@@ -55,8 +55,7 @@
 
     (s3/put-object bucket (str (::transit/id file) "_" (:filename uploaded-file))
                    (:tempfile uploaded-file))
-    (def last-req req)
-    (def last-file file)))
+    (http/transit-response file)))
 
 (defn- attachment-info [db user pre-notice-attachment-id]
   (first
