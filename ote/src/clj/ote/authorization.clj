@@ -5,6 +5,12 @@
             [specql.op :as op]
             [taoensso.timbre :as log]))
 
+(defn admin? [user]
+  (boolean (get-in user [:user :admin?])))
+
+(defn user-id [user]
+  (get-in user [:user :id]))
+
 (defn user-transport-operators
   "Returns set of transport-operators the user belongs to (based on CKAN group membership)."
   [db {groups :groups :as user}]

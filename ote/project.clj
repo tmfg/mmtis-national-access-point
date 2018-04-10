@@ -28,6 +28,8 @@
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-anti-forgery "1.1.0"]
                  [clj-http "3.7.0"]
+                 [commons-fileupload/commons-fileupload "1.3.3"]
+                 [javax.servlet/javax.servlet-api "4.0.0"]
 
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
@@ -89,6 +91,9 @@
                  [org.clojure/data.csv "0.1.4"]
                  [cljsjs/jszip "3.1.3-0"]
                  [cljsjs/filesaverjs "1.3.3-0"]
+
+                 ;; Amazon Web Services
+                 [amazonica "0.3.121"]
 
                  ;; override old guava version from deps
                  [com.google.guava/guava "21.0"]]
