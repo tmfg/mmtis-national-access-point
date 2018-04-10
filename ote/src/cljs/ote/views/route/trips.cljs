@@ -182,7 +182,7 @@
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
-        empty-calendar? (empty? (first (::transit/service-calendars route)))]
+        valid-first-calendar? (rw/valid-calendar? (first (::transit/service-calendars route)))]
     [:div.route-times
      [:div {:style {:overflow "auto"}}
       [:table {:style {:text-align "center"}}
@@ -198,7 +198,7 @@
      (when (:edit-service-calendar route)
        [route-service-calendar/service-calendar e! route])
 
-     (when empty-calendar?
+     (when-not valid-first-calendar?
        [:div {:style {:margin-top "10px"}}
         [common/help (tr [:form-help :trip-editor-no-calendar])]])
 
@@ -208,7 +208,7 @@
                           :update! #(e! (rw/->NewStartTime %))} (:new-start-time route)]
       [ui/raised-button {:style {:margin-left "5px"}
                          :primary true
-                         :disabled (or (time/empty-time? (:new-start-time route)) empty-calendar?)
+                         :disabled (or (time/empty-time? (:new-start-time route)) valid-first-calendar?)
                          :on-click #(e! (rw/->AddTrip))
                          :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
