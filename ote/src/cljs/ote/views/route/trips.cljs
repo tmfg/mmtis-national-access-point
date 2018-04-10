@@ -18,17 +18,10 @@
     [ote.style.form :as style-form]
     [ote.db.transport-service :as t-service]))
 
-(defn badge-content [service-calendars row-idx]
-  (let [rules (get-in service-calendars [row-idx ::transit/service-rules])
-        valid-rules (if (or (empty? rules) (nil? rules))
-                      false
-                      (rw/valid-calendar-rule-days rules))]
-  (if (or (empty? (get-in service-calendars [row-idx])) (not valid-rules)
-          (and
-            (empty? (get-in service-calendars [row-idx :rule-dates]))
-            (empty? (get-in service-calendars [row-idx ::transit/service-removed-dates]))
-            (empty? (get-in service-calendars [row-idx ::transit/service-added-dates]))
-            (empty? (get-in service-calendars [row-idx ::transit/service-rules]))))
+(defn badge-content [trip-calendar]
+  (if (rw/valid-calendar? trip-calendar)
+    {:badge-content ""
+     :style {:padding "0px 5px 0px 5px"}}
     {:badge-content "!"
      :secondary true
      :badgeStyle {:width 15
@@ -39,9 +32,7 @@
                   :padding "3px 3px 3px 3px"
                   :background-color "#ed0000"
                   :color "#fff"}
-     :style {:padding "0px 5px 0px 5px"}}
-    {:badge-content ""
-     :style {:padding "0px 5px 0px 5px"}})))
+     :style {:padding "0px 5px 0px 5px"}}))
 
 (defn- icon-for-type [type]
   (case type
@@ -135,7 +126,7 @@
                  :data-balloon-length "medium"
                  :style {:overflow "visible"}}
           [ui/badge
-           (badge-content service-calendars row-idx)
+           (badge-content (get-in service-calendars [row-idx]))
           [ui/icon-button {:style (if (= edit-service-calendar row-idx)
                                     {:border-radius "25px" :background-color "#b3b3b3"}
                                     {})
