@@ -512,14 +512,17 @@
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
                                                 stop)))
-                    (update ::transit/trips
-                            (fn [trips]
-                              ;; Update service-calendar indexes
-                              (mapv
-                                #(assoc % ::transit/service-calendar-idx
-                                          (nth cals-indices (::transit/service-calendar-idx %)))
-                                trips)))
-                    (dissoc :step :stops :new-start-time :edit-service-calendar))]
+                    (dissoc :step :stops :new-start-time :edit-service-calendar))
+          ;; Update calendar indexes if user has added calendars
+          route (if (and (not (nil? calendars)) (not (empty? calendars)))
+                  (update route ::transit/trips
+                          (fn [trips]
+                            ;; Update service-calendar indexes
+                            (mapv
+                              #(assoc % ::transit/service-calendar-idx
+                                        (nth cals-indices (::transit/service-calendar-idx %)))
+                              trips)))
+                  route)]
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
@@ -602,11 +605,9 @@
                       (valid-calendar-rule-days rules))]
     (if (or
           (empty? trip-calendar)
-          (not valid-rules)
           (and
             (empty? (get trip-calendar :rule-dates))
-            (empty? (get trip-calendar ::transit/service-added-dates))
-            (empty? (get trip-calendar ::transit/service-removed-dates)))) false true)))
+            (empty? (get trip-calendar ::transit/service-added-dates)))) false true)))
 
 (defn valid-trips?
   "Check if given route's trip stop times are valid.
