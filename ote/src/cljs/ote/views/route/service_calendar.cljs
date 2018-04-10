@@ -42,7 +42,7 @@
                        :table-fields (rule-fields calendar)
                        :delete? true
                        :add-label (tr [:route-wizard-page :route-calendar-add-new-period])
-                       :add-label-disabled? rw/from-to-dates-empty?}
+                       :add-label-disabled? rw/empty-calendar-from-to-dates?}
     (::transit/service-rules calendar)]])
 
 (defn day-style-fn [calendar]

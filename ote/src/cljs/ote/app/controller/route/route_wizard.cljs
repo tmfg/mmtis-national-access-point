@@ -646,7 +646,7 @@
         #(check-rule %)
         (::transit/service-rules data)))))
 
-(defn from-to-dates-empty? [data]
+(defn empty-calendar-from-to-dates? [data]
   (or
     (str/blank? (get data ::transit/from-date))
     (str/blank? (get data ::transit/to-date))
