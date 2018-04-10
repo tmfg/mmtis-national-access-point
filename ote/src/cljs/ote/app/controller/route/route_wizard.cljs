@@ -585,29 +585,12 @@
   (and (not (str/blank? name))
        transport-operator-id))
 
-(defn valid-calendar-rule-days [rules]
-  (let [valid-from-to-date (fn [rule] (and (not (str/blank? (get rule ::transit/from-date)))
-                                           (not (str/blank? (get rule ::transit/to-date)))))
-        valid-week-days (fn [rule] (or (::transit/monday rule)
-                                       (::transit/tuesday rule)
-                                       (::transit/wednesday rule)
-                                       (::transit/thursday rule)
-                                       (::transit/friday rule)
-                                       (::transit/saturday rule)
-                                       (::transit/sunday rule)))]
-    (every? #(if (or (nil? %) (empty? %)) false
-                                          (and (valid-from-to-date %) (valid-week-days %))) rules)))
-
 (defn valid-calendar? [trip-calendar]
-  (let [rules (get trip-calendar ::transit/service-rules)
-        valid-rules (if (or (empty? rules) (nil? rules))
-                      false
-                      (valid-calendar-rule-days rules))]
-    (if (or
-          (empty? trip-calendar)
-          (and
-            (empty? (get trip-calendar :rule-dates))
-            (empty? (get trip-calendar ::transit/service-added-dates)))) false true)))
+  (if (or
+        (empty? trip-calendar)
+        (and
+          (empty? (get trip-calendar :rule-dates))
+          (empty? (get trip-calendar ::transit/service-added-dates)))) false true))
 
 (defn valid-trips?
   "Check if given route's trip stop times are valid.
