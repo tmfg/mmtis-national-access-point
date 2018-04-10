@@ -660,7 +660,7 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-validate error-data] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-disabled? error-data] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -733,8 +733,8 @@
         [buttons/save {:on-click #(update! (conj (or data []) {}))
                        :label add-label
                        :label-style style-base/button-label-style
-                       :disabled (if add-label-validate
-                                   (not (add-label-validate (last data)))
+                       :disabled (if add-label-disabled?
+                                   (add-label-disabled? (last data))
                                    (values/effectively-empty? (last data)))}]])]))
 
 (defn- checkbox-container [update! table? label warning error style checked? disabled?]

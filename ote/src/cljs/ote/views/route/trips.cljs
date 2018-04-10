@@ -19,7 +19,11 @@
     [ote.db.transport-service :as t-service]))
 
 (defn badge-content [service-calendars row-idx]
-  (if (or (empty? (get-in service-calendars [row-idx]))
+  (let [rules (get-in service-calendars [row-idx ::transit/service-rules])
+        valid-rules (if (or (empty? rules) (nil? rules))
+                      false
+                      (rw/valid-calendar-rule-days rules))]
+  (if (or (empty? (get-in service-calendars [row-idx])) (not valid-rules)
           (and
             (empty? (get-in service-calendars [row-idx :rule-dates]))
             (empty? (get-in service-calendars [row-idx ::transit/service-removed-dates]))
@@ -37,7 +41,7 @@
                   :color "#fff"}
      :style {:padding "0px 5px 0px 5px"}}
     {:badge-content ""
-     :style {:padding "0px 5px 0px 5px"}}))
+     :style {:padding "0px 5px 0px 5px"}})))
 
 (defn- icon-for-type [type]
   (case type

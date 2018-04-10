@@ -582,13 +582,31 @@
   (and (not (str/blank? name))
        transport-operator-id))
 
+(defn valid-calendar-rule-days [rules]
+  (let [valid-from-to-date (fn [rule] (and (not (str/blank? (get rule ::transit/from-date)))
+                                           (not (str/blank? (get rule ::transit/to-date)))))
+        valid-week-days (fn [rule] (or (::transit/monday rule)
+                                       (::transit/tuesday rule)
+                                       (::transit/wednesday rule)
+                                       (::transit/thursday rule)
+                                       (::transit/friday rule)
+                                       (::transit/saturday rule)
+                                       (::transit/sunday rule)))]
+    (every? #(if (or (nil? %) (empty? %)) false
+                                          (and (valid-from-to-date %) (valid-week-days %))) rules)))
+
 (defn valid-calendar? [route-calendar]
-  (if (or (empty? route-calendar)
+  (let [rules (get route-calendar ::transit/service-rules)
+        valid-rules (if (or (empty? rules) (nil? rules))
+                      false
+                      (valid-calendar-rule-days rules))]
+    (if (or
+          (empty? route-calendar)
+          (not valid-rules)
           (and
             (empty? (get route-calendar :rule-dates))
             (empty? (get route-calendar ::transit/service-added-dates))
-            (empty? (get route-calendar ::transit/service-removed-dates))
-            (empty? (get route-calendar ::transit/service-rules)))) false true))
+            (empty? (get route-calendar ::transit/service-removed-dates)))) false true)))
 
 (defn valid-trips?
   "Check if given route's trip stop times are valid.
@@ -618,18 +636,18 @@
   (if (empty? (get route ::transit/name)) false true))
 
 (defn valid-calendar-rule-dates? [data]
-  (every?
-    (fn [rule]
-      (if (and
-            (not (str/blank? (get rule ::transit/from-date)))
-            (not (str/blank? (get rule ::transit/to-date)))
-            )
-        true false))
-    (::transit/service-rules data)))
+  (let [check-rule (fn [rule]
+                     (and (not (empty? rule))
+                          (not (str/blank? (get rule ::transit/from-date)))
+                          (not (str/blank? (get rule ::transit/to-date)))))]
+    (if (empty? (::transit/service-rules data))
+      false
+      (every?
+        #(check-rule %)
+        (::transit/service-rules data)))))
 
-(defn valid-calendar-from-tro-dates? [data]
-  (if (and
-        (not (str/blank? (get data ::transit/from-date)))
-        (not (str/blank? (get data ::transit/to-date)))
-        )
-    true false))
+(defn from-to-dates-empty? [data]
+  (or
+    (str/blank? (get data ::transit/from-date))
+    (str/blank? (get data ::transit/to-date))
+    ))

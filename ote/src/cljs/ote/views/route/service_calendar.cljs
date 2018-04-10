@@ -14,26 +14,26 @@
             [ote.localization :refer [tr selected-language]]))
 
 (defn rule-fields [calendar]
-    (into [{:type :date-picker
-                 :name ::transit/from-date
-                 :label (tr [:route-wizard-page :route-calendar-from-date])
-                 :width "29%"}
-                {:type :date-picker
-                 :name ::transit/to-date
-                 :label (tr [:route-wizard-page :route-calendar-to-date])
-                 :width "29%"}]
-               (for [[name label] [[::transit/monday (tr [:enums :ote.db.transport-service/day :short :MON])]
-                                   [::transit/tuesday (tr [:enums :ote.db.transport-service/day :short :TUE])]
-                                   [::transit/wednesday (tr [:enums :ote.db.transport-service/day :short :WED])]
-                                   [::transit/thursday (tr [:enums :ote.db.transport-service/day :short :THU])]
-                                   [::transit/friday (tr [:enums :ote.db.transport-service/day :short :FRI])]
-                                   [::transit/saturday (tr [:enums :ote.db.transport-service/day :short :SAT])]
-                                   [::transit/sunday (tr [:enums :ote.db.transport-service/day :short :SUN])]]]
-                 {:type :checkbox
-                  :name name
-                  :disabled? (not (rw/valid-calendar-rule-dates? calendar))
-                  :label label
-                  :width "6%"})))
+  (into [{:type  :date-picker
+          :name  ::transit/from-date
+          :label (tr [:route-wizard-page :route-calendar-from-date])
+          :width "29%"}
+         {:type  :date-picker
+          :name  ::transit/to-date
+          :label (tr [:route-wizard-page :route-calendar-to-date])
+          :width "29%"}]
+        (for [[name label] [[::transit/monday (tr [:enums :ote.db.transport-service/day :short :MON])]
+                            [::transit/tuesday (tr [:enums :ote.db.transport-service/day :short :TUE])]
+                            [::transit/wednesday (tr [:enums :ote.db.transport-service/day :short :WED])]
+                            [::transit/thursday (tr [:enums :ote.db.transport-service/day :short :THU])]
+                            [::transit/friday (tr [:enums :ote.db.transport-service/day :short :FRI])]
+                            [::transit/saturday (tr [:enums :ote.db.transport-service/day :short :SAT])]
+                            [::transit/sunday (tr [:enums :ote.db.transport-service/day :short :SUN])]]]
+          {:type      :checkbox
+           :name      name
+           :disabled? (not (rw/valid-calendar-rule-dates? calendar))
+           :label     label
+           :width     "6%"})))
 
 (defn- rules-table [e! trip-idx calendar]
   [:div.row {:style {:padding "20px"}}
@@ -42,7 +42,7 @@
                        :table-fields (rule-fields calendar)
                        :delete? true
                        :add-label (tr [:route-wizard-page :route-calendar-add-new-period])
-                       :add-label-validate rw/valid-calendar-from-tro-dates?}
+                       :add-label-disabled? rw/from-to-dates-empty?}
     (::transit/service-rules calendar)]])
 
 (defn day-style-fn [calendar]
