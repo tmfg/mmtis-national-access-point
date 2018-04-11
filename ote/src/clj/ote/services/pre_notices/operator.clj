@@ -9,18 +9,19 @@
             [clojure.string :as str]
             [ote.db.tx :as tx]
             [ote.db.modification :as modification]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.db.transport-operator :as t-operator]))
 
 (defn list-operator-notices [db user]
   (http/no-cache-transit-response
    (specql/fetch db ::transit/pre-notice
                  (specql/columns ::transit/pre-notice)
-                 {::transit/transport-operator-id (op/in (authorization/user-transport-operators db user))})))
+                 {::t-operator/id (op/in (authorization/user-transport-operators db user))})))
 
 (defn save-pre-notice [db user notice]
   (println "DAta " (pr-str notice))
   (authorization/with-transport-operator-check
-    db user (::transit/transport-operator-id notice)
+    db user (::t-operator/id notice)
     (fn []
       (tx/with-transaction db
         (let [n (-> notice
