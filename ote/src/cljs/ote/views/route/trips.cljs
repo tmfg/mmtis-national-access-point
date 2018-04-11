@@ -127,14 +127,15 @@
                  :style {:overflow "visible"}}
           [ui/badge
            (badge-content (get-in service-calendars [row-idx]))
-          [ui/icon-button {:style (if (= edit-service-calendar row-idx)
-                                    {:border-radius "25px" :background-color "#b3b3b3"}
-                                    {})
-                           :href     "#"
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (rw/->EditServiceCalendar row-idx)))}
-             [ic/action-today]]]]]]
+           [ui/icon-button {:id (str "button_" row-idx)
+                            :style (if (= edit-service-calendar row-idx)
+                                     {:border-radius "25px" :background-color "#b3b3b3"}
+                                     {})
+                            :href     "#"
+                            :on-click #(do
+                                         (.preventDefault %)
+                                         (e! (rw/->EditServiceCalendar row-idx)))}
+            [ic/action-today]]]]]]
    (map-indexed
     (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
       (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
@@ -207,7 +208,9 @@
       (tr [:route-wizard-page :trip-schedule-new-trip])
       [form-fields/field {:type :time
                           :update! #(e! (rw/->NewStartTime %))} (:new-start-time route)]
-      [ui/raised-button {:style {:margin-left "5px"}
+      [ui/raised-button {:id "add-route-button"
+                         :name (tr [:route-wizard-page :trip-add-new-trip])
+                         :style {:margin-left "5px"}
                          :primary true
                          :disabled (or (time/empty-time? (:new-start-time route)) (not valid-first-calendar?))
                          :on-click #(e! (rw/->AddTrip))
