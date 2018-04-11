@@ -508,6 +508,7 @@
           route (-> app :route form/without-form-metadata
                     (assoc ::transit/service-calendars deduped-cals)
                     (assoc ::transit/published? (or published? false))
+                    (assoc ::transit/route-type :ferry)
                     (update ::transit/stops (fn [stop]
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
