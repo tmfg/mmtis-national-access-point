@@ -62,7 +62,7 @@
                                          transport-operator-columns
                                          {::t-operator/id transport-operator-id}))
         routes (map #(-> %
-                       (update ::transit/name (flip t-service/localized-text-for) *language*)
+                       (update ::transit/name (flip t-service/localized-text-with-fallback) *language*)
                        (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))
                     (current-routes db transport-operator-id))]
     {:status 200

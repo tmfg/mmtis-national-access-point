@@ -18,12 +18,10 @@
     [ote.style.form :as style-form]
     [ote.db.transport-service :as t-service]))
 
-(defn badge-content [service-calendars row-idx]
-  (if (or (empty? (get-in service-calendars [row-idx]))
-          (and
-            (empty? (get-in service-calendars [row-idx :rule-dates]))
-            (empty? (get-in service-calendars [row-idx ::transit/service-removed-dates]))
-            (empty? (get-in service-calendars [row-idx ::transit/service-rules]))))
+(defn badge-content [trip-calendar]
+  (if (rw/valid-calendar? trip-calendar)
+    {:badge-content ""
+     :style {:padding "0px 5px 0px 5px"}}
     {:badge-content "!"
      :secondary true
      :badgeStyle {:width 15
@@ -34,8 +32,6 @@
                   :padding "3px 3px 3px 3px"
                   :background-color "#ed0000"
                   :color "#fff"}
-     :style {:padding "0px 5px 0px 5px"}}
-    {:badge-content ""
      :style {:padding "0px 5px 0px 5px"}}))
 
 (defn- icon-for-type [type]
@@ -96,7 +92,7 @@
                         :width "155px"
                         :overflow-x "hidden"
                         :white-space "pre"
-                        :text-overflow "ellipsis"}} (t-service/localized-text-for @selected-language name)]
+                        :text-overflow "ellipsis"}} (t-service/localized-text-with-fallback @selected-language name)]
          [:div {:style {:width "8px"
                         :margin-right "7px"
                         :display "inline-block"
@@ -130,15 +126,15 @@
                  :data-balloon-length "medium"
                  :style {:overflow "visible"}}
           [ui/badge
-           (badge-content service-calendars row-idx)
-           [ui/icon-button {:id (str "button_" row-idx)
-                            :style (if (= edit-service-calendar row-idx)
-                                     {:border-radius "25px" :background-color "#b3b3b3"}
-                                     {})
-                            :href     "#"
-                            :on-click #(do
-                                         (.preventDefault %)
-                                         (e! (rw/->EditServiceCalendar row-idx)))}
+           (badge-content (get-in service-calendars [row-idx]))
+            [ui/icon-button {:id (str "button_" row-idx)
+                             :style (if (= edit-service-calendar row-idx)
+                                      {:border-radius "25px" :background-color "#b3b3b3"}
+                                      {})
+                           :href     "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (rw/->EditServiceCalendar row-idx)))}
              [ic/action-today]]]]]]
    (map-indexed
     (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
@@ -187,7 +183,7 @@
   (let [stop-sequence (::transit/stops route)
         stop-count (count stop-sequence)
         trips (::transit/trips route)
-        empty-calendar? (empty? (first (::transit/service-calendars route)))]
+        valid-first-calendar? (rw/valid-calendar? (first (::transit/service-calendars route)))]
     [:div.route-times
      [:div {:style {:overflow "auto"}}
       [:table {:style {:text-align "center"}}
@@ -203,7 +199,7 @@
      (when (:edit-service-calendar route)
        [route-service-calendar/service-calendar e! route])
 
-     (when empty-calendar?
+     (when-not valid-first-calendar?
        [:div {:style {:margin-top "10px"}}
         [common/help (tr [:form-help :trip-editor-no-calendar])]])
 
@@ -215,7 +211,7 @@
                          :name (tr [:route-wizard-page :trip-add-new-trip])
                          :style {:margin-left "5px"}
                          :primary true
-                         :disabled (or (time/empty-time? (:new-start-time route)) empty-calendar?)
+                         :disabled (or (time/empty-time? (:new-start-time route)) (not valid-first-calendar?))
                          :on-click #(e! (rw/->AddTrip))
                          :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
