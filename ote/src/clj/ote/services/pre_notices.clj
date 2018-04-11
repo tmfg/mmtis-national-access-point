@@ -4,7 +4,7 @@
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes POST GET]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-            [specql.core :as specql]
+            [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [amazonica.aws.s3 :as s3]
@@ -12,25 +12,37 @@
             [ote.authorization :as authorization]
             [specql.op :as op]
             [ring.util.io :as ring-io]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [ote.db.tx :as tx]))
 
 
-(declare  attachment-routes upload-attachment download-attachment)
+(declare  attachment-routes notice-routes-auth upload-attachment download-attachment save-pre-notice)
 
 (defrecord PreNotices [config]
   component/Lifecycle
-  (start [{db :db
+  (start [{db   :db
            http :http
-           :as this}]
+           :as  this}]
     (if-let [routes (attachment-routes db config)]
       (assoc this ::stop
-             (http/publish! http routes))
-      this))
+        [(http/publish! http routes)
+         (http/publish! http (notice-routes-auth db config))])
+        this))
 
   (stop [{stop ::stop :as this}]
     (when stop
       (stop))
     (dissoc this ::stop)))
+
+(defn- notice-routes-auth
+  "Pre-notice routes that require authentication"
+
+  [db config]
+  (routes
+    (POST "/pre-notice" {form-data :body
+                         user      :user}
+      (http/transit-response
+        (save-pre-notice db user (http/transit-request form-data))))))
 
 (defn attachment-routes [db config]
   (if-not (:bucket config)
@@ -79,3 +91,14 @@
        :body (ring-io/piped-input-stream
               (fn [out]
                 (io/copy (:input-stream s3-file) out)))})))
+
+(defn save-pre-notice [db user notice]
+  (println "DAta " (pr-str notice))
+  (authorization/with-transport-operator-check
+    db user (::transit/transport-operator-id notice)
+    (fn []
+      (tx/with-transaction db
+                           (let [n (-> notice
+                                       (modification/with-modification-fields ::transit/id user))]
+                             (log/debug "Save notice: " n)
+                             (upsert! db ::transit/notice n))))))
