@@ -3,8 +3,7 @@
   (:require [tuck.core :as tuck :refer [define-event]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
-            [ote.localization :refer [tr]]
-            ))
+            [ote.localization :refer [tr]]))
 
 
 (declare ->OrganizationPreNoticesResponse ->OrganizationPreNoticesFailure)
