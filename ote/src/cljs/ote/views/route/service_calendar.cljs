@@ -85,8 +85,7 @@
                                    :label (tr [:buttons :route-calendar-clear])}]])
       :actions [(r/as-element
                   [ui/flat-button
-                   {:id "new-calendar-period-button"
-                    :label (tr [:buttons :close])
+                   {:label (tr [:buttons :close])
                     :secondary true
                     :primary true
                     :on-click #(e! (rw/->CloseServiceCalendar))}])]}
