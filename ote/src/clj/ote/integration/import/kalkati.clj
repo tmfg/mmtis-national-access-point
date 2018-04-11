@@ -10,7 +10,8 @@
 
 
 (defn kalkati-to-gtfs
-  "Invoke an kalkati_to_gtfs Lambda function directly through AWS SDK."
+  "Invoke an kalkati_to_gtfs Lambda function directly through AWS SDK.
+  Returns InvokeResult."
   [kalkati-url]
   (lambda/invoke :function-name "kalkati_to_gtfs"
                  :region "eu-central-1"
@@ -18,7 +19,9 @@
                  :payload (cheshire/encode {:body kalkati-url})))
 
 (defn load-kalkati [url]
-  (let [gtfs-url (kalkati-to-gtfs url)]
+  (let [payload (.getPayload (kalkati-to-gtfs url))
+        json (cheshire/decode (String. (.array payload) "UTF-8") keyword)
+        gtfs-url (:Location (:headers json))]
     (gtfs-import/load-gtfs gtfs-url)))
 
 (defrecord KalkatiImport []
