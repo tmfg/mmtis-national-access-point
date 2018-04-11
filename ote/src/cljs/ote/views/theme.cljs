@@ -1,13 +1,13 @@
 (ns ote.views.theme
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [get-mui-theme color]]
-            [ote.ui.debug :as debug]
             [ote.ui.nprogress :as progress]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [reagent.core :as r]
             [ote.localization :refer [tr tr-key]]
-            [ote.app.controller.front-page :as fp-controller]))
+            [ote.app.controller.front-page :as fp-controller]
+            [datafrisk.core :as df]))
 
 (defn- flash-message-error [e! msg]
   [ui/snackbar {:open (boolean msg)
@@ -25,7 +25,7 @@
                :auto-hide-duration 4000
                :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
 
-(defonce debug-visible? (r/atom false))
+(defonce debug-visible? (r/atom (not= -1 (.indexOf js/document.location.host "localhost"))))
 (defonce debug-state-toggle-listener
   (do (.addEventListener
        js/window "keypress"
@@ -40,7 +40,7 @@
   [:span
    (when @debug-visible?
      [:div.row
-      [debug/debug app]])])
+      [df/DataFriskShell app]])])
 
 (defn on-before-unload []
   (let [state (atom {})]
