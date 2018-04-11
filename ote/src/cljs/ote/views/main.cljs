@@ -31,7 +31,7 @@
             [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]
             [ote.views.gtfs-viewer :as gtfs-viewer]
-            [ote.views.pre-notice.pre-notice :as notice]
+            [ote.views.pre-notices.pre-notice :as notice]
             [ote.views.pre-notices.listing :as pre-notices-listing]))
 
 
@@ -106,7 +106,7 @@
        [ui/menu-item {:style {:color "#FFFFFF"}
                       :primary-text (tr [:common-texts :navigation-pre-notice])
                       :on-click #(do (.preventDefault %)
-                                     (e! (fp-controller/->ChangePage :new-notice nil)))}])
+                                     (e! (fp-controller/->ChangePage :pre-notices nil)))}])
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)

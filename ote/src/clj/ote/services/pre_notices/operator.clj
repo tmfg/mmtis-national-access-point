@@ -3,6 +3,7 @@
   (:require [ote.components.http :as http]
             [ote.authorization :as authorization]
             [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
             [compojure.core :refer [routes GET POST]]
             [specql.op :as op]
@@ -27,7 +28,7 @@
         (let [n (-> notice
                     (modification/with-modification-fields ::transit/id user))]
           (log/debug "Save notice: " n)
-          (specql/upsert! db ::transit/notice n))))))
+          (specql/upsert! db ::transit/pre-notice n))))))
 
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"
