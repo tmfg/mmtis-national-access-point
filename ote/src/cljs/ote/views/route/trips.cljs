@@ -208,7 +208,7 @@
                           :update! #(e! (rw/->NewStartTime %))} (:new-start-time route)]
       [ui/raised-button {:style {:margin-left "5px"}
                          :primary true
-                         :disabled (or (time/empty-time? (:new-start-time route)) valid-first-calendar?)
+                         :disabled (or (time/empty-time? (:new-start-time route)) (not valid-first-calendar?))
                          :on-click #(e! (rw/->AddTrip))
                          :label (tr [:route-wizard-page :trip-add-new-trip])}]]]))
 
