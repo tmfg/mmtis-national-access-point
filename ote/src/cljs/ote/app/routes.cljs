@@ -25,8 +25,10 @@
     ["/routes" :routes]
     ["/route/new" :new-route]
     ["/edit-route/:id" :edit-route]
-
     ["/routes/view-gtfs" :view-gtfs]
+
+    ;; 60 day pre-notice
+    ["/pre-notices" :pre-notices]
 
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))

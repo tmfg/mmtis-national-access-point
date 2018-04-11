@@ -30,7 +30,8 @@
             [ote.views.operators :as operators]
             [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]
-            [ote.views.gtfs-viewer :as gtfs-viewer]))
+            [ote.views.gtfs-viewer :as gtfs-viewer]
+            [ote.views.pre-notices.listing :as pre-notices-listing]))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -410,6 +411,7 @@
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
 
+                :pre-notices [pre-notices-listing/pre-notices e! app]
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 
        [footer e!]]]]))
