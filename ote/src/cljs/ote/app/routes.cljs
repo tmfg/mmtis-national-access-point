@@ -28,6 +28,10 @@
 
     ["/routes/view-gtfs" :view-gtfs]
 
+    ;; 60 day pre-notice
+    ["/pre-notices" :pre-notices]
+    ["/pre-notice/new" :new-notice]
+
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
 

@@ -234,9 +234,13 @@
   :ote.db.common/postal_code                          "Postnummer"
 
   :login {:email "Epost"
-          :password "Lösenord"}}
+          :password "Lösenord"}
 
-
+ :pre-notice {
+              :ote.db.notice/other-type-description "Muu muutos -SV"
+              :ote.db.notice/url                    "www-osoite -SV"
+              }
+ }
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -295,7 +299,9 @@
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
   :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
-  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."}
+  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
+  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi. - SV"
+  }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -320,6 +326,7 @@
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"
+  :save-and-send "Tallenna ja lähetä - SV"
   :save-updated "Spara uppdaterad info"
   :add-new-parking-capacity "Lägg till ny parkeringstyp"
   :add-new-price-class "Lägg till prisrad"
@@ -327,6 +334,7 @@
   :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
   :add-new-company "Lägg till företag"
   :add-new-route "Lägg till ny sjörutt"
+  :add-new-pre-notice "Uusi 60pv ilmoitus - SV"
   :discard "Ångra"
 
   :next "Fortsätt"
@@ -347,6 +355,7 @@
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
   :back-to-draft  "Ändra status till utkast"
+  :add-new-effective-date "Lisää uusi päivämäärä - SV"
   }
 
  ;; Database enumeration values
@@ -472,8 +481,15 @@
   :ote.db.transport-service/advance-reservation
   {:no "Ingen förhandsbokning krävs."
    :possible "Förhandsbokning möjlig men inte obligatorisk."
-   :mandatory "Obligatorisk förhandsbokning."}}
+   :mandatory "Obligatorisk förhandsbokning."}
 
+  :ote.db.notice/notice-type
+  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+   :new             "Liikenteen lisääminen tai uusi reitti"
+   :schedule-change "Aikataulumuutos"
+   :route-change    "Reittimuutos"
+   :other           "Muu muutos, mikä?"}
+  }
   ;; ENUMS end
 
 
@@ -677,6 +693,31 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   }
 
+ :pre-notice-list-page
+ {:header-pre-notice-list "Omat 60pv ilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut 60 päivän ennakkoilmoituksia."
+
+  :headers {:ote.db.transit/id "ID"
+           :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+           :ote.db.modification/created "Luotu"
+           :ote.db.transit/route-description "Reitin kuvaus"}
+
+ }
+
+:pre-notice-page
+{:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
+ :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+ :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+ :route-and-area-information-title "Reitin ja alueen tiedot"
+ :effective-date-from "Alkamispäivä"
+ :effective-date-description "Selitys"
+ :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+ :save-success-send "Ilmoituksen lähettäminen onnistui."
+ :save-success "Luonnoksen tallentaminen onnistui."
+ :save-failure "Luonnoksen tallentaminen epäonnistui."
+ :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+ }
+
  :price-dialog
  {:header-dialog "Fordonspris"
   :close-dialog  "Stäng"}
@@ -720,6 +761,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Kartverktyg för sjötrafik"
+  :navigation-pre-notice                      "60pv ilmoitus - SV"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
@@ -755,7 +797,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :language "Språk"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Error in server call. Contact support if the problem persists."}
 
 
  :dialog

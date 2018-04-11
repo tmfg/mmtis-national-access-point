@@ -32,11 +32,12 @@
 
   ["finnish_ports" ::finnish-ports
    ote.db.modification/modification-fields]
-
-  ["pre_notice_type" ::pre_notice_type]
+  ["pre_notice_type" ::pre_notice_type (specql.transform/transform (specql.transform/to-keyword))]
   ["notice_effective_date" ::notice-effective-date]
   ["pre_notice" ::pre-notice
-   {::attachments (specql.rel/has-many ::id
+   ote.db.modification/modification-fields
+   {"transport-operator-id" :ote.db.transport-operator/id
+    ::attachments (specql.rel/has-many ::id
                                        ::pre-notice-attachment
                                        ::pre-notice-id)}]
   ["pre_notice_attachment" ::pre-notice-attachment

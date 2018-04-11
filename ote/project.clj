@@ -67,6 +67,7 @@
                  [cljsjs/nprogress "0.2.0-1"]
                  ;; Note: Sadly, no good clj/cljs library was found. There were good libs only for server-side rendering.
                  [cljsjs/marked "0.3.5-1"]
+                 [data-frisk-reagent "0.4.5"]
 
                  ;; Aika
                  [com.andrewmcveigh/cljs-time "0.5.0"]

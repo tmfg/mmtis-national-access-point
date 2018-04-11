@@ -109,7 +109,7 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style password? on-enter hint-text autocomplete]
+                                  style input-style hint-style password? on-enter hint-text autocomplete disabled?]
                            :as   field} data]
   [text-field
    (merge
@@ -134,6 +134,8 @@
       {:max-length max-length})
     (when full-width?
       {:full-width true})
+    (when disabled?
+      {:disabled true})
     (when style
       {:style style})
     (when input-style
