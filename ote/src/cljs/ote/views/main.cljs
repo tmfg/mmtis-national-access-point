@@ -30,6 +30,7 @@
             [ote.views.operators :as operators]
             [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]
+            [ote.views.pre_notice.pre_notice :as notice]
             [ote.views.gtfs-viewer :as gtfs-viewer]))
 
 (defn logged-in? [app]
@@ -99,6 +100,11 @@
                     :primary-text (tr [:common-texts :navigation-route])
                     :on-click #(do (.preventDefault %)
                                    (e! (fp-controller/->ChangePage :routes nil)))}])
+     (when (flags/enabled? :pre-notice)
+       [ui/menu-item {:style {:color "#FFFFFF"}
+                      :primary-text (tr [:common-texts :navigation-pre-notice])
+                      :on-click #(do (.preventDefault %)
+                                     (e! (fp-controller/->ChangePage :new-notice nil)))}])
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
@@ -407,6 +413,9 @@
                 :routes [route-list/routes e! app]
                 :new-route [route/new-route e! app]
                 :edit-route [route/edit-route-by-id e! app]
+
+                ;; 60days pre notice views
+                :new-notice [notice/new-pre-notice e! app]
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
 

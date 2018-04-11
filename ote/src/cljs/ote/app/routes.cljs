@@ -26,6 +26,9 @@
     ["/route/new" :new-route]
     ["/edit-route/:id" :edit-route]
 
+    ;; 60 days pre notices
+    ["/notice/new" :new-notice]
+
     ["/routes/view-gtfs" :view-gtfs]
 
     ["/admin" :admin]

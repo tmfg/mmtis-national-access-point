@@ -231,7 +231,14 @@
   :ote.db.common/postal_code                          "Postinumero"
 
   :login {:email "Sähköpostiosoite"
-          :password "Salasana"}}
+          :password "Salasana"}
+
+
+  :pre-notice {
+   :ote.db.notice/other-type-description "Muu muutos"
+   :ote.db.notice/url                    "www-osoite"
+   }
+  }
 
 
 
@@ -287,7 +294,9 @@
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
   :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
-  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."}
+  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
+  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
+  }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -311,6 +320,7 @@
   :edit "Muokkaa"
 
   :save-and-publish "Tallenna ja julkaise"
+  :save-and-send "Tallenna ja lähetä"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
   :add-new-parking-capacity "Lisää rivi"
@@ -339,6 +349,7 @@
   :route-calendar-back-to-trips "Takaisin vuorolistaan"
   :route-calendar-clear "Tyhjennä kalenteri"
   :back-to-draft  "Muuta luonnokseksi"
+  :add-new-effective-date "Lisää uusi päivämäärä"
   }
 
  ;; Database enumeration values
@@ -467,7 +478,15 @@
   :ote.db.transport-service/advance-reservation
   {:no "Palvelun käyttöön ei liity ennakkovarausta."
    :possible "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
-   :mandatory "Palvelun ennakkovaraus on pakollista."}}
+   :mandatory "Palvelun ennakkovaraus on pakollista."}
+
+  :ote.db.notice/notice-type
+  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+   :new             "Liikenteen lisääminen tai uusi reitti"
+   :schedule-change "Aikataulumuutos"
+   :route-change    "Reittimuutos"
+   :other           "Muu muutos, mikä?"}
+  }
   ;; ENUMS end
 
 
@@ -676,6 +695,20 @@
 
   }
 
+ :pre-notice-page
+ {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+  :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+  :route-and-area-information-title "Reitin ja alueen tiedot"
+  :effective-date-from "Alkamispäivä"
+  :effective-date-description "Selitys"
+  :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+  :save-success-send "Ilmoituksen lähettäminen onnistui."
+  :save-success "Luonnoksen tallentaminen onnistui."
+  :save-failure "Luonnoksen tallentaminen epäonnistui."
+  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+  }
+
  :price-dialog
  {:header-dialog "Ajoneuvon hintatiedot"
   :close-dialog  "Sulje"}
@@ -724,6 +757,7 @@
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
+  :navigation-pre-notice                      "60pv ilmoitus"
   :navigation-privacy-policy "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
