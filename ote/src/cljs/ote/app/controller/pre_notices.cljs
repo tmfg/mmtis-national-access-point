@@ -1,6 +1,6 @@
 (ns ote.app.controller.pre-notices
   "Controller for 60 day pre notices"
-  (:require [tuck.core :as tuck :refer [define-event]]
+  (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
             [ote.localization :refer [tr]]))
