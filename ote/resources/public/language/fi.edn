@@ -233,14 +233,11 @@
   :login {:email "Sähköpostiosoite"
           :password "Salasana"}
 
-
   :pre-notice {
    :ote.db.notice/other-type-description "Muu muutos"
    :ote.db.notice/url                    "www-osoite"
    }
   }
-
-
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
