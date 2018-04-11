@@ -752,7 +752,9 @@
   :language                                   "Language"
 
   :hours-placeholder "hh"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Error in server call. Contact support if the problem persists."}
 
 
  :dialog

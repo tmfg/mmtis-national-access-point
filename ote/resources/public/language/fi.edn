@@ -793,7 +793,9 @@
   :language                                   "Kieli"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."}
 
 
  :dialog
@@ -820,6 +822,11 @@
   :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
   }
 
+ :pre-notices
+ {:headers {:ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.modification/created "Luotu"
+            :ote.db.transit/route-description "Reitin kuvaus"}
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut 60 päivän ennakkoilmoituksia."}
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
  ;; and we must show those as is.
