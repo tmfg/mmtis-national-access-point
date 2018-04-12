@@ -48,6 +48,7 @@
 (defrecord CreateNewPreNotice [])
 (defrecord SelectOperatorForNotice [data])
 (defrecord EditForm [form-data])
+(defrecord EditSingleFormElement [element data])
 (defrecord SaveToDb [published?])
 (defrecord SaveNoticeResponse [response])
 (defrecord SaveNoticeFailure [response])
@@ -76,11 +77,14 @@
             :transport-operator (:transport-operator selected-operator)
             :transport-service-vector (:transport-service-vector selected-operator)))))
 
+  EditSingleFormElement
+  (process-event [{element :element data :data} app]
+    (assoc-in app [:pre-notice element] data))
+
   EditForm
   (process-event [{form-data :form-data} app]
     (-> app
         (update :pre-notice merge form-data)))
-
 
   SaveToDb
   (process-event [{published? :published?} app]
@@ -89,10 +93,8 @@
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
-      (-> app
-          (dissoc :before-unload-message)
-          ;(set-saved-transfer-operator notice)
-          )))
+      (dissoc app :before-unload-message)))
+
   SaveNoticeResponse
   (process-event [{response :response} app]
     (routes/navigate! :pre-notices)
@@ -115,10 +117,7 @@
     (.log js/console " Canceloidaan ")
     app)
 
-
-
   DeleteEffectiveDate
   (process-event [{id :id} app]
     (.log js/console " DeleteEffectiveDate id " id)
-    app)
-  )
+    app))
