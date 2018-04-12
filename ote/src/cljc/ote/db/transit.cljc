@@ -35,13 +35,17 @@
    ote.db.modification/modification-fields]
   ["pre_notice_type" ::pre_notice_type (specql.transform/transform (specql.transform/to-keyword))]
   ["notice_effective_date" ::notice-effective-date]
+  ["pre_notice_comment" ::pre-notice-comment
+   ote.db.modification/modification-fields]
   ["pre_notice" ::pre-notice
    ote.db.modification/modification-fields
    {"transport-operator-id" :ote.db.transport-operator/id
     ::attachments (specql.rel/has-many ::id
                                        ::pre-notice-attachment
                                        ::pre-notice-id)
-
+    ::comments (specql.rel/has-many ::id
+                                    ::pre-notice-comment
+                                    ::pre-notice-id)
     :ote.db.transport-operator/transport-operator (specql.rel/has-one :ote.db.transport-operator/id
                                                                       :ote.db.transport-operator/transport-operator
                                                                       :ote.db.transport-operator/id)}]
