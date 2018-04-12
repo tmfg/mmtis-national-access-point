@@ -707,7 +707,7 @@
 }
 
  :pre-notice-page
- {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmogit itus"
+ {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
   :notice-type-title "Ilmoitettavan muutoksen tyyppi"
   :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
   :route-and-area-information-title "Reitin ja alueen tiedot"
