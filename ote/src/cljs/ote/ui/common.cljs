@@ -147,6 +147,7 @@
      [:input {:id id
               :readOnly true
               :on-focus copy!
+              :style {:width "250px"}
               :value text-to-copy}]
      [ui/flat-button {:icon (ic/content-content-copy)
                       :on-click copy!}]]))
