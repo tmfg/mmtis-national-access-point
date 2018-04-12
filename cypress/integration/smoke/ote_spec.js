@@ -154,9 +154,7 @@ describe('Sea route tests', function () {
 
     it('Add basic information', function () {
         cy.get('[id*="Reitinnimi"]').type('Test route').should('have.value', 'Test route');
-        cy.get('[id*="Palveluntuottaja"]').click();
 
-        cy.contains('Testinen').click();
         cy.get('[id*="departure-point-name"]').type('Oulu').should('have.value', 'Oulu');
         cy.get('[id*="destination-point-name"]').type('Vaasa').should('have.value', 'Vaasa');
 
