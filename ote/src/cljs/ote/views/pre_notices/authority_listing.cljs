@@ -18,14 +18,15 @@
     [:div
      [:div.row
       [:div.col-xs-12.col-sm-12.col-md-12
-       [:h1 "Säännöllisen henkilöliikenteen muutosilmoitukset FIXME" #_(tr [:pre-notice-list-page :header-pre-notice-list])]]]
+       [:h1 (tr [:pre-notice-list-page :header-authority-pre-notice-list])]]]
      [:div.row
 
       [table/table {:name->label     (tr-key [:pre-notice-list-page :headers])
                     :key-fn          ::transit/id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])}
        [{:name ::modification/created :format (comp str time/format-timestamp-for-ui)}
-        {:name ::transit/pre-notice-type :format #(str/join ", " (map name %))}
+        {:name ::transit/pre-notice-type
+         :format #(str/join ", " (map (tr-key [:enums ::transit/pre-notice-type]) %))}
         {:name ::transit/route-description}
         {:name :operator :read (comp ::t-operator/name ::t-operator/transport-operator)}]
 
