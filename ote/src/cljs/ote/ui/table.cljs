@@ -1,7 +1,8 @@
 (ns ote.ui.table
   "Simple Material UI data table"
   (:require [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [reagent.core :as r]))
 
 (defn table [{:keys [height name->label key-fn
                      on-select row-selected? no-rows-message] :as opts} headers rows]
@@ -34,8 +35,15 @@
                          :display-border false}
            (doall
             (for [{:keys [name width format read]} headers
-                  :let [value (if read (read row) (get row name))]]
+                  :let [value ((or format identity) (if read (read row) (get row name)))]]
               ^{:key (str name)}
               [ui/table-row-column (when width {:style {:width width}})
-               (if format (format value) value)]))])
+               (cond
+                 (vector? value)
+                 (r/as-element value)
+
+                 (string? value)
+                 value
+
+                 :else (str value))]))])
         rows)))]])
