@@ -36,6 +36,7 @@
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
+(defrecord ModifyPreNotice [id])
 (defrecord SelectOperatorForNotice [data])
 (defrecord EditForm [form-data])
 (defrecord SaveToDb [published?])
@@ -49,6 +50,13 @@
 
   CreateNewPreNotice
   (process-event [_ app]
+    (routes/navigate! :new-notice)
+    (-> app
+        (dissoc :pre-notice)
+        (assoc-in [:pre-notice ::t-operator/id] (get-in app [:transport-operator ::t-operator/id]))))
+
+  ModifyPreNotice
+  (process-event [{id :id} app]
     (routes/navigate! :new-notice)
     (-> app
         (dissoc :pre-notice)
