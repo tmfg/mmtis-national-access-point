@@ -22,9 +22,11 @@
                  :specql.core/order-direction :desc}))
 
 (defn fetch-notice [db id]
-  (first (specql/fetch db ::transit/pre-notice
-                       (specql/columns ::transit/pre-notice)
-                       {::transit/id id})))
+  (first
+   (specql/fetch db ::transit/pre-notice
+                 (conj (specql/columns ::transit/pre-notice)
+                       [::transit/comments (specql/columns ::transit/pre-notice-comment)])
+                 {::transit/id id})))
 
 (defn add-comment [db user {:keys [id comment]}]
   (specql/insert! db ::transit/pre-notice-comment
@@ -35,6 +37,11 @@
 
 (defn authority-pre-notices-routes [db]
   (routes
+   (GET "/pre-notices/show/:id" {params :params user :user}
+        (authorization/with-transit-authority-check
+          db user
+          #(http/no-cache-transit-response
+            (fetch-notice db (Long/parseLong (:id params))))))
    (GET "/pre-notices/authority-list" {user :user :as req}
         (authorization/with-transit-authority-check
           db user
