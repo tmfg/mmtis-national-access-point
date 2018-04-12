@@ -234,8 +234,8 @@
           :password "Salasana"}
 
   :pre-notice {
-   :ote.db.notice/other-type-description "Muu muutos"
-   :ote.db.notice/url                    "www-osoite"
+   :ote.db.transit/other-type-description "Selitys"
+   :ote.db.transit/url                    "www-osoite"
    }
   }
 

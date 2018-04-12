@@ -764,10 +764,11 @@
      (checkbox-container update! table? label warning error style checked? disabled?)]
     (checkbox-container update! table? label warning error style checked? disabled?)))
 
-(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled?]} data]
+(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled? option-addition]} data]
   ;; Options:
   ;; :header? Show or hide the header element above the checkbox-group. Default: true.
   ;; :option-enabled? Is option checkable. Default: true
+  ;; option-addition is a map, that knows which option needs additions and the addition. e.g. {:value: :other :addition [ReagentObject]}
   (let [selected (set (or data #{}))
         option-enabled? (or option-enabled? (constantly true))]
     [:div.checkbox-group
@@ -776,17 +777,26 @@
      (when help
        [common/help help])
      (doall
-      (map-indexed
-       (fn [i option]
-         (let [checked? (boolean (selected option))]
-           [ui/checkbox {:key      i
-                         :label    (when-not table? (show-option option))
-                         :checked  checked?
-                         :disabled (not (option-enabled? option))
-                         :labelStyle (when (not (option-enabled? option))
-                                       style-base/disabled-color)
-                         :on-check #(update! ((if checked? disj conj) selected option))}]))
-       options))
+       (map-indexed
+         (fn [i option]
+           (let [checked? (boolean (selected option))
+                 is-addition-valid (and (not (nil? option-addition)) (= option (:value option-addition)) checked?)
+                 addition (when is-addition-valid (:addition option-addition))]
+             ^{:key i}
+             [:div {:style {:display "flex"}}
+              [:span
+               [ui/checkbox {
+                             :label      (when-not table? (show-option option))
+                             :checked    checked?
+                             :disabled   (not (option-enabled? option))
+                             :labelStyle (merge style-base/checkbox-label
+                                                (if (not (option-enabled? option))
+                                                  style-base/disabled-color
+                                                  {:color "rgb(33, 33, 33)"}))
+                             :on-check   #(update! ((if checked? disj conj) selected option))}]]
+              (when is-addition-valid
+                [:span {:style {:padding-left "20px"}} addition])]))
+         options))
      (when (or error warning)
        [:div
         (stylefy/use-sub-style style-form-fields/radio-selection :required)

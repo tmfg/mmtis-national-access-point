@@ -280,11 +280,12 @@
 (defn- form-group-should-update?
   "Create a function to check if form group should be rerendered.
   A group is rerendered if its open/close status changes or it is
-  open and its data has changed."
+  open and its data has changed. Also should-update? function can be used to rerender group.
+  It takes form elements as vector and when one of those values is changed group will rerender."
   [{schemas :schemas opts :options :as group}]
   (let [read-fn (apply juxt
-                       (map (fn [{:keys [name read]}]
-                              (or read name))
+                       (map (fn [{:keys [name read should-update?]}]
+                              (or should-update? read name))
                             schemas))]
     (fn [_ old-argv new-argv]
       (let [[_ {old-closed-groups :closed-groups old-data :data :as old-form-options} old-group]
