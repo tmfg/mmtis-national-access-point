@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: ckanext-napote_theme 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-12-19 11:08+0000\n"
-"PO-Revision-Date: 2018-03-21 16:14+0200\n"
+"PO-Revision-Date: 2018-04-12 15:07+0300\n"
 "Last-Translator: \n"
 "Language: sv\n"
 "Language-Team: fi <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #: ckanext/napote_theme/controller.py:70
 #, python-format
@@ -960,6 +960,9 @@ msgstr "Oma nimi"
 #: ckan/logic/validators.py:343
 msgid "Must be purely lowercase alphanumeric (ascii) characters and these symbols: -_"
 msgstr "Använd små bokstäver utan mellanslag. Även streck (-) och punkt (.) tillåtna. "
+
+msgid "Sea traffic route and timetable editor"
+msgstr "Kartverktyg för sjötrafik"
 
 #~ msgid "Heading/NAP home page logged in main heading"
 #~ msgstr "Liikkumispalveluiden tallennus ja julkaisu"
