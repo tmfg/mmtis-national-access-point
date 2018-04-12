@@ -32,12 +32,10 @@
 
 (tuck/define-event LoadPreNotice [id]
                    {:path [:pre-notices]}
-                   (do
-                     (println id)
-                     (comm/get! (str "pre-notices/" id)
-                                {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
-                                 :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
-                     :loading))
+                   (comm/get! (str "pre-notices/" id)
+                              {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
+                               :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
+                   :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
