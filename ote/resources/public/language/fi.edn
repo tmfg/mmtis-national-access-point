@@ -326,7 +326,7 @@
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
   :add-new-route "Lisää uusi merireitti"
-  :add-new-pre-notice "Uusi 60pv ilmoitus"
+  :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
   :next "Jatka"
@@ -694,8 +694,8 @@
   }
 
  :pre-notice-list-page
- {:header-pre-notice-list "Omat 60pv ilmoitukset"
-  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut 60 päivän ennakkoilmoituksia."
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
@@ -768,7 +768,7 @@
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
-  :navigation-pre-notice                      "60pv ilmoitus"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-privacy-policy "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"

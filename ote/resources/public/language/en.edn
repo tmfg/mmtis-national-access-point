@@ -689,8 +689,8 @@
   }
 
  :pre-notice-list-page
- {:header-pre-notice-list "Omat 60pv ilmoitukset"
-  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut 60 päivän ennakkoilmoituksia."
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
@@ -760,7 +760,7 @@
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
-  :navigation-pre-notice                      "60pv ilmoitus"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"
