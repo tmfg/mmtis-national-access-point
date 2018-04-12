@@ -109,7 +109,7 @@
          :layout  :row}
 
         {:name            ::transit/pre-notice-type
-         :should-update? (juxt ::transit/pre-notice-type ::transit/other-type-description)
+         :should-update-check (juxt ::transit/pre-notice-type ::transit/other-type-description)
          :type            :checkbox-group
          :container-class "col-md-12"
          :header?         false
