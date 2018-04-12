@@ -234,8 +234,8 @@
           :password "Salasana"}
 
   :pre-notice {
-   :ote.db.notice/other-type-description "Muu muutos"
-   :ote.db.notice/url                    "www-osoite"
+   :ote.db.transit/other-type-description "Selitys"
+   :ote.db.transit/url                    "www-osoite"
    }
   }
 
@@ -478,7 +478,7 @@
    :possible "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
    :mandatory "Palvelun ennakkovaraus on pakollista."}
 
-  :ote.db.notice/notice-type
+  :ote.db.transit/pre-notice-type
   {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
    :new             "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"

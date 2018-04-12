@@ -58,7 +58,6 @@
     [ui/table-header {:adjust-for-checkbox false
                       :display-select-all  false}
      [ui/table-row {:selectable false}
-      [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "6%"}} "Id"]
       [ui/table-header-column {:style {:width "18%"}} (tr [:route-list-page :route-list-table-name])]
       [ui/table-header-column {:class "hidden-xs hidden-sm ":style {:width "10%"}} (tr [:route-list-page :route-list-published?])]
       [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-starting-point])]
@@ -75,7 +74,6 @@
                  ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
-            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "6%"}} id]
             [ui/table-row-column {:style {:width "18%"}}
              [:a {:href     "#"
                   :on-click #(do
@@ -144,6 +142,6 @@
            [:span
             [:div (tr [:route-list-page :route-list-active-routes])
              [common/linkify url (tr [:route-list-page :route-list-gtfs-zip-file])]]
-            [:div
+            [:div {:style {:width "100%"}}
              (tr [:route-list-page :route-list-copy-link])
              [common/copy-to-clipboard url]]]]]))]))
