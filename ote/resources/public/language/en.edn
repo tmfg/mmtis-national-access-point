@@ -232,8 +232,8 @@
           :password "Password"}
 
  :pre-notice {
-              :ote.db.notice/other-type-description "Other change"
-              :ote.db.notice/url                    "www address"
+              :ote.db.transit/other-type-description "Other change"
+              :ote.db.transit/url                    "www address"
               }
  }
 
@@ -476,7 +476,7 @@
    :possible "Service has advance reservation but it is not mandatory."
    :mandatory "Advance reservation is mandatory for this service."}
 
-  :ote.db.notice/notice-type
+  :ote.db.transit/pre-notice-type
   {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
    :new             "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"

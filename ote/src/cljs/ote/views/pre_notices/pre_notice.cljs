@@ -116,7 +116,7 @@
          :required?       true
          :options         notice-types
          :option-addition {:value :other :addition addition}
-         :show-option     (tr-key [:enums :ote.db.notice/notice-type])})]
+         :show-option     (tr-key [:enums ::transit/pre-notice-type])})]
      pre-notice]])))
 
 (defn effective-dates [e! app]
