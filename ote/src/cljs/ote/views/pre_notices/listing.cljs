@@ -25,7 +25,6 @@
     (let [pre-notices (filter #(= (::t-operator/id transport-operator)
                                   (::t-operator/id %))
                               pre-notices)]
-      (println pre-notices)
       [:div
        [:div.row
         [:div.col-xs-12.col-sm-6.col-md-9
