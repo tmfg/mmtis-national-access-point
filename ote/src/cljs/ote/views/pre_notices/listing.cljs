@@ -16,7 +16,7 @@
 (defn pre-notice-type->str
   [types]
   (str/join ", "
-            (map #(tr [:enums ::transit/pre-notice-type %]) types)))
+            (map (tr-key [:enums ::transit/pre-notice-type]) types)))
 
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices] :as app}]
