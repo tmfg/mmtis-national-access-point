@@ -11,7 +11,8 @@
             [cljs-react-material-ui.icons :as ic]
             [cljs-react-material-ui.reagent :as ui]
             [ote.time :as time]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.app.controller.front-page :as fp]))
 
 (defn pre-notice-type->str
   [types]
@@ -52,10 +53,10 @@
           {:name ::modification/modified
            :read (comp time/format-timestamp-for-ui ::modification/modified)}
           {:name :actions
-           :format (fn []
-                     [ui/icon-button {:href "#"
-                                      :on-click #(do
-                                                   (.preventDefault %)
-                                                   (e! (pre-notice/->ModifyPreNotice (::transit/id %))))}
-                      [ic/content-create]])}]
+           :read (fn [row]
+                   [ui/icon-button {:href "#"
+                                    :on-click #(do
+                                                 (.preventDefault %)
+                                                 (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
+                    [ic/content-create]])}]
          pre-notices]]])))

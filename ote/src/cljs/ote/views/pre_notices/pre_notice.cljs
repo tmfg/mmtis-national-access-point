@@ -219,3 +219,32 @@
                                     (.preventDefault %)
                                     (e! (pre-notice/->CancelNotice)))}
        (tr [:buttons :cancel])]]]))
+
+(defn edit-pre-notice-by-id [e! app]
+  (let [operator (:transport-operator app)
+        operators (mapv :transport-operator (:transport-operators-with-services app))]
+    [:span
+     [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
+     ;; Select operator
+     [select-operator e! operator operators]
+     [transport-type e! app]
+     [effective-dates e! app]
+     [notice-area e! app]
+     [notice-attatchments e! app]
+     (when (not (pre-notice/valid-notice? (:route app)))
+       [ui/card {:style {:margin "1em 0em 1em 0em"}}
+        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])
+     [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
+      [buttons/save {:disabled (not (pre-notice/valid-notice? (:pre-notice app)))
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (pre-notice/->SaveToDb true)))}
+       (tr [:buttons :save-and-send])]
+      [buttons/save {:on-click #(do
+                                  (.preventDefault %)
+                                  (e! (pre-notice/->SaveToDb false)))}
+       (tr [:buttons :save-as-draft])]
+      [buttons/cancel {:on-click #(do
+                                    (.preventDefault %)
+                                    (e! (pre-notice/->CancelNotice)))}
+       (tr [:buttons :cancel])]]]))
