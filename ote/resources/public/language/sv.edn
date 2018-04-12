@@ -700,11 +700,14 @@
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
-           :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
-           :ote.db.modification/created "Luotu"
-           :ote.db.transit/route-description "Reitin kuvaus"}
+            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.modification/created "Luotu"
+            :ote.db.modification/modified "Muokattu"
+            :ote.db.transit/route-description "Reitin kuvaus"
+            :actions "Toiminnot"}
 
- }
+
+  }
 
 :pre-notice-page
 {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"

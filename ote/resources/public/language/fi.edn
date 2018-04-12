@@ -639,15 +639,15 @@
  :route-wizard-page
  {:trip-stop-exception
   {:arrival {:tooltip "Muuta poistumismahdollisuutta"
-             :default "Poistumismahdollisuus oletuksena"
-             :no "Ei poistumismahdollisuutta"
-             :agency "Poistumisesta sovittava palveluntuottajan kanssa"
-             :driver "Poistumisesta sovittava kuljettajan kanssa"}
+             :default "Kyydistä poistuminen aina mahdollista"
+             :no "Kyydistä poistuminen ei mahdollista"
+             :agency "Poistuminen sovittava liikennöitsijän kanssa"
+             :driver "Poistuminen sovittava kuljettajan kanssa"}
    :departure {:tooltip "Muuta nousumahdollisuutta"
-               :default "Nousu mahdollista oletuksena"
-               :no "Ei nousumahdollisuutta"
-               :agency "Nousemisesta sovittava palveluntuottajan kanssa"
-               :driver "Noususta sovittava kuljettajan kanssa"}}
+               :default "Kyytiin otto aina mahdollista"
+               :no "Ei kyytiin ottoa"
+               :agency "Kyytiin otto sovittava liikennöitsijän kanssa"
+               :driver "Kyytiin otto sovittava kuljettajan kanssa"}}
 
   :trip-stop-arrival-header "tulo"
   :trip-stop-departure-header "lähtö"
@@ -701,8 +701,10 @@
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
-           :ote.db.modification/created "Luotu"
-           :ote.db.transit/route-description "Reitin kuvaus"}
+            :ote.db.modification/created "Luotu"
+            :ote.db.modification/modified "Muokattu"
+            :ote.db.transit/route-description "Reitin kuvaus"
+            :actions "Toiminnot"}
 
 }
 
