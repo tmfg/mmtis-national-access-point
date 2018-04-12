@@ -5,14 +5,16 @@
             [specql.core :as specql]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
-            [ote.authorization :as authorization]))
+            [ote.authorization :as authorization]
+            [ote.db.transport-operator :as t-operator]))
 
 
 (defn list-published-notices [db]
   (specql/fetch db ::transit/pre-notice
-                (specql/columns ::transit/pre-notice)
+                (conj (specql/columns ::transit/pre-notice)
+                      [::t-operator/transport-operator #{::t-operator/name}])
                 {}
-                #_{:specql.core/order-by ::modification/created}))
+                {:specql.core/order-by ::modification/created}))
 
 (defn authority-pre-notices-routes [db]
   (routes

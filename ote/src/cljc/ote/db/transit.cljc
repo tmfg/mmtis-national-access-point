@@ -11,7 +11,8 @@
             [ote.db.modification]
             [ote.db.transport-service]
             [ote.time :as time]
-            [ote.util.fn :refer [flip]])
+            [ote.util.fn :refer [flip]]
+            [ote.db.transport-operator])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -39,7 +40,11 @@
    {"transport-operator-id" :ote.db.transport-operator/id
     ::attachments (specql.rel/has-many ::id
                                        ::pre-notice-attachment
-                                       ::pre-notice-id)}]
+                                       ::pre-notice-id)
+
+    :ote.db.transport-operator/transport-operator (specql.rel/has-one :ote.db.transport-operator/id
+                                                                      :ote.db.transport-operator/transport-operator
+                                                                      :ote.db.transport-operator/id)}]
   ["pre_notice_attachment" ::pre-notice-attachment
    ote.db.modification/modification-fields])
 
