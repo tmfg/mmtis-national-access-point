@@ -6,33 +6,27 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.pre-notices :as pre-notice]
-            [ote.ui.table :as table]))
+            [ote.ui.table :as table]
+            [clojure.string :as str]
+            [ote.time :as time]
+            [ote.db.modification :as modification]
+            [ote.db.transport-operator :as t-operator]))
 
 (defn pre-notices [e! {:keys [pre-notices] :as app}]
   (if (= :loading pre-notices)
     [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
     [:div
      [:div.row
-      [:div.col-xs-12.col-sm-6.col-md-9
-       [:h1 (tr [:pre-notice-list-page :header-pre-notice-list])]]
-      [:div.col-xs-12.col-sm-6.col-md-3
-       [ui/raised-button {:label    (tr [:buttons :add-new-pre-notice])
-                          :style    {:float "right"}
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (pre-notice/->CreateNewPreNotice)))
-                          :primary  true
-                          :icon     (ic/content-add)}]]]
+      [:div.col-xs-12.col-sm-12.col-md-12
+       [:h1 "Säännöllisen henkilöliikenteen muutosilmoitukset FIXME" #_(tr [:pre-notice-list-page :header-pre-notice-list])]]]
      [:div.row
-
 
       [table/table {:name->label     (tr-key [:pre-notice-list-page :headers])
                     :key-fn          ::transit/id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])}
-       [{:name ::transit/id}
-        ;;{:name ::transit/pre-notice-type}
-        ;;{:name ::modification/created}
-        ;;{:name ::transit/route-description}
-        ]
+       [{:name ::modification/created :format (comp str time/format-timestamp-for-ui)}
+        {:name ::transit/pre-notice-type :format #(str/join ", " (map name %))}
+        {:name ::transit/route-description}
+        {:name :operator :read (comp ::t-operator/name ::t-operator/transport-operator)}]
 
        pre-notices]]]))
