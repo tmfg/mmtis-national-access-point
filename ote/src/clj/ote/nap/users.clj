@@ -16,10 +16,13 @@
 
 (defn find-user [db username]
   (let [rows (map db-utils/underscore->structure
-                  (fetch-user-by-username db {:username username}))]
-    (when-not (empty? rows)
-      (assoc (first rows)
-             :groups (map :group rows)))))
+                  (fetch-user-by-username db {:username username}))
+        user (first rows)]
+    (when user
+      (-> user
+          (assoc-in [:user :transit-authority?]
+                    (is-transit-authority-user? db {:user-id (get-in user [:user :id])}))
+          (assoc :groups (map :group rows))))))
 
 
 

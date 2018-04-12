@@ -771,6 +771,7 @@
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
   :navigation-pre-notice                      "60pv ilmoitus"
+  :navigation-authority-pre-notices "Saapunet muutosilmoitukset"
   :navigation-privacy-policy "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"

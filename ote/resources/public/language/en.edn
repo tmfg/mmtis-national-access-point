@@ -763,6 +763,7 @@
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
   :navigation-pre-notice                      "60pv ilmoitus"
+  :navigation-authority-pre-notices "Saapuneet ilmoitukset - EN"
   :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"

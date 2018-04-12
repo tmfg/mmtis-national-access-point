@@ -86,7 +86,7 @@
               :style link-style})
          flag]))]))
 
-(defn user-menu [e! name username]
+(defn user-menu [e! {:keys [name username transit-authority?]}]
   (when username
     [ui/drop-down-menu
     {:menu-style {}
@@ -108,6 +108,14 @@
                       :primary-text (tr [:common-texts :navigation-pre-notice])
                       :on-click #(do (.preventDefault %)
                                      (e! (fp-controller/->ChangePage :pre-notices nil)))}])
+
+     (when (and (flags/enabled? :pre-notice) transit-authority?)
+       [ui/menu-item {:style {:color "#FFFFFF"}
+                      :primary-text (tr [:common-texts :navigation-authority-pre-notices])
+                      :on-click #(do (.preventDefault %)
+                                     (e! (fp-controller/->ChangePage :authority-pre-notices nil)))}])
+
+
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
@@ -170,9 +178,7 @@
     [:div.user-menu {:class (is-user-menu-active app)
                      :style (when (> (:width app) style-base/mobile-width-px)
                               {:float "right"})}
-     [user-menu e!
-      (get-in app [:user :name])
-      (get-in app [:user :username])]]
+     [user-menu e! (:user app)]]
 
     (if (nil? (get-in app [:user :username]))
       [:ul (stylefy/use-style style-topnav/ul)

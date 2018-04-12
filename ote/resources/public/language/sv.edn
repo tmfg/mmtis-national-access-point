@@ -767,6 +767,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Kartverktyg för sjötrafik"
   :navigation-pre-notice                      "60pv ilmoitus - SV"
+  :navigation-authority-pre-notices "Saapuneet muutosilmoitukset - SV"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
