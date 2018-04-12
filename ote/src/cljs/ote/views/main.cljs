@@ -268,7 +268,7 @@
       [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
 
 
-(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes})
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes :pre-notices})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
