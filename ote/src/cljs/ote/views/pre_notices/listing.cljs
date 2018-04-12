@@ -47,11 +47,11 @@
          [{:name ::transit/id}
           {:name ::transit/pre-notice-type
            :read (comp pre-notice-type->str ::transit/pre-notice-type)}
+          {:name ::transit/route-description}
           {:name ::modification/created
            :read (comp time/format-timestamp-for-ui ::modification/created)}
           {:name ::modification/modified
            :read (comp time/format-timestamp-for-ui ::modification/modified)}
-          {:name ::transit/route-description}
           {:name :actions
            :format (fn []
                      [ui/icon-button {:href "#"
