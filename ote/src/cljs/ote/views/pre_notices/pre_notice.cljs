@@ -95,6 +95,12 @@
 
 (defn transport-type [e! app]
   (fn [e! {pre-notice :pre-notice :as app}]
+    (let [addition [form-fields/field
+                    {:label     nil
+                     :name      ::transit/other-type-description
+                     :type      :string
+                     :update!   #(e! (pre-notice/->EditSingleFormElement ::transit/other-type-description %))}
+                    (::transit/other-type-description pre-notice)]]
     [:div {:style {:padding-top "20px"}}
     [form/form {:update! #(e! (pre-notice/->EditForm %))}
      [(form/group
@@ -103,13 +109,15 @@
          :layout  :row}
 
         {:name            ::transit/pre-notice-type
+         :should-update-check (juxt ::transit/pre-notice-type ::transit/other-type-description)
          :type            :checkbox-group
          :container-class "col-md-12"
          :header?         false
          :required?       true
          :options         notice-types
-         :show-option     (tr-key [:enums :ote.db.notice/notice-type])})]
-     pre-notice]]))
+         :option-addition {:value :other :addition addition}
+         :show-option     (tr-key [:enums ::transit/pre-notice-type])})]
+     pre-notice]])))
 
 (defn effective-dates [e! app]
   (fn [e! {pre-notice :pre-notice :as app}]

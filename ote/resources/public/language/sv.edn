@@ -237,8 +237,8 @@
           :password "Lösenord"}
 
  :pre-notice {
-              :ote.db.notice/other-type-description "Muu muutos -SV"
-              :ote.db.notice/url                    "www-osoite -SV"
+              :ote.db.transit/other-type-description "Muu muutos -SV"
+              :ote.db.transit/url                    "www-osoite -SV"
               }
  }
 
@@ -483,7 +483,7 @@
    :possible "Förhandsbokning möjlig men inte obligatorisk."
    :mandatory "Obligatorisk förhandsbokning."}
 
-  :ote.db.notice/notice-type
+  :ote.db.transit/pre-notice-type
   {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
    :new             "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"

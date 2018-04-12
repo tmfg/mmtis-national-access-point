@@ -140,3 +140,9 @@
                                :margin-bottom "8px"}}})
 
 (def disabled-color {:color "rgba(0, 0, 0, 0.247059)"})
+(def checkbox-label {:float "left"
+                     :position "relative"
+                     :display "block"
+                     :width "calc(100% - 38px)"
+                     :line-height "24p";
+                     :font-family "Roboto, sans-serif"})
