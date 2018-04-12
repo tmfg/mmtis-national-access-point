@@ -4,7 +4,9 @@
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes POST GET]]
             [ote.services.pre-notices.attachments :as pre-notices-attachments]
-            [ote.services.pre-notices.operator :as pre-notices-operator]))
+            [ote.services.pre-notices.operator :as pre-notices-operator]
+            [ote.services.pre-notices.authority :as pre-notices-authority]))
+
 
 (defrecord PreNotices [config]
   component/Lifecycle
@@ -14,7 +16,8 @@
     (assoc this ::stop-published-routes
            [(or (some->> (pre-notices-attachments/attachment-routes db config)
                          (http/publish! http)) :not-published)
-            (http/publish! http (pre-notices-operator/operator-pre-notices-routes db))]))
+            (http/publish! http (pre-notices-operator/operator-pre-notices-routes db))
+            (http/publish! http (pre-notices-authority/authority-pre-notices-routes db))]))
 
   (stop [{stop-published-routes ::stop-published-routes :as this}]
     (doseq [stop-route stop-published-routes]

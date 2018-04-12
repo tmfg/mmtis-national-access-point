@@ -32,7 +32,8 @@
             [ote.views.route :as route]
             [ote.views.gtfs-viewer :as gtfs-viewer]
             [ote.views.pre-notices.pre-notice :as notice]
-            [ote.views.pre-notices.listing :as pre-notices-listing]))
+            [ote.views.pre-notices.listing :as pre-notices-listing]
+            [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]))
 
 
 (defn logged-in? [app]
@@ -419,6 +420,7 @@
                 ;; 60days pre notice views
                 :new-notice [notice/new-pre-notice e! app]
                 :pre-notices [pre-notices-listing/pre-notices e! app]
+                :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
 
