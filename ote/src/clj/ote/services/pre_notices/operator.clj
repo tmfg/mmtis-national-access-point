@@ -44,7 +44,7 @@
   (routes
     (GET "/pre-notices/list" {user :user}
       (list-operator-notices db user))
-    (GET "/pre-notices/:id" {{id :id} :params
+    (GET ["/pre-notices/:id" :id #"\d+"] {{id :id} :params
                              user :user}
       (get-operator-pre-notice db user (Long/parseLong id)))
     (POST "/pre-notice" {form-data :body
