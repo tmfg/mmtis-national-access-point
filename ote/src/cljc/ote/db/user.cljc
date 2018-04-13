@@ -1,17 +1,20 @@
-(ns ote.db.service-search
-  "Transport service search facet tables"
+(ns ote.db.user
+  "Datamodel for user table"
   (:require [clojure.spec.alpha :as s]
             #?(:clj [ote.db.specql-db :refer [define-tables]])
+            #?(:clj [specql.postgis])
             [specql.rel :as rel]
             [specql.transform :as xf]
             [specql.impl.registry]
-            [ote.db.common]
             [specql.data-types]
-            [ote.time]
-            [ote.db.modification])
+            [ote.db.common]
+            [ote.db.modification]
+            [ote.db.transport-service]
+            [ote.time :as time]
+            [ote.util.fn :refer [flip]]
+            [ote.db.transport-operator])
   #?(:cljs
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
-
 (define-tables
-  ["operation-area-facet" ::operation-area-facet])
+  ["user" ::user])

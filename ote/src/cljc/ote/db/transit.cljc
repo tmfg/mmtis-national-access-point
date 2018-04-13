@@ -1,7 +1,7 @@
 (ns ote.db.transit
   "Datamodel for route based transit"
   (:require [clojure.spec.alpha :as s]
-            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            #?(:clj [ote.db.specql-db :refer [define-tables]])
             #?(:clj [specql.postgis])
             [specql.rel :as rel]
             [specql.transform :as xf]
@@ -12,9 +12,10 @@
             [ote.db.transport-service]
             [ote.time :as time]
             [ote.util.fn :refer [flip]]
-            [ote.db.transport-operator])
+            [ote.db.transport-operator]
+            [ote.db.user])
   #?(:cljs
-     (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+     (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (define-tables
   ["localized_text" :ote.db.transport-service/localized_text]
@@ -35,13 +36,20 @@
    ote.db.modification/modification-fields]
   ["pre_notice_type" ::pre_notice_type (specql.transform/transform (specql.transform/to-keyword))]
   ["notice_effective_date" ::notice-effective-date]
+  ["pre_notice_comment" ::pre-notice-comment
+   ote.db.modification/modification-fields
+   {::author (specql.rel/has-one :ote.db.modification/created-by
+                                 :ote.db.user/user
+                                 :ote.db.user/id)}]
   ["pre_notice" ::pre-notice
    ote.db.modification/modification-fields
    {"transport-operator-id" :ote.db.transport-operator/id
     ::attachments (specql.rel/has-many ::id
                                        ::pre-notice-attachment
                                        ::pre-notice-id)
-
+    ::comments (specql.rel/has-many ::id
+                                    ::pre-notice-comment
+                                    ::pre-notice-id)
     :ote.db.transport-operator/transport-operator (specql.rel/has-one :ote.db.transport-operator/id
                                                                       :ote.db.transport-operator/transport-operator
                                                                       :ote.db.transport-operator/id)}]

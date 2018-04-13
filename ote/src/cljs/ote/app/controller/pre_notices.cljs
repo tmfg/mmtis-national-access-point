@@ -13,21 +13,25 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->LoadPreNoticesResponse ->LoadPreNoticesFailure)
+(tuck/define-event ServerError [response]
+  {}
+  (assoc app :flash-message-error (tr [:common-texts :server-error])))
+
+(declare ->LoadPreNoticesResponse)
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
   {:path [:pre-notices]}
   (comm/get! "pre-notices/list"
              {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
-              :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
+              :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
 (tuck/define-event LoadAuthorityPreNotices []
   {:path [:pre-notices]}
   (comm/get! "pre-notices/authority-list"
              {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
-              :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
+              :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
@@ -39,10 +43,6 @@
 (tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
   response)
-
-(tuck/define-event LoadPreNoticesFailure [response]
-  {}
-  (assoc app :flash-message-error (tr [:common-texts :server-error])))
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
@@ -129,3 +129,36 @@
   (process-event [{id :id} app]
     (.log js/console " DeleteEffectiveDate id " id)
     app))
+
+
+(define-event ShowPreNoticeResponse [response]
+  {:path [:pre-notice-dialog]}
+  response)
+
+(define-event ClosePreNotice []
+  {}
+  (dissoc app :pre-notice-dialog))
+
+(define-event ShowPreNotice [id]
+  {:path [:pre-notice-dialog]}
+  (comm/get! (str "pre-notices/show/" id)
+             {:on-success (tuck/send-async! ->ShowPreNoticeResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(define-event UpdateNewCommentText [text]
+  {:path [:pre-notice-dialog :new-comment]}
+  text)
+
+(define-event AddCommentResponse [new-comment]
+  {:path [:pre-notice-dialog ::transit/comments]}
+  (conj (or app []) new-comment))
+
+(define-event AddComment []
+  {}
+  (comm/post! "pre-notices/comment"
+              {:id (get-in app [:pre-notice-dialog ::transit/id])
+               :comment (get-in app [:pre-notice-dialog :new-comment])}
+              {:on-success (tuck/send-async! ->AddCommentResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  (update app :pre-notice-dialog dissoc :new-comment))
