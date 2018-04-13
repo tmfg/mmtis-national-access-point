@@ -43,7 +43,6 @@
       (assoc app
         :transport-operator (:transport-operator service-operator)
         :transport-service-vector (:transport-service-vector service-operator)
-        :transport-operator (:transport-operator route-operator)
         :routes-vector (:routes route-operator))))
 
   SelectOperatorForTransit
