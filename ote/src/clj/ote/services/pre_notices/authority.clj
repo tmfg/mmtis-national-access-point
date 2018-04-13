@@ -11,7 +11,6 @@
 
 
 (defn list-published-notices [db user]
-  (def last-user user) ;;FIXME: for repl debugging
   (specql/fetch db ::transit/pre-notice
                 #{::transit/id
                   ::modification/created
