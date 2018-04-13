@@ -482,6 +482,12 @@
    :schedule-change "Aikataulumuutos"
    :route-change    "Reittimuutos"
    :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
+
   }
   ;; ENUMS end
 
@@ -696,6 +702,7 @@
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"

@@ -44,12 +44,14 @@
                       :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])}
          [{:name ::transit/id}
           {:name ::transit/pre-notice-type
-           :read (comp pre-notice-type->str ::transit/pre-notice-type)}
+           :format pre-notice-type->str}
           {:name ::transit/route-description}
           {:name ::modification/created
            :read (comp time/format-timestamp-for-ui ::modification/created)}
           {:name ::modification/modified
            :read (comp time/format-timestamp-for-ui ::modification/modified)}
+          {:name ::transit/pre-notice-state
+           :format (tr-key [:enums ::transit/pre-notice-state])}
           {:name :actions
            :read (fn [row]
                    [ui/icon-button {:href "#"
