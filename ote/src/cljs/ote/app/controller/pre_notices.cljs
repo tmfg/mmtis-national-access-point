@@ -31,7 +31,7 @@
   :loading)
 
 (tuck/define-event LoadPreNotice [id]
-                   {:path [:pre-notices]}
+                   {:path [:pre-notice]}
                    (comm/get! (str "pre-notices/" id)
                               {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
                                :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
@@ -103,8 +103,10 @@
 
   SaveToDb
   (process-event [{published? :published?} app]
-    (let [n (:pre-notice app)
-          notice (form/without-form-metadata n)]
+    (let [notice (as-> (:pre-notice app) n
+                       (form/without-form-metadata n)
+                       (when published?
+                         (assoc n ::transit/pre-notice-state :sent)))]
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
