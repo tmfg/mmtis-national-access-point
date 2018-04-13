@@ -1,4 +1,4 @@
-(ns ote.ui.list_header
+(ns ote.ui.list-header
   "Header component for OTE list pages"
   (:require [cljs-react-material-ui.reagent :as ui]
             [ote.ui.common :as common]))
