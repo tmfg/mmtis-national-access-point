@@ -69,6 +69,9 @@
 (defrecord SaveRouteResponse [response])
 (defrecord SaveRouteFailure [response])
 
+;; Map draw control
+(defrecord SetDrawControl [show?])
+
 (defn- update-stop-by-idx [route stop-idx trip-idx update-fn & args]
   (update (get-in route [::transit/trips trip-idx]) ::transit/stop-times
           (fn [stops]
@@ -552,7 +555,11 @@
     (-> app
         (dissoc app :transport-service :before-unload-message)
         (dissoc app :route)
-        (assoc-in [:route :stops] stops)))))
+        (assoc-in [:route :stops] stops))))
+
+  SetDrawControl
+  (process-event [{show? :show?} app]
+    (assoc-in app [:route :map-controls :show?] show?)))
 
 (defn new-stop-time
   "Calculate new stop time based on trip start time."

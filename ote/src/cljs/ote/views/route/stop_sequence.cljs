@@ -61,56 +61,78 @@
         [common/help (tr [:route-wizard-page :stop-sequence-custom-dialog-help])]]])))
 
 (defn- route-map [e! route]
-  (r/create-class
-   {:component-did-mount
-    (fn [this]
-      (let [deleting? (atom false)
-            ^js/L.Map
-            m (aget this "refs" "stops-map" "leafletElement")]
+  (let [dc (atom nil)]
+    (r/create-class
+      {:component-did-mount
+        (fn [this]
+          (let [deleting? (atom false)
+               ^js/L.Maps
+               m (aget this "refs" "stops-map" "leafletElement")]
 
-        ;; Keep track if we are in delete mode
-        (.on m "draw:deletestart" #(reset! deleting? true))
-        (.on m "draw:deletestop" #(reset! deleting? false))
+            ;; Keep track if we are in delete mode
+            (.on m "draw:deletestart" #(reset! deleting? true))
+            (.on m "draw:deletestop" #(reset! deleting? false))
+            (leaflet-draw/install-draw-control!
+             this
+             {:ref-name                "stops-map"
+              ;; Disable all other geometry types
+              :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
+              :on-control-created (partial reset! dc)
+              :on-create               (fn [^js/L.Path layer]
+                                         (let [id (leaflet-draw/layer-id layer)]
+                                           (.on layer "click"
+                                                (fn [_]
+                                                  (when-not @deleting?
+                                                    (e! (rw/->AddCustomStop id)))))
+                                           (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
+              :on-remove               #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
+              :on-edit                 #(e! (rw/->UpdateCustomStopGeometry
+                                              (leaflet-draw/layer-id %)
+                                              (leaflet-draw/layer-geojson %)))
 
-        (leaflet-draw/install-draw-control!
-            this
-          {:add? true
-           :ref-name "stops-map"
-           ;; Disable all other geometry types
-           :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
-           :on-create (fn [^js/L.Path layer]
-                        (let [id (leaflet-draw/layer-id layer)]
-                          (.on layer "click"
-                               (fn [_]
-                                 (when-not @deleting?
-                                   (e! (rw/->AddCustomStop id)))))
-                          (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
-           :on-remove #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
-           :on-edit #(e! (rw/->UpdateCustomStopGeometry
-                          (leaflet-draw/layer-id %)
-                          (leaflet-draw/layer-geojson %)))
+              :add-features?           true
+              :localization            {:toolbar  {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
+                                        :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}})))
+            :component-will-receive-props (fn [this [_ _ route]]
+                                       (let [^js/L.map m (aget this "refs" "stops-map" "leafletElement")]
+                                         (if (get-in route [:map-controls :show?])
+                                           (.addControl m @dc)
+                                           (.removeControl m @dc))))
+            :reagent-render
+                                     (fn [e! route]
+                                       [:span
+                                        [custom-stop-dialog e! route]
+                                        [leaflet/Map {:ref         "stops-map"
+                                                      :center      #js [65 25]
+                                                      :zoomControl true
+                                                      :zoom        5}
+                                         (leaflet/background-tile-map)
+                                         (when-let [stops (:stops route)]
+                                           [leaflet/GeoJSON {:data         stops
+                                                             :style        {:color "green"}
+                                                             :pointToLayer (partial stop-marker e!)}])
 
-           :add-features? true
-           :localization {:toolbar {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
-                          :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}})))
-    :reagent-render
-    (fn [e! route]
-      [:div.stops-map {:style {:width "70%"}}
-       [custom-stop-dialog e! route]
-       [leaflet/Map {:ref "stops-map"
-                     :center #js [65 25]
-                     :zoomControl true
-                     :zoom 5}
-        (leaflet/background-tile-map)
-        (when-let [stops (:stops route)]
-          [leaflet/GeoJSON {:data stops
-                            :style {:color "green"}
-                            :pointToLayer (partial stop-marker e!)}])
-
-        (when-let [stop-sequence (seq (::transit/stops route))]
-          [leaflet/Polyline
-           {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
-            :color "red"}])]])}))
+                                         (when-let [stop-sequence (seq (::transit/stops route))]
+                                           [leaflet/Polyline
+                                            {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
+                                             :color     "red"}])]])})))
+(defn- map-container [e! route]
+  [:div.stops-map {:style {:width "70%"}}
+   [route-map e! route]
+   [:span
+    (if (get-in route [:map-controls :show?])
+      [:span.hide-draw-buttons
+       [ui/flat-button {:id :hide-draw-tools
+                        :primary true
+                        :label (tr [:route-wizard-page :hide-draw-tools])
+                        :name :hide-draw-tools
+                        :on-click #(e! (rw/->SetDrawControl false))}]]
+      [:span.draw-buttons
+       [ui/flat-button {:id :show-draw-tools
+                        :primary true
+                        :label (tr [:route-wizard-page :show-draw-tools])
+                        :name :draw-secondary
+                        :on-click #(e! (rw/->SetDrawControl true))}]])]])
 
 (defn- route-stops [e! stop-sequence]
   [:div {:style {:width "30%" :margin "1em"}}
@@ -147,5 +169,5 @@
        [:div (stylefy/use-style style-form/form-card-label) (tr [:route-wizard-page :wizard-step-stop-sequence])]
        [:div (stylefy/use-style style-form/form-card-body)
         [:div {:style {:display "flex" :flex-direction "row"}}
-         [route-map e! route]
+         [map-container e! route]
          [route-stops e! (::transit/stops route)]]]])))
