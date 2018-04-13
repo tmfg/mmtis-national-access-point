@@ -239,7 +239,7 @@
   :pre-notice
   {:ote.db.transit/other-type-description "Muu muutos -SV"
    :ote.db.transit/url                    "www-osoite -SV"
-   :ote.db.transit/effectiva-dates "Muutoksen alkamispäivä tai -päivät"
+   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    }
  }
 
