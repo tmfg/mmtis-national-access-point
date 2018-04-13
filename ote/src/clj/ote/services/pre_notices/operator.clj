@@ -11,7 +11,10 @@
             [ote.db.tx :as tx]
             [ote.db.modification :as modification]
             [taoensso.timbre :as log]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [jeesql.core :refer [defqueries]]))
+
+(defqueries "ote/services/pre_notices/regions.sql")
 
 (defn list-operator-notices [db user]
   (http/no-cache-transit-response
@@ -39,4 +42,11 @@
    (POST "/pre-notice" {form-data :body
                         user      :user}
          (http/transit-response
-          (save-pre-notice db user (http/transit-request form-data))))))
+          (save-pre-notice db user (http/transit-request form-data))))
+   (GET "/pre-notices/regions" {}
+        (http/transit-response (fetch-regions db)))
+   (GET "/pre-notices/region/:id" [id]
+        {:status 200
+         :headers {"Content-Type" "application/json"}
+         :body (fetch-region-geometry db {:id id})})
+   ))
