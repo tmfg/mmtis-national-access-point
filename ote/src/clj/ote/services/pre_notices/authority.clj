@@ -17,7 +17,7 @@
                   ::transit/route-description
                   ::transit/pre-notice-type
                   [::t-operator/transport-operator #{::t-operator/name}]}
-                {}
+                {::transit/pre-notice-state :sent}
                 {:specql.core/order-by ::modification/created
                  :specql.core/order-direction :desc}))
 
