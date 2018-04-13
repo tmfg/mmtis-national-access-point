@@ -127,7 +127,8 @@
          ^{:key (str code "_" i)}
          [:tr {:style {:border-bottom "solid 1px black"}}
           [:td (t-service/localized-text-with-fallback @selected-language name)]
-          [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])}
+          [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])
+                                :pos "left"}
                 [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
                  [ic/action-delete]]]]])
        stop-sequence))]
