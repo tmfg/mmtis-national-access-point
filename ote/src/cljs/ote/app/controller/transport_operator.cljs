@@ -34,12 +34,16 @@
   SelectOperatorForService
   (process-event [{data :data} app]
     (let [id (get data ::t-operator/id)
-          selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
+          service-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
                                      %)
-                                  (:transport-operators-with-services app))]
+                                  (:transport-operators-with-services app))
+          route-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
+                                     %)
+                                  (:route-list app))]
       (assoc app
-        :transport-operator (:transport-operator selected-operator)
-        :transport-service-vector (:transport-service-vector selected-operator))))
+        :transport-operator (:transport-operator service-operator)
+        :transport-service-vector (:transport-service-vector service-operator)
+        :routes-vector (:routes route-operator))))
 
   SelectOperatorForTransit
   (process-event [{data :data} app]

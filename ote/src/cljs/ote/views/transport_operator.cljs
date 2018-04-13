@@ -21,7 +21,7 @@
             [ote.localization :refer [tr tr-key]]))
 
 (defn transport-operator-selection [e! {operator :transport-operator
-                                        operators :transport-operators-with-services}]
+                                        operators :transport-operators-with-services} & extended]
   [:span
    ;; Show operator selection if there are operators and we are not creating a new one
    (when (and (not (empty? operators))
@@ -43,6 +43,7 @@
         :auto-width? true}
        operator]]
 
+      (when extended
        [:div.col-xs-12.col-sm-3.col-md-2
        [ui/flat-button {:label (tr [:buttons :edit])
                         :style {:margin-top "1.5em"
@@ -50,8 +51,8 @@
                         :icon (ic/content-create {:style {:width 16 :height 16}})
                         :on-click #(do
                                      (.preventDefault %)
-                                     (e! (fp/->ChangePage :transport-operator nil)))}]]
-
+                                     (e! (fp/->ChangePage :transport-operator nil)))}]])
+      (when extended
        [:div.col-xs-12.col-sm-3.col-md-2
        [ui/flat-button {:label (tr [:buttons :add-new-member])
                         :style {:margin-top "1.5em"
@@ -61,7 +62,7 @@
                                      (.preventDefault %)
                                      (e! (fp/->GoToUrl
                                           (str "/organization/member_new/"
-                                               (get operator ::t-operator/ckan-group-id)))))}]]])])
+                                               (get operator ::t-operator/ckan-group-id)))))}]])])])
 
 (defn- operator-form-groups []
   [(form/group

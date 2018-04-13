@@ -1,11 +1,11 @@
 (ns ote.db.auditlog
   "Database configurations for Auditlog"
   (:require [clojure.spec.alpha :as s]
-    #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+    #?(:clj [ote.db.specql-db :refer [define-tables]])
             [specql.data-types]
     #?(:clj [specql.impl.composite :as specql-composite]))
     #?(:cljs
-        (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+        (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 
 (define-tables

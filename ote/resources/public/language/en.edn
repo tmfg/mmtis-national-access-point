@@ -231,10 +231,11 @@
   :login {:email "Email"
           :password "Password"}
 
- :pre-notice {
-              :ote.db.transit/other-type-description "Other change"
-              :ote.db.transit/url                    "www address"
-              }
+  :pre-notice
+  {:ote.db.transit/other-type-description "Other change"
+   :ote.db.transit/url                    "www address"
+   :ote.db.transit/effective-dates "Change effective date or dates"
+   }
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -689,9 +690,9 @@
   }
 
  :pre-notice-list-page
- {:header-pre-notice-list "Omat 60pv ilmoitukset"
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
   :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
-  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut 60 päivän ennakkoilmoituksia."
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
@@ -701,7 +702,9 @@
             :ote.db.transit/route-description "Reitin kuvaus"
             :actions "Toiminnot"}
 
-
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaiselle)"
+                      :new-comment-label "Kirjoita kommentti"}
   }
 
  :pre-notice-page
@@ -762,7 +765,7 @@
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
-  :navigation-pre-notice                      "60pv ilmoitus"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-authority-pre-notices "Saapuneet ilmoitukset - EN"
   :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"

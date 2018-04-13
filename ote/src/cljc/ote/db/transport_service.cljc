@@ -2,7 +2,7 @@
   "Database configurations for Transport Services"
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]
-            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            #?(:clj [ote.db.specql-db :refer [define-tables]])
             [specql.rel :as rel]
             [specql.transform :as xf]
             [specql.impl.registry]
@@ -12,7 +12,7 @@
             [ote.db.modification]
             #?(:clj [specql.impl.composite :as specql-composite]))
   #?(:cljs
-     (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+     (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 
 (define-tables

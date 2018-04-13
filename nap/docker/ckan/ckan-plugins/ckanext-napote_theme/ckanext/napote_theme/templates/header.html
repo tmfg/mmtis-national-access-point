@@ -99,6 +99,12 @@
                                                     {% endif %}
                                                     {% block header_account_settings_link %}
                                                         <li>
+                                                            <a href="/ote/#/routes"
+                                                               title="{{_('Sea traffic route and timetable editor')}}">
+                                                                <span class="text">{{_('Sea traffic route and timetable editor')}}</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
                                                             <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}"
                                                                title="{{ _('View profile') }}">
                                                                 <span class="text">{{ _('View profile') }}</span>
