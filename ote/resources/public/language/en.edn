@@ -231,10 +231,11 @@
   :login {:email "Email"
           :password "Password"}
 
- :pre-notice {
-              :ote.db.transit/other-type-description "Other change"
-              :ote.db.transit/url                    "www address"
-              }
+  :pre-notice
+  {:ote.db.transit/other-type-description "Other change"
+   :ote.db.transit/url                    "www address"
+   :ote.db.transit/effective-dates "Change effective date or dates"
+   }
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -701,7 +702,9 @@
             :ote.db.transit/route-description "Reitin kuvaus"
             :actions "Toiminnot"}
 
-
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaiselle)"
+                      :new-comment-label "Kirjoita kommentti"}
   }
 
  :pre-notice-page

@@ -236,10 +236,11 @@
   :login {:email "Epost"
           :password "Lösenord"}
 
- :pre-notice {
-              :ote.db.transit/other-type-description "Muu muutos -SV"
-              :ote.db.transit/url                    "www-osoite -SV"
-              }
+  :pre-notice
+  {:ote.db.transit/other-type-description "Muu muutos -SV"
+   :ote.db.transit/url                    "www-osoite -SV"
+   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
+   }
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -706,6 +707,9 @@
             :ote.db.transit/route-description "Reitin kuvaus"
             :actions "Toiminnot"}
 
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
+                      :new-comment-label "Kirjoita kommentti"}
 
   }
 
