@@ -233,9 +233,11 @@
   :login {:email "Sähköpostiosoite"
           :password "Salasana"}
 
-  :pre-notice {
-   :ote.db.transit/other-type-description "Selitys"
+  :pre-notice
+  {:ote.db.transit/other-type-description "Selitys"
    :ote.db.transit/url                    "www-osoite"
+   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
+
    }
   }
 

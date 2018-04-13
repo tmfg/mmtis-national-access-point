@@ -236,10 +236,11 @@
   :login {:email "Epost"
           :password "Lösenord"}
 
- :pre-notice {
-              :ote.db.transit/other-type-description "Muu muutos -SV"
-              :ote.db.transit/url                    "www-osoite -SV"
-              }
+  :pre-notice
+  {:ote.db.transit/other-type-description "Muu muutos -SV"
+   :ote.db.transit/url                    "www-osoite -SV"
+   :ote.db.transit/effectiva-dates "Muutoksen alkamispäivä tai -päivät"
+   }
  }
 
  ;; Add form info elements here, these are textual help texts in the form

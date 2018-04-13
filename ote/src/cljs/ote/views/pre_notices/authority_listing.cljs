@@ -34,6 +34,13 @@
         [:span (::user/fullname author)]] ": "
        comment]))])
 
+(defn- format-effective-dates [effective-dates]
+  [:div
+   (map-indexed
+    (fn [i {::transit/keys [effective-date effective-date-description]}]
+      [:div (when effective-date (time/format-date effective-date)) " " effective-date-description])
+    effective-dates)])
+
 (defn pre-notice-view [e! pre-notice]
   (let [tr* (tr-key [:field-labels :pre-notice]
                     [:pre-notice-list-page :headers])]
@@ -56,7 +63,9 @@
                [[:b (str (tr* key) ": ")] (fmt (get pre-notice key))])
              [[::modification/created time/format-timestamp-for-ui]
               [::transit/pre-notice-type format-notice-types]
-              [::transit/route-description str]]))
+              [::transit/route-description str]
+              [::transit/effective-dates format-effective-dates]
+              [::transit/url str]]))
       [:div.pre-notice-comments (stylefy/use-style styles/comment-container)
        [:h3 (tr [:pre-notice-list-page :pre-notice-dialog :comments-label])]
        [comment-list (::transit/comments pre-notice)]
