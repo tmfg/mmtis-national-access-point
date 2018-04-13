@@ -48,5 +48,4 @@
    (GET "/pre-notices/region/:id" [id]
         {:status 200
          :headers {"Content-Type" "application/json"}
-         :body (fetch-region-geometry db {:id id})})
-   ))
+         :body (fetch-region-geometry db {:id id})})))

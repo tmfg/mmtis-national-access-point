@@ -13,14 +13,14 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->OrganizationPreNoticesResponse ->OrganizationPreNoticesFailure)
+(declare ->OrganizationPreNoticesResponse ->ServerError ->RegionsResponse)
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
   {:path [:pre-notices]}
   (comm/get! "pre-notices/list"
              {:on-success (tuck/send-async! ->OrganizationPreNoticesResponse)
-              :on-failure (tuck/send-async! ->OrganizationPreNoticesFailure)})
+              :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
@@ -30,9 +30,23 @@
   {:path [:pre-notices]}
   response)
 
-(tuck/define-event OrganizationPreNoticesFailure [response]
+(tuck/define-event ServerError [response]
   {}
   (assoc app :flash-message-error (tr [:common-texts :server-error])))
+
+(tuck/define-event LoadRegions []
+  {:path [:new-notice]}
+  (comm/get! "pre-notices/regions"
+             {:on-success (tuck/send-async! ->RegionsResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(defmethod routes/on-navigate-event :new-notice [_]
+  (->LoadRegions))
+
+(tuck/define-event RegionsResponse [response]
+  {}
+  (assoc-in app [:pre-notice :regions] response))
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
@@ -42,8 +56,9 @@
 (defrecord SaveNoticeResponse [response])
 (defrecord SaveNoticeFailure [response])
 (defrecord CancelNotice [])
-
 (defrecord DeleteEffectiveDate [index])
+(defrecord GetRegionLocation [id])
+(defrecord RegionLocationResponse [response id])
 
 (extend-protocol tuck/Event
 
@@ -105,10 +120,18 @@
     (.log js/console " Canceloidaan ")
     app)
 
-
-
   DeleteEffectiveDate
   (process-event [{id :id} app]
     (.log js/console " DeleteEffectiveDate id " id)
     app)
-  )
+
+  GetRegionLocation
+  (process-event [{id :id} app]
+    (comm/get! (str "pre-notices/region/" id)
+               {:on-success (tuck/send-async! ->RegionLocationResponse id)
+                :on-failure (tuck/send-async! ->ServerError)})
+    app)
+
+  RegionLocationResponse
+  (process-event [{:keys [id response]} app]
+    (assoc-in app [:pre-notice :locations :location id] response)))
