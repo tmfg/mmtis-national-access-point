@@ -35,11 +35,11 @@
   :loading)
 
 (tuck/define-event LoadPreNotice [id]
-                   {:path [:pre-notice]}
-                   (comm/get! (str "pre-notices/" id)
-                              {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
-                               :on-failure (tuck/send-async! ->ServerError)})
-                   :loading)
+  {:path [:pre-notice]}
+  (comm/get! (str "pre-notices/" id)
+            {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
+             :on-failure (tuck/send-async! ->ServerError)})
+  :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
@@ -105,8 +105,9 @@
   (process-event [{published? :published?} app]
     (let [notice (as-> (:pre-notice app) n
                        (form/without-form-metadata n)
-                       (when published?
-                         (assoc n ::transit/pre-notice-state :sent)))]
+                       (if published?
+                         (assoc n ::transit/pre-notice-state :sent)
+                         n))]
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
