@@ -690,7 +690,8 @@
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
   :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
-
+  :show-draw-tools "Lisää puuttuva satama/laituri"
+  :hide-draw-tools "Lopeta sataman/laiturin lisääminen"
   }
 
  :pre-notice-list-page
