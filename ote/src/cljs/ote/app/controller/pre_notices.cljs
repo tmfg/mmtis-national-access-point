@@ -13,24 +13,34 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->OrganizationPreNoticesResponse ->OrganizationPreNoticesFailure)
+(declare ->LoadPreNoticesResponse ->LoadPreNoticesFailure)
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
   {:path [:pre-notices]}
   (comm/get! "pre-notices/list"
-             {:on-success (tuck/send-async! ->OrganizationPreNoticesResponse)
-              :on-failure (tuck/send-async! ->OrganizationPreNoticesFailure)})
+             {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
+              :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
+  :loading)
+
+(tuck/define-event LoadAuthorityPreNotices []
+  {:path [:pre-notices]}
+  (comm/get! "pre-notices/authority-list"
+             {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
+              :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
   :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
 
-(tuck/define-event OrganizationPreNoticesResponse [response]
+(defmethod routes/on-navigate-event :authority-pre-notices [_]
+  (->LoadAuthorityPreNotices))
+
+(tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
   response)
 
-(tuck/define-event OrganizationPreNoticesFailure [response]
+(tuck/define-event LoadPreNoticesFailure [response]
   {}
   (assoc app :flash-message-error (tr [:common-texts :server-error])))
 

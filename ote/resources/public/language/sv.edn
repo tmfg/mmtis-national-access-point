@@ -695,7 +695,9 @@
 
  :pre-notice-list-page
  {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
   :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
@@ -764,7 +766,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Kartverktyg för sjötrafik"
-  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus - SV"
+  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset - SV"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
