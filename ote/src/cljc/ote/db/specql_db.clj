@@ -1,4 +1,4 @@
-(ns ote.tietokanta.specql-db
+(ns ote.db.specql-db
   "Specql DB määritys ajonaikaisia määrittelyjä varten."
   (:require [specql.core :as specql]
             [specql.transform :as xf]
