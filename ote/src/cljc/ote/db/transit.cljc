@@ -12,7 +12,8 @@
             [ote.db.transport-service]
             [ote.time :as time]
             [ote.util.fn :refer [flip]]
-            [ote.db.transport-operator])
+            [ote.db.transport-operator]
+            [ote.db.user])
   #?(:cljs
      (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
 
@@ -36,7 +37,10 @@
   ["pre_notice_type" ::pre_notice_type (specql.transform/transform (specql.transform/to-keyword))]
   ["notice_effective_date" ::notice-effective-date]
   ["pre_notice_comment" ::pre-notice-comment
-   ote.db.modification/modification-fields]
+   ote.db.modification/modification-fields
+   {::author (specql.rel/has-one :ote.db.modification/created-by
+                                 :ote.db.user/user
+                                 :ote.db.user/id)}]
   ["pre_notice" ::pre-notice
    ote.db.modification/modification-fields
    {"transport-operator-id" :ote.db.transport-operator/id

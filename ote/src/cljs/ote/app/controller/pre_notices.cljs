@@ -145,3 +145,20 @@
              {:on-success (tuck/send-async! ->ShowPreNoticeResponse)
               :on-failure (tuck/send-async! ->ServerError)})
   app)
+
+(define-event UpdateNewCommentText [text]
+  {:path [:pre-notice-dialog :new-comment]}
+  text)
+
+(define-event AddCommentResponse [new-comment]
+  {:path [:pre-notice-dialog ::transit/comments]}
+  (conj (or app []) new-comment))
+
+(define-event AddComment []
+  {}
+  (comm/post! "pre-notices/comment"
+              {:id (get-in app [:pre-notice-dialog ::transit/id])
+               :comment (get-in app [:pre-notice-dialog :new-comment])}
+              {:on-success (tuck/send-async! ->AddCommentResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  (update app :pre-notice-dialog dissoc :new-comment))

@@ -10,21 +10,62 @@
             [clojure.string :as str]
             [ote.time :as time]
             [ote.db.modification :as modification]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.user :as user]
+            [ote.ui.common :as common]
+            [stylefy.core :as stylefy]
+            [ote.style.pre-notice :as styles]
+            [ote.ui.form-fields :as form-fields]))
+
+(defn format-notice-types [types]
+  (str/join ", " (map (tr-key [:enums ::transit/pre-notice-type]) types)))
+
+(defn comment-list [comments]
+  [:div
+   (doall
+    (for [{::transit/keys [id author comment]
+           timestamp ::modification/created} comments]
+      ^{:key id}
+      [:div.comment (stylefy/use-style styles/comment-style)
+       [common/gravatar {:size 32 :default "mm"} (::user/email author)]
+       (time/format-timestamp-for-ui timestamp) " "
+       [common/tooltip {:text (::user/email author)
+                        :len "long"}
+        [:span (::user/fullname author)]] ": "
+       comment]))])
 
 (defn pre-notice-view [e! pre-notice]
-  [ui/dialog
-   {:open true
-    :modal true
-    :auto-scroll-body-content true
-    :title   "ilmoitus jee"
-    :actions [(r/as-element
-               [ui/flat-button
-                {:label     (tr [:buttons :close])
-                 :secondary true
-                 :primary   true
-                 :on-click  #(e! (pre-notice/->ClosePreNotice))}])]}
-   [:div (pr-str pre-notice)]])
+  (let [tr* (tr-key [:field-labels :pre-notice]
+                    [:pre-notice-list-page :headers])]
+    [ui/dialog
+     {:open true
+      :modal true
+      :auto-scroll-body-content true
+      :title   (tr [:pre-notice-list-page :pre-notice-dialog :label])
+      :actions [(r/as-element
+                 [ui/flat-button
+                  {:label     (tr [:buttons :close])
+                   :secondary true
+                   :primary   true
+                   :on-click  #(e! (pre-notice/->ClosePreNotice))}])]}
+
+     [:div.pre-notice-dialog
+      (into [common/table2]
+            (mapcat
+             (fn [[key fmt]]
+               [[:b (str (tr* key) ": ")] (fmt (get pre-notice key))])
+             [[::modification/created time/format-timestamp-for-ui]
+              [::transit/pre-notice-type format-notice-types]
+              [::transit/route-description str]]))
+      [:div.pre-notice-comments (stylefy/use-style styles/comment-container)
+       [:h3 (tr [:pre-notice-list-page :pre-notice-dialog :comments-label])]
+       [comment-list (::transit/comments pre-notice)]
+       [form-fields/field {:type :string
+                           :input-style {:height 50}
+                           :update! #(e! (pre-notice/->UpdateNewCommentText %))
+                           :label (tr [:pre-notice-list-page :pre-notice-dialog :new-comment-label])
+                           :on-enter #(e! (pre-notice/->AddComment))}
+        (:new-comment pre-notice)]]]]))
 
 (defn pre-notices-listing [e! pre-notices]
   (if (= :loading pre-notices)
@@ -41,13 +82,14 @@
                     :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))}
        [{:name ::modification/created :format (comp str time/format-timestamp-for-ui)}
         {:name ::transit/pre-notice-type
-         :format #(str/join ", " (map (tr-key [:enums ::transit/pre-notice-type]) %))}
+         :format format-notice-types}
         {:name ::transit/route-description}
         {:name :operator :read (comp ::t-operator/name ::t-operator/transport-operator)}]
 
        pre-notices]]]))
 
 (defn pre-notices [e! {:keys [pre-notices pre-notice-dialog] :as app}]
-  (if pre-notice-dialog
-    [pre-notice-view e! pre-notice-dialog]
-    [pre-notices-listing e! pre-notices]))
+  [:div.authority-pre-notices
+   [pre-notices-listing e! pre-notices]
+   (when pre-notice-dialog
+     [pre-notice-view e! pre-notice-dialog])])
