@@ -129,8 +129,9 @@
 
   CancelNotice
   (process-event [_ app]
-    (.log js/console " Canceloidaan ")
-    app)
+    (routes/navigate! :pre-notices)
+    (-> app
+        (dissoc :pre-notice)))
 
   DeleteEffectiveDate
   (process-event [{id :id} app]
