@@ -18,10 +18,3 @@ SELECT COUNT(id)
 SELECT COUNT(id)
   FROM "transport-operator" o
  WHERE o."deleted?" = FALSE
-
--- name: get-ckan-operator
--- single? true
-SELECT id
-FROM "group" g
-WHERE g.id = :ckanoperatorid
-AND g.state = 'active'

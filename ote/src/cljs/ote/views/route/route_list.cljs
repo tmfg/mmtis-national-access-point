@@ -16,7 +16,8 @@
     [ote.ui.common :as common]
     [ote.db.transport-service :as t-service]
     [ote.localization :refer [selected-language]]
-    [reagent.core :as r]))
+    [reagent.core :as r]
+    [ote.ui.list_header :as list-header]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
                                   :keys [show-delete-modal?]
@@ -53,7 +54,7 @@
 
 
 (defn list-routes [e! routes]
-  [:div
+  [:div {:style {:padding-top "20px"}}
    [ui/table
     [ui/table-header {:adjust-for-checkbox false
                       :display-select-all  false}
@@ -94,42 +95,20 @@
              [delete-route-action e! row]]])
          routes))]]])
 
-(defn list-operators [e! app]
-  [:div
-   [:div {:class "col-md-12"}
-    [form-fields/field
-     {:label       (tr [:field-labels :select-transport-operator])
-      :name        :select-transport-operator
-      :type        :selection
-      :show-option #(if (nil? %)
-                      (tr [:buttons :add-new-transport-operator])
-                      (::t-operator/name %))
-      :update!     #(if (nil? %)
-                      (e! (to/->CreateTransportOperator))
-                      (e! (to/->SelectOperatorForTransit %)))
-      :options     (into (mapv :transport-operator (:route-list app))
-                         [:divider nil])
-      :auto-width? true}
-     (:transport-operator app)]]])
-
 (defn routes [e! app]
   (e! (route-list/->LoadRoutes))
   (fn [e! {routes :routes-vector operator :transport-operator :as app}]
     [:div
-     [:div.row
-      [:div.col-xs-12.col-sm-6.col-md-9
-       [:h1 (tr [:route-list-page :header-route-list])]]
-      [:div.col-xs-12.col-sm-6.col-md-3
-       [ui/raised-button {:label    (tr [:buttons :add-new-route])
-                          :style    {:float "right"}
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (route-list/->CreateNewRoute)))
-                          :primary  true
-                          :icon     (ic/content-add)}]]]
+     [list-header/header
+      (tr [:route-list-page :header-route-list])
+      [ui/raised-button {:label    (tr [:buttons :add-new-route])
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (route-list/->CreateNewRoute)))
+                         :primary  true
+                         :icon     (ic/content-add)}]
+      [t-operator-view/transport-operator-selection e! app]]
 
-     [:div.row
-      [list-operators e! app]]
      (when routes
        [list-routes e! routes])
      (when routes
