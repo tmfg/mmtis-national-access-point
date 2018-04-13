@@ -23,7 +23,8 @@
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
-            [ote.views.transport-operator :as t-operator-view]))
+            [ote.views.transport-operator :as t-operator-view]
+            [ote.ui.list_header :as list-header]))
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
@@ -114,25 +115,17 @@
 
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
-   [:div.row
-    [:div.col-xs-12.col-sm-6.col-md-9
-     [:h1 (tr [:common-texts :own-api-list])]]
-    [:div.col-xs-12.col-sm-6.col-md-3
-
-      [ui/raised-button {:label (tr [:buttons :add-transport-service])
-                        :style {:float "right"}
-                        :on-click #(do
-                                     (.preventDefault %)
-                                     (e! (ts/->OpenTransportServiceTypePage)))
-                        :primary  true
-                        :icon (ic/content-add)}]]]
-
-     (warn-about-test-server)
-
-    [:div {:class "col-md-12"}
-     [t-operator-view/transport-operator-selection e! state]]
-
-   [:div.row
+   (warn-about-test-server)
+   [list-header/header
+    (tr [:common-texts :own-api-list])
+    [ui/raised-button {:label (tr [:buttons :add-transport-service])
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (ts/->OpenTransportServiceTypePage)))
+                       :primary  true
+                       :icon (ic/content-add)}]
+    [t-operator-view/transport-operator-selection e! state true]]
+    [:div.row
     [:div {:class "col-xs-12 col-md-12"}
      (if (and has-services? (not (empty? operator-services)))
        ;; TRUE -> Table for transport services
