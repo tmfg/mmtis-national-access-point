@@ -237,15 +237,17 @@
   AddStop
   (process-event [{feature :feature} app]
     ;; Add stop to current stop sequence
-    (-> app
-        (route-updated)
-        (add-stop-to-sequence
-          (vec (aget feature "geometry" "coordinates"))
-          (update (js->clj (aget feature "properties")) "name"
-                  (fn [name]
-                    (mapv #(set/rename-keys % {"ote.db.transport-service/lang" ::t-service/lang
-                                               "ote.db.transport-service/text" ::t-service/text})
-                          name))))))
+    (if (not (get-in app [:route :map-controls :show?]))
+      (-> app
+          (route-updated)
+          (add-stop-to-sequence
+            (vec (aget feature "geometry" "coordinates"))
+            (update (js->clj (aget feature "properties")) "name"
+                    (fn [name]
+                      (mapv #(set/rename-keys % {"ote.db.transport-service/lang" ::t-service/lang
+                                                 "ote.db.transport-service/text" ::t-service/text})
+                            name)))))
+      app))
 
   AddCustomStop
   (process-event [{id :id} {route :route :as app}]
@@ -253,15 +255,17 @@
           (first (keep #(when (= (:id %) id) %) (:custom-stops route)))
           location (vec (aget feature "geometry" "coordinates"))
           properties (js->clj (aget feature "properties"))]
-      (-> app
-          (route-updated)
-          (add-stop-to-sequence
-            location
-            (update properties "name"
-                    (fn [name]
-                      (mapv #(set/rename-keys % {"lang" ::t-service/lang
-                                                 "text" ::t-service/text})
-                            name)))))))
+      (if (not (get-in app [:route :map-controls :show?]))
+        (-> app
+            (route-updated)
+            (add-stop-to-sequence
+              location
+              (update properties "name"
+                      (fn [name]
+                        (mapv #(set/rename-keys % {"lang" ::t-service/lang
+                                                   "text" ::t-service/text})
+                              name)))))
+        app)))
 
   CreateCustomStop
   (process-event [{id :id geojson :geojson} app]

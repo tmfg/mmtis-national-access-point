@@ -134,8 +134,9 @@
                         :name :draw-secondary
                         :on-click #(e! (rw/->SetDrawControl true))}]])]])
 
-(defn- route-stops [e! stop-sequence]
+(defn- route-stops [e! {stop-sequence ::transit/stops :as route}]
   [:div {:style {:width "30%" :margin "1em"}}
+   (when (not (get-in route [:map-controls :show?]))
    [:table {:style {:width "100%"}}
     [:thead {:style {:text-align "left"}}
      [:tr
@@ -143,22 +144,23 @@
 
       [:th {:style {:width "10%"}} ""]]]
     [:tbody {:style {:text-align "left"}}
-     (doall
-      (map-indexed
-       (fn [i {::transit/keys [code name arrival-time departure-time]}]
-         ^{:key (str code "_" i)}
-         [:tr {:style {:border-bottom "solid 1px black"}}
-          [:td (t-service/localized-text-with-fallback @selected-language name)]
-          [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])
-                                :pos "left"}
-                [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
-                 [ic/action-delete]]]]])
-       stop-sequence))]
+
+       (doall
+         (map-indexed
+           (fn [i {::transit/keys [code name arrival-time departure-time]}]
+             ^{:key (str code "_" i)}
+             [:tr {:style {:border-bottom "solid 1px black"}}
+              [:td (t-service/localized-text-with-fallback @selected-language name)]
+              [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])
+                                    :pos  "left"}
+                    [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
+                     [ic/action-delete]]]]])
+           stop-sequence))]
     (when (empty? stop-sequence)
       [:tbody
        [:tr
         [:td {:colSpan 4}
-         [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])]])
+         [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])])])
 
 (defn stop-sequence [e! {route :route :as app}]
   (e! (rw/->LoadStops))
@@ -170,4 +172,4 @@
        [:div (stylefy/use-style style-form/form-card-body)
         [:div {:style {:display "flex" :flex-direction "row"}}
          [map-container e! route]
-         [route-stops e! (::transit/stops route)]]]])))
+         [route-stops e! route]]]])))
