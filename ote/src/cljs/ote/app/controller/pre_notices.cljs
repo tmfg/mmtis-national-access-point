@@ -13,7 +13,7 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->LoadPreNoticesResponse ->LoadPreNoticesFailure ->LoadPreNotice)
+(declare ->LoadPreNoticesResponse ->LoadPreNoticesFailure ->LoadPreNotice ->LoadPreNoticeResponse)
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
@@ -33,7 +33,7 @@
 (tuck/define-event LoadPreNotice [id]
                    {:path [:pre-notices]}
                    (comm/get! (str "pre-notices/" id)
-                              {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
+                              {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
                                :on-failure (tuck/send-async! ->LoadPreNoticesFailure)})
                    :loading)
 
@@ -46,6 +46,9 @@
 
 (defmethod routes/on-navigate-event :edit-pre-notice [{params :params}]
   (->LoadPreNotice (:id params)))
+
+(tuck/define-event LoadPreNoticeResponse [response]
+  {:path [:pre-notice]} response)
 
 (tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
@@ -73,12 +76,6 @@
   CreateNewPreNotice
   (process-event [_ app]
     (routes/navigate! :new-notice)
-    (-> app
-        (dissoc :pre-notice)
-        (assoc-in [:pre-notice ::t-operator/id] (get-in app [:transport-operator ::t-operator/id]))))
-
-  ModifyPreNotice
-  (process-event [{id :id} app]
     (-> app
         (dissoc :pre-notice)
         (assoc-in [:pre-notice ::t-operator/id] (get-in app [:transport-operator ::t-operator/id]))))
