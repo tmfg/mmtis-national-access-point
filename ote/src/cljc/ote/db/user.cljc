@@ -1,7 +1,7 @@
 (ns ote.db.user
   "Datamodel for user table"
   (:require [clojure.spec.alpha :as s]
-            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            #?(:clj [ote.db.specql-db :refer [define-tables]])
             #?(:clj [specql.postgis])
             [specql.rel :as rel]
             [specql.transform :as xf]
@@ -14,7 +14,7 @@
             [ote.util.fn :refer [flip]]
             [ote.db.transport-operator])
   #?(:cljs
-     (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+     (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (define-tables
   ["user" ::user])

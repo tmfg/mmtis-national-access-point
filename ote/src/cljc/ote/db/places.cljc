@@ -1,9 +1,9 @@
 (ns ote.db.places
   (:require [clojure.spec.alpha :as s]
-            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            #?(:clj [ote.db.specql-db :refer [define-tables]])
             [specql.impl.registry]
             [specql.data-types])
-  #?(:cljs (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+  #?(:cljs (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (define-tables
   ["places" ::places])

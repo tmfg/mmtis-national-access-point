@@ -1,7 +1,7 @@
 (ns ote.db.transit
   "Datamodel for route based transit"
   (:require [clojure.spec.alpha :as s]
-            #?(:clj [ote.tietokanta.specql-db :refer [define-tables]])
+            #?(:clj [ote.db.specql-db :refer [define-tables]])
             #?(:clj [specql.postgis])
             [specql.rel :as rel]
             [specql.transform :as xf]
@@ -15,7 +15,7 @@
             [ote.db.transport-operator]
             [ote.db.user])
   #?(:cljs
-     (:require-macros [ote.tietokanta.specql-db :refer [define-tables]])))
+     (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (define-tables
   ["localized_text" :ote.db.transport-service/localized_text]
