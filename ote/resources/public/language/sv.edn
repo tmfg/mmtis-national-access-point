@@ -692,8 +692,8 @@
   :save-success "Rutten sparades"
   :save-failure "Rutten kunde inte sparas"
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
-  :show-draw-tools "Lisää puuttuva satama/laituri"
-  :hide-draw-tools "Lopeta sataman/laiturin lisääminen"
+  :show-draw-tools "Lägg till hamn/kaj på kartan"
+  :hide-draw-tools "Lägg till hamn/kaj"
   }
 
  :pre-notice-list-page
