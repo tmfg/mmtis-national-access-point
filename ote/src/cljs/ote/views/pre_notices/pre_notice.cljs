@@ -157,9 +157,9 @@
         [:div.col-md-6
          [form-fields/field
           {:id "route-description"
-           :label "Muuttuvan reitin tai reittien nimet / kuvaukset"
+           :label (tr [:field-labels :pre-notice ::transit/route-description])
            :type :string
-           :hint-text "esim. Tampere - Pori tai Oulu - Seinäjoki"
+           :hint-text (tr [:pre-notice-page :route-description-hint])
            :full-width? true
            :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
           (::transit/route-description pre-notice)]
@@ -170,7 +170,7 @@
                selected-ids (set (::transit/regions pre-notice))]
            [form-fields/field
             {:id "regions"
-             :label "Lisää maakunta tai maakunnat, joita muutos koskee "
+             :label (tr [:field-labels :pre-notice ::transit/regions])
              :type :chip-input
              :update! #(e! (pre-notice/->SelectedRegions %))
              :full-width? true
