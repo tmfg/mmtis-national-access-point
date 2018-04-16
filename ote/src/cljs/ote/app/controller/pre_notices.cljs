@@ -47,7 +47,7 @@
   response)
 
 (tuck/define-event LoadRegions []
-  {:path [:new-notice]}
+  {}
   (comm/get! "pre-notices/regions"
              {:on-success (tuck/send-async! ->RegionsResponse)
               :on-failure (tuck/send-async! ->ServerError)})
@@ -57,11 +57,10 @@
   (->LoadRegions))
 
 (tuck/define-event RegionsResponse [response]
-  {}
-  (assoc-in app [:pre-notice :regions]
-            (into {}
-                  (map (juxt :id identity))
-                  response)))
+  {:path [:pre-notice :regions]}
+  (into {}
+        (map (juxt :id identity))
+        response))
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
@@ -148,9 +147,7 @@
   DeleteEffectiveDate
   (process-event [{id :id} app]
     (.log js/console " DeleteEffectiveDate id " id)
-    app)
-
-  )
+    app))
 
 (define-event RegionLocationResponse [response id]
   {:path [:pre-notice :regions]}
