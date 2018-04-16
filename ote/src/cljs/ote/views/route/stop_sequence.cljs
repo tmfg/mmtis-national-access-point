@@ -66,7 +66,7 @@
       {:component-did-mount
         (fn [this]
           (let [deleting? (atom false)
-               ^js/L.Maps
+               ^js/L.Map
                m (aget this "refs" "stops-map" "leafletElement")]
 
             ;; Keep track if we are in delete mode
@@ -98,24 +98,23 @@
                                          (if (get-in route [:map-controls :show?])
                                            (.addControl m @dc)
                                            (.removeControl m @dc))))
-            :reagent-render
-                                     (fn [e! route]
-                                       [:span
-                                        [custom-stop-dialog e! route]
-                                        [leaflet/Map {:ref         "stops-map"
-                                                      :center      #js [65 25]
-                                                      :zoomControl true
-                                                      :zoom        5}
-                                         (leaflet/background-tile-map)
-                                         (when-let [stops (:stops route)]
-                                           [leaflet/GeoJSON {:data         stops
-                                                             :style        {:color "green"}
-                                                             :pointToLayer (partial stop-marker e!)}])
+            :reagent-render            (fn [e! route]
+                                         [:span
+                                          [custom-stop-dialog e! route]
+                                          [leaflet/Map {:ref         "stops-map"
+                                                        :center      #js [65 25]
+                                                        :zoomControl true
+                                                        :zoom        5}
+                                           (leaflet/background-tile-map)
+                                           (when-let [stops (:stops route)]
+                                             [leaflet/GeoJSON {:data         stops
+                                                               :style        {:color "green"}
+                                                               :pointToLayer (partial stop-marker e!)}])
 
-                                         (when-let [stop-sequence (seq (::transit/stops route))]
-                                           [leaflet/Polyline
-                                            {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
-                                             :color     "red"}])]])})))
+                                           (when-let [stop-sequence (seq (::transit/stops route))]
+                                             [leaflet/Polyline
+                                              {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
+                                               :color     "red"}])]])})))
 (defn- map-container [e! route]
   [:div.stops-map {:style {:width "70%"}}
    [route-map e! route]
@@ -137,13 +136,13 @@
 (defn- route-stops [e! {stop-sequence ::transit/stops :as route}]
   [:div {:style {:width "30%" :margin "1em"}}
    (when (not (get-in route [:map-controls :show?]))
-   [:table {:style {:width "100%"}}
-    [:thead {:style {:text-align "left"}}
-     [:tr
-      [:th {:style {:width "50%"}} (tr [:route-wizard-page :stop-sequence-port-header])]
+     [:table {:style {:width "100%"}}
+      [:thead {:style {:text-align "left"}}
+       [:tr
+        [:th {:style {:width "50%"}} (tr [:route-wizard-page :stop-sequence-port-header])]
 
-      [:th {:style {:width "10%"}} ""]]]
-    [:tbody {:style {:text-align "left"}}
+        [:th {:style {:width "10%"}} ""]]]
+      [:tbody {:style {:text-align "left"}}
 
        (doall
          (map-indexed
@@ -156,11 +155,11 @@
                     [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
                      [ic/action-delete]]]]])
            stop-sequence))]
-    (when (empty? stop-sequence)
-      [:tbody
-       [:tr
-        [:td {:colSpan 4}
-         [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])])])
+      (when (empty? stop-sequence)
+        [:tbody
+         [:tr
+          [:td {:colSpan 4}
+           [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])])])
 
 (defn stop-sequence [e! {route :route :as app}]
   (e! (rw/->LoadStops))
