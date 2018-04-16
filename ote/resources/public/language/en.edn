@@ -825,7 +825,11 @@
   {:title "Confirm navigation"
    :stay "Stay on this page"
    :leave "Leave this page"
-   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}}
+   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Transport operators"

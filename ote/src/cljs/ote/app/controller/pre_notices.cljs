@@ -60,10 +60,11 @@
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
-(defrecord ModifyPreNotice [id])
 (defrecord SelectOperatorForNotice [data])
 (defrecord EditForm [form-data])
 (defrecord EditSingleFormElement [element data])
+(defrecord OpenSendModal [])
+(defrecord CloseSendModal [])
 (defrecord SaveToDb [published?])
 (defrecord SaveNoticeResponse [response])
 (defrecord SaveNoticeFailure [response])
@@ -100,6 +101,15 @@
   (process-event [{form-data :form-data} app]
     (-> app
         (update :pre-notice merge form-data)))
+
+
+  OpenSendModal
+  (process-event [_ app]
+    (assoc app :show-pre-notice-send-modal? true))
+
+  CloseSendModal
+  (process-event [_ app]
+    (dissoc app :show-pre-notice-send-modal?))
 
   SaveToDb
   (process-event [{published? :published?} app]

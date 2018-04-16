@@ -835,7 +835,11 @@
   {:title "Sivulta poistumisen varmistus"
    :stay "Jää"
    :leave "Poistu"
-   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
+   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Palveluntuottajat"

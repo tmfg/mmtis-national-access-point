@@ -829,7 +829,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   {:title "Vill du lämna denna sida"
    :stay "Stanna"
    :leave "Lämna"
-   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
+   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Tjänsteproducenter"
@@ -841,8 +845,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :description-read-more "Läs mer"
   :no-results "Inga tjänsteproducenter hittades"
   :result-count ["Hittades " :total-count " tjänsteproducenter"]
-  :result-count-all ["Total " :total-count " tjänsteproducenter"]
-  }
+  :result-count-all ["Total " :total-count " tjänsteproducenter"]}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
