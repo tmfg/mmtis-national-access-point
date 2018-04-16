@@ -6,6 +6,7 @@
             [clojure.spec.gen.alpha :as sgen]
             [clojure.spec.test.alpha :as stest]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transit :as transit]
             [ote.db.transport-service :as t-service]
             [ote.db.places :as places]
             [ote.db.common :as common]
@@ -27,6 +28,8 @@
     (gen/elements strings)))
 
 (def gen-name gen/string-alphanumeric)
+
+(def gen-text gen/string-alphanumeric)
 
 (def gen-us-letter (gen/elements "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 
@@ -133,6 +136,8 @@
   (gen/vector gen-parking-capacity 0 10))
 
 (def gen-description gen-localized-text-array)
+
+(def gen-effective-date (s/gen ::transit/effective-date))
 
 (def gen-available-from (s/gen ::t-service/available-from))
 
