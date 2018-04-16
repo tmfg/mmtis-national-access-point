@@ -144,25 +144,37 @@
       [:div (stylefy/use-style style-form/form-card-label) (tr [:pre-notice-page :route-and-area-information-title])]
       [:div (merge (stylefy/use-style style-form/form-card-body))
        [:div.row
-        [:div.col-md-6 "Ja tähän inputit"]
         [:div.col-md-6
-
+         [form-fields/field
+          {:id "route-description"
+           :label "Muuttuvan reitin tai reittien nimet / kuvaukset"
+           :type :string
+           :hint-text "esim. Tampere - Pori tai Oulu - Seinäjoki"
+           :full-width? true
+           }]
+         [form-fields/field
+          {:id "regions"
+           :label "Lisää maakunta tai maakunnat, joita muutos koskee "
+           :type :multiselect-selection
+           :show-option :name
+           :options (:regions pre-notice)
+           :update! #(e! (pre-notice/->GetRegionLocation "01"))
+           ;; chip-näkymä
+           ;; lista maakunnista
+           :hint-text "Hae maakunta nimellä"
+           :full-width? true
+           }]]
+        [:div.col-md-6
          [leaflet/Map {:ref         "notice-area-map"
                        :center      #js [65 25]
                        :zoomControl true
                        :zoom        5}
           (leaflet/background-tile-map)
-          (when-let [regions (:regions pre-notice)]
+          (when-let [regions (:locations pre-notice)]
             [leaflet/GeoJSON {:data  regions
                               :style {:color "green"}
-                              ;:pointToLayer (partial stop-marker e!)
-                              }])
-
-          ]
-
-         ]
-        ]]]]
-    ))
+                                        ;:pointToLayer (partial stop-marker e!)
+                              }])]]]]]]))
 
 (defn notice-attatchments [e! app]
   (fn [e! {pre-notice :pre-notice :as app}]
