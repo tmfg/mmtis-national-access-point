@@ -156,12 +156,12 @@
 (define-event SelectedRegions [regions]
   {:path [:pre-notice]}
   ;; Get locations for all regions
-  (doseq [region regions
+  (doseq [{region :id} regions
           :when (not (get-in app [:regions region :geojson]))]
     (comm/get! (str "pre-notices/region/" region)
                {:on-success (tuck/send-async! ->RegionLocationResponse region)
                 :on-failure (tuck/send-async! ->ServerError)}))
-  (assoc app ::transit/regions regions))
+  (assoc app ::transit/regions (mapv :id regions)))
 
 (define-event ShowPreNoticeResponse [response]
   {:path [:pre-notice-dialog]}
