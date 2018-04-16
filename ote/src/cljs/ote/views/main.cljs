@@ -32,7 +32,8 @@
             [ote.views.route :as route]
             [ote.views.gtfs-viewer :as gtfs-viewer]
             [ote.views.pre-notices.pre-notice :as notice]
-            [ote.views.pre-notices.listing :as pre-notices-listing]))
+            [ote.views.pre-notices.listing :as pre-notices-listing]
+            [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]))
 
 
 (defn logged-in? [app]
@@ -85,7 +86,7 @@
               :style link-style})
          flag]))]))
 
-(defn user-menu [e! name username]
+(defn user-menu [e! {:keys [name username transit-authority?]}]
   (when username
     [ui/drop-down-menu
     {:menu-style {}
@@ -107,6 +108,14 @@
                       :primary-text (tr [:common-texts :navigation-pre-notice])
                       :on-click #(do (.preventDefault %)
                                      (e! (fp-controller/->ChangePage :pre-notices nil)))}])
+
+     (when (and (flags/enabled? :pre-notice) transit-authority?)
+       [ui/menu-item {:style {:color "#FFFFFF"}
+                      :primary-text (tr [:common-texts :navigation-authority-pre-notices])
+                      :on-click #(do (.preventDefault %)
+                                     (e! (fp-controller/->ChangePage :authority-pre-notices nil)))}])
+
+
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
@@ -169,9 +178,7 @@
     [:div.user-menu {:class (is-user-menu-active app)
                      :style (when (> (:width app) style-base/mobile-width-px)
                               {:float "right"})}
-     [user-menu e!
-      (get-in app [:user :name])
-      (get-in app [:user :username])]]
+     [user-menu e! (:user app)]]
 
     (if (nil? (get-in app [:user :username]))
       [:ul (stylefy/use-style style-topnav/ul)
@@ -268,7 +275,7 @@
       [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
 
 
-(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes})
+(def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes :pre-notices})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
@@ -419,6 +426,7 @@
                 ;; 60days pre notice views
                 :new-notice [notice/new-pre-notice e! app]
                 :pre-notices [pre-notices-listing/pre-notices e! app]
+                :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
 

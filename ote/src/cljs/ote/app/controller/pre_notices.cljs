@@ -13,20 +13,36 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->OrganizationPreNoticesResponse ->ServerError ->RegionsResponse)
+(declare ->ServerError ->RegionsResponse)
+
+(tuck/define-event ServerError [response]
+  {}
+  (assoc app :flash-message-error (tr [:common-texts :server-error])))
+
+(declare ->LoadPreNoticesResponse)
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
   {:path [:pre-notices]}
   (comm/get! "pre-notices/list"
-             {:on-success (tuck/send-async! ->OrganizationPreNoticesResponse)
+             {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  :loading)
+
+(tuck/define-event LoadAuthorityPreNotices []
+  {:path [:pre-notices]}
+  (comm/get! "pre-notices/authority-list"
+             {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
               :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
 
-(tuck/define-event OrganizationPreNoticesResponse [response]
+(defmethod routes/on-navigate-event :authority-pre-notices [_]
+  (->LoadAuthorityPreNotices))
+
+(tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
   response)
 
@@ -50,8 +66,10 @@
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
+(defrecord ModifyPreNotice [id])
 (defrecord SelectOperatorForNotice [data])
 (defrecord EditForm [form-data])
+(defrecord EditSingleFormElement [element data])
 (defrecord SaveToDb [published?])
 (defrecord SaveNoticeResponse [response])
 (defrecord SaveNoticeFailure [response])
@@ -69,6 +87,13 @@
         (dissoc :pre-notice)
         (assoc-in [:pre-notice ::t-operator/id] (get-in app [:transport-operator ::t-operator/id]))))
 
+  ModifyPreNotice
+  (process-event [{id :id} app]
+    (routes/navigate! :new-notice)
+    (-> app
+        (dissoc :pre-notice)
+        (assoc-in [:pre-notice ::t-operator/id] (get-in app [:transport-operator ::t-operator/id]))))
+
   SelectOperatorForNotice
   (process-event [{data :data} app]
     (let [id (get data ::t-operator/id)
@@ -81,11 +106,14 @@
             :transport-operator (:transport-operator selected-operator)
             :transport-service-vector (:transport-service-vector selected-operator)))))
 
+  EditSingleFormElement
+  (process-event [{element :element data :data} app]
+    (assoc-in app [:pre-notice element] data))
+
   EditForm
   (process-event [{form-data :form-data} app]
     (-> app
         (update :pre-notice merge form-data)))
-
 
   SaveToDb
   (process-event [{published? :published?} app]
@@ -94,10 +122,8 @@
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
-      (-> app
-          (dissoc :before-unload-message)
-          ;(set-saved-transfer-operator notice)
-          )))
+      (dissoc app :before-unload-message)))
+
   SaveNoticeResponse
   (process-event [{response :response} app]
     (routes/navigate! :pre-notices)
@@ -135,3 +161,36 @@
   RegionLocationResponse
   (process-event [{:keys [id response]} app]
     (assoc-in app [:pre-notice :locations :location id] response)))
+
+
+(define-event ShowPreNoticeResponse [response]
+  {:path [:pre-notice-dialog]}
+  response)
+
+(define-event ClosePreNotice []
+  {}
+  (dissoc app :pre-notice-dialog))
+
+(define-event ShowPreNotice [id]
+  {:path [:pre-notice-dialog]}
+  (comm/get! (str "pre-notices/show/" id)
+             {:on-success (tuck/send-async! ->ShowPreNoticeResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(define-event UpdateNewCommentText [text]
+  {:path [:pre-notice-dialog :new-comment]}
+  text)
+
+(define-event AddCommentResponse [new-comment]
+  {:path [:pre-notice-dialog ::transit/comments]}
+  (conj (or app []) new-comment))
+
+(define-event AddComment []
+  {}
+  (comm/post! "pre-notices/comment"
+              {:id (get-in app [:pre-notice-dialog ::transit/id])
+               :comment (get-in app [:pre-notice-dialog :new-comment])}
+              {:on-success (tuck/send-async! ->AddCommentResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  (update app :pre-notice-dialog dissoc :new-comment))

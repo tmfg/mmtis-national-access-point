@@ -233,9 +233,11 @@
   :login {:email "Sähköpostiosoite"
           :password "Salasana"}
 
-  :pre-notice {
-   :ote.db.notice/other-type-description "Muu muutos"
-   :ote.db.notice/url                    "www-osoite"
+  :pre-notice
+  {:ote.db.transit/other-type-description "Selitys"
+   :ote.db.transit/url                    "www-osoite"
+   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
+
    }
   }
 
@@ -326,7 +328,7 @@
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
   :add-new-route "Lisää uusi merireitti"
-  :add-new-pre-notice "Uusi 60pv ilmoitus"
+  :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
   :next "Jatka"
@@ -478,7 +480,7 @@
    :possible "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
    :mandatory "Palvelun ennakkovaraus on pakollista."}
 
-  :ote.db.notice/notice-type
+  :ote.db.transit/pre-notice-type
   {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
    :new             "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"
@@ -639,15 +641,15 @@
  :route-wizard-page
  {:trip-stop-exception
   {:arrival {:tooltip "Muuta poistumismahdollisuutta"
-             :default "Poistumismahdollisuus oletuksena"
-             :no "Ei poistumismahdollisuutta"
-             :agency "Poistumisesta sovittava palveluntuottajan kanssa"
-             :driver "Poistumisesta sovittava kuljettajan kanssa"}
+             :default "Kyydistä poistuminen aina mahdollista"
+             :no "Kyydistä poistuminen ei mahdollista"
+             :agency "Poistuminen sovittava liikennöitsijän kanssa"
+             :driver "Poistuminen sovittava kuljettajan kanssa"}
    :departure {:tooltip "Muuta nousumahdollisuutta"
-               :default "Nousu mahdollista oletuksena"
-               :no "Ei nousumahdollisuutta"
-               :agency "Nousemisesta sovittava palveluntuottajan kanssa"
-               :driver "Noususta sovittava kuljettajan kanssa"}}
+               :default "Kyytiin otto aina mahdollista"
+               :no "Ei kyytiin ottoa"
+               :agency "Kyytiin otto sovittava liikennöitsijän kanssa"
+               :driver "Kyytiin otto sovittava kuljettajan kanssa"}}
 
   :trip-stop-arrival-header "tulo"
   :trip-stop-departure-header "lähtö"
@@ -694,14 +696,21 @@
   }
 
  :pre-notice-list-page
- {:header-pre-notice-list "Omat 60pv ilmoitukset"
-  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut 60 päivän ennakkoilmoituksia."
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
-           :ote.db.modification/created "Luotu"
-           :ote.db.transit/route-description "Reitin kuvaus"}
+            :ote.db.modification/created "Luotu"
+            :ote.db.modification/modified "Muokattu"
+            :ote.db.transit/route-description "Reitin kuvaus"
+            :actions "Toiminnot"}
 
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
+                      :new-comment-label "Kirjoita kommentti"}
 }
 
  :pre-notice-page
@@ -766,8 +775,9 @@
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
-  :navigation-pre-notice                      "60pv ilmoitus"
-  :navigation-privacy-policy "Rekisteriseloste"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :navigation-authority-pre-notices           "Saapunet muutosilmoitukset"
+  :navigation-privacy-policy                  "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
   :user-menu-log-out                          "Kirjaudu ulos"

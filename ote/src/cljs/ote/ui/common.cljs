@@ -8,7 +8,10 @@
             [ote.style.form :as style-form]
             [reagent.core :as r]
             [clojure.string :as str]
-            [reagent.core :as reagent]))
+            [reagent.core :as reagent]
+
+            [goog.crypt.Md5]
+            [goog.crypt]))
 
 (def mobile?
   (let [ua (str/lower-case js/window.navigator.userAgent)]
@@ -147,6 +150,7 @@
      [:input {:id id
               :readOnly true
               :on-focus copy!
+              :style {:width "250px"}
               :value text-to-copy}]
      [ui/flat-button {:icon (ic/content-content-copy)
                       :on-click copy!}]]))
@@ -165,3 +169,14 @@
       (boolean
        (some #(not= (get-in old-argv %) (get-in new-argv %))
              accessor-paths)))))
+
+
+(defn gravatar
+  ([email]
+   (gravatar {:size 32 :default "mm"} email))
+  ([{:keys [size default]} email]
+   (let [hash (-> (goog.crypt.Md5.)
+                  (doto (.update email))
+                  .digest
+                  goog.crypt/byteArrayToHex)]
+     [:img {:src (str "https://www.gravatar.com/avatar/" hash "?s=" size "&d=" default)}])))

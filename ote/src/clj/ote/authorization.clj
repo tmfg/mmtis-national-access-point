@@ -3,7 +3,8 @@
   (:require [specql.core :as specql]
             [ote.db.transport-operator :as t-operator]
             [specql.op :as op]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.nap.users :as users]))
 
 (defn admin? [user]
   (boolean (get-in user [:user :admin?])))
@@ -39,3 +40,11 @@
 
       :else
       (body-fn))))
+
+(defn with-transit-authority-check
+  [db user body-fn]
+  (if-not (users/is-transit-authority-user? db {:user-id (user-id user)})
+    (do
+      (log/warn "User" user "tried to access backend that is restricted to transport authority users.")
+      {:status 403 :body "Forbidden"})
+    (body-fn)))

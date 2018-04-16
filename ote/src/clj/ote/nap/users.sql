@@ -29,3 +29,16 @@ SELECT u.id as id,
  WHERE state = 'active' AND
        ((:email::VARCHAR IS NOT NULL AND u.email LIKE :email) OR
         (:name::VARCHAR IS NOT NULL AND u.fullname LIKE :name));
+
+-- name: is-transit-authority-user?
+-- single?: true
+-- Given a user id, check if the user belongs to a transit authority group
+SELECT EXISTS(SELECT ge.id
+                FROM group_extra ge
+               WHERE ge.key='transit-authority?' AND
+                     ge.value='true' AND
+                     ge.group_id IN (SELECT m.group_id
+                                       FROM "member" m
+                                      WHERE m.table_name = 'user' AND
+                                            m.state = 'active' AND
+                                            m.table_id = (SELECT u.id FROM "user" u WHERE u.id = :user-id)));
