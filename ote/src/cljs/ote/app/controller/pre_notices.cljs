@@ -13,7 +13,7 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse >ServerError ->RegionsResponse)
+(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse ->ServerError ->RegionsResponse)
 
 (tuck/define-event ServerError [response]
   {}
