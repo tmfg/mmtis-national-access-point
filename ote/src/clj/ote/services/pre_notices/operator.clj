@@ -11,7 +11,10 @@
             [ote.db.tx :as tx]
             [ote.db.modification :as modification]
             [taoensso.timbre :as log]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [jeesql.core :refer [defqueries]]))
+
+(defqueries "ote/services/pre_notices/regions.sql")
 
 (defn get-operator-pre-notice [db user id]
   "Get singular operator pre-notice by id"
@@ -42,12 +45,18 @@
   "Routes for listing and creating pre notices for transport operators"
   [db]
   (routes
-    (GET "/pre-notices/list" {user :user}
-      (list-operator-notices db user))
-    (GET ["/pre-notices/:id" :id #"\d+"] {{id :id} :params
+   (GET "/pre-notices/list" {user :user}
+        (list-operator-notices db user))
+   (GET ["/pre-notices/:id" :id #"\d+"] {{id :id} :params
                              user :user}
-      (get-operator-pre-notice db user (Long/parseLong id)))
-    (POST "/pre-notice" {form-data :body
-                         user :user}
-      (http/transit-response
-        (save-pre-notice db user (http/transit-request form-data))))))
+     (get-operator-pre-notice db user (Long/parseLong id)))
+   (POST "/pre-notice" {form-data :body
+                        user :user}
+         (http/transit-response
+          (save-pre-notice db user (http/transit-request form-data))))
+   (GET "/pre-notices/regions" {}
+        (http/transit-response (fetch-regions db)))
+   (GET "/pre-notices/region/:id" [id]
+        {:status 200
+         :headers {"Content-Type" "application/json"}
+         :body (fetch-region-geometry db {:id id})})))

@@ -13,11 +13,11 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse)
+(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse >ServerError ->RegionsResponse)
 
 (tuck/define-event ServerError [response]
-                   {}
-                   (assoc app :flash-message-error (tr [:common-texts :server-error])))
+  {}
+  (assoc app :flash-message-error (tr [:common-texts :server-error])))
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
@@ -58,6 +58,22 @@
   {:path [:pre-notices]}
   response)
 
+(tuck/define-event LoadRegions []
+  {}
+  (comm/get! "pre-notices/regions"
+             {:on-success (tuck/send-async! ->RegionsResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(defmethod routes/on-navigate-event :new-notice [_]
+  (->LoadRegions))
+
+(tuck/define-event RegionsResponse [response]
+  {:path [:pre-notice :regions]}
+  (into {}
+        (map (juxt :id identity))
+        response))
+
 ;; Create new route
 (defrecord CreateNewPreNotice [])
 (defrecord SelectOperatorForNotice [data])
@@ -69,7 +85,6 @@
 (defrecord SaveNoticeResponse [response])
 (defrecord SaveNoticeFailure [response])
 (defrecord CancelNotice [])
-
 (defrecord DeleteEffectiveDate [index])
 
 (extend-protocol tuck/Event
@@ -115,6 +130,7 @@
   (process-event [{published? :published?} app]
     (let [notice (as-> (:pre-notice app) n
                        (form/without-form-metadata n)
+                       (dissoc n :regions)
                        (if published?
                          (assoc n ::transit/pre-notice-state :sent)
                          n))]
@@ -151,6 +167,19 @@
     (.log js/console " DeleteEffectiveDate id " id)
     app))
 
+(define-event RegionLocationResponse [response id]
+  {:path [:pre-notice :regions]}
+  (update app id assoc :geojson response))
+
+(define-event SelectedRegions [regions]
+  {:path [:pre-notice]}
+  ;; Get locations for all regions
+  (doseq [{region :id} regions
+          :when (not (get-in app [:regions region :geojson]))]
+    (comm/get! (str "pre-notices/region/" region)
+               {:on-success (tuck/send-async! ->RegionLocationResponse region)
+                :on-failure (tuck/send-async! ->ServerError)}))
+  (assoc app ::transit/regions (mapv :id regions)))
 
 (define-event ShowPreNoticeResponse [response]
   {:path [:pre-notice-dialog]}

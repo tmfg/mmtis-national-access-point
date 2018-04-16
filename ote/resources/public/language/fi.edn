@@ -237,8 +237,8 @@
   {:ote.db.transit/other-type-description "Selitys"
    :ote.db.transit/url                    "www-osoite"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
-
-   }
+   :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
+   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
   }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -734,6 +734,7 @@
   :save-success "Luonnoksen tallentaminen onnistui."
   :save-failure "Luonnoksen tallentaminen epäonnistui."
   :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+  :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
   }
 
  :price-dialog
