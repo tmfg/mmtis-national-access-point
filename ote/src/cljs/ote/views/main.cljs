@@ -425,6 +425,7 @@
 
                 ;; 60days pre notice views
                 :new-notice [notice/new-pre-notice e! app]
+                :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
                 :pre-notices [pre-notices-listing/pre-notices e! app]
                 :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 

@@ -13,13 +13,11 @@
 (defn valid-notice? [notice]
   true)
 
-(declare ->ServerError ->RegionsResponse)
+(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse ->ServerError ->RegionsResponse)
 
 (tuck/define-event ServerError [response]
   {}
   (assoc app :flash-message-error (tr [:common-texts :server-error])))
-
-(declare ->LoadPreNoticesResponse)
 
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
@@ -36,11 +34,25 @@
               :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
+(tuck/define-event LoadPreNotice [id]
+  {:path [:pre-notice]}
+  (comm/get! (str "pre-notices/" id)
+            {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
+             :on-failure (tuck/send-async! ->ServerError)})
+  :loading)
+
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
 
 (defmethod routes/on-navigate-event :authority-pre-notices [_]
   (->LoadAuthorityPreNotices))
+
+
+(defmethod routes/on-navigate-event :edit-pre-notice [{params :params}]
+  (->LoadPreNotice (:id params)))
+
+(tuck/define-event LoadPreNoticeResponse [response]
+  {:path [:pre-notice]} response)
 
 (tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
@@ -64,10 +76,11 @@
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
-(defrecord ModifyPreNotice [id])
 (defrecord SelectOperatorForNotice [data])
 (defrecord EditForm [form-data])
 (defrecord EditSingleFormElement [element data])
+(defrecord OpenSendModal [])
+(defrecord CloseSendModal [])
 (defrecord SaveToDb [published?])
 (defrecord SaveNoticeResponse [response])
 (defrecord SaveNoticeFailure [response])
@@ -78,13 +91,6 @@
 
   CreateNewPreNotice
   (process-event [_ app]
-    (routes/navigate! :new-notice)
-    (-> app
-        (dissoc :pre-notice)
-        (assoc-in [:pre-notice ::t-operator/id] (get-in app [:transport-operator ::t-operator/id]))))
-
-  ModifyPreNotice
-  (process-event [{id :id} app]
     (routes/navigate! :new-notice)
     (-> app
         (dissoc :pre-notice)
@@ -111,12 +117,23 @@
     (-> app
         (update :pre-notice merge form-data)))
 
+
+  OpenSendModal
+  (process-event [_ app]
+    (assoc app :show-pre-notice-send-modal? true))
+
+  CloseSendModal
+  (process-event [_ app]
+    (dissoc app :show-pre-notice-send-modal?))
+
   SaveToDb
   (process-event [{published? :published?} app]
-    (let [notice (-> app
-                     :pre-notice
-                     form/without-form-metadata
-                     (dissoc :regions))]
+    (let [notice (as-> (:pre-notice app) n
+                       (form/without-form-metadata n)
+                       (dissoc n :regions)
+                       (if published?
+                         (assoc n ::transit/pre-notice-state :sent)
+                         n))]
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
@@ -141,8 +158,9 @@
 
   CancelNotice
   (process-event [_ app]
-    (.log js/console " Canceloidaan ")
-    app)
+    (routes/navigate! :pre-notices)
+    (-> app
+        (dissoc :pre-notice)))
 
   DeleteEffectiveDate
   (process-event [{id :id} app]

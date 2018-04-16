@@ -5,6 +5,9 @@
 
 (defn header [title add-button operator-selection]
   [:div
-   [:div.row [:h1 title]]
-   [:div.row operator-selection]
-   [:div.row add-button]])
+   (when title
+     [:div.row [:h1 title]])
+   (when operator-selection
+     [:div.row operator-selection])
+   (when add-button
+     [:div.row add-button])])

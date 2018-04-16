@@ -485,6 +485,12 @@
    :schedule-change "Aikataulumuutos"
    :route-change    "Reittimuutos"
    :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
+
   }
   ;; ENUMS end
 
@@ -695,10 +701,13 @@
  {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
   :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
   :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
+  :sent-pre-notices "Lähetetyt muutosilmoitukset"
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
@@ -819,7 +828,11 @@
   {:title "Confirm navigation"
    :stay "Stay on this page"
    :leave "Leave this page"
-   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}}
+   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Transport operators"
