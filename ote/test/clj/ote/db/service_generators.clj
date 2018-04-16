@@ -6,11 +6,26 @@
             [clojure.spec.gen.alpha :as sgen]
             [clojure.spec.test.alpha :as stest]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transit :as transit]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.time :as time]
             [clojure.string :as str]
             [ote.db.generators :as generators]))
+
+(def gen-effective-dates
+  (gen/hash-map
+    ::transit/effective-date generators/gen-effective-date
+    ::transit/effective-date-description generators/gen-naughty-string))
+
+(def gen-pre-notice
+  (gen/hash-map
+    ::t-operator/id (gen/return 1)
+    ::transit/pre-notice-type (gen/return [:new])
+    ::transit/effective-dates (gen/vector gen-effective-dates 5)
+    ::transit/route-description generators/gen-text
+    ::transit/url generators/gen-url
+    ))
 
 (def gen-terminal_information
   (gen/hash-map

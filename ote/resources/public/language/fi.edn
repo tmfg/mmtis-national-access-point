@@ -237,8 +237,8 @@
   {:ote.db.transit/other-type-description "Selitys"
    :ote.db.transit/url                    "www-osoite"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
-
-   }
+   :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
+   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
   }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -486,6 +486,12 @@
    :schedule-change "Aikataulumuutos"
    :route-change    "Reittimuutos"
    :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
+
   }
   ;; ENUMS end
 
@@ -699,10 +705,13 @@
  {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
   :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
   :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
+  :sent-pre-notices "Lähetetyt muutosilmoitukset"
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
@@ -725,6 +734,7 @@
   :save-success "Luonnoksen tallentaminen onnistui."
   :save-failure "Luonnoksen tallentaminen epäonnistui."
   :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+  :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
   }
 
  :price-dialog
@@ -826,7 +836,11 @@
   {:title "Sivulta poistumisen varmistus"
    :stay "Jää"
    :leave "Poistu"
-   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
+   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Palveluntuottajat"

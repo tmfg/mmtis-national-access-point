@@ -31,6 +31,7 @@
     ;; 60 day pre-notice
     ["/pre-notices" :pre-notices]
     ["/pre-notice/new" :new-notice]
+    ["/pre-notice/edit/:id" :edit-pre-notice]
     ["/authority-pre-notices" :authority-pre-notices]
 
     ["/admin" :admin]
