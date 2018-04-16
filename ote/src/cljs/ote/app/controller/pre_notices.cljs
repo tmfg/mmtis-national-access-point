@@ -114,8 +114,10 @@
 
   SaveToDb
   (process-event [{published? :published?} app]
-    (let [n (:pre-notice app)
-          notice (form/without-form-metadata n)]
+    (let [notice (-> app
+                     :pre-notice
+                     form/without-form-metadata
+                     (dissoc :regions))]
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
