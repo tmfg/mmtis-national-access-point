@@ -158,31 +158,33 @@
            :label "Muuttuvan reitin tai reittien nimet / kuvaukset"
            :type :string
            :hint-text "esim. Tampere - Pori tai Oulu - Seinäjoki"
-           :full-width? true
-           }]
+           :full-width? true}]
          [form-fields/field
           {:id "regions"
            :label "Lisää maakunta tai maakunnat, joita muutos koskee "
            :type :multiselect-selection
-           :show-option :name
-           :options (:regions pre-notice)
-           :update! #(e! (pre-notice/->GetRegionLocation "01"))
+           :show-option #(let [r (get-in pre-notice [:regions %])]
+                           (str (:id r) " " (:name r)))
+           :options (vec (sort (keys (:regions pre-notice))))
+           :update! #(e! (pre-notice/->SelectedRegions %))
            ;; chip-näkymä
            ;; lista maakunnista
            :hint-text "Hae maakunta nimellä"
-           :full-width? true
-           }]]
+           :full-width? true}
+          (::transit/regions pre-notice)]]
         [:div.col-md-6
          [leaflet/Map {:ref         "notice-area-map"
                        :center      #js [65 25]
                        :zoomControl true
                        :zoom        5}
           (leaflet/background-tile-map)
-          (when-let [regions (:locations pre-notice)]
-            [leaflet/GeoJSON {:data  regions
-                              :style {:color "green"}
-                                        ;:pointToLayer (partial stop-marker e!)
-                              }])]]]]]]))
+          (doall
+           (for [region (::transit/regions pre-notice)
+                 :let [region-geojson (get-in pre-notice [:regions region :geojson])]
+                 :when region-geojson]
+             ^{:key region}
+             [leaflet/GeoJSON {:data region-geojson
+                               :style {:color "green"}}]))]]]]]]))
 
 (defn notice-attatchments [e! app]
   (fn [e! {pre-notice :pre-notice :as app}]
