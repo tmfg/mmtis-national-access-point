@@ -6,7 +6,7 @@
             [ote.app.controller.pre-notices :as pre-notice]
             [ote.ui.buttons :as buttons]
             [ote.ui.form-fields :as form-fields]
-    ;; db
+            ;; db
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
@@ -15,7 +15,9 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.style.form :as style-form]
             [stylefy.core :as stylefy]
-            [ote.ui.leaflet :as leaflet]))
+            [ote.ui.leaflet :as leaflet]
+            [ote.ui.mui-chip-input :as chip-input]
+            [clojure.string :as str]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 
@@ -152,25 +154,51 @@
       [:div (stylefy/use-style style-form/form-card-label) (tr [:pre-notice-page :route-and-area-information-title])]
       [:div (merge (stylefy/use-style style-form/form-card-body))
        [:div.row
-        [:div.col-md-6 "Ja tähän inputit"]
         [:div.col-md-6
+         [form-fields/field
+          {:id "route-description"
+           :label (tr [:field-labels :pre-notice ::transit/route-description])
+           :type :string
+           :hint-text (tr [:pre-notice-page :route-description-hint])
+           :full-width? true
+           :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
+          (::transit/route-description pre-notice)]
 
+         (let [regions-with-show
+               (mapv #(assoc % :show (str (:id %) " " (:name %)))
+                     (sort-by :id (vals (:regions pre-notice))))
+               selected-ids (set (::transit/regions pre-notice))]
+           [form-fields/field
+            {:id "regions"
+             :label (tr [:field-labels :pre-notice ::transit/regions])
+             :type :chip-input
+             :update! #(e! (pre-notice/->SelectedRegions %))
+             :full-width? true
+             :suggestions-config {:text :show
+                                  :value :id}
+             :suggestions  (clj->js regions-with-show)
+             :max-results 25
+             :open-on-focus? true
+             :auto-select? true
+             :filter (fn [query key]
+                       (str/includes? (str/lower-case key)
+                                      (str/lower-case query)))}
+            (into #{}
+                  (keep #(when (selected-ids (:id %)) %))
+                  regions-with-show)])]
+        [:div.col-md-6
          [leaflet/Map {:ref         "notice-area-map"
                        :center      #js [65 25]
                        :zoomControl true
                        :zoom        5}
           (leaflet/background-tile-map)
-          (when-let [regions (:regions pre-notice)]
-            [leaflet/GeoJSON {:data  regions
-                              :style {:color "green"}
-                              ;:pointToLayer (partial stop-marker e!)
-                              }])
-
-          ]
-
-         ]
-        ]]]]
-    ))
+          (doall
+           (for [region (::transit/regions pre-notice)
+                 :let [region-geojson (get-in pre-notice [:regions region :geojson])]
+                 :when region-geojson]
+             ^{:key region}
+             [leaflet/GeoJSON {:data region-geojson
+                               :style {:color "green"}}]))]]]]]]))
 
 (defn notice-attatchments [e! app]
   (fn [e! {pre-notice :pre-notice :as app}]

@@ -109,11 +109,13 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style password? on-enter hint-text autocomplete disabled?]
+                                  style input-style hint-style password? on-enter
+                                  hint-text autocomplete disabled? id]
                            :as   field} data]
   [text-field
    (merge
-    {:name name
+    {:id id
+     :name name
      :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
@@ -418,7 +420,7 @@
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
-           auto-width? full-width?]
+           auto-width? full-width? id]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -427,7 +429,8 @@
     [:div
       [ui/select-field
        (merge
-        {:style style
+        {:id id
+         :style style
          :floating-label-text (when-not table? label)
          :floating-label-fixed true
          :multiple true
