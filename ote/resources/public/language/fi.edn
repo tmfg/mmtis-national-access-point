@@ -1116,20 +1116,14 @@
                             :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
  :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
                                             :text "Tallenna muutokset"}
-                                    :cancel {
-                                             :title "Peruuta tehdyt muutokset"
-                                             :text "Peruuta"
-                                             }
-                                    :clearAll {
-                                               :title "Tyhjenna kaikki"
-                                               :text "Tyhjennä kaikki"
-                                               }}
-                          :buttons {
-                                    :edit "Muokka"
-                                    :editDisabled "Ei löydy muokattavaa"
+                                    :cancel {:title "Peruuta tehdyt muutokset"
+                                             :text "Peruuta"}
+                                    :clearAll {:title "Tyhjenna kaikki"
+                                               :text "Tyhjennä kaikki"}}
+                          :buttons {:edit "Muokkaa"
+                                    :editDisabled "Muokkaustila on poissa käytöstä"
                                     :remove "Poista"
-                                    :removeDisabled "Ei löydy poistettavaa"
-                                    }}
+                                    :removeDisabled "Poistotila on poissa käytöstä"}}
                 :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
                                             :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
                            :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
