@@ -35,6 +35,7 @@
   ["finnish_ports" ::finnish-ports
    ote.db.modification/modification-fields]
   ["pre_notice_type" ::pre_notice_type (specql.transform/transform (specql.transform/to-keyword))]
+  ["pre_notice_state" ::pre_notice_state (specql.transform/transform (specql.transform/to-keyword))]
   ["notice_effective_date" ::notice-effective-date]
   ["pre_notice_comment" ::pre-notice-comment
    ote.db.modification/modification-fields

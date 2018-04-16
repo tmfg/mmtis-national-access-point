@@ -491,6 +491,11 @@
    :schedule-change "Aikataulumuutos"
    :route-change    "Reittimuutos"
    :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
   }
   ;; ENUMS end
 
@@ -701,10 +706,13 @@
  {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
   :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
   :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
+  :sent-pre-notices "Lähetetyt muutosilmoitukset"
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
@@ -825,7 +833,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   {:title "Vill du lämna denna sida"
    :stay "Stanna"
    :leave "Lämna"
-   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
+   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Tjänsteproducenter"
@@ -837,8 +849,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :description-read-more "Läs mer"
   :no-results "Inga tjänsteproducenter hittades"
   :result-count ["Hittades " :total-count " tjänsteproducenter"]
-  :result-count-all ["Totalt " :total-count " tjänsteproducenter"]
-  }
+  :result-count-all ["Totalt " :total-count " tjänsteproducenter"]}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)

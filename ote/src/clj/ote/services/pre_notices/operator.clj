@@ -16,6 +16,15 @@
 
 (defqueries "ote/services/pre_notices/regions.sql")
 
+(defn get-operator-pre-notice [db user id]
+  "Get singular operator pre-notice by id"
+  (http/no-cache-transit-response
+    (first (specql/fetch
+             db ::transit/pre-notice
+             (specql/columns ::transit/pre-notice)
+             {::t-operator/id (op/in (authorization/user-transport-operators db user))
+              ::transit/id id}))))
+
 (defn list-operator-notices [db user]
   (http/no-cache-transit-response
    (specql/fetch db ::transit/pre-notice
@@ -23,7 +32,6 @@
                  {::t-operator/id (op/in (authorization/user-transport-operators db user))})))
 
 (defn save-pre-notice [db user notice]
-  (println "DAta " (pr-str notice))
   (authorization/with-transport-operator-check
     db user (::t-operator/id notice)
     (fn []
@@ -39,8 +47,11 @@
   (routes
    (GET "/pre-notices/list" {user :user}
         (list-operator-notices db user))
+   (GET ["/pre-notices/:id" :id #"\d+"] {{id :id} :params
+                             user :user}
+     (get-operator-pre-notice db user (Long/parseLong id)))
    (POST "/pre-notice" {form-data :body
-                        user      :user}
+                        user :user}
          (http/transit-response
           (save-pre-notice db user (http/transit-request form-data))))
    (GET "/pre-notices/regions" {}
