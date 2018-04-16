@@ -238,7 +238,7 @@
 
 
 
-(defn new-pre-notice [e! {:keys [pre-notice transport-operator] :as app}]
+(defn new-pre-notice [e! {:keys [transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))]
     [:span
      [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
