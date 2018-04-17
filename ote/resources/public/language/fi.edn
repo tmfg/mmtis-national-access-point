@@ -231,9 +231,15 @@
   :ote.db.common/postal_code                          "Postinumero"
 
   :login {:email "Sähköpostiosoite"
-          :password "Salasana"}}
+          :password "Salasana"}
 
-
+  :pre-notice
+  {:ote.db.transit/other-type-description "Selitys"
+   :ote.db.transit/url                    "www-osoite"
+   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
+   :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
+   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
+  }
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -287,7 +293,9 @@
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
   :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
-  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."}
+  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
+  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
+  }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -311,6 +319,7 @@
   :edit "Muokkaa"
 
   :save-and-publish "Tallenna ja julkaise"
+  :save-and-send "Tallenna ja lähetä"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
   :add-new-parking-capacity "Lisää rivi"
@@ -319,6 +328,7 @@
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
   :add-new-route "Lisää uusi merireitti"
+  :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
   :next "Jatka"
@@ -339,6 +349,7 @@
   :route-calendar-back-to-trips "Takaisin vuorolistaan"
   :route-calendar-clear "Tyhjennä kalenteri"
   :back-to-draft  "Muuta luonnokseksi"
+  :add-new-effective-date "Lisää uusi päivämäärä"
   }
 
  ;; Database enumeration values
@@ -467,7 +478,21 @@
   :ote.db.transport-service/advance-reservation
   {:no "Palvelun käyttöön ei liity ennakkovarausta."
    :possible "Palvelun ennakkovaraus on mahdollista, muttei pakollista."
-   :mandatory "Palvelun ennakkovaraus on pakollista."}}
+   :mandatory "Palvelun ennakkovaraus on pakollista."}
+
+  :ote.db.transit/pre-notice-type
+  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+   :new             "Liikenteen lisääminen tai uusi reitti"
+   :schedule-change "Aikataulumuutos"
+   :route-change    "Reittimuutos"
+   :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
+
+  }
   ;; ENUMS end
 
 
@@ -622,15 +647,15 @@
  :route-wizard-page
  {:trip-stop-exception
   {:arrival {:tooltip "Muuta poistumismahdollisuutta"
-             :default "Poistumismahdollisuus oletuksena"
-             :no "Ei poistumismahdollisuutta"
-             :agency "Poistumisesta sovittava palveluntuottajan kanssa"
-             :driver "Poistumisesta sovittava kuljettajan kanssa"}
+             :default "Kyydistä poistuminen aina mahdollista"
+             :no "Kyydistä poistuminen ei mahdollista"
+             :agency "Poistuminen sovittava liikennöitsijän kanssa"
+             :driver "Poistuminen sovittava kuljettajan kanssa"}
    :departure {:tooltip "Muuta nousumahdollisuutta"
-               :default "Nousu mahdollista oletuksena"
-               :no "Ei nousumahdollisuutta"
-               :agency "Nousemisesta sovittava palveluntuottajan kanssa"
-               :driver "Noususta sovittava kuljettajan kanssa"}}
+               :default "Kyytiin otto aina mahdollista"
+               :no "Ei kyytiin ottoa"
+               :agency "Kyytiin otto sovittava liikennöitsijän kanssa"
+               :driver "Kyytiin otto sovittava kuljettajan kanssa"}}
 
   :trip-stop-arrival-header "tulo"
   :trip-stop-departure-header "lähtö"
@@ -673,7 +698,44 @@
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
   :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+  :show-draw-tools "Lisää puuttuva satama/laituri"
+  :hide-draw-tools "Lopeta sataman/laiturin lisääminen"
+  }
 
+ :pre-notice-list-page
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
+  :sent-pre-notices "Lähetetyt muutosilmoitukset"
+  :no-pre-notices "Ei muutosilmoituksia"
+
+  :headers {:ote.db.transit/id "ID"
+            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
+            :ote.db.modification/created "Luotu"
+            :ote.db.modification/modified "Muokattu"
+            :ote.db.transit/route-description "Reitin kuvaus"
+            :actions "Toiminnot"}
+
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
+                      :new-comment-label "Kirjoita kommentti"}
+}
+
+ :pre-notice-page
+ {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+  :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+  :route-and-area-information-title "Reitin ja alueen tiedot"
+  :effective-date-from "Alkamispäivä"
+  :effective-date-description "Selitys"
+  :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+  :save-success-send "Ilmoituksen lähettäminen onnistui."
+  :save-success "Luonnoksen tallentaminen onnistui."
+  :save-failure "Luonnoksen tallentaminen epäonnistui."
+  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+  :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
   }
 
  :price-dialog
@@ -724,7 +786,9 @@
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
-  :navigation-privacy-policy "Rekisteriseloste"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :navigation-authority-pre-notices           "Saapunet muutosilmoitukset"
+  :navigation-privacy-policy                  "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
   :user-menu-log-out                          "Kirjaudu ulos"
@@ -759,7 +823,9 @@
   :language                                   "Kieli"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."}
 
 
  :dialog
@@ -771,7 +837,11 @@
   {:title "Sivulta poistumisen varmistus"
    :stay "Jää"
    :leave "Poistu"
-   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}}
+   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Palveluntuottajat"
@@ -785,6 +855,7 @@
   :result-count ["Hakuehdoilla löytyi " :total-count " palveluntuottajaa"]
   :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
   }
+
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
@@ -1057,4 +1128,17 @@
                             :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
                             :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
                                      :radius "Säde"}
-                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}}
+                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
+ :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+                                            :text "Tallenna muutokset"}
+                                    :cancel {:title "Peruuta tehdyt muutokset"
+                                             :text "Peruuta"}
+                                    :clearAll {:title "Tyhjenna kaikki"
+                                               :text "Tyhjennä kaikki"}}
+                          :buttons {:edit "Muokkaa"
+                                    :editDisabled "Muokkaustila on poissa käytöstä"
+                                    :remove "Poista"
+                                    :removeDisabled "Poistotila on poissa käytöstä"}}
+                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
+                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
+                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}

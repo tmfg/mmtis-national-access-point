@@ -33,19 +33,21 @@
 
 (def chip-input* (r/adapt-react-class (aget js/window "MaterialUIChipInput")))
 
-(defn- auto-select [c orig-chip search-str js-handleAddChip]
-
+(defn- auto-select [c orig-chip search-str dataSourceConfig js-handleAddChip]
   (let [autocomplete (aget c "autoComplete")
         ;; RequestLists contains filtered suggestions from AutoComplete
         first-match (first (js->clj (aget autocomplete "requestsList") :keywordize-keys true))
         suggestions (js->clj (aget c "props" "dataSource") :keywordize-keys true)
+        dataSourceConfig (or dataSourceConfig {:text :text :value :value})
+        text-key (:text dataSourceConfig)
 
         ;; Pass original chip if we find a perfect match from suggestions. This enables chip add by clicking on the suggestion menu.
         ;; Otherwise, match first item from the filter requestList and try to find a match from suggestions.
         ;; RequestList does not contain chip :value, so we have to find our real Chip from the suggestions vector.
-        chip (if (some #(= search-str (or (:text %) %)) suggestions)
+        chip (if (some #(= search-str (or (text-key %) %)) suggestions)
                orig-chip
-               (first (filter #(= (or (:text %) %) (:text first-match)) suggestions)))]
+               ;; Note: requestList values i.e. first-match always have the :text key and dataSourceConfig has no relation to it.
+               (first (filter #(= (or (text-key %) %) (:text first-match)) suggestions)))]
 
     ;; Call the original ChipInput.handleAddChip function
     (when chip (.call js-handleAddChip c chip))))
@@ -57,16 +59,19 @@
        (fn [this]
          (let [c (reset! ref (aget this "refs" "chip-input"))
                js-handleAddChip (aget c "handleAddChip")
-               auto-select? (:auto-select? props)]
+               auto-select? (:auto-select? props)
+               dataSourceConfig (:dataSourceConfig props)
+               text-key (:text dataSourceConfig)]
+
            ;; Autoselect first matching suggestion if :auto-select prop is true after pressing :new-chip-key-code key.
            ;; This will override the normal handleAddChip member function of chip-input with our custom function.
            (aset c "handleAddChip"
                  (fn [js-chip]
                    (let [chip (js->clj js-chip :keywordize-keys true)
-                         search-str (or (:text chip) chip)]
+                         search-str (or (text-key chip) chip)]
                      (cond
                        (str/blank? search-str) nil
-                       auto-select? (auto-select c chip search-str js-handleAddChip)
+                       auto-select? (auto-select c chip search-str dataSourceConfig js-handleAddChip)
                        :else (.call js-handleAddChip c chip)))))))
 
        :reagent-render

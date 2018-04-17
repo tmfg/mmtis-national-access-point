@@ -104,3 +104,8 @@ VALUES
 INSERT INTO "public"."member_revision"("id","table_id","group_id","state","revision_id","continuity_id","expired_id","revision_timestamp","expired_timestamp","current","table_name","capacity")
 VALUES
 (E'76d4d130-5167-448c-9c6b-c8f897993383',E'676a2532-b106-4329-b95e-e30c8c8265d5',E'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4',E'active',E'9d7176c9-df56-492d-b243-f4ca762d014f',E'76d4d130-5167-448c-9c6b-c8f897993383',NULL,E'2018-01-23 08:38:51.32146',E'9999-12-31 00:00:00',NULL,E'user',E'admin');
+
+-- Make our test operator a "transport authority" for easier testing
+INSERT INTO "public"."group_extra"("id","group_id","key","value","state","revision_id")
+VALUES
+(E'ely-group-extra',E'79046442-ad25-4865-a174-ec199a4b39c4',E'transit-authority?',E'true',NULL,NULL);

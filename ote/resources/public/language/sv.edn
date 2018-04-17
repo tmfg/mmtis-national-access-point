@@ -234,9 +234,15 @@
   :ote.db.common/postal_code                          "Postnummer"
 
   :login {:email "Epost"
-          :password "Lösenord"}}
+          :password "Lösenord"}
 
-
+  :pre-notice
+  {:ote.db.transit/other-type-description "Muu muutos -SV"
+   :ote.db.transit/url                    "www-osoite -SV"
+   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
+   :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
+   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
+ }
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -294,8 +300,10 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
-  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
-  :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."}
+  :trip-editor-no-calendar  "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
+  :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
+  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi. - SV"
+  }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -320,6 +328,7 @@
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"
+  :save-and-send "Tallenna ja lähetä - SV"
   :save-updated "Spara uppdaterad info"
   :add-new-parking-capacity "Lägg till ny parkeringstyp"
   :add-new-price-class "Lägg till prisrad"
@@ -327,6 +336,7 @@
   :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
   :add-new-company "Lägg till företag"
   :add-new-route "Lägg till ny sjörutt"
+  :add-new-pre-notice "Uusi 60pv ilmoitus - SV"
   :discard "Ångra"
 
   :next "Fortsätt"
@@ -347,6 +357,7 @@
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
   :back-to-draft  "Ändra status till utkast"
+  :add-new-effective-date "Lisää uusi päivämäärä - SV"
   }
 
  ;; Database enumeration values
@@ -472,8 +483,20 @@
   :ote.db.transport-service/advance-reservation
   {:no "Ingen förhandsbokning krävs."
    :possible "Förhandsbokning möjlig men inte obligatorisk."
-   :mandatory "Obligatorisk förhandsbokning."}}
+   :mandatory "Obligatorisk förhandsbokning."}
 
+  :ote.db.transit/pre-notice-type
+  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+   :new             "Liikenteen lisääminen tai uusi reitti"
+   :schedule-change "Aikataulumuutos"
+   :route-change    "Reittimuutos"
+   :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
+  }
   ;; ENUMS end
 
 
@@ -527,8 +550,8 @@
   :header-no-operator "Du har ännu inte skapat en tjänsteproducent"
   :desc-to-add-new-operator "För att kunna skapa en ny mobilitetstjänst måste du först skapa en ny tjänsteproducent eller be administratören för en existerande tjänst koppla dig till den tjänsten."
   :desc-to-add-new-operator-2 "Finns tjänsteproducenten (tex. företag, annan organisation) redan i katalogen?"
-  :desc-to-add-new-operator-3 "Du kan kolla det i tjänsteproducent-vyn ovan."
-  :desc-to-add-new-operator-4 "Om din tjästeproducent redan finns, be då administratören/kollegan lägga till dig som producentens representant."
+  :desc-to-add-new-operator-3 "Du kan kolla det under fliken Tjänsteproducenter ovan."
+  :desc-to-add-new-operator-4 "Om din tjänsteproducent redan finns, be då administratören/kollegan lägga till dig som producentens representant."
   :desc-to-add-new-operator-5 "Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
@@ -617,22 +640,22 @@
   :route-list-table-created-modified "Skapad / Ändrad"
   :route-list-table-actions "Funktioner"
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
-  :route-list-gtfs-zip-file "GTFS Zip tiedosto"
+  :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
   }
 
  :route-wizard-page
  {:trip-stop-exception
-  {:arrival {:tooltip "Muuta poistumismahdollisuutta"
-             :default "Avstigning möjlig (standard)"
+  {:arrival {:tooltip "Ändra avstigningsalternativ"
+             :default "Avstigning möjlig"
              :no "Avstigning inte möjlig"
              :agency "Avstigning enligt överenskommelse med tjänsteproducenten"
-             :driver "Avstigning enligt överenskommelse med skepparen"}
-   :departure {:tooltip "Muuta nousumahdollisuutta"
-               :default "Ombordstigning möjlig (standard)"
-               :no "Ombordstigning inte möjlig"
-               :agency "Ombordstigning enligt överenskommelse med tjänsteproducenten"
-               :driver "Ombordstigning enligt överenskommelse med skepparen"}}
+             :driver "Avstigning enligt överenskommelse med föraren"}
+   :departure {:tooltip "Ändra påstigningsalternativ"
+               :default "Påstigning alltid möjlig"
+               :no "Påstigning inte möjlig"
+               :agency "Påstigning enligt överenskommelse med tjänsteproducenten"
+               :driver "Påstigning enligt överenskommelse med föraren"}}
 
   :trip-stop-arrival-header "ankomst"
   :trip-stop-departure-header "avgång"
@@ -652,7 +675,7 @@
   :stop-sequence-arrival-header "Ankomsttid"
   :stop-sequence-departure-header "Avgångstid"
   :stop-sequence-map-help  "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
-  :stop-sequence-delete "Poista pysäkki ketjusta"
+  :stop-sequence-delete "Ta bort en hamn från rutten"
 
   :wizard-step-basic-info "Ruttens namn"
   :wizard-step-stop-sequence "Ruttens hamnar"
@@ -675,7 +698,46 @@
   :save-success "Rutten sparades"
   :save-failure "Rutten kunde inte sparas"
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
+  :show-draw-tools "Lägg till hamn ny hamn/kaj"
+  :hide-draw-tools "Stäng verktyget för ny hamn/kaj"
   }
+
+ :pre-notice-list-page
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
+  :sent-pre-notices "Lähetetyt muutosilmoitukset"
+  :no-pre-notices "Ei muutosilmoituksia"
+
+  :headers {:ote.db.transit/id "ID"
+            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
+            :ote.db.modification/created "Luotu"
+            :ote.db.modification/modified "Muokattu"
+            :ote.db.transit/route-description "Reitin kuvaus"
+            :actions "Toiminnot"}
+
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
+                      :new-comment-label "Kirjoita kommentti"}
+
+  }
+
+:pre-notice-page
+{:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
+ :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+ :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+ :route-and-area-information-title "Reitin ja alueen tiedot"
+ :effective-date-from "Alkamispäivä"
+ :effective-date-description "Selitys"
+ :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+ :save-success-send "Ilmoituksen lähettäminen onnistui."
+ :save-success "Luonnoksen tallentaminen onnistui."
+ :save-failure "Luonnoksen tallentaminen epäonnistui."
+ :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+ :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
+ }
 
  :price-dialog
  {:header-dialog "Fordonspris"
@@ -693,7 +755,7 @@
                 Fyll i en ny blankett för varje tjänst."
   :transport-service-type-brokerage-help-text "Gör på samma sätt om du erbjuder en förmedlingstjänst."
   :transport-service-type-selection-help-example "Exempel: Tjänsteproducenten \"RapidBus Oy\" har två olika tjänster \"Rapidbus Tilausbussit\" och \"Rapidbus Taksipalvelu\"
-Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Abbonerad trafik eller annan anropsstyrd trafik\" och en andra blankett \"Taxitjänst\"."}
+Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i både blanketten \"Beställningstrafik med buss\" och blanketten \"Taxitjänst\"."}
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
@@ -715,18 +777,20 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-front-page                      "Framsida"
   :navigation-organizations                   "Tjänsteproducenter"
   :navigation-dataset                         "Tjänstekatalog"
-  :navigation-give-feedback                   "Feedback"
+  :navigation-give-feedback                   "Respons"
   :navigation-login                           "Logga in"
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Kartverktyg för sjötrafik"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus - SV"
+  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset - SV"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Sammandrag"
-  :user-menu-nap-help                         "Hjälp"
+  :user-menu-nap-help                         "Användarinstruktioner"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
@@ -748,14 +812,16 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :save-failed "Ett fel inträffade"
   :delete-service-success "Tjänsten borttagen."
   :delete-service-error "Tjänsten gick inte att ta bort "
-  :delete-route-success                       "Reitti poistettiin onnistuneesti."
-  :delete-route-error                         "Reitin poisto epäonnistui. Jos ongelma toistuu "
+  :delete-route-success                       "Rutten togs bort."
+  :delete-route-error                         "Rutten kunde inte tas bort. "
   :logged-in "Inloggningen lyckades!"
   :loading "Ladda"
   :language "Språk"
 
   :hours-placeholder "tt"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Error in server call. Contact support if the problem persists."}
 
 
  :dialog
@@ -767,11 +833,15 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   {:title "Vill du lämna denna sida"
    :stay "Stanna"
    :leave "Lämna"
-   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}}
+   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Tjänsteproducenter"
-  :filter "Sök tjänsteproducenten..."
+  :filter "Sök tjänsteproducent..."
   :loading "Laddar tjänsteproducenter"
   :result-service-count-single "1 tjänster"
   :result-service-count [:service-count " tjänster"]
@@ -779,8 +849,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :description-read-more "Läs mer"
   :no-results "Inga tjänsteproducenter hittades"
   :result-count ["Hittades " :total-count " tjänsteproducenter"]
-  :result-count-all ["Total " :total-count " tjänsteproducenter"]
-  }
+  :result-count-all ["Totalt " :total-count " tjänsteproducenter"]}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
@@ -1003,7 +1072,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
   :total-services [" Katalogen innehåller totalt " :total-service-count " tjänster."]
-  :fetching-more "Fetching more services..."
+  :fetching-more "Sökning av tjänster pågår..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
   :operator-no-services "Tjänsteproducenten har inga tjänster."}
 
@@ -1051,4 +1120,17 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
              :simpleshape {:tooltip {:end "Släpp musknappen för att avsluta."}}
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
-             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}}
+             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
+ :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+                                            :text "Tallenna muutokset"}
+                                     :cancel {:title "Peruuta tehdyt muutokset"
+                                              :text "Peruuta"}
+                                     :clearAll {:title "Tyhjenna kaikki"
+                                                :text "Tyhjennä kaikki"}}
+                          :buttons {:edit "Muokkaa"
+                                    :editDisabled "Ei löydy muokattavaa"
+                                    :remove "Poista"
+                                    :removeDisabled "Ei löydy poistettavaa"}}
+                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
+                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
+                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}

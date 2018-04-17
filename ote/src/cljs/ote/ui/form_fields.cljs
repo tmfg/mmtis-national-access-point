@@ -109,11 +109,13 @@
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur form? error warning table? full-width?
-                                  style input-style hint-style password? on-enter hint-text autocomplete]
+                                  style input-style hint-style password? on-enter
+                                  hint-text autocomplete disabled? id]
                            :as   field} data]
   [text-field
    (merge
-    {:name name
+    {:id id
+     :name name
      :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
@@ -134,6 +136,8 @@
       {:max-length max-length})
     (when full-width?
       {:full-width true})
+    (when disabled?
+      {:disabled true})
     (when style
       {:style style})
     (when input-style
@@ -416,7 +420,7 @@
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
-           auto-width? full-width?]
+           auto-width? full-width? id]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -425,7 +429,8 @@
     [:div
       [ui/select-field
        (merge
-        {:style style
+        {:id id
+         :style style
          :floating-label-text (when-not table? label)
          :floating-label-fixed true
          :multiple true
@@ -625,26 +630,28 @@
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :date-picker [{:keys [update! table? label ok-label cancel-label
-                                       show-clear? hint-text] :as opts} data]
+                                       show-clear? hint-text id] :as opts} data]
   [:div (stylefy/use-style style-base/inline-block)
-   [ui/date-picker {:style {:display "inline-block"}
-                    :text-field-style {:width "150px"}
-                    :hint-text (or hint-text "")
-                    :floating-label-text (when-not table? label)
-                    :floating-label-fixed true
-                    :auto-ok true
-                    :value data
-                    :on-change (fn [_ date]
-                                 (update! date))
-                    :format-date time/format-date
-                    :ok-label (or ok-label (tr [:buttons :save]))
-                    :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                    :locale (case @localization/selected-language
-                              :fi "fi-FI"
-                              :sv "sv-SE"
-                              :en "en-UK"
-                              "fi-FI")
-                    :Date-time-format js/Intl.DateTimeFormat}]
+   [ui/date-picker (merge {:style {:display "inline-block"}
+                           :text-field-style {:width "150px"}
+                           :hint-text (or hint-text "")
+                           :floating-label-text (when-not table? label)
+                           :floating-label-fixed true
+                           :auto-ok true
+                           :value data
+                           :on-change (fn [_ date]
+                                        (update! date))
+                           :format-date time/format-date
+                           :ok-label (or ok-label (tr [:buttons :save]))
+                           :cancel-label (or cancel-label (tr [:buttons :cancel]))
+                           :locale (case @localization/selected-language
+                                     :fi "fi-FI"
+                                     :sv "sv-SE"
+                                     :en "en-UK"
+                                     "fi-FI")
+                           :Date-time-format js/Intl.DateTimeFormat}
+                          (when (not (nil? id))
+                            {:id (str "date-picker-" id)}))]
    (when show-clear?
      [ui/icon-button {:on-click #(update! nil)
                       :disabled (not data)
@@ -660,7 +667,7 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-disabled? error-data] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-disabled? error-data id] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -694,7 +701,8 @@
                                                                (< i (count error-data))
                                                                (nth error-data i))]
                ^{:key i}
-               [ui/table-row (merge {:selectable false :display-border false}
+             [ui/table-row (merge {:id (str "row_" i)
+                                   :selectable false :display-border false}
                                     ;; If there are errors or missing fields, make the
                                     ;; row taller to show error messages
                                     (when (or errors missing-required-fields)
@@ -730,12 +738,14 @@
          data))]]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
-        [buttons/save {:on-click #(update! (conj (or data []) {}))
-                       :label add-label
-                       :label-style style-base/button-label-style
-                       :disabled (if add-label-disabled?
+        [buttons/save (merge {:on-click #(update! (conj (or data []) {}))
+                              :label add-label
+                              :label-style style-base/button-label-style
+                              :disabled (if add-label-disabled?
                                    (add-label-disabled? (last data))
-                                   (values/effectively-empty? (last data)))}]])]))
+                                   (values/effectively-empty? (last data)))}
+                             (when (not (nil? id))
+                               {:id (str id "-button")}))]])]))
 
 (defn- checkbox-container [update! table? label warning error style checked? disabled?]
   [:div (when error (stylefy/use-style style-base/required-element))
@@ -757,10 +767,11 @@
      (checkbox-container update! table? label warning error style checked? disabled?)]
     (checkbox-container update! table? label warning error style checked? disabled?)))
 
-(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled?]} data]
+(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled? option-addition]} data]
   ;; Options:
   ;; :header? Show or hide the header element above the checkbox-group. Default: true.
   ;; :option-enabled? Is option checkable. Default: true
+  ;; option-addition is a map, that knows which option needs additions and the addition. e.g. {:value: :other :addition [ReagentObject]}
   (let [selected (set (or data #{}))
         option-enabled? (or option-enabled? (constantly true))]
     [:div.checkbox-group
@@ -769,17 +780,26 @@
      (when help
        [common/help help])
      (doall
-      (map-indexed
-       (fn [i option]
-         (let [checked? (boolean (selected option))]
-           [ui/checkbox {:key      i
-                         :label    (when-not table? (show-option option))
-                         :checked  checked?
-                         :disabled (not (option-enabled? option))
-                         :labelStyle (when (not (option-enabled? option))
-                                       style-base/disabled-color)
-                         :on-check #(update! ((if checked? disj conj) selected option))}]))
-       options))
+       (map-indexed
+         (fn [i option]
+           (let [checked? (boolean (selected option))
+                 is-addition-valid (and (not (nil? option-addition)) (= option (:value option-addition)) checked?)
+                 addition (when is-addition-valid (:addition option-addition))]
+             ^{:key i}
+             [:div {:style {:display "flex"}}
+              [:span
+               [ui/checkbox {
+                             :label      (when-not table? (show-option option))
+                             :checked    checked?
+                             :disabled   (not (option-enabled? option))
+                             :labelStyle (merge style-base/checkbox-label
+                                                (if (not (option-enabled? option))
+                                                  style-base/disabled-color
+                                                  {:color "rgb(33, 33, 33)"}))
+                             :on-check   #(update! ((if checked? disj conj) selected option))}]]
+              (when is-addition-valid
+                [:span {:style {:padding-left "20px"}} addition])]))
+         options))
      (when (or error warning)
        [:div
         (stylefy/use-sub-style style-form-fields/radio-selection :required)

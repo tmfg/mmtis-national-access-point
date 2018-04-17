@@ -14,11 +14,13 @@
             [ote.localization :refer [tr selected-language]]))
 
 (defn rule-fields [calendar]
-  (into [{:type  :date-picker
+  (into [{:id "from-date"
+          :type  :date-picker
           :name  ::transit/from-date
           :label (tr [:route-wizard-page :route-calendar-from-date])
           :width "29%"}
-         {:type  :date-picker
+         {:id "to-date"
+          :type  :date-picker
           :name  ::transit/to-date
           :label (tr [:route-wizard-page :route-calendar-to-date])
           :width "29%"}]
@@ -37,7 +39,8 @@
 
 (defn- rules-table [e! trip-idx calendar]
   [:div.row {:style {:padding "20px"}}
-   [form-fields/field {:type :table
+   [form-fields/field {:id "new-calendar-period"
+                       :type :table
                        :update! #(e! (rw/->EditServiceCalendarRules {::transit/service-rules %} trip-idx))
                        :table-fields (rule-fields calendar)
                        :delete? true

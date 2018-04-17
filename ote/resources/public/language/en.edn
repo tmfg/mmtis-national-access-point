@@ -229,9 +229,16 @@
   :ote.db.common/postal_code                          "Postal code"
 
   :login {:email "Email"
-          :password "Password"}}
+          :password "Password"}
 
-
+  :pre-notice
+  {:ote.db.transit/other-type-description "Other change"
+   :ote.db.transit/url                    "www address"
+   :ote.db.transit/effective-dates "Change effective date or dates"
+   :ote.db.transit/route-description "Description of changed route or routes"
+   :ote.db.transit/regions "Regions that are affected by the change"
+   }
+ }
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -287,6 +294,7 @@
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
   :trip-editor-no-calendar  "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
   :trip-editor-no-stop-sequence "Please add stop sequence."
+  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -311,6 +319,7 @@
   :edit "Edit"
 
   :save-and-publish "Save and publish"
+  :save-and-send "Save and send"
   :save-as-draft "Save a draft"
   :save-updated "Save updated information"
   :add-new-parking-capacity "Add a new row"
@@ -319,6 +328,7 @@
   :add-new-service-exception "Add a new row"
   :add-new-company "Add a new row"
   :add-new-route "Add a new sea traffic route"
+  :add-new-pre-notice "Add new 60 day pre notice"
   :discard "Cancel"
 
   :next "Next"
@@ -339,6 +349,7 @@
   :route-calendar-back-to-trips "Back to the list of departures"
   :route-calendar-clear "Clear calendar"
   :back-to-draft  "Change back to draft"
+  :add-new-effective-date "Add new change date"
   }
 
  ;; Database enumeration values
@@ -466,8 +477,21 @@
   :ote.db.transport-service/advance-reservation
   {:no "Service does not have advance reservation."
    :possible "Service has advance reservation but it is not mandatory."
-   :mandatory "Advance reservation is mandatory for this service."}}
+   :mandatory "Advance reservation is mandatory for this service."}
 
+  :ote.db.transit/pre-notice-type
+  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+   :new             "Liikenteen lisääminen tai uusi reitti"
+   :schedule-change "Aikataulumuutos"
+   :route-change    "Reittimuutos"
+   :other           "Muu muutos, mikä?"}
+
+  :ote.db.transit/pre-notice-state
+  {:draft "Luonnos"
+   :sent "Lähetetty"
+   :read "Luettu"}
+
+  }
   ;; ENUMS end
 
 
@@ -664,13 +688,51 @@
   :basic-info-available-to "Valid to"
 
   :route-calendar-name "Reittikalenteri"
-  :route-calendar-group-name ["Service calendar (Departs from " :departure-stop " at " :departure-time ")"]
+  :route-calendar-group-name ["Service calendar (Starting point: " :departure-stop ", time of departure: " :departure-time ")"]
   :route-calendar-from-date "Valid from"
   :route-calendar-to-date "Valid to"
   :route-calendar-add-new-period "Add a new period to driving days calendar"
   :save-success "Route information has been saved!"
   :save-failure "Route information save failed"
   :publish-missing-required "You cannot publish the route because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
+  :show-draw-tools "Add a missing port/dock into the map"
+  :hide-draw-tools "Quit using the port/dock adding tools"
+  }
+
+ :pre-notice-list-page
+ {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
+  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
+  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
+  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
+  :sent-pre-notices "Lähetetyt muutosilmoitukset"
+  :no-pre-notices "Ei muutosilmoituksia"
+
+  :headers {:ote.db.transit/id "ID"
+            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :ote.db.transit/pre-notice-state "Tila"
+            :ote.db.modification/created "Luotu"
+            :ote.db.modification/modified "Muokattu"
+            :ote.db.transit/route-description "Reitin kuvaus"
+            :actions "Toiminnot"}
+
+  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
+                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaiselle)"
+                      :new-comment-label "Kirjoita kommentti"}
+  }
+
+ :pre-notice-page
+ {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+  :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+  :route-and-area-information-title "Reitin ja alueen tiedot"
+  :effective-date-from "Alkamispäivä"
+  :effective-date-description "Selitys"
+  :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+  :save-success-send "Ilmoituksen lähettäminen onnistui."
+  :save-success "Luonnoksen tallentaminen onnistui."
+  :save-failure "Luonnoksen tallentaminen epäonnistui."
+  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+  :route-description-hint "eg. Tampere - Pori or Oulu - Seinäjoki"
   }
 
  :price-dialog
@@ -717,6 +779,8 @@
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
+  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :navigation-authority-pre-notices "Saapuneet ilmoitukset - EN"
   :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"
@@ -752,7 +816,9 @@
   :language                                   "Language"
 
   :hours-placeholder "hh"
-  :minutes-placeholder "mm"}
+  :minutes-placeholder "mm"
+
+  :server-error "Error in server call. Contact support if the problem persists."}
 
 
  :dialog
@@ -764,7 +830,11 @@
   {:title "Confirm navigation"
    :stay "Stay on this page"
    :leave "Leave this page"
-   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}}
+   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}
+
+  :send-pre-notice
+  {:title "Lähetä muutosilmoitus?"
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
 
  :operators
  {:title "Transport operators"
@@ -1046,5 +1116,16 @@
                             :circle {:tooltip {:start "Click and drag to draw a circle."}
                                      :radius "Radius"}
                             :circlemarker {:tooltip {:start "Click map to set a circle marker."}}}}
-
- }
+ :leaflet-edit {:toolbar { :actions {:save {:title "Save changes"
+                                            :text "Save changes"}
+                                     :cancel {:title "Cancel changes"
+                                              :text "Cancel"}
+                                     :clearAll {:title "Clear all"
+                                                :text "Clear all"}}
+                          :buttons {:edit "Edit"
+                                    :editDisabled "No layers to edit"
+                                    :remove "Delete"
+                                    :removeDisabled "No layers to delete"}}
+                :handlers {:edit {:tooltip {:text "Drag handles or markers to edit features."
+                                            :subtext "Click cancel to undo changes"}}
+                           :remove {:tooltip {:text "Click on a feature to remove."}}}}}
