@@ -37,7 +37,9 @@
                     :icon (ic/action-delete-forever)
                     :secondary true
                     :primary true
-                    :on-click #(e! (pre-notice/->SaveToDb true))}])]}
+                    :on-click #(do
+                                 (e! (pre-notice/->CloseSendModal))
+                                 (e! (pre-notice/->SaveToDb true)))}])]}
      (tr [:dialog :send-pre-notice :confirm])]))
 
 (defn select-operator [e! operator operators]

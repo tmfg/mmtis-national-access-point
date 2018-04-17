@@ -1116,5 +1116,16 @@
                             :circle {:tooltip {:start "Click and drag to draw a circle."}
                                      :radius "Radius"}
                             :circlemarker {:tooltip {:start "Click map to set a circle marker."}}}}
-
- }
+ :leaflet-edit {:toolbar { :actions {:save {:title "Save changes"
+                                            :text "Save changes"}
+                                     :cancel {:title "Cancel changes"
+                                              :text "Cancel"}
+                                     :clearAll {:title "Clear all"
+                                                :text "Clear all"}}
+                          :buttons {:edit "Edit"
+                                    :editDisabled "No layers to edit"
+                                    :remove "Delete"
+                                    :removeDisabled "No layers to delete"}}
+                :handlers {:edit {:tooltip {:text "Drag handles or markers to edit features."
+                                            :subtext "Click cancel to undo changes"}}
+                           :remove {:tooltip {:text "Click on a feature to remove."}}}}}

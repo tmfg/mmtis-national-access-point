@@ -4,10 +4,10 @@
             [ote.localization :refer [tr-tree]]))
 
 (defn layer-id [^js/L.path layer]
-  (aget layer-id "__LAYER_ID"))
+  (aget layer "__LAYER_ID"))
 
 (defn- set-layer-id! [^js/L.Path layer]
-  (aset layer-id "__LAYER_ID" (name (gensym "draw-layer-"))))
+  (aset layer "__LAYER_ID" (name (gensym "draw-layer-"))))
 
 (defn layer-geojson [^js/L.Path layer]
   (.toGeoJSON layer))
@@ -48,11 +48,13 @@
   [this {:keys [on-create disabled-geometry-types ref-name
                 on-control-created add? localization
                 on-remove add-features? on-edit]}]
-
-  (set! (.-draw js/L.drawLocal)
-        (clj->js (merge-with merge
-                             (tr-tree [:leaflet-draw])
-                             localization)))
+  (do
+    (set! (.-draw js/L.drawLocal)
+          (clj->js (merge-with merge
+                               (tr-tree [:leaflet-draw])
+                               localization)))
+    (set! (.-edit js/L.drawLocal)
+          (clj->js (tr-tree [:leaflet-edit]))))
 
   (let [^js/L.map
         m (aget this "refs" (or ref-name "leaflet") "leafletElement")
