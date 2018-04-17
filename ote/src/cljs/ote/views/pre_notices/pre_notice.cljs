@@ -239,7 +239,7 @@
                                    [leaflet/GeoJSON {:data  region-geojson
                                                      :style {:color "green"}}]))]]])}))
 
-(defn notice-attachments []
+(defn notice-attachments [e!]
   (form/group
     {:label   (tr [:pre-notice-page :effective-dates-title])
      :columns 3
@@ -248,7 +248,18 @@
 
     {:name ::transit/url
      :type :string
-     }))
+     }
+    {:name :attachments
+     :type :table
+     :add-label "Uusi liite"
+     :delete? true
+     :table-fields [{:name ::transit/attachment-file-name
+                     :type :string
+                     :disabled? true}
+                    {:name :attachment-file
+                     :label "Valitse tiedosto"
+                     :type :file
+                     :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))}]}))
 
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))
@@ -262,7 +273,7 @@
      [(transport-type e! app)
       (effective-dates)
       (notice-area e!)
-      (notice-attachments)]
+      (notice-attachments e!)]
      pre-notice]
      [pre-notice-send-modal e! app]]
     ))
