@@ -142,7 +142,8 @@
           ::schema
           ::closed-groups
           :loading?
-          :csv-count))
+          :csv-count
+          :map-controls))
 
 (defrecord ^:private Label [label])
 (defn- label? [x]

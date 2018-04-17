@@ -300,7 +300,7 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
-  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
+  :trip-editor-no-calendar  "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
   :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi. - SV"
   }
@@ -550,8 +550,8 @@
   :header-no-operator "Du har ännu inte skapat en tjänsteproducent"
   :desc-to-add-new-operator "För att kunna skapa en ny mobilitetstjänst måste du först skapa en ny tjänsteproducent eller be administratören för en existerande tjänst koppla dig till den tjänsten."
   :desc-to-add-new-operator-2 "Finns tjänsteproducenten (tex. företag, annan organisation) redan i katalogen?"
-  :desc-to-add-new-operator-3 "Du kan kolla det i tjänsteproducent-vyn ovan."
-  :desc-to-add-new-operator-4 "Om din tjästeproducent redan finns, be då administratören/kollegan lägga till dig som producentens representant."
+  :desc-to-add-new-operator-3 "Du kan kolla det under fliken Tjänsteproducenter ovan."
+  :desc-to-add-new-operator-4 "Om din tjänsteproducent redan finns, be då administratören/kollegan lägga till dig som producentens representant."
   :desc-to-add-new-operator-5 "Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
@@ -698,6 +698,8 @@
   :save-success "Rutten sparades"
   :save-failure "Rutten kunde inte sparas"
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
+  :show-draw-tools "Lägg till hamn ny hamn/kaj"
+  :hide-draw-tools "Stäng verktyget för ny hamn/kaj"
   }
 
  :pre-notice-list-page
@@ -754,7 +756,7 @@
                 Fyll i en ny blankett för varje tjänst."
   :transport-service-type-brokerage-help-text "Gör på samma sätt om du erbjuder en förmedlingstjänst."
   :transport-service-type-selection-help-example "Exempel: Tjänsteproducenten \"RapidBus Oy\" har två olika tjänster \"Rapidbus Tilausbussit\" och \"Rapidbus Taksipalvelu\"
-Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en blankett \"Abbonerad trafik eller annan anropsstyrd trafik\" och en andra blankett \"Taxitjänst\"."}
+Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i både blanketten \"Beställningstrafik med buss\" och blanketten \"Taxitjänst\"."}
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
@@ -776,7 +778,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :navigation-front-page                      "Framsida"
   :navigation-organizations                   "Tjänsteproducenter"
   :navigation-dataset                         "Tjänstekatalog"
-  :navigation-give-feedback                   "Feedback"
+  :navigation-give-feedback                   "Respons"
   :navigation-login                           "Logga in"
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
@@ -789,7 +791,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :user-menu-log-out                          "Utloggning"
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Sammandrag"
-  :user-menu-nap-help                         "Hjälp"
+  :user-menu-nap-help                         "Användarinstruktioner"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
@@ -840,7 +842,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
 
  :operators
  {:title "Tjänsteproducenter"
-  :filter "Sök tjänsteproducenten..."
+  :filter "Sök tjänsteproducent..."
   :loading "Laddar tjänsteproducenter"
   :result-service-count-single "1 tjänster"
   :result-service-count [:service-count " tjänster"]
@@ -848,7 +850,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
   :description-read-more "Läs mer"
   :no-results "Inga tjänsteproducenter hittades"
   :result-count ["Hittades " :total-count " tjänsteproducenter"]
-  :result-count-all ["Total " :total-count " tjänsteproducenter"]}
+  :result-count-all ["Totalt " :total-count " tjänsteproducenter"]}
 
  ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
  ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
