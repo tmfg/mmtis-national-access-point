@@ -695,6 +695,8 @@
   :save-success "Route information has been saved!"
   :save-failure "Route information save failed"
   :publish-missing-required "You cannot publish the route because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
+  :show-draw-tools "Add a missing port/dock into the map"
+  :hide-draw-tools "Quit using the port/dock adding tools"
   }
 
  :pre-notice-list-page
