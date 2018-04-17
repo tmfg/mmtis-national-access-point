@@ -1118,4 +1118,17 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i en 
              :simpleshape {:tooltip {:end "Släpp musknappen för att avsluta."}}
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
-             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}}
+             :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
+ :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+                                            :text "Tallenna muutokset"}
+                                     :cancel {:title "Peruuta tehdyt muutokset"
+                                              :text "Peruuta"}
+                                     :clearAll {:title "Tyhjenna kaikki"
+                                                :text "Tyhjennä kaikki"}}
+                          :buttons {:edit "Muokkaa"
+                                    :editDisabled "Ei löydy muokattavaa"
+                                    :remove "Poista"
+                                    :removeDisabled "Ei löydy poistettavaa"}}
+                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
+                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
+                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
