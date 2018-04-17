@@ -11,7 +11,8 @@
 
 
 (defn valid-notice? [notice]
-  true)
+  (and (not (form/errors? notice))
+       (not (form/required-fields-missing? notice))))
 
 (declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse ->ServerError ->RegionsResponse)
 
