@@ -8,12 +8,6 @@
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]))
 
-
-
-(defn valid-notice? [notice]
-  (and (not (form/errors? notice))
-       (not (form/required-fields-missing? notice))))
-
 (declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse ->ServerError ->RegionsResponse)
 
 (tuck/define-event ServerError [response]
@@ -220,5 +214,6 @@
 
 (define-event UploadAttachment [input]
   {}
-  (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)})
+  (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)
+                                           :on-failure (tuck/send-async! ->ServerError)})
   app)

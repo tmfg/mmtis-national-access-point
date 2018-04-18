@@ -16,23 +16,18 @@
 
 (defqueries "ote/services/pre_notices/regions.sql")
 
-(defn- parse-attachments
-  [attachments db user]
-  (let [saved-attachments (mapv
-                            #(first (specql/fetch db ::transit/pre-notice-attachment
-                                           (specql/columns ::transit/pre-notice-attachment)
-                                                  (op/and
-                                                  {::transit/attachment-file-name (::transit/attachment-file-name %)
-                                                   ::modification/created-by (get-in user [:user :id])})))
-                            attachments)]
-    saved-attachments))
+(def pre-notice-columns #{::transit/id ::t-operator/id ::transit/regions
+                          ::transit/pre-notice-type ::transit/pre-notice-state
+                          ::transit/other-type-description ::transit/effective-dates
+                          ::transit/route-description ::transit/url
+                          [::transit/attachments #{::transit/attachment-file-name}]})
 
 (defn get-operator-pre-notice [db user id]
   "Get singular operator pre-notice by id"
   (http/no-cache-transit-response
     (let [pre-notice (first (specql/fetch
              db ::transit/pre-notice
-             (specql/columns ::transit/pre-notice)
+             pre-notice-columns
              {::t-operator/id (op/in (authorization/user-transport-operators db user))
               ::transit/id id}))
           pre-notice (assoc pre-notice :attachments (into [] (specql/fetch db ::transit/pre-notice-attachment
@@ -53,19 +48,19 @@
     db user (::t-operator/id notice)
     (fn []
       (tx/with-transaction db
-         (let [attachment-names (:attachments notice)
+         (let [form-attachments (:attachments notice)
                n (-> notice
                      (dissoc :attachments)
+                     (dissoc ::transit/attachments)
                      (modification/with-modification-fields ::transit/id user))
                saved-notice (specql/upsert! db ::transit/pre-notice n)
-               notice-id (::transit/id saved-notice)
-               attachments (parse-attachments attachment-names db user)
-               ments (mapv #(assoc % ::transit/pre-notice-id notice-id) attachments)]
+               notice-id (::transit/id saved-notice)]
            (log/debug "Save notice: " saved-notice)
-           (log/debug "Attachments: " attachments)
-           (doall
-             (mapv #(specql/upsert! db ::transit/pre-notice-attachment %)
-                   ments)))))))
+           (specql/update! db ::transit/pre-notice-attachment
+                           {::transit/pre-notice-id notice-id}
+                           (op/and
+                             {::transit/id              (op/in (mapv ::transit/id (:attachments notice)))
+                              ::modification/created-by (authorization/user-id user)})))))))
 
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"

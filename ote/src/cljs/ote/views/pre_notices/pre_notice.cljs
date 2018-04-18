@@ -27,7 +27,7 @@
       [ui/card {:style {:margin "1em 0em 1em 0em"}}
        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])
     [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
-     [buttons/save {:disabled (not valid-notice?)
+     [buttons/save {:disabled (not (form/valid? pre-notice))
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (pre-notice/->OpenSendModal)))}
@@ -256,6 +256,7 @@
      :table-fields [{:name ::transit/attachment-file-name
                      :type :string
                      :disabled? true}
+
                     {:name :attachment-file
                      :label "Valitse tiedosto"
                      :type :file
