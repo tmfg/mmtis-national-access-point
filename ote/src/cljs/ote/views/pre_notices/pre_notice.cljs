@@ -22,7 +22,7 @@
 (def notice-types [:termination :new :schedule-change :route-change :other])
 
 (defn footer [e! pre-notice]
-  (let [valid-notice? (pre-notice/valid-notice? pre-notice)]
+  (let [valid-notice? (form/valid? pre-notice)]
     (when (not valid-notice?)
       [ui/card {:style {:margin "1em 0em 1em 0em"}}
        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])
