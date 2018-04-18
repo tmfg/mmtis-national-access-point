@@ -642,6 +642,7 @@
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
+  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
   }
 
  :route-wizard-page

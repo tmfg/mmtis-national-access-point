@@ -639,6 +639,7 @@
   :route-list-active-routes "Transport operator’s valid routes: "
   :route-list-gtfs-zip-file "GTFS.Zip file"
   :route-list-copy-link "Copy address: "
+  :link-to-help-pdf   "Sea traffic route and timetable editor user guide"
   }
 
  :route-wizard-page
