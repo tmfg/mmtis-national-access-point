@@ -1134,12 +1134,12 @@
                                             :text "Tallenna muutokset"}
                                     :cancel {:title "Peruuta tehdyt muutokset"
                                              :text "Peruuta"}
-                                    :clearAll {:title "Tyhjenna kaikki"
-                                               :text "Tyhjennä kaikki"}}
+                                    :clearAll {:title "Poista kaikki lisäämäsi satamat"
+                                               :text "Poista kaikki lisäämäsi satamat"}}
                           :buttons {:edit "Muokkaa"
                                     :editDisabled "Muokkaustila on poissa käytöstä"
                                     :remove "Poista"
                                     :removeDisabled "Poistotila on poissa käytöstä"}}
-                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
-                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
+                :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
+                                            :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
                            :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
