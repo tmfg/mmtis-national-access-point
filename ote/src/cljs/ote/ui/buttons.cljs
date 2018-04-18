@@ -1,8 +1,10 @@
 (ns ote.ui.buttons
   (:require [cljs-react-material-ui.reagent :as ui]
+            [ote.localization :refer [tr tr-key]]
             [cljs-react-material-ui.core :refer [color]]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.app.controller.front-page :as fp-controller]))
 
 
 (defn- button-container [button]
@@ -27,3 +29,11 @@
                     :font-size "12px"
                     :font-weight "bold"}} opts)
     label]])
+
+(defn open-link [e! url]
+  [cancel
+   {:buttonStyle style-base/base-button
+    :on-click     #(do (.preventDefault %)
+                       (e! (fp-controller/->OpenNewTab url)))
+    }
+   (tr [:route-list-page :link-to-help-pdf])])
