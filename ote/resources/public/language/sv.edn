@@ -737,6 +737,7 @@
  :save-failure "Luonnoksen tallentaminen epäonnistui."
  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
  :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
+ :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
  }
 
  :price-dialog
