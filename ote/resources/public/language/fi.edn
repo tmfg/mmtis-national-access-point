@@ -792,7 +792,7 @@
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
   :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :navigation-authority-pre-notices           "Saapunet muutosilmoitukset"
+  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset"
   :navigation-privacy-policy                  "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"

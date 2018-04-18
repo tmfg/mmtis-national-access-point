@@ -785,7 +785,7 @@
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
   :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :navigation-authority-pre-notices "Saapuneet ilmoitukset - EN"
+  :navigation-authority-pre-notices           "Saapuneet ilmoitukset - EN"
   :navigation-privacy-policy "Privacy Policy"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"

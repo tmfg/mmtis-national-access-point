@@ -17,7 +17,9 @@
     [ote.db.transport-service :as t-service]
     [ote.localization :refer [selected-language]]
     [reagent.core :as r]
-    [ote.ui.list_header :as list-header]))
+    [ote.ui.list-header :as list-header]
+    [ote.style.base :as style-base]
+    [ote.ui.buttons :as buttons]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
                                   :keys [show-delete-modal?]
@@ -107,7 +109,8 @@
                                       (e! (route-list/->CreateNewRoute)))
                          :primary  true
                          :icon     (ic/content-add)}]
-      [t-operator-view/transport-operator-selection e! app]]
+      [t-operator-view/transport-operator-selection e! app]
+      [buttons/open-link e! "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf"]]
 
      (when routes
        [list-routes e! routes])
