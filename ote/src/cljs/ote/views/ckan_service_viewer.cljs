@@ -167,7 +167,7 @@
   (r/create-class
     {:display-name         "operation-area-map"
      :component-did-mount  #(do
-                              (leaflet/customize-zoom-controls e! % {:zoomInTitle (tr [:leaflet :zoom-in])
+                              (leaflet/customize-zoom-controls e! % "leaflet" {:zoomInTitle (tr [:leaflet :zoom-in])
                                                                      :zoomOutTitle (tr [:leaflet :zoom-out])})
                               (leaflet/update-bounds-on-load %))
      :component-did-update leaflet/update-bounds-from-layers

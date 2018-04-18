@@ -1121,7 +1121,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
- :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+ :leaflet-port-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
                                             :text "Tallenna muutokset"}
                                      :cancel {:title "Peruuta tehdyt muutokset"
                                               :text "Peruuta"}
@@ -1133,4 +1133,4 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                     :removeDisabled "Ei löydy poistettavaa"}}
                 :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
                                             :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
-                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
+                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}
