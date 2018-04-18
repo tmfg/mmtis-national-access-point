@@ -60,7 +60,8 @@
                            {::transit/pre-notice-id notice-id}
                            (op/and
                              {::transit/id              (op/in (mapv ::transit/id (:attachments notice)))
-                              ::modification/created-by (authorization/user-id user)})))))))
+                              ::modification/created-by (authorization/user-id user)}))
+           saved-notice)))))
 
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"
