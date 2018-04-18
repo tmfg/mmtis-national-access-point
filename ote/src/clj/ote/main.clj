@@ -23,6 +23,7 @@
             [ote.integration.import.gtfs :as import-gtfs]
 
             [ote.tasks.company :as tasks-company]
+            [ote.tasks.pre-notices :as tasks-pre-notices]
 
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
@@ -77,7 +78,8 @@
    :operators (component/using (operators-service/->Operators) [:db :http])
 
    ;; Scheduled tasks
-   :tasks-company (component/using (tasks-company/company-tasks) [:db])))
+   :tasks-company (component/using (tasks-company/company-tasks) [:db])
+   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks) [])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!

@@ -6,10 +6,8 @@
             [taoensso.timbre :as log]
             [ote.localization :as localization]))
 
-(defonce default-conn {:host "localhost"})
 
-
-(defn send
-  "Send a singular email"
-  [email conn]
-  (postal/send-message (merge default-conn conn) email))
+(defn send-email
+  "Send a singular email using Postal."
+  [& args]
+  (apply postal/send-message args))
