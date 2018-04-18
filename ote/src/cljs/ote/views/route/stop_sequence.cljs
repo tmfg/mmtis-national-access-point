@@ -72,30 +72,31 @@
             ;; Keep track if we are in delete mode
             (.on m "draw:deletestart" #(reset! deleting? true))
             (.on m "draw:deletestop" #(reset! deleting? false))
-            (do
-              (leaflet/customize-zoom-controls e! this "stops-map" {:zoomInTitle (tr [:leaflet :zoom-in])
-                                                     :zoomOutTitle (tr [:leaflet :zoom-out])})
-              (leaflet-draw/install-draw-control!
-               this
-               {:ref-name                "stops-map"
-                ;; Disable all other geometry types
-                :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
-                :on-control-created (partial reset! dc)
-                :on-create               (fn [^js/L.Path layer]
-                                           (let [id (leaflet-draw/layer-id layer)]
-                                             (.on layer "click"
-                                                  (fn [_]
-                                                    (when-not @deleting?
-                                                      (e! (rw/->AddCustomStop id)))))
-                                             (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
-                :on-remove               #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
-                :on-edit                 #(e! (rw/->UpdateCustomStopGeometry
-                                                (leaflet-draw/layer-id %)
-                                                (leaflet-draw/layer-geojson %)))
 
-                :add-features?           true
-                :localization            {:toolbar  {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
-                                          :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}}))))
+            (leaflet/customize-zoom-controls e! this "stops-map" {:zoomInTitle (tr [:leaflet :zoom-in])
+                                                   :zoomOutTitle (tr [:leaflet :zoom-out])})
+            (leaflet-draw/install-draw-control!
+             this
+             {:ref-name                "stops-map"
+              ;; Disable all other geometry types
+              :disabled-geometry-types #{:circle :circlemarker :rectangle :polyline :polygon}
+              :on-control-created (partial reset! dc)
+              :on-create               (fn [^js/L.Path layer]
+                                         (let [id (leaflet-draw/layer-id layer)]
+                                           (.on layer "click"
+                                                (fn [_]
+                                                  (when-not @deleting?
+                                                    (e! (rw/->AddCustomStop id)))))
+                                           (e! (rw/->CreateCustomStop id (leaflet-draw/layer-geojson layer)))))
+              :on-remove               #(e! (rw/->RemoveCustomStop (leaflet-draw/layer-id %)))
+              :on-edit                 #(e! (rw/->UpdateCustomStopGeometry
+                                              (leaflet-draw/layer-id %)
+                                              (leaflet-draw/layer-geojson %)))
+
+              :add-features?           true
+              :localization            {:toolbar  {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
+                                        :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}
+              :leaflet-edit-tr-key :leaflet-port-edit})))
             :component-will-receive-props (fn [this [_ _ route]]
                                        (let [^js/L.map m (aget this "refs" "stops-map" "leafletElement")]
                                          (if (get-in route [:map-controls :show?])

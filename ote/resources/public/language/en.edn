@@ -1116,7 +1116,7 @@
                             :circle {:tooltip {:start "Click and drag to draw a circle."}
                                      :radius "Radius"}
                             :circlemarker {:tooltip {:start "Click map to set a circle marker."}}}}
- :leaflet-edit {:toolbar { :actions {:save {:title "Save changes"
+ :leaflet-port-edit {:toolbar { :actions {:save {:title "Save changes"
                                             :text "Save changes"}
                                      :cancel {:title "Cancel changes"
                                               :text "Cancel"}
