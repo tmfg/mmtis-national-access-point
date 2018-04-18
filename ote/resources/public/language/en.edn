@@ -233,7 +233,8 @@
 
   :pre-notice
   {:ote.db.transit/other-type-description "Other change"
-   :ote.db.transit/url                    "www address"
+   :ote.db.transit/url                    "Web address"
+   :ote.db.transit/attachment-file-name   "Attachment"
    :ote.db.transit/effective-dates "Change effective date or dates"
    :ote.db.transit/route-description "Description of changed route or routes"
    :ote.db.transit/regions "Regions that are affected by the change"

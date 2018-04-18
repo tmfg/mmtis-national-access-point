@@ -237,8 +237,9 @@
           :password "Lösenord"}
 
   :pre-notice
-  {:ote.db.transit/other-type-description "Muu muutos -SV"
-   :ote.db.transit/url                    "www-osoite -SV"
+  {:ote.db.transit/other-type-description "Muu muutos - SV"
+   :ote.db.transit/url                    "www-osoite - SV"
+   :ote.db.transit/attachment-file-name   "Liitetiedosto - SV"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
