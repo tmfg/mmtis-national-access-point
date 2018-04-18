@@ -80,7 +80,7 @@
   (let [dc (atom nil)]
     (r/create-class
      {:component-did-mount #(do
-                              (leaflet/customize-zoom-controls e! % {:zoomInTitle (tr [:leaflet :zoom-in])
+                              (leaflet/customize-zoom-controls e! %  "leaflet" {:zoomInTitle (tr [:leaflet :zoom-in])
                                                                      :zoomOutTitle (tr [:leaflet :zoom-out])})
                               (leaflet-draw/install-draw-control!
                                   %
