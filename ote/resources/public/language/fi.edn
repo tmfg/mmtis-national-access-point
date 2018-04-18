@@ -1141,4 +1141,4 @@
                                     :removeDisabled "Poistotila on poissa käytöstä"}}
                 :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
                                             :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
-                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
+                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}
