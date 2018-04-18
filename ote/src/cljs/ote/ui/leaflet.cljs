@@ -81,9 +81,9 @@
 
 (defn customize-zoom-controls
   "Use customized zoom controls to allow translation of the zoom button titles."
-  [e! this opts]
+  [e! this ref opts]
   (let [^js/L.map
-  m (aget this "refs" "leaflet" "leafletElement")
+  m (aget this "refs" ref "leafletElement")
         zoom (new js/L.control.zoom (clj->js opts))]
     (.addControl m zoom)))
 
