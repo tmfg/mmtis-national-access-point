@@ -1,5 +1,5 @@
 (ns ote.app.controller.front-page
-  (:require [tuck.core :as tuck]
+  (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
@@ -141,3 +141,8 @@
   ClearFlashMessage
   (process-event [_ app]
     (dissoc app :flash-message :flash-message-error)))
+
+(define-event ToggleAddMemberDialog []
+  {:path [:show-add-member-dialog?]
+   :app show?}
+  (not show?))
