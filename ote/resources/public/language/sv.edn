@@ -237,8 +237,9 @@
           :password "Lösenord"}
 
   :pre-notice
-  {:ote.db.transit/other-type-description "Muu muutos -SV"
-   :ote.db.transit/url                    "www-osoite -SV"
+  {:ote.db.transit/other-type-description "Muu muutos - SV"
+   :ote.db.transit/url                    "www-osoite - SV"
+   :ote.db.transit/attachment-file-name   "Liitetiedosto - SV"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
@@ -642,6 +643,7 @@
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
+  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
   }
 
  :route-wizard-page
@@ -728,6 +730,7 @@
 {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
  :notice-type-title "Ilmoitettavan muutoksen tyyppi"
  :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+ :attachment-section-title "Muutoksen tarkemmat tiedot"
  :route-and-area-information-title "Reitin ja alueen tiedot"
  :effective-date-from "Alkamispäivä"
  :effective-date-description "Selitys"
@@ -738,6 +741,8 @@
  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
  :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
  :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
+ :add-attachment "Uusi liite"
+ :select-attachment "Valitse tiedosto"
  }
 
  :price-dialog

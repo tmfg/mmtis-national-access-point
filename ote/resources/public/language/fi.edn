@@ -235,7 +235,8 @@
 
   :pre-notice
   {:ote.db.transit/other-type-description "Selitys"
-   :ote.db.transit/url                    "www-osoite"
+   :ote.db.transit/url                    "Web-osoite"
+   :ote.db.transit/attachment-file-name   "Liitetiedosto"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
@@ -641,7 +642,7 @@
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
-
+  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
   }
 
  :route-wizard-page
@@ -727,6 +728,7 @@
  {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
   :notice-type-title "Ilmoitettavan muutoksen tyyppi"
   :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+  :attachment-section-title "Muutoksen tarkemmat tiedot"
   :route-and-area-information-title "Reitin ja alueen tiedot"
   :effective-date-from "Alkamispäivä"
   :effective-date-description "Selitys"
@@ -737,6 +739,8 @@
   :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
   :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
   :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
+  :add-attachment "Uusi liite"
+  :select-attachment "Valitse tiedosto"
   }
 
  :price-dialog
@@ -788,7 +792,7 @@
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
   :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :navigation-authority-pre-notices           "Saapunet muutosilmoitukset"
+  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset"
   :navigation-privacy-policy                  "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"

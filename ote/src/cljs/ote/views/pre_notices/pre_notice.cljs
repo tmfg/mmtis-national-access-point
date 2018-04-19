@@ -241,7 +241,7 @@
 
 (defn notice-attachments [e!]
   (form/group
-    {:label   (tr [:pre-notice-page :effective-dates-title])
+    {:label   (tr [:pre-notice-page :attachment-section-title])
      :columns 3
      :layout  :row}
     (form/info (tr [:form-help :pre-notice-attatchment-info]) {:type :generic})
@@ -251,20 +251,21 @@
      }
     {:name :attachments
      :type :table
-     :add-label "Uusi liite"
+     :add-label (tr [:pre-notice-page :add-attachment])
      :delete? true
      :table-fields [{:name ::transit/attachment-file-name
                      :type :string
                      :disabled? true}
 
                     {:name :attachment-file
-                     :label "Valitse tiedosto"
+                     :label (tr [:pre-notice-page :select-attachment])
                      :type :file
                      :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))}]}))
 
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))
-        form-options {:footer-fn (r/partial footer e!)
+        form-options {:name->label (tr-key [:field-labels :pre-notice])
+                      :footer-fn (r/partial footer e!)
                       :update!   #(e! (pre-notice/->EditForm %))}]
     [:span
     [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
