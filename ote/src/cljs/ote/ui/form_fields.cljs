@@ -242,8 +242,7 @@
           (if error error warning)])
        (when (and (not error) (not warning) is-empty? (is-empty? data))
          [:div (stylefy/use-style style-base/required-element)
-          (tr [:common-texts :required-field])])
-       ])))
+          (tr [:common-texts :required-field])])])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
                                         max-length style hint-style

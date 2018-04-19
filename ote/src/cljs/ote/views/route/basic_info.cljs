@@ -29,8 +29,7 @@
           :type      :localized-text
           :label     (tr [:route-wizard-page :basic-info-route-name])
           :is-empty? validation/empty-localized-text?
-          :required? true
-          }
+          :required? true}
          {:name         ::transit/transport-operator-id
           :option-value ::t-operator/id
           :type         :selection
