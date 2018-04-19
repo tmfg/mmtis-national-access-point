@@ -5,7 +5,8 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transit :as transit]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.localization :refer [tr tr-key]]))
+            [ote.localization :refer [tr tr-key]]
+            [ote.ui.validation :as validation]))
 
 (defn- ensure-operator
   "When page is refreshed it is possible that operator is not set.
@@ -27,7 +28,9 @@
          {:name      ::transit/name
           :type      :localized-text
           :label     (tr [:route-wizard-page :basic-info-route-name])
-          :required? true}
+          :is-empty? validation/empty-localized-text?
+          :required? true
+          }
          {:name         ::transit/transport-operator-id
           :option-value ::t-operator/id
           :type         :selection

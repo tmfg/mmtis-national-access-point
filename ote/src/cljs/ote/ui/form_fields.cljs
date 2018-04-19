@@ -189,7 +189,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? label name rows rows-max warning error full-width? style]
+(defmethod field :localized-text [{:keys [update! table? is-empty? label name rows rows-max warning error full-width? style]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -239,7 +239,11 @@
              lang]))]
        (when (or error warning)
          [:div (stylefy/use-style style-base/required-element)
-          (if error error warning)])])))
+          (if error error warning)])
+       (when (and (not error) (not warning) is-empty? (is-empty? data))
+         [:div (stylefy/use-style style-base/required-element)
+          (tr [:common-texts :required-field])])
+       ])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
                                         max-length style hint-style

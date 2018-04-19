@@ -15,7 +15,8 @@
             [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
             [ote.util.collections :as collections]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.localization :refer [selected-language]]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -591,11 +592,16 @@
   [{::transit/keys [stops] :as route}]
   (> (count stops) 1))
 
+(defn valid-route-name? [name]
+  (let [localized-name (t-service/localized-text-for @selected-language name)]
+    (not (str/blank? localized-name))))
+
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
   [{::transit/keys [name transport-operator-id]}]
-  (and (not (str/blank? name))
-       transport-operator-id))
+  (and
+    (valid-route-name? name)
+    (not (nil? transport-operator-id))))
 
 (defn valid-calendar? [trip-calendar]
   (not (or
@@ -644,5 +650,4 @@
 (defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or
     (str/blank? from-date)
-    (str/blank? to-date)
-    ))
+    (str/blank? to-date)))
