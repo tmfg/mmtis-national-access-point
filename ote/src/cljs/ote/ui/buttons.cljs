@@ -4,7 +4,7 @@
             [cljs-react-material-ui.core :refer [color]]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
-            [ote.app.controller.front-page :as fp-controller]))
+            [ote.ui.common :as common]))
 
 
 (defn- button-container [button]
@@ -30,10 +30,10 @@
                     :font-weight "bold"}} opts)
     label]])
 
-(defn open-link [e! url]
-  [cancel
-   {:buttonStyle style-base/base-button
-    :on-click     #(do (.preventDefault %)
-                       (e! (fp-controller/->OpenNewTab url)))
-    }
-   (tr [:route-list-page :link-to-help-pdf])])
+(defn open-link
+  "Create button like linkify link"
+  [url label]
+  [button-container
+   (common/linkify url
+                   [ui/flat-button {:label label :primary true}]
+                   {:target "_blank"})])

@@ -28,7 +28,7 @@
 (defn form-container [e! app]
   [:div
    [:h1 (tr [:common-texts :navigation-route])]
-   [buttons/open-link e! "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf"]
+   [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf" (tr [:route-list-page :link-to-help-pdf])]
    [route-components e! app]
    (when (not (rw/valid-route? (:route app)))
      [ui/card {:style {:margin "1em 0em 1em 0em"}}

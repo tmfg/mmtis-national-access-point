@@ -110,7 +110,7 @@
                          :primary  true
                          :icon     (ic/content-add)}]
       [t-operator-view/transport-operator-selection e! app]
-      [buttons/open-link e! "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf"]]
+      [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf" (tr [:route-list-page :link-to-help-pdf])]]
 
      (when routes
        [list-routes e! routes])
