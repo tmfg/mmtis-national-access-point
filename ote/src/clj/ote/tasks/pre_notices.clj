@@ -7,8 +7,11 @@
             [clj-time.periodic :refer [periodic-seq]]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
+            [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
-            [ote.db.tx :as tx])
+            [ote.db.tx :as tx]
+            [ote.localization :refer [tr]]
+            [ote.localization :as localization])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/nap/users.sql")
@@ -17,17 +20,18 @@
 (def daily-notify-time (t/from-time-zone (t/today-at 8 15)
                                          (DateTimeZone/forID "Europe/Helsinki")))
 
-(defn PgArray->str [arr]
+(defn PgArray->seqable [arr]
   (if arr
-    (str/join ", " (.getArray arr))
-    "-"))
+    (.getArray arr)
+    []))
 
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description created modified :as pre-notice]}]
   [:tr
    [:td [:b id]]
-   [:td (PgArray->str regions)]
+   [:td (str/join ", " (PgArray->seqable regions))]
    [:td operator-name]
-   [:td (PgArray->str pre-notice-type)]
+   [:td (str/join ", " (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
+                             (PgArray->seqable pre-notice-type)))]
    [:td "Muutoksen ensimmäinen voimaantulopäivä??? (Tämä vielä epäselvä)"]
    [:td route-description]])
 
@@ -39,11 +43,6 @@
       table,td,tr,th { border: 1px solid black; }
       td,tr,th { padding: 5px; }"]]
    [:body
-    [:p [:b "Herätesähköposti 1krt/vrk –  60pv muutosilmoitukset"]]
-    [:br]
-    [:p [:b "Lähettäjä: NAP"]]
-    [:p [:b "OTSIKKO: Uudet 60 päivän muutosilmoitukset NAP:ssa xx.xx.xxxx"]]
-    [:p [:b "SISÄLTÖ:"]]
     [:p [:b "Uudet 60 päivän muutosilmoitukset NAP:ssa"]]
     [:ul
      [:li
@@ -79,26 +78,28 @@
       (log/warn "Error while generating notification html:" e))))
 
 (defn send-notification! [db]
-  (tx/with-transaction
-    db
-    (let [users (list-users db {:transit-authority? true :email nil :name nil})
-          emails (mapv #(:email %) users)
-          notification (notificiation-html db)]
-      (println emails)
-      (try
-        #_(send-email {:bcc "nomailatall@nope.com"
-                     :from "nope@localhost"
-                     :subject "testing"
-                     :body [{:type "text/html" :content notification}]})
-        (catch Exception e
-          (log/warn "Error while sending a notification" e))))))
+  (localization/with-language
+    "fi"
+    (tx/with-transaction
+      db
+      (let [users (list-users db {:transit-authority? true :email nil :name nil})
+            emails (mapv #(:email %) users)
+            notification (notificiation-html db)]
+        (try
+          #_(println "#### Trying to send mail to: " (pr-str emails))
+          (send-email {:bcc emails
+                       :from "NAP"
+                       :subject "Uudet 60 päivän muutosilmoitukset NAP:ssa xx.xx.xxxx"
+                       :body [{:type "text/html" :content notification}]})
+          (catch Exception e
+            (log/warn "Error while sending a notification" e)))))))
 
 
 (defrecord PreNoticesTasks [at]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 40)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 60)))
                               (fn [_]
                                 (#'send-notification! db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
