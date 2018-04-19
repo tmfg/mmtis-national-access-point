@@ -4,26 +4,31 @@
             [com.stuartsierra.component :as component]
             [taoensso.timbre :as log]
             [clj-time.core :as t]
+            [clj-time.format :as format]
             [clj-time.periodic :refer [periodic-seq]]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
             [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
-            [ote.localization :refer [tr]]
-            [ote.localization :as localization])
+            [ote.localization :refer [tr] :as localization])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/nap/users.sql")
 (defqueries "ote/tasks/pre_notices.sql")
 
-(def daily-notify-time (t/from-time-zone (t/today-at 8 15)
-                                         (DateTimeZone/forID "Europe/Helsinki")))
+(defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
+(defonce daily-notify-time (t/from-time-zone (t/today-at 8 15) timezone))
 
 (defn PgArray->seqable [arr]
   (if arr
     (.getArray arr)
     []))
+
+(defn time-string-local [dt timezone]
+  (format/unparse (format/with-zone
+                    (format/formatter "dd.MM.yyyy HH:mm")
+                    timezone) dt))
 
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description created modified :as pre-notice]}]
   [:tr
@@ -86,11 +91,13 @@
             emails (mapv #(:email %) users)
             notification (notificiation-html db)]
         (try
-          #_(println "#### Trying to send mail to: " (pr-str emails))
-          (send-email {:bcc emails
-                       :from "NAP"
-                       :subject "Uudet 60 päivän muutosilmoitukset NAP:ssa xx.xx.xxxx"
-                       :body [{:type "text/html" :content notification}]})
+          (when-not (empty? emails)
+            (log/info "Trying to send a pre-notice email to: " (pr-str emails))
+            (send-email {:bcc emails
+                         :from "NAP"
+                         :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                       (time-string-local (t/to-time-zone (t/now) timezone) timezone))
+                         :body [{:type "text/html" :content notification}]}))
           (catch Exception e
             (log/warn "Error while sending a notification" e)))))))
 
@@ -99,7 +106,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 60)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 30)))
                               (fn [_]
                                 (#'send-notification! db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
