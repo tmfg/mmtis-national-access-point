@@ -16,7 +16,8 @@
             [taoensso.timbre :as log]
             [ote.util.collections :as collections]
             [clojure.set :as set]
-            [ote.localization :refer [selected-language]]))
+            [ote.localization :refer [selected-language]]
+            [ote.ui.validation :as validation]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -593,8 +594,7 @@
   (> (count stops) 1))
 
 (defn valid-route-name? [name]
-  (let [localized-name (t-service/localized-text-for @selected-language name)]
-    (not (str/blank? localized-name))))
+  (not (validation/empty-localized-text? name)))
 
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
