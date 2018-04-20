@@ -673,14 +673,15 @@
   :stop-sequence-custom-dialog-help  "Du kan ändra kajens/hamnens position eller ta bort den med kartverktyget. Efter att du sparat rutten, kan hamnen/kajen inte längre ändras."
   :stop-sequence-leaflet-button-marker "Lägg till en ny hamn/kaj"
   :stop-sequence-leaflet-button-start "Klicka på kartan för att lägga till en hamn/kaj"
-  :stop-sequence-port-header "Hamn"
+  :stop-sequence-port-header "Hållplats"
   :stop-sequence-arrival-header "Ankomsttid"
   :stop-sequence-departure-header "Avgångstid"
   :stop-sequence-map-help  "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
   :stop-sequence-delete "Ta bort en hamn från rutten"
+  :stop-sequence-edit-map-help "Muokkaustilassa voit lisätä puuttuvia pysähtymispaikkoja kartalle. Voit myös siirtää ja poistaa juuri lisäämiäsi pysähtymispaikkoja. Kartan muita pysähtymispaikkoja et voi muokata. Muokkauspainikkeet löydät kartan vasemmasta reunasta."
 
   :wizard-step-basic-info "Ruttens namn"
-  :wizard-step-stop-sequence "Ruttens hamnar"
+  :wizard-step-stop-sequence "Ruttens hållplats"
   :wizard-step-times "Avgångar"
   :wizard-step-save "Spara rutten"
 
@@ -702,6 +703,7 @@
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
   :show-draw-tools "Lägg till hamn ny hamn/kaj"
   :hide-draw-tools "Stäng verktyget för ny hamn/kaj"
+  :data-missing "Tietoja täyttämättä"
   }
 
  :pre-notice-list-page
@@ -1131,8 +1133,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                             :text "Tallenna muutokset"}
                                      :cancel {:title "Peruuta tehdyt muutokset"
                                               :text "Peruuta"}
-                                     :clearAll {:title "Poista kaikki lisäämäsi satamat"
-                                                :text "Poista kaikki lisäämäsi satamat"}}
+                                     :clearAll {:title "Poista kaikki lisäämäsi pysähdyspaikat"
+                                                :text "Poista kaikki lisäämäsi pysähdyspaikat"}}
                           :buttons {:edit "Muokkaa"
                                     :editDisabled "Ei löydy muokattavaa"
                                     :remove "Poista"

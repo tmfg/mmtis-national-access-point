@@ -670,11 +670,13 @@
   :stop-sequence-custom-dialog-help  "You can change location of the port or remove it using map tools. When port is saved it cannot be changed or removed."
   :stop-sequence-leaflet-button-marker "Add new port"
   :stop-sequence-leaflet-button-start "Click to add a new port."
-  :stop-sequence-port-header "Port"
+  :stop-sequence-port-header "Berths"
   :stop-sequence-arrival-header "Arrival time"
   :stop-sequence-departure-header "Departure time"
   :stop-sequence-map-help "Make a new route by selecting stops from the map with a mouse click. You can also add your own stops if you need to."
   :stop-sequence-delete "Remove stop from sequence"
+  :stop-sequence-edit-map-help "In edit mode you can add new berths on the map. You can also relocate and delete the berths you have newly added. (Editing of other berths is not possible.) You can find edit buttons on the left edge of the map."
+
 
   :wizard-step-basic-info "Route name"
   :wizard-step-stop-sequence "Route stops"
@@ -696,9 +698,10 @@
   :route-calendar-add-new-period "Add a new period to driving days calendar"
   :save-success "Route information has been saved!"
   :save-failure "Route information save failed"
-  :publish-missing-required "You cannot publish the route because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
-  :show-draw-tools "Add a missing port/dock into the map"
-  :hide-draw-tools "Quit using the port/dock adding tools"
+  :publish-missing-required "You cannot publish the route because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\" or \"Data missing\"."
+  :show-draw-tools "Edit stops"
+  :hide-draw-tools "Stop editing"
+  :data-missing "Data missing"
   }
 
  :pre-notice-list-page
