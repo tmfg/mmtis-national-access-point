@@ -10,4 +10,5 @@ SELECT id, "pre-notice-type", "route-description", created, modified,
     WHERE op.id = n."transport-operator-id") as "operator-name"
   FROM "pre_notice" n
  WHERE "pre-notice-state" = 'sent' AND
-       (created > (current_timestamp - :interval::interval) OR modified > (current_timestamp - :interval::interval));
+       sent IS NOT NULL AND
+       (sent > (current_timestamp - :interval::interval));

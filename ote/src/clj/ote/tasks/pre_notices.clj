@@ -28,10 +28,12 @@
     []))
 
 (defn datetime-string [dt timezone]
-  (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt))
+  (when dt
+    (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
 
 (defn date-string [dt timezone]
-  (time/format-date (t/to-time-zone dt timezone)))
+  (when dt
+    (time/format-date (t/to-time-zone dt timezone))))
 
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                               effective-dates-asc]}]
@@ -115,7 +117,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 15)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 60)))
                               (fn [_]
                                 (#'send-notification! db config)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
