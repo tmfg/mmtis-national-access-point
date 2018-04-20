@@ -11,7 +11,9 @@
             [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
-            [ote.localization :refer [tr] :as localization])
+            [ote.localization :refer [tr] :as localization]
+            [ote.time :as time]
+            [clj-time.coerce :as coerce])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/nap/users.sql")
@@ -25,20 +27,25 @@
     (.getArray arr)
     []))
 
-(defn time-string-local [dt timezone]
-  (format/unparse (format/with-zone
-                    (format/formatter "dd.MM.yyyy HH:mm")
-                    timezone) dt))
+(defn datetime-string [dt timezone]
+  (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt))
 
-(defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description created modified :as pre-notice]}]
-  [:tr
-   [:td [:b id]]
-   [:td (str/join ", " (PgArray->seqable regions))]
-   [:td operator-name]
-   [:td (str/join ", " (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
-                             (PgArray->seqable pre-notice-type)))]
-   [:td "Muutoksen ensimmäinen voimaantulopäivä??? (Tämä vielä epäselvä)"]
-   [:td route-description]])
+(defn date-string [dt timezone]
+  (time/format-date (t/to-time-zone dt timezone)))
+
+(defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
+                              effective-dates-asc]}]
+  (let [effective-date-str (date-string (coerce/from-sql-date
+                                          (first (PgArray->seqable effective-dates-asc)))
+                                        timezone)]
+    [:tr
+     [:td [:b id]]
+     [:td (str/join ", " (PgArray->seqable regions))]
+     [:td operator-name]
+     [:td (str/join ", " (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
+                               (PgArray->seqable pre-notice-type)))]
+     [:td effective-date-str]
+     [:td [:a {:href "finap.fi"} route-description]]]))
 
 (defn notification-template [pre-notices]
   [:html
@@ -96,7 +103,7 @@
             (send-email {:bcc emails
                          :from "NAP"
                          :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                       (time-string-local (t/to-time-zone (t/now) timezone) timezone))
+                                       (datetime-string (t/now) timezone))
                          :body [{:type "text/html" :content notification}]}))
           (catch Exception e
             (log/warn "Error while sending a notification" e)))))))
@@ -106,7 +113,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 30)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 10)))
                               (fn [_]
                                 (#'send-notification! db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
