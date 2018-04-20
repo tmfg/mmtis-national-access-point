@@ -187,7 +187,7 @@
 
     {:type                :component
      :name                :notice-area
-     :should-update-check (juxt ::transit/route-description ::transit/regions)
+     :should-update-check (juxt ::transit/route-description ::transit/regions :regions)
      :read                identity
      :container-style     style-form/full-width
      :component           (fn [{pre-notice :data :as f}]
