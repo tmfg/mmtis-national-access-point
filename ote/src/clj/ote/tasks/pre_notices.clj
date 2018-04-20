@@ -89,41 +89,41 @@
     (catch Exception e
       (log/warn "Error while generating notification html:" e))))
 
-(defn send-notification! [db]
+(defn send-notification! [db email-config]
   (localization/with-language
     "fi"
-    (tx/with-transaction
-      db
-      (tx/with-xact-advisory-lock
-        db
+    (tx/with-transaction db
+      (tx/with-xact-advisory-lock db
         (let [users (list-users db {:transit-authority? true :email nil :name nil})
               emails (mapv #(:email %) users)
               notification (notificiation-html db)]
           (try
             (when-not (empty? emails)
               (log/info "Trying to send a pre-notice email to: " (pr-str emails))
-              (send-email {:bcc emails
-                           :from "NAP"
-                           :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                         (datetime-string (t/now) timezone))
-                           :body [{:type "text/html" :content notification}]}))
+              (send-email
+                email-config
+                {:bcc emails
+                 :from "NAP"
+                 :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                               (datetime-string (t/now) timezone))
+                 :body [{:type "text/html" :content notification}]}))
             (catch Exception e
               (log/warn "Error while sending a notification" e))))))))
 
 
-(defrecord PreNoticesTasks [at]
+(defrecord PreNoticesTasks [at config]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 10)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 15)))
                               (fn [_]
-                                (#'send-notification! db)))]))
+                                (#'send-notification! db config)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks
-  ([] (pre-notices-tasks daily-notify-time))
-  ([at]
-   (->PreNoticesTasks at)))
+  ([config] (pre-notices-tasks daily-notify-time config))
+  ([at config]
+   (->PreNoticesTasks at config)))

@@ -79,7 +79,8 @@
 
    ;; Scheduled tasks
    :tasks-company (component/using (tasks-company/company-tasks) [:db])
-   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks) [:db])))
+   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks
+                                         (:email config)) [:db])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!
