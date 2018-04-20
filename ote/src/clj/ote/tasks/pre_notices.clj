@@ -94,19 +94,21 @@
     "fi"
     (tx/with-transaction
       db
-      (let [users (list-users db {:transit-authority? true :email nil :name nil})
-            emails (mapv #(:email %) users)
-            notification (notificiation-html db)]
-        (try
-          (when-not (empty? emails)
-            (log/info "Trying to send a pre-notice email to: " (pr-str emails))
-            (send-email {:bcc emails
-                         :from "NAP"
-                         :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                       (datetime-string (t/now) timezone))
-                         :body [{:type "text/html" :content notification}]}))
-          (catch Exception e
-            (log/warn "Error while sending a notification" e)))))))
+      (tx/with-xact-advisory-lock
+        db
+        (let [users (list-users db {:transit-authority? true :email nil :name nil})
+              emails (mapv #(:email %) users)
+              notification (notificiation-html db)]
+          (try
+            (when-not (empty? emails)
+              (log/info "Trying to send a pre-notice email to: " (pr-str emails))
+              (send-email {:bcc emails
+                           :from "NAP"
+                           :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                         (datetime-string (t/now) timezone))
+                           :body [{:type "text/html" :content notification}]}))
+            (catch Exception e
+              (log/warn "Error while sending a notification" e))))))))
 
 
 (defrecord PreNoticesTasks [at]
