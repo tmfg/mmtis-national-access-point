@@ -47,14 +47,15 @@
   "
   [this {:keys [on-create disabled-geometry-types ref-name
                 on-control-created add? localization
-                on-remove add-features? on-edit]}]
+                on-remove add-features? on-edit leaflet-edit-tr-key]}]
   (do
     (set! (.-draw js/L.drawLocal)
           (clj->js (merge-with merge
                                (tr-tree [:leaflet-draw])
                                localization)))
-    (set! (.-edit js/L.drawLocal)
-          (clj->js (tr-tree [:leaflet-edit]))))
+    (when leaflet-edit-tr-key
+      (set! (.-edit js/L.drawLocal)
+            (clj->js (tr-tree [leaflet-edit-tr-key])))))
 
   (let [^js/L.map
         m (aget this "refs" (or ref-name "leaflet") "leafletElement")

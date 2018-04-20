@@ -1,8 +1,10 @@
 (ns ote.ui.buttons
   (:require [cljs-react-material-ui.reagent :as ui]
+            [ote.localization :refer [tr tr-key]]
             [cljs-react-material-ui.core :refer [color]]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.ui.common :as common]))
 
 
 (defn- button-container [button]
@@ -27,3 +29,11 @@
                     :font-size "12px"
                     :font-weight "bold"}} opts)
     label]])
+
+(defn open-link
+  "Create button like linkify link"
+  [url label]
+  [button-container
+   (common/linkify url
+                   [ui/flat-button {:label label :primary true}]
+                   {:target "_blank"})])

@@ -72,6 +72,9 @@
             ;; Keep track if we are in delete mode
             (.on m "draw:deletestart" #(reset! deleting? true))
             (.on m "draw:deletestop" #(reset! deleting? false))
+
+            (leaflet/customize-zoom-controls e! this "stops-map" {:zoomInTitle (tr [:leaflet :zoom-in])
+                                                   :zoomOutTitle (tr [:leaflet :zoom-out])})
             (leaflet-draw/install-draw-control!
              this
              {:ref-name                "stops-map"
@@ -92,7 +95,8 @@
 
               :add-features?           true
               :localization            {:toolbar  {:buttons {:marker (tr [:route-wizard-page :stop-sequence-leaflet-button-marker])}}
-                                        :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}})))
+                                        :handlers {:marker {:tooltip {:start (tr [:route-wizard-page :stop-sequence-leaflet-button-start])}}}}
+              :leaflet-edit-tr-key :leaflet-port-edit})))
             :component-will-receive-props (fn [this [_ _ route]]
                                        (let [^js/L.map m (aget this "refs" "stops-map" "leafletElement")]
                                          (if (get-in route [:map-controls :show?])
@@ -103,7 +107,7 @@
                                           [custom-stop-dialog e! route]
                                           [leaflet/Map {:ref         "stops-map"
                                                         :center      #js [65 25]
-                                                        :zoomControl true
+                                                        :zoomControl false
                                                         :zoom        5}
                                            (leaflet/background-tile-map)
                                            (when-let [stops (:stops route)]

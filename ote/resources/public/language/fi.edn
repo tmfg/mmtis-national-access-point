@@ -235,7 +235,8 @@
 
   :pre-notice
   {:ote.db.transit/other-type-description "Selitys"
-   :ote.db.transit/url                    "www-osoite"
+   :ote.db.transit/url                    "Web-osoite"
+   :ote.db.transit/attachment-file-name   "Liitetiedosto"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
@@ -641,7 +642,7 @@
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
-
+  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
   }
 
  :route-wizard-page
@@ -727,6 +728,7 @@
  {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
   :notice-type-title "Ilmoitettavan muutoksen tyyppi"
   :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+  :attachment-section-title "Muutoksen tarkemmat tiedot"
   :route-and-area-information-title "Reitin ja alueen tiedot"
   :effective-date-from "Alkamispäivä"
   :effective-date-description "Selitys"
@@ -736,6 +738,9 @@
   :save-failure "Luonnoksen tallentaminen epäonnistui."
   :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
   :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
+  :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
+  :add-attachment "Uusi liite"
+  :select-attachment "Valitse tiedosto"
   }
 
  :price-dialog
@@ -787,7 +792,7 @@
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
   :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :navigation-authority-pre-notices           "Saapunet muutosilmoitukset"
+  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset"
   :navigation-privacy-policy                  "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
@@ -1129,16 +1134,16 @@
                             :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
                                      :radius "Säde"}
                             :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
- :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+ :leaflet-port-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
                                             :text "Tallenna muutokset"}
                                     :cancel {:title "Peruuta tehdyt muutokset"
                                              :text "Peruuta"}
-                                    :clearAll {:title "Tyhjenna kaikki"
-                                               :text "Tyhjennä kaikki"}}
+                                    :clearAll {:title "Poista kaikki lisäämäsi satamat"
+                                               :text "Poista kaikki lisäämäsi satamat"}}
                           :buttons {:edit "Muokkaa"
                                     :editDisabled "Muokkaustila on poissa käytöstä"
                                     :remove "Poista"
                                     :removeDisabled "Poistotila on poissa käytöstä"}}
-                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
-                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
-                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
+                :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
+                                            :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
+                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}

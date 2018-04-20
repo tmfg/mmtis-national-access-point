@@ -10,7 +10,9 @@
             ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
-            [ote.views.route.trips :as route-trips]))
+            [ote.views.route.trips :as route-trips]
+            [ote.style.base :as style-base]
+            [ote.app.controller.front-page :as fp-controller]))
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
@@ -23,38 +25,39 @@
    [route-stop-sequence/stop-sequence e! app]
    [route-trips/trips e! app]])
 
+(defn form-container [e! app]
+  [:div
+   [:h1 (tr [:common-texts :navigation-route])]
+   [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf" (tr [:route-list-page :link-to-help-pdf])]
+   [route-components e! app]
+   (when (not (rw/valid-route? (:route app)))
+     [ui/card {:style {:margin "1em 0em 1em 0em"}}
+      [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])])
+
 (defn new-route [e! app]
-  (fn [e! app]
-    [:span
-     [route-components e! app]
-     (when (not (rw/valid-route? (:route app)))
-       [ui/card {:style {:margin "1em 0em 1em 0em"}}
-        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])
-     [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
-      [buttons/save {:disabled (not (rw/valid-route? (:route app)))
-                     :on-click #(do
+  [:span
+   [form-container e! app]
+   [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
+    [buttons/save {:disabled (not (rw/valid-route? (:route app)))
+                   :on-click #(do
+                                (.preventDefault %)
+                                (e! (rw/->SaveToDb true)))}
+     (tr [:buttons :save-and-publish])]
+    [buttons/save {:disabled (not (rw/valid-name (:route app)))
+                   :on-click #(do
+                                (.preventDefault %)
+                                (e! (rw/->SaveToDb false)))}
+     (tr [:buttons :save-as-draft])]
+    [buttons/cancel {:on-click #(do
                                   (.preventDefault %)
-                                  (e! (rw/->SaveToDb true)))}
-       (tr [:buttons :save-and-publish])]
-      [buttons/save {:disabled (not (rw/valid-name (:route app)))
-                     :on-click #(do
-                                  (.preventDefault %)
-                                  (e! (rw/->SaveToDb false)))}
-       (tr [:buttons :save-as-draft])]
-      [buttons/cancel {:on-click #(do
-                                    (.preventDefault %)
-                                    (e! (rw/->CancelRoute)))}
-       (tr [:buttons :cancel])]]]))
+                                  (e! (rw/->CancelRoute)))}
+     (tr [:buttons :cancel])]]])
 
 (defn edit-route-by-id [e! app]
   (e! (rw/->LoadRoute (get-in app [:params :id])))
   (fn [e! app]
     [:span
-     [:h1 (tr [:common-texts :navigation-route])]
-     [route-components e! app]
-     (when (not (rw/valid-route? (:route app)))
-       [ui/card {:style {:margin "1em 0em 1em 0em"}}
-        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])
+     [form-container e! app]
      [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
       (if (get-in app [:route ::transit/published?])
         [:span

@@ -8,11 +8,6 @@
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]))
 
-
-
-(defn valid-notice? [notice]
-  true)
-
 (declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse ->ServerError ->RegionsResponse)
 
 (tuck/define-event ServerError [response]
@@ -212,3 +207,13 @@
               {:on-success (tuck/send-async! ->AddCommentResponse)
                :on-failure (tuck/send-async! ->ServerError)})
   (update app :pre-notice-dialog dissoc :new-comment))
+
+(define-event UploadResponse [response]
+  {:path [:pre-notice :attachments]}
+  (conj (or (vec (butlast app)) []) response))
+
+(define-event UploadAttachment [input]
+  {}
+  (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)
+                                           :on-failure (tuck/send-async! ->ServerError)})
+  app)
