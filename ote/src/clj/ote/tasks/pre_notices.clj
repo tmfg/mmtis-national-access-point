@@ -117,7 +117,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds 60)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/days 1)))
                               (fn [_]
                                 (#'send-notification! db config)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
