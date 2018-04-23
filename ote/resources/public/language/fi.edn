@@ -717,7 +717,10 @@
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
-            :actions "Toiminnot"}
+            :actions "Toiminnot"
+            :region-names "Maakunta"
+            :ote.db.transit/attachments "Liitetiedostot"
+            :ote.db.transport-operator/transport-operator "Palveluntuottaja"}
 
   :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
                       :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
