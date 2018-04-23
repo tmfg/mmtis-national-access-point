@@ -29,9 +29,18 @@
      (if-not url
        [:span]
        ;; Lazy check if url has a protocol, or if it is a relative path
-       (let [url (if (re-matches #"^(\w+:|.?.?/).*" url)
+       (let [url (cond
+                   ;; URL with protocol, use as is
+                   (re-matches #"^(\w+:|.?.?/).*" url)
                    url
-                   (str "http://" url))]
+
+                   ;; User specified link without protocol (like "www.serviceprovider.fi/foo")
+                   (re-matches #"^[^/]+\..*" url)
+                   (str "http://" url)
+
+                   ;; Internal relative link, like "pre-notice/attachment/1"
+                   :default
+                   url)]
          [:a (merge {:href url} a-props) label])))))
 
 
