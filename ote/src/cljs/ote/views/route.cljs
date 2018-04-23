@@ -43,7 +43,7 @@
                                 (.preventDefault %)
                                 (e! (rw/->SaveToDb true)))}
      (tr [:buttons :save-and-publish])]
-    [buttons/save {:disabled (not (rw/valid-name (:route app)))
+    [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
                    :on-click #(do
                                 (.preventDefault %)
                                 (e! (rw/->SaveToDb false)))}
@@ -66,7 +66,7 @@
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb true)))}
           (tr [:buttons :save])]
-         [buttons/save {:disabled (not (rw/valid-name (:route app)))
+         [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
                         :on-click #(do
                                   (.preventDefault %)
                                   (e! (rw/->SaveToDb false)))}

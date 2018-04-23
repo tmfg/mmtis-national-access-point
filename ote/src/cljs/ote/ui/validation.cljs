@@ -22,9 +22,8 @@
       (and (coll? val) (empty? val))))
 
 (defn empty-localized-text? [value]
-  (let [text-value (get (first value) :ote.db.transport-service/text)]
-    (or (nil? text-value)
-      (str/blank? text-value))))
+  (or (empty? value)
+      (every? #(str/blank? (:ote.db.transport-service/text %)) value)))
 
 (defn empty-enum-dropdown? [value]
   (or (nil? (first value))
