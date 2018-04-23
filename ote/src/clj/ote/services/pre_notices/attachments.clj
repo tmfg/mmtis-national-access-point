@@ -10,7 +10,8 @@
             [specql.core :as specql]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
-            [ote.components.http :as http]))
+            [ote.components.http :as http]
+            [ote.nap.users :as users]))
 
 (defn upload-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (let [uploaded-file (get-in req [:multipart-params "file"])
@@ -27,14 +28,16 @@
     (http/transit-response file)))
 
 (defn- attachment-info [db user pre-notice-attachment-id]
-  (first
-   (specql/fetch db ::transit/pre-notice-attachment
-                 #{::transit/id ::transit/attachment-file-name}
-                 (op/and
-                  {::transit/id pre-notice-attachment-id}
-                  ;; PENDING: check ELY group membership
-                  (when (not (authorization/admin? user))
-                    {::transit/created-by (authorization/user-id user)})))))
+  (let [can-view-all-attachments?
+        (or (authorization/admin? user)
+            (users/is-transit-authority-user? db {:user-id (authorization/user-id user)}))]
+    (first
+     (specql/fetch db ::transit/pre-notice-attachment
+                   #{::transit/id ::transit/attachment-file-name}
+                   (op/and
+                    {::transit/id pre-notice-attachment-id}
+                    (when-not can-view-all-attachments?
+                      {::transit/created-by (authorization/user-id user)}))))))
 
 (defn download-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (let [attachment (attachment-info db user (Long/parseLong (get-in req [:params :id])))
