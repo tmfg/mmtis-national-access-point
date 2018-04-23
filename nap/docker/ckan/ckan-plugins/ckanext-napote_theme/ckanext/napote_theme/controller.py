@@ -101,9 +101,7 @@ class CustomUserController(UserController):
                 return render('user/logout_first.html')
 
     def register(self, data=None, errors=None, error_summary=None):
-        ret = super(CustomUserController, self).register(data, errors, error_summary)
-        log.info(ret)
-        return ret
+        return super(CustomUserController, self).register(data, errors, error_summary)
 
     def request_reset(self):
         context = {'model': model, 'session': model.Session, 'user': c.user,
