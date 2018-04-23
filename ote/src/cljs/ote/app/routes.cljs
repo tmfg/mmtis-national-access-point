@@ -7,7 +7,7 @@
 
 (def ote-router
   (r/router
-   [["/" :own-services]
+   [["/" :front-page]
     ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]

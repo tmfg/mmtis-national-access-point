@@ -63,21 +63,9 @@
                                       (.preventDefault %)
                                       (e! (fp/->ToggleAddMemberDialog)))}]
         (when show-add-member-dialog?
-          [ui/dialog
-           {:open true
-            :modal true
-            :auto-scroll-body-content true
-            :title   (::t-operator/name operator)
-            :actions [(r/as-element
-                       [ui/flat-button
-                        {:label     (tr [:buttons :close])
-                         :secondary true
-                         :primary   true
-                         :on-click  #(e! (fp/->ToggleAddMemberDialog))}])]}
-           [:iframe {:style {:width "100%"
-                             :height "400px"
-                             :border "none"}
-                     :src (str "/organization/member_new/" (::t-operator/ckan-group-id operator))}]])])])])
+          [ui-common/ckan-iframe-dialog (::t-operator/name operator)
+           (str "/organization/member_new/" (::t-operator/ckan-group-id operator))
+           #(e! (fp/->ToggleAddMemberDialog))])])])])
 
 (defn- operator-form-groups []
   [(form/group

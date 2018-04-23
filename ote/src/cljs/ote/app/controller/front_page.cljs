@@ -3,7 +3,8 @@
             [ote.communication :as comm]
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
-            [ote.app.controller.login :as login]))
+            [ote.app.controller.login :as login]
+            [ote.localization :refer [tr]]))
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
@@ -146,3 +147,22 @@
   {:path [:show-add-member-dialog?]
    :app show?}
   (not show?))
+
+(define-event ToggleRegistrationDialog []
+  {}
+  (-> app
+      (update :show-register-dialog? not)
+      (dissoc :login) ;; close login dialog if visible
+      get-transport-operator-data))
+
+(define-event ToggleUserResetDialog []
+  {}
+  (-> app
+      (update :show-reset-dialog? not)
+      (dissoc :login)))
+
+(define-event UserResetRequested []
+  {}
+  (assoc app
+         :show-reset-dialog? false
+         :flash-message (tr [:login :check-email-for-link])))

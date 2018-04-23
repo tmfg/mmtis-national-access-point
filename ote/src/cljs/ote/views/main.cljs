@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
@@ -182,20 +182,23 @@
 
     (if (nil? (get-in app [:user :username]))
       [:ul (stylefy/use-style style-topnav/ul)
-       [:li
-        [linkify "/user/register" (tr [:common-texts :navigation-register])
-         (merge (stylefy/use-style
-                  (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}})]]
+       [:li {:style {:float "right"}}
+        [:a (merge (stylefy/use-style
+                    (if desktop? style-topnav/desktop-link style-topnav/link))
+                   {:href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (fp-controller/->ToggleRegistrationDialog)))})
+         (tr [:common-texts :navigation-register])]]
        [:li
         (if (flags/enabled? :ote-login)
-          [linkify "#" (tr [:common-texts :navigation-login])
-           (merge (stylefy/use-style
-                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                  {:style {:float "right"}}
-                  {:on-click #(do
-                                (.preventDefault %)
-                                (e! (login/->ShowLoginDialog)))})]
+          [:a (merge (stylefy/use-style
+                      (if desktop? style-topnav/desktop-link style-topnav/link))
+                     {:style {:float "right"}}
+                     {:on-click #(do
+                                   (.preventDefault %)
+                                   (e! (login/->ShowLoginDialog)))})
+           (tr [:common-texts :navigation-login])]
           [linkify "/user/login" (tr [:common-texts :navigation-login])
            (merge (stylefy/use-style
                    (if desktop? style-topnav/desktop-link style-topnav/link))
@@ -303,7 +306,7 @@
        :on-enter #(e! (login/->Login))})]
     credentials]])
 
-(defn login-action-cards []
+(defn login-action-cards [e!]
   [:div {:style {:flex-basis 0 :flex-grow 1}}
    [:div (stylefy/use-style (merge (style-base/flex-container "column")
                                    {:margin-left "1em"
@@ -313,14 +316,18 @@
      [ui/card-text
       [:div
        [:div (tr [:login :no-account-help])]
-       [linkify "/user/register" (tr [:login :no-account-button])]]]]
+       [ui/flat-button {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))
+                        :label (tr [:login :no-account-button])
+                        :primary true}]]]]
 
     [ui/card
      [ui/card-header {:title (tr [:login :forgot-password?])}]
      [ui/card-text
       [:div
        [:div (tr [:login :forgot-password-help])]
-       [linkify "/user/reset" (tr [:login :forgot-password-button])]]]]]])
+       [ui/flat-button {:on-click #(e! (fp-controller/->ToggleUserResetDialog))
+                        :label (tr [:login :forgot-password-button])
+                        :primary true}]]]]]])
 
 (defn mobile-login-form [e! {:keys [credentials failed? error] :as login}]
   [:span
@@ -352,7 +359,7 @@
                           :secondary true
                           :on-click #(e! (login/->LoginCancel))
                           :label (tr [:buttons :cancel])}]]]]]
-   [login-action-cards]])
+   [login-action-cards e!]])
 
 (defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
   [ui/dialog {:open true
@@ -360,7 +367,7 @@
    [:div (stylefy/use-style (merge (style-base/flex-container "row")))
     [:div {:style {:flex-basis 0 :flex-grow 1}}
      [login-form e! login]]
-    [login-action-cards]]])
+    [login-action-cards e!]]])
 
 (defn document-title [page]
   (set! (.-title js/document)
@@ -385,6 +392,8 @@
 
   (fn [e! {loaded? :transport-operator-data-loaded?
            login :login
+           show-register-dialog? :show-register-dialog?
+           show-reset-dialog? :show-reset-dialog?
            :as app}]
     [:div {:style (stylefy/use-style style-base/body)}
      [theme e! app
@@ -395,7 +404,23 @@
          [mobile-login-form e! login]
          [:span
           (when (:show? login)
+            ^{:key "login"}
             [login-dialog e! login])
+
+          (when show-register-dialog?
+            ^{:key "ckan-register"}
+            [ckan-iframe-dialog
+             (tr [:common-texts :navigation-register])
+             "/user/register"
+             #(e! (fp-controller/->ToggleRegistrationDialog))])
+
+          (when show-reset-dialog?
+            ^{:key "ckan-reset"}
+            [ckan-iframe-dialog
+             (tr [:login :forgot-password?])
+             "/user/reset"
+             #(e! (fp-controller/->ToggleUserResetDialog))
+             #(e! (fp-controller/->UserResetRequested))])
 
           (if (not loaded?)
             [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
@@ -403,7 +428,7 @@
              [:div.container-fluid
               [document-title (:page app)]
               (case (:page app)
-                :front-page [fp/own-services e! app]
+                :front-page [fp/front-page e! app]
                 :own-services [fp/own-services e! app]
                 :transport-service [t-service/select-service-type e! app]
                 :transport-operator [to/operator e! app]

@@ -1098,7 +1098,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :forgot-password-button "Glömt ditt löseonrd?"
 
   :error {:no-such-user "Okänd konto"
-          :incorrect-password "Fel lösenord"}}
+          :incorrect-password "Fel lösenord"}
+
+  :check-email-for-link "Återställningskoden har skickats per e-post."}
 
 
  :leaflet

@@ -83,7 +83,7 @@ class CustomUserController(UserController):
         if not c.user:
             # log the user in programatically
             set_repoze_user(data_dict['name'])
-            h.redirect_to(str('/ote/#/?logged_in=1'))
+            return render('user/ote_close.html')
         else:
             # #1799 User has managed to register whilst logged in - warn user
             # they are not re-logged in as new user.
@@ -100,7 +100,9 @@ class CustomUserController(UserController):
                 return render('user/logout_first.html')
 
     def register(self, data=None, errors=None, error_summary=None):
-        return super(CustomUserController, self).register(data, errors, error_summary)
+        ret = super(CustomUserController, self).register(data, errors, error_summary)
+        log.info(ret)
+        return ret
 
     def request_reset(self):
         context = {'model': model, 'session': model.Session, 'user': c.user,
@@ -138,9 +140,7 @@ class CustomUserController(UserController):
             if user_obj:
                 try:
                     mailer.send_reset_link(user_obj)
-                    h.flash_success(_('Please check your inbox for '
-                                      'a reset code.'))
-                    h.redirect_to('/')
+                    return render('user/ote_close.html')
                 except mailer.MailerException, e:
                     h.flash_error(_('Could not send reset link: %s') %
                                   unicode(e))

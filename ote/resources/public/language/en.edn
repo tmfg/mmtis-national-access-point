@@ -1094,7 +1094,9 @@
   :forgot-password-button "Reset password"
 
   :error {:no-such-user "Unknown user"
-          :incorrect-password "Incorrect password"}}
+          :incorrect-password "Incorrect password"}
+
+  :check-email-for-link "Please check your inbox for a reset code."}
 
 
  :leaflet

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% set raw = c.controller in ['organization', 'ckanext.napote_theme.organization_controller:CustomOrganizationController']  %}
+{% set raw = c.controller in ['organization', 'ckanext.napote_theme.organization_controller:CustomOrganizationController', 'ckanext.napote_theme.controller:CustomUserController']  %}
 
 {%- block page -%}
   {% block skip %}
@@ -60,7 +60,7 @@
             {% endblock %}
 
             {% block primary %}
-              <div class="primary {{ 'span9' if not raw else '' }}">
+              <div class="primary{{ 'raw' if raw else '' }} {{ 'span9' if not raw else '' }}">
                 {#
                 The primary_content block can be used to add content to the page.
                 This is the main block that is likely to be used within a template.

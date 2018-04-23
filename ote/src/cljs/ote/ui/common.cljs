@@ -189,3 +189,29 @@
                   .digest
                   goog.crypt/byteArrayToHex)]
      [:img {:src (str "https://www.gravatar.com/avatar/" hash "?s=" size "&d=" default)}])))
+
+(defn ckan-iframe-dialog
+  ([title url on-close]
+   (ckan-iframe-dialog title url on-close on-close))
+  ([title url on-close on-ckan-close]
+   (r/create-class
+    {:component-did-mount
+     (fn [_]
+       (aset js/window "closeOteCkanDialog" on-ckan-close))
+     :reagent-render
+     (fn [title url on-close _]
+       [ui/dialog
+        {:open true
+         :modal true
+         :auto-scroll-body-content true
+         :title   title
+         :actions [(r/as-element
+                    [ui/flat-button
+                     {:label     (tr [:buttons :close])
+                      :secondary true
+                      :primary   true
+                      :on-click  on-close}])]}
+        [:iframe {:style {:width "100%"
+                          :height "400px"
+                          :border "none"}
+                  :src url}]])})))
