@@ -52,8 +52,7 @@
                               :url   "/organization"})]
   (filter some?
           [{:page  :front-page
-            :label [:common-texts :navigation-front-page]
-            :url   "/"}
+            :label [:common-texts :navigation-front-page]}
 
            {:page  :services
             :label [:common-texts :navigation-dataset]}
@@ -139,6 +138,7 @@
 "Return true if given current-page belongs to given page-group"
 [page-group current-page]
   (cond
+    (= page-group :front-page current-page) true
     (= page-group :own-services) (own-services-pages current-page)
     (= page-group :services) (services-pages current-page)
     (= page-group :operators) (operator-pages current-page)
@@ -156,7 +156,7 @@
                {:href     "#"
                 :on-click #(do
                              (.preventDefault %)
-                             (e! (fp-controller/->GoToUrl "/")))})
+                             (e! (fp-controller/->ChangePage :front-page nil)))})
         [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
 
     (doall
@@ -251,11 +251,11 @@
   [:footer.site-footer
    [:div.container-fluid
     [:div.row
-     [:img {:src "/ote/img/EU-logo.png" :style {:float "right"
-                                                :transform "scale(0.5, 0.5)"}}]
+     [:img {:src "/img/EU-logo.png" :style {:float "right"
+                                            :transform "scale(0.5, 0.5)"}}]
      [:div.col-md-2.footer-links
       [:a.logo {:href "#" }
-       [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
+       [:img {:src "/img/icons/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
      [:div.col-md-2.footer-links
       [:ul.unstyled
        [:li
@@ -273,7 +273,7 @@
         [language-selection e! style-base/language-selection-footer nil true]]]]
      [:div.col-md-12 (stylefy/use-style style-base/footer-copyright)
       [linkify "http://creativecommons.org/licenses/by/4.0/"
-       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/cc.svg"})]
+       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/img/icons/cc.svg"})]
        {:target "_blank"}]
       [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
 

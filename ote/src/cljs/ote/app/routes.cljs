@@ -68,7 +68,7 @@
                  app))))))
 
 (defn start! [go-to-url-event]
-  (r/start! ote-router {:default :own-services
+  (r/start! ote-router {:default :front-page
                         :on-navigate (partial on-navigate go-to-url-event)}))
 
 (defn navigate!
