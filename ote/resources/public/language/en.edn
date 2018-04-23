@@ -742,6 +742,10 @@
   :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
   :add-attachment "Uusi liite"
   :select-attachment "Valitse tiedosto"
+  :effective-date-descriptions {:year-start "Year start"
+                                :school-start "The beginning of the school year"
+                                :school-end "The end of the school year"
+                                :season-schedule-change "Season schedule change"}
   }
 
  :price-dialog

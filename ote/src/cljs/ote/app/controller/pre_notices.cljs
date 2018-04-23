@@ -8,7 +8,8 @@
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]))
 
-(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse ->ServerError ->RegionsResponse)
+(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse
+         ->ServerError ->RegionsResponse effective-date-description->set)
 
 (tuck/define-event ServerError [response]
   {}
@@ -47,7 +48,7 @@
   (->LoadPreNotice (:id params)))
 
 (tuck/define-event LoadPreNoticeResponse [response]
-  {:path [:pre-notice]} response)
+  {:path [:pre-notice]} (effective-date-description->set response))
 
 (tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
@@ -68,6 +69,28 @@
   (into {}
         (map (juxt :id identity))
         response))
+
+(defn effective-dates-desc->text
+  "Before save convert effective date descriptions from set to text."
+  [pre-notice]
+  (update pre-notice ::transit/effective-dates
+          (fn [dates]
+            (mapv
+              (fn [date]
+                {::transit/effective-date             (::transit/effective-date date)
+                 ::transit/effective-date-description (first (::transit/effective-date-description date))})
+              dates))))
+
+(defn effective-date-description->set [pre-notice]
+  "After load convert effective date descriptions to set."
+  (update pre-notice ::transit/effective-dates
+          (fn [dates]
+            (mapv
+              (fn [date]
+                {::transit/effective-date             (::transit/effective-date date)
+                 ::transit/effective-date-description (conj #{} (::transit/effective-date-description date))})
+              dates))))
+
 
 ;; Create new route
 (defrecord CreateNewPreNotice [])
@@ -125,6 +148,7 @@
   (process-event [{published? :published?} app]
     (let [notice (as-> (:pre-notice app) n
                        (form/without-form-metadata n)
+                       (effective-dates-desc->text n)
                        (dissoc n :regions)
                        (if published?
                          (assoc n ::transit/pre-notice-state :sent)
