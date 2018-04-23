@@ -87,6 +87,12 @@
                                    :label (tr [:buttons :route-calendar-clear])}]])
       :actions [(r/as-element
                   [ui/flat-button
+                   {:label (tr [:buttons :cancel])
+                    :secondary true
+                    :primary true
+                    :on-click #(e! (rw/->CancelServiceCalendar))}])
+                (r/as-element
+                  [ui/flat-button
                    {:label (tr [:buttons :close])
                     :secondary true
                     :primary true
