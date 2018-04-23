@@ -540,8 +540,8 @@
                        "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
                        "kehittäjille.\n\n"
                        "## **NAP-palvelun rakenne**\n"
-                       "[Palvelukatalog](/ote/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
-                       "[Palveluntuottajat](/ote/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
+                       "[Palvelukatalog](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
+                       "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
   :new-user? "Uusi käyttäjä?"
 
   :table-header-service-name      "Palvelun nimi"
