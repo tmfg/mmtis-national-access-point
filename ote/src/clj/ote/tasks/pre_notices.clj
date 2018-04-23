@@ -5,6 +5,7 @@
             [taoensso.timbre :as log]
             [clj-time.core :as t]
             [clj-time.format :as format]
+            [clj-time.coerce :as coerce]
             [clj-time.periodic :refer [periodic-seq]]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
@@ -13,10 +14,9 @@
             [ote.db.tx :as tx]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
-            [clj-time.coerce :as coerce])
+            [ote.nap.users :as nap-users])
   (:import (org.joda.time DateTimeZone)))
 
-(defqueries "ote/nap/users.sql")
 (defqueries "ote/tasks/pre_notices.sql")
 
 (defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
@@ -84,7 +84,7 @@
      [:span " tai 0295 34 3434 (arkisin 10-16)"]]]])
 
 
-(defn notificiation-html [db]
+(defn notification-html [db]
   (try
     (when-let [notices (fetch-pre-notices-by-interval db {:interval "1 day"})]
       (html (notification-template notices)))
@@ -96,9 +96,9 @@
     "fi"
     (tx/with-transaction db
       (tx/with-xact-advisory-lock db
-        (let [users (list-users db {:transit-authority? true :email nil :name nil})
+        (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
               emails (mapv #(:email %) users)
-              notification (notificiation-html db)]
+              notification (notification-html db)]
           (try
             (when-not (empty? emails)
               (log/info "Trying to send a pre-notice email to: " (pr-str emails))
