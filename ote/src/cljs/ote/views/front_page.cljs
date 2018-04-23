@@ -214,10 +214,10 @@
                 :font-weight "bold"}}
     "TÄMÄ ON TESTIPALVELU!"]
    [:p {:style {:margin "10px"}}
-    "Julkinen NAP-palvelukatalogi löytyy osoitteesta:"
+    "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "
     [linkify "https://finap.fi/ote/#/services" "finap.fi"]]
    [:p {:style {:margin "10px"}}
-    "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta"
+    "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta "
     [linkify "http://www.liikennevirasto.fi/nap" "www.liikennevirasto.fi/nap"]]])
 
 (defn front-page

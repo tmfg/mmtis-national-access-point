@@ -13,9 +13,14 @@ Invalid = df.Invalid
 def email_uniq_validator(value, context):
     model = context['model']
 
-    users = model.User.by_email(value)
+    username = context['user']
+    user_obj =  context['user_obj']
 
-    if users:
-        raise Invalid(_('Email already exists'))
+    if (username == user_obj.name and user_obj.email != value) or (username != user_obj.name):
+        # Only check if editing self and email has changed or if editing someone else
+        users = model.User.by_email(value)
+
+        if users:
+            raise Invalid(_('Email already exists'))
 
     return email_validator(value, context)

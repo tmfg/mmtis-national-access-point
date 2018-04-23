@@ -118,7 +118,7 @@
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
+                                   (e! (fp-controller/->ToggleUserEditDialog)))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :navigation-give-feedback])
                     :on-click #(do (.preventDefault %)
@@ -383,6 +383,35 @@
   ;; Render as an empty span
   [:span])
 
+(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog?
+                               show-user-edit-dialog? user]}]
+  [:span
+   (when (:show? login)
+     ^{:key "login"}
+     [login-dialog e! login])
+
+   (when show-register-dialog?
+     ^{:key "ckan-register"}
+     [ckan-iframe-dialog
+      (tr [:common-texts :navigation-register])
+      "/user/register"
+      #(e! (fp-controller/->ToggleRegistrationDialog))])
+
+   (when show-reset-dialog?
+            ^{:key "ckan-reset"}
+     [ckan-iframe-dialog
+      (tr [:login :forgot-password?])
+      "/user/reset"
+      #(e! (fp-controller/->ToggleUserResetDialog))
+      #(e! (fp-controller/->UserResetRequested))])
+
+   (when show-user-edit-dialog?
+     ^{:key "ckan-user-edit"}
+     [ckan-iframe-dialog
+      (tr [:common-texts :user-menu-profile])
+      (str "/user/edit/" (:username user))
+      #(e! (fp-controller/->ToggleUserEditDialog))])])
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -392,8 +421,6 @@
 
   (fn [e! {loaded? :transport-operator-data-loaded?
            login :login
-           show-register-dialog? :show-register-dialog?
-           show-reset-dialog? :show-reset-dialog?
            :as app}]
     [:div {:style (stylefy/use-style style-base/body)}
      [theme e! app
@@ -403,25 +430,7 @@
        (if (and (:show? login) common/mobile?)
          [mobile-login-form e! login]
          [:span
-          (when (:show? login)
-            ^{:key "login"}
-            [login-dialog e! login])
-
-          (when show-register-dialog?
-            ^{:key "ckan-register"}
-            [ckan-iframe-dialog
-             (tr [:common-texts :navigation-register])
-             "/user/register"
-             #(e! (fp-controller/->ToggleRegistrationDialog))])
-
-          (when show-reset-dialog?
-            ^{:key "ckan-reset"}
-            [ckan-iframe-dialog
-             (tr [:login :forgot-password?])
-             "/user/reset"
-             #(e! (fp-controller/->ToggleUserResetDialog))
-             #(e! (fp-controller/->UserResetRequested))])
-
+          [ckan-dialogs e! app]
           (if (not loaded?)
             [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
             [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
