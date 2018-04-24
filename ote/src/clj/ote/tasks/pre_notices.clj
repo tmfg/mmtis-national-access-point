@@ -91,7 +91,7 @@
     (catch Exception e
       (log/warn "Error while generating notification html:" e))))
 
-(defn send-notification! [db email-config]
+(defn send-notification! [db {server-opts :server msg-opts :msg :as email-opts}]
   (localization/with-language
     "fi"
     (tx/with-transaction db
@@ -103,9 +103,9 @@
             (when-not (empty? emails)
               (log/info "Trying to send a pre-notice email to: " (pr-str emails))
               (send-email
-                email-config
+                server-opts
                 {:bcc emails
-                 :from "NAP"
+                 :from (or (:from msg-opts) "NAP")
                  :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
                                (datetime-string (t/now) timezone))
                  :body [{:type "text/html" :content notification}]}))
