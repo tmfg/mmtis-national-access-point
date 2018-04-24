@@ -326,6 +326,7 @@
   :publish "Publicera"
   :edit-service "Redigera tjänstens info"
   :edit "Redigera"
+  :approve "Hyväksy"
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"
@@ -724,6 +725,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
+  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen ajettavat viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä ajopäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
   :save-success "Rutten sparades"
   :save-failure "Rutten kunde inte sparas"
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
@@ -773,6 +775,10 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
  :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
  :add-attachment "Uusi liite"
  :select-attachment "Valitse tiedosto"
+ :effective-date-descriptions {:year-start "Vuoden alku"
+                               :school-start "Kouluvuoden alku"
+                               :school-end "Kouluvuoden päätös"
+                               :season-schedule-change "Aikataulukauden vaihtuminen"}
  }
 
  :price-dialog

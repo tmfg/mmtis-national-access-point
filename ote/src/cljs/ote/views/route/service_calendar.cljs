@@ -11,7 +11,8 @@
             [stylefy.core :as stylefy]
             [ote.ui.form-fields :as form-fields]
             [ote.db.transport-service :as t-service]
-            [ote.localization :refer [tr selected-language]]))
+            [ote.localization :refer [tr selected-language]]
+            [ote.ui.common :as common]))
 
 (defn rule-fields [calendar]
   (into [{:id "from-date"
@@ -87,14 +88,14 @@
                                    :label (tr [:buttons :route-calendar-clear])}]])
       :actions [(r/as-element
                   [ui/flat-button
-                   {:label (tr [:buttons :close])
+                   {:label (tr [:buttons :approve])
                     :secondary true
                     :primary true
                     :on-click #(e! (rw/->CloseServiceCalendar))}])]}
      (let [calendar (get-in route [::transit/service-calendars trip-idx])]
        [:div.route-service-calendar {:style {:padding-top "20px"}}
 
-
+        [common/generic-help (tr [:route-wizard-page :route-calendar-guidance-info])]
         [rules-table e! trip-idx calendar]
 
         [service-calendar/service-calendar

@@ -43,6 +43,11 @@
                  (specql/columns ::transit/pre-notice)
                  {::t-operator/id (op/in (authorization/user-transport-operators db user))})))
 
+(defn with-sent-field [notice]
+  (if (= (::transit/pre-notice-state notice) :sent)
+    (assoc notice ::transit/sent (java.sql.Timestamp. (System/currentTimeMillis)))
+    notice))
+
 (defn save-pre-notice [db user notice]
   (authorization/with-transport-operator-check
     db user (::t-operator/id notice)
@@ -52,7 +57,8 @@
                n (-> notice
                      (dissoc :attachments)
                      (dissoc ::transit/attachments)
-                     (modification/with-modification-fields ::transit/id user))
+                     (modification/with-modification-fields ::transit/id user)
+                     (with-sent-field))
                saved-notice (specql/upsert! db ::transit/pre-notice n)
                notice-id (::transit/id saved-notice)]
            (log/debug "Save notice: " saved-notice)
