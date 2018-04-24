@@ -519,7 +519,34 @@
           :brokerage                "Välityspalvelut"}
 
  :front-page
- {:table-header-service-name      "Palvelun nimi"
+ {:front-page-content (:md
+                       "\n"
+                       "# **Mikä on NAP?**\n"
+                       "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon "
+                       " **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** "
+                       "koneluettavista rajapinnoistaan. \n"
+                       "NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on aikaansaada mahdollisimman "
+                       "helppokäyttöisiä uusia yhdistettyjä liikkumispalveluita ja infopalveluita.\n"
+                       "\n"
+                       "## **Mitä ovat liikkumispalvelut?**\n"
+                       "Liikkumispalveluilla tarkoitetaan:\n\n"
+                       "1. henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)\n"
+                       "2. asemia, satamia ja terminaaleja\n"
+                       "3. pysäköintilaitoksia\n"
+                       "4. liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita\n"
+                       "5. välityspalveluita\n"
+                       "\n\n"
+                       "## **Mitä tarkoitetaan olennaisilla tiedoilla?**\n"
+                       "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat ja esteettömyystiedot. NAP ei "
+                       "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
+                       "kehittäjille.\n\n"
+                       "## **NAP-palvelun rakenne**\n"
+                       "[Palvelukatalog](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
+                       "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
+  :hero-title "Liikkumispalveluiden katalogi."
+  :new-user? "Uusi käyttäjä?"
+
+  :table-header-service-name      "Palvelun nimi"
   :table-header-service-url       "Palvelun verkko-osoite"
   :table-header-NAP-status        "NAP tila"
   :table-header-modified          "Muokattu"
@@ -1112,7 +1139,10 @@
   :forgot-password-button "Aseta salasana uudelleen"
 
   :error {:no-such-user "Tuntematon käyttäjä"
-          :incorrect-password "Väärä salasana"}}
+          :incorrect-password "Väärä salasana"}
+
+  :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
+  :logged-out "Olet kirjautunut ulos."}
 
 
  :leaflet

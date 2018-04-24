@@ -518,7 +518,30 @@
           :brokerage                "Brokering service companies"}
 
  :front-page
- {:table-header-service-name      "Service name"
+ {:front-page-content
+  (:md "# **What is NAP?**\n"
+       "The NAP transport service catalog is an open National Access Point (NAP) where all mobility service providers (transport operators) regardless of their mode of transport shall publish essential information on their services in the form of machine-readable open interfaces. NAP is an important part of an EU-wide goal to give rise to new and easily utilizable combined transport services and information services.\n"
+       "The NAP catalog is meant for transport operators and service developers - not for end users or passengers.\n"
+
+       "## **What is a transport service?**\n"
+       "A transport service can be:\n"
+       "1. a passenger transport service (e.g. bus or a taxi service),\n"
+       "2. a station, a port or a terminal,\n"
+       "3. a general commercial parking service,\n"
+       "4. a vehicle rental service or a commercial ridesharing service, or\n"
+       "5. a brokering service or a dispatch service."
+
+       "## **What is essential information?**\n"
+       "Essential information is e.g. data that includes routes, stops, timetables, prices and fares as well as information on the availability and accessibility of services.\n\n"
+
+       "## **NAP site map**\n"
+       "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
+       "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
+       "To digitize and publish a transport service login is required.")
+  :hero-title "Transport service catalog."
+
+  :new-user? "New user?"
+  :table-header-service-name      "Service name"
   :table-header-service-url       "Service WWW-address"
   :table-header-NAP-status        "NAP-status"
   :table-header-modified          "Modified"
@@ -1100,7 +1123,10 @@
   :forgot-password-button "Reset password"
 
   :error {:no-such-user "Unknown user"
-          :incorrect-password "Incorrect password"}}
+          :incorrect-password "Incorrect password"}
+
+  :check-email-for-link "Please check your inbox for a reset code."
+  :logged-out "You have been logged out."}
 
 
  :leaflet
