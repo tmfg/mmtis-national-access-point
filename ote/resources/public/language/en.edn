@@ -1125,7 +1125,8 @@
   :error {:no-such-user "Unknown user"
           :incorrect-password "Incorrect password"}
 
-  :check-email-for-link "Please check your inbox for a reset code."}
+  :check-email-for-link "Please check your inbox for a reset code."
+  :logged-out "You have been logged out."}
 
 
  :leaflet

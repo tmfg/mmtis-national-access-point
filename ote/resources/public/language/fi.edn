@@ -1141,7 +1141,8 @@
   :error {:no-such-user "Tuntematon käyttäjä"
           :incorrect-password "Väärä salasana"}
 
-  :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"}
+  :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
+  :logged-out "Olet kirjautunut ulos."}
 
 
  :leaflet

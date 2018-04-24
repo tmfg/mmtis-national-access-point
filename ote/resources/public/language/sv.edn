@@ -1134,7 +1134,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :error {:no-such-user "Okänd konto"
           :incorrect-password "Fel lösenord"}
 
-  :check-email-for-link "Återställningskoden har skickats per e-post."}
+  :check-email-for-link "Återställningskoden har skickats per e-post."
+  :logged-out "Du har blivit utloggad"}
 
 
  :leaflet

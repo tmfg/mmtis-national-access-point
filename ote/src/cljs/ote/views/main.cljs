@@ -126,7 +126,7 @@
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-log-out])
                     :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
+                                   (e! (login/->Logout)))} ]
 
      [ui/menu-item {:primary-text (r/as-element [language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
 
