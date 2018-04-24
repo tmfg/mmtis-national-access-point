@@ -10,7 +10,7 @@ describe('Sea route tests', function () {
 
 
     it('Create new route', function () {
-        cy.visit('/ote/#/routes/');
+        cy.visit('/#/routes/');
 
         cy.get('tr').should('have.length', 1);
 

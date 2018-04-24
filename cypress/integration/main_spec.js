@@ -22,7 +22,7 @@ describe('NAP Main', function () {
 
         // Checking if our plugin is redirecting to the correct page
         cy.location().should(loc => {
-            expect(loc.pathname).to.eq('/ote/');
+            expect(loc.pathname).to.eq('/');
             expect(loc.hash).to.eq('#/?logged_in=1');
         });
     });
@@ -36,8 +36,8 @@ describe('OTE login dialog', () => {
 
     beforeEach(() => {
         cy.server();
-        cy.route('POST', '/ote/login').as('login');
-        cy.visit('/ote/#/services')
+        cy.route('POST', '/login').as('login');
+        cy.visit('/#/services')
     });
 
     const login = (username, password, click) => {
@@ -78,8 +78,8 @@ describe('Header - Logged Out', function () {
 
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
-            cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/ote/#/operators');
+            cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/#/services');
+            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/#/operators');
             cy.contains('Kirjaudu sisään').should('have.attr', 'href').and('eq', '/user/login');
             cy.contains('Rekisteröidy').should('have.attr', 'href').and('eq', '/user/register');
             cy.contains('Käyttöohje');
@@ -87,7 +87,7 @@ describe('Header - Logged Out', function () {
     });
 
     it('OTE should have proper header links', function () {
-        cy.visit('/ote/');
+        cy.visit('/');
 
         cy.get('.ote-sovellus .container-fluid').find('ul')
             .within($navbar => {
@@ -116,9 +116,9 @@ describe('Header - Logged In', function () {
 
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
-            cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/ote/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/ote/#/operators');
-            cy.contains('Omat palvelutiedot').should('have.attr', 'href').and('eq', '/ote/#/own-services');
+            cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/#/services');
+            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/#/operators');
+            cy.contains('Omat palvelutiedot').should('have.attr', 'href').and('eq', '/#/own-services');
             cy.contains('Käyttöohje');
 
             cy.get('.section-right').within($el => {

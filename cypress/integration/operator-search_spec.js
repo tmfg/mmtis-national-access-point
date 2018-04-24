@@ -3,23 +3,23 @@
 describe('Operator search page basic tests', function () {
 
     it('should render operator page', () => {
-        cy.visit('/ote/#/operators');
+        cy.visit('/#/operators');
         cy.contains('Palveluntuottajat');
         cy.contains('Yhteensä');
     });
 
     it('operator page should contain initial results', () => {
        cy.server();
-       cy.route('POST', '/ote/operators/list').as('getOperators');
-       cy.visit('/ote/#/operators');
+       cy.route('POST', '/operators/list').as('getOperators');
+       cy.visit('/#/operators');
        cy.wait('@getOperators');
        cy.get('.operator')
     });
 
     it('search and find operator', () => {
         cy.server();
-        cy.route('POST', '/ote/operators/list').as('getOperators');
-        cy.visit('/ote/#/operators');
+        cy.route('POST', '/operators/list').as('getOperators');
+        cy.visit('/#/operators');
         cy.wait('@getOperators');
 
         // Give search term
@@ -33,7 +33,7 @@ describe('Operator search page basic tests', function () {
 
     it('search and dont find operator', () => {
         cy.server();
-        cy.route('POST','/ote/operators/list').as('findOperators')
+        cy.route('POST','/operators/list').as('findOperators')
 
         // Clear old search terms and give new one
         cy.get('input[id*="-Haenimelltainimenosalla-"]').as('operatorName');
@@ -52,8 +52,8 @@ describe('Operator search page - modal tests', function () {
 
     it('open operator modal', () => {
         cy.server();
-        cy.route('POST', '/ote/operators/list').as('getOperators');
-        cy.visit('/ote/#/operators');
+        cy.route('POST', '/operators/list').as('getOperators');
+        cy.visit('/#/operators');
         cy.wait('@getOperators');
 
         // Give search term
@@ -61,7 +61,7 @@ describe('Operator search page - modal tests', function () {
         cy.get('@operatorName').type("Oy");
         cy.wait('@getOperators');
         cy.wait(100);
-        
+
         // Open Modal
         cy.get('.operator :first').within(() => {
             cy.get('.operator-header > a').click();
