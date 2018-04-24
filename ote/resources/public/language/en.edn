@@ -538,6 +538,7 @@
        "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
        "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
        "To digitize and publish a transport service login is required.")
+  :hero-title "Transport service catalog."
 
   :new-user? "New user?"
   :table-header-service-name      "Service name"

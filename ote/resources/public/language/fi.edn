@@ -543,6 +543,7 @@
                        "## **NAP-palvelun rakenne**\n"
                        "[Palvelukatalog](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
                        "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
+  :hero-title "Liikkumispalveluiden katalogi."
   :new-user? "Uusi käyttäjä?"
 
   :table-header-service-name      "Palvelun nimi"

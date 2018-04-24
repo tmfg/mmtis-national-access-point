@@ -212,7 +212,8 @@
 
 (defn test-env-warning []
   [:div.test-env-warning
-   {:style {:border "4px dashed red"}}
+   {:style {:margin "0.2em"
+            :border "4px dashed red"}}
    [:p {:style {:margin "10px 0px 0px 10px"
                 :font-weight "bold"}}
     "TÄMÄ ON TESTIPALVELU!"]
@@ -227,7 +228,23 @@
   "Front page info"
   [e! {user :user :as app
        show-register-dialog? :show-register-dialog?}]
-  [:div.front-page
+  [:div.front-page {:style {:position "relative" :top "-18px"}}
+   [:header {:style {:height "260px"
+                     :padding-top "0px"
+                     :background "url(/img/home_header.jpg)"
+                     :text-align "center"}}
+    [:img.livi-logo {:style {:width "220px"
+                             :position "relative"
+                             :top "100px"}
+                     :src "/img/icons/nap-logo.svg" :alt "FINAP" :title "FINAP"}]
+    [:div {:style {:position "relative"
+                   :top "120px"
+                   :color "white"
+                   :font-size "21px"
+                   :font-weight 200
+                   :line-height "30px"
+                   :font-family "'Roboto', sans-serfi"}}
+     (tr [:front-page :hero-title])]]
    (when test-env?
      [test-env-warning])
    (tr [:front-page :front-page-content])

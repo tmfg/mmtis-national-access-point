@@ -549,6 +549,7 @@ På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssn
 På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
 
 Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
+  :hero-title "Katalog för mobilitetstjänster"
   :new-user? "Ny användare?"
   :table-header-service-name      "Tjänstens namn"
   :table-header-service-url       "Tjänstens www-adress"
