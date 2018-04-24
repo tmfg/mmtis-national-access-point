@@ -208,7 +208,6 @@
          :actions [(r/as-element
                     [ui/flat-button
                      {:label     (tr [:buttons :close])
-                      :secondary true
                       :primary   true
                       :on-click  on-close}])]}
         [:iframe {:style {:width "100%"
