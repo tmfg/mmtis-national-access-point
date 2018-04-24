@@ -73,7 +73,7 @@ describe('Header - Logged Out', function () {
             cy.contains('Palveluntuottajat');
             cy.contains('Kirjaudu sisään');
             cy.contains('Rekisteröidy');
-            cy.contains('Etusivu');
+            cy.contains('Käyttöohje');
         });
     });
 });
