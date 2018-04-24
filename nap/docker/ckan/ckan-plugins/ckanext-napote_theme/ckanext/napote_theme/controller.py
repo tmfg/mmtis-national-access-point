@@ -238,6 +238,8 @@ class CustomUserController(UserController):
                 # Changing currently logged in user's name.
                 # Update repoze.who cookie to match
                 set_repoze_user(data_dict['name'])
+
+            ## CUSTOMIZED FROM CKAN
             return render('user/ote_close.html')
         except NotAuthorized:
             abort(403, _('Unauthorized to edit user %s') % id)
