@@ -697,7 +697,7 @@
   :route-calendar-from-date "Alkaen"
   :route-calendar-to-date "Päättyen"
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
-  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen ajettavat viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä ajopäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
+  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen liikennöitävät viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä kulkupäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
   :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
