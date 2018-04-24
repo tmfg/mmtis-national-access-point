@@ -57,8 +57,7 @@
      :type            :localized-text
      :full-width?     true
      :write           #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
-     :read            (comp ::t-service/description ::t-service/pricing)
-     :is-empty?       validation/empty-localized-text?}
+     :read            (comp ::t-service/description ::t-service/pricing)}
 
     {:container-class "col-md-5"
      :name  ::t-service/pricing-url
@@ -77,11 +76,7 @@
      :name ::t-service/payment-method-description
      :type :localized-text
      :rows 1
-     :full-width? true
-     :is-empty? validation/empty-localized-text?
-     }
-
-    ))
+     :full-width? true}))
 
 (defn service-hours-group [e!]
   (let [tr* (tr-key [:field-labels :service-exception])
@@ -141,8 +136,7 @@
        :prepare-for-save values/without-empty-rows
        :table-fields [{:name  ::t-service/description
                        :label (tr* :description)
-                       :type  :localized-text
-                       :is-empty? validation/empty-localized-text?}
+                       :type  :localized-text}
                       {:name  ::t-service/from-date
                        :type  :date-picker
                        :label (tr* :from-date)}
@@ -187,7 +181,6 @@
     {:name            ::t-service/charging-points
      :rows            2
      :type            :localized-text
-     :is-empty? validation/empty-localized-text?
      :full-width?     true
      :container-class "col-md-6"}))
 
@@ -213,7 +206,6 @@
 
     {:name            ::t-service/accessibility-description
      :type            :localized-text
-     :is-empty? validation/empty-localized-text?
      :rows            2
      :container-class "col-md-6"
      :full-width?     true}
