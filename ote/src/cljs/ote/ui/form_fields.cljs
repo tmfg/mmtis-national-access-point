@@ -166,7 +166,10 @@
   [:input {:id "hidden-file-input"
            :type "file"
            :name name
-           :on-change on-change}]])
+           :on-change on-change
+           ;; Hack to hide file input tooltip on different browsers.
+           ;; String with space -> hide title on Chrome, empty string -> hide title on other browsers
+           :title (if (aget js/window "webkitURL") " " "")}]])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length]
                               :as   field} data]
