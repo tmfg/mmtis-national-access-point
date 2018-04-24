@@ -377,8 +377,7 @@
   CloseServiceCalendar
   (process-event [_ app]
     (-> app
-        (update-in [:route] dissoc :edit-service-calendar)
-        (update-in [:route] dissoc :temporary-calendar)))
+        (update-in [:route] dissoc :edit-service-calendar :temporary-calendar)))
 
   CancelServiceCalendar
   (process-event [_ app]
@@ -387,8 +386,7 @@
       ;; Take calendar from save place and replace changed calendar with it.
       (-> app
           (assoc-in [:route ::transit/service-calendars cal-idx] temp-cal)
-          (update-in [:route] dissoc :edit-service-calendar)
-          (update-in [:route] dissoc :temporary-calendar))))
+          (update-in [:route] dissoc :edit-service-calendar :temporary-calendar))))
 
   ToggleDate
   (process-event [{date :date trip-idx :trip-idx} app]

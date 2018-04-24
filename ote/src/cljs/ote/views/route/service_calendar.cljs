@@ -90,12 +90,10 @@
                   [ui/flat-button
                    {:label (tr [:buttons :cancel])
                     :secondary true
-                    :primary true
                     :on-click #(e! (rw/->CancelServiceCalendar))}])
                 (r/as-element
                   [ui/flat-button
                    {:label (tr [:buttons :approve])
-                    :secondary true
                     :primary true
                     :on-click #(e! (rw/->CloseServiceCalendar))}])]}
      (let [calendar (get-in route [::transit/service-calendars trip-idx])]
