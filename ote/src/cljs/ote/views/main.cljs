@@ -145,7 +145,7 @@
       :default false))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
-  [:div (stylefy/use-style style-topnav/clear)
+  [:div.navbar (stylefy/use-style style-topnav/clear)
    [:ul (stylefy/use-style style-topnav/ul)
     (when (> (:width app) style-base/mobile-width-px)
       [:li

@@ -16,19 +16,10 @@ describe('NAP Main', function () {
 
         // Check if our repoze auth-tkt session cookie exists after login
         cy.getCookie('auth_tkt').should('exist');
-
-        // Simulating repoze login redirect behaviour
-        cy.visit('/user/logged_in');
-
-        // Checking if our plugin is redirecting to the correct page
-        cy.location().should(loc => {
-            expect(loc.pathname).to.eq('/');
-            expect(loc.hash).to.eq('#/?logged_in=1');
-        });
     });
 
     it('.should() - assert that <title> is correct', function () {
-        cy.title().should('include', 'Tervetuloa - NAP');
+        cy.title().should('include', 'NAP - liikkumispalvelukatalogi');
     });
 });
 
@@ -73,30 +64,17 @@ describe('OTE login dialog', () => {
 });
 
 describe('Header - Logged Out', function () {
-    it('CKAN should have proper header links', function () {
+    it('OTE should have proper header links', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
-            cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/#/operators');
-            cy.contains('Kirjaudu sisään').should('have.attr', 'href').and('eq', '/user/login');
-            cy.contains('Rekisteröidy').should('have.attr', 'href').and('eq', '/user/register');
-            cy.contains('Käyttöohje');
+            cy.contains('Palvelukatalogi');
+            cy.contains('Palveluntuottajat');
+            cy.contains('Kirjaudu sisään');
+            cy.contains('Rekisteröidy');
+            cy.contains('Etusivu');
         });
-    });
-
-    it('OTE should have proper header links', function () {
-        cy.visit('/');
-
-        cy.get('.ote-sovellus .container-fluid').find('ul')
-            .within($navbar => {
-                cy.contains('Palvelukatalogi');
-                cy.contains('Palveluntuottajat');
-                cy.contains('Kirjaudu sisään');
-                cy.contains('Rekisteröidy');
-                cy.contains('Etusivu');
-            });
     });
 });
 
@@ -111,26 +89,26 @@ describe('Header - Logged In', function () {
         cy.preserveSessionOnce();
     });
 
-    it('CKAN should have proper header links', function () {
+    it('OTE should have proper header links', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
             cy.contains('Etusivu');
-            cy.contains('Palvelukatalogi').should('have.attr', 'href').and('eq', '/#/services');
-            cy.contains('Palveluntuottajat').should('have.attr', 'href').and('eq', '/#/operators');
-            cy.contains('Omat palvelutiedot').should('have.attr', 'href').and('eq', '/#/own-services');
+            cy.contains('Palvelukatalogi');
+            cy.contains('Palveluntuottajat');
+            cy.contains('Omat palvelutiedot');
             cy.contains('Käyttöohje');
+        });
 
-            cy.get('.section-right').within($el => {
-                cy.get('.authed');
+        cy.get('.user-menu button').click();
 
-                // Dropdown menu links
-                cy.contains('Käyttäjätilin muokkaus');
-                cy.contains('Anna palautetta palvelusta');
-                cy.contains('Kirjaudu ulos');
-                cy.contains('suomi');
-                cy.contains('svenska');
-            });
+        cy.get('div[role=menu]').within($el => {
+            // Dropdown menu links
+            cy.contains('Käyttäjätilin muokkaus');
+            cy.contains('Anna palautetta palvelusta');
+            cy.contains('Kirjaudu ulos');
+            cy.contains('suomi');
+            cy.contains('svenska');
         });
     });
 });
