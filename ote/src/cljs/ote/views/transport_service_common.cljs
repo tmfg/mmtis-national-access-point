@@ -59,7 +59,6 @@
 
     {:name ::t-service/description
      :type  :localized-text
-     :is-empty? validation/empty-localized-text?
      :rows  1
      :read  (comp ::t-service/description service-url-field)
      :write (fn [data desc]
@@ -80,8 +79,7 @@
      :table-fields [{:name ::t-service/url
                      :type :string}
                     {:name ::t-service/description
-                     :type :localized-text
-                     :is-empty? validation/empty-localized-text?}]
+                     :type :localized-text}]
      :delete?      true
      :add-label    (tr [:buttons :add-new-service-link])}))
 
@@ -196,8 +194,7 @@
                        :full-width? true
                        :read (comp ::t-service/description ::t-service/external-interface)
                        :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
-                       :required? false
-                       :is-empty? validation/empty-localized-text?}]
+                       :required? false}]
        :delete? true
        :add-label (tr [:buttons :add-external-interface])}
 
@@ -387,8 +384,7 @@
       :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/description
                       :label (tr* :description)
-                      :type :localized-text
-                      :is-empty? validation/empty-localized-text?}
+                      :type :localized-text}
                      {:name ::t-service/from-date
                       :type :date-picker
                       :label (tr* :from-date)}
@@ -401,7 +397,6 @@
      {:name ::t-service/service-hours-info
       :label (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
       :type :localized-text
-      :is-empty? validation/empty-localized-text?
       :full-width? true
       :container-class "col-xs-12"})))
 
@@ -421,7 +416,6 @@
 
    {:name ::t-service/description
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :rows 2
     :full-width? true
     :container-class "col-xs-12 col-sm-12 col-md-8"}

@@ -39,7 +39,6 @@
 
     {:name ::t-service/assistance-description
      :type :localized-text
-     :is-empty?       validation/empty-localized-text?
      :full-width      true
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :rows            2
@@ -48,7 +47,6 @@
      :read            (comp ::t-service/description ::t-service/assistance)}
 
     {:name ::t-service/assistance-place-description
-     :type :localized-text
      :full-width true
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :rows 2
@@ -99,7 +97,6 @@
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/accessibility-description
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :full-width? true
     :rows 2}
 

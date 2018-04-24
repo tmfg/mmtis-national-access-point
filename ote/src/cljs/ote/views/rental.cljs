@@ -136,14 +136,12 @@
 
     {:name            ::t-service/guaranteed-accessibility-description
      :type            :localized-text
-     :is-empty?       validation/empty-localized-text?
      :rows            1
      :full-width?     true
      :container-class "col-md-6"}
 
     {:name ::t-service/limited-accessibility-description
      :type :localized-text
-     :is-empty? validation/empty-localized-text?
      :rows 1
      :container-class "col-md-6"
      :full-width? true}
@@ -191,7 +189,6 @@
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :rows 1
     :container-class "col-md-6"
     :full-width?  true}
