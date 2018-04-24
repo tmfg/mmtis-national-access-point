@@ -236,10 +236,8 @@
       [ui/raised-button {:on-click #(e! (login/->ShowLoginDialog))
                          :primary true
                          :label (tr [:common-texts :navigation-login])}]
-      [:br]
-      [:br]
-      (tr [:front-page :new-user?])
-      [:br]
+      [:div {:style {:padding-top "1em"}}
+       (tr [:front-page :new-user?])]
       [ui/flat-button {:primary true
                        :label (tr [:common-texts :navigation-register])
                        :on-click #(e! (fp/->ToggleRegistrationDialog))}]])])
