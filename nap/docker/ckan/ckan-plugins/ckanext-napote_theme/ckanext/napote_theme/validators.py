@@ -14,10 +14,14 @@ def email_uniq_validator(value, context):
     model = context['model']
 
     username = context['user']
-    user_obj =  context['user_obj']
 
-    if (username == user_obj.name and user_obj.email != value) or (username != user_obj.name):
-        # Only check if editing self and email has changed or if editing someone else
+    try:
+        user_obj =  context['user_obj']
+    except KeyError:
+        user_obj = None
+
+    if user_obj == None or (username == user_obj.name and user_obj.email != value):
+        # Check if editing self and email has changed or registering new user
         users = model.User.by_email(value)
 
         if users:
