@@ -203,7 +203,6 @@
        [ui/dialog
         {:open true
          :modal true
-         :auto-scroll-body-content true
          :title   title
          :actions [(r/as-element
                     [ui/flat-button
