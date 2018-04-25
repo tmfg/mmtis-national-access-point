@@ -44,10 +44,13 @@
                  (specql/columns ::transit/pre-notice)
                  {::t-operator/id (op/in (authorization/user-transport-operators db user))})))
 
-(defn- list-attachments-in-db [db user]
+(defn- list-attachments-in-db [db user pre-notice-id]
   (specql/fetch db ::transit/pre-notice-attachment
                 (specql/columns ::transit/pre-notice-attachment)
-                {::modification/created-by (authorization/user-id user)}))
+                (op/and {::modification/created-by (authorization/user-id user)}
+                 (op/or
+                  {::transit/pre-notice-id pre-notice-id}
+                  {::transit/pre-notice-id op/null?}))))
 
 (defn- delete-attachments [db config attachments]
   (doseq [{id ::transit/id} attachments]
@@ -60,7 +63,7 @@
     notice))
 
 (defn save-pre-notice [db user notice config]
-  (let [attachments-from-db (list-attachments-in-db db user)
+  (let [attachments-from-db (list-attachments-in-db db user (::transit/id notice))
         attachments-ids-from-client (set (map ::transit/id (:attachments notice)))
         to-be-removed (filter #(not (contains? attachments-ids-from-client (::transit/id %)))
                               attachments-from-db)]
