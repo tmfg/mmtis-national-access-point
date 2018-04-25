@@ -10,11 +10,11 @@ describe('Sea route tests', function () {
 
 
     it('Create new route', function () {
-        cy.visit('/ote/#/routes/');
+        cy.visit('/#/routes/');
 
         cy.get('tr').should('have.length', 1);
 
-        cy.contains('Lisää uusi merireitti').click();
+        cy.contains('Lisää uusi laivareitti').click();
     });
 
     it('Add basic information', function () {
@@ -56,7 +56,7 @@ describe('Sea route tests', function () {
         cy.get('#new-calendar-period-button').click()
             .should('is.disabled');
 
-        cy.contains('button', 'Sulje').click();
+        cy.contains('button', 'Hyväksy').click();
     });
 
     it('Add route times', function () {

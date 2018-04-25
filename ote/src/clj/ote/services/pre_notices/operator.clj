@@ -16,14 +16,26 @@
 
 (defqueries "ote/services/pre_notices/regions.sql")
 
+(def pre-notice-columns #{::transit/id ::t-operator/id ::transit/regions
+                          ::transit/pre-notice-type ::transit/pre-notice-state
+                          ::transit/other-type-description ::transit/effective-dates
+                          ::transit/route-description ::transit/url
+                          [::transit/attachments #{::transit/attachment-file-name}]})
+
 (defn get-operator-pre-notice [db user id]
   "Get singular operator pre-notice by id"
   (http/no-cache-transit-response
-    (first (specql/fetch
+    (let [pre-notice (first (specql/fetch
              db ::transit/pre-notice
-             (specql/columns ::transit/pre-notice)
+             pre-notice-columns
              {::t-operator/id (op/in (authorization/user-transport-operators db user))
-              ::transit/id id}))))
+              ::transit/id id}))
+          pre-notice (assoc pre-notice :attachments (into [] (specql/fetch db ::transit/pre-notice-attachment
+                                                                  (specql/columns ::transit/pre-notice-attachment)
+                                                                  {::transit/pre-notice-id (::transit/id pre-notice)}
+                                                                  {::specql/order-by ::transit/id
+                                                                   :specql.core/order-direction :asc})))]
+      pre-notice)))
 
 (defn list-operator-notices [db user]
   (http/no-cache-transit-response
@@ -31,15 +43,31 @@
                  (specql/columns ::transit/pre-notice)
                  {::t-operator/id (op/in (authorization/user-transport-operators db user))})))
 
+(defn with-sent-field [notice]
+  (if (= (::transit/pre-notice-state notice) :sent)
+    (assoc notice ::transit/sent (java.sql.Timestamp. (System/currentTimeMillis)))
+    notice))
+
 (defn save-pre-notice [db user notice]
   (authorization/with-transport-operator-check
     db user (::t-operator/id notice)
     (fn []
       (tx/with-transaction db
-        (let [n (-> notice
-                    (modification/with-modification-fields ::transit/id user))]
-          (log/debug "Save notice: " n)
-          (specql/upsert! db ::transit/pre-notice n))))))
+         (let [form-attachments (:attachments notice)
+               n (-> notice
+                     (dissoc :attachments)
+                     (dissoc ::transit/attachments)
+                     (modification/with-modification-fields ::transit/id user)
+                     (with-sent-field))
+               saved-notice (specql/upsert! db ::transit/pre-notice n)
+               notice-id (::transit/id saved-notice)]
+           (log/debug "Save notice: " saved-notice)
+           (specql/update! db ::transit/pre-notice-attachment
+                           {::transit/pre-notice-id notice-id}
+                           (op/and
+                             {::transit/id              (op/in (mapv ::transit/id (:attachments notice)))
+                              ::modification/created-by (authorization/user-id user)}))
+           saved-notice)))))
 
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"

@@ -21,7 +21,8 @@
             [ote.localization :refer [tr tr-key]]))
 
 (defn transport-operator-selection [e! {operator :transport-operator
-                                        operators :transport-operators-with-services} & extended]
+                                        operators :transport-operators-with-services
+                                        show-add-member-dialog? :show-add-member-dialog?} & extended]
   [:span
    ;; Show operator selection if there are operators and we are not creating a new one
    (when (and (not (empty? operators))
@@ -54,15 +55,17 @@
                                      (e! (fp/->ChangePage :transport-operator nil)))}]])
       (when extended
        [:div.col-xs-12.col-sm-3.col-md-2
-       [ui/flat-button {:label (tr [:buttons :add-new-member])
-                        :style {:margin-top "1.5em"
-                                :font-size "8pt"}
-                        :icon (ic/content-add {:style {:width 16 :height 16}})
-                        :on-click #(do
-                                     (.preventDefault %)
-                                     (e! (fp/->GoToUrl
-                                          (str "/organization/member_new/"
-                                               (get operator ::t-operator/ckan-group-id)))))}]])])])
+        [ui/flat-button {:label (tr [:buttons :add-new-member])
+                         :style {:margin-top "1.5em"
+                                 :font-size "8pt"}
+                         :icon (ic/content-add {:style {:width 16 :height 16}})
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (fp/->ToggleAddMemberDialog)))}]
+        (when show-add-member-dialog?
+          [ui-common/ckan-iframe-dialog (::t-operator/name operator)
+           (str "/organization/member_new/" (::t-operator/ckan-group-id operator))
+           #(e! (fp/->ToggleAddMemberDialog))])])])])
 
 (defn- operator-form-groups []
   [(form/group

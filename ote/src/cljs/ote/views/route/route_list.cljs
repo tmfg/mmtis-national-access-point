@@ -17,7 +17,9 @@
     [ote.db.transport-service :as t-service]
     [ote.localization :refer [selected-language]]
     [reagent.core :as r]
-    [ote.ui.list_header :as list-header]))
+    [ote.ui.list-header :as list-header]
+    [ote.style.base :as style-base]
+    [ote.ui.buttons :as buttons]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
                                   :keys [show-delete-modal?]
@@ -86,7 +88,7 @@
             [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
             [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]
-            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "11%"}}
+            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "13%"}}
              [ui/icon-button {:href     "#"
                               :on-click #(do
                                            (.preventDefault %)
@@ -107,7 +109,8 @@
                                       (e! (route-list/->CreateNewRoute)))
                          :primary  true
                          :icon     (ic/content-add)}]
-      [t-operator-view/transport-operator-selection e! app]]
+      [t-operator-view/transport-operator-selection e! app]
+      [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/Meriliikenteen+editorin+k%C3%A4ytt%C3%B6ohje+130418.pdf" (tr [:route-list-page :link-to-help-pdf])]]
 
      (when routes
        [list-routes e! routes])

@@ -70,7 +70,7 @@
    :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Formaatti"
-   :ote.db.transport-service/format-short "Muoto"
+   :ote.db.transport-service/format-short "Formaatti"
    :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
    :ote.db.transport-service/company-name "Yrityksen nimi"
    :ote.db.transport-service/business-id "Yrityksen Y-tunnus"
@@ -230,12 +230,13 @@
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"
 
-  :login {:email "Sähköpostiosoite"
+  :login {:email-or-username "Sähköpostiosoite tai käyttäjätunnus"
           :password "Salasana"}
 
   :pre-notice
   {:ote.db.transit/other-type-description "Selitys"
-   :ote.db.transit/url                    "www-osoite"
+   :ote.db.transit/url                    "Web-osoite"
+   :ote.db.transit/attachment-file-name   "Liitetiedosto"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
@@ -292,7 +293,7 @@
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
-  :trip-editor-no-calendar  "Lisää tämän vuoron ajopäivät ennen kuin lisäät reitille muita vuoroja. Samat ajopäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä ajopäiviä kalentereihin vuorokohtaisesti."
+  :trip-editor-no-calendar  "Lisää tämän vuoron kulkupäivät ennen kuin lisäät reitille muita vuoroja. Samat kulkupäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä kulkupäiviä kalentereihin vuorokohtaisesti."
   :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   }
@@ -317,6 +318,7 @@
   :publish "Julkaise"
   :edit-service "Muokkaa palvelun tietoja"
   :edit "Muokkaa"
+  :approve "Hyväksy"
 
   :save-and-publish "Tallenna ja julkaise"
   :save-and-send "Tallenna ja lähetä"
@@ -327,7 +329,7 @@
   :add-new-service-hour "Lisää rivi"
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
-  :add-new-route "Lisää uusi merireitti"
+  :add-new-route "Lisää uusi laivareitti"
   :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
@@ -517,7 +519,34 @@
           :brokerage                "Välityspalvelut"}
 
  :front-page
- {:table-header-service-name      "Palvelun nimi"
+ {:front-page-content (:md
+                       "\n"
+                       "# **Mikä on NAP?**\n"
+                       "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon "
+                       " **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** "
+                       "koneluettavista rajapinnoistaan. \n"
+                       "NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on aikaansaada mahdollisimman "
+                       "helppokäyttöisiä uusia yhdistettyjä liikkumispalveluita ja infopalveluita.\n"
+                       "\n"
+                       "## **Mitä ovat liikkumispalvelut?**\n"
+                       "Liikkumispalveluilla tarkoitetaan:\n\n"
+                       "1. henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)\n"
+                       "2. asemia, satamia ja terminaaleja\n"
+                       "3. pysäköintilaitoksia\n"
+                       "4. liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita\n"
+                       "5. välityspalveluita\n"
+                       "\n\n"
+                       "## **Mitä tarkoitetaan olennaisilla tiedoilla?**\n"
+                       "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat ja esteettömyystiedot. NAP ei "
+                       "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
+                       "kehittäjille.\n\n"
+                       "## **NAP-palvelun rakenne**\n"
+                       "[Palvelukatalog](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
+                       "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
+  :hero-title "Liikkumispalveluiden katalogi."
+  :new-user? "Uusi käyttäjä?"
+
+  :table-header-service-name      "Palvelun nimi"
   :table-header-service-url       "Palvelun verkko-osoite"
   :table-header-NAP-status        "NAP tila"
   :table-header-modified          "Muokattu"
@@ -626,7 +655,7 @@
 
  :route-list-page
  {:header-route-list "Omat meriliikenteen reitti- ja aikataulutietot"
-  :delete-dialog-header "Haluatko poistaa merireitin?"
+  :delete-dialog-header "Haluatko poistaa laivareitin?"
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
   :route-list-published? "Reitin tila"
@@ -641,7 +670,7 @@
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
-
+  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
   }
 
  :route-wizard-page
@@ -695,6 +724,7 @@
   :route-calendar-from-date "Alkaen"
   :route-calendar-to-date "Päättyen"
   :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
+  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen liikennöitävät viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä kulkupäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
   :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
@@ -716,17 +746,21 @@
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
-            :actions "Toiminnot"}
+            :actions "Toiminnot"
+            :region-names "Maakunta"
+            :ote.db.transit/attachments "Liitetiedostot"
+            :ote.db.transport-operator/transport-operator "Palveluntuottaja"}
 
   :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
                       :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
                       :new-comment-label "Kirjoita kommentti"}
-}
+  }
 
  :pre-notice-page
  {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
   :notice-type-title "Ilmoitettavan muutoksen tyyppi"
   :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+  :attachment-section-title "Muutoksen tarkemmat tiedot"
   :route-and-area-information-title "Reitin ja alueen tiedot"
   :effective-date-from "Alkamispäivä"
   :effective-date-description "Selitys"
@@ -736,6 +770,13 @@
   :save-failure "Luonnoksen tallentaminen epäonnistui."
   :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
   :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
+  :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
+  :add-attachment "Uusi liite"
+  :select-attachment "Valitse tiedosto"
+  :effective-date-descriptions {:year-start "Vuoden alku"
+                                :school-start "Kouluvuoden alku"
+                                :school-end "Kouluvuoden päätös"
+                                :season-schedule-change "Aikataulukauden vaihtuminen"}
   }
 
  :price-dialog
@@ -787,7 +828,7 @@
   :navigation-admin                           "Ylläpitopaneeli"
   :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
   :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :navigation-authority-pre-notices           "Saapunet muutosilmoitukset"
+  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset"
   :navigation-privacy-policy                  "Rekisteriseloste"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
@@ -1022,7 +1063,7 @@
           "external-interfaces" "Ulkoiset rajapinnat"
           "data-content" "Tietosisältö"
           "license" "Lisenssi/käyttöehdot"
-          "format" "Muoto"
+          "format" "Formaatti"
           "external-interface" "Ulkoinen rajapinta"
 
           ;; accessibility
@@ -1098,7 +1139,10 @@
   :forgot-password-button "Aseta salasana uudelleen"
 
   :error {:no-such-user "Tuntematon käyttäjä"
-          :incorrect-password "Väärä salasana"}}
+          :incorrect-password "Väärä salasana"}
+
+  :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
+  :logged-out "Olet kirjautunut ulos."}
 
 
  :leaflet
@@ -1129,16 +1173,16 @@
                             :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
                                      :radius "Säde"}
                             :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
- :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+ :leaflet-port-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
                                             :text "Tallenna muutokset"}
                                     :cancel {:title "Peruuta tehdyt muutokset"
                                              :text "Peruuta"}
-                                    :clearAll {:title "Tyhjenna kaikki"
-                                               :text "Tyhjennä kaikki"}}
+                                    :clearAll {:title "Poista kaikki lisäämäsi satamat"
+                                               :text "Poista kaikki lisäämäsi satamat"}}
                           :buttons {:edit "Muokkaa"
                                     :editDisabled "Muokkaustila on poissa käytöstä"
                                     :remove "Poista"
                                     :removeDisabled "Poistotila on poissa käytöstä"}}
-                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
-                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
-                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
+                :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
+                                            :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
+                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}

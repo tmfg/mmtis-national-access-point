@@ -70,3 +70,17 @@
          :error-handler   (response-handler! on-failure)
          :format          (transit-request-format)
          :response-format (or response-format (transit-response-format))}))
+
+(defn upload! [url input {:keys [on-success on-failure on-progress]}]
+  (let [fd (js/FormData.)
+        files (.-files input)
+        name (.-name input)]
+    (.append fd "file" (aget files 0))
+    (progress/start)
+    (swap! query-counter inc)
+    (POST (request-url url)
+          {:headers (anti-csrf-token-header)
+           :body fd
+           :handler (response-handler! on-success)
+           :error-handler (response-handler! on-failure)
+           :response-format (transit-response-format)})))

@@ -233,12 +233,13 @@
   :ote.db.common/post_office                          "Postkontor"
   :ote.db.common/postal_code                          "Postnummer"
 
-  :login {:email "Epost"
+  :login {:email-or-username "Epost eller användarnamn"
           :password "Lösenord"}
 
   :pre-notice
-  {:ote.db.transit/other-type-description "Muu muutos -SV"
-   :ote.db.transit/url                    "www-osoite -SV"
+  {:ote.db.transit/other-type-description "Muu muutos - SV"
+   :ote.db.transit/url                    "www-osoite - SV"
+   :ote.db.transit/attachment-file-name   "Liitetiedosto - SV"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
@@ -325,6 +326,7 @@
   :publish "Publicera"
   :edit-service "Redigera tjänstens info"
   :edit "Redigera"
+  :approve "Hyväksy"
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"
@@ -521,7 +523,35 @@
           :brokerage                "Förmedlingstjänst"}
 
  :front-page
- {:table-header-service-name      "Tjänstens namn"
+ {:front-page-content
+  (:md
+   "# **Vad är NAP?**
+
+Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken mobilitetstjänsteproducenter ska lämna in data om sina digitala maskinläsbara gränssnitt för väsentlig information. NAP-tjänsten är en väsentlig del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.
+
+## **Vad är mobilitetstjänster?**
+
+Med mobilitetstjänster avses:
+1. persontransporttjänster (t.ex. taxi- och busstrafik)
+2. stationer, hamnar och andra terminaler
+3. parkeringsanläggningar
+4. tjänster för uthyrning av färdmedel och kommersiella samavändningstjänster
+5. förmedlingstjänster
+
+## **Vad avses med väsentlig information?**
+
+Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.
+
+## **NAP-tjänstens uppbyggnad**
+
+På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
+
+På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
+
+Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
+  :hero-title "Katalog för mobilitetstjänster"
+  :new-user? "Ny användare?"
+  :table-header-service-name      "Tjänstens namn"
   :table-header-service-url       "Tjänstens www-adress"
   :table-header-NAP-status        "NAP status"
   :table-header-modified          "Redigerat"
@@ -642,6 +672,7 @@
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
+  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
   }
 
  :route-wizard-page
@@ -695,6 +726,7 @@
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
+  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen ajettavat viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä ajopäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
   :save-success "Rutten sparades"
   :save-failure "Rutten kunde inte sparas"
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
@@ -716,7 +748,10 @@
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
-            :actions "Toiminnot"}
+            :actions "Toiminnot"
+            :region-names "Maakunnat"
+            :ote.db.transit/attachments "Liitetiedostot"
+            :ote.db.transport-operator/transport-operator "Tjänsteproducent"}
 
   :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
                       :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
@@ -728,6 +763,7 @@
 {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
  :notice-type-title "Ilmoitettavan muutoksen tyyppi"
  :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
+ :attachment-section-title "Muutoksen tarkemmat tiedot"
  :route-and-area-information-title "Reitin ja alueen tiedot"
  :effective-date-from "Alkamispäivä"
  :effective-date-description "Selitys"
@@ -737,6 +773,13 @@
  :save-failure "Luonnoksen tallentaminen epäonnistui."
  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
  :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
+ :sent-pre-notice-cannot-be-edited "Lähetettyä ilmoitusta ei voi enää muokata!"
+ :add-attachment "Uusi liite"
+ :select-attachment "Valitse tiedosto"
+ :effective-date-descriptions {:year-start "Vuoden alku"
+                               :school-start "Kouluvuoden alku"
+                               :school-end "Kouluvuoden päätös"
+                               :season-schedule-change "Aikataulukauden vaihtuminen"}
  }
 
  :price-dialog
@@ -1089,7 +1132,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :forgot-password-button "Glömt ditt löseonrd?"
 
   :error {:no-such-user "Okänd konto"
-          :incorrect-password "Fel lösenord"}}
+          :incorrect-password "Fel lösenord"}
+
+  :check-email-for-link "Återställningskoden har skickats per e-post."
+  :logged-out "Du har blivit utloggad"}
 
 
  :leaflet
@@ -1121,16 +1167,16 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
- :leaflet-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
+ :leaflet-port-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
                                             :text "Tallenna muutokset"}
                                      :cancel {:title "Peruuta tehdyt muutokset"
                                               :text "Peruuta"}
-                                     :clearAll {:title "Tyhjenna kaikki"
-                                                :text "Tyhjennä kaikki"}}
+                                     :clearAll {:title "Poista kaikki lisäämäsi satamat"
+                                                :text "Poista kaikki lisäämäsi satamat"}}
                           :buttons {:edit "Muokkaa"
                                     :editDisabled "Ei löydy muokattavaa"
                                     :remove "Poista"
                                     :removeDisabled "Ei löydy poistettavaa"}}
-                :handlers {:edit {:tooltip {:text "Siirrä pisteitä"
-                                            :subtext "Klikkaa peruuta, peruuttaaksesi muutokset."}}
-                           :remove {:tooltip {:text "Merkitse poistettavaksi klikkaamalla"}}}}}
+                :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
+                                            :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
+                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}

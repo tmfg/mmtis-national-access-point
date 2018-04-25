@@ -45,7 +45,8 @@
 
 (defn- list-users [db user query]
   (nap-users/list-users db {:email (str "%" query "%")
-                            :name  (str "%" query "%")}))
+                            :name  (str "%" query "%")
+                            :transit-authority? nil}))
 (defn- published-search-param [query]
   (case (:published-type query)
     nil? nil

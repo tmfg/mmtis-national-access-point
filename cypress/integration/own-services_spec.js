@@ -12,7 +12,7 @@ describe('Own services basic tests', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/ote/#/own-services');
+        cy.visit('/#/own-services');
     });
 
     it('should render the own services page', function () {
@@ -55,14 +55,14 @@ describe('Add a new service', function () {
         it('should should add a new service', function () {
             const service = this.service;
 
-            cy.visit('/ote/#/new-service');
+            cy.visit('/#/new-service');
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
                 .click();
 
 
             cy.server();
-            cy.route('/ote/place-completions/*').as('placeCompletion');
+            cy.route('/place-completions/*').as('placeCompletion');
 
             cy.contains(/^Taksi*/).click();
             cy.contains('Jatka').click();
@@ -96,9 +96,9 @@ describe('Add a new service', function () {
 
         it('should delete the test service', function () {
             cy.server();
-            cy.route('POST','/ote/transport-service/delete').as('deleteService');
+            cy.route('POST','/transport-service/delete').as('deleteService');
 
-            cy.visit('/ote/#/own-services');
+            cy.visit('/#/own-services');
 
             cy.contains('tr', this.serviceName)
                 .within($tr => {
@@ -122,7 +122,7 @@ describe('Add new service provider', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/ote/#/own-services');
+        cy.visit('/#/own-services');
 
         // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
         cy.get('[id*="Valitsepalveluntuottaja"]')

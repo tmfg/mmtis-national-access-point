@@ -7,7 +7,10 @@
             [ote.db.modification :as modification]
             [ote.db.user :as user]
             [ote.authorization :as authorization]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [clojure.string :as str]
+            [ote.db.places :as places]
+            [specql.op :as op]))
 
 
 (defn list-published-notices [db user]
@@ -25,11 +28,24 @@
                             [::transit/author #{::user/fullname ::user/email}]))
 
 (defn fetch-notice [db id]
-  (first
-   (specql/fetch db ::transit/pre-notice
-                 (conj (specql/columns ::transit/pre-notice)
-                       [::transit/comments comment-columns])
-                 {::transit/id id})))
+  (let [notice (first
+                (specql/fetch db ::transit/pre-notice
+                              (conj (specql/columns ::transit/pre-notice)
+                                    [::transit/comments comment-columns]
+                                    [::t-operator/transport-operator #{::t-operator/name}])
+                              {::transit/id id}))]
+    (assoc notice
+           ::transit/attachments
+           (specql/fetch db ::transit/pre-notice-attachment
+                                  (specql/columns ::transit/pre-notice-attachment)
+                                  {::transit/pre-notice-id id})
+
+           :region-names
+           (str/join ", "
+                     (map ::places/nimi
+                          (specql/fetch db ::places/finnish-regions
+                                        #{::places/nimi}
+                                        {::places/numero (op/in (::transit/regions notice))}))))))
 
 (defn add-comment [db user {:keys [id comment] :as form-data}]
   (let [inserted (specql/insert! db ::transit/pre-notice-comment
