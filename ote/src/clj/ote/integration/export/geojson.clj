@@ -40,14 +40,6 @@
    :headers {"Content-Type" "application/vnd.geo+json"}
    :body data})
 
-(defn- simplify-collection
-  "If collection has a single geometry, use that instead."
-  [{geoms :geometries :as geometry-collection}]
-  (if (= 1 (count geoms))
-    (first geoms)
-    geometry-collection))
-
-
 (defn- feature-collection [geometry properties]
   {:type "FeatureCollection"
    :features [{:type "Feature"
@@ -72,8 +64,16 @@
                     ::t-service/company-csv-filename ::t-service/companies-csv-url
                     ::t-service/company-source}))
 
+(defn- styled-operation-area [areas]
+  {:type "GeometryCollection"
+   :geometries (mapv
+                (fn [{:keys [geojson primary?]}]
+                  (assoc (cheshire/decode geojson keyword)
+                         :style {:fill (if primary? "green" "orange")}))
+                areas)})
+
 (defn- export-geojson [db transport-operator-id transport-service-id]
-  (let [geojson (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
+  (let [areas (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       transport-operator-properties-columns
                                       {::t-operator/id transport-operator-id}))
@@ -83,9 +83,9 @@
                                       ::t-service/id transport-service-id
                                       ::t-service/published? true}))]
 
-    (if (and geojson operator service)
-      (-> (cheshire/decode geojson keyword)
-          simplify-collection
+    (if (and (seq areas) operator service)
+      (-> areas
+          styled-operation-area
           (feature-collection (transform/transform-deep
                                {:transport-operator operator
                                 :transport-service service}))
