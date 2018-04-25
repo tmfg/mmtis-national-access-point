@@ -700,14 +700,15 @@
   :stop-sequence-custom-dialog-help  "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla. Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."
   :stop-sequence-leaflet-button-marker "Lisää uusi satama/laituri"
   :stop-sequence-leaflet-button-start "Klikkaa karttaa lisätäksesi satama/laituri"
-  :stop-sequence-port-header "Satama"
+  :stop-sequence-port-header "Pysähtymispaikka"
   :stop-sequence-arrival-header "Saapumisaika"
   :stop-sequence-departure-header "Lähtöaika"
   :stop-sequence-map-help  "Muodosta reitti valitsemalla pysähdyspaikkoja kartalta. Voit tarvittaessa lisätä pysähdyspaikkoja myös itse."
   :stop-sequence-delete "Poista pysäkki ketjusta"
+  :stop-sequence-edit-map-help "Muokkaustilassa voit lisätä puuttuvia pysähtymispaikkoja kartalle. Voit myös siirtää ja poistaa juuri lisäämiäsi pysähtymispaikkoja. Kartan muita pysähtymispaikkoja et voi muokata. Muokkauspainikkeet löydät kartan vasemmasta reunasta."
 
   :wizard-step-basic-info "Reitin nimi"
-  :wizard-step-stop-sequence "Reittipysäkit"
+  :wizard-step-stop-sequence "Pysähtymispaikat"
   :wizard-step-times "Vuorot"
   :wizard-step-save "Reitin tallennus"
 
@@ -727,9 +728,10 @@
   :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen liikennöitävät viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä kulkupäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
-  :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
-  :show-draw-tools "Lisää puuttuva satama/laituri"
-  :hide-draw-tools "Lopeta sataman/laiturin lisääminen"
+  :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\" tai \"Tietoja täyttämättä\"."
+  :show-draw-tools "Muokkaa pysähtymispaikkoja"
+  :hide-draw-tools "Lopeta muokkaus"
+  :data-missing "Tietoja täyttämättä"
   }
 
  :pre-notice-list-page
@@ -1177,12 +1179,12 @@
                                             :text "Tallenna muutokset"}
                                     :cancel {:title "Peruuta tehdyt muutokset"
                                              :text "Peruuta"}
-                                    :clearAll {:title "Poista kaikki lisäämäsi satamat"
-                                               :text "Poista kaikki lisäämäsi satamat"}}
+                                    :clearAll {:title "Poista kaikki lisäämäsi pysähdyspaikat"
+                                               :text "Poista kaikki lisäämäsi pysähdyspaikat"}}
                           :buttons {:edit "Muokkaa"
                                     :editDisabled "Muokkaustila on poissa käytöstä"
                                     :remove "Poista"
                                     :removeDisabled "Poistotila on poissa käytöstä"}}
-                :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
+                :handlers {:edit {:tooltip {:text "Siirrä pysähtymispaikkaa klikkaamalla niitä ja liikuttamalla samalla hiirtä"
                                             :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
-                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}
+                           :remove {:tooltip {:text "Merkitse pysähtymispaikka poistettavaksi klikkaamalla."}}}}}

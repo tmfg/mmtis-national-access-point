@@ -326,7 +326,7 @@
   :publish "Publicera"
   :edit-service "Redigera tjänstens info"
   :edit "Redigera"
-  :approve "Hyväksy"
+  :approve "Godkänn"
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"
@@ -672,7 +672,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
-  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
+  :link-to-help-pdf   "Användarinstruktioner för kartverktyget för sjötrafik"
   }
 
  :route-wizard-page
@@ -702,14 +702,15 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :stop-sequence-custom-dialog-help  "Du kan ändra kajens/hamnens position eller ta bort den med kartverktyget. Efter att du sparat rutten, kan hamnen/kajen inte längre ändras."
   :stop-sequence-leaflet-button-marker "Lägg till en ny hamn/kaj"
   :stop-sequence-leaflet-button-start "Klicka på kartan för att lägga till en hamn/kaj"
-  :stop-sequence-port-header "Hamn"
+  :stop-sequence-port-header "Anlöpshamn"
   :stop-sequence-arrival-header "Ankomsttid"
   :stop-sequence-departure-header "Avgångstid"
   :stop-sequence-map-help  "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
   :stop-sequence-delete "Ta bort en hamn från rutten"
+  :stop-sequence-edit-map-help "I editeringsläget kan du lägga till sådana anlöpshamnar som saknas på kartan. Du kan också flytta och ta bort anlöpshamnar som du just har lagt till. Kartans övriga anlöpshamnar kan inte editeras. Du hittar editeringsknapparna till vänster på kartan."
 
   :wizard-step-basic-info "Ruttens namn"
-  :wizard-step-stop-sequence "Ruttens hamnar"
+  :wizard-step-stop-sequence "Anlöpshamnar"
   :wizard-step-times "Avgångar"
   :wizard-step-save "Spara rutten"
 
@@ -726,12 +727,13 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :route-calendar-from-date "Från och med"
   :route-calendar-to-date "Fram till"
   :route-calendar-add-new-period "Lägg till en ny tidsperiod i kalendern"
-  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen ajettavat viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä ajopäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
+  :route-calendar-guidance-info "Lägg till en trafikeringsperiod för turen genom att välja ett begynnelsedatum (Från och med) och ett slutdatum (Till) för perioden. Välj därefter de veckodagar som trafikeras genom att klicka på rutorna under dem. Du kan ta bort och lägga till trafikeringsdagar i efterhand genom att klicka på kalendern."
   :save-success "Rutten sparades"
   :save-failure "Rutten kunde inte sparas"
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
-  :show-draw-tools "Lägg till hamn ny hamn/kaj"
-  :hide-draw-tools "Stäng verktyget för ny hamn/kaj"
+  :show-draw-tools "Ändra anlöpshamnar"
+  :hide-draw-tools "Avsluta editeringen"
+  :data-missing "Uppgifter saknas"
   }
 
  :pre-notice-list-page
@@ -767,7 +769,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
  :route-and-area-information-title "Reitin ja alueen tiedot"
  :effective-date-from "Alkamispäivä"
  :effective-date-description "Selitys"
- :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+ :publish-missing-required "Du kan ännu inte publicera rutten, eftersom du inte har fyllt i alla obligatoriska uppgifter på blanketten. Fyll i de ställen som är markerade med texten \"Obligatorisk uppgift\" eller \"Uppgifter saknas\"."
  :save-success-send "Ilmoituksen lähettäminen onnistui."
  :save-success "Luonnoksen tallentaminen onnistui."
  :save-failure "Luonnoksen tallentaminen epäonnistui."
@@ -1167,16 +1169,16 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
- :leaflet-port-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
-                                            :text "Tallenna muutokset"}
-                                     :cancel {:title "Peruuta tehdyt muutokset"
-                                              :text "Peruuta"}
-                                     :clearAll {:title "Poista kaikki lisäämäsi satamat"
-                                                :text "Poista kaikki lisäämäsi satamat"}}
-                          :buttons {:edit "Muokkaa"
-                                    :editDisabled "Ei löydy muokattavaa"
-                                    :remove "Poista"
-                                    :removeDisabled "Ei löydy poistettavaa"}}
-                :handlers {:edit {:tooltip {:text "Siirrä satamia/laitureita klikkaamalla niitä ja liikuttamalla samalla hiirtä"
-                                            :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
-                           :remove {:tooltip {:text "Merkitse satama poistettavaksi klikkaamalla."}}}}}
+ :leaflet-port-edit {:toolbar { :actions {:save {:title "Spara ändringarna"
+                                            :text "Spara ändringarna"}
+                                     :cancel {:title "Ångra ändringarna"
+                                              :text "Ångra"}
+                                     :clearAll {:title "Ta bort alla anlöpshamnar som du lagt till"
+                                                :text "Ta bort alla anlöpshamnar som du lagt till"}}
+                          :buttons {:edit "Editera"
+                                    :editDisabled "Det finns inget att editera"
+                                    :remove "Ta bort"
+                                    :removeDisabled "Det finns inget att ta bort"}}
+                :handlers {:edit {:tooltip {:text "Flytta anlöpshamnen genom att klicka på den och samtidigt dra musen"
+                                            :subtext "Om du vill ångra ändringarna, välj \"ångra\"."}}
+                           :remove {:tooltip {:text "Markera anlöpshamnen som kan tas bort genom att klicka på den."}}}}}
