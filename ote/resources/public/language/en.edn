@@ -228,7 +228,7 @@
   :ote.db.common/post_office                          "Post office"
   :ote.db.common/postal_code                          "Postal code"
 
-  :login {:email "Email"
+  :login {:email-or-username "Email or username"
           :password "Password"}
 
   :pre-notice

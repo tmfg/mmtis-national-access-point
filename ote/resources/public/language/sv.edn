@@ -233,7 +233,7 @@
   :ote.db.common/post_office                          "Postkontor"
   :ote.db.common/postal_code                          "Postnummer"
 
-  :login {:email "Epost"
+  :login {:email-or-username "Epost eller användarnamn"
           :password "Lösenord"}
 
   :pre-notice

@@ -296,6 +296,7 @@
       {:label (tr [:login :label]) :expandable? false
        :columns 3}
       {:name :email
+       :label (tr [:field-labels :login :email-or-username])
        :type :string
        :autocomplete "email"
        :on-enter #(e! (login/->Login))}
@@ -339,7 +340,7 @@
       (when failed?
         [:div (stylefy/use-style style-base/error-element)
          (tr [:login :error error])])
-      [form-fields/field {:label (tr [:field-labels :login :email])
+      [form-fields/field {:label (tr [:field-labels :login :email-or-username])
                           :type :string :name :email
                           :style {:width "95%" :align-self "center"}
                           :update! #(e! (login/->UpdateLoginCredentials {:email %}))}
