@@ -15,11 +15,13 @@
   [kalkati-url]
   (lambda/invoke :function-name "kalkati_to_gtfs"
                  :region "eu-central-1"
-                 :invocation-type "Event"
-                 :payload (cheshire/encode {:body kalkati-url})))
+                 :invocation-type "RequestResponse"
+                 ;; We also want to support invoking lambda functions through API Gateway lambda proxy
+                 ;; so we'll have to encode the :body separately.
+                 :payload (cheshire/encode {:body (cheshire/encode kalkati-url)})))
 
 (defn load-kalkati [url]
-  (let [payload (.getPayload (kalkati-to-gtfs url))
+  (let [payload (:payload (kalkati-to-gtfs url))
         json (cheshire/decode (String. (.array payload) "UTF-8") keyword)
         gtfs-url (:Location (:headers json))]
     (gtfs-import/load-gtfs gtfs-url)))
