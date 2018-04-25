@@ -230,7 +230,7 @@
   :ote.db.common/post_office                          "Postitoimipaikka"
   :ote.db.common/postal_code                          "Postinumero"
 
-  :login {:email "Sähköpostiosoite"
+  :login {:email-or-username "Sähköpostiosoite tai käyttäjätunnus"
           :password "Salasana"}
 
   :pre-notice
