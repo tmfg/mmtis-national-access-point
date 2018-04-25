@@ -38,6 +38,7 @@
    ;; Basic components
    :db (db/database (:db config))
    :http (component/using (http/http-server (:http config)) [:db])
+   :ssl-upgrade (http/map->SslUpgrade (get-in config [:http :ssl-upgrade]))
 
    ;; Index page
    :index (component/using (index/->Index config)

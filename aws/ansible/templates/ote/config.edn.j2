@@ -7,7 +7,7 @@
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}
         ;;:session {:key "{{ote_cookie_key}}"}
-        }
+        :ssl-upgrade {:port 8080 :url "{{base_url}}"}}
 
  :email {:server
          {;; Hostname of the STMP server. Optional if running locally.
