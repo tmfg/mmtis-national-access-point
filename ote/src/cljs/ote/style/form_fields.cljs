@@ -36,3 +36,21 @@
                       {:required (merge style-base/required-element {:margin-top "15px"})}})
 
 (def compensatory-label {:font-size "12px" :color "rgb(33, 33, 33)"})
+
+(def file-button-wrapper
+  {:position "relative"
+   :overflow "hidden"
+   :display "inline-block"
+
+   ::stylefy/sub-styles
+   {:button {:padding "10px 20px 10px 20px"
+             :text-transform "uppercase"
+             :color "#FFFFFF"
+             :background-color "#1565C0"
+             :font-size "12px"
+             :font-weight "bold"}
+    :file-input {:font-size "100px"
+                 :position "absolute"
+                 :left "0"
+                 :top "0"
+                 :opacity "0"}}})
