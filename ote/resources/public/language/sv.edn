@@ -233,7 +233,7 @@
   :ote.db.common/post_office                          "Postkontor"
   :ote.db.common/postal_code                          "Postnummer"
 
-  :login {:email "Epost"
+  :login {:email-or-username "Epost eller användarnamn"
           :password "Lösenord"}
 
   :pre-notice
@@ -523,7 +523,35 @@
           :brokerage                "Förmedlingstjänst"}
 
  :front-page
- {:table-header-service-name      "Tjänstens namn"
+ {:front-page-content
+  (:md
+   "# **Vad är NAP?**
+
+Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken mobilitetstjänsteproducenter ska lämna in data om sina digitala maskinläsbara gränssnitt för väsentlig information. NAP-tjänsten är en väsentlig del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.
+
+## **Vad är mobilitetstjänster?**
+
+Med mobilitetstjänster avses:
+1. persontransporttjänster (t.ex. taxi- och busstrafik)
+2. stationer, hamnar och andra terminaler
+3. parkeringsanläggningar
+4. tjänster för uthyrning av färdmedel och kommersiella samavändningstjänster
+5. förmedlingstjänster
+
+## **Vad avses med väsentlig information?**
+
+Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.
+
+## **NAP-tjänstens uppbyggnad**
+
+På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
+
+På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
+
+Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
+  :hero-title "Katalog för mobilitetstjänster"
+  :new-user? "Ny användare?"
+  :table-header-service-name      "Tjänstens namn"
   :table-header-service-url       "Tjänstens www-adress"
   :table-header-NAP-status        "NAP status"
   :table-header-modified          "Redigerat"
@@ -1104,7 +1132,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :forgot-password-button "Glömt ditt löseonrd?"
 
   :error {:no-such-user "Okänd konto"
-          :incorrect-password "Fel lösenord"}}
+          :incorrect-password "Fel lösenord"}
+
+  :check-email-for-link "Återställningskoden har skickats per e-post."
+  :logged-out "Du har blivit utloggad"}
 
 
  :leaflet

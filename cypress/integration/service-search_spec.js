@@ -3,9 +3,9 @@
 describe('Service search page basic tests', function () {
     it('should open the search page and load default results', function () {
         cy.server();
-        cy.route('/ote/service-search*').as('serviceSearch');
+        cy.route('/service-search*').as('serviceSearch');
 
-        cy.visit('/ote/#/services');
+        cy.visit('/#/services');
 
         cy.wait('@serviceSearch');
 
