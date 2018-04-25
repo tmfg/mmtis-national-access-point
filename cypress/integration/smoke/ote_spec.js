@@ -12,7 +12,7 @@ describe('Own services basic tests', () => {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/ote/#/own-services');
+        cy.visit('/#/own-services');
     });
 
     it('should render the own services page', () => {
@@ -51,14 +51,14 @@ describe('Add a new service', () => {
         });
 
         it('should should add a new service', () => {
-            cy.visit('/ote/#/new-service');
+            cy.visit('/#/new-service');
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
                 .click();
 
 
             cy.server();
-            cy.route('/ote/place-completions/*').as('placeCompletion');
+            cy.route('/place-completions/*').as('placeCompletion');
 
             cy.contains(/^Taksi*/).click();
             cy.contains('Jatka').click();
@@ -97,9 +97,9 @@ describe('Add a new service', () => {
 
         it('should delete the test service', () => {
             cy.server();
-            cy.route('POST', '/ote/transport-service/delete').as('deleteService');
+            cy.route('POST', '/transport-service/delete').as('deleteService');
 
-            cy.visit('/ote/#/own-services');
+            cy.visit('/#/own-services');
 
             cy.contains('tr', serviceName)
                 .within($tr => {
@@ -123,7 +123,7 @@ describe('Add new service provider', () => {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/ote/#/own-services');
+        cy.visit('/#/own-services');
 
         // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
         cy.get('[id*="Valitsepalveluntuottaja"]')
@@ -145,11 +145,11 @@ describe('Sea route tests', function () {
 
 
     it('Create new route', function () {
-        cy.visit('/ote/#/routes/');
+        cy.visit('/#/routes/');
 
         cy.get('tr').should('have.length', 1);
 
-        cy.contains('Lisää uusi merireitti').click();
+        cy.contains('Lisää uusi laivareitti').click();
     });
 
     it('Add basic information', function () {
@@ -191,7 +191,7 @@ describe('Sea route tests', function () {
         cy.get('#new-calendar-period-button').click()
             .should('is.disabled');
 
-        cy.contains('button', 'Sulje').click();
+        cy.contains('button', 'Hyväksy').click();
     });
 
     it('Add route times', function () {

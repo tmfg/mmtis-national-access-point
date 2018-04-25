@@ -31,6 +31,9 @@
                  [commons-fileupload/commons-fileupload "1.3.3"]
                  [javax.servlet/javax.servlet-api "4.0.0"]
 
+                 ;; Email
+                 [com.draines/postal "2.0.2"]
+
                  ;; Routing library for publishing services
                  [compojure "1.6.0"]
 

@@ -7,7 +7,21 @@
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}
         ;;:session {:key "{{ote_cookie_key}}"}
-        }
+        :ssl-upgrade {:port 8080 :url "{{base_url}}"}}
+
+ :email {:server
+         {;; Hostname of the STMP server. Optional if running locally.
+          :host "{{email_smtp_server}}"
+          ;; Port is set to 465 is ssl is true
+          :ssl false
+          ;; Port is set to 25 if tsl is true
+          :tsl true
+          :user "{{email_user}}"
+          :pass "{{email_password}}"}
+
+         ;; Common message opts
+         :msg {:from "{{email_from}}"}}
+
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"

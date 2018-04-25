@@ -38,7 +38,6 @@
 
     {:name      ::t-service/luggage-restrictions
      :type      :localized-text
-     :is-empty? validation/empty-localized-text?
      :rows      1
      :full-width? true
      :container-class "col-xs-12"}))
@@ -97,14 +96,12 @@
 
    {:name ::t-service/guaranteed-accessibility-description
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :rows 1
     :full-width? true
     :container-class "col-xs-12 col-sm-6 col-md-6"}
 
    {:name ::t-service/limited-accessibility-description
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :rows 1
     :container-class "col-xs-12 col-sm-6 col-md-6"
     :full-width? true}
@@ -160,7 +157,6 @@
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/payment-method-description
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :rows 6
     :full-width? true
     }
@@ -169,7 +165,6 @@
     :name ::t-service/pricing-description
     :label price-description-label
     :type :localized-text
-    :is-empty? validation/empty-localized-text?
     :full-width? true
     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
     :read (comp ::t-service/description ::t-service/pricing)

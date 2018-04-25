@@ -369,6 +369,12 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
                     controller='ckanext.napote_theme.controller:CustomUserController',
                     action='logout')
 
+        map.connect('/user/edit',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='edit')
+        map.connect('/user/edit/{id}',
+                    controller='ckanext.napote_theme.controller:CustomUserController',
+                    action='edit')
         return map
 
     def after_map(self, map):

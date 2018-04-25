@@ -11,6 +11,9 @@
 (defrecord LoginResponse [response])
 (defrecord LoginFailed [response])
 (defrecord LoginCancel [])
+(defrecord Logout [])
+(defrecord LogoutResponse [response])
+(defrecord LogoutFailed [response])
 
 (defn update-transport-operator-data
   [{:keys [page ckan-organization-id transport-operator] :as app}
@@ -86,4 +89,23 @@
 
   LoginCancel
   (process-event [_ app]
-    (dissoc app :login)))
+    (dissoc app :login))
+
+  Logout
+  (process-event [_ app]
+    (comm/post! "logout" nil
+                {:on-success (tuck/send-async! ->LogoutResponse)
+                 :on-failure (tuck/send-async! ->LogoutFailed) })
+    app)
+
+  LogoutResponse
+  (process-event [_ app]
+    (routes/navigate! :front-page)
+    (-> app
+        (dissoc :user :transport-operator
+                :transport-operators-with-services :transport-service-vector)
+        (assoc :flash-message (tr [:login :logged-out]))))
+
+  LogoutFailed
+  (process-event [_ app]
+    (assoc app :flash-message (tr [:common-texts :server-error]))))

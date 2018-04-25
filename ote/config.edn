@@ -6,7 +6,25 @@
         :auth-tkt {:shared-secret "localdev"
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}
-        :session {:key "cookie0123456789"}}
+        :session {:key "cookie0123456789"}
+        :ssl-upgrade {:port 3080
+                      :url "http://localhost:3000/"}}
+
+ :email {:server
+         {;; Hostname of the STMP server. Optional if running locally.
+          :host nil
+          ;; Port of the SMTP server. Numerous contextual defaults exists. E.g. when using :ssl or :tsl settings.
+          :port nil
+          ;; Port is set to 465 is ssl is true
+          :ssl false
+          ;; Port is set to 25 if tsl is true
+          :tsl false
+          :user nil
+          :pass nil}
+
+         ;; Common message opts
+         :msg {:from "NAP"}}
+
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"
@@ -20,6 +38,6 @@
 
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
 
-  ;; add features to the set to enable them in production
+ ;; add features to the set to enable them in production
  :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice}
  }

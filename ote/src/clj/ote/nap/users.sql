@@ -26,9 +26,19 @@ SELECT u.id as id,
                m.state='active' AND
                m.table_id=u.id) as groups
   FROM "user" u
- WHERE state = 'active' AND
-       ((:email::VARCHAR IS NOT NULL AND u.email LIKE :email) OR
-        (:name::VARCHAR IS NOT NULL AND u.fullname LIKE :name));
+  WHERE state = 'active' AND
+        ((:email :: VARCHAR IS NOT NULL AND u.email LIKE :email) OR
+         (:name :: VARCHAR IS NOT NULL AND u.fullname LIKE :name) OR
+         :transit-authority? :: BOOLEAN IS NOT NULL AND
+         EXISTS(SELECT m.group_id,m.table_id
+                  FROM "member" m
+                 WHERE m.table_name = 'user' AND
+                       m.state = 'active' AND
+                       m.table_id = u.id AND
+                       m.group_id IN (SELECT ge.group_id
+                                        FROM group_extra ge
+                                       WHERE ge.key = 'transit-authority?' AND
+                                             ge.value = :transit-authority? :: VARCHAR)));
 
 -- name: is-transit-authority-user?
 -- single?: true

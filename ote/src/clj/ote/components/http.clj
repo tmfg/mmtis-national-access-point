@@ -170,3 +170,16 @@
   "Parse HTTP POST body as Transit data."
   [in]
   (transit/transit->clj in))
+
+(defrecord SslUpgrade [port url]
+  component/Lifecycle
+  (start [this]
+    (assoc this ::stop
+           (server/run-server
+            (constantly {:status 301
+                         :headers {"Location" url}})
+            {:port port})))
+
+  (stop [{stop ::stop :as this}]
+    (stop)
+    (dissoc this ::stop)))

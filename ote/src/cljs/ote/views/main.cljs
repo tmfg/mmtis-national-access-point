@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
@@ -52,8 +52,7 @@
                               :url   "/organization"})]
   (filter some?
           [{:page  :front-page
-            :label [:common-texts :navigation-front-page]
-            :url   "/"}
+            :label [:common-texts :navigation-front-page]}
 
            {:page  :services
             :label [:common-texts :navigation-dataset]}
@@ -119,7 +118,7 @@
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-profile])
                     :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl (str "/user/edit/" username))))}]
+                                   (e! (fp-controller/->ToggleUserEditDialog)))}]
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :navigation-give-feedback])
                     :on-click #(do (.preventDefault %)
@@ -127,7 +126,7 @@
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-log-out])
                     :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->GoToUrl "/user/_logout")))} ]
+                                   (e! (login/->Logout)))} ]
 
      [ui/menu-item {:primary-text (r/as-element [language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
 
@@ -139,13 +138,14 @@
 "Return true if given current-page belongs to given page-group"
 [page-group current-page]
   (cond
+    (= page-group :front-page current-page) true
     (= page-group :own-services) (own-services-pages current-page)
     (= page-group :services) (services-pages current-page)
     (= page-group :operators) (operator-pages current-page)
       :default false))
 
 (defn- top-nav-links [e! {current-page :page :as app} desktop?]
-  [:div (stylefy/use-style style-topnav/clear)
+  [:div.navbar (stylefy/use-style style-topnav/clear)
    [:ul (stylefy/use-style style-topnav/ul)
     (when (> (:width app) style-base/mobile-width-px)
       [:li
@@ -156,7 +156,7 @@
                {:href     "#"
                 :on-click #(do
                              (.preventDefault %)
-                             (e! (fp-controller/->GoToUrl "/")))})
+                             (e! (fp-controller/->ChangePage :front-page nil)))})
         [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
 
     (doall
@@ -182,20 +182,23 @@
 
     (if (nil? (get-in app [:user :username]))
       [:ul (stylefy/use-style style-topnav/ul)
-       [:li
-        [linkify "/user/register" (tr [:common-texts :navigation-register])
-         (merge (stylefy/use-style
-                  (if desktop? style-topnav/desktop-link style-topnav/link))
-                {:style {:float "right"}})]]
+       [:li {:style {:float "right"}}
+        [:a (merge (stylefy/use-style
+                    (if desktop? style-topnav/desktop-link style-topnav/link))
+                   {:href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (fp-controller/->ToggleRegistrationDialog)))})
+         (tr [:common-texts :navigation-register])]]
        [:li
         (if (flags/enabled? :ote-login)
-          [linkify "#" (tr [:common-texts :navigation-login])
-           (merge (stylefy/use-style
-                   (if desktop? style-topnav/desktop-link style-topnav/link))
-                  {:style {:float "right"}}
-                  {:on-click #(do
-                                (.preventDefault %)
-                                (e! (login/->ShowLoginDialog)))})]
+          [:a (merge (stylefy/use-style
+                      (if desktop? style-topnav/desktop-link style-topnav/link))
+                     {:style {:float "right"}}
+                     {:on-click #(do
+                                   (.preventDefault %)
+                                   (e! (login/->ShowLoginDialog)))})
+           (tr [:common-texts :navigation-login])]
           [linkify "/user/login" (tr [:common-texts :navigation-login])
            (merge (stylefy/use-style
                    (if desktop? style-topnav/desktop-link style-topnav/link))
@@ -248,11 +251,11 @@
   [:footer.site-footer
    [:div.container-fluid
     [:div.row
-     [:img {:src "/ote/img/EU-logo.png" :style {:float "right"
-                                                :transform "scale(0.5, 0.5)"}}]
+     [:img {:src "/img/EU-logo.png" :style {:float "right"
+                                            :transform "scale(0.5, 0.5)"}}]
      [:div.col-md-2.footer-links
       [:a.logo {:href "#" }
-       [:img {:src "/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
+       [:img {:src "/img/icons/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
      [:div.col-md-2.footer-links
       [:ul.unstyled
        [:li
@@ -270,7 +273,7 @@
         [language-selection e! style-base/language-selection-footer nil true]]]]
      [:div.col-md-12 (stylefy/use-style style-base/footer-copyright)
       [linkify "http://creativecommons.org/licenses/by/4.0/"
-       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/cc.svg"})]
+       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/img/icons/cc.svg"})]
        {:target "_blank"}]
       [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
 
@@ -293,6 +296,7 @@
       {:label (tr [:login :label]) :expandable? false
        :columns 3}
       {:name :email
+       :label (tr [:field-labels :login :email-or-username])
        :type :string
        :autocomplete "email"
        :on-enter #(e! (login/->Login))}
@@ -303,7 +307,7 @@
        :on-enter #(e! (login/->Login))})]
     credentials]])
 
-(defn login-action-cards []
+(defn login-action-cards [e!]
   [:div {:style {:flex-basis 0 :flex-grow 1}}
    [:div (stylefy/use-style (merge (style-base/flex-container "column")
                                    {:margin-left "1em"
@@ -313,14 +317,18 @@
      [ui/card-text
       [:div
        [:div (tr [:login :no-account-help])]
-       [linkify "/user/register" (tr [:login :no-account-button])]]]]
+       [ui/flat-button {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))
+                        :label (tr [:login :no-account-button])
+                        :primary true}]]]]
 
     [ui/card
      [ui/card-header {:title (tr [:login :forgot-password?])}]
      [ui/card-text
       [:div
        [:div (tr [:login :forgot-password-help])]
-       [linkify "/user/reset" (tr [:login :forgot-password-button])]]]]]])
+       [ui/flat-button {:on-click #(e! (fp-controller/->ToggleUserResetDialog))
+                        :label (tr [:login :forgot-password-button])
+                        :primary true}]]]]]])
 
 (defn mobile-login-form [e! {:keys [credentials failed? error] :as login}]
   [:span
@@ -332,7 +340,7 @@
       (when failed?
         [:div (stylefy/use-style style-base/error-element)
          (tr [:login :error error])])
-      [form-fields/field {:label (tr [:field-labels :login :email])
+      [form-fields/field {:label (tr [:field-labels :login :email-or-username])
                           :type :string :name :email
                           :style {:width "95%" :align-self "center"}
                           :update! #(e! (login/->UpdateLoginCredentials {:email %}))}
@@ -352,7 +360,7 @@
                           :secondary true
                           :on-click #(e! (login/->LoginCancel))
                           :label (tr [:buttons :cancel])}]]]]]
-   [login-action-cards]])
+   [login-action-cards e!]])
 
 (defn login-dialog [e! {:keys [credentials failed? error in-progress?] :as login}]
   [ui/dialog {:open true
@@ -360,7 +368,7 @@
    [:div (stylefy/use-style (merge (style-base/flex-container "row")))
     [:div {:style {:flex-basis 0 :flex-grow 1}}
      [login-form e! login]]
-    [login-action-cards]]])
+    [login-action-cards e!]]])
 
 (defn document-title [page]
   (set! (.-title js/document)
@@ -375,6 +383,35 @@
 
   ;; Render as an empty span
   [:span])
+
+(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog?
+                               show-user-edit-dialog? user]}]
+  [:span
+   (when (:show? login)
+     ^{:key "login"}
+     [login-dialog e! login])
+
+   (when show-register-dialog?
+     ^{:key "ckan-register"}
+     [ckan-iframe-dialog
+      (tr [:common-texts :navigation-register])
+      "/user/register"
+      #(e! (fp-controller/->ToggleRegistrationDialog))])
+
+   (when show-reset-dialog?
+            ^{:key "ckan-reset"}
+     [ckan-iframe-dialog
+      (tr [:login :forgot-password?])
+      "/user/reset"
+      #(e! (fp-controller/->ToggleUserResetDialog))
+      #(e! (fp-controller/->UserResetRequested))])
+
+   (when show-user-edit-dialog?
+     ^{:key "ckan-user-edit"}
+     [ckan-iframe-dialog
+      (tr [:common-texts :user-menu-profile])
+      (str "/user/edit/" (:username user))
+      #(e! (fp-controller/->ToggleUserEditDialog))])])
 
 (defn ote-application
   "OTE application main view"
@@ -394,16 +431,14 @@
        (if (and (:show? login) common/mobile?)
          [mobile-login-form e! login]
          [:span
-          (when (:show? login)
-            [login-dialog e! login])
-
+          [ckan-dialogs e! app]
           (if (not loaded?)
             [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
             [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
              [:div.container-fluid
               [document-title (:page app)]
               (case (:page app)
-                :front-page [fp/own-services e! app]
+                :front-page [fp/front-page e! app]
                 :own-services [fp/own-services e! app]
                 :transport-service [t-service/select-service-type e! app]
                 :transport-operator [to/operator e! app]

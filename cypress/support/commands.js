@@ -58,7 +58,7 @@ Cypress.Commands.add('login', (login, password) => {
 
     cy.request({
         method: 'POST',
-        url: '/ote/login',
+        url: '/login',
         form: false, // indicates the body should be form urlencoded and sets Content-Type: application/x-www-form-urlencoded headers
         followRedirect: false,
         body: ["^ ", "~:email", username, "~:password", password || Cypress.env('NAP_PASSWORD')]

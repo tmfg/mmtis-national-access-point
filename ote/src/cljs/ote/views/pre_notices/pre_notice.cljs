@@ -20,6 +20,7 @@
             [clojure.string :as str]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
+(def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
 
 (defn footer [e! pre-notice]
   (let [valid-notice? (form/valid? pre-notice)]
@@ -172,10 +173,13 @@
                      :label (tr [:pre-notice-page :effective-date-from])}
 
                     {:name  ::transit/effective-date-description
-                     :type  :string
+                     :type  :autocomplete
                      :label (tr [:pre-notice-page :effective-date-description])
-                     ;:required? true
-                     }]
+                     :open-on-focus? true
+                     :auto-select? true
+                     :suggestions (mapv #(tr [:pre-notice-page :effective-date-descriptions %]) effective-date-descriptions)
+                     :write #(assoc-in %1 [::transit/effective-date-description] #{%2})
+                     :read #(first (get-in % [::transit/effective-date-description]))}]
      :delete?      true
      :add-label    (tr [:buttons :add-new-effective-date])}))
 

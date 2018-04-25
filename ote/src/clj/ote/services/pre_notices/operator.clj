@@ -54,11 +54,16 @@
     (specql/delete! db ::transit/pre-notice-attachment {::transit/id id}))
   (attachment/delete-from-aws db config attachments))
 
+(defn with-sent-field [notice]
+  (if (= (::transit/pre-notice-state notice) :sent)
+    (assoc notice ::transit/sent (java.sql.Timestamp. (System/currentTimeMillis)))
+    notice))
+
 (defn save-pre-notice [db user notice config]
   (let [attachments-from-db (list-attachments-in-db db user)
         attachments-ids-from-client (set (map ::transit/id (:attachments notice)))
         to-be-removed (filter #(not (contains? attachments-ids-from-client (::transit/id %)))
-                       attachments-from-db)]
+                              attachments-from-db)]
     (authorization/with-transport-operator-check
       db user (::t-operator/id notice)
       (fn []
@@ -67,7 +72,8 @@
                 n (-> notice
                       (dissoc :attachments)
                       (dissoc ::transit/attachments)
-                      (modification/with-modification-fields ::transit/id user))
+                      (modification/with-modification-fields ::transit/id user)
+                      (with-sent-field))
                 saved-notice (specql/upsert! db ::transit/pre-notice n)
                 notice-id (::transit/id saved-notice)]
             (specql/update! db ::transit/pre-notice-attachment
