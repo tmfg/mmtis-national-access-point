@@ -52,7 +52,7 @@
 (defn- delete-attachments [db config attachments]
   (doseq [{id ::transit/id} attachments]
     (specql/delete! db ::transit/pre-notice-attachment {::transit/id id}))
-  (attachment/delete-from-aws db config attachments))
+  (attachment/delete-from-s3 db config attachments))
 
 (defn with-sent-field [notice]
   (if (= (::transit/pre-notice-state notice) :sent)

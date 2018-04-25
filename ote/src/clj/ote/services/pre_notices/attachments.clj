@@ -13,6 +13,9 @@
             [ote.components.http :as http]
             [ote.nap.users :as users]))
 
+(defn- generate-file-key [id filename]
+  (str id "_" filename))
+
 (defn upload-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (let [uploaded-file (get-in req [:multipart-params "file"])
         _ (assert (and (:filename uploaded-file)
@@ -23,7 +26,7 @@
                                {::transit/attachment-file-name (:filename uploaded-file)}
                                ::transit/id user))]
 
-    (s3/put-object bucket (str (::transit/id file) "_" (:filename uploaded-file))
+    (s3/put-object bucket (generate-file-key (::transit/id file) (:filename uploaded-file))
                    (:tempfile uploaded-file))
     (http/transit-response file)))
 
@@ -42,8 +45,9 @@
 (defn download-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (let [attachment (attachment-info db user (Long/parseLong (get-in req [:params :id])))
         s3-file (when attachment
-                  (s3/get-object bucket (str (::transit/id attachment) "_"
-                                             (::transit/attachment-file-name attachment))))]
+                  (s3/get-object bucket (generate-file-key
+                                         (::transit/id attachment)
+                                         (::transit/attachment-file-name attachment))))]
     (if-not s3-file
       {:status 404
        :body "No such attachment"}
@@ -52,9 +56,9 @@
               (fn [out]
                 (io/copy (:input-stream s3-file) out)))})))
 
-(defn delete-from-aws [db {bucket :bucket :as config} attachments]
+(defn delete-from-s3 [db {bucket :bucket :as config} attachments]
   (doseq [{id ::transit/id file-name ::transit/attachment-file-name}  attachments]
-    (s3/delete-object bucket (str id "_" file-name))))
+    (s3/delete-object bucket (generate-file-key id file-name))))
 
 (defn attachment-routes [db config]
   (if-not (:bucket config)
