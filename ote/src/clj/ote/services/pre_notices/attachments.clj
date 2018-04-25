@@ -49,6 +49,10 @@
               (fn [out]
                 (io/copy (:input-stream s3-file) out)))})))
 
+(defn delete-from-aws [db {bucket :bucket :as config} attachments]
+  (doseq [{id ::transit/id file-name ::transit/attachment-file-name}  attachments]
+    (s3/delete-object bucket (str id "_" file-name))))
+
 (defn attachment-routes [db config]
   (if-not (:bucket config)
     (do (log/error "No S3 bucket configured, attachment upload/download disabled")
