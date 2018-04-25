@@ -151,25 +151,22 @@
                         (on-enter))}))])
 
 (defmethod field :file [{:keys [update! label name max-length min-length regex
-                                 focus on-focus form? error warning table? full-width?
-                                 style input-style hint-style on-change]
-                          :as   field} data]
-[:div.upload-btn-wrapper
- [:button {:style
-           {:padding "10px 20px 10px 20px"
-            :text-transform "uppercase"
-            :color "#FFFFFF"
-            :background-color "#1565C0"
-            :font-size "12px"
-            :font-weight "bold"}}
-           label ]
-  [:input {:id "hidden-file-input"
-           :type "file"
-           :name name
-           :on-change on-change
-           ;; Hack to hide file input tooltip on different browsers.
-           ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
-           :title " "}]])
+                                focus on-focus form? error warning table? full-width?
+                                style input-style hint-style on-change]
+                         :as field} data]
+  [:div (stylefy/use-style style-form-fields/file-button-wrapper)
+   [:button (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
+    label]
+   [:input
+    (merge (stylefy/use-sub-style
+             style-form-fields/file-button-wrapper :file-input)
+           {:id "hidden-file-input"
+            :type "file"
+            :name name
+            :on-change on-change
+            ;; Hack to hide file input tooltip on different browsers.
+            ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
+            :title " "})]])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length]
                               :as   field} data]
