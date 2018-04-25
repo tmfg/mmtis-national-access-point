@@ -123,7 +123,7 @@
                        (.preventDefault %)
                        (e! (ss/->ShowServiceGeoJSON
                              (str js/document.location.protocol "//" js/document.location.host
-                                  "/ote/export/geojson/" transport-operator-id "/" id))))}
+                                  "/export/geojson/" transport-operator-id "/" id))))}
       [:div.result-title (stylefy/use-style style/result-card-label) name
        [:span.small-text (stylefy/use-style style/result-card-small-label)
         (sub-type-tr sub-type)]]]
