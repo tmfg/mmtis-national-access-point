@@ -65,7 +65,7 @@
    ;; Integration: export GeoJSON and GTFS
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
    :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
-   :import-gtfs (component/using (import-gtfs/->GTFSImport) [:http])
+   :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:http])
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
