@@ -15,7 +15,9 @@
             [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
             [ote.util.collections :as collections]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.localization :refer [selected-language]]
+            [ote.ui.validation :as validation]))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
@@ -56,6 +58,7 @@
 ;; Event to set service calendar
 (defrecord EditServiceCalendar [trip-idx])
 (defrecord CloseServiceCalendar [])
+(defrecord CancelServiceCalendar[])
 (defrecord ToggleDate [date trip-idx])
 (defrecord EditServiceCalendarRules [rules trip-idx])
 (defrecord ClearServiceCalendar [trip-idx])
@@ -363,14 +366,27 @@
     (if (= trip-idx (get-in app [:route :edit-service-calendar]))
       (-> app
           (route-updated)
-          (update-in [:route] dissoc :edit-service-calendar))
+          (update-in [:route] dissoc :edit-service-calendar)
+          ;; Move selected calendar to safty if user wants to cancel changes
+          (assoc-in [:route :temporary-calendar] (get-in app [:route ::transit/service-calendars trip-idx])))
       (-> app
           (route-updated)
-          (assoc-in [:route :edit-service-calendar] trip-idx))))
+          (assoc-in [:route :edit-service-calendar] trip-idx)
+          (assoc-in [:route :temporary-calendar] (get-in app [:route ::transit/service-calendars trip-idx])))))
 
   CloseServiceCalendar
   (process-event [_ app]
-    (update-in app [:route] dissoc :edit-service-calendar))
+    (-> app
+        (update-in [:route] dissoc :edit-service-calendar :temporary-calendar)))
+
+  CancelServiceCalendar
+  (process-event [_ app]
+    (let [cal-idx (get-in app [:route :edit-service-calendar])
+          temp-cal (get-in app [:route :temporary-calendar])]
+      ;; Take calendar from save place and replace changed calendar with it.
+      (-> app
+          (assoc-in [:route ::transit/service-calendars cal-idx] temp-cal)
+          (update-in [:route] dissoc :edit-service-calendar :temporary-calendar))))
 
   ToggleDate
   (process-event [{date :date trip-idx :trip-idx} app]
@@ -591,11 +607,15 @@
   [{::transit/keys [stops] :as route}]
   (> (count stops) 1))
 
+(defn valid-route-name? [name]
+  (not (validation/empty-localized-text? name)))
+
 (defn valid-basic-info?
   "Check if given route has a name and an operator."
   [{::transit/keys [name transport-operator-id]}]
-  (and (not (str/blank? name))
-       transport-operator-id))
+  (and
+    (valid-route-name? name)
+    (not (nil? transport-operator-id))))
 
 (defn valid-calendar? [trip-calendar]
   (not (or
@@ -644,5 +664,4 @@
 (defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or
     (str/blank? from-date)
-    (str/blank? to-date)
-    ))
+    (str/blank? to-date)))

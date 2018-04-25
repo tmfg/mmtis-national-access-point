@@ -8,6 +8,20 @@
                    :digest-algorithm "MD5"}
         ;;:session {:key "{{ote_cookie_key}}"}
         }
+
+ :email {:server
+         {;; Hostname of the STMP server. Optional if running locally.
+          :host "{{email_smtp_server}}"
+          ;; Port is set to 465 is ssl is true
+          :ssl false
+          ;; Port is set to 25 if tsl is true
+          :tsl true
+          :user "{{email_user}}"
+          :pass "{{email_password}}"}
+
+         ;; Common message opts
+         :msg {:from "{{email_from}}"}}
+
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"
@@ -17,4 +31,5 @@
  :log {:level :info}
  :ga {:tracking-code "UA-5406842-15"}
  :enabled-features {{flags}}
+ :pre-notices {:bucket "{{pre_notice_attachment_bucket}}"}
 }

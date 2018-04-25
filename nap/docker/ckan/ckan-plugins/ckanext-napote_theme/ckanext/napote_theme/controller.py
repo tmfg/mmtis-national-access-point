@@ -10,6 +10,7 @@ import ckan.logic.schema as schema
 import ckan.lib.captcha as captcha
 import ckan.lib.mailer as mailer
 import ckan.plugins as p
+import ckan.lib.authenticator as authenticator
 
 import ckan.lib.navl.dictization_functions as dictization_functions
 
@@ -83,7 +84,7 @@ class CustomUserController(UserController):
         if not c.user:
             # log the user in programatically
             set_repoze_user(data_dict['name'])
-            h.redirect_to(str('/ote/#/?logged_in=1'))
+            return render('user/ote_close.html')
         else:
             # #1799 User has managed to register whilst logged in - warn user
             # they are not re-logged in as new user.
@@ -138,9 +139,7 @@ class CustomUserController(UserController):
             if user_obj:
                 try:
                     mailer.send_reset_link(user_obj)
-                    h.flash_success(_('Please check your inbox for '
-                                      'a reset code.'))
-                    h.redirect_to('/')
+                    return render('user/ote_close.html')
                 except mailer.MailerException, e:
                     h.flash_error(_('Could not send reset link: %s') %
                                   unicode(e))
@@ -200,3 +199,59 @@ class CustomUserController(UserController):
                         __ckan_no_root=True)
         h.redirect_to(self._get_repoze_handler('logout_handler_path') +
                       '?came_from=' + url)
+
+    def edit(self, id=None, data=None, errors=None, error_summary=None):
+        return super(CustomUserController, self).edit(id, data, errors, error_summary)
+
+    def _save_edit(self, id, context):
+        try:
+            if id in (c.userobj.id, c.userobj.name):
+                current_user = True
+            else:
+                current_user = False
+            old_username = c.userobj.name
+
+            data_dict = logic.clean_dict(unflatten(
+                logic.tuplize_dict(logic.parse_params(request.params))))
+            context['message'] = data_dict.get('log_message', '')
+            data_dict['id'] = id
+
+            email_changed = data_dict['email'] != c.userobj.email
+            if (data_dict['password1'] and data_dict['password2']) \
+                    or email_changed:
+                identity = {'login': c.user,
+                            'password': data_dict['old_password']}
+                auth = authenticator.UsernamePasswordAuthenticator()
+
+                if auth.authenticate(request.environ, identity) != c.user:
+                    raise UsernamePasswordError
+
+            # MOAN: Do I really have to do this here?
+            if 'activity_streams_email_notifications' not in data_dict:
+                data_dict['activity_streams_email_notifications'] = False
+
+            user = get_action('user_update')(context, data_dict)
+
+            h.flash_success(_('Profile updated'))
+
+            if current_user and data_dict['name'] != old_username:
+                # Changing currently logged in user's name.
+                # Update repoze.who cookie to match
+                set_repoze_user(data_dict['name'])
+
+            ## CUSTOMIZED FROM CKAN
+            return render('user/ote_close.html')
+        except NotAuthorized:
+            abort(403, _('Unauthorized to edit user %s') % id)
+        except NotFound, e:
+            abort(404, _('User not found'))
+        except DataError:
+            abort(400, _(u'Integrity Error'))
+        except ValidationError, e:
+            errors = e.error_dict
+            error_summary = e.error_summary
+            return self.edit(id, data_dict, errors, error_summary)
+        except UsernamePasswordError:
+            errors = {'oldpassword': [_('Password entered was incorrect')]}
+            error_summary = {_('Old Password'): _('incorrect password')}
+            return self.edit(id, data_dict, errors, error_summary)

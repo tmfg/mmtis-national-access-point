@@ -4,11 +4,12 @@
             [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.front-page :as fp]
+            [ote.app.controller.login :as login]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.transport-operator :as to]
             [ote.views.transport-service :as transport-service]
@@ -24,13 +25,17 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
             [ote.views.transport-operator :as t-operator-view]
-            [ote.ui.list_header :as list-header]))
+            [ote.ui.list_header :as list-header]
+            [clojure.string :as str]))
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
                                   :as service}]
   [:span
-   [ui/icon-button {:href "#" :on-click #(e! (ts/->DeleteTransportService id))}
+   [ui/icon-button {:href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (ts/->DeleteTransportService id)))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -200,3 +205,56 @@
          [table-container-for-front-page e! has-services? operator-services state]
          ;; Render service type selection page if no services added
          [transport-service/select-service-type e! state])]))))
+
+(let [host (.-host (.-location js/document))]
+  (def test-env? (or (str/includes? host "test")
+                     (str/includes? host "localhost"))))
+
+(defn test-env-warning []
+  [:div.test-env-warning
+   {:style {:margin "0.2em"
+            :border "4px dashed red"}}
+   [:p {:style {:margin "10px 0px 0px 10px"
+                :font-weight "bold"}}
+    "TÄMÄ ON TESTIPALVELU!"]
+   [:p {:style {:margin "10px"}}
+    "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "
+    [linkify "https://finap.fi/ote/#/services" "finap.fi"]]
+   [:p {:style {:margin "10px"}}
+    "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta "
+    [linkify "http://www.liikennevirasto.fi/nap" "www.liikennevirasto.fi/nap"]]])
+
+(defn front-page
+  "Front page info"
+  [e! {user :user :as app
+       show-register-dialog? :show-register-dialog?}]
+  [:div.front-page {:style {:position "relative" :top "-18px"}}
+   [:header {:style {:height "260px"
+                     :padding-top "0px"
+                     :background "url(/img/home_header.jpg)"
+                     :text-align "center"}}
+    [:img.livi-logo {:style {:width "220px"
+                             :position "relative"
+                             :top "100px"}
+                     :src "/img/icons/nap-logo.svg" :alt "FINAP" :title "FINAP"}]
+    [:div {:style {:position "relative"
+                   :top "120px"
+                   :color "white"
+                   :font-size "21px"
+                   :font-weight 200
+                   :line-height "30px"
+                   :font-family "'Roboto', sans-serfi"}}
+     (tr [:front-page :hero-title])]]
+   (when test-env?
+     [test-env-warning])
+   (tr [:front-page :front-page-content])
+   (when-not user
+     [:div.front-page-login {:style {:text-align "center"}}
+      [ui/raised-button {:on-click #(e! (login/->ShowLoginDialog))
+                         :primary true
+                         :label (tr [:common-texts :navigation-login])}]
+      [:div {:style {:padding-top "1em"}}
+       (tr [:front-page :new-user?])]
+      [ui/flat-button {:primary true
+                       :label (tr [:common-texts :navigation-register])
+                       :on-click #(e! (fp/->ToggleRegistrationDialog))}]])])

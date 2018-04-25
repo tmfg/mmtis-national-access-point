@@ -88,7 +88,7 @@
             [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
             [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]
-            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "11%"}}
+            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "13%"}}
              [ui/icon-button {:href     "#"
                               :on-click #(do
                                            (.preventDefault %)
