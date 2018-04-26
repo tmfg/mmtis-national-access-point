@@ -35,6 +35,9 @@
   (when dt
     (time/format-date (t/to-time-zone dt timezone))))
 
+(defn hours->seconds [hours]
+  (int (* 3600 hours)))
+
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                               effective-dates-asc]}]
   (let [effective-date-str (date-string (coerce/from-sql-date
@@ -87,11 +90,18 @@
 (defn notification-html [db]
   (try
     (when-let [notices (fetch-pre-notices-by-interval db {:interval "1 day"})]
-      (html (notification-template notices)))
+      (if-not (empty? notices)
+        (do
+          (log/info "Found" (count notices) "new pre-notices from 24 hours.")
+          (html (notification-template notices)))
+        (log/info "No new pre-notices found.")))
+
     (catch Exception e
       (log/warn "Error while generating notification html:" e))))
 
 (defn send-notification! [db {server-opts :server msg-opts :msg :as email-opts}]
+  (log/info "Starting pre-notices notification task...")
+
   (localization/with-language
     "fi"
     (tx/with-transaction db
@@ -99,9 +109,11 @@
         (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
               emails (mapv #(:email %) users)
               notification (notification-html db)]
+
           (try
-            (when-not (empty? emails)
+            (when (and (not (empty? emails)) notification)
               (log/info "Trying to send a pre-notice email to: " (pr-str emails))
+
               (send-email
                 server-opts
                 {:bcc emails
@@ -113,19 +125,22 @@
               (log/warn "Error while sending a notification" e))))))))
 
 
-(defrecord PreNoticesTasks [at config]
+(defrecord PreNoticesTasks [at email-config interval]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/days 1)))
+      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds
+                                                         (hours->seconds (or interval
+                                                                             24)))))
                               (fn [_]
-                                (#'send-notification! db config)))]))
+                                (#'send-notification! db email-config)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks
-  ([config] (pre-notices-tasks daily-notify-time config))
-  ([at config]
-   (->PreNoticesTasks at config)))
+  ([email-config interval]
+   (pre-notices-tasks daily-notify-time email-config interval))
+  ([at email-config interval]
+   (->PreNoticesTasks at email-config interval)))
