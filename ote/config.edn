@@ -39,7 +39,7 @@
 
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"
                ;; Interval in hours
-               :notify-interval 0.5}
+               :notify-interval 24}
 
  ;; add features to the set to enable them in production
  :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice}
