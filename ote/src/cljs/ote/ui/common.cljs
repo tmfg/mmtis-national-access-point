@@ -124,7 +124,7 @@
      (fn [i [left right]]
        ^{:key i}
        [:tr
-        [:td left]
+        [:td {:style {:vertical-align "top"}} left]
         [:td right]])
      (partition 2 items))]])
 
