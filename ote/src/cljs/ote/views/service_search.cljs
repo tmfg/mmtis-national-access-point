@@ -155,8 +155,7 @@
         contact-phone]
 
        [data-item [ic/communication-email {:style style/contact-icon}]
-        contact-email]
-       ]]]))
+        contact-email]]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count
