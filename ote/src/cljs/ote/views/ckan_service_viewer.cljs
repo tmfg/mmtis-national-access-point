@@ -165,24 +165,31 @@
 
 (defn operation-area [e! {:keys [geojson] :as app}]
   (r/create-class
-    {:display-name         "operation-area-map"
-     :component-did-mount  #(do
-                              (leaflet/customize-zoom-controls e! % "leaflet" {:zoomInTitle (tr [:leaflet :zoom-in])
-                                                                     :zoomOutTitle (tr [:leaflet :zoom-out])})
-                              (leaflet/update-bounds-on-load %))
+    {:display-name "operation-area-map"
+     :component-did-mount #(do
+                             (leaflet/customize-zoom-controls e! % "leaflet" {:zoomInTitle (tr [:leaflet :zoom-in])
+                                                                              :zoomOutTitle (tr [:leaflet :zoom-out])})
+                             (leaflet/update-bounds-on-load %))
      :component-did-update leaflet/update-bounds-from-layers
      :reagent-render
-                           (fn [e! {:keys [geojson] :as app}]
-                             [leaflet/Map {:ref         "leaflet"
-                                           :center      #js [65 25]
-                                           :zoomControl false
-                                           :zoom        5}
-                              [leaflet/TileLayer {:url         "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                                                  :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+     (fn [e! {:keys [geojson] :as app}]
+       [leaflet/Map {:ref         "leaflet"
+                     :center      #js [65 25]
+                     :zoomControl false
+                     :zoom        5}
+        [leaflet/TileLayer {:url         "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
 
-                              (when geojson
-                                [leaflet/GeoJSON {:data  geojson
-                                                  :style {:color "green"}}])])}))
+        ;; Go through the geometrycollection and separately show each geometry.
+        ;; The GeoJSON export adds a GeoJSON-CSS style to each geometry which has
+        ;; a color based on the operation area primary? flag.
+        (doall
+         (map-indexed
+          (fn [i geom]
+            ^{:key i}
+            [leaflet/GeoJSON {:data geom
+                              :style {:color (aget geom "style" "fill")}}])
+          (seq (aget geojson "features" 0 "geometry" "geometries"))))])}))
 
 (defn viewer [e! _]
   (e! (v/->StartViewer))
@@ -206,4 +213,4 @@
                 (tr [:buttons :edit-service])]])]
 
          [operation-area e! app]
-       [show-features resource]]])))
+         [show-features resource]]])))

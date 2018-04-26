@@ -16,7 +16,8 @@
     ;; Calendar subview
     [ote.views.route.service-calendar :as route-service-calendar]
     [ote.style.form :as style-form]
-    [ote.db.transport-service :as t-service]))
+    [ote.db.transport-service :as t-service]
+    [ote.style.base :as style-base]))
 
 (defn badge-content [trip-calendar]
   (if (rw/valid-calendar? trip-calendar)
@@ -224,4 +225,6 @@
       [:div (merge (stylefy/use-style style-form/form-card-body))
        (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))
          [trips-list e! route]
-         [common/help (tr [:form-help :trip-editor-no-stop-sequence])])]]]))
+         [:div
+          [common/help (tr [:form-help :trip-editor-no-stop-sequence])]
+          [:span (stylefy/use-style style-base/required-element) (tr [:route-wizard-page :data-missing])]])]]]))

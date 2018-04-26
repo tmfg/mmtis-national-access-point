@@ -116,7 +116,7 @@
   (fn [{cookies :cookies headers :headers :as req}]
     (let [auth-ticket (:value (get cookies "auth_tkt"))
           ip "0.0.0.0" ;; (client-ip req)  FIXME: ckan seems to always get 0.0.0.0 as IP
-          cookie (and auth-ticket ip
+          cookie (and (not (str/blank? auth-ticket)) ip
                       (some->> auth-ticket
                                (parse (or digest-algorithm "MD5"))
                                (verify-digest shared-secret ip)
