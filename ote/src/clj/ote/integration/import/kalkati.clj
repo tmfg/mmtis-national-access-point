@@ -12,18 +12,21 @@
 (defn kalkati-to-gtfs
   "Invoke an kalkati_to_gtfs Lambda function directly through AWS SDK.
   Returns InvokeResult."
-  [kalkati-url]
-  (lambda/invoke :function-name "kalkati_to_gtfs"
-                 :region "eu-central-1"
-                 :invocation-type "RequestResponse"
-                 ;; We also want to support invoking lambda functions through API Gateway lambda proxy
-                 ;; so we'll have to encode the :body separately.
-                 :payload (cheshire/encode {:body (cheshire/encode kalkati-url)})))
+  [kalkati-url headers]
+  (let [headers (select-keys headers ["if-modified-since"])]
+    (lambda/invoke :function-name "kalkati_to_gtfs"
+                   :region "eu-central-1"
+                   :invocation-type "RequestResponse"
+                   ;; We also want to support invoking lambda functions through API Gateway lambda proxy
+                   ;; so we'll have to encode the :body separately.
+                   :payload (cheshire/encode {:body (cheshire/encode kalkati-url)
+                                              :headers headers}))))
 
-(defn load-kalkati [url]
-  (let [payload (:payload (kalkati-to-gtfs url))
+(defn load-kalkati [url headers]
+  (let [payload (:payload (kalkati-to-gtfs url headers))
         json (cheshire/decode (String. (.array payload) "UTF-8") keyword)
-        gtfs-url (:Location (:headers json))]
+        resp-headers (:headers json)
+        gtfs-url (:Location resp-headers)]
     (gtfs-import/load-gtfs gtfs-url)))
 
 (defrecord KalkatiImport []
@@ -32,8 +35,9 @@
     (assoc this ::stop
                 (http/publish! http {:authenticated? false}
                                (routes
-                                 (GET "/import/kalkati" {params :query-params}
-                                   (load-kalkati (get params "url")))))))
+                                 (GET "/import/kalkati" {params :query-params
+                                                         headers :headers}
+                                   (load-kalkati (get params "url") headers))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
