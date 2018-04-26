@@ -91,7 +91,6 @@ def lambda_handler(event, context):
             }
 
         except Exception as e:
-            print(e)
             raise RuntimeError('Error while processing file {}: {}'.format(file_url, str(e)))
 
         file_key = '%s/gtfs-%s.zip' % (s3_folder, datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
