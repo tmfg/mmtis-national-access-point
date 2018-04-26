@@ -120,7 +120,7 @@
                  :from (or (:from msg-opts) "NAP")
                  :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
                                (datetime-string (t/now) timezone))
-                 :body [{:type "text/html" :content notification}]}))
+                 :body [{:type "text/html;charset=utf-8" :content notification}]}))
             (catch Exception e
               (log/warn "Error while sending a notification" e))))))))
 
