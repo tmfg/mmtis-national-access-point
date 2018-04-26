@@ -50,7 +50,7 @@
      [:td (str/join ", " (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
                                (PgArray->seqable pre-notice-type)))]
      [:td effective-date-str]
-     [:td [:a {:href "finap.fi"} route-description]]]))
+     [:td [:a {:href "https://finap.fi"} route-description]]]))
 
 (defn notification-template [pre-notices]
   [:html
