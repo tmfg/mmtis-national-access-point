@@ -33,6 +33,7 @@
     ["/pre-notice/new" :new-notice]
     ["/pre-notice/edit/:id" :edit-pre-notice]
     ["/authority-pre-notices" :authority-pre-notices]
+    ["/authority-pre-notices/:id" :authority-pre-notices]
 
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
@@ -64,7 +65,15 @@
                (if event
                  (binding [tuck/*current-send-function*
                            #(swap! state/app (flip tuck/process-event) %)]
-                   (tuck/process-event event app))
+                   (if (vector? event)
+                     ;; Received multiple events, apply them all
+                     (reduce (fn [app event]
+                               (if event
+                                 (tuck/process-event event app)
+                                 app))
+                             app event)
+                     ;; Apply single event
+                     (tuck/process-event event app)))
                  app))))))
 
 (defn start! [go-to-url-event]
