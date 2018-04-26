@@ -6,7 +6,8 @@
             [clj-http.client :as http-client]
             [ote.integration.import.gtfs :as gtfs-import]
             [amazonica.aws.lambda :as lambda]
-            [cheshire.core :as cheshire]))
+            [cheshire.core :as cheshire]
+            [clojure.walk :as walk]))
 
 
 (defn kalkati-to-gtfs
@@ -26,8 +27,15 @@
   (let [payload (:payload (kalkati-to-gtfs url headers))
         json (cheshire/decode (String. (.array payload) "UTF-8") keyword)
         resp-headers (:headers json)
+        status-code (:statusCode json)
         gtfs-url (:Location resp-headers)]
-    (gtfs-import/load-gtfs gtfs-url)))
+
+    (if-not (= status-code 200)
+      (merge
+        {:status status-code}
+        (when resp-headers
+          {:headers (walk/stringify-keys resp-headers)}))
+      (gtfs-import/load-gtfs gtfs-url))))
 
 (defrecord KalkatiImport []
   component/Lifecycle
