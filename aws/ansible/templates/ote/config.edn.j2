@@ -2,6 +2,7 @@
       :username "{{db_username}}"
       :password "{{db_password}}"}
  :http {:port 3000
+        :max-body 33554432
         :strip-prefix "/ote"
         :auth-tkt {:shared-secret "{{auth_shared_secret}}"
                    :max-age-in-seconds 36000
