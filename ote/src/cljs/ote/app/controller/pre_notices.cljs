@@ -8,8 +8,10 @@
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]))
 
-(declare ->LoadPreNoticesResponse ->LoadPreNotice ->LoadPreNoticeResponse
-         ->ServerError ->RegionsResponse effective-date-description->set)
+(declare ->LoadPreNoticesResponse ->LoadPreNoticeResponse
+         ->ServerError ->RegionsResponse effective-date-description->set
+         ->LoadRegions load-regions-from-server)
+
 
 (tuck/define-event ServerError [response]
   {}
@@ -30,12 +32,6 @@
               :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
-(tuck/define-event LoadPreNotice [id]
-  {:path [:pre-notice]}
-  (comm/get! (str "pre-notices/" id)
-            {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
-             :on-failure (tuck/send-async! ->ServerError)})
-  :loading)
 
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
@@ -43,12 +39,12 @@
 (defmethod routes/on-navigate-event :authority-pre-notices [_]
   (->LoadAuthorityPreNotices))
 
-
-(defmethod routes/on-navigate-event :edit-pre-notice [{params :params}]
-  (->LoadPreNotice (:id params)))
-
 (tuck/define-event LoadPreNoticeResponse [response]
-  {:path [:pre-notice]} (effective-date-description->set response))
+  {:path [:pre-notice]
+   :app pre-notice}
+     (merge
+       (select-keys pre-notice #{:regions})
+       (effective-date-description->set response)))
 
 (tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
@@ -56,9 +52,7 @@
 
 (tuck/define-event LoadRegions []
   {}
-  (comm/get! "pre-notices/regions"
-             {:on-success (tuck/send-async! ->RegionsResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
+  (load-regions-from-server)
   app)
 
 (defmethod routes/on-navigate-event :new-notice [_]
@@ -104,8 +98,22 @@
 (defrecord SaveNoticeFailure [response])
 (defrecord CancelNotice [])
 (defrecord DeleteEffectiveDate [index])
+(defrecord LoadPreNotice [id])
+
+(defmethod routes/on-navigate-event :edit-pre-notice [{params :params}]
+  (->LoadPreNotice (:id params)))
 
 (extend-protocol tuck/Event
+
+  LoadPreNotice
+  (process-event [{id :id} app]
+    (do
+      (load-regions-from-server)
+      (comm/get! (str "pre-notices/" id)
+                 {:on-success (tuck/send-async! ->LoadPreNoticeResponse)
+                  :on-failure (tuck/send-async! ->ServerError)}))
+    (assoc-in app [:pre-notice :loading] true))
+
 
   CreateNewPreNotice
   (process-event [_ app]
@@ -134,7 +142,6 @@
   (process-event [{form-data :form-data} app]
     (-> app
         (update :pre-notice merge form-data)))
-
 
   OpenSendModal
   (process-event [_ app]
@@ -173,7 +180,6 @@
     ;; TODO: when published? true, use save-failure-send
     (assoc app
       :flash-message-error (tr [:pre-notice-page :save-failure])))
-
 
   CancelNotice
   (process-event [_ app]
@@ -241,3 +247,8 @@
   (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)
                                            :on-failure (tuck/send-async! ->ServerError)})
   app)
+
+(defn load-regions-from-server []
+  (comm/get! "pre-notices/regions"
+             {:on-success (tuck/send-async! ->RegionsResponse)
+              :on-failure (tuck/send-async! ->ServerError)}))
