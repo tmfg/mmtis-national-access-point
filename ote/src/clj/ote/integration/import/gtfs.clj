@@ -49,19 +49,24 @@
 (defn upload-gtfs->s3 [gtfs-config db url operator-id ts-id last-import-date]
   ;; TODO: add transactions
   (let [filename (gtfs-file-name operator-id ts-id)
-        gtfs-file (load-file-from-url url last-import-date)
-        new-gtfs-hash (gtfs-hash gtfs-file)
-        old-gtfs-hash (::gtfs/sha256 (first (specql/fetch db ::gtfs/package
-                                                          (specql/columns ::gtfs/package)
-                                                          {::gtfs/transport-operator-id operator-id})))]
-
-    ;; IF hash doesn't match, save new and upload file to s3
-    (when (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
-      (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
-      (specql/upsert! db ::gtfs/package {::gtfs/sha256                new-gtfs-hash
-                                         ::gtfs/transport-operator-id operator-id
-                                         ::gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))})
-      (log/debug "File " filename " was uploaded to S3"))))
+        gtfs-file (load-file-from-url url last-import-date)]
+    (if (nil? gtfs-file)
+      (log/debug "Could not found anything from given url " url)
+      (let [new-gtfs-hash (gtfs-hash gtfs-file)
+            old-gtfs-hash (::gtfs/sha256 (first (specql/fetch db ::gtfs/package
+                                                              (specql/columns ::gtfs/package)
+                                                              {::gtfs/transport-operator-id operator-id
+                                                               ::gtfs/transport-service-id  ts-id})))]
+        ;; IF hash doesn't match, save new and upload file to s3
+        (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
+          (do
+            (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
+            (specql/upsert! db ::gtfs/package {::gtfs/sha256                new-gtfs-hash
+                                               ::gtfs/transport-operator-id operator-id
+                                               ::gtfs/transport-service-id  ts-id
+                                               ::gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))})
+            (log/debug "File " filename " was uploaded to S3"))
+          (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying."))))))
 
 (defrecord GTFSImport [gtfs-config]
   component/Lifecycle
@@ -70,9 +75,7 @@
       (http/publish! http {:authenticated? false}
                      (routes
                        (GET "/import/gtfs" {params :query-params}
-                         (load-gtfs (get params "url")))
-                       (GET "/import/gtfss3" {{:strs [url operator-id ts-id]} :query-params}
-                         (upload-gtfs->s3 gtfs-config db url operator-id ts-id nil))))))
+                         (load-gtfs (get params "url")))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

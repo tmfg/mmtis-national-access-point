@@ -25,7 +25,7 @@
          (if (nil? gtfs-data)
            (log/debug "No gtfs files to upload.")
            (do
-             (log/debug "GTFS File found - Upload file to S3. - " (pr-str gtfs-data))
+             (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
              (import-gtfs/upload-gtfs->s3 gtfs-config db url operator-id ts-id last-import-date)
              (specql/update! db ::t-service/external-interface-description
                              {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
