@@ -38,7 +38,12 @@
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
 
-(defmulti on-navigate-event :page)
+(defmulti on-navigate-event
+  "Determine event(s) to be run when user navigates to a given route.
+  Returns a single Tuck event or a vector of Tuck events to be applied
+  to the app state. Takes a map containing the navigation data as parameter.
+  Route parameters are under the :params key."
+  :page)
 
 (defmethod on-navigate-event :default [_] nil)
 
