@@ -25,6 +25,8 @@
               :on-failure (tuck/send-async! ->ServerError)})
   :loading)
 
+(declare ->ShowPreNotice)
+
 (tuck/define-event LoadAuthorityPreNotices []
   {:path [:pre-notices]}
   (comm/get! "pre-notices/authority-list"
@@ -36,8 +38,10 @@
 (defmethod routes/on-navigate-event :pre-notices [_]
   (->LoadOrganizationPreNotices))
 
-(defmethod routes/on-navigate-event :authority-pre-notices [_]
-  (->LoadAuthorityPreNotices))
+(defmethod routes/on-navigate-event :authority-pre-notices [{params :params}]
+  [(when-let [id (:id params)]
+     (->ShowPreNotice id))
+   (->LoadAuthorityPreNotices)])
 
 (tuck/define-event LoadPreNoticeResponse [response]
   {:path [:pre-notice]
