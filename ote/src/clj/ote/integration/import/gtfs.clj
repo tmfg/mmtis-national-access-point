@@ -71,12 +71,8 @@
                      (routes
                        (GET "/import/gtfs" {params :query-params}
                          (load-gtfs (get params "url")))
-                       (GET "/import/gtfss3" {params :query-params}
-                         (upload-gtfs->s3 gtfs-config db
-                                          (get params "url")
-                                          (get params "operator-id")
-                                          (get params "ts-id")
-                                          nil))))))
+                       (GET "/import/gtfss3" {{:strs [url operator-id ts-id]} :query-params}
+                         (upload-gtfs->s3 gtfs-config db url operator-id ts-id nil))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
