@@ -183,6 +183,24 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-effective-date])}))
 
+(defn- notice-area-map [pre-notice]
+  (r/create-class
+   {:component-did-update leaflet/update-bounds-from-layers
+    :component-did-mount leaflet/update-bounds-from-layers
+    :reagent-render
+    (fn [pre-notice]
+      [leaflet/Map {:ref "leaflet"
+                    :center      #js [65 25]
+                    :zoomControl true
+                    :zoom        5}
+       (leaflet/background-tile-map)
+       (doall
+        (for [region (::transit/regions pre-notice)
+              :let [region-geojson (get-in pre-notice [:regions region :geojson])]
+              :when region-geojson]
+          ^{:key region}
+          [leaflet/GeoJSON {:data  region-geojson
+                            :style {:color "green"}}]))])}))
 (defn notice-area [e!]
   (form/group
     {:label   (tr [:pre-notice-page :route-and-area-information-title])
@@ -230,18 +248,7 @@
                                        (keep #(when (selected-ids (:id %)) %))
                                        regions-with-show)])]
                              [:div.col-md-8
-                              [leaflet/Map {:ref         "notice-area-map"
-                                            :center      #js [65 25]
-                                            :zoomControl true
-                                            :zoom        5}
-                               (leaflet/background-tile-map)
-                               (doall
-                                 (for [region (::transit/regions pre-notice)
-                                       :let [region-geojson (get-in pre-notice [:regions region :geojson])]
-                                       :when region-geojson]
-                                   ^{:key region}
-                                   [leaflet/GeoJSON {:data  region-geojson
-                                                     :style {:color "green"}}]))]]])}))
+                              [notice-area-map pre-notice]]])}))
 
 (defn notice-attachments [e!]
   (form/group
