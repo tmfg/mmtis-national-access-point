@@ -24,6 +24,7 @@
 
             [ote.tasks.company :as tasks-company]
             [ote.tasks.pre-notices :as tasks-pre-notices]
+            [ote.tasks.gtfs :as tasks-gtfs]
 
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
@@ -65,7 +66,7 @@
    ;; Integration: export GeoJSON and GTFS
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
    :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
-   :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:http])
+   :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
@@ -79,8 +80,8 @@
 
    ;; Scheduled tasks
    :tasks-company (component/using (tasks-company/company-tasks) [:db])
-   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks
-                                         (:email config)) [:db])))
+   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:email config)) [:db])
+   :tasks-gtfs (component/using (tasks-gtfs/gtfs-tasks (:gtfs config)) [:db])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!
