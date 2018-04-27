@@ -104,6 +104,7 @@
                                com.amazonaws/amazon-kinesis-client]]
                  [com.amazonaws/aws-java-sdk-core "1.11.312"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
+                 [com.amazonaws/aws-java-sdk-lambda "1.11.312"]
 
                  ;; override old guava version from deps
                  [com.google.guava/guava "21.0"]]

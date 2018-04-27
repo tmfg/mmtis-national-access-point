@@ -15,7 +15,9 @@
             [ote.ui.common :as common]
             [stylefy.core :as stylefy]
             [ote.style.pre-notice :as styles]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.views.service-search :as service-search]
+            [ote.style.service-search :as style-service-search]))
 
 (defn format-notice-types [types]
   (str/join ", " (map (tr-key [:enums ::transit/pre-notice-type]) types)))
@@ -49,6 +51,20 @@
             (str "pre-notice/attachment/" id) attachment-file-name
             {:target "_blank"}]])])
 
+(defn- format-transport-operator [{::t-operator/keys [name email phone gsm]}]
+  [:div
+   name " "
+   [:div
+    (when-not (str/blank? email)
+      [service-search/data-item [ic/communication-email {:style style-service-search/contact-icon}]
+       email])
+    (when-not (str/blank? phone)
+      [service-search/data-item [ic/communication-phone {:style style-service-search/contact-icon}]
+       phone])
+    (when-not (str/blank? gsm)
+      [service-search/data-item [ic/communication-phone {:style style-service-search/contact-icon}]
+       gsm])]])
+
 (defn pre-notice-view [e! pre-notice]
   (let [tr* (tr-key [:field-labels :pre-notice]
                     [:pre-notice-list-page :headers])]
@@ -70,7 +86,7 @@
              (fn [[key fmt]]
                [[:b (str (tr* key) ": ")] (fmt (get pre-notice key))])
              [[::modification/created time/format-timestamp-for-ui]
-              [::t-operator/transport-operator ::t-operator/name]
+              [::t-operator/transport-operator format-transport-operator]
               [::transit/pre-notice-type format-notice-types]
               [::transit/route-description str]
               [:region-names str]

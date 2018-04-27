@@ -11,9 +11,11 @@
 
 (define-event StartViewer []
   {}
-  (comm/get! (str "import/gtfs?url=" (js/encodeURIComponent (get-in app [:query :url])))
-    {:on-success (tuck/send-async! ->LoadGTFSResponse)
-     :on-failure (tuck/send-async! ->LoadGTFSFailure)})
+  (let [{url :url type :type} (get-in app [:query])
+        import-api (if (= type "kalkati") "import/kalkati" "import/gtfs")]
+    (comm/get! (str import-api "?url=" (js/encodeURIComponent url))
+               {:on-success (tuck/send-async! ->LoadGTFSResponse)
+                :on-failure (tuck/send-async! ->LoadGTFSFailure)}))
   app)
 
 (define-event LoadGTFSResponse [response]

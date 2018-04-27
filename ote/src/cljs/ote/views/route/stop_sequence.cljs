@@ -13,7 +13,8 @@
             [ote.localization :refer [tr tr-key selected-language]]
             [ote.style.form :as style-form]
             [stylefy.core :as stylefy]
-            [ote.db.transport-service :as t-service]))
+            [ote.db.transport-service :as t-service]
+            [ote.style.base :as style-base]))
 
 
 (def stop-marker-style
@@ -139,7 +140,7 @@
 
 (defn- route-stops [e! {stop-sequence ::transit/stops :as route}]
   [:div {:style {:width "30%" :margin "1em"}}
-   (when (not (get-in route [:map-controls :show?]))
+   (if (not (get-in route [:map-controls :show?]))
      [:table {:style {:width "100%"}}
       [:thead {:style {:text-align "left"}}
        [:tr
@@ -163,7 +164,11 @@
         [:tbody
          [:tr
           [:td {:colSpan 4}
-           [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]])])])
+           [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]
+         [:tr
+          [:td {:colSpan 4}
+           [:span (stylefy/use-style style-base/required-element) (tr [:route-wizard-page :data-missing])]]]])]
+     [:div [common/help (tr [:route-wizard-page :stop-sequence-edit-map-help])]])])
 
 (defn stop-sequence [e! {route :route :as app}]
   (e! (rw/->LoadStops))

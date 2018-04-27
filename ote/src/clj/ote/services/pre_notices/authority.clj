@@ -32,7 +32,10 @@
                 (specql/fetch db ::transit/pre-notice
                               (conj (specql/columns ::transit/pre-notice)
                                     [::transit/comments comment-columns]
-                                    [::t-operator/transport-operator #{::t-operator/name}])
+                                    [::t-operator/transport-operator #{::t-operator/name
+                                                                       ::t-operator/email
+                                                                       ::t-operator/phone
+                                                                       ::t-operator/gsm}])
                               {::transit/id id}))]
     (assoc notice
            ::transit/attachments

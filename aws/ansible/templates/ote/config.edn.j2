@@ -2,12 +2,13 @@
       :username "{{db_username}}"
       :password "{{db_password}}"}
  :http {:port 3000
+        :max-body 33554432
         :strip-prefix "/ote"
         :auth-tkt {:shared-secret "{{auth_shared_secret}}"
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}
         ;;:session {:key "{{ote_cookie_key}}"}
-        }
+        :ssl-upgrade {:port 8080 :url "{{base_url}}"}}
 
  :email {:server
          {;; Hostname of the STMP server. Optional if running locally.
@@ -31,5 +32,7 @@
  :log {:level :info}
  :ga {:tracking-code "UA-5406842-15"}
  :enabled-features {{flags}}
- :pre-notices {:bucket "{{pre_notice_attachment_bucket}}"}
+ :pre-notices {:bucket "{{pre_notice_attachment_bucket}}"
+               ;; Interval in hours
+               :notify-interval 0.5}
 }

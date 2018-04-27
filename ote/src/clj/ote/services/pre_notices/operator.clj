@@ -1,6 +1,7 @@
 (ns ote.services.pre-notices.operator
   "Transport operator's routes for managing 60 day pre notices"
-  (:require [ote.components.http :as http]
+  (:require [ote.services.pre-notices.attachments :as attachment]
+            [ote.components.http :as http]
             [ote.authorization :as authorization]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
@@ -43,35 +44,52 @@
                  (specql/columns ::transit/pre-notice)
                  {::t-operator/id (op/in (authorization/user-transport-operators db user))})))
 
+(defn- list-attachments-in-db [db user pre-notice-id]
+  (specql/fetch db ::transit/pre-notice-attachment
+                (specql/columns ::transit/pre-notice-attachment)
+                (op/and {::modification/created-by (authorization/user-id user)}
+                 (op/or
+                  {::transit/pre-notice-id pre-notice-id}
+                  {::transit/pre-notice-id op/null?}))))
+
+(defn- delete-attachments [db config attachments]
+  (doseq [{id ::transit/id} attachments]
+    (specql/delete! db ::transit/pre-notice-attachment {::transit/id id}))
+  (attachment/delete-from-s3 db config attachments))
+
 (defn with-sent-field [notice]
   (if (= (::transit/pre-notice-state notice) :sent)
     (assoc notice ::transit/sent (java.sql.Timestamp. (System/currentTimeMillis)))
     notice))
 
-(defn save-pre-notice [db user notice]
-  (authorization/with-transport-operator-check
-    db user (::t-operator/id notice)
-    (fn []
-      (tx/with-transaction db
-         (let [form-attachments (:attachments notice)
-               n (-> notice
-                     (dissoc :attachments)
-                     (dissoc ::transit/attachments)
-                     (modification/with-modification-fields ::transit/id user)
-                     (with-sent-field))
-               saved-notice (specql/upsert! db ::transit/pre-notice n)
-               notice-id (::transit/id saved-notice)]
-           (log/debug "Save notice: " saved-notice)
-           (specql/update! db ::transit/pre-notice-attachment
-                           {::transit/pre-notice-id notice-id}
-                           (op/and
+(defn save-pre-notice [db user notice config]
+  (let [attachments-from-db (list-attachments-in-db db user (::transit/id notice))
+        attachments-ids-from-client (set (map ::transit/id (:attachments notice)))
+        to-be-removed (filter #(not (contains? attachments-ids-from-client (::transit/id %)))
+                              attachments-from-db)]
+    (authorization/with-transport-operator-check
+      db user (::t-operator/id notice)
+      (fn []
+        (tx/with-transaction db
+          (let [form-attachments (:attachments notice)
+                n (-> notice
+                      (dissoc :attachments)
+                      (dissoc ::transit/attachments)
+                      (modification/with-modification-fields ::transit/id user)
+                      (with-sent-field))
+                saved-notice (specql/upsert! db ::transit/pre-notice n)
+                notice-id (::transit/id saved-notice)]
+            (specql/update! db ::transit/pre-notice-attachment
+                            {::transit/pre-notice-id notice-id}
+                            (op/and
                              {::transit/id              (op/in (mapv ::transit/id (:attachments notice)))
                               ::modification/created-by (authorization/user-id user)}))
-           saved-notice)))))
+            (delete-attachments db config to-be-removed)
+            saved-notice))))))
 
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"
-  [db]
+  [db config]
   (routes
    (GET "/pre-notices/list" {user :user}
         (list-operator-notices db user))
@@ -81,7 +99,7 @@
    (POST "/pre-notice" {form-data :body
                         user :user}
          (http/transit-response
-          (save-pre-notice db user (http/transit-request form-data))))
+          (save-pre-notice db user (http/transit-request form-data) config)))
    (GET "/pre-notices/regions" {}
         (http/transit-response (fetch-regions db)))
    (GET "/pre-notices/region/:id" [id]

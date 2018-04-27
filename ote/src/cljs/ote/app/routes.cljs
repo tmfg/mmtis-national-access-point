@@ -33,11 +33,17 @@
     ["/pre-notice/new" :new-notice]
     ["/pre-notice/edit/:id" :edit-pre-notice]
     ["/authority-pre-notices" :authority-pre-notices]
+    ["/authority-pre-notices/:id" :authority-pre-notices]
 
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
 
-(defmulti on-navigate-event :page)
+(defmulti on-navigate-event
+  "Determine event(s) to be run when user navigates to a given route.
+  Returns a single Tuck event or a vector of Tuck events to be applied
+  to the app state. Takes a map containing the navigation data as parameter.
+  Route parameters are under the :params key."
+  :page)
 
 (defmethod on-navigate-event :default [_] nil)
 
@@ -64,7 +70,15 @@
                (if event
                  (binding [tuck/*current-send-function*
                            #(swap! state/app (flip tuck/process-event) %)]
-                   (tuck/process-event event app))
+                   (if (vector? event)
+                     ;; Received multiple events, apply them all
+                     (reduce (fn [app event]
+                               (if event
+                                 (tuck/process-event event app)
+                                 app))
+                             app event)
+                     ;; Apply single event
+                     (tuck/process-event event app)))
                  app))))))
 
 (defn start! [go-to-url-event]

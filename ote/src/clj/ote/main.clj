@@ -21,6 +21,7 @@
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
             [ote.integration.import.gtfs :as import-gtfs]
+            [ote.integration.import.kalkati :as import-kalkati]
 
             [ote.tasks.company :as tasks-company]
             [ote.tasks.pre-notices :as tasks-pre-notices]
@@ -39,6 +40,7 @@
    ;; Basic components
    :db (db/database (:db config))
    :http (component/using (http/http-server (:http config)) [:db])
+   :ssl-upgrade (http/map->SslUpgrade (get-in config [:http :ssl-upgrade]))
 
    ;; Index page
    :index (component/using (index/->Index config)
@@ -67,6 +69,7 @@
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
    :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
+   :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
@@ -80,8 +83,11 @@
 
    ;; Scheduled tasks
    :tasks-company (component/using (tasks-company/company-tasks) [:db])
-   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:email config)) [:db])
-   :tasks-gtfs (component/using (tasks-gtfs/gtfs-tasks (:gtfs config)) [:db])))
+   :tasks-gtfs (component/using (tasks-gtfs/gtfs-tasks (:gtfs config)) [:db])
+   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks
+                                         (:email config)
+                                         (get-in config [:pre-notices :notify-interval]))
+                                       [:db])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!
