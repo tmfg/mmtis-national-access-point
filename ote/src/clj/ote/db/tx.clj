@@ -11,10 +11,3 @@
   [db-sym & body]
   `(jdbc/with-db-transaction [~db-sym ~db-sym]
                              ~@body))
-
-(defmacro with-xact-advisory-lock
-  "Try to get transaction level advisory lock.
-  Runs `body` with advisory lock. This should be ran inside transaction."
-  [db-sym & body]
-  `(when (try-advisory-xact-lock! ~db-sym {:id 1})
-     ~@body))
