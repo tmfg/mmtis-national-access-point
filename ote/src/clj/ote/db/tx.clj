@@ -1,9 +1,7 @@
 (ns ote.db.tx
   "Helper for transactions"
-  (:require [clojure.java.jdbc :as jdbc]
-            [jeesql.core :refer [defqueries]]))
+  (:require [clojure.java.jdbc :as jdbc]))
 
-(defqueries "ote/db/transaction_lock.sql")
 
 (defmacro with-transaction
   "Start or join current db transaction.
