@@ -12,6 +12,7 @@
             [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
+            [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
             [ote.nap.users :as nap-users])
@@ -102,30 +103,31 @@
 (defn send-notification! [db {server-opts :server msg-opts :msg :as email-opts}]
   (log/info "Starting pre-notices notification task...")
 
-  (localization/with-language
-    "fi"
-    (tx/with-transaction db
-      (tx/with-xact-advisory-lock db
-        (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
-              emails (mapv #(:email %) users)
-              notification (notification-html db)]
+  (lock/try-with-lock
+   db "pre-notice-email" 300
+   (localization/with-language
+     "fi"
+     (tx/with-transaction db
+       (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
+             emails (mapv #(:email %) users)
+             notification (notification-html db)]
 
-          (try
-            (when (and (not (empty? emails)) notification)
-              (log/info "Trying to send a pre-notice email to: " (pr-str emails))
+         (try
+           (when (and (not (empty? emails)) notification)
+             (log/info "Trying to send a pre-notice email to: " (pr-str emails))
 
-              (send-email
-                server-opts
-                {:bcc emails
-                 :from (or (:from msg-opts) "NAP")
-                 :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                               (datetime-string (t/now) timezone))
-                 :body [{:type "text/html;charset=utf-8" :content notification}]}))
+             (send-email
+              server-opts
+              {:bcc emails
+               :from (or (:from msg-opts) "NAP")
+               :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                             (datetime-string (t/now) timezone))
+               :body [{:type "text/html;charset=utf-8" :content notification}]}))
 
-            ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
-            (Thread/sleep 5000)
-            (catch Exception e
-              (log/warn "Error while sending a notification" e))))))))
+           ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
+           (Thread/sleep 5000)
+           (catch Exception e
+             (log/warn "Error while sending a notification" e))))))))
 
 
 (defrecord PreNoticesTasks [at email-config interval]
