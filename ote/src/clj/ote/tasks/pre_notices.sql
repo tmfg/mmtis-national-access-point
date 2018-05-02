@@ -11,5 +11,4 @@ SELECT id, "pre-notice-type", "route-description", created, modified,
   FROM "pre_notice" n
  WHERE "pre-notice-state" = 'sent' AND
        sent IS NOT NULL AND
-       (sent > (current_timestamp - :interval::interval))
-ACCESS EXCLUSIVE;
+       (sent > (current_timestamp - :interval::interval));
