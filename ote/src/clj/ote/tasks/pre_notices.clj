@@ -6,7 +6,6 @@
             [clj-time.core :as t]
             [clj-time.format :as format]
             [clj-time.coerce :as coerce]
-            [clj-time.periodic :refer [periodic-seq]]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
             [ote.db.transit :as transit]
@@ -15,13 +14,14 @@
             [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
-            [ote.nap.users :as nap-users])
+            [ote.nap.users :as nap-users]
+            [ote.tasks.util :refer [daily-at]])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
 
 (defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
-(defonce daily-notify-time (t/from-time-zone (t/today-at 8 15) timezone))
+
 
 (defn PgArray->seqable [arr]
   (if arr
@@ -130,22 +130,18 @@
              (log/warn "Error while sending a notification" e))))))))
 
 
-(defrecord PreNoticesTasks [at email-config interval]
+(defrecord PreNoticesTasks [email-config]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/seconds
-                                                         (hours->seconds (or interval
-                                                                             24)))))
-                              (fn [_]
-                                (#'send-notification! db email-config)))]))
+           ::stop-tasks [(chime-at (daily-at 8 15)
+                                   (fn [_]
+                                     (#'send-notification! db email-config)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks
-  ([email-config interval]
-   (pre-notices-tasks daily-notify-time email-config interval))
-  ([at email-config interval]
-   (->PreNoticesTasks at email-config interval)))
+  [email-config]
+  (->PreNoticesTasks email-config))
