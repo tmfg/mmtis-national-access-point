@@ -1,6 +1,7 @@
 (ns ote.tasks.company
   "Scheduled tasks to update company CSVs and stats."
   (:require [chime :refer [chime-at]]
+            [ote.tasks.util :refer [daily-at]]
             [clj-time.core :as t]
             [clj-time.periodic :refer [periodic-seq]]
             [com.stuartsierra.component :as component]
@@ -13,9 +14,6 @@
 
 (defqueries "ote/tasks/company.sql")
 
-
-(def daily-update-time (t/from-time-zone (t/today-at 0 5)
-                                         (DateTimeZone/forID "Europe/Helsinki")))
 
 (defn update-one-csv! [db]
   (try
@@ -30,11 +28,11 @@
     (catch Exception e
       (log/warn "Error in updating company CSV file" e))))
 
-(defrecord CompanyTasks [at]
+(defrecord CompanyTasks []
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-           ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/days 1)))
+           ::stop-tasks [(chime-at (daily-at 0 5)
                                    (fn [_]
                                      (store-daily-company-stats db)))
                          (chime-at (drop 1 (periodic-seq (t/now) (t/minutes 1)))
@@ -45,7 +43,5 @@
       (stop))
     (dissoc this ::stop-tasks)))
 
-(defn company-tasks
-  ([] (company-tasks daily-update-time))
-  ([at]
-   (->CompanyTasks at)))
+(defn company-tasks []
+  (->CompanyTasks at))
