@@ -44,4 +44,4 @@
     (dissoc this ::stop-tasks)))
 
 (defn company-tasks []
-  (->CompanyTasks at))
+  (->CompanyTasks))
