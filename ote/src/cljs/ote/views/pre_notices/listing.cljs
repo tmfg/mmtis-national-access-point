@@ -28,7 +28,8 @@
                    :key-fn ::transit/id
                    :no-rows-message (case state
                                       :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
-                                      :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))}
+                                      :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))
+                   :on-select #(e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id (first %))}))}
       [{:name ::transit/pre-notice-type
         :format pre-notice-type->str}
        {:name ::transit/route-description}
