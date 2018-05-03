@@ -150,18 +150,23 @@
       {:on-key-press #(when (= "Enter" (.-key %))
                         (on-enter))}))])
 
-(defmethod field :file-and-delete [{:keys [on-delete table-data row-number] :as f} data]
+(defmethod field :file-and-delete [{:keys [on-delete table-data row-number disabled?] :as f} data]
   (if (empty? (get table-data row-number))
-    (field (assoc f :type :file) )
-    [ui/icon-button {:on-click #(on-delete row-number)}
+    (field (assoc f :type :file))
+    [ui/icon-button (merge
+                      {:on-click #(on-delete row-number)}
+                      (when disabled?
+                        {:disabled true}))
      [ic/action-delete]]))
 
-(defmethod field :file [{:keys [update! label name max-length min-length regex
-                                focus on-focus form? error warning table? full-width?
-                                style input-style hint-style on-change]
+(defmethod field :file [{:keys [label name disabled? on-change]
                          :as field} data]
+  (println disabled?)
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
-   [:button (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
+   [:button (merge
+              (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
+              (when disabled?
+                {:disabled true}))
     label]
    [:input
     (merge (stylefy/use-sub-style
@@ -172,7 +177,9 @@
             :on-change on-change
             ;; Hack to hide file input tooltip on different browsers.
             ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
-            :title " "})]])
+            :title " "}
+           (when disabled?
+             {:disabled true}))]])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length
                                      max-length on-blur warning full-width?
