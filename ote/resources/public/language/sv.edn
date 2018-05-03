@@ -759,6 +759,9 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
                       :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
                       :new-comment-label "Kirjoita kommentti"}
 
+  :delete-pre-notice-dialog {:label "Poista luonnostilassa oleva muutosilmoitus?"
+                             :content "Haluatko poistaa tämän muutosilmoituksen pysyvästi?"
+                             :success-message "Muutosilmoitus poistettu"}
   }
 
 :pre-notice-page

@@ -87,6 +87,12 @@
             (delete-attachments db config to-be-removed)
             saved-notice))))))
 
+(defn delete-pre-notice [db user {::transit/keys [id]}]
+  (specql/delete! db ::transit/pre-notice
+                  {::transit/id id
+                   ::transit/pre-notice-state :draft
+                   ::t-operator/id (op/in (authorization/user-transport-operators db user))}))
+
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"
   [db config]
@@ -105,4 +111,8 @@
    (GET "/pre-notices/region/:id" [id]
         {:status 200
          :headers {"Content-Type" "application/json"}
-         :body (fetch-region-geometry db {:id id})})))
+         :body (fetch-region-geometry db {:id id})})
+   (POST "/pre-notice/delete" {form-data :body
+                               user :user}
+         (http/transit-response
+          (delete-pre-notice db user (http/transit-request form-data))))))
