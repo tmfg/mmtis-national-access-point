@@ -59,6 +59,9 @@ s3_folder = 'kalkati2gtfs'
 ### Lambda handler ###
 ## NOTE: We are using Lambda proxy integration in AWS API Gateway
 def lambda_handler(event, context):
+
+    headers = event.get('headers')
+
     try:
         try:
             file_url = json.loads(event['body'])
@@ -69,10 +72,23 @@ def lambda_handler(event, context):
             logger.info('Trying to fetch a kalkati zip-file from URL: {}'.format(file_url))
 
             opener = urllib2.build_opener()
+
+            if headers and type(headers) is dict:
+                opener.addheaders = headers.items()
+
             response = opener.open(file_url)
 
             with io.BytesIO(response.read()) as tf:
                 zipf_buf = kalkati_zip_to_gtfs_zip(tf)
+
+        except urllib2.HTTPError, e:
+            return {
+                'statusCode': e.code,
+                'headers':  dict(e.info()),
+                'body': json.dumps({
+                    'error': str(e)
+                })
+            }
 
         except Exception as e:
             raise RuntimeError('Error while processing file {}: {}'.format(file_url, str(e)))

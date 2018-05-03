@@ -541,7 +541,7 @@
                        "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
                        "kehittäjille.\n\n"
                        "## **NAP-palvelun rakenne**\n"
-                       "[Palvelukatalog](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
+                       "[Palvelukatalogi](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
                        "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
   :hero-title "Liikkumispalveluiden katalogi."
   :new-user? "Uusi käyttäjä?"

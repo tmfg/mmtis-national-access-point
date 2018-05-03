@@ -3,7 +3,7 @@ db_username: "{{vault_db_ote_user}}"
 db_password: "{{vault_db_ote_password}}"
 auth_shared_secret: "{{vault_beaker_session_secret}}"
 base_url: "https://finap.fi"
-flags: "#{:ote-login :ote-operators-list :sea-routes}"
+flags: "#{:ote-login :ote-operators-list :sea-routes :pre-notice}"
 ote_cookie_key: "{{vault_ote_cookie_key}}"
 pre_notice_attachment_bucket: "napote-pre-notice-attachment-prod"
 email_from: noreply@finap.fi

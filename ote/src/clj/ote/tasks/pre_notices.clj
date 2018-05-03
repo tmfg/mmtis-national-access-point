@@ -6,21 +6,22 @@
             [clj-time.core :as t]
             [clj-time.format :as format]
             [clj-time.coerce :as coerce]
-            [clj-time.periodic :refer [periodic-seq]]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
             [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
+            [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
-            [ote.nap.users :as nap-users])
+            [ote.nap.users :as nap-users]
+            [ote.tasks.util :refer [daily-at]])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
 
 (defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
-(defonce daily-notify-time (t/from-time-zone (t/today-at 8 15) timezone))
+
 
 (defn PgArray->seqable [arr]
   (if arr
@@ -35,6 +36,9 @@
   (when dt
     (time/format-date (t/to-time-zone dt timezone))))
 
+(defn hours->seconds [hours]
+  (int (* 3600 hours)))
+
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                               effective-dates-asc]}]
   (let [effective-date-str (date-string (coerce/from-sql-date
@@ -47,7 +51,7 @@
      [:td (str/join ", " (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
                                (PgArray->seqable pre-notice-type)))]
      [:td effective-date-str]
-     [:td [:a {:href "finap.fi"} route-description]]]))
+     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} route-description]]]))
 
 (defn notification-template [pre-notices]
   [:html
@@ -87,45 +91,57 @@
 (defn notification-html [db]
   (try
     (when-let [notices (fetch-pre-notices-by-interval db {:interval "1 day"})]
-      (html (notification-template notices)))
+      (if-not (empty? notices)
+        (do
+          (log/info "Found" (count notices) "new pre-notices from 24 hours.")
+          (html (notification-template notices)))
+        (log/info "No new pre-notices found.")))
+
     (catch Exception e
       (log/warn "Error while generating notification html:" e))))
 
 (defn send-notification! [db {server-opts :server msg-opts :msg :as email-opts}]
-  (localization/with-language
-    "fi"
-    (tx/with-transaction db
-      (tx/with-xact-advisory-lock db
-        (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
-              emails (mapv #(:email %) users)
-              notification (notification-html db)]
-          (try
-            (when-not (empty? emails)
-              (log/info "Trying to send a pre-notice email to: " (pr-str emails))
-              (send-email
-                server-opts
-                {:bcc emails
-                 :from (or (:from msg-opts) "NAP")
-                 :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                               (datetime-string (t/now) timezone))
-                 :body [{:type "text/html" :content notification}]}))
-            (catch Exception e
-              (log/warn "Error while sending a notification" e))))))))
+  (log/info "Starting pre-notices notification task...")
+
+  (lock/try-with-lock
+   db "pre-notice-email" 300
+   (localization/with-language
+     "fi"
+     (tx/with-transaction db
+       (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
+             emails (mapv #(:email %) users)
+             notification (notification-html db)]
+
+         (try
+           (when (and (not (empty? emails)) notification)
+             (log/info "Trying to send a pre-notice email to: " (pr-str emails))
+
+             (send-email
+              server-opts
+              {:bcc emails
+               :from (or (:from msg-opts) "NAP")
+               :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                             (datetime-string (t/now) timezone))
+               :body [{:type "text/html;charset=utf-8" :content notification}]}))
+
+           ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
+           (Thread/sleep 5000)
+           (catch Exception e
+             (log/warn "Error while sending a notification" e))))))))
 
 
-(defrecord PreNoticesTasks [at config]
+(defrecord PreNoticesTasks [email-config]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq at (t/days 1)))
-                              (fn [_]
-                                (#'send-notification! db config)))]))
+           ::stop-tasks [(chime-at (daily-at 8 15)
+                                   (fn [_]
+                                     (#'send-notification! db email-config)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks
-  ([config] (pre-notices-tasks daily-notify-time config))
-  ([at config]
-   (->PreNoticesTasks at config)))
+  [email-config]
+  (->PreNoticesTasks email-config))

@@ -64,12 +64,11 @@
       (.fitBounds leaflet bounds))))
 
 (defn update-leaflet-bounds-soon [leaflet]
-  (.setTimeout js/window #(update-map-bounds-from-layers leaflet) 50)
-  )
+  (.setTimeout js/window #(update-map-bounds-from-layers leaflet) 50))
 
 (defn update-bounds-from-layers [this]
   (let [^js/L.map
-  leaflet (aget this "refs" "leaflet" "leafletElement")]
+        leaflet (aget this "refs" "leaflet" "leafletElement")]
     (update-leaflet-bounds-soon leaflet)))
 
 (defn update-bounds-on-load [this]
