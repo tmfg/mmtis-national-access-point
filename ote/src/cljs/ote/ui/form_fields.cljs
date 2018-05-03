@@ -161,7 +161,6 @@
 
 (defmethod field :file [{:keys [label name disabled? on-change]
                          :as field} data]
-  (println disabled?)
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
    [:button (merge
               (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
