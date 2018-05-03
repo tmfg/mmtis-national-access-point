@@ -205,11 +205,6 @@ def dataset_purge_custom_auth(context, data_dict):
     return authz.is_authorized('package_update', context, data_dict)
 
 
-def user_list_custom_auth(context, data_dict):
-    # Allow only sysadmins to view user list
-    return authz.is_authorized('sysadmin', context, data_dict)
-
-
 ### HELPERS ####
 
 def log_debug(*args):
@@ -286,9 +281,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
     plugins.implements(plugins.IResourceView, inherit=True)
 
     def get_auth_functions(self):
-        return {'dataset_purge': dataset_purge_custom_auth,
-                'user_list': user_list_custom_auth
-                }
+        return {'dataset_purge': dataset_purge_custom_auth}
 
     def get_helpers(self):
         return {
