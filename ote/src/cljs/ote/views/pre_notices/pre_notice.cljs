@@ -213,15 +213,15 @@
      :read                identity
      :container-style     style-form/full-width
      :component           (fn [{pre-notice :data :as f}]
-                            (.log js/console " componentin sisältä " (clj->js f))
                             [:div
                              [:div.col-md-4
                               [form-fields/field
                                {:id          "route-description"
                                 :label       (tr [:field-labels :pre-notice ::transit/route-description])
-                                :type        :string
+                                :type        :text-area
                                 :hint-text   (tr [:pre-notice-page :route-description-hint])
                                 :full-width? true
+                                :rows 1
                                 :update!     #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
                                (::transit/route-description pre-notice)]
 
