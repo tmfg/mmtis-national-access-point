@@ -150,6 +150,12 @@
       {:on-key-press #(when (= "Enter" (.-key %))
                         (on-enter))}))])
 
+(defmethod field :file-and-delete [{:keys [on-delete table-data row-number] :as f} data]
+  (if (empty? (get table-data row-number))
+    (field (assoc f :type :file) )
+    [ui/icon-button {:on-click #(on-delete row-number)}
+     [ic/action-delete]]))
+
 (defmethod field :file [{:keys [update! label name max-length min-length regex
                                 focus on-focus form? error warning table? full-width?
                                 style input-style hint-style on-change]
@@ -677,76 +683,78 @@
                data)]
     [:div
      [:div.table-wrapper {:style table-wrapper-style}
-     ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
-     [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
-      [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
-                              {:style style-form-fields/table-header})
-       [ui/table-row (merge {:selectable false}
-                            {:style style-form-fields/table-header-row})
-        (doall
-         (for [{:keys [name label width tooltip tooltip-pos tooltip-len] :as tf} table-fields]
-           ^{:key name}
-           [ui/table-header-column {:style
-                                    (merge {:width width :white-space "pre-wrap"}
-                                           style-form-fields/table-header-column)}
-            label
-            (when tooltip
-              [tooltip-icon {:text tooltip :pos  tooltip-pos :len tooltip-len}])]))
-        (when delete?
-          [ui/table-header-column {:style (merge {:width "70px"} style-form-fields/table-header-column)}
-           (tr [:buttons :delete])])]]
+      ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
+      [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
+       [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
+                               {:style style-form-fields/table-header})
+        [ui/table-row (merge {:selectable false}
+                             {:style style-form-fields/table-header-row})
+         (doall
+          (for [{:keys [name label width tooltip tooltip-pos tooltip-len] :as tf} table-fields]
+            ^{:key name}
+            [ui/table-header-column {:style
+                                     (merge {:width width :white-space "pre-wrap"}
+                                            style-form-fields/table-header-column)}
+             label
+             (when tooltip
+               [tooltip-icon {:text tooltip :pos  tooltip-pos :len tooltip-len}])]))
+         (when delete?
+           [ui/table-header-column {:style (merge {:width "70px"} style-form-fields/table-header-column)}
+            (tr [:buttons :delete])])]]
 
-      [ui/table-body {:display-row-checkbox false}
-       (doall
-        (map-indexed
-         (fn [i row]
-           (let [{:keys [errors missing-required-fields]} (and error-data
-                                                               (< i (count error-data))
-                                                               (nth error-data i))]
-               ^{:key i}
-             [ui/table-row (merge {:id (str "row_" i)
-                                   :selectable false :display-border false}
-                                    ;; If there are errors or missing fields, make the
-                                    ;; row taller to show error messages
-                                    (when (or errors missing-required-fields)
-                                      {:style {:height 65}}))
-                (doall
-                 (for [{:keys [name read write width type component] :as tf} table-fields
-                       :let [field-error (get errors name)
-                             missing? (get missing-required-fields name)
-                             update-fn (if write
-                                         #(update data i write %)
-                                         #(assoc-in data [i name] %))
-                             value ((or read name) row)]]
-                   ^{:key name}
-                   [ui/table-row-column {:style (merge style-form-fields/table-row-column
-                                                       {:width width})}
-                    (if (= :component type)
-                      (component {:update-form! #(update! (update-fn %))
-                                  :data value})
-                      [field (merge (assoc tf
-                                           :table? true
-                                           :update! #(update! (update-fn %)))
-                                    (when missing?
-                                      {:warning (tr [:common-texts :required-field])})
-                                    (when field-error
-                                      {:error field-error}))
-                       value])]))
-                (when delete?
-                  [ui/table-row-column {:style (merge style-form-fields/table-row-column {:width "70px"})}
-                 [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
-                                                                     (take i data))
-                                                                   (drop (inc i) data))))}
-                  [ic/action-delete]]])]))
-         data))]]]
+       [ui/table-body {:display-row-checkbox false}
+        (doall
+         (map-indexed
+          (fn [i row]
+            (let [{:keys [errors missing-required-fields]} (and error-data
+                                                                (< i (count error-data))
+                                                                (nth error-data i))]
+              ^{:key i}
+              [ui/table-row (merge {:id (str "row_" i)
+                                    :selectable false :display-border false}
+                                   ;; If there are errors or missing fields, make the
+                                   ;; row taller to show error messages
+                                   (when (or errors missing-required-fields)
+                                     {:style {:height 65}}))
+               (doall
+                (for [{:keys [name read write width type component] :as tf} table-fields
+                      :let [field-error (get errors name)
+                            missing? (get missing-required-fields name)
+                            update-fn (if write
+                                        #(update data i write %)
+                                        #(assoc-in data [i name] %))
+                            value ((or read name) row)]]
+                  ^{:key name}
+                  [ui/table-row-column {:style (merge style-form-fields/table-row-column
+                                                      {:width width})}
+                   (if (= :component type)
+                     (component {:update-form! #(update! (update-fn %))
+                                 :data value})
+                     [field (merge (assoc tf
+                                          :table? true
+                                          :row-number i
+                                          :table-data data
+                                          :update! #(update! (update-fn %)))
+                                   (when missing?
+                                     {:warning (tr [:common-texts :required-field])})
+                                   (when field-error
+                                     {:error field-error}))
+                      value])]))
+               (when delete?
+                 [ui/table-row-column {:style (merge style-form-fields/table-row-column {:width "70px"})}
+                  [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
+                                                                      (take i data))
+                                                                    (drop (inc i) data))))}
+                   [ic/action-delete]]])]))
+          data))]]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
         [buttons/save (merge {:on-click #(update! (conj (or data []) {}))
                               :label add-label
                               :label-style style-base/button-label-style
                               :disabled (if add-label-disabled?
-                                   (add-label-disabled? (last data))
-                                   (values/effectively-empty? (last data)))}
+                                          (add-label-disabled? (last data))
+                                          (values/effectively-empty? (last data)))}
                              (when (not (nil? id))
                                {:id (str id "-button")}))]])]))
 

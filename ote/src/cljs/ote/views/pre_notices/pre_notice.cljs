@@ -263,15 +263,15 @@
     {:name :attachments
      :type :table
      :add-label (tr [:pre-notice-page :add-attachment])
-     :delete? true
      :table-fields [{:name ::transit/attachment-file-name
                      :type :string
                      :disabled? true}
 
                     {:name :attachment-file
                      :label (tr [:pre-notice-page :select-attachment])
-                     :type :file
-                     :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))}]}))
+                     :type :file-and-delete
+                     :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))
+                     :on-delete #(e! (pre-notice/->DeleteAttachment %))}]}))
 
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))
