@@ -241,3 +241,8 @@
   (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)
                                            :on-failure (tuck/send-async! ->ServerError)})
   app)
+
+(define-event DeleteAttachment [row]
+  {:path [:pre-notice :attachments]}
+  (vec (concat (take row app)
+           (drop (inc row) app))))

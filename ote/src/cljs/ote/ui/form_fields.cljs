@@ -150,6 +150,12 @@
       {:on-key-press #(when (= "Enter" (.-key %))
                         (on-enter))}))])
 
+(defmethod field :file-and-delete [{:keys [on-delete table-data row-number] :as f} data]
+  (if (empty? (get table-data row-number))
+    (field (assoc f :type :file) )
+    [ui/icon-button {:on-click #(on-delete row-number)}
+     [ic/action-delete]]))
+
 (defmethod field :file [{:keys [update! label name max-length min-length regex
                                 focus on-focus form? error warning table? full-width?
                                 style input-style hint-style on-change]
@@ -726,6 +732,8 @@
                                   :data value})
                       [field (merge (assoc tf
                                            :table? true
+                                           :row-number i
+                                           :table-data data
                                            :update! #(update! (update-fn %)))
                                     (when missing?
                                       {:warning (tr [:common-texts :required-field])})
