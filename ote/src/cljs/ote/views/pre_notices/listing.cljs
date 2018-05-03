@@ -24,12 +24,16 @@
 (defn pre-notices-table [e! pre-notices state]
   (let [notices (filter #(= state (::transit/pre-notice-state %)) pre-notices)]
     [:div.row
-     [table/table {:name->label (tr-key [:pre-notice-list-page :headers])
-                   :key-fn ::transit/id
-                   :no-rows-message (case state
-                                      :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
-                                      :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))
-                   :on-select #(e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id (first %))}))}
+     [table/table (merge
+                    {:name->label (tr-key [:pre-notice-list-page :headers])
+                     :key-fn ::transit/id
+                     :no-rows-message (case state
+                                        :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
+                                        :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))}
+                    (when (= :sent state)
+                      {:on-select #(e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id (first %))}))
+                       :show-row-hover? true
+                       :row-style {:cursor "pointer"}}))
       [{:name ::transit/pre-notice-type
         :format pre-notice-type->str}
        {:name ::transit/route-description}
