@@ -773,7 +773,7 @@
   :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
   :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
   :add-attachment "Uusi liite"
-  :select-attachment "Valitse tiedosto"
+  :select-attachment "Lisää liite"
   :effective-date-descriptions {:year-start "Vuoden alku"
                                 :school-start "Kouluvuoden alku"
                                 :school-end "Kouluvuoden päätös"

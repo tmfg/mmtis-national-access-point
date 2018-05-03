@@ -159,14 +159,14 @@
                         {:disabled true}))
      [ic/action-delete]]))
 
-(defmethod field :file [{:keys [label name disabled? on-change]
+(defmethod field :file [{:keys [label button-label name disabled? on-change]
                          :as field} data]
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
    [:button (merge
               (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
               (when disabled?
                 {:disabled true}))
-    label]
+    (if-not (empty? label) label button-label)]
    [:input
     (merge (stylefy/use-sub-style
              style-form-fields/file-button-wrapper :file-input)

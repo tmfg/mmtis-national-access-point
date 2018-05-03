@@ -272,7 +272,7 @@
                      :disabled? true}
 
                     {:name :attachment-file
-                     :label (tr [:pre-notice-page :select-attachment])
+                     :button-label (tr [:pre-notice-page :select-attachment])
                      :type :file-and-delete
                      :disabled? sent?
                      :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))
