@@ -115,6 +115,8 @@
       [table/table {:name->label     (tr-key [:pre-notice-list-page :headers])
                     :key-fn          ::transit/id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])
+                    :row-style {:cursor "pointer"}
+                    :show-row-hover? true
                     :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))}
        [{:name ::modification/created :format (comp str time/format-timestamp-for-ui)}
         {:name ::transit/pre-notice-type
