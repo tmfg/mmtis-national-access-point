@@ -29,8 +29,7 @@
                    :no-rows-message (case state
                                       :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
                                       :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))}
-      [{:name ::transit/id}
-       {:name ::transit/pre-notice-type
+      [{:name ::transit/pre-notice-type
         :format pre-notice-type->str}
        {:name ::transit/route-description}
        {:name ::modification/created
