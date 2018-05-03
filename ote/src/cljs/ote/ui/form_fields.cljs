@@ -174,8 +174,11 @@
             ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
             :title " "})]])
 
-(defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length]
-                              :as   field} data]
+(defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length
+                                     max-length on-blur warning full-width?
+                                     style input-style hint-style on-enter
+                                     hint-text disabled? id]
+                              :as field} data]
   [:span
    (when tooltip
      [:div {:style {:padding-top "10px"}}
@@ -183,15 +186,38 @@
       (r/as-element [tooltip-icon {:text tooltip :len (or tooltip-length "medium")}])])
    [:div
     [text-field
-     {:name                 name
-      :floating-label-text  (when-not (or table? tooltip) label)
-      :floating-label-fixed true
-      :hintText             (placeholder field data)
-      :on-change            #(update! %2)
-      :value                (or data "")
-      :multi-line           true
-      :rows                 rows
-      :error-text           error}]]])
+     (merge
+       {:id id
+        :name name
+        :floating-label-text (when-not (or table? tooltip) label)
+        :floating-label-fixed true
+        :on-change #(update! %2)
+        :on-blur on-blur
+        :hint-text (or hint-text (placeholder field data))
+        :hint-style (merge style-base/placeholder
+                           hint-style)
+        :value (or data "")
+        :multi-line true
+        :rows rows
+        ;; Show error text or warning text or empty string
+        :error-text (or error warning "")
+        ;; Error is more critical than required - showing it first
+        :error-style (if error
+                       style-base/error-element
+                       style-base/required-element)}
+       (when max-length
+         {:max-length max-length})
+       (when full-width?
+         {:full-width true})
+       (when disabled?
+         {:disabled true})
+       (when style
+         {:style style})
+       (when input-style
+         {:input-style input-style})
+       (when on-enter
+         {:on-key-press #(when (= "Enter" (.-key %))
+                           (on-enter))}))]]])
 
 (def languages ["FI" "SV" "EN"])
 
