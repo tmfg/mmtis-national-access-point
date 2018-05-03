@@ -252,10 +252,10 @@
                                            :on-failure (tuck/send-async! ->ServerError)})
   app)
 
-(define-event DeleteAttachment [row]
+(define-event DeleteAttachment [row-index]
   {:path [:pre-notice :attachments]}
-  (vec (concat (take row app)
-           (drop (inc row) app))))
+  (vec (concat (take row-index app)
+           (drop (inc row-index) app))))
 
 (defn load-regions-from-server []
   (comm/get! "pre-notices/regions"
