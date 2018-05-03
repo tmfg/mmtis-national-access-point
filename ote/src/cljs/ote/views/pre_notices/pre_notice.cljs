@@ -259,7 +259,8 @@
 
     {:name ::transit/url
      :type :string
-     }
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-6"}
     {:name :attachments
      :type :table
      :add-label (tr [:pre-notice-page :add-attachment])
