@@ -73,10 +73,13 @@
   LoginResponse
   (process-event [{response :response} app]
     (if (:success? response)
-      (-> app
-          (dissoc :login)
-          (update-transport-operator-data (:session-data response))
-          (assoc :flash-message (tr [:common-texts :logged-in])))
+      (do
+        (routes/navigate! :own-services)
+        (-> app
+            (dissoc :login)
+            (update-transport-operator-data (:session-data response))
+            (assoc :flash-message (tr [:common-texts :logged-in])
+                   :page :own-services)))
       (update app :login assoc
               :failed? true
               :in-progress? false
