@@ -248,7 +248,7 @@
   :name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
   :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
   :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
-  :external-interfaces-intro-2 "Meriliikenteen reitti- ja aikataulutiedot voit luoda NAP-palvelun"
+  :external-interfaces-intro-2 "Merenkulun reitti- ja aikataulutiedot voit luoda NAP-palvelun"
   :external-interfaces "Koneluettava rajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa (esim. muodossa csv, xml, json tai gtfs). Ulkoiset rajapinnat on tarkoitettu yhteistyökumppaneille ja kehittäjille, jotka voivat käyttää niitä lisenssi- ja sopimusehtojen mukaisesti omissa palveluissaan."
   :external-interfaces-read-more {:link "Lue lisää NAP-katalogin koneluettavista rajapinnoista."
                                   :dialog-title "Koneluettavat rajapinnat NAP-katalogissa"
@@ -271,7 +271,7 @@
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
                                  :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille (esim. lisenssistä). Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
   :RAE-link-text "Rae-työkalulla"
-  :SEA-ROUTE-link-text "Meriliikenteen reitti - ja aikataulueditorilla"
+  :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
   :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
@@ -654,7 +654,7 @@
 
 
  :route-list-page
- {:header-route-list "Omat meriliikenteen reitti- ja aikataulutietot"
+ {:header-route-list "Omat merenkulun reitti- ja aikataulutietot"
   :delete-dialog-header "Haluatko poistaa laivareitin?"
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
@@ -670,7 +670,7 @@
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
-  :link-to-help-pdf   "Meriliikennetyökalun käyttöohje"
+  :link-to-help-pdf   "Merenkulun reittityökalun käyttöohje"
   }
 
  :route-wizard-page
@@ -828,7 +828,7 @@
   :navigation-login                           "Kirjaudu sisään"
   :navigation-register                        "Rekisteröidy"
   :navigation-admin                           "Ylläpitopaneeli"
-  :navigation-route                           "Meriliikenteen reitti- ja aikataulueditori"
+  :navigation-route                           "Merenkulun reitti- ja aikataulueditori"
   :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset"
   :navigation-privacy-policy                  "Rekisteriseloste"

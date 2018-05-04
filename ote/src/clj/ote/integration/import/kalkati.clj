@@ -30,11 +30,15 @@
         status-code (:statusCode json)
         gtfs-url (:Location resp-headers)]
 
-    (if-not (= status-code 200)
+    ;; If lambda invocation has errors, or there are errors in the third-party kalkati interface
+    ;; get error headers and status code from Lambda function payload and pass them through.
+    ;; Note: kalkati2gtfs Lambda returns 303 after a successful execution.
+    (if-not (= status-code 303)
       (merge
         {:status status-code}
         (when resp-headers
-          {:headers (walk/stringify-keys resp-headers)}))
+          {:headers (walk/stringify-keys
+                      (dissoc resp-headers :Location))}))
       (gtfs-import/load-gtfs gtfs-url))))
 
 (defrecord KalkatiImport []

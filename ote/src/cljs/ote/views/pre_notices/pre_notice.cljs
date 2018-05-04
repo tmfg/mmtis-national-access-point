@@ -183,6 +183,24 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-effective-date])}))
 
+(defn- notice-area-map [pre-notice]
+  (r/create-class
+   {:component-did-update leaflet/update-bounds-from-layers
+    :component-did-mount leaflet/update-bounds-from-layers
+    :reagent-render
+    (fn [pre-notice]
+      [leaflet/Map {:ref "leaflet"
+                    :center      #js [65 25]
+                    :zoomControl true
+                    :zoom        5}
+       (leaflet/background-tile-map)
+       (doall
+        (for [region (::transit/regions pre-notice)
+              :let [region-geojson (get-in pre-notice [:regions region :geojson])]
+              :when region-geojson]
+          ^{:key region}
+          [leaflet/GeoJSON {:data  region-geojson
+                            :style {:color "green"}}]))])}))
 (defn notice-area [e!]
   (form/group
     {:label   (tr [:pre-notice-page :route-and-area-information-title])
@@ -195,15 +213,15 @@
      :read                identity
      :container-style     style-form/full-width
      :component           (fn [{pre-notice :data :as f}]
-                            (.log js/console " componentin sisältä " (clj->js f))
                             [:div
                              [:div.col-md-4
                               [form-fields/field
                                {:id          "route-description"
                                 :label       (tr [:field-labels :pre-notice ::transit/route-description])
-                                :type        :string
+                                :type        :text-area
                                 :hint-text   (tr [:pre-notice-page :route-description-hint])
                                 :full-width? true
+                                :rows 1
                                 :update!     #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
                                (::transit/route-description pre-notice)]
 
@@ -230,18 +248,7 @@
                                        (keep #(when (selected-ids (:id %)) %))
                                        regions-with-show)])]
                              [:div.col-md-8
-                              [leaflet/Map {:ref         "notice-area-map"
-                                            :center      #js [65 25]
-                                            :zoomControl true
-                                            :zoom        5}
-                               (leaflet/background-tile-map)
-                               (doall
-                                 (for [region (::transit/regions pre-notice)
-                                       :let [region-geojson (get-in pre-notice [:regions region :geojson])]
-                                       :when region-geojson]
-                                   ^{:key region}
-                                   [leaflet/GeoJSON {:data  region-geojson
-                                                     :style {:color "green"}}]))]]])}))
+                              [notice-area-map pre-notice]]])}))
 
 (defn notice-attachments [e!]
   (form/group
@@ -252,19 +259,20 @@
 
     {:name ::transit/url
      :type :string
-     }
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-6"}
     {:name :attachments
      :type :table
      :add-label (tr [:pre-notice-page :add-attachment])
-     :delete? true
      :table-fields [{:name ::transit/attachment-file-name
                      :type :string
                      :disabled? true}
 
                     {:name :attachment-file
                      :label (tr [:pre-notice-page :select-attachment])
-                     :type :file
-                     :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))}]}))
+                     :type :file-and-delete
+                     :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))
+                     :on-delete #(e! (pre-notice/->DeleteAttachment %))}]}))
 
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))

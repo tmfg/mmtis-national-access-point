@@ -10,7 +10,7 @@
    :operators (component/using (sut/->Operators) [:db :http])))
 
 
-(deftest list
+(deftest operators-list
   (let [result (:transit (http-post "normaluser" "operators/list"
                                     {:filter ""
                                      :limit 10

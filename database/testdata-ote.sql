@@ -10,3 +10,10 @@ VALUES
 INSERT INTO "transport-operator" (name, "business-id", homepage, "visiting-address", "ckan-group-id")
 VALUES ('Terminaali Oy', '1234567-8', 'http://www.example.com',
 ROW('Terminaalitie 1','90100','Terminaalikaupunki')::address, 'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4');
+
+INSERT INTO "public"."finnish_ports"("code","name","location","created")
+VALUES
+(E'OTE141',E'{"(FI,\\"Puerto Mont\\")"}',E'POINT(-72.917481 -41.474117)',E'2018-04-27 10:01:51.364+00'),
+(E'OTE140',E'{"(FI,Panama)"}',E'POINT(-79.498291 8.995635)',E'2018-04-27 10:01:51.342+00'),
+(E'OTE139',E'{"(FI,\\"Los Angeles\\")"}',E'POINT(-118.349611 33.474982)',E'2018-04-27 10:01:51.304+00'),
+(E'OTE138',E'{"(FI,\\"Middleton Island\\")"}',E'POINT(-146.318054 59.430127)',E'2018-04-27 07:06:00.846+00');
