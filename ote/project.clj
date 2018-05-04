@@ -39,6 +39,8 @@
 
                  ;; Password hashing
                  [buddy/buddy-hashers "1.3.0"]
+                 ;; File hash
+                 [digest "1.4.8"]
 
                  ;; Cache libraries
                  [org.clojure/core.cache "0.6.5"]
