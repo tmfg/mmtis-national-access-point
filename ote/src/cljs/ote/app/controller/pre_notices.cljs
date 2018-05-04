@@ -17,12 +17,15 @@
   {}
   (assoc app :flash-message-error (tr [:common-texts :server-error])))
 
+(defn load-organization-pre-notices! []
+  (comm/get! "pre-notices/list"
+             {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
+              :on-failure (tuck/send-async! ->ServerError)}))
+
 ;; Load the pre-notices that are available
 (tuck/define-event LoadOrganizationPreNotices []
   {:path [:pre-notices]}
-  (comm/get! "pre-notices/list"
-             {:on-success (tuck/send-async! ->LoadPreNoticesResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
+  (load-organization-pre-notices!)
   :loading)
 
 (declare ->ShowPreNotice)
@@ -261,3 +264,26 @@
   (comm/get! "pre-notices/regions"
              {:on-success (tuck/send-async! ->RegionsResponse)
               :on-failure (tuck/send-async! ->ServerError)}))
+
+(define-event DeletePreNotice [pre-notice]
+  {:path [:delete-pre-notice-dialog]}
+  pre-notice)
+
+(define-event DeletePreNoticeResponse [response]
+  {}
+  (load-organization-pre-notices!)
+  (-> app
+      (dissoc :delete-pre-notice-dialog)
+      (assoc :pre-notices :loading
+             :flash-message (tr [:pre-notice-list-page :delete-pre-notice-dialog :success-message]))))
+
+(define-event DeletePreNoticeConfirm []
+  {:path [:delete-pre-notice-dialog]}
+  (comm/post! "pre-notice/delete" (select-keys app #{::transit/id})
+              {:on-success (tuck/send-async! ->DeletePreNoticeResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(define-event DeletePreNoticeCancel []
+  {}
+  (dissoc app :delete-pre-notice-dialog))

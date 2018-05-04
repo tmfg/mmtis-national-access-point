@@ -751,6 +751,10 @@
   :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
                       :comments-label "Viranomaisen kommentit (näkyvät vain viranomaiselle)"
                       :new-comment-label "Kirjoita kommentti"}
+
+  :delete-pre-notice-dialog {:label "Delete draft pre notice?"
+                             :content "Permanently delete this pre notice?"
+                             :success-message "Pre notice deleted"}
   }
 
  :pre-notice-page

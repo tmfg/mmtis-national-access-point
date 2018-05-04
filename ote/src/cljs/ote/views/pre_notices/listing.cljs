@@ -46,10 +46,16 @@
                                               (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
                  (case state
                    :draft [ic/content-create]
-                   :sent [ic/action-visibility])])}]
+                   :sent [ic/action-visibility])]
+                (when (= :draft state)
+                  [ui/icon-button {:href "#"
+                                   :on-click #(do
+                                                (.preventDefault %)
+                                                (e! (pre-notice/->DeletePreNotice row)))}
+                   [ic/action-delete]]))}]
       notices]]))
 
-(defn pre-notices [e! {:keys [transport-operator pre-notices] :as app}]
+(defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]
   (if (= :loading pre-notices)
     [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
     (let [pre-notices (filter #(= (::t-operator/id transport-operator)
@@ -67,6 +73,23 @@
                             :icon (ic/content-add)}]
          [t-operator-view/transport-operator-selection e! app]]]
        [:div {:style {:margin-bottom "40px"}}
-        [pre-notices-table e! pre-notices :draft]]
+        [pre-notices-table e! pre-notices :draft]
+        (when delete-pre-notice-dialog
+          [ui/dialog
+           {:open true
+            :title (tr [:pre-notice-list-page :delete-pre-notice-dialog :label])
+            :actions [(r/as-element
+                       [ui/flat-button
+                        {:label (tr [:buttons :cancel])
+                         :primary true
+                         :on-click #(e! (pre-notice/->DeletePreNoticeCancel))}])
+                      (r/as-element
+                       [ui/raised-button
+                        {:label (tr [:buttons :delete])
+                         :icon (ic/action-delete-forever)
+                         :secondary true
+                         :primary true
+                         :on-click #(e! (pre-notice/->DeletePreNoticeConfirm))}])]}
+           (tr [:pre-notice-list-page :delete-pre-notice-dialog :content])])]
        [:h3 (tr [:pre-notice-list-page :sent-pre-notices])]
        [pre-notices-table e! pre-notices :sent]])))
