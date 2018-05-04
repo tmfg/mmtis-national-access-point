@@ -229,16 +229,18 @@
        (update t :seconds (fnil double 0))
         (map->Interval t)))
 
-(defn time->pginterval [time]
-  (->PGInterval (time->interval time)))
+#?(:clj
+   (defn time->pginterval [time]
+     (->PGInterval (time->interval time))))
 
-(defn format-interval-as-time [interval]
-  (let [interval (if (instance? org.postgresql.util.PGInterval interval)
-                   (pginterval->interval interval)
-                   interval)]
-    (format-time-full
-      (update (select-keys interval [:hours :minutes :seconds])
-              :seconds int))))
+#?(:clj
+   (defn format-interval-as-time [interval]
+     (let [interval (if (instance? org.postgresql.util.PGInterval interval)
+                      (pginterval->interval interval)
+                      interval)]
+       (format-time-full
+         (update (select-keys interval [:hours :minutes :seconds])
+                 :seconds int)))))
 
 #?(:clj
    (defmethod specql-composite/parse-value "interval" [_ string]

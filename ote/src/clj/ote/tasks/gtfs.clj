@@ -23,15 +23,15 @@
   (if (feature/feature-enabled? config :gtfs-import)
     (try
       (tx/with-transaction db
-                           (let [{:keys [url operator-id ts-id last-import-date] :as gtfs-data} (first (select-gtfs-urls-update db))]
-                             (if (nil? gtfs-data)
-                               (log/debug "No gtfs files to upload.")
-                               (do
-                                 (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
-                                 (import-gtfs/download-and-store-transit-package (:gtfs config) db url operator-id ts-id last-import-date)
-                                 (specql/update! db ::t-service/external-interface-description
-                                                 {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
-                                                 {::t-service/id (:id gtfs-data)})))))
+        (let [{:keys [url operator-id ts-id last-import-date] :as gtfs-data} (first (select-gtfs-urls-update db))]
+          (if (nil? gtfs-data)
+            (log/debug "No gtfs files to upload.")
+            (do
+              (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
+              (import-gtfs/download-and-store-transit-package (:gtfs config) db url operator-id ts-id last-import-date)
+              (specql/update! db ::t-service/external-interface-description
+                              {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
+                              {::t-service/id (:id gtfs-data)})))))
       (catch Exception e
         (log/warn "Error in gtfs s3 upload!" e)))
     (log/debug "GTFS IMPORT IS NOT ENABLED!")))

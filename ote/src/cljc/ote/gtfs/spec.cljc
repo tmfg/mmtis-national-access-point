@@ -266,7 +266,7 @@
           :opt [:gtfs/shape-dist-traveled]))
 
 (s/def :gtfs/shape-pt-sequence nat-int?)
-(s/def :gtfs/shape-dist-traveled decimal?)
+(s/def :gtfs/shape-dist-traveled #?(:cljs number? :clj decimal?))
 
 (def shapes-txt-fields
   [:gtfs/shape-id :gtfs/shape-pt-lat :gtfs/shape-pt-lon

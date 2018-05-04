@@ -89,14 +89,14 @@
     (if (nil? gtfs-file)
       (log/debug "Could not found anything from given url: " url)
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
-            old-gtfs-hash (:gtfs/sha256 (first (specql/fetch db :gtfs/package
-                                                             (specql/columns :gtfs/package)
-                                                             {:gtfs/transport-operator-id operator-id
-                                                              :gtfs/transport-service-id  ts-id})))]
+            old-gtfs-hash (specql/fetch db :gtfs/package
+                                        #{:gtfs/sha256}
+                                        {:gtfs/transport-operator-id operator-id
+                                         :gtfs/transport-service-id  ts-id})]
         ;; IF hash doesn't match, save new and upload file to s3
         (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
           (do
-            (let [package (specql/upsert! db :gtfs/package {:gtfs/sha256                new-gtfs-hash
+            (let [package (specql/insert! db :gtfs/package {:gtfs/sha256                new-gtfs-hash
                                                             :gtfs/transport-operator-id operator-id
                                                             :gtfs/transport-service-id  ts-id
                                                             :gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))})]
