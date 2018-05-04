@@ -24,16 +24,11 @@
 (defn pre-notices-table [e! pre-notices state]
   (let [notices (filter #(= state (::transit/pre-notice-state %)) pre-notices)]
     [:div.row
-     [table/table (merge
-                    {:name->label (tr-key [:pre-notice-list-page :headers])
-                     :key-fn ::transit/id
-                     :no-rows-message (case state
-                                        :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
-                                        :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))}
-                    (when (= :sent state)
-                      {:on-select #(e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id (first %))}))
-                       :show-row-hover? true
-                       :row-style {:cursor "pointer"}}))
+     [table/table {:name->label (tr-key [:pre-notice-list-page :headers])
+                   :key-fn ::transit/id
+                   :no-rows-message (case state
+                                      :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
+                                      :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))}
       [{:name ::transit/pre-notice-type
         :format pre-notice-type->str}
        {:name ::transit/route-description}
@@ -43,14 +38,15 @@
         :read (comp time/format-timestamp-for-ui ::modification/modified)}
        {:name ::transit/pre-notice-state
         :format (tr-key [:enums ::transit/pre-notice-state])}
-       (when (= :draft state)
-         {:name :actions
-          :read (fn [row]
-                  [ui/icon-button {:href "#"
-                                   :on-click #(do
-                                                (.preventDefault %)
-                                                (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
-                   [ic/content-create]])})]
+       {:name :actions
+        :read (fn [row]
+                [ui/icon-button {:href "#"
+                                 :on-click #(do
+                                              (.preventDefault %)
+                                              (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
+                 (case state
+                   :draft [ic/content-create]
+                   :sent [ic/action-visibility])])}]
       notices]]))
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices] :as app}]
