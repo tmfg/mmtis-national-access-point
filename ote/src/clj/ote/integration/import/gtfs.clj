@@ -107,7 +107,7 @@
               (save-gtfs-to-db db gtfs-file (:gtfs/id package))))
           (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying."))))))
 
-(defrecord GTFSImport [gtfs-config]
+(defrecord GTFSImport [config]
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
