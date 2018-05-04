@@ -87,11 +87,23 @@
             (delete-attachments db config to-be-removed)
             saved-notice))))))
 
-(defn delete-pre-notice [db user {::transit/keys [id]}]
-  (specql/delete! db ::transit/pre-notice
-                  {::transit/id id
-                   ::transit/pre-notice-state :draft
-                   ::t-operator/id (op/in (authorization/user-transport-operators db user))}))
+(defn delete-pre-notice [config db user {::transit/keys [id]}]
+  (tx/with-transaction db
+    (let [operator-ids (authorization/user-transport-operators db user)
+          notice-to-delete (first (specql/fetch db ::transit/pre-notice
+                                                #{::transit/id}
+                                                {::transit/id id
+                                                 ::transit/pre-notice-state :draft
+                                                 ::t-operator/id (op/in operator-ids)}))]
+      (if (not notice-to-delete)
+        (do
+          (log/warn "User " (:user user) " tried to delete notice with id " id ", but it was not found.")
+          (throw (SecurityException. "Can't find notice to delete")))
+
+        (let [attachments (list-attachments-in-db db user id)]
+          (delete-attachments db config attachments)
+          (specql/delete! db ::transit/pre-notice
+                          {::transit/id (::transit/id notice-to-delete)}))))))
 
 (defn operator-pre-notices-routes
   "Routes for listing and creating pre notices for transport operators"
@@ -115,4 +127,4 @@
    (POST "/pre-notice/delete" {form-data :body
                                user :user}
          (http/transit-response
-          (delete-pre-notice db user (http/transit-request form-data))))))
+          (delete-pre-notice config db user (http/transit-request form-data))))))
