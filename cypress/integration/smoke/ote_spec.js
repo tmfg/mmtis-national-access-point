@@ -165,10 +165,15 @@ describe('Sea route tests', function () {
     });
 
     it('Add stops', function () {
-        cy.get('img[title="OULUN SATAMA: Vihreäsaari"]').click();
-        cy.get('img[title="RAAHE: Rautaruukki"]').click();
-        cy.get('img[title="KALAJOKI: Itäkenttä"]').click();
-        cy.get('img[title="VAASA: Lassenlaituri"]').click();
+        cy.get('.leaflet-control-zoom-out').click().wait(200);
+        cy.get('.leaflet-control-zoom-out').click().wait(200);
+        cy.get('.leaflet-control-zoom-out').click().wait(200);
+        cy.get('.leaflet-control-zoom-out').click().wait(200);
+        cy.get('.leaflet-control-zoom-out').click();
+        cy.get('img[title="Puerto Mont"]').click();
+        cy.get('img[title="Panama"]').click();
+        cy.get('img[title="Los Angeles"]').click();
+        cy.get('img[title="Middleton Island"]').click();
     });
 
     it('Add calendar', function () {

@@ -84,9 +84,7 @@
    ;; Scheduled tasks
    :tasks-company (component/using (tasks-company/company-tasks) [:db])
    :tasks-gtfs (component/using (tasks-gtfs/gtfs-tasks (:gtfs config)) [:db])
-   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks
-                                         (:email config)
-                                         (get-in config [:pre-notices :notify-interval]))
+   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:email config))
                                        [:db])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
