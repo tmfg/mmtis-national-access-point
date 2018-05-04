@@ -24,7 +24,7 @@
                                   {:style {:width width}})
          (name->label name)]))]]
    [ui/table-body {:display-row-checkbox false
-                   :show-row-hover show-row-hover?}
+                   :show-row-hover (boolean show-row-hover?)}
     (if (empty? rows)
       [:tr [:td {:colSpan (count headers)}
             [common/help no-rows-message]]]
