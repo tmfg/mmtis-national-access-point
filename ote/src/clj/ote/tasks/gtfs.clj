@@ -3,6 +3,7 @@
   (:require [chime :refer [chime-at]]
             [clj-time.core :as t]
             [clj-time.periodic :refer [periodic-seq]]
+            [ote.util.feature :as feature]
             [com.stuartsierra.component :as component]
             [jeesql.core :refer [defqueries]]
             [ote.db.tx :as tx]
@@ -19,7 +20,7 @@
 
 (defn update-one-gtfs! [config db]
   ;; Ensure that gtfs-import flag is enabled
-  (if (contains? (:enabled-features config) :gtfs-import)
+  (if (feature/feature-enabled? config :gtfs-import)
     (try
       (tx/with-transaction db
                            (let [{:keys [url operator-id ts-id last-import-date] :as gtfs-data} (first (select-gtfs-urls-update db))]
