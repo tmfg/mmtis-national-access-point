@@ -171,7 +171,7 @@
      :type         :table
      :table-fields [{:name  ::transit/effective-date
                      :type  :date-picker
-                     ;:required? true
+                     :required? true
                      :label (tr [:pre-notice-page :effective-date-from])}
 
                     {:name  ::transit/effective-date-description
