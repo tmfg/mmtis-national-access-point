@@ -22,9 +22,11 @@ CREATE TABLE "gtfs-agency"
   "agency-id"         text,
   "agency-name"       text NOT NULL,
   "agency-url"        text NOT NULL,
+  "agency-fare-url"   text,
   "agency-timezone"   text NOT NULL,
   "agency-lang"       text,
-  "agency-phone"      text
+  "agency-phone"      text,
+  "agency-email"	  text	
 );
 
 CREATE TABLE "gtfs-stop"
@@ -40,7 +42,8 @@ CREATE TABLE "gtfs-stop"
   "zone-id"           text,
   "stop-url"          text,
   "location-type"     INTEGER CHECK ("location-type" BETWEEN 0 AND 2), -- 0,1,2
-  "parent-station"    text 
+  "parent-station"    text,
+  "stop-timezone"     text  
 );
 
 CREATE TABLE "gtfs-route"
@@ -83,15 +86,19 @@ CREATE TABLE "gtfs-calendar-date"
   "exception-type"    integer NOT NULL
 );
 
+CREATE TYPE route_shape AS (
+	"shape-pt-lat"      	NUMERIC ,
+	"shape-pt-lon"      	NUMERIC ,
+	"shape-pt-sequence" 	integer ,
+	"shape-dist-traveled" 	NUMERIC
+);
+
 CREATE TABLE "gtfs-shape"
 (
   id                  SERIAL PRIMARY KEY,
   "package-id"		  INTEGER NOT NULL REFERENCES gtfs_package (id), 	  
   "shape-id"          text,
-  "shape-pt-lat"      NUMERIC NOT NULL,
-  "shape-pt-lon"      NUMERIC NOT NULL,
-  "shape-pt-sequence" integer NOT NULL,
-  "shape-dist-traveled" numeric
+  "route-shape"               route_shape[]
 );
 
 CREATE TABLE "gtfs-trip"
@@ -104,7 +111,8 @@ CREATE TABLE "gtfs-trip"
   "trip-headsign"     text,
   "direction-id"      integer CHECK ("direction-id" IN (0,1)),
   "block-id"          text,
-  "shape-id"          text
+  "shape-id"          text,
+  "wheelchair-accessible" integer NULL CHECK("wheelchair-accessible" BETWEEN 0 AND 2)
 );
 
 CREATE TABLE "gtfs-stop-time"
