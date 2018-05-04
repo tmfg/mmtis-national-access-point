@@ -5,6 +5,7 @@
             [reagent.core :as r]))
 
 (defn table [{:keys [height name->label key-fn
+                     row-style show-row-hover?
                      on-select row-selected? no-rows-message] :as opts} headers rows]
   [ui/table (merge
              (when on-select
@@ -22,7 +23,8 @@
         [ui/table-header-column (when width
                                   {:style {:width width}})
          (name->label name)]))]]
-   [ui/table-body {:display-row-checkbox false}
+   [ui/table-body {:display-row-checkbox false
+                   :show-row-hover (boolean show-row-hover?)}
     (if (empty? rows)
       [:tr [:td {:colSpan (count headers)}
             [common/help no-rows-message]]]
@@ -30,9 +32,12 @@
        (map-indexed
         (fn [i row]
           ^{:key (if key-fn (key-fn row) i)}
-          [ui/table-row {:selectable (boolean on-select)
-                         :selected (if row-selected? (row-selected? row) false)
-                         :display-border false}
+          [ui/table-row (merge
+                          {:selectable (boolean on-select)
+                           :selected (if row-selected? (row-selected? row) false)
+                           :display-border false}
+                          (when row-style
+                            {:style row-style}))
            (doall
             (for [{:keys [name width format read]} headers
                   :let [value ((or format identity) (if read (read row) (get row name)))]]

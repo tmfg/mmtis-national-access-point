@@ -38,20 +38,22 @@
         :read (comp time/format-timestamp-for-ui ::modification/modified)}
        {:name ::transit/pre-notice-state
         :format (tr-key [:enums ::transit/pre-notice-state])}
-       (when (= :draft state)
-         {:name :actions
-          :read (fn [row]
-                  [:div
-                   [ui/icon-button {:href "#"
-                                    :on-click #(do
-                                                 (.preventDefault %)
-                                                 (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
-                    [ic/content-create]]
+       {:name :actions
+        :read (fn [row]
+                [:div
+                 [ui/icon-button {:href "#"
+                                  :on-click #(do
+                                               (.preventDefault %)
+                                               (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
+                  (case state
+                    :draft [ic/content-create]
+                    :sent [ic/action-visibility])]
+                 (when (= :draft state)
                    [ui/icon-button {:href "#"
                                     :on-click #(do
                                                  (.preventDefault %)
                                                  (e! (pre-notice/->DeletePreNotice row)))}
-                    [ic/action-delete]]])})]
+                    [ic/action-delete]])])}]
       notices]]))
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]

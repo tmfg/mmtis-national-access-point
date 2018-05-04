@@ -22,21 +22,23 @@
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
 
-(defn footer [e! pre-notice]
+(defn footer [e! sent? pre-notice]
   (let [valid-notice? (form/valid? pre-notice)]
     (when (not valid-notice?)
       [ui/card {:style {:margin "1em 0em 1em 0em"}}
        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])
     [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
-     [buttons/save {:disabled (not (form/valid? pre-notice))
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (pre-notice/->OpenSendModal)))}
-      (tr [:buttons :save-and-send])]
-     [buttons/save {:on-click #(do
-                                 (.preventDefault %)
-                                 (e! (pre-notice/->SaveToDb false)))}
-      (tr [:buttons :save-as-draft])]
+     (when-not sent?
+       [:span
+        [buttons/save {:disabled (not (form/valid? pre-notice))
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (pre-notice/->OpenSendModal)))}
+         (tr [:buttons :save-and-send])]
+        [buttons/save {:on-click #(do
+                                    (.preventDefault %)
+                                    (e! (pre-notice/->SaveToDb false)))}
+         (tr [:buttons :save-as-draft])]])
      [buttons/cancel {:on-click #(do
                                    (.preventDefault %)
                                    (e! (pre-notice/->CancelNotice)))}
@@ -250,11 +252,11 @@
                              [:div.col-md-8
                               [notice-area-map pre-notice]]])}))
 
-(defn notice-attachments [e!]
+(defn notice-attachments [e! sent?]
   (form/group
-    {:label   (tr [:pre-notice-page :attachment-section-title])
+    {:label (tr [:pre-notice-page :attachment-section-title])
      :columns 3
-     :layout  :row}
+     :layout :row}
     (form/info (tr [:form-help :pre-notice-attatchment-info]) {:type :generic})
 
     {:name ::transit/url
@@ -264,40 +266,40 @@
     {:name :attachments
      :type :table
      :add-label (tr [:pre-notice-page :add-attachment])
+     :add-label-disabled? (constantly sent?)
      :table-fields [{:name ::transit/attachment-file-name
                      :type :string
                      :disabled? true}
 
                     {:name :attachment-file
-                     :label (tr [:pre-notice-page :select-attachment])
+                     :button-label (tr [:pre-notice-page :select-attachment])
                      :type :file-and-delete
+                     :disabled? sent?
                      :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))
                      :on-delete #(e! (pre-notice/->DeleteAttachment %))}]}))
 
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))
+        sent? (= :sent (::transit/pre-notice-state pre-notice))
         form-options {:name->label (tr-key [:field-labels :pre-notice])
-                      :footer-fn (r/partial footer e!)
-                      :update!   #(e! (pre-notice/->EditForm %))}]
+                      :footer-fn (r/partial footer e! sent?)
+                      :update! #(e! (pre-notice/->EditForm %))}]
     [:span
-    [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
-    [select-operator e! transport-operator operators]
-    [form/form
-     form-options
-     [(transport-type e! app)
-      (effective-dates)
-      (notice-area e!)
-      (notice-attachments e!)]
-     pre-notice]
-     [pre-notice-send-modal e! app]]
-    ))
+     [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
+     [select-operator e! transport-operator operators]
+     [form/form
+      form-options
+      [(transport-type e! app)
+       (effective-dates)
+       (notice-area e!)
+       (notice-attachments e! sent?)]
+      pre-notice]
+     [pre-notice-send-modal e! app]]))
 
-(defn new-pre-notice [e! {:keys [transport-operator] :as app}]
-    [pre-notice-form e! app])
+(defn new-pre-notice [e! app]
+  [pre-notice-form e! app])
 
-(defn edit-pre-notice-by-id [e! {:keys [pre-notice transport-operator] :as app}]
-  (if (or (nil? pre-notice) (= :loading pre-notice))
+(defn edit-pre-notice-by-id [e! {:keys [pre-notice] :as app}]
+  (if (or (nil? pre-notice) (:loading pre-notice))
     [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-    (if (= (::transit/pre-notice-state pre-notice) :draft)
-      [pre-notice-form e! app]
-      [:span (tr [:pre-notice-page :sent-pre-notice-cannot-be-edited])])))
+    [pre-notice-form e! app]))
