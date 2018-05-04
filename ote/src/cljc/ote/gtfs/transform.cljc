@@ -176,8 +176,8 @@
                 idx :idx} (index-key :idx identity stop-times)]
            {:gtfs/trip-id (str id "_" i)
             :gtfs/stop-id (::transit/code (nth stops stop-idx))
-            :gtfs/arrival-time (or arrival-time departure-time)
-            :gtfs/departure-time (or departure-time arrival-time)
+            :gtfs/arrival-time  (time/time->pginterval (or arrival-time departure-time))
+            :gtfs/departure-time (time/time->pginterval (or departure-time arrival-time))
             :gtfs/pickup-type (stopping-type pickup-type)
             :gtfs/drop-off-type (stopping-type drop-off-type)
             :gtfs/stop-sequence idx}))
@@ -200,8 +200,6 @@
        {:name "stop_times.txt"
         :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt
                                             (stop-times-txt routes))}
-
-
        {:name "routes.txt"
         :data (gtfs-parse/unparse-gtfs-file
                :gtfs/routes-txt
@@ -220,4 +218,5 @@
                :gtfs/calendar-dates-txt
                (calendar-dates-txt routes))}]
       (catch #?(:cljs js/Object :clj Exception) e
+        (.printStackTrace e)
         (log/warn "Error generating GTFS file content" e)))))
