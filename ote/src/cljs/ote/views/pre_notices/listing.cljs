@@ -40,19 +40,20 @@
         :format (tr-key [:enums ::transit/pre-notice-state])}
        {:name :actions
         :read (fn [row]
-                [ui/icon-button {:href "#"
-                                 :on-click #(do
-                                              (.preventDefault %)
-                                              (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
-                 (case state
-                   :draft [ic/content-create]
-                   :sent [ic/action-visibility])]
-                (when (= :draft state)
-                  [ui/icon-button {:href "#"
-                                   :on-click #(do
-                                                (.preventDefault %)
-                                                (e! (pre-notice/->DeletePreNotice row)))}
-                   [ic/action-delete]]))}]
+                [:div
+                 [ui/icon-button {:href "#"
+                                  :on-click #(do
+                                               (.preventDefault %)
+                                               (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
+                  (case state
+                    :draft [ic/content-create]
+                    :sent [ic/action-visibility])]
+                 (when (= :draft state)
+                   [ui/icon-button {:href "#"
+                                    :on-click #(do
+                                                 (.preventDefault %)
+                                                 (e! (pre-notice/->DeletePreNotice row)))}
+                    [ic/action-delete]])])}]
       notices]]))
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]
