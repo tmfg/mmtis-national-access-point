@@ -209,48 +209,55 @@
      :columns 3
      :layout  :row}
 
-    {:type                :component
-     :name                :notice-area
+    {:type :component
+     :name :notice-area
      :should-update-check (juxt ::transit/route-description ::transit/regions :regions)
-     :read                identity
-     :container-style     style-form/full-width
-     :component           (fn [{pre-notice :data :as f}]
-                            [:div
-                             [:div.col-md-4
-                              [form-fields/field
-                               {:id          "route-description"
-                                :label       (tr [:field-labels :pre-notice ::transit/route-description])
-                                :type        :text-area
-                                :hint-text   (tr [:pre-notice-page :route-description-hint])
-                                :full-width? true
-                                :rows 1
-                                :update!     #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
-                               (::transit/route-description pre-notice)]
+     :read identity
+     :required? true
+     :is-empty? (fn [{regions ::transit/regions description ::transit/route-description}]
+                  (or (empty? regions) (str/blank? description)))
+     :container-style style-form/full-width
+     :component (fn [{pre-notice :data}]
+                  [:div
+                   [:div.col-md-4
+                    [form-fields/field
+                     {:id "route-description"
+                      :label (tr [:field-labels :pre-notice ::transit/route-description])
+                      :type :text-area
+                      :hint-text (tr [:pre-notice-page :route-description-hint])
+                      :full-width? true
+                      :warning (when (str/blank? (::transit/route-description pre-notice))
+                                 (tr [:common-texts :required-field]))
+                      :rows 1
+                      :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
+                     (::transit/route-description pre-notice)]
 
-                              (let [regions-with-show
-                                    (mapv #(assoc % :show (str (:id %) " " (:name %)))
-                                          (sort-by :id (vals (:regions pre-notice))))
-                                    selected-ids (set (::transit/regions pre-notice))]
-                                [form-fields/field
-                                 {:id                 "regions"
-                                  :label              (tr [:field-labels :pre-notice ::transit/regions])
-                                  :type               :chip-input
-                                  :update!            #(e! (pre-notice/->SelectedRegions %))
-                                  :full-width?        true
-                                  :suggestions-config {:text  :show
-                                                       :value :id}
-                                  :suggestions        (clj->js regions-with-show)
-                                  :max-results        25
-                                  :open-on-focus?     true
-                                  :auto-select?       true
-                                  :filter             (fn [query key]
-                                                        (str/includes? (str/lower-case key)
-                                                                       (str/lower-case query)))}
-                                 (into #{}
-                                       (keep #(when (selected-ids (:id %)) %))
-                                       regions-with-show)])]
-                             [:div.col-md-8
-                              [notice-area-map pre-notice]]])}))
+                    (let [regions-with-show
+                          (mapv #(assoc % :show (str (:id %) " " (:name %)))
+                                (sort-by :id (vals (:regions pre-notice))))
+                          selected-ids (set (::transit/regions pre-notice))]
+                      [form-fields/field
+                       {:id "regions"
+                        :label (tr [:field-labels :pre-notice ::transit/regions])
+                        :type :chip-input
+                        :update! #(e! (pre-notice/->SelectedRegions %))
+                        :full-width? true
+                        :suggestions-config {:text :show
+                                             :value :id}
+                        :suggestions (clj->js regions-with-show)
+                        :max-results 25
+                        :open-on-focus? true
+                        :auto-select? true
+                        :filter (fn [query key]
+                                  (str/includes? (str/lower-case key)
+                                                 (str/lower-case query)))
+                        :warning (when (empty? (::transit/regions pre-notice))
+                                   (tr [:common-texts :required-field]))}
+                       (into #{}
+                             (keep #(when (selected-ids (:id %)) %))
+                             regions-with-show)])]
+                   [:div.col-md-8
+                    [notice-area-map pre-notice]]])}))
 
 (defn notice-attachments [e! sent?]
   (form/group
