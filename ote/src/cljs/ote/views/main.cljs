@@ -396,7 +396,12 @@
      [ckan-iframe-dialog
       (tr [:common-texts :navigation-register])
       "/user/register"
-      #(e! (fp-controller/->ToggleRegistrationDialog))])
+      ;; On modal close
+      #(e! (fp-controller/->ToggleRegistrationDialog))
+      ;; On ckan close i.e. user has been registered.
+      #(do
+        (e! (fp-controller/->ToggleRegistrationDialog))
+        (e! (fp-controller/->ChangePage :own-services {})))])
 
    (when show-reset-dialog?
             ^{:key "ckan-reset"}
