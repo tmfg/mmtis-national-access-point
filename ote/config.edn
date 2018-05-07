@@ -37,8 +37,9 @@
  :log {:level :debug}
  :ga {:tracking-code "UA-5406842-15"}
 
+ :gtfs {:bucket "napote-gtfs-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
 
  ;; add features to the set to enable them in production
- :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice}
+ :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import}
  }
