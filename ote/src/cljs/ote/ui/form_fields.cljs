@@ -283,7 +283,7 @@
           (tr [:common-texts :required-field])])])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
-                                        max-length style hint-style
+                                        max-length style hint-style hint-text
                                         filter suggestions max-results
                                         on-blur
                                         form? table? full-width? open-on-focus?] :as field}
@@ -305,7 +305,7 @@
         :open-on-focus open-on-focus?
         :search-text (or data "")
 
-        :hintText (placeholder field data)
+        :hint-text (or hint-text (placeholder field data))
         :full-width full-width?
 
 

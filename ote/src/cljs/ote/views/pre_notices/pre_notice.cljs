@@ -176,6 +176,7 @@
 
                     {:name  ::transit/effective-date-description
                      :type  :autocomplete
+                     :hint-text (tr [:form-help :autocomplete-hint])
                      :label (tr [:pre-notice-page :effective-date-description])
                      :open-on-focus? true
                      :auto-select? true
