@@ -23,9 +23,11 @@
     ::t-operator/id (gen/return 1)
     ::transit/pre-notice-type (gen/return [:new])
     ::transit/effective-dates (gen/vector gen-effective-dates 5)
-    ::transit/route-description generators/gen-text
+    ::transit/route-description generators/gen-naughty-string
     ::transit/url generators/gen-url
-    ))
+    ::transit/regions (gen/return ["01"])
+    ::transit/pre-notice-state (gen/return :draft)
+    ::transit/other-type-description generators/gen-naughty-string))
 
 (def gen-terminal_information
   (gen/hash-map
