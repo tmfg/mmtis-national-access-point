@@ -18,10 +18,10 @@
 (defmethod gtfs->clj :default [_ value] value)
 (defmethod clj->gtfs :default [_ value] value)
 
-(defmethod gtfs->clj 'boolean? [_ value]
+(defmethod gtfs->clj :specql.data-types/bool [_ value]
   (= "1" value))
 
-(defmethod clj->gtfs 'boolean? [_ value]
+(defmethod clj->gtfs :specql.data-types/bool [_ value]
   (case value
     true "1"
     false "0"))
@@ -49,6 +49,38 @@
   (#?(:cljs js/parseFloat
       :clj Double/parseDouble) value))
 
+(defmethod gtfs->clj '(nilable :specql.data-types/int4) [_ value]
+  (if (str/blank? value)
+    nil
+    (#?(:cljs js/parseInt
+        :clj Integer/parseInt) value)))
+
+(defmethod gtfs->clj :specql.data-types/int4 [_ value]
+  (#?(:cljs js/parseInt
+        :clj Integer/parseInt) value))
+
+(defmethod gtfs->clj :specql.data-types/numeric [_ value]
+  (if (str/blank? value)
+    nil
+    (#?(:cljs js/parseFloat
+        :clj  java.math.BigDecimal. (Double/parseDouble value)) value)))
+
+(defmethod gtfs->clj '(nilable :specql.data-types/numeric) [_ value]
+  (#?(:cljs js/parseFloat
+      :clj java.math.BigDecimal. (Double/parseDouble value)) value))
+
+(defmethod gtfs->clj :specql.data-types/interval [_ value]
+  (#?(:cljs str
+      :clj (comp time/time->pginterval time/parse-time)) value))
+
+(defmethod clj->gtfs :specql.data-types/interval [_ value]
+  (#?(:cljs str
+      :clj time/format-interval-as-time) value))
+
+(defmethod gtfs->clj 'decimal? [_ value]
+  (#?(:cljs js/parseFloat
+      :clj java.math.BigDecimal. (Double/parseDouble value)) value))
+
 (def ^{:private true
        :doc "Memoized function for looking up a GTFS field spec (which may not exist).
 This is only called with GTFS field names and cannot grow unbounded."}
@@ -56,7 +88,10 @@ This is only called with GTFS field names and cannot grow unbounded."}
   (memoize
    (fn [field]
      (try
-       (s/describe field)
+       (let [spec (s/get-spec field)]
+         (if (qualified-keyword? spec)
+           spec
+          (s/describe field)))
        (catch #?(:cljs js/Error
                  :clj Exception) e
          field)))))
@@ -104,7 +139,7 @@ This is only called with GTFS field names and cannot grow unbounded."}
                              (when-not (str/blank? value)
                                [field (gtfs->clj (field-spec-description field) value)]))
                            content-fields line))))
-     (rest rows))))
+     rows)))
 
 
 (defn unparse-gtfs-file [gtfs-file-type content]

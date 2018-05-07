@@ -296,6 +296,7 @@
   :trip-editor-no-calendar  "Lisää tämän vuoron kulkupäivät ennen kuin lisäät reitille muita vuoroja. Samat kulkupäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä kulkupäiviä kalentereihin vuorokohtaisesti."
   :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
+  :autocomplete-hint "Kirjoita oma tai valitse listalta"
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)

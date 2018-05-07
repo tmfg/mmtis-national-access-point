@@ -304,6 +304,7 @@
   :trip-editor-no-calendar  "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
   :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi. - SV"
+  :autocomplete-hint "Kirjoita oma tai valitse listalta"
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)

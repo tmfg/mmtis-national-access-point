@@ -72,6 +72,11 @@
                 :gtfs/stop-timezone
                 :gtfs/wheelchair-boarding]))
 
+(s/def :gtfs/wheelchair-boarding #{"0" "1" "2"})
+
+(s/def :gtfs/stop-lat double?)
+(s/def :gtfs/stop-lon double?)
+
 (def ^{:doc "Defines the order of the CSV fields in a stops.txt file"}
   stops-txt-fields
   [:gtfs/stop-id :gtfs/stop-code :gtfs/stop-name :gtfs/stop-desc
@@ -80,10 +85,7 @@
 
 (def stops-txt-header "stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding")
 
-(s/def :gtfs/wheelchair-boarding #{"0" "1" "2"})
 
-(s/def :gtfs/stop-lat double?)
-(s/def :gtfs/stop-lon double?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for routes.txt
@@ -129,6 +131,8 @@
                 :gtfs/wheelchair-accessible
                 :gtfs/bikes-allowed]))
 
+(s/def :gtfs/wheelchair-accessible nat-int?)
+
 (def ^{:doc "Defines the order of the CSV fields in a trips.txt file"}
   trips-txt-fields
   [:gtfs/route-id
@@ -162,8 +166,7 @@
                  :gtfs/shape-dist-traveled
                  :gtfs/timepoint]))
 
-(s/def :gtfs/arrival-time time?)
-(s/def :gtfs/departure-time time?)
+(s/def :gtfs/shape-dist-traveled nat-int?)
 (s/def :gtfs/stop-sequence nat-int?)
 
 (def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file"}
@@ -241,6 +244,7 @@
                 :gtfs/exception-type]))
 
 (s/def :gtfs/date date?)
+(s/def :gtfs/exception-type nat-int?)
 
 (def calendar-dates-txt-fields
   [:gtfs/service-id :gtfs/date :gtfs/exception-type])
@@ -261,14 +265,12 @@
                 :gtfs/shape-pt-sequence]
           :opt [:gtfs/shape-dist-traveled]))
 
-(s/def :gtfs/shape-pt-lat double?)
-(s/def :gtfs/shape-pt-lon double?)
 (s/def :gtfs/shape-pt-sequence nat-int?)
-(s/def :gtfs/shape-dist-traveled double?)
+(s/def :gtfs/shape-dist-traveled #?(:cljs number? :clj decimal?))
 
 (def shapes-txt-fields
   [:gtfs/shape-id :gtfs/shape-pt-lat :gtfs/shape-pt-lon
-   :gtfs/shape-pt-sequence :gtfs/shape-idst-traveled])
+   :gtfs/shape-pt-sequence :gtfs/shape-dist-traveled])
 
 (def shapes-txt-header "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_idst_traveled")
 

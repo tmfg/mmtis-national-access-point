@@ -283,7 +283,7 @@
           (tr [:common-texts :required-field])])])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
-                                        max-length style hint-style
+                                        max-length style hint-style hint-text
                                         filter suggestions max-results
                                         on-blur
                                         form? table? full-width? open-on-focus?] :as field}
@@ -305,7 +305,7 @@
         :open-on-focus open-on-focus?
         :search-text (or data "")
 
-        :hintText (placeholder field data)
+        :hint-text (or hint-text (placeholder field data))
         :full-width full-width?
 
 
@@ -670,39 +670,45 @@
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
-(defmethod field :date-picker [{:keys [update! table? label ok-label cancel-label
+(defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
                                        show-clear? hint-text id] :as opts} data]
-  [:div (stylefy/use-style style-base/inline-block)
-   [ui/date-picker (merge {:style {:display "inline-block"}
-                           :text-field-style {:width "150px"}
-                           :hint-text (or hint-text "")
-                           :floating-label-text (when-not table? label)
-                           :floating-label-fixed true
-                           :auto-ok true
-                           :value data
-                           :on-change (fn [_ date]
-                                        (update! date))
-                           :format-date time/format-date
-                           :ok-label (or ok-label (tr [:buttons :save]))
-                           :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                           :locale (case @localization/selected-language
-                                     :fi "fi-FI"
-                                     :sv "sv-SE"
-                                     :en "en-UK"
-                                     "fi-FI")
-                           :Date-time-format js/Intl.DateTimeFormat}
-                          (when (not (nil? id))
-                            {:id (str "date-picker-" id)}))]
-   (when show-clear?
-     [ui/icon-button {:on-click #(update! nil)
-                      :disabled (not data)
-                      :style {:width 16 :height 16
-                              :position "relative"
-                              :padding 0
-                              :left -15
-                              :top "5px"}
-                      :icon-style {:width 16 :height 16}}
-      [ic/content-clear {:style {:width 16 :height 16}}]])])
+  (let [warning (when (and required? (not data))
+                  (tr [:common-texts :required-field]))]
+    [:div (stylefy/use-style style-base/inline-block)
+     [ui/date-picker (merge {:style {:display "inline-block"}
+                             :text-field-style {:width "150px"}
+                             :hint-text (or hint-text "")
+                             :floating-label-text (when-not table? label)
+                             :floating-label-fixed true
+
+                             ;; Show warning text or empty string
+                             :error-text (or warning "")
+                             :error-style style-base/required-element
+                             :auto-ok true
+                             :value data
+                             :on-change (fn [_ date]
+                                          (update! date))
+                             :format-date time/format-date
+                             :ok-label (or ok-label (tr [:buttons :save]))
+                             :cancel-label (or cancel-label (tr [:buttons :cancel]))
+                             :locale (case @localization/selected-language
+                                       :fi "fi-FI"
+                                       :sv "sv-SE"
+                                       :en "en-UK"
+                                       "fi-FI")
+                             :Date-time-format js/Intl.DateTimeFormat}
+                            (when (not (nil? id))
+                              {:id (str "date-picker-" id)}))]
+     (when show-clear?
+       [ui/icon-button {:on-click #(update! nil)
+                        :disabled (not data)
+                        :style {:width 16 :height 16
+                                :position "relative"
+                                :padding 0
+                                :left -15
+                                :top "5px"}
+                        :icon-style {:width 16 :height 16}}
+        [ic/content-clear {:style {:width 16 :height 16}}]])]))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
