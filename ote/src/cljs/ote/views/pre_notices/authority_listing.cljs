@@ -19,6 +19,30 @@
             [ote.views.service-search :as service-search]
             [ote.style.service-search :as style-service-search]))
 
+(defn region-name [region-code]
+  (let [region-case #(case %
+                      "01" "Uusimaa"
+                      "02" "Varsinais-Suomi"
+                      "04" "Satakunta"
+                      "05" "Kanta-Häme"
+                      "06" "Pirkanmaa"
+                      "07" "Päijät-Häme"
+                      "08" "Kymenlaakso"
+                      "09" "Etelä-Karjala"
+                      "10" "Etelä-Savo"
+                      "11" "Pohjois-Savo"
+                      "12" "Pohjois-Karjala"
+                      "13" "Keski-Suomi"
+                      "14" "Etelä-Pohjanmaa"
+                      "15" "Pohjanmaa"
+                      "16" "Keski-Pohjanmaa"
+                      "17" "Pohjois-Pohjanmaa"
+                      "18" "Kainuu"
+                      "19" "Lappi"
+                      "21" "Ahvenanmaa"
+                      "Maakunta puuttuu")]
+  (str/join ", " (mapv #(region-case %)  region-code))))
+
 (defn format-notice-types [types]
   (str/join ", " (map (tr-key [:enums ::transit/pre-notice-type]) types)))
 
@@ -122,6 +146,7 @@
                     :show-row-hover? true
                     :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))}
        [{:name ::modification/created :format (comp str time/format-timestamp-for-ui)}
+        {:name ::transit/regions :format region-name}
         {:name ::transit/pre-notice-type
          :format format-notice-types}
         {:name ::transit/route-description}
