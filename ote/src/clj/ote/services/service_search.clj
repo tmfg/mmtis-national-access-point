@@ -75,21 +75,14 @@
 
 (defn- operator-ids [db operators]
   (when-not (empty? operators)
-    (ids ::t-service/id
-         (specql/fetch db ::t-service/transport-service
-                       #{::t-service/id}
-                       {::t-service/published? true
-                        ::t-service/transport-operator-id (op/in operators)}))))
+    (ids :id
+         (service-ids-by-business-id db {:operators (apply list operators)}))))
 
 (defn operator-completions
   "Return a list of completions that match the given search term."
   [db term]
-  (into []
-        (specql/fetch db ::t-operator/transport-operator
-                      #{::t-operator/name ::t-operator/id}
-                      {::t-operator/name (op/ilike (str "%" term "%"))
-                       ::t-operator/deleted? false}
-                      {::specql/order-by ::t-operator/name})))
+  (into [] (service-search-by-operator db {:name (str "%" term "%")
+                                           :businessid (str "%" term "%")})))
 
 (defn- search [db {:keys [operation-area sub-type text operators offset limit]
                    :as filters}]
@@ -128,9 +121,8 @@
    :sub-type (when-let [st (some-> (params "sub_types")
                                    (str/split #","))]
                (into #{} (map keyword st)))
-   :operators (map #(Long/parseLong %)
-                   (some-> "operators" params
-                           (str/split #",")))
+   :operators (some-> "operators" params
+                      (str/split #","))
    :limit (some-> "limit" params (Integer/parseInt))
    :offset (some-> "offset" params (Integer/parseInt))})
 

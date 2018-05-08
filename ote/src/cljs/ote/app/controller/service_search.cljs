@@ -19,7 +19,7 @@
 (defrecord GeoJSONFetched [response])
 (defrecord SetOperatorName [name])
 (defrecord OperatorCompletionsResponse [completions name])
-(defrecord AddOperator [id])
+(defrecord AddOperator [business-id])
 (defrecord RemoveOperatorById [id])
 
 (defn- search-params [{operators :operators
@@ -32,7 +32,7 @@
    (when-not (empty? oa)
      {:operation_area (str/join "," (map :text oa))})
    (when-not (empty? (get operators :chip-results))
-     {:operators (str/join "," (map ::t-operator/id (get operators :chip-results)))})
+     {:operators (str/join "," (map :business-id (get operators :chip-results)))})
    (when text
      {:text text})
    (when-not (empty? st)
@@ -75,7 +75,7 @@
 (defn- operator-in-list?
   "Return nil if operator is not in given list"
   [operator list]
-    (some #(= (::t-operator/id operator) (::t-operator/id %)) list))
+    (some #(= (:business-id operator) (:business-id %)) list))
 
 (extend-protocol tuck/Event
 
@@ -171,12 +171,12 @@
       (assoc-in app [:service-search :filters :operators :results] clean-response)))
 
   AddOperator
-  (process-event [{id :id} app]
-    (if (some #(= id (::t-operator/id (:operator %)))
+  (process-event [{business-id :business-id} app]
+    (if (some #(= business-id (:business-id (:operator %)))
               (get-in app [:service-search :filters :operators :chip-results]))
       ;; This name has already been added, don't do it again
       app
-      (if-let [operator (some #(when (= id (::t-operator/id %)) %)
+      (if-let [operator (some #(when (= business-id (:business-id %)) %)
                            (get-in app [:service-search :filters :operators :results]))]
         (-> app
             (add-operator-to-chip-list operator)
@@ -188,5 +188,5 @@
     (update-in app [:service-search :filters :operators :chip-results]
                (fn [results]
                  (filterv
-                   (fn [x] (not= id (get x ::t-operator/id)))
+                   (fn [x] (not= id (get x :business-id)))
                    results)))))

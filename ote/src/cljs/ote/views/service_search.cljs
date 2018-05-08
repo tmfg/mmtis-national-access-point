@@ -188,24 +188,24 @@
 (defn result-chips [e! chip-results]
   (fn [e! chip-results]
     [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-     (for [{::t-operator/keys [name id] :as result} chip-results]
-       ^{:key (str "transport-operator-" id)}
+     (for [{:keys [operator business-id]} chip-results]
+       ^{:key (str "transport-operator-" business-id)}
        [:span
-        [ui/chip {:ref id
+        [ui/chip {:ref business-id
                   :style {:margin 4}
                   :on-request-delete #(do
-                                        (e! (ss/->RemoveOperatorById id))
+                                        (e! (ss/->RemoveOperatorById business-id))
                                         (e! (ss/->UpdateSearchFilters nil)))}
-         name]])]))
+         operator]])]))
 
 
 (defn- parse-operator-data-source [completions]
   (into-array
-    (map (fn [{::t-operator/keys [id name]}]
-           #js {:text name
-                :id id
+    (map (fn [{:keys [business-id operator]}]
+           #js {:text operator
+                :business-id business-id
                 :value (r/as-element
-                         [ui/menu-item {:primary-text name}])})
+                         [ui/menu-item {:primary-text operator}])})
          completions)))
 
 (defn operator-search [e! data]
@@ -221,9 +221,9 @@
                          :maxSearchResults 12
                          :dataSource (parse-operator-data-source results)
                          :on-update-input #(e! (ss/->SetOperatorName %))
-                         :search-text (or (:name data) "")
+                         :search-text (or (:operator data) "")
                          :on-new-request #(do
-                                            (e! (ss/->AddOperator (aget % "id")))
+                                            (e! (ss/->AddOperator (aget % "business-id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
       [result-chips e! chip-results]]]))
