@@ -77,22 +77,24 @@
 
         (is (= 200 (:status result)))
         (is (pos? (count transit-result)))
-        (is (some #(= (:name (first operator-names)) (::t-operator/name %))
+        (is (some #(= (:name (first operator-names)) (:operator %))
                   transit-result))))
 
     (testing "Search by operator"
       (let [{op-id ::t-service/transport-operator-id :as s} (first services)
-            result (http-get (str "service-search?operators=" op-id "&response_format=json"))]
+            operator (sql-query  "SELECT * FROM \"transport-operator\" WHERE id = " op-id)
+            op-bi (:business-id (first operator))
+            result (http-get (str "service-search?operators=" op-bi "&response_format=json"))]
         (is (= 200 (:status result)))
         (is (pos? (count (:results (:json result)))))
-        (is (some #(= op-id (:transport-operator-id %))
+        (is (some #(= op-bi (:business-id %))
                   (:results (:json result)))))))
 
   (testing "Operator search returns matching company"
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
       (is (= 200 (:status result)))
       (is (pos? (count (:json result))))
-      (is (some #(= "Ajopalvelu Testinen Oy" (:name %))
+      (is (some #(= "Ajopalvelu Testinen Oy" (:operator %))
                 (:json result)))))
 
   (testing "Operator search does not return deleted companies"
