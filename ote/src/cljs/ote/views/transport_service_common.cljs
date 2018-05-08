@@ -83,17 +83,18 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-service-link])}))
 
-(defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format}]
-  (let [format (str/lower-case format)]
-    (when (or (= "gtfs" format) (= "kalkati.net" format))
-      (linkify
-        (str "#/routes/view-gtfs?url=" (::t-service/url interface)
-             (when (= "kalkati.net" format)
-               "&type=kalkati"))
-        [ui/icon-button
-         [(tooltip-wrapper ic/action-visibility) {:style style-base/icon-medium}
-          {:text (tr [:form-help :external-interfaces-tooltips :view-routes])}]]
-        {:target "_blank"}))))
+(defn- gtfs-viewer-link [{interface ::t-service/external-interface format ::t-service/format}]
+  (when (seq format)
+    (let [format (str/lower-case (first format))]
+      (when (or (= "gtfs" format) (= "kalkati.net" format))
+        (linkify
+          (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+               (when (= "kalkati.net" format)
+                 "&type=kalkati"))
+          [ui/icon-button
+           [(tooltip-wrapper ic/action-visibility) {:style style-base/icon-medium}
+            {:text (tr [:form-help :external-interfaces-tooltips :view-routes])}]]
+          {:target "_blank"})))))
 
 (defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
