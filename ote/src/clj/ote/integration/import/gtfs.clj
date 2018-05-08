@@ -5,7 +5,7 @@
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET]]
             [clj-http.client :as http-client]
-            [ote.util.zip :refer [read-zip]]
+            [ote.util.zip :refer [read-zip read-zip-with]]
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
             [specql.core :as specql]
@@ -13,7 +13,13 @@
             [clojure.java.io :as io]
             [digest]
             [specql.op :as op]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [specql.impl.composite :as specql-composite]
+            [specql.impl.registry :refer [table-info-registry]]
+            [jeesql.core :refer [defqueries]])
+  (:import (java.io File)))
+
+(defqueries "ote/integration/import/stop_times.sql")
 
 (defn load-zip-from-url [url]
   (with-open [in (:body (http-client/get url {:as :stream}))]
@@ -57,28 +63,104 @@
     "stop_times.txt" :gtfs/stop-time
     "trips.txt" :gtfs/trip
     "transfers.txt" nil
-    ))
+    nil))
+
+(defmulti process-rows (fn [file rows] file))
+
+(defmethod process-rows :gtfs/trips-txt [_ trips]
+  (for [[[route-id service-id] trips] (group-by (juxt :gtfs/route-id :gtfs/service-id) trips)]
+    {:gtfs/route-id route-id
+     :gtfs/service-id service-id
+     :gtfs/trips (map #(dissoc % :gtfs/route-id :gtfs/service-id) trips)}))
+
+(defmethod process-rows :gtfs/shapes-txt [_ shapes]
+  (for [[shape-id shapes] (group-by :gtfs/shape-id shapes)]
+    {:gtfs/shape-id shape-id
+     :gtfs/route-shape (map #(select-keys % #{:gtfs/shape-pt-lat :gtfs/shape-pt-lon
+                                              :gtfs/shape-pt-sequence :gtfs/shape-dist-traveled})
+                            shapes)}))
+
+(defmethod process-rows :gtfs/stop-times-txt [_ stop-times]
+  (let [dir-name (str (gensym "import-stop-times-"))
+        tmp-dir (doto (File. dir-name)
+                  (.mkdir))]
+    (loop [files-by-stop {}
+           [row & rows] stop-times]
+      (if-not row
+        []
+        (let [file (or (files-by-stop (:gtfs/stop-id row))
+                       (File/createTempFile "stop-times" ".edn" tmp-dir))]
+          (with-open [out (io/writer file :append true)]
+            (.write out (pr-str (dissoc row :gtfs/stop-id))))
+          (recur (assoc files-by-stop (:gtfs/stop-id row) file)
+                 rows)))))
+  #_(for [[stop-id stop-times] (group-by :gtfs/stop-id stop-times)]
+    {:gtfs/stop-id stop-id
+     :gtfs/stop-times (map #(dissoc % :gtfs/stop-id) stop-times)}))
+
+(defmethod process-rows :default [_ rows] rows)
+
+(defn import-stop-times [db package-id stop-times-file]
+  (log/debug "Importing stop times from " stop-times-file " (" (int (/ (.length stop-times-file) (* 1024 1024))) "mb)")
+  (let [trip-id->update-info (into {}
+                                   (map (juxt :trip-id identity))
+                                   (gtfs-trip-id-and-index db {:package-id package-id}))]
+    (loop [i 0
+           [p & ps] (partition-by
+                     :gtfs/trip-id
+                     (gtfs-parse/parse-gtfs-file :gtfs/stop-times-txt
+                                                 (io/reader stop-times-file)))]
+      (when p
+        (when (zero? (mod i 1000))
+          (log/debug "Trip partitions stored: " i))
+        (def stop-times-partition-debug p)
+        (let [stop-times (specql-composite/stringify @table-info-registry
+                                                     {:category "A"
+                                                      :element-type :gtfs/stop-time-info}
+                                                     p true)
+              {:keys [trip-row-id index]} (trip-id->update-info (:gtfs/trip-id (first p)))]
+          (update-stop-times! db {:trip-row-id trip-row-id
+                                  :index index
+                                  :stop-times stop-times})
+          (recur (inc i) ps))))))
 
 (defn save-gtfs-to-db [db gtfs-file package-id]
-  (try
-    (let [file-list (read-zip (java.io.ByteArrayInputStream. gtfs-file))]
-      (doseq [f file-list
-              :let [file-data (gtfs-parse/parse-gtfs-file (gtfs-spec/name->keyword (:name f)) (:data f))
-                    db-table-name (db-table-name (:name f))]]
-        (log/debug "File: " (:name f) " PARSED.")
+  (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
+    (try
+      (read-zip-with
+       (java.io.ByteArrayInputStream. gtfs-file)
+       (fn [{:keys [name input]}]
+         (if (= name "stop_times.txt")
+           ;; Copy stop times to a temp file, we need to process it last
+           (with-open [output (io/output-stream stop-times-file)]
+             (io/copy input output))
+           (when-let [db-table-name (db-table-name name)]
+             (let [file-type (gtfs-spec/name->keyword name)
+                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))]
+               (log/debug file-type " file: " name " PARSED.")
 
-        (cond
-          (= db-table-name :gtfs/shape) nil                 ;; save shape data to shape[] array
-          (= db-table-name :gtfs/stop-time) nil
-          :else                                             ;; Save all rows separately
-          (doseq [fk file-data]
-            (when (and db-table-name (seq fk))
-              (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))
-      (log/debug "Save-gtfs-to-db - package-id: " package-id))
-    (catch Exception e
-      (.printStackTrace e)
-      (log/warn "Error in save-gtfs-to-db" e))))
+               (doseq [fk (process-rows file-type file-data)]
+                 (when (and db-table-name (seq fk))
+                   (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))
+         (log/debug "Save-gtfs-to-db - package-id: " package-id)))
 
+      ;; Handle stop times
+      (import-stop-times db package-id stop-times-file)
+      (.delete stop-times-file)
+      (catch Exception e
+        (.printStackTrace e)
+        (log/warn "Error in save-gtfs-to-db" e)))))
+
+(defn test-hsl-gtfs []
+  (let [db (:db ote.main/ote)]
+    (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
+    (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
+    (let [bytes (with-open [in (io/input-stream "hsl_gtfs.zip")]
+                  (let [out (java.io.ByteArrayOutputStream.)]
+                    (io/copy in out)
+                    (.toByteArray out)))]
+      (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
+      (save-gtfs-to-db db bytes 1))))
 
 (defn download-and-store-transit-package
   "Download gtfs (later kalkati files also) file, upload to s3, parse and store to database.
