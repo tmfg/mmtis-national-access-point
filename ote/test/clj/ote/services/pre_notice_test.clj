@@ -87,3 +87,12 @@
     (is (= 0 (notice-count list :draft)))
     ;; 1 sent
     (is (= 1 (notice-count list :sent)))))
+
+(deftest authority-pre-notice-list
+  (let [generated-notice (gen/generate s-generators/gen-pre-notice)
+        sent-notice (assoc generated-notice :ote.db.transit/pre-notice-state :sent)
+        response (http-post "admin" "pre-notice" sent-notice)
+        list (:transit (http-get "admin" "pre-notices/authority-list"))]
+
+    ;; 1 sent notice
+    (is (= 1 (count list)))))
