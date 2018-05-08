@@ -69,13 +69,15 @@
   (let [tr* (tr-key [:field-labels :pre-notice]
                     [:pre-notice-list-page :headers])]
     [ui/dialog
-     {:open true
+     {:id "pre-notice-dialog"
+      :open true
       :modal true
       :auto-scroll-body-content true
       :title   (tr [:pre-notice-list-page :pre-notice-dialog :label])
       :actions [(r/as-element
                  [ui/flat-button
-                  {:label     (tr [:buttons :close])
+                  {:id        "close-pre-notice-dialog"
+                   :label     (tr [:buttons :close])
                    :secondary true
                    :primary   true
                    :on-click  #(e! (pre-notice/->ClosePreNotice))}])]}
@@ -110,11 +112,12 @@
      [:div.row
       [:div.col-xs-12.col-sm-12.col-md-12
        [:h1 (tr [:pre-notice-list-page :header-authority-pre-notice-list])]]]
-     [:div.row
+     [:div.row.authority-pre-notice-table
 
       [table/table {:name->label     (tr-key [:pre-notice-list-page :headers])
                     :key-fn          ::transit/id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])
+                    :stripedRows    true
                     :row-style {:cursor "pointer"}
                     :show-row-hover? true
                     :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))}
