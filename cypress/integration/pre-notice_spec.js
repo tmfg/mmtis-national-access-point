@@ -36,9 +36,6 @@ describe('Pre notice tests', () => {
         cy.visit('/#/pre-notices');
         cy.contains('Uusi muutosilmoitus').click();
 
-        //cy.server();
-        //cy.route('/regions').as('regionCompletion');
-
         // Select type
         cy.get('#0_termination').click();
 
@@ -46,7 +43,7 @@ describe('Pre notice tests', () => {
         cy.get('#effective-dates-table #row_0 input').first().click();
         cy.document().its('body').type('{enter}');
 
-        // Type stupid reason for change
+        // Give reason to make the change at given time
         cy.get('#effective-dates-table #row_0 [name=effective-date-description]').type("Koska halusin");
 
         // Describe route
@@ -58,11 +55,7 @@ describe('Pre notice tests', () => {
 
         cy.contains('Tallenna ja lähetä').click();
         cy.get('#confirm-send-pre-notice').click();
-
     });
-
-
-
 });
 
 describe('Autority pre notice tests', () => {
@@ -102,6 +95,5 @@ describe('Autority pre notice tests', () => {
         cy.contains('Liikenteen lakkauttaminen (osittain tai kokonaan)');
         cy.contains('Koska halusin');
         cy.contains('Sulje').click();
-
     });
 });
