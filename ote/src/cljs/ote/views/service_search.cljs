@@ -60,14 +60,28 @@
   (let [comma (if (not (empty? street)) ", " " ")]
     (str street comma postal_code " " post_office)))
 
+(defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format}]
+  (let [format (str/lower-case format)]
+    (when (or (= "gtfs" format) (= "kalkati.net" format))
+      (common-ui/linkify
+        (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+             (when (= "kalkati.net" format)
+               "&type=kalkati"))
+        [ui/flat-button {:label (tr [:service-search :view-routes])
+                         :primary true
+                         :label-position "before"
+                         :icon (ic/action-open-in-new)}]
+        {:target "_blank"}))))
+
 (def external-interface-table-columns
   ;; [label width value-fn]
-  [[:table-header-external-interface "20%"
+  [[:table-header-external-interface "25%"
     (comp #(common-ui/linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
    [::t-service/format-short "10%" (comp #(str/join ", " %) ::t-service/format)]
-   [::t-service/license "10%" ::t-service/license]
-   [::t-service/external-service-description "10%"
-    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])
+   [::t-service/license "15%" ::t-service/license]
+   [::t-service/external-service-description "25%"
+    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
+   [:gtfs-viewer "25%" (comp #(gtfs-viewer-link %))]])
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
@@ -80,7 +94,7 @@
   (when-not (empty? external-interface-links)
     [:div
      [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
-     [:table {:style {:margin-top "10px"}}
+     [:table {:style {:margin-top "10px" :width "100%"}}
       [:thead (stylefy/use-style style/external-interface-header)
        [:tr
         (doall
@@ -95,7 +109,7 @@
              ^{:key (str "external-table-row-" i)}
              [:tr {:style style/external-table-row}
               ^{:key (str "external-interface-" i)}
-              [:td {:style {:width "20%" :font-size "14px"}}
+              [:td {:style {:width "25%" :font-size "14px"}}
                (common-ui/linkify
                  (::t-service/url external-interface)
                  (if (nil? data-content)
@@ -103,9 +117,11 @@
                    (parse-content-value data-content))
                  {:target "_blank"})]
               [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
-              [:td {:style {:width "10%" :font-size "14px"}} license]
-              [:td {:style {:width "10%" :font-size "14px"}}
-               (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
+              [:td {:style {:width "15%" :font-size "14px"}} license]
+              [:td {:style {:width "25%" :font-size "14px"}}
+               (t-service/localized-text-for "FI" (::t-service/description external-interface))]
+              [:td {:style {:width "25%" :font-size "14px"}}
+               (gtfs-viewer-link row)]])
            external-interface-links))]]]))
 
 (defn- result-card [e! admin?

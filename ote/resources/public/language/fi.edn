@@ -1130,7 +1130,8 @@
   :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua."]
   :fetching-more "Haetaan lisää palveluita..."
   :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
-  :operator-no-services "Palveluntuottajalla ei ole palveluita."}
+  :operator-no-services "Palveluntuottajalla ei ole palveluita."
+  :view-routes "Katsele reittejä"}
 
  :login
  {:label "Kirjautumistiedot"

@@ -1122,7 +1122,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :total-services [" Katalogen innehåller totalt " :total-service-count " tjänster."]
   :fetching-more "Sökning av tjänster pågår..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
-  :operator-no-services "Tjänsteproducenten har inga tjänster."}
+  :operator-no-services "Tjänsteproducenten har inga tjänster."
+  :view-routes "Visa rutter"}
 
  :login
  {:label "Inloggning"

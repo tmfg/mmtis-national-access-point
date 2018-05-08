@@ -1115,7 +1115,8 @@
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."
   :operator-services ["Transport operator " :name " has " :count " services"]
-  :operator-no-services "Transport operator has no services."}
+  :operator-no-services "Transport operator has no services."
+  :view-routes "View routes"}
 
  :login
  {:label "Login credentials"
