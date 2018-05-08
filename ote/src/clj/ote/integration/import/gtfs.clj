@@ -19,16 +19,18 @@
   (with-open [in (:body (http-client/get url {:as :stream}))]
     (read-zip in)))
 
-(defn load-file-from-url [url last-import-date]
-  (let [query-headers (if (nil? last-import-date)
-                        {:as :byte-array}
-                        {:headers {"If-Modified-Since" last-import-date}
-                         :as      :byte-array})
+(defn load-file-from-url [url last-import-date etag]
+  (let [query-headers {:headers (merge
+                                 (if (not (nil? etag))
+                                   {"If-None-Match" etag}
+                                   (when-not (nil? last-import-date)
+                                     {"If-Modified-Since" last-import-date})))
+                       :as :byte-array}
         response (http-client/get url query-headers)]
     (if (= 304 (:status response))
       ;; Not modified
       nil
-      (:body response))))
+      response)))
 
 (defn load-gtfs [url]
   (http/transit-response
@@ -85,9 +87,15 @@
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
   [gtfs-config db url operator-id ts-id last-import-date]
   (let [filename (gtfs-file-name operator-id ts-id)
-        gtfs-file (load-file-from-url url last-import-date)]
+        saved-etag (:gtfs/etag (last (specql/fetch db :gtfs/package
+                                                   #{:gtfs/etag}
+                                                   {:gtfs/transport-operator-id operator-id
+                                                    :gtfs/transport-service-id  ts-id})))
+        response (load-file-from-url url last-import-date saved-etag)
+        new-etag (get-in response [:headers :etag])
+        gtfs-file (:body response)]
     (if (nil? gtfs-file)
-      (log/debug "Could not found anything from given url: " url)
+      (log/debug "Could not find new file version from given url " url)
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (specql/fetch db :gtfs/package
                                         #{:gtfs/sha256}
@@ -99,7 +107,8 @@
             (let [package (specql/insert! db :gtfs/package {:gtfs/sha256                new-gtfs-hash
                                                             :gtfs/transport-operator-id operator-id
                                                             :gtfs/transport-service-id  ts-id
-                                                            :gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))})]
+                                                            :gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))
+                                                            :gtfs/etag new-etag})]
               (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
               (log/debug "File: " filename " was uploaded to S3 successfully.")
 
