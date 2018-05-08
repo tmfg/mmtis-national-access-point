@@ -67,12 +67,14 @@
 
 (defmulti process-rows (fn [file rows] file))
 
+;; Combine trips into an array by route and service ids
 (defmethod process-rows :gtfs/trips-txt [_ trips]
   (for [[[route-id service-id] trips] (group-by (juxt :gtfs/route-id :gtfs/service-id) trips)]
     {:gtfs/route-id route-id
      :gtfs/service-id service-id
      :gtfs/trips (map #(dissoc % :gtfs/route-id :gtfs/service-id) trips)}))
 
+;; Combine into an array by shape id
 (defmethod process-rows :gtfs/shapes-txt [_ shapes]
   (for [[shape-id shapes] (group-by :gtfs/shape-id shapes)]
     {:gtfs/shape-id shape-id
@@ -80,32 +82,20 @@
                                               :gtfs/shape-pt-sequence :gtfs/shape-dist-traveled})
                             shapes)}))
 
-(defmethod process-rows :gtfs/stop-times-txt [_ stop-times]
-  (let [dir-name (str (gensym "import-stop-times-"))
-        tmp-dir (doto (File. dir-name)
-                  (.mkdir))]
-    (loop [files-by-stop {}
-           [row & rows] stop-times]
-      (if-not row
-        []
-        (let [file (or (files-by-stop (:gtfs/stop-id row))
-                       (File/createTempFile "stop-times" ".edn" tmp-dir))]
-          (with-open [out (io/writer file :append true)]
-            (.write out (pr-str (dissoc row :gtfs/stop-id))))
-          (recur (assoc files-by-stop (:gtfs/stop-id row) file)
-                 rows)))))
-  #_(for [[stop-id stop-times] (group-by :gtfs/stop-id stop-times)]
-    {:gtfs/stop-id stop-id
-     :gtfs/stop-times (map #(dissoc % :gtfs/stop-id) stop-times)}))
-
 (defmethod process-rows :default [_ rows] rows)
 
 (defn import-stop-times [db package-id stop-times-file]
-  (log/debug "Importing stop times from " stop-times-file " (" (int (/ (.length stop-times-file) (* 1024 1024))) "mb)")
-  (let [trip-id->update-info (into {}
+  (log/debug "Importing stop times from " stop-times-file
+             " (" (int (/ (.length stop-times-file) (* 1024 1024))) "mb)")
+  (let [;; Read all trips into memory (mapping from trip id to the row and index for update)
+        trip-id->update-info (into {}
                                    (map (juxt :trip-id identity))
                                    (gtfs-trip-id-and-index db {:package-id package-id}))]
     (loop [i 0
+
+           ;; Stop times file should have stops with the same trip id on consecutive lines
+           ;; Partition returns a lazy sequence of groups of consecutive lines that have
+           ;; the same trip id.
            [p & ps] (partition-by
                      :gtfs/trip-id
                      (gtfs-parse/parse-gtfs-file :gtfs/stop-times-txt
@@ -113,18 +103,22 @@
       (when p
         (when (zero? (mod i 1000))
           (log/debug "Trip partitions stored: " i))
-        (def stop-times-partition-debug p)
-        (let [stop-times (specql-composite/stringify @table-info-registry
+
+        (let [;; Use specql internal stringify to turn sequence of stop times
+              ;; to a string in PostgreSQL composite array format
+              stop-times (specql-composite/stringify @table-info-registry
                                                      {:category "A"
                                                       :element-type :gtfs/stop-time-info}
                                                      p true)
-              {:keys [trip-row-id index]} (trip-id->update-info (:gtfs/trip-id (first p)))]
-          (update-stop-times! db {:trip-row-id trip-row-id
-                                  :index index
-                                  :stop-times stop-times})
+              {:keys [trip-row-id index] :as found} (trip-id->update-info (:gtfs/trip-id (first p)))]
+          (when found
+            (update-stop-times! db {:trip-row-id trip-row-id
+                                    :index index
+                                    :stop-times stop-times}))
           (recur (inc i) ps))))))
 
 (defn save-gtfs-to-db [db gtfs-file package-id]
+  (log/debug "save-gtfs-to-db - package-id: " package-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
     (try
       (read-zip-with
@@ -141,17 +135,21 @@
 
                (doseq [fk (process-rows file-type file-data)]
                  (when (and db-table-name (seq fk))
-                   (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))
-         (log/debug "Save-gtfs-to-db - package-id: " package-id)))
+                   (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
 
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
-      (.delete stop-times-file)
+
       (catch Exception e
         (.printStackTrace e)
-        (log/warn "Error in save-gtfs-to-db" e)))))
+        (log/warn "Error in save-gtfs-to-db" e))
 
-(defn test-hsl-gtfs []
+      (finally
+        (.delete stop-times-file)))))
+
+;; PENDING: this is for local testing, truncates *ALL* GTFS data from the database
+;;          and reads in a local GTFS zip file
+#_(defn test-hsl-gtfs []
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
