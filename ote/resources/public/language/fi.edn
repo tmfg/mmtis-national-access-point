@@ -269,7 +269,8 @@
                                  :external-service-url "Ilmoita ensisijaisesti suora osoite koneluettavaan rajapintaan. Voit vaihtoehtoisesti ilmoittaa web-osoitteen, jossa kerrotaan tietoja rajapinnasta tai sen käytöstä."
                                  :format "Valitse listalta tietosisällön formaatti. Jos listalla ei ole käyttämääsi formaattia, voit lisätä sen kirjoittamalla."
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
-                                 :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille (esim. lisenssistä). Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."}
+                                 :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille (esim. lisenssistä). Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."
+                                 :view-routes "Katsele reittejä"}
   :RAE-link-text "Rae-työkalulla"
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen). Tätä kohtaa eivät täytä ne yksittäiset yritykset, jotka ajavat välityskeskuksen kyytejä."

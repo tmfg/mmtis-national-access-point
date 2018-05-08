@@ -269,7 +269,8 @@
                                  :external-service-url "Direct URL to machine-readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use."
                                  :format "Select the data format. If the list does not have a format, you can add it by writing it in."
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
-                                 :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."}
+                                 :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."
+                                 :view-routes "View routes"}
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"

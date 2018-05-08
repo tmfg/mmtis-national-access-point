@@ -83,6 +83,18 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-service-link])}))
 
+(defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format}]
+  (let [format (str/lower-case format)]
+    (when (or (= "gtfs" format) (= "kalkati.net" format))
+      (linkify
+        (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+             (when (= "kalkati.net" format)
+               "&type=kalkati"))
+        [ui/icon-button
+         [(tooltip-wrapper ic/action-visibility) {:style style-base/icon-medium}
+          {:text (tr [:form-help :external-interfaces-tooltips :view-routes])}]]
+        {:target "_blank"}))))
+
 (defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
   [& [e! type sub-type]]
@@ -154,19 +166,21 @@
                        :required? true}
                       {:name :ext-validation
                        :type :component
-                       :component (fn [{{status :status} :data}]
-                                    (if-not status
-                                      [:span]
-                                      (if (= :success status)
-                                        [(tooltip-wrapper ic/action-done) {:style (merge style-base/icon-medium
-                                                                                         {:color "green"})}
-                                         {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
-                                        [(tooltip-wrapper ic/alert-warning) {:style (merge style-base/icon-medium
-                                                                                           {:color "cccc00"})}
-                                         {:text (tr [:field-labels :transport-service-common :external-interfaces-warning])}])))
-                       :read (comp :url-status ::t-service/external-interface)
-                       :width "5%"
-                       }
+                       :component (fn [{{external-interface ::t-service/external-interface :as service} :data}]
+                                    (let [url-status (get-in external-interface [:url-status :status])]
+                                      [:span
+                                       (if-not url-status
+                                         [gtfs-viewer-link service]
+                                         (if (= :success url-status)
+                                           [:span [(tooltip-wrapper ic/action-done) {:style (merge style-base/icon-small
+                                                                                                   {:color "green"})}
+                                                   {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
+                                            [gtfs-viewer-link service]]
+                                           [(tooltip-wrapper ic/alert-warning) {:style (merge style-base/icon-small
+                                                                                              {:color "cccc00"})}
+                                            {:text (tr [:field-labels :transport-service-common :external-interfaces-warning])}]))]))
+                       :read #(identity %)
+                       :width "8%"}
                       {:name ::t-service/format
                        :type :autocomplete
                        :tooltip (tr [:form-help :external-interfaces-tooltips :format])
@@ -183,7 +197,7 @@
                        :type :autocomplete
                        :open-on-focus? true
                        :tooltip (tr [:form-help :external-interfaces-tooltips :license])
-                       :width "20%"
+                       :width "17%"
                        :full-width? true
                        :suggestions (tr-tree [:licenses :external-interfaces])
                        :max-results 10}
