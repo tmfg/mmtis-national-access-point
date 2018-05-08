@@ -23,8 +23,8 @@
     {:gtfs/stop-id id
      :gtfs/stop-name (t-service/localized-text-with-fallback #?(:cljs @localization/selected-language
                                                       :clj localization/*language*) name)
-     :gtfs/stop-lat (.-x (.getGeometry location))
-     :gtfs/stop-lon (.-y (.getGeometry location))}))
+     :gtfs/stop-lat (.-y (.getGeometry location))
+     :gtfs/stop-lon (.-x (.getGeometry location))}))
 
 (defn- routes-txt [transport-operator-id routes]
   (for [{::transit/keys [id name route-type]} routes]
