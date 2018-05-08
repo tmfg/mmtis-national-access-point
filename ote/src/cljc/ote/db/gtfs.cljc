@@ -17,10 +17,12 @@
   ["gtfs-route" :gtfs/route]
   ["gtfs-calendar" :gtfs/calendar]
   ["gtfs-calendar-date" :gtfs/calendar-date]
+  ["route_shape" :gtfs/shape-info]
   ["gtfs-shape" :gtfs/shape]
-  ["gtfs-stop-time" :gtfs/stop-time]
+  ["gtfs-stop-time-info" :gtfs/stop-time-info]
   ["gtfs-stop" :gtfs/stop]
   ["gtfs-transfer" :gtfs/transfer]
+  ["gtfs-trip-info" :gtfs/trip-info]
   ["gtfs-trip" :gtfs/trip])
 
 (defn date? [dt]
