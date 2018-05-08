@@ -72,7 +72,7 @@
                 :gtfs/stop-timezone
                 :gtfs/wheelchair-boarding]))
 
-(s/def :gtfs/wheelchair-boarding #{"0" "1" "2"})
+(s/def :gtfs/wheelchair-boarding nat-int?)
 
 (s/def :gtfs/stop-lat double?)
 (s/def :gtfs/stop-lon double?)
@@ -132,6 +132,7 @@
                 :gtfs/bikes-allowed]))
 
 (s/def :gtfs/wheelchair-accessible nat-int?)
+(s/def :gtfs/bikes-allowed nat-int?)
 
 (def ^{:doc "Defines the order of the CSV fields in a trips.txt file"}
   trips-txt-fields
