@@ -119,7 +119,11 @@ This is only called with GTFS field names and cannot grow unbounded."}
    :gtfs/shapes-txt {:header gtfs-spec/shapes-txt-header
                      :fields gtfs-spec/shapes-txt-fields}})
 
-(defn parse-gtfs-file [gtfs-file-type content]
+(defn parse-gtfs-file
+  "Parse GTFS file of `gtfs-file-type` from `content`.
+  Content may be a string or a reader. Returns a lazy sequence
+  of parsed items."
+  [gtfs-file-type content]
   (let [[header & rows] (csv/read-csv content)
         {fields :fields} (file-info gtfs-file-type)
         allowed-fields (into #{} fields)
@@ -131,15 +135,14 @@ This is only called with GTFS field names and cannot grow unbounded."}
                              header)]
     (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
       (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields))
-    (mapv
-     (fn [line]
-       (into {}
-             (remove nil?
-                     (map (fn [field value]
-                             (when-not (str/blank? value)
-                               [field (gtfs->clj (field-spec-description field) value)]))
-                           content-fields line))))
-     rows)))
+    (for [row rows]
+      (into {}
+           (remove nil?
+                   (map (fn [field value]
+                          (when (and (allowed-fields field)
+                                     (not (str/blank? value)))
+                            [field (gtfs->clj (field-spec-description field) value)]))
+                        content-fields row))))))
 
 
 (defn unparse-gtfs-file [gtfs-file-type content]
