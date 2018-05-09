@@ -56,7 +56,8 @@
                     :on-click #(e! (pre-notice/->CloseSendModal))}])
                 (r/as-element
                   [ui/raised-button
-                   {:label     (tr [:buttons :save-and-send])
+                   {:id        "confirm-send-pre-notice"
+                    :label     (tr [:buttons :save-and-send])
                     :icon      (ic/action-delete-forever)
                     :secondary true
                     :primary   true
@@ -169,6 +170,7 @@
 
     {:name         ::transit/effective-dates
      :type         :table
+     :id           :effective-dates-table
      :table-fields [{:name  ::transit/effective-date
                      :type  :date-picker
                      :required? true
