@@ -34,7 +34,7 @@
    :app gtfs}
   (let [route-id (:gtfs/route-id route)
         trips (gq/route-trips gtfs route-id)
-        shape-ids (into #{} (map :gtfs/shape-id) trips)
+        shape-ids (into #{} (keep :gtfs/shape-id) trips)
         stop-sequences (gq/stop-sequences-for-trips gtfs trips)
         color (if (str/blank? (:gtfs/route-color route))
                 "#000000"

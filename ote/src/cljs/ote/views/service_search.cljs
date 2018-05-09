@@ -60,14 +60,18 @@
   (let [comma (if (not (empty? street)) ", " " ")]
     (str street comma postal_code " " post_office)))
 
-(def external-interface-table-columns
-  ;; [label width value-fn]
-  [[:table-header-external-interface "20%"
-    (comp #(common-ui/linkify % % {:target "_blank"}) ::t-service/url ::t-service/external-interface)]
-   [::t-service/format-short "10%" (comp #(str/join ", " %) ::t-service/format)]
-   [::t-service/license "10%" ::t-service/license]
-   [::t-service/external-service-description "10%"
-    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]])
+(defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format}]
+  (let [format (str/lower-case format)]
+    (when (or (= "gtfs" format) (= "kalkati.net" format))
+      (common-ui/linkify
+        (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+             (when (= "kalkati.net" format)
+               "&type=kalkati"))
+        [ui/flat-button {:label (tr [:service-search :view-routes])
+                         :primary true
+                         :label-position "before"
+                         :icon (ic/action-open-in-new)}]
+        {:target "_blank"}))))
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
@@ -75,12 +79,27 @@
         return-value (common-ui/maybe-shorten-text-to 45 value-str)]
     return-value))
 
+(def external-interface-table-columns
+  ;; [label width value-fn]
+  [[:table-header-external-interface "25%"
+    (fn [{::t-service/keys [data-content external-interface]}]
+      (common-ui/linkify (::t-service/url external-interface)
+                         (if (nil? data-content)
+                           (::t-service/url external-interface)
+                           (parse-content-value data-content))
+                         {:target "_blank"}))]
+   [::t-service/format-short "10%" (comp #(str/join ", " %) ::t-service/format)]
+   [::t-service/license "15%" ::t-service/license]
+   [::t-service/external-service-description "25%"
+    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
+   [:gtfs-viewer "25%" (comp #(gtfs-viewer-link %))]])
+
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
                                                        transport-operator-id ckan-resource-id]}]
   (when-not (empty? external-interface-links)
     [:div
      [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
-     [:table {:style {:margin-top "10px"}}
+     [:table {:style {:margin-top "10px" :width "100%"}}
       [:thead (stylefy/use-style style/external-interface-header)
        [:tr
         (doall
@@ -95,17 +114,11 @@
              ^{:key (str "external-table-row-" i)}
              [:tr {:style style/external-table-row}
               ^{:key (str "external-interface-" i)}
-              [:td {:style {:width "20%" :font-size "14px"}}
-               (common-ui/linkify
-                 (::t-service/url external-interface)
-                 (if (nil? data-content)
-                   (::t-service/url external-interface)
-                   (parse-content-value data-content))
-                 {:target "_blank"})]
-              [:td {:style {:width "10%" :font-size "14px"}} (str/join ", " format)]
-              [:td {:style {:width "10%" :font-size "14px"}} license]
-              [:td {:style {:width "10%" :font-size "14px"}}
-               (t-service/localized-text-for "FI" (::t-service/description external-interface))]])
+              (doall
+                (for [[k w value-fn] external-interface-table-columns]
+                  ^{:key k}
+                  [:td {:style {:width w :font-size "14px"}}
+                   (value-fn row)]))])
            external-interface-links))]]]))
 
 (defn- result-card [e! admin?
