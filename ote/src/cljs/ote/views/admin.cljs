@@ -78,22 +78,24 @@
            [ui/table-header {:adjust-for-checkbox false
                              :display-select-all false}
             [ui/table-row
-              [ui/table-header-column "Yritys"]
-              [ui/table-header-column "Y-tunnus"]
-              [ui/table-header-column "GSM"]
-              [ui/table-header-column "Puhelin"]
-              [ui/table-header-column "Sähköposti"]
-              [ui/table-header-column "Lähde"]]]
-          [ui/table-body {:display-row-checkbox false}
-           (doall
-             (for [{:keys [operator business-id gsm phone email source]} results]
+             [ui/table-header-column {:width "5%"} "Id"]
+             [ui/table-header-column {:width "20%"} "Yritys"]
+             [ui/table-header-column {:width "15%"} "Y-tunnus"]
+             [ui/table-header-column {:width "15%"} "GSM"]
+             [ui/table-header-column {:width "10%"} "Puhelin"]
+             [ui/table-header-column {:width "20%"} "Sähköposti"]
+             [ui/table-header-column {:width "15%"} "Lähde"]]]
+           [ui/table-body {:display-row-checkbox false}
+            (doall
+             (for [{:keys [id operator business-id gsm phone email source]} results]
                [ui/table-row {:selectable false}
-                [ui/table-row-column operator]
-                [ui/table-row-column business-id]
-                [ui/table-row-column gsm]
-                [ui/table-row-column phone]
-                [ui/table-row-column email]
-                [ui/table-row-column (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]
+                [ui/table-row-column {:width "5%"} id]
+                [ui/table-row-column {:width "20%"} operator]
+                [ui/table-row-column {:width "15%"} business-id]
+                [ui/table-row-column {:width "15%"} gsm]
+                [ui/table-row-column {:width "10%"} phone]
+                [ui/table-row-column {:width "20%"} email]
+                [ui/table-row-column {:width "15%"} (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]
          [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
