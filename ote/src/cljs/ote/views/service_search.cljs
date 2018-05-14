@@ -256,15 +256,15 @@
   (let [sub-type (tr-key [:enums ::t-service/sub-type]
                          [:enums ::t-service/type])
         sub-types-to-list (fn [data]
-                             (keep (fn [val]
-                                  (let [subtype (:sub-type val)]
-                                    (when (not= :other subtype)
-                                      (into (sorted-map)
-                                            (-> val
-                                              (dissoc :sub-type )
-                                              (assoc :value subtype)
-                                              (assoc :text (tr [:enums ::t-service/sub-type subtype])))))))
-                               data))]
+                            (keep (fn [val]
+                                    (let [subtype (:sub-type val)]
+                                      (when (not= :other subtype)
+                                        (into (sorted-map)
+                                              (-> val
+                                                  (dissoc :sub-type)
+                                                  (assoc :value subtype)
+                                                  (assoc :text (tr [:enums ::t-service/sub-type subtype])))))))
+                                  data))]
     [:div
      [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
@@ -299,8 +299,7 @@
           :auto-select? true
           :full-width? true}
 
-          {:id "sub-types"
-          :label "Diippiä tyyppiä"
+         {:id "sub-types"
           :name ::t-service/sub-type
           :type :chip-input
           :full-width? true
