@@ -36,7 +36,7 @@
    (when text
      {:text text})
    (when-not (empty? st)
-     {:sub_types (str/join "," (map (comp name :sub-type) st))})
+     {:sub_types (str/join "," (map (comp name :value) st))})
    (when (and limit offset)
      {:limit limit
       :offset offset})))
