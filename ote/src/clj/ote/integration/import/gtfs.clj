@@ -134,13 +134,17 @@
              (let [file-type (gtfs-spec/name->keyword name)
                    file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))]
                (log/debug file-type " file: " name " PARSED.")
-
+               (when (= file-type :gtfs/calendar-txt)
+                 (def debug-calendar file-data))
                (doseq [fk (process-rows file-type file-data)]
                  (when (and db-table-name (seq fk))
                    (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
 
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
+
+      (log/info "Generating date hashes for package " package-id)
+      (generate-date-hashes! db {:package-id package-id})
 
       (catch Exception e
         (.printStackTrace e)
@@ -151,11 +155,11 @@
 
 ;; PENDING: this is for local testing, truncates *ALL* GTFS data from the database
 ;;          and reads in a local GTFS zip file
-#_(defn test-hsl-gtfs []
+(defn test-hsl-gtfs []
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
-    (let [bytes (with-open [in (io/input-stream "hsl_gtfs.zip")]
+    (let [bytes (with-open [in (io/input-stream "resources/public/google_transit.zip" #_"hsl_gtfs.zip")]
                   (let [out (java.io.ByteArrayOutputStream.)]
                     (io/copy in out)
                     (.toByteArray out)))]
