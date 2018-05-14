@@ -155,11 +155,11 @@
 
 ;; PENDING: this is for local testing, truncates *ALL* GTFS data from the database
 ;;          and reads in a local GTFS zip file
-(defn test-hsl-gtfs []
+#_(defn test-hsl-gtfs []
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
-    (let [bytes (with-open [in (io/input-stream "resources/public/google_transit.zip" #_"hsl_gtfs.zip")]
+    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/gtfs_tampere (2).zip" #_"hsl_gtfs.zip")]
                   (let [out (java.io.ByteArrayOutputStream.)]
                     (io/copy in out)
                     (.toByteArray out)))]
