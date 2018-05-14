@@ -237,12 +237,12 @@
           :password "Lösenord"}
 
   :pre-notice
-  {:ote.db.transit/other-type-description "Muu muutos - SV"
-   :ote.db.transit/url                    "www-osoite - SV"
-   :ote.db.transit/attachment-file-name   "Liitetiedosto - SV"
-   :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
-   :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
-   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
+  {:ote.db.transit/other-type-description "Förklaring"
+   :ote.db.transit/url                    "Webbadress"
+   :ote.db.transit/attachment-file-name   "Bifogad fil"
+   :ote.db.transit/effective-dates "Ändringens begynnelsedatum"
+   :ote.db.transit/route-description "Namn/beskrivningar på rutten eller rutterna som ändras"
+   :ote.db.transit/regions "Lägg till landskapet/landskapen som ändringen gäller"}
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -304,7 +304,7 @@
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
   :trip-editor-no-calendar  "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
   :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
-  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi. - SV"
+  :pre-notice-attatchment-info "Meddela de detaljerade rutt- och tidtabellsändringarna i din transporttjänst inom persontrafik. Du kan lägga till en webbadress där uppgifterna framgår. Du kan också bifoga filer som visar ändringarna till denna blankett."
   :autocomplete-hint "Kirjoita oma tai valitse listalta"
   }
 
@@ -332,7 +332,7 @@
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"
-  :save-and-send "Tallenna ja lähetä - SV"
+  :save-and-send "Spara och skicka"
   :save-updated "Spara uppdaterad info"
   :add-new-parking-capacity "Lägg till ny parkeringstyp"
   :add-new-price-class "Lägg till prisrad"
@@ -340,7 +340,7 @@
   :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
   :add-new-company "Lägg till företag"
   :add-new-route "Lägg till ny sjörutt"
-  :add-new-pre-notice "Uusi 60pv ilmoitus - SV"
+  :add-new-pre-notice "Nytt ändringsmeddelande"
   :discard "Ångra"
 
   :next "Fortsätt"
@@ -361,7 +361,7 @@
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
   :back-to-draft  "Ändra status till utkast"
-  :add-new-effective-date "Lisää uusi päivämäärä - SV"
+  :add-new-effective-date "Lägg till nytt datum"
   }
 
  ;; Database enumeration values
@@ -490,16 +490,16 @@
    :mandatory "Obligatorisk förhandsbokning."}
 
   :ote.db.transit/pre-notice-type
-  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
-   :new             "Liikenteen lisääminen tai uusi reitti"
-   :schedule-change "Aikataulumuutos"
-   :route-change    "Reittimuutos"
-   :other           "Muu muutos, mikä?"}
+  {:termination     "Trafiken upphör (delvis eller helt)"
+   :new             "Trafiken utökas eller ny rutt"
+   :schedule-change "Tidtabellsändring"
+   :route-change    "Ruttändring"
+   :other           "Annan ändring, vilken?"}
 
   :ote.db.transit/pre-notice-state
-  {:draft "Luonnos"
-   :sent "Lähetetty"
-   :read "Luettu"}
+  {:draft "Utkast"
+   :sent "Skickat"
+   :read "Läst"}
   }
   ;; ENUMS end
 
@@ -739,54 +739,54 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   }
 
  :pre-notice-list-page
- {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
-  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
-  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
-  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
-  :sent-pre-notices "Lähetetyt muutosilmoitukset"
-  :no-pre-notices "Ei muutosilmoituksia"
+ {:header-pre-notice-list "Egna meddelanden om ändring i regelbunden persontrafik"
+  :header-authority-pre-notice-list "Meddelanden om ändring i regelbunden persontrafik"
+  :no-pre-notices-for-operator "Den valda tjänsteproducenten har inte skapat några meddelanden om ändring i regelbunden persontrafik."
+  :no-pre-notices-sent "Den valda tjänsteproducenten har inte skickat några meddelanden om ändring i regelbunden persontrafik till mundigheterna."
+  :sent-pre-notices "Skickade ändringsmeddelanden"
+  :no-pre-notices "Inga ändringsmeddelanden"
 
   :headers {:ote.db.transit/id "ID"
-            :ote.db.transit/regions "Maakunta"
-            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
-            :ote.db.transit/pre-notice-state "Tila"
-            :ote.db.modification/created "Luotu"
-            :ote.db.modification/modified "Muokattu"
-            :ote.db.transit/route-description "Reitin kuvaus"
-            :actions "Toiminnot"
-            :region-names "Maakunnat"
-            :ote.db.transit/attachments "Liitetiedostot"
+            :ote.db.transit/regions "Landskap"
+            :ote.db.transit/pre-notice-type "Typ av meddelande"
+            :ote.db.transit/pre-notice-state "Status"
+            :ote.db.modification/created "Skapad"
+            :ote.db.modification/modified "Ändrad"
+            :ote.db.transit/route-description "Ruttbeskrivning"
+            :actions "Funktioner"
+            :region-names "Landskap"
+            :ote.db.transit/attachments "Bifogade filer"
             :ote.db.transport-operator/transport-operator "Tjänsteproducent"}
 
-  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
-                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
-                      :new-comment-label "Kirjoita kommentti"}
+  :pre-notice-dialog {:label "Uppgifter i ändringsmeddelandet"
+                      :comments-label "Myndighetens kommentarer (visas endast för myndigheter)"
+                      :new-comment-label "Skriv en kommentar"}
 
-  :delete-pre-notice-dialog {:label "Poista luonnostilassa oleva muutosilmoitus?"
-                             :content "Haluatko poistaa tämän muutosilmoituksen pysyvästi?"
-                             :success-message "Muutosilmoitus poistettu"}
+  :delete-pre-notice-dialog {:label "Ta bort ett ändringsmeddelande med utkast-status?"
+                             :content "Vill du ta bort det här ändringsmeddelandet för gott?"
+                             :success-message "Ändringsmeddelandet har tagits bort"}
   }
 
 :pre-notice-page
-{:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
- :notice-type-title "Ilmoitettavan muutoksen tyyppi"
- :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
- :attachment-section-title "Muutoksen tarkemmat tiedot"
- :route-and-area-information-title "Reitin ja alueen tiedot"
- :effective-date-from "Alkamispäivä"
- :effective-date-description "Selitys"
- :publish-missing-required "Du kan ännu inte publicera rutten, eftersom du inte har fyllt i alla obligatoriska uppgifter på blanketten. Fyll i de ställen som är markerade med texten \"Obligatorisk uppgift\" eller \"Uppgifter saknas\"."
- :save-success-send "Ilmoituksen lähettäminen onnistui."
- :save-success "Luonnoksen tallentaminen onnistui."
- :save-failure "Luonnoksen tallentaminen epäonnistui."
- :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
- :route-description-hint "esim. Tampere - Pori tai Oulu - Seinäjoki"
- :add-attachment "Uusi liite"
- :select-attachment "Lisää liite"
- :effective-date-descriptions {:year-start "Vuoden alku"
-                               :school-start "Kouluvuoden alku"
-                               :school-end "Kouluvuoden päätös"
-                               :season-schedule-change "Aikataulukauden vaihtuminen"}
+{:pre-notice-form-title "Meddelande om ändring i regelbunden persontrafik"
+ :notice-type-title "Typ av ändring som meddelas"
+ :effective-dates-title "Ändringens begynnelsedatum"
+ :attachment-section-title "Noggrannare uppgifter om ändringen"
+ :route-and-area-information-title "Uppgifter om rutten och området"
+ :effective-date-from "Begynnelsedatum"
+ :effective-date-description "Förklaring"
+ :publish-missing-required "Du kan inte skicka meddelandet ännu, eftersom det ännu saknas obligatoriska uppgifter i blanketten. Fyll i de ställen där det står \\\"Uppgift krävs\\\"."
+ :save-success-send "Meddelandet har skickats."
+ :save-success "Utkastet har sparats."
+ :save-failure "Utkastet har inte sparats."
+ :save-failure-send "Meddelandet har inte skickats."
+ :route-description-hint "t.ex. Tammerfors–Björneborg eller Uleåborg–Seinäjoki"
+ :add-attachment "Ny bilaga"
+ :select-attachment "Lägg till bilaga"
+ :effective-date-descriptions {:year-start "Början av året"
+                               :school-start "Början av läsåret"
+                               :school-end "Slutet av läsåret"
+                               :season-schedule-change "Tidtabellsperioden ändras"}
  }
 
  :price-dialog
@@ -832,8 +832,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-register                        "Registrera"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Kartverktyg för sjötrafik"
-  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus - SV"
-  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset - SV"
+  :navigation-pre-notice                      "Meddelande om ändring i regelbunden persontrafik"
+  :navigation-authority-pre-notices           "Inkomna ändringsmeddelanden"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
@@ -871,7 +871,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Error in server call. Contact support if the problem persists."}
+  :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."}
 
 
  :dialog
@@ -886,8 +886,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
    :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}
 
   :send-pre-notice
-  {:title "Lähetä muutosilmoitus?"
-   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
+  {:title "Skicka ändringsmeddelandet?"
+   :confirm "Då ändringsmeddelandet har skickats, kan det inte längre ändras. Är du säker på att du vill skicka ändringsmeddelandet till myndigheten?"}}
 
  :operators
  {:title "Tjänsteproducenter"
