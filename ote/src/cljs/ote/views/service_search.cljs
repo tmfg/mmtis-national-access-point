@@ -258,12 +258,12 @@
         sub-types-to-list (fn [data]
                             (keep (fn [val]
                                     (let [subtype (:sub-type val)]
-                                      (when (not= :other subtype)
+                                      (when-not (= :other subtype)
                                         (into (sorted-map)
                                               (-> val
                                                   (dissoc :sub-type)
-                                                  (assoc :value subtype)
-                                                  (assoc :text (tr [:enums ::t-service/sub-type subtype])))))))
+                                                  (assoc :value subtype
+                                                         :text (tr [:enums ::t-service/sub-type subtype])))))))
                                   data))]
     [:div
      [:h1 (tr [:service-search :label])]
