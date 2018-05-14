@@ -40,7 +40,7 @@ UNION
 SELECT c.name as "operator", c."business-id" as "business-id"
   FROM "transport-service" s
   LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
-  LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
+  JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
  WHERE (c.name ILIKE :name OR c."business-id" ILIKE :businessid)
    AND s."published?" = TRUE;
 
@@ -55,6 +55,6 @@ UNION
 SELECT ts.id as id
   FROM "transport-service" ts
   LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
-  LEFT JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
+  JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
  WHERE c."business-id" IN (:operators)
    AND ts."published?" = TRUE;
