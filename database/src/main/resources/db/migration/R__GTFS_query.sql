@@ -33,7 +33,7 @@ SELECT DISTINCT c."service-id"
         (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
         (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
         (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
-   AND cd."exception-type" != 2
+   AND (cd."exception-type" IS NULL OR cd."exception-type" != 2)
 UNION
 SELECT cd."service-id"
   FROM "gtfs-calendar-date" cd
