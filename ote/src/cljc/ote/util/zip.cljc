@@ -23,18 +23,28 @@
               (.write out (.getBytes data "UTF-8"))
               (.closeEntry out)))))
 
+
+
+#?(:clj
+   (defn read-zip-with
+     "Reads a zip file. Calls `file-callback` with each file in the zip.
+  File callback is called with a map containing `:name` and `:input` keys."
+     [input file-callback]
+     (with-open [in (ZipInputStream. input)]
+       (loop []
+         (when-let [entry (.getNextEntry in)]
+           (file-callback {:name (.getName entry)
+                           :input in})
+           (recur))))))
 #?(:clj
    (defn read-zip
      "Read a zip file. Returns a sequence of file descriptors.
   Each file descriptor is a map containing the name and data."
      [input]
-     (with-open [in (ZipInputStream. input)]
-       (loop [files []]
-         (let [entry (.getNextEntry in)]
-           (if-not entry
-             files
-             (recur (conj files
-                          {:name (.getName entry)
-                           :data (with-open [out (java.io.ByteArrayOutputStream.)]
-                                   (io/copy in out)
-                                   (String. (.toByteArray out) "UTF-8"))}))))))))
+     (let [files (atom [])]
+       (read-zip-with input (fn [{:keys [name input]}]
+                              (swap! files conj {:name name
+                                                 :data (with-open [out (java.io.ByteArrayOutputStream.)]
+                                                         (io/copy input out)
+                                                         (String. (.toByteArray out) "UTF-8"))})))
+       @files)))

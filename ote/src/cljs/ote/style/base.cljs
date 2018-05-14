@@ -20,7 +20,7 @@
 (def action-button-container (merge inline-block
                                     {:margin-right "1em"}))
 
-(def icon-small {:width 16 :height 16
+(def icon-small {:width 20 :height 20
                  :vertical-align "middle"})
 
 (def icon-medium {:width 24 :height 24

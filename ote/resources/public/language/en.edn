@@ -269,7 +269,8 @@
                                  :external-service-url "Direct URL to machine-readable interface. If a direct link is not available you can alternatively use a web-address with information about the interface and its use."
                                  :format "Select the data format. If the list does not have a format, you can add it by writing it in."
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
-                                 :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."}
+                                 :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."
+                                 :view-routes "View routes"}
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
@@ -739,11 +740,12 @@
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
-            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
-            :ote.db.transit/pre-notice-state "Tila"
-            :ote.db.modification/created "Luotu"
-            :ote.db.modification/modified "Muokattu"
-            :ote.db.transit/route-description "Reitin kuvaus"
+            :ote.db.transit/regions "Regions"
+            :ote.db.transit/pre-notice-type "Notice type"
+            :ote.db.transit/pre-notice-state "State"
+            :ote.db.modification/created "Created"
+            :ote.db.modification/modified "Modified"
+            :ote.db.transit/route-description "Route description"
             :actions "Toiminnot"
             :region-names "Regions"
             :ote.db.transit/attachments "Attached files"
@@ -1115,7 +1117,8 @@
   :total-services ["Catalog has total of " :total-service-count " services."]
   :fetching-more "Fetching more services..."
   :operator-services ["Transport operator " :name " has " :count " services"]
-  :operator-no-services "Transport operator has no services."}
+  :operator-no-services "Transport operator has no services."
+  :view-routes "View routes"}
 
  :login
  {:label "Login credentials"

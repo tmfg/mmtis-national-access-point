@@ -172,7 +172,7 @@
                             :primary true
                             :on-click #(do
                                          (.preventDefault %)
-                                         (e! (fp/->GoToUrl "/organization")))
+                                         (e! (fp/->ChangePage :operators nil)))
                             :style {:margin "20px 0px 20px 0px"}}]
          [:p (tr [:front-page :desc-to-add-new-operator-4])]
 

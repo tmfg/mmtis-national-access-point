@@ -277,7 +277,8 @@
                                  :external-service-url "Ange i första hand ett direkt maskinläsbart gränssnitt. Om detta inte är ändamålsenligt ange då en webbadress för mera information om gränssnittet och dess användning."
                                  :format "Välj ett format i listan. Ifall lämpligt format saknas, fyll då i det själv."
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
-                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."}
+                                 :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."
+                                 :view-routes "Visa rutter"}
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
   :SEA-ROUTE-link-text " (Öppna rutteditorn för sjötrafik här)"
   :companies-main-info "Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här."
@@ -746,6 +747,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :no-pre-notices "Ei muutosilmoituksia"
 
   :headers {:ote.db.transit/id "ID"
+            :ote.db.transit/regions "Maakunta"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
             :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
@@ -1122,7 +1124,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :total-services [" Katalogen innehåller totalt " :total-service-count " tjänster."]
   :fetching-more "Sökning av tjänster pågår..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
-  :operator-no-services "Tjänsteproducenten har inga tjänster."}
+  :operator-no-services "Tjänsteproducenten har inga tjänster."
+  :view-routes "Visa rutter"}
 
  :login
  {:label "Inloggning"

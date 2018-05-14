@@ -720,9 +720,11 @@
                [{}]
                data)]
     [:div
-     [:div.table-wrapper {:style table-wrapper-style}
+     [:div.table-wrapper {:style table-wrapper-style
+                          :id id}
       ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
-      [ui/table {:wrapperStyle {:overflow "visible"} :bodyStyle {:overflow "visible"}}
+      [ui/table {:wrapperStyle {:overflow "visible"}
+                 :bodyStyle {:overflow "visible"}}
        [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
                                {:style style-form-fields/table-header})
         [ui/table-row (merge {:selectable false}
@@ -837,7 +839,7 @@
              ^{:key i}
              [:div {:style {:display "flex"}}
               [:span
-               [ui/checkbox {
+               [ui/checkbox {:id (str i "_" (name option))
                              :label      (when-not table? (show-option option))
                              :checked    checked?
                              :disabled   (not (option-enabled? option))

@@ -17,6 +17,7 @@
   (specql/fetch db ::transit/pre-notice
                 #{::transit/id
                   ::modification/created
+                  ::transit/regions
                   ::transit/route-description
                   ::transit/pre-notice-type
                   [::t-operator/transport-operator #{::t-operator/name}]}

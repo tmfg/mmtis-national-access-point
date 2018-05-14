@@ -66,7 +66,8 @@
        [:div {:style {:margin-bottom "20px"}}
         [list-header/header
          (tr [:pre-notice-list-page :header-pre-notice-list])
-         [ui/raised-button {:label (tr [:buttons :add-new-pre-notice])
+         [ui/raised-button {:id "add-new-pre-notice"
+                            :label (tr [:buttons :add-new-pre-notice])
                             :on-click #(do
                                          (.preventDefault %)
                                          (e! (pre-notice/->CreateNewPreNotice)))

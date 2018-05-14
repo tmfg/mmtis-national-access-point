@@ -8,7 +8,7 @@
       AND s."published?" = TRUE;
 
 -- name: fetch-operator-business-ids
-SELECT o."name" as "operator", o."business-id" as "business-id",
+SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
        o."phone" as "phone", o."gsm" as "gsm", o."email" as "email", CAST('operator' AS text) as "source"
   FROM "transport-operator" o
  WHERE o."business-id" IS NOT NULL;
