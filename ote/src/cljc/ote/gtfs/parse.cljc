@@ -18,13 +18,27 @@
 (defmethod gtfs->clj :default [_ value] value)
 (defmethod clj->gtfs :default [_ value] value)
 
-(defmethod gtfs->clj :specql.data-types/bool [_ value]
+(defn- parse-boolean [value]
   (= "1" value))
 
+(defn- boolean->gtfs [bool]
+  (cond
+    (nil? bool) ""
+    bool "1"
+    :else "0"))
+
+(defmethod gtfs->clj :specql.data-types/bool [_ value]
+  (parse-boolean value))
+
+(defmethod gtfs->clj `boolean? [_ value]
+  (parse-boolean value))
+
 (defmethod clj->gtfs :specql.data-types/bool [_ value]
-  (case value
-    true "1"
-    false "0"))
+  (boolean->gtfs value))
+
+(defmethod clj->gtfs `boolean? [_ value]
+  (boolean->gtfs value))
+
 
 (defmethod gtfs->clj 'date? [_ value]
   (let [[_ y m d] (re-matches #"(\d{4})(\d{2})(\d{2})" value)]
