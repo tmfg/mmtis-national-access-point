@@ -1,4 +1,3 @@
-CREATE EXTENSION pgcrypto;
 
 CREATE TABLE "gtfs-date-hash" (
   "package-id" INTEGER REFERENCES "gtfs_package" (id),
