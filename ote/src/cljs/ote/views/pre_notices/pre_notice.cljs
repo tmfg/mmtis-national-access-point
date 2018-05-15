@@ -160,7 +160,14 @@
        :required?           true
        :options             notice-types
        :option-addition     {:value :other :addition addition}
-       :show-option         (tr-key [:enums ::transit/pre-notice-type])})))
+       :show-option         (tr-key [:enums ::transit/pre-notice-type])}
+
+      {:name ::transit/description
+       :type :text-area
+       :hint-text (tr [:pre-notice-page :notice-description-hint])
+       :full-width? true
+       :required? true
+       :container-class "col-xs-12 col-sm-12 col-md-6"})))
 
 (defn effective-dates []
   (form/group

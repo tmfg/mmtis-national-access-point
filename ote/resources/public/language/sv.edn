@@ -242,7 +242,8 @@
    :ote.db.transit/attachment-file-name   "Bifogad fil"
    :ote.db.transit/effective-dates "Ändringens begynnelsedatum"
    :ote.db.transit/route-description "Namn på rutten eller rutterna som ändras"
-   :ote.db.transit/regions "Lägg till landskapen som ändringen gäller"}
+   :ote.db.transit/regions "Lägg till landskapen som ändringen gäller"
+   :ote.db.transit/description "Detaljerade uppgifter om förändringen"}
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -770,6 +771,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
 :pre-notice-page
 {:pre-notice-form-title "Meddelande om ändring i regelbunden persontrafik"
  :notice-type-title "Typ av ändring som meddelas"
+ :notice-description-hint "Beskriv ändringen kortfattat här"
  :effective-dates-title "Ändringens begynnelsedatum"
  :attachment-section-title "Noggrannare uppgifter om ändringen"
  :route-and-area-information-title "Uppgifter om rutten och området"
