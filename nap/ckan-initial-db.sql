@@ -2103,3 +2103,4 @@ ALTER TABLE ONLY user_following_user
 -- PostgreSQL database dump complete
 --
 
+CREATE EXTENSION pgcrypto;
