@@ -18,7 +18,7 @@
 (defqueries "ote/services/pre_notices/regions.sql")
 
 (def pre-notice-columns #{::transit/id ::t-operator/id ::transit/regions
-                          ::transit/pre-notice-type ::transit/pre-notice-state
+                          ::transit/pre-notice-type ::transit/description ::transit/pre-notice-state
                           ::transit/other-type-description ::transit/effective-dates
                           ::transit/route-description ::transit/url
                           [::transit/attachments #{::transit/attachment-file-name}]})
