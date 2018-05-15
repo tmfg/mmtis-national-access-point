@@ -7,11 +7,15 @@
 (defn migration-number [name]
   (second (re-matches #"^V1_(\d+)__.*\.sql$" name)))
 
+(defn repeatable-migration? [name]
+  (re-matches #"^R_.*$" name))
+
 (deftest migration-files-ok
   (let [files (->> (File. "../database/src/main/resources/db/migration")
                    .listFiles
                    seq
                    (map #(.getName %))
+                   (remove repeatable-migration?)
                    set)
         migrations (disj files "afterMigrate.sql")]
 
