@@ -241,8 +241,8 @@
    :ote.db.transit/url                    "Webbadress"
    :ote.db.transit/attachment-file-name   "Bifogad fil"
    :ote.db.transit/effective-dates "Ändringens begynnelsedatum"
-   :ote.db.transit/route-description "Namn/beskrivningar på rutten eller rutterna som ändras"
-   :ote.db.transit/regions "Lägg till landskapet/landskapen som ändringen gäller"}
+   :ote.db.transit/route-description "Namn på rutten eller rutterna som ändras"
+   :ote.db.transit/regions "Lägg till landskapen som ändringen gäller"}
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -780,7 +780,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
  :save-success "Utkastet har sparats."
  :save-failure "Utkastet har inte sparats."
  :save-failure-send "Meddelandet har inte skickats."
- :route-description-hint "t.ex. Tammerfors–Björneborg eller Uleåborg–Seinäjoki"
+ :route-description-hint "t.ex. Tammerfors–Björneborg"
  :add-attachment "Ny bilaga"
  :select-attachment "Lägg till bilaga"
  :effective-date-descriptions {:year-start "Början av året"
