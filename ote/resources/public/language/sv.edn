@@ -775,7 +775,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
  :route-and-area-information-title "Uppgifter om rutten och området"
  :effective-date-from "Begynnelsedatum"
  :effective-date-description "Förklaring"
- :publish-missing-required "Du kan inte skicka meddelandet ännu, eftersom det ännu saknas obligatoriska uppgifter i blanketten. Fyll i de ställen där det står \\\"Uppgift krävs\\\"."
+ :publish-missing-required "Du kan inte skicka meddelandet ännu, eftersom det ännu saknas obligatoriska uppgifter i blanketten. Fyll i de ställen där det står \"Uppgift krävs\"."
  :save-success-send "Meddelandet har skickats."
  :save-success "Utkastet har sparats."
  :save-failure "Utkastet har inte sparats."
@@ -965,6 +965,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "days" "Dagar"
           "months" "Månader"
           "years" "År"
+          "transport-type" "Trafikslag"
+          "advance-reservation" "Förhandsbokning"
 
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
@@ -1059,7 +1061,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                    ;; rentals
                    "pick-up" "Avhämtning"
                    "return" "Returnering"
-                   "pick-up-return" "Avhämtning och returnering"}
+                   "pick-up-return" "Avhämtning och returnering"
+
+                   "advance-reservation" "förhandsbokning"
+                   "no" "Inte"
+                   "road" "Vägtrafik"
+                   "rail"      "Tågtrafik"
+                   "sea"       "Sjötrafik"
+                   "aviation"  "Luftfart"}
 
           ;; External interfaces
           "external-interfaces" "Externa maskinläsbara gränssnitt"
