@@ -970,6 +970,8 @@
           "days" "Päivää"
           "months" "Kuukautta"
           "years" "Vuotta"
+          "transport-type" "Palvelun liikennemuoto"
+          "advance-reservation" "Ennakkovaraus"
 
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
@@ -1064,7 +1066,14 @@
                    ;; rentals
                    "pick-up" "Nouto"
                    "return" "Palautus"
-                   "pick-up-return" "Nouto ja palautus"}
+                   "pick-up-return" "Nouto ja palautus"
+
+                   "advance-reservation" "Ennakkovaraus"
+                   "no" "ei"
+                   "road" "Tieliikenne"
+                   "rail"      "Rautatieliikenne"
+                   "sea"       "Merenkulku"
+                   "aviation"  "Ilmailu"}
 
 
           ;; External interfaces

@@ -960,6 +960,9 @@
           "months" "Months"
           "years" "Years"
 
+          "transport-type" "Transport type"
+          "advance-reservation" "Advance reservation"
+
           :values {"passenger-transportation" "Passenger transportation"
                    true "Yes"
                    false "No"
@@ -1054,6 +1057,13 @@
                    "pick-up" "Pick up"
                    "return" "Return"
                    "pick-up-return" "Pick up and return"
+
+                   "advance-reservation" "Advance reservation"
+                   "no" "no"
+                   "road" "Road traffic"
+                   "rail" "Rail traffic"
+                   "sea"  "Sea traffic"
+                   "aviation"  "Air traffic"
                    }
 
           ;; External interfaces
