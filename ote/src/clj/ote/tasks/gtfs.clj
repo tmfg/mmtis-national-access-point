@@ -18,16 +18,23 @@
 (def daily-update-time (t/from-time-zone (t/today-at 0 5)
                                          (DateTimeZone/forID "Europe/Helsinki")))
 
+(defn interface-type [format]
+  (case format
+    "GTFS" :gtfs
+    "Kalkati.net" :kalkati))
+
 (defn update-one-gtfs! [config db]
   ;; Ensure that gtfs-import flag is enabled
   (if (feature/feature-enabled? config :gtfs-import)
     (try
-      (let [{:keys [url operator-id ts-id last-import-date] :as gtfs-data} (first (select-gtfs-urls-update db))]
+      (let [{:keys [url operator-id ts-id last-import-date format] :as gtfs-data} (first (select-gtfs-urls-update db))]
         (if (nil? gtfs-data)
           (log/debug "No gtfs files to upload.")
           (do
             (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
-            (import-gtfs/download-and-store-transit-package (:gtfs config) db url operator-id ts-id last-import-date)
+            (import-gtfs/download-and-store-transit-package (interface-type format)
+                                                            (:gtfs config) db url operator-id ts-id
+                                                            last-import-date)
             (specql/update! db ::t-service/external-interface-description
                             {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
                             {::t-service/id (:id gtfs-data)}))))

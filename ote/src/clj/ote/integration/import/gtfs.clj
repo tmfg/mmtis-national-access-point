@@ -166,16 +166,24 @@
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
       (save-gtfs-to-db db bytes 1))))
 
+(defmulti load-transit-interface-url
+  "Load transit interface from URL. Dispatches on type.
+  Returns a response map or nil if it has not been modified."
+  (fn [type url last-import-date saved-etag] type))
+
+(defmethod load-transit-interface-url :gtfs [_ url last-import-date saved-etag]
+  (load-file-from-url url last-import-date saved-etag))
+
 (defn download-and-store-transit-package
-  "Download gtfs (later kalkati files also) file, upload to s3, parse and store to database.
+  "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
-  [gtfs-config db url operator-id ts-id last-import-date]
+  [interface-type gtfs-config db url operator-id ts-id last-import-date]
   (let [filename (gtfs-file-name operator-id ts-id)
         saved-etag (:gtfs/etag (last (specql/fetch db :gtfs/package
                                                    #{:gtfs/etag}
                                                    {:gtfs/transport-operator-id operator-id
                                                     :gtfs/transport-service-id  ts-id})))
-        response (load-file-from-url url last-import-date saved-etag)
+        response (load-transit-interface-url interface-type url last-import-date saved-etag)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
     (if (nil? gtfs-file)
