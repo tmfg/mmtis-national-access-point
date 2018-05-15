@@ -198,7 +198,7 @@
        (when (> filter-service-count (count results))
          [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]))
 
-(defn result-chips [e! chip-results]
+(defn operator-result-chips [e! chip-results]
   (fn [e! chip-results]
     [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
      (for [{::t-operator/keys [name id] :as result} chip-results]
@@ -239,7 +239,7 @@
                                             (e! (ss/->AddOperator (aget % "id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
-      [result-chips e! chip-results]]]))
+      [operator-result-chips e! chip-results]]]))
 
 (defn- sort-places [places]
   (let [names (filter #(re-matches #"^\D+$" (:text %)) places)
@@ -254,7 +254,17 @@
                         operators :operators
                         :as service-search}]
   (let [sub-type (tr-key [:enums ::t-service/sub-type]
-                         [:enums ::t-service/type])]
+                         [:enums ::t-service/type])
+        sub-types-to-list (fn [data]
+                            (keep (fn [val]
+                                    (let [subtype (:sub-type val)]
+                                      (when-not (= :other subtype)
+                                        (into (sorted-map)
+                                              (-> val
+                                                  (dissoc :sub-type)
+                                                  (assoc :value subtype
+                                                         :text (tr [:enums ::t-service/sub-type subtype])))))))
+                                  data))]
     [:div
      [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
@@ -289,11 +299,14 @@
           :auto-select? true
           :full-width? true}
 
-         {:name ::t-service/sub-type
-          :type :multiselect-selection
-          :show-option #(str (sub-type (:sub-type %)))
-          :options (::t-service/sub-type facets)
-          :auto-width? true}
+         {:id "sub-types"
+          :name ::t-service/sub-type
+          :type :chip-input
+          :full-width? true
+          :full-width-input? false
+          :suggestions-config {:text :text :value :text}
+          :suggestions (sub-types-to-list (::t-service/sub-type facets))
+          :open-on-focus? true}
 
          {:type :component
           :name :operators
