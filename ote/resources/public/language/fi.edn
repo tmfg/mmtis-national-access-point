@@ -239,7 +239,8 @@
    :ote.db.transit/attachment-file-name   "Liitetiedosto"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
-   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"}
+   :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"
+   :ote.db.transit/description "Muutoksen tarkemmat tiedot"}
   }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -768,6 +769,7 @@
  :pre-notice-page
  {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
   :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+  :notice-description-hint "Kuvaa tähän muutoksen tarkempi sisältö lyhyesti"
   :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
   :attachment-section-title "Muutoksen tarkemmat tiedot"
   :route-and-area-information-title "Reitin ja alueen tiedot"

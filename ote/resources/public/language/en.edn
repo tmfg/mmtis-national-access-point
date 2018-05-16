@@ -238,6 +238,7 @@
    :ote.db.transit/effective-dates "Change effective date or dates"
    :ote.db.transit/route-description "Description of changed route or routes"
    :ote.db.transit/regions "Regions that are affected by the change"
+   :ote.db.transit/description "Details of the change"
    }
  }
 
@@ -763,6 +764,7 @@
  :pre-notice-page
  {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
   :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+  :notice-description-hint "Describe briefly essential information about the change"
   :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
   :attachment-section-title "Muutoksen tarkemmat tiedot"
   :route-and-area-information-title "Reitin ja alueen tiedot"
