@@ -7,25 +7,46 @@
             [ote.integration.import.gtfs :as gtfs-import]
             [amazonica.aws.lambda :as lambda]
             [cheshire.core :as cheshire]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [taoensso.timbre :as log]))
 
+
+(defn- decode-payload [lambda-response]
+  (-> lambda-response
+      :payload
+      .array
+      (String. "UTF-8")
+      (cheshire/decode keyword)))
 
 (defn kalkati-to-gtfs
   "Invoke an kalkati_to_gtfs Lambda function directly through AWS SDK.
   Returns InvokeResult."
   [kalkati-url headers]
   (let [headers (select-keys headers ["if-modified-since"])]
-    (lambda/invoke :function-name "kalkati_to_gtfs"
-                   :region "eu-central-1"
-                   :invocation-type "RequestResponse"
-                   ;; We also want to support invoking lambda functions through API Gateway lambda proxy
-                   ;; so we'll have to encode the :body separately.
-                   :payload (cheshire/encode {:body (cheshire/encode kalkati-url)
-                                              :headers headers}))))
+    (decode-payload
+     (lambda/invoke :function-name "kalkati_to_gtfs"
+                    :region "eu-central-1"
+                    :invocation-type "RequestResponse"
+                    ;; We also want to support invoking lambda functions through API Gateway lambda proxy
+                    ;; so we'll have to encode the :body separately.
+                    :payload (cheshire/encode {:body (cheshire/encode kalkati-url)
+                                               :headers headers})))))
+
+
+
+(defmethod gtfs-import/load-transit-interface-url :kalkati [_ url last-import-date saved-etag]
+  (log/info "Loading kalkati interface: " url)
+  (let [{:keys [statusCode headers] :as response}
+        (kalkati-to-gtfs url {"if-modified-since" last-import-date})]
+    (log/debug "Got kalkati-to-gtfs response: " response)
+    (if (= statusCode 303)
+      (http-client/get (:Location headers) {:as :byte-array})
+      (do
+        (log/warn "Kalkati to GTFS conversion failed, returned: " (pr-str response))
+        nil))))
 
 (defn load-kalkati [url headers]
-  (let [payload (:payload (kalkati-to-gtfs url headers))
-        json (cheshire/decode (String. (.array payload) "UTF-8") keyword)
+  (let [json (kalkati-to-gtfs url headers)
         resp-headers (:headers json)
         status-code (:statusCode json)
         gtfs-url (:Location resp-headers)]
