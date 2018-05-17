@@ -45,5 +45,4 @@
     (let [org-id (str (nth (clojure.string/split (get app :url) "/") 6))
           service-org-id (str (get response :ote.db.transport-operator/id))
           authorized? (= org-id service-org-id)]
-      (assoc app :authorized? authorized?)))
-  )
+      (assoc app :authorized? authorized?))))

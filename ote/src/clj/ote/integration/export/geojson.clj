@@ -59,10 +59,24 @@
                                                                ::t-service/id
                                                                ::t-service/transport-service-id)])
                   modification/modification-field-keys
-                  #{::t-service/id ::t-service/notice-external-interfaces?
-                    ::t-service/published? ::t-service/companies
-                    ::t-service/company-csv-filename ::t-service/companies-csv-url
-                    ::t-service/company-source}))
+                  #{::t-service/notice-external-interfaces?
+                    ::t-service/published?
+                    ::t-service/company-csv-filename
+                    ::t-service/company-source
+                    ::t-service/ckan-dataset-id
+                    ::t-service/ckan-resource-id}))
+
+(defn- link-to-companies-csv-url
+  "Brokerage services could have lots of companies providing the service. With this function
+  we remove company data from the geojson data set and replace it with link where companies data could be loaded."
+  [service]
+  (cond
+    (not (empty? (::t-service/companies service)))
+    (-> service
+        (assoc :csv-url (str "/export-company-csv/" (::t-service/id service)))
+        (dissoc ::t-service/companies))
+    (not (nil? (::t-service/companies-csv-url service)))
+    (assoc service :csv-url (::t-service/companies-csv-url service))))
 
 (defn- styled-operation-area [areas]
   {:type "GeometryCollection"
@@ -81,7 +95,8 @@
                                      transport-service-properties-columns
                                      {::t-service/transport-operator-id transport-operator-id
                                       ::t-service/id transport-service-id
-                                      ::t-service/published? true}))]
+                                      ::t-service/published? true}))
+        service (link-to-companies-csv-url service)]
 
     (if (and (seq areas) operator service)
       (-> areas
