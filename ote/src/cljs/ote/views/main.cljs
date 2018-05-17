@@ -33,7 +33,8 @@
             [ote.views.gtfs-viewer :as gtfs-viewer]
             [ote.views.pre-notices.pre-notice :as notice]
             [ote.views.pre-notices.listing :as pre-notices-listing]
-            [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]))
+            [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]
+            [ote.views.transit-visualization :as transit-visualization]))
 
 
 (defn logged-in? [app]
@@ -470,6 +471,7 @@
                 :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
+                :transit-visualization [transit-visualization/transit-visualization e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 

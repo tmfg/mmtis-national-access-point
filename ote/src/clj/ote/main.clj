@@ -17,6 +17,7 @@
             [ote.services.admin :as admin-service]
             [ote.services.operators :as operators-service]
             [ote.services.pre-notices :as pre-notices]
+            [ote.services.transit-visualization :as transit-visualization]
 
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
@@ -52,6 +53,7 @@
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
+   :transit-visualization (component/using (transit-visualization/->TransitVisualization) [:http :db])
 
    ;; Return localization information to frontend
    :localization (component/using

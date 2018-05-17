@@ -27,6 +27,7 @@
     ["/edit-route/:id" :edit-route]
 
     ["/routes/view-gtfs" :view-gtfs]
+    ["/transit-visualization" :transit-visualization]
 
     ;; 60 day pre-notice
     ["/pre-notices" :pre-notices]
