@@ -19,18 +19,22 @@
                                            :on-select (r/partial e! :D)
                                            :on-hover #(e! (tv/->HighlightHash (date->hash (time/format-date %))))
                                            :day-style (fn [day selected?]
-                                                        (let [d (time/format-date day)]
+                                                        (let [d (time/format-date day)
+                                                              hash-color (hash->color (date->hash d))
+                                                              highlight (:highlight transit-visualization)]
                                                           (merge
-                                                           {:background-color (hash->color (date->hash d))
-                                                            ;:border "solid 4px white"
-                                                            }
-                                                           (when (= (date->hash d)
-                                                                    (:highlight transit-visualization))
-                                                             {:background "repeating-linear-gradient(45deg, transparent, transparent 3px, #ccc 3px, #ccc 6px)"
-
-                                                              ;:box-shadow "inset 0 0 10px #000000"
-                                                              ;:border "solid 4px black"
-                                                              }))))
+                                                            {:background-color hash-color
+                                                             :color "rgb (0, 255, 255)"
+                                                             :transition "box-shadow 0.25s"
+                                                             :box-shadow "inset 0 0 0 2px transparent,
+                                                                          inset 0 0 0 100px transparent"}
+                                                            (if (and highlight (= (date->hash d) highlight))
+                                                              {;:background (str "repeating-linear-gradient(-45deg," hash-color "," hash-color ",6px, black 3px, black 7px)")
+                                                               :box-shadow "inset 0 0 0 2px black,
+                                                                            inset 0 0 0 100px rgba(255,255,255,.5)"}
+                                                              (when highlight
+                                                                {:box-shadow "inset 0 0 0 2px transparent,
+                                                                              inset 0 0 0 100px rgba(0,0,0,.25)"})))))
                                            :years [2017 2018]}])
 
      ]))

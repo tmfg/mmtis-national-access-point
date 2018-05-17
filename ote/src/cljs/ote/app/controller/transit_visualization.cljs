@@ -13,7 +13,7 @@
 (define-event LoadOperatorDatesResponse [dates]
   {:path [:transit-visualization]}
   (-> app
-      (assoc :hash->color (zipmap (distinct (map :hash dates))
+      (assoc :hash->color (zipmap (distinct (keep :hash dates))
                             (cycle hash-colors
                                     ;; FIXME: after all colors are consumed, add some pattern style
                                    ))
