@@ -39,6 +39,11 @@ describe('Pre notice tests', () => {
         // Select type
         cy.get('#0_termination').click();
 
+        // Give a description
+
+        cy.get('[id*=Kuvaathnmuutoksentarkempisisltlyhyesti-Muutoksentarkemmattiedot]').type("Kuvaus");
+
+
         // Select random effective date
         cy.get('#effective-dates-table #row_0 input').first().click();
         cy.document().its('body').type('{enter}');
