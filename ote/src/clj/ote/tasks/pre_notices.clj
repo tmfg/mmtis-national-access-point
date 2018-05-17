@@ -40,24 +40,25 @@
   (int (* 3600 hours)))
 
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
-                              effective-dates-asc]}]
+                              effective-dates-asc description]}]
   (let [effective-date-str (date-string (coerce/from-sql-date
                                           (first (PgArray->seqable effective-dates-asc)))
                                         timezone)]
     [:tr
      [:td [:b id]]
-     [:td (str/join ", " (PgArray->seqable regions))]
+     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} route-description]]
+     [:td (str/join ",<br />" (PgArray->seqable regions))]
      [:td operator-name]
-     [:td (str/join ", " (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
+     [:td (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
                                (PgArray->seqable pre-notice-type)))]
      [:td effective-date-str]
-     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} route-description]]]))
+     [:td description]]))
 
 (defn notification-template [pre-notices]
   [:html
    [:head
     [:style
-     "table { border-collapse: collapse; font-size: 10px; }
+     "table { border-collapse: collapse; font-size: 10px; table-layout: fixed;}
       table,td,tr,th { border: 1px solid black; }
       td,tr,th { padding: 5px; }"]]
    [:body
@@ -68,14 +69,23 @@
      [:li
       "Pääset tarkastelemaan muutosilmoitusta NAP:ssa klikkaamalla reitin nimeä taulukossa."]]
     [:table
+     [:colgroup
+      [:col {:style "width: 5%"}]
+      [:col {:style "width: 10%"}]
+      [:col {:style "width: 10%"}]
+      [:col {:style "width: 10%"}]
+      [:col {:style "width: 20%"}]
+      [:col {:style "width: 15%"}]
+      [:col {:style "width: 30%"}]]
      [:tbody
       [:tr
        [:th [:b "#"]]
+       [:th [:b "Reitin nimi"]]
        [:th [:b "Alue"]]
        [:th [:b "Palveluntuottajan nimi"]]
        [:th [:b "Muutoksen tyyppi"]]
        [:th [:b "Muutoksen ensimmäinen voimaantulopäivä"]]
-       [:th [:b "Reitin nimi"]]]
+       [:th [:b "Muutoksen tarkemmat tiedot"]]]
       (doall
         (for [n pre-notices]
           (pre-notice-row n)))]]

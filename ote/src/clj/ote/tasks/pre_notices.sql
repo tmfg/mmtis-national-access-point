@@ -1,5 +1,5 @@
 -- name: fetch-pre-notices-by-interval
-SELECT id, "pre-notice-type", "route-description", created, modified,
+SELECT id, "pre-notice-type", "route-description", created, modified, description,
   (SELECT array_agg(eds."effective-date" ORDER BY eds."effective-date"::DATE ASC)
      FROM unnest(n."effective-dates") eds) as "effective-dates-asc",
   (SELECT array_agg(fr.nimi)
