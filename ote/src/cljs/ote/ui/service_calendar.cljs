@@ -86,7 +86,7 @@
   (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
-(defn- service-calendar-year [{:keys [selected-date? on-select
+(defn- service-calendar-year [{:keys [selected-date? on-select on-hover
                                       day-style]} year]
   (let [day-style (or day-style (constantly nil))]
     [:div.service-calendar-year
@@ -132,8 +132,12 @@
                                         (on-select day))
                       :on-mouse-over #(do
                                         (.preventDefault %)
-                                        (when (pos? (.-buttons %))
-                                          (on-select day)))}))
+                                        (cond
+                                          (pos? (.-buttons %))
+                                          (on-select day)
+
+                                          on-hover
+                                          (on-hover day)))}))
                   (t/day day)]))
              (separate-weeks (month-days year month))))
 
@@ -143,9 +147,13 @@
 
 (defn service-calendar
   "Service calendar component."
-  [{:keys [selected-date? on-select] :as options}]
+  [{:keys [selected-date? on-select years] :as options}]
   (let [current-year (t/year (t/now))
-        next-year (inc current-year)]
+        next-year (inc current-year)
+        years (or years
+                  [current-year next-year])]
     [:div.service-calendar {:style {:padding "20px"}}
-     [service-calendar-year options current-year]
-     [service-calendar-year options next-year]]))
+     (doall
+      (for [year years]
+        ^{:key year}
+        [service-calendar-year options year]))]))
