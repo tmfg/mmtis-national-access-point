@@ -911,6 +911,7 @@
           "contact-phone" "Phonenumber"
           "id" "Business ID"
           "name" "Name"
+          "business-id" "Business ID"
           "published?" "Published?"
           "transport-operator-id" "Transport operator ID"
           "type" "Service mode"
@@ -938,7 +939,7 @@
           "luggage-restrictions" "Luggage restrictions"
 
           "url" "WWW-address"
-          "companies-csv-url" "WWW-address containing .csv file about companies involved"
+          "csv-url" "Companies providing the service"
           "service-hours-info" "Additional information"
           "indoor-map" "Indoor map WWW-address"
           "pick-up-locations" "Pick-up and returning points"
@@ -1130,7 +1131,8 @@
   :fetching-more "Fetching more services..."
   :operator-services ["Transport operator " :name " has " :count " services"]
   :operator-no-services "Transport operator has no services."
-  :view-routes "View routes"}
+  :view-routes "View routes"
+  :load-csv-file "Load csv file"}
 
  :login
  {:label "Login credentials"
