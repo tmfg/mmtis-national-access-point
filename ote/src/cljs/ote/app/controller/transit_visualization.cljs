@@ -37,9 +37,9 @@
 (defmethod routes/on-navigate-event :transit-visualization [_]
   (->LoadOperatorDates 1))
 
-(define-event HighlightHash [hash]
+(define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
-  hash)
+  {:hash hash :day day})
 
 (define-event RoutesForDatesResponse [date1 date2 routes]
   {:path [:transit-visualization :compare]}

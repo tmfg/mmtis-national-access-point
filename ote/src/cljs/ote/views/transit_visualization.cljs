@@ -10,20 +10,28 @@
 
 (defn day-style [hash->color date->hash highlight day selected?]
   (let [d (time/format-date day)
-        hash-color (hash->color (date->hash d))]
+        d-hash (date->hash d)
+        hash-color (hash->color (date->hash d))
+        hover-day (:day highlight)
+        hover-hash (:hash highlight)]
+
     (merge
      {:background-color hash-color
       :color "rgb (0, 255, 255)"
       :transition "box-shadow 0.25s"
       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px transparent"}
-     (if (and highlight (= (date->hash d) highlight))
-       {;:background (str "repeating-linear-gradient(-45deg," hash-color "," hash-color ",6px, black 3px, black 7px)")
-        :box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.5)"}
-       (when highlight
-         {:box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px rgba(0,0,0,.25)"})))))
+     (when hover-hash
+       (if (and (not (= d-hash hover-hash))
+                (= (time/day-of-week day) (time/day-of-week hover-day))
+                hash-color)
+         {;:background (str "repeating-linear-gradient(-45deg," hash-color "," hash-color ",6px, black 3px, black 7px)")
+          :box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.5)"}
+         (if (and (= d-hash hover-hash) (= d (time/format-date hover-day)))
+           {:box-shadow "inset 0 0 0 1px red, inset 0 0 0 100px rgba(255,255,255,.5)"}
+           {:box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px rgba(0,0,0,.25)"}))))))
 
 (defn hover-day [e! date->hash day]
-  (e! (tv/->HighlightHash (date->hash (time/format-date day)))))
+  (e! (tv/->HighlightHash (date->hash (time/format-date day)) day)))
 
 (defn select-day [e! day]
   (e! (tv/->SelectDateForComparison day)))
