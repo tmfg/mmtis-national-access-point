@@ -20,6 +20,11 @@
 (defprotocol DateFields
   (date-fields [this] "Return date fields as a map of data."))
 
+(defn date-fields-only
+  "Return date fields without any time fields."
+  [x]
+  (select-keys (date-fields x) #{::year ::month ::date}))
+
 ;; Record for wall clock time (hours, minutes and seconds)
 (defrecord Time [hours minutes seconds])
 
@@ -127,7 +132,7 @@
 
 (defn date-fields->date [{::keys [year date month]}]
   #?(:clj (java.time.LocalDate/of year month date)
-     :cljs (goog.date.Date. year month date)))
+     :cljs (goog.date.Date. year (dec month) date)))
 
 (defn format-date
   "Format given date in human readable format."
@@ -326,5 +331,5 @@
   to UTC (like Finnish UTC+2/+3) the date part is the previous day.
 
   For example: midnight 27 Feb 2018 => 26 Feb 2018 22:00"
-   [native-date]
-   (date-fields->date-time (date-fields native-date)))
+  [native-date]
+  (date-fields->date-time (date-fields native-date)))
