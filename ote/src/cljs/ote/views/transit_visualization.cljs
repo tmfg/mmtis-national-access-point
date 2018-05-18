@@ -15,7 +15,7 @@
         hash-color (hash->color (date->hash d))
         hover-day (:day highlight)
         hover-hash (:hash highlight)
-        mode (or (:mode highlight) :same)]
+        mode (:mode highlight)]
 
     (when hash-color
       (case mode
@@ -29,10 +29,10 @@
                 {:box-shadow "inset 0 0 0 2px crimson, inset 0 0 0 3px black, inset 0 0 0 100px rgba(255,255,255,.65)"}
                 (if (and (= d-hash hover-hash) (= d (time/format-date hover-day)))
                   {:box-shadow "inset 0 0 0 2px black,
-                                inset 0 0 0 4px transparent,
+                                inset 0 0 0 3px transparent,
                                 inset 0 0 0 100px rgba(255,255,255,.75)"}
                   {:box-shadow "inset 0 0 0 2px transparent,
-                                inset 0 0 0 4px transparent,
+                                inset 0 0 0 3px transparent,
                                 inset 0 0 0 100px rgba(0,0,0,.25)"}))))))
 
 (defn day-style [hash->color date->hash highlight day selected?]
@@ -43,7 +43,7 @@
      {:background-color hash-color
       :color "rgb (0, 255, 255)"
       :transition "box-shadow 0.25s"
-      :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px transparent"}
+      :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
      (when (:hash highlight)
        (highlight-style hash->color date->hash day highlight)))))
 
