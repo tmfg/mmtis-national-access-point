@@ -5,7 +5,8 @@
             [ote.ui.service-calendar :as service-calendar]
             [ote.app.controller.transit-visualization :as tv]
             [taoensso.timbre :as log]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.ui.table :as table]))
 
 (defn day-style [hash->color date->hash highlight day selected?]
   (let [d (time/format-date day)
@@ -34,13 +35,16 @@
       [:div.transit-visualization-compare
        "Vertaillaan päiviä: " [:b date1] " ja " [:b date2]
        (when (= (date->hash date1) (date->hash date2))
-         [:div "Päivien liikenne on samanlaista"])])))
+         [:div "Päivien liikenne on samanlaista"])
+       [table/table {:no-rows-message "Ei reittejä"}
+        [{:name "Nimi" :width "20%"}]]
+       ])))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash loading highlight]
+(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
                                  :as transit-visualization}]
   [:div
    "tähän palvelun valinta"
-   (when (and (not loading) hash->color)
+   (when (and (not loading?) hash->color)
      [:div.transit-visualization
       [service-calendar/service-calendar {:selected-date? (constantly false)
                                           :on-select (r/partial select-day e!)
