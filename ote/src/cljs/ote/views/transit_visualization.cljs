@@ -99,14 +99,14 @@
                                :on-change #(e! (tv/->SetHighlightMode (keyword %2)))
                                :value-selected (:mode highlight)
                                :style {:display "flex" :justify-content "flex-start" :flex-direction "row wrap"}}
-        [ui/radio-button {:label "Näytä samanlaiset"
+        [ui/radio-button {:label "Korosta samanlaiset"
                           :value :same
                           :style {:white-space "nowrap"
                                   :width "auto"
                                   :margin-right "20px"
                                   :font-size "12px"
                                   :font-weight "bold"}}]
-        [ui/radio-button {:label "Näytä poikkeukset"
+        [ui/radio-button {:label "Korosta poikkeukset"
                           :value :diff
                           :style {:white-space "nowrap"
                                   :width "auto"
