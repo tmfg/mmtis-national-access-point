@@ -15,7 +15,7 @@
   (-> app
       (assoc :hash->color (zipmap (distinct (keep :hash dates))
                             (cycle hash-colors
-                                    ;; FIXME: after all colors are consumed, add some pattern style
+                                   ;; FIXME: after all colors are consumed, add some pattern style
                                    ))
              :date->hash (into {}
                                (map (juxt (comp time/format-date :date)
@@ -35,3 +35,14 @@
 (define-event HighlightHash [hash]
   {:path [:transit-visualization :highlight]}
   hash)
+
+(define-event SelectDateForComparison [date]
+  {:path [:transit-visualization :compare]}
+  (let [app (or app {})
+        last-selected (:last-selected app)]
+    (assoc app
+           (if (not= 1 last-selected)
+             {:date1 date
+              :last-selected 1}
+             {:date2 date
+              :last-selected 2}))))
