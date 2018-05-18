@@ -378,7 +378,8 @@
    :request      "Tilausliikenne ja muu kutsuun perustuva liikenne"
    :schedule     "Säännöllinen aikataulun mukainen liikenne"
    :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking      "Yleiset kaupalliset pysäköintipalvelut"}
+   :parking      "Yleiset kaupalliset pysäköintipalvelut"
+   :brokerage    "Välityspalvelu"}
 
 
   :ote.db.transport-service/payment-methods

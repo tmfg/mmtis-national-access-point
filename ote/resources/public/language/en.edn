@@ -378,7 +378,8 @@
    :request       "Charter traffic and other request based traffic"
    :schedule      "Regular scheduled traffic"
    :rentals       "Vehicle rentals and commercial shared vehicle solutions"
-   :parking       "General commercial parking services"}
+   :parking       "General commercial parking services"
+   :brokerage     "Brokering service"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Cash"
