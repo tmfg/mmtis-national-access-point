@@ -1131,6 +1131,7 @@
   :operator-search "Palveluntuottaja"
   :operator-search-placeholder "Hae nimellä tai sen osalla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+  :type-search "Liikkumispalvelun tyyppi"
 
   :result-count ["Hakuehdoille "
                  (:plural :count
