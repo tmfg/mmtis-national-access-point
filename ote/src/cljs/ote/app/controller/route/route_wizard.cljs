@@ -189,6 +189,15 @@
   [app-state]
   (assoc app-state :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))
 
+(defn valid-calendar-rule? [{::transit/keys [from-date to-date]}]
+  (and (time/valid-date? from-date)
+       (time/valid-date? to-date)))
+
+(defn valid-calendar-rule-dates? [calendar]
+  (and (seq (::transit/service-rules calendar))
+       (every? valid-calendar-rule?
+               (::transit/service-rules calendar))))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -372,8 +381,11 @@
 
   CloseServiceCalendar
   (process-event [_ app]
-    (-> app
-        (update-in [:route] dissoc :edit-service-calendar :temporary-calendar)))
+    (let [edit-service-calendar (get-in app [:route :edit-service-calendar])]
+      (-> app
+          (update :route dissoc :edit-service-calendar :temporary-calendar)
+          (update-in [:route ::transit/service-calendars edit-service-calendar ::transit/service-rules]
+                     (flip filterv) valid-calendar-rule?))))
 
   CancelServiceCalendar
   (process-event [_ app]
@@ -647,15 +659,7 @@
 (defn valid-name [route]
   (if (empty? (get route ::transit/name)) false true))
 
-(defn valid-calendar-rule-dates? [data]
-  (let [check-rule (fn [rule]
-                     (and (not (empty? rule))
-                          (not (str/blank? (get rule ::transit/from-date)))
-                          (not (str/blank? (get rule ::transit/to-date)))))]
-    (and (seq (::transit/service-rules data))
-      (every?
-        #(check-rule %)
-        (::transit/service-rules data)))))
+
 
 (defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or
