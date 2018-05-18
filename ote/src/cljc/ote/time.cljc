@@ -127,6 +127,8 @@
         ::minutes (.getMinuteOfHour this)
         ::seconds (.getSecondOfMinute this)})))
 
+(def midnight {::hours 0 ::minutes 0 ::seconds 0})
+
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
 
@@ -333,3 +335,10 @@
   For example: midnight 27 Feb 2018 => 26 Feb 2018 22:00"
   [native-date]
   (date-fields->date-time (date-fields native-date)))
+
+(defn date-fields->native
+  "Convert date fields ma pto native Date object"
+  [{::keys [year month date hours minutes seconds]}]
+  #?(:cljs (js/Date. year (dec month) date hours minutes seconds)
+     :clj (let [gc (java.util.GregorianCalendar. year (dec month) date hours minutes seconds)]
+            (.getTime gc))))
