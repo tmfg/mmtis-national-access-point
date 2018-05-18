@@ -20,7 +20,12 @@
              :date->hash (into {}
                                (map (juxt (comp time/format-date :date)
                                           :hash))
-                               dates))
+                               dates)
+             :years (if (empty? dates)
+                      []
+                      (vec
+                       (range (reduce min (map (comp time/year :date) dates))
+                              (inc (reduce max (map (comp time/year :date) dates)))))))
       (dissoc :loading)))
 
 (define-event LoadOperatorDates [operator-id]
@@ -39,8 +44,9 @@
 (define-event SelectDateForComparison [date]
   {:path [:transit-visualization :compare]}
   (let [app (or app {})
-        last-selected (:last-selected app)]
-    (assoc app
+        last-selected (:last-selected app)
+        date (time/format-date date)]
+    (merge app
            (if (not= 1 last-selected)
              {:date1 date
               :last-selected 1}

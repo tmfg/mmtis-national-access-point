@@ -129,6 +129,9 @@
   #?(:clj (java.time.LocalDate/of year month date)
      :cljs (goog.date.Date. year month date)))
 
+(defn year [dt]
+  (::year (date-fields dt)))
+
 (defn format-date
   "Format given date in human readable format."
   [date]

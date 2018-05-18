@@ -471,7 +471,7 @@
                 :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                :transit-visualization [transit-visualization/transit-visualization e! app]
+                :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 

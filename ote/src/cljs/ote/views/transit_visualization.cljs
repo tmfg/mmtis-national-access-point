@@ -24,19 +24,28 @@
 (defn hover-day [e! date->hash day]
   (e! (tv/->HighlightHash (date->hash (time/format-date day)))))
 
-(defn select-day [e! day])
+(defn select-day [e! day]
+  (e! (tv/->SelectDateForComparison day)))
 
-(defn transit-visualization [e! {:keys [transit-visualization] :as app}]
-  (let [hash->color (:hash->color transit-visualization)
-        date->hash (:date->hash transit-visualization)]
-    [:div "here is the transit visualization"
-     (when (and (not (:loading transit-visualization))
-                (:hash->color transit-visualization))
-       [service-calendar/service-calendar {:selected-date? (constantly false)
-                                           :on-select (r/partial select-day e!)
-                                           :on-hover (r/partial hover-day e! date->hash)
-                                           :day-style (r/partial day-style hash->color date->hash
-                                                                 (:highlight transit-visualization))
-                                           :years [2017 2018]}])
+(defn date-comparison [e! {:keys [date->hash compare]}]
+  (let [date1 (:date1 compare)
+        date2 (:date2 compare)]
+    (when (and date1 date2)
+      [:div.transit-visualization-compare
+       "Vertaillaan päiviä: " [:b date1] " ja " [:b date2]
+       (when (= (date->hash date1) (date->hash date2))
+         [:div "Päivien liikenne on samanlaista"])])))
 
-     ]))
+(defn transit-visualization [e! {:keys [hash->color date->hash loading highlight]
+                                 :as transit-visualization}]
+  [:div
+   "tähän palvelun valinta"
+   (when (and (not loading) hash->color)
+     [:div.transit-visualization
+      [service-calendar/service-calendar {:selected-date? (constantly false)
+                                          :on-select (r/partial select-day e!)
+                                          :on-hover (r/partial hover-day e! date->hash)
+                                          :day-style (r/partial day-style hash->color date->hash
+                                                                (:highlight transit-visualization))
+                                          :years [2017 2018]}]
+      [date-comparison e! transit-visualization]])])
