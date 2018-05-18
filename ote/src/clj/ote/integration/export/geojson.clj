@@ -72,11 +72,12 @@
   [service]
   (cond
     (not (empty? (::t-service/companies service)))
-    (-> service
-        (assoc :csv-url (str "/export-company-csv/" (::t-service/id service)))
-        (dissoc ::t-service/companies))
+      (-> service
+          (assoc :csv-url (str "/export-company-csv/" (::t-service/id service)))
+          (dissoc ::t-service/companies))
     (not (nil? (::t-service/companies-csv-url service)))
-    (assoc service :csv-url (::t-service/companies-csv-url service))))
+      (assoc service :csv-url (::t-service/companies-csv-url service))
+    :else service))
 
 (defn- styled-operation-area [areas]
   {:type "GeometryCollection"
