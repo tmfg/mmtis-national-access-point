@@ -100,7 +100,7 @@
   "Return a list of completions that match the given search term."
   [db term]
   (into [] (service-search-by-operator db {:name (str "%" term "%")
-                                           :businessid (str "%" term "%")})))
+                                           :businessid (str term )})))
 
 (defn- search [db {:keys [operation-area sub-type text operators offset limit]
                    :as filters}]

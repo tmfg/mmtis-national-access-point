@@ -36,14 +36,14 @@ SELECT COUNT(id) FROM "transport-service" WHERE "published?" = TRUE;
 -- Finds operators by name and by business-id and services that have companies added as "operators.
 SELECT op.name as "operator", op."business-id" as "business-id"
   FROM "transport-operator" op
- WHERE ( op.name ILIKE :name OR op."business-id" ILIKE :businessid)
+ WHERE ( op.name ILIKE :name OR op."business-id" = :businessid)
    AND op."deleted?" = FALSE
 UNION
 SELECT c.name as "operator", c."business-id" as "business-id"
   FROM "transport-service" s
   LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
   JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
- WHERE (c.name ILIKE :name OR c."business-id" ILIKE :businessid)
+ WHERE (c.name ILIKE :name OR c."business-id" = :businessid)
    AND s."published?" = TRUE;
 
 -- name: service-ids-by-business-id

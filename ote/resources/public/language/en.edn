@@ -1118,7 +1118,7 @@
   :operators "Transport operator"
   :text-search-placeholder "Search by name"
   :operator-search "Transport operator"
-  :operator-search-placeholder "Search by name"
+  :operator-search-placeholder "Search by name or business id"
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
   :result-count (:plural :count
