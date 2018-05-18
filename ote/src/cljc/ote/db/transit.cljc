@@ -67,7 +67,6 @@
   (let [week-days (into #{}
                         (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
                         time/week-days)]
-    (log/info "FROM: " (pr-str from-date) " TO: " (pr-str to-date))
     (when (and from-date to-date (not (empty? week-days)))
       (for [d (time/date-range (time/date-fields->date from-date)
                                (time/date-fields->date to-date))

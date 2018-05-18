@@ -75,6 +75,15 @@
 
 (def valid-time? (complement empty-time?))
 
+(defn empty-date?
+  "Check if date is empty. Requires year, month and date to be set."
+  [{::keys [year month date]}]
+  (or (nil? year)
+      (nil? month)
+      (nil? date)))
+
+(def valid-date? (complement empty-date?))
+
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)

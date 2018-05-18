@@ -686,7 +686,8 @@
                              :error-style style-base/required-element
                              :auto-ok true
                              :value (if date-fields?
-                                      (time/date-fields->native (merge time/midnight data))
+                                      (when (time/valid-date? data)
+                                        (time/date-fields->native (merge time/midnight data)))
                                       data)
                              :on-change (fn [_ date]
                                           (update! (if date-fields?
