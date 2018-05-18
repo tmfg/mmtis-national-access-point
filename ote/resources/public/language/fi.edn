@@ -1129,7 +1129,7 @@
   :operators "Palveluntuottajat"
   :text-search-placeholder "Hae nimellä tai sen osalla"
   :operator-search "Palveluntuottaja"
-  :operator-search-placeholder "Hae nimellä tai sen osalla"
+  :operator-search-placeholder "Hae nimellä tai y-tunnuksella"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
 
   :result-count ["Hakuehdoille "
