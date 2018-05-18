@@ -379,7 +379,7 @@
    :schedule     "Säännöllinen aikataulun mukainen liikenne"
    :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
    :parking      "Yleiset kaupalliset pysäköintipalvelut"
-   :brokerage    "Välityspalvelu"}
+   :brokerage    "Välityspalvelut"}
 
 
   :ote.db.transport-service/payment-methods

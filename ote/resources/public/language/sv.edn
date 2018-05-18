@@ -387,7 +387,7 @@
    :schedule    "Regelbunden ruttbaserad trafik"
    :rentals     "Fordonsuthyrning och kommersiella samanvändningstjänster"
    :parking     "Allmänna kommersiella parkeringstjänster"
-   :brokerage   "Förmedlingstjänst"}
+   :brokerage   "Förmedlingstjänster"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Kontant"

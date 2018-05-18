@@ -379,7 +379,7 @@
    :schedule      "Regular scheduled traffic"
    :rentals       "Vehicle rentals and commercial shared vehicle solutions"
    :parking       "General commercial parking services"
-   :brokerage     "Brokering service"}
+   :brokerage     "Brokering services"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Cash"
