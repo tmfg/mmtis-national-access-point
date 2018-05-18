@@ -671,7 +671,7 @@
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
-                                       show-clear? hint-text id] :as opts} data]
+                                       show-clear? hint-text id date-fields?] :as opts} data]
   (let [warning (when (and required? (not data))
                   (tr [:common-texts :required-field]))]
     [:div (stylefy/use-style style-base/inline-block)
@@ -685,9 +685,13 @@
                              :error-text (or warning "")
                              :error-style style-base/required-element
                              :auto-ok true
-                             :value data
+                             :value (if date-fields?
+                                      (time/date-fields->native (merge time/midnight data))
+                                      data)
                              :on-change (fn [_ date]
-                                          (update! date))
+                                          (update! (if date-fields?
+                                                     (time/date-fields-only date)
+                                                     date)))
                              :format-date time/format-date
                              :ok-label (or ok-label (tr [:buttons :save]))
                              :cancel-label (or cancel-label (tr [:buttons :cancel]))
