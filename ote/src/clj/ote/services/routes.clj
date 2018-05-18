@@ -61,9 +61,13 @@
          ::transit/location (point-geometry loc)))
 
 (defn- service-calendar-dates->db [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
-  (assoc cal
-    ::transit/service-removed-dates (map service-date->inst service-removed-dates)
-    ::transit/service-added-dates (map service-date->inst service-added-dates)))
+  (log/info "CAL: " cal)
+  (-> cal
+      (update ::transit/service-rules (flip mapv) #(-> %
+                                                       (update ::transit/from-date service-date->inst)
+                                                       (update ::transit/to-date service-date->inst)))
+      (update ::transit/service-removed-dates (flip mapv) service-date->inst)
+      (update ::transit/service-added-dates (flip mapv) service-date->inst)))
 
 (defn- next-stop-code [db]
   (str "OTE" (next-stop-sequence-number db)))
@@ -103,12 +107,14 @@
 (defn get-route
   "Get single route by id"
   [db id]
-  (let [route (first (fetch db ::transit/route
-                            (specql/columns ::transit/route)
-                            {::transit/id id}))]
+  (let [route (-> (fetch db ::transit/route
+                         (specql/columns ::transit/route)
+                         {::transit/id id})
+                  first
+                  (update ::transit/service-calendars (flip mapv) transit/service-calendar-date-fields)
+                  (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))]
     (log/debug  "**************** route" (pr-str route))
-    (-> route
-        (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))))
+    route))
 
 (defn delete-route!
   "Delete single route by id"

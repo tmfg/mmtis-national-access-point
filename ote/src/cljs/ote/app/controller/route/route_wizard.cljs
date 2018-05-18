@@ -103,8 +103,8 @@
   [trips service-calendars]
   (let [new-calendars
         (mapv
-          (fn [trip]
-            (if (empty? service-calendars)
+         (fn [trip]
+           (if (empty? service-calendars)
               {::transit/service-added-dates   #{}
                ::transit/service-removed-dates #{}
                ::transit/service-rules         []
@@ -117,12 +117,8 @@
                                      (::transit/service-rules cal))]
                 (-> cal
                     (assoc :rule-dates rule-dates)
-                    (assoc ::transit/service-added-dates (into #{}
-                                                               (map #(time/date-fields-from-timestamp %)
-                                                                    (::transit/service-added-dates cal))))
-                    (assoc ::transit/service-removed-dates (into #{}
-                                                                 (map #(time/date-fields-from-timestamp %)
-                                                                      (::transit/service-removed-dates cal))))))))
+                    (update ::transit/service-added-dates set)
+                    (update ::transit/service-removed-dates set)))))
           trips)]
     new-calendars))
 
@@ -391,33 +387,33 @@
   ToggleDate
   (process-event [{date :date trip-idx :trip-idx} app]
     (update-in
-      (route-updated app)
-      [:route ::transit/service-calendars trip-idx]
-               (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
-                     :as service-calendar}]
-                 (let [service-added-dates (or service-added-dates #{})
-                       service-removed-dates (or service-removed-dates #{})
-                       date (time/date-fields date)]
-                   (cond
-                     ;; This date is in added dates, remove it
-                     (service-added-dates date)
-                     (assoc service-calendar ::transit/service-added-dates
-                            (disj service-added-dates date))
+     (route-updated app)
+     [:route ::transit/service-calendars trip-idx]
+     (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
+           :as service-calendar}]
+       (let [service-added-dates (or service-added-dates #{})
+             service-removed-dates (or service-removed-dates #{})
+             date (time/date-fields date)]
+         (cond
+           ;; This date is in added dates, remove it
+           (service-added-dates date)
+           (assoc service-calendar ::transit/service-added-dates
+                  (disj service-added-dates date))
 
-                     ;; This date is in removed dates, remove it
-                     (service-removed-dates date)
-                     (assoc service-calendar ::transit/service-removed-dates
-                            (disj service-removed-dates date))
+           ;; This date is in removed dates, remove it
+           (service-removed-dates date)
+           (assoc service-calendar ::transit/service-removed-dates
+                  (disj service-removed-dates date))
 
-                     ;; This date matches a rule, add it to removed dates
-                     (some #(some (partial = date) (transit/rule-dates %)) service-rules)
-                     (assoc service-calendar ::transit/service-removed-dates
-                            (conj service-removed-dates date))
+           ;; This date matches a rule, add it to removed dates
+           (some #(some (partial = date) (transit/rule-dates %)) service-rules)
+           (assoc service-calendar ::transit/service-removed-dates
+                  (conj service-removed-dates date))
 
-                     ;; Otherwise add this to added dates
-                     :default
-                     (assoc service-calendar ::transit/service-added-dates
-                            (conj service-added-dates date)))))))
+           ;; Otherwise add this to added dates
+           :default
+           (assoc service-calendar ::transit/service-added-dates
+                  (conj service-added-dates date)))))))
 
   EditServiceCalendarRules
   (process-event [{rules :rules trip-idx :trip-idx} app]

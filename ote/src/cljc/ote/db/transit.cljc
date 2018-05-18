@@ -13,7 +13,8 @@
             [ote.time :as time]
             [ote.util.fn :refer [flip]]
             [ote.db.transport-operator]
-            [ote.db.user])
+            [ote.db.user]
+            [taoensso.timbre :as log])
   #?(:cljs
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
@@ -66,9 +67,10 @@
   (let [week-days (into #{}
                         (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
                         time/week-days)]
+    (log/info "FROM: " (pr-str from-date) " TO: " (pr-str to-date))
     (when (and from-date to-date (not (empty? week-days)))
-      (for [d (time/date-range (time/native->date-time from-date)
-                               (time/native->date-time to-date))
+      (for [d (time/date-range (time/date-fields->date from-date)
+                               (time/date-fields->date to-date))
             :when (week-days (time/day-of-week d))]
         (select-keys
          (time/date-fields d)
@@ -113,3 +115,14 @@
                                        (update ::departure-time #(when % (update % :hours + hours-to-add)))))
                          (::departure-time st)
                          stop-times)))))))
+
+
+(defn service-calendar-date-fields
+  "Convert service calendar dates from database (with time part) to date fields."
+  [service-calendar]
+  (-> service-calendar
+      (update ::service-rules (flip mapv) #(-> %
+                                               (update ::from-date time/date-fields-only)
+                                               (update ::to-date time/date-fields-only)))
+      (update ::service-added-dates (flip mapv) time/date-fields-only)
+      (update ::service-removed-dates (flip mapv) time/date-fields-only)))
