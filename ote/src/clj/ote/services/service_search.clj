@@ -65,13 +65,31 @@
                          {::t-service/published? true
                           ::t-service/name (op/ilike (str "%" text "%"))})))))
 
-(defn- sub-type-ids [db types]
-  (when-not (empty? types)
-    (ids ::t-service/id
-         (specql/fetch db ::t-service/transport-service
-                       #{::t-service/id}
-                       {::t-service/published? true
-                        ::t-service/sub-type (op/in types)}))))
+(defn- sub-type-ids
+  "Fetch sub-types and brokerage service."
+  [db types]
+  (let [ids (cond
+              (and (> (count types) 1) (contains? types :brokerage)) ;; Get sub types and brokerage
+                (ids ::t-service/id
+                    (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/id}
+                                  (op/and {::t-service/published? true}
+                                          (op/or
+                                           {::t-service/sub-type (op/in types)}
+                                           {::t-service/brokerage? true}))))
+              (and (not (empty? types)) (not (contains? types :brokerage))) ;; Only sub types
+                (ids ::t-service/id
+                    (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/id}
+                                  {::t-service/sub-type   (op/in types)
+                                   ::t-service/published? true}))
+              (and (= 1 (count types)) (contains? types :brokerage)) ;; Only brokerage
+                (ids ::t-service/id
+                    (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/id}
+                                  {::t-service/published? true
+                                   ::t-service/brokerage? true})))]
+    ids))
 
 (defn- operator-ids [db operators]
   (when-not (empty? operators)

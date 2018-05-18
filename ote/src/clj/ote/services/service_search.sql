@@ -12,7 +12,9 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
                    WHERE t."published?" = true
                    GROUP BY t."sub-type") count ON type."sub-type" = count."sub-type"
  -- PENDING: remove value from enum if we decide not to implement brokerage type at all
- WHERE type."sub-type" NOT IN ('brokerage')
+ -- Brokerage enabled, but it only affects on dropdown list in ui. Brokerage isn't a subtype anymore, and we cant
+ -- calculate how many brokering services we have using this query.
+ -- WHERE type."sub-type" NOT IN ('brokerage')
  ORDER BY count DESC
 
 -- name: latest-service-ids
