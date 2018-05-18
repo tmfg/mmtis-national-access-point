@@ -26,10 +26,10 @@
                       (vec
                        (range (reduce min (map (comp time/year :date) dates))
                               (inc (reduce max (map (comp time/year :date) dates)))))))
-      (dissoc :loading)))
+      (dissoc :loading?)))
 
 (define-event LoadOperatorDates [operator-id]
-  {:path [:transit-visualization :loading]}
+  {:path [:transit-visualization :loading?]}
   (comm/get! (str "transit-visualization/dates/" operator-id)
              {:on-success (tuck/send-async! ->LoadOperatorDatesResponse)})
   true)
@@ -41,14 +41,29 @@
   {:path [:transit-visualization :highlight]}
   hash)
 
+(define-event RoutesForDatesResponse [date1 date2 routes]
+  {:path [:transit-visualization :compare]}
+  (when (and (= date1 (:date1 app))
+             (= date2 (:date2 app)))
+    (-> app
+        (assoc :routes routes)
+        (dissoc :loading?))))
+
 (define-event SelectDateForComparison [date]
   {:path [:transit-visualization :compare]}
   (let [app (or app {})
         last-selected (:last-selected app)
-        date (time/format-date date)]
-    (merge app
-           (if (not= 1 last-selected)
-             {:date1 date
-              :last-selected 1}
-             {:date2 date
-              :last-selected 2}))))
+        date (time/format-date date)
+        app (merge app
+                   (if (not= 1 last-selected)
+                     {:date1 date
+                      :last-selected 1}
+                     {:date2 date
+                      :last-selected 2}))]
+    (if (and (:date1 app) (:date2 app))
+      (do
+        (comm/get! (str "transit-visualization/routes-for-dates")
+                   {:params (select-keys app [:date1 :date2])
+                    :on-success (tuck/send-async! ->RoutesForDatesResponse date1 date2)})
+        (assoc app :loading? true))
+      app)))
