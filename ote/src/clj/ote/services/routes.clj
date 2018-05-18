@@ -61,7 +61,6 @@
          ::transit/location (point-geometry loc)))
 
 (defn- service-calendar-dates->db [{::transit/keys [service-removed-dates service-added-dates] :as cal}]
-  (log/info "CAL: " cal)
   (-> cal
       (update ::transit/service-rules (flip mapv) #(-> %
                                                        (update ::transit/from-date service-date->inst)
