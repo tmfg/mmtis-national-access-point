@@ -301,6 +301,7 @@
 
          {:id "sub-types"
           :name ::t-service/sub-type
+          :label (tr [:service-search :type-search])
           :type :chip-input
           :full-width? true
           :full-width-input? false

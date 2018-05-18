@@ -1119,6 +1119,7 @@
   :operator-search "Transport operator"
   :operator-search-placeholder "Search by name"
   :no-filters "Search for services by adding search criteria above"
+  :type-search "Transport service mode"
   :result-count (:plural :count
                          "No services found"
                          "One service found"

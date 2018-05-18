@@ -1125,6 +1125,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operator-search "Tjänsteproducent"
   :operator-search-placeholder "Sök med namn"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
+  :type-search "Tjänstetyp"
   :result-count (:plural :count
                          "Inga resultat"
                          "Hittades en tjänst."
