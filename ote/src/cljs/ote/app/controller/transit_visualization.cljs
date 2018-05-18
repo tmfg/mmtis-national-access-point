@@ -2,6 +2,8 @@
   (:require [ote.communication :as comm]
             [tuck.core :as tuck :refer-macros [define-event]]
             [ote.app.routes :as routes]
+            [cljs-time.core :as t]
+            [cljs-time.format :as tf]
             [ote.time :as time]
             [taoensso.timbre :as log]))
 
@@ -9,6 +11,22 @@
   ["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
+
+(defn parse-date [date-str]
+  (tf/parse (tf/formatter "dd.MM.yyyy") date-str))
+
+(defn days-to-first-diff [start-date date->hash]
+  (let [hash (date->hash start-date)
+        dt (parse-date start-date)
+        first-diff (first
+                     (sort #(t/before? (first %1) (first %2))
+                           (filter #(and (not (= hash (second %)))
+                                         (t/after? (first %) dt)
+                                         (= (time/day-of-week (first %))
+                                            (time/day-of-week dt)))
+                                   (map (juxt (comp parse-date first)
+                                              second) date->hash))))]
+    (t/in-days (t/interval dt (first first-diff)))))
 
 (define-event LoadOperatorDatesResponse [dates]
   {:path [:transit-visualization]}
@@ -26,7 +44,7 @@
                       (vec
                        (range (reduce min (map (comp time/year :date) dates))
                               (inc (reduce max (map (comp time/year :date) dates))))))
-             :highlight {:mode :same})
+             :highlight {:mode :diff})
       (dissoc :loading?)))
 
 (define-event LoadOperatorDates [operator-id]
@@ -39,6 +57,10 @@
   {:path [:transit-visualization :highlight]}
   (-> app
       (assoc :mode mode)))
+
+(define-event DaysToFirstDiff [start-date date->hash]
+  {:path [:transit-visualization :days-to-diff]}
+  (days-to-first-diff start-date date->hash))
 
 (defmethod routes/on-navigate-event :transit-visualization [_]
   (->LoadOperatorDates 1))

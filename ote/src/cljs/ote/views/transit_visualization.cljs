@@ -40,15 +40,16 @@
         hash-color (hash->color (date->hash d))]
 
     (merge
-     {:background-color hash-color
-      :color "rgb (0, 255, 255)"
-      :transition "box-shadow 0.25s"
-      :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-     (when (:hash highlight)
-       (highlight-style hash->color date->hash day highlight)))))
+      {:background-color hash-color
+       :color "rgb (0, 255, 255)"
+       :transition "box-shadow 0.25s"
+       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
+      (when (:hash highlight)
+        (highlight-style hash->color date->hash day highlight)))))
 
 (defn hover-day [e! date->hash day]
-  (e! (tv/->HighlightHash (date->hash (time/format-date day)) day)))
+  (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
+  (e! (tv/->DaysToFirstDiff (time/format-date day) date->hash)))
 
 (defn select-day [e! day]
   (e! (tv/->SelectDateForComparison day)))
@@ -65,12 +66,34 @@
         [{:name "Nimi" :width "20%"}]]
        ])))
 
+(defn days-to-diff-info [e! transit-visualization highlight]
+  (if-let [hovered-date (:day highlight)]
+    (when (:hash highlight)
+      [:div {:style {:position "fixed"
+                     :top "80px"
+                     :left "50px"
+                     :min-height "50px"
+                     :width "250px"
+                     :border "solid black 1px"
+                     :padding "5px"}}
+       (str (:days-to-diff transit-visualization)
+            " päivää ensimmäiseen muutokseen viikonpäivästä: "
+            (time/format-date hovered-date) " (" (case (time/day-of-week hovered-date)
+                                                     :monday "Ma"
+                                                     :tuesday "Ti"
+                                                     :wednesday "Ke"
+                                                     :thursday "To"
+                                                     :friday "Pe"
+                                                     :saturday "La"
+                                                     :sunday "Su") ")")])))
+
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
                                  :as transit-visualization}]
   [:div
    "tähän palvelun valinta"
    (when (and (not loading?) hash->color)
      [:div.transit-visualization
+      [days-to-diff-info e! transit-visualization (:highlight transit-visualization)]
       [:div
        [ui/radio-button-group {:name "select-highlight-mode"
                                :on-change #(e! (tv/->SetHighlightMode (keyword %2)))
