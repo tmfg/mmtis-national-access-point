@@ -102,10 +102,14 @@
   {:path [:transit-visualization :compare]}
   (cond
     (= date (:date1 app))
-    (assoc app :date1-route-lines geojson)
+    (assoc app
+           :date1-route-lines geojson
+           :date1-show? true)
 
     (= date (:date2 app))
-    (assoc app :date2-route-lines geojson)
+    (assoc app
+           :date2-route-lines geojson
+           :date2-show? true)
 
     :default
     app))
@@ -123,3 +127,15 @@
   (assoc app
          :route-short-name route-short-name
          :route-long-name route-long-name))
+
+(define-event ToggleRouteDisplayDate [date]
+  {:path [:transit-visualization :compare]}
+  (cond
+    (= date (:date1 app))
+    (update app :date1-show? not)
+
+    (= date (:date2 app))
+    (update app :date2-show? not)
+
+    :default
+    app))

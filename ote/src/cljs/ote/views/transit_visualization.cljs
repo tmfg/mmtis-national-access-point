@@ -90,21 +90,31 @@
     :component-did-mount leaflet/update-bounds-from-layers
     :reagent-render
     (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
-                                                             date1 date1-route-lines
-                                           date2 date2-route-lines]}]
-      [leaflet/Map {:ref "leaflet"
-                    :center      #js [65 25]
-                    :zoomControl true
-                    :zoom        5}
-       (leaflet/background-tile-map)
+                                           date1 date1-route-lines date1-show?
+                                           date2 date2-route-lines date2-show?]}]
+      [:div.transit-visualization-route-map
+
        (when date1-route-lines
-         ^{:key (str date1 "_" route-short-name "_" route-long-name)}
-         [leaflet/GeoJSON {:data date1-route-lines
-                           :style {:color (-> date1 date->hash hash->color)}}])
+         [ui/checkbox {:label (str "Näytä " date1)
+                       :checked (boolean date1-show?)
+                       :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
        (when date2-route-lines
-         ^{:key (str date2 "_" route-short-name "_" route-long-name)}
-         [leaflet/GeoJSON {:data date2-route-lines
-                           :style {:color (-> date2 date->hash hash->color)}}])])}))
+         [ui/checkbox {:label (str "Näytä " date2)
+                       :checked (boolean date2-show?)
+                       :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
+       [leaflet/Map {:ref "leaflet"
+                     :center      #js [65 25]
+                     :zoomControl true
+                     :zoom        5}
+        (leaflet/background-tile-map)
+        (when (and date1-route-lines date1-show?)
+          ^{:key (str date1 "_" route-short-name "_" route-long-name)}
+          [leaflet/GeoJSON {:data date1-route-lines
+                            :style {:color (-> date1 date->hash hash->color)}}])
+        (when (and date2-route-lines date2-show?)
+          ^{:key (str date2 "_" route-short-name "_" route-long-name)}
+          [leaflet/GeoJSON {:data date2-route-lines
+                            :style {:color (-> date2 date->hash hash->color)}}])]])}))
 
 (defn date-comparison [e! {:keys [date->hash hash->color compare]}]
   (let [date1 (:date1 compare)
