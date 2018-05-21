@@ -50,7 +50,9 @@
                                         :transit-authority? nil})]
     (mapv
       (fn [{groups :groups :as user}]
-        (assoc user :groups (cheshire/parse-string (.getValue groups) keyword)))
+        (if groups
+          (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
+          user))
       users)))
 (defn- published-search-param [query]
   (case (:published-type query)
