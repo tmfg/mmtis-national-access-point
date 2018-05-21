@@ -18,9 +18,7 @@
             [ote.ui.common :as common-ui]))
 
 (defn show-service-count-link [e! operator]
-  (let [service-count (::t-operator/service-count operator)
-        operator-id (::t-operator/id operator)
-        operator-name (::t-operator/name operator)]
+  (let [service-count (::t-operator/service-count operator)]
   [:span {:style {:font-weight "600" :font-size "14px"}}
    (if (zero? service-count)
      (tr [:operators :result-no-services])
