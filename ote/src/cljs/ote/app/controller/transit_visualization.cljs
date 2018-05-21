@@ -97,3 +97,29 @@
                     :on-success (tuck/send-async! ->RoutesForDatesResponse (select-keys app [:date1 :date2]))})
         (assoc app :loading? true))
       app)))
+
+(define-event RouteLinesForDateResponse [geojson date]
+  {:path [:transit-visualization :compare]}
+  (cond
+    (= date (:date1 app))
+    (assoc app :date1-route-lines geojson)
+
+    (= date (:date2 app))
+    (assoc app :date2-route-lines geojson)
+
+    :default
+    app))
+
+(define-event SelectRouteForDisplay [route-short-name route-long-name]
+  {:path [:transit-visualization :compare]}
+  ;; FIXME: operator
+  (doseq [date [(:date1 app)
+                (:date2 app)]]
+    (comm/get! (str "transit-visualization/route-lines-for-date/1")
+               {:params {:date date
+                         :short route-short-name
+                         :long route-long-name}
+                :on-success (tuck/send-async! ->RouteLinesForDateResponse date)}))
+  (assoc app
+         :route-short-name route-short-name
+         :route-long-name route-long-name))

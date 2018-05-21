@@ -9,27 +9,29 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.table :as table]
             [ote.db.transport-service :as t-service]
-            [ote.localization :refer [tr]]))
+            [ote.localization :refer [tr]]
+            [ote.ui.leaflet :as leaflet]))
 
 (defn highlight-style [hash->color date->hash day highlight]
   (let [d (time/format-date day)
         d-hash (date->hash d)
         hash-color (hash->color (date->hash d))
         hover-day (:day highlight)
+        hover-day-formatted (time/format-date hover-day)
         hover-hash (:hash highlight)
         mode (:mode highlight)]
 
     (when hash-color
       (case mode
-        :same (if (and (= d-hash hover-hash) (not (= d (time/format-date hover-day))))
+        :same (if (and (= d-hash hover-hash) (not (= d hover-day-formatted)))
                 {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.5)"}
-                (if (= d (time/format-date hover-day))
+                (if (= d hover-day-formatted)
                   {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.75)"}
                   {:box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px rgba(0,0,0,.25)"}))
         :diff (if (and (not (= d-hash hover-hash))
                        (= (time/day-of-week day) (time/day-of-week hover-day)))
                 {:box-shadow "inset 0 0 0 2px crimson, inset 0 0 0 3px black, inset 0 0 0 100px rgba(255,255,255,.65)"}
-                (if (and (= d-hash hover-hash) (= d (time/format-date hover-day)))
+                (if (and (= d-hash hover-hash) (= d hover-day-formatted))
                   {:box-shadow "inset 0 0 0 2px black,
                                 inset 0 0 0 3px transparent,
                                 inset 0 0 0 100px rgba(255,255,255,.75)"}
@@ -66,7 +68,45 @@
                                        :saturday :SAT
                                        :sunday :SUN)]))
 
-(defn date-comparison [e! {:keys [date->hash compare]}]
+(defn- route-listing [e! {:keys [date1 date2] :as compare}]
+  [table/table {:no-rows-message "Ei reittejä"
+                :height 300
+                :name->label str
+                :show-row-hover? true
+                :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
+                                                            (:route-long-name (first %))))}
+   [{:name "Nimi" :width "70%"
+     :read identity
+     :format #(str (:route-short-name %) " " (:route-long-name %))}
+    {:name (str "Vuoroja " date1) :width "15%"
+     :read :date1-trips}
+    {:name (str "Vuoroja " date2) :width "15%"
+     :read :date2-trips}]
+   (:routes compare)])
+
+(defn- selected-route-map [_ _ _ _]
+  (r/create-class
+   {:component-did-update leaflet/update-bounds-from-layers
+    :component-did-mount leaflet/update-bounds-from-layers
+    :reagent-render
+    (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
+                                                             date1 date1-route-lines
+                                           date2 date2-route-lines]}]
+      [leaflet/Map {:ref "leaflet"
+                    :center      #js [65 25]
+                    :zoomControl true
+                    :zoom        5}
+       (leaflet/background-tile-map)
+       (when date1-route-lines
+         ^{:key (str date1 "_" route-short-name "_" route-long-name)}
+         [leaflet/GeoJSON {:data date1-route-lines
+                           :style {:color (-> date1 date->hash hash->color)}}])
+       (when date2-route-lines
+         ^{:key (str date2 "_" route-short-name "_" route-long-name)}
+         [leaflet/GeoJSON {:data date2-route-lines
+                           :style {:color (-> date2 date->hash hash->color)}}])])}))
+
+(defn date-comparison [e! {:keys [date->hash hash->color compare]}]
   (let [date1 (:date1 compare)
         date2 (:date2 compare)
         dow1 (day-of-week-short (time/parse-date-eu date1))
@@ -76,17 +116,13 @@
        "Vertaillaan päiviä: " [:b dow1 " " date1] " ja " [:b dow2 " " date2]
        (when (= (date->hash date1) (date->hash date2))
          [:div "Päivien liikenne on samanlaista"])
-       [table/table {:no-rows-message "Ei reittejä"
-                     :height 300
-                     :name->label str}
-        [{:name "Nimi" :width "70%"
-          :read identity
-          :format #(str (:route-short-name %) " " (:route-long-name %))}
-         {:name (str "Vuoroja " date1) :width "15%"
-          :read :date1-trips}
-         {:name (str "Vuoroja " date2) :width "15%"
-          :read :date2-trips}]
-        (:routes compare)]])))
+
+       ;; List routes and trip counts for seleted dates
+       [route-listing e! compare]
+
+       ;; If a route is selected, show map
+       [selected-route-map e! date->hash hash->color compare]
+       ])))
 
 
 (defn days-to-diff-info [e! transit-visualization highlight]
