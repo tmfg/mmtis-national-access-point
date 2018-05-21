@@ -286,7 +286,8 @@
                 "Välityspalvelu **välittää korvausta** vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsota sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta.")
   :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
-  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta. Lisättäviä alueita ovat Suomen maakunnat, kunnat, postinumerot, sekä maailman valtiot ja maanosat. Voit samalla tavalla lisätä useita alueita.
+Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."

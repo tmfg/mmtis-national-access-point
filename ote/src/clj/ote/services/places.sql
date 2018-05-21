@@ -27,3 +27,19 @@ VALUES (:transport-service-id,
         ST_GeomFromGeoJSON(:geojson),
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
         :primary?);
+
+-- name: fetch-operation-area-search
+-- sort operation area places search in following alphabetical order
+-- finnish-region, finnish-municipality, finnish-postal, country, continent
+SELECT namefin as "ote.db.places/namefin", id as "ote.db.places/id", type as "ote.db.places/type"
+  FROM places
+ WHERE namefin ilike :name
+ ORDER BY
+  CASE TYPE
+  WHEN 'finnish-region' THEN 1
+  WHEN 'finnish-municipality' THEN 2
+  WHEN 'finnish-postal' THEN 3
+  WHEN 'country' THEN 4
+  WHEN 'continent' THEN 5
+   END,
+  namefin;
