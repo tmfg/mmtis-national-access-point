@@ -24,8 +24,8 @@
                    {:strs [date1 date2]} :query-params}
                   (http/transit-response
                    (fetch-routes-for-dates db {:operator-id (Long/parseLong operator)
-                                               :date1 (time/parse-date-iso-8601 date1)
-                                               :date2 (time/parse-date-iso-8601 date2)})))))))
+                                               :date1 (time/parse-date-eu date1)
+                                               :date2 (time/parse-date-eu date2)})))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

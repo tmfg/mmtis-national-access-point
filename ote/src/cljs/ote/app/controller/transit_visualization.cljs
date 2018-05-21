@@ -70,13 +70,13 @@
   (-> app
       (merge {:hash hash :day day})))
 
-(define-event RoutesForDatesResponse [date1 date2 routes]
+(define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
-  (when (and (= date1 (:date1 app))
-             (= date2 (:date2 app)))
+  (if (= dates (select-keys app [:date1 :date2]))
     (-> app
         (assoc :routes routes)
-        (dissoc :loading?))))
+        (dissoc :loading?))
+    app))
 
 (define-event SelectDateForComparison [date]
   {:path [:transit-visualization :compare]}
@@ -91,9 +91,9 @@
                       :last-selected 2}))]
     (if (and (:date1 app) (:date2 app))
       (do
-        (comm/get! (str "transit-visualization/routes-for-dates")
+        (comm/get! (str "transit-visualization/routes-for-dates/1" ;; FIXME: operator
+                        )
                    {:params (select-keys app [:date1 :date2])
-                    ;:on-success (tuck/send-async! ->RoutesForDatesResponse date1 date2)
-                    })
+                    :on-success (tuck/send-async! ->RoutesForDatesResponse (select-keys app [:date1 :date2]))})
         (assoc app :loading? true))
       app)))

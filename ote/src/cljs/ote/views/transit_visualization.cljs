@@ -7,7 +7,9 @@
             [taoensso.timbre :as log]
             [ote.time :as time]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.table :as table]))
+            [ote.ui.table :as table]
+            [ote.db.transport-service :as t-service]
+            [ote.localization :refer [tr]]))
 
 (defn highlight-style [hash->color date->hash day highlight]
   (let [d (time/format-date day)
@@ -54,17 +56,38 @@
 (defn select-day [e! day]
   (e! (tv/->SelectDateForComparison day)))
 
+(defn day-of-week-short [dt]
+  (tr [:enums ::t-service/day :short (case (time/day-of-week dt)
+                                       :monday :MON
+                                       :tuesday :TUE
+                                       :wednesday :WED
+                                       :thursday :THU
+                                       :friday :FRI
+                                       :saturday :SAT
+                                       :sunday :SUN)]))
+
 (defn date-comparison [e! {:keys [date->hash compare]}]
   (let [date1 (:date1 compare)
-        date2 (:date2 compare)]
+        date2 (:date2 compare)
+        dow1 (day-of-week-short (time/parse-date-eu date1))
+        dow2 (day-of-week-short (time/parse-date-eu date2))]
     (when (and date1 date2)
       [:div.transit-visualization-compare
-       "Vertaillaan päiviä: " [:b date1] " ja " [:b date2]
+       "Vertaillaan päiviä: " [:b dow1 " " date1] " ja " [:b dow2 " " date2]
        (when (= (date->hash date1) (date->hash date2))
          [:div "Päivien liikenne on samanlaista"])
-       [table/table {:no-rows-message "Ei reittejä"}
-        [{:name "Nimi" :width "20%"}]]
-       ])))
+       [table/table {:no-rows-message "Ei reittejä"
+                     :height 300
+                     :name->label str}
+        [{:name "Nimi" :width "70%"
+          :read identity
+          :format #(str (:route-short-name %) " " (:route-long-name %))}
+         {:name (str "Vuoroja " date1) :width "15%"
+          :read :date1-trips}
+         {:name (str "Vuoroja " date2) :width "15%"
+          :read :date2-trips}]
+        (:routes compare)]])))
+
 
 (defn days-to-diff-info [e! transit-visualization highlight]
   (if-let [hovered-date (:day highlight)]
@@ -78,14 +101,7 @@
                      :padding "5px"}}
        (str (:days-to-diff transit-visualization)
             " päivää ensimmäiseen muutokseen viikonpäivästä: "
-            (time/format-date hovered-date) " (" (case (time/day-of-week hovered-date)
-                                                     :monday "Ma"
-                                                     :tuesday "Ti"
-                                                     :wednesday "Ke"
-                                                     :thursday "To"
-                                                     :friday "Pe"
-                                                     :saturday "La"
-                                                     :sunday "Su") ")")])))
+            (time/format-date hovered-date) " (" (day-of-week-short hovered-date) ")")])))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
                                  :as transit-visualization}]
