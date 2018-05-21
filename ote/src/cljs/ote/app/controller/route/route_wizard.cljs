@@ -103,8 +103,8 @@
   [trips service-calendars]
   (let [new-calendars
         (mapv
-          (fn [trip]
-            (if (empty? service-calendars)
+         (fn [trip]
+           (if (empty? service-calendars)
               {::transit/service-added-dates   #{}
                ::transit/service-removed-dates #{}
                ::transit/service-rules         []
@@ -117,12 +117,8 @@
                                      (::transit/service-rules cal))]
                 (-> cal
                     (assoc :rule-dates rule-dates)
-                    (assoc ::transit/service-added-dates (into #{}
-                                                               (map #(time/date-fields-from-timestamp %)
-                                                                    (::transit/service-added-dates cal))))
-                    (assoc ::transit/service-removed-dates (into #{}
-                                                                 (map #(time/date-fields-from-timestamp %)
-                                                                      (::transit/service-removed-dates cal))))))))
+                    (update ::transit/service-added-dates set)
+                    (update ::transit/service-removed-dates set)))))
           trips)]
     new-calendars))
 
@@ -192,6 +188,15 @@
   "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
   [app-state]
   (assoc app-state :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))
+
+(defn valid-calendar-rule? [{::transit/keys [from-date to-date]}]
+  (and (time/valid-date? from-date)
+       (time/valid-date? to-date)))
+
+(defn valid-calendar-rule-dates? [calendar]
+  (and (seq (::transit/service-rules calendar))
+       (every? valid-calendar-rule?
+               (::transit/service-rules calendar))))
 
 (extend-protocol tuck/Event
   LoadStops
@@ -376,8 +381,11 @@
 
   CloseServiceCalendar
   (process-event [_ app]
-    (-> app
-        (update-in [:route] dissoc :edit-service-calendar :temporary-calendar)))
+    (let [edit-service-calendar (get-in app [:route :edit-service-calendar])]
+      (-> app
+          (update :route dissoc :edit-service-calendar :temporary-calendar)
+          (update-in [:route ::transit/service-calendars edit-service-calendar ::transit/service-rules]
+                     (flip filterv) valid-calendar-rule?))))
 
   CancelServiceCalendar
   (process-event [_ app]
@@ -391,33 +399,33 @@
   ToggleDate
   (process-event [{date :date trip-idx :trip-idx} app]
     (update-in
-      (route-updated app)
-      [:route ::transit/service-calendars trip-idx]
-               (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
-                     :as service-calendar}]
-                 (let [service-added-dates (or service-added-dates #{})
-                       service-removed-dates (or service-removed-dates #{})
-                       date (time/date-fields date)]
-                   (cond
-                     ;; This date is in added dates, remove it
-                     (service-added-dates date)
-                     (assoc service-calendar ::transit/service-added-dates
-                            (disj service-added-dates date))
+     (route-updated app)
+     [:route ::transit/service-calendars trip-idx]
+     (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
+           :as service-calendar}]
+       (let [service-added-dates (or service-added-dates #{})
+             service-removed-dates (or service-removed-dates #{})
+             date (time/date-fields date)]
+         (cond
+           ;; This date is in added dates, remove it
+           (service-added-dates date)
+           (assoc service-calendar ::transit/service-added-dates
+                  (disj service-added-dates date))
 
-                     ;; This date is in removed dates, remove it
-                     (service-removed-dates date)
-                     (assoc service-calendar ::transit/service-removed-dates
-                            (disj service-removed-dates date))
+           ;; This date is in removed dates, remove it
+           (service-removed-dates date)
+           (assoc service-calendar ::transit/service-removed-dates
+                  (disj service-removed-dates date))
 
-                     ;; This date matches a rule, add it to removed dates
-                     (some #(some (partial = date) (transit/rule-dates %)) service-rules)
-                     (assoc service-calendar ::transit/service-removed-dates
-                            (conj service-removed-dates date))
+           ;; This date matches a rule, add it to removed dates
+           (some #(some (partial = date) (transit/rule-dates %)) service-rules)
+           (assoc service-calendar ::transit/service-removed-dates
+                  (conj service-removed-dates date))
 
-                     ;; Otherwise add this to added dates
-                     :default
-                     (assoc service-calendar ::transit/service-added-dates
-                            (conj service-added-dates date)))))))
+           ;; Otherwise add this to added dates
+           :default
+           (assoc service-calendar ::transit/service-added-dates
+                  (conj service-added-dates date)))))))
 
   EditServiceCalendarRules
   (process-event [{rules :rules trip-idx :trip-idx} app]
@@ -651,15 +659,7 @@
 (defn valid-name [route]
   (if (empty? (get route ::transit/name)) false true))
 
-(defn valid-calendar-rule-dates? [data]
-  (let [check-rule (fn [rule]
-                     (and (not (empty? rule))
-                          (not (str/blank? (get rule ::transit/from-date)))
-                          (not (str/blank? (get rule ::transit/to-date)))))]
-    (and (seq (::transit/service-rules data))
-      (every?
-        #(check-rule %)
-        (::transit/service-rules data)))))
+
 
 (defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or
