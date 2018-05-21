@@ -64,3 +64,13 @@ SELECT ts.id as id
   SELECT ts.id as id
     FROM "transport-service" ts, unnest(ts."transport-type") as str
    WHERE str::text IN (:tt)
+
+-- name: participating-companies
+-- Search all services companies and their business-ids
+ SELECT c."business-id" as "Y-tunnus", c.name as "Nimi"
+   FROM "transport-service" s
+        LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
+        LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
+  WHERE c."business-id" IS NOT NULL
+    AND s.id = :id
+    AND s."published?" = TRUE;

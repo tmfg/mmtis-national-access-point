@@ -922,6 +922,7 @@
           "contact-phone" "Puhelinnumero"
           "id" "Tunnistenumero"
           "name" "Nimi"
+          "business-id" "Y-tunnus"
           "published?" "Julkaistu?"
           "transport-operator-id" "Palveluntuottajan tunnistenumero"
           "type" "Palvelun tyyppi"
@@ -949,7 +950,7 @@
           "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
 
           "url" "WWW-osoite"
-          "companies-csv-url" "Yrityslistan osoite"
+          "csv-url" "Palvelun tuottamiseen osallistuvat yritykset"
           "service-hours-info" "Lisätiedot"
           "indoor-map" "Sisätilakartan osoitetiedot"
           "pick-up-locations" "Toimipisteet"
@@ -1145,7 +1146,8 @@
   :fetching-more "Haetaan lisää palveluita..."
   :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
-  :view-routes "Katsele reittejä"}
+  :view-routes "Katsele reittejä"
+  :load-csv-file "Lataa csv tiedosto"}
 
  :login
  {:label "Kirjautumistiedot"
