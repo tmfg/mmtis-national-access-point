@@ -127,7 +127,7 @@
 
 (defn date-fields->date [{::keys [year date month]}]
   #?(:clj (java.time.LocalDate/of year month date)
-     :cljs (goog.date.Date. year month date)))
+     :cljs (goog.date.Date. year (dec month) date)))
 
 (defn year [dt]
   (::year (date-fields dt)))
@@ -154,6 +154,14 @@
            (map #(Integer/parseInt %)
                 (str/split date #"-"))]
        (java.time.LocalDate/of year month date))))
+
+(defn parse-date-eu
+  "Parse a EU formatted date (dd.MM.yyyy) to a local date"
+  [date]
+  (let [[date month year] (map #?(:clj #(Integer/parseInt %)
+                                  :cljs js/parseInt)
+                               (str/split date #"\."))]
+    (date-fields->date {::year year ::month month ::date date})))
 
 ;; Hook into specql to allow us to read/write the time
 #?(:clj
