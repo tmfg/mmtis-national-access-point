@@ -13,7 +13,8 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
-            [ote.services.transport :as transport]))
+            [ote.services.transport :as transport]
+            [cheshire.core :as cheshire]))
 
 (defqueries "ote/services/admin.sql")
 
@@ -44,9 +45,13 @@
    (handler db user (http/transit-request form-data))))
 
 (defn- list-users [db user query]
-  (nap-users/list-users db {:email (str "%" query "%")
-                            :name  (str "%" query "%")
-                            :transit-authority? nil}))
+  (let [users (nap-users/list-users db {:email (str "%" query "%")
+                                        :name (str "%" query "%")
+                                        :transit-authority? nil})]
+    (mapv
+      (fn [{groups :groups :as user}]
+        (assoc user :groups (cheshire/parse-string (.getValue groups) keyword)))
+      users)))
 (defn- published-search-param [query]
   (case (:published-type query)
     nil? nil
