@@ -61,17 +61,18 @@
     (str street comma postal_code " " post_office)))
 
 (defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format}]
-  (let [format (str/lower-case format)]
-    (when (or (= "gtfs" format) (= "kalkati.net" format))
-      (common-ui/linkify
-        (str "#/routes/view-gtfs?url=" (::t-service/url interface)
-             (when (= "kalkati.net" format)
-               "&type=kalkati"))
-        [ui/flat-button {:label (tr [:service-search :view-routes])
-                         :primary true
-                         :label-position "before"
-                         :icon (ic/action-open-in-new)}]
-        {:target "_blank"}))))
+  (when format
+    (let [format (str/lower-case format)]
+      (when (or (= "gtfs" format) (= "kalkati.net" format))
+        (common-ui/linkify
+          (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+               (when (= "kalkati.net" format)
+                 "&type=kalkati"))
+          [ui/flat-button {:label (tr [:service-search :view-routes])
+                           :primary true
+                           :label-position "before"
+                           :icon (ic/action-open-in-new)}]
+          {:target "_blank"})))))
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
