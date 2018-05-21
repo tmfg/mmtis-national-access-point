@@ -318,8 +318,6 @@
 (defn service-search [e! app]
   (e! (ss/->InitServiceSearch))
   (fn [e! {{results :results
-            total-service-count :total-service-count
-            empty-filters? :empty-filters?
             resource :resource
             geojson :geojson
             loading-geojson? :loading-geojson?
@@ -331,6 +329,7 @@
        [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
                    :open true
                    :modal false
+                   :content-style {:width "80%" :max-width "none"}
                    :auto-scroll-body-content true
                    :on-request-close #(e! (ss/->CloseServiceGeoJSON))
                    :actions [(r/as-element

@@ -11,6 +11,6 @@
 
 (def th {:vertical-align "top"
          :padding-top "0.2em"
-         :padding-right "0.5em"})
+         :padding-right "1.5em"})
 
-(def td {})
+(def value {:padding-right "0.5em"})

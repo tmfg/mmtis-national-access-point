@@ -917,6 +917,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "contact-phone" "Telefonnr"
           "id" "id"
           "name" "Namn"
+          "business-id" "FO-nummer"
           "published?" "Publicerat?"
           "transport-operator-id" "Tjänsteproducentens id"
           "type" "Tjänstetyp"
@@ -944,7 +945,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "luggage-restrictions" "Begränsningar gällande resgods"
 
           "url" "WWW-adress"
-          "companies-csv-url" "Företagslistans tekniska address"
+          "csv-url" "Företag som medverkar i tjänsteproduktionen"
           "service-hours-info" "Tilläggsinfo"
           "indoor-map" "Inomhuskarta www-sidor"
           "pick-up-locations" "Verksamhetsställen"
@@ -1137,7 +1138,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :fetching-more "Sökning av tjänster pågår..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
   :operator-no-services "Tjänsteproducenten har inga tjänster."
-  :view-routes "Visa rutter"}
+  :view-routes "Visa rutter"
+  :load-csv-file "Ladda csv"}
 
  :login
  {:label "Inloggning"

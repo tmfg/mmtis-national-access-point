@@ -58,3 +58,13 @@ SELECT ts.id as id
   JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
  WHERE c."business-id" IN (:operators)
    AND ts."published?" = TRUE;
+
+-- name: participating-companies
+-- Search all services companies and their business-ids
+ SELECT c."business-id" as "Y-tunnus", c.name as "Nimi"
+   FROM "transport-service" s
+        LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
+        LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
+  WHERE c."business-id" IS NOT NULL
+    AND s.id = :id
+    AND s."published?" = TRUE;

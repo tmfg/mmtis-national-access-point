@@ -25,12 +25,14 @@
 
 
 (defn ignore-key? [key]
-  (str/ends-with? key "-id"))
+  (let [keys-to-ignore ["ckan-dataset-id" "ckan-resource-id" "-imported" "created" "-csv-url"]]
+  (some #(str/ends-with? key %) keys-to-ignore)))
 
 (defmulti transform-value (fn [key value] key))
 
 (defmethod transform-value "url" [_ value] (linkify value value {:target "_blank"}))
 (defmethod transform-value "homepage" [_ value] (linkify value value {:target "_blank"}))
+(defmethod transform-value "csv-url" [_ value] (linkify value (tr [:service-search :load-csv-file]) {:target "_blank"}))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
 
 
@@ -104,7 +106,8 @@
 
       ;; Other values, like strings and numbers
       :default
-      [:span (transform-value key value)])))
+      [:span (stylefy/use-style style/value)
+       (transform-value key value)])))
 
 (defn properties-table [properties]
   [:table.table.table-striped.table-bordered.table-condensed
@@ -118,7 +121,7 @@
          [:th (merge {:scope "row" :width "25%"}
                      (stylefy/use-style style/th))
           (tr-or (tr [:viewer key]) key)]
-         [:td (stylefy/use-style style/td)
+         [:td (stylefy/use-style style/value)
           [show-value key value]]])
 
       (filter (fn [[key value]]
