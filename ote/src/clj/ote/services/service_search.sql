@@ -68,3 +68,9 @@ SELECT ts.id as id
   WHERE c."business-id" IS NOT NULL
     AND s.id = :id
     AND s."published?" = TRUE;
+
+-- name: service-ids-by-data-content
+-- Find services using external url data content
+SELECT eid."transport-service-id" as id
+  FROM "external-interface-description" eid, unnest(eid."data-content") as str
+ WHERE  str::text IN (:dc)

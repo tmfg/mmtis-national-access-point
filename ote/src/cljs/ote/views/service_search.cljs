@@ -18,7 +18,8 @@
             [clojure.string :as str]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.app.controller.admin :as admin]
-            [tuck.core :as tuck]))
+            [tuck.core :as tuck]
+            [ote.ui.validation :as validation]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -309,6 +310,19 @@
           :suggestions-config {:text :text :value :text}
           :suggestions (sub-types-to-list (::t-service/sub-type facets))
           :open-on-focus? true}
+
+         {:name               ::t-service/data-content
+          :type               :chip-input
+          :full-width?        true
+          :auto-select?       true
+          :open-on-focus?     true
+          ;; Translate visible suggestion text, but keep the value intact.
+          :suggestions        (mapv (fn [val]
+                                      {:text (tr [:enums ::t-service/interface-data-content val])
+                                       :value val})
+                                    t-service/interface-data-contents)
+          :suggestions-config {:text :text :value :value}
+          :is-empty?          validation/empty-enum-dropdown?}
 
          {:type :component
           :name :operators
