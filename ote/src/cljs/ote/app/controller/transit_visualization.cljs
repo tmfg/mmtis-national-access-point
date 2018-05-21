@@ -26,7 +26,8 @@
                                             (time/day-of-week dt)))
                                    (map (juxt (comp parse-date first)
                                               second) date->hash))))]
-    (t/in-days (t/interval dt (first first-diff)))))
+    (when first-diff
+      (t/in-days (t/interval dt (first first-diff))))))
 
 (define-event LoadOperatorDatesResponse [dates]
   {:path [:transit-visualization]}

@@ -135,9 +135,9 @@
        ])))
 
 
-(defn days-to-diff-info [e! transit-visualization highlight]
-  (if-let [hovered-date (:day highlight)]
-    (when (:hash highlight)
+(defn days-to-diff-info [e! {:keys [days-to-diff]} highlight]
+  (when-let [hovered-date (:day highlight)]
+    (when (and days-to-diff (:hash highlight))
       [:div {:style {:position "fixed"
                      :top "80px"
                      :left "50px"
@@ -145,7 +145,7 @@
                      :width "250px"
                      :border "solid black 1px"
                      :padding "5px"}}
-       (str (:days-to-diff transit-visualization)
+       (str days-to-diff
             " päivää ensimmäiseen muutokseen viikonpäivästä: "
             (time/format-date hovered-date) " (" (day-of-week-short hovered-date) ")")])))
 
