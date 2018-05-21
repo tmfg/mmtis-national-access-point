@@ -26,6 +26,7 @@
                        oa ::t-service/operation-area
                        text :text-search
                        st ::t-service/sub-type
+                       tt ::t-service/transport-type
                        limit :limit offset :offset
                        :as filters}]
   (merge
@@ -37,6 +38,8 @@
      {:text text})
    (when-not (empty? st)
      {:sub_types (str/join "," (map (comp name :value) st))})
+   (when-not (empty? tt)
+     {:transport_types (str/join "," (map (comp name :value) tt))})
    (when (and limit offset)
      {:limit limit
       :offset offset})))

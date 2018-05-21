@@ -73,6 +73,11 @@
                        {::t-service/published? true
                         ::t-service/sub-type (op/in types)}))))
 
+(defn- transport-type-ids [db transport-types]
+  (when-not (empty? transport-types)
+    (ids :id
+         (service-ids-by-transport-type db {:tt (apply list transport-types)}))))
+
 (defn- operator-ids [db operators]
   (when-not (empty? operators)
     (ids :id
@@ -84,10 +89,11 @@
   (into [] (service-search-by-operator db {:name (str "%" term "%")
                                            :businessid (str term )})))
 
-(defn- search [db {:keys [operation-area sub-type text operators offset limit]
+(defn- search [db {:keys [operation-area sub-type transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
                         (sub-type-ids db sub-type)
+                        (transport-type-ids db transport-type)
                         (text-search-ids db text)
                         (operator-ids db operators)]
         empty-filters? (every? nil? result-id-sets)
@@ -121,6 +127,8 @@
    :sub-type (when-let [st (some-> (params "sub_types")
                                    (str/split #","))]
                (into #{} (map keyword st)))
+   :transport-type (some-> "transport_types" params
+                           (str/split #","))
    :operators (some-> "operators" params
                       (str/split #","))
    :limit (some-> "limit" params (Integer/parseInt))

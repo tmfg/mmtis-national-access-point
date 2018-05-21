@@ -58,3 +58,9 @@ SELECT ts.id as id
   JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
  WHERE c."business-id" IN (:operators)
    AND ts."published?" = TRUE;
+
+-- name: service-ids-by-transport-type
+-- Find services using transport type
+  SELECT ts.id as id
+    FROM "transport-service" ts, unnest(ts."transport-type") as str
+   WHERE str::text IN (:tt)

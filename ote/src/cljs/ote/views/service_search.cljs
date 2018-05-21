@@ -46,7 +46,6 @@
                      :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
-
 (defn data-item [icon item]
   [:div (stylefy/use-style style/data-items)
    [:div (stylefy/use-style style-base/item-list-row-margin)
@@ -211,7 +210,6 @@
                                         (e! (ss/->UpdateSearchFilters nil)))}
          operator]])]))
 
-
 (defn- parse-operator-data-source [completions]
   (into-array
     (map (fn [{:keys [business-id operator]}]
@@ -249,13 +247,11 @@
       (sort-by :text names)
       (sort-by :text numeric))))
 
+(def transport-types [:road :rail :aviation :sea])
+
 (defn filters-form [e! {filters :filters
-                        facets :facets
-                        operators :operators
-                        :as service-search}]
-  (let [sub-type (tr-key [:enums ::t-service/sub-type]
-                         [:enums ::t-service/type])
-        sub-types-to-list (fn [data]
+                        facets  :facets}]
+  (let [sub-types-to-list (fn [data]
                             (keep (fn [val]
                                     (let [subtype (:sub-type val)]
                                       (when-not (= :other subtype)
@@ -264,7 +260,13 @@
                                                   (dissoc :sub-type)
                                                   (assoc :value subtype
                                                          :text (tr [:enums ::t-service/sub-type subtype])))))))
-                                  data))]
+                                  data))
+        transport-types-to-list (fn [data]
+                                  (keep (fn [val]
+                                          (into (sorted-map)
+                                                (assoc {} :text (tr [:enums ::t-service/transport-type val])
+                                                          :value val)))
+                                        data))]
     [:div
      [:h1 (tr [:service-search :label])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
@@ -307,6 +309,15 @@
           :full-width-input? false
           :suggestions-config {:text :text :value :text}
           :suggestions (sub-types-to-list (::t-service/sub-type facets))
+          :open-on-focus? true}
+
+         {:id "transport-types"
+          :name ::t-service/transport-type
+          :type :chip-input
+          :full-width? true
+          :full-width-input? false
+          :suggestions-config {:text :text :value :text}
+          :suggestions (transport-types-to-list transport-types)
           :open-on-focus? true}
 
          {:type :component
