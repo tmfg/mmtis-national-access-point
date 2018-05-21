@@ -223,11 +223,12 @@
   (let [results (:results data)
         chip-results (:chip-results data)]
     [:div
-     [:div.col-xs-12.col-md-3
       [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
                          :floating-label-fixed true
                          :hintText (tr [:service-search :operator-search-placeholder])
                          :hint-style style-base/placeholder
+                         :full-width? true
+                         :style {:width "100%"}
                          :filter (constantly true)          ;; no filter, backend returns what we want
                          :maxSearchResults 12
                          :dataSource (parse-operator-data-source results)
@@ -237,7 +238,7 @@
                                             (e! (ss/->AddOperator (aget % "business-id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
-      [operator-result-chips e! chip-results]]]))
+      [operator-result-chips e! chip-results]]))
 
 (defn- sort-places [places]
   (let [names (filter #(re-matches #"^\D+$" (:text %)) places)
@@ -247,7 +248,7 @@
       (sort-by :text names)
       (sort-by :text numeric))))
 
-(def transport-types [:road :rail :aviation :sea])
+(def transport-types [:road :rail :sea :aviation])
 
 (defn filters-form [e! {filters :filters
                         facets  :facets}]
@@ -279,12 +280,32 @@
           :layout :row
           :card-style style-base/filters-form}
 
+         {:type :component
+          :name :operators
+          :full-width? true
+          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :component (fn [{data :data}]
+                       [:span [operator-search e! data]])}
+
          {:name :text-search
           :type :string
+          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :full-width? true
           :hint-text (tr [:service-search :text-search-placeholder])}
+
+         {:id "transport-types"
+          :name ::t-service/transport-type
+          :type :chip-input
+          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :full-width? true
+          :full-width-input? false
+          :suggestions-config {:text :text :value :text}
+          :suggestions (transport-types-to-list transport-types)
+          :open-on-focus? true}
 
          {:name ::t-service/operation-area
           :type :chip-input
+          :container-class "col-xs-12 col-sm-12 col-md-4"
           :filter (fn [query, key]
                     (let [k (str/lower-case key)
                           q (str/lower-case query)]
@@ -305,25 +326,12 @@
           :name ::t-service/sub-type
           :label (tr [:service-search :type-search])
           :type :chip-input
+          :container-class "col-xs-12 col-sm-12 col-md-4"
           :full-width? true
           :full-width-input? false
           :suggestions-config {:text :text :value :text}
           :suggestions (sub-types-to-list (::t-service/sub-type facets))
-          :open-on-focus? true}
-
-         {:id "transport-types"
-          :name ::t-service/transport-type
-          :type :chip-input
-          :full-width? true
-          :full-width-input? false
-          :suggestions-config {:text :text :value :text}
-          :suggestions (transport-types-to-list transport-types)
-          :open-on-focus? true}
-
-         {:type :component
-          :name :operators
-          :component (fn [{data :data}]
-                       [:span [operator-search e! data]])})]
+          :open-on-focus? true})]
       filters]]))
 
 (defn service-search [e! app]
