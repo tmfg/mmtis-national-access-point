@@ -47,6 +47,17 @@
 
 (defmethod on-navigate-event :default [_] nil)
 
+(defn- send-startup-events [event]
+  (let [e! (fn e! [event]
+             (binding [tuck/*current-send-function* e!]
+               (swap! state/app (flip tuck/process-event) event)))]
+    (if (vector? event)
+      ;; Received multiple events, apply them all
+      (doseq [event event]
+        (e! event))
+      ;; Apply single event
+      (e! event))))
+
 (defn- on-navigate [go-to-url-event name params query]
   (swap! state/app
          (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
@@ -67,19 +78,11 @@
                                     :url js/window.location.href}
                    event (on-navigate-event navigation-data)
                    app (merge app navigation-data)]
-               (if event
-                 (binding [tuck/*current-send-function*
-                           #(swap! state/app (flip tuck/process-event) %)]
-                   (if (vector? event)
-                     ;; Received multiple events, apply them all
-                     (reduce (fn [app event]
-                               (if event
-                                 (tuck/process-event event app)
-                                 app))
-                             app event)
-                     ;; Apply single event
-                     (tuck/process-event event app)))
-                 app))))))
+
+               ;; Send startup events (if any) immediately after returning from this swap
+               (when event
+                 (.setTimeout js/window #(send-startup-events event) 0))
+               app)))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page
