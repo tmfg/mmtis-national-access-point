@@ -40,7 +40,7 @@
         :format (tr-key [:enums ::transit/pre-notice-state])}
        {:name :actions
         :read (fn [row]
-                [:div
+                [:div.edit-pre-notice
                  [ui/icon-button {:href "#"
                                   :on-click #(do
                                                (.preventDefault %)
