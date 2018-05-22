@@ -125,6 +125,8 @@
                          :long route-long-name}
                 :on-success (tuck/send-async! ->RouteLinesForDateResponse date)}))
   (assoc app
+         :date1-route-lines nil
+         :date2-route-lines nil
          :route-short-name route-short-name
          :route-long-name route-long-name))
 
