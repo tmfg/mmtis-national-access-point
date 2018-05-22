@@ -345,6 +345,7 @@
           :open-on-focus? true})]
       filters]]))
 
+
 (defn service-search [e! app]
   (e! (ss/->InitServiceSearch))
   (fn [e! {{results :results
