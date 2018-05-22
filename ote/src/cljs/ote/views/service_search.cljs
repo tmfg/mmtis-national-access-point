@@ -242,7 +242,7 @@
       [operator-result-chips e! chip-results]]))
 
 (defn- capitalize-operation-area [sentence]
-  (str/replace sentence #"([^A-Öa-ä0-9_])(\w)"
+  (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
                (fn [[_ before capitalize]]
                  (str before (str/upper-case capitalize)))))
 
