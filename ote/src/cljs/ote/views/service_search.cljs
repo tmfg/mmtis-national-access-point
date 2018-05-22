@@ -225,7 +225,7 @@
   (let [results (:results data)
         chip-results (:chip-results data)]
     [:div
-      [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
+     [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
                          :floating-label-fixed true
                          :hintText (tr [:service-search :operator-search-placeholder])
                          :hint-style style-base/placeholder
@@ -240,7 +240,7 @@
                                             (e! (ss/->AddOperator (aget % "business-id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
-      [operator-result-chips e! chip-results]]))
+     [operator-result-chips e! chip-results]]))
 
 (defn- sort-places [places]
   (let [names (filter #(re-matches #"^\D+$" (:text %)) places)
@@ -308,6 +308,8 @@
          {:name ::t-service/operation-area
           :type :chip-input
           :container-class "col-xs-12 col-sm-12 col-md-4"
+          :full-width? true
+          :full-width-input? false
           :filter (fn [query, key]
                     (let [k (str/lower-case key)
                           q (str/lower-case query)]
@@ -321,8 +323,7 @@
           :suggestions-config {:text :text :value :text}
           :suggestions (sort-places (::t-service/operation-area facets))
           ;; Select first match from autocomplete filter result list after pressing enter
-          :auto-select? true
-          :full-width? true}
+          :auto-select? true}
 
          {:id "sub-types"
           :name ::t-service/sub-type
@@ -336,6 +337,7 @@
           :open-on-focus? true}
 
          {:name               ::t-service/data-content
+          :label              (tr [:service-search :data-content-search-label])
           :type               :chip-input
           :full-width?        true
           :container-class    "col-xs-12 col-sm-12 col-md-4"
