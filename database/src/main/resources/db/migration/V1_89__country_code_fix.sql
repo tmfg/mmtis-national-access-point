@@ -2,7 +2,7 @@
 -- Remove duplicate Indian Ocean Territories
 -- Update Yhdistynyt Kuningaskunta to Iso-Britannia
 
-delete country where nameeng = 'Indian Ocean Territories';
+delete from country where nameeng = 'Indian Ocean Territories';
 
 update country set code = 'AE' where nameeng = 'United Arab Emirates';
 update country set code = 'AG' where nameeng = 'Antigua and Barbuda';
