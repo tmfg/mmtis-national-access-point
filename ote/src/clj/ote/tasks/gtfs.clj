@@ -10,7 +10,9 @@
             [ote.db.transport-service :as t-service]
             [ote.integration.import.gtfs :as import-gtfs]
             [taoensso.timbre :as log]
-            [specql.core :as specql])
+            [specql.core :as specql]
+            [ote.time :as time]
+            [ote.tasks.util :refer [timezone]])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -42,17 +44,23 @@
         (log/warn "Error in gtfs s3 upload!" e)))
     (log/debug "GTFS IMPORT IS NOT ENABLED!")))
 
+(def night-hours #{0 1 2 3 4})
+
+(defn night-time? [dt]
+  (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
+
 (defrecord GtfsTasks [at config]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::stop-tasks [(chime-at (drop 1 (periodic-seq (t/now) (t/minutes 1)))
-                              (fn [_]
-                                (#'update-one-gtfs! config db)))]))
-  (stop [{stop-tasks ::stop-tasks :as this}]
-    (doseq [stop stop-tasks]
-      (stop))
-    (dissoc this ::stop-tasks)))
+           ::stop-task (chime-at
+                        (filter night-time?
+                                (drop 1 (periodic-seq (t/now) (t/minutes 10))))
+                        (fn [_]
+                          (#'update-one-gtfs! config db)))))
+  (stop [{stop-task ::stop-task :as this}]
+    (stop-task)
+    (dissoc this ::stop-task)))
 
 (defn gtfs-tasks
   ([config] (gtfs-tasks daily-update-time config))
