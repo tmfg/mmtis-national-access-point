@@ -72,18 +72,22 @@
 
   LoginResponse
   (process-event [{response :response} app]
+    (let [navigate-to (get-in app [:login :navigate-to])
+          new-page (if navigate-to
+                     (:page navigate-to)
+                     :own-services)]
     (if (:success? response)
       (do
-        (routes/navigate! :own-services)
+        (routes/navigate! new-page (:params navigate-to))
         (-> app
             (dissoc :login)
             (update-transport-operator-data (:session-data response))
             (assoc :flash-message (tr [:common-texts :logged-in])
-                   :page :own-services)))
+                   :page new-page)))
       (update app :login assoc
               :failed? true
               :in-progress? false
-              :error (:error response))))
+              :error (:error response)))))
 
   LoginFailed
   (process-event [{response :response} app]
@@ -105,8 +109,12 @@
   (process-event [_ app]
     (routes/navigate! :front-page)
     (-> app
-        (dissoc :user :transport-operator
-                :transport-operators-with-services :transport-service-vector)
+        (dissoc :user
+                :transport-operator
+                :transport-operators-with-services
+                :transport-service-vector
+                :route-list
+                :routes-vector)
         (assoc :flash-message (tr [:login :logged-out]))))
 
   LogoutFailed
