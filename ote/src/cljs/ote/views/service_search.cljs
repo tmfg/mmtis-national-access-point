@@ -242,13 +242,23 @@
 
      [operator-result-chips e! chip-results]]))
 
+(defn- capitalize-operation-area-postal-code [sentence]
+  (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
+               (fn [[_ before capitalize]]
+                 (str before (str/upper-case capitalize)))))
+
 (defn- sort-places [places]
-  (let [names (filter #(re-matches #"^\D+$" (:text %)) places)
-        ;; Place names starting with a number, like postal code areas
-        numeric (filter #(re-matches #"^\d.*" (:text %)) places)]
-    (concat
-      (sort-by :text names)
-      (sort-by :text numeric))))
+  (when-not (nil? places)
+    (let [names (filter #(re-matches #"^\D+$" (:text %)) places)
+          names (mapv #(update % :text str/capitalize) names)
+          ;; Place names starting with a number, like postal code areas
+          numeric (filter #(re-matches #"^\d.*" (:text %)) places)
+          numeric (mapv (fn [val]
+                          (update val :text capitalize-operation-area-postal-code))
+                        numeric)]
+      (concat
+        (sort-by :text names)
+        (sort-by :text numeric)))))
 
 (def transport-types [:road :rail :sea :aviation])
 
@@ -351,6 +361,7 @@
           :suggestions-config {:text :text :value :value}
           :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))
+
 
 (defn service-search [e! app]
   (e! (ss/->InitServiceSearch))
