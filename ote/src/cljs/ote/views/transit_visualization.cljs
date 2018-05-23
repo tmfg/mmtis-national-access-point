@@ -159,7 +159,6 @@
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
                                  :as transit-visualization}]
   [:div
-   "tähän palvelun valinta"
    (when (and (not loading?) hash->color)
      [:div.transit-visualization
       [days-to-diff-info e! transit-visualization (:highlight transit-visualization)]

@@ -65,8 +65,8 @@
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
 
-(defmethod routes/on-navigate-event :transit-visualization [_]
-  (->LoadOperatorDates 1))
+(defmethod routes/on-navigate-event :transit-visualization [{params :params}]
+  (->LoadOperatorDates (:operator-id params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
