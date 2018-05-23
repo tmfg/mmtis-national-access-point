@@ -242,7 +242,7 @@
 
      [operator-result-chips e! chip-results]]))
 
-(defn- capitalize-operation-area [sentence]
+(defn- capitalize-operation-area-postal-code [sentence]
   (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
                (fn [[_ before capitalize]]
                  (str before (str/upper-case capitalize)))))
@@ -254,7 +254,7 @@
           ;; Place names starting with a number, like postal code areas
           numeric (filter #(re-matches #"^\d.*" (:text %)) places)
           numeric (mapv (fn [val]
-                          (update val :text capitalize-operation-area))
+                          (update val :text capitalize-operation-area-postal-code))
                         numeric)]
       (concat
         (sort-by :text names)
