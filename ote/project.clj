@@ -58,7 +58,7 @@
 
                  ;; Frontend UI libraries
                  [reagent "0.8.0-alpha2"]
-                 [webjure/tuck "0.4.4"]
+                 [webjure/tuck "20180327"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
                  [cljs-react-material-ui "0.2.48"]

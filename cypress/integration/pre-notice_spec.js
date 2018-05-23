@@ -61,6 +61,15 @@ describe('Pre notice tests', () => {
         cy.contains('Tallenna ja lähetä').click();
         cy.get('#confirm-send-pre-notice').click();
     });
+
+    it('open the pre-notice and check region', () => {
+        cy.get('tr:last-child div.edit-pre-notice a').click();
+        cy.get('#route-description').contains('Oulu - Kajaani');
+
+        // two regions drawn on the map
+        cy.get('div.leaflet-container').find('path.leaflet-interactive').should('have.length',2);
+    });
+
 });
 
 describe('Autority pre notice tests', () => {

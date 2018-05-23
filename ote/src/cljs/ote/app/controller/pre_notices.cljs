@@ -46,12 +46,15 @@
      (->ShowPreNotice id))
    (->LoadAuthorityPreNotices)])
 
+(declare load-region-geojson)
+
 (tuck/define-event LoadPreNoticeResponse [response]
   {:path [:pre-notice]
    :app pre-notice}
-     (merge
-       (select-keys pre-notice #{:regions})
-       (effective-date-description->set response)))
+  (load-region-geojson pre-notice (::transit/regions response))
+  (merge
+   (select-keys pre-notice #{:regions})
+   (effective-date-description->set response)))
 
 (tuck/define-event LoadPreNoticesResponse [response]
   {:path [:pre-notices]}
@@ -203,15 +206,19 @@
   {:path [:pre-notice :regions]}
   (update app id assoc :geojson response))
 
+(defn- load-region-geojson [pre-notice region-ids]
+  (doseq [region-id region-ids
+          :when (not (get-in pre-notice [:regions region-id :geojson]))]
+    (comm/get! (str "pre-notices/region/" region-id)
+               {:on-success (tuck/send-async! ->RegionLocationResponse region-id)
+                :on-failure (tuck/send-async! ->ServerError)})))
+
 (define-event SelectedRegions [regions]
   {:path [:pre-notice]}
-  ;; Get locations for all regions
-  (doseq [{region :id} regions
-          :when (not (get-in app [:regions region :geojson]))]
-    (comm/get! (str "pre-notices/region/" region)
-               {:on-success (tuck/send-async! ->RegionLocationResponse region)
-                :on-failure (tuck/send-async! ->ServerError)}))
-  (assoc app ::transit/regions (mapv :id regions)))
+  (let [region-ids (mapv :id regions)]
+    ;; Get locations for all regions
+    (load-region-geojson app region-ids)
+    (assoc app ::transit/regions region-ids)))
 
 (define-event ShowPreNoticeResponse [response]
   {:path [:pre-notice-dialog]}

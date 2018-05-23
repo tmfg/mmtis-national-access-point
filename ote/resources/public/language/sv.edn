@@ -386,7 +386,8 @@
    :request     "Abbonerad trafik eller annan anropsstyrd trafik"
    :schedule    "Regelbunden ruttbaserad trafik"
    :rentals     "Fordonsuthyrning och kommersiella samanvändningstjänster"
-   :parking     "Allmänna kommersiella parkeringstjänster"}
+   :parking     "Allmänna kommersiella parkeringstjänster"
+   :brokerage   "Förmedlingstjänster"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Kontant"
@@ -1139,7 +1140,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
   :operator-no-services "Tjänsteproducenten har inga tjänster."
   :view-routes "Visa rutter"
-  :load-csv-file "Ladda csv"}
+  :load-csv-file "Ladda csv"
+  :data-content-search-label "Gränssnittsinnehåll"}
 
  :login
  {:label "Inloggning"

@@ -379,7 +379,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :request      "Tilausliikenne ja muu kutsuun perustuva liikenne"
    :schedule     "Säännöllinen aikataulun mukainen liikenne"
    :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking      "Yleiset kaupalliset pysäköintipalvelut"}
+   :parking      "Yleiset kaupalliset pysäköintipalvelut"
+   :brokerage    "Välityspalvelut"}
 
 
   :ote.db.transport-service/payment-methods
@@ -1148,7 +1149,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
-  :load-csv-file "Lataa csv tiedosto"}
+  :load-csv-file "Lataa csv tiedosto"
+  :data-content-search-label "Rajapinnan sisältö"}
 
  :login
  {:label "Kirjautumistiedot"

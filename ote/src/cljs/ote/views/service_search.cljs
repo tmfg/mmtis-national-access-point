@@ -18,7 +18,8 @@
             [clojure.string :as str]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.app.controller.admin :as admin]
-            [tuck.core :as tuck]))
+            [tuck.core :as tuck]
+            [ote.ui.validation :as validation]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -224,7 +225,7 @@
   (let [results (:results data)
         chip-results (:chip-results data)]
     [:div
-      [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
+     [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
                          :floating-label-fixed true
                          :hintText (tr [:service-search :operator-search-placeholder])
                          :hint-style style-base/placeholder
@@ -239,7 +240,7 @@
                                             (e! (ss/->AddOperator (aget % "business-id")))
                                             (e! (ss/->UpdateSearchFilters nil)))}]
 
-      [operator-result-chips e! chip-results]]))
+     [operator-result-chips e! chip-results]]))
 
 (defn- capitalize-operation-area [sentence]
   (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
@@ -317,6 +318,8 @@
          {:name ::t-service/operation-area
           :type :chip-input
           :container-class "col-xs-12 col-sm-12 col-md-4"
+          :full-width? true
+          :full-width-input? false
           :filter (fn [query, key]
                     (let [k (str/lower-case key)
                           q (str/lower-case query)]
@@ -330,8 +333,7 @@
           :suggestions-config {:text :text :value :text}
           :suggestions (sort-places (::t-service/operation-area facets))
           ;; Select first match from autocomplete filter result list after pressing enter
-          :auto-select? true
-          :full-width? true}
+          :auto-select? true}
 
          {:id "sub-types"
           :name ::t-service/sub-type
@@ -342,7 +344,22 @@
           :full-width-input? false
           :suggestions-config {:text :text :value :text}
           :suggestions (sub-types-to-list (::t-service/sub-type facets))
-          :open-on-focus? true})]
+          :open-on-focus? true}
+
+         {:name               ::t-service/data-content
+          :label              (tr [:service-search :data-content-search-label])
+          :type               :chip-input
+          :full-width?        true
+          :container-class    "col-xs-12 col-sm-12 col-md-4"
+          :auto-select?       true
+          :open-on-focus?     true
+          ;; Translate visible suggestion text, but keep the value intact.
+          :suggestions        (mapv (fn [val]
+                                      {:text  (tr [:enums ::t-service/interface-data-content val])
+                                       :value val})
+                                    t-service/interface-data-contents)
+          :suggestions-config {:text :text :value :value}
+          :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))
 
 

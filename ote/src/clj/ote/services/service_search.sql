@@ -12,7 +12,9 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
                    WHERE t."published?" = true
                    GROUP BY t."sub-type") count ON type."sub-type" = count."sub-type"
  -- PENDING: remove value from enum if we decide not to implement brokerage type at all
- WHERE type."sub-type" NOT IN ('brokerage')
+ -- Brokerage enabled, but it only affects on dropdown list in ui. Brokerage isn't a subtype anymore, and we cant
+ -- calculate how many brokering services we have using this query.
+ -- WHERE type."sub-type" NOT IN ('brokerage')
  ORDER BY count DESC
 
 -- name: latest-service-ids
@@ -74,3 +76,9 @@ SELECT ts.id as id
   WHERE c."business-id" IS NOT NULL
     AND s.id = :id
     AND s."published?" = TRUE;
+
+-- name: service-ids-by-data-content
+-- Find services using external url data content
+SELECT eid."transport-service-id" as id
+  FROM "external-interface-description" eid, unnest(eid."data-content") as str
+ WHERE  str::text IN (:dc)
