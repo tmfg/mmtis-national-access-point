@@ -156,31 +156,57 @@
         [:div (str "alkaen: " (time/format-date hovered-date) " (" (day-of-week-short hovered-date) ")")]
         ]])))
 
+(defn highlight-mode-switch [e! highlight]
+  [:div
+   [ui/radio-button-group {:name "select-highlight-mode"
+                           :on-change #(e! (tv/->SetHighlightMode (keyword %2)))
+                           :value-selected (:mode highlight)
+                           :style {:display "flex" :justify-content "flex-start" :flex-direction "row wrap"}}
+    [ui/radio-button {:label "Korosta samanlaiset"
+                      :value :same
+                      :style {:white-space "nowrap"
+                              :width "auto"
+                              :margin-right "20px"
+                              :font-size "12px"
+                              :font-weight "bold"}}]
+    [ui/radio-button {:label "Korosta poikkeukset"
+                      :value :diff
+                      :style {:white-space "nowrap"
+                              :width "auto"
+                              :font-size "12px"
+                              :font-weight "bold"}}]]])
+
+(defn calendar-style-switch [e! transit-visualization]
+  [:div
+   [ui/radio-button-group {:name "select-highlight-mode"
+                           :on-change #(e! (tv/->SetCalendarMode (keyword %2)))
+                           :value-selected (:calendar-mode transit-visualization)
+                           :style {:display "flex" :justify-content "flex-start" :flex-direction "row wrap"}}
+    [ui/radio-button {:label "Tiivis näkymä"
+                      :value :compact
+                      :style {:white-space "nowrap"
+                              :width "auto"
+                              :margin-right "20px"
+                              :font-size "12px"
+                              :font-weight "bold"}}]
+    [ui/radio-button {:label "Viikkonäkymä"
+                      :value :weeks
+                      :style {:white-space "nowrap"
+                              :width "auto"
+                              :font-size "12px"
+                              :font-weight "bold"}}]]])
+
+
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
                                  :as transit-visualization}]
   [:div
    (when (and (not loading?) hash->color)
      [:div.transit-visualization
-      [days-to-diff-info e! transit-visualization (:highlight transit-visualization)]
-      [:div
-       [ui/radio-button-group {:name "select-highlight-mode"
-                               :on-change #(e! (tv/->SetHighlightMode (keyword %2)))
-                               :value-selected (:mode highlight)
-                               :style {:display "flex" :justify-content "flex-start" :flex-direction "row wrap"}}
-        [ui/radio-button {:label "Korosta samanlaiset"
-                          :value :same
-                          :style {:white-space "nowrap"
-                                  :width "auto"
-                                  :margin-right "20px"
-                                  :font-size "12px"
-                                  :font-weight "bold"}}]
-        [ui/radio-button {:label "Korosta poikkeukset"
-                          :value :diff
-                          :style {:white-space "nowrap"
-                                  :width "auto"
-                                  :font-size "12px"
-                                  :font-weight "bold"}}]]]
-      [service-calendar/service-calendar {:selected-date? (constantly false)
+      [days-to-diff-info e! transit-visualization highlight]
+      [highlight-mode-switch e! highlight]
+      [calendar-style-switch e! transit-visualization]
+      [service-calendar/service-calendar {:view-mode (:calendar-mode transit-visualization)
+                                          :selected-date? (constantly false)
                                           :on-select (r/partial select-day e!)
                                           :on-hover (r/partial hover-day e! date->hash)
                                           :day-style (r/partial day-style hash->color date->hash

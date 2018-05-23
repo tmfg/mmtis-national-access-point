@@ -47,7 +47,8 @@
                       (vec
                        (range (reduce min (map (comp time/year :date) dates))
                               (inc (reduce max (map (comp time/year :date) dates))))))
-             :highlight {:mode :diff})
+             :highlight {:mode :diff}
+             :calendar-mode :compact)
       (dissoc :loading?)))
 
 (define-event LoadOperatorDates [operator-id]
@@ -62,6 +63,10 @@
   {:path [:transit-visualization :highlight]}
   (-> app
       (assoc :mode mode)))
+
+(define-event SetCalendarMode [mode]
+  {:path [:transit-visualization :calendar-mode]}
+  mode)
 
 (define-event DaysToFirstDiff [start-date date->hash]
   {:path [:transit-visualization :days-to-diff]}
