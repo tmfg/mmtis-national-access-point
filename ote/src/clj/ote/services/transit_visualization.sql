@@ -1,8 +1,11 @@
 -- name: fetch-operator-date-hashes
 SELECT date, hash::text
   FROM "gtfs-date-hash"
- WHERE hash IS NOT NULL AND
-       "package-id" IN (SELECT id FROM gtfs_package WHERE "transport-operator-id" = :operator-id);
+ WHERE hash IS NOT NULL
+   AND "package-id" IN (SELECT id FROM gtfs_package WHERE "transport-operator-id" = :operator-id)
+   -- Take dates from two months ago two 1 year in the future (but always full years)
+   AND date >= make_date(EXTRACT(YEAR FROM (current_date - '2 months'::interval)::date)::integer, 1, 1)
+   AND date <= make_date(EXTRACT(YEAR FROM (current_date + '1 year'::interval)::date)::integer, 12, 31);
 
 -- name: fetch-routes-for-dates
 -- Given a package id and two dates, fetch the routes operating on those days with
