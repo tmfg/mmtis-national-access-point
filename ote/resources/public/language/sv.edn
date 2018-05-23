@@ -386,7 +386,8 @@
    :request     "Abbonerad trafik eller annan anropsstyrd trafik"
    :schedule    "Regelbunden ruttbaserad trafik"
    :rentals     "Fordonsuthyrning och kommersiella samanvändningstjänster"
-   :parking     "Allmänna kommersiella parkeringstjänster"}
+   :parking     "Allmänna kommersiella parkeringstjänster"
+   :brokerage   "Förmedlingstjänster"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Kontant"
