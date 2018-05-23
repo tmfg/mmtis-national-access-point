@@ -146,7 +146,9 @@
                      :min-height "50px"
                      :width "250px"
                      :border "solid black 1px"
-                     :padding "5px"}}
+                     :padding "5px"
+                     :background-color "#fff"
+                     :z-index 9}}
        [:div [:b (str days " päivää")]
         [:div "ensimmäiseen muutokseen"]]
        [:div
