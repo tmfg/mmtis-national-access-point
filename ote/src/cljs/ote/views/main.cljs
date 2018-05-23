@@ -423,9 +423,6 @@
   "OTE application main view"
   [e! app]
 
-  ;; init - Get operator and service data from DB when refresh or on usage start
-  (e! (fp-controller/->GetTransportOperatorData))
-
   (fn [e! {loaded? :transport-operator-data-loaded?
            login :login
            :as app}]

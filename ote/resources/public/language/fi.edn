@@ -286,7 +286,8 @@
                 "Välityspalvelu **välittää korvausta** vastaan muiden toimijoiden yksittäisiä matkoja. Välityspalvelu voi välittää myös oman yrityksen matkoja samalla. Esimerkkinä välityspalvelusta on taksien tilausvälityskeskus. Välityspalveluksi ei katsota sitä, jos yritys siirtää itselle tarkoitettuja ajoja toiselle yritykselle ilman minkäänlaista korvausta.")
   :brokerage-link "Lue lisää välityspalveluiden velvollisuuksista 1.7.2018 alkaen"
 
-  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta (tällä hetkellä haettavissa maakunta, kunta, postinumero, Suomi). Voit samalla tavalla lisätä useita alueita.\nVoit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim \"Itäkeskuksen taksiasema\"."
+  :operation-area "Lisää toiminta-alue kirjoittamalla alueen tai kohteen nimi \"Hae paikka nimellä\" -tekstikenttään ja valitsemalla haluttu alue avautuvalta listalta. Lisättäviä alueita ovat Suomen maakunnat, kunnat, postinumerot, sekä maailman valtiot ja maanosat. Voit samalla tavalla lisätä useita alueita.
+Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
   :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
@@ -378,7 +379,8 @@
    :request      "Tilausliikenne ja muu kutsuun perustuva liikenne"
    :schedule     "Säännöllinen aikataulun mukainen liikenne"
    :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking      "Yleiset kaupalliset pysäköintipalvelut"}
+   :parking      "Yleiset kaupalliset pysäköintipalvelut"
+   :brokerage    "Välityspalvelut"}
 
 
   :ote.db.transport-service/payment-methods
@@ -922,6 +924,7 @@
           "contact-phone" "Puhelinnumero"
           "id" "Tunnistenumero"
           "name" "Nimi"
+          "business-id" "Y-tunnus"
           "published?" "Julkaistu?"
           "transport-operator-id" "Palveluntuottajan tunnistenumero"
           "type" "Palvelun tyyppi"
@@ -949,7 +952,7 @@
           "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
 
           "url" "WWW-osoite"
-          "companies-csv-url" "Yrityslistan osoite"
+          "csv-url" "Palvelun tuottamiseen osallistuvat yritykset"
           "service-hours-info" "Lisätiedot"
           "indoor-map" "Sisätilakartan osoitetiedot"
           "pick-up-locations" "Toimipisteet"
@@ -1129,8 +1132,9 @@
   :operators "Palveluntuottajat"
   :text-search-placeholder "Hae nimellä tai sen osalla"
   :operator-search "Palveluntuottaja"
-  :operator-search-placeholder "Hae nimellä tai sen osalla"
+  :operator-search-placeholder "Hae nimellä tai y-tunnuksella"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
+  :type-search "Liikkumispalvelun tyyppi"
 
   :result-count ["Hakuehdoille "
                  (:plural :count
@@ -1144,7 +1148,9 @@
   :fetching-more "Haetaan lisää palveluita..."
   :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
-  :view-routes "Katsele reittejä"}
+  :view-routes "Katsele reittejä"
+  :load-csv-file "Lataa csv tiedosto"
+  :data-content-search-label "Rajapinnan sisältö"}
 
  :login
  {:label "Kirjautumistiedot"

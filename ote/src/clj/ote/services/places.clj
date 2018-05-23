@@ -23,11 +23,7 @@
 (defn place-completions
   "Return a list of completions that match the given search term."
   [db term]
-  (into []
-        (specql/fetch db ::places/places
-                      #{::places/namefin ::places/id ::places/type}
-                      {::places/namefin (op/ilike (str "%" term "%"))}
-                      {::specql/order-by ::places/namefin})))
+  (into [] (fetch-operation-area-search db {:name (str "%" term "%")})))
 
 (defn place-by-id [db id]
   (first

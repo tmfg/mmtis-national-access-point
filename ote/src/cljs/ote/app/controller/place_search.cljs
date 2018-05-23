@@ -84,11 +84,7 @@
                                                  :secondary-name)]))
       ;; Received stale completions (name is not what was searched for), ignore
       app
-      (assoc-in app [:place-search :completions]
-                (let [name-lower (str/lower-case name)]
-                  (sort-by #(str/index-of (str/lower-case (::places/namefin %))
-                                          name-lower)
-                           completions)))))
+      (assoc-in app [:place-search :completions] completions)))
 
   AddPlace
   (process-event [{:keys [id primary?]} app]

@@ -12,7 +12,9 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
                    WHERE t."published?" = true
                    GROUP BY t."sub-type") count ON type."sub-type" = count."sub-type"
  -- PENDING: remove value from enum if we decide not to implement brokerage type at all
- WHERE type."sub-type" NOT IN ('brokerage')
+ -- Brokerage enabled, but it only affects on dropdown list in ui. Brokerage isn't a subtype anymore, and we cant
+ -- calculate how many brokering services we have using this query.
+ -- WHERE type."sub-type" NOT IN ('brokerage')
  ORDER BY count DESC
 
 -- name: latest-service-ids
@@ -34,14 +36,14 @@ SELECT COUNT(id) FROM "transport-service" WHERE "published?" = TRUE;
 -- Finds operators by name and by business-id and services that have companies added as "operators.
 SELECT op.name as "operator", op."business-id" as "business-id"
   FROM "transport-operator" op
- WHERE ( op.name ILIKE :name OR op."business-id" ILIKE :businessid)
+ WHERE ( op.name ILIKE :name OR op."business-id" = :businessid)
    AND op."deleted?" = FALSE
 UNION
 SELECT c.name as "operator", c."business-id" as "business-id"
   FROM "transport-service" s
   LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
   JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
- WHERE (c.name ILIKE :name OR c."business-id" ILIKE :businessid)
+ WHERE (c.name ILIKE :name OR c."business-id" = :businessid)
    AND s."published?" = TRUE;
 
 -- name: service-ids-by-business-id
@@ -58,3 +60,25 @@ SELECT ts.id as id
   JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
  WHERE c."business-id" IN (:operators)
    AND ts."published?" = TRUE;
+
+-- name: service-ids-by-transport-type
+-- Find services using transport type
+  SELECT ts.id as id
+    FROM "transport-service" ts, unnest(ts."transport-type") as str
+   WHERE str::text IN (:tt)
+
+-- name: participating-companies
+-- Search all services companies and their business-ids
+ SELECT c."business-id" as "Y-tunnus", c.name as "Nimi"
+   FROM "transport-service" s
+        LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
+        LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
+  WHERE c."business-id" IS NOT NULL
+    AND s.id = :id
+    AND s."published?" = TRUE;
+
+-- name: service-ids-by-data-content
+-- Find services using external url data content
+SELECT eid."transport-service-id" as id
+  FROM "external-interface-description" eid, unnest(eid."data-content") as str
+ WHERE  str::text IN (:dc)

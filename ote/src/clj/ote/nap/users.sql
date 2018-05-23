@@ -19,9 +19,9 @@ SELECT u.id as id,
        u.fullname as name,
        u.email as email,
        u.sysadmin as "admin?",
-       (SELECT string_agg(g.title, ', ')
+       (SELECT to_json(array_agg(json_build_object('title', g.title, 'name', g.name)))
           FROM "member" m
-               JOIN "group" g ON g.id = m.group_id
+          JOIN "group" g ON g.id = m.group_id
          WHERE m.table_name='user' AND
                m.state='active' AND
                m.table_id=u.id) as groups

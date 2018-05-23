@@ -286,7 +286,8 @@
   :brokerage? "A brokering service is a service that brokers single rides for other companies for remuneration. (Remuneration can be money or other benefits.) A brokering service can also broke its own rides at the same time. An example of a brokering service is a taxi centre. If a company only brokes its own rides to other companies with no remuneration, the company is not a brokering service."
   :brokerage-link "Read more about the obligations of a brogering services starting from 1st July 2018"
 
-  :operation-area "In this section you can add the operating area of your service by writing the name of the area or the target into the text field called \"Search place by name\" and by choosing the area wanted from the opening list (you can search by using region, community, postal code or Finland). You can add more districts with the same way.\nYou can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Taxistand of Espoo\"."
+  :operation-area "In this section you can add the operating area of your service by writing the name of the area into the text field called \"Search place by name\" and by choosing the area wanted from the opening list. You can search by using regions, communities and postal codes of Finland, or by using nations and continents. You can add more operating areas with the same way.
+You can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Area of operation in Southern Finland\"."
 
   :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
   :description-why-contact-info "Fill in contact information, so that customers can contact you."
@@ -378,7 +379,8 @@
    :request       "Charter traffic and other request based traffic"
    :schedule      "Regular scheduled traffic"
    :rentals       "Vehicle rentals and commercial shared vehicle solutions"
-   :parking       "General commercial parking services"}
+   :parking       "General commercial parking services"
+   :brokerage     "Brokering services"}
 
   :ote.db.transport-service/payment-methods
   {:cash                "Cash"
@@ -911,6 +913,7 @@
           "contact-phone" "Phonenumber"
           "id" "Business ID"
           "name" "Name"
+          "business-id" "Business ID"
           "published?" "Published?"
           "transport-operator-id" "Transport operator ID"
           "type" "Service mode"
@@ -938,7 +941,7 @@
           "luggage-restrictions" "Luggage restrictions"
 
           "url" "WWW-address"
-          "companies-csv-url" "WWW-address containing .csv file about companies involved"
+          "csv-url" "Companies providing the service"
           "service-hours-info" "Additional information"
           "indoor-map" "Indoor map WWW-address"
           "pick-up-locations" "Pick-up and returning points"
@@ -1117,8 +1120,9 @@
   :operators "Transport operator"
   :text-search-placeholder "Search by name"
   :operator-search "Transport operator"
-  :operator-search-placeholder "Search by name"
+  :operator-search-placeholder "Search by name or business id"
   :no-filters "Search for services by adding search criteria above"
+  :type-search "Transport service mode"
   :result-count (:plural :count
                          "No services found"
                          "One service found"
@@ -1130,7 +1134,9 @@
   :fetching-more "Fetching more services..."
   :operator-services ["Transport operator " :name " has " :count " services"]
   :operator-no-services "Transport operator has no services."
-  :view-routes "View routes"}
+  :view-routes "View routes"
+  :load-csv-file "Load csv file"
+  :data-content-search-label "Interface content"}
 
  :login
  {:label "Login credentials"

@@ -65,29 +65,59 @@
                          {::t-service/published? true
                           ::t-service/name (op/ilike (str "%" text "%"))})))))
 
-(defn- sub-type-ids [db types]
-  (when-not (empty? types)
-    (ids ::t-service/id
-         (specql/fetch db ::t-service/transport-service
-                       #{::t-service/id}
-                       {::t-service/published? true
-                        ::t-service/sub-type (op/in types)}))))
+(defn- sub-type-ids
+  "Fetch sub-types and brokerage service."
+  [db types]
+  (let [ids (cond
+              (and (> (count types) 1) (contains? types :brokerage)) ;; Get sub types and brokerage
+                (ids ::t-service/id
+                    (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/id}
+                                  (op/and {::t-service/published? true}
+                                          (op/or
+                                           {::t-service/sub-type (op/in types)}
+                                           {::t-service/brokerage? true}))))
+              (and (not (empty? types)) (not (contains? types :brokerage))) ;; Only sub types
+                (ids ::t-service/id
+                    (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/id}
+                                  {::t-service/sub-type   (op/in types)
+                                   ::t-service/published? true}))
+              (and (= 1 (count types)) (contains? types :brokerage)) ;; Only brokerage
+                (ids ::t-service/id
+                    (specql/fetch db ::t-service/transport-service
+                                  #{::t-service/id}
+                                  {::t-service/published? true
+                                   ::t-service/brokerage? true})))]
+    ids))
+
+(defn- transport-type-ids [db transport-types]
+  (when-not (empty? transport-types)
+    (ids :id
+         (service-ids-by-transport-type db {:tt (apply list transport-types)}))))
 
 (defn- operator-ids [db operators]
   (when-not (empty? operators)
     (ids :id
          (service-ids-by-business-id db {:operators (apply list operators)}))))
 
+(defn- data-content-ids [db data-content]
+  (when-not (empty? data-content)
+    (ids :id
+         (service-ids-by-data-content db {:dc (apply list data-content)}))))
+
 (defn operator-completions
   "Return a list of completions that match the given search term."
   [db term]
   (into [] (service-search-by-operator db {:name (str "%" term "%")
-                                           :businessid (str "%" term "%")})))
+                                           :businessid (str term )})))
 
-(defn- search [db {:keys [operation-area sub-type text operators offset limit]
+(defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
                         (sub-type-ids db sub-type)
+                        (transport-type-ids db transport-type)
+                        (data-content-ids db data-content)
                         (text-search-ids db text)
                         (operator-ids db operators)]
         empty-filters? (every? nil? result-id-sets)
@@ -121,7 +151,11 @@
    :sub-type (when-let [st (some-> (params "sub_types")
                                    (str/split #","))]
                (into #{} (map keyword st)))
+   :transport-type (some-> "transport_types" params
+                           (str/split #","))
    :operators (some-> "operators" params
+                      (str/split #","))
+   :data-content (some-> "data_content" params
                       (str/split #","))
    :limit (some-> "limit" params (Integer/parseInt))
    :offset (some-> "offset" params (Integer/parseInt))})

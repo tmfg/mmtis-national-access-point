@@ -20,6 +20,11 @@
 (defprotocol DateFields
   (date-fields [this] "Return date fields as a map of data."))
 
+(defn date-fields-only
+  "Return date fields without any time fields."
+  [x]
+  (select-keys (date-fields x) #{::year ::month ::date}))
+
 ;; Record for wall clock time (hours, minutes and seconds)
 (defrecord Time [hours minutes seconds])
 
@@ -69,6 +74,15 @@
       (nil? minutes)))
 
 (def valid-time? (complement empty-time?))
+
+(defn empty-date?
+  "Check if date is empty. Requires year, month and date to be set."
+  [{::keys [year month date]}]
+  (or (nil? year)
+      (nil? month)
+      (nil? date)))
+
+(def valid-date? (complement empty-date?))
 
 (defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
@@ -122,6 +136,8 @@
         ::minutes (.getMinuteOfHour this)
         ::seconds (.getSecondOfMinute this)})))
 
+(def midnight {::hours 0 ::minutes 0 ::seconds 0})
+
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
 
@@ -131,6 +147,7 @@
 
 (defn year [dt]
   (::year (date-fields dt)))
+
 
 (defn format-date
   "Format given date in human readable format."
@@ -345,5 +362,12 @@
   to UTC (like Finnish UTC+2/+3) the date part is the previous day.
 
   For example: midnight 27 Feb 2018 => 26 Feb 2018 22:00"
-   [native-date]
-   (date-fields->date-time (date-fields native-date)))
+  [native-date]
+  (date-fields->date-time (date-fields native-date)))
+
+(defn date-fields->native
+  "Convert date fields ma pto native Date object"
+  [{::keys [year month date hours minutes seconds]}]
+  #?(:cljs (js/Date. year (dec month) date hours minutes seconds)
+     :clj (let [gc (java.util.GregorianCalendar. year (dec month) date hours minutes seconds)]
+            (.getTime gc))))
