@@ -83,17 +83,23 @@
     (ids :id
          (service-ids-by-business-id db {:operators (apply list operators)}))))
 
+(defn- data-content-ids [db data-content]
+  (when-not (empty? data-content)
+    (ids :id
+         (service-ids-by-data-content db {:dc (apply list data-content)}))))
+
 (defn operator-completions
   "Return a list of completions that match the given search term."
   [db term]
   (into [] (service-search-by-operator db {:name (str "%" term "%")
                                            :businessid (str term )})))
 
-(defn- search [db {:keys [operation-area sub-type transport-type text operators offset limit]
+(defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
                         (sub-type-ids db sub-type)
                         (transport-type-ids db transport-type)
+                        (data-content-ids db data-content)
                         (text-search-ids db text)
                         (operator-ids db operators)]
         empty-filters? (every? nil? result-id-sets)
@@ -130,6 +136,8 @@
    :transport-type (some-> "transport_types" params
                            (str/split #","))
    :operators (some-> "operators" params
+                      (str/split #","))
+   :data-content (some-> "data_content" params
                       (str/split #","))
    :limit (some-> "limit" params (Integer/parseInt))
    :offset (some-> "offset" params (Integer/parseInt))})

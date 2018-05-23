@@ -1148,7 +1148,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
-  :load-csv-file "Lataa csv tiedosto"}
+  :load-csv-file "Lataa csv tiedosto"
+  :data-content-search-label "Rajapinnan sisältö"}
 
  :login
  {:label "Kirjautumistiedot"
