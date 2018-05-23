@@ -86,7 +86,7 @@
   (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
-(defn- service-calendar-year [{:keys [selected-date? on-select on-hover
+(defn service-calendar-year [{:keys [selected-date? on-select on-hover
                                       day-style]} year]
   (let [day-style (or day-style (constantly nil))]
     [:div.service-calendar-year
@@ -144,16 +144,3 @@
            ;; Fill days to fill out table
            (fill-days (t/plus (t/last-day-of-the-month year month) (t/days 1))
                       fill-days-after)]))]]]))
-
-(defn service-calendar
-  "Service calendar component."
-  [{:keys [selected-date? on-select years] :as options}]
-  (let [current-year (t/year (t/now))
-        next-year (inc current-year)
-        years (or years
-                  [current-year next-year])]
-    [:div.service-calendar {:style {:padding "20px"}}
-     (doall
-      (for [year years]
-        ^{:key year}
-        [service-calendar-year options year]))]))
