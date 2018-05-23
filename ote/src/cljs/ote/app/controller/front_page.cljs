@@ -22,7 +22,6 @@
 (defrecord TransportOperatorFailed [response])
 (defrecord EnsureTransportOperator [])
 
-(defrecord GetTransportOperatorData [])
 (defrecord TransportOperatorDataResponse [response])
 (defrecord TransportOperatorDataFailed [error])
 
@@ -115,11 +114,6 @@
     ;; e.g. unauhtorized should shown unauthorized page and ask user to log in.
     (.log js/console " Error: " (clj->js response))
     app)
-
-  GetTransportOperatorData
-  ;; FIXME: this should be called something else, like SessionInit (the route as well)
-  (process-event [_ app]
-    (get-transport-operator-data app))
 
   TransportOperatorDataFailed
   (process-event [{error :error} app]

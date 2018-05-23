@@ -38,6 +38,10 @@
     ["/admin" :admin]
     ["/admin/:admin-page" :admin]]))
 
+;; Add pages that needs authenticating to this list
+(def auth-required #{:own-services :transport-service :transport-operator :edit-service :new-service :admin :routes
+                     :new-route :edit-route :new-notice :edit-pre-notice :pre-notices :authority-pre-notices})
+
 (defmulti on-navigate-event
   "Determine event(s) to be run when user navigates to a given route.
   Returns a single Tuck event or a vector of Tuck events to be applied
@@ -47,16 +51,25 @@
 
 (defmethod on-navigate-event :default [_] nil)
 
+
+(defn requires-authentication? [app]
+  (and
+       (nil? (get-in app [:user :username]))
+       (contains? auth-required (:page app))))
+
 (defn- send-startup-events [event]
   (let [e! (fn e! [event]
              (binding [tuck/*current-send-function* e!]
                (swap! state/app (flip tuck/process-event) event)))]
     (if (vector? event)
       ;; Received multiple events, apply them all
-      (doseq [event event]
+      (doseq [event event
+              :when event]
         (e! event))
       ;; Apply single event
       (e! event))))
+
+(declare navigate!)
 
 (defn- on-navigate [go-to-url-event name params query]
   (swap! state/app
@@ -72,17 +85,24 @@
                       :navigation-prompt-open? true
                       :navigation-confirm (go-to-url-event new-url)))
 
-             (let [navigation-data {:page name
+             (let [navigation-data {:page   name
                                     :params params
-                                    :query query
-                                    :url js/window.location.href}
+                                    :query  query
+                                    :url    js/window.location.href}
                    event (on-navigate-event navigation-data)
+                   orig-app app
                    app (merge app navigation-data)]
 
-               ;; Send startup events (if any) immediately after returning from this swap
-               (when event
-                 (.setTimeout js/window #(send-startup-events event) 0))
-               app)))))
+               (if (requires-authentication? app)
+                 (do (navigate! :front-page)
+                     (assoc orig-app
+                            :login {:show?       true
+                                    :navigate-to navigation-data}))
+                 (do
+                   ;; Send startup events (if any) immediately after returning from this swap
+                   (when event
+                     (.setTimeout js/window #(send-startup-events event) 0))
+                   app)))))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page

@@ -13,25 +13,33 @@
             [ote.views.main :as main]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.views.ckan-org-viewer :as ckan-org-viewer]
-            [ote.views.ckan-org-editor :as ckan-org-edit]
             [ote.localization :as localization]
             [ote.app.routes :as routes]
             [ote.app.controller.front-page :as fp-controller]
             [stylefy.core :as stylefy]
             [ote.communication :as comm]
-            [goog.net.Cookies]))
+            [goog.net.Cookies]
+            [ote.app.controller.login :as login]))
 
 (defn language []
   (.get (goog.net.Cookies. js/document)
         "finap_lang" "fi"))
 
-(defn ^:export main []
-  (localization/load-embedded-translations!)
+(defn init-app [session-data]
+  (if (nil? session-data)
+    (swap! state/app login/unauthenticated)
+    (swap! state/app login/update-transport-operator-data session-data))
   (stylefy/init)
   (routes/start! fp-controller/->GoToUrl)
   (state/windowresize-handler nil) ;; Calculate window width
   (r/render-component [tuck/tuck state/app main/ote-application]
                       (.getElementById js/document "oteapp")))
+
+(defn ^:export main []
+  (localization/load-embedded-translations!)
+  (comm/post! "transport-operator/data" {}
+              {:on-success init-app
+               :on-failure #(init-app nil)}))
 
 (defn ^:export reload-hook []
   (r/force-update-all))
@@ -54,16 +62,4 @@
       (reset! localization/selected-language lang)
       (stylefy/init)
       (r/render-component [tuck/tuck state/app ckan-org-viewer/viewer]
-                          (.getElementById js/document "nap_viewer")))))
-
-
-(defn ^:export ckan_org_edit [ckan-organization-id]
-  (comm/set-base-url! "/ote/")
-  (localization/load-language!
-    (language)
-    (fn [lang _]
-      (reset! localization/selected-language lang)
-      (stylefy/init)
-      (state/set-init-state! {:ckan-organization-id ckan-organization-id})
-      (r/render-component [tuck/tuck state/app ckan-org-edit/editor]
                           (.getElementById js/document "nap_viewer")))))
