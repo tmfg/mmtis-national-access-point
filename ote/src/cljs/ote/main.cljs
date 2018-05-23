@@ -13,7 +13,6 @@
             [ote.views.main :as main]
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.views.ckan-org-viewer :as ckan-org-viewer]
-            [ote.views.ckan-org-editor :as ckan-org-edit]
             [ote.localization :as localization]
             [ote.app.routes :as routes]
             [ote.app.controller.front-page :as fp-controller]
@@ -65,16 +64,4 @@
       (reset! localization/selected-language lang)
       (stylefy/init)
       (r/render-component [tuck/tuck state/app ckan-org-viewer/viewer]
-                          (.getElementById js/document "nap_viewer")))))
-
-
-(defn ^:export ckan_org_edit [ckan-organization-id]
-  (comm/set-base-url! "/ote/")
-  (localization/load-language!
-    (language)
-    (fn [lang _]
-      (reset! localization/selected-language lang)
-      (stylefy/init)
-      (state/set-init-state! {:ckan-organization-id ckan-organization-id})
-      (r/render-component [tuck/tuck state/app ckan-org-edit/editor]
                           (.getElementById js/document "nap_viewer")))))
