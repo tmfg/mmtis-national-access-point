@@ -7,11 +7,14 @@
             [ote.localization :as lang]
             [ote.db.transport-service :as t-service]
             [stylefy.core :as stylefy]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [cljs-react-material-ui.icons :as ic]))
 
 (def base-day-style {:width 96
                      :height 34
+                     :line-height "34px"
                      :text-align "center"
+                     :vertical-align "middle"
                      :border "solid 1px black"
                      :cursor "pointer"
                      :user-select "none"})
@@ -31,6 +34,9 @@
 (def selected-day-style (merge base-day-style
                                {:background-color "wheat"
                                 :font-weight "bold"}))
+
+(def static-holidays
+  [[1 1] [6 1] [1 5] [6 12] [25 12] [26 12]])
 
 (defn month-days [year month]
   (let [first-date (t/first-day-of-the-month year month)
@@ -88,11 +94,12 @@
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 (defn service-calendar-year [{:keys [selected-date? on-select on-hover
-                                      day-style]} year]
+                                     day-style]} year]
   (let [day-style (or day-style (constantly nil))
         weeks (partition-by (complement #{::week-separator})
                             (separate-weeks (all-days year)))
-        weeks (filter #(not= ::week-separator (first %)) weeks)]
+        weeks (filter #(not= ::week-separator (first %)) weeks)
+        holidays (map #(t/date-time year (second %) (first %)) static-holidays)]
     [:div.service-calendar-year
      [:h3 year]
      [:div {:style {:display "flex" :align-items "center" :justify-content "center"}}
@@ -143,5 +150,10 @@
 
                                                    on-hover
                                                    (on-hover day)))}))
-                          (str (t/day day) "." (t/month day))]) week))]]))
+
+                          (str (t/day day) "." (t/month day))
+                          (when (some #(t/equal? % day) holidays)
+                            [ic/toggle-star {:style {:position "relative"
+                                                     :top 3 :width 20 :height 20}}])])
+                       week))]]))
              weeks))])]]))
