@@ -19,19 +19,30 @@
             [ote.app.controller.front-page :as fp-controller]
             [stylefy.core :as stylefy]
             [ote.communication :as comm]
-            [goog.net.Cookies]))
+            [goog.net.Cookies]
+            [ote.app.controller.login :as login]))
 
 (defn language []
   (.get (goog.net.Cookies. js/document)
         "finap_lang" "fi"))
 
-(defn ^:export main []
-  (localization/load-embedded-translations!)
+(defn init-app [session-data]
+  (if (nil? session-data)
+    (swap! state/app assoc
+           :transport-operator-data-loaded? true
+           :user nil)
+    (swap! state/app login/update-transport-operator-data session-data))
   (stylefy/init)
   (routes/start! fp-controller/->GoToUrl)
   (state/windowresize-handler nil) ;; Calculate window width
   (r/render-component [tuck/tuck state/app main/ote-application]
                       (.getElementById js/document "oteapp")))
+
+(defn ^:export main []
+  (localization/load-embedded-translations!)
+  (comm/post! "transport-operator/data" {}
+              {:on-success init-app
+               :on-failure #(init-app nil)}))
 
 (defn ^:export reload-hook []
   (r/force-update-all))
