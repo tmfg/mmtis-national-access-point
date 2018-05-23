@@ -27,9 +27,7 @@
 
 (defn init-app [session-data]
   (if (nil? session-data)
-    (swap! state/app assoc
-           :transport-operator-data-loaded? true
-           :user nil)
+    (swap! state/app login/unauthenticated)
     (swap! state/app login/update-transport-operator-data session-data))
   (stylefy/init)
   (routes/start! fp-controller/->GoToUrl)

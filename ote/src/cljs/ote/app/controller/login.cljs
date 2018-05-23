@@ -15,6 +15,13 @@
 (defrecord LogoutResponse [response])
 (defrecord LogoutFailed [response])
 
+(defn unauthenticated
+  "Init session without user."
+  [app]
+  (assoc app
+         :transport-operator-data-loaded? true
+         :user nil))
+
 (defn update-transport-operator-data
   [{:keys [page ckan-organization-id transport-operator] :as app}
    {:keys [user transport-operators] :as response}]
