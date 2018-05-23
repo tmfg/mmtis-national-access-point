@@ -185,5 +185,6 @@
                                           :on-hover (r/partial hover-day e! date->hash)
                                           :day-style (r/partial day-style hash->color date->hash
                                                                 (:highlight transit-visualization))
-                                          :years [2017 2018]}]
+                                          :years (or (:years transit-visualization)
+                                                     [2017 2018])}]
       [date-comparison e! transit-visualization]])])

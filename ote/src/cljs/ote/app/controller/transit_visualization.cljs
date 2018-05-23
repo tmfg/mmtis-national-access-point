@@ -51,10 +51,12 @@
       (dissoc :loading?)))
 
 (define-event LoadOperatorDates [operator-id]
-  {:path [:transit-visualization :loading?]}
+  {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/dates/" operator-id)
              {:on-success (tuck/send-async! ->LoadOperatorDatesResponse)})
-  true)
+  (assoc app
+         :loading? true
+         :operator-id operator-id))
 
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
@@ -82,24 +84,28 @@
     app))
 
 (define-event SelectDateForComparison [date]
-  {:path [:transit-visualization :compare]}
-  (let [app (or app {})
-        last-selected (:last-selected app)
-        date (time/format-date date)
-        app (merge app
-                   (if (not= 1 last-selected)
-                     {:date1 date
-                      :last-selected 1}
-                     {:date2 date
-                      :last-selected 2}))]
-    (if (and (:date1 app) (:date2 app))
-      (do
-        (comm/get! (str "transit-visualization/routes-for-dates/1" ;; FIXME: operator
-                        )
-                   {:params (select-keys app [:date1 :date2])
-                    :on-success (tuck/send-async! ->RoutesForDatesResponse (select-keys app [:date1 :date2]))})
-        (assoc app :loading? true))
-      app)))
+  {:path [:transit-visualization]}
+  (let [operator-id (:operator-id app)]
+    (update
+     app :compare
+     (fn [app]
+       (let [app (or app {})
+             last-selected (:last-selected app)
+             date (time/format-date date)
+             app (merge app
+                        (if (not= 1 last-selected)
+                          {:date1 date
+                           :last-selected 1}
+                          {:date2 date
+                           :last-selected 2}))]
+         (if (and (:date1 app) (:date2 app))
+           (do
+             (comm/get! (str "transit-visualization/routes-for-dates/" operator-id)
+                        {:params (select-keys app [:date1 :date2])
+                         :on-success (tuck/send-async! ->RoutesForDatesResponse
+                                                       (select-keys app [:date1 :date2]))})
+             (assoc app :loading? true))
+           app))))))
 
 (define-event RouteLinesForDateResponse [geojson date]
   {:path [:transit-visualization :compare]}
@@ -118,20 +124,23 @@
     app))
 
 (define-event SelectRouteForDisplay [route-short-name route-long-name]
-  {:path [:transit-visualization :compare]}
-  ;; FIXME: operator
-  (doseq [date [(:date1 app)
-                (:date2 app)]]
-    (comm/get! (str "transit-visualization/route-lines-for-date/1")
-               {:params {:date date
-                         :short route-short-name
-                         :long route-long-name}
-                :on-success (tuck/send-async! ->RouteLinesForDateResponse date)}))
-  (assoc app
-         :date1-route-lines nil
-         :date2-route-lines nil
-         :route-short-name route-short-name
-         :route-long-name route-long-name))
+  {:path [:transit-visualization]}
+  (let [operator-id (:operator-id app)]
+    (update
+     app :compare
+     (fn [app]
+       (doseq [date [(:date1 app)
+                     (:date2 app)]]
+         (comm/get! (str "transit-visualization/route-lines-for-date/" operator-id)
+                    {:params {:date date
+                              :short route-short-name
+                              :long route-long-name}
+                     :on-success (tuck/send-async! ->RouteLinesForDateResponse date)}))
+       (assoc app
+              :date1-route-lines nil
+              :date2-route-lines nil
+              :route-short-name route-short-name
+              :route-long-name route-long-name)))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
