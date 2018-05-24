@@ -175,13 +175,13 @@
                (for [{::transit/keys [stop-idx arrival-time departure-time
                                       pickup-type drop-off-type]
                       idx            :idx} (index-key :idx identity stop-times)]
-                 {:gtfs/trip-id        (str id "_" i)
-                  :gtfs/stop-id        (::transit/code (nth stops stop-idx))
-                  :gtfs/arrival-time   (time/time->pginterval (or arrival-time departure-time))
-                  :gtfs/departure-time (time/time->pginterval (or departure-time arrival-time))
-                  :gtfs/pickup-type    (stopping-type pickup-type)
-                  :gtfs/drop-off-type  (stopping-type drop-off-type)
-                  :gtfs/stop-sequence  idx}))
+                 {:gtfs/trip-id (str id "_" i)
+                  :gtfs/stop-id (::transit/code (nth stops stop-idx))
+                  :gtfs/arrival-time (time/format-interval-as-time (time/time->pginterval (or arrival-time departure-time)))
+                  :gtfs/departure-time (time/format-interval-as-time (time/time->pginterval (or departure-time arrival-time)))
+                  :gtfs/pickup-type (stopping-type pickup-type)
+                  :gtfs/drop-off-type (stopping-type drop-off-type)
+                  :gtfs/stop-sequence idx}))
              trips)))
        routes)))
 
