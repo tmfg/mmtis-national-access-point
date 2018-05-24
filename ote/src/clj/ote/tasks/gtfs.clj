@@ -28,26 +28,31 @@
 (defn update-one-gtfs! [config db]
   ;; Ensure that gtfs-import flag is enabled
   (if (feature/feature-enabled? config :gtfs-import)
-    (try
-      (let [{:keys [url operator-id ts-id last-import-date format] :as gtfs-data} (first (select-gtfs-urls-update db))]
-        (if (nil? gtfs-data)
-          (log/debug "No gtfs files to upload.")
-          (do
-            (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
-            (import-gtfs/download-and-store-transit-package (interface-type format)
-                                                            (:gtfs config) db url operator-id ts-id
-                                                            last-import-date)
+    (let [{:keys [url operator-id ts-id last-import-date format] :as gtfs-data} (first (select-gtfs-urls-update db))]
+      (if (nil? gtfs-data)
+        (log/debug "No gtfs files to upload.")
+        (try
+          (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
+          (import-gtfs/download-and-store-transit-package (interface-type format)
+                                                          (:gtfs config) db url operator-id ts-id
+                                                          last-import-date)
+          (specql/update! db ::t-service/external-interface-description
+                          {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
+                          {::t-service/id (:id gtfs-data)})
+          (catch Exception e
             (specql/update! db ::t-service/external-interface-description
-                            {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
-                            {::t-service/id (:id gtfs-data)}))))
-      (catch Exception e
-        (log/warn "Error in gtfs s3 upload!" e)))
+                            {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                             ::t-service/gtfs-import-error (str (.getName (class e)) ": " (.getMessage e))}
+                            {::t-service/id (:id gtfs-data)})
+            (log/warn "Error in gtfs s3 upload!" e)))))
+
     (log/debug "GTFS IMPORT IS NOT ENABLED!")))
 
 (def night-hours #{0 1 2 3 4})
 
 (defn night-time? [dt]
-  (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
+  true ;; PENDING: temporarily enable import always
+  #_(-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
