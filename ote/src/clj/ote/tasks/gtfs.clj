@@ -60,7 +60,7 @@
     (assoc this
            ::stop-task (chime-at
                         (filter night-time?
-                                (drop 1 (periodic-seq (t/now) (t/minutes 10))))
+                                (drop 1 (periodic-seq (t/now) (t/minutes 1))))
                         (fn [_]
                           (#'update-one-gtfs! config db)))))
   (stop [{stop-task ::stop-task :as this}]
