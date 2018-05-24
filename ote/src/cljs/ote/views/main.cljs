@@ -400,9 +400,7 @@
       ;; On modal close
       #(e! (fp-controller/->ToggleRegistrationDialog))
       ;; On ckan close i.e. user has been registered.
-      #(do
-        (e! (fp-controller/->ToggleRegistrationDialog))
-        (e! (fp-controller/->ChangePage :own-services {})))])
+      #(e! (fp-controller/->ToggleRegistrationDialog))])
 
    (when show-reset-dialog?
             ^{:key "ckan-reset"}
