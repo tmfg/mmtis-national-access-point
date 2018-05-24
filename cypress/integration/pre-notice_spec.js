@@ -19,9 +19,12 @@ describe('Pre notice tests', () => {
 
     it('should render pre-notice form page', () => {
         cy.visit('/#/pre-notices');
-        cy.wait(500);
-        cy.contains('button', 'Uusi muutosilmoitus').click();
-        cy.wait(500);
+        cy.server();
+        cy.route('GET', '/pre-notices/list').as('getPreNotices');
+        // Wait for pre-notices query because it causes re-render of the view.
+        cy.wait('@getPreNotices');
+
+        cy.get('#add-new-pre-notice').click();
         cy.contains('Säännöllisen henkilöliikenteen muutosilmoitus');
         cy.contains('Ilmoitettavan muutoksen tyyppi');
         cy.contains('Muutoksen alkamispäivä tai -päivät');
@@ -36,9 +39,14 @@ describe('Pre notice tests', () => {
     it('save and send pre-notice', () => {
         // Open pre notice form
         cy.visit('/#/pre-notices');
-        cy.wait(500);
-        cy.contains('button', 'Uusi muutosilmoitus').click();
-        cy.wait(500);
+        cy.server();
+        cy.route('GET', '/pre-notices/list').as('getPreNotices');
+
+        // Wait for pre-notices query because it causes re-render of the view.
+        cy.wait('@getPreNotices');
+
+        cy.get('#add-new-pre-notice').click();
+
         // Select type
         cy.get('#0_termination').click();
 
@@ -70,7 +78,7 @@ describe('Pre notice tests', () => {
         cy.get('#route-description').contains('Oulu - Kajaani');
 
         // two regions drawn on the map
-        cy.get('div.leaflet-container').find('path.leaflet-interactive').should('have.length',2);
+        cy.get('div.leaflet-container').find('path.leaflet-interactive').should('have.length', 2);
     });
 
 });
