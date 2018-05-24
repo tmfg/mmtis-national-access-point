@@ -19,7 +19,9 @@ describe('Pre notice tests', () => {
 
     it('should render pre-notice form page', () => {
         cy.visit('/#/pre-notices');
-        cy.contains('Uusi muutosilmoitus').click();
+        cy.wait(500);
+        cy.contains('button', 'Uusi muutosilmoitus').click();
+        cy.wait(500);
         cy.contains('Säännöllisen henkilöliikenteen muutosilmoitus');
         cy.contains('Ilmoitettavan muutoksen tyyppi');
         cy.contains('Muutoksen alkamispäivä tai -päivät');
@@ -34,8 +36,9 @@ describe('Pre notice tests', () => {
     it('save and send pre-notice', () => {
         // Open pre notice form
         cy.visit('/#/pre-notices');
-        cy.contains('Uusi muutosilmoitus').click();
-
+        cy.wait(500);
+        cy.contains('button', 'Uusi muutosilmoitus').click();
+        cy.wait(500);
         // Select type
         cy.get('#0_termination').click();
 
