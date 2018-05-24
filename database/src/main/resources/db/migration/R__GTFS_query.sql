@@ -59,3 +59,15 @@ SELECT digest(string_agg(concat(d.route, ':', d.times), '|'), 'sha256')
                  ORDER BY route, stops."trip-id", "stop-sequence") x
   GROUP BY x.route) d;
 $$ LANGUAGE SQL STABLE;
+
+
+CREATE OR REPLACE FUNCTION gtfs_latest_package_for_date(operator_id INTEGER, date DATE) RETURNS INTEGER AS $$
+SELECT p.id FROM gtfs_package p
+ WHERE p."transport-operator-id" = operator_id
+   AND gtfs_package_date_range(p.id) @> date
+ ORDER BY p.id DESC
+ LIMIT 1;
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_latest_package_for_date(INTEGER,DATE) IS
+E'Returns the id of the latest package of the given transport-operator that has data for the given date.';

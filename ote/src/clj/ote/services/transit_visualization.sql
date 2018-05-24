@@ -1,0 +1,66 @@
+-- name: fetch-operator-date-hashes
+SELECT date, hash::text
+  FROM "gtfs-date-hash"
+ WHERE hash IS NOT NULL
+   AND "package-id" IN (SELECT id FROM gtfs_package WHERE "transport-operator-id" = :operator-id)
+   -- Take dates from two months ago two 1 year in the future (but always full years)
+   AND date >= make_date(EXTRACT(YEAR FROM (current_date - '2 months'::interval)::date)::integer, 1, 1)
+   AND date <= make_date(EXTRACT(YEAR FROM (current_date + '1 year'::interval)::date)::integer, 12, 31);
+
+-- name: fetch-routes-for-dates
+-- Given a package id and two dates, fetch the routes operating on those days with
+-- the amount of trips on each day.
+WITH
+date1_trips AS (
+SELECT r."route-id", r."route-short-name", r."route-long-name", SUM(array_length(t.trips, 1)) as trips
+  FROM "gtfs-route" r
+       JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+ WHERE t."service-id" IN (SELECT gtfs_services_for_date(
+                           (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date1::date)),
+                           :date1::date))
+   AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date1::date))
+ GROUP BY r."route-id", r."route-short-name", r."route-long-name"
+),
+date2_trips AS (
+SELECT r."route-id", r."route-short-name", r."route-long-name", SUM(array_length(t.trips, 1)) as trips
+  FROM "gtfs-route" r
+       JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+ WHERE t."service-id" IN (SELECT gtfs_services_for_date(
+                           (SELECT gtfs_latest_package_for_date(1, :date2::date)),
+                           :date2::date))
+   AND r."package-id" = (SELECT gtfs_latest_package_for_date(1, :date2::date))
+ GROUP BY r."route-id", r."route-short-name", r."route-long-name"
+)
+SELECT x.* FROM (
+ SELECT COALESCE(d1."route-id",d2."route-id") AS "route-id",
+        COALESCE(d1."route-short-name", d2."route-short-name") AS "route-short-name",
+        COALESCE(d1."route-long-name", d2."route-long-name") AS "route-long-name",
+        d1.trips as "date1-trips", d2.trips as "date2-trips"
+   FROM date1_trips d1 FULL OUTER JOIN
+        date2_trips d2 ON (d1."route-id" = d2."route-id" AND
+                           d1."route-short-name" = d2."route-short-name" AND
+                           d1."route-long-name" = d2."route-long-name")) x
+ORDER BY x."route-short-name";
+
+
+-- name: fetch-route-trips-by-name-and-date
+-- Fetch geometries of route trips for given date by route short and long name
+SELECT x."route-line", array_agg(departure) as departures
+  FROM (SELECT r."route-short-name", r."route-long-name", -- trip."trip-id",
+               (array_agg(stoptime."departure-time"))[1] as "departure",
+               st_asgeojson(ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat"))) as "route-line"
+          FROM "gtfs-route" r
+          JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+          JOIN LATERAL unnest(t.trips) trip ON TRUE
+          JOIN LATERAL unnest(trip."stop-times") stoptime ON TRUE
+          JOIN "gtfs-stop" stop ON stoptime."stop-id" = stop."stop-id"
+         WHERE r."route-short-name" = :route-short-name
+           AND r."route-long-name" = :route-long-name
+           AND t."service-id" IN (SELECT gtfs_services_for_date(
+                                  (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
+                                 :date::date))
+           AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE))
+         GROUP BY r."route-short-name", r."route-long-name", trip."trip-id"
+         ORDER BY r."route-short-name") x
+ -- Group same route lines to single row (aggregate departures to array)
+ GROUP BY "route-line";

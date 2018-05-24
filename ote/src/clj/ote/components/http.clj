@@ -155,6 +155,11 @@
    :headers {"Content-Type" "application/json; charset=UTF-8"}
    :body (cheshire/encode data {:key-fn name})})
 
+(defn geojson-response [json-data]
+  {:status 200
+   :headers {"Content-Type" "application/vnd.geo+json"}
+   :body json-data})
+
 (defn api-response
   "Helper for API responses that are used both by OTE app and public.
   If \"response_format\" query parameter is \"json\", returns a JSON response.
