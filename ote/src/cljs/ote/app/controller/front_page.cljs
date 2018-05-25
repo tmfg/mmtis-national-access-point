@@ -126,7 +126,10 @@
 
   TransportOperatorDataResponse
   (process-event [{response :response} app]
-    (login/update-transport-operator-data app response))
+    (let [{:keys [page params]} (get-in app [:login :navigate-to])]
+      (when page
+        (routes/navigate! page params)))
+    (login/update-transport-operator-data (dissoc app :login) response))
 
   SetLanguage
   (process-event [{lang :lang} app]
@@ -146,7 +149,7 @@
   {}
   (-> app
       (update :show-register-dialog? not)
-      (dissoc :login) ;; close login dialog if visible
+      (assoc-in [:login :navigate-to] {:page :own-services})
       get-transport-operator-data))
 
 (define-event ToggleUserResetDialog []

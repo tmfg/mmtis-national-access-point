@@ -38,9 +38,16 @@
             iterations
             (base64->hex password))))
 
-(defn with-auth-tkt [response auth-tkt-value]
+(defn with-auth-tkt [response auth-tkt-value domain]
   (update response :headers
-          assoc "Set-Cookie" (str "auth_tkt=" auth-tkt-value "; path=/;")))
+          assoc "Set-Cookie" (if (nil? domain)
+                               (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly")
+                               ;; Two cookies are required for wild card and exact domain
+                               ;; similar to ckan cookie configuration
+                               [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                     "; Domain=." domain "; Secure")
+                                (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                     "; Domain=" domain "; Secure")])))
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
@@ -59,15 +66,16 @@
                           {:digest-algorithm (:digest-algorithm auth-tkt-config)
                            :timestamp (java.util.Date.)
                            :user-id (:name login-info)
-                           :user-data ""}))
+                           :user-data ""})
+          (:domain auth-tkt-config))
 
         ;; No need to hide if the error was in the email or the password
         ;; the registration page can be used to check if an email has an account
         (http/transit-response {:error :incorrect-password}))
       (http/transit-response {:error :no-such-user}))))
 
-(defn logout []
-  (with-auth-tkt (http/transit-response :ok) ""))
+(defn logout [auth-tkt-config]
+  (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
 
 (defn- login-routes [db auth-tkt-config]
   (routes
@@ -75,7 +83,7 @@
          (#'login db auth-tkt-config
                 (http/transit-request form-data)))
    (POST "/logout" []
-         (logout))))
+         (logout auth-tkt-config))))
 
 (defrecord LoginService [auth-tkt-config]
   component/Lifecycle

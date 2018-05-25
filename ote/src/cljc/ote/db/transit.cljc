@@ -1,8 +1,11 @@
 (ns ote.db.transit
   "Datamodel for route based transit"
   (:require [clojure.spec.alpha :as s]
-            #?(:clj [ote.db.specql-db :refer [define-tables]])
-            #?(:clj [specql.postgis])
+            #?@(:clj [[ote.db.specql-db :refer [define-tables]]
+                      [specql.postgis]
+                      [clj-time.coerce :as tc]]
+                :cljs [[cljs-time.coerce :as tc]])
+
             [specql.rel :as rel]
             [specql.transform :as xf]
             [specql.impl.registry]
@@ -68,8 +71,12 @@
                         (keep #(when (get rule (keyword "ote.db.transit" (name %))) %))
                         time/week-days)]
     (when (and from-date to-date (not (empty? week-days)))
-      (for [d (time/date-range (time/date-fields->date from-date)
-                               (time/date-fields->date to-date))
+      (for [d (time/date-range (if (inst? from-date)
+                                 (tc/from-date from-date)
+                                 (time/date-fields->date from-date))
+                               (if (inst? to-date)
+                                 (tc/from-date to-date)
+                                 (time/date-fields->date to-date)))
             :when (week-days (time/day-of-week d))]
         (select-keys
          (time/date-fields d)
