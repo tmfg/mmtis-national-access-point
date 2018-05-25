@@ -1,6 +1,7 @@
 (ns ote.app.controller.admin
   (:require [tuck.core :as tuck]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.communication :as comm]))
 
@@ -14,13 +15,16 @@
 
 (defrecord UpdateUserFilter [user-filter])
 (defrecord UpdateServiceFilter [service-filter])
+(defrecord UpdateServiceOperatorFilter [operator-filter])
 (defrecord UpdateOperatorFilter [operator-filter])
 (defrecord UpdatePublishedFilter [published-filter])
 (defrecord SearchUsers [])
 (defrecord SearchServices [])
 (defrecord SearchServicesByOperator [])
+(defrecord SearchOperators [])
 (defrecord SearchUsersResponse [response])
 (defrecord SearchServicesResponse [response])
+(defrecord SearchOperatorResponse [response])
 (defrecord GetBusinessIdReport [])
 (defrecord GetBusinessIdReportResponse [response])
 (defrecord UpdateBusinessIdFilter [business-id-filter])
@@ -30,6 +34,29 @@
 (defrecord DeleteTransportServiceResponse [response])
 (defrecord FailedDeleteTransportServiceResponse [response])
 (defrecord ChangeAdminTab [tab])
+
+;; Delete Transport Operator
+(defrecord OpenDeleteOperatorModal [id])
+(defrecord CancelDeleteOperator [id])
+(defrecord ConfirmDeleteOperator [id])
+(defrecord DeleteOperatorResponse [response])
+(defrecord DeleteOperatorResponseFailed [response])
+(defrecord EnsureServiceOperatorId [id ensured-id])
+
+(defrecord ToggleAddMemberDialog [id])
+
+(defn- update-operator-by-id [app id update-fn & args]
+  (update-in app [:admin :operator-list :results]
+             (fn [operators]
+               (map #(if (= (::t-operator/id %) id)
+                       (apply update-fn % args)
+                       %)
+                    operators))))
+
+(defn- get-search-result-operator-by-id [app id]
+  (some
+    #(when (= (::t-operator/id %) id) %)
+    (get-in app [:admin :operator-list :results])))
 
 (extend-protocol tuck/Event
 
@@ -41,9 +68,13 @@
   (process-event [{f :service-filter} app]
     (update-in app [:admin :service-listing] assoc :service-filter f))
 
-  UpdateOperatorFilter
+  UpdateServiceOperatorFilter
   (process-event [{f :operator-filter} app]
     (update-in app [:admin :service-listing] assoc :operator-filter f))
+
+  UpdateOperatorFilter
+  (process-event [{f :operator-filter} app]
+    (update-in app [:admin :operator-list] assoc :operator-filter f))
 
   UpdateBusinessIdFilter
    (process-event [{f :business-id-filter} app]
@@ -99,6 +130,19 @@
                :loading? false
                :results response))
 
+  SearchOperators
+  (process-event [_ app]
+    (comm/post! "admin/transport-operators"
+                {:query (get-in app [:admin :operator-list :operator-filter])}
+                {:on-success (tuck/send-async! ->SearchOperatorResponse)})
+    (assoc-in app [:admin :operator-list :loading?] true))
+
+  SearchOperatorResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :operator-list] assoc
+               :loading? false
+               :results response))
+
   DeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
@@ -134,5 +178,51 @@
     (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
   ChangeAdminTab
-    (process-event [{tab :tab} app]
-      (assoc-in app [:params :admin-page] tab)))
+  (process-event [{tab :tab} app]
+    (assoc-in app [:admin :tab :admin-page] tab))
+
+  OpenDeleteOperatorModal
+  (process-event [{id :id} app]
+    (update-operator-by-id
+      app id
+      assoc :show-delete-modal? true
+      :ensure-id nil))
+
+  CancelDeleteOperator
+  (process-event [{id :id} app]
+    (update-operator-by-id
+      app id
+      dissoc :show-delete-modal?))
+
+  ConfirmDeleteOperator
+  (process-event [{id :id} app]
+    (when (= id (int (:ensured-id (get-search-result-operator-by-id app id))))
+      (comm/post! "admin/transport-operator/delete" {:id id}
+                  {:on-success (tuck/send-async! ->DeleteOperatorResponse)
+                   :on-failure (tuck/send-async! ->DeleteOperatorResponseFailed)}))
+    app)
+
+  DeleteOperatorResponse
+  (process-event [{response :response} app]
+    (let [filtered-map (filter #(not= (::t-operator/id %) (int response)) (get-in app [:admin :operator-list :results]))]
+      (-> app
+          (assoc-in [:admin :operator-list :results] filtered-map)
+          (assoc :flash-message "Palveluntuottaja poistettu onnistuneesti."
+                 :operators-changed? true))))
+
+  DeleteOperatorResponseFailed
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error "Palveluntuottajan poistaminen epäonnistui"))
+
+  EnsureServiceOperatorId
+  (process-event [{id :id ensured-id :ensured-id} app]
+    (update-operator-by-id
+      app id
+      assoc :ensured-id ensured-id))
+
+  ToggleAddMemberDialog
+  (process-event [{id :id} app]
+    (let [show? (:show-add-member-dialog? (get-search-result-operator-by-id app id))]
+      (update-operator-by-id
+        app id
+        assoc :show-add-member-dialog? (not show?)))))
