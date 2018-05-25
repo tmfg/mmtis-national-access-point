@@ -42,12 +42,12 @@
   (update response :headers
           assoc "Set-Cookie" (if (nil? domain)
                                (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly")
-                               ;; Two cookies are required for wild card and exact domain
-                               ;; similar to ckan cookie configuration
-                               [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
-                                     "; Domain=." domain "; Secure")
+                               ;; Three cookies are required to match ckan cookie configuration
+                               [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Secure")
                                 (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
-                                     "; Domain=" domain "; Secure")])))
+                                     "; Domain=" domain "; Secure")
+                                (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                     "; Domain=." domain "; Secure")])))
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
