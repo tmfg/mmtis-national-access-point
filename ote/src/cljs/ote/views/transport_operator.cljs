@@ -52,7 +52,7 @@
                         :icon (ic/content-create {:style {:width 16 :height 16}})
                         :on-click #(do
                                      (.preventDefault %)
-                                     (e! (fp/->ChangePage :transport-operator nil)))}]])
+                                     (e! (fp/->ChangePage :transport-operator {:id (::t-operator/id operator)})))}]])
       (when extended
        [:div.col-xs-12.col-sm-3.col-md-2
         [ui/flat-button {:label (tr [:buttons :add-new-member])
@@ -131,26 +131,23 @@
                  (tr [:buttons :save])])})
 
 (defn operator [e! {operator :transport-operator :as state}]
-  (r/with-let [form-options (operator-form-options e!)
-               form-groups (operator-form-groups)]
-    [:div
-     [:div.row
-      [:div  {:class "col-xs-12"}
-       [:h1 (tr [:organization-page
-                 (if (:new? operator)
-                   :organization-new-title
-                   :organization-form-title)])]]]
+  (e! (to/->EditTransportOperator (get-in state [:params :id])))
+  (fn [e! {operator :transport-operator :as state}]
+    (r/with-let [form-options (operator-form-options e!)
+                 form-groups (operator-form-groups)]
+                [:div
+                 [:div.row
+                  [:div {:class "col-xs-12"}
+                   [:h1 (tr [:organization-page
+                             (if (:new? operator)
+                               :organization-new-title
+                               :organization-form-title)])]]]
 
-     [:div {:style {:white-space "pre-wrap"}}
-      [:p
-       (tr [:organization-page :help-desc-1])]
-      [:p
-       (tr [:organization-page :help-desc-2])]]
-
-       [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
-
-        [form/form
-         form-options
-         form-groups
-
-         (:transport-operator state)]]]))
+                 [:div {:style {:white-space "pre-wrap"}}
+                  [:p (tr [:organization-page :help-desc-1])]
+                  [:p (tr [:organization-page :help-desc-2])]]
+                 [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
+                  [form/form
+                   form-options
+                   form-groups
+                   (:transport-operator state)]]])))
