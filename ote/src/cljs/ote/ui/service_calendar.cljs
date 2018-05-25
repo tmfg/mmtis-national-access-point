@@ -3,7 +3,8 @@
   (:require
     [cljs-time.core :as t]
     [ote.ui.service-calendar-compact :as compact-view]
-    [ote.ui.service-calendar-weeks :as weeks-view]))
+    [ote.ui.service-calendar-weeks :as weeks-view]
+    [ote.ui.service-calendar-timeline :as timeline-view]))
 
 
 (defn service-calendar
@@ -20,5 +21,6 @@
            (case view-mode
              :weeks [weeks-view/service-calendar-year options year]
              :compact [compact-view/service-calendar-year options year]
+             :timeline [timeline-view/service-calendar-year]
              [compact-view/service-calendar-year options year])
            {:key year})))]))
