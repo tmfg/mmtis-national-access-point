@@ -21,6 +21,6 @@
            (case view-mode
              :weeks [weeks-view/service-calendar-year options year]
              :compact [compact-view/service-calendar-year options year]
-             :timeline [timeline-view/service-calendar-year]
+             :timeline [timeline-view/service-calendar-year options year]
              [compact-view/service-calendar-year options year])
            {:key year})))]))

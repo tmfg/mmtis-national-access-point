@@ -99,7 +99,7 @@
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 
-(def cur-scroll (r/atom 0))
+(def cur-zoom (r/atom 0))
 
 (defn- handle-wheel [e]
   (.preventDefault e)
@@ -116,43 +116,44 @@
 (defn listen-scroll! [el]
   (let [chan (scroll-chan el)]
     (go-loop []
-             (let [new-scroll (<! chan)]
-               (reset! cur-scroll (+ @cur-scroll new-scroll)))
+             (let [new-scroll (* -1 (<! chan))
+                   zoom (max (+ @cur-zoom (* new-scroll 0.05)) 0)]
+               (reset! cur-zoom zoom))
              (recur))))
 
 (defn handle-mouse-down [e]
   (listen-scroll! (.-target e)))
 
-(defn svg-bars [items bar-width handle-val]
+(defn svg-bars [items bar-width x-scale handle-val bar-style]
   [:g
    (doall
      (map-indexed
        (fn [i val]
-         (let [x (* (+ bar-width 5) i)]
-           ^{:key (str "svg-week-" i)}
-           [:svg {:width bar-width :height 20 :x x :y 0}
-            ^{:key (str "svg-week-rect" i)}
-            [:rect {:x 0 :y 0 :width bar-width :height 20 :fill "green"}]
-            ^{:key (str "svg-week-label" i)}
-            [:text {:x "50%" :y "50%" :dy "5px" :text-anchor "middle"} (handle-val val)]]))
+         (let [w (* x-scale bar-width)
+               x (* (+ w 5) i)]
+           ^{:key (str "svg-bar-" i)}
+           [:svg {:width w :height "100%" :x x :y 0}
+            ^{:key (str "svg-bar-rect" i)}
+            [:rect {:x 0 :y 0 :width w :height 20 :fill (if bar-style
+                                                          (bar-style val)
+                                                          "green")}]
+            ^{:key (str "svg-bar-line" i)}
+            [:line {:x1 "50%" :y1 "40%" :x2 "50%" :y2 "20"
+                    :stroke "black" :strokeWidth "1"}]
+            ^{:key (str "svg-bar-label-box" i)}
+            [:rect {:x 0 :y "40%" :width 50 :height 20 :fill "#fff"}]
+            ^{:key (str "svg-bar-label" i)}
+            [:text {:x "50%" :y "50%" :dy "0" :text-anchor "middle"} (handle-val val)]]))
        items))])
 
-(defn week-bars [weeks bar-width]
-  [svg-bars weeks bar-width #(t/week-number-of-year (first %))])
+(defn month-bars [months bar-width bar-scale]
+  [svg-bars months bar-width bar-scale #(identity %)])
 
-(defn day-bars [days bar-width]
-  [svg-bars days bar-width #(t/week-number-of-year (first %))])
+(defn week-bars [weeks bar-width bar-scale]
+  [svg-bars weeks bar-width bar-scale #(t/week-number-of-year (first %))])
 
-(defn timeline [weeks]
-  (let [cur-scroll @cur-scroll
-        chart-height 200
-        bar-width (+ 100 cur-scroll)]
-    [:div {:style {:width "100%"}
-           :on-mouse-down handle-mouse-down}
-     [:svg {:style {:transition "1s all"}
-            :id "service-calendar-timeline" :width "100%" :height chart-height}
-      [:g {:transform (str "translate(0," (- (/ chart-height 2) 10) ")")}
-       [week-bars weeks bar-width chart-height]]]]))
+(defn day-bars [days bar-width bar-scale day-style]
+  [svg-bars days bar-width bar-scale #(str (t/day %) "." (t/month %)) day-style])
 
 (defn service-calendar-year [{:keys [selected-date? on-select on-hover
                                      day-style]} year]
@@ -160,9 +161,25 @@
         weeks (partition-by (complement #{::week-separator})
                             (separate-weeks (all-days year)))
         weeks (filter #(not= ::week-separator (first %)) weeks)
-        holidays (map #(t/date-time year (second %) (first %)) static-holidays)]
+        holidays (map #(t/date-time year (second %) (first %)) static-holidays)
+        cur-zoom @cur-zoom
+        chart-height 200
+        x-scale (max (+ 1 cur-zoom) 1)]
     [:div.service-calendar-year
      [:h3 year]
      [:div {:style {:display "flex" :align-items "center" :justify-content "center"}}
-
-      [timeline weeks]]]))
+      [:div {:style {:width "100%" :border "solid 1px black"}
+             :on-mouse-down handle-mouse-down}
+       [:svg {:id "service-calendar-timeline" :width "100%" :height chart-height
+              :style {:transition "1s all"}}
+        [:g {:transform (str "translate(0," (- (/ chart-height 2) 10) ")")}
+         (cond
+           (< x-scale 2)
+           [month-bars (range 1 13) 100 x-scale]
+           (< x-scale 4)
+           [week-bars weeks 50 x-scale]
+           (< x-scale 6)
+           [day-bars (flatten weeks) 25 x-scale
+            ;; Currently, we'll use background color only from the style to fill rects.
+            (fn [day]
+              (:background-color (day-style day false)))])]]]]]))
