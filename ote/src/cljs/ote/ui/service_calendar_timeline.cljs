@@ -158,7 +158,7 @@
 
 (defn week-bars [weeks bar-width]
   [svg-bars weeks bar-width (fn [val]
-                                        (str "Vko " (t/week-number-of-year (first val))))
+                              (str "Vko " (t/week-number-of-year (first val))))
    (constantly "blue")])
 
 (defn day-bars [days bar-width day-style]
@@ -166,14 +166,13 @@
 
 (defn timeline [weeks width height day-style]
   (let [cur-zoom @cur-zoom
-        chart-height 200
         x-offset (:cur @x-offset)
         x-scale (max (+ 1 cur-zoom) 1)]
     [:svg {:xmlns "http://www.w3.org/2000/svg"
            :style {:width "100%" :height "100%"}
            :id "service-calendar-timeline"
            :view-box (str x-offset " 0 " width " " height)}
-     [:g {:transform (str "translate(0," (- (/ chart-height 2) 10) ")")}
+     [:g {:transform (str "translate(0," (- (/ height 2) 10) ")")}
       (cond
         (< x-scale 4)
         (do
