@@ -150,7 +150,7 @@
   [svg-bars months bar-width bar-scale #(identity %)])
 
 (defn week-bars [weeks bar-width bar-scale]
-  [svg-bars weeks bar-width bar-scale #(t/week-number-of-year (first %))])
+  [svg-bars weeks bar-width bar-scale #(t/week-number-of-year (first %)) (constantly "blue")])
 
 (defn day-bars [days bar-width bar-scale day-style]
   [svg-bars days bar-width bar-scale #(str (t/day %) "." (t/month %)) day-style])
