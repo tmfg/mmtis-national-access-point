@@ -43,7 +43,7 @@
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 
-(def cur-zoom (r/atom 0))
+(def cur-zoom (r/atom 1))
 (def x-offset (r/atom {:cur 0 :prev 0}))
 (def start-offset (r/atom 0))
 
@@ -99,17 +99,15 @@
 (defn listen-scroll! [el]
   (let [chan (scroll-chan el)]
     (go-loop []
-             (let [new-scroll (* -1 (<! chan))
-                   zoom (max (+ @cur-zoom (* new-scroll 0.025)) 0)]
-               (reset! cur-zoom zoom))
+             (let [new-scroll (- (<! chan))
+                   zoom (max (+ @cur-zoom (* new-scroll 0.05)) 0)]
+               (reset! cur-zoom (min zoom 20)))
              (recur))))
 
 (defn listen-mouse-move! [el]
   (let [mouse-down (mouse-down-chan el)
         mouse-move (mouse-move-chan el)
-        mouse-up (mouse-up-chan el)
-        client-rect (.getBoundingClientRect el)
-        client-left (.-left client-rect)]
+        mouse-up (mouse-up-chan js/document)]
     (go-loop []
              (loop []
                (alt! [mouse-down] nil
@@ -119,7 +117,9 @@
                      (swap! x-offset assoc :prev (:cur @x-offset))
 
                      [mouse-move]
-                     (let [mouse-x (<! mouse-move)
+                     (let [client-rect (.getBoundingClientRect el)
+                           client-left (.-left client-rect)
+                           mouse-x (<! mouse-move)
                            x (- mouse-x client-left)
                            delta (- @start-offset x)
                            prev-offset (:prev @x-offset)]
@@ -130,13 +130,13 @@
 
 
 
-(defn svg-bars [items bar-width x-scale handle-val bar-style]
+(defn svg-bars [items bar-width handle-val bar-style]
   [:g
    (doall
      (map-indexed
        (fn [i val]
-         (let [w (* x-scale bar-width)
-               x (* (+ w 5) i)]
+         (let [w (- bar-width 4)
+               x (* (+ w 4) i)]
            ^{:key (str "svg-bar-" i)}
            [:svg {:style {:user-select "none"}
                   :width w :height "100%" :x x :y 0}
@@ -153,56 +153,70 @@
             [:text {:x "50%" :y "50%" :dy "0" :text-anchor "middle"} (handle-val val)]]))
        items))])
 
-(defn month-bars [months bar-width bar-scale]
-  [svg-bars months bar-width bar-scale #(month-name %)])
+(defn month-bars [months bar-width]
+  [svg-bars months bar-width #(month-name %)])
 
-(defn week-bars [weeks bar-width bar-scale]
-  [svg-bars weeks bar-width bar-scale (fn [val]
+(defn week-bars [weeks bar-width]
+  [svg-bars weeks bar-width (fn [val]
                                         (str "Vko " (t/week-number-of-year (first val))))
    (constantly "blue")])
 
-(defn day-bars [days bar-width bar-scale day-style]
-  [svg-bars days bar-width bar-scale #(str (t/day %) "." (t/month %)) day-style])
+(defn day-bars [days bar-width day-style]
+  [svg-bars days bar-width #(str (t/day %) "." (t/month %)) day-style])
+
+(defn timeline [weeks width height day-style]
+  (let [cur-zoom @cur-zoom
+        chart-height 200
+        x-offset (:cur @x-offset)
+        x-scale (max (+ 1 cur-zoom) 1)]
+    [:svg {:xmlns "http://www.w3.org/2000/svg"
+           :style {:width "100%" :height "100%"}
+           :id "service-calendar-timeline"
+           :view-box (str x-offset " 0 " width " " height)}
+     [:g {:transform (str "translate(0," (- (/ chart-height 2) 10) ")")}
+      (cond
+        (< x-scale 4)
+        (do
+          [month-bars (range 1 13) (* x-scale
+                                      ;; width / 12 months
+                                      (/ width 12))])
+        (< x-scale 12)
+        (do
+          [week-bars weeks (* x-scale
+                              ;; width / (12 months * 4 weeks)
+                              (/ width 48))])
+        (> x-scale 12)
+        [day-bars (flatten weeks) (* x-scale
+                                     ;; width / (12 months * 4 weeks * 7 days)
+                                     (/ width 336))
+         ;; Currently, we'll use background color only from the style to fill rects.
+         (fn [day]
+           (:background-color (day-style day false)))])]]))
 
 (defn service-calendar-year [{:keys [selected-date? on-select on-hover
                                      day-style]} year]
-  (let [node (r/atom nil)]
+  (let [dimensions (r/atom {:width nil :height nil})]
     (r/create-class
-      {:component-did-mount (fn [el]
-                              (let [dom-node (r/dom-node el)]
-                                (reset! node dom-node)
-                                (listen-scroll! dom-node)
-                                (listen-mouse-move! dom-node)))
+      {:component-did-mount (fn [this]
+                              (let [node (r/dom-node this)
+                                    wrapper-el (first (array-seq (.getElementsByClassName
+                                                                   node "service-calendar-timeline-wrapper")))]
+                                (swap! dimensions assoc
+                                       :width (.-clientWidth wrapper-el)
+                                       :height (.-clientHeight wrapper-el))
+                                (listen-scroll! wrapper-el)
+                                (listen-mouse-move! wrapper-el)))
        :reagent-render
        (fn []
          (let [day-style (or day-style (constantly nil))
                weeks (partition-by (complement #{::week-separator})
                                    (separate-weeks (all-days year)))
-               weeks (filter #(not= ::week-separator (first %)) weeks)
-               cur-zoom @cur-zoom
-               chart-height 200
-               x-offset (:cur @x-offset)
-               x-scale (max (+ 1 cur-zoom) 1)
-               width (when @node (.-clientWidth @node))
-               height (when @node (.-clientHeight @node))]
-           [:div.service-calendar-year {:style {:user-select "none"
-                                                :height "200px"}}
+               weeks (filter #(not= ::week-separator (first %)) weeks)]
+           [:div.service-calendar-year
             [:h3 year]
             [:div {:style {:display "flex" :align-items "center" :justify-content "center"}}
-             [:div {:style {:width "100%" :border "solid 1px black"}
-                    :on-mouse-down handle-mouse-down}
-              [:svg {:xmlns "http://www.w3.org/2000/svg"
-                     :style {:width "100%" :height "100%"}
-                     :id "service-calendar-timeline"
-                     :view-box (str x-offset " 0 " (or width 100) " " (or height 100))}
-               [:g {:transform (str "translate(0," (- (/ chart-height 2) 10) ")")}
-                (cond
-                  (< x-scale 2)
-                  [month-bars (range 1 13) 100 x-scale]
-                  (< x-scale 4)
-                  [week-bars weeks 50 x-scale]
-                  (< x-scale 6)
-                  [day-bars (flatten weeks) 25 x-scale
-                   ;; Currently, we'll use background color only from the style to fill rects.
-                   (fn [day]
-                     (:background-color (day-style day false)))])]]]]]))})))
+             [:div {:class "service-calendar-timeline-wrapper"
+                    :style {:width "100%" :height "200px"
+                            :user-select "none" :border "solid 1px black"}}
+              (when (:width @dimensions)
+                [timeline weeks (:width @dimensions) (:height @dimensions) day-style])]]]))})))
