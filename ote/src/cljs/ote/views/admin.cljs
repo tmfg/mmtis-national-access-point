@@ -61,9 +61,7 @@
                            :full-width? true
                            :label "Anna varmistukseksi palveluntuottajan id"
                            :update! #(e! (admin-controller/->EnsureServiceOperatorId id %))}
-        (:ensured-id operator)]]
-      ])])
-
+        (:ensured-id operator)]]])])
 
 (defn operator-list [e! app]
   (let [{:keys [loading? results operator-filter]} (get-in app [:admin :operator-list])]
@@ -76,8 +74,7 @@
       [ui/raised-button {:primary true
                          :disabled (str/blank? filter)
                          :on-click #(e! (admin-controller/->SearchOperators))
-                         :label "Hae palveluntuottajia"}
-       ]]
+                         :label "Hae palveluntuottajia"}]]
      [:div.row
       (when loading?
         [:span "Ladataan palveluntuottajia..."])
@@ -96,8 +93,7 @@
             [ui/table-header-column {:width "10%"} "Puhelin"]
             [ui/table-header-column {:width "18%"} "Sähköposti"]
             [ui/table-header-column {:width "14%"} "Käyttäjähallinta"]
-            [ui/table-header-column {:width "10%"} "Toiminnot"]
-            ]]
+            [ui/table-header-column {:width "10%"} "Toiminnot"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
              (for [{::t-operator/keys [id name gsm phone business-id ckan-group-id email ]
@@ -118,15 +114,13 @@
                  [ui/flat-button {:label (tr [:buttons :add-new-member])
                                   :style {:margin-top "1.5em"
                                           :font-size "8pt"}
-                                  ;:icon (ic/content-add {:style {:width 16 :height 16}})
                                   :on-click #(do
                                                (.preventDefault %)
                                                (e! (admin-controller/->ToggleAddMemberDialog id)))}]
                  (when show-add-member-dialog?
                    [ui-common/ckan-iframe-dialog (::t-operator/name result)
                     (str "/organization/member_new/" ckan-group-id)
-                    #(e! (admin-controller/->ToggleAddMemberDialog id))])
-                 #_ [linkify (str "/organization/member_new/" ckan-group-id)  "Lisää käyttäjä" {:target "_blank"}]]
+                    #(e! (admin-controller/->ToggleAddMemberDialog id))])]
                 [ui/table-row-column {:style {:width "10%"}} [ui/icon-button {:href     "#"
                                                                               :on-click #(do
                                                                                            (.preventDefault %)
