@@ -88,5 +88,4 @@
 
 (defn background-tile-map []
   [TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-              :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors<br>
-Contains data from the National Land Survey<br>of Finland Topographic Database 10/2017."}])
+              :attribution "<a href=\"https://www.maanmittauslaitos.fi/en/opendata-licence-cc40\">MML</a> | &copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors<br>"}])
