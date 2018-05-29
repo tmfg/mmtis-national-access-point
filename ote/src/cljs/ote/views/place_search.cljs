@@ -112,20 +112,6 @@
                                               "green"
                                               "orange")}}])])})))
 
-
-(defn marker-map [e! coordinate]
-  [leaflet/Map {
-                :center #js [65.01212149716532 25.47065377235413]
-                :zoom 16
-                :on-click  #(e! (ps/->SetMarker %))
-                }
-   [leaflet/TileLayer {:url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                       :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
-
-   [leaflet/Marker
-    {:position [(first (get-in coordinate  [:coordinates  :coordinates]))
-                (second (get-in coordinate  [:coordinates  :coordinates]))]}]])
-
 (defn- completions [completions]
   (apply array
          (map (fn [{::places/keys [id namefin type]}]
@@ -224,17 +210,3 @@
                     ;; Component knows this way that same element is in use.
                     ^{:key "place-search"}
                     [place-search e! (:place-search data)]])})))
-
-
-(defn place-marker [e! coordinates]
-  (let [coordinate  coordinates]
-    [:div
-     [marker-map e! coordinates]]))
-
-(defn place-marker-form-group [e! label name]
-  (form/group
-    {:label label
-     :columns 3}
-    {:type :component
-     :name name
-     :component (fn [{data :data}] [place-marker e! {:coordinates data}])}))

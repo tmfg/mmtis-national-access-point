@@ -26,9 +26,9 @@ SELECT r."route-id", r."route-short-name", r."route-long-name", SUM(array_length
   FROM "gtfs-route" r
        JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
  WHERE t."service-id" IN (SELECT gtfs_services_for_date(
-                           (SELECT gtfs_latest_package_for_date(1, :date2::date)),
+                           (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date2::date)),
                            :date2::date))
-   AND r."package-id" = (SELECT gtfs_latest_package_for_date(1, :date2::date))
+   AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date2::date))
  GROUP BY r."route-id", r."route-short-name", r."route-long-name"
 )
 SELECT x.* FROM (

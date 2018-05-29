@@ -267,7 +267,7 @@
        [:li
         [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
-       [:li [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/Tietosuojaseloste_NAP.pdf"
+       [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"
              (tr [:common-texts :navigation-privacy-policy])
              {:target "_blank"}]]
        [:li

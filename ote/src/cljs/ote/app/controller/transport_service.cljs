@@ -368,6 +368,9 @@
   (process-event [{:keys [schemas publish?]} {service :transport-service
                                               operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
+          operator-id (if (nil? (::t-service/transport-operator-id service))
+                        (::t-operator/id operator)
+                        (::t-service/transport-operator-id service))
           service-data
           (-> service
               (update key (comp (partial form/prepare-for-save schemas)
@@ -376,7 +379,7 @@
                       :select-transport-operator)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/published? publish?
-                     ::t-service/transport-operator-id (::t-operator/id operator))
+                     ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
               transform-save-by-type)]
 

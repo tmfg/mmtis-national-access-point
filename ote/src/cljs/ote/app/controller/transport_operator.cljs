@@ -5,10 +5,13 @@
             [ote.ui.form :as form]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-operator :as t-operator]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [tuck.core :as tuck]))
 
 (defrecord SelectOperatorForService [data])
 (defrecord SelectOperatorForTransit [data])
+(defrecord EditTransportOperator [id])
+(defrecord EditTransportOperatorResponse [response])
 (defrecord EditTransportOperatorState [data])
 (defrecord SaveTransportOperator [])
 (defrecord SaveTransportOperatorResponse [data])
@@ -54,6 +57,18 @@
       (assoc app
         :transport-operator (:transport-operator selected-operator)
         :routes-vector (:routes selected-operator))))
+
+  EditTransportOperator
+  (process-event [{id :id} app]
+    (comm/get! (str "t-operator/" id)
+               {:on-success (tuck/send-async! ->EditTransportOperatorResponse)})
+    (assoc app :transport-operator-loaded? false))
+
+  EditTransportOperatorResponse
+  (process-event [{response :response} app]
+       (assoc app
+              :transport-operator-loaded? true
+              :transport-operator response))
 
   EditTransportOperatorState
   (process-event [{data :data} app]
