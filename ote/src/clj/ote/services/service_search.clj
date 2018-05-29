@@ -134,7 +134,7 @@
                    :specql.core/order-direction :desc}
                   {})
         results (specql/fetch db ::t-service/transport-service-search-result
-                              search-result-columns
+                              (specql/columns ::t-service/transport-service-search-result)
                               {::t-service/id (op/in ids)}
                               options)]
     {:empty-filters? empty-filters?
