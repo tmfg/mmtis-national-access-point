@@ -15,7 +15,7 @@
 (def operator-result-header {:width            "100%"
                              :display          "block"
                              :padding          "10px"
-                             :background-color "#00A9DF"})
+                             :background-color "#06c"})
 
 (def operator-result-header-link {:color       "white"
                                   :font-weight 600})
@@ -65,19 +65,19 @@
 
 (def result-card-chevron {:float "right"
                           :position "relative"
-                          :top "-39px"
+                          :top "-41px"
                           :color "#fff"})
 
 (def result-card-show-data {:float "right"
                             :position "relative"
-                            :top "-35px"
+                            :top "-37px"
                             :color "#fff"})
 
 (def delete-icon {:color         "rgba(0, 0, 0, 0,75)"
                   ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})
 (def partly-visible-delete-icon {:color "rgba(0, 0, 0, 0,75)"})
 
-(def service-link {:color "#2D75B4" :text-decoration "none"})
+(def service-link {:color "#06c" :text-decoration "none"})
 
 (def data-items
   (merge base/item-list-container

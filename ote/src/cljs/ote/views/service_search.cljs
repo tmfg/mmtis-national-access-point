@@ -47,6 +47,15 @@
                      :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
+(defn data-item [icon item]
+  [:div (stylefy/use-style style/data-items)
+   [:div (stylefy/use-style style-base/item-list-row-margin)
+    (when (and icon item)
+      [:div (stylefy/use-style style/icon-div) icon])
+    (when item
+      [:div (stylefy/use-style style-base/item-list-item)
+       item])]])
+
 (defn- format-address [{::common/keys [street postal_code post_office]}]
   (let [comma (if (not (empty? street)) ", " " ")]
     (str street comma postal_code " " post_office)))
@@ -291,8 +300,7 @@
       [(form/group
          {:label (tr [:service-search :filters-label])
           :columns 3
-          :layout :row
-          :card-style style-base/filters-form}
+          :layout :row}
 
          {:type :component
           :name :operators

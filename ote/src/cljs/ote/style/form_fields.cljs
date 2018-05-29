@@ -20,11 +20,11 @@
    :text-decoration "none"
    :margin-left "0.5em"
    :cursor "pointer"
-   ::stylefy/mode {:hover {:background-color "#00A9DF" :text-decoration "none!important"}}})
+   ::stylefy/mode {:hover {:background-color "#06c" :text-decoration "none!important"}}})
 
 (def localized-text-language-selected
   (merge localized-text-language
-         {:background-color "#00A9DF"}))
+         {:background-color "#06c"}))
 
 (def checkbox-group-label {:margin-bottom "4px"})
 

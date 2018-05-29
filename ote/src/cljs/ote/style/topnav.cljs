@@ -3,7 +3,8 @@
 
 (def topnav {:min-height "56px"
              :overflow "hidden"
-             :background-color "#2D75B4"})
+             :background-color "#323232"
+             :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"})
 
 (def topnav-desktop (merge topnav {:height "56px"
                                    :line-height "56px"}))
@@ -22,8 +23,7 @@
            :text-align "center"
            :padding "10px 15px 10px 15px"
            :text-decoration "none"
-           :font-size "14px"
-           :font-weight "700"
+           :font-size "0.875em"
            ::stylefy/mode {:hover {:background "rgba(0, 0, 0, 0.2)"}}})
 
 (def img {:padding-top "10px"
