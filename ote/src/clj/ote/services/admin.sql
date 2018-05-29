@@ -12,3 +12,7 @@ SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
        o."phone" as "phone", o."gsm" as "gsm", o."email" as "email", CAST('operator' AS text) as "source"
   FROM "transport-operator" o
  WHERE o."business-id" IS NOT NULL;
+
+-- name: delete-transport-operator
+-- Delete all operator data except published external interface data from ckan
+SELECT del_operator(:operator-group-name);

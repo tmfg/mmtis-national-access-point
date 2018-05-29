@@ -315,7 +315,7 @@
                        (ts/is-service-owner? app)
                        true)]
 
-    (when show-footer?
+    (when true ;show-footer? - Take owner check away for now
       [:div.row
        (when (not (form/can-save? data))
          [ui/card {:style {:margin-bottom "1em"}}
