@@ -71,3 +71,18 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_latest_package_for_date(INTEGER,DATE) IS
 E'Returns the id of the latest package of the given transport-operator that has data for the given date.';
+
+CREATE OR REPLACE FUNCTION gtfs_package_week_hash(package_id INTEGER, dt DATE) RETURNS VARCHAR AS $$
+SELECT string_agg(concat(x.weekday,'=',x.hash),',') as weekhash
+  FROM (SELECT EXTRACT(ISODOW FROM date) as weekday, EXTRACT(YEAR FROM date) as year, EXTRACT(WEEK FROM date) as week, hash
+          FROM "gtfs-date-hash"
+         WHERE "package-id" = package_id
+           AND (EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM dt) AND
+                EXTRACT(WEEK FROM date) = EXTRACT(WEEK FROM dt))
+         ORDER BY date ASC) x
+ group by year, week
+ ORDER BY year, week
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_package_week_hash(INTEGER,DATE) IS
+E'Returns a string description of a week's traffic hash for a package.';
