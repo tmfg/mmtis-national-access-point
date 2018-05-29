@@ -75,20 +75,17 @@
 
 (defn mouse-down-chan [el]
   (let [c (chan (sliding-buffer 1) (map handle-mouse-down))]
-    (events->chan (or el js/window)
-                  EventType/MOUSEDOWN c)
+    (events->chan (or el js/window) EventType/MOUSEDOWN c)
     c))
 
 (defn mouse-move-chan [el]
   (let [c (chan (sliding-buffer 1) (map handle-mouse-move))]
-    (events->chan (or el js/window)
-                  EventType/MOUSEMOVE c)
+    (events->chan (or el js/window) EventType/MOUSEMOVE c)
     c))
 
 (defn mouse-up-chan [el]
   (let [c (chan 1 (map handle-mouse-up))]
-    (events->chan (or el js/window)
-                  EventType/MOUSEUP c)
+    (events->chan (or el js/window) EventType/MOUSEUP c)
     c))
 
 
@@ -161,13 +158,19 @@
             [:text {:x "50%" :y "50%" :dy "0" :text-anchor "middle"} (handle-val val)]]))
        items))])
 
-(defn month-bars [months offset bar-width]
-  [svg-bars months offset bar-width #(month-name %)])
+(defn tmp-bar-colors [items transform]
+  (zipmap items (take (count items)
+                      (cycle (transform ["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
+                                             "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
+                                             "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])))))
 
-(defn week-bars [weeks offset bar-width]
-  [svg-bars weeks offset bar-width (fn [val]
-                                     (str "Vko " (t/week-number-of-year (first val))))
-   (constantly "blue")])
+(defn month-bars [months offset bar-width month-style]
+  [svg-bars months offset bar-width #(month-name %) month-style])
+
+(defn week-bars [weeks offset bar-width week-style]
+  [svg-bars weeks offset bar-width
+   #(str "Vko " (t/week-number-of-year (first %)))
+   week-style])
 
 (defn day-bars [days offset bar-width day-style]
   [svg-bars days offset bar-width #(str (t/day %) "." (t/month %)) day-style])
@@ -184,13 +187,16 @@
      [:g {:transform (str "translate(0," (- (/ height 2) 10) ")")}
       (cond
         (< x-scale 4)
+
         [month-bars (range 1 13) bar-offset (* x-scale
                                                ;; width / 12 months
-                                               (/ width 12))]
+                                               (/ width 12))
+         (tmp-bar-colors (range 1 13) #(take-nth  6 %))]
         (< x-scale 12)
         [week-bars weeks bar-offset (* x-scale
                                        ;; Un-accurately, width / weeks
-                                       (/ width 52))]
+                                       (/ width 52))
+         (tmp-bar-colors weeks #(take-nth 2 %))]
         (> x-scale 12)
         [day-bars (flatten weeks) bar-offset (* x-scale
                                                 ;; Un-accurately, width / 365, not taking in
