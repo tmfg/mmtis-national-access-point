@@ -49,10 +49,10 @@
   [table/table {:no-rows-message (if loading?
                                    "Ladataan muutoksia, odota hetki..."
                                    "Ei löydettyjä muutoksia")
-                :name->label str}
-   [{:name "Palveluntuottaja" :read :transport-operator-name :width "15%"}
-    {:name "Palvelu" :read :transport-service-name :width "15%"}
+                :name->label str
+                :on-select #(e! (tc/->ShowChangesForOperator (:transport-operator-id (first %))))}
+   [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
     {:name "Muutospvm" :read (comp :change-date :next-different-week)
      :format time/format-date-opt :width "10%"}
-    {:name "Muutos" :read change-description :width "60%"}]
+    {:name "Muutos" :read change-description :width "65%"}]
    changes])

@@ -22,3 +22,8 @@
 
 (defmethod routes/on-navigate-event :transit-changes [_]
   (->LoadTransitChanges))
+
+(define-event ShowChangesForOperator [id]
+  {}
+  (routes/navigate! :transit-visualization {:operator-id id})
+  app)

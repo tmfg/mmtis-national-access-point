@@ -73,7 +73,7 @@ COMMENT ON FUNCTION gtfs_latest_package_for_date(INTEGER,DATE) IS
 E'Returns the id of the latest package of the given transport-operator that has data for the given date.';
 
 CREATE OR REPLACE FUNCTION gtfs_operator_week_hash(operator_id INTEGER, dt DATE) RETURNS VARCHAR AS $$
-SELECT string_agg(concat(x.weekday,'=',x.hash),',') as weekhash
+SELECT string_agg(concat(x.weekday,'=',x.hash::TEXT),',') as weekhash
   FROM (SELECT EXTRACT(ISODOW FROM date) as weekday,
                EXTRACT(YEAR FROM date) as year,
                EXTRACT(WEEK FROM date) as week,
