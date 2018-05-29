@@ -38,7 +38,8 @@
   ;; Ensure that gtfs-import flag is enabled
   (let [{:keys [url operator-id ts-id last-import-date format] :as gtfs-data}
         (fetch-and-mark-gtfs-interface! db)]
-    (if (nil? gtfs-data)
+    (if (or (nil? gtfs-data)
+            (contains? (:no-gtfs-update-for-operators config) operator-id))
       (log/debug "No gtfs files to upload.")
       (try
         (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
