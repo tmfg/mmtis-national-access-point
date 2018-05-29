@@ -33,15 +33,19 @@
          :different-week-traffic (parse-weekhash (:different-weekhash difference))))
 
 (defn list-current-changes [db]
-  (let [now (java.util.Date.)
-        current-packages (list-current-packages db {:date now})]
-    (mapv (fn [{package-id :package-id :as row}]
-            (assoc row :next-different-week
-                   (describe-week-difference
-                    (first (next-different-week-for-package db
-                                                            {:date now
-                                                             :package-id package-id})))))
-          current-packages)))
+  (let [now (java.util.Date.)]
+    (into []
+          (comp
+           (map (fn [{op-id :transport-operator-id :as row}]
+                  (assoc row :next-different-week
+                         (describe-week-difference
+                          (first (next-different-week-for-operator db
+                                                                   {:date now
+                                                                    :operator-id op-id}))))))
+           (filter (fn [{diff :next-different-week}]
+                     (not= (:current-week-traffic diff)
+                           (:different-week-traffic diff)))))
+          (list-current-operators db {:date now}))))
 
 (define-service-component TransitChanges {}
 

@@ -52,6 +52,7 @@
                 :name->label str}
    [{:name "Palveluntuottaja" :read :transport-operator-name :width "15%"}
     {:name "Palvelu" :read :transport-service-name :width "15%"}
-    {:name "Muutospvm" :read (comp :change-date :next-different-week) :format time/format-date :width "10%"}
+    {:name "Muutospvm" :read (comp :change-date :next-different-week)
+     :format time/format-date-opt :width "10%"}
     {:name "Muutos" :read change-description :width "60%"}]
    changes])

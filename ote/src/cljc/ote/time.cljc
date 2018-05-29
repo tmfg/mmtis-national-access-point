@@ -163,6 +163,13 @@
     (#?(:cljs gstr/format :clj format)
      "%d-%02d-%02d" year month date)))
 
+(defn format-date-opt
+  "Format given date in human readable format or empty string if nil."
+  [date]
+  (if date
+    (format-date date)
+    ""))
+
 #?(:clj
    (defn parse-date-iso-8601
      "Parse a date in ISO-8601 format."
