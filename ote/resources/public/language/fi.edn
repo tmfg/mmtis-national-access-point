@@ -1150,7 +1150,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
   :load-csv-file "Lataa csv tiedosto"
-  :data-content-search-label "Rajapinnan sisältö"}
+  :data-content-search-label "Rajapinnan sisältö"
+  :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
+  :other-company " muuta yritystä"
+  :show-all-information "Näytä kaikki tiedot"}
 
  :login
  {:label "Kirjautumistiedot"
