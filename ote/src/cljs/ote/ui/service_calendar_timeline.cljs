@@ -43,10 +43,6 @@
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 
-(def cur-zoom (r/atom 1))
-(def x-offset (r/atom {:cur 0 :prev 0}))
-(def start-offset (r/atom 0))
-
 (defn- handle-wheel [e]
   (.preventDefault e)
 
@@ -62,7 +58,7 @@
         client-rect (.getBoundingClientRect target)
         client-left (.-left client-rect)
         start-x (- mouse-x client-left)]
-    (reset! start-offset start-x)))
+    start-x))
 
 (defn- handle-mouse-up [e]
   (.preventDefault e)
@@ -96,13 +92,23 @@
     c))
 
 
+;; Current zoom level
+(def cur-zoom (r/atom 0))
+;; Start position of the mouse (in viewport) when dragging
+(def drag-start-offset (r/atom 0))
+;; Drag offset of the svg view-box
+(def view-offset (r/atom {:cur 0 :prev 0}))
+
+
 (defn listen-scroll! [el]
   (let [chan (scroll-chan el)]
     (go-loop []
              (let [new-scroll (- (<! chan))
-                   zoom (max (+ @cur-zoom (* new-scroll 0.05)) 0)]
-               (reset! cur-zoom (min zoom 20)))
-             (recur))))
+                   prev-zoom @cur-zoom
+                   ;; Use bigger zoom increments on bigger zoom levels to achieve more linear zoom-in
+                   zoom (+ prev-zoom (* new-scroll (+ 1 prev-zoom) 0.01))]
+               (reset! cur-zoom (min (max zoom 0) 40))
+               (recur)))))
 
 (defn listen-mouse-move! [el]
   (let [mouse-down (mouse-down-chan el)
@@ -110,33 +116,35 @@
         mouse-up (mouse-up-chan js/document)]
     (go-loop []
              (loop []
-               (alt! [mouse-down] nil
-                     [mouse-move] (recur)))
+               (alt! [mouse-down]
+                     ([start-offset]
+                       (reset! drag-start-offset start-offset))))
              (loop []
                (alt! [mouse-up]
-                     (swap! x-offset assoc :prev (:cur @x-offset))
+                     (swap! view-offset assoc :prev (:cur @view-offset))
 
                      [mouse-move]
-                     (let [client-rect (.getBoundingClientRect el)
-                           client-left (.-left client-rect)
-                           mouse-x (<! mouse-move)
-                           x (- mouse-x client-left)
-                           delta (- @start-offset x)
-                           prev-offset (:prev @x-offset)]
-                       (swap! x-offset assoc :cur (+ prev-offset delta))
-                       (recur))))
+                     ([mouse-x]
+                       (let [client-rect (.getBoundingClientRect el)
+                             client-left (.-left client-rect)
+                             x (- mouse-x client-left)
+                             delta (- @drag-start-offset x)
+                             prev-offset (:prev @view-offset)
+                             zoom-factor (+ @cur-zoom 1)]
+                         (swap! view-offset assoc :cur (+ prev-offset (/ delta zoom-factor)))
+                         (recur)))))
              (recur))))
 
 
 
 
-(defn svg-bars [items bar-width handle-val bar-style]
+(defn svg-bars [items offset bar-width handle-val bar-style]
   [:g
    (doall
      (map-indexed
        (fn [i val]
          (let [w (- bar-width 4)
-               x (* (+ w 4) i)]
+               x (- (* (+ w 4) i) offset)]
            ^{:key (str "svg-bar-" i)}
            [:svg {:style {:user-select "none"}
                   :width w :height "100%" :x x :y 0}
@@ -153,41 +161,41 @@
             [:text {:x "50%" :y "50%" :dy "0" :text-anchor "middle"} (handle-val val)]]))
        items))])
 
-(defn month-bars [months bar-width]
-  [svg-bars months bar-width #(month-name %)])
+(defn month-bars [months offset bar-width]
+  [svg-bars months offset bar-width #(month-name %)])
 
-(defn week-bars [weeks bar-width]
-  [svg-bars weeks bar-width (fn [val]
-                              (str "Vko " (t/week-number-of-year (first val))))
+(defn week-bars [weeks offset bar-width]
+  [svg-bars weeks offset bar-width (fn [val]
+                                     (str "Vko " (t/week-number-of-year (first val))))
    (constantly "blue")])
 
-(defn day-bars [days bar-width day-style]
-  [svg-bars days bar-width #(str (t/day %) "." (t/month %)) day-style])
+(defn day-bars [days offset bar-width day-style]
+  [svg-bars days offset bar-width #(str (t/day %) "." (t/month %)) day-style])
 
 (defn timeline [weeks width height day-style]
   (let [cur-zoom @cur-zoom
-        x-offset (:cur @x-offset)
+        view-offset (:cur @view-offset)
+        bar-offset (* cur-zoom (+ view-offset (/ width 2)))
         x-scale (max (+ 1 cur-zoom) 1)]
     [:svg {:xmlns "http://www.w3.org/2000/svg"
            :style {:width "100%" :height "100%"}
            :id "service-calendar-timeline"
-           :view-box (str x-offset " 0 " width " " height)}
+           :view-box (str view-offset " 0 " width " " height)}
      [:g {:transform (str "translate(0," (- (/ height 2) 10) ")")}
       (cond
         (< x-scale 4)
-        (do
-          [month-bars (range 1 13) (* x-scale
-                                      ;; width / 12 months
-                                      (/ width 12))])
+        [month-bars (range 1 13) bar-offset (* x-scale
+                                               ;; width / 12 months
+                                               (/ width 12))]
         (< x-scale 12)
-        (do
-          [week-bars weeks (* x-scale
-                              ;; width / (12 months * 4 weeks)
-                              (/ width 48))])
+        [week-bars weeks bar-offset (* x-scale
+                                       ;; Un-accurately, width / weeks
+                                       (/ width 52))]
         (> x-scale 12)
-        [day-bars (flatten weeks) (* x-scale
-                                     ;; width / (12 months * 4 weeks * 7 days)
-                                     (/ width 336))
+        [day-bars (flatten weeks) bar-offset (* x-scale
+                                                ;; Un-accurately, width / 365, not taking in
+                                                ;; account any exceptions.
+                                                (/ width 365))
          ;; Currently, we'll use background color only from the style to fill rects.
          (fn [day]
            (:background-color (day-style day false)))])]]))
