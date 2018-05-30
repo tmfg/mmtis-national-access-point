@@ -44,6 +44,19 @@
                                                          db {:id (::t-operator/ckan-group-id operator)})
                                                         "")))))
 
+(defn edit-transport-operator [db user transport-operator-id]
+  (authorization/with-transport-operator-check
+    db user transport-operator-id
+    #(do
+       (let [operator (first (fetch db ::t-operator/transport-operator
+                     (specql/columns ::t-operator/transport-operator)
+                     {::t-operator/id transport-operator-id}
+                     {::specql/limit 1}))]
+         (when operator
+           (assoc operator ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
+                                                               db {:id (::t-operator/ckan-group-id operator)})
+                                                             "")))))))
+
 (def transport-services-columns
   #{::t-service/id
     ::t-service/transport-operator-id
@@ -351,6 +364,12 @@
           (if-not ts
             {:status 404}
             (http/no-cache-transit-response ts))))
+
+   (GET "/t-operator/:id" [id :as {user :user}]
+     (let [to (edit-transport-operator db user (Long/parseLong id))]
+       (if-not to
+         {:status 404}
+         (http/no-cache-transit-response to))))
 
    (POST "/transport-operator/group" {user :user}
      (http/transit-response

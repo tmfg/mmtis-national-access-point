@@ -181,7 +181,9 @@
                      :zoomControl false
                      :zoom        5}
         [leaflet/TileLayer {:url         "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                            :attribution "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"}]
+                            :attribution "&copy; <a href=\"https://opensource.org/licenses/MIT\">MIT</a>
+| &copy; <a href=\"https://www.maanmittauslaitos.fi/en/opendata-licence-cc40\">MML</a>
+| &copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors<br>"}]
 
         ;; Go through the geometrycollection and separately show each geometry.
         ;; The GeoJSON export adds a GeoJSON-CSS style to each geometry which has

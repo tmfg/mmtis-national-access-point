@@ -100,6 +100,8 @@
              app (merge app
                         (if (not= 1 last-selected)
                           {:date1 date
+                           ;; date1 = date2 by default. Date2 will be changed on the second click of day.
+                           :date2 date
                            :last-selected 1}
                           {:date2 date
                            :last-selected 2}))]

@@ -36,7 +36,7 @@
          "window.dataLayer = window.dataLayer || []; "
          "function gtag(){dataLayer.push(arguments);} "
          "gtag('js', new Date()); "
-         "gtag('config','" (:tracking-code ga-conf) "'); "
+         "gtag('config','" (:tracking-code ga-conf) "', { 'anonymize_ip': true }); "
          "if (host === 'localhost' || host.indexOf('testi') !== -1) { "
          "  window['ga-disable-" (:tracking-code ga-conf) "'] = true; "
          "}"))))

@@ -34,7 +34,8 @@
             [ote.views.pre-notices.pre-notice :as notice]
             [ote.views.pre-notices.listing :as pre-notices-listing]
             [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]
-            [ote.views.transit-visualization :as transit-visualization]))
+            [ote.views.transit-visualization :as transit-visualization]
+            [ote.views.transit-changes :as transit-changes]))
 
 
 (defn logged-in? [app]
@@ -267,7 +268,7 @@
        [:li
         [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
-       [:li [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/Tietosuojaseloste_NAP.pdf"
+       [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"
              (tr [:common-texts :navigation-privacy-policy])
              {:target "_blank"}]]
        [:li
@@ -467,6 +468,7 @@
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
                 :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
+                :transit-changes [transit-changes/transit-changes e! (:transit-changes app)]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
 

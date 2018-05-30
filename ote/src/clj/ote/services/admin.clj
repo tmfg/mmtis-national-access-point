@@ -14,7 +14,8 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]
-            [cheshire.core :as cheshire]))
+            [cheshire.core :as cheshire]
+            [ote.authorization :as authorization]))
 
 (defqueries "ote/services/admin.sql")
 
@@ -54,6 +55,7 @@
           (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
           user))
       users)))
+
 (defn- published-search-param [query]
   (case (:published-type query)
     nil? nil
@@ -72,6 +74,17 @@
          service-search-result-columns
          search-params
          {:specql.core/order-by ::t-service/name})))
+
+(defn- list-operators
+  "Returns list of transport-operators. Query parameters aren't mandatory, but it can be used to filter results."
+  [db user query]
+  (let [q (when (not (nil? (:query query)))
+            {::t-operator/deleted? false
+             ::t-operator/name (op/ilike (str "%" (:query query) "%"))})]
+    (fetch db ::t-operator/transport-operator
+           (specql/columns ::t-operator/transport-operator)
+           q
+           {:specql.core/order-by ::t-operator/name})))
 
 (defn- list-services-by-operator [db user query]
   (let [q (when (not (nil? (:query query)))
@@ -117,11 +130,29 @@
     (upsert! db ::auditlog/auditlog auditlog)
     return))
 
+(defn delete-transport-operator!
+  "Delete single transport operator by id. Delete services and all other datas as well."
+  [db user transport-operator-id]
+  (let [auditlog {::auditlog/event-type :delete-operator
+                  ::auditlog/event-attributes
+                                        [{::auditlog/name "transport-operator-id"
+                                          ::auditlog/value (str transport-operator-id)}]
+                  ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
+                  ::auditlog/created-by (get-in user [:user :id])}]
+  (authorization/with-transport-operator-check
+    db user transport-operator-id
+    #(do
+       (delete-transport-operator db {:operator-group-name (str "transport-operator-" transport-operator-id)})
+       (upsert! db ::auditlog/auditlog auditlog)
+       transport-operator-id))))
+
 (defn- admin-routes [db http nap-config]
   (routes
     (POST "/admin/users" req (admin-service "users" req db #'list-users))
 
     (POST "/admin/transport-services" req (admin-service "services" req db #'list-services))
+
+    (POST "/admin/transport-operators" req (admin-service "operators" req db #'list-operators))
 
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
@@ -129,7 +160,12 @@
       (admin-service "transport-service/delete" req db
                      (partial admin-delete-transport-service! nap-config)))
 
-    (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))))
+    (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
+
+    (POST "/admin/transport-operator/delete" {form-data :body user :user}
+      (http/transit-response
+        (delete-transport-operator! db user
+                                    (:id (http/transit-request form-data)))))))
 
 (defrecord Admin [nap-config]
   component/Lifecycle
