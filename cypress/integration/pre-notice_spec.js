@@ -74,7 +74,27 @@ describe('Pre notice tests', () => {
     });
 
     it('open the pre-notice and check region', () => {
+        // Open pre notice form
+        cy.visit('/#/pre-notices');
+        cy.server();
+        cy.route('GET', '/pre-notices/list').as('getPreNotices');
+
+        // Wait for pre-notices query because it causes re-render of the view.
+        cy.wait('@getPreNotices');
+
+        cy.route('GET', '/pre-notices/*').as('getPreNotice');
+        cy.route('GET', '/pre-notices/regions').as('getRegions');
+        cy.route('GET', '/pre-notices/region/*').as('getRegion');
+
+
+        // Go to edit pre-notice view
         cy.get('tr:last-child div.edit-pre-notice a').click();
+
+        // Wait for pre-notice edit form queries because it causes re-render of the view.
+        cy.wait('@getPreNotice');
+        cy.wait('@getRegions');
+        cy.wait('@getRegion');
+
         cy.get('#route-description').contains('Oulu - Kajaani');
 
         // two regions drawn on the map
