@@ -98,12 +98,13 @@
 
 
 (defn listen-scroll! [el]
-  (let [chan (scroll-chan el)]
+  (let [chan (scroll-chan el)
+        zoom-speed 0.02]
     (go-loop []
              (let [new-scroll (- (<! chan))
                    prev-zoom @cur-zoom
                    ;; Use bigger zoom increments on bigger zoom levels to achieve more linear zoom-in
-                   zoom (+ prev-zoom (* new-scroll (+ 1 prev-zoom) 0.01))]
+                   zoom (+ prev-zoom (* new-scroll (+ 1 prev-zoom) zoom-speed))]
                (reset! cur-zoom (min (max zoom 0) 40))
                (recur)))))
 
