@@ -25,7 +25,7 @@
                               :raw p
                               :transit (let [[method path bindings & body] p]
                                          `(~method ~path ~bindings
-                                           (http/transit-response
+                                           (http/no-cache-transit-response
                                             (do ~@body)))))))))]))
 
        (stop [{stop-routes# :ote.components.service/stop-routes :as this#}]
