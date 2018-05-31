@@ -45,7 +45,8 @@
         (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
         (import-gtfs/download-and-store-transit-package (interface-type format)
                                                         (:gtfs config) db url operator-id ts-id
-                                                        last-import-date)
+                                                        last-import-date
+                                                        (:license gtfs-data))
         (catch Exception e
           (specql/update! db ::t-service/external-interface-description
                           {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))

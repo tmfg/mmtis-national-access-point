@@ -1,5 +1,5 @@
 -- name: select-gtfs-urls-update
-SELECT eid.id as id, (eid."external-interface").url, eid.format[1],
+SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
        ts."transport-operator-id" as "operator-id", ts.id as "ts-id", eid."gtfs-imported" as "last-import-date"
   FROM "transport-service"  ts, "external-interface-description"  eid
  WHERE ts."published?" = TRUE
