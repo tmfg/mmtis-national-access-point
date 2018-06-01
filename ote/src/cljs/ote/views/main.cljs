@@ -93,7 +93,7 @@
     {:menu-style {}
      :underline-style {}
      :label-style {:color "#FFFFFF" :font-weight 700}
-     :list-style {:background-color "#2D75B4"}
+     :list-style {:background-color "#323232"}
      :on-click #(e! (fp-controller/->OpenUserMenu))
      :anchor-origin {:horizontal "right" :vertical "bottom"}
      :target-origin {:horizontal "right" :vertical "top"}

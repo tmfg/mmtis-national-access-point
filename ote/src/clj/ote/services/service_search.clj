@@ -44,6 +44,7 @@
     ;; Information JOINed from other tables
     ::t-service/external-interface-links
     ::t-service/operator-name
+    ::t-service/service-companies
     ::t-service/business-id})
 
 (defn- ids [key query-result]

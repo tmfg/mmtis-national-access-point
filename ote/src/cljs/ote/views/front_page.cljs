@@ -228,7 +228,7 @@
   "Front page info"
   [e! {user :user :as app
        show-register-dialog? :show-register-dialog?}]
-  [:div.front-page {:style {:position "relative" :top "-18px"}}
+  [:div.front-page {:style {:position "relative" :top "-20px"}}
    [:header {:style {:height "260px"
                      :padding-top "0px"
                      :background "url(/img/home_header.jpg)"

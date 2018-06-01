@@ -67,7 +67,7 @@ In order to our OTE menu to render correctly work, we need to reset margin and p
 }
 
 .grey-wrapper {
-    background-color: #f1f1f1;
+    background-color: rgba(58, 57, 57, 0.1);
 }
 
 
