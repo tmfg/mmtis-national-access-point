@@ -130,6 +130,18 @@
     :default
     app))
 
+(define-event RouteTripsForDateResponse [trips date]
+  {:path [:transit-visualization :compare]}
+  (cond
+    (= date (:date1 app))
+    (assoc app :date1-trips trips)
+
+    (= date (:date2 app))
+    (assoc app :date2-trips trips)
+
+    :default
+    app))
+
 (define-event SelectRouteForDisplay [route-short-name route-long-name]
   {:path [:transit-visualization]}
   (let [operator-id (:operator-id app)]
@@ -142,10 +154,17 @@
                     {:params {:date date
                               :short route-short-name
                               :long route-long-name}
-                     :on-success (tuck/send-async! ->RouteLinesForDateResponse date)}))
+                     :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
+         (comm/get! (str "transit-visualization/route-trips-for-date/" operator-id)
+                    {:params {:date date
+                              :short route-short-name
+                              :long route-long-name}
+                     :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
        (assoc app
               :date1-route-lines nil
               :date2-route-lines nil
+              :date1-trips nil
+              :date2-trips nil
               :route-short-name route-short-name
               :route-long-name route-long-name)))))
 
@@ -160,3 +179,8 @@
 
     :default
     app))
+
+
+(define-event ToggleDifferent []
+  {:path [:transit-visualization :compare :different?]}
+  (not app))
