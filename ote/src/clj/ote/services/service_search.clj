@@ -44,6 +44,7 @@
     ;; Information JOINed from other tables
     ::t-service/external-interface-links
     ::t-service/operator-name
+    ::t-service/service-companies
     ::t-service/business-id})
 
 (defn- ids [key query-result]
@@ -134,7 +135,7 @@
                    :specql.core/order-direction :desc}
                   {})
         results (specql/fetch db ::t-service/transport-service-search-result
-                              (specql/columns ::t-service/transport-service-search-result)
+                              search-result-columns
                               {::t-service/id (op/in ids)}
                               options)]
     {:empty-filters? empty-filters?
