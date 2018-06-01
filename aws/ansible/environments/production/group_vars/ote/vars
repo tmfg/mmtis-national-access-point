@@ -12,4 +12,5 @@ email_smtp_server: email-smtp.eu-west-1.amazonaws.com
 email_user: "{{vault_email_user}}"
 email_password: "{{vault_email_password}}"
 no_gtfs_update_for_operators: "#{612}"
+allow_robots: true
 gtfs_bucket: "napote-gtfs"

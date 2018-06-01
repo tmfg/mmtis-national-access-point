@@ -8,7 +8,7 @@
   "Define a service component that publishes HTTP routes."
   [component-name options & paths]
   (let [http (gensym "http")]
-    `(defrecord ~component-name []
+    `(defrecord ~component-name [~@(:fields options)]
        component/Lifecycle
        (start [{~'db :db ~http :http :as this#}]
          (assoc this#
