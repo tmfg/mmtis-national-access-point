@@ -6,4 +6,4 @@
 (def stepper {::stylefy/mode {:hover {:text-decoration "underline"}}})
 (def exception-icon-size {:width 18 :height 18})
 (def exception-icon (merge {:color "#CCC"} exception-icon-size))
-(def selected-exception-icon (merge {:color "#2D75B4"} exception-icon-size))
+(def selected-exception-icon (merge {:color "#06c"} exception-icon-size))

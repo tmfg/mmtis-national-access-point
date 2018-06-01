@@ -64,15 +64,13 @@
   (when format
     (let [format (str/lower-case format)]
       (when (or (= "gtfs" format) (= "kalkati.net" format))
-        (common-ui/linkify
-          (str "#/routes/view-gtfs?url=" (::t-service/url interface)
-               (when (= "kalkati.net" format)
-                 "&type=kalkati"))
-          [ui/flat-button {:label (tr [:service-search :view-routes])
-                           :primary true
-                           :label-position "before"
-                           :icon (ic/action-open-in-new)}]
-          {:target "_blank"})))))
+        [:span " | "
+         (common-ui/linkify
+           (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+                (when (= "kalkati.net" format)
+                  "&type=kalkati"))
+           (tr [:service-search :view-routes])
+           {:target "_blank"})]))))
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
@@ -80,96 +78,109 @@
         return-value (common-ui/maybe-shorten-text-to 45 value-str)]
     return-value))
 
-(def external-interface-table-columns
-  ;; [label width value-fn]
-  [[:table-header-external-interface "25%"
-    (fn [{::t-service/keys [data-content external-interface]}]
-      (common-ui/linkify (::t-service/url external-interface)
-                         (if (nil? data-content)
-                           (::t-service/url external-interface)
-                           (parse-content-value data-content))
-                         {:target "_blank"}))]
-   [::t-service/format-short "10%" (comp #(str/join ", " %) ::t-service/format)]
-   [::t-service/license "15%" ::t-service/license]
-   [::t-service/external-service-description "25%"
-    (comp #(t-service/localized-text-for "FI" %) ::t-service/description ::t-service/external-interface)]
-   [:gtfs-viewer "25%" (comp #(gtfs-viewer-link %))]])
-
-(defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
-                                                       transport-operator-id ckan-resource-id]}]
-  (when-not (empty? external-interface-links)
+(defn- external-interface-links [e! {::t-service/keys [id external-interface-links transport-operator-id]}]
+  (let [nap-url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
     [:div
-     [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
-     [:table {:style {:margin-top "10px" :width "100%"}}
-      [:thead (stylefy/use-style style/external-interface-header)
-       [:tr
+     [:div.row (stylefy/use-style style/link-result-card-row)
+      [common-ui/linkify nap-url "NAP-rajapinta" {:target "_blank"}]
+      [:span " | "]
+      [:span "GeoJSON"]]
+     (when-not (empty? external-interface-links)
+       [:div.row
         (doall
-          (for [[k w _] external-interface-table-columns]
-            ^{:key k}
-            [:th {:style (merge {:width w} style/external-table-header)}
-             (tr [:field-labels :transport-service-common k])]))]]
-      [:tbody (stylefy/use-style style/external-interface-body)
-       (doall
-         (map-indexed
-           (fn [i {::t-service/keys [data-content external-interface format license description] :as row}]
-             ^{:key (str "external-table-row-" i)}
-             [:tr {:style style/external-table-row}
-              ^{:key (str "external-interface-" i)}
-              (doall
-                (for [[k w value-fn] external-interface-table-columns]
-                  ^{:key k}
-                  [:td {:style {:width w :font-size "14px"}}
-                   (value-fn row)]))])
-           external-interface-links))]]]))
+          (map-indexed
+            (fn [i {::t-service/keys [external-interface format data-content] :as row}]
+              (let [data-content (if (nil? data-content)
+                                   (::t-service/url external-interface)
+                                   (parse-content-value data-content))]
+                [:div.row (stylefy/use-style style/link-result-card-row)
+                 [common-ui/linkify (::t-service/url external-interface) data-content {:target "_blank"}]
+                 [:span " | " (str/join ", " format)]
+                 [gtfs-viewer-link row]]))
+            external-interface-links))])]))
+
+(defn- list-service-companies [service-companies service-search]
+  (when (not (nil? service-companies))
+    (let [searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
+          found-business-ids (keep (fn [sc]
+                                     (let [s (keep #(when (= (::t-service/business-id sc) %) sc) searched-business-ids)]
+                                       (when (not (empty? s)) (first s))))
+                                   service-companies)
+          presented-companies-count (if (not (empty? found-business-ids))
+                                      (count found-business-ids)
+                                      2)]
+      [:div
+       [:h4 (tr [:service-search :other-involved-companies])]
+       (if (not (empty? found-business-ids))
+         (doall (for [c found-business-ids]
+                  (when (::t-service/name c)
+                    [:div.row (stylefy/use-style style/simple-result-card-row)
+                     (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))
+         (doall
+           (for [c (take 2 service-companies)]
+             (when (::t-service/name c)
+               [:div.row (stylefy/use-style style/simple-result-card-row)
+                (str (::t-service/name c) " (" (::t-service/business-id c) ")")]))))
+       [:div.row (stylefy/use-style style/simple-result-card-row)
+        (str " + " (- (count service-companies) presented-companies-count) (tr [:service-search :other-company]))]])))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
                                        operation-area-description description contact-phone contact-email
-                                       operator-name business-id ckan-resource-id transport-operator-id]
-                     :as service}]
+                                       operator-name business-id ckan-resource-id transport-operator-id service-companies companies]
+                     :as              service} service-search]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
-        service-desc (t-service/localized-text-for "FI" description)]
+        service-desc (t-service/localized-text-for "FI" description)
+        service-companies (cond
+                            (and service-companies companies) (merge service-companies companies)
+                            (and service-companies (empty? companies)) service-companies
+                            :else companies)
+        open-link (fn [content]
+                    [:a {:style    {:color "#fff"}
+                         :href     "#"
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (ss/->ShowServiceGeoJSON
+                                            (str js/document.location.protocol "//" js/document.location.host
+                                                 "/export/geojson/" transport-operator-id "/" id))))}
+                     content])]
     [:div.result-card (stylefy/use-style style/result-card)
+     [:div
+      [:div.result-title (stylefy/use-style style/result-card-title)
+       (open-link name)
 
-     [:a {:href "#"
-          :on-click #(do
-                       (.preventDefault %)
-                       (e! (ss/->ShowServiceGeoJSON
-                             (str js/document.location.protocol "//" js/document.location.host
-                                  "/export/geojson/" transport-operator-id "/" id))))}
-      [:div.result-title (stylefy/use-style style/result-card-label) name
-       [:span.small-text (stylefy/use-style style/result-card-small-label)
-        (sub-type-tr sub-type)]]]
+       (when admin?
+         [:div (stylefy/use-style style/result-card-delete)
+          [delete-service-action e! id name (get service :show-delete-modal?)]])]
+      (open-link
+        [:span [:div (stylefy/use-style style/result-card-chevron)
+                [ic/navigation-chevron-right {:color "#fff" :height 24 :padding 4}]]
 
-     (when admin?
-       [:div (stylefy/use-style style/result-card-delete)
-        [delete-service-action e! id name (get service :show-delete-modal?)]])
+         [:div (stylefy/use-style style/result-card-show-data)
+          [:span {:style {:padding-top "10px"}} (tr [:service-search :show-all-information])]]])]
 
 
-     [:div.result-body (stylefy/use-style style/result-card-body)
-      (when-not (empty? service-desc)
-        [:div.description {:style style/result-border}
-         (common-ui/shortened-description service-desc 270)])
-      [:div.nap-interface {:style style/result-border}
-       [:span.search-card-title (tr [:service-search :nap-interface])]
-       (let [url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
-         [common-ui/linkify url url {:target "_blank"}])]
-
-      (when-not (empty? (::t-service/external-interface-links service))
-        [:div.result-interfaces {:style style/result-border}
-         e-links])
-      [:div
-       [data-item nil (str operator-name " " business-id)]
-
-       [data-item [ic/action-home {:style style/contact-icon}]
+     [:div.row.result-body (stylefy/use-style style/result-card-body)
+      [:div.col-md-8 {:style {:padding-left "30px"}}
+       [:h4 (stylefy/use-style style/result-card-header) (sub-type-tr sub-type)]
+       (when-not (empty? service-desc)
+         [:div.description
+          (common-ui/shortened-description service-desc 270)])
+       (when-not (empty? (::t-service/external-interface-links service))
+         [:div.result-interfaces e-links])
+       ]
+      [:div.col-md-3 {:style {:padding-left "30px"}}
+       [:h4 (stylefy/use-style style/result-card-header) operator-name]
+       [:div (stylefy/use-style style/simple-result-card-row)
+        (tr [:field-labels :ote.db.transport-operator/business-id]) business-id]
+       [:div (stylefy/use-style style/simple-result-card-row)
         (format-address contact-address)]
-
-       [data-item [ic/communication-phone {:style style/contact-icon}]
-        contact-phone]
-
-       [data-item [ic/communication-email {:style style/contact-icon}]
-        contact-email]]]]))
+       [:div (stylefy/use-style style/simple-result-card-row)
+        (str contact-phone)]
+       [:div (stylefy/use-style style/simple-result-card-row)
+        contact-email]
+       (list-service-companies service-companies service-search)]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count
@@ -192,7 +203,7 @@
      (doall
        (for [result results]
          ^{:key (::t-service/id result)}
-         [result-card e! (:admin? user) result]))
+         [result-card e! (:admin? user) result service-search]))
 
      (if fetching-more?
        [:span (tr [:service-search :fetching-more])]
@@ -289,8 +300,7 @@
       [(form/group
          {:label (tr [:service-search :filters-label])
           :columns 3
-          :layout :row
-          :card-style style-base/filters-form}
+          :layout :row}
 
          {:type :component
           :name :operators

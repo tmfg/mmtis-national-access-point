@@ -13,3 +13,4 @@ email_user: "{{vault_email_user}}"
 email_password: "{{vault_email_password}}"
 no_gtfs_update_for_operators: "#{}"
 allow_robots: false
+gtfs_bucket: "napote-gtfs-dev"

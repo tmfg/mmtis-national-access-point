@@ -102,7 +102,7 @@
 
 (def help-link-container {:padding "10px 0px 0px 0px"})
 (def link-icon-container {:float "left" :padding-right "10px"})
-(def link-icon {:color "#2D75B4" :height 18 :width 18})
+(def link-icon {:color "#06c" :height 18 :width 18})
 
 (def filters-form
   {:border "solid 1px #0046ad"})

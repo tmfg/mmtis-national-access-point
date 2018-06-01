@@ -1137,7 +1137,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :operator-no-services "Transport operator has no services."
   :view-routes "View routes"
   :load-csv-file "Load csv file"
-  :data-content-search-label "Interface content"}
+  :data-content-search-label "Interface content"
+  :other-involved-companies "Other companies providing the service"
+  :other-company " other company"
+  :show-all-information "Show all information"}
 
  :login
  {:label "Login credentials"
