@@ -15,8 +15,9 @@
      :day->hash {}}
     (let [days (set/rename-keys
                 (into {}
-                      (map #(str/split % #"=")
-                           (str/split weekhash #",")))
+                      (map #(let [[day hash] (str/split % #"=")]
+                              [day hash]))
+                      (str/split weekhash #","))
                 (zipmap (map str (range 1 8)) time/week-days))]
       {:days-with-traffic (into #{}
                                 (comp
