@@ -27,26 +27,6 @@
          (map #(update % :sub-type keyword))
          (sub-type-facet db))})
 
-(def search-result-columns
-  #{::t-service/contact-email
-    ::t-service/sub-type
-    ::t-service/ckan-resource-id
-    ::t-service/id
-    ::t-service/contact-gsm
-    ::t-service/ckan-dataset-id
-    ::t-service/contact-address
-    ::t-service/name
-    ::t-service/type
-    ::t-service/transport-operator-id
-    ::t-service/contact-phone
-    ::t-service/description
-
-    ;; Information JOINed from other tables
-    ::t-service/external-interface-links
-    ::t-service/operator-name
-    ::t-service/service-companies
-    ::t-service/business-id})
-
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
 
@@ -135,7 +115,7 @@
                    :specql.core/order-direction :desc}
                   {})
         results (specql/fetch db ::t-service/transport-service-search-result
-                              search-result-columns
+                              (specql/columns ::t-service/transport-service-search-result)
                               {::t-service/id (op/in ids)}
                               options)]
     {:empty-filters? empty-filters?
