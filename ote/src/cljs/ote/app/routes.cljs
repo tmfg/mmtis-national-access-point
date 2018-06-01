@@ -28,6 +28,7 @@
 
     ["/routes/view-gtfs" :view-gtfs]
     ["/transit-visualization/:operator-id" :transit-visualization]
+    ["/transit-changes" :transit-changes]
 
     ;; 60 day pre-notice
     ["/pre-notices" :pre-notices]

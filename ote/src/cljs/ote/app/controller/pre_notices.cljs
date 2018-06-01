@@ -6,16 +6,15 @@
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
             [ote.ui.form :as form]
-            [ote.localization :refer [tr]]))
+            [ote.localization :refer [tr]]
+            [ote.app.controller.common :refer [->ServerError]]))
 
 (declare ->LoadPreNoticesResponse ->LoadPreNoticeResponse
-         ->ServerError ->RegionsResponse effective-date-description->set
+          ->RegionsResponse effective-date-description->set
          ->LoadRegions load-regions-from-server)
 
 
-(tuck/define-event ServerError [response]
-  {}
-  (assoc app :flash-message-error (tr [:common-texts :server-error])))
+
 
 (defn load-organization-pre-notices! []
   (comm/get! "pre-notices/list"

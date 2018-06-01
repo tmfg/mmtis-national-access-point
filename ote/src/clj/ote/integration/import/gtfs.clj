@@ -177,7 +177,7 @@
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
-  [interface-type gtfs-config db url operator-id ts-id last-import-date]
+  [interface-type gtfs-config db url operator-id ts-id last-import-date license]
   (let [filename (gtfs-file-name operator-id ts-id)
         saved-etag (:gtfs/etag (last (specql/fetch db :gtfs/package
                                                    #{:gtfs/etag}
@@ -200,7 +200,8 @@
                                                             :gtfs/transport-operator-id operator-id
                                                             :gtfs/transport-service-id  ts-id
                                                             :gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))
-                                                            :gtfs/etag new-etag})]
+                                                            :gtfs/etag new-etag
+                                                            :gtfs/license license})]
               (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
               (log/debug "File: " filename " was uploaded to S3 successfully.")
 

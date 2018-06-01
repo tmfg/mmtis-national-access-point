@@ -193,6 +193,13 @@
                       :value :weeks
                       :style {:white-space "nowrap"
                               :width "auto"
+                              :margin-right "20px"
+                              :font-size "12px"
+                              :font-weight "bold"}}]
+    [ui/radio-button {:label "Aikajana"
+                      :value :timeline
+                      :style {:white-space "nowrap"
+                              :width "auto"
                               :font-size "12px"
                               :font-weight "bold"}}]]])
 

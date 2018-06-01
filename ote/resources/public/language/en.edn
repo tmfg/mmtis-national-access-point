@@ -275,7 +275,8 @@
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
-  :companies-main-info "If there are other companies involved in providing the service or the service if a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part."
+  :companies-main-info (:md "If there are other companies involved in providing the service or the service is a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities). Small companies who only take ride orders from taxi centres do not fill this part.
+**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**")
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
   :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
