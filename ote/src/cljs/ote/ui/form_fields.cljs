@@ -151,15 +151,18 @@
                         (on-enter))}))])
 
 (defmethod field :file-and-delete [{:keys [on-delete table-data row-number disabled?] :as f} data]
-  (if (empty? (get table-data row-number))
-    (field (assoc f :type :file))
-    [ui/icon-button (merge
-                      {:on-click #(on-delete row-number)}
-                      (when disabled?
-                        {:disabled true}))
-     [ic/action-delete]]))
+  (let [row-data (get table-data row-number)]
+    (if (or (empty? row-data) (:error row-data))
+      (field (assoc f :type :file
+                      :error (:error row-data)))
+      [ui/icon-button (merge
+                        {:on-click #(on-delete row-number)}
+                        (when disabled?
+                          {:disabled true}))
+       [ic/action-delete]])))
 
-(defmethod field :file [{:keys [label button-label name disabled? on-change]
+(defmethod field :file [{:keys [label button-label name disabled? on-change
+                                error warning]
                          :as field} data]
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
    [:button (merge
@@ -178,7 +181,10 @@
             ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
             :title " "}
            (when disabled?
-             {:disabled true}))]])
+             {:disabled true}))]
+   (when (or error warning)
+     [:div (stylefy/use-style style-base/required-element)
+      (if error error warning)])])
 
 (defmethod field :text-area [{:keys [update! table? label name rows error tooltip tooltip-length
                                      max-length on-blur warning full-width?

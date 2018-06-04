@@ -844,6 +844,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :data-not-found                             "Data is not found"
   :required-field                             "Required field"
   :invalid-postal-code                        "Please, check the postalcode (5 numbers)"
+  :invalid-file-type                          "Invalid file type"
   :transport-service-saved                    "Transport service information has been saved!"
   :transport-operator-saved                   "Transport operator information has been saved!"
   :footer-livi-logo                           "Finnish Transport Aggency Logo"
