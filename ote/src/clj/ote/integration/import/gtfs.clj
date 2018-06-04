@@ -159,7 +159,7 @@
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
-    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/gtfs_tampere (2).zip" #_"hsl_gtfs.zip")]
+    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/google_transit (3).zip" #_"hsl_gtfs.zip")]
                   (let [out (java.io.ByteArrayOutputStream.)]
                     (io/copy in out)
                     (.toByteArray out)))]

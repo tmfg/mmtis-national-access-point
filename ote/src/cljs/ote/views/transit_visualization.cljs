@@ -10,7 +10,8 @@
             [ote.ui.table :as table]
             [ote.db.transport-service :as t-service]
             [ote.localization :refer [tr]]
-            [ote.ui.leaflet :as leaflet]))
+            [ote.ui.leaflet :as leaflet]
+            [clojure.string :as str]))
 
 (defn highlight-style [hash->color date->hash day highlight]
   (let [d (time/format-date day)
@@ -68,21 +69,27 @@
                                        :saturday :SAT
                                        :sunday :SUN)]))
 
-(defn- route-listing [e! {:keys [date1 date2] :as compare}]
-  [table/table {:no-rows-message "Ei reittejä"
-                :height 300
-                :name->label str
-                :show-row-hover? true
-                :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
-                                                            (:route-long-name (first %))))}
-   [{:name "Nimi" :width "70%"
-     :read identity
-     :format #(str (:route-short-name %) " " (:route-long-name %))}
-    {:name (str "Vuoroja " date1) :width "15%"
-     :read :date1-trips}
-    {:name (str "Vuoroja " date2) :width "15%"
-     :read :date2-trips}]
-   (:routes compare)])
+(defn- route-listing [e! {:keys [date1 date2 different?] :as compare}]
+  [:div
+   [ui/checkbox {:label "Näytä vain reitit, jotka erilaisia"
+                 :checked different?
+                 :on-check #(e! (tv/->ToggleDifferent))}]
+   [table/table {:no-rows-message "Ei reittejä"
+                 :height 300
+                 :name->label str
+                 :show-row-hover? true
+                 :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
+                                                             (:route-long-name (first %))))}
+    [{:name "Nimi" :width "70%"
+      :read identity
+      :format #(str (:route-short-name %) " " (:route-long-name %))}
+     {:name (str "Vuoroja " date1) :width "15%"
+      :read :date1-trips}
+     {:name (str "Vuoroja " date2) :width "15%"
+      :read :date2-trips}]
+    (if different?
+      (filter :different? (:routes compare))
+      (:routes compare))]])
 
 (defn- selected-route-map [_ _ _ _]
   (r/create-class
@@ -116,6 +123,35 @@
           [leaflet/GeoJSON {:data date2-route-lines
                             :style {:color (-> date2 date->hash hash->color)}}])]])}))
 
+(defn stop-listing [trips]
+  [:div {:style {:width "100%"}}
+   (for [{:keys [trip-id trip-headsign stops]} trips]
+     ^{:key trip-id}
+     [:table
+      [:thead
+       [:tr [:th {:width "75%"} "Pysäkki"] [:th {:width "25%"} "Lähtöaika"]]]
+      [:tbody
+       (map-indexed
+        (fn [i stoptime]
+          (let [[stop time] (str/split stoptime #"@")]
+            ^{:key i}
+            [:tr
+             [:td stop]
+             [:td time]]))
+        (str/split stops #"->"))]])])
+
+(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips]}]
+  [:table {:style {:width "100%"}}
+   [:thead
+    [:tr
+     [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
+   [:tbody
+    [:tr
+     [:td
+      [stop-listing date1-trips]]
+     [:td
+      [stop-listing date2-trips]]]]])
+
 (defn date-comparison [e! {:keys [date->hash hash->color compare]}]
   (let [date1 (:date1 compare)
         date2 (:date2 compare)
@@ -132,7 +168,9 @@
 
        ;; If a route is selected, show map
        [selected-route-map e! date->hash hash->color compare]
-       ])))
+
+       ;; Show trip list
+       [date-trips e! compare]])))
 
 
 (defn days-to-diff-info [e! {:keys [days-to-diff]} highlight]
