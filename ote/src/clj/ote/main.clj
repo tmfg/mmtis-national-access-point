@@ -48,7 +48,7 @@
 
    ;; Index page
    :index (component/using (index/->Index config)
-                           [:http])
+                           [:http :db])
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
 
    ;; Services for the frontend

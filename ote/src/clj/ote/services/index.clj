@@ -9,7 +9,8 @@
             [com.stuartsierra.component :as component]
             [ote.tools.git :refer [current-revision-sha]]
             [ring.middleware.anti-forgery :as anti-forgery]
-            [ote.transit :as transit]))
+            [ote.transit :as transit]
+            [ote.services.transport :as transport]))
 
 (def stylesheets [{:href "css/normalize.css"}               ;; Normalize css on wide range of browsers
                   {:href "css/bootstrap_style_grid.css"}
@@ -55,7 +56,13 @@
     {:language language
      :translations (localization/translations language)})])
 
-(defn index-page [config]
+(defn user-info [db user]
+  [:script#ote-user-info {:type "x-ote-user-info"}
+   (transit/clj->transit
+    (when user
+      (transport/get-user-transport-operators-with-services db (:groups user) (:user user))))])
+
+(defn index-page [db user config]
   (let [dev-mode? (:dev-mode? config)
         ga-conf (:ga config)
         flags (str/join "," (map name (:enabled-features config)))]
@@ -78,6 +85,7 @@
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
       (translations localization/*language*)
+      (user-info db user)
 
       (when (not dev-mode?)
         (google-analytics-scripts ga-conf))]
@@ -96,20 +104,22 @@
       (when dev-mode?
         [:script {:type "text/javascript"} "goog.require('ote.main');"])]]))
 
-(defn index [dev-mode?]
+(defn index [db req dev-mode?]
   {:status 200
    :headers {"Content-Type" "text/html; charset=UTF-8"}
-   :body (html (index-page dev-mode?))})
+   :body (html (index-page db (:user req) dev-mode?))})
 
 (defrecord Index [dev-mode?]
   component/Lifecycle
-  (start [{http :http :as this}]
+  (start [{http :http
+           db :db
+           :as this}]
     (assoc this ::stop
            (http/publish!
             http {:authenticated? false}
             (routes
-             (GET "/" req (index dev-mode?))
-             (GET "/index.html" req (index dev-mode?))))))
+             (GET "/" req (index db req dev-mode?))
+             (GET "/index.html" req (index db req dev-mode?))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
