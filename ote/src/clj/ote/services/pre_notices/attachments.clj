@@ -11,24 +11,44 @@
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.components.http :as http]
-            [ote.nap.users :as users]))
+            [ote.nap.users :as users])
+  (:import (java.nio.file Files)))
 
 (defn- generate-file-key [id filename]
   (str id "_" filename))
 
-(defn upload-attachment [db {bucket :bucket :as config} {user :user :as req}]
-  (let [uploaded-file (get-in req [:multipart-params "file"])
-        _ (assert (and (:filename uploaded-file)
-                       (:tempfile uploaded-file))
-                  "No uploaded file")
-        file (specql/insert! db ::transit/pre-notice-attachment
-                             (modification/with-modification-timestamp-and-user
-                               {::transit/attachment-file-name (:filename uploaded-file)}
-                               ::transit/id user))]
+(def allowed-mime-types ["application/pdf" "image/jpeg" "image/png"])
 
-    (s3/put-object bucket (generate-file-key (::transit/id file) (:filename uploaded-file))
-                   (:tempfile uploaded-file))
-    (http/transit-response file)))
+(defn validate-file [{:keys [tempfile]}]
+  (let [path (.toPath tempfile)
+        content-mime (Files/probeContentType path)]
+    (when-not (some #(= % content-mime) allowed-mime-types)
+      (throw (ex-info "Invalid file type" {:file-type content-mime})))))
+
+(defn upload-attachment [db {bucket :bucket :as config} {user :user :as req}]
+  (try
+    (let [uploaded-file (get-in req [:multipart-params "file"])
+          _ (assert (and (:filename uploaded-file)
+                         (:tempfile uploaded-file))
+                    "No uploaded file")
+          _ (validate-file uploaded-file)
+          file (specql/insert! db ::transit/pre-notice-attachment
+                               (modification/with-modification-timestamp-and-user
+                                 {::transit/attachment-file-name (:filename uploaded-file)}
+                                 ::transit/id user))]
+
+      (s3/put-object bucket (generate-file-key (::transit/id file) (:filename uploaded-file))
+                     (:tempfile uploaded-file))
+      (http/transit-response file))
+    (catch Exception e
+      (let [msg (.getMessage e)]
+        (log/error msg)
+        (case msg
+          "Invalid file type"
+          {:status 422
+           :body (str "Invalid file type.")}
+          {:status 500
+           :body msg})))))
 
 (defn- attachment-info [db user pre-notice-attachment-id]
   (let [can-view-all-attachments?
