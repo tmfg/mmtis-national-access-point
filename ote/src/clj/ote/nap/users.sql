@@ -52,3 +52,10 @@ SELECT EXISTS(SELECT ge.id
                                       WHERE m.table_name = 'user' AND
                                             m.state = 'active' AND
                                             m.table_id = (SELECT u.id FROM "user" u WHERE u.id = :user-id)));
+
+-- name: transit-authority-group-id
+-- single?: true
+SELECT group_id
+  FROM group_extra
+ WHERE key = 'transit-authority?'
+   AND value = 'true';
