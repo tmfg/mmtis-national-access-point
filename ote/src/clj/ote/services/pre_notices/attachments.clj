@@ -14,7 +14,7 @@
             [ote.nap.users :as users])
   (:import (java.nio.file Files)))
 
-(def allowed-mime-types ["application/pdf" "image/jpeg" "image/png"])
+(def allowed-mime-types #{"application/pdf" "image/jpeg" "image/png"})
 
 (defn- generate-file-key [id filename]
   (str id "_" filename))
@@ -22,7 +22,7 @@
 (defn validate-file [{:keys [tempfile]}]
   (let [path (.toPath tempfile)
         content-mime (Files/probeContentType path)]
-    (when-not (some #(= % content-mime) allowed-mime-types)
+    (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
 
 (defn upload-attachment [db {bucket :bucket :as config} {user :user :as req}]
