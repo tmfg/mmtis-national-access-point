@@ -14,10 +14,10 @@
             [ote.nap.users :as users])
   (:import (java.nio.file Files)))
 
+(def allowed-mime-types ["application/pdf" "image/jpeg" "image/png"])
+
 (defn- generate-file-key [id filename]
   (str id "_" filename))
-
-(def allowed-mime-types ["application/pdf" "image/jpeg" "image/png"])
 
 (defn validate-file [{:keys [tempfile]}]
   (let [path (.toPath tempfile)
