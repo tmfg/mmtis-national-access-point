@@ -73,7 +73,7 @@
 
 (def result-card-header-link {:color "#fff"
                               ::stylefy/mode {:hover {:cursor          "pointer"
-                                                :text-decoration "underline"}}})
+                                                      :text-decoration "underline"}}})
 
 (def delete-icon {:color         "rgba(0, 0, 0, 0,75)"
                   ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})

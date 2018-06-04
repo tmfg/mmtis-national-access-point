@@ -125,8 +125,8 @@
                [:div.row (stylefy/use-style style/simple-result-card-row)
                 (str (::t-service/name c) " (" (::t-service/business-id c) ")")]))))
        (when (> extra-companies 0)
-       [:div.row (stylefy/use-style style/simple-result-card-row)
-        (str " + " extra-companies (tr [:service-search :other-company]))])])))
+         [:div.row (stylefy/use-style style/simple-result-card-row)
+          (str " + " extra-companies (tr [:service-search :other-company]))])])))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
@@ -141,7 +141,7 @@
                             (and service-companies (empty? companies)) service-companies
                             :else companies)
         open-link (fn [content]
-                    [:a {:style (merge {:color "#fff"} style/result-card-header-link)
+                    [:a {:style    (merge {:color "#fff"} style/result-card-header-link)
                          :href     "#"
                          :on-click #(do
                                       (.preventDefault %)
@@ -152,7 +152,7 @@
         card-padding (if (< (:width app) 767) "15px" "30px")]
     [:div.result-card (stylefy/use-style style/result-card)
      [:div
-      [:div.result-title {:style (merge {:padding-left card-padding}  style/result-card-title)}
+      [:div.result-title {:style (merge {:padding-left card-padding} style/result-card-title)}
        (open-link name)
 
        (when admin?
@@ -183,10 +183,10 @@
         (format-address contact-address)]
        (when contact-phone
          [:div (stylefy/use-style style/simple-result-card-row)
-        (str contact-phone)])
+          (str contact-phone)])
        (when contact-email
-       [:div (stylefy/use-style style/simple-result-card-row)
-        contact-email])
+         [:div (stylefy/use-style style/simple-result-card-row)
+          contact-email])
        (list-service-companies service-companies service-search)]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
