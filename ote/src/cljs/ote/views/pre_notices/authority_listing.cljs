@@ -154,8 +154,15 @@
 
        pre-notices]]]))
 
-(defn pre-notices [e! {:keys [pre-notices pre-notice-dialog] :as app}]
+(defn pre-notices [e! {:keys [pre-notices pre-notice-dialog pre-notice-users-dialog?] :as app}]
   [:div.authority-pre-notices
+   [ui/flat-button {:label "Kutsu käyttäjiä"
+                    :primary true
+                    :on-click #(e! (pre-notice/->TogglePreNoticeUsersDialog))}]
+   (when pre-notice-users-dialog?
+     [common/ckan-iframe-dialog "Kutsu käyttäjiä"
+      "/pre-notices/authority-users"
+      #(e! (pre-notice/->TogglePreNoticeUsersDialog))])
    [pre-notices-listing e! pre-notices]
    (when pre-notice-dialog
      [pre-notice-view e! pre-notice-dialog])])
