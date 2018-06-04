@@ -110,10 +110,8 @@
       last
       str/trim))
 
-(defn wrap-check-cookie
-  "Ring middleware to check auth_tkt cookie."
-  [{:keys [digest-algorithm shared-secret max-age-in-seconds] :as options} handler]
-  (fn [{cookies :cookies headers :headers :as req}]
+(defn- check-cookie [{:keys [digest-algorithm shared-secret max-age-in-seconds] :as options}
+                     {cookies :cookies headers :headers :as req}]
     (let [auth-ticket (:value (get cookies "auth_tkt"))
           ip "0.0.0.0" ;; (client-ip req)  FIXME: ckan seems to always get 0.0.0.0 as IP
           cookie (and (not (str/blank? auth-ticket)) ip
@@ -121,13 +119,24 @@
                                (parse (or digest-algorithm "MD5"))
                                (verify-digest shared-secret ip)
                                (verify-timestamp max-age-in-seconds)))]
-      (if (and (:valid-digest? cookie)
-               (:valid-timestamp? cookie))
-        ;; Ticket is valid, pass it to the handler
-        (handler (assoc req :user-id (:user-id cookie)))
+      (and (:valid-digest? cookie)
+           (:valid-timestamp? cookie)
+           cookie)))
 
-        ;; Ticket is invalid, log this attempt and return
+(defn wrap-check-cookie
+  "Ring middleware to check auth_tkt cookie."
+  [{:keys [allow-unauthenticated?] :as options} handler]
+  (fn [{cookies :cookies headers :headers :as req}]
+    (if-let [cookie (check-cookie options req)]
+      (handler (assoc req :user-id (:user-id cookie)))
+
+      ;; Ticket is invalid,
+      (if allow-unauthenticated?
+        ;; authentication is optional, pass request to handler without user info
+        (handler req)
+
+        ;; log this attempt and return error to client
         (do
-          (log/warn "Access denied to " (:uri req) " with invalid cookie:" auth-ticket ", ip:" ip ", COOKIE: " (pr-str cookie))
+          (log/warn "Access denied to " (:uri req) " with invalid cookie.")
           {:status 401
            :body "Invalid cookie"})))))

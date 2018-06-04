@@ -82,14 +82,18 @@
           ;; Handler for routes that don't require authenticated user
           public-handler
           (wrap-middleware strip-prefix #(serve-request @public-handlers %)
+                           (partial nap-users/wrap-user-info {:db db :allow-unauthenticated? true})
+                           (partial nap-cookie/wrap-check-cookie (assoc (:auth-tkt config)
+                                                                        :allow-unauthenticated? true))
                            (partial wrap-session config))
 
           ;; Handler for routes that require authentication
           handler
           (wrap-middleware strip-prefix #(serve-request @handlers %)
                            wrap-security-exception
-                           (partial nap-users/wrap-user-info db)
-                           (partial nap-cookie/wrap-check-cookie (:auth-tkt config))
+                           (partial nap-users/wrap-user-info {:db db :allow-unauthenticated? false})
+                           (partial nap-cookie/wrap-check-cookie (assoc (:auth-tkt config)
+                                                                        :allow-unauthenticated? false))
                            (partial wrap-session config))]
       (assoc this ::stop
              (server/run-server
