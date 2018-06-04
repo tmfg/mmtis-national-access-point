@@ -102,6 +102,7 @@
 
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
+   [ui-common/help (tr [:common-texts :nap-data-license])]
    (case type
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app) app]
      :terminal [terminal/terminal e! (:transport-service app) app]

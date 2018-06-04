@@ -875,7 +875,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."}
+  :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."
+  :nap-data-license (:md "Informationen som du fyller i på denna blankett kommer att publiceras i NAP-tjänstekatalogen som öppen data. De publicerade uppgifterna kommer att licensieras med [Creative Commons Erkännande 4.0 Internationell (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
+  }
 
 
  :dialog
