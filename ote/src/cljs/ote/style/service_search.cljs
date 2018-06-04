@@ -8,10 +8,6 @@
                     ::stylefy/mode {:hover {:cursor          "pointer"
                                             :text-decoration "underline"}}})
 
-(def result-border {:padding "0.5em 0em 1em 0em"
-                    :margin-bottom  "10px"
-                    :border-bottom  "1px solid #d9d9d9"})
-
 (def operator-result-header {:width            "100%"
                              :display          "block"
                              :padding          "10px"
@@ -37,26 +33,28 @@
                   :background-color "#fff"
                   :box-shadow       "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
-(def result-card-title {:padding          "20px 0px 20px 30px"
+(def result-card-title {:padding-top          "20px"
+                        :padding-right          "0px"
+                        :padding-bottom          "20px"
                         :font-size        "1.125em"
                         :font-weight      "700"
                         :color            "#fff"
-                        :background-color "#06c"
-                        ::stylefy/mode {:hover {:cursor          "pointer"
-                                                :text-decoration "underline"}}})
+                        :background-color "#06c"})
 
 (def result-card-header {:font-size "1em"
                          :color "#323232"
                          :font-weight "700"})
 
 (def result-card-body {:padding-top "20px"
-                       :margin-bottom "20px"
+                       :padding-bottom "20px"
                        :font-size "1em"
                        :color     "#444444"})
 
-(def simple-result-card-row {:padding-bottom "10px"})
+(def simple-result-card-row {:padding-top "3px"})
 
-(def link-result-card-row {:padding-bottom "15px" :font-weight 400})
+(def link-result-card-row {:padding-bottom "15px"
+                           :font-weight 400
+                           :color "#06c"})
 
 (def result-card-delete {:float "right"
                          :position "relative"
@@ -73,6 +71,10 @@
                             :top "-37px"
                             :color "#fff"})
 
+(def result-card-header-link {:color "#fff"
+                              ::stylefy/mode {:hover {:cursor          "pointer"
+                                                :text-decoration "underline"}}})
+
 (def delete-icon {:color         "rgba(0, 0, 0, 0,75)"
                   ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})
 (def partly-visible-delete-icon {:color "rgba(0, 0, 0, 0,75)"})
@@ -85,16 +87,6 @@
           :position  "relative"
           :font-size "13px"
           :color     "#999999"}))
-
-(def external-interface-header
-  {:color "#444444"
-   :font-size  "14px"
-   :font-weight 500
-   :text-align "left"})
-
-(def external-table-header {:height "20px" :font-weight 500})
-
-(def external-interface-body {:font-weight "normal"})
 
 (def external-table-row {:height "20px"})
 
