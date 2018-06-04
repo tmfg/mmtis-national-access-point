@@ -69,7 +69,9 @@
            (str "#/routes/view-gtfs?url=" (::t-service/url interface)
                 (when (= "kalkati.net" format)
                   "&type=kalkati"))
-           (tr [:service-search :view-routes])
+           [:span
+            [ic/action-open-in-new {:style {:position "relative" :top "6px" :color "#06c" :padding-right "3px"}}]
+            (tr [:service-search :view-routes])]
            {:target "_blank"})]))))
 
 (defn parse-content-value [value-array]
@@ -94,7 +96,7 @@
                                    (::t-service/url external-interface)
                                    (parse-content-value data-content))]
                 [:div.row (stylefy/use-style style/link-result-card-row)
-                 [common-ui/linkify (::t-service/url external-interface) data-content {:target "_blank"}]
+                 [common-ui/linkify (::t-service/url external-interface) data-content {:target "_blank" :style {:color "#06c"}}]
                  [:span " | " (str/join ", " format)]
                  [gtfs-viewer-link row]]))
             external-interface-links))])]))
@@ -108,7 +110,8 @@
                                    service-companies)
           presented-companies-count (if (not (empty? found-business-ids))
                                       (count found-business-ids)
-                                      2)]
+                                      2)
+          extra-companies (- (count service-companies) presented-companies-count)]
       [:div
        [:h4 (tr [:service-search :other-involved-companies])]
        (if (not (empty? found-business-ids))
@@ -121,14 +124,15 @@
              (when (::t-service/name c)
                [:div.row (stylefy/use-style style/simple-result-card-row)
                 (str (::t-service/name c) " (" (::t-service/business-id c) ")")]))))
+       (when (> extra-companies 0)
        [:div.row (stylefy/use-style style/simple-result-card-row)
-        (str " + " (- (count service-companies) presented-companies-count) (tr [:service-search :other-company]))]])))
+        (str " + " extra-companies (tr [:service-search :other-company]))])])))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
-                                       operation-area-description description contact-phone contact-email
-                                       operator-name business-id ckan-resource-id transport-operator-id service-companies companies]
-                     :as              service} service-search]
+                                       description contact-phone contact-email
+                                       operator-name business-id transport-operator-id service-companies companies]
+                     :as              service} service-search app]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
         service-desc (t-service/localized-text-for "FI" description)
@@ -137,17 +141,18 @@
                             (and service-companies (empty? companies)) service-companies
                             :else companies)
         open-link (fn [content]
-                    [:a {:style    {:color "#fff"}
+                    [:a {:style (merge {:color "#fff"} style/result-card-header-link)
                          :href     "#"
                          :on-click #(do
                                       (.preventDefault %)
                                       (e! (ss/->ShowServiceGeoJSON
                                             (str js/document.location.protocol "//" js/document.location.host
                                                  "/export/geojson/" transport-operator-id "/" id))))}
-                     content])]
+                     content])
+        card-padding (if (< (:width app) 767) "15px" "30px")]
     [:div.result-card (stylefy/use-style style/result-card)
      [:div
-      [:div.result-title (stylefy/use-style style/result-card-title)
+      [:div.result-title {:style (merge {:padding-left card-padding}  style/result-card-title)}
        (open-link name)
 
        (when admin?
@@ -162,7 +167,7 @@
 
 
      [:div.row.result-body (stylefy/use-style style/result-card-body)
-      [:div.col-md-8 {:style {:padding-left "30px"}}
+      [:div.col-sm-8.col-md-8 {:style {:padding-left card-padding}}
        [:h4 (stylefy/use-style style/result-card-header) (sub-type-tr sub-type)]
        (when-not (empty? service-desc)
          [:div.description
@@ -170,16 +175,18 @@
        (when-not (empty? (::t-service/external-interface-links service))
          [:div.result-interfaces e-links])
        ]
-      [:div.col-md-3 {:style {:padding-left "30px"}}
+      [:div.col-sm-3.col-md-3 {:style {:padding-left card-padding}}
        [:h4 (stylefy/use-style style/result-card-header) operator-name]
        [:div (stylefy/use-style style/simple-result-card-row)
-        (tr [:field-labels :ote.db.transport-operator/business-id]) business-id]
+        (str (tr [:field-labels :ote.db.transport-operator/business-id]) ": " business-id)]
        [:div (stylefy/use-style style/simple-result-card-row)
         (format-address contact-address)]
+       (when contact-phone
+         [:div (stylefy/use-style style/simple-result-card-row)
+        (str contact-phone)])
+       (when contact-email
        [:div (stylefy/use-style style/simple-result-card-row)
-        (str contact-phone)]
-       [:div (stylefy/use-style style/simple-result-card-row)
-        contact-email]
+        contact-email])
        (list-service-companies service-companies service-search)]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
@@ -203,7 +210,7 @@
      (doall
        (for [result results]
          ^{:key (::t-service/id result)}
-         [result-card e! (:admin? user) result service-search]))
+         [result-card e! (:admin? user) result service-search app]))
 
      (if fetching-more?
        [:span (tr [:service-search :fetching-more])]
@@ -305,20 +312,20 @@
          {:type :component
           :name :operators
           :full-width? true
-          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :container-class "col-xs-12 col-sm-4 col-md-4"
           :component (fn [{data :data}]
                        [:span [operator-search e! data]])}
 
          {:name :text-search
           :type :string
-          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :container-class "col-xs-12 col-sm-4 col-md-4"
           :full-width? true
           :hint-text (tr [:service-search :text-search-placeholder])}
 
          {:id "transport-types"
           :name ::t-service/transport-type
           :type :chip-input
-          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :container-class "col-xs-12 col-sm-4 col-md-4"
           :full-width? true
           :full-width-input? false
           :suggestions-config {:text :text :value :text}
@@ -327,7 +334,7 @@
 
          {:name ::t-service/operation-area
           :type :chip-input
-          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :container-class "col-xs-12 col-sm-4 col-md-4"
           :full-width? true
           :full-width-input? false
           :filter (fn [query, key]
@@ -349,7 +356,7 @@
           :name ::t-service/sub-type
           :label (tr [:service-search :type-search])
           :type :chip-input
-          :container-class "col-xs-12 col-sm-12 col-md-4"
+          :container-class "col-xs-12 col-sm-4 col-md-4"
           :full-width? true
           :full-width-input? false
           :suggestions-config {:text :text :value :text}
@@ -360,7 +367,7 @@
           :label              (tr [:service-search :data-content-search-label])
           :type               :chip-input
           :full-width?        true
-          :container-class    "col-xs-12 col-sm-12 col-md-4"
+          :container-class    "col-xs-12 col-sm-4 col-md-4"
           :auto-select?       true
           :open-on-focus?     true
           ;; Translate visible suggestion text, but keep the value intact.
