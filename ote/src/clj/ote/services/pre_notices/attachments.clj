@@ -46,7 +46,7 @@
         (case msg
           "Invalid file type"
           {:status 422
-           :body (str "Invalid file type.")}
+           :body "Invalid file type."}
           {:status 500
            :body msg})))))
 
