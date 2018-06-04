@@ -100,9 +100,14 @@
     :rentals (tr [:rentals-page :header-new-rentals])
     :parking (tr [:parking-page :header-new-parking])))
 
+(defn- license-info []
+  [:p {:style {:padding-top "20px"
+               :padding-bottom "20px"}}
+   (tr [:common-texts :nap-data-license])])
+
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
-   [ui-common/help (tr [:common-texts :nap-data-license])]
+   [license-info]
    (case type
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app) app]
      :terminal [terminal/terminal e! (:transport-service app) app]
