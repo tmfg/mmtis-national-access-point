@@ -42,7 +42,8 @@
 
 ;; Add pages that needs authenticating to this list
 (def auth-required #{:own-services :transport-service :transport-operator :edit-service :new-service :admin :routes
-                     :new-route :edit-route :new-notice :edit-pre-notice :pre-notices :authority-pre-notices})
+                     :new-route :edit-route :new-notice :edit-pre-notice :pre-notices :authority-pre-notices
+                     :transit-visualization :transit-changes})
 
 (defmulti on-navigate-event
   "Determine event(s) to be run when user navigates to a given route.
