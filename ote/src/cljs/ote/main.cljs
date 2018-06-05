@@ -38,10 +38,8 @@
 
 (defn- load-embedded-user-info []
   (let [elt (.getElementById js/document "ote-user-info")
-        user-info (when elt
-                    (transit/transit->clj (.-innerText elt)))]
-    (when elt
-      (.removeChild (.-parentNode elt) elt))
+        user-info (transit/transit->clj (.-innerText elt))]
+    (.removeChild (.-parentNode elt) elt)
     user-info))
 
 (defn ^:export main []
