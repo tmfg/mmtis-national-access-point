@@ -80,9 +80,9 @@
         return-value (common-ui/maybe-shorten-text-to 45 value-str)]
     return-value))
 
-(defn- external-interface-links [e! {::t-service/keys [id external-interface-links transport-operator-id]}]
+(defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
   (let [nap-url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
-    [:div
+    [:div {:key id}
      [:div.row (stylefy/use-style style/link-result-card-row)
       [common-ui/linkify nap-url "NAP-rajapinta" {:target "_blank"}]
       [:span " | "]
@@ -95,7 +95,8 @@
               (let [data-content (if (nil? data-content)
                                    (::t-service/url external-interface)
                                    (parse-content-value data-content))]
-                [:div.row (stylefy/use-style style/link-result-card-row)
+                [:div.row (merge {:key (str id "_" format)}
+                                 (stylefy/use-style style/link-result-card-row))
                  [common-ui/linkify (::t-service/url external-interface) data-content {:target "_blank" :style {:color "#06c"}}]
                  [:span " | " (str/join ", " format)]
                  [gtfs-viewer-link row]]))
@@ -117,12 +118,14 @@
        (if (not (empty? found-business-ids))
          (doall (for [c found-business-ids]
                   (when (::t-service/name c)
-                    [:div.row (stylefy/use-style style/simple-result-card-row)
+                    [:div.row (merge {:key (::t-service/business-id c)}
+                                     (stylefy/use-style style/simple-result-card-row))
                      (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))
          (doall
            (for [c (take 2 service-companies)]
              (when (::t-service/name c)
-               [:div.row (stylefy/use-style style/simple-result-card-row)
+               [:div.row (merge {:key (::t-service/business-id c)}
+                                (stylefy/use-style style/simple-result-card-row))
                 (str (::t-service/name c) " (" (::t-service/business-id c) ")")]))))
        (when (> extra-companies 0)
          [:div.row (stylefy/use-style style/simple-result-card-row)
@@ -132,9 +135,9 @@
                     {::t-service/keys [id name sub-type contact-address
                                        description contact-phone contact-email
                                        operator-name business-id transport-operator-id service-companies companies]
-                     :as              service} service-search app]
+                     :as              service} service-search card-width]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
-        e-links [external-interface-links e! service]
+        e-links [external-interface-links service]
         service-desc (t-service/localized-text-for "FI" description)
         service-companies (cond
                             (and service-companies companies) (merge service-companies companies)
@@ -149,7 +152,7 @@
                                             (str js/document.location.protocol "//" js/document.location.host
                                                  "/export/geojson/" transport-operator-id "/" id))))}
                      content])
-        card-padding (if (< (:width app) 767) "15px" "30px")]
+        card-padding (if (< card-width 767) "15px" "30px")]
     [:div.result-card (stylefy/use-style style/result-card)
      [:div
       [:div.result-title {:style (merge {:padding-left card-padding} style/result-card-title)}
@@ -160,7 +163,7 @@
           [delete-service-action e! id name (get service :show-delete-modal?)]])]
       (open-link
         [:span [:div (stylefy/use-style style/result-card-chevron)
-                [ic/navigation-chevron-right {:color "#fff" :height 24 :padding 4}]]
+                [ic/navigation-chevron-right {:color "#fff" :height 24}]]
 
          [:div (stylefy/use-style style/result-card-show-data)
           [:span {:style {:padding-top "10px"}} (tr [:service-search :show-all-information])]]])]
@@ -210,7 +213,7 @@
      (doall
        (for [result results]
          ^{:key (::t-service/id result)}
-         [result-card e! (:admin? user) result service-search app]))
+         [result-card e! (:admin? user) result service-search (:width app)]))
 
      (if fetching-more?
        [:span (tr [:service-search :fetching-more])]
@@ -247,7 +250,6 @@
                          :floating-label-fixed true
                          :hintText (tr [:service-search :operator-search-placeholder])
                          :hint-style style-base/placeholder
-                         :full-width? true
                          :style {:width "100%"}
                          :filter (constantly true)          ;; no filter, backend returns what we want
                          :maxSearchResults 12
