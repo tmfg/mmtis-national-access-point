@@ -43,7 +43,7 @@
                  [digest "1.4.8"]
 
                  ;; Cache libraries
-                 [org.clojure/core.cache "0.6.5"]
+                 [org.clojure/core.cache "0.7.1"]
 
                  ;; Transit tietomuoto
                  [com.cognitect/transit-clj "0.8.300"]

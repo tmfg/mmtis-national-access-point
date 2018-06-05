@@ -19,7 +19,8 @@
             [stylefy.core :as stylefy]
             [ote.communication :as comm]
             [goog.net.Cookies]
-            [ote.app.controller.login :as login]))
+            [ote.app.controller.login :as login]
+            [ote.transit :as transit]))
 
 (defn language []
   (.get (goog.net.Cookies. js/document)
@@ -35,11 +36,15 @@
   (r/render-component [tuck/tuck state/app main/ote-application]
                       (.getElementById js/document "oteapp")))
 
+(defn- load-embedded-user-info []
+  (let [elt (.getElementById js/document "ote-user-info")
+        user-info (transit/transit->clj (.-innerText elt))]
+    (.removeChild (.-parentNode elt) elt)
+    user-info))
+
 (defn ^:export main []
   (localization/load-embedded-translations!)
-  (comm/post! "transport-operator/data" {}
-              {:on-success init-app
-               :on-failure #(init-app nil)}))
+  (init-app (load-embedded-user-info)))
 
 (defn ^:export reload-hook []
   (r/force-update-all))
