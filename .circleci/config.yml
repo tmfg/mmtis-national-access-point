@@ -121,8 +121,8 @@ jobs:
 
       # Note: When running with chrome, it seems we cannot record a video. Only Electron browser can record a video.
       - run:
-          name: Run smoke tests for pull request
-          command: $(npm bin)/cypress run --browser chrome --record --spec cypress/integration/smoke/ote_spec.js
+          name: Run all tests for a pull request
+          command: $(npm bin)/cypress run --browser chrome --record
 
 workflows:
   version: 2

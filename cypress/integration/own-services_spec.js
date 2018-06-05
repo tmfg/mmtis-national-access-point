@@ -1,6 +1,6 @@
 // TODO: Test own services page (Omat palvelutiedot) features
 
-import {randomName} from '../support/util';
+import { randomName } from '../support/util';
 
 describe('Own services basic tests', function () {
     // Login in only once before tests run
@@ -72,7 +72,7 @@ describe('Add a new service', function () {
             cy.get('input[name="street"]').type(service.contact.street);
             cy.get('input[name="postal_code"]').type(service.contact.postal_code);
             cy.get('input[name="post_office"]').type(service.contact.post_office);
-	    cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
+            cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
 
             cy.wrap(service.areas).each(area => {
                 cy.get('@areaInput').type(area);
@@ -90,13 +90,13 @@ describe('Add a new service', function () {
                     cy.get('input[type="checkbox"]').check();
                 });
 
-	    cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
+            cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
             cy.contains('Tallenna ja julkaise').click();
         });
 
         it('should delete the test service', function () {
             cy.server();
-            cy.route('POST','/transport-service/delete').as('deleteService');
+            cy.route('POST', '/transport-service/delete').as('deleteService');
 
             cy.visit('/#/own-services');
 
