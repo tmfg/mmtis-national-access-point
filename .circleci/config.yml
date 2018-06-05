@@ -107,7 +107,7 @@ jobs:
 
       - run:
           name: Install Cypress
-          command: npm i cypress@1.x && $(npm bin)/cypress verify
+          command: npm i cypress@3.x && $(npm bin)/cypress verify
 
       - save_cache:
           key: v2-npm-deps-
