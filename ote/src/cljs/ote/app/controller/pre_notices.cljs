@@ -293,3 +293,7 @@
 (define-event DeletePreNoticeCancel []
   {}
   (dissoc app :delete-pre-notice-dialog))
+
+(define-event TogglePreNoticeUsersDialog []
+  {:path [:pre-notice-users-dialog?]}
+  (not app))

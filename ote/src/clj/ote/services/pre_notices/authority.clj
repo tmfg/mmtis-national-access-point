@@ -10,7 +10,8 @@
             [ote.db.transport-operator :as t-operator]
             [clojure.string :as str]
             [ote.db.places :as places]
-            [specql.op :as op]))
+            [specql.op :as op]
+            [ote.nap.users :as users]))
 
 
 (defn list-published-notices [db user]
@@ -79,4 +80,8 @@
          (authorization/with-transit-authority-check
            db user
            #(http/transit-response
-             (add-comment db user (http/transit-request form-data)))))))
+             (add-comment db user (http/transit-request form-data)))))
+   (GET "/pre-notices/authority-users" req
+        {:status 302
+         :headers {"Location" (str "/organization/member_new/"
+                                   (users/transit-authority-group-id db))}})))
