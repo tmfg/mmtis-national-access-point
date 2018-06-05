@@ -853,6 +853,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
+  :invalid-file-type                          "Virheellinen tiedostotyyppi"
   :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
   :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo                           "Liikennevirasto Logo"

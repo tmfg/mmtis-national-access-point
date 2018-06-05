@@ -849,6 +849,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
   :invalid-postal-code                        "Kolla postnumret (5 siffror)"
+  :invalid-file-type                          "Ogiltig filtyp"
   :transport-service-saved                    "Uppgifterna sparade!"
   :transport-operator-saved                   "Uppgifterna sparade!"
   :footer-livi-logo                           "Liikennevirasto Logo"

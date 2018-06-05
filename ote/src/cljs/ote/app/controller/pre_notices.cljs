@@ -257,9 +257,18 @@
 
 (define-event UploadAttachment [input]
   {}
-  (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)
-                                           :on-failure (tuck/send-async! ->ServerError)})
-  app)
+  (let [filename (.-name (first (array-seq (.-files input))))]
+    (if (re-matches #".*\.(png|jpg|jpeg|pdf)" filename)
+      (do
+        (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)
+                                                 :on-failure (tuck/send-async! ->ServerError)})
+        app)
+      (->
+        app
+        (update-in [:pre-notice :attachments]
+                   #(conj (or (vec (butlast %)) [])
+                          {:error (str (tr [:common-texts :invalid-file-type]) ": " filename)}))
+        (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
 
 (define-event DeleteAttachment [row-index]
   {:path [:pre-notice :attachments]}
