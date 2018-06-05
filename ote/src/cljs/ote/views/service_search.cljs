@@ -95,7 +95,7 @@
               (let [data-content (if (nil? data-content)
                                    (::t-service/url external-interface)
                                    (parse-content-value data-content))]
-                [:div.row (merge {:key (str id "_" format)}
+                [:div.row (merge {:key (str i "_" id)}
                                  (stylefy/use-style style/link-result-card-row))
                  [common-ui/linkify (::t-service/url external-interface) data-content {:target "_blank" :style {:color "#06c"}}]
                  [:span " | " (str/join ", " format)]
