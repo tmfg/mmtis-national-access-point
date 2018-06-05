@@ -54,7 +54,7 @@
 
 (def link-result-card-row {:padding-bottom "15px"
                            :font-weight 400
-                           :color "#06c"})
+                           :color "#323232"})
 
 (def result-card-delete {:float "right"
                          :position "relative"
