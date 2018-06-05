@@ -93,6 +93,26 @@
   (into [] (service-search-by-operator db {:name (str "%" term "%")
                                            :businessid (str term )})))
 
+(def search-result-columns
+  #{::t-service/contact-email
+    ::t-service/sub-type
+    ::t-service/ckan-resource-id
+    ::t-service/id
+    ::t-service/contact-gsm
+    ::t-service/ckan-dataset-id
+    ::t-service/contact-address
+    ::t-service/name
+    ::t-service/type
+    ::t-service/transport-operator-id
+    ::t-service/contact-phone
+    ::t-service/description
+
+    ;; Information JOINed from other tables
+    ::t-service/external-interface-links
+    ::t-service/operator-name
+    ::t-service/service-companies
+    ::t-service/business-id})
+
 (defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
@@ -115,7 +135,7 @@
                    :specql.core/order-direction :desc}
                   {})
         results (specql/fetch db ::t-service/transport-service-search-result
-                              (specql/columns ::t-service/transport-service-search-result)
+                              search-result-columns
                               {::t-service/id (op/in ids)}
                               options)]
     {:empty-filters? empty-filters?
