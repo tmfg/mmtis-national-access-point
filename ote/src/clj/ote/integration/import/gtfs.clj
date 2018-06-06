@@ -121,7 +121,7 @@
           (recur (inc i) ps))))))
 
 (defn save-gtfs-to-db [db gtfs-file package-id interface-id]
-  (log/debug "save-gtfs-to-db - package-id: " package-id "interface-id" interface-id)
+  (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
     (try
       (read-zip-with

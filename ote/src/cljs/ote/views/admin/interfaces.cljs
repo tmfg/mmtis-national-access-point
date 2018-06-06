@@ -23,7 +23,7 @@
      {:open                     true
       :modal                    false
       :auto-scroll-body-content true
-      :on-request-close  #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))
+      :on-request-close         #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))
       :title                    "Rajapinnan käsittelyssä tapahtunut virhe"
       :actions                  [(r/as-element
                                    [ui/flat-button
@@ -34,10 +34,10 @@
      [:div.col-md-8
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
-       [:div.col-md-6  (:url interface)]]
+       [:div.col-md-6 (:url interface)]]
       [:div.row
-        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
-        [:div.col-md-6 (str/join ", " (:format interface))]]
+       [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
+       [:div.col-md-6 (str/join ", " (:format interface))]]
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Virhe: "]
        [:div.col-md-6 (:import-error interface) (:db-error interface)]]]]))
@@ -48,7 +48,7 @@
      {:open                     true
       :modal                    false
       :auto-scroll-body-content true
-      :on-request-close          #(e! (admin-controller/->CloseOperatorModal (:interface-id interface)))
+      :on-request-close         #(e! (admin-controller/->CloseOperatorModal (:interface-id interface)))
       :title                    "Palvelun ja palveluntuottajan tiedot"
       :actions                  [(r/as-element
                                    [ui/flat-button
@@ -59,7 +59,7 @@
      [:div.col-md-6 {:style {:border-right "1px solid gray"}}
       [:div.row [:h2 "Rajapinnan tuottaa"]]
       [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: " ]
+       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
        [:div.col-md-6 [:a {:href     "#"
                            :on-click #(do
                                         (.preventDefault %)
@@ -67,29 +67,29 @@
                        (:operator-name interface)]]]
       [:div.row
        [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Puhelin: "]
-        [:div.col-md-6 (:operator-phone interface)]]
+       [:div.col-md-6 (:operator-phone interface)]]
       [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "GSM: " ]
+       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "GSM: "]
        [:div.col-md-6 (:operator-gsm interface)]]
       [:div.row
        [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
-        [:div.col-md-6 (:operator-email interface)]]]
+       [:div.col-md-6 (:operator-email interface)]]]
 
      [:div.col-md-6 {:style {:padding-left "20px"}}
       [:div.row [:h2 "Rajapinta kuuluu palveluun:"]]
       [:div.row
        [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
-        [:div.col-md-6 [:a {:href     "#"
-                            :on-click #(do
-                                         (.preventDefault %)
-                                         (e! (fp/->ChangePage :edit-service {:id (:service-id interface)})))}
-                        (:service-name interface)]]]
+       [:div.col-md-6 [:a {:href     "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (fp/->ChangePage :edit-service {:id (:service-id interface)})))}
+                       (:service-name interface)]]]
       [:div.row
        [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Puhelin: "]
-        [:div.col-md-6 (:service-phone interface)]]
+       [:div.col-md-6 (:service-phone interface)]]
       [:div.row
        [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
-        [:div.col-md-6 (:service-email interface)]]]]))
+       [:div.col-md-6 (:service-email interface)]]]]))
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])

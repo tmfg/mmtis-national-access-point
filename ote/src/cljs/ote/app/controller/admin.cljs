@@ -98,8 +98,8 @@
     (update-in app [:admin :operator-list] assoc :operator-filter f))
 
   UpdateBusinessIdFilter
-   (process-event [{f :business-id-filter} app]
-          (update-in app [:admin :business-id-report] assoc :business-id-filter f))
+  (process-event [{f :business-id-filter} app]
+    (update-in app [:admin :business-id-report] assoc :business-id-filter f))
 
   UpdatePublishedFilter
   (process-event [{f :published-filter} app]

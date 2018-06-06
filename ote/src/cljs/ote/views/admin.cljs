@@ -316,7 +316,7 @@
 
 (defn admin-panel [e! app]
   (let [selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
-    [ui/tabs {:value selected-tab
+    [ui/tabs {:value     selected-tab
               :on-change #(e! (admin-controller/->ChangeAdminTab %))}
      [ui/tab {:label "Käyttäjät" :value "users"}
       [user-listing e! app]]
