@@ -40,7 +40,7 @@
         [:div.col-md-6 (str/join ", " (:format interface))]]
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Virhe: "]
-       [:div.col-md-6 (:import-error interface)]]]]))
+       [:div.col-md-6 (:import-error interface) (:db-error interface)]]]]))
 
 (defn operator-modal [e! interface]
   (when (:show-operator-modal? interface)
@@ -137,7 +137,6 @@
         [:span "Ladataan rajapintoja..."])
 
       (when results
-        (.log js/console "results " (pr-str results))
         [:span
          [:div "Hakuehdoilla löytyi " (count results) " rajapintaa."]
          [ui/table {:selectable false}
@@ -148,11 +147,12 @@
             [ui/table-header-column {:style {:width "20%"}} "Sisältö"]
             [ui/table-header-column {:width "10%"} "Tyyppi"]
             [ui/table-header-column {:width "15%"} "Viimeisin käsittely"]
-            [ui/table-header-column {:width "20%"} "Status"]
+            [ui/table-header-column {:width "10%"} "Latausvirhe"]
+            [ui/table-header-column {:width "10%"} "Käsittelyvirhe"]
             [ui/table-header-column {:width "10%"} "Katso"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{:keys [interface-id operator-name format data-content url imported import-error] :as interface} results]
+             (for [{:keys [interface-id operator-name format data-content url imported import-error db-error] :as interface} results]
                ^{:key (str "link_" interface-id)}
                [ui/table-row {:selectable false}
                 [ui/table-row-column {:style {:width "15%"}} [:a {:href     "#"
@@ -162,14 +162,16 @@
                 [ui/table-row-column {:style {:width "20%"}} (parse-content-value data-content)]
                 [ui/table-row-column {:style {:width "10%"}} (first format)]
                 [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui imported)]
-                [ui/table-row-column {:style {:width "20%"}} (if import-error
+                [ui/table-row-column {:style {:width "10%"}} (when import-error
                                                                [:a {:href     "#"
                                                                     :on-click #(do (.preventDefault %)
                                                                                    (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
-                                                                "Ks. Virhe"]
-                                                               (if imported
-                                                                 "OK"
-                                                                 "Ei käsitelty"))]
-                [ui/table-row-column {:style {:width "10%"}} (when (nil? import-error) [gtfs-viewer-link url (first format)])]
+                                                                "Ks. Virhe"])]
+                [ui/table-row-column {:style {:width "10%"}} (when db-error
+                                                               [:a {:href     "#"
+                                                                    :on-click #(do (.preventDefault %)
+                                                                                   (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
+                                                                "Ks. Virhe"])]
+                [ui/table-row-column {:style {:width "10%"}} (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]
                 (error-modal e! interface)
                 (operator-modal e! interface)]))]]])]]))

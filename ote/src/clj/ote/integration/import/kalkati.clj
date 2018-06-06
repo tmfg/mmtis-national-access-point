@@ -43,7 +43,7 @@
       (http-client/get (:Location headers) {:as :byte-array})
       (do
         (log/warn "Kalkati to GTFS conversion failed, returned: " (pr-str response))
-        nil))))
+        {:error (str "Kalkati -> GTFS muunnos epäonnistui tiedostolle, joka löytyi osoitteesta: " url)}))))
 
 (defn load-kalkati [url headers]
   (let [json (kalkati-to-gtfs url headers)

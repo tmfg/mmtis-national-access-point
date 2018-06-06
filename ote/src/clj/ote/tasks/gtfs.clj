@@ -36,23 +36,17 @@
 
 (defn update-one-gtfs! [config db]
   ;; Ensure that gtfs-import flag is enabled
-  (let [{:keys [url operator-id ts-id last-import-date format] :as gtfs-data}
+  (let [{:keys [id url operator-id ts-id last-import-date format license] :as gtfs-data}
         (fetch-and-mark-gtfs-interface! db)]
     (if (or (nil? gtfs-data)
             (contains? (:no-gtfs-update-for-operators config) operator-id))
       (log/debug "No gtfs files to upload.")
       (try
-        (log/debug "GTFS File found - Try to upload file to S3. - " (pr-str gtfs-data))
-        (import-gtfs/download-and-store-transit-package (interface-type format)
-                                                        (:gtfs config) db url operator-id ts-id
-                                                        last-import-date
-                                                        (:license gtfs-data))
+        (log/debug "GTFS File url found. " (pr-str gtfs-data))
+        (import-gtfs/download-and-store-transit-package
+          (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id)
         (catch Exception e
-          (specql/update! db ::t-service/external-interface-description
-                          {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                           ::t-service/gtfs-import-error (str (.getName (class e)) ": " (.getMessage e))}
-                          {::t-service/id (:id gtfs-data)})
-          (log/warn "Error in gtfs s3 upload!" e))))))
+          (log/warn "Error when importing, uploading or saving gtfs package to db!" e))))))
 
 (def night-hours #{0 1 2 3 4})
 

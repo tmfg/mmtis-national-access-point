@@ -23,7 +23,7 @@ SELECT i.id as "interface-id", ts.id as "service-id",
 op.id as "operator-id", op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone", op.gsm as "operator-gsm",
 ts.name as "service-name", ts."contact-phone" as "service-phone", ts."contact-email" as "service-email",
 i."data-content" as "data-content", (i."external-interface").url as url,
-i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error"
+i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error", i."gtfs-db-error" as "db-error"
   FROM "transport-operator" as op, "transport-service" as ts, "external-interface-description" as i
  WHERE op.name ilike :name
    AND ts."published?" = TRUE
@@ -39,7 +39,7 @@ SELECT i.id as "interface-id", ts.id as "service-id",
 op.id as "operator-id", op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone", op.gsm as "operator-gsm",
 ts.name as "service-name", ts."contact-phone" as "service-phone", ts."contact-email" as "service-email",
 i."data-content" as "data-content", (i."external-interface").url as url,
-i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error"
+i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error", i."gtfs-db-error" as "db-error"
   FROM "transport-operator" as op, "transport-service" as ts, "external-interface-description" as i
  WHERE ts.name ilike :name
    AND ts."published?" = TRUE

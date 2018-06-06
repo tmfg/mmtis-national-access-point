@@ -106,11 +106,11 @@
     (update-in app [:admin :service-listing] assoc :published-filter f))
 
   UpdateInterfaceOperatorFilter
-  (process-event [{f :interface-operator-filter} app]
+  (process-event [{f :interface-filter} app]
     (update-in app [:admin :interface-list] assoc :interface-operator-filter f))
 
   UpdateInterfaceServiceFilter
-  (process-event [{f :interface-service-filter} app]
+  (process-event [{f :interface-filter} app]
     (update-in app [:admin :interface-list] assoc :interface-service-filter f))
 
   SearchUsers

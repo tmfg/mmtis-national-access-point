@@ -102,11 +102,10 @@
                     (update :data-content #(db-util/PgArray->vec %)))) db-interfaces))
 
 (defn- list-interfaces-by-operator [db user query]
-  (interfaces-array->vec (into [] (search-interfaces-by-operator db {:name (str "%" (:query query) "%")}))))
+  (interfaces-array->vec (into [] (search-interfaces-by-operator db {:name (str "%" query "%")}))))
 
 (defn- list-interfaces-by-service [db user query]
-  (let [daa (interfaces-array->vec (into [] (search-interfaces-by-service db {:name (str "%" (:query query) "%")})))]
-    daa))
+  (interfaces-array->vec (into [] (search-interfaces-by-service db {:name (str "%" query "%")}))))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
