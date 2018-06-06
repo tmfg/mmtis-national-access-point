@@ -30,10 +30,8 @@
 (def search-result-columns
   #{::t-service/contact-email
     ::t-service/sub-type
-    ::t-service/ckan-resource-id
     ::t-service/id
     ::t-service/contact-gsm
-    ::t-service/ckan-dataset-id
     ::t-service/contact-address
     ::t-service/name
     ::t-service/type

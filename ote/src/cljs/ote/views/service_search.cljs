@@ -96,7 +96,7 @@
    [:gtfs-viewer "25%" (comp #(gtfs-viewer-link %))]])
 
 (defn- external-interface-links [e! {::t-service/keys [id external-interface-links name
-                                                       transport-operator-id ckan-resource-id]}]
+                                                       transport-operator-id]}]
   (when-not (empty? external-interface-links)
     [:div
      [:span.search-card-title {:style {:padding "0.5em 0em 1em 0em"}} (tr [:service-search :external-interfaces])]
@@ -125,7 +125,7 @@
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
                                        operation-area-description description contact-phone contact-email
-                                       operator-name business-id ckan-resource-id transport-operator-id]
+                                       operator-name business-id transport-operator-id]
                      :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links e! service]
