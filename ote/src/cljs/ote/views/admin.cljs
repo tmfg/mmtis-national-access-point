@@ -14,7 +14,9 @@
             [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
-            [ote.ui.common :as ui-common]))
+            [ote.ui.common :as ui-common]
+            [ote.ui.common :as common-ui]
+            [ote.views.admin.interfaces :as interfaces]))
 
 (def id-filter-type [:operators :services :ALL])
 (def published-types [:YES :NO :ALL])
@@ -323,4 +325,6 @@
      [ui/tab {:label "Y-tunnus raportti" :value "businessid"}
       [business-id-report e! app]]
      [ui/tab {:label "Palveluntuottajat" :value "operators"}
-      [operator-list e! app]]]))
+      [operator-list e! app]]
+     [ui/tab {:label "Rajapinnat" :value "interfaces"}
+      [interfaces/interface-list e! app]]]))

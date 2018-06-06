@@ -35,6 +35,18 @@
 (defrecord FailedDeleteTransportServiceResponse [response])
 (defrecord ChangeAdminTab [tab])
 
+;; Interface tab
+(defrecord UpdateInterfaceOperatorFilter [interface-filter])
+(defrecord UpdateInterfaceServiceFilter [interface-filter])
+(defrecord SearchInterfacesByOperator [])
+(defrecord SearchInterfacesByOperatorResponse [response])
+(defrecord SearchInterfacesByService [])
+(defrecord SearchInterfacesByServiceResponse [response])
+(defrecord OpenInterfaceErrorModal [id])
+(defrecord CloseInterfaceErrorModal [id])
+(defrecord OpenOperatorModal [id])
+(defrecord CloseOperatorModal [id])
+
 ;; Delete Transport Operator
 (defrecord OpenDeleteOperatorModal [id])
 (defrecord CancelDeleteOperator [id])
@@ -52,6 +64,15 @@
                        (apply update-fn % args)
                        %)
                     operators))))
+
+(defn- update-interface-by-id [app id update-fn & args]
+  (update-in app [:admin :interface-list :results]
+             (fn [operators]
+               (map #(if (= (:interface-id %) id)
+                       (apply update-fn % args)
+                       %)
+                    operators))))
+
 
 (defn- get-search-result-operator-by-id [app id]
   (some
@@ -83,6 +104,14 @@
   UpdatePublishedFilter
   (process-event [{f :published-filter} app]
     (update-in app [:admin :service-listing] assoc :published-filter f))
+
+  UpdateInterfaceOperatorFilter
+  (process-event [{f :interface-operator-filter} app]
+    (update-in app [:admin :interface-list] assoc :interface-operator-filter f))
+
+  UpdateInterfaceServiceFilter
+  (process-event [{f :interface-service-filter} app]
+    (update-in app [:admin :interface-list] assoc :interface-service-filter f))
 
   SearchUsers
   (process-event [_ app]
@@ -142,6 +171,55 @@
     (update-in app [:admin :operator-list] assoc
                :loading? false
                :results response))
+
+
+  SearchInterfacesByOperator
+  (process-event [_ app]
+    (comm/post! "admin/interfaces-by-operator" (get-in app [:admin :interface-list :interface-operator-filter])
+                {:on-success (tuck/send-async! ->SearchInterfacesByOperatorResponse)})
+    (assoc-in app [:admin :interface-list :loading?] true))
+
+  SearchInterfacesByOperatorResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :interface-list] assoc
+               :loading? false
+               :results response))
+
+  SearchInterfacesByService
+  (process-event [_ app]
+    (comm/post! "admin/interfaces-by-service" (get-in app [:admin :interface-list :interface-service-filter])
+                {:on-success (tuck/send-async! ->SearchInterfacesByOperatorResponse)})
+    (assoc-in app [:admin :interface-list :loading?] true))
+
+  SearchInterfacesByServiceResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :interface-list] assoc
+               :loading? false
+               :results response))
+
+  OpenInterfaceErrorModal
+  (process-event [{id :id} app]
+    (update-interface-by-id
+      app id
+      assoc :show-error-modal? true))
+
+  CloseInterfaceErrorModal
+  (process-event [{id :id} app]
+    (update-interface-by-id
+      app id
+      dissoc :show-error-modal?))
+
+  OpenOperatorModal
+  (process-event [{id :id} app]
+    (update-interface-by-id
+      app id
+      assoc :show-operator-modal? true))
+
+  CloseOperatorModal
+  (process-event [{id :id} app]
+    (update-interface-by-id
+      app id
+      dissoc :show-operator-modal?))
 
   DeleteTransportService
   (process-event [{id :id} app]
