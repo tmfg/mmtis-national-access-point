@@ -15,7 +15,7 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
  -- Brokerage enabled, but it only affects on dropdown list in ui. Brokerage isn't a subtype anymore, and we cant
  -- calculate how many brokering services we have using this query.
  -- WHERE type."sub-type" NOT IN ('brokerage')
- ORDER BY count DESC
+ ORDER BY count DESC;
 
 -- name: latest-service-ids
 -- row-fn: :id
@@ -66,6 +66,7 @@ SELECT ts.id as id
   SELECT ts.id as id
     FROM "transport-service" ts, unnest(ts."transport-type") as str
    WHERE str::text IN (:tt)
+     AND ts."published?" = TRUE;
 
 -- name: participating-companies
 -- Search all services companies and their business-ids
@@ -82,3 +83,7 @@ SELECT ts.id as id
 SELECT eid."transport-service-id" as id
   FROM "external-interface-description" eid, unnest(eid."data-content") as str
  WHERE  str::text IN (:dc)
+   AND EXISTS(SELECT ts.id
+                FROM "transport-service" ts
+               WHERE ts.id = eid."transport-service-id"
+                 AND ts."published?" = TRUE)
