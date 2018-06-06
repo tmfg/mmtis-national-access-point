@@ -844,6 +844,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :data-not-found                             "Data is not found"
   :required-field                             "Required field"
   :invalid-postal-code                        "Please, check the postalcode (5 numbers)"
+  :invalid-file-type                          "Invalid file type"
   :transport-service-saved                    "Transport service information has been saved!"
   :transport-operator-saved                   "Transport operator information has been saved!"
   :footer-livi-logo                           "Finnish Transport Aggency Logo"
@@ -870,7 +871,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :hours-placeholder "hh"
   :minutes-placeholder "mm"
 
-  :server-error "Error in server call. Contact support if the problem persists."}
+  :server-error "Error in server call. Contact support if the problem persists."
+
+  :nap-data-license (:md "The information you fill in on this form will be published in the NAP service catalog as open data. The published data will be licensed with [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en).")
+  }
 
 
  :dialog
