@@ -15,7 +15,8 @@
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]
             [cheshire.core :as cheshire]
-            [ote.authorization :as authorization]))
+            [ote.authorization :as authorization]
+            [ote.util.db :as db-util]))
 
 (defqueries "ote/services/admin.sql")
 
@@ -95,6 +96,18 @@
          search-params
          {:specql.core/order-by ::t-service/operator-name})))
 
+(defn- interfaces-array->vec [db-interfaces]
+  (mapv (fn [d] (-> d
+                    (update :format #(db-util/PgArray->vec %))
+                    (update :data-content #(db-util/PgArray->vec %)))) db-interfaces))
+
+(defn- list-interfaces-by-operator [db user query]
+  (interfaces-array->vec (into [] (search-interfaces-by-operator db {:name (str "%" (:query query) "%")}))))
+
+(defn- list-interfaces-by-service [db user query]
+  (let [daa (interfaces-array->vec (into [] (search-interfaces-by-service db {:name (str "%" (:query query) "%")})))]
+    daa))
+
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
     (map #(first (groups %)) (distinct (map f coll)))))
@@ -155,6 +168,10 @@
     (POST "/admin/transport-operators" req (admin-service "operators" req db #'list-operators))
 
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
+
+    (POST "/admin/interfaces-by-operator" req (admin-service "interfaces-by-operator" req db #'list-interfaces-by-operator))
+
+    (POST "/admin/interfaces-by-service" req (admin-service "interfaces-by-service" req db #'list-interfaces-by-service))
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db
