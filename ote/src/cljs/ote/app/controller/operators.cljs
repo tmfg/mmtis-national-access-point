@@ -74,6 +74,7 @@
                                results)
                          (vec results))
               :total-count total-count)))
+
   OpenOperatorModal
   (process-event [{id :id} app]
     (update-operator-by-id
