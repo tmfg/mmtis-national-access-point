@@ -8,9 +8,9 @@
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"
                    :domain "localhost"}
-         :ssl-upgrade {:port 3080
-                       :url "http://localhost:3000/"}
-         :allow-robots? true}
+        :ssl-upgrade {:port 3080
+                      :url "http://localhost:3000/"}
+        :allow-robots? true}
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"
