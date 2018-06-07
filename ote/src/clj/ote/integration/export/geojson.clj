@@ -62,9 +62,7 @@
                   #{::t-service/notice-external-interfaces?
                     ::t-service/published?
                     ::t-service/company-csv-filename
-                    ::t-service/company-source
-                    ::t-service/ckan-dataset-id
-                    ::t-service/ckan-resource-id}))
+                    ::t-service/company-source}))
 
 (defn- link-to-companies-csv-url
   "Brokerage services could have lots of companies providing the service. With this function
