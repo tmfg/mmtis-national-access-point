@@ -9,7 +9,8 @@
                    :digest-algorithm "MD5"
                    :domain "{{cookie_domain}}"}
         ;;:session {:key "{{ote_cookie_key}}"}
-        :ssl-upgrade {:port 8080 :url "{{base_url}}"}}
+        :ssl-upgrade {:port 8080 :url "{{base_url}}"}
+        :allow-robots? {{allow_robots}}}
 
  :email {:server
          {;; Hostname of the STMP server. Optional if running locally.
@@ -32,7 +33,7 @@
        :export-base-url "{{base_url}}"}
  :log {:level :info}
  :ga {:tracking-code "UA-5406842-15"}
- :gtfs {:bucket "napote-gtfs-dev"}
+ :gtfs {:bucket "{{gtfs_bucket}}"}
  :enabled-features {{flags}}
  :pre-notices {:bucket "{{pre_notice_attachment_bucket}}"}
  :no-gtfs-update-for-operators "{{no_gtfs_update_for_operators}}"

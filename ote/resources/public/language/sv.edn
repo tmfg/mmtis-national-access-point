@@ -849,6 +849,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
   :invalid-postal-code                        "Kolla postnumret (5 siffror)"
+  :invalid-file-type                          "Ogiltig filtyp"
   :transport-service-saved                    "Uppgifterna sparade!"
   :transport-operator-saved                   "Uppgifterna sparade!"
   :footer-livi-logo                           "Liikennevirasto Logo"
@@ -875,7 +876,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."}
+  :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."
+  :nap-data-license (:md "Informationen Du ger i detta formulär publiceras i NAP-katalogen som öppen data med licensen [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
+  }
 
 
  :dialog
@@ -1142,7 +1145,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operator-no-services "Tjänsteproducenten har inga tjänster."
   :view-routes "Visa rutter"
   :load-csv-file "Ladda csv"
-  :data-content-search-label "Gränssnittsinnehåll"}
+  :data-content-search-label "Gränssnittsinnehåll"
+  :other-involved-companies "De företag som producerar tjänsten"
+  :other-company " annat företag"
+  :show-all-information "Visa alla data"}
 
  :login
  {:label "Inloggning"

@@ -26,7 +26,7 @@
                       :font-size "1.125em"
                       :font-weight "bold"
                       :color "#fff"
-                      :background-color "#00A9DF"})
+                      :background-color "#06c"})
 
 (def form-card-body {:padding "15px 15px"
                      :font-size "1em"

@@ -43,7 +43,7 @@
                  [digest "1.4.8"]
 
                  ;; Cache libraries
-                 [org.clojure/core.cache "0.6.5"]
+                 [org.clojure/core.cache "0.7.1"]
 
                  ;; Transit tietomuoto
                  [com.cognitect/transit-clj "0.8.300"]
@@ -59,7 +59,6 @@
                  ;; Frontend UI libraries
                  [reagent "0.8.0-alpha2"]
                  [webjure/tuck "20180327"]
-                 [org.clojure/core.async "0.4.474"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
                  [cljs-react-material-ui "0.2.48"]

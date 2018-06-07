@@ -27,23 +27,6 @@
          (map #(update % :sub-type keyword))
          (sub-type-facet db))})
 
-(def search-result-columns
-  #{::t-service/contact-email
-    ::t-service/sub-type
-    ::t-service/id
-    ::t-service/contact-gsm
-    ::t-service/contact-address
-    ::t-service/name
-    ::t-service/type
-    ::t-service/transport-operator-id
-    ::t-service/contact-phone
-    ::t-service/description
-
-    ;; Information JOINed from other tables
-    ::t-service/external-interface-links
-    ::t-service/operator-name
-    ::t-service/business-id})
-
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
 
@@ -109,6 +92,24 @@
   [db term]
   (into [] (service-search-by-operator db {:name (str "%" term "%")
                                            :businessid (str term )})))
+
+(def search-result-columns
+  #{::t-service/contact-email
+    ::t-service/sub-type
+    ::t-service/id
+    ::t-service/contact-gsm
+    ::t-service/contact-address
+    ::t-service/name
+    ::t-service/type
+    ::t-service/transport-operator-id
+    ::t-service/contact-phone
+    ::t-service/description
+
+    ;; Information JOINed from other tables
+    ::t-service/external-interface-links
+    ::t-service/operator-name
+    ::t-service/service-companies
+    ::t-service/business-id})
 
 (defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]

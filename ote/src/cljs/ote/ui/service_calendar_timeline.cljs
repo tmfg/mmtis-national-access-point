@@ -1,6 +1,5 @@
 (ns ote.ui.service-calendar-timeline
   ""
-  (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]])
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-time.core :as t]
@@ -10,7 +9,6 @@
             [stylefy.core :as stylefy]
             [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
-            [cljs.core.async :refer [<! put! chan timeout sliding-buffer]]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.events.MouseWheelHandler.EventType :as MEventType]))
@@ -43,99 +41,6 @@
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
 
 
-(defn- handle-wheel [e]
-  (.preventDefault e)
-
-  (.-deltaY e))
-
-(defn- handle-mouse-move [e]
-  (.preventDefault e)
-  (.-clientX e))
-
-(defn handle-mouse-down [e]
-  (let [target (.-target e)
-        mouse-x (.-clientX e)
-        client-rect (.getBoundingClientRect target)
-        client-left (.-left client-rect)
-        start-x (- mouse-x client-left)]
-    start-x))
-
-(defn- handle-mouse-up [e]
-  (.preventDefault e)
-  (.-clientX e))
-
-(defn- events->chan [el event-type c]
-  (events/listen el event-type #(put! c %)) c)
-
-(defn scroll-chan [el]
-  (let [c (chan 1 (map handle-wheel))]
-    (events->chan (events/MouseWheelHandler. (or el js/window))
-                  MEventType/MOUSEWHEEL c)
-    c))
-
-(defn mouse-down-chan [el]
-  (let [c (chan (sliding-buffer 1) (map handle-mouse-down))]
-    (events->chan (or el js/window) EventType/MOUSEDOWN c)
-    c))
-
-(defn mouse-move-chan [el]
-  (let [c (chan (sliding-buffer 1) (map handle-mouse-move))]
-    (events->chan (or el js/window) EventType/MOUSEMOVE c)
-    c))
-
-(defn mouse-up-chan [el]
-  (let [c (chan 1 (map handle-mouse-up))]
-    (events->chan (or el js/window) EventType/MOUSEUP c)
-    c))
-
-
-;; Current zoom level
-(def cur-zoom (r/atom 0))
-;; Start position of the mouse (in viewport) when dragging
-(def drag-start-offset (r/atom 0))
-;; Drag offset of the svg view-box
-(def view-offset (r/atom {:cur 0 :prev 0}))
-
-
-(defn listen-scroll! [el]
-  (let [chan (scroll-chan el)
-        zoom-speed 0.02]
-    (go-loop []
-             (let [new-scroll (- (<! chan))
-                   prev-zoom @cur-zoom
-                   ;; Use bigger zoom increments on bigger zoom levels to achieve more linear zoom-in
-                   zoom (+ prev-zoom (* new-scroll (+ 1 prev-zoom) zoom-speed))]
-               (reset! cur-zoom (min (max zoom 0) 40))
-               (recur)))))
-
-(defn listen-mouse-move! [el]
-  (let [mouse-down (mouse-down-chan el)
-        mouse-move (mouse-move-chan el)
-        mouse-up (mouse-up-chan js/document)]
-    (go-loop []
-             (loop []
-               (alt! [mouse-down]
-                     ([start-offset]
-                       (reset! drag-start-offset start-offset))))
-             (loop []
-               (alt! [mouse-up]
-                     (swap! view-offset assoc :prev (:cur @view-offset))
-
-                     [mouse-move]
-                     ([mouse-x]
-                       (let [client-rect (.getBoundingClientRect el)
-                             client-left (.-left client-rect)
-                             x (- mouse-x client-left)
-                             delta (- @drag-start-offset x)
-                             prev-offset (:prev @view-offset)
-                             zoom-factor (+ @cur-zoom 1)]
-                         (swap! view-offset assoc :cur (+ prev-offset (/ delta zoom-factor)))
-                         (recur)))))
-             (recur))))
-
-
-
-
 (defn svg-bars [items offset bar-width handle-val bar-style]
   [:g
    (doall
@@ -162,8 +67,8 @@
 (defn tmp-bar-colors [items transform]
   (zipmap items (take (count items)
                       (cycle (transform ["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
-                                             "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
-                                             "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])))))
+                                         "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
+                                         "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])))))
 
 (defn month-bars [months offset bar-width month-style]
   [svg-bars months offset bar-width #(month-name %) month-style])
@@ -176,15 +81,15 @@
 (defn day-bars [days offset bar-width day-style]
   [svg-bars days offset bar-width #(str (t/day %) "." (t/month %)) day-style])
 
-(defn timeline [weeks width height day-style]
-  (let [cur-zoom @cur-zoom
-        view-offset (:cur @view-offset)
-        bar-offset (* cur-zoom (+ view-offset (/ width 2)))
-        x-scale (max (+ 1 cur-zoom) 1)]
+(defn timeline [cur-zoom view-offset weeks width height day-style]
+  (let [zoom @cur-zoom
+        offset (:cur @view-offset)
+        bar-offset (* zoom (+ offset (/ width 2)))
+        x-scale (max (+ 1 zoom) 1)]
     [:svg {:xmlns "http://www.w3.org/2000/svg"
            :style {:width "100%" :height "100%"}
            :id "service-calendar-timeline"
-           :view-box (str view-offset " 0 " width " " height)}
+           :view-box (str offset " 0 " width " " height)}
      [:g {:transform (str "translate(0," (- (/ height 2) 10) ")")}
       (cond
         (< x-scale 4)
@@ -192,7 +97,7 @@
         [month-bars (range 1 13) bar-offset (* x-scale
                                                ;; width / 12 months
                                                (/ width 12))
-         (tmp-bar-colors (range 1 13) #(take-nth  6 %))]
+         (tmp-bar-colors (range 1 13) #(take-nth 6 %))]
         (< x-scale 12)
         [week-bars weeks bar-offset (* x-scale
                                        ;; Un-accurately, width / weeks
@@ -207,9 +112,72 @@
          (fn [day]
            (:background-color (day-style day false)))])]]))
 
+
+
+(defn- listen-scroll [el handler]
+  ;; MouseWheelHandler allows us to catch scroll events in a consistent manner on various platforms.
+  (events/listen (events/MouseWheelHandler. el) MEventType/MOUSEWHEEL handler el))
+
+(defn- listen-mouse-up [el handler]
+  (events/listen el EventType/MOUSEUP handler el))
+
+
+(defn handle-scroll! [cur-zoom e]
+  (.preventDefault e)
+
+  (let [new-scroll (- (.-deltaY e))
+        zoom-speed 0.02
+        prev-zoom @cur-zoom
+        zoom (+ prev-zoom (* new-scroll (+ 1 prev-zoom) zoom-speed))]
+    (reset! cur-zoom (min (max zoom 0) 40))))
+
+(defn- handle-mouse-move! [view-offset cur-zoom drag-start-x e]
+  (.preventDefault e)
+
+  (let [mouse-x (.-clientX e)
+        target-el (.-currentTarget e)
+        client-rect (.getBoundingClientRect target-el)
+        client-left (.-left client-rect)
+        x (- mouse-x client-left)
+        delta (- drag-start-x x)
+        prev-offset (:prev @view-offset)
+        zoom-factor (+ @cur-zoom 1)]
+    (swap! view-offset assoc :cur (+ prev-offset (/ delta zoom-factor)))))
+
+(defn- handle-mouse-up! [el view-offset mouse-move-key mouse-up-atom]
+  (swap! view-offset assoc :prev (:cur @view-offset))
+  (events/unlistenByKey mouse-move-key)
+  (events/unlisten el EventType/MOUSEUP @mouse-up-atom el))
+
+(defn- listen-mouse-move! [el view-offset cur-zoom drag-start-x]
+  (let [mouse-move-key (events/listen
+                     el
+                     EventType/MOUSEMOVE
+                     (partial handle-mouse-move! view-offset cur-zoom drag-start-x)
+                     el)
+        mouse-up-atom (atom nil)
+        mouse-up-fn (partial handle-mouse-up! js/window view-offset mouse-move-key mouse-up-atom)]
+
+    ;; Storing a reference to mouse-up-fn, so we can remove the event handler from window after all is done.
+    (reset! mouse-up-atom mouse-up-fn)
+
+    (listen-mouse-up js/window mouse-up-fn)
+    mouse-move-key))
+
+
+(defn- handle-mouse-down! [view-offset cur-zoom e]
+  (let [target-el (.-currentTarget e)
+        mouse-x (.-clientX e)
+        client-rect (.getBoundingClientRect target-el)
+        client-left (.-left client-rect)
+        drag-start-x (- mouse-x client-left)]
+    (listen-mouse-move! target-el view-offset cur-zoom drag-start-x)))
+
 (defn service-calendar-year [{:keys [selected-date? on-select on-hover
                                      day-style]} year]
-  (let [dimensions (r/atom {:width nil :height nil})]
+  (let [dimensions (r/atom {:width nil :height nil})
+        cur-zoom (r/atom 0)
+        view-offset (r/atom {:cur 0 :prev 0})]
     (r/create-class
       {:component-did-mount (fn [this]
                               (let [node (r/dom-node this)
@@ -218,8 +186,7 @@
                                 (swap! dimensions assoc
                                        :width (.-clientWidth wrapper-el)
                                        :height (.-clientHeight wrapper-el))
-                                (listen-scroll! wrapper-el)
-                                (listen-mouse-move! wrapper-el)))
+                                (listen-scroll wrapper-el (partial handle-scroll! cur-zoom))))
        :reagent-render
        (fn []
          (let [day-style (or day-style (constantly nil))
@@ -231,6 +198,8 @@
             [:div {:style {:display "flex" :align-items "center" :justify-content "center"}}
              [:div {:class "service-calendar-timeline-wrapper"
                     :style {:width "100%" :height "200px"
-                            :user-select "none" :border "solid 1px black"}}
+                            :user-select "none" :border "solid 1px black"}
+                    :on-mouse-down (partial handle-mouse-down! view-offset cur-zoom)}
               (when (:width @dimensions)
-                [timeline weeks (:width @dimensions) (:height @dimensions) day-style])]]]))})))
+                [timeline cur-zoom view-offset
+                 weeks (:width @dimensions) (:height @dimensions) day-style])]]]))})))

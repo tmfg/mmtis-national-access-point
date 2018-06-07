@@ -9,7 +9,8 @@
                    :digest-algorithm "MD5"}
         :session {:key "cookie0123456789"}
         :ssl-upgrade {:port 3080
-                      :url "http://localhost:3000/"}}
+                      :url "http://localhost:3000/"}
+        :allow-robots? true}
 
  :email {:server
          {;; Hostname of the STMP server. Optional if running locally.

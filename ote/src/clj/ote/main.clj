@@ -19,6 +19,7 @@
             [ote.services.pre-notices :as pre-notices]
             [ote.services.transit-visualization :as transit-visualization]
             [ote.services.transit-changes :as transit-changes]
+            [ote.services.robots :as robots]
 
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
@@ -47,7 +48,8 @@
 
    ;; Index page
    :index (component/using (index/->Index config)
-                           [:http])
+                           [:http :db])
+   :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
 
    ;; Services for the frontend
    :transport (component/using (transport-service/->Transport (:nap config)) [:http :db])

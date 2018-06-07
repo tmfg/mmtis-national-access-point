@@ -8,14 +8,10 @@
                     ::stylefy/mode {:hover {:cursor          "pointer"
                                             :text-decoration "underline"}}})
 
-(def result-border {:padding "0.5em 0em 1em 0em"
-                    :margin-bottom  "10px"
-                    :border-bottom  "1px solid #d9d9d9"})
-
 (def operator-result-header {:width            "100%"
                              :display          "block"
                              :padding          "10px"
-                             :background-color "#00A9DF"})
+                             :background-color "#06c"})
 
 (def operator-result-header-link {:color       "white"
                                   :font-weight 600})
@@ -37,31 +33,53 @@
                   :background-color "#fff"
                   :box-shadow       "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
-(def result-card-label {:padding          "15px 15px"
+(def result-card-title {:padding-top          "20px"
+                        :padding-right          "0px"
+                        :padding-bottom          "20px"
                         :font-size        "1.125em"
-                        :font-weight      "bold"
+                        :font-weight      "700"
                         :color            "#fff"
-                        :background-color "#00A9DF"
-                        ::stylefy/mode {:hover {:cursor          "pointer"
-                                                :text-decoration "underline"}}})
+                        :background-color "#06c"})
 
-(def result-card-small-label {:font-size "14px"
-                              :font-weight "20"
-                              :padding-left "20px"})
+(def result-card-header {:font-size "1em"
+                         :color "#323232"
+                         :font-weight "700"})
 
-(def result-card-body {:padding   "15px 15px"
+(def result-card-body {:padding-top "20px"
+                       :padding-bottom "20px"
                        :font-size "1em"
                        :color     "#444444"})
 
+(def simple-result-card-row {:padding-top "3px"})
+
+(def link-result-card-row {:padding-bottom "15px"
+                           :font-weight 400
+                           :color "#323232"})
+
 (def result-card-delete {:float "right"
                          :position "relative"
-                         :top "-50px"})
+                         :top "-15px"
+                         :color "#fff"})
+
+(def result-card-chevron {:float "right"
+                          :position "relative"
+                          :top "-41px"
+                          :color "#fff"})
+
+(def result-card-show-data {:float "right"
+                            :position "relative"
+                            :top "-37px"
+                            :color "#fff"})
+
+(def result-card-header-link {:color "#fff"
+                              ::stylefy/mode {:hover {:cursor          "pointer"
+                                                      :text-decoration "underline"}}})
 
 (def delete-icon {:color         "rgba(0, 0, 0, 0,75)"
                   ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})
 (def partly-visible-delete-icon {:color "rgba(0, 0, 0, 0,75)"})
 
-(def service-link {:color "#2D75B4" :text-decoration "none"})
+(def service-link {:color "#06c" :text-decoration "none"})
 
 (def data-items
   (merge base/item-list-container
@@ -69,16 +87,6 @@
           :position  "relative"
           :font-size "13px"
           :color     "#999999"}))
-
-(def external-interface-header
-  {:color "#444444"
-   :font-size  "14px"
-   :font-weight 500
-   :text-align "left"})
-
-(def external-table-header {:height "20px" :font-weight 500})
-
-(def external-interface-body {:font-weight "normal"})
 
 (def external-table-row {:height "20px"})
 

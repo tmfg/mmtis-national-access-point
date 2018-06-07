@@ -7,7 +7,8 @@
             [ote.ui.table :as table]
             [clojure.string :as str]
             [ote.time :as time]
-            [ote.localization :refer [tr]]))
+            [ote.localization :refer [tr]]
+            [cljs-react-material-ui.reagent :as ui]))
 
 (defn week-day-short [week-day]
   (tr [:enums :ote.db.transport-service/day :short
@@ -46,13 +47,15 @@
                                           time/week-days)))))))))
 
 (defn transit-changes [e! {:keys [loading? changes] :as transit-changes}]
-  [table/table {:no-rows-message (if loading?
-                                   "Ladataan muutoksia, odota hetki..."
-                                   "Ei löydettyjä muutoksia")
-                :name->label str
-                :on-select #(e! (tc/->ShowChangesForOperator (:transport-operator-id (first %))))}
-   [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
-    {:name "Muutospvm" :read (comp :change-date :next-different-week)
-     :format time/format-date-opt :width "10%"}
-    {:name "Muutos" :read change-description :width "65%"}]
-   changes])
+  [:div.transit-changes
+   [:h3 "Säännöllisen markkinaehtoisen reittiliikenteen tulevat muutokset"]
+   [table/table {:no-rows-message (if loading?
+                                    "Ladataan muutoksia, odota hetki..."
+                                    "Ei löydettyjä muutoksia")
+                 :name->label str
+                 :on-select #(e! (tc/->ShowChangesForOperator (:transport-operator-id (first %))))}
+    [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
+     {:name "Muutospvm" :read (comp :change-date :next-different-week)
+      :format time/format-date-opt :width "10%"}
+     {:name "Muutos" :read change-description :width "65%"}]
+    changes]])

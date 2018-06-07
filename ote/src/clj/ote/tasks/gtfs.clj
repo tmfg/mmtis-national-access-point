@@ -57,8 +57,7 @@
 (def night-hours #{0 1 2 3 4})
 
 (defn night-time? [dt]
-  true ;; PENDING: temporarily enable import always
-  #_(-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
+  (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle

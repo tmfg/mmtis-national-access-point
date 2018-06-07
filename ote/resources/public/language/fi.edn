@@ -853,6 +853,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
+  :invalid-file-type                          "Virheellinen tiedostotyyppi"
   :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
   :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo                           "Liikennevirasto Logo"
@@ -879,7 +880,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."}
+  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."
+
+  :nap-data-license (:md "Tälle lomakkeelle täytetyt tiedot julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")}
 
 
  :dialog
@@ -1151,7 +1154,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
   :load-csv-file "Lataa csv tiedosto"
-  :data-content-search-label "Rajapinnan sisältö"}
+  :data-content-search-label "Rajapinnan sisältö"
+  :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
+  :other-company " muuta yritystä"
+  :show-all-information "Näytä kaikki tiedot"}
 
  :login
  {:label "Kirjautumistiedot"
