@@ -331,6 +331,7 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         map.redirect('/group/member_new/{id:.*}', '/error/')
         map.redirect('/group/edit/{id:.*}', '/error/')
         map.redirect('/organization/bulk_process/{id:.*}/', '/error/')
+        map.redirect('/user/activity/{url:.*}', '/error/')
 
         # Hook user password reset route to our custom user controller
 
@@ -368,6 +369,10 @@ class NapoteThemePlugin(plugins.SingletonPlugin, DefaultTranslation, tk.DefaultD
         map.connect('/user/edit/{id}',
                     controller='ckanext.napote_theme.controller:CustomUserController',
                     action='edit')
+
+        map.connect('/user/{id}',
+                    controller='')
+
         return map
 
     def after_map(self, map):
