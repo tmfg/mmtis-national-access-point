@@ -21,6 +21,7 @@ body {
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     margin-bottom: 1rem;
+    font-family: Monserrat, sans-serif;
 }
 
 h1 {
@@ -88,7 +89,7 @@ In order to our OTE menu to render correctly work, we need to reset margin and p
     .container-fluid {
         padding-left: 0px;
         padding-right: 0px;
-        width: 1170px;
+        width: 100%;
         margin-left: auto;
         margin-right: auto;
     }

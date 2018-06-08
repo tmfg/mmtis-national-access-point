@@ -151,14 +151,14 @@
    [:ul (stylefy/use-style style-topnav/ul)
     (when (> (:width app) style-base/mobile-width-px)
       [:li
-       [:a
-        (merge (stylefy/use-style (if desktop?
-                                    style-topnav/desktop-link
-                                    style-topnav/link))
-               {:href     "#"
+       [:a {:style  (merge {:padding-top "11px"}
+                              (if desktop?
+                                style-topnav/desktop-link
+                                style-topnav/link))
+                :href     "#"
                 :on-click #(do
                              (.preventDefault %)
-                             (e! (fp-controller/->ChangePage :front-page nil)))})
+                             (e! (fp-controller/->ChangePage :front-page nil)))}
         [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
 
     (doall
@@ -243,7 +243,7 @@
 (defn- top-nav [e! app]
   (let [desktop? (> (:width app) style-base/mobile-width-px)]
     [:div (if desktop? (stylefy/use-style style-topnav/topnav-desktop) (stylefy/use-style style-topnav/topnav) )
-     [:div.container-fluid
+     [:div.container
       (if desktop?
         (top-nav-links e! app true)
         (mobile-top-nav-links e! app))]]))
