@@ -21,6 +21,7 @@
             [ote.time :as time]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
+            [ote.style.front-page :as style-front-page]
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
@@ -226,35 +227,89 @@
 
 (defn front-page
   "Front page info"
-  [e! {user :user :as app
-       show-register-dialog? :show-register-dialog?}]
-  [:div.front-page {:style {:position "relative" :top "-20px"}}
-   [:header {:style {:height "260px"
-                     :padding-top "0px"
-                     :background "url(/img/home_header.jpg)"
-                     :text-align "center"}}
-    [:img.livi-logo {:style {:width "220px"
-                             :position "relative"
-                             :top "100px"}
-                     :src "/img/icons/nap-logo.svg" :alt "FINAP" :title "FINAP"}]
-    [:div {:style {:position "relative"
-                   :top "120px"
-                   :color "white"
-                   :font-size "21px"
-                   :font-weight 200
-                   :line-height "30px"
-                   :font-family "'Roboto', sans-serfi"}}
-     (tr [:front-page :hero-title])]]
+  [e! {user :user :as app}]
+  [:div
+   [:div.hero {:style {:height          "540px"
+                       :margin-top      "-20px"
+                       :background      "url(/img/hero.png)"
+                       :background-size "cover"}}
+    [:div.container {:style {:padding-top "20px"}}
+     [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
+     [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
+      [:div.row {:style {:padding-top "40px"}}
+       [ui/raised-button {:on-click   #(do
+                                         (.preventDefault %)
+                                         (e! (fp/->ChangePage :services nil)))
+                          :primary    true
+                          :label      (tr [:buttons :transport-service-catalog])
+                          :icon       (ic/device-dvr {:style {:height 30 :width 30 :padding-top 7}})
+                          :icon-style {:width 40 :height 30}}]]]]]
    (when test-env?
      [test-env-warning])
-   (tr [:front-page :front-page-content])
+   [:div.container
+    [:div.row {:style {:margin-top "20px"}}
+     [:div.col-xs-3.col-sm-3.col-md-3
+      [ic/action-all-out {:style {:width 200 :height 200 :color "#969696"}}]]
+     [:div.col-xs-9.col-sm-9.col-md-9 {:style {:padding-left "60px"}}
+      [:h2 {:style {:font-size "2.25em"}} (tr [:front-page :title-NAP])]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       (tr [:front-page :column-NAP])]]]
+    [:div.row
+     [:div.col-xs-9.col-sm-9.col-md-9 {:style {:padding-right "60px"}}
+      [:h2 {:style {:font-size "2.25em"}} (tr [:front-page :title-transport-services])]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       (tr [:front-page :column-transport-services])]]
+     [:div.col-xs-3.col-sm-3.col-md-3
+      [ic/places-airport-shuttle {:style {:width 200 :height 200 :color "#969696"}}]]
+     ]
+    [:div.row
+     [:div.col-xs-3.col-sm-3.col-md-3
+      [ic/content-flag {:style {:width 200 :height 200 :color "#969696"}}]]
+     [:div.col-xs-9.col-sm-9.col-md-9 {:style {:padding-left "60px"}}
+      [:h2 {:style {:font-size "2.25em"}} (tr [:front-page :title-essential-info])]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       (tr [:front-page :column-essential-info])]]]
+    ]
+   [:div {:style {:padding-top      "80px"
+                  :padding-bottom   "100px"
+                  :background-image "linear-gradient(45deg, #ddd, #f8f8f8 46%, #f1f1f1)"
+                  :box-shadow       "4px 0 50px 0 rgba(0, 0, 0, .2), 4px 0 20px 0 #fff"}}
+    [:div.container
+     [:div.col-md-6
+      [:div {:style {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"}}
+       [ic/maps-train {:style {:width 120 :height 120 :color "#969696"}}]
+       [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-transport-operator])]
+       [:p {:style {:text-align "center" :font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+        (tr [:front-page :column-transport-operator])]
+       [:div {:style {:padding-top "20px"}}
+        [ui/raised-button {:on-click   #(do
+                                          (.preventDefault %)
+                                          (e! (fp/->ChangePage :services nil)))
+                           :primary    true
+                           :label      (tr [:buttons :register-to-service])
+                           :icon       (ic/device-dvr {:style {:height 30 :width 30 :padding-top 7}})
+                           :icon-style {:width 40 :height 30}}]]]]
+     [:div.col-md-6
+      [:div {:style {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"}}
+       [ic/device-developer-mode {:style {:width 120 :height 120 :color "#969696"}}]
+       [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-transport-operator])]
+       [:p {:style {:text-align "center" :font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+        (tr [:front-page :column-transport-operator])]
+       [:div {:style {:padding-top "20px"}}
+        [ui/raised-button {:on-click   #(do
+                                          (.preventDefault %)
+                                          (e! (fp/->ChangePage :services nil)))
+                           :primary    true
+                           :label      (tr [:buttons :check-out-the-service])
+                           :icon       (ic/device-dvr {:style {:height 30 :width 30 :padding-top 7}})
+                           :icon-style {:width 40 :height 30}}]]]]]]
    (when-not user
      [:div.front-page-login {:style {:text-align "center"}}
       [ui/raised-button {:on-click #(e! (login/->ShowLoginDialog))
-                         :primary true
-                         :label (tr [:common-texts :navigation-login])}]
+                         :primary  true
+                         :label    (tr [:common-texts :navigation-login])}]
       [:div {:style {:padding-top "1em"}}
        (tr [:front-page :new-user?])]
-      [ui/flat-button {:primary true
-                       :label (tr [:common-texts :navigation-register])
+      [ui/flat-button {:primary  true
+                       :label    (tr [:common-texts :navigation-register])
                        :on-click #(e! (fp/->ToggleRegistrationDialog))}]])])
