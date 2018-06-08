@@ -14,10 +14,13 @@ SELECT date_trunc('week', x.dt::DATE) as "change-date",
 
 -- name: list-current-operators
 WITH operators AS (
-  SELECT DISTINCT "transport-operator-id"
+  SELECT DISTINCT "transport-operator-id", "transport-service-id"
     FROM gtfs_package
 )
-SELECT op.id as "transport-operator-id", op.name AS "transport-operator-name"
+SELECT op.id AS "transport-operator-id",
+       op.name AS "transport-operator-name",
+       ts.name AS "transport-service-name"
   FROM operators ops
   JOIN "transport-operator" op ON ops."transport-operator-id" = op.id
+  JOIN "transport-service" ts ON ops."transport-service-id" = ts.id
  WHERE gtfs_latest_package_for_date(ops."transport-operator-id", :date::date) IS NOT NULL;
