@@ -105,9 +105,10 @@
         [:script {:type "text/javascript"} "goog.require('ote.main');"])]]))
 
 (defn index [db req dev-mode?]
-  {:status 200
-   :headers {"Content-Type" "text/html; charset=UTF-8"}
-   :body (html (index-page db (:user req) dev-mode?))})
+  (http/with-no-cache-headers
+    {:status 200
+     :headers {"Content-Type" "text/html; charset=UTF-8"}
+     :body (html (index-page db (:user req) dev-mode?))}))
 
 (defrecord Index [dev-mode?]
   component/Lifecycle
