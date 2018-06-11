@@ -2,15 +2,10 @@
       :username "$OTE_DB_USERNAME"
       :password "$OTE_DB_PASSWORD"}
  :http {:port 3000
-        :max-body 33554432
         :strip-prefix "/ote"
         :auth-tkt {:shared-secret "$OTE_AUTH_SHARED_SECRET"
                    :max-age-in-seconds 36000
-                   :digest-algorithm "MD5"
-                   :domain "localhost"}
-        :ssl-upgrade {:port 3080
-                      :url "http://localhost:3000/"}
-        :allow-robots? true}
+                   :digest-algorithm "MD5"}}
  :places {:finnish-municipalities
           {:type :shapefile
            :name-field "NAMEFIN"
