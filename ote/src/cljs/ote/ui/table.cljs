@@ -39,10 +39,11 @@
                           (when row-style
                             {:style row-style}))
            (doall
-            (for [{:keys [name width format read]} headers
+            (for [{:keys [name width col-style format read]} headers
                   :let [value ((or format identity) (if read (read row) (get row name)))]]
               ^{:key (str name)}
-              [ui/table-row-column (when width {:style {:width width}})
+              [ui/table-row-column {:style (merge (when width {:width width})
+                                                  (when col-style col-style))}
                (cond
                  (vector? value)
                  (r/as-element value)

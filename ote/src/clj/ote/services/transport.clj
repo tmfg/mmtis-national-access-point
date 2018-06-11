@@ -18,7 +18,6 @@
             [jeesql.core :refer [defqueries]]
             [cheshire.core :as cheshire]
             [ote.db.tx :as tx]
-            [ote.nap.publish :as publish]
             [ote.db.modification :as modification]
             [ote.access-rights :as access]
             [clojure.string :as str]
@@ -100,19 +99,7 @@
     (authorization/with-transport-operator-check
       db user transport-operator-id
       #(do
-
-         (if published?
-           ;; For published services, call CKAN API to delete dataset
-           ;; this cascades to all OTE information
-           (do
-             (try
-               (publish/delete-published-service! nap-config db user id)
-               ;; If for some reason the service is not found
-               ;; from ckan then delete service from OTE anyway
-               (catch Exception e
-                 (delete! db ::t-service/transport-service {::t-service/id id}))))
-           ;; Otherwise delete from transport-service table
-           (delete! db ::t-service/transport-service {::t-service/id id}))
+         (delete! db ::t-service/transport-service {::t-service/id id})
          id))))
 
 (defn get-user-transport-operators-with-services [db groups user]
@@ -234,25 +221,17 @@
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removed-resources]
 
-  ;; Delete services that have not been published yet
-  (specql/delete! db ::t-service/external-interface-description
-                  {::t-service/transport-service-id transport-service-id
-                   ::t-service/ckan-resource-id op/null?})
-
   ;; Delete removed services from OTE db
   (doseq [{id ::t-service/id} removed-resources]
     (specql/delete! db ::t-service/external-interface-description
                     {::t-service/id id}))
 
-  ;; Update or insert new external interfaces
-  (doseq [{ckan-resource-id ::t-service/ckan-resource-id :as ext-if}
-          (filter (fn [el] (not (:deleted? el))) external-interfaces)]
-    (if ckan-resource-id
+  (doseq [{id ::t-service/id :as ext-if} external-interfaces]
+    (if id
       (specql/update! db ::t-service/external-interface-description
                       ext-if
                       {::t-service/transport-service-id transport-service-id
-                       ::t-service/ckan-resource-id ckan-resource-id})
-
+                       ::t-service/id id})
       (specql/insert! db ::t-service/external-interface-description
                       (assoc ext-if ::t-service/transport-service-id transport-service-id)))))
 
@@ -260,7 +239,7 @@
   [from-db from-client]
   (let [in-db (into #{} (map ::t-service/id) from-db)
         from-ui (into #{} (map ::t-service/id) from-client)
-        to-delete (map #(select-keys % #{::t-service/ckan-resource-id ::t-service/id})
+        to-delete (map #(select-keys % #{::t-service/id})
                        (filter (comp (complement from-ui) ::t-service/id) from-db))]
     to-delete))
 
@@ -296,6 +275,13 @@
     (= :csv-url source) (assoc transport-service ::t-service/companies {})
     :else transport-service)))
 
+(defn- fetch-transport-service-external-interfaces [db id]
+  (when id
+    (fetch db ::t-service/external-interface-description
+           #{::t-service/external-interface ::t-service/data-content ::t-service/format
+             ::t-service/license ::t-service/id}
+           {::t-service/transport-service-id id})))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [nap-config db user {places ::t-service/operation-area
@@ -311,8 +297,9 @@
                                  ::t-service/service-company)
                          (maybe-clear-companies))
 
-        resources-from-db (publish/fetch-transport-service-external-interfaces db (::t-service/id data))
+        resources-from-db (fetch-transport-service-external-interfaces db (::t-service/id data))
         removed-resources (removable-resources resources-from-db external-interfaces)
+
         ;; Store to OTE database
         transport-service
         (jdbc/with-db-transaction [db db]
@@ -331,13 +318,7 @@
               (save-external-companies db transport-service)
               ;; If url is empty, delete remaining data
               (delete-external-companies db transport-service))
-
             transport-service))]
-
-    ;; If published, use CKAN API to add dataset and resource
-    (when (::t-service/published? data)
-      (publish/delete-resources-from-published-service! nap-config user removed-resources)
-      (publish/publish-service-to-ckan! nap-config db user (::t-service/id transport-service)))
 
     ;; Return the stored transport-service
     transport-service))

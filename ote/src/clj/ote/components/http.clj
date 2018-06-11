@@ -98,8 +98,8 @@
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (or (public-handler req)
-                    (resources req)
+                (or (resources req)
+                    (public-handler req)
                     (handler req)))
               config))))
   (stop [{stop ::stop :as this}]
