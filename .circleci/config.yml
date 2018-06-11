@@ -27,15 +27,15 @@ jobs:
 
       - restore_cache:
           keys:
-          - v2-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
+          - v3-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           # fallback to using the latest cache if no exact match is found
-          - v2-dependencies-{{ .Branch }}
-          - v2-dependencies-
+          - v3-dependencies-{{ .Branch }}
+          - v3-dependencies-
 
       - run: cd ote && lein deps
 
       - save_cache:
-          key: v2-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
+          key: v3-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           paths:
             - ~/.m2
 
@@ -105,14 +105,14 @@ jobs:
 
       - restore_cache:
           keys:
-            - v2-npm-deps-
+            - v3-npm-deps-
 
       - run:
           name: Install Cypress
           command: npm i cypress@3.x && $(npm bin)/cypress verify
 
       - save_cache:
-          key: v2-npm-deps-
+          key: v3-npm-deps-
           paths:
             - node_modules
 
