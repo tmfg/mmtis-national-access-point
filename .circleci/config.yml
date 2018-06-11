@@ -121,6 +121,13 @@ jobs:
           command: cd /tmp/ote && java -jar ote.jar
           background: true
 
+      - run:
+          name: Wait for OTE app to respond
+          command: |
+            while ! nc -z localhost 3000; do
+              sleep 0.5;
+            done;
+
       # Note: When running with chrome, it seems we cannot record a video. Only Electron browser can record a video.
       - run:
           name: Run all tests for a pull request
