@@ -2,12 +2,12 @@
     "name": "NAP",
     "icons": [
         {
-            "src": "/ote/favicon/android-chrome-192x192.png?v=E6jNQXq6yK",
+            "src": "/favicon/android-chrome-192x192.png?v=E6jNQXq6yK",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/ote/favicon/android-chrome-512x512.png?v=E6jNQXq6yK",
+            "src": "/favicon/android-chrome-512x512.png?v=E6jNQXq6yK",
             "sizes": "512x512",
             "type": "image/png"
         }
