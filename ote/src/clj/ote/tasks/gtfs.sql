@@ -8,3 +8,7 @@ SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
    AND ( "gtfs-imported" < (current_timestamp - '1 day'::interval) OR "gtfs-imported" IS NULL)
  ORDER BY "gtfs-imported" ASC LIMIT 1
    FOR UPDATE SKIP LOCKED;
+
+
+-- name: refresh-nightly-transit-changes!
+REFRESH MATERIALIZED VIEW "nightly-transit-changes";
