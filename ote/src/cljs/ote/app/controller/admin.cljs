@@ -3,7 +3,8 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
-            [ote.communication :as comm]))
+            [ote.communication :as comm]
+            [ote.ui.form :as form]))
 
 (defn- update-service-by-id [app id update-fn & args]
   (update-in app [:service-search :results]
@@ -36,12 +37,9 @@
 (defrecord ChangeAdminTab [tab])
 
 ;; Interface tab
-(defrecord UpdateInterfaceOperatorFilter [interface-filter])
-(defrecord UpdateInterfaceServiceFilter [interface-filter])
-(defrecord SearchInterfacesByOperator [])
-(defrecord SearchInterfacesByOperatorResponse [response])
-(defrecord SearchInterfacesByService [])
-(defrecord SearchInterfacesByServiceResponse [response])
+(defrecord UpdateInterfaceFilters [filter])
+(defrecord SearchInterfaces [])
+(defrecord SearchInterfacesResponse [response])
 (defrecord OpenInterfaceErrorModal [id])
 (defrecord CloseInterfaceErrorModal [id])
 (defrecord OpenOperatorModal [id])
@@ -105,14 +103,6 @@
   (process-event [{f :published-filter} app]
     (update-in app [:admin :service-listing] assoc :published-filter f))
 
-  UpdateInterfaceOperatorFilter
-  (process-event [{f :interface-filter} app]
-    (update-in app [:admin :interface-list] assoc :interface-operator-filter f))
-
-  UpdateInterfaceServiceFilter
-  (process-event [{f :interface-filter} app]
-    (update-in app [:admin :interface-list] assoc :interface-service-filter f))
-
   SearchUsers
   (process-event [_ app]
     (comm/post! "admin/users" (get-in app [:admin :user-listing :user-filter])
@@ -172,26 +162,18 @@
                :loading? false
                :results response))
 
+  UpdateInterfaceFilters
+  (process-event [{filter :filter} app]
+    (update-in app [:admin :interface-list :filters] merge filter))
 
-  SearchInterfacesByOperator
+  SearchInterfaces
   (process-event [_ app]
-    (comm/post! "admin/interfaces-by-operator" (get-in app [:admin :interface-list :interface-operator-filter])
-                {:on-success (tuck/send-async! ->SearchInterfacesByOperatorResponse)})
+    (comm/post! "admin/interfaces" (form/without-form-metadata
+                                     (get-in app [:admin :interface-list :filters]))
+                {:on-success (tuck/send-async! ->SearchInterfacesResponse)})
     (assoc-in app [:admin :interface-list :loading?] true))
 
-  SearchInterfacesByOperatorResponse
-  (process-event [{response :response} app]
-    (update-in app [:admin :interface-list] assoc
-               :loading? false
-               :results response))
-
-  SearchInterfacesByService
-  (process-event [_ app]
-    (comm/post! "admin/interfaces-by-service" (get-in app [:admin :interface-list :interface-service-filter])
-                {:on-success (tuck/send-async! ->SearchInterfacesByOperatorResponse)})
-    (assoc-in app [:admin :interface-list :loading?] true))
-
-  SearchInterfacesByServiceResponse
+  SearchInterfacesResponse
   (process-event [{response :response} app]
     (update-in app [:admin :interface-list] assoc
                :loading? false
