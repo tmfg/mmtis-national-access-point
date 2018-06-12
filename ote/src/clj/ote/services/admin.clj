@@ -101,11 +101,17 @@
                     (update :format #(db-util/PgArray->vec %))
                     (update :data-content #(db-util/PgArray->vec %)))) db-interfaces))
 
-(defn- list-interfaces-by-operator [db user query]
-  (interfaces-array->vec (into [] (search-interfaces-by-operator db {:name (str "%" query "%")}))))
-
-(defn- list-interfaces-by-service [db user query]
-  (interfaces-array->vec (into [] (search-interfaces-by-service db {:name (str "%" query "%")}))))
+(defn- list-interfaces [db user query]
+  (let [service-name (:service-name query)
+        operator-name (:operator-name query)
+        import-error (:import-error query)
+        db-error (:db-error query)
+        interface-format (:interface-format query)]
+  (interfaces-array->vec (search-interfaces db {:service-name (when service-name (str "%" service-name "%"))
+                                                :operator-name (when operator-name (str "%" operator-name "%"))
+                                                :import-error (when import-error true)
+                                                :db-error (when db-error true)
+                                                :interface-format (when (and interface-format (not= :ALL interface-format)) (name interface-format))}))))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
@@ -168,9 +174,7 @@
 
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
-    (POST "/admin/interfaces-by-operator" req (admin-service "interfaces-by-operator" req db #'list-interfaces-by-operator))
-
-    (POST "/admin/interfaces-by-service" req (admin-service "interfaces-by-service" req db #'list-interfaces-by-service))
+    (POST "/admin/interfaces" req (admin-service "interfaces-by-operator" req db #'list-interfaces))
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db

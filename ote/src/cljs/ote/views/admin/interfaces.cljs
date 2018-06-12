@@ -15,7 +15,8 @@
             [ote.ui.common :as common-ui]
             [stylefy.core :as stylefy]
             [ote.style.admin :as style-admin]
-            [ote.app.controller.front-page :as fp]))
+            [ote.app.controller.front-page :as fp]
+            [ote.ui.form :as form]))
 
 (defn error-modal [e! interface]
   (when (:show-error-modal? interface)
@@ -108,36 +109,68 @@
           (tr [:service-search :view-routes])
           {:target "_blank"})))))
 
+(def interface-formats [:GTFS :Kalkati.net :ALL])
+
 (defn interface-list [e! app]
-  (let [{:keys [loading? results interface-operator-filter interface-service-filter]}
+  (let [{:keys [loading? results filters]}
         (get-in app [:admin :interface-list])]
     [:div.row
-     [:div.row.col-md-6
-      [form-fields/field {:type    :string
-                          :label   "Hae palveluntuottajan nimellä tai sen osalla"
-                          :update! #(e! (admin-controller/->UpdateInterfaceOperatorFilter %))}
-       interface-operator-filter]
+     [:div.row.col-md-12 {:style {:padding-top "20px"}}
+      [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
+       [(form/group
+          {:label   "Etsi rajapintoja"
+           :columns 3
+           :layout  :row}
+
+          {:name            :operator-name
+           :label "Palveluntuottaja"
+           :type            :string
+           :hint-text       "Palveluntuottajan nimi tai sen osa"
+           :full-width?     true
+           :container-class "col-xs-12 col-sm-4 col-md-4"
+           }
+          {:name            :service-name
+           :label "Palvelu"
+           :type            :string
+           :hint-text       "Palvelun nimi tai sen osa"
+           :full-width?     true
+           :container-class "col-xs-12 col-sm-4 col-md-4"
+           }
+          {:name            :interface-format
+           :type            :selection
+           :options         interface-formats
+           :label           "Tyyppi"
+           :hint-text       "Palvelun nimi tai sen osa"
+           :show-option     (tr-key [:admin-page :interface-formats])
+           :update!         #(e! (admin-controller/->UpdatePublishedFilter %))
+           :full-width?     true
+           :container-class "col-xs-12 col-sm-4 col-md-4"
+           }
+          {:name            :import-error
+           :type            :checkbox
+           :label           "Latausvirheet"
+           :full-width?     true
+           :container-class "col-xs-12 col-sm-4 col-md-4"
+           }
+          {:name            :db-error
+           :type            :checkbox
+           :label           "Käsittelyvirhe"
+           :full-width?     true
+           :container-class "col-xs-12 col-sm-4 col-md-4"
+           })]
+       filters]
 
       [ui/raised-button {:primary  true
                          :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->SearchInterfacesByOperator))
+                         :on-click #(e! (admin-controller/->SearchInterfaces))
                          :label    "Hae rajapintoja"}]]
-     [:div.row.col-md-6
-      [form-fields/field {:type    :string
-                          :label   "Hae palvelun nimellä tai sen osalla"
-                          :update! #(e! (admin-controller/->UpdateInterfaceServiceFilter %))}
-       interface-service-filter]
 
-      [ui/raised-button {:primary  true
-                         :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->SearchInterfacesByService))
-                         :label    "Hae rajapintoja"}]]
-     [:div.row
+     [:div.row {:style {:padding-top "40px"}}
       (when loading?
         [:span "Ladataan rajapintoja..."])
 
       (when results
-        [:span
+        [:div
          [:div "Hakuehdoilla löytyi " (count results) " rajapintaa."]
          [ui/table {:selectable false}
           [ui/table-header {:adjust-for-checkbox false
