@@ -817,7 +817,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
-  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.

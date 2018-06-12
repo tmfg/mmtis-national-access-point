@@ -10,6 +10,7 @@
             [ote.gtfs.parse :as gtfs-parse]
             [specql.core :as specql]
             [ote.db.gtfs :as gtfs]
+            [ote.db.transport-service :as t-service]
             [clojure.java.io :as io]
             [digest]
             [specql.op :as op]
@@ -119,8 +120,8 @@
                                     :stop-times stop-times}))
           (recur (inc i) ps))))))
 
-(defn save-gtfs-to-db [db gtfs-file package-id]
-  (log/debug "save-gtfs-to-db - package-id: " package-id)
+(defn save-gtfs-to-db [db gtfs-file package-id interface-id]
+  (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
     (try
       (read-zip-with
@@ -146,8 +147,17 @@
       (log/info "Generating date hashes for package " package-id)
       (generate-date-hashes! db {:package-id package-id})
 
+      ;; IF handling was ok, remove all errors from the interface table
+      (specql/update! db ::t-service/external-interface-description
+                      {::t-service/gtfs-db-error nil ::t-service/gtfs-import-error nil}
+                      {::t-service/id interface-id})
+
       (catch Exception e
         (.printStackTrace e)
+        (specql/update! db ::t-service/external-interface-description
+                        {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                         ::t-service/gtfs-db-error (str (.getName (class e)) ": " (.getMessage e))}
+                        {::t-service/id interface-id})
         (log/warn "Error in save-gtfs-to-db" e))
 
       (finally
@@ -177,7 +187,7 @@
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
-  [interface-type gtfs-config db url operator-id ts-id last-import-date license]
+  [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id]
   (let [filename (gtfs-file-name operator-id ts-id)
         saved-etag (:gtfs/etag (last (specql/fetch db :gtfs/package
                                                    #{:gtfs/etag}
@@ -187,7 +197,13 @@
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
     (if (nil? gtfs-file)
-      (log/debug "Could not find new file version from given url " url)
+      (do
+        (log/debug "Could not find new file version from given url " url)
+        (when (not (nil? response))
+          (specql/update! db ::t-service/external-interface-description
+                          {::t-service/gtfs-imported     (java.sql.Timestamp. (System/currentTimeMillis))
+                           ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
+                          {::t-service/id interface-id})))
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (specql/fetch db :gtfs/package
                                         #{:gtfs/sha256}
@@ -206,7 +222,7 @@
               (log/debug "File: " filename " was uploaded to S3 successfully.")
 
               ;; Parse gtfs package and save it to database.
-              (save-gtfs-to-db db gtfs-file (:gtfs/id package))))
+              (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id)))
           (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying."))))))
 
 (defrecord GTFSImport [config]
