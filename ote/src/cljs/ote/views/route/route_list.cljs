@@ -97,18 +97,23 @@
              [delete-route-action e! row]]])
          routes))]]])
 
-(defn routes [e! app]
+(defn routes [e! {operators :transport-operators-with-services :as app}]
   (e! (route-list/->LoadRoutes))
   (fn [e! {routes :routes-vector operator :transport-operator :as app}]
     [:div
      [list-header/header
       (tr [:route-list-page :header-route-list])
-      [ui/raised-button {:label    (tr [:buttons :add-new-route])
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (route-list/->CreateNewRoute)))
-                         :primary  true
-                         :icon     (ic/content-add)}]
+      [common/tooltip
+       {:text (if (empty? operators)
+                (tr [:route-list-page :create-new-route-disabled])
+                (tr [:buttons :add-new-route]))}
+       [ui/raised-button {:label    (tr [:buttons :add-new-route])
+                          :on-click #(do
+                                       (.preventDefault %)
+                                       (e! (route-list/->CreateNewRoute)))
+                          :primary  true
+                          :disabled (empty? operators)
+                          :icon     (ic/content-add)}]]
       [t-operator-view/transport-operator-selection e! app]
       [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf" (tr [:route-list-page :link-to-help-pdf])]]
 

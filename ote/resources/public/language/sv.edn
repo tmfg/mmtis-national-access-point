@@ -697,6 +697,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
   :link-to-help-pdf   "Användarinstruktioner för kartverktyget för sjötrafik"
+  :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
   }
 
  :route-wizard-page
@@ -832,7 +833,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
-  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :common-texts
  {:front-page-help-text                       "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.

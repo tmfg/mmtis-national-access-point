@@ -15,7 +15,8 @@
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]
             [cheshire.core :as cheshire]
-            [ote.authorization :as authorization]))
+            [ote.authorization :as authorization]
+            [ote.util.db :as db-util]))
 
 (defqueries "ote/services/admin.sql")
 
@@ -95,6 +96,23 @@
          search-params
          {:specql.core/order-by ::t-service/operator-name})))
 
+(defn- interfaces-array->vec [db-interfaces]
+  (mapv (fn [d] (-> d
+                    (update :format #(db-util/PgArray->vec %))
+                    (update :data-content #(db-util/PgArray->vec %)))) db-interfaces))
+
+(defn- list-interfaces [db user query]
+  (let [service-name (:service-name query)
+        operator-name (:operator-name query)
+        import-error (:import-error query)
+        db-error (:db-error query)
+        interface-format (:interface-format query)]
+  (interfaces-array->vec (search-interfaces db {:service-name (when service-name (str "%" service-name "%"))
+                                                :operator-name (when operator-name (str "%" operator-name "%"))
+                                                :import-error (when import-error true)
+                                                :db-error (when db-error true)
+                                                :interface-format (when (and interface-format (not= :ALL interface-format)) (name interface-format))}))))
+
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
     (map #(first (groups %)) (distinct (map f coll)))))
@@ -155,6 +173,8 @@
     (POST "/admin/transport-operators" req (admin-service "operators" req db #'list-operators))
 
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
+
+    (POST "/admin/interfaces" req (admin-service "interfaces-by-operator" req db #'list-interfaces))
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db

@@ -8,6 +8,7 @@
             [clj-time.coerce :as coerce]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
+            [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
@@ -15,18 +16,13 @@
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
             [ote.nap.users :as nap-users]
-            [ote.tasks.util :refer [daily-at]])
+            [ote.tasks.util :refer [daily-at]]
+            [ote.util.db :as db-util])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
 
 (defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
-
-
-(defn PgArray->seqable [arr]
-  (if arr
-    (.getArray arr)
-    []))
 
 (defn datetime-string [dt timezone]
   (when dt
@@ -42,17 +38,17 @@
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                               effective-dates-asc description]}]
   (let [effective-date-str (date-string (coerce/from-sql-date
-                                          (first (PgArray->seqable effective-dates-asc)))
+                                          (first (db-util/PgArray->seqable effective-dates-asc)))
                                         timezone)]
     [:tr
      [:td [:b id]]
-     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} route-description]]
-     [:td (str/join ",<br />" (PgArray->seqable regions))]
-     [:td operator-name]
+     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} (escape-html route-description)]]
+     [:td (str/join ",<br />" (db-util/PgArray->seqable regions))]
+     [:td (escape-html operator-name)]
      [:td (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
-                               (PgArray->seqable pre-notice-type)))]
+                               (db-util/PgArray->seqable pre-notice-type)))]
      [:td effective-date-str]
-     [:td description]]))
+     [:td (escape-html description)]]))
 
 (defn notification-template [pre-notices]
   [:html
