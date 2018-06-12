@@ -9,16 +9,12 @@
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
-            [ote.views.passenger-transportation :as pt]
-            [ote.views.terminal :as terminal]
-            [ote.views.rental :as rental]
-            [ote.views.parking :as parking]
+            [ote.views.footer :as footer]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
-            [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]
             [ote.ui.form :as form]
@@ -69,24 +65,6 @@
              {:page :admin
               :label [:common-texts :navigation-admin]})])))
 
-(def selectable-languages [["fi" "suomi"]
-                           ["sv" "svenska"]
-                           ["en" "english"]])
-
-(defn- language-selection [e! style link-style show-label?]
-  (let [current-language @localization/selected-language]
-    [:div (stylefy/use-style style) (when show-label? (str (tr [:common-texts :language]) ": "))
-
-     (doall
-      (for [[lang flag] selectable-languages]
-        [:a (merge
-             (stylefy/use-style style-base/language-flag)
-             {:key lang
-              :href "#"
-              :on-click #(e! (fp-controller/->SetLanguage lang))
-              :style link-style})
-         flag]))]))
-
 (defn user-menu [e! {:keys [name username transit-authority?]}]
   (when username
     [ui/drop-down-menu
@@ -130,7 +108,7 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (login/->Logout)))} ]
 
-     [ui/menu-item {:primary-text (r/as-element [language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
+     [ui/menu-item {:primary-text (r/as-element [footer/language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service :transport-operator :organizations})
 (def services-pages #{:services})
@@ -179,7 +157,7 @@
          (tr label)]]))
     [:div.user-menu {:class (is-user-menu-active app)
                      :style (when (> (:width app) style-base/mobile-width-px)
-                              {:float "right"})}
+                              {:float "right" :padding-top "12px"})}
      [user-menu e! (:user app)]]
 
     (if (nil? (get-in app [:user :username]))
@@ -247,38 +225,6 @@
       (if desktop?
         (top-nav-links e! app true)
         (mobile-top-nav-links e! app))]]))
-
-
-(defn- footer [e!]
-  [:footer.site-footer
-   [:div.container-fluid
-    [:div.row
-     [:img {:src "/img/EU-logo.png" :style {:float "right"
-                                            :transform "scale(0.5, 0.5)"}}]
-     [:div.col-md-2.footer-links
-      [:a.logo {:href "#" }
-       [:img {:src "/img/icons/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
-     [:div.col-md-2.footer-links
-      [:ul.unstyled
-       [:li
-        [linkify (tr [:common-texts :footer-livi-url-link])
-         (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
-       [:li
-        [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
-       [:li
-        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
-       [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
-       [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"
-             (tr [:common-texts :navigation-privacy-policy])
-             {:target "_blank"}]]
-       [:li
-        [language-selection e! style-base/language-selection-footer nil true]]]]
-     [:div.col-md-12 (stylefy/use-style style-base/footer-copyright)
-      [linkify "http://creativecommons.org/licenses/by/4.0/"
-       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/img/icons/cc.svg"})]
-       {:target "_blank"}]
-      [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
-
 
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes :pre-notices})
 
@@ -437,7 +383,10 @@
           (if (not loaded?)
             [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
             [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
-             [:div.container-fluid
+             [:div (if (= :front-page (:page app))
+                     {:class "container-fluid"}
+                     {:style {:padding-bottom "20px"}
+                      :class "container"})
               [document-title (:page app)]
               (case (:page app)
                 :front-page [fp/front-page e! app]
@@ -471,5 +420,4 @@
                 :transit-changes [transit-changes/transit-changes e! (:transit-changes app)]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
-
-       [footer e!]]]]))
+       [footer/footer e!]]]]))
