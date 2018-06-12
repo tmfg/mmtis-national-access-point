@@ -8,6 +8,7 @@
             [clj-time.coerce :as coerce]
             [clojure.string :as str]
             [hiccup.core :refer [html]]
+            [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
             [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
@@ -41,13 +42,13 @@
                                         timezone)]
     [:tr
      [:td [:b id]]
-     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} route-description]]
+     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} (escape-html route-description)]]
      [:td (str/join ",<br />" (db-util/PgArray->seqable regions))]
-     [:td operator-name]
+     [:td (escape-html operator-name)]
      [:td (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
                                (db-util/PgArray->seqable pre-notice-type)))]
      [:td effective-date-str]
-     [:td description]]))
+     [:td (escape-html description)]]))
 
 (defn notification-template [pre-notices]
   [:html
