@@ -173,11 +173,10 @@
       [:div.col-sm-8.col-md-8 {:style {:padding-left card-padding}}
        [:h4 (stylefy/use-style style/result-card-header) (sub-type-tr sub-type)]
        (when-not (empty? service-desc)
-         [:div.description
+         [:div.description {:style {:padding-bottom "20px"}}
           (common-ui/shortened-description service-desc 270)])
-       (when-not (empty? (::t-service/external-interface-links service))
-         [:div.result-interfaces e-links])
-       ]
+
+       [:div.result-interfaces e-links]]
       [:div.col-sm-3.col-md-3 {:style {:padding-left card-padding}}
        [:h4 (stylefy/use-style style/result-card-header) operator-name]
        [:div (stylefy/use-style style/simple-result-card-row)
