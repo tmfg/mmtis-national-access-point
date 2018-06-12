@@ -364,6 +364,9 @@
   :route-calendar-clear "Töm kalendern"
   :back-to-draft  "Ändra status till utkast"
   :add-new-effective-date "Lägg till nytt datum"
+  :transport-service-catalog "Liikkumispalvelukatalogi"
+  :register-to-service "Rekisteröidy palveluun"
+  :check-out-the-service "Tutustu tietoihin"
   }
 
  ;; Database enumeration values
@@ -528,7 +531,23 @@
           :brokerage                "Förmedlingstjänst"}
 
  :front-page
- {:front-page-content
+ {:title-NAP "NAP - National Access Point"
+  :title-transport-services "Liikkumispalvelut"
+  :title-essential-info "Olennaiset tiedot"
+  :title-transport-operator "Palveluntuottaja"
+  :title-developer "Sovelluskehittäjä"
+  :column-NAP (:md
+                "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon
+                 **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen**
+                koneluettavista rajapinnoistaan.
+                NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä
+                liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
+  :column-transport-services "Liikkumispalveluilla tarkoitetaan henkilöiden kuljetuspalveluita, kuten tieliikenteen, merenkulun ja ilmailun henkilökuljetuksia; asemia, satamia ja terminaaleja; liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita; yleisiä kaupallisia pysäköintipalveluita sekä välityspalveluita."
+  :column-essential-info "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat, palvelun saatavuus, esteettömyys sekä varaus-, myynti-, lippu- ja maksutiedot. Kaikki tiedot eivät ole olennaisia jokaisen palvelun osalta.  Avattavat tiedot on määritetty valtioneuvoston asetuksessa."
+  :column-transport-operator "Tietojen avaamisvelvollisuus koskee kaikkia liikkumispalveluita tarjoavia yrityksiä. Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii rekisteröitymisen ja kirjautumisen palveluun. NAP-palvelu ohjeistaa käyttäjää kirjaamaan tiettyä palvelua koskevat olennaiset tiedot."
+  :column-developer "NAP on palveluiden kehittäjille tarkoitettu katalogi, josta kehittäjät löytävät tarvitsemiaan tietoja ja rajapintoja. Tietojen hyödyntäminen ei vaadi rekisteröitymistä. NAP mahdollistaa esimerkiksi nykyistä laajempien reittioppaiden ja liikennepalveluiden kehittämisen."
+
+  :front-page-content
   (:md
    "# **Vad är NAP?**
 
@@ -858,6 +877,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
+  :footer-funded  (:md "Osarahoitettu Euroopan Union [Verkkojen Eurooppa -välineellä.](#)")
+  :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
   :time-units {:minutes  "Minuter"

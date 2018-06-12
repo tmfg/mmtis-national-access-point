@@ -357,6 +357,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-calendar-clear "Clear calendar"
   :back-to-draft  "Change back to draft"
   :add-new-effective-date "Add new change date"
+  :transport-service-catalog "Liikkumispalvelukatalogi"
+  :register-to-service "Rekisteröidy palveluun"
+  :check-out-the-service "Tutustu tietoihin"
   }
 
  ;; Database enumeration values
@@ -524,7 +527,23 @@ You can also draw the operating area or point to the map with drawing tools. You
           :brokerage                "Brokering service companies"}
 
  :front-page
- {:front-page-content
+ {:title-NAP "NAP - National Access Point"
+  :title-transport-services "Liikkumispalvelut"
+  :title-essential-info "Olennaiset tiedot"
+  :title-transport-operator "Palveluntuottaja"
+  :title-developer "Sovelluskehittäjä"
+  :column-NAP (:md
+                "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon
+                 **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen**
+                koneluettavista rajapinnoistaan.
+                NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä
+                liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
+  :column-transport-services "Liikkumispalveluilla tarkoitetaan henkilöiden kuljetuspalveluita, kuten tieliikenteen, merenkulun ja ilmailun henkilökuljetuksia; asemia, satamia ja terminaaleja; liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita; yleisiä kaupallisia pysäköintipalveluita sekä välityspalveluita."
+  :column-essential-info "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat, palvelun saatavuus, esteettömyys sekä varaus-, myynti-, lippu- ja maksutiedot. Kaikki tiedot eivät ole olennaisia jokaisen palvelun osalta.  Avattavat tiedot on määritetty valtioneuvoston asetuksessa."
+  :column-transport-operator "Tietojen avaamisvelvollisuus koskee kaikkia liikkumispalveluita tarjoavia yrityksiä. Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii rekisteröitymisen ja kirjautumisen palveluun. NAP-palvelu ohjeistaa käyttäjää kirjaamaan tiettyä palvelua koskevat olennaiset tiedot."
+  :column-developer "NAP on palveluiden kehittäjille tarkoitettu katalogi, josta kehittäjät löytävät tarvitsemiaan tietoja ja rajapintoja. Tietojen hyödyntäminen ei vaadi rekisteröitymistä. NAP mahdollistaa esimerkiksi nykyistä laajempien reittioppaiden ja liikennepalveluiden kehittämisen."
+
+  :front-page-content
   (:md "# **What is NAP?**\n"
        "The NAP transport service catalog is an open National Access Point (NAP) where all mobility service providers (transport operators) regardless of their mode of transport shall publish essential information on their services in the form of machine-readable open interfaces. NAP is an important part of an EU-wide goal to give rise to new and easily utilizable combined transport services and information services.\n"
        "The NAP catalog is meant for transport operators and service developers - not for end users or passengers.\n"
@@ -544,7 +563,7 @@ You can also draw the operating area or point to the map with drawing tools. You
        "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
        "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
        "To digitize and publish a transport service login is required.")
-  :hero-title "Transport service catalog."
+  :hero-title "Finnish national open transport service catalog."
 
   :new-user? "New user?"
   :table-header-service-name      "Service name"
@@ -853,6 +872,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :footer-ckan-software                       "CKAN-software"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Finap.fi-service, made by  [Liikennevirasto](https://www.liikennevirasto.fi/), is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
+  :footer-funded  (:md "Osarahoitettu Euroopan Union [Verkkojen Eurooppa -välineellä.](#)")
+  :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Page not found: "
   :time-unit                                  "Time unit"
   :time-units {:minutes  "Minutes"
