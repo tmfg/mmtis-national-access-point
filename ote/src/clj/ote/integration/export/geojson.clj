@@ -3,6 +3,7 @@
   transport services."
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
+            [ote.components.service :refer [define-service-component]]
             [compojure.core :refer [GET]]
             [specql.core :as specql]
             [ote.db.transport-operator :as t-operator]
@@ -14,26 +15,13 @@
             [ote.integration.export.transform :as transform]
 
             ;; Require time which extends PGInterval JSON generation
-            [ote.time]))
+            [ote.time]
+            [clojure.spec.alpha :as s]
+            [taoensso.timbre :as log]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
 (declare export-geojson)
-
-(defrecord GeoJSONExport []
-  component/Lifecycle
-  (start [{:keys [db http] :as this}]
-    (assoc this ::stop
-           (http/publish!
-            http {:authenticated? false}
-            (GET "/export/geojson/:transport-operator-id{[0-9]+}/:transport-service-id{[0-9]+}"
-                 [transport-operator-id transport-service-id]
-                 (export-geojson db
-                                 (Long/parseLong transport-operator-id)
-                                 (Long/parseLong transport-service-id))))))
-  (stop [{stop ::stop :as this}]
-    (stop)
-    (dissoc this ::stop)))
 
 (defn- json-response [data]
   {:status 200
@@ -108,17 +96,134 @@
       {:status 404
        :body "GeoJSON for service not found."})))
 
-(comment
-  {:ote.db.transport-service/type :passenger-transportation,
-   :ote.db.transport-service/transport-operator-id 36,
-   :ote.db.transport-service/passenger-transportation
-   {:ote.db.transport-service/accessibility-tool #{:wheelchair :walkingstick},
-    :ote.db.transport-service/additional-services #{:child-seat},
-    :ote.db.transport-service/price-classes
-    [{:ote.db.transport-service/currency "EUR", :ote.db.transport-service/name "perusmaksu", :ote.db.transport-service/price-per-unit 7M, :ote.db.transport-service/unit "matkan alkaessa"}
-     {:ote.db.transport-service/currency "EUR", :ote.db.transport-service/name "perustaksa", :ote.db.transport-service/price-per-unit 4.9M, :ote.db.transport-service/unit "km"}],
-    :ote.db.transport-service/payment-methods #{:debit-card :cash :credit-card}
-    :ote.db.transport-service/accessibility-description
-    [{:ote.db.transport-service/lang "FI", :ote.db.transport-service/text "Joissain autoissa voidaan kuljettaa pyörätuoli, varmista tilattaessa."}]
-    :ote.db.transport-service/luggage-restrictions
-    [{:ote.db.transport-service/lang "FI", :ote.db.transport-service/text "ei saa liikaa olla laukkuja"}]}})
+(defn- spec->type-keyword [spec]
+  (if (keyword? spec)
+    spec
+    (first (filter keyword? (flatten spec)))))
+
+(defn- keys-of [keys-spec]
+  (let [spec (into {} (map vec) (partition 2 (rest keys-spec)))]
+    (concat (:req spec) (:opt spec))))
+
+(defn spec->json-schema [spec]
+  (if (and (seq? spec)
+           (= 'coll-of (first spec)))
+    {:type "array"
+     :items (spec->json-schema (second spec))}
+    (let [kw (spec->type-keyword spec)
+          desc (some-> kw s/describe)]
+
+      (cond
+
+        ;; A nested object
+        (and (seq? desc)
+             (= 'keys (first desc)))
+        {:type "object"
+         :properties
+         (into {}
+               (for [k (keys-of desc)]
+                 [(name k) (spec->json-schema k)]))}
+
+        ;; An array of items
+        (and (seq? desc)
+             (= 'coll-of (first desc)))
+        {:type "array"
+         :items (spec->json-schema (second desc))}
+
+        ;; A set (enum values)
+        (set? desc)
+        {:enum (mapv name desc)}
+
+        ;; Nilable
+        (and (seq? desc)
+             (= 'nilable (first desc)))
+        (spec->json-schema (second desc))
+
+        ;; Some primitive data type
+        :default
+        (case kw
+          (:specql.data-types/varchar
+           :specql.data-types/bpchar
+           :specql.data-types/text
+           :specql.data-types/date)
+          {:type "string"}
+
+          :specql.data-types/bool
+          {:type "boolean"}
+
+          (:specql.data-types/numeric :specql.data-types/int4)
+          {:type "number"}
+
+          :specql.data-types/geometry
+          {:type "object"}
+
+          :specql.data-types/time
+          {:type "object"
+           :properties {"hours" {:type "number"}
+                        "minutes" {:type "number"}
+                        "seconds" {:type "number"}}}
+          :specql.data-types/interval
+          {:type "object"
+           :properties {"years" {:type "number"}
+                        "months" {:type "number"}
+                        "days" {:type "number"}
+                        "hours" {:type "number"}
+                        "minutes" {:type "number"}
+                        "seconds" {:type "number"}}}
+
+          (do
+            (log/warn "NO DEF FOR: " kw ", spec: " spec)
+            {}))))))
+
+(def transport-service-schema
+  {:type "object"
+   :properties
+   (into {}
+         (for [c transport-service-properties-columns]
+           (if (vector? c)
+             [(name (first c))
+              {:type "array"
+               :item {:type "object"
+                      :properties
+                      (into {}
+                            (for [c (second c)]
+                              [(name c) (spec->json-schema (s/describe c))]))}}]
+             [(name c) (spec->json-schema (s/describe c))])))})
+
+(def transport-operator-schema
+  {:type "object"
+   :properties
+   (into {}
+         (for [c transport-operator-properties-columns]
+           [(name c) (spec->json-schema (s/describe c))]))})
+
+
+
+(defn- export-geojson-schema []
+  {:$schema "http://json-schema.org/draft-07/schema#"
+   :type "object"
+   :properties
+   {"type" {:type "string"}
+    "features"
+    {:type "array"
+     :items {:type "object"
+             :properties
+             {"properties"
+              {:type "object"
+               :properties {"transport-operator" transport-operator-schema
+                            "transport-service" transport-service-schema}}
+              "geometry" {:type "object"}}}}}})
+
+
+(define-service-component GeoJSONExport {}
+
+  ^:unauthenticated
+  (GET "/export/geojson/:transport-operator-id{[0-9]+}/:transport-service-id{[0-9]+}"
+       [transport-operator-id transport-service-id]
+       (export-geojson db
+                       (Long/parseLong transport-operator-id)
+                       (Long/parseLong transport-service-id)))
+
+  ^:unauthenticated
+  (GET "/export/geojson/transport-service.schema.json" []
+       (http/json-response (#'export-geojson-schema))))
