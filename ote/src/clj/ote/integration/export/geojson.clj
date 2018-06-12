@@ -106,74 +106,79 @@
     (concat (:req spec) (:opt spec))))
 
 (defn spec->json-schema [spec]
-  (if (and (seq? spec)
-           (= 'coll-of (first spec)))
-    {:type "array"
-     :items (spec->json-schema (second spec))}
-    (let [kw (spec->type-keyword spec)
-          desc (some-> kw s/describe)]
+  (let [first-elt (when (seq? spec)
+                    (first spec))
+        kw (cond
+             (keyword? spec) spec
+             (= 'and first-elt) (second spec))]
 
-      (cond
+    (cond
 
-        ;; A nested object
-        (and (seq? desc)
-             (= 'keys (first desc)))
+      (= ::s/unknown spec)
+      {}
+
+      ;; Array of things
+      (= first-elt 'coll-of)
+      {:type "array"
+       :items (spec->json-schema (second spec))}
+
+      ;; Nilable value (nil or matches spec)
+      (= first-elt 'nilable)
+      {:anyOf [{:type "null"}
+               (spec->json-schema (second spec))]}
+
+
+       ;; A nested object
+      (= first-elt 'keys)
+      {:type "object"
+       :properties
+       (into {}
+             (for [k (keys-of spec)]
+               [(name k) (spec->json-schema k)]))}
+
+      ;; Set of allowed values
+      (set? spec)
+      {:enum (mapv name spec)}
+
+      ;; Some primitive data type
+      kw
+      (case kw
+        (:specql.data-types/varchar
+         :specql.data-types/bpchar
+         :specql.data-types/text
+         :specql.data-types/date)
+        {:type "string"}
+
+        :specql.data-types/bool
+        {:type "boolean"}
+
+        (:specql.data-types/numeric :specql.data-types/int4)
+        {:type "number"}
+
+        :specql.data-types/geometry
+        {:type "object"}
+
+        :specql.data-types/time
         {:type "object"
-         :properties
-         (into {}
-               (for [k (keys-of desc)]
-                 [(name k) (spec->json-schema k)]))}
+         :properties {"hours" {:type "number"}
+                      "minutes" {:type "number"}
+                      "seconds" {:type "number"}}}
+        :specql.data-types/interval
+        {:type "object"
+         :properties {"years" {:type "number"}
+                      "months" {:type "number"}
+                      "days" {:type "number"}
+                      "hours" {:type "number"}
+                      "minutes" {:type "number"}
+                      "seconds" {:type "number"}}}
 
-        ;; An array of items
-        (and (seq? desc)
-             (= 'coll-of (first desc)))
-        {:type "array"
-         :items (spec->json-schema (second desc))}
+        ;; Default: Unrecognized, describe it and recurse
+        (spec->json-schema (s/describe spec)))
 
-        ;; A set (enum values)
-        (set? desc)
-        {:enum (mapv name desc)}
-
-        ;; Nilable
-        (and (seq? desc)
-             (= 'nilable (first desc)))
-        (spec->json-schema (second desc))
-
-        ;; Some primitive data type
-        :default
-        (case kw
-          (:specql.data-types/varchar
-           :specql.data-types/bpchar
-           :specql.data-types/text
-           :specql.data-types/date)
-          {:type "string"}
-
-          :specql.data-types/bool
-          {:type "boolean"}
-
-          (:specql.data-types/numeric :specql.data-types/int4)
-          {:type "number"}
-
-          :specql.data-types/geometry
-          {:type "object"}
-
-          :specql.data-types/time
-          {:type "object"
-           :properties {"hours" {:type "number"}
-                        "minutes" {:type "number"}
-                        "seconds" {:type "number"}}}
-          :specql.data-types/interval
-          {:type "object"
-           :properties {"years" {:type "number"}
-                        "months" {:type "number"}
-                        "days" {:type "number"}
-                        "hours" {:type "number"}
-                        "minutes" {:type "number"}
-                        "seconds" {:type "number"}}}
-
-          (do
-            (log/warn "NO DEF FOR: " kw ", spec: " spec)
-            {}))))))
+      :default
+      (do
+        (println "I don't know what this spec is: " (pr-str spec))
+        {}))))
 
 (def transport-service-schema
   {:type "object"
