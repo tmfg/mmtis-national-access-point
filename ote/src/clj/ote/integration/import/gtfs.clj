@@ -147,6 +147,11 @@
       (log/info "Generating date hashes for package " package-id)
       (generate-date-hashes! db {:package-id package-id})
 
+      ;; IF handling was ok, remove all errors from the interface table
+      (specql/update! db ::t-service/external-interface-description
+                      {::t-service/gtfs-db-error nil ::t-service/gtfs-import-error nil}
+                      {::t-service/id interface-id})
+
       (catch Exception e
         (.printStackTrace e)
         (specql/update! db ::t-service/external-interface-description
