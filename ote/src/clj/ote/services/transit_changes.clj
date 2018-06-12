@@ -41,12 +41,11 @@
                   (assoc row :next-different-week
                          (describe-week-difference
                           (first (next-different-week-for-operator db
-                                                                   {:date now
-                                                                    :operator-id op-id}))))))
+                                                                   {:operator-id op-id}))))))
            (filter (fn [{diff :next-different-week}]
                      (not= (:current-week-traffic diff)
                            (:different-week-traffic diff)))))
-          (list-current-operators db {:date now}))))
+          (list-current-operators db))))
 
 (define-service-component TransitChanges {}
 
