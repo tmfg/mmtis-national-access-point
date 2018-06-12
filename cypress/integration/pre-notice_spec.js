@@ -103,7 +103,7 @@ describe('Pre notice tests', () => {
 
 });
 
-describe('Autority pre notice tests', () => {
+describe('Authority pre notice tests', () => {
     before(() => {
         cy.login();
     });

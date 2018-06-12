@@ -677,6 +677,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
   :link-to-help-pdf   "Merenkulun reittityökalun käyttöohje"
+  :create-new-route-disabled "Luo palveluntuottaja \"Omat palvelutiedot\"-sivulta ensin"
   }
 
  :route-wizard-page
@@ -817,7 +818,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
-  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :common-texts
  {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
