@@ -50,7 +50,7 @@
      [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} (escape-html route-description)]]
      [:td (str/join ",<br />" (PgArray->seqable regions))]
      [:td (escape-html operator-name)]
-     [:td (str/join ",<br />" (mapv (tr [:enums ::transit/pre-notice-type (keyword %)])
+     [:td (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
                                (PgArray->seqable pre-notice-type)))]
      [:td effective-date-str]
      [:td (escape-html description)]]))
