@@ -813,7 +813,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
-  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}}
+  :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :common-texts
  {:front-page-help-text                       "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.

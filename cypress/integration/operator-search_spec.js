@@ -1,5 +1,7 @@
 // Basic operator page search tests
 
+import { genNaughtyString } from "../support/generators";
+
 describe('Operator search page basic tests', function () {
 
     it('should render operator page', () => {
@@ -33,12 +35,12 @@ describe('Operator search page basic tests', function () {
 
     it('search and dont find operator', () => {
         cy.server();
-        cy.route('POST','/operators/list').as('findOperators')
+        cy.route('POST','/operators/list').as('findOperators');
 
         // Clear old search terms and give new one
         cy.get('input[id*="-Haenimelltainimenosalla-"]').as('operatorName');
         cy.get('@operatorName').clear();
-        cy.get('@operatorName').type("Eijoleeee");
+        cy.get('@operatorName').typeRaw(genNaughtyString(20));
         cy.get('@operatorName').click();
         cy.wait('@findOperators');
 

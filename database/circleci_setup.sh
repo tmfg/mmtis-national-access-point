@@ -16,6 +16,12 @@ if [ -f finnish_municipalities.csv ]; then
     $P napote -c "\COPY finnish_municipalities FROM finnish_municipalities.csv CSV HEADER;" || true
 fi
 
+if [ -f maakunnat.csv ]; then
+    echo "Insert Finnish regions"
+    $P napote -c "TRUNCATE finnish_regions;" || true
+    $P napote -c "\COPY finnish_regions FROM maakunnat.csv CSV HEADER;" || true
+fi
+
 
 echo "Clean up and free connections"
 $P -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'napote' AND pid <> pg_backend_pid();"
