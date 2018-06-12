@@ -233,83 +233,73 @@
                        :margin-top      "-20px"
                        :background      "url(/img/hero.png)"
                        :background-size "cover"}}
-    [:div.container {:style {:padding-top "20px"}}
+    [:div.container {:style {:padding-top "20px" }}
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
      [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
-      [:div.row {:style {:padding-top "40px"}}
-       [ui/raised-button {:on-click   #(do
-                                         (.preventDefault %)
-                                         (e! (fp/->ChangePage :services nil)))
-                          :primary    true
-                          :label      (tr [:buttons :transport-service-catalog])
-                          :icon       (ic/device-dvr {:style {:height 30 :width 30 :padding-top 7}})
-                          :icon-style {:width 40 :height 30}}]]]]]
-   (when test-env?
+      [:div.row {:style {:padding-top "60px"}}
+       [:a {:on-click   #(do
+                            (.preventDefault %)
+                            (e! (fp/->ChangePage :services nil)))}
+       [:button (stylefy/use-style style-front-page/front-page-button)
+        [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+         "Liikkumispalvelukatalogi"]]]]]]
+    (when test-env?
      [test-env-warning])
    [:div.container
-    [:div.row {:style {:margin-top "20px"}}
-     [:div.col-xs-3.col-sm-3.col-md-3
-      [ic/action-all-out {:style {:width 200 :height 200 :color "#969696"}}]]
-     [:div.col-xs-9.col-sm-9.col-md-9 {:style {:padding-left "60px"}}
-      [:h2 {:style {:font-size "2.25em"}} (tr [:front-page :title-NAP])]
+    [:div.row (stylefy/use-style style-front-page/row-media)
+     [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
+      [ic/action-all-out {:style  style-front-page/large-icon}]]
+     [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
+      [:h2
+       (stylefy/use-style style-front-page/h2)
+       (tr [:front-page :title-NAP])]
       [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
        (tr [:front-page :column-NAP])]]]
-    [:div.row
-     [:div.col-xs-9.col-sm-9.col-md-9 {:style {:padding-right "60px"}}
-      [:h2 {:style {:font-size "2.25em"}} (tr [:front-page :title-transport-services])]
+    [:div.row (stylefy/use-style style-front-page/row-media)
+     [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
+      [:h2
+       (stylefy/use-style style-front-page/h2)
+       (tr [:front-page :title-transport-services])]
       [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
        (tr [:front-page :column-transport-services])]]
-     [:div.col-xs-3.col-sm-3.col-md-3
+     [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
       [ic/places-airport-shuttle {:style {:width 200 :height 200 :color "#969696"}}]]
      ]
-    [:div.row
-     [:div.col-xs-3.col-sm-3.col-md-3
+    [:div.row (stylefy/use-style style-front-page/row-media)
+     [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
       [ic/content-flag {:style {:width 200 :height 200 :color "#969696"}}]]
-     [:div.col-xs-9.col-sm-9.col-md-9 {:style {:padding-left "60px"}}
-      [:h2 {:style {:font-size "2.25em"}} (tr [:front-page :title-essential-info])]
+     [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
+      [:h2
+       (stylefy/use-style style-front-page/h2)
+       (tr [:front-page :title-essential-info])]
       [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
        (tr [:front-page :column-essential-info])]]]
     ]
-   [:div {:style {:padding-top      "80px"
-                  :padding-bottom   "100px"
-                  :background-image "linear-gradient(45deg, #ddd, #f8f8f8 46%, #f1f1f1)"
-                  :box-shadow       "4px 0 50px 0 rgba(0, 0, 0, .2), 4px 0 20px 0 #fff"}}
+   [:div (stylefy/use-style style-front-page/lower-section)
     [:div.container
      [:div.col-md-6
-      [:div {:style {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"}}
-       [ic/maps-train {:style {:width 120 :height 120 :color "#969696"}}]
+      [:div (stylefy/use-style style-front-page/lower-section-data-container)
+       [ic/maps-train {:style  style-front-page/lower-section-icon}]
        [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-transport-operator])]
-       [:p {:style {:text-align "center" :font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-transport-operator])]
        [:div {:style {:padding-top "20px"}}
-        [ui/raised-button {:on-click   #(do
-                                          (.preventDefault %)
-                                          (e! (fp/->ChangePage :services nil)))
-                           :primary    true
-                           :label      (tr [:buttons :register-to-service])
-                           :icon       (ic/device-dvr {:style {:height 30 :width 30 :padding-top 7}})
-                           :icon-style {:width 40 :height 30}}]]]]
-     [:div.col-md-6
-      [:div {:style {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"}}
-       [ic/device-developer-mode {:style {:width 120 :height 120 :color "#969696"}}]
-       [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-transport-operator])]
-       [:p {:style {:text-align "center" :font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
-        (tr [:front-page :column-transport-operator])]
+        [:a {:on-click   #(do
+                            (.preventDefault %)
+                            (e! (fp/->ChangePage :services nil)))}
+        [:button (stylefy/use-style style-front-page/front-page-button)
+         [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+         (tr [:buttons :register-to-service])]]]]]
+     [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
+      [:div (stylefy/use-style style-front-page/lower-section-data-container)
+       [ic/device-developer-mode {:style  style-front-page/lower-section-icon}]
+       [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-developer])]
+       [:p (stylefy/use-style style-front-page/lower-section-text)
+        (tr [:front-page :column-developer])]
        [:div {:style {:padding-top "20px"}}
-        [ui/raised-button {:on-click   #(do
-                                          (.preventDefault %)
-                                          (e! (fp/->ChangePage :services nil)))
-                           :primary    true
-                           :label      (tr [:buttons :check-out-the-service])
-                           :icon       (ic/device-dvr {:style {:height 30 :width 30 :padding-top 7}})
-                           :icon-style {:width 40 :height 30}}]]]]]]
-   (when-not user
-     [:div.front-page-login {:style {:text-align "center"}}
-      [ui/raised-button {:on-click #(e! (login/->ShowLoginDialog))
-                         :primary  true
-                         :label    (tr [:common-texts :navigation-login])}]
-      [:div {:style {:padding-top "1em"}}
-       (tr [:front-page :new-user?])]
-      [ui/flat-button {:primary  true
-                       :label    (tr [:common-texts :navigation-register])
-                       :on-click #(e! (fp/->ToggleRegistrationDialog))}]])])
+        [:a {:on-click   #(do
+                            (.preventDefault %)
+                            (e! (fp/->ChangePage :services nil)))}
+         [:button (stylefy/use-style style-front-page/front-page-button)
+          [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+          (tr [:buttons :check-out-the-service])]]]]]]]])

@@ -6,9 +6,58 @@
 (def width-xs 767)
 (def width-sm 991)
 (def width-md 1199)
-;(def width-l 1199)
 
+(def h2 {:font-size "2.25em"
+         ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.5em"}}})
 
+(def front-page-button {:display "flex"
+                        :padding "20px 20px 20px 10px"
+                        :-webkit-box-pack "center"
+                        :-webkit-justify-content "center"
+                        :-ms-flex-pack "center"
+                        :justify-content "center"
+                        :background-image "linear-gradient(90deg, #06c, #0029b8)"
+                        :box-shadow "3px 3px 8px 0 rgba(0, 0, 0, .2)"
+                        :-webkit-backface-visibility "visible"
+                        :backface-visibility "visible"
+                        :-webkit-transform-origin "50% 50% 0px"
+                        :-ms-transform-origin "50% 50% 0px"
+                        :transform-origin "50% 50% 0px"
+                        :-webkit-transition "all 300ms ease"
+                        :transition "all 300ms ease"
+                        :font-family "Roboto, sans-serif"
+                        :font-weight "400"
+                        :font-size "1.1rem"
+                        :text-align "center"
+                        :color "#fff"
+                        :border 0
+                        :cursor "pointer"
+                        ::stylefy/mode {:hover {:background-image "-webkit-linear-gradient(45deg, #06c, #0029b8)"
+                                         ;:background-image "linear-gradient(45deg, #06c, #0029b8)"
+                                         :box-shadow "1px 1px 4px 0 rgba(0, 0, 0, .2)"
+                                         :-webkit-transform "scale(0.98)"
+                                         :-ms-transform "scale(0.98)"
+                                         :transform "scale(0.98)"}}})
+
+(def row-media {:margin-top "20px"
+                :margin-bottom "20px"
+                ::stylefy/media {{:max-width (str width-xs "px")}
+                                 {:display "flex" :flex-direction "column"}}})
+
+(def large-text-container {:padding-left "60px"
+                           ::stylefy/media {{:max-width (str width-xs "px")} {:padding-left "10px"
+                                                                              :order 2}}})
+
+(def large-icon-container {:display "-webkit-flex"
+                           :flex-direction "column"
+                           :align-items "center"
+                           ::stylefy/media {{:max-width (str width-xs "px")} {:order 1}}})
+(def large-icon  {:width 200
+                  :height 200
+                  :color "#969696"
+                  :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
+                  ::stylefy/media {{:max-width (str width-xs "px")} {:width 150
+                                                                     :height 150}}})
 
 (def front-page-h1  {:position "static"
                       :display "flex"
@@ -28,7 +77,8 @@
                       :font-size "6em"
                       :font-weight "200"
                       :text-shadow "0 2px 10px rgba(0, 0, 0, .5)"
-                      ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "3em"}}})
+                      ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "3em"
+                                                                         :font-weight "300"}}})
 
 (def front-page-hero-text {:display "flex"
                            :margin-top "60px"
@@ -52,4 +102,43 @@
                            :font-weight "300"
                            :text-align "center"
                            :text-shadow "0 1px 5px rgba(0, 0, 0, .5)"
-                           ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.6em" }}})
+                           ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.6em"
+                                                                              :font-weight "400"}}})
+
+(def third-column-text {:margin-bottom 40
+                        :color "#c8c8c8"
+                        :font-size "0.875em"
+                        :font-weight 300
+                        :-webkit-align-items "flex-start"})
+
+(def lower-section {:padding-top      "80px"
+                    :padding-bottom   "100px"
+                    :background-image "linear-gradient(45deg, #ddd, #f8f8f8 46%, #f1f1f1)"
+                    :box-shadow       "4px 0 50px 0 rgba(0, 0, 0, .2), 4px 0 20px 0 #fff"})
+
+(def media-transport-service {::stylefy/media {
+                                              {:max-width (str width-xs "px")} {:padding-top "60px"}}})
+
+(def lower-section-data-container {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"})
+
+(def lower-section-icon  {:width 120
+                          :height 120
+                          :color "#969696"
+                          :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
+                          ::stylefy/media {{:max-width (str width-xs "px")} {:width 80
+                                                                             :height 80}}})
+
+(def lower-section-text {:text-align "center" :font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"})
+
+(def footer-logo-ul {
+                     ::stylefy/media {{:max-width (str width-xs "px")} {:display "flex"
+                                                                        :align-items "center"
+                                                                        :width "90px" }}})
+
+(def footer-logo {:width "160px"
+                  ::stylefy/media {{:max-width (str width-xs "px")} {:width "90px" }}})
+
+(def footer-small-icon {:position "relative" :height 22 :width 30 :top 5 :color "#fff" :padding-right "10px"})
+
+(def footer-3-container {:padding-top "60px"
+                         ::stylefy/media {{:max-width (str width-xs "px")} {:padding-top "40px" }}})
