@@ -20,21 +20,22 @@ jobs:
       OTE_DB_USERNAME: "napote"
       OTE_DB_PASSWORD: ""
       OTE_AUTH_SHARED_SECRET: "test"
+      OTE_FLAGS: "#{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import}"
 
     steps:
       - checkout
 
       - restore_cache:
           keys:
-          - v2-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
+          - v3-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           # fallback to using the latest cache if no exact match is found
-          - v2-dependencies-{{ .Branch }}
-          - v2-dependencies-
+          - v3-dependencies-{{ .Branch }}
+          - v3-dependencies-
 
       - run: cd ote && lein deps
 
       - save_cache:
-          key: v2-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
+          key: v3-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           paths:
             - ~/.m2
 
@@ -98,19 +99,20 @@ jobs:
           at: /tmp/ote
 
       # setup database
-      - run: curl https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish_municipalities.csv -o database/finnish_municipalities.csv
+      - run: aws s3 cp s3://ote-assets/places/finnish_municipalities.csv database/finnish_municipalities.csv
+      - run: aws s3 cp s3://ote-assets/places/maakunnat.csv database/maakunnat.csv
       - run: cd database && sh circleci_setup.sh
 
       - restore_cache:
           keys:
-            - v2-npm-deps-
+            - v3-npm-deps-
 
       - run:
           name: Install Cypress
-          command: npm i cypress@1.x && $(npm bin)/cypress verify
+          command: npm i cypress@3.x && $(npm bin)/cypress verify
 
       - save_cache:
-          key: v2-npm-deps-
+          key: v3-npm-deps-
           paths:
             - node_modules
 
@@ -119,10 +121,17 @@ jobs:
           command: cd /tmp/ote && java -jar ote.jar
           background: true
 
+      - run:
+          name: Wait for OTE app to respond
+          command: |
+            while ! nc -z localhost 3000; do
+              sleep 0.5;
+            done;
+
       # Note: When running with chrome, it seems we cannot record a video. Only Electron browser can record a video.
       - run:
-          name: Run smoke tests for pull request
-          command: $(npm bin)/cypress run --browser chrome --record --spec cypress/integration/smoke/ote_spec.js
+          name: Run all tests for a pull request
+          command: $(npm bin)/cypress run --browser chrome --record
 
 workflows:
   version: 2

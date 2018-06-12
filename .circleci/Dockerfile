@@ -2,7 +2,7 @@ FROM circleci/clojure:lein-2.7.1
 
 USER root
 
-ENV NODE_VERSION 6
+ENV NODE_VERSION 8
 ENV TERM xterm
 
 # Allow installing when the main user is root

@@ -28,7 +28,7 @@ describe('OTE login dialog', () => {
     beforeEach(() => {
         cy.server();
         cy.route('POST', '/login').as('login');
-        cy.visit('/#/services')
+        cy.visit('/')
     });
 
     const login = (username, password, click) => {

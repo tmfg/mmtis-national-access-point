@@ -1,6 +1,7 @@
 // TODO: Test own services page (Omat palvelutiedot) features
 
-import {randomName} from '../support/util';
+import { randomName } from '../support/util';
+import { genNaughtyString } from "../support/generators";
 
 describe('Own services basic tests', function () {
     // Login in only once before tests run
@@ -69,10 +70,10 @@ describe('Add a new service', function () {
 
             // Fill mandatory fields
             cy.get('input[id*="name--Palvelunnimi"]').type(this.serviceName);
-            cy.get('input[name="street"]').type(service.contact.street);
+            cy.get('input[name="street"]').typeRaw(genNaughtyString(20));
             cy.get('input[name="postal_code"]').type(service.contact.postal_code);
-            cy.get('input[name="post_office"]').type(service.contact.post_office);
-	    cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
+            cy.get('input[name="post_office"]').typeRaw(genNaughtyString(20));
+            cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
 
             cy.wrap(service.areas).each(area => {
                 cy.get('@areaInput').type(area);
@@ -90,13 +91,38 @@ describe('Add a new service', function () {
                     cy.get('input[type="checkbox"]').check();
                 });
 
-	    cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
+
+            // ## Add some data for non-mandatory fields
+
+            cy.get('#radio-company-csv-url').click();
+            cy.get('input[id*="companies-csv-url-"').typeRaw(genNaughtyString(100));
+            cy.get('textarea[id*="luggage-restrictions--Matkatavaroitakoskevatrajoitukset-"')
+                .typeRaw(genNaughtyString(100));
+
+            // Get parent el form-group-container that contains the following text
+            cy.contains('.form-group-container', 'Reaaliaikapalvelun verkko-osoitetiedot')
+                .within(() => {
+                    cy.get('input[id*="url--Palvelunverkko-osoite"]').typeRaw(genNaughtyString(100));
+
+                    cy.get('textarea[id*="description--Palvelunkuvaus"]').typeRaw(genNaughtyString(100));
+                });
+
+            // Get parent el form-group-container that contains the following text
+            cy.contains('.form-group-container', 'Varauspalvelun osoitetiedot')
+                .within($el => {
+                    cy.get('input[id*="url--Palvelunverkko-osoite"]').typeRaw(genNaughtyString(100));
+
+                    cy.get('textarea[id*="description--Palvelunkuvaus"]').typeRaw(genNaughtyString(100));
+                });
+
+            cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
+
             cy.contains('Tallenna ja julkaise').click();
         });
 
         it('should delete the test service', function () {
             cy.server();
-            cy.route('POST','/transport-service/delete').as('deleteService');
+            cy.route('POST', '/transport-service/delete').as('deleteService');
 
             cy.visit('/#/own-services');
 
