@@ -678,6 +678,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
   :link-to-help-pdf   "Användarinstruktioner för kartverktyget för sjötrafik"
+  :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
   }
 
  :route-wizard-page
