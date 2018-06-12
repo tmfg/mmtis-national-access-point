@@ -12,7 +12,7 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [ote.time :as time]
-            [ote.tasks.util :refer [timezone]])
+            [ote.tasks.util :refer [daily-at timezone]])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -57,19 +57,23 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-           ::stop-task (if (feature/feature-enabled? config :gtfs-import)
-                         (chime-at
-                          (filter night-time?
-                                  (drop 1 (periodic-seq (t/now) (t/minutes 1))))
-                          (fn [_]
-                            (#'update-one-gtfs! config db)))
-                         (do
-                           (log/debug "GTFS IMPORT IS NOT ENABLED!")
-                           nil))))
-  (stop [{stop-task ::stop-task :as this}]
-    (when stop-task
+           ::stop-tasks
+           (if (feature/feature-enabled? config :gtfs-import)
+             [(chime-at
+               (filter night-time?
+                       (drop 1 (periodic-seq (t/now) (t/minutes 1))))
+               (fn [_]
+                 (#'update-one-gtfs! config db)))
+              (chime-at (daily-at 5 15)
+                        (fn [_]
+                          (refresh-nightly-transit-changes! db)))]
+             (do
+               (log/debug "GTFS IMPORT IS NOT ENABLED!")
+               nil))))
+  (stop [{stop-tasks ::stop-tasks :as this}]
+    (for [stop-task stop-tasks]
       (stop-task))
-    (dissoc this ::stop-task)))
+    (dissoc this ::stop-tasks)))
 
 (defn gtfs-tasks
   ([config] (gtfs-tasks daily-update-time config))
