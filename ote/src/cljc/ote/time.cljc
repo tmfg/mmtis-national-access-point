@@ -352,6 +352,7 @@
            (date-range (t/plus start (t/days 1)) end)))))
 
 (def week-days [:monday :tuesday :wednesday :thursday :friday :saturday :sunday])
+(def week-day-order {:monday 0 :tuesday 1 :wednesday 2 :thursday 3 :friday 4 :saturday 5 :sunday 6})
 
 (defn day-of-week [dt]
   (case (t/day-of-week dt)

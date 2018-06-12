@@ -22,14 +22,15 @@
          :saturday :SAT
          :sunday :SUN)]))
 
-(defn- change-description [{next-different-week :next-different-week}]
+
+(defn- change-description [{:keys [next-different-week week-start-date diff-week-start-date diff-days]}]
   (when next-different-week
     (let [{:keys [current-week different-week current-week-traffic
                   different-week-traffic change-date]} next-different-week
-          change-date-str (time/format-date-opt change-date)
-          current-date-str (time/format-date-opt (t/minus (t/now) (t/days (dec (t/day-of-week (t/now))))))]
+          current-week-start (time/format-date-opt week-start-date)
+          diff-week-start (time/format-date-opt diff-week-start-date)]
       [:div
-       [:span (str change-date-str " alkava viikko (" different-week ") eroaa " current-date-str " alkaneesta viikosta ("
+       [:span (str diff-week-start " alkava viikko (" different-week ") eroaa " current-week-start " alkaneesta viikosta ("
                    current-week "). \n")]
        [:span (str
                 (cond
@@ -44,12 +45,7 @@
                   :default
                   (str "Eri liikennöinti päivinä "
                        (str/join ", "
-                                 (remove nil?
-                                         (keep (fn [day]
-                                                 (when (not= ((:day->hash current-week-traffic) day)
-                                                             ((:day->hash different-week-traffic) day))
-                                                   (week-day-short day)))
-                                               time/week-days))) ".")))]])))
+                                 (mapv week-day-short diff-days)) ".")))]])))
 
 (defn transit-changes [e! {:keys [loading? changes] :as transit-changes}]
   [:div.transit-changes
@@ -58,7 +54,11 @@
                                     "Ladataan muutoksia, odota hetki..."
                                     "Ei löydettyjä muutoksia")
                  :name->label str
-                 :on-select #(e! (tc/->ShowChangesForOperator (:transport-operator-id (first %))))}
+                 :on-select (fn [evt]
+                              (let [change (first evt)
+                                    {date1 :date1 date2 :date2} (:first-diff-dates change)]
+                                (e! (tc/->ShowChangesForOperator (:transport-operator-id change)
+                                                                 (time/format-date-opt date1) (time/format-date-opt date2)))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
      {:name "Palvelu" :read :transport-service-name :width "20%"}
      {:name "Aikaa muutokseen" :width "10%"
