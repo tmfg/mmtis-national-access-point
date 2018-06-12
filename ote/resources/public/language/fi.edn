@@ -677,6 +677,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
   :link-to-help-pdf   "Merenkulun reittityökalun käyttöohje"
+  :create-new-route-disabled "Luo palveluntuottaja \"Omat palvelutiedot\"-sivulta ensin"
   }
 
  :route-wizard-page

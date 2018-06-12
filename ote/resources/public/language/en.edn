@@ -671,6 +671,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-list-gtfs-zip-file "GTFS.Zip file"
   :route-list-copy-link "Copy address: "
   :link-to-help-pdf   "Sea traffic route and timetable editor user guide"
+  :create-new-route-disabled "Create new transport operator in \"Own services\" page first"
   }
 
  :route-wizard-page
