@@ -29,10 +29,10 @@ i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "imp
   AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
   AND (:import-error::BOOLEAN IS NULL OR i."gtfs-import-error" IS NOT NULL)
   AND (:db-error::BOOLEAN IS NULL OR i."gtfs-db-error" IS NOT NULL)
-  AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(i.format))
+  AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(i.format::text)::text[]))
    AND ts."published?" = TRUE
    AND ts."transport-operator-id" = op.id
    AND i."transport-service-id" = ts.id
-   AND ('GTFS' = ANY(i.format) OR 'Kalkati.net' = ANY(i.format))
+   AND ('gtfs' = ANY(lower(i.format::text)::text[]) OR 'kalkati.net' = ANY(lower(i.format::text)::text[]))
  GROUP BY ts.id, op.id, i.id
  ORDER BY i.format ASC, i."gtfs-import-error" DESC;

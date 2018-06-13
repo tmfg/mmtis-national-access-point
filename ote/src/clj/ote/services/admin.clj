@@ -16,7 +16,8 @@
             [ote.services.transport :as transport]
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
-            [ote.util.db :as db-util]))
+            [ote.util.db :as db-util]
+            [clojure.string :as str]))
 
 (defqueries "ote/services/admin.sql")
 
@@ -113,11 +114,11 @@
         import-error (:import-error query)
         db-error (:db-error query)
         interface-format (:interface-format query)]
-  (interfaces-array->vec (search-interfaces db {:service-name (when service-name (str "%" service-name "%"))
-                                                :operator-name (when operator-name (str "%" operator-name "%"))
-                                                :import-error (when import-error true)
-                                                :db-error (when db-error true)
-                                                :interface-format (when (and interface-format (not= :ALL interface-format)) (name interface-format))}))))
+  (interfaces-array->vec (search-interfaces db {:service-name     (when service-name (str "%" service-name "%"))
+                                                :operator-name    (when operator-name (str "%" operator-name "%"))
+                                                :import-error     (when import-error true)
+                                                :db-error         (when db-error true)
+                                                :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}))))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
