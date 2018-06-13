@@ -19,11 +19,19 @@
 (defrecord UpdateServiceOperatorFilter [operator-filter])
 (defrecord UpdateOperatorFilter [operator-filter])
 (defrecord UpdatePublishedFilter [published-filter])
+
+;; User tab
 (defrecord SearchUsers [])
+(defrecord SearchUsersResponse [response])
+(defrecord OpenDeleteUserModal [id])
+(defrecord CancelDeleteUser [id])
+(defrecord ConfirmDeleteUser [id])
+(defrecord ConfirmDeleteUserResponse [response])
+(defrecord EnsureUserId [id ensured-id])
+
 (defrecord SearchServices [])
 (defrecord SearchServicesByOperator [])
 (defrecord SearchOperators [])
-(defrecord SearchUsersResponse [response])
 (defrecord SearchServicesResponse [response])
 (defrecord SearchOperatorResponse [response])
 (defrecord GetBusinessIdReport [])
@@ -71,11 +79,24 @@
                        %)
                     operators))))
 
+(defn- update-user-by-id [app id update-fn & args]
+  (update-in app [:admin :user-listing :results]
+             (fn [operators]
+               (map #(if (= (:id %) id)
+                       (apply update-fn % args)
+                       %)
+                    operators))))
+
 
 (defn- get-search-result-operator-by-id [app id]
   (some
     #(when (= (::t-operator/id %) id) %)
     (get-in app [:admin :operator-list :results])))
+
+(defn- get-user-by-id [app id]
+  (some
+    #(when (= (:id %) id) %)
+    (get-in app [:admin :user-listing :results])))
 
 (extend-protocol tuck/Event
 
@@ -109,11 +130,44 @@
                 {:on-success (tuck/send-async! ->SearchUsersResponse)})
     (assoc-in app [:admin :user-listing :loading?] true))
 
+  ConfirmDeleteUser
+  (process-event [{id :id} app]
+    (if (= id (:ensured-id (get-user-by-id app id)))
+      (comm/post! "admin/delete-user" {:id id}
+                  {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)})
+      (.log js/console "Could not delete user! Check given id."))
+    app)
+
+  ConfirmDeleteUserResponse
+  (process-event [{response :response} app]
+    (let [filtered-map (filter #(not= (:id %) response) (get-in app [:admin :user-listing :results]))]
+      (-> app
+          (assoc-in [:admin :user-listing :results] filtered-map)
+          (assoc :flash-message "Käyttäjä poistettu onnistuneesti."))))
+
   SearchUsersResponse
   (process-event [{response :response} app]
     (update-in app [:admin :user-listing] assoc
                :loading? false
                :results response))
+
+  OpenDeleteUserModal
+  (process-event [{id :id} app]
+    (update-user-by-id
+      app id
+      assoc :show-delete-modal? true))
+
+  CancelDeleteUser
+  (process-event [{id :id} app]
+    (update-user-by-id
+      app id
+      dissoc :show-delete-modal?))
+
+  EnsureUserId
+  (process-event [{id :id ensured-id :ensured-id} app]
+    (update-user-by-id
+      app id
+      assoc :ensured-id ensured-id))
 
   GetBusinessIdReport
   (process-event [_ app]
