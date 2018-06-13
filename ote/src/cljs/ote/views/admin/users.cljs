@@ -18,7 +18,6 @@
 
 (defn- delete-user-action [e! {:keys [id show-delete-modal?] :as user}]
   [:span
-   (.log js/console " delete-user-action user:  " (pr-str user))
    [ui/icon-button {:id       (str "delete-user-" id)
                     :href     "#"
                     :on-click #(do
@@ -50,11 +49,11 @@
       Käyttäjän lisäämät palvelut ja palveluntuottajat jätetään palveluun. Tämä poistaa vain käyttäjän."]
        [:p (str "Käyttäjän id: " id)]
 
-       [form-fields/field {:name :ensured-id
-                           :type :string
+       [form-fields/field {:name        :ensured-id
+                           :type        :string
                            :full-width? true
-                           :label "Anna varmistukseksi käyttäjän id"
-                           :update! #(e! (admin-controller/->EnsureUserId id %))}
+                           :label       "Anna varmistukseksi käyttäjän id"
+                           :update!     #(e! (admin-controller/->EnsureUserId id %))}
         (:ensured-id user)]]])])
 
 
@@ -66,42 +65,42 @@
    (if (seq groups)
      [:div {:style {:padding "0 0 15px 10px"}}
 
-      [ui/table {:selectable false
+      [ui/table {:selectable   false
                  :fixed-header true
-                 :body-style {:overflow-y "auto"
-                              :max-height "100px"}}
+                 :body-style   {:overflow-y "auto"
+                                :max-height "100px"}}
        [ui/table-header {:adjust-for-checkbox false
-                         :display-select-all false}
+                         :display-select-all  false}
         [ui/table-row {:style groups-header-style}
          [ui/table-header-column {:style groups-header-style} "Nimi"]
          [ui/table-header-column {:style groups-header-style} "ID"]]]
        [ui/table-body {:display-row-checkbox false
-                       :show-row-hover true}
+                       :show-row-hover       true}
 
         (doall
           (for [{:keys [title name]} groups]
             ^{:key (str "group-" name)}
             [ui/table-row {:selectable false
-                           :style groups-row-style}
+                           :style      groups-row-style}
              [ui/table-row-column {:style groups-row-style} title]
              [ui/table-row-column {:style groups-row-style} name]]))]]]
      [:div {:style {:padding-left "10px"
-                    :line-height "48px"}}
+                    :line-height  "48px"}}
       "Ei palveluntuottajia."])])
 
 (defn user-listing [e! app]
   (let [{:keys [loading? results user-filter]} (get-in app [:admin :user-listing])]
     [:div
      [:div {:style {:margin-bottom "25px"}}
-      [form-fields/field {:style {:margin-right "10px"}
-                          :type :string :label "Nimen tai sähköpostiosoitteen osa"
+      [form-fields/field {:style   {:margin-right "10px"}
+                          :type    :string :label "Nimen tai sähköpostiosoitteen osa"
                           :update! #(e! (admin-controller/->UpdateUserFilter %))}
        user-filter]
 
-      [ui/raised-button {:primary true
+      [ui/raised-button {:primary  true
                          :disabled (str/blank? filter)
                          :on-click #(e! (admin-controller/->SearchUsers))
-                         :label "Hae käyttäjiä"}]]
+                         :label    "Hae käyttäjiä"}]]
 
      (if loading?
        [:span "Ladataan käyttäjiä..."]
@@ -109,14 +108,14 @@
 
      (when (seq results)
        [:span
-        [ui/table {:selectable false
-                   :fixed-header false
-                   :style {:width "auto" :table-layout "auto"}
+        [ui/table {:selectable    false
+                   :fixed-header  false
+                   :style         {:width "auto" :table-layout "auto"}
                    :wrapper-style {:border-style "solid"
                                    :border-color "rgb(224, 224, 224)"
                                    :border-width "1px 1px 0 1px"}}
          [ui/table-header {:adjust-for-checkbox false
-                           :display-select-all false}
+                           :display-select-all  false}
           [ui/table-row
            [ui/table-header-column "Käyttäjätunnus"]
            [ui/table-header-column "Nimi"]
@@ -128,7 +127,7 @@
           (doall
             (for [{:keys [id username name email groups] :as user} results]
               ^{:key (str "user-" username)}
-              [ui/table-row {:style {:border-bottom "3px solid rgb(224, 224, 224)"}
+              [ui/table-row {:style      {:border-bottom "3px solid rgb(224, 224, 224)"}
                              :selectable false}
                [ui/table-row-column username]
                [ui/table-row-column name]
