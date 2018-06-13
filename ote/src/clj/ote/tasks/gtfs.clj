@@ -25,9 +25,12 @@
     "GTFS" :gtfs
     "Kalkati.net" :kalkati))
 
-(defn fetch-and-mark-gtfs-interface! [db]
+(defn fetch-and-mark-gtfs-interface! [config db]
   (tx/with-transaction db
-    (let [gtfs-data (first (select-gtfs-urls-update db))]
+    (let [blacklisted-operators {:blacklist (if (empty? (:no-gtfs-update-for-operators config))
+                                              #{-1} ;; this is needed for postgres NOT IN conditional
+                                              (:no-gtfs-update-for-operators config))}
+          gtfs-data (first (select-gtfs-urls-update db blacklisted-operators))]
       (when gtfs-data
         (specql/update! db ::t-service/external-interface-description
                         {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
@@ -37,9 +40,8 @@
 (defn update-one-gtfs! [config db]
   ;; Ensure that gtfs-import flag is enabled
   (let [{:keys [id url operator-id ts-id last-import-date format license] :as gtfs-data}
-        (fetch-and-mark-gtfs-interface! db)]
-    (if (or (nil? gtfs-data)
-            (contains? (:no-gtfs-update-for-operators config) operator-id))
+        (fetch-and-mark-gtfs-interface! config db)]
+    (if (nil? gtfs-data)
       (log/debug "No gtfs files to upload.")
       (try
         (log/debug "GTFS File url found. " (pr-str gtfs-data))
