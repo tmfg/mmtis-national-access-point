@@ -96,11 +96,6 @@
       {:status 404
        :body "GeoJSON for service not found."})))
 
-(defn- spec->type-keyword [spec]
-  (if (keyword? spec)
-    spec
-    (first (filter keyword? (flatten spec)))))
-
 (defn- keys-of [keys-spec]
   (let [spec (into {} (map vec) (partition 2 (rest keys-spec)))]
     (concat (:req spec) (:opt spec))))
