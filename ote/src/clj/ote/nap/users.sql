@@ -59,3 +59,7 @@ SELECT group_id
   FROM group_extra
  WHERE key = 'transit-authority?'
    AND value = 'true';
+
+-- name: delete-user!
+-- Delete user from the database
+DELETE FROM "user" as u WHERE u.id = :id;
