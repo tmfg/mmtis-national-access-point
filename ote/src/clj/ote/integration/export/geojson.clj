@@ -43,20 +43,22 @@
   transport-service-properties-columns
   (set/difference (conj (specql/columns ::t-service/transport-service)
                         ;; Fetch linked external interfaces
-                        [::t-service/external-interfaces (disj (specql/columns ::t-service/external-interface-description)
-                                                               ::t-service/id
-                                                               ::t-service/transport-service-id)])
+                        [::t-service/external-interfaces #{::t-service/format ::t-service/license
+                                                           ::t-service/data-content
+                                                           ::t-service/external-interface}])
                   modification/modification-field-keys
                   #{::t-service/notice-external-interfaces?
                     ::t-service/published?
                     ::t-service/company-csv-filename
-                    ::t-service/company-source}))
+                    ::t-service/company-source
+                    ::t-service/ckan-resource-id
+                    ::t-service/ckan-dataset-id}))
 
 (defn- link-to-companies-csv-url
   "Brokerage services could have lots of companies providing the service. With this function
   we remove company data from the geojson data set and replace it with link where companies data could be loaded."
   [service]
-  (cond
+  (con
     (not (empty? (::t-service/companies service)))
       (-> service
           (assoc :csv-url (str "/export-company-csv/" (::t-service/id service)))
