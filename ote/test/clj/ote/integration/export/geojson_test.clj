@@ -12,7 +12,11 @@
             [ote.db.places :as places]
             [ote.db.generators :as generators]
             [ote.integration.export.transform :as transform]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [webjure.json-schema.validator.macro :refer [make-validator]]
+            [cheshire.core :as cheshire]
+            [taoensso.timbre :as log]
+            [clojure.string :as str]))
 
 (use-fixtures :each
   (system-fixture
@@ -100,3 +104,30 @@
       (= minutes (.getMinutes parsed))
       ;; Joda period has separate field for milliseconds, so cast to int
       (= (int seconds) (.getSeconds parsed))))))
+
+(defn- json*
+  "Roundtrip data through cheshire to change keyword keys to strings (json-schema works w/ strings)."
+  [data]
+  (-> data cheshire/encode cheshire/decode))
+
+(def geojson-validator
+  (make-validator (json* (geojson/export-geojson-schema)) {}))
+
+(defn valid-geojson? [geojson]
+  (let [geojson (json* geojson)
+        validation (geojson-validator geojson)]
+    (def geojson-validation-debug {:payload geojson
+                                   :errors validation})
+    (nil? validation)))
+
+
+(defspec validate-exported-geojson
+  50
+  (prop/for-all
+   [generated-service service-generators/gen-transport-service]
+   (let [service (assoc generated-service ::t-service/operation-area test-operation-area)
+         response (http-post "admin" "transport-service" service)
+         id (get-in response [:transit ::t-service/id])]
+
+     (and (pos? id)
+          (valid-geojson? (export-geojson (:transit response)))))))

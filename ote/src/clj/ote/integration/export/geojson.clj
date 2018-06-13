@@ -58,7 +58,7 @@
   "Brokerage services could have lots of companies providing the service. With this function
   we remove company data from the geojson data set and replace it with link where companies data could be loaded."
   [service]
-  (con
+  (cond
     (not (empty? (::t-service/companies service)))
       (-> service
           (assoc :csv-url (str "/export-company-csv/" (::t-service/id service)))
@@ -143,7 +143,8 @@
         (:specql.data-types/varchar
          :specql.data-types/bpchar
          :specql.data-types/text
-         :specql.data-types/date)
+         :specql.data-types/date
+         ::t-service/maximum-stay)
         {:type "string"}
 
         :specql.data-types/bool
@@ -174,7 +175,7 @@
 
       :default
       (do
-        (println "I don't know what this spec is: " (pr-str spec))
+        (log/debug "I don't know what this spec is: " (pr-str spec))
         {}))))
 
 (def transport-service-schema
@@ -184,12 +185,13 @@
          (for [c transport-service-properties-columns]
            (if (vector? c)
              [(name (first c))
-              {:type "array"
-               :item {:type "object"
-                      :properties
-                      (into {}
-                            (for [c (second c)]
-                              [(name c) (spec->json-schema (s/describe c))]))}}]
+              {:anyOf [{:type "null"}
+                       {:type "array"
+                         :item {:type "object"
+                                :properties
+                                (into {}
+                                      (for [c (second c)]
+                                        [(name c) (spec->json-schema (s/describe c))]))}}]}]
              [(name c) (spec->json-schema (s/describe c))])))})
 
 (def transport-operator-schema
@@ -201,7 +203,7 @@
 
 
 
-(defn- export-geojson-schema []
+(defn export-geojson-schema []
   {:$schema "http://json-schema.org/draft-07/schema#"
    :type "object"
    :properties
