@@ -244,7 +244,11 @@
              (for [{:keys [id operator business-id gsm phone email source]} results]
                [ui/table-row {:selectable false}
                 [ui/table-row-column {:width "7%"} id]
-                [ui/table-row-column {:width "20%"} operator]
+                [ui/table-row-column {:style {:width "21%"}}
+                 [:a {:href     "#"
+                      :on-click #(do
+                                   (.preventDefault %)
+                                   (e! (fp/->ChangePage :transport-operator {:id id})))} operator]]
                 [ui/table-row-column {:width "13%"} business-id]
                 [ui/table-row-column {:width "15%"} gsm]
                 [ui/table-row-column {:width "10%"} phone]
