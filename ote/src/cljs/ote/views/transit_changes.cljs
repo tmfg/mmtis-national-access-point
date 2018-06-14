@@ -54,6 +54,9 @@
                                     "Ladataan muutoksia, odota hetki..."
                                     "Ei löydettyjä muutoksia")
                  :name->label str
+                 :stripedRows    true
+                 :row-style {:cursor "pointer"}
+                 :show-row-hover? true
                  :on-select (fn [evt]
                               (let [change (first evt)
                                     {date1 :date1 date2 :date2} (:first-diff-dates change)]
