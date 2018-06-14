@@ -6,8 +6,8 @@
              :background-color "#323232"
              :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"})
 
-(def topnav-desktop (merge topnav {:height "56px"
-                                   :line-height "56px"}))
+(def topnav-desktop (merge topnav {:height "80px"
+                                   :line-height "80px"}))
 
 (def clear {:clear "both"})
 
@@ -33,7 +33,10 @@
                       {:float "left"}))
 (def desktop-link
   (merge link-left
-         {:padding "0px 15px 0px 15px"}))
+         {:padding-top "0px"
+          :padding-right "15px"
+          :padding-bottom "0px"
+          :padding-left "15px"}))
 
 (def active-style {:background "rgba(0, 0, 0, 0.3)"})
 

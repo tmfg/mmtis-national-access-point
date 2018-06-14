@@ -69,6 +69,7 @@
       :modal false
       :auto-scroll-body-content true
       :title   (::t-operator/name operator)
+      :on-request-close #(e! (operators-controller/->CloseOperatorModal (::t-operator/id operator)))
       :actions [(r/as-element
                   [ui/flat-button
                    {:label     (tr [:buttons :close])
