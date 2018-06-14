@@ -879,7 +879,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
-  :footer-funded  (:md "Osarahoitettu Euroopan Union [Verkkojen Eurooppa -välineellä.](#)")
+  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](#)")
   :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"

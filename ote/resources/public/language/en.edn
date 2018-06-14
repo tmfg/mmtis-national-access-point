@@ -874,7 +874,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :footer-ckan-software                       "CKAN-software"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Finap.fi-service, made by  [Liikennevirasto](https://www.liikennevirasto.fi/), is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
-  :footer-funded  (:md "Osarahoitettu Euroopan Union [Verkkojen Eurooppa -välineellä.](#)")
+  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](#)")
   :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Page not found: "
   :time-unit                                  "Time unit"
