@@ -384,15 +384,13 @@
               transform-save-by-type)]
 
       ;; Disable post if concurrent save event is in progress
-      (if (not (:service-save-in-progress app))
+      (when-not (:service-save-in-progress app)
         (do
           (comm/post! "transport-service" service-data
                       {:on-success (tuck/send-async! ->SaveTransportServiceResponse)
                        :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
           (-> app
-              (assoc :service-save-in-progress true)
-              (dissoc :before-unload-message)))
-          (dissoc app :before-unload-message))))
+              (assoc :service-save-in-progress true))))))
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
@@ -404,7 +402,9 @@
         (assoc :service-save-in-progress false
                :services-changed? true
                :page :own-services)
-        (dissoc :transport-service))))
+        (dissoc :transport-service
+                ;; Remove navigation prompt message only if save was successful.
+                :before-unload-message))))
 
   FailedTransportServiceResponse
   (process-event [{response :response} app]
@@ -421,7 +421,7 @@
   CancelTransportServiceForm
   (process-event [_ app]
     (routes/navigate! :own-services)
-    (dissoc app :transport-service :before-unload-message))
+    app)
 
   SetNewServiceType
   (process-event [_ app]
