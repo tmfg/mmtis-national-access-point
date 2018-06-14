@@ -15,7 +15,6 @@
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
             [ote.ui.common :as ui-common]
-            [ote.ui.common :as common-ui]
             [ote.views.admin.interfaces :as interfaces]
             [ote.views.admin.users :as users]))
 

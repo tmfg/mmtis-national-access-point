@@ -28,6 +28,8 @@
 (defrecord ConfirmDeleteUser [id])
 (defrecord ConfirmDeleteUserResponse [response])
 (defrecord EnsureUserId [id ensured-id])
+(defrecord OpenEditUserDialog [id])
+(defrecord CloseEditUserDialog [id])
 
 (defrecord SearchServices [])
 (defrecord SearchServicesByOperator [])
@@ -168,6 +170,18 @@
     (update-user-by-id
       app id
       assoc :ensured-id ensured-id))
+
+  OpenEditUserDialog
+  (process-event [{id :id} app]
+    (update-user-by-id
+      app id
+      assoc :show-edit-dialog? true))
+
+  CloseEditUserDialog
+  (process-event [{id :id} app]
+    (update-user-by-id
+      app id
+      assoc :show-edit-dialog? false))
 
   GetBusinessIdReport
   (process-event [_ app]

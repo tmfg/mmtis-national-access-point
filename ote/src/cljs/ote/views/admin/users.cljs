@@ -3,18 +3,29 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [ote.ui.form-fields :as form-fields]
             [ote.app.controller.admin :as admin-controller]
-            [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.modification :as modification]
+            [ote.app.controller.front-page :as fp-controller]
             [clojure.string :as str]
-            [ote.app.controller.front-page :as fp]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :refer [linkify]]
             [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
-            [ote.ui.common :as ui-common]
             [ote.ui.common :as common-ui]))
+
+(defn- edit-user-action [e! {:keys [id username show-edit-dialog?] :as user}]
+  [:span
+   [ui/icon-button {:id       (str "edit-user-" id)
+                    :href     "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-controller/->OpenEditUserDialog id)))}
+    [ic/content-create]]
+   (when show-edit-dialog?
+     ^{:key "ckan-user-edit"}
+     [common-ui/ckan-iframe-dialog
+      (tr [:common-texts :user-menu-profile])
+      (str "/user/edit/" (:username user))
+      #(e! (admin-controller/->CloseEditUserDialog id))])])
 
 (defn- delete-user-action [e! {:keys [id show-delete-modal?] :as user}]
   [:span
@@ -134,5 +145,6 @@
                [ui/table-row-column email]
                [ui/table-row-column {:style {:padding 0}}
                 [groups-list groups]]
-               [ui/table-row-column [delete-user-action e! user]]
-               ]))]]])]))
+               [ui/table-row-column
+                [delete-user-action e! user]
+                [edit-user-action e! user]]]))]]])]))
