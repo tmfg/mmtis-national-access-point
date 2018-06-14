@@ -68,7 +68,7 @@
                  (#'update-one-gtfs! config db)))
               (chime-at (daily-at 5 15)
                         (fn [_]
-                          (refresh-nightly-transit-changes! db)))]
+                          (refresh-nightly-transit-changes db)))]
              (do
                (log/debug "GTFS IMPORT IS NOT ENABLED!")
                nil))))
