@@ -380,12 +380,10 @@
   (process-event [{trip-idx :trip-idx} app]
     (if (= trip-idx (get-in app [:route :edit-service-calendar]))
       (-> app
-          (route-updated)
           (update-in [:route] dissoc :edit-service-calendar)
-          ;; Move selected calendar to safty if user wants to cancel changes
+          ;; Move selected calendar to safety if user wants to cancel changes
           (assoc-in [:route :temporary-calendar] (get-in app [:route ::transit/service-calendars trip-idx])))
       (-> app
-          (route-updated)
           (assoc-in [:route :edit-service-calendar] trip-idx)
           (assoc-in [:route :temporary-calendar] (get-in app [:route ::transit/service-calendars trip-idx])))))
 
@@ -393,6 +391,7 @@
   (process-event [_ app]
     (let [edit-service-calendar (get-in app [:route :edit-service-calendar])]
       (-> app
+          (route-updated)
           (update :route dissoc :edit-service-calendar :temporary-calendar)
           (update-in [:route ::transit/service-calendars edit-service-calendar ::transit/service-rules]
                      (flip filterv) valid-calendar-rule?))))
@@ -409,7 +408,7 @@
   ToggleDate
   (process-event [{date :date trip-idx :trip-idx} app]
     (update-in
-     (route-updated app)
+     app
      [:route ::transit/service-calendars trip-idx]
      (fn [{::transit/keys [service-added-dates service-removed-dates service-rules]
            :as service-calendar}]
@@ -443,7 +442,6 @@
                            (mapcat transit/rule-dates)
                            (::transit/service-rules rules))]
       (-> app
-          (route-updated)
           (update-in [:route ::transit/service-calendars trip-idx] merge rules)
           (assoc-in [:route ::transit/service-calendars trip-idx :rule-dates] rule-dates))))
 
@@ -569,16 +567,16 @@
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
       (-> app
-          (dissoc :before-unload-message)
           (set-saved-transfer-operator route))))
 
   SaveRouteResponse
   (process-event [{response :response} app]
     (routes/navigate! :routes)
     (-> app
-        (assoc :flash-message (tr [:route-wizard-page :save-success]))
-        (dissoc :route)
-        (assoc :page :routes)))
+        (assoc :flash-message (tr [:route-wizard-page :save-success])
+               :page :routes)
+        ;; Remove warning only after a successful save
+        (dissoc :route :before-unload-message)))
 
   SaveRouteFailure
   (process-event [{response :response} app]
@@ -591,7 +589,6 @@
     (let [stops (get-in app [:route :stops])]
     (routes/navigate! :routes)
     (-> app
-        (dissoc app :transport-service :before-unload-message)
         (dissoc app :route)
         (assoc-in [:route :stops] stops))))
 
