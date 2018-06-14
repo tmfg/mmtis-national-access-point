@@ -21,6 +21,7 @@
             [ote.time :as time]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
+            [ote.style.front-page :as style-front-page]
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
@@ -226,35 +227,79 @@
 
 (defn front-page
   "Front page info"
-  [e! {user :user :as app
-       show-register-dialog? :show-register-dialog?}]
-  [:div.front-page {:style {:position "relative" :top "-20px"}}
-   [:header {:style {:height "260px"
-                     :padding-top "0px"
-                     :background "url(/img/home_header.jpg)"
-                     :text-align "center"}}
-    [:img.livi-logo {:style {:width "220px"
-                             :position "relative"
-                             :top "100px"}
-                     :src "/img/icons/nap-logo.svg" :alt "FINAP" :title "FINAP"}]
-    [:div {:style {:position "relative"
-                   :top "120px"
-                   :color "white"
-                   :font-size "21px"
-                   :font-weight 200
-                   :line-height "30px"
-                   :font-family "'Roboto', sans-serfi"}}
-     (tr [:front-page :hero-title])]]
-   (when test-env?
+  [e! {user :user :as app}]
+  [:div
+   [:div.hero {:style {:height          "540px"
+                       :margin-top      "-20px"
+                       :background      "url(/img/hero.png)"
+                       :background-size "cover"}}
+    [:div.container {:style {:padding-top "20px" }}
+     [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
+     [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
+      [:div.row {:style {:padding-top "60px"}}
+       [:a {:on-click   #(do
+                            (.preventDefault %)
+                            (e! (fp/->ChangePage :services nil)))}
+       [:button (stylefy/use-style style-front-page/front-page-button)
+        [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+         "Liikkumispalvelukatalogi"]]]]]]
+    (when test-env?
      [test-env-warning])
-   (tr [:front-page :front-page-content])
-   (when-not user
-     [:div.front-page-login {:style {:text-align "center"}}
-      [ui/raised-button {:on-click #(e! (login/->ShowLoginDialog))
-                         :primary true
-                         :label (tr [:common-texts :navigation-login])}]
-      [:div {:style {:padding-top "1em"}}
-       (tr [:front-page :new-user?])]
-      [ui/flat-button {:primary true
-                       :label (tr [:common-texts :navigation-register])
-                       :on-click #(e! (fp/->ToggleRegistrationDialog))}]])])
+   [:div.container
+    [:div.row (stylefy/use-style style-front-page/row-media)
+     [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
+      [ic/action-all-out {:style  style-front-page/large-icon}]]
+     [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
+      [:h2
+       (stylefy/use-style style-front-page/h2)
+       (tr [:front-page :title-NAP])]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       (tr [:front-page :column-NAP])]]]
+    [:div.row (stylefy/use-style style-front-page/row-media)
+     [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
+      [:h2
+       (stylefy/use-style style-front-page/h2)
+       (tr [:front-page :title-transport-services])]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       (tr [:front-page :column-transport-services])]]
+     [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
+      [ic/places-airport-shuttle {:style {:width 200 :height 200 :color "#969696"}}]]
+     ]
+    [:div.row (stylefy/use-style style-front-page/row-media)
+     [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
+      [ic/content-flag {:style {:width 200 :height 200 :color "#969696"}}]]
+     [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
+      [:h2
+       (stylefy/use-style style-front-page/h2)
+       (tr [:front-page :title-essential-info])]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+       (tr [:front-page :column-essential-info])]]]
+    ]
+   [:div (stylefy/use-style style-front-page/lower-section)
+    [:div.container
+     [:div.col-md-6
+      [:div (stylefy/use-style style-front-page/lower-section-data-container)
+       [ic/maps-train {:style  style-front-page/lower-section-icon}]
+       [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-transport-operator])]
+       [:p (stylefy/use-style style-front-page/lower-section-text)
+        (tr [:front-page :column-transport-operator])]
+       [:div {:style {:padding-top "20px"}}
+        [:a {:on-click   #(do
+                            (.preventDefault %)
+                            (e! (fp/->ToggleRegistrationDialog)))}
+        [:button (stylefy/use-style style-front-page/front-page-button)
+         [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+         (tr [:buttons :register-to-service])]]]]]
+     [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
+      [:div (stylefy/use-style style-front-page/lower-section-data-container)
+       [ic/device-developer-mode {:style  style-front-page/lower-section-icon}]
+       [:h3 {:style {:font-size "1.5em" :font-weight 600}} (tr [:front-page :title-developer])]
+       [:p (stylefy/use-style style-front-page/lower-section-text)
+        (tr [:front-page :column-developer])]
+       [:div {:style {:padding-top "20px"}}
+        [:a {:on-click   #(do
+                            (.preventDefault %)
+                            (e! (fp/->ChangePage :services nil)))}
+         [:button (stylefy/use-style style-front-page/front-page-button)
+          [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+          (tr [:buttons :check-out-the-service])]]]]]]]])
