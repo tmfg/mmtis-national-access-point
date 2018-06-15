@@ -1,10 +1,11 @@
 (ns ote.app.controller.route.route-wizard
   "Route based traffic controller"
-  (:require [tuck.core :as tuck]
+  (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.time :as time]
             [clojure.string :as str]
             [ote.app.controller.route.gtfs :as route-gtfs]
+            [ote.app.controller.front-page :as fp]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
@@ -18,6 +19,15 @@
             [clojure.set :as set]
             [ote.localization :refer [selected-language]]
             [ote.ui.validation :as validation]))
+
+(define-event CheckTransportOperator []
+  {}
+  (when (empty? (:transport-operators-with-services app))
+    (routes/navigate! :routes))
+  app)
+
+(defmethod routes/on-navigate-event :new-route [_]
+  (->CheckTransportOperator))
 
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])

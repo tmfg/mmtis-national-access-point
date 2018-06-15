@@ -66,7 +66,8 @@
       (when (or (= "gtfs" format) (= "kalkati.net" format))
         [:span " | "
          (common-ui/linkify
-           (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+           (str "#/routes/view-gtfs?url=" (.encodeURIComponent js/window
+                                                               (::t-service/url interface))
                 (when (= "kalkati.net" format)
                   "&type=kalkati"))
            [:span
