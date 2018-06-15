@@ -1,6 +1,6 @@
 -- Type and procedure for calculating transit changes between two days
 
----- Copy functions we need from R__GTFS_query (for fresh instances)
+---- BEGIN Copy functions we need from R__GTFS_query (for fresh instances)
 CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_id INTEGER, dt DATE) RETURNS SETOF TEXT AS $$
 SELECT DISTINCT c."service-id"
   FROM "gtfs-calendar" c
@@ -22,9 +22,10 @@ SELECT cd."service-id"
    AND cd.date = dt
    AND cd."exception-type" = 1;
 $$ LANGUAGE SQL STABLE;
+---- END
 
 
-
+-- Create a return type that holds the different difference calculations
 CREATE TYPE "transit-day-difference" AS (
   "routes-added" INTEGER,
   "routes-removed" INTEGER,
