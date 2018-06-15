@@ -284,12 +284,13 @@
        [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-transport-operator])]
        [:div {:style {:padding-top "20px"}}
-        [:a {:on-click   #(do
+        (when (not (get-in app [:user :username]))
+          [:a {:on-click #(do
                             (.preventDefault %)
                             (e! (fp/->ToggleRegistrationDialog)))}
-        [:button (stylefy/use-style style-front-page/front-page-button)
-         [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-         (tr [:buttons :register-to-service])]]]]]
+           [:button (stylefy/use-style style-front-page/front-page-button)
+            [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+            (tr [:buttons :register-to-service])]])]]]
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
        [ic/device-developer-mode {:style  style-front-page/lower-section-icon}]

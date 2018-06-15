@@ -103,7 +103,7 @@
     (let [format (str/lower-case format)]
       (when (or (= "gtfs" format) (= "kalkati.net" format))
         (common-ui/linkify
-          (str "#/routes/view-gtfs?url=" url
+          (str "#/routes/view-gtfs?url=" (.encodeURIComponent js/window url)
                (when (= "kalkati.net" format)
                  "&type=kalkati"))
           (tr [:service-search :view-routes])
