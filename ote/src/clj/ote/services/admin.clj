@@ -64,6 +64,12 @@
     (nap-users/delete-user! db {:id id})
     id))
 
+(defn- user-operator-members [db user query]
+  (let [user-id (:id query)
+        members (into [] (nap-users/search-user-operators-and-members db {:user-id user-id}))]
+    (mapv (fn [x]
+            (update x :members #(db-util/PgArray->vec %))) members)))
+
 (defn- published-search-param [query]
   (case (:published-type query)
     nil? nil
@@ -176,6 +182,8 @@
     (POST "/admin/users" req (admin-service "users" req db #'list-users))
 
     (POST "/admin/delete-user" req (admin-service "delete-user" req db #'delete-user))
+
+    (POST "/admin/user-operator-members" req (admin-service "user-operators" req db #'user-operator-members))
 
     (POST "/admin/transport-services" req (admin-service "services" req db #'list-services))
 
