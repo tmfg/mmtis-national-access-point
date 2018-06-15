@@ -4,10 +4,20 @@
 (def topnav {:min-height "56px"
              :overflow "hidden"
              :background-color "#323232"
-             :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"})
+             :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
+             :position "fixed"
+             :width "100%"
+             :top 0
+             :z-index 100
+             :transition "all 300ms ease"})
 
 (def topnav-desktop (merge topnav {:height "80px"
-                                   :line-height "80px"}))
+                                   :line-height "80px"
+                                   :position "fixed"
+                                   :width "100%"
+                                   :top 0
+                                   :z-index 100
+                                   :transition "all 300ms ease"}))
 
 (def clear {:clear "both"})
 

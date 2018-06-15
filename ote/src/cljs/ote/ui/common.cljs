@@ -136,7 +136,7 @@
                              element-y (.-top (.getBoundingClientRect @sensor-node))]
 
                          (when (<= viewport-y-min element-y viewport-y-max)
-                           (on-scroll))))]
+                           (on-scroll element-y))))]
 
     (r/create-class
      {:component-did-mount
