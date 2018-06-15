@@ -85,27 +85,29 @@
                ;; Open confirmation dialog and only go to new page
                ;; if the user confirms navigation.
                (assoc app
-                      :navigation-prompt-open? true
-                      :navigation-confirm (go-to-url-event new-url)))
+                 :navigation-prompt-open? true
+                 :navigation-confirm (go-to-url-event new-url)))
 
-             (let [navigation-data {:page   name
-                                    :params params
-                                    :query  query
-                                    :url    js/window.location.href}
-                   event (on-navigate-event navigation-data)
-                   orig-app app
-                   app (merge app navigation-data)]
+             (if (not= (:url app) js/window.location.href)
+               (let [navigation-data {:page name
+                                      :params params
+                                      :query query
+                                      :url js/window.location.href}
+                     event (on-navigate-event navigation-data)
+                     orig-app app
+                     app (merge app navigation-data)]
 
-               (if (requires-authentication? app)
-                 (do (navigate! :front-page)
-                     (assoc orig-app
-                            :login {:show?       true
-                                    :navigate-to navigation-data}))
-                 (do
-                   ;; Send startup events (if any) immediately after returning from this swap
-                   (when event
-                     (.setTimeout js/window #(send-startup-events event) 0))
-                   app)))))))
+                 (if (requires-authentication? app)
+                   (do (navigate! :front-page)
+                       (assoc orig-app
+                         :login {:show? true
+                                 :navigate-to navigation-data}))
+                   (do
+                     ;; Send startup events (if any) immediately after returning from this swap
+                     (when event
+                       (.setTimeout js/window #(send-startup-events event) 0))
+                     app)))
+               app)))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page
