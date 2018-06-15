@@ -39,8 +39,9 @@ RETURNS SETOF TEXT
 AS $$
 SELECT DISTINCT COALESCE(r."route-short-name", r."route-long-name") as name
   FROM "gtfs-trip" t
-  JOIN "gtfs-route" r ON t."route-id" = r."route-id"
- WHERE t."service-id" IN (SELECT gtfs_services_for_date(gtfs_latest_package_for_date(op_,date), date));
+  JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND t."route-id" = r."route-id")
+ WHERE t."package-id" = (SELECT gtfs_latest_package_for_date(op_,date))
+   AND t."service-id" IN (SELECT gtfs_services_for_date(gtfs_latest_package_for_date(op_,date), date));
 $$ LANGUAGE SQL STABLE;
 
 
@@ -52,7 +53,8 @@ SELECT DISTINCT string_agg(stop."stop-name", '->' order by stops."stop-sequence"
   JOIN LATERAL unnest(t.trips) trips ON true
   JOIN LATERAL unnest(trips."stop-times") stops ON TRUE
   JOIN "gtfs-stop" stop ON (t."package-id" = stop."package-id" AND stops."stop-id" = stop."stop-id")
- WHERE t."service-id" IN (SELECT gtfs_services_for_date(
+ WHERE t."package-id" = (SELECT gtfs_latest_package_for_date(op_, date))
+   AND t."service-id" IN (SELECT gtfs_services_for_date(
                           (SELECT gtfs_latest_package_for_date(op_, date)), date))
  GROUP BY trips."trip-id";
 $$ LANGUAGE SQL STABLE;
@@ -66,7 +68,8 @@ SELECT DISTINCT concat(stop."stop-name", '@', stops."departure-time"::text) as "
   JOIN LATERAL unnest(t.trips) trips ON true
   JOIN LATERAL unnest(trips."stop-times") stops ON TRUE
   JOIN "gtfs-stop" stop ON (t."package-id" = stop."package-id" AND stops."stop-id" = stop."stop-id")
- WHERE t."service-id" IN (SELECT gtfs_services_for_date(
+ WHERE t."package-id" = (SELECT gtfs_latest_package_for_date(op_, date))
+   AND t."service-id" IN (SELECT gtfs_services_for_date(
                           (SELECT gtfs_latest_package_for_date(op_, date)), date))
 $$ LANGUAGE SQL STABLE;
 
@@ -101,14 +104,16 @@ BEGIN
   SELECT SUM(array_length(t.trips,1))
     INTO date1_trips
     FROM "gtfs-trip" t
-   WHERE t."service-id" IN (SELECT gtfs_services_for_date(
+   WHERE t."package-id" = (SELECT gtfs_latest_package_for_date(op_, date1))
+     AND t."service-id" IN (SELECT gtfs_services_for_date(
                             (SELECT gtfs_latest_package_for_date(op_, date1)),
                             date1));
 
   SELECT SUM(array_length(t.trips,1))
     INTO date2_trips
     FROM "gtfs-trip" t
-   WHERE t."service-id" IN (SELECT gtfs_services_for_date(
+   WHERE t."package-id" = (SELECT gtfs_latest_package_for_date(op_, date2))
+     AND t."service-id" IN (SELECT gtfs_services_for_date(
                             (SELECT gtfs_latest_package_for_date(op_, date2)),
                             date2));
 
