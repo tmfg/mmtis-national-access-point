@@ -384,13 +384,14 @@
               transform-save-by-type)]
 
       ;; Disable post if concurrent save event is in progress
-      (when-not (:service-save-in-progress app)
+      (if (not (:service-save-in-progress app))
         (do
           (comm/post! "transport-service" service-data
                       {:on-success (tuck/send-async! ->SaveTransportServiceResponse)
                        :on-failure (tuck/send-async! ->FailedTransportServiceResponse)})
           (-> app
-              (assoc :service-save-in-progress true))))))
+              (assoc :service-save-in-progress true)))
+        app)))
 
   SaveTransportServiceResponse
   (process-event [{response :response} app]
