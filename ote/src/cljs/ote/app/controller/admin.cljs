@@ -24,9 +24,11 @@
 (defrecord SearchUsers [])
 (defrecord SearchUsersResponse [response])
 (defrecord OpenDeleteUserModal [id])
+(defrecord OpenDeleteUserModalResponse [response id])
 (defrecord CancelDeleteUser [id])
 (defrecord ConfirmDeleteUser [id])
 (defrecord ConfirmDeleteUserResponse [response])
+(defrecord ConfirmDeleteUserResponseFailure [response])
 (defrecord EnsureUserId [id ensured-id])
 (defrecord OpenEditUserDialog [id])
 (defrecord CloseEditUserDialog [id])
@@ -136,7 +138,8 @@
   (process-event [{id :id} app]
     (if (= id (:ensured-id (get-user-by-id app id)))
       (comm/post! "admin/delete-user" {:id id}
-                  {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)})
+                  {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
+                   :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
       (.log js/console "Could not delete user! Check given id."))
     app)
 
@@ -147,6 +150,10 @@
           (assoc-in [:admin :user-listing :results] filtered-map)
           (assoc :flash-message "Käyttäjä poistettu onnistuneesti."))))
 
+  ConfirmDeleteUserResponseFailure
+  (process-event [{response :response} app]
+    (assoc app :flash-message-error "Käyttäjän poistaminen epäonnistui"))
+
   SearchUsersResponse
   (process-event [{response :response} app]
     (update-in app [:admin :user-listing] assoc
@@ -155,9 +162,19 @@
 
   OpenDeleteUserModal
   (process-event [{id :id} app]
-    (update-user-by-id
-      app id
-      assoc :show-delete-modal? true))
+    (comm/post! "admin/user-operator-members" {:id id}
+                {:on-success (tuck/send-async! ->OpenDeleteUserModalResponse id)})
+    app)
+
+  OpenDeleteUserModalResponse
+  (process-event [{response :response id :id } app]
+    (-> app
+        (update-user-by-id
+          id
+          assoc :show-delete-modal? true)
+        (update-user-by-id
+          id
+          assoc :other-members response)))
 
   CancelDeleteUser
   (process-event [{id :id} app]

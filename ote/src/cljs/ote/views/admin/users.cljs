@@ -27,7 +27,7 @@
       (str "/user/edit/" (:username user))
       #(e! (admin-controller/->CloseEditUserDialog id))])])
 
-(defn- delete-user-action [e! {:keys [id show-delete-modal?] :as user}]
+(defn- delete-user-action [e! {:keys [id show-delete-modal? other-members] :as user}]
   [:span
    [ui/icon-button {:id       (str "delete-user-" id)
                     :href     "#"
@@ -36,36 +36,50 @@
                                  (e! (admin-controller/->OpenDeleteUserModal id)))}
     [ic/action-delete]]
    (when show-delete-modal?
-     [ui/dialog
-      {:open    true
-       :title   "Poista käyttäjä"
-       :actions [(r/as-element
-                   [ui/flat-button
-                    {:label    (tr [:buttons :cancel])
-                     :primary  true
-                     :on-click #(do
-                                  (.preventDefault %)
-                                  (e! (admin-controller/->CancelDeleteUser id)))}])
-                 (r/as-element
-                   [ui/raised-button
-                    {:label     (tr [:buttons :delete])
-                     :icon      (ic/action-delete-forever)
-                     :secondary true
-                     :primary   true
-                     :on-click  #(do
-                                   (.preventDefault %)
-                                   (e! (admin-controller/->ConfirmDeleteUser id)))}])]}
+     (let [admin-list (mapv #(if (> (count (:members %)) 0) true false) other-members)]
+       [ui/dialog
+        {:open    true
+         :title   "Poista käyttäjä"
+         :actions [(r/as-element
+                     [ui/flat-button
+                      {:label    (tr [:buttons :cancel])
+                       :primary  true
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (admin-controller/->CancelDeleteUser id)))}])
+                   (if (some false? admin-list)
+                     nil
+                     (r/as-element
+                       [ui/raised-button
+                        {:label     (tr [:buttons :delete])
+                         :icon      (ic/action-delete-forever)
+                         :secondary true
+                         :primary   true
+                         :on-click  #(do
+                                       (.preventDefault %)
+                                       (e! (admin-controller/->ConfirmDeleteUser id)))}]))]}
+        [:div
+         (doall
+           (for [m other-members]
+             ^{:key (:operator-name m)}
+             [:div.row
+              [:span [:strong (:operator-name m)] (str ":lle jää " (count (:members m))
+                                                       (if (> (count (:members m)) 1)
+                                                         " admin käyttäjää. "
+                                                         " admin käyttäjä."))]]))
+         [:div.row "Jos käyttäjä on ainoa admin käyttäjä yhdellekään palveluntuottajalle. Käyttäjää ei voida poistaa."]
+         (if (some false? admin-list)
+           [:p "Ei voida poistaa käyttäjää."]
+           [:div
+            [:p "Oletko varma, että haluat poistaa käyttäjän? Käyttäjän lisäämät palvelut ja palveluntuottajat jätetään palveluun. Tämä poistaa vain käyttäjän."]
+            [:p (str "Käyttäjän id: " id)]
 
-      [:div [:p "Oletko varma, että haluat poistaa käyttäjän?
-      Käyttäjän lisäämät palvelut ja palveluntuottajat jätetään palveluun. Tämä poistaa vain käyttäjän."]
-       [:p (str "Käyttäjän id: " id)]
-
-       [form-fields/field {:name        :ensured-id
-                           :type        :string
-                           :full-width? true
-                           :label       "Anna varmistukseksi käyttäjän id"
-                           :update!     #(e! (admin-controller/->EnsureUserId id %))}
-        (:ensured-id user)]]])])
+            [form-fields/field {:name        :ensured-id
+                                :type        :string
+                                :full-width? true
+                                :label       "Anna varmistukseksi käyttäjän id"
+                                :update!     #(e! (admin-controller/->EnsureUserId id %))}
+             (:ensured-id user)]])]]))])
 
 
 (def groups-header-style {:height "10px" :padding "5px 0 5px 0"})
