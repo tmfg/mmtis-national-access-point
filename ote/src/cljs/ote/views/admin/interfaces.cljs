@@ -19,13 +19,16 @@
             [ote.ui.form :as form]))
 
 (defn error-modal [e! interface]
+  (let [title (if (:db-error interface)
+                "Rajapinnan käsittelyssä tapahtunut virhe"
+                "Rajapinnan lataamisessa tapahtunut virhe")]
   (when (:show-error-modal? interface)
     [ui/dialog
      {:open                     true
       :modal                    false
       :auto-scroll-body-content true
       :on-request-close         #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))
-      :title                    "Rajapinnan käsittelyssä tapahtunut virhe"
+      :title                    title
       :actions                  [(r/as-element
                                    [ui/flat-button
                                     {:label     (tr [:buttons :close])
@@ -35,13 +38,17 @@
      [:div.col-md-8
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
-       [:div.col-md-6 (:url interface)]]
+       [:div.col-md-6 [linkify (:url interface) (:url interface) {:target "_blank"}]]]
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
        [:div.col-md-6 (str/join ", " (:format interface))]]
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Virhe: "]
-       [:div.col-md-6 (:import-error interface) (:db-error interface)]]]]))
+       [:div.col-md-6
+        (when (:import-error interface)
+          [:p (:import-error interface)])
+        (when (:db-error interface)
+          [:p (:db-error interface)])]]]])))
 
 (defn operator-modal [e! interface]
   (when (:show-operator-modal? interface)
@@ -177,12 +184,11 @@
                             :display-select-all  false}
            [ui/table-row
             [ui/table-header-column {:style {:width "15%"}} "Palveluntuottaja"]
-            [ui/table-header-column {:style {:width "20%"}} "Sisältö"]
+            [ui/table-header-column {:style {:width "15%"}} "Sisältö"]
             [ui/table-header-column {:width "10%"} "Tyyppi"]
+            [ui/table-header-column {:width "25%"} "Rajapinta"]
             [ui/table-header-column {:width "15%"} "Viimeisin käsittely"]
-            [ui/table-header-column {:width "10%"} "Latausvirhe"]
-            [ui/table-header-column {:width "10%"} "Käsittelyvirhe"]
-            [ui/table-header-column {:width "10%"} "Katso"]]]
+            [ui/table-header-column {:width "20%"} "Katso"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
              (for [{:keys [interface-id operator-name format data-content url imported import-error db-error] :as interface} results]
@@ -192,19 +198,23 @@
                                                                   :on-click #(do (.preventDefault %)
                                                                                  (e! (admin-controller/->OpenOperatorModal interface-id)))}
                                                               operator-name]]
-                [ui/table-row-column {:style {:width "20%"}} (parse-content-value data-content)]
+                [ui/table-row-column {:style {:width "15%"}} (parse-content-value data-content)]
                 [ui/table-row-column {:style {:width "10%"}} (first format)]
+                [ui/table-row-column {:style {:width "25%"}} [linkify url url {:target "_blank"}]]
                 [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui imported)]
-                [ui/table-row-column {:style {:width "10%"}} (when import-error
-                                                               [:a {:href     "#"
-                                                                    :on-click #(do (.preventDefault %)
-                                                                                   (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
-                                                                "Ks. Virhe"])]
-                [ui/table-row-column {:style {:width "10%"}} (when db-error
-                                                               [:a {:href     "#"
-                                                                    :on-click #(do (.preventDefault %)
-                                                                                   (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
-                                                                "Ks. Virhe"])]
-                [ui/table-row-column {:style {:width "10%"}} (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]
+                [ui/table-row-column {:style {:width "20%"}}
+                 (when import-error
+                   [:a {:style {:color "red"}
+                        :href     "#"
+                        :on-click #(do (.preventDefault %)
+                                       (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
+                    " Latausvirhe "])
+                 (when db-error
+                   [:a {:style {:color "red"}
+                        :href     "#"
+                        :on-click #(do (.preventDefault %)
+                                       (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
+                    " Käsittelyvirhe "])
+                 (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]
                 (error-modal e! interface)
                 (operator-modal e! interface)]))]]])]]))
