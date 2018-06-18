@@ -54,6 +54,13 @@
 
 (defmethod on-navigate-event :default [_] nil)
 
+(defmulti on-leave-event
+          "Determine event(s) to be run when user navigates away from the give route.
+          Return values identical to on-navigate-event."
+          :page)
+
+(defmethod on-leave-event :default [_] nil)
+
 
 (defn requires-authentication? [app]
   (and
@@ -85,27 +92,32 @@
                ;; Open confirmation dialog and only go to new page
                ;; if the user confirms navigation.
                (assoc app
-                      :navigation-prompt-open? true
-                      :navigation-confirm (go-to-url-event new-url)))
+                 :navigation-prompt-open? true
+                 :navigation-confirm (go-to-url-event new-url)))
 
-             (let [navigation-data {:page   name
-                                    :params params
-                                    :query  query
-                                    :url    js/window.location.href}
-                   event (on-navigate-event navigation-data)
-                   orig-app app
-                   app (merge app navigation-data)]
+             (if (not= (:url app) js/window.location.href)
+               (let [navigation-data {:page name
+                                      :params params
+                                      :query query
+                                      :url js/window.location.href}
+                     event-leave (on-leave-event {:page (:page app)})
+                     event-leave (if (vector? event-leave) event-leave [event-leave])
+                     event-to (on-navigate-event navigation-data)
+                     event-to (if (vector? event-to) event-to [event-to])
+                     orig-app app
+                     app (merge app navigation-data)]
 
-               (if (requires-authentication? app)
-                 (do (navigate! :front-page)
-                     (assoc orig-app
-                            :login {:show?       true
-                                    :navigate-to navigation-data}))
-                 (do
-                   ;; Send startup events (if any) immediately after returning from this swap
-                   (when event
-                     (.setTimeout js/window #(send-startup-events event) 0))
-                   app)))))))
+                 (if (requires-authentication? app)
+                   (do (navigate! :front-page)
+                       (assoc orig-app
+                         :login {:show? true
+                                 :navigate-to navigation-data}))
+                   (do
+                     ;; Send startup events (if any) immediately after returning from this swap
+                     (when (or event-leave event-to)
+                       (.setTimeout js/window #(send-startup-events (vec (concat event-leave event-to))) 0))
+                     app)))
+               app)))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page
