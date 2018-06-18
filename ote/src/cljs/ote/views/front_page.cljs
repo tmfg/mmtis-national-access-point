@@ -229,14 +229,11 @@
   "Front page info"
   [e! {user :user :as app}]
   [:div
-   [:div.hero {:style {:height          "540px"
-                       :margin-top      "-20px"
-                       :background      "url(/img/hero.png)"
-                       :background-size "cover"}}
+   [:div.hero (stylefy/use-style style-front-page/hero-img)
     [:div.container {:style {:padding-top "20px" }}
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
      [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
-      [:div.row {:style {:padding-top "60px"}}
+      [:div.row (stylefy/use-style style-front-page/hero-btn)
        [:a {:on-click   #(do
                             (.preventDefault %)
                             (e! (fp/->ChangePage :services nil)))}
