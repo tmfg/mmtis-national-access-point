@@ -413,11 +413,12 @@
                 :new-notice [notice/new-pre-notice e! app]
                 :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
                 :pre-notices [pre-notices-listing/pre-notices e! app]
-                :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 
                 :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
                 :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
-                :transit-changes [transit-changes/transit-changes e! (:transit-changes app)]
+
+                (:transit-changes :authority-pre-notices)
+                [transit-changes/transit-changes e! app]
 
                 [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
        [footer/footer e!]]]]))
