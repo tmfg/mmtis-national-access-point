@@ -37,11 +37,6 @@
 (define-event CreateServiceNavigate [operator-id sub-type]
   {}
   ;; Set transport-operator and sub-type
-  (.log js/console "SET OP: " operator-id " => "
-        (pr-str (->> app :transport-operators-with-services
-                     (map :transport-operator)
-                     (filter #(= (::t-operator/id %) operator-id))
-                     first)))
   (pre-set-transport-type
    (assoc app
           :transport-operator (->> app :transport-operators-with-services
@@ -53,7 +48,7 @@
                                       {::t-service/sub-type sub-type
                                        ::t-service/type (service-type-from-sub-type sub-type)})))))
 
-;;; Navigation
+;;; Navigation hook events for new service creation and editing
 
 (defmethod routes/on-navigate-event :new-service [{p :params}]
   (->CreateServiceNavigate (js/parseInt (:operator-id p))
