@@ -35,6 +35,25 @@
             [ote.ui.common :as common-ui]))
 
 
+(defn header-scroll-sensor [is-scrolled? trigger-offset]
+  (let [sensor-node (atom nil)
+        check-scroll (fn []
+                       (let [element-y (.-top (.getBoundingClientRect @sensor-node))]
+                         (reset! is-scrolled? (< element-y trigger-offset))))]
+
+    (r/create-class
+      {:component-did-mount
+       (fn [this]
+         (reset! sensor-node (aget this "refs" "sensor"))
+         (check-scroll)
+         (.addEventListener js/window "scroll" check-scroll))
+       :component-will-unmount
+       (fn [this]
+         (.removeEventListener js/window "scroll" check-scroll))
+       :reagent-render
+       (fn [_]
+         [:span {:ref "sensor"}])})))
+
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
 
@@ -232,8 +251,7 @@
 
 (defn- top-nav [e! app is-scrolled? desktop?]
   [:span
-   [common-ui/scroll-sensor (fn [y]
-                              (reset! is-scrolled? (< y 40)))]
+   [header-scroll-sensor is-scrolled? -250]
    [:div
     (stylefy/use-style (merge
                          (if desktop? style-topnav/topnav-desktop style-topnav/topnav)
