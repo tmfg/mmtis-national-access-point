@@ -301,6 +301,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :trip-editor-no-stop-sequence "Please add stop sequence."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   :autocomplete-hint "Write your own or choose from a list"
+  :allowed-file-types "Approved file formats are "
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -874,7 +875,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :footer-ckan-software                       "CKAN-software"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Finap.fi-service, made by  [Liikennevirasto](https://www.liikennevirasto.fi/), is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
-  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](#)")
+  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Page not found: "
   :time-unit                                  "Time unit"

@@ -119,9 +119,11 @@
         operator-name (:operator-name query)
         import-error (:import-error query)
         db-error (:db-error query)
-        interface-format (:interface-format query)]
+        interface-format (:interface-format query)
+        interface-url (:interface-url query)]
   (interfaces-array->vec (search-interfaces db {:service-name     (when service-name (str "%" service-name "%"))
                                                 :operator-name    (when operator-name (str "%" operator-name "%"))
+                                                :interface-url    (when interface-url (str "%" interface-url "%"))
                                                 :import-error     (when import-error true)
                                                 :db-error         (when db-error true)
                                                 :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}))))

@@ -308,6 +308,7 @@
   :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
   :pre-notice-attatchment-info "Meddela de detaljerade rutt- och tidtabellsändringarna i din transporttjänst inom persontrafik. Du kan lägga till en webbadress där uppgifterna framgår. Du kan också bifoga filer som visar ändringarna till denna blankett."
   :autocomplete-hint "Kirjoita oma tai valitse listalta"
+  :allowed-file-types "Godkända filformat är "
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -879,7 +880,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
-  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](#)")
+  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
