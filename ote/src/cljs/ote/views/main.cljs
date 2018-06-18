@@ -131,19 +131,21 @@
     (when (> (:width app) style-base/mobile-width-px)
       [:li
        [:a
-        (merge
-          (stylefy/use-style (merge {:transition "padding-top 300ms ease"}
-                                    (if desktop?
-                                      style-topnav/desktop-link
-                                      style-topnav/link)
-                                    (if @is-scrolled?
-                                      {:padding-top "0px"}
-                                      {:padding-top "11px"})))
-          {:href "#"
-           :on-click #(do
-                        (.preventDefault %)
-                        (e! (fp-controller/->ChangePage :front-page nil)))})
-        [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
+        {:style (merge (if desktop?
+                         style-topnav/desktop-link
+                         style-topnav/link)
+                       (if @is-scrolled?
+                         {:padding-top "0px"}
+                         {:padding-top "11px"}))
+         :href "#"
+         :on-click #(do
+                      (.preventDefault %)
+                      (e! (fp-controller/->ChangePage :front-page nil)))}
+        [:img {:style (merge
+                        style-topnav/logo
+                        (when @is-scrolled?
+                          style-topnav/logo-small))
+               :src "img/icons/nap-logo.svg"}]]])
 
     (doall
      (for [{:keys [page label url]} (header-links app)]

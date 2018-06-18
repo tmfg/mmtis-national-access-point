@@ -28,7 +28,8 @@
 
 (def mobile-li {:padding-top "10px" :padding-bottom "10px"})
 
-(def link {:bottom "0"
+(def link {:transition "padding-top 300ms ease, height 300ms ease"
+           :bottom "0"
            :color "#ffffff"
            :text-align "center"
            :padding "10px 15px 10px 15px"
@@ -36,8 +37,19 @@
            :font-size "0.875em"
            ::stylefy/mode {:hover {:background "rgba(0, 0, 0, 0.2)"}}})
 
-(def img {:padding-top "10px"
-          :margin-left "-8px"})
+(def logo {:transition "margin-top 300ms ease, height 300ms ease"
+           :margin-top "10px"
+           :margin-left "-8px"
+           :display "block"
+           :height "40px"
+           :flex "0 auto"})
+
+(def logo-small
+  (merge logo
+         {:transition "margin-top 300ms ease, height 300ms ease"
+          :margin-top "16px"
+          :height "24px"}))
+
 
 (def link-left (merge link
                       {:float "left"}))
