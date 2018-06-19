@@ -184,8 +184,7 @@
     (-> app
         (dissoc :pre-notice
                 :before-unload-message)
-        (assoc :flash-message (tr [:pre-notice-page :save-success])
-               :page :pre-notices)))
+        (assoc :flash-message (tr [:pre-notice-page :save-success]))))
 
   SaveNoticeFailure
   (process-event [{response :response} app]

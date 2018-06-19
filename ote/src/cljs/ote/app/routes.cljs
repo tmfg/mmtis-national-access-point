@@ -9,6 +9,7 @@
   (r/router
    [["/" :front-page]
     ["/own-services" :own-services]
+    ["/transport-operator" :transport-operator]
     ["/transport-operator/:id" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
     ["/terminal" :terminal]

@@ -594,8 +594,7 @@
   (process-event [{response :response} app]
     (routes/navigate! :routes)
     (-> app
-        (assoc :flash-message (tr [:route-wizard-page :save-success])
-               :page :routes)
+        (assoc :flash-message (tr [:route-wizard-page :save-success]))
         ;; Remove warning only after a successful save
         (dissoc :route :before-unload-message)))
 

@@ -356,7 +356,6 @@
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
       (assoc app :transport-service-vector filtered-map
-                 :page :own-services
                  :flash-message (tr [:common-texts :delete-service-success])
                  :services-changed? true)))
 
@@ -401,8 +400,7 @@
     (routes/navigate! :own-services)
     (-> app
         (assoc :service-save-in-progress false
-               :services-changed? true
-               :page :own-services)
+               :services-changed? true)
         (dissoc :transport-service
                 ;; Remove navigation prompt message only if save was successful.
                 :before-unload-message))))
