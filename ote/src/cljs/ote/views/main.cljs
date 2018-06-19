@@ -400,6 +400,15 @@
       (str "/user/edit/" (:username user))
       #(e! (fp-controller/->ToggleUserEditDialog))])])
 
+(defn- scroll-to-page
+  "Invisible component that scrolls to the top of the window whenever it is mounted."
+  [page]
+  (r/create-class
+   {:component-did-mount #(.scrollTo js/window 0 0)
+    :reagent-render
+    (fn [page]
+      [:span])}))
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -431,6 +440,11 @@
                          {:style {:padding-bottom "20px"}
                           :class "container"})
                   [document-title (:page app)]
+
+                  ;; Ensure that a new scroll-to-page component is created when page changes
+                  ^{:key (name (:page app))}
+                  [scroll-to-page (:page app)]
+
                   (case (:page app)
                     :front-page [fp/front-page e! app]
                     :own-services [fp/own-services e! app]
