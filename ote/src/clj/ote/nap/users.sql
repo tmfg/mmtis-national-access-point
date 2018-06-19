@@ -74,5 +74,5 @@ AND g.id = m.group_id
 AND m.state = 'active';
 
 -- name: delete-user!
--- Delete user from the database
-DELETE FROM "user" as u WHERE u.id = :id;
+-- "Delete" user from the database - only changes user data to null to preserve foreign key links
+UPDATE "user" SET name = :name, fullname = NULL, email = NULL, state = 'deleted' WHERE id = :id;

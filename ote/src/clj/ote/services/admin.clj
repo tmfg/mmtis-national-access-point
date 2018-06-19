@@ -59,9 +59,10 @@
       users)))
 
 (defn- delete-user [db user query]
-  (let [id (:id query)]
+  (let [id (:id query)
+        timestamp (java.util.Date.)]
     (log/info "Deleting user with id: " (pr-str id))
-    (nap-users/delete-user! db {:id id})
+    (nap-users/delete-user! db {:id id :name timestamp})
     id))
 
 (defn- user-operator-members [db user query]
