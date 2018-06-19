@@ -13,10 +13,10 @@
 
 (def transit-changes-legend-icon
   {:display "inline-block"
-   :margin-right "1em"})
+   :margin-right "1rem"})
 
 (def change-icon-value
   {:display "inline-block"
    :position "relative"
-   :top "-0.5em"
-   :left "0.2em"})
+   :top "-0.5rem"
+   :left "0.2rem"})
