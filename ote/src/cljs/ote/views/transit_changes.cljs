@@ -108,7 +108,7 @@
     "Taulukossa on listattu " [:b "säännöllisen aikataulun mukaisen liikenteen"]
     " palveluista havaittuja muutoksia. "
     "Voit tarkastella yksittäisessä palvelussa tapahtuvia muutoksia yksityiskohtaisemmin napsauttamalla taulukon riviä. "
-    "Yksyityiskohtaiset tiedot avautuva erilliseen näkymään."]
+    "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
                                     "Ladataan muutoksia, odota hetki..."
