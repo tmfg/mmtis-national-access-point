@@ -314,8 +314,7 @@
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get-in app [:service-search :results]))]
       (-> app
           (assoc-in [:service-search :results] filtered-map)
-          (assoc :page :services
-                 :flash-message (tr [:common-texts :delete-service-success])
+          (assoc :flash-message (tr [:common-texts :delete-service-success])
                  :services-changed? true))))
 
   FailedDeleteTransportServiceResponse
