@@ -17,22 +17,29 @@
                ::stylefy/media {{:max-width (str width-xl "px")} {:background      "url(/img/hero-2000.png)"}
                                 {:max-width (str width-l "px")}  {:background      "url(/img/hero-1600.png)"}
                                 {:max-width (str width-sm "px")} {:background      "url(/img/hero-1080.png)"
-                                                                  :height          "371px"}
+                                                                  :background-size "cover"
+                                                                  :height          "400px"}
                                 {:max-width (str width-xs "px")} {:background      "url(/img/hero-800.png)"
-                                                                  :height          "274px"}}})
+                                                                  :background-size "cover"
+                                                                  :height          "350px"}}})
 
 (def hero-btn {:padding-top "60px"
                ::stylefy/media {{:max-width (str width-xl "px")} {:padding-top "60px"}
                                 {:max-width (str width-l "px")} {:padding-top "60px"}
                                 {:max-width (str width-sm "px")} {:padding-top "60px"}
-                                {:max-width (str width-xs "px")} {:padding-top "20px"}}})
+                                {:max-width (str width-xs "px")} {:padding-top "40px"}}})
 
 (def h2 {:font-size "2.25em"
          ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.5em"}}})
 
-(def fp-btn-blue {:background-image "linear-gradient(90deg, #06c, #0029b8)"})
+(def fp-btn-blue {:box-shadow "3px 3px 8px 0 rgba(0, 0, 0, .2)"
+                  :cursor "pointer"
+                  :background-image "linear-gradient(90deg, #06c, #0029b8)"})
+(def fp-btn-hover {::stylefy/mode {:hover {:box-shadow "1px 1px 4px 0 rgba(0, 0, 0, .2)"
+                                           :-webkit-transform "scale(0.98)"
+                                           :-ms-transform "scale(0.98)"
+                                           :transform "scale(0.98)"}}})
 (def fp-btn-blue-hover {:background-image "-webkit-linear-gradient(45deg, #06c, #0029b8)"})
-(def fp-btn-gray-hover {:background-image "-webkit-linear-gradient(45deg, #ccc, #ccc)"})
 (def fp-btn-gray {:background-image "linear-gradient(90deg, #ccc, #ccc)"})
 (def fp-btn {:display "flex"
              :padding "20px 20px 20px 10px"
@@ -40,7 +47,6 @@
              :-webkit-justify-content "center"
              :-ms-flex-pack "center"
              :justify-content "center"
-             :box-shadow "3px 3px 8px 0 rgba(0, 0, 0, .2)"
              :-webkit-backface-visibility "visible"
              :backface-visibility "visible"
              :-webkit-transform-origin "50% 50% 0px"
@@ -54,21 +60,17 @@
              :text-align "center"
              :color "#fff"
              :border 0
-             :cursor "pointer"
-             ::stylefy/mode {:hover {:box-shadow "1px 1px 4px 0 rgba(0, 0, 0, .2)"
-                                     :-webkit-transform "scale(0.98)"
-                                     :-ms-transform "scale(0.98)"
-                                     :transform "scale(0.98)"}}})
+             })
 
 (def front-page-button (merge
                          fp-btn-blue
                          fp-btn
+                         fp-btn-hover
                          fp-btn-blue-hover))
 
 (def front-page-button-disabled (merge
                                   fp-btn-gray
-                                  fp-btn
-                                  fp-btn-gray-hover))
+                                  fp-btn))
 
 (def row-media {:margin-top "20px"
                 :margin-bottom "20px"
@@ -83,13 +85,6 @@
                            :flex-direction "column"
                            :align-items "center"
                            ::stylefy/media {{:max-width (str width-xs "px")} {:order 1}}})
-
-(def large-icon  {:width 200
-                  :height 200
-                  :color "#969696"
-                  :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
-                  ::stylefy/media {{:max-width (str width-xs "px")} {:width 150
-                                                                     :height 150}}})
 
 (def large-font-icon  {:font-size "14rem"
                        :color "#969696"
@@ -118,10 +113,10 @@
                                                                          :font-size "4em"
                                                                          :font-weight "300"}
                                        {:max-width (str width-xs "px")} {:padding-top "20px"
-                                                                         :font-size "2.5em"
+                                                                         :font-size "3em"
                                                                          :font-weight "400"}
                                        {:min-width "0px" :max-width (str width-xxs "px")} {:padding-top "20px"
-                                                                                           :font-size "2em"
+                                                                                           :font-size "2.5em"
                                                                                            :font-weight "400"}}})
 
 (def front-page-hero-text {:display "flex"
@@ -150,10 +145,10 @@
                                                                               :font-size "1.6em"
                                                                               :font-weight "400"}
                                             {:max-width (str width-xs "px")} {:margin-top "20px"
-                                                                              :font-size "1.2em"
+                                                                              :font-size "1.4em"
                                                                               :font-weight "400"}
                                             {:min-width "0px" :max-width (str width-xxs "px")} {:margin-top "20px"
-                                                                                                :font-size "1.1em"
+                                                                                                :font-size "1.2em"
                                                                                                 :font-weight "400"}}})
 
 (def third-column-text {:margin-bottom 40
@@ -175,13 +170,6 @@
                           :font-weight 600
                           ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.25em"
                                                                              :font-weight 500}}})
-
-(def lower-section-icon  {:width 120
-                          :height 120
-                          :color "#969696"
-                          :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
-                          ::stylefy/media {{:max-width (str width-xs "px")} {:width 80
-                                                                             :height 80}}})
 
 (def lower-section-font-icon  {:font-size "8em"
                                :color "#969696"
