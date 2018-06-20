@@ -255,7 +255,7 @@
    [:div
     (stylefy/use-style (merge
                          (if desktop? style-topnav/topnav-desktop style-topnav/topnav)
-                         (when @is-scrolled?
+                         (when (and desktop? @is-scrolled?)
                            {:height "56px" :line-height "56px"})))
     [:div.container
      (if desktop?
