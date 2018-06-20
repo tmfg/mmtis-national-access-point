@@ -39,6 +39,14 @@
          (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
 
 #?(:cljs
+   (defn format-timestamp->date-for-ui [time]
+     (if  (nil? time)
+       " " ;: if nil - print empty string
+       (->> time
+            t/to-default-time-zone
+            (format/unparse (format/formatter "dd.MM.yyyy"))))))
+
+#?(:cljs
    (defn date-fields-from-timestamp [timestamp]
      (if  (nil? timestamp)
        nil
