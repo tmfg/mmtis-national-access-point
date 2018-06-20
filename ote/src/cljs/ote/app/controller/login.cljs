@@ -69,8 +69,7 @@
       (-> app
           (dissoc :login)
           (update-transport-operator-data (:session-data response))
-          (assoc :flash-message (tr [:common-texts :logged-in])
-                 :page new-page)))))
+          (assoc :flash-message (tr [:common-texts :logged-in]))))))
 
 (extend-protocol tuck/Event
 

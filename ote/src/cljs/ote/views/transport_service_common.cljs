@@ -471,3 +471,11 @@
                        (if (= sub-type :taxi)
                          false
                           true))}))
+
+
+(defn place-search-dirty-event [e!]
+  ;; To set transport service form dirty when adding / removing places using the place-search component,
+  ;; we'll have to manually trigger EditTransportService event with empty data.
+  #(do
+     (e! (ts/->EditTransportService {}))
+     (e! %)))
