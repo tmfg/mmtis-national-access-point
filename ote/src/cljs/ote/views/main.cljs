@@ -400,6 +400,15 @@
       (str "/user/edit/" (:username user))
       #(e! (fp-controller/->ToggleUserEditDialog))])])
 
+(defn- scroll-to-page
+  "Invisible component that scrolls to the top of the window whenever it is mounted."
+  [page]
+  (r/create-class
+   {:component-did-mount #(.scrollTo js/window 0 0)
+    :reagent-render
+    (fn [page]
+      [:span])}))
+
 (defn ote-application
   "OTE application main view"
   [e! app]
@@ -431,6 +440,11 @@
                          {:style {:padding-bottom "20px"}
                           :class "container"})
                   [document-title (:page app)]
+
+                  ;; Ensure that a new scroll-to-page component is created when page changes
+                  ^{:key (name (:page app))}
+                  [scroll-to-page (:page app)]
+
                   (case (:page app)
                     :front-page [fp/front-page e! app]
                     :own-services [fp/own-services e! app]
@@ -456,11 +470,12 @@
                     :new-notice [notice/new-pre-notice e! app]
                     :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
                     :pre-notices [pre-notices-listing/pre-notices e! app]
-                    :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
 
                     :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
                     :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
-                    :transit-changes [transit-changes/transit-changes e! (:transit-changes app)]
+
+                    (:transit-changes :authority-pre-notices)
+                    [transit-changes/transit-changes e! app]
 
                     [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
            [footer/footer e!]]]]))))
