@@ -8,16 +8,12 @@
              :position "fixed"
              :width "100%"
              :top 0
-             :z-index 100
+             :z-index 999
              :transition "all 300ms ease"})
 
 (def topnav-desktop (merge topnav {:height "80px"
                                    :line-height "80px"
-                                   :position "fixed"
-                                   :width "100%"
-                                   :top 0
-                                   :z-index 100
-                                   :transition "all 300ms ease"}))
+                                   :position "fixed"}))
 
 (def clear {:clear "both"})
 
