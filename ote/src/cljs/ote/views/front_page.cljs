@@ -4,6 +4,7 @@
             [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.icons :as icons]
             [ote.ui.common :refer [linkify ckan-iframe-dialog]]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
@@ -245,8 +246,7 @@
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
-      [cljs-react-material-ui.core/font-icon {:class-name "material-icons"
-                  :style style-front-page/large-font-icon} "all_out"]]
+      [icons/all-out style-front-page/large-font-icon]]
      [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
       [:h2
        (stylefy/use-style style-front-page/h2)
@@ -261,12 +261,10 @@
       [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
        (tr [:front-page :column-transport-services])]]
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
-      [cljs-react-material-ui.core/font-icon {:class-name "material-icons"
-                                              :style style-front-page/large-font-icon} "airport_shuttle"]]]
+      [icons/airport-shuttle style-front-page/large-font-icon]]]
     [:div.row (stylefy/use-style style-front-page/row-media)
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
-      [cljs-react-material-ui.core/font-icon {:class-name "material-icons"
-                                              :style style-front-page/large-font-icon} "flag"]]
+      [icons/flag style-front-page/large-font-icon]]
      [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
       [:h2
        (stylefy/use-style style-front-page/h2)
@@ -278,8 +276,7 @@
     [:div.container
      [:div.col-md-6
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
-       [cljs-react-material-ui.core/font-icon {:class-name "material-icons"
-                                               :style style-front-page/lower-section-font-icon} "train"]
+       [icons/train style-front-page/lower-section-font-icon]
        [:h3 (stylefy/use-style style-front-page/lower-section-title) (tr [:front-page :title-transport-operator])]
        [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-transport-operator])]
@@ -299,8 +296,7 @@
             (tr [:buttons :register-to-service])]])]]]
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
-       [cljs-react-material-ui.core/font-icon {:class-name "material-icons"
-                                               :style      style-front-page/lower-section-font-icon} "developer_mode"]
+       [icons/developer-mode style-front-page/lower-section-font-icon]
        [:h3 (stylefy/use-style style-front-page/lower-section-title) (tr [:front-page :title-developer])]
        [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-developer])]
