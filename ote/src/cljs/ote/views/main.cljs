@@ -9,16 +9,12 @@
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
-            [ote.views.passenger-transportation :as pt]
-            [ote.views.terminal :as terminal]
-            [ote.views.rental :as rental]
-            [ote.views.parking :as parking]
+            [ote.views.footer :as footer]
             [ote.localization :refer [tr tr-key] :as localization]
             [ote.views.place-search :as place-search]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
-            [ote.app.controller.transport-service :as ts]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]
             [ote.ui.form :as form]
@@ -35,8 +31,28 @@
             [ote.views.pre-notices.listing :as pre-notices-listing]
             [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]
             [ote.views.transit-visualization :as transit-visualization]
-            [ote.views.transit-changes :as transit-changes]))
+            [ote.views.transit-changes :as transit-changes]
+            [ote.ui.common :as common-ui]))
 
+
+(defn header-scroll-sensor [is-scrolled? trigger-offset]
+  (let [sensor-node (atom nil)
+        check-scroll (fn []
+                       (let [element-y (.-top (.getBoundingClientRect @sensor-node))]
+                         (reset! is-scrolled? (< element-y trigger-offset))))]
+
+    (r/create-class
+      {:component-did-mount
+       (fn [this]
+         (reset! sensor-node (aget this "refs" "sensor"))
+         (check-scroll)
+         (.addEventListener js/window "scroll" check-scroll))
+       :component-will-unmount
+       (fn [this]
+         (.removeEventListener js/window "scroll" check-scroll))
+       :reagent-render
+       (fn [_]
+         [:span {:ref "sensor"}])})))
 
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
@@ -68,24 +84,6 @@
            (when (:admin? (:user app))
              {:page :admin
               :label [:common-texts :navigation-admin]})])))
-
-(def selectable-languages [["fi" "suomi"]
-                           ["sv" "svenska"]
-                           ["en" "english"]])
-
-(defn- language-selection [e! style link-style show-label?]
-  (let [current-language @localization/selected-language]
-    [:div (stylefy/use-style style) (when show-label? (str (tr [:common-texts :language]) ": "))
-
-     (doall
-      (for [[lang flag] selectable-languages]
-        [:a (merge
-             (stylefy/use-style style-base/language-flag)
-             {:key lang
-              :href "#"
-              :on-click #(e! (fp-controller/->SetLanguage lang))
-              :style link-style})
-         flag]))]))
 
 (defn user-menu [e! {:keys [name username transit-authority?]}]
   (when username
@@ -130,7 +128,7 @@
                     :on-click #(do (.preventDefault %)
                                    (e! (login/->Logout)))} ]
 
-     [ui/menu-item {:primary-text (r/as-element [language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
+     [ui/menu-item {:primary-text (r/as-element [footer/language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
 
 (def own-services-pages #{:own-services :transport-service :new-service :edit-service :transport-operator :organizations})
 (def services-pages #{:services})
@@ -146,20 +144,27 @@
     (= page-group :operators) (operator-pages current-page)
       :default false))
 
-(defn- top-nav-links [e! {current-page :page :as app} desktop?]
+(defn- top-nav-links [e! {current-page :page :as app} desktop? is-scrolled?]
   [:div.navbar (stylefy/use-style style-topnav/clear)
    [:ul (stylefy/use-style style-topnav/ul)
     (when (> (:width app) style-base/mobile-width-px)
       [:li
        [:a
-        (merge (stylefy/use-style (if desktop?
-                                    style-topnav/desktop-link
-                                    style-topnav/link))
-               {:href     "#"
-                :on-click #(do
-                             (.preventDefault %)
-                             (e! (fp-controller/->ChangePage :front-page nil)))})
-        [:img {:src "img/icons/nap-logo.svg" :style style-topnav/img }]]])
+        {:style (merge (if desktop?
+                         style-topnav/desktop-link
+                         style-topnav/link)
+                       (if @is-scrolled?
+                         {:padding-top "0px"}
+                         {:padding-top "11px"}))
+         :href "#"
+         :on-click #(do
+                      (.preventDefault %)
+                      (e! (fp-controller/->ChangePage :front-page nil)))}
+        [:img {:style (merge
+                        style-topnav/logo
+                        (when @is-scrolled?
+                          style-topnav/logo-small))
+               :src "img/icons/nap-logo.svg"}]]])
 
     (doall
      (for [{:keys [page label url]} (header-links app)]
@@ -178,8 +183,12 @@
                                 (e! (fp-controller/->ChangePage page nil))))})
          (tr label)]]))
     [:div.user-menu {:class (is-user-menu-active app)
-                     :style (when (> (:width app) style-base/mobile-width-px)
-                              {:float "right"})}
+                     :style (merge
+                              {:transition "padding-top 300ms ease"}
+                              (when (> (:width app) style-base/mobile-width-px)
+                                {:float "right" :padding-top "12px"})
+                              (when @is-scrolled?
+                                {:padding-top "0px"}))}
      [user-menu e! (:user app)]]
 
     (if (nil? (get-in app [:user :username]))
@@ -214,7 +223,7 @@
               :style (when (> (:width app) style-base/mobile-width-px)
                        {:float "right"})})]]]])
 
-(defn- mobile-top-nav-links [e! app]
+(defn- mobile-top-nav-links [e! app is-scrolled?]
   [:div
    [:ul (stylefy/use-style style-topnav/ul)
     [:li (stylefy/use-style style-topnav/li)
@@ -237,48 +246,21 @@
                                    :height 40
                                    }}]]]]
   (when (get-in app [:ote-service-flags :header-open])
-    (top-nav-links e! app false))])
+    (top-nav-links e! app false is-scrolled?))])
 
 
-(defn- top-nav [e! app]
-  (let [desktop? (> (:width app) style-base/mobile-width-px)]
-    [:div (if desktop? (stylefy/use-style style-topnav/topnav-desktop) (stylefy/use-style style-topnav/topnav) )
-     [:div.container-fluid
-      (if desktop?
-        (top-nav-links e! app true)
-        (mobile-top-nav-links e! app))]]))
-
-
-(defn- footer [e!]
-  [:footer.site-footer
-   [:div.container-fluid
-    [:div.row
-     [:img {:src "/img/EU-logo.png" :style {:float "right"
-                                            :transform "scale(0.5, 0.5)"}}]
-     [:div.col-md-2.footer-links
-      [:a.logo {:href "#" }
-       [:img {:src "/img/icons/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo]) }]]]
-     [:div.col-md-2.footer-links
-      [:ul.unstyled
-       [:li
-        [linkify (tr [:common-texts :footer-livi-url-link])
-         (tr [:common-texts :footer-livi-url]) {:target "_blank"}]]
-       [:li
-        [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help]) {:target "_blank"}]]
-       [:li
-        [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback]) {:target "_blank"}]]
-       [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md" "Developers"]]
-       [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"
-             (tr [:common-texts :navigation-privacy-policy])
-             {:target "_blank"}]]
-       [:li
-        [language-selection e! style-base/language-selection-footer nil true]]]]
-     [:div.col-md-12 (stylefy/use-style style-base/footer-copyright)
-      [linkify "http://creativecommons.org/licenses/by/4.0/"
-       [:img (merge (stylefy/use-sub-style style-base/footer-copyright :logo) {:src "/img/icons/cc.svg"})]
-       {:target "_blank"}]
-      [:div (tr [:common-texts :footer-copyright-disclaimer])]]]]])
-
+(defn- top-nav [e! app is-scrolled? desktop?]
+  [:span
+   [header-scroll-sensor is-scrolled? -250]
+   [:div
+    (stylefy/use-style (merge
+                         (if desktop? style-topnav/topnav-desktop style-topnav/topnav)
+                         (when @is-scrolled?
+                           {:height "56px" :line-height "56px"})))
+    [:div.container
+     (if desktop?
+       (top-nav-links e! app true is-scrolled?)
+       (mobile-top-nav-links e! app is-scrolled?))]]])
 
 (def grey-background-pages #{:edit-service :services :transport-operator :own-services :new-service :operators :routes :pre-notices})
 
@@ -418,58 +400,82 @@
       (str "/user/edit/" (:username user))
       #(e! (fp-controller/->ToggleUserEditDialog))])])
 
+(defn- scroll-to-page
+  "Invisible component that scrolls to the top of the window whenever it is mounted."
+  [page]
+  (r/create-class
+   {:component-did-mount #(.scrollTo js/window 0 0)
+    :reagent-render
+    (fn [page]
+      [:span])}))
+
 (defn ote-application
   "OTE application main view"
   [e! app]
+  (let [is-scrolled? (r/atom false)]
+    (fn [e! {loaded? :transport-operator-data-loaded?
+             login :login
+             :as app}]
+      (let [desktop? (> (:width app) style-base/mobile-width-px)]
+        [:div {:style (stylefy/use-style style-base/body)}
+         [theme e! app
+          [:div.ote-sovellus
+           [top-nav e! app is-scrolled? desktop?]
 
-  (fn [e! {loaded? :transport-operator-data-loaded?
-           login :login
-           :as app}]
-    [:div {:style (stylefy/use-style style-base/body)}
-     [theme e! app
-      [:div.ote-sovellus
-       [top-nav e! app]
+           (if (and (:show? login) common/mobile?)
+             [mobile-login-form e! login]
+             [:span
+              [ckan-dialogs e! app]
+              (if (not loaded?)
+                [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+                [:div.wrapper
+                 (stylefy/use-style (merge
+                                      {:transition "margin-top 300ms ease"}
+                                      (when (grey-background-pages (:page app))
+                                        {:background-color "rgba (58, 57, 57, 0.1)"})
+                                      (if (or (not desktop?) @is-scrolled?)
+                                        {:margin-top "56px"})))
+                 [:div (if (= :front-page (:page app))
+                         {:class "container-fluid"}
+                         {:style {:padding-bottom "20px"}
+                          :class "container"})
+                  [document-title (:page app)]
 
-       (if (and (:show? login) common/mobile?)
-         [mobile-login-form e! login]
-         [:span
-          [ckan-dialogs e! app]
-          (if (not loaded?)
-            [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-            [:div.wrapper (when (grey-background-pages (:page app)) {:class "grey-wrapper"})
-             [:div.container-fluid
-              [document-title (:page app)]
-              (case (:page app)
-                :front-page [fp/front-page e! app]
-                :own-services [fp/own-services e! app]
-                :transport-service [t-service/select-service-type e! app]
-                :transport-operator [to/operator e! app]
+                  ;; Ensure that a new scroll-to-page component is created when page changes
+                  ^{:key (name (:page app))}
+                  [scroll-to-page (:page app)]
 
-                ;; Routes for the service form, one for editing an existing one by id
-                ;; and another when creating a new service
-                :edit-service [t-service/edit-service-by-id e! app]
-                :new-service [t-service/create-new-service e! app]
+                  (case (:page app)
+                    :front-page [fp/front-page e! app]
+                    :own-services [fp/own-services e! app]
+                    :transport-service [t-service/select-service-type e! app]
+                    :transport-operator [to/operator e! app]
 
-                :services [service-search/service-search e! app]
+                    ;; Routes for the service form, one for editing an existing one by id
+                    ;; and another when creating a new service
+                    :edit-service [t-service/edit-service-by-id e! app]
+                    :new-service [t-service/create-new-service e! app]
 
-                :admin [admin/admin-panel e! app]
+                    :services [service-search/service-search e! app]
 
-                :operators [operators/operators e! app]
+                    :admin [admin/admin-panel e! app]
 
-                :routes [route-list/routes e! app]
-                :new-route [route/new-route e! app]
-                :edit-route [route/edit-route-by-id e! app]
+                    :operators [operators/operators e! app]
 
-                ;; 60days pre notice views
-                :new-notice [notice/new-pre-notice e! app]
-                :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
-                :pre-notices [pre-notices-listing/pre-notices e! app]
-                :authority-pre-notices [pre-notices-authority-listing/pre-notices e! app]
+                    :routes [route-list/routes e! app]
+                    :new-route [route/new-route e! app]
+                    :edit-route [route/edit-route-by-id e! app]
 
-                :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
-                :transit-changes [transit-changes/transit-changes e! (:transit-changes app)]
+                    ;; 60days pre notice views
+                    :new-notice [notice/new-pre-notice e! app]
+                    :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
+                    :pre-notices [pre-notices-listing/pre-notices e! app]
 
-                [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
+                    :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
+                    :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
 
-       [footer e!]]]]))
+                    (:transit-changes :authority-pre-notices)
+                    [transit-changes/transit-changes e! app]
+
+                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])])
+           [footer/footer e!]]]]))))

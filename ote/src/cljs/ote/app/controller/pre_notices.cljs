@@ -141,16 +141,20 @@
           (assoc-in [:pre-notice ::t-operator/id] id)
           (assoc
             :transport-operator (:transport-operator selected-operator)
-            :transport-service-vector (:transport-service-vector selected-operator)))))
+            :transport-service-vector (:transport-service-vector selected-operator)
+            :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
 
   EditSingleFormElement
   (process-event [{element :element data :data} app]
-    (assoc-in app [:pre-notice element] data))
+    (-> app
+        (assoc-in [:pre-notice element] data)
+        (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
 
   EditForm
   (process-event [{form-data :form-data} app]
     (-> app
-        (update :pre-notice merge form-data)))
+        (update :pre-notice merge form-data)
+        (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
 
   OpenSendModal
   (process-event [_ app]
@@ -172,16 +176,16 @@
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
                    :on-failure (tuck/send-async! ->SaveNoticeFailure)})
-      (dissoc app :before-unload-message)))
+      app))
 
   SaveNoticeResponse
   (process-event [{response :response} app]
     (routes/navigate! :pre-notices)
     ;; TODO: when published? true, use save-success-send
     (-> app
-        (assoc :flash-message (tr [:pre-notice-page :save-success]))
-        (dissoc :pre-notice)
-        (assoc :page :pre-notices)))
+        (dissoc :pre-notice
+                :before-unload-message)
+        (assoc :flash-message (tr [:pre-notice-page :save-success]))))
 
   SaveNoticeFailure
   (process-event [{response :response} app]
@@ -193,8 +197,7 @@
   CancelNotice
   (process-event [_ app]
     (routes/navigate! :pre-notices)
-    (-> app
-        (dissoc :pre-notice)))
+    app)
 
   DeleteEffectiveDate
   (process-event [{id :id} app]
@@ -213,11 +216,13 @@
                 :on-failure (tuck/send-async! ->ServerError)})))
 
 (define-event SelectedRegions [regions]
-  {:path [:pre-notice]}
+  {}
   (let [region-ids (mapv :id regions)]
     ;; Get locations for all regions
-    (load-region-geojson app region-ids)
-    (assoc app ::transit/regions region-ids)))
+    (load-region-geojson (:pre-notice app) region-ids)
+    (-> app
+        (assoc-in [:pre-notice ::transit/regions] region-ids)
+        (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
 
 (define-event ShowPreNoticeResponse [response]
   {:path [:pre-notice-dialog]}
@@ -252,8 +257,11 @@
   (update app :pre-notice-dialog dissoc :new-comment))
 
 (define-event UploadResponse [response]
-  {:path [:pre-notice :attachments]}
-  (conj (or (vec (butlast app)) []) response))
+  {}
+  (-> app
+      (update-in [:pre-notice :attachments]
+                 #(conj (or (vec (butlast %)) []) response))
+      (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
 
 (define-event UploadAttachment [input]
   {}
@@ -272,8 +280,11 @@
 
 (define-event DeleteAttachment [row-index]
   {:path [:pre-notice :attachments]}
-  (vec (concat (take row-index app)
-           (drop (inc row-index) app))))
+  (-> app
+      (update-in [:pre-notice :attachments]
+                 #(vec (concat (take row-index %)
+                               (drop (inc row-index) %))))
+      (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
 
 (defn load-regions-from-server []
   (comm/get! "pre-notices/regions"

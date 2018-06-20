@@ -11,5 +11,5 @@ SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
  ORDER BY "gtfs-imported" ASC LIMIT 1
    FOR UPDATE SKIP LOCKED;
 
--- name: refresh-nightly-transit-changes!
-REFRESH MATERIALIZED VIEW "nightly-transit-changes";
+-- name: refresh-nightly-transit-changes
+SELECT refresh_nightly_transit_changes();

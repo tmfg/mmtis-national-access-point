@@ -67,7 +67,7 @@
      (tr [:dialog :send-pre-notice :confirm])]))
 
 (defn select-operator [e! operator operators]
-  [:div
+  [:div {:style {:margin-bottom "20px"}}
    [:div.row
     [form-fields/field
      {:label       (tr [:field-labels :select-transport-operator])
@@ -78,67 +78,68 @@
       :options     operators
       :auto-width? true}
      operator]]
-   [:div.row.col-xs-12.col-sm-12.col-md-8
-    [:div.col-xs-8.col-sm-6.col-md-6
-     [form-fields/field
-      {:label     (tr [:field-labels ::t-operator/business-id])
-       :name      ::t-operator/business-id
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::t-operator/business-id operator)]
+   [:div.row
+    [:div.col-xs-12.col-sm-12.col-md-8
+     [:div.col-xs-8.col-sm-6.col-md-6
+      [form-fields/field
+       {:label     (tr [:field-labels ::t-operator/business-id])
+        :name      ::t-operator/business-id
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::t-operator/business-id operator)]
 
-     [form-fields/field
-      {:label     (tr [:field-labels ::db-common/street])
-       :name      ::db-common/street
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::db-common/street (::t-operator/visiting-address operator))]
+      [form-fields/field
+       {:label     (tr [:field-labels ::db-common/street])
+        :name      ::db-common/street
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::db-common/street (::t-operator/visiting-address operator))]
 
-     [form-fields/field
-      {:label     (tr [:field-labels ::db-common/postal_code])
-       :name      ::db-common/postal_code
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::db-common/postal_code (::t-operator/visiting-address operator))]
-     [form-fields/field
-      {:label     (tr [:field-labels ::db-common/post_office])
-       :name      ::db-common/post_office
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::db-common/post_office (::t-operator/visiting-address operator))]]
-    [:div.col-xs-8.col-sm-6.col-md-6
-     [form-fields/field
-      {:label     (tr [:field-labels ::t-operator/homepage])
-       :name      ::t-operator/business-id
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::t-operator/homepage operator)]
-     [form-fields/field
-      {:label     (tr [:field-labels ::t-operator/phone])
-       :name      ::t-operator/phone
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::t-operator/phone operator)]
-     [form-fields/field
-      {:label     (tr [:field-labels ::t-operator/gsm])
-       :name      ::t-operator/gsm
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::t-operator/gsm operator)]
-     [form-fields/field
-      {:label     (tr [:field-labels ::t-operator/email])
-       :name      ::t-operator/email
-       :type      :string
-       :update!   nil
-       :disabled? true}
-      (::t-operator/email operator)]]]])
+      [form-fields/field
+       {:label     (tr [:field-labels ::db-common/postal_code])
+        :name      ::db-common/postal_code
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::db-common/postal_code (::t-operator/visiting-address operator))]
+      [form-fields/field
+       {:label     (tr [:field-labels ::db-common/post_office])
+        :name      ::db-common/post_office
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::db-common/post_office (::t-operator/visiting-address operator))]]
+     [:div.col-xs-8.col-sm-6.col-md-6
+      [form-fields/field
+       {:label     (tr [:field-labels ::t-operator/homepage])
+        :name      ::t-operator/business-id
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::t-operator/homepage operator)]
+      [form-fields/field
+       {:label     (tr [:field-labels ::t-operator/phone])
+        :name      ::t-operator/phone
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::t-operator/phone operator)]
+      [form-fields/field
+       {:label     (tr [:field-labels ::t-operator/gsm])
+        :name      ::t-operator/gsm
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::t-operator/gsm operator)]
+      [form-fields/field
+       {:label     (tr [:field-labels ::t-operator/email])
+        :name      ::t-operator/email
+        :type      :string
+        :update!   nil
+        :disabled? true}
+       (::t-operator/email operator)]]]]])
 
 (defn transport-type [e! {pre-notice :pre-notice :as app}]
   (let [addition [form-fields/field
@@ -213,6 +214,7 @@
           ^{:key region}
           [leaflet/GeoJSON {:data  region-geojson
                             :style {:color "green"}}]))])}))
+
 (defn notice-area [e!]
   (form/group
     {:label   (tr [:pre-notice-page :route-and-area-information-title])
@@ -291,6 +293,7 @@
                     {:name :attachment-file
                      :button-label (tr [:pre-notice-page :select-attachment])
                      :type :file-and-delete
+                     :allowed-file-types [".pdf" ".png" ".jpeg"]
                      :disabled? sent?
                      :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))
                      :on-delete #(e! (pre-notice/->DeleteAttachment %))}]}))

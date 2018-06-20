@@ -88,7 +88,8 @@
     (let [format (str/lower-case (first format))]
       (when (or (= "gtfs" format) (= "kalkati.net" format))
         (linkify
-          (str "#/routes/view-gtfs?url=" (::t-service/url interface)
+          (str "#/routes/view-gtfs?url=" (.encodeURIComponent js/window
+                                                              (::t-service/url interface))
                (when (= "kalkati.net" format)
                  "&type=kalkati"))
           [ui/icon-button
@@ -470,3 +471,11 @@
                        (if (= sub-type :taxi)
                          false
                           true))}))
+
+
+(defn place-search-dirty-event [e!]
+  ;; To set transport service form dirty when adding / removing places using the place-search component,
+  ;; we'll have to manually trigger EditTransportService event with empty data.
+  #(do
+     (e! (ts/->EditTransportService {}))
+     (e! %)))

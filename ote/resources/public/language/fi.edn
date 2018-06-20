@@ -301,6 +301,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   :autocomplete-hint "Kirjoita oma tai valitse listalta"
+  :allowed-file-types "Hyväksyttyjä tiedostomuotoja ovat "
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -357,6 +358,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-calendar-clear "Tyhjennä kalenteri"
   :back-to-draft  "Muuta luonnokseksi"
   :add-new-effective-date "Lisää uusi päivämäärä"
+  :transport-service-catalog "Liikkumispalvelukatalogi"
+  :register-to-service "Rekisteröidy palveluun"
+  :check-out-the-service "Tutustu tietoihin"
   }
 
  ;; Database enumeration values
@@ -525,7 +529,23 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
           :brokerage                "Välityspalvelut"}
 
  :front-page
- {:front-page-content (:md
+ {:title-NAP "NAP - National Access Point"
+  :title-transport-services "Liikkumispalvelut"
+  :title-essential-info "Olennaiset tiedot"
+  :title-transport-operator "Palveluntuottaja"
+  :title-developer "Sovelluskehittäjä"
+  :column-NAP (:md
+                        "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon
+                         **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen**
+                        koneluettavista rajapinnoistaan.
+                        NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä
+                        liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
+  :column-transport-services "Liikkumispalveluilla tarkoitetaan henkilöiden kuljetuspalveluita, kuten tieliikenteen, merenkulun ja ilmailun henkilökuljetuksia; asemia, satamia ja terminaaleja; liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita; yleisiä kaupallisia pysäköintipalveluita sekä välityspalveluita."
+  :column-essential-info "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat, palvelun saatavuus, esteettömyys sekä varaus-, myynti-, lippu- ja maksutiedot. Kaikki tiedot eivät ole olennaisia jokaisen palvelun osalta.  Avattavat tiedot on määritetty valtioneuvoston asetuksessa."
+  :column-transport-operator "Tietojen avaamisvelvollisuus koskee kaikkia liikkumispalveluita tarjoavia yrityksiä. Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii rekisteröitymisen ja kirjautumisen palveluun. NAP-palvelu ohjeistaa käyttäjää kirjaamaan tiettyä palvelua koskevat olennaiset tiedot."
+  :column-developer "NAP on palveluiden kehittäjille tarkoitettu katalogi, josta kehittäjät löytävät tarvitsemiaan tietoja ja rajapintoja. Tietojen hyödyntäminen ei vaadi rekisteröitymistä. NAP mahdollistaa esimerkiksi nykyistä laajempien reittioppaiden ja liikennepalveluiden kehittämisen."
+
+ :front-page-content (:md
                        "\n"
                        "# **Mikä on NAP?**\n"
                        "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon "
@@ -549,7 +569,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                        "## **NAP-palvelun rakenne**\n"
                        "[Palvelukatalogi](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
                        "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
-  :hero-title "Liikkumispalveluiden katalogi."
+  :hero-title "Suomen liikkumispalveluiden tietojen avoin yhteyspiste palveluiden kehitykseen."
   :new-user? "Uusi käyttäjä?"
 
   :table-header-service-name      "Palvelun nimi"
@@ -864,6 +884,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :footer-ckan-software                       "CKAN-ohjelmistolla"
   :footer-made-width                          "Toteutettu"
   :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
+  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
+  :footer-ckan (:md "Toteutetuksessa hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page                               "Valittua sivua ei löydy: "
   :time-unit                                  "Aikayksikkö"
   :time-units {:minutes  "Minuuttia"

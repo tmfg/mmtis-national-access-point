@@ -52,11 +52,7 @@
   CreateNewRoute
   (process-event [_ app]
     (routes/navigate! :new-route)
-    (-> app
-        (dissoc :route)
-        (assoc-in [:route :step] :basic-info)
-        (assoc-in [:route ::transit/route-type] :ferry)
-        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))))
+    app)
 
   OpenDeleteRouteModal
   (process-event [{id :id} app]
@@ -81,7 +77,6 @@
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (::transit/id %) (int response)) (get app :routes-vector))]
       (assoc app :routes-vector filtered-map
-                 :page :routes
                  :flash-message (tr [:common-texts :delete-route-success])
                  :routes-changed? true)))
 

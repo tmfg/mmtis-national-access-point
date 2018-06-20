@@ -35,27 +35,28 @@
       [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])])
 
 (defn new-route [e! app]
-  [:span
-   [form-container e! app]
-   [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
-    [buttons/save {:disabled (not (rw/valid-route? (:route app)))
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (rw/->SaveToDb true)))}
-     (tr [:buttons :save-and-publish])]
-    [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (rw/->SaveToDb false)))}
-     (tr [:buttons :save-as-draft])]
-    [buttons/cancel {:on-click #(do
+  (when-not (nil? (:route app))
+    [:span
+     [form-container e! app]
+     [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
+      [buttons/save {:disabled (not (rw/valid-route? (:route app)))
+                     :on-click #(do
                                   (.preventDefault %)
-                                  (e! (rw/->CancelRoute)))}
-     (tr [:buttons :cancel])]]])
+                                  (e! (rw/->SaveToDb true)))}
+       (tr [:buttons :save-and-publish])]
+      [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (rw/->SaveToDb false)))}
+       (tr [:buttons :save-as-draft])]
+      [buttons/cancel {:on-click #(do
+                                    (.preventDefault %)
+                                    (e! (rw/->CancelRoute)))}
+       (tr [:buttons :cancel])]]]))
 
-(defn edit-route-by-id [e! app]
-  (e! (rw/->LoadRoute (get-in app [:params :id])))
-  (fn [e! app]
+(defn edit-route-by-id [e! {route :route :as app}]
+  (if (or (nil? route) (:loading? route))
+    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
     [:span
      [form-container e! app]
      [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
@@ -68,8 +69,8 @@
           (tr [:buttons :save])]
          [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
                         :on-click #(do
-                                  (.preventDefault %)
-                                  (e! (rw/->SaveToDb false)))}
+                                     (.preventDefault %)
+                                     (e! (rw/->SaveToDb false)))}
           (tr [:buttons :back-to-draft])]]
         [:span
          [buttons/save {:disabled (not (rw/valid-route? (:route app)))
@@ -79,9 +80,9 @@
           (tr [:buttons :save-and-publish])]
          [buttons/save {:disabled (not (rw/valid-name (:route app)))
                         :on-click #(do
-                                  (.preventDefault %)
-                                  (e! (rw/->SaveToDb false)))}
-           (tr [:buttons :save-as-draft])]])
+                                     (.preventDefault %)
+                                     (e! (rw/->SaveToDb false)))}
+          (tr [:buttons :save-as-draft])]])
       [buttons/cancel {:on-click #(do
                                     (.preventDefault %)
                                     (e! (rw/->CancelRoute)))}

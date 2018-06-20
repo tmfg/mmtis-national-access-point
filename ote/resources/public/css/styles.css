@@ -21,6 +21,7 @@ body {
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     margin-bottom: 1rem;
+    font-family: 'Montserrat', montserrat, Arial, sans-serif;
 }
 
 h1 {
@@ -55,8 +56,9 @@ In order to our OTE menu to render correctly work, we need to reset margin and p
 }
 
 .wrapper {
-    padding: 20px 0px 20px 0px;
+    padding: 20px 0px 0px 0px;
     min-height: 100%;
+    margin-top: 80px;
 }
 
 /* Disable top margin for h1 inside wrapper, we do not need top margin for these, as they are our titles.
@@ -88,7 +90,7 @@ In order to our OTE menu to render correctly work, we need to reset margin and p
     .container-fluid {
         padding-left: 0px;
         padding-right: 0px;
-        width: 1170px;
+        width: 100%;
         margin-left: auto;
         margin-right: auto;
     }
@@ -149,7 +151,7 @@ footer {
 
 }
 .site-footer {
-    background: #444444;
+    background: #323232;
     color: #ffffff;
     min-height: 100px;
     padding: 20px 0;
@@ -158,14 +160,11 @@ footer {
     position: relative;
 }
 .site-footer a {
-    color: #ccdee3;
+    color: #fff;
     text-decoration: none;
 }
 .site-footer a:hover {
     text-decoration: underline;
-}
-.footer-links .logo > img {
-    height: 70px;
 }
 
 ul.unstyled, ol.unstyled {
