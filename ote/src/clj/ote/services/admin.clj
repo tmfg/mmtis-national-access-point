@@ -118,21 +118,31 @@
   (let [groups (group-by f coll)]
     (map #(first (groups %)) (distinct (map f coll)))))
 
+(defn- PGobj->clj
+  [data]
+  (mapv
+   (fn [{services :services :as row}]
+     (if services
+       (assoc row :services (cheshire/parse-string (.getValue  services) keyword))
+       row))
+   data))
+
 (defn- business-id-report [db user query]
   (let [services (when
-                   (or
-                     (nil? (:business-id-filter query))
-                     (= :ALL (:business-id-filter query))
-                     (= :services (:business-id-filter query)))
-                   (fetch-service-business-ids db))
+                     (or
+                      (nil? (:business-id-filter query))
+                      (= :ALL (:business-id-filter query))
+                      (= :services (:business-id-filter query)))
+                   (PGobj->clj (fetch-service-business-ids db)))
         operators (when
-                   (or
-                     (nil? (:business-id-filter query))
-                     (= :ALL (:business-id-filter query))
-                     (= :operators (:business-id-filter query)))
-                    (fetch-operator-business-ids db))
+                      (or
+                       (nil? (:business-id-filter query))
+                       (= :ALL (:business-id-filter query))
+                       (= :operators (:business-id-filter query)))
+                    (PGobj->clj (fetch-operator-business-ids db)))
 
         report (concat services operators)]
+
     (sort-by :operator (distinct-by :business-id report))))
 
 (defn- admin-delete-transport-service!

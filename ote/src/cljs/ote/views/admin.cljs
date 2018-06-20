@@ -203,58 +203,91 @@
                [ui/table-row-column {:style {:padding 0}}
                  [groups-list groups]]]))]]])]))
 
+(defn services-list [e! services]
+  [:div {:style {:border-left "1px solid rgb(224, 224, 224)"}}
+   (if (seq services)
+     [:div {:style {:padding "0 0 15px 10px"}}
+
+      [ui/table {:selectable false
+                 :fixed-header true
+                 :body-style {:overflow-y "auto"
+                              :max-height "100px"}}
+       [ui/table-body {:display-row-checkbox false
+                       :show-row-hover true}
+        (doall
+         (for [{:keys [id name transport-type operation-area]} services]
+           ^{:key (str "service-" name)}
+           [ui/table-row {:selectable false
+                          :style groups-row-style}
+            [ui/table-row-column {:style groups-row-style :width "50%"}
+             [:a {:href "#" :on-click #(do
+                                         (.preventDefault %)
+                                         (e! (fp/->ChangePage :edit-service {:id id})))} name] ]
+            [ui/table-row-column {:style groups-row-style :width "20%"} (str/join ", " (mapv #(tr [:enums :ote.db.transport-service/transport-type (keyword %)]) transport-type))]
+            [ui/table-row-column {:style groups-row-style :width "30%"} (str/join ", " operation-area)]
+            ]))]]]
+     [:div {:style {:padding-left "10px"
+                    :line-height "48px"}}
+      "Ei palveluja."])])
+
 (defn business-id-report [e! app]
   (let [{:keys [loading? business-id-filter results]} (get-in app [:admin :business-id-report])]
     [:div
-      [:div.row
-       [:h1 "Y-tunnus raportti"]
-       [:p "Listataan joko Palveluntuottajien y-tunnukset, palveluihin lisättyjen yritysten y-tunnukset tai molemmat.
+     [:div.row
+      [:h1 "Y-tunnus raportti"]
+      [:p "Listataan joko Palveluntuottajien y-tunnukset, palveluihin lisättyjen yritysten y-tunnukset tai molemmat.
        Palveluista mukaan on otettu vain jo julkaistut palvelut."]]
-      [:div.row
-       [form-fields/field {:type :selection
-                           :label "Y-tunnuksen lähde"
-                           :options id-filter-type
-                           :show-option (tr-key [:admin-page :business-id-filter])
-                           :update! #(e! (admin-controller/->UpdateBusinessIdFilter %))}
-        business-id-filter]
-       [ui/raised-button {:label "Hae raportti"
-                          :primary true
-                          :disabled (str/blank? filter)
-                          :on-click #(e! (admin-controller/->GetBusinessIdReport))}]]
+     [:div.row
+      [form-fields/field {:type :selection
+                          :label "Y-tunnuksen lähde"
+                          :options id-filter-type
+                          :show-option (tr-key [:admin-page :business-id-filter])
+                          :update! #(e! (admin-controller/->UpdateBusinessIdFilter %))}
+       business-id-filter]
+      [ui/raised-button {:label "Hae raportti"
+                         :primary true
+                         :disabled (str/blank? filter)
+                         :on-click #(e! (admin-controller/->GetBusinessIdReport))}]]
 
-       (when loading?
-         [:div.row "Ladataan raporttia..."])
+     (when loading?
+       [:div.row "Ladataan raporttia..."])
 
-       (if results
-         [:div.row
-          [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
-          [ui/table {:selectable false}
-           [ui/table-header {:adjust-for-checkbox false
-                             :display-select-all false}
-            [ui/table-row
-             [ui/table-header-column {:width "7%"} "Id"]
-             [ui/table-header-column {:width "20%"} "Yritys"]
-             [ui/table-header-column {:width "13%"} "Y-tunnus"]
-             [ui/table-header-column {:width "15%"} "GSM"]
-             [ui/table-header-column {:width "10%"} "Puhelin"]
-             [ui/table-header-column {:width "20%"} "Sähköposti"]
-             [ui/table-header-column {:width "15%"} "Lähde"]]]
-           [ui/table-body {:display-row-checkbox false}
-            (doall
-             (for [{:keys [id operator business-id gsm phone email source]} results]
-               [ui/table-row {:selectable false}
-                [ui/table-row-column {:width "7%"} id]
-                [ui/table-row-column {:style {:width "21%"}}
-                 [:a {:href     "#"
-                      :on-click #(do
-                                   (.preventDefault %)
-                                   (e! (fp/->ChangePage :transport-operator {:id id})))} operator]]
-                [ui/table-row-column {:width "13%"} business-id]
-                [ui/table-row-column {:width "15%"} gsm]
-                [ui/table-row-column {:width "10%"} phone]
-                [ui/table-row-column {:width "20%"} email]
-                [ui/table-row-column {:width "15%"} (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]
-         [:div "Hakuehdoilla ei löydy yrityksiä"])]))
+     (if results
+       [:div.row
+        [:div "Hakuehdoilla löytyi " (count results) " yritystä."]
+        [:div
+         [ui/table {:selectable false}
+          [ui/table-header {:adjust-for-checkbox false
+                            :display-select-all false}
+           [ui/table-row
+            [ui/table-header-column {:width "7%"   } "Id"]
+            [ui/table-header-column {:width "20%"  } "Yritys"]
+            [ui/table-header-column {:width "13%"  :style {:padding 10}} "Y-tunnus"]
+            [ui/table-header-column {:width "25%"  :style {:padding 10}} "Palvelu"]
+            [ui/table-header-column {:width "10%"  :style {:padding 10}} "Tyyppi"]
+            [ui/table-header-column {:width "15%"  :style {:padding 10}} "Toiminta-alue"]
+            [ui/table-header-column {:width "15%"  } "GSM"]
+            [ui/table-header-column {:width "10%"  } "Puhelin"]
+            [ui/table-header-column {:width "20%"  } "Sähköposti"]
+            [ui/table-header-column {:width "15%"  } "Lähde"]]]
+          [ui/table-body {:display-row-checkbox false}
+           (doall
+            (for [{:keys [id operator business-id services gsm phone email source]} results]
+              [ui/table-row {:selectable false}
+               [ui/table-row-column {:width "7%"} id]
+               [ui/table-row-column {:style {:width "21%"}}
+                [:a {:href     "#"
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (fp/->ChangePage :transport-operator {:id id})))} operator]]
+               [ui/table-row-column {:width "13%" :style {:padding 0}} business-id]
+               [ui/table-row-column {:width "50%" :style {:padding 0}}
+                [services-list e! services]]
+               [ui/table-row-column {:width "15%" :style {:padding 0}} gsm]
+               [ui/table-row-column {:width "10%" :style {:padding 0}} phone]
+               [ui/table-row-column {:width "20%" :style {:padding 0}} email]
+               [ui/table-row-column {:width "15%" :style {:padding 0}} (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]]
+       [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
   (let [{:keys [loading? results service-filter operator-filter published-filter]} (get-in app [:admin :service-listing])]
