@@ -49,9 +49,7 @@
   [page-group current-page pages]
   (cond
     (= page-group :front-page current-page) true
-    (= page-group :own-services) ((:own-services pages) current-page)
-    (= page-group :services) ((:services pages) current-page)
-    (= page-group :operators) ((:operator pages) current-page)
+    (page-group pages) ((page-group pages) current-page)
     :default false))
 
 (defn header-links [app]

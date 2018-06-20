@@ -38,7 +38,7 @@
 (def pages {:own-services #{:own-services :transport-service :new-service :edit-service :transport-operator
                             :organizations}
             :services #{:services}
-            :operator #{:operators}})
+            :operators #{:operators}})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
