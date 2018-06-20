@@ -300,14 +300,14 @@
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
        [cljs-react-material-ui.core/font-icon {:class-name "material-icons"
-                                               :style style-front-page/lower-section-font-icon} "developer_mode"]
+                                               :style      style-front-page/lower-section-font-icon} "developer_mode"]
        [:h3 (stylefy/use-style style-front-page/lower-section-title) (tr [:front-page :title-developer])]
        [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-developer])]
        [:div {:style {:padding-top "20px"}}
-        [:a {:on-click   #(do
-                            (.preventDefault %)
-                            (e! (fp/->ChangePage :services nil)))}
+        [:a {:on-click #(do
+                          (.preventDefault %)
+                          (e! (fp/->ChangePage :services nil)))}
          [:button (stylefy/use-style style-front-page/front-page-button)
           [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
           (tr [:buttons :check-out-the-service])]]]]]]]])
