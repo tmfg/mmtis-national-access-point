@@ -38,9 +38,7 @@
 (def pages {:own-services #{:own-services :transport-service :new-service :edit-service :transport-operator
                             :organizations}
             :services #{:services}
-            :operator #{:operators}
-            :gray-background #{:edit-service :services :transport-operator :own-services :new-service :operators
-                               :routes :pre-notices}})
+            :operator #{:operators}})
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
@@ -209,8 +207,6 @@
                 [:div.wrapper
                  (stylefy/use-style (merge
                                       {:transition "margin-top 300ms ease"}
-                                      (when ((:gray-background pages) (:page app))
-                                        {:background-color "rgba(58, 57, 57, 0.1)"})
                                       (if (or (not desktop?) @is-scrolled?)
                                         {:margin-top "56px"})))
                  [:div (if (= :front-page (:page app))
