@@ -43,16 +43,11 @@
 (def fp-btn-gray {:background-image "linear-gradient(90deg, #ccc, #ccc)"})
 (def fp-btn {:display "flex"
              :padding "20px 20px 20px 10px"
-             :-webkit-box-pack "center"
-             :-webkit-justify-content "center"
-             :-ms-flex-pack "center"
+             :box-pack "center"
              :justify-content "center"
-             :-webkit-backface-visibility "visible"
+             :flex-pack "center"
              :backface-visibility "visible"
-             :-webkit-transform-origin "50% 50% 0px"
-             :-ms-transform-origin "50% 50% 0px"
              :transform-origin "50% 50% 0px"
-             :-webkit-transition "all 300ms ease"
              :transition "all 300ms ease"
              :font-family "Roboto, sans-serif"
              :font-weight "400"
@@ -60,6 +55,8 @@
              :text-align "center"
              :color "#fff"
              :border 0
+             :stylefy/vendors ["webkit" "moz" "o" "ms"]
+             ::stylefy/auto-prefix #{:box-pack :justify-content :flex-pack :backface-visibility :transform-origin :transition}
              })
 
 (def front-page-button (merge
@@ -89,71 +86,73 @@
 (def large-font-icon  {:font-size "14rem"
                        :color "#969696"
                        :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
-                       ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "10rem"}}})
+                       ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "10rrem"}}})
 
 (def front-page-h1  {:position "static"
                       :display "flex"
                       :padding-top "40px"
-                      :-webkit-box-orient "vertical"
-                      :-webkit-box-direction "normal"
-                      :-webkit-flex-direction "column"
+                      :box-orient "vertical"
+                      :box-direction "normal"
                       :flex-direction "column"
-                      :-webkit-box-pack "start"
-                      :-ms-flex-pack "start"
+                      :box-pack "start"
+                      :flex-pack "start"
                       :justify-content "flex-start"
-                      :-webkit-box-align "center"
-                      :-ms-flex-align "center"
+                      :box-align "center"
+                      :flex-align "center"
                       :align-items "center"
                       :font-family "Montserrat, sans-serif"
                       :color "#fff"
-                      :font-size "6em"
+                      :font-size "6rem"
                       :font-weight "200"
                       :text-shadow "0 2px 10px rgba(0, 0, 0, .5)"
+                      :stylefy/vendors ["webkit" "moz" "o" "ms"]
+                      ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :flex-pack :justify-content :box-align :flex-align}
                       ::stylefy/media {{:max-width (str width-sm "px")} {:padding-top "20px"
-                                                                         :font-size "4em"
+                                                                         :font-size "4rem"
                                                                          :font-weight "300"}
                                        {:max-width (str width-xs "px")} {:padding-top "20px"
-                                                                         :font-size "3em"
+                                                                         :font-size "3rem"
                                                                          :font-weight "400"}
                                        {:min-width "0px" :max-width (str width-xxs "px")} {:padding-top "20px"
-                                                                                           :font-size "2.5em"
+                                                                                           :font-size "2.5rem"
                                                                                            :font-weight "400"}}})
 
 (def front-page-hero-text {:display "flex"
                            :margin-top "60px"
-                           :-webkit-box-orient "vertical"
-                           :-webkit-box-direction "normal"
-                           :-webkit-flex-direction "column"
-                           :-ms-flex-direction "column"
+                           :box-orient "vertical"
+                           :box-direction "normal"
                            :flex-direction "column"
-                           :-webkit-box-pack "start"
-                           :-webkit-justify-content "flex-start"
-                           :-ms-flex-pack "start"
+                           :box-pack "start"
+                           :flex-pack "start"
                            :justify-content "flex-start"
                            :v-webkit-box-align "center"
-                           :-webkit-align-items "center"
-                           :-ms-flex-align "center"
+                           :flex-align "center"
                            :align-items "center"
                            :font-family "Montserrat, sans-serif"
                            :color "#fafafa"
-                           :font-size "2.25em"
-                           :line-height "1.5em"
+                           :font-size "2.25rem"
+                           :line-height "2.25rem"
                            :font-weight "300"
                            :text-align "center"
                            :text-shadow "0 1px 5px rgba(0, 0, 0, .5)"
+                           :stylefy/vendors ["webkit" "moz" "o" "ms"]
+                           ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :flex-pack :justify-content :align-items :flex-align}
                            ::stylefy/media {{:max-width (str width-sm "px")} {:margin-top "40px"
-                                                                              :font-size "1.6em"
+                                                                              :line-height "1.6rem"
+                                                                              :font-size "1.6rem"
                                                                               :font-weight "400"}
                                             {:max-width (str width-xs "px")} {:margin-top "20px"
-                                                                              :font-size "1.4em"
+                                                                              :line-height "1.4rem"
+                                                                              :font-size "1.4rem"
                                                                               :font-weight "400"}
                                             {:min-width "0px" :max-width (str width-xxs "px")} {:margin-top "20px"
-                                                                                                :font-size "1.2em"
+                                                                                                :line-height "1.2rem"
+                                                                                                :font-size "1.2rem"
                                                                                                 :font-weight "400"}}})
 
 (def third-column-text {:margin-bottom 40
                         :color "#c8c8c8"
-                        :font-size "0.875em"
+                        :font-size "0.875rem"
                         :font-weight 300
                         :-webkit-align-items "flex-start"})
 
@@ -166,18 +165,18 @@
 
 (def lower-section-data-container {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"})
 
-(def lower-section-title {:font-size "1.5em"
+(def lower-section-title {:font-size "1.5rem"
                           :font-weight 600
-                          ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.25em"
+                          ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "1.25rem"
                                                                              :font-weight 500}}})
 
-(def lower-section-font-icon  {:font-size "8em"
+(def lower-section-font-icon  {:font-size "8rem"
                                :color "#969696"
                                :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
-                               ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "6em"}
-                                                {:min-width "0px" :max-width (str width-xxs "px")} {:font-size "5em"}}})
+                               ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "6rem"}
+                                                {:min-width "0px" :max-width (str width-xxs "px")} {:font-size "5rem"}}})
 
-(def lower-section-text {:text-align "center" :font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"})
+(def lower-section-text {:text-align "center" :font-size "1rem" :font-weight 400 :text-aign "left" :line-height "1.5"})
 
 (def footer-logo-ul {
                      ::stylefy/media {{:max-width (str width-xs "px")} {:display "flex"
