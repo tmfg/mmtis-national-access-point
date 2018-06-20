@@ -476,5 +476,6 @@
 (defn place-search-dirty-event [e!]
   ;; To set transport service form dirty when adding / removing places using the place-search component,
   ;; we'll have to manually trigger EditTransportService event with empty data.
-  (e! (ts/->EditTransportService {}))
-  (e! %))
+  #(do
+     (e! (ts/->EditTransportService {}))
+     (e! %)))
