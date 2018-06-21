@@ -5,6 +5,8 @@ services AS (
            'id',             s1.id,
            'name',           s1.name,
            'transport-type', s1."transport-type",
+           'sub-type',       s1."sub-type",
+           'brokerage?',     s1."brokerage?",
            'operation-area', (SELECT array_agg(description[1].text)
                                 FROM "operation_area" oa
                                WHERE oa."transport-service-id" = s1.id)))) AS services
@@ -28,7 +30,7 @@ SELECT *
 -- name: fetch-operator-business-ids
 SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
        o."phone" as "phone", o."gsm" as "gsm", o."email" as "email", CAST('operator' AS text) as "source",
-       (SELECT to_json(array_agg(json_build_object('id', s.id, 'name', s."name", 'transport-type', s."transport-type", 'operation-area',
+       (SELECT to_json(array_agg(json_build_object('id', s.id, 'name', s."name", 'transport-type', s."transport-type", 'sub-type', s."sub-type", 'brokerage?', s."brokerage?", 'operation-area',
           (SELECT array_agg(description[1].text) FROM "operation_area" oa
              where oa."transport-service-id" = s.id))))
           FROM "transport-service" s
