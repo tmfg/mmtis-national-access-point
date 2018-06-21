@@ -279,7 +279,7 @@
         (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
 
 (define-event DeleteAttachment [row-index]
-  {:path [:pre-notice :attachments]}
+  {}
   (-> app
       (update-in [:pre-notice :attachments]
                  #(vec (concat (take row-index %)
