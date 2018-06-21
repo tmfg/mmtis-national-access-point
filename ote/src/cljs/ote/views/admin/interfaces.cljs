@@ -165,8 +165,7 @@
         [:div
          [:div "Hakuehdoilla löytyi " (count results) " rajapintaa. "
           [ui/raised-button {:secondary true
-                             :on-click #(e! (admin-controller/->DownloadInterfacesCSV)
-                                         )
+                             :on-click #(e! (admin-controller/->DownloadInterfacesCSV))
                              :label "Lataa CSV"}]]
          [ui/table {:selectable false}
           [ui/table-header {:adjust-for-checkbox false
