@@ -1201,6 +1201,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
   :logged-out "Olet kirjautunut ulos."}
 
+  :gtfs-viewer
+ {:gtfs-load-failed "Palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
+
 
  :leaflet
  {:zoom-in "Lähennä"

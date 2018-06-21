@@ -1192,6 +1192,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :check-email-for-link "Återställningskoden har skickats per e-post."
   :logged-out "Du har blivit utloggad"}
 
+  :gtfs-viewer
+ {:gtfs-load-failed "Kan inte visa ruttinformation på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
+
 
  :leaflet
  {:zoom-in "Zooma in"
