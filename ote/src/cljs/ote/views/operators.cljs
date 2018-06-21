@@ -15,7 +15,8 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.common :as common]
             [ote.app.controller.front-page :as fp-controller]
-            [ote.ui.common :as common-ui]))
+            [ote.ui.common :as common-ui]
+            [ote.util.text :as text]))
 
 (defn show-service-count-link [e! operator]
   (let [service-count (::t-operator/service-count operator)]
@@ -99,7 +100,7 @@
          [:div (stylefy/use-style style-service-search/operator-description)
           [:div
            (if (< 120 (count (::t-operator/description ckan-group)))
-             [:span (common-ui/shorten-text-to 120 (::t-operator/description ckan-group))
+             [:span (text/shorten-text-to 120 (::t-operator/description ckan-group))
               [:br]
               [:a.operator-link {:href     "#/operators"
                                  :on-click #(do (.preventDefault %)

@@ -99,11 +99,7 @@
        [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
        [:div.col-md-6 (:service-email interface)]]]]))
 
-(defn parse-content-value [value-array]
-  (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
-        value-str (str/join ", " (map #(data-content-value (keyword %)) value-array))
-        return-value (common-ui/maybe-shorten-text-to 45 value-str)]
-    return-value))
+
 
 (defn- gtfs-viewer-link [url format]
   (when format
@@ -124,53 +120,36 @@
     [:div.row
      [:div.row.col-md-12 {:style {:padding-top "20px"}}
       [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
-       [(form/group
-          {:label   "Etsi rajapintoja"
-           :columns 3
-           :layout  :row}
+       [(apply
+         form/group
+         {:label   "Etsi rajapintoja"
+          :columns 3
+          :layout  :row}
 
-          {:name            :operator-name
-           :label "Palveluntuottaja"
-           :type            :string
-           :hint-text       "Palveluntuottajan nimi tai sen osa"
-           :full-width?     true
-           :container-class "col-xs-12 col-sm-4 col-md-4"
-           }
-          {:name            :service-name
-           :label "Palvelu"
-           :type            :string
-           :hint-text       "Palvelun nimi tai sen osa"
-           :full-width?     true
-           :container-class "col-xs-12 col-sm-4 col-md-4"
-           }
-          {:name            :interface-format
-           :type            :selection
-           :options         interface-formats
-           :label           "Tyyppi"
-           :hint-text       "Palvelun nimi tai sen osa"
-           :show-option     (tr-key [:admin-page :interface-formats])
-           :update!         #(e! (admin-controller/->UpdatePublishedFilter %))
-           :full-width?     true
-           :container-class "col-xs-12 col-sm-4 col-md-4"
-           }
-          {:name            :interface-url
-           :type            :string
-           :label           "Rajapinnan osoite"
-           :full-width?     true
-           :container-class "col-xs-12 col-sm-4 col-md-4"
-           }
-          {:name            :import-error
-           :type            :checkbox
-           :label           "Latausvirheet"
-           :full-width?     true
-           :container-class "col-xs-12 col-sm-4 col-md-4"
-           }
-          {:name            :db-error
-           :type            :checkbox
-           :label           "Käsittelyvirhe"
-           :full-width?     true
-           :container-class "col-xs-12 col-sm-4 col-md-4"
-           })]
+         (map #(merge {:type :string
+                       :container-class "col-xs-12 col-sm-4 col-md-4"
+                       :full-width? true} %)
+              [{:name            :operator-name
+                :label "Palveluntuottaja"
+                :hint-text       "Palveluntuottajan nimi tai sen osa"}
+               {:name            :service-name
+                :label "Palvelu"
+                :hint-text       "Palvelun nimi tai sen osa"}
+               {:name            :interface-format
+                :type            :selection
+                :options         interface-formats
+                :label           "Tyyppi"
+                :hint-text       "Palvelun nimi tai sen osa"
+                :show-option     (tr-key [:admin-page :interface-formats])
+                :update!         #(e! (admin-controller/->UpdatePublishedFilter %))}
+               {:name            :interface-url
+                :label           "Rajapinnan osoite"}
+               {:name            :import-error
+                :type            :checkbox
+                :label           "Latausvirheet"}
+               {:name            :db-error
+                :type            :checkbox
+                :label           "Käsittelyvirhe"}]))]
        filters]
 
       [ui/raised-button {:primary  true
@@ -184,7 +163,11 @@
 
       (when results
         [:div
-         [:div "Hakuehdoilla löytyi " (count results) " rajapintaa."]
+         [:div "Hakuehdoilla löytyi " (count results) " rajapintaa. "
+          [ui/raised-button {:secondary true
+                             :on-click #(e! (admin-controller/->DownloadInterfacesCSV)
+                                         )
+                             :label "Lataa CSV"}]]
          [ui/table {:selectable false}
           [ui/table-header {:adjust-for-checkbox false
                             :display-select-all  false}
@@ -204,7 +187,7 @@
                                                                   :on-click #(do (.preventDefault %)
                                                                                  (e! (admin-controller/->OpenOperatorModal interface-id)))}
                                                               operator-name]]
-                [ui/table-row-column {:style {:width "15%"}} (parse-content-value data-content)]
+                [ui/table-row-column {:style {:width "15%"}} (admin-controller/format-interface-content-values data-content)]
                 [ui/table-row-column {:style {:width "10%"}} (first format)]
                 [ui/table-row-column {:style {:width "25%"}} [linkify url url {:target "_blank"}]]
                 [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui imported)]
