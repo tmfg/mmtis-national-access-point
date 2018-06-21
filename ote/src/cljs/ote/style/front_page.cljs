@@ -36,9 +36,9 @@
                   :cursor "pointer"
                   :background-image "linear-gradient(90deg, #06c, #0029b8)"})
 (def fp-btn-hover {::stylefy/mode {:hover {:box-shadow "1px 1px 4px 0 rgba(0, 0, 0, .2)"
-                                           :-webkit-transform "scale(0.98)"
-                                           :-ms-transform "scale(0.98)"
-                                           :transform "scale(0.98)"}}})
+                                           :transform "scale(0.98)"}
+                                           :stylefy/vendors ["webkit" "moz" "o" "ms"]
+                                           ::stylefy/auto-prefix #{:transform}}})
 (def fp-btn-blue-hover {:background-image "-webkit-linear-gradient(45deg, #06c, #0029b8)"})
 (def fp-btn-gray {:background-image "linear-gradient(90deg, #ccc, #ccc)"})
 (def fp-btn {:display "flex"
