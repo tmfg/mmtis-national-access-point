@@ -27,7 +27,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
             [ote.views.transport-operator :as t-operator-view]
-            [ote.ui.list_header :as list-header]
+            [ote.ui.list-header :as list-header]
             [clojure.string :as str]))
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
@@ -117,8 +117,7 @@
              [:br]
              "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/ote/#/services"} "finap.fi" ]
              [:br]
-             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
-             ]])))
+             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]]])))
 
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
