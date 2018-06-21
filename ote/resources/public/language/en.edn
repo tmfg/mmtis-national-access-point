@@ -602,7 +602,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :desc-to-add-new-operator-5 "Did you not find the transport operator you were looking for or are you the main user of the organization, company or community you are representing?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "You have not added information about your transport services to NAP-catalog so far."}
+  :operator-dont-have-any-services "You have added service provider information to NAP-service catalog succesfully. Well done! Next, please, add a new transport service or services to NAP. If you conduct many types of transport services, add first just a single service by pressing the button ”Add a new service”. After that you can add another service the same way as the previous one."}
 
 
  :organization-page
