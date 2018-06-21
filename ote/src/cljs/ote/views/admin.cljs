@@ -144,7 +144,6 @@
          (for [{:keys [id name transport-type sub-type brokerage? operation-area]} services]
            ^{:key (str "service-" name)}
            [ui/table-row {:selectable false :style services-row-style}
-            (.log js/console "sub-type: " (pr-str sub-type))
             [ui/table-row-column {:style services-row-style
                                   :width "25%"}
              [:a {:href "#" :on-click #(do
