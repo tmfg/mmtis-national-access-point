@@ -127,10 +127,12 @@
                                                               [ic/content-create]]
                  [delete-transport-operator-action e! result]]]))]]])]]))
 
+(def services-row-style {:height "20px" :padding "0 0 0px 1px"})
+
 (defn services-list [e! services]
   [:div {:style {:border-left "1px solid rgb(224, 224, 224)"}}
    (if (seq services)
-     [:div {:style {:padding "0 0 15px 10px"}}
+     [:div {:style {:padding "0 0 0px 5px"}}
 
       [ui/table {:selectable false
                  :fixed-header true
@@ -141,14 +143,14 @@
         (doall
          (for [{:keys [id name transport-type operation-area]} services]
            ^{:key (str "service-" name)}
-           [ui/table-row {:selectable false
-                          :style groups-row-style}
-            [ui/table-row-column {:style groups-row-style :width "50%"}
+           [ui/table-row {:selectable false :style services-row-style}
+            [ui/table-row-column {:style services-row-style
+                                  :width "35%"}
              [:a {:href "#" :on-click #(do
                                          (.preventDefault %)
                                          (e! (fp/->ChangePage :edit-service {:id id})))} name] ]
-            [ui/table-row-column {:style groups-row-style :width "20%"} (str/join ", " (mapv #(tr [:enums :ote.db.transport-service/transport-type (keyword %)]) transport-type))]
-            [ui/table-row-column {:style groups-row-style :width "30%"} (str/join ", " operation-area)]
+            [ui/table-row-column {:style services-row-style :width "30%"} (str/join ", " (mapv #(tr [:enums :ote.db.transport-service/transport-type (keyword %)]) transport-type))]
+            [ui/table-row-column {:style services-row-style :width "35%"} (str/join ", " operation-area)]
             ]))]]]
      [:div {:style {:padding-left "10px"
                     :line-height "48px"}}
@@ -199,18 +201,18 @@
             (for [{:keys [id operator business-id services gsm phone email source]} results]
               [ui/table-row {:selectable false}
                [ui/table-row-column {:width "7%"} id]
-               [ui/table-row-column {:style {:width "21%"}}
+               [ui/table-row-column {:width "21%" :style services-row-style}
                 [:a {:href     "#"
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (fp/->ChangePage :transport-operator {:id id})))} operator]]
-               [ui/table-row-column {:width "13%" :style {:padding 0}} business-id]
-               [ui/table-row-column {:width "50%" :style {:padding 0}}
+               [ui/table-row-column {:width "13%" :style services-row-style} business-id]
+               [ui/table-row-column {:width "50%" :style services-row-style}
                 [services-list e! services]]
-               [ui/table-row-column {:width "15%" :style {:padding 0}} gsm]
-               [ui/table-row-column {:width "10%" :style {:padding 0}} phone]
-               [ui/table-row-column {:width "20%" :style {:padding 0}} email]
-               [ui/table-row-column {:width "15%" :style {:padding 0}} (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]]
+               [ui/table-row-column {:width "15%" :style services-row-style} gsm]
+               [ui/table-row-column {:width "10%" :style services-row-style} phone]
+               [ui/table-row-column {:width "20%" :style services-row-style} email]
+               [ui/table-row-column {:width "15%" :style services-row-style} (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]]
        [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn service-listing [e! app]
