@@ -1,19 +1,29 @@
 (ns ote.style.topnav
   (:require [stylefy.core :as stylefy]))
 
+(def topnav-wrapper {:position "fixed"
+                     :width "100%"
+                     :top 0
+                     :z-index 999
+                     :transition "all 300ms ease"})
+
+(def topnav-dropdown {:width "100%"
+                      :background-color "#323232"
+                      :min-height "200px"
+                      :padding-top "20px"
+                      :padding-bottom "20px"
+                      :border-top "2px solid #646464"
+                      :transition "visibility 300ms ease, opacity 300ms ease"})
+
+
 (def topnav {:min-height "56px"
-             :overflow "hidden"
              :background-color "#323232"
+             :overflow "hidden"
              :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
-             :position "fixed"
-             :width "100%"
-             :top 0
-             :z-index 999
              :transition "all 300ms ease"})
 
 (def topnav-desktop (merge topnav {:height "80px"
-                                   :line-height "80px"
-                                   :position "fixed"}))
+                                   :line-height "80px"}))
 
 (def clear {:clear "both"})
 
@@ -31,7 +41,15 @@
            :padding "10px 15px 10px 15px"
            :text-decoration "none"
            :font-size "0.875em"
+           :display "block"
            ::stylefy/mode {:hover {:background "rgba(0, 0, 0, 0.2)"}}})
+
+(def topnav-dropdown-link
+  {:color "#fafafa"
+   :padding "10px 0 10px 0"
+   :text-decoration "none"
+   :font-size "1rem"
+   :display "block"})
 
 (def logo {:transition "margin-top 300ms ease, height 300ms ease"
            :margin-top "10px"

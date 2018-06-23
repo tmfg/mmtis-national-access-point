@@ -52,29 +52,6 @@
     (page-group pages) ((page-group pages) current-page)
     :default false))
 
-(defn header-links [app]
-  (let [operators-list-link (if (flags/enabled? :ote-operators-list)
-                              {:page  :operators
-                               :label [:common-texts :navigation-organizations]}
-                              {:page  :organizations
-                               :label [:common-texts :navigation-organizations]
-                               :url   "/organization"})]
-    (filter some?
-            [{:page  :front-page
-              :label [:common-texts :navigation-front-page]}
-
-             {:page  :services
-              :label [:common-texts :navigation-dataset]}
-
-             operators-list-link
-
-             (when (logged-in? app)
-               {:page  :own-services
-                :label [:common-texts :navigation-own-service-list]})
-
-             (when (:admin? (:user app))
-               {:page :admin
-                :label [:common-texts :navigation-admin]})])))
 
 (defn user-menu [e! {:keys [name username transit-authority?]}]
   (when username
@@ -117,125 +94,157 @@
      [ui/menu-item {:style {:color "#FFFFFF"}
                     :primary-text (tr [:common-texts :user-menu-log-out])
                     :on-click #(do (.preventDefault %)
-                                   (e! (login/->Logout)))} ]
+                                   (e! (login/->Logout)))}]
 
      [ui/menu-item {:primary-text (r/as-element [footer/language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
 
-(defn- top-nav-links [e! {current-page :page :as app} desktop? is-scrolled? pages]
+
+(defn- top-nav-drop-down-menu [e! app is-scrolled? pages]
+  (let [header-open? (get-in app [:ote-service-flags :header-open])]
+    [:div {:style (merge style-topnav/topnav-dropdown
+                         (if header-open?
+                           {:opacity 1
+                            :visibility "visible"}
+                           {:opacity 0
+                            :visibility "hidden"
+                            ;; Remove the element from normal document flow, by setting position absolute.
+                            :position "absolute"}))}
+     [:div.container
+      [:div.row
+       [:div.col-md-4
+        [:ul (stylefy/use-style style-topnav/ul)
+         [:li
+          [:a (merge (stylefy/use-style
+                       style-topnav/topnav-dropdown-link)
+                     {:href "#/"})
+           "Etusivu"]]
+
+         [:li
+          [:a (merge (stylefy/use-style
+                       style-topnav/topnav-dropdown-link)
+                     {:href "#/services"})
+           "Liikkumispalvelukatalogi"]]]]
+       [:div.col-md-4
+        [:ul (stylefy/use-style style-topnav/ul)
+         [:li
+          [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
+           (merge (stylefy/use-style
+                    style-topnav/topnav-dropdown-link)
+                  {:target "_blank"})]]
+
+         [:li
+          [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
+           "Ohjelmointirajapinta kehittäjille"
+           (merge (stylefy/use-style
+                    style-topnav/topnav-dropdown-link)
+                  {:target "_blank"})]]]]
+       [:div.col-md-4
+        [:ul (stylefy/use-style style-topnav/ul)
+         (if (nil? (get-in app [:user :username]))
+           [:ul (stylefy/use-style style-topnav/ul)
+            [:li
+             [:a (merge (stylefy/use-style
+                          style-topnav/topnav-dropdown-link)
+                        {:href "#"
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (fp-controller/->ToggleRegistrationDialog)))})
+              (tr [:common-texts :navigation-register])]]
+            [:li
+             (if (flags/enabled? :ote-login)
+               [:a (merge (stylefy/use-style
+                            style-topnav/topnav-dropdown-link)
+                          {:href "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (login/->ShowLoginDialog)))})
+                (tr [:common-texts :navigation-login])]
+               [linkify "/user/login" (tr [:common-texts :navigation-login])
+                (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link))])]])
+
+         [:li
+          [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" "Rekisteriseloste"
+           (merge (stylefy/use-style
+                    style-topnav/topnav-dropdown-link)
+                  {:target "_blank"})]]
+         [:li
+          [linkify "http://bit.ly/nap-palaute" "Palautelomake"
+           (merge (stylefy/use-style
+                    style-topnav/topnav-dropdown-link)
+                  {:target "_blank"})]]]]]]]))
+
+(defn- top-nav-links [e! {current-page :page :as app} is-scrolled? pages]
   [:div.navbar (stylefy/use-style style-topnav/clear)
    [:ul (stylefy/use-style style-topnav/ul)
-    (when (> (:width app) style-base/mobile-width-px)
-      [:li
-       [:a
-        {:style (merge (if desktop?
-                         style-topnav/desktop-link
-                         style-topnav/link)
-                       (if @is-scrolled?
-                         {:padding-top "0px"}
-                         {:padding-top "11px"}))
-         :href "#"
-         :on-click #(do
-                      (.preventDefault %)
-                      (e! (fp-controller/->ChangePage :front-page nil)))}
-        [:img {:style (merge
-                        style-topnav/logo
-                        (when @is-scrolled?
-                          style-topnav/logo-small))
-               :src "img/icons/nap-logo.svg"}]]])
+    [:li
+     [:a
+      {:style (merge
+                style-topnav/desktop-link
+                (if @is-scrolled?
+                  {:padding-top "0px"}
+                  {:padding-top "11px"}))
+       :href "#"
+       :on-click #(do
+                    (.preventDefault %)
+                    (e! (fp-controller/->ChangePage :front-page nil)))}
+      [:img {:style (merge
+                      style-topnav/logo
+                      (when @is-scrolled?
+                        style-topnav/logo-small))
+             :src "img/icons/nap-logo.svg"}]]]
 
     (doall
-      (for [{:keys [page label url]} (header-links app)]
+      (for [{:keys [page label url]}
+            (filter some? [{:page :services
+                            :label [:common-texts :navigation-dataset]}
+                           (when (logged-in? app)
+                             {:page :own-services
+                              :label [:common-texts :navigation-own-service-list]})])]
         ^{:key page}
-        [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
+        [:li
          [:a
-          (merge (stylefy/use-style
-                   (if (page-active? page current-page pages)
-                     (if desktop? style-topnav/desktop-active style-topnav/active)
-                     (if desktop? style-topnav/desktop-link style-topnav/link)))
-                 {:href     "#"
-                  :on-click #(do
-                               (.preventDefault %)
-                               (if url
-                                 (e! (fp-controller/->GoToUrl url))
-                                 (e! (fp-controller/->ChangePage page nil))))})
+          (merge
+            (stylefy/use-style style-topnav/desktop-link)
+            {:href "#"
+             :on-click #(do
+                          (.preventDefault %)
+                          (if url
+                            (e! (fp-controller/->GoToUrl url))
+                            (e! (fp-controller/->ChangePage page nil))))})
           (tr label)]]))
-    [:div.user-menu {:class (is-user-menu-active app)
-                     :style (merge
-                              {:transition "padding-top 300ms ease"}
-                              (when (> (:width app) style-base/mobile-width-px)
-                                {:float "right" :padding-top "12px"})
-                              (when @is-scrolled?
-                                {:padding-top "0px"}))}
-     [user-menu e! (:user app)]]
 
-    (if (nil? (get-in app [:user :username]))
-      [:ul (stylefy/use-style style-topnav/ul)
-       [:li {:style {:float "right"}}
-        [:a (merge (stylefy/use-style
-                     (if desktop? style-topnav/desktop-link style-topnav/link))
-                   {:href "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (fp-controller/->ToggleRegistrationDialog)))})
-         (tr [:common-texts :navigation-register])]]
-       [:li
-        (if (flags/enabled? :ote-login)
-          [:a (merge (stylefy/use-style
-                       (if desktop? style-topnav/desktop-link style-topnav/link))
-                     {:style {:float "right"}}
-                     {:on-click #(do
-                                   (.preventDefault %)
-                                   (e! (login/->ShowLoginDialog)))})
-           (tr [:common-texts :navigation-login])]
-          [linkify "/user/login" (tr [:common-texts :navigation-login])
-           (merge (stylefy/use-style
-                    (if desktop? style-topnav/desktop-link style-topnav/link))
-                  {:style {:float "right"}})])]])
 
-    [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
-     [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
-      (merge (stylefy/use-style
-               (if desktop? style-topnav/desktop-link style-topnav/link))
-             {:target "_blank"
-              :style (when (> (:width app) style-base/mobile-width-px)
-                       {:float "right"})})]]]])
-
-(defn- mobile-top-nav-links [e! app is-scrolled? pages]
-  [:div
-   [:ul (stylefy/use-style style-topnav/ul)
-    [:li (stylefy/use-style style-topnav/li)
-     [:a (merge
-           (stylefy/use-style style-topnav/link)
-           {:href     "#"
-            :on-click #(do
-                         (.preventDefault %)
-                         (e! (fp-controller/->GoToUrl "/")))})
-      [:img {:src "img/icons/nap-logo.svg"}]]]
-    [:li (stylefy/use-style style-topnav/right)
+    [:li {:style {:float "right"}}
      [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
-                      :style {:padding 8
-                              :width 56
-                              :height 56}
-                      :icon-style {:height 40
-                                   :width 40}}
-      [ic/action-reorder {:style {:color "#fff"
-                                  :width 40
-                                  :height 40
-                                  }}]]]]
-   (when (get-in app [:ote-service-flags :header-open])
-     (top-nav-links e! app false is-scrolled? pages))])
+                      :style (merge
+                               {:float "right"
+                                :margin-top "20px"}
+                               (when @is-scrolled?
+                                 {:margin-top "10px"}))
+                      :icon-style {:height 24
+                                   :width 24}}
+      [ic/action-reorder {:style {:color "#fff"}}]]]
+
+    [:li {:style {:float "right"}}
+     [:div.user-menu {:class (is-user-menu-active app)
+                      :style (merge
+                               {:transition "padding-top 300ms ease"
+                                :float "right" :padding-top "12px"}
+                               (when @is-scrolled?
+                                 {:padding-top "0px"}))}
+      [user-menu e! (:user app)]]]]])
 
 
-(defn- top-nav [e! app is-scrolled? desktop?
-                pages]
+(defn- top-nav [e! app is-scrolled? pages]
   [:span
    [header-scroll-sensor is-scrolled? -250]
-   [:div
-    (stylefy/use-style (merge
-                         (if desktop? style-topnav/topnav-desktop style-topnav/topnav)
-                         (when (and desktop? @is-scrolled?)
-                           {:height "56px" :line-height "56px"})))
-    [:div.container
-     (if desktop?
-       (top-nav-links e! app true is-scrolled? pages)
-       (mobile-top-nav-links e! app is-scrolled? pages))]]])
+   [:div (stylefy/use-style style-topnav/topnav-wrapper)
+    [:div
+     (stylefy/use-style (merge
+                          style-topnav/topnav-desktop
+                          (when @is-scrolled?
+                            {:height "56px" :line-height "56px"})))
+     [:div.container
+      (top-nav-links e! app is-scrolled? pages)]]
+    [top-nav-drop-down-menu e! app is-scrolled?]]])
