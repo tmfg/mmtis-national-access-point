@@ -85,31 +85,31 @@
           [ui/table-header {:adjust-for-checkbox false
                             :display-select-all false}
            [ui/table-row
-            [ui/table-header-column {:style {:width "7%"}} "Id"]
-            [ui/table-header-column {:style {:width "10%"}} "Y-tunnus"]
-            [ui/table-header-column {:width "21%"} "Nimi"]
-            [ui/table-header-column {:width "10%"} "GSM"]
-            [ui/table-header-column {:width "10%"} "Puhelin"]
-            [ui/table-header-column {:width "18%"} "Sähköposti"]
-            [ui/table-header-column {:width "14%"} "Käyttäjähallinta"]
-            [ui/table-header-column {:width "10%"} "Toiminnot"]]]
+            [ui/table-header-column {:style {:width "7%" :padding-left "15px" :padding-right "15px"}} "Id"]
+            [ui/table-header-column {:style {:width "9%" :padding-left "15px" :padding-right "15px"}} "Y-tunnus"]
+            [ui/table-header-column {:width "20%" :padding-left "15px" :padding-right "15px"} "Nimi"]
+            [ui/table-header-column {:width "10%" :padding-left "15px" :padding-right "15px"} "GSM"]
+            [ui/table-header-column {:width "10%" :padding-left "15px" :padding-right "15px"} "Puhelin"]
+            [ui/table-header-column {:width "18%" :padding-left "15px" :padding-right "15px"} "Sähköposti"]
+            [ui/table-header-column {:width "13%" :padding-left "15px" :padding-right "15px"} "Käyttäjähallinta"]
+            [ui/table-header-column {:width "12%" :padding-left "15px" :padding-right "15px"} "Toiminnot"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
              (for [{::t-operator/keys [id name gsm phone business-id ckan-group-id email ]
                     :keys [show-add-member-dialog?] :as result} results]
                ^{:key (::t-operator/id result)}
                [ui/table-row {:selectable false}
-                [ui/table-row-column {:style {:width "7%"}} id]
-                [ui/table-row-column {:style {:width "10%"}} business-id]
-                [ui/table-row-column {:style {:width "21%"}}
+                [ui/table-row-column {:style {:width "7%" :padding-left "15px" :padding-right "15px"}} id]
+                [ui/table-row-column {:style {:width "9%" :padding-left "15px" :padding-right "15px"}} business-id]
+                [ui/table-row-column {:style {:width "20%" :padding-left "15px" :padding-right "15px"}}
                  [:a {:href     "#"
                       :on-click #(do
                                    (.preventDefault %)
                                    (e! (fp/->ChangePage :transport-operator {:id id})))} name]]
-                [ui/table-row-column {:style {:width "10%"}} gsm]
-                [ui/table-row-column {:style {:width "10%"}} phone]
-                [ui/table-row-column {:style {:width "18%"}} email]
-                [ui/table-row-column {:style {:width "14%"}}
+                [ui/table-row-column {:style {:width "10%" :padding-left "15px" :padding-right "15px"}} gsm]
+                [ui/table-row-column {:style {:width "10%" :padding-left "15px" :padding-right "15px"}} phone]
+                [ui/table-row-column {:style {:width "18%" :padding-left "15px" :padding-right "15px"}} email]
+                [ui/table-row-column {:style {:width "13%" :padding-left "15px" :padding-right "15px"}}
                  [ui/flat-button {:label (tr [:buttons :add-new-member])
                                   :style {:margin-top "1.5em"
                                           :font-size "8pt"}
@@ -120,7 +120,7 @@
                    [ui-common/ckan-iframe-dialog (::t-operator/name result)
                     (str "/organization/member_new/" ckan-group-id)
                     #(e! (admin-controller/->ToggleAddMemberDialog id))])]
-                [ui/table-row-column {:style {:width "10%"}} [ui/icon-button {:href     "#"
+                [ui/table-row-column {:style {:width "12%" :padding-left "15px" :padding-right "15px"}} [ui/icon-button {:href     "#"
                                                                               :on-click #(do
                                                                                            (.preventDefault %)
                                                                                            (e! (fp/->ChangePage :transport-operator {:id id})))}
