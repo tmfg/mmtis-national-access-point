@@ -13,10 +13,6 @@ SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
   FROM "transport-operator" o
  WHERE o."business-id" IS NOT NULL;
 
--- name: delete-transport-operator
--- Delete all operator data except published external interface data from ckan
-SELECT del_operator(:operator-group-name);
-
 -- name: search-interfaces
 -- Find published interfaces using operator name, service name
 SELECT i.id as "interface-id", ts.id as "service-id",

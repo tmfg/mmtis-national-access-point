@@ -14,6 +14,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]
+            [ote.services.operators :as operators]
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.util.db :as db-util]
@@ -176,7 +177,7 @@
   (authorization/with-transport-operator-check
     db user transport-operator-id
     #(do
-       (delete-transport-operator db {:operator-group-name (str "transport-operator-" transport-operator-id)})
+       (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" transport-operator-id)})
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
