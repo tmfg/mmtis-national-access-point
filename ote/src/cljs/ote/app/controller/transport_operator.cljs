@@ -1,23 +1,19 @@
 (ns ote.app.controller.transport-operator
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
-  (:require [tuck.core :as t]
-            [ote.communication :as comm]
+  (:require [ote.communication :as comm]
             [ote.ui.form :as form]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
-            [tuck.core :as tuck]))
+            [tuck.core :refer [define-event send-async! Event]]
+            [ote.app.controller.common :refer [->ServerError]]))
 
-(t/define-event ServerError [response]
-  {}
-  (assoc app :flash-message-error (tr [:common-texts :server-error])))
-
-(t/define-event ToggleTransportOperatorDeleteDialog []
+(define-event ToggleTransportOperatorDeleteDialog []
   {:path [:transport-operator :show-delete-dialog?]
    :app show?}
   (not show?))
 
-(t/define-event DeleteTransportOperatorResponse [response]
+(define-event DeleteTransportOperatorResponse [response]
   {}
   (routes/navigate! :own-services)
   (-> app
@@ -25,11 +21,11 @@
     (assoc :flash-message (tr [:common-texts :delete-operator-success])
            :services-changed? true)))
 
-(t/define-event DeleteTransportOperator [id]
+(define-event DeleteTransportOperator [id]
   {}
   (comm/post! "transport-operator/delete"  {:id id}
-            {:on-success (tuck/send-async! ->DeleteTransportOperatorResponse)
-             :on-failure (tuck/send-async! ->ServerError)})
+            {:on-success (send-async! ->DeleteTransportOperatorResponse)
+             :on-failure (send-async! ->ServerError)})
   app)
 
 (defrecord SelectOperatorForService [data])
@@ -46,9 +42,9 @@
 
 
 (defn transport-operator-by-ckan-group-id[id]
-  (comm/get! (str "transport-operator/" id) {:on-success (t/send-async! ->TransportOperatorResponse)}))
+  (comm/get! (str "transport-operator/" id) {:on-success (send-async! ->TransportOperatorResponse)}))
 
-(extend-protocol t/Event
+(extend-protocol Event
 
   CreateTransportOperator
   (process-event [_ app]
@@ -84,7 +80,7 @@
   EditTransportOperator
   (process-event [{id :id} app]
     (comm/get! (str "t-operator/" id)
-               {:on-success (tuck/send-async! ->EditTransportOperatorResponse)})
+               {:on-success (send-async! ->EditTransportOperatorResponse)})
     (assoc app :transport-operator-loaded? false))
 
   EditTransportOperatorResponse
@@ -102,8 +98,8 @@
     (let [operator-data (-> app
                             :transport-operator
                             form/without-form-metadata)]
-      (comm/post! "transport-operator" operator-data {:on-success (t/send-async! ->SaveTransportOperatorResponse)
-                                                      :on-failure (t/send-async! ->FailedTransportOperatorResponse)})
+      (comm/post! "transport-operator" operator-data {:on-success (send-async! ->SaveTransportOperatorResponse)
+                                                      :on-failure (send-async! ->FailedTransportOperatorResponse)})
       app))
 
   FailedTransportOperatorResponse
