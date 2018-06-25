@@ -19,6 +19,14 @@
                               {:button-style style-base/base-button}))
                      label]])
 
+(defn delete [opts label]
+  [button-container [ui/raised-button
+                     (merge opts
+                            (if (:disabled opts)
+                              {:button-style style-base/disabled-button :disabled true}
+                              {:button-style style-base/delete-button}))
+                     label]])
+
 (defn cancel [opts label]
   [button-container
    [ui/flat-button
