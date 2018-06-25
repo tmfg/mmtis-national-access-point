@@ -8,6 +8,30 @@
             [ote.app.routes :as routes]
             [tuck.core :as tuck]))
 
+(t/define-event ServerError [response]
+  {}
+  (assoc app :flash-message-error (tr [:common-texts :server-error])))
+
+(t/define-event ToggleTransportOperatorDeleteDialog []
+  {:path [:transport-operator :show-delete-dialog?]
+   :app show?}
+  (not show?))
+
+(t/define-event DeleteTransportOperatorResponse [response]
+  {}
+  (routes/navigate! :own-services)
+  (-> app
+    (assoc-in [:transport-operator :show-delete-dialog?] false)
+    (assoc :flash-message (tr [:common-texts :delete-operator-success])
+           :services-changed? true)))
+
+(t/define-event DeleteTransportOperator [id]
+  {}
+  (comm/post! "transport-operator/delete"  {:id id}
+            {:on-success (tuck/send-async! ->DeleteTransportOperatorResponse)
+             :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
 (defrecord SelectOperatorForService [data])
 (defrecord SelectOperatorForTransit [data])
 (defrecord EditTransportOperator [id])
