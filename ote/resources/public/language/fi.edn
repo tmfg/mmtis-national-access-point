@@ -893,6 +893,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                :days     "Päivää"
                :seconds  "Sekuntia"}
   :save-failed                                "Tallennettaessa sattui virhe. Jos ongelma toistuu "
+  :delete-operator-success                    "Palveluntuottaja poistettiin onnistuneesti."
   :delete-service-success                     "Palvelu poistettiin onnistuneesti."
   :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
   :delete-route-success                       "Reitti poistettiin onnistuneesti."
@@ -913,6 +914,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:delete-transport-service
   {:title "Poista liikkumispalvelun tiedot?"
    :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}
+
+  :delete-transport-operator
+  {:title "Poista palveluntuottaja?"
+   :confirm ["Haluatko varmasti poistaa palveluntuottajan: \"" :name "\" pysyvästi?"]}
 
   :navigation-prompt
   {:title "Sivulta poistumisen varmistus"
