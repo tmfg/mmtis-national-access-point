@@ -22,11 +22,14 @@
             cljsjs.leaflet
             [ote.time :as time]))
 
-
-
 (defn ignore-key? [key]
-  (let [keys-to-ignore ["ckan-dataset-id" "ckan-resource-id" "-imported" "created" "-csv-url"]]
-  (some #(str/ends-with? key %) keys-to-ignore)))
+  (let [ends-with-keys-to-ignore ["-imported" "-csv-url" "operator-id"]
+        keys-to-ignore ["ckan-dataset-id" "ckan-resource-id" "created" "id"]
+        ends-with-ignore (some #(str/ends-with? key %) ends-with-keys-to-ignore)
+        ignore (if ends-with-ignore
+                 ends-with-ignore
+                 (some #(= key %) keys-to-ignore))]
+    ignore))
 
 (defmulti transform-value (fn [key value] key))
 

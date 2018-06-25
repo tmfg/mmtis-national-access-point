@@ -1,10 +1,16 @@
 (ns ote.app.controller.admin
-  (:require [tuck.core :as tuck]
+  (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.communication :as comm]
-            [ote.ui.form :as form]))
+            [ote.ui.form :as form]
+            [testdouble.cljs.csv :as csv]
+            [ote.localization :refer [tr]]
+            [clojure.string :as str]
+            [ote.util.text :as text]
+            [ote.time :as time]
+            cljsjs.filesaverjs))
 
 (defn- update-service-by-id [app id update-fn & args]
   (update-in app [:service-search :results]
@@ -370,3 +376,31 @@
       (update-operator-by-id
         app id
         assoc :show-add-member-dialog? (not show?)))))
+
+(defn format-interface-content-values [value-array]
+  (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
+        value-str (str/join ", " (map #(data-content-value (keyword %)) value-array))
+        return-value (text/maybe-shorten-text-to 45 value-str)]
+    return-value))
+
+
+(defn download-csv [filename content]
+  (let [mime-type (str "text/csv;charset=" (.-characterSet js/document))
+        blob (new js/Blob
+                  (clj->js [content])
+                  (clj->js {:type mime-type}))]
+    (js/saveAs blob filename)))
+
+(define-event DownloadInterfacesCSV []
+  {:path [:admin :interface-list :results]}
+  (->> (concat
+        [["Palveluntuottaja" "Sisältö" "Tyyppi" "Rajapinta" "Viimeisin käsittely"]]
+        (map (juxt :operator-name
+                   (comp #(str "\"" (format-interface-content-values %) "\"") :data-content)
+                   (comp #(str "\"" (str/join "," %) "\"") :format)
+                   :url
+                   (comp time/format-timestamp-for-ui :imported))
+             app))
+       csv/write-csv
+       (download-csv "rajapinnat.csv"))
+  app)

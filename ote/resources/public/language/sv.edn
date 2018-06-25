@@ -610,7 +610,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :desc-to-add-new-operator-5 "Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Tjänsteproducenten har ännu ingen tjänst i NAP-katalogen."}
+  :operator-dont-have-any-services "Du har tillfört tjänsteleverantörsinformation till NAP-tjänstekatalog framgångsrikt. Bra gjort! Lägg sedan till en ny transporttjänst eller tjänster till NAP. Om du utför många typer av transporttjänster, lägg till först bara en enda tjänst genom att trycka på knappen \"Lägg till en ny tjänst\". Därefter kan du lägga till en annan tjänst på samma sätt som den föregående."}
 
 
  :organization-page
@@ -1196,6 +1196,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :check-email-for-link "Återställningskoden har skickats per e-post."
   :logged-out "Du har blivit utloggad"}
+
+  :gtfs-viewer
+ {:gtfs-load-failed "Kan inte visa ruttinformation på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
 
 
  :leaflet

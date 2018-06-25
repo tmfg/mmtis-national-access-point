@@ -5,7 +5,8 @@
             [ote.communication :as comm]
             [ote.gtfs.query :as gq]
             [clojure.string :as str]
-            [ote.util.fn :refer [flip]]))
+            [ote.util.fn :refer [flip]]
+            [ote.localization :refer [tr]]))
 
 (declare ->LoadGTFSResponse ->LoadGTFSFailure)
 
@@ -27,7 +28,7 @@
 (define-event LoadGTFSFailure [response]
   {}
   (.log js/console "Load GTFS failed: " (pr-str response))
-  (assoc app :flash-message-error "GTFS tiedoston lataus epäonnistui"))
+  (assoc app :flash-message-error (tr [:gtfs-viewer :gtfs-load-failed])))
 
 (define-event SelectRoute [route]
   {:path [:gtfs-viewer]
