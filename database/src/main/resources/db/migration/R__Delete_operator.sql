@@ -11,7 +11,7 @@ BEGIN
   -- Remove services under operator
   DELETE FROM "transport-service" WHERE "transport-operator-id" = op;
 
-  -- Set pre notice attachments to NULL
+  -- Set pre notice references in attachments to NULL
   -- we want to keep track of them so that we can delete orphaned
   -- files from S3
   UPDATE pre_notice_attachment
