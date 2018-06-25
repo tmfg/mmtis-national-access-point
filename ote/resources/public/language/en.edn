@@ -884,6 +884,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                :days     "Days"
                :seconds  "Seconds"}
   :save-failed                                "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
+  :delete-operator-success                    "The service provider was deleted successfully."
   :delete-service-success                     "The service was deleted successfully."
   :delete-service-error                       "Deleting the service has failed. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
   :delete-route-success                       "Reitti poistettiin onnistuneesti."
@@ -905,6 +906,10 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:delete-transport-service
   {:title "Want to delete a transport service?"
    :confirm ["Are you sure you want to delete service named \"" :name "\" permanently?"]}
+
+  :delete-transport-operator
+  {:title "Want to delete a transport operator?"
+   :confirm ["Are you sure you want to delete operator named \"" :name "\" permanently?"]}
 
   :navigation-prompt
   {:title "Confirm navigation"

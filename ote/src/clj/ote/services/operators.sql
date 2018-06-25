@@ -18,3 +18,7 @@ SELECT COUNT(id)
 SELECT COUNT(id)
   FROM "transport-operator" o
  WHERE o."deleted?" = FALSE
+
+-- name: delete-transport-operator
+-- Delete all operator data except published external interface data from ckan
+SELECT del_operator(:operator-group-name);

@@ -889,8 +889,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                :days     "Dagar"
                :seconds  "Sekunder"}
   :save-failed "Ett fel inträffade"
-  :delete-service-success "Tjänsten borttagen."
-  :delete-service-error "Tjänsten gick inte att ta bort "
+  :delete-operator-success    "Tjänsteproducenter borttagen."
+  :delete-service-success     "Tjänsten borttagen."
+  :delete-service-error       "Tjänsten gick inte att ta bort "
   :delete-route-success                       "Rutten togs bort."
   :delete-route-error                         "Rutten kunde inte tas bort. "
   :logged-in "Inloggningen lyckades!"
@@ -909,6 +910,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  {:delete-transport-service
   {:title "Ta bort hela tjänsten?"
    :confirm ["Vill du ta bort tjänsten \"" :name "\" slutgiltigt?"]}
+
+  :delete-transport-operator
+  {:title "Ta bort hela tjänsteproducenter?"
+   :confirm ["Vill du ta bort tjänsteproducenter \"" :name "\" slutgiltigt?"]}
 
   :navigation-prompt
   {:title "Vill du lämna denna sida"
