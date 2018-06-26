@@ -19,7 +19,8 @@
             [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.app.controller.admin :as admin]
             [tuck.core :as tuck]
-            [ote.ui.validation :as validation]))
+            [ote.ui.validation :as validation]
+            [ote.util.text :as text]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -78,7 +79,7 @@
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
         value-str (str/join ", " (map #(data-content-value %) value-array))
-        return-value (common-ui/maybe-shorten-text-to 45 value-str)]
+        return-value (text/maybe-shorten-text-to 45 value-str)]
     return-value))
 
 (defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]

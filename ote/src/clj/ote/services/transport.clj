@@ -13,6 +13,7 @@
             [clojure.java.jdbc :as jdbc]
             [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
+            [ote.services.operators :as operators]
             [ote.services.external :as external]
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
@@ -101,6 +102,15 @@
       #(do
          (delete! db ::t-service/transport-service {::t-service/id id})
          id))))
+
+(defn delete-transport-operator!
+  "Delete transport operator by id"
+  [nap-config db user id]
+    (authorization/with-transport-operator-check
+      db user id
+      #(do
+         (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" id)})
+         id)))
 
 (defn get-user-transport-operators-with-services [db groups user]
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
@@ -374,7 +384,13 @@
                                       user :user}
         (http/transit-response
          (delete-transport-service! nap-config db user
-                                    (:id (http/transit-request form-data)))))))
+                                    (:id (http/transit-request form-data)))))
+
+   (POST "/transport-operator/delete" {form-data :body
+                                       user :user}
+     (http/transit-response
+       (delete-transport-operator! nap-config db user
+                                   (:id (http/transit-request form-data)))))))
 
 (defn- transport-routes
   "Unauthenticated routes"

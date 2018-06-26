@@ -77,7 +77,6 @@
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (::transit/id %) (int response)) (get app :routes-vector))]
       (assoc app :routes-vector filtered-map
-                 :page :routes
                  :flash-message (tr [:common-texts :delete-route-success])
                  :routes-changed? true)))
 

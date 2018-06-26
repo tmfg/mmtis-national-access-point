@@ -130,9 +130,8 @@ describe('Authority pre notice tests', () => {
     it('should open authority pre notice modal', () => {
 
         // Open Modal
-        cy.get('table tbody tr td').within(() => {
-            cy.contains('Oulu - Kajaani').click();
-        });
+        cy.get('table tbody tr td').contains('Oulu - Kajaani').click();
+
         // Check that modal contains something
         cy.contains('Muutosilmoituksen tiedot');
         cy.contains('Uusimaa');

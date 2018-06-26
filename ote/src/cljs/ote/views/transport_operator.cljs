@@ -20,6 +20,25 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
+(defn- delete-operator [e! operator]
+  (when (:show-delete-dialog? operator)
+    [ui/dialog
+     {:open    true
+      :title   (tr [:dialog :delete-transport-operator :title])
+      :actions [(r/as-element
+                  [ui/flat-button
+                   {:label    (tr [:buttons :cancel])
+                    :primary  true
+                    :on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))}])
+                (r/as-element
+                  [ui/raised-button
+                   {:label     (tr [:buttons :delete])
+                    :icon      (ic/action-delete-forever)
+                    :secondary true
+                    :primary   true
+                    :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}])]}
+     (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})]))
+
 (defn transport-operator-selection [e! {operator :transport-operator
                                         operators :transport-operators-with-services
                                         show-add-member-dialog? :show-add-member-dialog?} & extended]
@@ -123,12 +142,16 @@
 
 (defn- operator-form-options [e!]
   {:name->label (tr-key [:field-labels])
-   :update! #(e! (to/->EditTransportOperatorState %))
-   :name #(tr [:olennaiset-tiedot :otsikot %])
-   :footer-fn (fn [data]
-                [buttons/save {:on-click #(e! (to/->SaveTransportOperator))
-                               :disabled (form/disable-save? data)}
-                 (tr [:buttons :save])])})
+   :update!     #(e! (to/->EditTransportOperatorState %))
+   :name        #(tr [:olennaiset-tiedot :otsikot %])
+   :footer-fn   (fn [data]
+                  [:div
+                   [buttons/save {:on-click #(e! (to/->SaveTransportOperator))
+                                  :disabled (form/disable-save? data)}
+                    (tr [:buttons :save])]
+                   [buttons/delete {:on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))
+                                    :disabled (if (::t-operator/id data) false true)}
+                    (tr [:buttons :delete])]])})
 
 (defn operator [e! {operator :transport-operator :as state}]
   (e! (to/->EditTransportOperator (get-in state [:params :id])))
@@ -146,6 +169,7 @@
                  [:div {:style {:white-space "pre-wrap"}}
                   [:p (tr [:organization-page :help-desc-1])]
                   [:p (tr [:organization-page :help-desc-2])]]
+                 [delete-operator e! operator]
                  [:div.row.organization-info (stylefy/use-style style-form/organization-padding)
                   [form/form
                    form-options

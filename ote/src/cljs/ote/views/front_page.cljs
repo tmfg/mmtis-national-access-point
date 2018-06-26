@@ -27,7 +27,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
             [ote.views.transport-operator :as t-operator-view]
-            [ote.ui.list_header :as list-header]
+            [ote.ui.list-header :as list-header]
             [clojure.string :as str]))
 
 (defn- delete-service-action [e! {::t-service/keys [id name]
@@ -117,20 +117,20 @@
              [:br]
              "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/ote/#/services"} "finap.fi" ]
              [:br]
-             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
-             ]])))
+             "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]]])))
 
 (defn table-container-for-front-page [e! has-services? operator-services state]
   [:div
    (warn-about-test-server)
    [list-header/header
     (tr [:common-texts :own-api-list])
-    [ui/raised-button {:label (tr [:buttons :add-transport-service])
-                       :on-click #(do
-                                    (.preventDefault %)
-                                    (e! (ts/->OpenTransportServiceTypePage)))
-                       :primary  true
-                       :icon (ic/content-add)}]
+    (when (not (empty? operator-services))
+      [ui/raised-button {:label    (tr [:buttons :add-transport-service])
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (ts/->OpenTransportServiceTypePage)))
+                         :primary  true
+                         :icon     (ic/content-add)}])
     [t-operator-view/transport-operator-selection e! state true]]
     [:div.row
     [:div {:class "col-xs-12 col-md-12"}
@@ -289,11 +289,9 @@
            [:button (stylefy/use-style style-front-page/front-page-button)
             [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
             (tr [:buttons :register-to-service])]]
-          [:a {:style    {:text-decoration "none"}
-               :on-click #(.preventDefault %)}
-           [:button (stylefy/use-style style-front-page/front-page-button-disabled)
+          [:div (stylefy/use-style style-front-page/front-page-button-disabled)
             [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-            (tr [:buttons :register-to-service])]])]]]
+            (tr [:buttons :register-to-service])])]]]
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
        [icons/developer-mode style-front-page/lower-section-font-icon]

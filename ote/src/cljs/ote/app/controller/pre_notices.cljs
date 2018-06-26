@@ -141,7 +141,8 @@
           (assoc-in [:pre-notice ::t-operator/id] id)
           (assoc
             :transport-operator (:transport-operator selected-operator)
-            :transport-service-vector (:transport-service-vector selected-operator)))))
+            :transport-service-vector (:transport-service-vector selected-operator)
+            :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
 
   EditSingleFormElement
   (process-event [{element :element data :data} app]
@@ -184,8 +185,7 @@
     (-> app
         (dissoc :pre-notice
                 :before-unload-message)
-        (assoc :flash-message (tr [:pre-notice-page :save-success])
-               :page :pre-notices)))
+        (assoc :flash-message (tr [:pre-notice-page :save-success]))))
 
   SaveNoticeFailure
   (process-event [{response :response} app]
@@ -279,7 +279,7 @@
         (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
 
 (define-event DeleteAttachment [row-index]
-  {:path [:pre-notice :attachments]}
+  {}
   (-> app
       (update-in [:pre-notice :attachments]
                  #(vec (concat (take row-index %)

@@ -11,7 +11,9 @@
             [reagent.core :as reagent]
 
             [goog.crypt.Md5]
-            [goog.crypt]))
+            [goog.crypt]
+
+            [ote.util.text :as text]))
 
 (def mobile?
   (let [ua (str/lower-case js/window.navigator.userAgent)]
@@ -104,18 +106,14 @@
    [:div (extended-help-link help-link help-link-text)]
    component])
 
-(defn shorten-text-to [max-length text]
-  (str (subs text 0 max-length) "\u2026"))
+
 
 (defn shortened-description [desc max-length]
   (if (< max-length (count desc))
-    [:span (shorten-text-to max-length desc)]
+    [:span (text/shorten-text-to max-length desc)]
     [:span desc]))
 
-(defn maybe-shorten-text-to [max-length text]
-  (if (< max-length (count text))
-    (shorten-text-to max-length text)
-    text))
+
 
 (defn table2 [& items]
   [:table

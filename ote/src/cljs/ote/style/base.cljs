@@ -35,8 +35,10 @@
                   :color "#FFFFFF"
                   :background-color "#1565C0"
                   :font-size "12px"
-                  :font-weight "bold"
-                  })
+                  :font-weight "bold"})
+
+(def delete-button (merge base-button {:background-color "rgb(221,0,0)"}))
+
 
 (def disabled-button (merge base-button {:background-color "#CCCCCC"}))
 

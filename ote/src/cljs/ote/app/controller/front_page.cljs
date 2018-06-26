@@ -59,9 +59,7 @@
     (navigate e app (fn [app]
                       (do
                         (routes/navigate! given-page params)
-                        (assoc app
-                          :page given-page
-                          :params params)))))
+                        app))))
 
   GoToUrl
   (process-event [{url :url :as e} app]

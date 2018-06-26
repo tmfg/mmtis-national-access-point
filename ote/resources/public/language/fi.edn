@@ -605,9 +605,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :desc-to-add-new-operator-4 "Mikäli löysit edustamasi organisaation, pyydä sen
          hallinnoijaa lisäämään sinut kyseisen organisaation edustajaksi. Edustajat voivat hallita kyseisen organisaation liikkumispalveluita tästä näkymästä."
   :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
-   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
-   :to-add-new-operator-tab " välilehdestä."
-   :operator-dont-have-any-services "Et ole vielä lisännyt tarjoamiesi liikkumispalveluiden tietoja NAP-palvelukatalogiin."}
+  :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
+  :to-add-new-operator-tab " välilehdestä."
+  :operator-dont-have-any-services "Hienoa! Olet nyt lisännyt palveluntuottajan tiedot NAP:iin. Lisää seuraavaksi tiedot tarjoamastasi liikkumispalvelusta tai -palveluista. Mikäli tarjoat useamman tyyppistä liikkumispalvelua, lisää ensin yksi palvelu. Tämän jälkeen voit lisätä seuraavan palvelun."}
 
 
  :organization-page
@@ -893,6 +893,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                :days     "Päivää"
                :seconds  "Sekuntia"}
   :save-failed                                "Tallennettaessa sattui virhe. Jos ongelma toistuu "
+  :delete-operator-success                    "Palveluntuottaja poistettiin onnistuneesti."
   :delete-service-success                     "Palvelu poistettiin onnistuneesti."
   :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
   :delete-route-success                       "Reitti poistettiin onnistuneesti."
@@ -913,6 +914,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:delete-transport-service
   {:title "Poista liikkumispalvelun tiedot?"
    :confirm ["Haluatko varmasti poistaa \"" :name "\" liikkumispalvelun pysyvästi?"]}
+
+  :delete-transport-operator
+  {:title "Poista palveluntuottaja?"
+   :confirm ["Haluatko varmasti poistaa palveluntuottajan: \"" :name "\" pysyvästi?"]}
 
   :navigation-prompt
   {:title "Sivulta poistumisen varmistus"
@@ -1200,6 +1205,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
   :logged-out "Olet kirjautunut ulos."}
+
+  :gtfs-viewer
+ {:gtfs-load-failed "Palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
 
 
  :leaflet
