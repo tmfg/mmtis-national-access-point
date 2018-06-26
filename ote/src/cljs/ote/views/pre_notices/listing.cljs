@@ -24,7 +24,8 @@
 (defn pre-notices-table [e! pre-notices state]
   (let [notices (filter #(= state (::transit/pre-notice-state %)) pre-notices)]
     [:div.row
-     [table/table {:name->label (tr-key [:pre-notice-list-page :headers])
+     [table/table {:class (name state)
+                   :name->label (tr-key [:pre-notice-list-page :headers])
                    :key-fn ::transit/id
                    :no-rows-message (case state
                                       :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
@@ -40,20 +41,23 @@
         :format (tr-key [:enums ::transit/pre-notice-state])}
        {:name :actions
         :read (fn [row]
-                [:div.edit-pre-notice
-                 [ui/icon-button {:href "#"
-                                  :on-click #(do
-                                               (.preventDefault %)
-                                               (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
-                  (case state
-                    :draft [ic/content-create]
-                    :sent [ic/action-visibility])]
+                [:div
+                 [:span.edit-pre-notice
+                  [ui/icon-button {:href     "#"
+                                   :on-click #(do
+                                                (.preventDefault %)
+                                                (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
+                   (case state
+                     :draft [ic/content-create]
+                     :sent [ic/action-visibility])]]
+
                  (when (= :draft state)
-                   [ui/icon-button {:href "#"
-                                    :on-click #(do
-                                                 (.preventDefault %)
-                                                 (e! (pre-notice/->DeletePreNotice row)))}
-                    [ic/action-delete]])])}]
+                   [:span.delete-pre-notice
+                    [ui/icon-button {:href     "#"
+                                     :on-click #(do
+                                                  (.preventDefault %)
+                                                  (e! (pre-notice/->DeletePreNotice row)))}
+                     [ic/action-delete]]])])}]
       notices]]))
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]

@@ -72,6 +72,7 @@
         [:ul (stylefy/use-style style-topnav/ul)
          (doall
            (for [[lang flag] footer/selectable-languages]
+             ^{:key (str "link_"(name lang) "_" flag)}
              [:li
               [:a (merge
                     (stylefy/use-style style-topnav/topnav-dropdown-link)
@@ -95,7 +96,7 @@
                               :visibility "hidden"
                               ;; Remove the element from normal document flow, by setting position absolute.
                               :position   "absolute"}))}
-       [:div.container
+       [:div.container.user-menu
         [:div.row
          [:div.col-sm-2.col-md-4]
          [:div.col-sm-2.col-md-4]
@@ -133,52 +134,6 @@
                                        (e! (fp-controller/->OpenUserMenu))
                                        (e! (login/->Logout)))})
              (tr [:common-texts :user-menu-log-out])]]]]]]])))
-
-#_ (defn user-menu [e! {:keys [name username transit-authority?]}]
-  (when username
-    [ui/drop-down-menu
-     {:menu-style {}
-      :underline-style {}
-      :label-style {:color "#FFFFFF" :font-weight 700}
-      :list-style {:background-color "#323232"}
-      :on-click #(e! (fp-controller/->OpenUserMenu))
-      :anchor-origin {:horizontal "right" :vertical "bottom"}
-      :target-origin {:horizontal "right" :vertical "top"}
-      :selection-renderer (constantly name)}
-
-     (when (flags/enabled? :sea-routes)
-       [ui/menu-item {:style {:color "#FFFFFF"}
-                      :primary-text (tr [:common-texts :navigation-route])
-                      :on-click #(do (.preventDefault %)
-                                     (e! (fp-controller/->ChangePage :routes nil)))}])
-     (when (flags/enabled? :pre-notice)
-       [ui/menu-item {:style {:color "#FFFFFF"}
-                      :primary-text (tr [:common-texts :navigation-pre-notice])
-                      :on-click #(do (.preventDefault %)
-                                     (e! (fp-controller/->ChangePage :pre-notices nil)))}])
-
-     (when (and (flags/enabled? :pre-notice) transit-authority?)
-       [ui/menu-item {:style {:color "#FFFFFF"}
-                      :primary-text (tr [:common-texts :navigation-authority-pre-notices])
-                      :on-click #(do (.preventDefault %)
-                                     (e! (fp-controller/->ChangePage :authority-pre-notices nil)))}])
-
-
-     [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:common-texts :user-menu-profile])
-                    :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->ToggleUserEditDialog)))}]
-     [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:common-texts :navigation-give-feedback])
-                    :on-click #(do (.preventDefault %)
-                                   (e! (fp-controller/->OpenNewTab "http://bit.ly/nap-palaute")))}]
-     [ui/menu-item {:style {:color "#FFFFFF"}
-                    :primary-text (tr [:common-texts :user-menu-log-out])
-                    :on-click #(do (.preventDefault %)
-                                   (e! (login/->Logout)))}]
-
-     [ui/menu-item {:primary-text (r/as-element [footer/language-selection e! style-base/language-selection-dropdown {:color "#fff"}])}]]))
-
 
 (defn- top-nav-drop-down-menu [e! app is-scrolled? pages]
   (let [header-open? (get-in app [:ote-service-flags :header-open])]
@@ -356,7 +311,7 @@
         [:li (if (get-in app [:ote-service-flags :user-menu-open])
                (stylefy/use-style style-topnav/li-right-blue)
                (stylefy/use-style style-topnav/li-right-white))
-         [:div {:on-click #(e! (fp-controller/->OpenUserMenu))
+         [:div.header-user-menu {:on-click #(e! (fp-controller/->OpenUserMenu))
                 :style    {:cursor        "pointer"
                            :display       "-webkit-box"
                            :padding-right "20px"}}

@@ -32,6 +32,7 @@ describe('OTE login dialog', () => {
     });
 
     const login = (username, password, activate) => {
+        cy.contains('Valikko').click();
         cy.contains('Kirjaudu sisään').click();
         cy.get('input[id*="email--Shkpostiosoite"]').typeRaw(username);
         cy.get('input[id*="password--Salasana"]').typeRaw(password);
@@ -70,12 +71,9 @@ describe('Header - Logged Out', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
-            cy.contains('Etusivu');
             cy.contains('Palvelukatalogi');
-            cy.contains('Palveluntuottajat');
-            cy.contains('Kirjaudu sisään');
-            cy.contains('Rekisteröidy');
-            cy.contains('Käyttöohje');
+            cy.contains('Valikko');
+            cy.contains('FI');
         });
     });
 });
@@ -95,22 +93,19 @@ describe('Header - Logged In', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
-            cy.contains('Etusivu');
             cy.contains('Palvelukatalogi');
-            cy.contains('Palveluntuottajat');
-            cy.contains('Omat palvelutiedot');
-            cy.contains('Käyttöohje');
+            cy.contains('Valikko');
+            cy.contains('FI');
         });
 
-        cy.get('.user-menu button').click();
+        cy.get('.header-user-menu').click();
 
-        cy.get('div[role=menu]').within($el => {
+        cy.get('div.container.user-menu').within($el => {
             // Dropdown menu links
+            cy.contains('Saapuneet muutosilmoitukset');
+            cy.contains('Ylläpitopaneeli');
             cy.contains('Käyttäjätilin muokkaus');
-            cy.contains('Anna palautetta palvelusta');
             cy.contains('Kirjaudu ulos');
-            cy.contains('suomi');
-            cy.contains('svenska');
         });
     });
 });
