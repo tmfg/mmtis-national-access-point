@@ -22,6 +22,9 @@ BEGIN
   -- Remove pre notices
   DELETE FROM pre_notice WHERE "transport-operator-id" = op;
 
+  -- Remove sea routes
+  DELETE FROM transit_route WHERE "transport-operator-id" = op;
+
   -- Remove OTE operator
   DELETE FROM "transport-operator" WHERE id = op;
 
