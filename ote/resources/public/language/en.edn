@@ -302,6 +302,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   :autocomplete-hint "Write your own or choose from a list"
   :allowed-file-types "Approved file formats are "
+
+  :real-time-info "Here, you can report real-time services related to your service such as \"cars on the map\" or \"free parking spaces\""
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)

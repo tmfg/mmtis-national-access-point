@@ -42,29 +42,36 @@
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
-  [label service-url-field]
-  (form/group
+  ([label service-url-field] (service-url label service-url-field nil))
+  ([label service-url-field info-message]
+   (apply
+    form/group
     {:label label
-    :layout :row
-    :columns 3}
+     :layout :row
+     :columns 3}
 
-    {:class "set-bottom"
-     :name   ::t-service/url
-     :type   :string
-     :read   (comp ::t-service/url service-url-field)
-     :write  (fn [data url]
-             (assoc-in data [service-url-field ::t-service/url] url))
-     :full-width? true
-     :container-class "col-xs-12 col-sm-6 col-md-6"}
+    (concat
+     (when info-message
+       [(form/info info-message)])
 
-    {:name ::t-service/description
-     :type  :localized-text
-     :rows  1
-     :read  (comp ::t-service/description service-url-field)
-     :write (fn [data desc]
-             (assoc-in data [service-url-field ::t-service/description] desc))
-     :container-class "col-xs-12 col-sm-6 col-md-6"
-     :full-width?  true}))
+     [{:class "set-bottom"
+       :name   ::t-service/url
+       :type   :string
+       :read   (comp ::t-service/url service-url-field)
+       :write  (fn [data url]
+                 (assoc-in data [service-url-field ::t-service/url] url))
+       :full-width? true
+       :container-class "col-xs-12 col-sm-6 col-md-6"}
+
+      {:name ::t-service/description
+       :type  :localized-text
+       :rows  1
+       :read  (comp ::t-service/description service-url-field)
+       :write (fn [data desc]
+                (assoc-in data [service-url-field ::t-service/description] desc))
+       :container-class "col-xs-12 col-sm-6 col-md-6"
+       :full-width?  true}]))))
+
 
 (defn service-urls
   "Creates a table for additional service urls."
