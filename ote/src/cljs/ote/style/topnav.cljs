@@ -27,10 +27,20 @@
 
 (def clear {:clear "both"})
 
+(def bottom-border {:-moz-box-sizing "border-box"
+                    :-webkit-box-sizing "border-box"
+                    :box-sizing "border-box"
+                    :height "80px"})
+
 (def ul {:list-style-type "none" })
 
-(def li {:display "inline-block"
-         :padding-top "10px"})
+(def li-right {:font-size "0.875rem"
+               :float "right"})
+
+(def li-right-white (merge bottom-border li-right
+                           {::stylefy/mode {:hover {:border-bottom "4px solid #fafafa"}}}))
+(def li-right-blue (merge bottom-border li-right
+                          {:border-bottom "4px solid rgb(102,163,224)"}))
 
 (def mobile-li {:padding-top "10px" :padding-bottom "10px"})
 
@@ -42,7 +52,8 @@
            :text-decoration "none"
            :font-size "0.875em"
            :display "block"
-           ::stylefy/mode {:hover {:background "rgba(0, 0, 0, 0.2)"}}})
+           ::stylefy/mode {:hover {:padding-bottom "0px"
+                                   :border-bottom "4px solid #fafafa"}}})
 
 (def topnav-dropdown-link
   {:color "#fafafa"
@@ -67,17 +78,21 @@
 
 (def link-left (merge link
                       {:float "left"}))
+
+(def white-hover {:padding-bottom "0px"
+                  :border-bottom "4px solid #fafafa"})
+
+(def default-main-header-object (merge bottom-border
+                                       {:padding-top "0px"
+                                        :padding-right "15px"
+                                        :padding-bottom "0px"
+                                        :padding-left "15px"}))
 (def desktop-link
-  (merge link-left
-         {:padding-top "0px"
-          :padding-right "15px"
-          :padding-bottom "0px"
-          :padding-left "15px"}))
+  (merge link-left default-main-header-object
+         {::stylefy/mode {:hover white-hover}}))
 
 (def active-style {:background "rgba(0, 0, 0, 0.3)"})
 
 (def active (merge link active-style))
-
-(def desktop-active (merge desktop-link active-style))
 
 (def right {:float "right"})

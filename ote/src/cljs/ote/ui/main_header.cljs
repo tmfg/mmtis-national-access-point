@@ -15,8 +15,10 @@
             [ote.style.topnav :as style-topnav]
             [ote.views.theme :refer [theme]]
             [ote.app.controller.login :as login]
-            [ote.app.controller.flags :as flags]))
-
+            [ote.app.controller.flags :as flags]
+            [clojure.string :as str]
+            [ote.localization :as localization]
+            [ote.ui.common :as common-ui]))
 
 (defn header-scroll-sensor [is-scrolled? trigger-offset]
   (let [sensor-node (atom nil)
@@ -52,8 +54,87 @@
     (page-group pages) ((page-group pages) current-page)
     :default false))
 
+(defn- lang-menu [e! app]
+  (let [header-open? (get-in app [:ote-service-flags :lang-menu-open])]
+    [:div {:style (merge style-topnav/topnav-dropdown
+                         (if header-open?
+                           {:opacity    1
+                            :visibility "visible"}
+                           {:opacity    0
+                            :visibility "hidden"
+                            ;; Remove the element from normal document flow, by setting position absolute.
+                            :position   "absolute"}))}
+     [:div.container
+      [:div.row
+       [:div.col-sm-4.col-md-4]
+       [:div.col-sm-4.col-md-4]
+       [:div.col-sm-8.col-md-4
+        [:ul (stylefy/use-style style-topnav/ul)
+         (doall
+           (for [[lang flag] footer/selectable-languages]
+             [:li
+              [:a (merge
+                    (stylefy/use-style style-topnav/topnav-dropdown-link)
+                    {:key      lang
+                     :href     "#"
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (fp-controller/->OpenLangMenu))
+                                  (e! (fp-controller/->SetLanguage lang)))
+                     })
+               (str (str/upper-case lang) " - " flag)]]))]]]]]))
 
-(defn user-menu [e! {:keys [name username transit-authority?]}]
+(defn- user-menu [e! app]
+  (when (get-in app [:user :username])
+    (let [header-open? (get-in app [:ote-service-flags :user-menu-open])]
+      [:div {:style (merge style-topnav/topnav-dropdown
+                           (if header-open?
+                             {:opacity    1
+                              :visibility "visible"}
+                             {:opacity    0
+                              :visibility "hidden"
+                              ;; Remove the element from normal document flow, by setting position absolute.
+                              :position   "absolute"}))}
+       [:div.container
+        [:div.row
+         [:div.col-sm-2.col-md-4]
+         [:div.col-sm-2.col-md-4]
+         [:div.col-sm-8.col-md-4
+          [:ul (stylefy/use-style style-topnav/ul)
+           (when (and (flags/enabled? :pre-notice) (get-in app [:user :transit-authority?]))
+             [:li
+              [:a (merge (stylefy/use-style
+                           style-topnav/topnav-dropdown-link)
+                         {:href     "#/authority-pre-notices"
+                          :on-click #(e! (fp-controller/->OpenUserMenu))})
+               (tr [:common-texts :navigation-authority-pre-notices])]])
+           (when (:admin? (:user app))
+             [:li
+              [:a (merge (stylefy/use-style
+                           style-topnav/topnav-dropdown-link)
+                         {:href "#/admin"
+                          :on-click #(do
+                                       (.preventDefault %)
+                                       (e! (fp-controller/->OpenUserMenu)))})
+               (tr [:document-title :admin])]])
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href     "#"
+                        :on-click #(do (.preventDefault %)
+                                       (e! (fp-controller/->OpenUserMenu))
+                                       (e! (fp-controller/->ToggleUserEditDialog)))})
+             (tr [:common-texts :user-menu-profile])]]
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href     "#"
+                        :on-click #(do (.preventDefault %)
+                                       (e! (fp-controller/->OpenUserMenu))
+                                       (e! (login/->Logout)))})
+             (tr [:common-texts :user-menu-log-out])]]]]]]])))
+
+#_ (defn user-menu [e! {:keys [name username transit-authority?]}]
   (when username
     [ui/drop-down-menu
      {:menu-style {}
@@ -111,20 +192,42 @@
                             :position "absolute"}))}
      [:div.container
       [:div.row
-       [:div.col-md-4
+       [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
          [:li
           [:a (merge (stylefy/use-style
                        style-topnav/topnav-dropdown-link)
-                     {:href "#/"})
-           "Etusivu"]]
-
+                     {:href "#/"
+                      :on-click #(e! (fp-controller/->OpenHeader))})
+           (tr [:common-texts :navigation-front-page])]]
          [:li
           [:a (merge (stylefy/use-style
                        style-topnav/topnav-dropdown-link)
-                     {:href "#/services"})
-           "Liikkumispalvelukatalogi"]]]]
-       [:div.col-md-4
+                     {:href "#/services"
+                      :on-click #(e! (fp-controller/->OpenHeader))})
+           (tr [:document-title :services])]]
+         (when (get-in app [:user :username])
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href "#/own-services"
+                        :on-click #(e! (fp-controller/->OpenHeader))})
+             (tr [:document-title :own-services])]])
+         (when (get-in app [:user :username])
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href "#/routes"
+                        :on-click #(e! (fp-controller/->OpenHeader))})
+             (tr [:common-texts :navigation-route])]])
+         (when (get-in app [:user :username])
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href "#/pre-notices"
+                        :on-click #(e! (fp-controller/->OpenHeader))})
+             (tr [:common-texts :navigation-pre-notice])]])]]
+       [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
          [:li
           [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
@@ -138,7 +241,7 @@
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]]]
-       [:div.col-md-4
+       [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
          (if (nil? (get-in app [:user :username]))
            [:ul (stylefy/use-style style-topnav/ul)
@@ -148,6 +251,7 @@
                         {:href "#"
                          :on-click #(do
                                       (.preventDefault %)
+                                      (e! (fp-controller/->OpenHeader))
                                       (e! (fp-controller/->ToggleRegistrationDialog)))})
               (tr [:common-texts :navigation-register])]]
             [:li
@@ -157,6 +261,7 @@
                           {:href "#"
                            :on-click #(do
                                         (.preventDefault %)
+                                        (e! (fp-controller/->OpenHeader))
                                         (e! (login/->ShowLoginDialog)))})
                 (tr [:common-texts :navigation-login])]
                [linkify "/user/login" (tr [:common-texts :navigation-login])
@@ -175,65 +280,92 @@
                   {:target "_blank"})]]]]]]]))
 
 (defn- top-nav-links [e! {current-page :page :as app} is-scrolled? pages]
-  [:div.navbar (stylefy/use-style style-topnav/clear)
-   [:ul (stylefy/use-style style-topnav/ul)
-    [:li
-     [:a
-      {:style (merge
-                style-topnav/desktop-link
-                (if @is-scrolled?
-                  {:padding-top "0px"}
-                  {:padding-top "11px"}))
-       :href "#"
-       :on-click #(do
-                    (.preventDefault %)
-                    (e! (fp-controller/->ChangePage :front-page nil)))}
-      [:img {:style (merge
-                      style-topnav/logo
-                      (when @is-scrolled?
-                        style-topnav/logo-small))
-             :src "img/icons/nap-logo.svg"}]]]
+  (let [current-language @localization/selected-language]
+    [:div.navbar (stylefy/use-style style-topnav/clear)
+     [:ul (stylefy/use-style style-topnav/ul)
+      [:li
+       [:a
+        {:style    (merge
+                     style-topnav/desktop-link
+                     (if @is-scrolled?
+                       {:padding-top "0px"}
+                       {:padding-top "11px"}))
+         :href     "#"
+         :on-click #(do
+                      (.preventDefault %)
+                      (e! (fp-controller/->CloseHeaderMenus))
+                      (e! (fp-controller/->ChangePage :front-page nil)))}
+        [:img {:style (merge
+                        style-topnav/logo
+                        (when @is-scrolled?
+                          style-topnav/logo-small))
+               :src   "img/icons/nap-logo.svg"}]]]
 
-    (doall
-      (for [{:keys [page label url]}
-            (filter some? [{:page :services
-                            :label [:common-texts :navigation-dataset]}
-                           (when (logged-in? app)
-                             {:page :own-services
-                              :label [:common-texts :navigation-own-service-list]})])]
-        ^{:key page}
-        [:li
-         [:a
-          (merge
-            (stylefy/use-style style-topnav/desktop-link)
-            {:href "#"
-             :on-click #(do
-                          (.preventDefault %)
-                          (if url
-                            (e! (fp-controller/->GoToUrl url))
-                            (e! (fp-controller/->ChangePage page nil))))})
-          (tr label)]]))
+      (doall
+        (for [{:keys [page label url]}
+              (filter some? [{:page  :services
+                              :label [:common-texts :navigation-dataset]}
+                             (when (logged-in? app)
+                               {:page  :own-services
+                                :label [:common-texts :navigation-own-service-list]})])]
+          ^{:key page}
+          [:li
+           [:a
+            (merge
+              (stylefy/use-style style-topnav/desktop-link)
+              {:href     "#"
+               :on-click #(do
+                            (.preventDefault %)
+                            (e! (fp-controller/->CloseHeaderMenus))
+                            (if url
+                              (e! (fp-controller/->GoToUrl url))
+                              (e! (fp-controller/->ChangePage page nil))))})
+            [:div
+             (tr label)]]]))
 
 
-    [:li {:style {:float "right"}}
-     [ui/icon-button {:on-click #(e! (fp-controller/->OpenHeader))
-                      :style (merge
-                               {:float "right"
-                                :margin-top "20px"}
-                               (when @is-scrolled?
-                                 {:margin-top "10px"}))
-                      :icon-style {:height 24
-                                   :width 24}}
-      [ic/action-reorder {:style {:color "#fff"}}]]]
+      [:li (if (get-in app [:ote-service-flags :lang-menu-open])
+             (stylefy/use-style style-topnav/li-right-blue)
+             (stylefy/use-style style-topnav/li-right-white))
+       [:div {:on-click #(e! (fp-controller/->OpenLangMenu))
+              :style    {:cursor  "pointer"
+                         :display "-webkit-box"}}
+        [:div {:style (merge {:transition "margin-top 300ms ease"}
+                             (if @is-scrolled?
+                               {:margin-top "15px"}
+                               {:margin-top "28px"}))}
+         [ic/action-language {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
+        [:span.hidden-xs.hidden-sm {:style {:color "#fff"}}
+         (str/upper-case (name current-language))]]]
 
-    [:li {:style {:float "right"}}
-     [:div.user-menu {:class (is-user-menu-active app)
-                      :style (merge
-                               {:transition "padding-top 300ms ease"
-                                :float "right" :padding-top "12px"}
-                               (when @is-scrolled?
-                                 {:padding-top "0px"}))}
-      [user-menu e! (:user app)]]]]])
+      [:li (if (get-in app [:ote-service-flags :header-open])
+             (stylefy/use-style style-topnav/li-right-blue)
+             (stylefy/use-style style-topnav/li-right-white))
+       [:div {:on-click #(e! (fp-controller/->OpenHeader))
+              :style    {:cursor        "pointer"
+                         :display       "-webkit-box"
+                         :padding-right "20px"}}
+        [:div {:style (merge {:transition "margin-top 300ms ease"}
+                             (if @is-scrolled?
+                               {:margin-top "15px"}
+                               {:margin-top "28px"}))}
+         [ic/action-reorder {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
+        [:span.hidden-xs.hidden-sm {:style {:color "#fff"}} " Valikko "]]]
+
+      (when (get-in app [:user :username])
+        [:li (if (get-in app [:ote-service-flags :user-menu-open])
+               (stylefy/use-style style-topnav/li-right-blue)
+               (stylefy/use-style style-topnav/li-right-white))
+         [:div {:on-click #(e! (fp-controller/->OpenUserMenu))
+                :style    {:cursor        "pointer"
+                           :display       "-webkit-box"
+                           :padding-right "20px"}}
+          [:div {:style (merge {:transition "margin-top 300ms ease"}
+                               (if @is-scrolled?
+                                 {:margin-top "15px"}
+                                 {:margin-top "28px"}))}
+           [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
+          [:span.hidden-xs.hidden-sm {:style {:color "#fff"}} (common-ui/maybe-shorten-text-to 25 (get-in app [:user :name]))]]])]]))
 
 
 (defn- top-nav [e! app is-scrolled? pages]
@@ -246,5 +378,7 @@
                           (when @is-scrolled?
                             {:height "56px" :line-height "56px"})))
      [:div.container
-      (top-nav-links e! app is-scrolled? pages)]]
-    [top-nav-drop-down-menu e! app is-scrolled?]]])
+      [top-nav-links e! app is-scrolled? pages]]]
+    [top-nav-drop-down-menu e! app is-scrolled?]
+    [user-menu e! app]
+    [lang-menu e! app]]])
