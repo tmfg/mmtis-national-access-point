@@ -302,6 +302,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   :autocomplete-hint "Kirjoita oma tai valitse listalta"
   :allowed-file-types "Hyväksyttyjä tiedostomuotoja ovat "
+
+  :real-time-info "Tässä kohdassa voit ilmoittaa palveluusi liittyviä reaaliaikapalveluita, kuten \"autot kartalla\" tai \"vapaat pysäköintipaikat\"."
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
