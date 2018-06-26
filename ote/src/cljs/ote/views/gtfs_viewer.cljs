@@ -7,7 +7,9 @@
             [clojure.string :as str]
             [ote.ui.table :as table]
             [ote.ui.leaflet :as leaflet]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.style.base :as style-base]
+            [stylefy.core :refer [use-style]]))
 
 (defn routes-table [e! {:gtfs/keys [agency-txt routes-txt trips-txt]
                         selected-route :selected-route}]
@@ -100,5 +102,10 @@
 
 (defn gtfs-viewer [e! {gtfs :gtfs-viewer}]
   [:div.gtfs-viewer
-   [routes-table e! gtfs]
-   [trips-map e! gtfs]])
+   (if-let [err (:error-message gtfs)]
+     [:div (use-style (merge style-base/error-element
+                             {:margin-top "40px"}))
+      err]
+     [:span
+      [routes-table e! gtfs]
+      [trips-map e! gtfs]])])

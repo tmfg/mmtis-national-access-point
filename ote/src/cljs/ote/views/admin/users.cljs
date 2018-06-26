@@ -59,19 +59,10 @@
                                        (.preventDefault %)
                                        (e! (admin-controller/->ConfirmDeleteUser id)))}]))]}
         [:div
-         (doall
-           (for [m other-members]
-             ^{:key (:operator-name m)}
-             [:div.row
-              [:span [:strong (:operator-name m)] (str ":lle jää " (count (:members m))
-                                                       (if (> (count (:members m)) 1)
-                                                         " admin käyttäjää. "
-                                                         " admin käyttäjä."))]]))
-         [:div.row "Jos käyttäjä on ainoa admin käyttäjä yhdellekään palveluntuottajalle. Käyttäjää ei voida poistaa."]
          (if (some false? admin-list)
            [:p "Ei voida poistaa käyttäjää."]
            [:div
-            [:p "Oletko varma, että haluat poistaa käyttäjän? Käyttäjän lisäämät palvelut ja palveluntuottajat jätetään palveluun. Tämä poistaa vain käyttäjän."]
+            [:p "Oletko varma, että haluat poistaa käyttäjän?"]
             [:p (str "Käyttäjän id: " id)]
 
             [form-fields/field {:name        :ensured-id
