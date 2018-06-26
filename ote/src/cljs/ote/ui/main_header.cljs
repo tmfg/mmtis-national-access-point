@@ -18,7 +18,7 @@
             [ote.app.controller.flags :as flags]
             [clojure.string :as str]
             [ote.localization :as localization]
-            [ote.ui.common :as common-ui]))
+            [ote.util.text :as text]))
 
 (defn header-scroll-sensor [is-scrolled? trigger-offset]
   (let [sensor-node (atom nil)
@@ -365,7 +365,7 @@
                                  {:margin-top "15px"}
                                  {:margin-top "28px"}))}
            [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
-          [:span.hidden-xs.hidden-sm {:style {:color "#fff"}} (common-ui/maybe-shorten-text-to 25 (get-in app [:user :name]))]]])]]))
+          [:span.hidden-xs.hidden-sm {:style {:color "#fff"}} (text/maybe-shorten-text-to 25 (get-in app [:user :name]))]]])]]))
 
 
 (defn- top-nav [e! app is-scrolled? pages]
