@@ -16,8 +16,8 @@
         import-api (if (= type "kalkati") "import/kalkati" "import/gtfs")]
     (comm/get! (str import-api "?url=" (js/encodeURIComponent url))
                {:on-success (tuck/send-async! ->LoadGTFSResponse)
-                :on-failure (tuck/send-async! ->LoadGTFSFailure)}))
-  app)
+                :on-failure (tuck/send-async! ->LoadGTFSFailure)})
+    (assoc app :gtfs-viewer {})))
 
 (define-event LoadGTFSResponse [response]
   {:path [:gtfs-viewer]}
@@ -26,9 +26,8 @@
                                :gtfs/route-long-name)))
 
 (define-event LoadGTFSFailure [response]
-  {}
-  (.log js/console "Load GTFS failed: " (pr-str response))
-  (assoc app :flash-message-error (tr [:gtfs-viewer :gtfs-load-failed])))
+  {:path [:gtfs-viewer :error-message]}
+  (tr [:gtfs-viewer :gtfs-load-failed]))
 
 (define-event SelectRoute [route]
   {:path [:gtfs-viewer]
