@@ -223,8 +223,9 @@
                        (ts-common/external-interfaces e!)
                        (ts-common/advance-reservation-group)
                        (ts-common/service-url
-                         (tr [:field-labels :parking ::t-service/real-time-information])
-                         ::t-service/real-time-information)
+                        (tr [:field-labels :parking ::t-service/real-time-information])
+                        ::t-service/real-time-information
+                        (tr [:form-help :real-time-info]))
                        (ts-common/service-url
                          (tr [:field-labels :parking ::t-service/booking-service])
                          ::t-service/booking-service)
