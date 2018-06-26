@@ -14,6 +14,8 @@
 (defrecord StayOnPage [])
 (defrecord OpenUserMenu [])
 (defrecord OpenHeader [])
+(defrecord OpenLangMenu [])
+(defrecord CloseHeaderMenus [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
 
@@ -80,12 +82,34 @@
 
   OpenUserMenu
   (process-event [_ app]
-    (assoc-in app [:ote-service-flags :user-menu-open] true) app)
+    (-> app
+      (assoc-in [:ote-service-flags :user-menu-open]
+                (if (get-in app [:ote-service-flags :user-menu-open]) false true))
+      (assoc-in [:ote-service-flags :header-open] false)
+      (assoc-in [:ote-service-flags :lang-menu-open] false)))
 
   OpenHeader
   (process-event [_ app]
-    (assoc-in app [:ote-service-flags :header-open]
-              (if (get-in app [:ote-service-flags :header-open]) false true)))
+    (-> app
+      (assoc-in [:ote-service-flags :header-open]
+              (if (get-in app [:ote-service-flags :header-open]) false true))
+      (assoc-in [:ote-service-flags :user-menu-open] false)
+      (assoc-in [:ote-service-flags :lang-menu-open] false)))
+
+  OpenLangMenu
+  (process-event [_ app]
+    (-> app
+      (assoc-in [:ote-service-flags :lang-menu-open]
+                (if (get-in app [:ote-service-flags :lang-menu-open]) false true))
+      (assoc-in [:ote-service-flags :user-menu-open] false)
+      (assoc-in [:ote-service-flags :header-open] false)))
+
+  CloseHeaderMenus
+  (process-event [_ app]
+    (-> app
+        (assoc-in [:ote-service-flags :lang-menu-open] false)
+        (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :header-open] false)))
 
   Logout
   (process-event [_ app]
