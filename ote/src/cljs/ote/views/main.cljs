@@ -205,7 +205,7 @@
         (if (flags/enabled? :ote-login)
           [:a (merge (stylefy/use-style
                       (if desktop? style-topnav/desktop-link style-topnav/link))
-                     {:style {:float "right"}}
+                     {:style {:float "right" :cursor "pointer"}}
                      {:on-click #(do
                                    (.preventDefault %)
                                    (e! (login/->ShowLoginDialog)))})
@@ -213,7 +213,7 @@
           [linkify "/user/login" (tr [:common-texts :navigation-login])
            (merge (stylefy/use-style
                    (if desktop? style-topnav/desktop-link style-topnav/link))
-                  {:style {:float "right"}})])]])
+                  {:style {:float "right" :cursor "pointer"}})])]])
 
     [:li (if desktop? nil (stylefy/use-style style-topnav/mobile-li))
      [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
