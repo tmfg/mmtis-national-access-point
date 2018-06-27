@@ -192,7 +192,7 @@
 
          [:li
           [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
-           "Ohjelmointirajapinta kehittäjille"
+           (tr [:common-texts :navigation-for-developers])
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]]]
@@ -224,12 +224,12 @@
                          style-topnav/topnav-dropdown-link))])]])
 
          [:li
-          [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" "Rekisteriseloste"
+          [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" (tr [:common-texts :navigation-privacy-policy])
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]
          [:li
-          [linkify "http://bit.ly/nap-palaute" "Palautelomake"
+          [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]]]]]]))
@@ -275,9 +275,8 @@
                             (if url
                               (e! (fp-controller/->GoToUrl url))
                               (e! (fp-controller/->ChangePage page nil))))})
-            [:div
+            [:div.hidden-xs.hidden-sm
              (tr label)]]]))
-
 
       [:li (if (get-in app [:ote-service-flags :lang-menu-open])
              (stylefy/use-style style-topnav/li-right-blue)
@@ -290,7 +289,7 @@
                                {:margin-top "15px"}
                                {:margin-top "28px"}))}
          [ic/action-language {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
-        [:span.hidden-xs.hidden-sm {:style {:color "#fff"}}
+        [:span.hidden-xs {:style {:color "#fff"}}
          (str/upper-case (name current-language))]]]
 
       [:li (if (get-in app [:ote-service-flags :header-open])
@@ -305,7 +304,7 @@
                                {:margin-top "15px"}
                                {:margin-top "28px"}))}
          [ic/action-reorder {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
-        [:span.hidden-xs.hidden-sm {:style {:color "#fff"}} " Valikko "]]]
+        [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-general-menu])]]]
 
       (when (get-in app [:user :username])
         [:li (if (get-in app [:ote-service-flags :user-menu-open])
@@ -320,7 +319,7 @@
                                  {:margin-top "15px"}
                                  {:margin-top "28px"}))}
            [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
-          [:span.hidden-xs.hidden-sm {:style {:color "#fff"}} (text/maybe-shorten-text-to 25 (get-in app [:user :name]))]]])]]))
+          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 25 (get-in app [:user :name]))]]])]]))
 
 
 (defn- top-nav [e! app is-scrolled? pages]
