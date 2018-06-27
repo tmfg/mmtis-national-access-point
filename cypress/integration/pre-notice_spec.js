@@ -88,7 +88,7 @@ describe('Pre notice tests', () => {
 
 
         // Go to edit pre-notice view
-        cy.get('table.draft tr:last-child span.edit-pre-notice a').click();
+        cy.get('table.sent tr:last-child span.edit-pre-notice a').click();
 
         // Wait for pre-notice edit form queries because it causes re-render of the view.
         cy.wait('@getPreNotice');
@@ -128,6 +128,14 @@ describe('Authority pre notice tests', () => {
     });
 
     it('should open authority pre notice modal', () => {
+
+        cy.get('.header-user-menu').click();
+
+        cy.get('div.container.user-menu').within($el => {
+            // Dropdown menu links
+            cy.contains('Saapuneet muutosilmoitukset').click();
+
+        });
 
         // Open Modal
         cy.get('table tbody tr td').contains('Oulu - Kajaani').click();
