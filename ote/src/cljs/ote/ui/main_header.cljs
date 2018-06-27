@@ -115,7 +115,6 @@
                            style-topnav/topnav-dropdown-link)
                          {:href "#/admin"
                           :on-click #(do
-                                       (.preventDefault %)
                                        (e! (fp-controller/->OpenUserMenu)))})
                (tr [:document-title :admin])]])
            [:li
@@ -234,7 +233,7 @@
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]]]]]]))
 
-(defn- top-nav-links [e! {current-page :page :as app} is-scrolled? pages]
+(defn- top-nav-links [e! app is-scrolled?]
   (let [current-language @localization/selected-language]
     [:div.navbar (stylefy/use-style style-topnav/clear)
      [:ul (stylefy/use-style style-topnav/ul)
@@ -321,7 +320,7 @@
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
           [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])]]))
 
-(defn- top-nav [e! app is-scrolled? pages]
+(defn- top-nav [e! app is-scrolled?]
   [:span
    [header-scroll-sensor is-scrolled? -250]
    [:div (stylefy/use-style style-topnav/topnav-wrapper)
@@ -331,7 +330,7 @@
                           (when @is-scrolled?
                             {:height "56px" :line-height "56px"})))
      [:div.container
-      [top-nav-links e! app is-scrolled? pages]]]
+      [top-nav-links e! app is-scrolled?]]]
     [top-nav-drop-down-menu e! app is-scrolled?]
     [user-menu e! app]
     [lang-menu e! app]]])

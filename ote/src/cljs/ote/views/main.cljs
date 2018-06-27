@@ -196,7 +196,7 @@
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
           [:div.ote-sovellus
-           [top-nav e! app is-scrolled? desktop? pages]
+           [top-nav e! app is-scrolled? desktop?]
 
            (if (and (:show? login) common/mobile?)
              [mobile-login-form e! login]
