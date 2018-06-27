@@ -14,4 +14,17 @@
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+    on('before:browser:launch', (browser = {}, args) => {
+        //console.log(browser, args) // see what all is in here!
+
+        // args are different based on the browser
+        // sometimes an array, sometimes an object
+
+        if (browser.name === 'chrome') {
+            args.push('--disable-gpu')
+
+            // whatever you return here becomes the new args
+            return args
+        }
+    });
 };

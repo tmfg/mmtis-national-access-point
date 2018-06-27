@@ -12,20 +12,6 @@
                            ["sv" "svenska"]
                            ["en" "english"]])
 
-(defn- language-selection [e! style link-style show-label?]
-  (let [current-language @localization/selected-language]
-    [:div (stylefy/use-style style) (when show-label? (str (tr [:common-texts :language]) ": "))
-
-     (doall
-       (for [[lang flag] selectable-languages]
-         [:a (merge
-               (stylefy/use-style style-base/language-flag)
-               {:key      lang
-                :href     "#"
-                :on-click #(e! (fp-controller/->SetLanguage lang))
-                :style    link-style})
-          flag]))]))
-
 (defn- footer [e!]
   [:div
    [:footer.site-footer
@@ -47,8 +33,7 @@
        [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :footer-livi-url-link])
-             [:div {:style {:height "30px"}} [:span [ic/action-open-in-new {:style style-front-page/footer-small-icon}] (tr [:common-texts :footer-livi-url])]] {:target "_blank"}]]
-       [:li [language-selection e! {} {:color "#fff"}]]]]
+             [:div {:style {:height "30px"}} [:span [ic/action-open-in-new {:style style-front-page/footer-small-icon}] (tr [:common-texts :footer-livi-url])]] {:target "_blank"}]]]]
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
       [:ul.unstyled
        [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width 80 :height 52 :margin-right "20px"} :src "/img/EU-logo.svg"}] (tr [:common-texts :footer-funded])]]
