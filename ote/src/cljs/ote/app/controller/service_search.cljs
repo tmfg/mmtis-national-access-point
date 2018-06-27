@@ -5,7 +5,8 @@
             [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.util.url :as url-util]))
+            [ote.util.url :as url-util]
+            [ote.util.fn :refer [flip]]))
 
 
 (defrecord UpdateSearchFilters [filters])
@@ -19,7 +20,7 @@
 (defrecord GeoJSONFetched [response])
 (defrecord SetOperatorName [name])
 (defrecord OperatorCompletionsResponse [completions name])
-(defrecord AddOperator [business-id])
+(defrecord AddOperator [business-id operator])
 (defrecord RemoveOperatorById [id])
 
 (defn- search-params [{operators :operators
@@ -162,11 +163,12 @@
 
   SetOperatorName
   (process-event [{name :name} app]
-    (let [app (assoc-in app [:service-search :filters :operators :name] name)]
-      (when (>= (count name) 2) ;; Search after two (2) chars is given
-        (comm/get! (str "operator-completions/" (url-util/encode-url-component name))
-                   {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
-      (assoc-in app [:service-search :filters :operators :results] [])))
+    (when (>= (count name) 2) ;; Search after two (2) chars is given
+      (comm/get! (str "operator-completions/" (url-util/encode-url-component name))
+                 {:on-success (tuck/send-async! ->OperatorCompletionsResponse name)}))
+    (-> app
+        (assoc-in [:service-search :filters :operators :name] name)
+        (assoc-in [:service-search :filters :operators :results] [])))
 
   OperatorCompletionsResponse
   (process-event [result app]
@@ -177,17 +179,14 @@
       (assoc-in app [:service-search :filters :operators :results] clean-response)))
 
   AddOperator
-  (process-event [{business-id :business-id} app]
-    (if (some #(= business-id (:business-id (:operator %)))
-              (get-in app [:service-search :filters :operators :chip-results]))
-      ;; This name has already been added, don't do it again
-      app
-      (if-let [operator (some #(when (= business-id (:business-id %)) %)
-                           (get-in app [:service-search :filters :operators :results]))]
-        (-> app
-            (add-operator-to-chip-list operator)
-            (assoc-in [:service-search :filters :operators :name] ""))
-        app)))
+  (process-event [{:keys [business-id operator]} app]
+    (-> (if (some #(= business-id (:business-id (:operator %)))
+                  (get-in app [:service-search :filters :operators :chip-results]))
+          ;; This name has already been added, don't do it again
+          app
+          (add-operator-to-chip-list app {:business-id business-id
+                                          :operator operator}))
+        (assoc-in [:service-search :filters :operators :name] "")))
 
   RemoveOperatorById
   (process-event [{id :id} app]

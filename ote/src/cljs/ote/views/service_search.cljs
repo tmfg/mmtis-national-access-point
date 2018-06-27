@@ -243,25 +243,25 @@
                          [ui/menu-item {:primary-text operator}])})
          completions)))
 
-(defn operator-search [e! data]
-  (let [results (:results data)
-        chip-results (:chip-results data)]
-    [:div
-     [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
-                         :floating-label-fixed true
-                         :hintText (tr [:service-search :operator-search-placeholder])
-                         :hint-style style-base/placeholder
-                         :style {:width "100%"}
-                         :filter (constantly true)          ;; no filter, backend returns what we want
-                         :maxSearchResults 12
-                         :dataSource (parse-operator-data-source results)
-                         :on-update-input #(e! (ss/->SetOperatorName %))
-                         :search-text (or (:operator data) "")
-                         :on-new-request #(do
-                                            (e! (ss/->AddOperator (aget % "business-id")))
-                                            (e! (ss/->UpdateSearchFilters nil)))}]
+(defn operator-search [e! {:keys [results chip-results name] :as data}]
+  [:div
+   [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
+                      :floating-label-fixed true
+                      :hintText (tr [:service-search :operator-search-placeholder])
+                      :hint-style style-base/placeholder
+                      :style {:width "100%"}
+                      :filter (constantly true)          ;; no filter, backend returns what we want
+                      :maxSearchResults 12
+                      :dataSource (parse-operator-data-source results)
+                      :on-update-input #(e! (ss/->SetOperatorName %))
+                      :search-text (or name "")
+                      :on-new-request #(do
+                                         (e! (ss/->AddOperator
+                                              (aget % "business-id")
+                                              (aget % "text")))
+                                         (e! (ss/->UpdateSearchFilters nil)))}]
 
-     [operator-result-chips e! chip-results]]))
+   [operator-result-chips e! chip-results]])
 
 (defn- capitalize-operation-area-postal-code [sentence]
   (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
