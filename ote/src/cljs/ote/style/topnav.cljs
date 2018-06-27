@@ -35,12 +35,22 @@
 (def ul {:list-style-type "none" })
 
 (def li-right {:font-size "0.875rem"
-               :float "right"})
+                     :float "right"
+                     :padding-right "10px"})
 
-(def li-right-white (merge bottom-border li-right
-                           {::stylefy/mode {:hover {:border-bottom "4px solid #fafafa"}}}))
-(def li-right-blue (merge bottom-border li-right
-                          {:border-bottom "4px solid rgb(102,163,224)"}))
+(def li-right-div {:cursor  "pointer"
+                   :display "-webkit-box"
+                   :padding-right "10px"
+                   :margin-left "10px"})
+
+(def li-right-div-blue (merge bottom-border li-right-div
+                              {:cursor  "pointer" :display "-webkit-box"
+                               :border-bottom "4px solid rgb(102,163,224)"}))
+
+(def li-right-div-white  (merge bottom-border li-right-div
+                                {:cursor  "pointer"
+                         :display "-webkit-box"
+                         ::stylefy/mode {:hover {:border-bottom "4px solid #fafafa"}}}))
 
 (def mobile-li {:padding-top "10px" :padding-bottom "10px"})
 
@@ -60,7 +70,8 @@
    :padding "10px 0 10px 0"
    :text-decoration "none"
    :font-size "1rem"
-   :display "block"})
+   :display "block"
+   ::stylefy/mode {:hover {:text-decoration "underline"}}})
 
 (def logo {:transition "margin-top 300ms ease, height 300ms ease"
            :margin-top "10px"

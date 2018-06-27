@@ -264,7 +264,7 @@
                                {:page  :own-services
                                 :label [:common-texts :navigation-own-service-list]})])]
           ^{:key page}
-          [:li
+          [:li.hidden-xs.hidden-sm
            [:a
             (merge
               (stylefy/use-style style-topnav/desktop-link)
@@ -275,52 +275,51 @@
                             (if url
                               (e! (fp-controller/->GoToUrl url))
                               (e! (fp-controller/->ChangePage page nil))))})
-            [:div.hidden-xs.hidden-sm
+            [:div
              (tr label)]]]))
 
-      [:li (if (get-in app [:ote-service-flags :lang-menu-open])
-             (stylefy/use-style style-topnav/li-right-blue)
-             (stylefy/use-style style-topnav/li-right-white))
+      [:li (stylefy/use-style style-topnav/li-right)
        [:div {:on-click #(e! (fp-controller/->OpenLangMenu))
-              :style    {:cursor  "pointer"
-                         :display "-webkit-box"}}
+              :class (:class (if (get-in app [:ote-service-flags :lang-menu-open])
+                               (stylefy/use-style style-topnav/li-right-div-blue)
+                               (stylefy/use-style style-topnav/li-right-div-white)))}
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              (if @is-scrolled?
                                {:margin-top "15px"}
                                {:margin-top "28px"}))}
-         [ic/action-language {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
-        [:span.hidden-xs {:style {:color "#fff"}}
-         (str/upper-case (name current-language))]]]
+         (if (get-in app [:ote-service-flags :lang-menu-open])
+          [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
+          [ic/action-language {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
+        [:span {:style {:color "#fff"}} (str/upper-case (name current-language))]]]
 
-      [:li (if (get-in app [:ote-service-flags :header-open])
-             (stylefy/use-style style-topnav/li-right-blue)
-             (stylefy/use-style style-topnav/li-right-white))
+      [:li (stylefy/use-style style-topnav/li-right)
        [:div {:on-click #(e! (fp-controller/->OpenHeader))
-              :style    {:cursor        "pointer"
-                         :display       "-webkit-box"
-                         :padding-right "20px"}}
+              :class (:class (if (get-in app [:ote-service-flags :header-open])
+                               (stylefy/use-style style-topnav/li-right-div-blue)
+                               (stylefy/use-style style-topnav/li-right-div-white)))}
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              (if @is-scrolled?
                                {:margin-top "15px"}
                                {:margin-top "28px"}))}
-         [ic/action-reorder {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
+         (if (get-in app [:ote-service-flags :header-open])
+          [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
+          [ic/navigation-menu {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
         [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-general-menu])]]]
 
       (when (get-in app [:user :username])
-        [:li (if (get-in app [:ote-service-flags :user-menu-open])
-               (stylefy/use-style style-topnav/li-right-blue)
-               (stylefy/use-style style-topnav/li-right-white))
+        [:li (stylefy/use-style style-topnav/li-right)
          [:div.header-user-menu {:on-click #(e! (fp-controller/->OpenUserMenu))
-                :style    {:cursor        "pointer"
-                           :display       "-webkit-box"
-                           :padding-right "20px"}}
+                                 :class (:class (if (get-in app [:ote-service-flags :user-menu-open])
+                                          (stylefy/use-style style-topnav/li-right-div-blue)
+                                          (stylefy/use-style style-topnav/li-right-div-white)))}
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "15px"}
                                  {:margin-top "28px"}))}
-           [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}]]
-          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 25 (get-in app [:user :name]))]]])]]))
-
+           (if (get-in app [:ote-service-flags :user-menu-open])
+            [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
+            [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
+          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])]]))
 
 (defn- top-nav [e! app is-scrolled? pages]
   [:span
