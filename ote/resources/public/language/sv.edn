@@ -307,7 +307,7 @@
   :trip-editor-no-calendar  "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
   :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
   :pre-notice-attatchment-info "Meddela de detaljerade rutt- och tidtabellsändringarna i din transporttjänst inom persontrafik. Du kan lägga till en webbadress där uppgifterna framgår. Du kan också bifoga filer som visar ändringarna till denna blankett."
-  :autocomplete-hint "Kirjoita oma tai valitse listalta"
+  :autocomplete-hint "Ange din egen eller välj från listan"
   :allowed-file-types "Godkända filformat är "
 
   :real-time-info "Här kan du rapportera realtidstjänster relaterade till din tjänst som \"bilar på kartan\" eller \"fria parkeringsplatser\""
@@ -367,9 +367,9 @@
   :route-calendar-clear "Töm kalendern"
   :back-to-draft  "Ändra status till utkast"
   :add-new-effective-date "Lägg till nytt datum"
-  :transport-service-catalog "Liikkumispalvelukatalogi"
-  :register-to-service "Rekisteröidy palveluun"
-  :check-out-the-service "Tutustu tietoihin"
+  :transport-service-catalog "Tjänstekatalogen"
+  :register-to-service "Registrera"
+  :check-out-the-service "Kolla in informationen"
   }
 
  ;; Database enumeration values
@@ -535,9 +535,9 @@
 
  :front-page
  {:title-NAP "NAP - National Access Point"
-  :title-transport-services "Liikkumispalvelut"
-  :title-essential-info "Olennaiset tiedot"
-  :title-transport-operator "Palveluntuottaja"
+  :title-transport-services "Mobilitetstjänster"
+  :title-essential-info "Viktig information"
+  :title-transport-operator "Tjänsteproducenter"
   :title-developer "Sovelluskehittäjä"
   :column-NAP (:md
                 "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon
