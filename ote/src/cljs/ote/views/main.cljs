@@ -32,6 +32,7 @@
             [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]
             [ote.views.transit-visualization :as transit-visualization]
             [ote.views.transit-changes :as transit-changes]
+            [ote.views.register :as register]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
@@ -220,6 +221,7 @@
                   [scroll-to-page (:page app)]
 
                   (case (:page app)
+                    :register [register/register e! (:register app) (:user app)]
                     :front-page [fp/front-page e! app]
                     :own-services [fp/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
