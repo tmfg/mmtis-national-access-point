@@ -74,10 +74,10 @@
    ::stylefy/mode {:hover {:text-decoration "underline"}}})
 
 (def logo {:transition "margin-top 300ms ease, height 300ms ease"
-           :margin-top "10px"
+           :margin-top "13px"
            :margin-left "-8px"
            :display "block"
-           :height "40px"
+           :height "35px"
            :flex "0 auto"})
 
 (def logo-small
