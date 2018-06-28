@@ -21,7 +21,7 @@ describe('Own services basic tests', function () {
     });
 
     it('should redirect to add service view', function () {
-        cy.contains('Lisää uusi palvelu').click();
+        cy.contains('Lisää uusi palvelu').click({force: true});
     });
 
     it('should redirect to add new service provider view', function () {
@@ -57,7 +57,7 @@ describe('Add a new service', function () {
             const service = this.service;
 
             cy.visit('/#/own-services');
-            cy.contains('Lisää uusi palvelu').click({"force": true});
+            cy.contains('Lisää uusi palvelu').click();
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
                 .click();
