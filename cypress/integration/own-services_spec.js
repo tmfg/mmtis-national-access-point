@@ -57,7 +57,7 @@ describe('Add a new service', function () {
             const service = this.service;
 
             cy.visit('/#/own-services');
-            cy.contains('Lisää uusi palvelu').click();
+            cy.contains('Lisää uusi palvelu').click({"force": true});
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
                 .click();

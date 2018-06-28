@@ -45,7 +45,7 @@ describe('Pre notice tests', () => {
         // Wait for pre-notices query because it causes re-render of the view.
         cy.wait('@getPreNotices');
 
-        cy.get('#add-new-pre-notice').click();
+        cy.get('#add-new-pre-notice').click({"force": true});
 
         // Select type
         cy.get('#0_termination').click();
