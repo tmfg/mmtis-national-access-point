@@ -102,21 +102,6 @@
          [:div.col-sm-2.col-md-4]
          [:div.col-sm-8.col-md-4
           [:ul (stylefy/use-style style-topnav/ul)
-           (when (and (flags/enabled? :pre-notice) (get-in app [:user :transit-authority?]))
-             [:li
-              [:a (merge (stylefy/use-style
-                           style-topnav/topnav-dropdown-link)
-                         {:href     "#/authority-pre-notices"
-                          :on-click #(e! (fp-controller/->OpenUserMenu))})
-               (tr [:common-texts :navigation-authority-pre-notices])]])
-           (when (:admin? (:user app))
-             [:li
-              [:a (merge (stylefy/use-style
-                           style-topnav/topnav-dropdown-link)
-                         {:href "#/admin"
-                          :on-click #(do
-                                       (e! (fp-controller/->OpenUserMenu)))})
-               (tr [:document-title :admin])]])
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
@@ -180,7 +165,22 @@
                          style-topnav/topnav-dropdown-link)
                        {:href "#/pre-notices"
                         :on-click #(e! (fp-controller/->OpenHeader))})
-             (tr [:common-texts :navigation-pre-notice])]])]]
+             (tr [:common-texts :navigation-pre-notice])]])
+         (when (and (flags/enabled? :pre-notice) (get-in app [:user :transit-authority?]))
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href     "#/authority-pre-notices"
+                        :on-click #(e! (fp-controller/->OpenHeader))})
+             (tr [:common-texts :navigation-authority-pre-notices])]])
+         (when (:admin? (:user app))
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href "#/admin"
+                        :on-click #(do
+                                     (e! (fp-controller/->OpenUserMenu)))})
+             (tr [:document-title :admin])]])]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
          [:li

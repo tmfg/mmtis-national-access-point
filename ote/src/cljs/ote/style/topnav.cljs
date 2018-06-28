@@ -9,7 +9,7 @@
 
 (def topnav-dropdown {:width "100%"
                       :background-color "#323232"
-                      :min-height "200px"
+                      :min-height "120px"
                       :padding-top "20px"
                       :padding-bottom "20px"
                       :border-top "2px solid #646464"
