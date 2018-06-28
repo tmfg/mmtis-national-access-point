@@ -6,7 +6,7 @@
 
 (defn table [{:keys [height name->label key-fn
                      row-style show-row-hover?
-                     on-select row-selected? no-rows-message] :as opts} headers rows]
+                     on-select row-selected? no-rows-message class] :as opts} headers rows]
   [ui/table (merge
              (when on-select
                {:on-row-selection (fn [selected-rows]
@@ -14,7 +14,9 @@
                                       (on-select (map (partial nth rows) selected-rows))))})
              (when height
                {:height height
-                :fixed-header true}))
+                :fixed-header true})
+             (when class
+               {:class class}))
    [ui/table-header {:adjust-for-checkbox false :display-select-all false}
     [ui/table-row {:selectable false}
      (doall
