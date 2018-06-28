@@ -121,7 +121,7 @@
                                               {:positions (clj->js (mapv (comp flip-coords ::transit/location) stop-sequence))
                                                :color     "red"}])]])})))
 (defn- map-container [e! route]
-  [:div.stops-map {:style {:width "70%"}}
+  [:div.stops-map {:style {:width "70%" :z-index 99 :position "relative"}}
    [route-map e! route]
    [:span
     (if (get-in route [:map-controls :show?])
