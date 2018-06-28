@@ -99,7 +99,7 @@
     (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
                                            date1 date1-route-lines date1-show?
                                            date2 date2-route-lines date2-show?]}]
-      [:div.transit-visualization-route-map
+      [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
        (when date1-route-lines
          [ui/checkbox {:label (str "Näytä " date1)

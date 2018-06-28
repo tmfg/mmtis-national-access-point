@@ -165,7 +165,7 @@
                          :search-text (or (:secondary-name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}]]
 
-     [:div {:style {:width "70%"}}
+     [:div {:style {:width "70%" :z-index 99}}
        [places-map e! (:results place-search) (:show? place-search)]
 
       [:span
