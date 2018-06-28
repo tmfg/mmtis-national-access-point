@@ -200,15 +200,6 @@
          (if (nil? (get-in app [:user :username]))
            [:ul (stylefy/use-style style-topnav/ul)
             [:li
-             [:a (merge (stylefy/use-style
-                          style-topnav/topnav-dropdown-link)
-                        {:href "#"
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (fp-controller/->OpenHeader))
-                                      (e! (fp-controller/->ToggleRegistrationDialog)))})
-              (tr [:common-texts :navigation-register])]]
-            [:li
              (if (flags/enabled? :ote-login)
                [:a (merge (stylefy/use-style
                             style-topnav/topnav-dropdown-link)
@@ -220,7 +211,16 @@
                 (tr [:common-texts :navigation-login])]
                [linkify "/user/login" (tr [:common-texts :navigation-login])
                 (merge (stylefy/use-style
-                         style-topnav/topnav-dropdown-link))])]])
+                         style-topnav/topnav-dropdown-link))])]
+            [:li
+             [:a (merge (stylefy/use-style
+                          style-topnav/topnav-dropdown-link)
+                        {:href "#"
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (fp-controller/->OpenHeader))
+                                      (e! (fp-controller/->ToggleRegistrationDialog)))})
+              (tr [:common-texts :navigation-register])]]])
 
          [:li
           [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" (tr [:common-texts :navigation-privacy-policy])
@@ -318,7 +318,25 @@
            (if (get-in app [:ote-service-flags :user-menu-open])
             [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
-          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])]]))
+          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])
+      (when (nil? (get-in app [:user :username]))
+        [:li (stylefy/use-style style-topnav/li-right)
+         [:div {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))
+                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+          [:div {:style (merge {:transition "margin-top 300ms ease"}
+                               (if @is-scrolled?
+                                 {:margin-top "0px"}
+                                 {:margin-top "0px"}))}
+           [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-register])]]]])
+      (when (and (nil? (get-in app [:user :username])) (flags/enabled? :ote-login))
+        [:li (stylefy/use-style style-topnav/li-right)
+         [:div {:on-click #(e! (login/->ShowLoginDialog))
+                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+          [:div {:style (merge {:transition "margin-top 300ms ease"}
+                               (if @is-scrolled?
+                                 {:margin-top "0px"}
+                                 {:margin-top "0px"}))}
+           [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-login])]]]])]]))
 
 (defn- top-nav [e! app is-scrolled?]
   [:span
