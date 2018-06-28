@@ -13,7 +13,8 @@
                       :padding-top "20px"
                       :padding-bottom "20px"
                       :border-top "2px solid #646464"
-                      :transition "visibility 300ms ease, opacity 300ms ease"})
+                      :transition "visibility 300ms ease, opacity 300ms ease"
+                      :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"})
 
 
 (def topnav {:min-height "56px"
