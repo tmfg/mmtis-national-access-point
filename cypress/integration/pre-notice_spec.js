@@ -114,9 +114,9 @@ describe('Authority pre notice tests', () => {
     });
 
     it('should render authority pre notice list', () => {
-        cy.get('.header-user-menu').click();
+        cy.get('.header-general-menu').click();
 
-        cy.get('div.container.user-menu').within($el => {
+        cy.get('div.container.general-menu').within($el => {
             // Dropdown menu links
             cy.contains('Saapuneet muutosilmoitukset').click();
 
@@ -129,9 +129,9 @@ describe('Authority pre notice tests', () => {
 
     it('should open authority pre notice modal', () => {
 
-        cy.get('.header-user-menu').click();
+        cy.get('.header-general-menu').click();
 
-        cy.get('div.container.user-menu').within($el => {
+        cy.get('div.container.general-menu').within($el => {
             // Dropdown menu links
             cy.contains('Saapuneet muutosilmoitukset').click();
 

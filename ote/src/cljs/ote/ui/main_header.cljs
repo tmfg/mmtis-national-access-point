@@ -129,7 +129,7 @@
                             :visibility "hidden"
                             ;; Remove the element from normal document flow, by setting position absolute.
                             :position "absolute"}))}
-     [:div.container
+     [:div.container.general-menu
       [:div.row
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
@@ -292,7 +292,7 @@
         [:span {:style {:color "#fff"}} (str/upper-case (name current-language))]]]
 
       [:li (stylefy/use-style style-topnav/li-right)
-       [:div {:on-click #(e! (fp-controller/->OpenHeader))
+       [:div.header-general-menu {:on-click #(e! (fp-controller/->OpenHeader))
               :class (:class (if (get-in app [:ote-service-flags :header-open])
                                (stylefy/use-style style-topnav/li-right-div-blue)
                                (stylefy/use-style style-topnav/li-right-div-white)))}
