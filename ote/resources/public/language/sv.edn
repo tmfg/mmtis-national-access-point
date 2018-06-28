@@ -1008,6 +1008,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "years" "År"
           "transport-type" "Trafikslag"
           "advance-reservation" "Förhandsbokning"
+          "visiting-address"  "Besöksadress"
 
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
