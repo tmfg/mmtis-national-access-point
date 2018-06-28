@@ -8,7 +8,9 @@
             [compojure.core :refer [routes POST]]
             [ote.nap.cookie :as cookie]
             [ote.nap.users :as users]
-            [ote.services.transport :as transport])
+            [ote.services.transport :as transport]
+            [ote.components.service :refer [define-service-component]]
+            [ote.db.tx :refer [with-transaction]])
   (:import (java.util Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
@@ -77,22 +79,33 @@
 (defn logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
 
-(defn- login-routes [db auth-tkt-config]
-  (routes
-   (POST "/login" {form-data :body}
-         (#'login db auth-tkt-config
-                (http/transit-request form-data)))
-   (POST "/logout" []
-         (logout auth-tkt-config))))
+(defn register [db auth-tkt-config {:keys [username name email password] :as form-data}]
+  (with-transaction db
+    (let [username-taken? (username-exists? db {:username username})
+          email-taken? (email-exists? db {:email email})]
+      (http/transit-response
+       {:success? (and (not username-taken?)
+                       (not email-taken?))
+        :username-taken (when username-taken? username)
+        :email-taken (when email-taken? email)}))))
 
-(defrecord LoginService [auth-tkt-config]
-  component/Lifecycle
-  (start [{db :db
-           http :http
-           :as this}]
-    (assoc this ::stop
-           (http/publish! http {:authenticated? false}
-                          (login-routes db auth-tkt-config))))
-  (stop [{stop ::stop :as this}]
-    (stop)
-    (dissoc this ::stop)))
+(define-service-component LoginService
+  {:fields [auth-tkt-config]}
+
+  ^:unauthenticated
+  (POST "/login" {form-data :body}
+        (#'login db auth-tkt-config
+                 (http/transit-request form-data)))
+
+  ^:unauthenticated
+  (POST "/logout" []
+        (logout auth-tkt-config))
+
+  ^:unauthenticated
+  (POST "/register" {form-data :body
+                     user :user}
+        (if user
+          ;; Trying to register while logged in
+          (http/transit-response {:success? false})
+          (#'register db auth-tkt-config
+                      (http/transit-request form-data)))))
