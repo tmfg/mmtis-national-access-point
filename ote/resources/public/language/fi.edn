@@ -1014,6 +1014,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
           "years" "Vuotta"
           "transport-type" "Palvelun liikennemuoto"
           "advance-reservation" "Ennakkovaraus"
+          "visiting-address"  "Käyntiosoite"
 
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
