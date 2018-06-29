@@ -179,7 +179,7 @@
                          style-topnav/topnav-dropdown-link)
                        {:href "#/admin"
                         :on-click #(do
-                                     (e! (fp-controller/->OpenUserMenu)))})
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:document-title :admin])]])]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
