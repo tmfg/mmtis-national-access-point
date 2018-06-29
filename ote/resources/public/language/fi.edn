@@ -1224,7 +1224,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :errors {:passwords-must-match "Syötä sama salasana uudestaan"
            :username-taken "Käyttäjänimi on jo varattu"
            :email-taken "Tälle sähköpostiosoitteelle on jo käyttäjätili"
-           :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]}
+           :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
+           :password-not-valid "Pituus 6 - 32 merkkiä ja sisältää numeron"}
+
   }
 
   :gtfs-viewer

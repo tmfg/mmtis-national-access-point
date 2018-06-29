@@ -1215,7 +1215,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :errors {:passwords-must-match "Ange samma lösenord igen"
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
            :email-taken "E-postadressen är redan i bruk"
-           :logged-in ["Du är redan inloggad som: " :name]}}
+           :logged-in ["Du är redan inloggad som: " :name]
+           :password-not-valid "Längd mellan 6 och 32 tecken inklusive ett nummer"}}
 
   :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
