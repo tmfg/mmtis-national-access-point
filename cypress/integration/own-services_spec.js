@@ -161,25 +161,33 @@ describe('Add new service provider', function () {
 
         cy.server();
         cy.route('POST', '/transport-operator').as('addOperator');
+        cy.route('GET' ,'/t-operator/').as('openOperatorPage');
 
         // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
         cy.get('[id*="Valitsepalveluntuottaja"]').click();
         cy.contains('Lisää uusi palveluntuottaja').click();
+        cy.wait('@openOperatorPage');
 
         cy.get('input[id*="name--Palveluntuottajannimi-"]').type(this.operatorName);
         cy.get('input[id*="business-id--Y-tunnus-"]').type('1231233-3');
         cy.contains('button', 'Tallenna').click();
         cy.wait('@addOperator');
+        cy.contains('Palveluntarjoajan tiedot tallennettu');
     });
 
     it('should delete added tranport operator', function () {
+        cy.server();
+        cy.route('POST', '/transport-operator/delete').as('deleteOperator');
 
-        // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
         cy.get('[id*="Valitsepalveluntuottaja"]').click();
         cy.contains(this.operatorName).click();
         cy.contains('button', 'Muokkaa').click();
         cy.contains('button', 'Poista palveluntuottaja').click();
-        cy.contains('button', 'Poista').click();
+        cy.get('#confirm-operator-delete').contains('Poista').click();
+
+        cy.wait('@deleteOperator');
+
+        cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
     });
 
 });
