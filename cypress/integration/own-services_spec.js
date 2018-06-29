@@ -56,6 +56,9 @@ describe('Add a new service', function () {
         it('should should add a new service', function () {
             const service = this.service;
 
+            cy.server();
+            cy.route('POST', '/transport-service').as('addService');
+
             cy.visit('/#/own-services');
             cy.contains('Lisää uusi palvelu').click();
 
@@ -119,6 +122,7 @@ describe('Add a new service', function () {
             cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
 
             cy.contains('Tallenna ja julkaise').click();
+            cy.wait('@addService');
         });
 
         it('should delete the test service', function () {
@@ -143,6 +147,7 @@ describe('Add a new service', function () {
 describe('Add new service provider', function () {
     before(function () {
         cy.login();
+        cy.wrap(randomName('test-operator-')).as('operatorName')
     });
 
     beforeEach(function () {
@@ -150,11 +155,40 @@ describe('Add new service provider', function () {
         cy.preserveSessionOnce();
 
         cy.visit('/#/own-services');
+    });
+
+    // Currently these test won't work in PR run. Because we do not have ckan there.
+    xit('should add new tranport operator', function () {
+
+        cy.server();
+        cy.route('POST', '/transport-operator').as('addOperator');
+        cy.route('GET' ,'/t-operator/').as('openOperatorPage');
 
         // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
-        cy.get('[id*="Valitsepalveluntuottaja"]')
-            .click();
-        cy.contains('Lisää uusi palveluntuottaja')
-            .click();
+        cy.get('[id*="Valitsepalveluntuottaja"]').click();
+        cy.contains('Lisää uusi palveluntuottaja').click();
+        cy.wait('@openOperatorPage');
+
+        cy.get('input[id*="name--Palveluntuottajannimi-"]').type(this.operatorName);
+        cy.get('input[id*="business-id--Y-tunnus-"]').type('1231233-3');
+        cy.contains('button', 'Tallenna').click();
+        cy.wait('@addOperator');
+        cy.contains('Palveluntarjoajan tiedot tallennettu');
     });
+
+    xit('should delete added tranport operator', function () {
+        cy.server();
+        cy.route('POST', '/transport-operator/delete').as('deleteOperator');
+
+        cy.get('[id*="Valitsepalveluntuottaja"]').click();
+        cy.contains(this.operatorName).click();
+        cy.contains('button', 'Muokkaa').click();
+        cy.contains('button', 'Poista palveluntuottaja').click();
+        cy.get('#confirm-operator-delete').contains('Poista').click();
+
+        cy.wait('@deleteOperator');
+
+        cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
+    });
+
 });

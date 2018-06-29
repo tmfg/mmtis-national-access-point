@@ -322,6 +322,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:save "Tallenna"
   :cancel "Peruuta"
   :delete "Poista"
+  :delete-operator "Poista palveluntuottaja"
   :close "Sulje"
   :publish "Julkaise"
   :edit-service "Muokkaa palvelun tietoja"

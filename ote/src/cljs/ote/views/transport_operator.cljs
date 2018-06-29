@@ -23,7 +23,8 @@
 (defn- delete-operator [e! operator]
   (when (:show-delete-dialog? operator)
     [ui/dialog
-     {:open    true
+     {:id "delete-transport-operator-dialog"
+      :open    true
       :title   (tr [:dialog :delete-transport-operator :title])
       :actions [(r/as-element
                   [ui/flat-button
@@ -32,7 +33,8 @@
                     :on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))}])
                 (r/as-element
                   [ui/raised-button
-                   {:label     (tr [:buttons :delete])
+                   {:id "confirm-operator-delete"
+                    :label     (tr [:buttons :delete])
                     :icon      (ic/action-delete-forever)
                     :secondary true
                     :primary   true
@@ -151,7 +153,7 @@
                     (tr [:buttons :save])]
                    [buttons/delete {:on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))
                                     :disabled (if (::t-operator/id data) false true)}
-                    (tr [:buttons :delete])]])})
+                    (tr [:buttons :delete-operator])]])})
 
 (defn operator [e! {operator :transport-operator :as state}]
   (e! (to/->EditTransportOperator (get-in state [:params :id])))

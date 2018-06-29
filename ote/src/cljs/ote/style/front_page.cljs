@@ -176,7 +176,7 @@
                                ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "6rem"}
                                                 {:min-width "0px" :max-width (str width-xxs "px")} {:font-size "5rem"}}})
 
-(def lower-section-text {:text-align "center" :font-size "1rem" :font-weight 400 :text-aign "left" :line-height "1.5"})
+(def lower-section-text {:text-align "center" :font-size "1rem" :font-weight 400 :text-aign "left" :line-height "1.5" :min-height "95px"})
 
 (def footer-logo-ul {
                      ::stylefy/media {{:max-width (str width-xs "px")} {:display "flex"
