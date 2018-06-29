@@ -4,6 +4,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
             [ote.app.controller.login :as login]
+            [ote.app.controller.flags :as flags]
             [ote.localization :refer [tr]]))
 
 
@@ -169,10 +170,14 @@
 
 (define-event ToggleRegistrationDialog []
   {}
-  (-> app
-      (update :show-register-dialog? not)
-      (assoc-in [:login :navigate-to] {:page :own-services})
-      get-transport-operator-data))
+  (if (flags/enabled? :ote-register)
+    (do
+      (routes/navigate! :register)
+      app)
+    (-> app
+        (update :show-register-dialog? not)
+        (assoc-in [:login :navigate-to] {:page :own-services})
+        get-transport-operator-data)))
 
 (define-event ToggleUserResetDialog []
   {}
