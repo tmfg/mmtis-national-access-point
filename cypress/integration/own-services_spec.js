@@ -124,9 +124,6 @@ describe('Add a new service', function () {
         it('should delete the test service', function () {
             cy.server();
             cy.route('POST', '/transport-service/delete').as('deleteService');
-            cy.wait(1000);
-            cy.server();
-            cy.route('POST', '/transport-service/delete').as('deleteService');
 
             cy.visit('/#/own-services');
 
@@ -158,6 +155,9 @@ describe('Add new service provider', function () {
 
     it('should add new tranport operator', function () {
 
+        cy.server();
+        cy.route('POST', '/transport-operator').as('addOperator');
+
         // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
         cy.get('[id*="Valitsepalveluntuottaja"]').click();
         cy.contains('Lisää uusi palveluntuottaja').click();
@@ -165,11 +165,11 @@ describe('Add new service provider', function () {
         cy.get('input[id*="name--Palveluntuottajannimi-"]').type(this.operatorName);
         cy.get('input[id*="business-id--Y-tunnus-"]').type('1231233-3');
         cy.contains('button', 'Tallenna').click();
+        cy.wait('@addOperator');
     });
 
     it('should delete added tranport operator', function () {
 
-        cy.wait(1000);
         // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
         cy.get('[id*="Valitsepalveluntuottaja"]').click();
         cy.contains(this.operatorName).click();
