@@ -113,7 +113,7 @@
 (defn valid-registration? [{:keys [username name email password]}]
   (and (user/password-valid? password)
        (user/email-valid? email)
-       (string? username) (not (str/blank? username))
+       (user/username-valid? username)
        (string? name) (not (str/blank? name))))
 
 (defn- register-user! [db auth-tkt-config {:keys [username name email password] :as form-data}]

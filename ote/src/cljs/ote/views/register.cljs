@@ -34,6 +34,9 @@
        {:name :username :type :string :required? true :full-width? true
         :placeholder (tr [:register :placeholder :username])
         :validate [(fn [data _]
+                     (when (not (user/username-valid? data))
+                       (tr [:common-texts :required-field])))
+                   (fn [data _]
                      (when (and username-taken (username-taken data))
                        (tr [:register :errors :username-taken])))]}
        {:name :name :type :string :required? true :full-width? true

@@ -21,6 +21,10 @@
   ["user" ::user])
 
 
+(defn username-valid? [username]
+  (boolean (and (string? username)
+                (>= (count username) 3))))
+
 (defn password-valid? [password]
   (boolean (and (string? password)
                 (<= 6 (count password) 32)
