@@ -322,6 +322,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:save "Save"
   :cancel "Cancel"
   :delete "Delete"
+  :delete-operator "Delete transport operator"
   :close "Close"
   :publish "Publish"
   :edit-service "Edit service"

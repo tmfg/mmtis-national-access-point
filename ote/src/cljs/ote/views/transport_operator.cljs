@@ -151,7 +151,7 @@
                     (tr [:buttons :save])]
                    [buttons/delete {:on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))
                                     :disabled (if (::t-operator/id data) false true)}
-                    (tr [:buttons :delete])]])})
+                    (tr [:buttons :delete-operator])]])})
 
 (defn operator [e! {operator :transport-operator :as state}]
   (e! (to/->EditTransportOperator (get-in state [:params :id])))

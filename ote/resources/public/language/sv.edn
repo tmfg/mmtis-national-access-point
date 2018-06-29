@@ -329,6 +329,7 @@
  {:save "Spara"
   :cancel "Ångra"
   :delete "Ta bort"
+  :delete-operator "Ta bort tjänsteproducent"
   :close "Stäng"
   :publish "Publicera"
   :edit-service "Redigera tjänstens info"
