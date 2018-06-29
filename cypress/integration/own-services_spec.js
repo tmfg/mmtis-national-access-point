@@ -56,6 +56,9 @@ describe('Add a new service', function () {
         it('should should add a new service', function () {
             const service = this.service;
 
+            cy.server();
+            cy.route('POST', '/transport-service').as('addService');
+
             cy.visit('/#/own-services');
             cy.contains('Lisää uusi palvelu').click();
 
@@ -119,6 +122,7 @@ describe('Add a new service', function () {
             cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
 
             cy.contains('Tallenna ja julkaise').click();
+            cy.wait('@addService');
         });
 
         it('should delete the test service', function () {
