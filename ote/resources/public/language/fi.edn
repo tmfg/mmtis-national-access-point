@@ -112,7 +112,7 @@
    :ote.db.transport-service/currency                  "Valuutta"
 
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
-   :ote.db.transport-service/pricing-description-taxi "Hinnoittelun kuvaus. Esim. valtioneuvoston taksa-asetuksen mukainen hinnasto."
+   :ote.db.transport-service/pricing-description-taxi "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
    :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"}
 

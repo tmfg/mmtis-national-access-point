@@ -111,7 +111,7 @@
    :ote.db.transport-service/currency                  "Currency"
 
    :ote.db.transport-service/pricing-description "Price description"
-   :ote.db.transport-service/pricing-description-taxi "Price description, e.g. government mandated prices"
+   :ote.db.transport-service/pricing-description-taxi "Price description"
    :ote.db.transport-service/pricing-url "Price information WWW-address"
    :ote.db.transport-service/payment-method-description "Additional information about payment methods"}
 
