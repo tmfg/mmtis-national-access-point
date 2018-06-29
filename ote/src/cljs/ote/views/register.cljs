@@ -17,7 +17,8 @@
                  :flex-direction "column"
                  :align-items "center"
                  :width "100%"}}
-   [:div {:style {:width "50%"}}
+   [:div.col-xs-12.col-md-6
+    [:h2 (tr [:register :label])]
     [form/form
      {:update! #(e! (lc/->UpdateRegistrationForm %))
       :name->label (tr-key [:register :fields])
@@ -30,7 +31,7 @@
                                                  (form/disable-save? data))}
                      (tr [:register :label])]])}
      [(form/group
-       {:label (tr [:register :label]) :expandable? false :columns 3}
+       {:expandable? false :columns 3}
        {:name :username :type :string :required? true :full-width? true
         :placeholder (tr [:register :placeholder :username])
         :validate [(fn [data _]
