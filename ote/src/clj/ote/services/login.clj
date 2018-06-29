@@ -13,7 +13,8 @@
             [ote.db.tx :refer [with-transaction]]
             [specql.core :as specql]
             [ote.db.user :as user]
-            [ote.time :as time])
+            [ote.time :as time]
+            [ote.util.feature :as feature])
   (:import (java.util UUID Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
@@ -156,13 +157,14 @@
               {:success? true}))))))
 
 (defn register [db auth-tkt-config form-data]
-  (let [result (register-user! db auth-tkt-config form-data )]
-    (if (:success? result)
-      ;; User created, log in immediately with the user info
-      (login db auth-tkt-config form-data)
+  (feature/when-enabled :ote-register
+    (let [result (register-user! db auth-tkt-config form-data )]
+      (if (:success? result)
+        ;; User created, log in immediately with the user info
+        (login db auth-tkt-config form-data)
 
-      ;; Registration failed, return errors
-      (http/transit-response result))))
+        ;; Registration failed, return errors
+        (http/transit-response result)))))
 
 (define-service-component LoginService
   {:fields [auth-tkt-config]}
