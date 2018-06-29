@@ -84,7 +84,6 @@
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
-  (println "CREDS: " (pr-str credentials))
   (let [login-info (first (fetch-login-info db {:email email}))]
     (if login-info
       (if (hashers/check password
@@ -110,19 +109,6 @@
 
 (defn logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
-
-;; id: '98cf8902-c6b4-41cc-ba56-0f291eec6db6'
-;; name: 'foo'
-;; apikey: 'da00cec6-02c3-4e1e-bb2b-5e14fd9e8ca2'
-;; created: 2018-06-28 15:44:55.023196
-;; about NULL, openid NULL
-;; password: '$pbkdf2-sha512$25000$VWpN6R3DGIPQeg9BaM0ZYw$N3UgR/CjKS6IiDLiVMRFFFdY8wN8dwD4PGqHabrOyI9qb/SOB5sVM.telDQVzOsmHz0r0LHoDU4rupoc4KXg0Q'
-;; fullname: 'barsku'
-;; email: 'foobar@example.com'
-;; reset_key: NULL
-;; sysadmin: FALSE
-;; activity_stream: FALSE
-;; active: 'active'
 
 (defn valid-registration? [{:keys [username name email password]}]
   (and (user/password-valid? password)
