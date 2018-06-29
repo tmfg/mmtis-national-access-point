@@ -30,10 +30,10 @@ describe('Sea route tests', function () {
     });
 
     it('Add stops', function () {
-        cy.get('.leaflet-control-zoom-out').click().wait(200);
-        cy.get('.leaflet-control-zoom-out').click().wait(200);
-        cy.get('.leaflet-control-zoom-out').click().wait(200);
-        cy.get('.leaflet-control-zoom-out').click().wait(200);
+        cy.get('.leaflet-control-zoom-out').click().wait(400);
+        cy.get('.leaflet-control-zoom-out').click().wait(400);
+        cy.get('.leaflet-control-zoom-out').click().wait(400);
+        cy.get('.leaflet-control-zoom-out').click().wait(400);
         cy.get('.leaflet-control-zoom-out').click();
         cy.get('img[title="Puerto Mont"]').click();
         cy.get('img[title="Panama"]').click();
