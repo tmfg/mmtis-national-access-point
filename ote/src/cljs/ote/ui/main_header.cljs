@@ -102,21 +102,6 @@
          [:div.col-sm-2.col-md-4]
          [:div.col-sm-8.col-md-4
           [:ul (stylefy/use-style style-topnav/ul)
-           (when (and (flags/enabled? :pre-notice) (get-in app [:user :transit-authority?]))
-             [:li
-              [:a (merge (stylefy/use-style
-                           style-topnav/topnav-dropdown-link)
-                         {:href     "#/authority-pre-notices"
-                          :on-click #(e! (fp-controller/->OpenUserMenu))})
-               (tr [:common-texts :navigation-authority-pre-notices])]])
-           (when (:admin? (:user app))
-             [:li
-              [:a (merge (stylefy/use-style
-                           style-topnav/topnav-dropdown-link)
-                         {:href "#/admin"
-                          :on-click #(do
-                                       (e! (fp-controller/->OpenUserMenu)))})
-               (tr [:document-title :admin])]])
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
@@ -144,7 +129,7 @@
                             :visibility "hidden"
                             ;; Remove the element from normal document flow, by setting position absolute.
                             :position "absolute"}))}
-     [:div.container
+     [:div.container.general-menu
       [:div.row
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
@@ -180,7 +165,22 @@
                          style-topnav/topnav-dropdown-link)
                        {:href "#/pre-notices"
                         :on-click #(e! (fp-controller/->OpenHeader))})
-             (tr [:common-texts :navigation-pre-notice])]])]]
+             (tr [:common-texts :navigation-pre-notice])]])
+         (when (and (flags/enabled? :pre-notice) (get-in app [:user :transit-authority?]))
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href     "#/authority-pre-notices"
+                        :on-click #(e! (fp-controller/->OpenHeader))})
+             (tr [:common-texts :navigation-authority-pre-notices])]])
+         (when (:admin? (:user app))
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
+                       {:href "#/admin"
+                        :on-click #(do
+                                     (e! (fp-controller/->OpenUserMenu)))})
+             (tr [:document-title :admin])]])]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
          [:li
@@ -200,15 +200,6 @@
          (if (nil? (get-in app [:user :username]))
            [:ul (stylefy/use-style style-topnav/ul)
             [:li
-             [:a (merge (stylefy/use-style
-                          style-topnav/topnav-dropdown-link)
-                        {:href "#"
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (fp-controller/->OpenHeader))
-                                      (e! (fp-controller/->ToggleRegistrationDialog)))})
-              (tr [:common-texts :navigation-register])]]
-            [:li
              (if (flags/enabled? :ote-login)
                [:a (merge (stylefy/use-style
                             style-topnav/topnav-dropdown-link)
@@ -220,7 +211,16 @@
                 (tr [:common-texts :navigation-login])]
                [linkify "/user/login" (tr [:common-texts :navigation-login])
                 (merge (stylefy/use-style
-                         style-topnav/topnav-dropdown-link))])]])
+                         style-topnav/topnav-dropdown-link))])]
+            [:li
+             [:a (merge (stylefy/use-style
+                          style-topnav/topnav-dropdown-link)
+                        {:href "#"
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (fp-controller/->OpenHeader))
+                                      (e! (fp-controller/->ToggleRegistrationDialog)))})
+              (tr [:common-texts :navigation-register])]]])
 
          [:li
           [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" (tr [:common-texts :navigation-privacy-policy])
@@ -292,7 +292,7 @@
         [:span {:style {:color "#fff"}} (str/upper-case (name current-language))]]]
 
       [:li (stylefy/use-style style-topnav/li-right)
-       [:div {:on-click #(e! (fp-controller/->OpenHeader))
+       [:div.header-general-menu {:on-click #(e! (fp-controller/->OpenHeader))
               :class (:class (if (get-in app [:ote-service-flags :header-open])
                                (stylefy/use-style style-topnav/li-right-div-blue)
                                (stylefy/use-style style-topnav/li-right-div-white)))}
@@ -318,7 +318,25 @@
            (if (get-in app [:ote-service-flags :user-menu-open])
             [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
-          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])]]))
+          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])
+      (when (nil? (get-in app [:user :username]))
+        [:li (stylefy/use-style style-topnav/li-right)
+         [:div {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))
+                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+          [:div {:style (merge {:transition "margin-top 300ms ease"}
+                               (if @is-scrolled?
+                                 {:margin-top "0px"}
+                                 {:margin-top "0px"}))}
+           [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-register])]]]])
+      (when (and (nil? (get-in app [:user :username])) (flags/enabled? :ote-login))
+        [:li (stylefy/use-style style-topnav/li-right)
+         [:div {:on-click #(e! (login/->ShowLoginDialog))
+                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+          [:div {:style (merge {:transition "margin-top 300ms ease"}
+                               (if @is-scrolled?
+                                 {:margin-top "0px"}
+                                 {:margin-top "0px"}))}
+           [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-login])]]]])]]))
 
 (defn- top-nav [e! app is-scrolled?]
   [:span

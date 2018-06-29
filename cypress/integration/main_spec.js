@@ -33,7 +33,7 @@ describe('OTE login dialog', () => {
 
     const login = (username, password, activate) => {
         cy.contains('Valikko').click();
-        cy.contains('Kirjaudu sisään').click();
+        cy.contains('Kirjaudu').click();
         cy.get('input[id*="email--Shkpostiosoite"]').typeRaw(username);
         cy.get('input[id*="password--Salasana"]').typeRaw(password);
 
@@ -71,7 +71,7 @@ describe('Header - Logged Out', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
-            cy.contains('Palvelukatalogi');
+            cy.contains('Liikkumispalvelukatalogi');
             cy.contains('Valikko');
             cy.contains('FI');
         });
@@ -93,7 +93,7 @@ describe('Header - Logged In', function () {
         cy.visit('/');
 
         cy.get('.navbar').within($navbar => {
-            cy.contains('Palvelukatalogi');
+            cy.contains('Liikkumispalvelukatalogi');
             cy.contains('Valikko');
             cy.contains('FI');
         });
@@ -102,8 +102,6 @@ describe('Header - Logged In', function () {
 
         cy.get('div.container.user-menu').within($el => {
             // Dropdown menu links
-            cy.contains('Saapuneet muutosilmoitukset');
-            cy.contains('Ylläpitopaneeli');
             cy.contains('Käyttäjätilin muokkaus');
             cy.contains('Kirjaudu ulos');
         });

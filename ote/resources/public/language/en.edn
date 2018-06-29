@@ -865,7 +865,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-log-out                          "Log out"
   :user-menu-profile                          "Edit user account"
   :user-menu-summary                          "Summary"
-  :user-menu-nap-help                         "User guide"
+  :user-menu-nap-help                         "User guide for transport service providers"
   :title-operator-basic-details               "Basic information"
   :data-not-found                             "Data is not found"
   :required-field                             "Required field"
