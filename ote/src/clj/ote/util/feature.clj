@@ -9,7 +9,7 @@
 
 (defn feature-enabled?
   ([feature]
-   (feature-enabled? @enabled-features feature))
+   (feature-enabled? {:enabled-features @enabled-features} feature))
   ([config feature]
    (contains? (:enabled-features config) feature)))
 
