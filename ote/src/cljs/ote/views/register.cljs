@@ -7,7 +7,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
-            ))
+
+            [ote.db.user :as user]))
 
 
 (defn register [e! {:keys [form-data email-taken username-taken] :as register} user]
@@ -30,20 +31,28 @@
                      (tr [:register :label])]])}
      [(form/group
        {:label (tr [:register :label]) :expandable? false :columns 3}
-       {:name :username :type :string :required? true
+       {:name :username :type :string :required? true :full-width? true
         :placeholder (tr [:register :placeholder :username])
         :validate [(fn [data _]
                      (when (and username-taken (username-taken data))
                        (tr [:register :errors :username-taken])))]}
-       {:name :name :type :string :required? true
+       {:name :name :type :string :required? true :full-width? true
         :placeholder (tr [:register :placeholder :name])}
        {:name :email :type :string :autocomplete "email" :required? true
-        :placeholder (tr [:register :placeholder :email])
+        :full-width? true :placeholder (tr [:register :placeholder :email])
         :validate [(fn [data _]
+                     (when (not (user/email-valid? data))
+                       (tr [:common-texts :required-field])))
+                   (fn [data _]
                      (when (and email-taken (email-taken data))
                        (tr [:register :errors :email-taken])))]}
-       {:name :password :type :string :password? true :required? true}
+       {:name :password :type :string :password? true :required? true
+        :full-width? true
+        :validate [(fn [data _]
+                     (when (not (user/password-valid? data))
+                       (tr [:register :errors :password-not-valid])))]}
        {:name :confirm :type :string :password? true :required? true
+        :full-width? true
         :validate [(fn [data row]
                       (when (not= data (:password row))
                         (tr [:register :errors :passwords-must-match])))]})]

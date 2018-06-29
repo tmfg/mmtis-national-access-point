@@ -4,7 +4,8 @@
             [ote.app.routes :as routes]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr]]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [clojure.string :as str]))
 
 (defrecord ShowLoginDialog [])
 (defrecord UpdateLoginCredentials [credentials])
@@ -136,7 +137,11 @@
 
 (define-event UpdateRegistrationForm [form-data]
   {:path [:register :form-data]}
-  (merge app form-data))
+  (-> app
+      (merge form-data)
+      (update :name (fnil str/triml ""))
+      (update :email (fnil str/trim ""))
+      (update :username (fnil str/trim ""))))
 
 (define-event RegisterResponse [response]
   {}

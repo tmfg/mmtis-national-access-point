@@ -10,8 +10,11 @@
             [ote.nap.users :as users]
             [ote.services.transport :as transport]
             [ote.components.service :refer [define-service-component]]
-            [ote.db.tx :refer [with-transaction]])
-  (:import (java.util Base64 Base64$Decoder)))
+            [ote.db.tx :refer [with-transaction]]
+            [specql.core :as specql]
+            [ote.db.user :as user]
+            [ote.time :as time])
+  (:import (java.util UUID Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
 
@@ -22,6 +25,18 @@
                        ;; Passlib uses unconventional \. character instead of \+ in base64
                        (str/replace base64 #"\." "+"))]
     (str/join (map #(format "%02x" %) bytes))))
+
+(defn hex->base64
+  "Convert hex string to base64 encoded"
+  [hex]
+  (str/replace
+   (->> hex
+        (partition 2)
+        (map #(Integer/parseInt (str/join %) 16))
+        byte-array
+        (.encode (Base64/getEncoder))
+        (String.))
+   #"\+" "."))
 
 (defn passlib->buddy
   "Convert encrypted password from Python passlib format to buddy format."
@@ -40,6 +55,21 @@
             iterations
             (base64->hex password))))
 
+(defn buddy->passlib
+  "Reverse of passlib->buddy."
+  [hash]
+  (let [[alg salt iterations password] (str/split hash #"\$")]
+    (assert (= alg "pbkdf2+sha512"))
+    (format "$pbkdf2-sha512$%s$%s$%s"
+            iterations
+            (hex->base64 salt)
+            (hex->base64 password))))
+
+(defn encrypt
+  "Encrypt raw password. Returns buddy formatted password hash."
+  [password]
+  (hashers/derive password {:alg :pbkdf2+sha512}))
+
 (defn with-auth-tkt [response auth-tkt-value domain]
   (update response :headers
           assoc "Set-Cookie" (if (nil? domain)
@@ -53,6 +83,7 @@
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
+  (println "CREDS: " (pr-str credentials))
   (let [login-info (first (fetch-login-info db {:email email}))]
     (if login-info
       (if (hashers/check password
@@ -79,15 +110,59 @@
 (defn logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
 
-(defn register [db auth-tkt-config {:keys [username name email password] :as form-data}]
-  (with-transaction db
-    (let [username-taken? (username-exists? db {:username username})
-          email-taken? (email-exists? db {:email email})]
-      (http/transit-response
-       {:success? (and (not username-taken?)
-                       (not email-taken?))
-        :username-taken (when username-taken? username)
-        :email-taken (when email-taken? email)}))))
+;; id: '98cf8902-c6b4-41cc-ba56-0f291eec6db6'
+;; name: 'foo'
+;; apikey: 'da00cec6-02c3-4e1e-bb2b-5e14fd9e8ca2'
+;; created: 2018-06-28 15:44:55.023196
+;; about NULL, openid NULL
+;; password: '$pbkdf2-sha512$25000$VWpN6R3DGIPQeg9BaM0ZYw$N3UgR/CjKS6IiDLiVMRFFFdY8wN8dwD4PGqHabrOyI9qb/SOB5sVM.telDQVzOsmHz0r0LHoDU4rupoc4KXg0Q'
+;; fullname: 'barsku'
+;; email: 'foobar@example.com'
+;; reset_key: NULL
+;; sysadmin: FALSE
+;; activity_stream: FALSE
+;; active: 'active'
+
+(defn valid-registration? [{:keys [username name email password]}]
+  (and (user/password-valid? password)
+       (user/email-valid? email)
+       (string? username) (not (str/blank? username))
+       (string? name) (not (str/blank? name))))
+
+(defn- register-user! [db auth-tkt-config {:keys [username name email password] :as form-data}]
+  (if-not (valid-registration? form-data)
+    ;; Check errors that should have been checked on the form
+    {:success? false}
+    (with-transaction db
+      (let [username-taken? (username-exists? db {:username username})
+            email-taken? (email-exists? db {:email email})]
+        (if (or username-taken? email-taken?)
+          ;; Username or email taken, return errors to form
+          {:success? false
+           :username-taken (when username-taken? username)
+           :email-taken (when email-taken? email)}
+
+          ;; Registration data is valid and username/email is not taken
+          (do (specql/insert! db ::user/user
+                              {::user/id (str (UUID/randomUUID))
+                               ::user/name username
+                               ::user/fullname name
+                               ::user/email email
+                               ::user/password (buddy->passlib (encrypt password))
+                               ::user/created (java.util.Date.)
+                               ::user/state "active"
+                               ::user/sysadmin false
+                               ::user/activity_streams_email_notifications false})
+              {:success? true}))))))
+
+(defn register [db auth-tkt-config form-data]
+  (let [result (register-user! db auth-tkt-config form-data )]
+    (if (:success? result)
+      ;; User created, log in immediately with the user info
+      (login db auth-tkt-config form-data)
+
+      ;; Registration failed, return errors
+      (http/transit-response result))))
 
 (define-service-component LoginService
   {:fields [auth-tkt-config]}
