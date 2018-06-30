@@ -119,7 +119,7 @@
      :floating-label-text (when-not table? label)
      :floating-label-fixed true
      :on-blur           on-blur
-     :hint-text         (or hint-text "")
+     :hint-text         (or hint-text (placeholder field data) "")
      :on-change         #(let [v %2]
                            (if regex
                              (when (re-matches regex v)

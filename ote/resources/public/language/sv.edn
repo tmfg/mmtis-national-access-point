@@ -1198,6 +1198,22 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :check-email-for-link "Återställningskoden har skickats per e-post."
   :logged-out "Du har blivit utloggad"}
 
+ :register
+ {:label "Skapa ett nytt konto"
+  :fields {:username "Användarnamn"
+           :name "Namn"
+           :email "E-post"
+           :password "Lösenord"
+           :confirm "Bekräfta"}
+  :placeholder {:username "användarnamn"
+                :name "Medel-Svensson"
+                :email "medel-svensson@epost.se"}
+  :errors {:passwords-must-match "Ange samma lösenord igen"
+           :username-taken "Det inloggningsnamnet är inte tillgängligt"
+           :email-taken "E-postadressen är redan i bruk"
+           :logged-in ["Du är redan inloggad som: " :name]
+           :password-not-valid "Längd mellan 6 och 32 tecken inklusive ett nummer"}}
+
   :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
 

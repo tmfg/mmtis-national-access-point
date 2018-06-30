@@ -31,6 +31,8 @@
             [ote.tasks.pre-notices :as tasks-pre-notices]
             [ote.tasks.gtfs :as tasks-gtfs]
 
+            [ote.util.feature :as feature]
+
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
             [jeesql.autoreload :as autoreload])
@@ -108,6 +110,7 @@
    (fn [_]
      (let [config (read-string (slurp "config.edn"))]
        (configure-logging (:log config))
+       (feature/set-enabled-features! (or (:enabled-features config) #{}))
        (when (:dev-mode? config)
          (autoreload/start-autoreload))
        (component/start-system (ote-system config))))))

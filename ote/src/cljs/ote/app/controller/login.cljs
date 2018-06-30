@@ -1,9 +1,11 @@
 (ns ote.app.controller.login
-  (:require [tuck.core :as tuck]
+  (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
             [ote.db.transport-operator :as t-operator]
-            [ote.localization :refer [tr]]))
+            [ote.localization :refer [tr]]
+            [ote.app.controller.common :refer [->ServerError]]
+            [clojure.string :as str]))
 
 (defrecord ShowLoginDialog [])
 (defrecord UpdateLoginCredentials [credentials])
@@ -132,3 +134,34 @@
   LogoutFailed
   (process-event [_ app]
     (assoc app :flash-message (tr [:common-texts :server-error]))))
+
+(define-event UpdateRegistrationForm [form-data]
+  {:path [:register :form-data]}
+  (-> app
+      (merge form-data)
+      (update :name (fnil str/triml ""))
+      (update :email (fnil str/trim ""))
+      (update :username (fnil str/trim ""))))
+
+(define-event RegisterResponse [response]
+  {}
+  (let [{:keys [success? username-taken email-taken]} response]
+    (if success?
+      (login-navigate->page app response)
+      (-> app
+          (update-in [:register :username-taken]
+                     #(if username-taken
+                        (conj (or % #{}) username-taken)
+                        %))
+          (update-in [:register :email-taken]
+                     #(if email-taken
+                        (conj (or % #{}) email-taken)
+                        %))
+          (assoc :flash-message-error "ei onnaa")))))
+
+(define-event Register [form-data]
+  {}
+  (comm/post! "register" form-data
+              {:on-success (tuck/send-async! ->RegisterResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  app)

@@ -1199,6 +1199,23 @@ You can also draw the operating area or point to the map with drawing tools. You
   :check-email-for-link "Please check your inbox for a reset code."
   :logged-out "You have been logged out."}
 
+ :register
+ {:label "Register for an Account"
+  :fields {:username "Username"
+           :name "Full Name"
+           :email "Email"
+           :password "Password"
+           :confirm "Confirm"}
+  :placeholder {:username "username"
+                :name "Joe Bloggs"
+                :email "joe@example.com"}
+  :errors {:passwords-must-match "Enter the same password again"
+           :username-taken "That login name is not available."
+           :email-taken "Email already exists"
+           :logged-in ["You are already logged in as: " :name]
+           :password-not-valid "Length between 6 and 32 characters including a number"}
+  }
+
  :gtfs-viewer
  {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}
 

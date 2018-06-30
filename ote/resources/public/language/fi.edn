@@ -1212,6 +1212,24 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
   :logged-out "Olet kirjautunut ulos."}
 
+ :register
+ {:label "Rekisteröi uusi käyttäjätili"
+  :fields {:username "Käyttäjätunnus"
+           :name "Oma nimi"
+           :email "Sähköposti"
+           :password "Salasana"
+           :confirm "Vahvista"}
+  :placeholder {:username "käyttäjänimi"
+                :name "Matti Meikäläinen"
+                :email "matti@example.com"}
+  :errors {:passwords-must-match "Syötä sama salasana uudestaan"
+           :username-taken "Käyttäjänimi on jo varattu"
+           :email-taken "Tälle sähköpostiosoitteelle on jo käyttäjätili"
+           :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
+           :password-not-valid "Pituus 6 - 32 merkkiä ja sisältää numeron"}
+
+  }
+
   :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
 
