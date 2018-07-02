@@ -27,7 +27,7 @@
 
 (defn password-valid? [password]
   (boolean (and (string? password)
-                (<= 6 (count password) 32)
+                (<= 6 (count password) 512)
                 (re-find #"[^\d]" password)
                 (re-find #"\d" password))))
 
