@@ -157,7 +157,7 @@
                      #(if email-taken
                         (conj (or % #{}) email-taken)
                         %))
-          (assoc :flash-message-error "ei onnaa")))))
+          (assoc :flash-message-error (tr [:common-texts :server-error]))))))
 
 (define-event Register [form-data]
   {}
