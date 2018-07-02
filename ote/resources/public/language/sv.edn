@@ -1212,7 +1212,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
            :email-taken "E-postadressen är redan i bruk"
            :logged-in ["Du är redan inloggad som: " :name]
-           :password-not-valid "Längd mellan 6 och 32 tecken inklusive ett nummer"}}
+           :password-not-valid "Minsta längd 6 tecken. Lösenordet måste innehålla bokstäver och minst ett nummer."}}
 
   :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}

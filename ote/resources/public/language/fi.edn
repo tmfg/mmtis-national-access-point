@@ -1226,7 +1226,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :username-taken "Käyttäjänimi on jo varattu"
            :email-taken "Tälle sähköpostiosoitteelle on jo käyttäjätili"
            :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
-           :password-not-valid "Pituus 6 - 32 merkkiä ja sisältää numeron"}
+           :password-not-valid "Pituus vähintään 6 merkkiä. Salasanan tulee sisältää kirjaimia ja vähintään yksi numero."}
 
   }
 
