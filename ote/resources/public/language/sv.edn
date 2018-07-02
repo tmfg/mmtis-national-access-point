@@ -1204,7 +1204,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :name "Namn"
            :email "E-post"
            :password "Lösenord"
-           :confirm "Bekräfta"}
+           :confirm "Bekräfta lösenord"}
   :placeholder {:username "användarnamn"
                 :name "Medel-Svensson"
                 :email "medel-svensson@epost.se"}

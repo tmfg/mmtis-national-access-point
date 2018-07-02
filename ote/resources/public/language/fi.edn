@@ -1218,7 +1218,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :name "Oma nimi"
            :email "Sähköposti"
            :password "Salasana"
-           :confirm "Vahvista"}
+           :confirm "Syötä salasana uudelleen"}
   :placeholder {:username "käyttäjänimi"
                 :name "Matti Meikäläinen"
                 :email "matti@example.com"}
