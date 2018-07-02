@@ -403,10 +403,9 @@
               can-edit? (if (some? can-edit?)
                           can-edit?
                           true)
-              update-form (fn [new-data & names]
+              update-form (fn [new-data & [name]]
                             (assert update! (str ":update! missing, options:" (pr-str options)))
-                            (let [name (first names)
-                                  modified (or (::modified new-data) #{})
+                            (let [modified (or (::modified new-data) #{})
                                   modified (if name
                                              (conj modified name)
                                              modified)]
