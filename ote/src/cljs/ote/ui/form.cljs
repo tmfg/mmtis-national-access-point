@@ -206,26 +206,32 @@
            component] :as s}
    data update-fn editable? update-form
    modified? show-errors? errors warnings notices]
-  (if (= type :component)
-    [:div.component (component {:update-form! #(update-form s)
-                                :data data})]
-    (if editable?
-      [:div (stylefy/use-style style-form/form-field)
-       [form-fields/field (assoc s
-                            :form? true
-                            :update! update-fn
-                            :error (when (and show-errors? (not (empty? errors)))
-                                     (str/join " " errors))
+  (let [show-errors? (if (contains? s :show-errors?)
+                       ;; Field schema has specified show-errors? => use it
+                       (:show-errors? s)
 
-                            ;; Pass raw error data (for composite fields like tables)
-                            :error-data (when show-errors? errors)
-                            :warning (when (and show-errors? required? (validation/empty-value? data))
-                                       (tr [:common-texts :required-field])))
-        data]]
-      [:div.form-control-static
-       (if fmt
-         (fmt ((or read #(get % name)) data))
-         (form-fields/show-value s data))])))
+                       ;; Use value given from group-ui
+                       show-errors?)]
+    (if (= type :component)
+      [:div.component (component {:update-form! #(update-form s)
+                                  :data data})]
+      (if editable?
+        [:div (stylefy/use-style style-form/form-field)
+         [form-fields/field (assoc s
+                                   :form? true
+                                   :update! update-fn
+                                   :error (when (and show-errors? (not (empty? errors)))
+                                            (str/join " " errors))
+
+                                   ;; Pass raw error data (for composite fields like tables)
+                                   :error-data (when show-errors? errors)
+                                   :warning (when (and show-errors? required? (validation/empty-value? data))
+                                              (tr [:common-texts :required-field])))
+          data]]
+        [:div.form-control-static
+         (if fmt
+           (fmt ((or read #(get % name)) data))
+           (form-fields/show-value s data))]))))
 
 ;; Grid column classes for columns spanned
 (def col-classes {1 ["col-xs-12" "col-md-4" "col-lg-4"]
