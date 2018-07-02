@@ -114,7 +114,7 @@
    (localization/with-language
      "fi"
      (tx/with-transaction db
-       (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil})
+       (let [users (nap-users/list-users db {:transit-authority? true :email nil :name nil :group nil})
              emails (mapv #(:email %) users)
              notification (notification-html db)]
 
