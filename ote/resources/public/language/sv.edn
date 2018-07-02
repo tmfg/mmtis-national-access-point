@@ -1208,7 +1208,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :placeholder {:username "användarnamn"
                 :name "Medel-Svensson"
                 :email "medel-svensson@epost.se"}
-  :errors {:passwords-must-match "Ange samma lösenord igen"
+  :errors {:passwords-must-match "Lösenordet du angav matchar inte lösenordet för föregående fält"
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
            :email-taken "E-postadressen är redan i bruk"
            :logged-in ["Du är redan inloggad som: " :name]
