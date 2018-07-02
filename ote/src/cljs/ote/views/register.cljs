@@ -29,7 +29,8 @@
                     [buttons/save {:on-click #(e! (lc/->Register (form/without-form-metadata data)))
                                    :disabled (or (some? user)
                                                  (form/disable-save? data))}
-                     (tr [:register :label])]])}
+                     (tr [:register :label])]])
+      :hide-error-until-modified? true}
      [(form/group
        {:expandable? false :columns 3}
        {:name :username :type :string :required? true :full-width? true
