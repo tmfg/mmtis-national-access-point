@@ -55,7 +55,9 @@
                          (when (and username-taken (username-taken data))
                            (tr [:register :errors :username-taken])))]
             :on-blur #(edit! :username)
-            :show-errors? (@edited :username)
+            :show-errors? (or (and username-taken
+                                   (username-taken (:username form-data)))
+                              (@edited :username))
             :should-update-check always-update}
            {:name :name :type :string :required? true :full-width? true
             :placeholder (tr [:register :placeholder :name])
@@ -71,7 +73,9 @@
                          (when (and email-taken (email-taken data))
                            (tr [:register :errors :email-taken])))]
             :on-blur #(edit! :email)
-            :show-errors? (@edited :email)
+            :show-errors? (or (and email-taken
+                                   (email-taken (:email form-data)))
+                              (@edited :email))
             :should-update-check always-update}
            {:name :password :type :string :password? true :required? true
             :full-width? true
