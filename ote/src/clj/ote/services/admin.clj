@@ -51,6 +51,7 @@
 (defn- list-users [db user query]
   (let [users (nap-users/list-users db {:email (str "%" query "%")
                                         :name (str "%" query "%")
+                                        :group (str "%" query "%")
                                         :transit-authority? nil})]
     (mapv
       (fn [{groups :groups :as user}]
