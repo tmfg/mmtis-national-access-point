@@ -5,8 +5,8 @@ SELECT name, email, password, fullname
 
 -- name: username-exists?
 -- single?: true
-SELECT EXISTS(SELECT id FROM "user" WHERE name = :username);
+SELECT EXISTS(SELECT id FROM "user" WHERE LOWER(name) = LOWER(:username));
 
 -- name: email-exists?
 -- single?: true
-SELECT EXISTS(SELECT id FROM "user" WHERE email = :email);
+SELECT EXISTS(SELECT id FROM "user" WHERE LOWER(email) = LOWER(:email));
