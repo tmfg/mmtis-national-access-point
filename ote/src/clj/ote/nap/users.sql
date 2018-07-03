@@ -27,8 +27,8 @@ SELECT u.id as id,
                m.table_id=u.id) as groups
   FROM "user" u
   WHERE state = 'active' AND
-        ((:email :: VARCHAR IS NOT NULL AND u.email LIKE :email) OR
-         (:name :: VARCHAR IS NOT NULL AND u.fullname LIKE :name) OR
+        ((:email :: VARCHAR IS NOT NULL AND u.email ILIKE :email) OR
+         (:name :: VARCHAR IS NOT NULL AND u.fullname ILIKE :name) OR
          (:transit-authority? :: BOOLEAN IS NOT NULL AND
           EXISTS(SELECT m.group_id,m.table_id
                    FROM "member" m
