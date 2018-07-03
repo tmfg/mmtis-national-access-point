@@ -157,7 +157,13 @@
                      #(if email-taken
                         (conj (or % #{}) email-taken)
                         %))
-          (assoc :flash-message-error (tr [:common-texts :server-error]))))))
+          (assoc :flash-message-error
+                 (if (or username-taken email-taken)
+                   ;; Expected form errors, don't show snackbar
+                   nil
+
+                   ;; Unexpected failure, show server error message
+                   (tr [:common-texts :server-error])))))))
 
 (define-event Register [form-data]
   {}
