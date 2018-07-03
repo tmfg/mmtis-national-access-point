@@ -1205,15 +1205,15 @@ You can also draw the operating area or point to the map with drawing tools. You
            :name "Full Name"
            :email "Email"
            :password "Password"
-           :confirm "Confirm"}
+           :confirm "Re-enter password"}
   :placeholder {:username "username"
                 :name "Joe Bloggs"
                 :email "joe@example.com"}
-  :errors {:passwords-must-match "Enter the same password again"
+  :errors {:passwords-must-match "Password does not match the previous field"
            :username-taken "That login name is not available."
            :email-taken "Email already exists"
            :logged-in ["You are already logged in as: " :name]
-           :password-not-valid "Length between 6 and 32 characters including a number"}
+           :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
   }
 
  :gtfs-viewer

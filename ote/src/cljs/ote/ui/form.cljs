@@ -205,28 +205,33 @@
   [{:keys [columns name label type read fmt col-class required?
            component] :as s}
    data update-fn editable? update-form
-   modified? errors warnings notices]
-  (if (= type :component)
-    [:div.component (component {:update-form! #(update-form s)
-                                :data data})]
-    (if editable?
-      [:div (stylefy/use-style style-form/form-field)
-       [form-fields/field (assoc s
-                            :form? true
-                            :update! update-fn
-                            :error (when (not (empty? errors))
-                                     (str/join " " errors))
+   modified? show-errors? errors warnings notices]
+  (let [show-errors? (if (contains? s :show-errors?)
+                       ;; Field schema has specified show-errors? => use it
+                       (:show-errors? s)
 
-                            ;; Pass raw error data (for composite fields like tables)
-                            :error-data errors
-                            :warning (when
-                                       (and required? (validation/empty-value? data))
-                                       (tr [:common-texts :required-field])))
-        data]]
-      [:div.form-control-static
-       (if fmt
-         (fmt ((or read #(get % name)) data))
-         (form-fields/show-value s data))])))
+                       ;; Use value given from group-ui
+                       show-errors?)]
+    (if (= type :component)
+      [:div.component (component {:update-form! #(update-form s)
+                                  :data data})]
+      (if editable?
+        [:div (stylefy/use-style style-form/form-field)
+         [form-fields/field (assoc s
+                                   :form? true
+                                   :update! update-fn
+                                   :error (when (and show-errors? (not (empty? errors)))
+                                            (str/join " " errors))
+
+                                   ;; Pass raw error data (for composite fields like tables)
+                                   :error-data (when show-errors? errors)
+                                   :warning (when (and show-errors? required? (validation/empty-value? data))
+                                              (tr [:common-texts :required-field])))
+          data]]
+        [:div.form-control-static
+         (if fmt
+           (fmt ((or read #(get % name)) data))
+           (form-fields/show-value s data))]))))
 
 ;; Grid column classes for columns spanned
 (def col-classes {1 ["col-xs-12" "col-md-4" "col-lg-4"]
@@ -236,13 +241,15 @@
 (defn group-ui
   "UI for a group of fields in the form"
   [style schemas data update-fn can-edit? current-focus set-focus!
-   modified errors warnings notices update-form]
+   modified errors warnings notices update-form hide-error-until-modified?]
   [:div.form-group (stylefy/use-style style)
    (doall
     (for [{:keys [name editable? read write container-style container-class] :as s} schemas
           :let [editable? (and can-edit?
                                (or (nil? editable?)
-                                   (editable? data)))]]
+                                   (editable? data)))
+                show-errors? (or (not hide-error-until-modified?)
+                                 (get modified name))]]
       ^{:key name}
       [:div.form-field {:class container-class :style container-style}
        [field-ui (assoc s
@@ -250,9 +257,10 @@
                         :focus (= name current-focus)
                         :on-focus #(set-focus! name))
         ((or read name) data)
-        #(update-fn (or write name) %)
+        #(update-fn name (or write name) %)
         editable? update-form
         (get modified name)
+        show-errors?
         (get errors name)
         (get warnings name)
         (get notices name)]]))])
@@ -326,7 +334,7 @@
 
      :reagent-render
      (fn [{:keys [name->label update-field-fn can-edit? focus update-form
-                  data closed-groups] :as form-options}
+                  data closed-groups hide-error-until-modified?] :as form-options}
           {:keys [label schemas options] :as group}]
        (let [{::keys [modified errors warnings notices]} data
              columns (or (:columns options) 1)
@@ -349,7 +357,8 @@
                               #(reset! focus %)
                               modified
                               errors warnings notices
-                              update-form]
+                              update-form
+                              hide-error-until-modified?]
              card? (get options :card? true)]
          [:div.form-group-container (merge (stylefy/use-style style-form/form-group-container
                                                               {::stylefy/with-classes classes})
@@ -378,6 +387,9 @@
   :name->label  Optional function to automatically generate a `:label` for field schemas that
                 is based on the `:name` of the field. This is useful to automatically take
                 a translation as the label.
+
+  :hide-error-until-modified? If set to true, fields don't show any error messages unless
+                they have been edited by the user.
   "
   [_ _ data]
   (let [focus (atom nil)
@@ -388,7 +400,8 @@
         (reset! latest-data new-data))
 
       :reagent-render
-      (fn [{:keys [update! class footer-fn can-edit? label name->label] :as options}
+      (fn [{:keys [update! class footer-fn can-edit? label name->label hide-error-until-modified?]
+            :as options}
            schemas
            {modified ::modified
             :as data}]
@@ -396,19 +409,23 @@
               can-edit? (if (some? can-edit?)
                           can-edit?
                           true)
-              update-form (fn [new-data]
+              update-form (fn [new-data & [name]]
                             (assert update! (str ":update! missing, options:" (pr-str options)))
-                            (-> new-data
-                                modification-time
-                                (validate schemas)
-                                (assoc ::modified (conj (or (::modified new-data) #{}) name))
-                                update!))
-              update-field-fn (fn [name-or-write value]
+                            (let [modified (or (::modified new-data) #{})
+                                  modified (if name
+                                             (conj modified name)
+                                             modified)]
+                              (-> new-data
+                                  modification-time
+                                  (validate schemas)
+                                  (assoc ::modified modified)
+                                  update!)))
+              update-field-fn (fn [name name-or-write value]
                                 (let [data @latest-data
                                       new-data (if (keyword? name-or-write)
                                                  (assoc data name-or-write value)
                                                  (name-or-write data value))]
-                                  (update-form new-data)))
+                                  (update-form new-data name)))
               closed-groups (::closed-groups data #{})]
           [:div.form {:class class}
            (when label
@@ -425,7 +442,8 @@
                   :can-edit? can-edit?
                   :focus focus
                   :update-form update-form
-                  :closed-groups closed-groups}
+                  :closed-groups closed-groups
+                  :hide-error-until-modified? hide-error-until-modified?}
                  form-group])
 
               schemas))]

@@ -1218,15 +1218,15 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :name "Oma nimi"
            :email "Sähköposti"
            :password "Salasana"
-           :confirm "Vahvista"}
+           :confirm "Syötä salasana uudelleen"}
   :placeholder {:username "käyttäjänimi"
                 :name "Matti Meikäläinen"
                 :email "matti@example.com"}
-  :errors {:passwords-must-match "Syötä sama salasana uudestaan"
+  :errors {:passwords-must-match "Antamasi salasana ei vastaa edellisen kentän salasanaa"
            :username-taken "Käyttäjänimi on jo varattu"
            :email-taken "Tälle sähköpostiosoitteelle on jo käyttäjätili"
            :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
-           :password-not-valid "Pituus 6 - 32 merkkiä ja sisältää numeron"}
+           :password-not-valid "Pituus vähintään 6 merkkiä. Salasanan tulee sisältää kirjaimia ja vähintään yksi numero."}
 
   }
 
