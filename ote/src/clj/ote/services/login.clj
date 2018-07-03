@@ -139,6 +139,7 @@
                                ::user/created (java.util.Date.)
                                ::user/state "active"
                                ::user/sysadmin false
+                               ::user/apikey (str (UUID/randomUUID))
                                ::user/activity_streams_email_notifications false})
               {:success? true}))))))
 
