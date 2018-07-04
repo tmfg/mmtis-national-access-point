@@ -23,7 +23,10 @@
 
 (defn username-valid? [username]
   (boolean (and (string? username)
-                (>= (count username) 3))))
+                (>= (count username) 3)
+                ;; Allow lowercase ascii letters, digits and characters "-" and "_"
+                ;; same as CKAN
+                (re-find #"^[a-z0-9_\-]+$" username))))
 
 (defn password-valid? [password]
   (boolean (and (string? password)
