@@ -49,6 +49,9 @@
            {:name :username :type :string :required? true :full-width? true
             :placeholder (tr [:register :placeholder :username])
             :validate [(fn [data _]
+                         (when (< (count data) 3)
+                           (tr [:common-texts :required-field])))
+                       (fn [data _]
                          (when (not (user/username-valid? data))
                            (tr [:register :errors :username-invalid])))
                        (fn [data _]
