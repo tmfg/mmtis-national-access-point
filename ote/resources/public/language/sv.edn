@@ -1210,6 +1210,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                 :email "medel-svensson@epost.se"}
   :errors {:passwords-must-match "Lösenordet du angav matchar inte lösenordet för föregående fält"
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
+           :username-invalid "Får bara vara gemena alfanumeriska tecken (gemener och siffror) samt specialtecknen - och _"
            :email-taken "E-postadressen är redan i bruk"
            :logged-in ["Du är redan inloggad som: " :name]
            :password-not-valid "Minsta längd 6 tecken. Lösenordet måste innehålla bokstäver och minst ett nummer."}}

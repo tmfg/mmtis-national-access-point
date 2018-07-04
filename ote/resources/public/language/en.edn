@@ -1211,6 +1211,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                 :email "joe@example.com"}
   :errors {:passwords-must-match "Password does not match the previous field"
            :username-taken "That login name is not available."
+           :username-invalid "Must be purely lowercase alphanumeric (ascii) characters and these symbols: -_"
            :email-taken "Email already exists"
            :logged-in ["You are already logged in as: " :name]
            :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
