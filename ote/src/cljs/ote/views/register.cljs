@@ -50,7 +50,7 @@
             :placeholder (tr [:register :placeholder :username])
             :validate [(fn [data _]
                          (when (not (user/username-valid? data))
-                           (tr [:common-texts :required-field])))
+                           (tr [:register :errors :username-invalid])))
                        (fn [data _]
                          (when (and username-taken (username-taken data))
                            (tr [:register :errors :username-taken])))]
