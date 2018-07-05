@@ -61,6 +61,10 @@
                                    (username-taken (:username form-data)))
                               (@edited :username))
             :should-update-check always-update}
+           {:type :component
+            :name :spacer
+            :component (fn [_]
+                         [:div {:style {:margin-top "20px"}}])}
            {:name :name :type :string :required? true :full-width? true
             :placeholder (tr [:register :placeholder :name])
             :on-blur #(edit! :name)
