@@ -120,15 +120,16 @@
 
          (try
            (when (and (not (empty? emails)) notification)
-             (log/info "Trying to send a pre-notice email to: " (pr-str emails))
+             (doseq [emails (partition-all 50 emails)]
+               (log/info "Trying to send a pre-notice email to: " (pr-str emails))
 
-             (send-email
-              server-opts
-              {:bcc emails
-               :from (or (:from msg-opts) "NAP")
-               :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                             (datetime-string (t/now) timezone))
-               :body [{:type "text/html;charset=utf-8" :content notification}]}))
+               (send-email
+                server-opts
+                {:bcc emails
+                 :from (or (:from msg-opts) "NAP")
+                 :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                               (datetime-string (t/now) timezone))
+                 :body [{:type "text/html;charset=utf-8" :content notification}]})))
 
            ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
            (Thread/sleep 5000)
