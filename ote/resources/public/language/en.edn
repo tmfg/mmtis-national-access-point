@@ -855,7 +855,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-register                        "Register"
   :navigation-admin                           "Admin panel"
   :navigation-route                           "Sea traffic route and timetable editor"
-  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :navigation-pre-notice                      "Report changes in regular scheduled passenger transport"
   :navigation-authority-pre-notices           "Saapuneet ilmoitukset"
   :navigation-privacy-policy                  "Privacy Policy"
   :navigation-general-menu                    "Menu"
