@@ -540,9 +540,9 @@
   :title-essential-info "Väsentlig information"
   :title-transport-operator "Tjänsteproducent"
   :title-developer "Tjänsteutvecklare"
-  :column-NAP (:md "Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken **mobilitetstjänsteproducenter** ska lämna in data om sina digitala maskinläsbara gränssnitt för **väsentlig information**. NAP-tjänsten är en del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.")
+  :column-NAP (:md "Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken **mobilitetstjänsteproducenter** ska lämna in data om sina digitala maskinläsbara gränssnitt för **väsentlig information**. NAP-tjänsten är en del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.")
   :column-transport-services "Med mobilitetstjänster avses persontransporttjänster på land, till sjöss eller i luften (t.ex. taxi- och busstrafik), stationer, hamnar och andra terminaler, parkeringsanläggningar, tjänster för uthyrning av färdmedel och kommersiella samanvändningstjänster samt förmedlingstjänster."
-  :column-essential-info "Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster."
+  :column-essential-info "Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. Väsentlig information definieras i statsrådets förordning 643/2017."
   :column-transport-operator "Alla mobilitetstjänster är skyldiga att uppge information om tjänsten i maskinläsbart format. Registrering och inloggning i NAP krävs för att informationen ska kunna sparas. NAP-tjänsten handleder användaren så att all väsentlig information sparas."
   :column-developer "NAP är en katalog med gränssnitt och information avsedd för tjänsteutvecklare. Man behöver inte registrera sig och logga in i NAP för att använda informationen."
 
@@ -572,7 +572,7 @@ På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssn
 På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
 
 Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
-  :hero-title "Katalogen med Finlands mobilitetstjänster avsedd för tjänsteutvecklare"
+  :hero-title "Katalogen med Finlands mobilitetstjänster avsedd för tjänsteutvecklare."
   :new-user? "Ny användare?"
   :table-header-service-name      "Tjänstens namn"
   :table-header-service-url       "Tjänstens www-adress"
@@ -880,8 +880,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer-ckan-software                       "CKAN"
   :footer-made-width                          "Made with"
   :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
-  :footer-funded  (:md "Delvis finansierat av EU [Connecting Europe Facility](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
-  :footer-ckan (:md "NAP utnyttjar öppen källkod från [CKAN](https://ckan.org/)")
+  :footer-funded  (:md "Delvis finansierat av EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
+  :footer-ckan (:md "NAP utnyttjar öppen källkod från [CKAN.](https://ckan.org/)")
   :no-such-page                               "Valda sidan hittas ej: "
   :time-unit                                  "Tidsenhet"
   :time-units {:minutes  "Minuter"
