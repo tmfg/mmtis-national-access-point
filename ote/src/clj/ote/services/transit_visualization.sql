@@ -45,9 +45,8 @@ SELECT x.* FROM (
           ELSE true
         END as "different?"
    FROM date1_trips d1 FULL OUTER JOIN
-        date2_trips d2 ON (d1."route-id" = d2."route-id" AND
-                           d1."route-short-name" = d2."route-short-name" AND
-                           d1."route-long-name" = d2."route-long-name")) x
+        date2_trips d2 ON (COALESCE(d1."route-short-name",'') = COALESCE(d2."route-short-name", '') AND
+                           COALESCE(d1."route-long-name",'') = COALESCE(d2."route-long-name", ''))) x
 ORDER BY x."route-short-name";
 
 -- name: fetch-trip-stops-for-route-by-name-and-date
