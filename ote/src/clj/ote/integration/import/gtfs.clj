@@ -115,7 +115,8 @@
                                                      p true)
               {:keys [trip-row-id index] :as found} (trip-id->update-info (:gtfs/trip-id (first p)))]
           (when found
-            (update-stop-times! db {:trip-row-id trip-row-id
+            (update-stop-times! db {:package-id package-id
+                                    :trip-row-id trip-row-id
                                     :index index
                                     :stop-times stop-times}))
           (recur (inc i) ps))))))
@@ -169,12 +170,12 @@
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
-    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/google_transit (3).zip" #_"hsl_gtfs.zip")]
+    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/gtfs_tampere (3).zip" #_"hsl_gtfs.zip")]
                   (let [out (java.io.ByteArrayOutputStream.)]
                     (io/copy in out)
                     (.toByteArray out)))]
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
-      (save-gtfs-to-db db bytes 1))))
+      (save-gtfs-to-db db bytes 1 1))))
 
 (defmulti load-transit-interface-url
   "Load transit interface from URL. Dispatches on type.

@@ -9,6 +9,7 @@ SELECT tr."trip-id" AS "trip-id", gt.id as "trip-row-id", tr.ordinality as index
 UPDATE "gtfs-trip"
    SET trips[:index]."stop-times" = :stop-times::"gtfs-stop-time-info"[]
  WHERE "gtfs-trip".id = :trip-row-id
+   AND "package-id" = :package-id;
 
 -- name: generate-date-hashes!
 INSERT INTO "gtfs-date-hash" ("package-id", date, hash)
