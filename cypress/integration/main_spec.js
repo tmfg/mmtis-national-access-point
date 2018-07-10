@@ -17,10 +17,6 @@ describe('NAP Main', function () {
         // Check if our repoze auth-tkt session cookie exists after login
         cy.getCookie('auth_tkt').should('exist');
     });
-
-    it('.should() - assert that <title> is correct', function () {
-        cy.title().should('include', 'NAP - liikkumispalvelukatalogi');
-    });
 });
 
 describe('OTE login dialog', () => {
