@@ -161,16 +161,17 @@
      app :compare
      (fn [app]
        (doseq [date [(:date1 app)
-                     (:date2 app)]]
+                     (:date2 app)]
+               :let [params (merge {:date date}
+                                   (when route-short-name
+                                     {:short route-short-name})
+                                   (when route-long-name
+                                     {:long route-long-name}))]]
          (comm/get! (str "transit-visualization/route-lines-for-date/" operator-id)
-                    {:params {:date date
-                              :short route-short-name
-                              :long route-long-name}
+                    {:params params
                      :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
          (comm/get! (str "transit-visualization/route-trips-for-date/" operator-id)
-                    {:params {:date date
-                              :short route-short-name
-                              :long route-long-name}
+                    {:params params
                      :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
        (assoc app
               :date1-route-lines nil

@@ -60,8 +60,8 @@ SELECT trip."trip-id", trip."trip-headsign", stop."stop-name", stoptime."departu
   JOIN LATERAL unnest(t.trips) trip ON TRUE
   JOIN LATERAL unnest(trip."stop-times") stoptime ON TRUE
   JOIN "gtfs-stop" stop ON stoptime."stop-id" = stop."stop-id"
- WHERE r."route-short-name" = :route-short-name
-   AND r."route-long-name" = :route-long-name
+ WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
+   AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
    AND t."service-id" IN (SELECT gtfs_services_for_date(
                                 (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
                                 :date::date))
@@ -80,8 +80,8 @@ SELECT x."route-line", array_agg(departure) as departures
           JOIN LATERAL unnest(t.trips) trip ON TRUE
           JOIN LATERAL unnest(trip."stop-times") stoptime ON TRUE
           JOIN "gtfs-stop" stop ON stoptime."stop-id" = stop."stop-id"
-         WHERE r."route-short-name" = :route-short-name
-           AND r."route-long-name" = :route-long-name
+         WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
+           AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
            AND t."service-id" IN (SELECT gtfs_services_for_date(
                                   (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
                                  :date::date))
