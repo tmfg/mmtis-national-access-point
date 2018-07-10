@@ -52,14 +52,14 @@ ORDER BY x."route-short-name";
 -- name: fetch-trip-stops-for-route-by-name-and-date
 -- Fetch all trips with stop sequence
 SELECT x."trip-id", x."trip-headsign",
-       string_agg(concat(x."stop-name",'@',x."departure-time"), '->') as stops
+       string_agg(concat(x."stop-name",'@',x."departure-time"), '->' ORDER BY x."trip-id", x."departure-time") as stops
   FROM (
 SELECT trip."trip-id", trip."trip-headsign", stop."stop-name", stoptime."departure-time"
   FROM "gtfs-route" r
-  JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+  JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON TRUE
   JOIN LATERAL unnest(trip."stop-times") stoptime ON TRUE
-  JOIN "gtfs-stop" stop ON stoptime."stop-id" = stop."stop-id"
+  JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
  WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
    AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
    AND t."service-id" IN (SELECT gtfs_services_for_date(
@@ -76,10 +76,10 @@ SELECT x."route-line", array_agg(departure) as departures
                (array_agg(stoptime."departure-time"))[1] as "departure",
                st_asgeojson(ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat"))) as "route-line"
           FROM "gtfs-route" r
-          JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+          JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
           JOIN LATERAL unnest(t.trips) trip ON TRUE
           JOIN LATERAL unnest(trip."stop-times") stoptime ON TRUE
-          JOIN "gtfs-stop" stop ON stoptime."stop-id" = stop."stop-id"
+          JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
          WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
            AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
            AND t."service-id" IN (SELECT gtfs_services_for_date(
