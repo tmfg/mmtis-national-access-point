@@ -119,6 +119,10 @@
               [::transit/effective-dates format-effective-dates]
               [::transit/url str]
               [::transit/attachments attachment-list]]))
+      [:div
+       [:h3 (tr* ::transit/description)]
+       [:p {:style {:white-space "pre"}}
+        (::transit/description pre-notice)]]
       [:div.pre-notice-comments (stylefy/use-style styles/comment-container)
        [:h3 (tr [:pre-notice-list-page :pre-notice-dialog :comments-label])]
        [comment-list (::transit/comments pre-notice)]
