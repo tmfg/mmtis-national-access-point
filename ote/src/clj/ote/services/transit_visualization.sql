@@ -72,9 +72,9 @@ SELECT trip."trip-id", trip."trip-headsign", stop."stop-name", stoptime."departu
 -- name: fetch-route-trips-by-name-and-date
 -- Fetch geometries of route trips for given date by route short and long name
 SELECT x."route-line", array_agg(departure) as departures
-  FROM (SELECT r."route-short-name", r."route-long-name", -- trip."trip-id",
+  FROM (SELECT
                (array_agg(stoptime."departure-time"))[1] as "departure",
-               st_asgeojson(ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat"))) as "route-line"
+               st_asgeojson(ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence")) as "route-line"
           FROM "gtfs-route" r
           JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
           JOIN LATERAL unnest(t.trips) trip ON TRUE
@@ -86,7 +86,6 @@ SELECT x."route-line", array_agg(departure) as departures
                                   (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
                                  :date::date))
            AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE))
-         GROUP BY r."route-short-name", r."route-long-name", trip."trip-id"
-         ORDER BY r."route-short-name") x
+         GROUP BY trip."trip-id") x
  -- Group same route lines to single row (aggregate departures to array)
  GROUP BY "route-line";
