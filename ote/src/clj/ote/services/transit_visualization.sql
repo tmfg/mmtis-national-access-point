@@ -74,7 +74,9 @@ SELECT trip."trip-id", trip."trip-headsign", stop."stop-name", stoptime."departu
 SELECT x."route-line", array_agg(departure) as departures
   FROM (SELECT
                (array_agg(stoptime."departure-time"))[1] as "departure",
-               st_asgeojson(ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence")) as "route-line"
+               st_asgeojson(st_collect(
+                   ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence"),
+                   ST_Collect(ST_MakePoint(stop."stop-lon", stop."stop-lat")))) as "route-line"
           FROM "gtfs-route" r
           JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
           JOIN LATERAL unnest(t.trips) trip ON TRUE
