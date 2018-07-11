@@ -185,18 +185,32 @@ class KalkatiHandler(ContentHandler):
                                              departure_time, attrs['StationId'], attrs['Ix']))
 
     def add_route(self, route_id):
-        route_type = '3'  # fallback is bus
+        route_type = '3'  # fallback is a bus
+        route_name_suffix = ''
 
         if self.service_mode in self.transmodes:
             trans_mode = self.transmodes[self.service_mode]
 
-            if trans_mode in KALKATI_MODE_TO_GTFS_MODE:
-                route_type = KALKATI_MODE_TO_GTFS_MODE[trans_mode]
+            if trans_mode['type'] in KALKATI_MODE_TO_GTFS_MODE:
+                route_type = KALKATI_MODE_TO_GTFS_MODE[trans_mode['type']]
+
+            # There is a possibility that a Kalkati file has multiple transmodes. Usually we assume (in our case we are
+            # only interested in buses) that there is only one TrnsMode tag defined for the whole Kalkati-file.
+            # We'll have to differentiate same routes that are using different transmodes
+            # somehow by adding a suffix after the route name.
+            # For example:
+            # <Trnsmode TrnsmodeId="1" Name="N/A" ModeType="5"/>
+            # <Trnsmode TrnsmodeId="2" Name="Small bus" ModeType="5"/>
+            if trans_mode['id'] != "1":
+                route_name_suffix = ' (' + (trans_mode['name'] or trans_mode['id']) + ')'
+
+        short_name = (self.route_short_name + route_name_suffix) if self.route_short_name else ''
+        long_name = (self.route_long_name + route_name_suffix) if self.route_long_name else ''
 
         self.write_values('routes', (route_id,
                                      self.route_agency_id,
-                                     self.route_short_name.replace(',', '.'),
-                                     self.route_long_name.replace(',', '.'),
+                                     short_name.replace(',', '.'),
+                                     long_name.replace(',', '.'),
                                      route_type))
 
     def add_trip(self, route_id):
@@ -217,8 +231,9 @@ class KalkatiHandler(ContentHandler):
             self.add_stop(attrs)
 
         elif not self.synonym and name == 'Trnsmode':
-            if 'Modetype' in attrs:
-                self.transmodes[attrs['TrnsmodeId']] = attrs['Modetype']
+            self.transmodes[attrs['TrnsmodeId']] = {'id': attrs['TrnsmodeId'],
+                                                    'name': attrs['Name'],
+                                                    'type': attrs['ModeType']}
 
         elif name == 'Footnote':
             self.add_calendar(attrs)
