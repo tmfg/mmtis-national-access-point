@@ -39,7 +39,9 @@ SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-heads
 )
 SELECT x.* FROM (
  SELECT COALESCE(d1."route-id",d2."route-id") AS "route-id",
-        d1."route-short-name", d1."route-long-name", d1."trip-headsign",
+        COALESCE(d1."route-short-name",d2."route-short-name") AS "route-short-name",
+        COALESCE(d1."route-long-name",d2."route-long-name") AS "route-long-name",
+        COALESCE(d1."trip-headsign",d2."trip-headsign") AS "trip-headsign",
         d1.trips as "date1-trips", d2.trips as "date2-trips",
         CASE
           WHEN d1.tripdata = d2.tripdata THEN false

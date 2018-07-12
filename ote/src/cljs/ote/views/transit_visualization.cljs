@@ -166,9 +166,8 @@
         [:span " otsatunnuksella " [:b trip-headsign]])
       " valittuina päivinä:"]
      [table/table {:height 300 :name->label str}
-      [{:name "Lähtö" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
-       {:name "Määränpää" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :destination}
-       {:name "Otsatunnus" :width "20%" :read :headsign}
+      [{:name "Lähtö" :width "35%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
+       {:name "Määränpää" :width "35%" :format #(str (:time %) " " (:stop-name %)) :read :destination}
        {:name "Pysäkkejä" :width "12%" :read :stops}
        {:name date1 :width "9%" :format #(if % "\u2713" "-") :read (comp boolean date1-trip-descriptions)}
        {:name date2 :width "9%" :format #(if % "\u2713" "-") :read (comp boolean date2-trip-descriptions)}]
