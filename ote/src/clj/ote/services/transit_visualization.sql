@@ -12,41 +12,43 @@ SELECT date, hash::text
 -- the amount of trips on each day.
 WITH
 date1_trips AS (
-SELECT r."route-id", r."route-short-name", r."route-long-name",
-       SUM(array_length(t.trips, 1)) as trips,
+SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign",
+       COUNT(trip."trip-id") AS trips,
        string_agg(t.trips::TEXT,',') as tripdata
   FROM "gtfs-route" r
-       JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+  JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+  JOIN LATERAL unnest(t.trips) trip ON true
  WHERE t."service-id" IN (SELECT gtfs_services_for_date(
                            (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date1::date)),
                            :date1::date))
    AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date1::date))
- GROUP BY r."route-id", r."route-short-name", r."route-long-name"
+ GROUP BY r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign"
 ),
 date2_trips AS (
-SELECT r."route-id", r."route-short-name", r."route-long-name",
-       SUM(array_length(t.trips, 1)) as trips,
+SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign",
+       COUNT(trip."trip-id") AS trips,
        string_agg(t.trips::TEXT,',') as tripdata
   FROM "gtfs-route" r
-       JOIN "gtfs-trip" t ON r."route-id" = t."route-id"
+  JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+  JOIN LATERAL unnest(t.trips) trip ON true
  WHERE t."service-id" IN (SELECT gtfs_services_for_date(
                            (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date2::date)),
                            :date2::date))
    AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date2::date))
- GROUP BY r."route-id", r."route-short-name", r."route-long-name"
+ GROUP BY r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign"
 )
 SELECT x.* FROM (
  SELECT COALESCE(d1."route-id",d2."route-id") AS "route-id",
-        COALESCE(d1."route-short-name", d2."route-short-name") AS "route-short-name",
-        COALESCE(d1."route-long-name", d2."route-long-name") AS "route-long-name",
+        d1."route-short-name", d1."route-long-name", d1."trip-headsign",
         d1.trips as "date1-trips", d2.trips as "date2-trips",
         CASE
           WHEN d1.tripdata = d2.tripdata THEN false
           ELSE true
         END as "different?"
-   FROM date1_trips d1 FULL OUTER JOIN
-        date2_trips d2 ON (COALESCE(d1."route-short-name",'') = COALESCE(d2."route-short-name", '') AND
-                           COALESCE(d1."route-long-name",'') = COALESCE(d2."route-long-name", ''))) x
+   FROM date1_trips d1 FULL OUTER JOIN date2_trips d2
+        ON (COALESCE(d1."route-short-name",'') = COALESCE(d2."route-short-name", '') AND
+            COALESCE(d1."route-long-name",'') = COALESCE(d2."route-long-name", '') AND
+            COALESCE(d1."trip-headsign",'') = COALESCE(d2."trip-headsign",''))) x
 ORDER BY x."route-short-name";
 
 -- name: fetch-trip-stops-for-route-by-name-and-date
@@ -62,6 +64,7 @@ SELECT trip."trip-id", trip."trip-headsign", stop."stop-name", stoptime."departu
   JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
  WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
    AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
+   AND COALESCE(:headsign::VARCHAR,'') = COALESCE(trip."trip-headsign",'')
    AND t."service-id" IN (SELECT gtfs_services_for_date(
                                 (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
                                 :date::date))
@@ -82,6 +85,7 @@ SELECT x."route-line", array_agg(departure) as departures
           JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
          WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
            AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
+           AND COALESCE(:headsign::VARCHAR,'') = COALESCE(trip."trip-headsign",'')
            AND t."service-id" IN (SELECT gtfs_services_for_date(
                                   (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
                                  :date::date))

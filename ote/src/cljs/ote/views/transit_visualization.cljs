@@ -79,10 +79,13 @@
                  :name->label str
                  :show-row-hover? true
                  :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
-                                                             (:route-long-name (first %))))}
-    [{:name "Nimi" :width "70%"
+                                                             (:route-long-name (first %))
+                                                             (:trip-headsign (first %))))}
+    [{:name "Nimi" :width "50%"
       :read identity
       :format #(str (:route-short-name %) " " (:route-long-name %))}
+     {:name "Otsatunnus" :width "20%"
+      :read :trip-headsign}
      {:name (str "Vuoroja " date1) :width "15%"
       :read :date1-trips}
      {:name (str "Vuoroja " date2) :width "15%"
@@ -93,35 +96,39 @@
 
 (defn- selected-route-map [_ _ _ _]
   (r/create-class
-   {:component-did-update leaflet/update-bounds-from-layers
-    :component-did-mount leaflet/update-bounds-from-layers
-    :reagent-render
-    (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
-                                           date1 date1-route-lines date1-show?
-                                           date2 date2-route-lines date2-show?]}]
-      [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
+    {:component-did-update leaflet/update-bounds-from-layers
+     :component-did-mount leaflet/update-bounds-from-layers
+     :reagent-render
+     (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
+                                            date1 date1-route-lines date1-show?
+                                            date2 date2-route-lines date2-show?]}]
+       [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
-       (when date1-route-lines
-         [ui/checkbox {:label (str "Näytä " date1)
-                       :checked (boolean date1-show?)
-                       :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
-       (when date2-route-lines
-         [ui/checkbox {:label (str "Näytä " date2)
-                       :checked (boolean date2-show?)
-                       :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
-       [leaflet/Map {:ref "leaflet"
-                     :center      #js [65 25]
-                     :zoomControl true
-                     :zoom        5}
-        (leaflet/background-tile-map)
-        (when (and date1-route-lines date1-show?)
-          ^{:key (str date1 "_" route-short-name "_" route-long-name)}
-          [leaflet/GeoJSON {:data date1-route-lines
-                            :style {:color (-> date1 date->hash hash->color)}}])
-        (when (and date2-route-lines date2-show?)
-          ^{:key (str date2 "_" route-short-name "_" route-long-name)}
-          [leaflet/GeoJSON {:data date2-route-lines
-                            :style {:color (-> date2 date->hash hash->color)}}])]])}))
+        (when date1-route-lines
+          [ui/checkbox {:label (str "Näytä " date1 " (musta)")
+                        :checked (boolean date1-show?)
+                        :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
+        (when date2-route-lines
+          [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
+                        :checked (boolean date2-show?)
+                        :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
+        [leaflet/Map {:ref "leaflet"
+                      :center #js [65 25]
+                      :zoomControl true
+                      :zoom 5}
+         (leaflet/background-tile-map)
+         (when (and date1-route-lines date1-show?)
+           ^{:key (str date1 "_" route-short-name "_" route-long-name)}
+           [leaflet/GeoJSON {:data date1-route-lines
+                             :style {:dash-array "10"
+                                     :dash-offset 0
+                                     :color "black" #_(-> date1 date->hash hash->color)}}])
+         (when (and date2-route-lines date2-show?)
+           ^{:key (str date2 "_" route-short-name "_" route-long-name)}
+           [leaflet/GeoJSON {:data date2-route-lines
+                             :style {:dash-array "10"
+                                     :dash-offset 10
+                                     :color "red" #_(-> date2 date->hash hash->color)}}])]])}))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
@@ -132,25 +139,52 @@
        [:tr [:th {:width "75%"} "Pysäkki"] [:th {:width "25%"} "Lähtöaika"]]]
       [:tbody
        (map-indexed
-        (fn [i stoptime]
-          (let [[stop time] (str/split stoptime #"@")]
-            ^{:key i}
-            [:tr
-             [:td stop]
-             [:td time]]))
-        (str/split stops #"->"))]])])
+         (fn [i stoptime]
+           (let [[stop time] (str/split stoptime #"@")]
+             ^{:key i}
+             [:tr
+              [:td stop]
+              [:td time]]))
+         (str/split stops #"->"))]])])
 
-(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips]}]
-  [:table {:style {:width "100%"}}
-   [:thead
-    [:tr
-     [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
-   [:tbody
-    [:tr
-     [:td
-      [stop-listing date1-trips]]
-     [:td
-      [stop-listing date2-trips]]]]])
+(defn short-trip-description [{:keys [trip-headsign stops]}]
+  (let [stops (mapv #(zipmap [:stop-name :time] (str/split % #"@"))
+                    (str/split stops #"->"))]
+    {:departure (first stops)
+     :destination (last stops)
+     :stops (count stops)
+     :headsign trip-headsign}))
+
+(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips route-short-name route-long-name trip-headsign]}]
+  (let [date1-trip-descriptions (into #{} (map short-trip-description) date1-trips)
+        date2-trip-descriptions (into #{} (map short-trip-description) date2-trips)
+        all-trip-descriptions (into #{} (concat date1-trip-descriptions
+                                                date2-trip-descriptions))]
+    [:div
+     [:span "Vuorot reitille " [:b route-short-name " " route-long-name]
+      (when trip-headsign
+        [:span " otsatunnuksella " [:b trip-headsign]])
+      " valittuina päivinä:"]
+     [table/table {:height 300 :name->label str}
+      [{:name "Lähtö" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
+       {:name "Määränpää" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :destination}
+       {:name "Otsatunnus" :width "20%" :read :headsign}
+       {:name "Pysäkkejä" :width "12%" :read :stops}
+       {:name date1 :width "9%" :format #(if % "\u2713" "-") :read (comp boolean date1-trip-descriptions)}
+       {:name date2 :width "9%" :format #(if % "\u2713" "-") :read (comp boolean date2-trip-descriptions)}]
+      (sort-by (juxt (comp :time :departure) (comp :stop-name :departure))
+               all-trip-descriptions)]
+
+     #_[:table {:style {:width "100%"}}
+        [:thead
+         [:tr
+          [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
+        [:tbody
+         [:tr
+          [:td
+           [stop-listing date1-trips]]
+          [:td
+           [stop-listing date2-trips]]]]]]))
 
 (defn date-comparison [e! {:keys [date->hash hash->color compare]}]
   (let [date1 (:date1 compare)
@@ -200,6 +234,13 @@
                            :on-change #(e! (tv/->SetHighlightMode (keyword %2)))
                            :value-selected (:mode highlight)
                            :style {:display "flex" :justify-content "flex-start" :flex-direction "row wrap"}}
+    [ui/radio-button {:label "Ei korostusta"
+                      :value nil
+                      :style {:white-space "nowrap"
+                              :width "auto"
+                              :margin-right "20px"
+                              :font-size "12px"
+                              :font-weight "bold"}}]
     [ui/radio-button {:label "Korosta samanlaiset"
                       :value :same
                       :style {:white-space "nowrap"
@@ -242,20 +283,22 @@
                               :font-weight "bold"}}]]])
 
 
-(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
+(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name]
                                  :as transit-visualization}]
   [:div
    (when (and (not loading?) hash->color)
      [:div.transit-visualization
       [days-to-diff-info e! transit-visualization highlight]
+      [:h3 operator-name]
       [highlight-mode-switch e! highlight]
       [calendar-style-switch e! transit-visualization]
-      [service-calendar/service-calendar {:view-mode (:calendar-mode transit-visualization)
-                                          :selected-date? (constantly false)
-                                          :on-select (r/partial select-day e!)
-                                          :on-hover (r/partial hover-day e! date->hash)
-                                          :day-style (r/partial day-style hash->color date->hash
-                                                                (:highlight transit-visualization))
-                                          :years (or (:years transit-visualization)
-                                                     [2017 2018])}]
+      [service-calendar/service-calendar (merge {:view-mode (:calendar-mode transit-visualization)
+                                                 :selected-date? (constantly false)
+                                                 :on-select (r/partial select-day e!)}
+                                                (when (get highlight :mode)
+                                                  {:on-hover (r/partial hover-day e! date->hash)})
+                                                {:day-style (r/partial day-style hash->color date->hash
+                                                                       (:highlight transit-visualization))
+                                                 :years (or (:years transit-visualization)
+                                                            [2017 2018])})]
       [date-comparison e! transit-visualization]])])

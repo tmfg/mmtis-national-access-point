@@ -5,6 +5,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as tf]
             [ote.time :as time]
+            [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]))
 
 (def hash-colors
@@ -55,7 +56,7 @@
                       (vec
                         (range (reduce min (map (comp time/year :date) dates))
                                (inc (reduce max (map (comp time/year :date) dates))))))
-             :highlight {:mode :diff}
+             :highlight {:mode nil}
              :calendar-mode :compact)
       (update :compare
               (fn [{:keys [date1 date2] :as compare}]
@@ -79,6 +80,17 @@
          :compare {:date1 compare-date1
                    :date2 compare-date2}))
 
+(define-event LoadInfoResponse [info]
+  {:path [:transit-visualization]}
+  (-> app
+      (assoc :operator-name (::t-operator/name info))))
+
+(define-event LoadInfo [operator-id]
+  {:path [:transit-visualization]}
+  (comm/get! (str "transit-visualization/info/" operator-id)
+             {:on-success (tuck/send-async! ->LoadInfoResponse)})
+  app)
+
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
   (-> app
@@ -93,7 +105,8 @@
   (days-to-first-diff start-date date->hash))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params query :query}]
-  (->LoadOperatorDates (:operator-id params) (:compare-date1 query) (:compare-date2 query)))
+  [(->LoadInfo (:operator-id params))
+   (->LoadOperatorDates (:operator-id params) (:compare-date1 query) (:compare-date2 query))])
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -154,7 +167,7 @@
     :default
     app))
 
-(define-event SelectRouteForDisplay [route-short-name route-long-name]
+(define-event SelectRouteForDisplay [route-short-name route-long-name trip-headsign]
   {:path [:transit-visualization]}
   (let [operator-id (:operator-id app)]
     (update
@@ -166,7 +179,9 @@
                                    (when route-short-name
                                      {:short route-short-name})
                                    (when route-long-name
-                                     {:long route-long-name}))]]
+                                     {:long route-long-name})
+                                   (when trip-headsign
+                                     {:headsign trip-headsign}))]]
          (comm/get! (str "transit-visualization/route-lines-for-date/" operator-id)
                     {:params params
                      :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
@@ -179,7 +194,8 @@
               :date1-trips nil
               :date2-trips nil
               :route-short-name route-short-name
-              :route-long-name route-long-name)))))
+              :route-long-name route-long-name
+              :trip-headsign trip-headsign)))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
