@@ -770,6 +770,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Landskap"
+            :ote.db.transit/sent "Publicerad"
             :ote.db.transit/pre-notice-type "Typ av meddelande"
             :ote.db.transit/pre-notice-state "Status"
             :ote.db.modification/created "Skapad"

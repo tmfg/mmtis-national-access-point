@@ -17,13 +17,14 @@
 (defn list-published-notices [db user]
   (specql/fetch db ::transit/pre-notice
                 #{::transit/id
+                  ::transit/sent
                   ::modification/created
                   ::transit/regions
                   ::transit/route-description
                   ::transit/pre-notice-type
                   [::t-operator/transport-operator #{::t-operator/name}]}
                 {::transit/pre-notice-state :sent}
-                {:specql.core/order-by ::modification/created
+                {:specql.core/order-by ::transit/sent
                  :specql.core/order-direction :desc}))
 
 (def comment-columns  (conj (specql/columns ::transit/pre-notice-comment)
