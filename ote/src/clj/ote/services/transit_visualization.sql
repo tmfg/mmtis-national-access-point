@@ -12,7 +12,7 @@ SELECT date, hash::text
 -- the amount of trips on each day.
 WITH
 date1_trips AS (
-SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign",
+SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
        COUNT(trip."trip-id") AS trips,
        string_agg(t.trips::TEXT,',') as tripdata
   FROM "gtfs-route" r
@@ -22,10 +22,10 @@ SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-heads
                            (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date1::date)),
                            :date1::date))
    AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date1::date))
- GROUP BY r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign"
+ GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
 ),
 date2_trips AS (
-SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign",
+SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
        COUNT(trip."trip-id") AS trips,
        string_agg(t.trips::TEXT,',') as tripdata
   FROM "gtfs-route" r
@@ -35,11 +35,10 @@ SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-heads
                            (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date2::date)),
                            :date2::date))
    AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date2::date))
- GROUP BY r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign"
+ GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
 )
 SELECT x.* FROM (
- SELECT COALESCE(d1."route-id",d2."route-id") AS "route-id",
-        COALESCE(d1."route-short-name",d2."route-short-name") AS "route-short-name",
+ SELECT COALESCE(d1."route-short-name",d2."route-short-name") AS "route-short-name",
         COALESCE(d1."route-long-name",d2."route-long-name") AS "route-long-name",
         COALESCE(d1."trip-headsign",d2."trip-headsign") AS "trip-headsign",
         d1.trips as "date1-trips", d2.trips as "date2-trips",
