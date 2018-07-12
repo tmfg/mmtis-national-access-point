@@ -768,6 +768,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Regions"
+            :ote.db.transit/sent "Published"
             :ote.db.transit/pre-notice-type "Notice type"
             :ote.db.transit/pre-notice-state "State"
             :ote.db.modification/created "Created"

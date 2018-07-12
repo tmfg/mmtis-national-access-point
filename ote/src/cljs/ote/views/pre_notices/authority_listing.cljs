@@ -111,7 +111,7 @@
             (mapcat
              (fn [[key fmt]]
                [[:b (str (tr* key) ": ")] (fmt (get pre-notice key))])
-             [[::modification/created time/format-timestamp-for-ui]
+             [[::transit/sent time/format-timestamp-for-ui]
               [::t-operator/transport-operator format-transport-operator]
               [::transit/pre-notice-type format-notice-types]
               [::transit/route-description str]
@@ -149,7 +149,7 @@
                     :row-style {:cursor "pointer"}
                     :show-row-hover? true
                     :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))}
-       [{:name ::modification/created :format (comp str time/format-timestamp-for-ui)}
+       [{:name ::transit/sent :format (comp str time/format-timestamp-for-ui)}
         {:name ::transit/regions :format region-name}
         {:name ::transit/pre-notice-type
          :format format-notice-types}
