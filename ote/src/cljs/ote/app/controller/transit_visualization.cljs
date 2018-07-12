@@ -56,7 +56,7 @@
                       (vec
                         (range (reduce min (map (comp time/year :date) dates))
                                (inc (reduce max (map (comp time/year :date) dates))))))
-             :highlight {:mode :diff}
+             :highlight {:mode nil}
              :calendar-mode :compact)
       (update :compare
               (fn [{:keys [date1 date2] :as compare}]
