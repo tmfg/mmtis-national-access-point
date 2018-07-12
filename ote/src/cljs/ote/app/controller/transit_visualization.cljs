@@ -5,6 +5,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as tf]
             [ote.time :as time]
+            [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]))
 
 (def hash-colors
@@ -79,6 +80,17 @@
          :compare {:date1 compare-date1
                    :date2 compare-date2}))
 
+(define-event LoadInfoResponse [info]
+  {:path [:transit-visualization]}
+  (-> app
+      (assoc :operator-name (::t-operator/name info))))
+
+(define-event LoadInfo [operator-id]
+  {:path [:transit-visualization]}
+  (comm/get! (str "transit-visualization/info/" operator-id)
+             {:on-success (tuck/send-async! ->LoadInfoResponse)})
+  app)
+
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
   (-> app
@@ -93,7 +105,8 @@
   (days-to-first-diff start-date date->hash))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params query :query}]
-  (->LoadOperatorDates (:operator-id params) (:compare-date1 query) (:compare-date2 query)))
+  [(->LoadInfo (:operator-id params))
+   (->LoadOperatorDates (:operator-id params) (:compare-date1 query) (:compare-date2 query))])
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
