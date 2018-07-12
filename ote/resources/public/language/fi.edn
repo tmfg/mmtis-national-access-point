@@ -774,6 +774,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Maakunta"
+            :ote.db.transit/sent "Julkaistu"
             :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
             :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
