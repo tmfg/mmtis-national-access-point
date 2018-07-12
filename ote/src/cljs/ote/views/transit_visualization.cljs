@@ -79,11 +79,12 @@
                  :name->label str
                  :show-row-hover? true
                  :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
-                                                             (:route-long-name (first %))))}
-    [{:name "Nimi" :width "60%"
+                                                             (:route-long-name (first %))
+                                                             (:trip-headsign (first %))))}
+    [{:name "Nimi" :width "50%"
       :read identity
       :format #(str (:route-short-name %) " " (:route-long-name %))}
-     {:name "Otsatunnus" :width "10%"
+     {:name "Otsatunnus" :width "20%"
       :read :trip-headsign}
      {:name (str "Vuoroja " date1) :width "15%"
       :read :date1-trips}
@@ -154,13 +155,16 @@
      :stops (count stops)
      :headsign trip-headsign}))
 
-(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips route-short-name route-long-name]}]
+(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips route-short-name route-long-name trip-headsign]}]
   (let [date1-trip-descriptions (into #{} (map short-trip-description) date1-trips)
         date2-trip-descriptions (into #{} (map short-trip-description) date2-trips)
         all-trip-descriptions (into #{} (concat date1-trip-descriptions
                                                 date2-trip-descriptions))]
     [:div
-     [:b "Vuorot reitille " route-short-name " " route-long-name " valittuina päivinä:"]
+     [:span "Vuorot reitille " [:b route-short-name " " route-long-name]
+      (when trip-headsign
+        [:span " otsatunnuksella " [:b trip-headsign]])
+      " valittuina päivinä:"]
      [table/table {:height 300 :name->label str}
       [{:name "Lähtö" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
        {:name "Määränpää" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :destination}

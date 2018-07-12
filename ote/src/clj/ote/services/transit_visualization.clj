@@ -24,7 +24,7 @@
   ^:unauthenticated
   (GET "/transit-visualization/route-lines-for-date/:operator"
        {{operator :operator} :params
-        {:strs [date short long]} :query-params}
+        {:strs [date short long headsign]} :query-params}
        (http/geojson-response
         (cheshire/encode
          {:type "FeatureCollection"
@@ -34,7 +34,8 @@
                            {:operator-id (Long/parseLong operator)
                             :date (time/parse-date-eu date)
                             :route-short-name short
-                            :route-long-name long})]
+                            :route-long-name long
+                            :headsign headsign})]
                       {:type "Feature"
                        :properties {:departures (mapv time/format-interval-as-time (.getArray departures))}
                        :geometry (cheshire/decode route-line keyword)})}
@@ -43,8 +44,9 @@
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/route-trips-for-date/:operator"
        {{operator :operator} :params
-        {:strs [date short long]} :query-params}
+        {:strs [date short long headsign]} :query-params}
        (fetch-trip-stops-for-route-by-name-and-date db {:operator-id (Long/parseLong operator)
                                                         :date (time/parse-date-eu date)
                                                         :route-short-name short
-                                                        :route-long-name long})))
+                                                        :route-long-name long
+                                                        :headsign headsign})))

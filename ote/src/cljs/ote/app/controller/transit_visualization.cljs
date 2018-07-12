@@ -154,7 +154,7 @@
     :default
     app))
 
-(define-event SelectRouteForDisplay [route-short-name route-long-name]
+(define-event SelectRouteForDisplay [route-short-name route-long-name trip-headsign]
   {:path [:transit-visualization]}
   (let [operator-id (:operator-id app)]
     (update
@@ -166,7 +166,9 @@
                                    (when route-short-name
                                      {:short route-short-name})
                                    (when route-long-name
-                                     {:long route-long-name}))]]
+                                     {:long route-long-name})
+                                   (when trip-headsign
+                                     {:headsign trip-headsign}))]]
          (comm/get! (str "transit-visualization/route-lines-for-date/" operator-id)
                     {:params params
                      :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
@@ -179,7 +181,8 @@
               :date1-trips nil
               :date2-trips nil
               :route-short-name route-short-name
-              :route-long-name route-long-name)))))
+              :route-long-name route-long-name
+              :trip-headsign trip-headsign)))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
