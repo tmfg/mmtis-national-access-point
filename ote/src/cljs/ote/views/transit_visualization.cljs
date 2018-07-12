@@ -276,12 +276,13 @@
                               :font-weight "bold"}}]]])
 
 
-(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight]
+(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name]
                                  :as transit-visualization}]
   [:div
    (when (and (not loading?) hash->color)
      [:div.transit-visualization
       [days-to-diff-info e! transit-visualization highlight]
+      [:h3 operator-name]
       [highlight-mode-switch e! highlight]
       [calendar-style-switch e! transit-visualization]
       [service-calendar/service-calendar {:view-mode (:calendar-mode transit-visualization)
