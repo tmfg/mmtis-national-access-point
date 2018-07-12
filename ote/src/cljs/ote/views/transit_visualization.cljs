@@ -80,9 +80,11 @@
                  :show-row-hover? true
                  :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
                                                              (:route-long-name (first %))))}
-    [{:name "Nimi" :width "70%"
+    [{:name "Nimi" :width "60%"
       :read identity
       :format #(str (:route-short-name %) " " (:route-long-name %))}
+     {:name "Otsatunnus" :width "10%"
+      :read :trip-headsign}
      {:name (str "Vuoroja " date1) :width "15%"
       :read :date1-trips}
      {:name (str "Vuoroja " date2) :width "15%"
@@ -102,11 +104,11 @@
       [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
        (when date1-route-lines
-         [ui/checkbox {:label (str "Näytä " date1)
+         [ui/checkbox {:label (str "Näytä " date1 " (musta)")
                        :checked (boolean date1-show?)
                        :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
        (when date2-route-lines
-         [ui/checkbox {:label (str "Näytä " date2)
+         [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
                        :checked (boolean date2-show?)
                        :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
        [leaflet/Map {:ref "leaflet"
@@ -117,11 +119,15 @@
         (when (and date1-route-lines date1-show?)
           ^{:key (str date1 "_" route-short-name "_" route-long-name)}
           [leaflet/GeoJSON {:data date1-route-lines
-                            :style {:color (-> date1 date->hash hash->color)}}])
+                            :style {:dash-array "10"
+                                    :dash-offset 0
+                                    :color "black" #_(-> date1 date->hash hash->color)}}])
         (when (and date2-route-lines date2-show?)
           ^{:key (str date2 "_" route-short-name "_" route-long-name)}
           [leaflet/GeoJSON {:data date2-route-lines
-                            :style {:color (-> date2 date->hash hash->color)}}])]])}))
+                            :style {:dash-array  "10"
+                                    :dash-offset 10
+                                    :color "red" #_(-> date2 date->hash hash->color)}}])]])}))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
@@ -140,17 +146,41 @@
              [:td time]]))
         (str/split stops #"->"))]])])
 
-(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips]}]
-  [:table {:style {:width "100%"}}
-   [:thead
-    [:tr
-     [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
-   [:tbody
-    [:tr
-     [:td
-      [stop-listing date1-trips]]
-     [:td
-      [stop-listing date2-trips]]]]])
+(defn short-trip-description [{:keys [trip-headsign stops]}]
+  (let [stops (mapv #(zipmap [:stop-name :time] (str/split % #"@"))
+                    (str/split stops #"->"))]
+    {:departure (first stops)
+     :destination (last stops)
+     :stops (count stops)
+     :headsign trip-headsign}))
+
+(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips route-short-name route-long-name]}]
+  (let [date1-trip-descriptions (into #{} (map short-trip-description) date1-trips)
+        date2-trip-descriptions (into #{} (map short-trip-description) date2-trips)
+        all-trip-descriptions (into #{} (concat date1-trip-descriptions
+                                                date2-trip-descriptions))]
+    [:div
+     [:b "Vuorot reitille " route-short-name " " route-long-name " valittuina päivinä:"]
+     [table/table {:height 300 :name->label str}
+      [{:name "Lähtö" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
+       {:name "Määränpää" :width "25%" :format #(str (:time %) " " (:stop-name %)) :read :destination}
+       {:name "Otsatunnus" :width "20%" :read :headsign}
+       {:name "Pysäkkejä" :width "12%" :read :stops}
+       {:name date1 :width "9%" :format #(if % "\u2713" "-") :read (comp boolean date1-trip-descriptions)}
+       {:name date2 :width "9%" :format #(if % "\u2713" "-") :read (comp boolean date2-trip-descriptions)}]
+      (sort-by (juxt (comp :time :departure) (comp :stop-name :departure))
+               all-trip-descriptions)]
+
+     #_[:table {:style {:width "100%"}}
+        [:thead
+         [:tr
+          [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
+        [:tbody
+         [:tr
+          [:td
+           [stop-listing date1-trips]]
+          [:td
+           [stop-listing date2-trips]]]]]]))
 
 (defn date-comparison [e! {:keys [date->hash hash->color compare]}]
   (let [date1 (:date1 compare)
