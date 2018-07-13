@@ -96,7 +96,7 @@
 
 (defn- initialize-stop-marker
   "Bind popup content and set marker icon for stop marker features."
-  [feature ^L.Layer layer]
+  [feature ^js/L.Layer layer]
   (when-let [name (aget feature "properties" "name")]
     (when-let [icon-options (aget layer "options" "icon" "options")]
       ;; Make the icon smaller
