@@ -97,6 +97,10 @@ The format is:
 
 Substitute `<transport-operator-id>` and `<id>` with the values from the JSON result.
 
+Please note that "external-interface" links obtained from exported NAP GeoJSON service descriptions do not always lead directly to the actual machine-readable data or API. Sometimes the link can lead to a human-readable web page containing information about how to access the data or API. When assuming that the external-interface link is a direct link to the external data or API, errors can occur in your application.
+
+The Finnish Transport Agency assumes no responsibility for the correctness of the transport service information obtained by using the FINAP Service Catalog API.  If you encounter errors other than technical problems with service search API or the format of responses, please contact the service provider in question.
+
 ### Example GeoJSON output
 
 The following is a simple output example output for a terminal service.
