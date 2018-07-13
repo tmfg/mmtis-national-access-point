@@ -13,4 +13,4 @@ Directories:
 * `database` contains migrations and test data to setup the OTE database
 
 
-<a href="https://www.browserstack.com"><img src="./Browserstack-logo.svg" width="200"></a>
+<a href="https://www.browserstack.com" target="_blank" rel="noopener noreferrer"><img src="./Browserstack-logo.svg" width="200"></a>
