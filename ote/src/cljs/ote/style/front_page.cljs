@@ -37,15 +37,15 @@
                   :background-image "linear-gradient(90deg, #06c, #0029b8)"})
 (def fp-btn-hover {::stylefy/mode {:hover {:box-shadow "1px 1px 4px 0 rgba(0, 0, 0, .2)"
                                            :transform "scale(0.98)"}
-                                           :stylefy/vendors ["webkit" "moz" "o" "ms"]
+                                           ::stylefy/vendors ["webkit" "moz" "ms"]
                                            ::stylefy/auto-prefix #{:transform}}})
 (def fp-btn-blue-hover {:background-image "linear-gradient(45deg, #06c, #0029b8)"})
 (def fp-btn-gray {:background-image "linear-gradient(90deg, #ccc, #ccc)"})
 (def fp-btn {:display "flex"
              :padding "20px 20px 20px 10px"
-             :box-pack "center"
+             :box-pack "center" ;; Old flex standard
+             :flex-pack "center" ;; Old flex standard
              :justify-content "center"
-             :flex-pack "center"
              :backface-visibility "visible"
              :transform-origin "50% 50% 0px"
              :transition "all 300ms ease"
@@ -55,7 +55,7 @@
              :text-align "center"
              :color "#fff"
              :border 0
-             :stylefy/vendors ["webkit" "moz" "o" "ms"]
+             ::stylefy/vendors ["webkit" "moz" "ms"]
              ::stylefy/auto-prefix #{:box-pack :justify-content :flex-pack :backface-visibility :transform-origin :transition}
              })
 
@@ -78,9 +78,11 @@
                            ::stylefy/media {{:max-width (str width-xs "px")} {:padding-left "10px"
                                                                               :order 2}}})
 
-(def large-icon-container {:display "-webkit-flex"
+(def large-icon-container {:display "flex"
                            :flex-direction "column"
                            :align-items "center"
+                           ::stylefy/vendors ["webkit" "moz" "ms"]
+                           ::stylefy/auto-prefix #{:display :flex-direction :align-items}
                            ::stylefy/media {{:max-width (str width-xs "px")} {:order 1}}})
 
 (def large-font-icon  {:font-size "14rem"
@@ -88,45 +90,45 @@
                        :text-shadow "0 4px 4px rgba(0, 0, 0, .2)"
                        ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "10rrem"}}})
 
-(def front-page-h1  {:position "static"
-                      :display "flex"
-                      :padding-top "40px"
-                      :box-orient "vertical"
-                      :box-direction "normal"
-                      :flex-direction "column"
-                      :box-pack "start"
-                      :flex-pack "start"
-                      :justify-content "flex-start"
-                      :box-align "center"
-                      :flex-align "center"
-                      :align-items "center"
-                      :font-family "Montserrat, sans-serif"
-                      :color "#fff"
-                      :font-size "6rem"
-                      :font-weight "200"
-                      :text-shadow "0 2px 10px rgba(0, 0, 0, .5)"
-                      :stylefy/vendors ["webkit" "moz" "o" "ms"]
-                      ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :flex-pack :justify-content :box-align :flex-align}
-                      ::stylefy/media {{:max-width (str width-sm "px")} {:padding-top "20px"
-                                                                         :font-size "4rem"
-                                                                         :font-weight "300"}
-                                       {:max-width (str width-xs "px")} {:padding-top "20px"
-                                                                         :font-size "3rem"
-                                                                         :font-weight "400"}
-                                       {:min-width "0px" :max-width (str width-xxs "px")} {:padding-top "20px"
-                                                                                           :font-size "2.5rem"
-                                                                                           :font-weight "400"}}})
+(def front-page-h1 {:position "static"
+                    :display "flex"
+                    :padding-top "40px"
+                    :box-orient "vertical" ;; Old flex standard
+                    :box-direction "normal" ;; Old flex standard
+                    :flex-direction "column"
+                    :box-pack "start" ;; Old flex standard
+                    :flex-pack "start" ;; Old flex standard
+                    :justify-content "flex-start"
+                    :box-align "center" ;; Old flex standard
+                    :flex-align "center" ;; Old flex standard
+                    :align-items "center"
+                    :font-family "Montserrat, sans-serif"
+                    :color "#fff"
+                    :font-size "6rem"
+                    :font-weight "200"
+                    :text-shadow "0 2px 10px rgba(0, 0, 0, .5)"
+                    ::stylefy/vendors ["webkit" "moz" "ms"]
+                    ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :flex-pack :justify-content :box-align :flex-align}
+                    ::stylefy/media {{:max-width (str width-sm "px")} {:padding-top "20px"
+                                                                       :font-size "4rem"
+                                                                       :font-weight "300"}
+                                     {:max-width (str width-xs "px")} {:padding-top "20px"
+                                                                       :font-size "3rem"
+                                                                       :font-weight "400"}
+                                     {:min-width "0px" :max-width (str width-xxs "px")} {:padding-top "20px"
+                                                                                         :font-size "2.5rem"
+                                                                                         :font-weight "400"}}})
 
 (def front-page-hero-text {:display "flex"
                            :margin-top "60px"
-                           :box-orient "vertical"
-                           :box-direction "normal"
+                           :box-orient "vertical" ;; Old flex standard
+                           :box-direction "normal" ;; Old flex standard
                            :flex-direction "column"
-                           :box-pack "start"
-                           :flex-pack "start"
+                           :box-pack "start" ;; Old flex standard
+                           :flex-pack "start" ;; Old flex standard
                            :justify-content "flex-start"
-                           :v-webkit-box-align "center"
-                           :flex-align "center"
+                           :box-align "center" ;; Old flex standard
+                           :flex-align "center" ;; Old flex standard
                            :align-items "center"
                            :font-family "Montserrat, sans-serif"
                            :color "#fafafa"
@@ -135,8 +137,9 @@
                            :font-weight "300"
                            :text-align "center"
                            :text-shadow "0 1px 5px rgba(0, 0, 0, .5)"
-                           :stylefy/vendors ["webkit" "moz" "o" "ms"]
-                           ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :flex-pack :justify-content :align-items :flex-align}
+                           ::stylefy/vendors ["webkit" "moz" "ms"]
+                           ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :box-align
+                                                   :flex-pack :justify-content :align-items :flex-align}
                            ::stylefy/media {{:max-width (str width-sm "px")} {:margin-top "40px"
                                                                               :line-height "1.6rem"
                                                                               :font-size "1.6rem"
@@ -154,7 +157,11 @@
                         :color "#c8c8c8"
                         :font-size "0.875rem"
                         :font-weight 300
-                        :-webkit-align-items "flex-start"})
+                        :box-align "center" ;; Old flex standard
+                        :flex-align "center" ;; Old flex standard
+                        :align-items "flex-start"
+                        ::stylefy/vendors ["webkit" "moz" "ms"]
+                        ::stylefy/auto-prefix #{:box-align :align-items :flex-align}})
 
 (def lower-section {:padding-top      "80px"
                     :padding-bottom   "100px"
@@ -163,7 +170,16 @@
 
 (def media-transport-service {::stylefy/media {{:max-width (str width-xs "px")} {:padding-top "60px"}}})
 
-(def lower-section-data-container {:display "-webkit-flex" :-webkit-flex-direction "column" :align-items "center"})
+(def lower-section-data-container {:display "flex"
+                                   :box-orient "vertical" ;; Old flex standard
+                                   :box-direction "normal" ;; Old flex standard
+                                   :flex-direction "column"
+                                   :box-align "center" ;; Old flex standard
+                                   :flex-align "center" ;; Old flex standard
+                                   :align-items "center"
+                                   ::stylefy/vendors ["webkit" "moz" "ms"]
+                                   ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-align
+                                                           :align-items :flex-align}})
 
 (def lower-section-title {:font-size "1.5rem"
                           :font-weight 600
