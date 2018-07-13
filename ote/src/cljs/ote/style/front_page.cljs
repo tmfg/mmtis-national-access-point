@@ -163,7 +163,8 @@
                         ::stylefy/vendors ["webkit" "moz" "ms"]
                         ::stylefy/auto-prefix #{:box-align :align-items :flex-align}})
 
-(def lower-section {:padding-top      "80px"
+(def lower-section {:display "flex"
+                    :padding-top      "80px"
                     :padding-bottom   "100px"
                     :background-image "linear-gradient(45deg, #ddd, #f8f8f8 46%, #f1f1f1)"
                     :box-shadow       "4px 0 50px 0 rgba(0, 0, 0, .2), 4px 0 20px 0 #fff"})
@@ -192,10 +193,15 @@
                                ::stylefy/media {{:max-width (str width-xs "px")} {:font-size "6rem"}
                                                 {:min-width "0px" :max-width (str width-xxs "px")} {:font-size "5rem"}}})
 
-(def lower-section-text {:text-align "center" :font-size "1rem" :font-weight 400 :text-aign "left" :line-height "1.5" :min-height "95px"})
+(def lower-section-text {:text-align "center"
+                         :font-size "1rem"
+                         :font-weight 400
+                         :line-height "1.5"
+                         :min-height "95px"
+                         :width "100%" ;; Required by IE11 for some odd reason (here be dragons!).
+                         })
 
-(def footer-logo-ul {
-                     ::stylefy/media {{:max-width (str width-xs "px")} {:display "flex"
+(def footer-logo-ul {::stylefy/media {{:max-width (str width-xs "px")} {:display "flex"
                                                                         :align-items "center"
                                                                         :width "90px" }}})
 

@@ -241,8 +241,10 @@
        [:button (stylefy/use-style style-front-page/front-page-button)
         [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
         (tr [:buttons :transport-service-catalog])]]]]]]
+
     (when test-env?
      [test-env-warning])
+
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
@@ -251,17 +253,19 @@
       [:h2
        (stylefy/use-style style-front-page/h2)
        (tr [:front-page :title-NAP])]
-      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5"}}
        (tr [:front-page :column-NAP])]]]
+
     [:div.row (stylefy/use-style style-front-page/row-media)
      [:div.col-xs-12.col-sm-9.col-md-9 (stylefy/use-style style-front-page/large-text-container)
       [:h2
        (stylefy/use-style style-front-page/h2)
        (tr [:front-page :title-transport-services])]
-      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
+      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5"}}
        (tr [:front-page :column-transport-services])]]
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
       [icons/airport-shuttle style-front-page/large-font-icon]]]
+
     [:div.row (stylefy/use-style style-front-page/row-media)
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
       [icons/flag style-front-page/large-font-icon]]
@@ -269,9 +273,9 @@
       [:h2
        (stylefy/use-style style-front-page/h2)
        (tr [:front-page :title-essential-info])]
-      [:p {:style {:font-size "1em" :font-weight 400 :text-aign "left" :line-height "1.5"}}
-       (tr [:front-page :column-essential-info])]]]
-    ]
+      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5"}}
+       (tr [:front-page :column-essential-info])]]]]
+
    [:div (stylefy/use-style style-front-page/lower-section)
     [:div.container
      [:div.col-md-6
@@ -280,6 +284,7 @@
        [:h3 (stylefy/use-style style-front-page/lower-section-title) (tr [:front-page :title-transport-operator])]
        [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-transport-operator])]
+
        [:div {:style {:padding-top "20px"}}
         (if (not (get-in app [:user :username]))
           [:a {:style    {:text-decoration "none"}
@@ -292,6 +297,7 @@
           [:div (stylefy/use-style style-front-page/front-page-button-disabled)
             [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
             (tr [:buttons :register-to-service])])]]]
+
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
        [icons/developer-mode style-front-page/lower-section-font-icon]
