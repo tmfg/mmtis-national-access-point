@@ -330,8 +330,10 @@
 
       (when (nil? (get-in app [:user :username]))
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))
-                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
+                                                (when @is-scrolled?
+                                                  {:height "56px"})))
+                      {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "0px"}
@@ -340,8 +342,10 @@
 
       (when (and (nil? (get-in app [:user :username])) (flags/enabled? :ote-login))
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div {:on-click #(e! (login/->ShowLoginDialog))
-                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
+                                                (when @is-scrolled?
+                                                  {:height "56px"})))
+                      {:on-click #(e! (login/->ShowLoginDialog))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "0px"}
