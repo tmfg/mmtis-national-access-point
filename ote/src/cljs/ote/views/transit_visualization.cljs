@@ -94,6 +94,18 @@
       (filter :different? (:routes compare))
       (:routes compare))]])
 
+(defn- initialize-stop-marker
+  "Bind popup content and set marker icon for stop marker features."
+  [feature ^L.Layer layer]
+  (when-let [name (aget feature "properties" "name")]
+    (when-let [icon-options (aget layer "options" "icon" "options")]
+      ;; Make the icon smaller
+      (aset icon-options "iconSize" #js [16 24])
+      (aset icon-options "iconAnchor" #js [8 24])
+      (aset icon-options "shadowSize" #js [16 24])
+      (aset icon-options "shadowAnchor" #js [4 24])
+      (aset icon-options "popupAnchor" #js [0 -20]))
+    (.bindPopup layer name)) )
 (defn- selected-route-map [_ _ _ _]
   (r/create-class
     {:component-did-update leaflet/update-bounds-from-layers
@@ -120,12 +132,14 @@
          (when (and date1-route-lines date1-show?)
            ^{:key (str date1 "_" route-short-name "_" route-long-name)}
            [leaflet/GeoJSON {:data date1-route-lines
+                             :onEachFeature initialize-stop-marker
                              :style {:dash-array "10"
                                      :dash-offset 0
                                      :color "black" #_(-> date1 date->hash hash->color)}}])
          (when (and date2-route-lines date2-show?)
            ^{:key (str date2 "_" route-short-name "_" route-long-name)}
            [leaflet/GeoJSON {:data date2-route-lines
+                             :onEachFeature initialize-stop-marker
                              :style {:dash-array "10"
                                      :dash-offset 10
                                      :color "red" #_(-> date2 date->hash hash->color)}}])]])}))

@@ -7,9 +7,26 @@
             [ote.components.service :refer [define-service-component]]
             [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
-            [specql.op :as op]))
+            [specql.op :as op]
+            [clojure.string :as str]))
 
 (defqueries "ote/services/transit_visualization.sql")
+
+(defn route-line-features [rows]
+  (mapcat (fn [{:keys [route-line departures stops] :as foo}]
+            (vec (into
+                  #{{:type "Feature"
+                     :properties {:departures (mapv time/format-interval-as-time (.getArray departures))}
+                     :geometry (cheshire/decode route-line keyword)}}
+                  (map (fn [stop]
+                         (let [[lon lat name] (str/split stop #",")]
+                           {:type "Point"
+                            :coordinates [(Double/parseDouble lon)
+                                          (Double/parseDouble lat)]
+                            :properties {"name" name}})))
+                  (when (not (str/blank? stops))
+                    (str/split stops #"\|\|")))))
+          rows))
 
 (define-service-component TransitVisualization {}
   ^{:unauthenticated true :format :transit}
@@ -40,17 +57,13 @@
        (http/geojson-response
         (cheshire/encode
          {:type "FeatureCollection"
-          :features (for [{:keys [route-line departures]}
-                          (fetch-route-trips-by-name-and-date
-                           db
-                           {:operator-id (Long/parseLong operator)
-                            :date (time/parse-date-eu date)
-                            :route-short-name short
-                            :route-long-name long
-                            :headsign headsign})]
-                      {:type "Feature"
-                       :properties {:departures (mapv time/format-interval-as-time (.getArray departures))}
-                       :geometry (cheshire/decode route-line keyword)})}
+          :features (route-line-features (fetch-route-trips-by-name-and-date
+                                          db
+                                          {:operator-id (Long/parseLong operator)
+                                           :date (time/parse-date-eu date)
+                                           :route-short-name short
+                                           :route-long-name long
+                                           :headsign headsign}))}
          {:key-fn name})))
 
   ^{:unauthenticated true :format :transit}
