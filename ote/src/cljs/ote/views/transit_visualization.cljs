@@ -114,35 +114,47 @@
      (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
                                             date1 date1-route-lines date1-show?
                                             date2 date2-route-lines date2-show?]}]
-       [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
+       (let [show-date1? (and date1-show?
+                              (not (empty? (get date1-route-lines "features"))))
+             show-date2? (and date2-show?
+                              (not (empty? (get date2-route-lines "features"))))]
+         [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
-        (when date1-route-lines
-          [ui/checkbox {:label (str "Näytä " date1 " (musta)")
-                        :checked (boolean date1-show?)
-                        :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
-        (when date2-route-lines
-          [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
-                        :checked (boolean date2-show?)
-                        :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
-        [leaflet/Map {:ref "leaflet"
-                      :center #js [65 25]
-                      :zoomControl true
-                      :zoom 5}
-         (leaflet/background-tile-map)
-         (when (and date1-route-lines date1-show?)
-           ^{:key (str date1 "_" route-short-name "_" route-long-name)}
-           [leaflet/GeoJSON {:data date1-route-lines
-                             :onEachFeature initialize-stop-marker
-                             :style {:dash-array "10"
-                                     :dash-offset 0
-                                     :color "black" #_(-> date1 date->hash hash->color)}}])
-         (when (and date2-route-lines date2-show?)
-           ^{:key (str date2 "_" route-short-name "_" route-long-name)}
-           [leaflet/GeoJSON {:data date2-route-lines
-                             :onEachFeature initialize-stop-marker
-                             :style {:dash-array "10"
-                                     :dash-offset 10
-                                     :color "red" #_(-> date2 date->hash hash->color)}}])]])}))
+          (when date1-route-lines
+            [ui/checkbox {:label (str "Näytä " date1 " (musta)")
+                          :checked (boolean date1-show?)
+                          :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
+          (when date2-route-lines
+            [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
+                          :checked (boolean date2-show?)
+                          :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
+          [leaflet/Map {:ref "leaflet"
+                        :center #js [65 25]
+                        :zoomControl true
+                        :zoom 5}
+           (leaflet/background-tile-map)
+           (when show-date1?
+             ^{:key (str date1 "_" route-short-name "_" route-long-name
+                         (when show-date2? "dash"))}
+             [leaflet/GeoJSON {:data date1-route-lines
+                               :onEachFeature initialize-stop-marker
+                               :style (merge
+                                       {:color "black"
+                                        :weight 6}
+                                       (when show-date2?
+                                         {:dash-array "10"
+                                          :dash-offset 0}))}])
+           (when show-date2?
+             ^{:key (str date2 "_" route-short-name "_" route-long-name
+                         (when show-date1? "dash"))}
+             [leaflet/GeoJSON {:data date2-route-lines
+                               :onEachFeature initialize-stop-marker
+                               :style (merge
+                                       {:color "red"
+                                        :weight 6}
+                                       (when show-date1?
+                                         {:dash-array "10"
+                                          :dash-offset 10}))}])]]))}))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
