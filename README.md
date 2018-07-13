@@ -11,3 +11,6 @@ Directories:
 * `ote` contains the OTE digitalization tools application (both frontend and backend)
 * `aws` contains configuration and scripts for setting up the cloud environments (except secrets, like keys)
 * `database` contains migrations and test data to setup the OTE database
+
+
+<a href="https://www.browserstack.com" target="_blank" rel="noopener noreferrer"><img src="./Browserstack-logo.svg" width="200"></a>
