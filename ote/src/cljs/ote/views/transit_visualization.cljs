@@ -104,7 +104,7 @@
       ;; This features is a stop marker
       (do
         (aset (aget layer "options") "icon"
-              (new L.Icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
+              (js/L.icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
                                :iconSize #js [20 20]
                                :iconAnchor #js [10 10]}))
         (.bindPopup layer name))
