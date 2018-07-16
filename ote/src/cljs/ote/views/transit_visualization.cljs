@@ -109,7 +109,7 @@
                                :iconAnchor #js [10 10]}))
         (.bindPopup layer name))
       ;; This feature has no name, it is the route line, apply pixel offset
-      (.setOffset layer offset))))
+      (.call (aget layer "setOffset") layer offset))))
 
 (defn update-marker-visibility-by-zoom [this]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
