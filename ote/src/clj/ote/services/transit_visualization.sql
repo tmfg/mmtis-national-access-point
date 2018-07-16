@@ -75,11 +75,22 @@ SELECT trip."trip-id", trip."trip-headsign", stop."stop-name", stoptime."departu
 
 -- name: fetch-route-trips-by-name-and-date
 -- Fetch geometries of route trips for given date by route short and long name
-SELECT x."route-line", array_agg(departure) as departures,
+SELECT ST_AsGeoJSON(COALESCE(
+          -- If there exists a "gtfs-shape" row for this package and trip shape id,
+          -- use that to generate the detailed route line
+          (SELECT ST_MakeLine(ST_MakePoint(rs."shape-pt-lon", rs."shape-pt-lat") ORDER BY rs."shape-pt-sequence") as routeline
+             FROM "gtfs-shape" gs
+             JOIN LATERAL unnest(gs."route-shape") rs ON TRUE
+            WHERE gs."shape-id" = x."shape-id"
+              AND gs."package-id" = x."package-id"),
+          -- Otherwise use line generated from the stop sequence
+          x."route-line")) as "route-line",
+       array_agg(departure) as departures,
        string_agg(stops, '||') as stops
   FROM (SELECT (array_agg(stoptime."departure-time"))[1] as "departure",
-               st_asgeojson(ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence")) as "route-line",
-               string_agg(DISTINCT CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name"), '||') as stops
+               ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence") as "route-line",
+               string_agg(DISTINCT CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name"), '||') as stops,
+               trip."shape-id", r."package-id"
           FROM "gtfs-route" r
           JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
           JOIN LATERAL unnest(t.trips) trip ON TRUE
@@ -92,6 +103,6 @@ SELECT x."route-line", array_agg(departure) as departures,
                                   (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
                                  :date::date))
            AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE))
-         GROUP BY trip."trip-id") x
+         GROUP BY trip."shape-id", r."package-id", trip."trip-id") x
  -- Group same route lines to single row (aggregate departures to array)
- GROUP BY "route-line";
+ GROUP BY "route-line", "shape-id", "package-id";
