@@ -17,6 +17,7 @@
             [ote.ui.common :as common]
             [cljs-react-material-ui.icons :as ic]
             [ote.style.base :as style-base]
+            [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
             [clojure.string :as str]))
 
 (set! *warn-on-infer* true)
@@ -134,8 +135,10 @@
 (defn  place-search [e! place-search]
   (let [{primary-results true
          secondary-results false} (group-by (comp ::places/primary? :place) (:results place-search))]
-    [:div.place-search (stylefy/use-style (style-base/flex-container "row"))
-     [:div {:style {:width "30%"}}
+    [:div.place-search (stylefy/use-style (merge (style-base/flex-container "row")
+                                                 {:flex-wrap "wrap"}))
+     [:div (stylefy/use-style {:width "100%"
+                               ::stylefy/media {{:min-width (str width-xs "px")} {:width "30%"}}})
       [:div {:style {:font-weight "bold"}}
        [:span (tr [:place-search :primary-header])]
        [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
@@ -165,7 +168,9 @@
                          :search-text (or (:secondary-name place-search) "")
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}]]
 
-     [:div {:style {:width "70%" :z-index 99}}
+     [:div (stylefy/use-style {:width "100%"
+                               :z-index 99
+                               ::stylefy/media {{:min-width (str width-xs "px")} {:width "70%"}}})
        [places-map e! (:results place-search) (:show? place-search)]
 
       [:span
