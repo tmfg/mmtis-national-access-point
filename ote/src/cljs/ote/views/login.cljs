@@ -43,7 +43,9 @@
     credentials]])
 
 (defn login-action-cards [e!]
-  [:div {:style {:padding-top "2em"}}
+  [:div {:style {:margin-top "2em"
+                 :padding "0.5em"
+                 :background-color "#f5f5f5"}}
    [:div
     [:h5 (tr [:login :no-account?])]
     [:div (tr [:login :no-account-help])]
