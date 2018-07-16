@@ -13,6 +13,8 @@
             [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]))
 
+(set! *warn-on-infer* true)
+
 (defn highlight-style [hash->color date->hash day highlight]
   (let [d (time/format-date day)
         d-hash (date->hash d)
@@ -94,22 +96,38 @@
       (filter :different? (:routes compare))
       (:routes compare))]])
 
-(defn- initialize-stop-marker
+(defn- initialize-route-features
   "Bind popup content and set marker icon for stop marker features."
-  [feature ^js/L.Layer layer]
-  (when-let [name (aget feature "properties" "name")]
-    (when-let [icon-options (aget layer "options" "icon" "options")]
-      ;; Make the icon smaller
-      (aset icon-options "iconSize" #js [16 24])
-      (aset icon-options "iconAnchor" #js [8 24])
-      (aset icon-options "shadowSize" #js [16 24])
-      (aset icon-options "shadowAnchor" #js [4 24])
-      (aset icon-options "popupAnchor" #js [0 -20]))
-    (.bindPopup layer name)) )
+  [offset]
+  (fn [feature ^js/L.Layer layer]
+    (if-let [name (aget feature "properties" "name")]
+      ;; This features is a stop marker
+      (do
+        (aset (aget layer "options") "icon"
+              (new L.Icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
+                               :iconSize #js [20 20]
+                               :iconAnchor #js [10 10]}))
+        (.bindPopup layer name))
+      ;; This feature has no name, it is the route line, apply pixel offset
+      (.setOffset layer offset))))
+
+(defn update-marker-visibility-by-zoom [this]
+  (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
+        show? (>= (.getZoom m) 13)]
+    (.eachLayer m (fn [layer]
+                    (when-let [icon (aget layer "_icon")]
+                      (set! (.-visibility (aget icon "style"))
+                            (if show? "" "hidden")))))))
+
 (defn- selected-route-map [_ _ _ _]
   (r/create-class
-    {:component-did-update leaflet/update-bounds-from-layers
-     :component-did-mount leaflet/update-bounds-from-layers
+   {:component-did-update (fn [this]
+                            (update-marker-visibility-by-zoom this)
+                            (leaflet/update-bounds-from-layers this))
+    :component-did-mount (fn [this]
+                           (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
+                             (.on m "zoomend" (fn [_] (update-marker-visibility-by-zoom this)))
+                             (leaflet/update-bounds-from-layers this)))
      :reagent-render
      (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
                                             date1 date1-route-lines date1-show?
@@ -134,27 +152,19 @@
                         :zoom 5}
            (leaflet/background-tile-map)
            (when show-date1?
-             ^{:key (str date1 "_" route-short-name "_" route-long-name
-                         (when show-date2? "dash"))}
+             ^{:key (str date1 "_" route-short-name "_" route-long-name)}
              [leaflet/GeoJSON {:data date1-route-lines
-                               :onEachFeature initialize-stop-marker
+                               :onEachFeature (initialize-route-features -3)
                                :style (merge
                                        {:color "black"
-                                        :weight 6}
-                                       (when show-date2?
-                                         {:dash-array "10"
-                                          :dash-offset 0}))}])
+                                        :weight 6})}])
            (when show-date2?
-             ^{:key (str date2 "_" route-short-name "_" route-long-name
-                         (when show-date1? "dash"))}
+             ^{:key (str date2 "_" route-short-name "_" route-long-name)}
              [leaflet/GeoJSON {:data date2-route-lines
-                               :onEachFeature initialize-stop-marker
+                               :onEachFeature (initialize-route-features 3)
                                :style (merge
                                        {:color "red"
-                                        :weight 6}
-                                       (when show-date1?
-                                         {:dash-array "10"
-                                          :dash-offset 10}))}])]]))}))
+                                        :weight 6})}])]]))}))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
