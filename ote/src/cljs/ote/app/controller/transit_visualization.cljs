@@ -173,8 +173,7 @@
     (update
      app :compare
      (fn [app]
-       (doseq [date [(:date1 app)
-                     (:date2 app)]
+       (doseq [date [(:date1 app) (:date2 app)]
                :let [params (merge {:date date}
                                    (when route-short-name
                                      {:short route-short-name})
