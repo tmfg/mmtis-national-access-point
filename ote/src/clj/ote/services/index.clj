@@ -104,7 +104,7 @@
       [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
       (when dev-mode?
         [:script {:type "text/javascript"} "goog.require('ote.main');"])
-      [:script {:src "js/leaflet.polylineoffset.js" :type "text/javascript"}]]]))
+      [:script {:src "js-ext/leaflet.polylineoffset.js" :type "text/javascript"}]]]))
 
 (defn index [db req dev-mode?]
   (http/with-no-cache-headers
