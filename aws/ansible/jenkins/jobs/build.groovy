@@ -37,6 +37,14 @@ job('OTE build from master') {
             subdirPath('ote')
             task('production')
         }
+
+        downstreamParameterized {
+            trigger('Deploy OTE') {
+                parameters {
+                    predefinedProp('ENV','staging')
+                }
+            }
+        }
     }
     publishers {
         archiveArtifacts {
