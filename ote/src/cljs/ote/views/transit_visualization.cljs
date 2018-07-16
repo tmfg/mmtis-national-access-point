@@ -152,27 +152,19 @@
                         :zoom 5}
            (leaflet/background-tile-map)
            (when show-date1?
-             ^{:key (str date1 "_" route-short-name "_" route-long-name
-                         (when show-date2? "dash"))}
+             ^{:key (str date1 "_" route-short-name "_" route-long-name)}
              [leaflet/GeoJSON {:data date1-route-lines
                                :onEachFeature (initialize-route-features -3)
                                :style (merge
                                        {:color "black"
-                                        :weight 6}
-                                       #_(when show-date2?
-                                         {:dash-array "10"
-                                          :dash-offset 0}))}])
+                                        :weight 6})}])
            (when show-date2?
-             ^{:key (str date2 "_" route-short-name "_" route-long-name
-                         (when show-date1? "dash"))}
+             ^{:key (str date2 "_" route-short-name "_" route-long-name)}
              [leaflet/GeoJSON {:data date2-route-lines
                                :onEachFeature (initialize-route-features 3)
                                :style (merge
                                        {:color "red"
-                                        :weight 6}
-                                       #_(when show-date1?
-                                         {:dash-array "10"
-                                          :dash-offset 10}))}])]]))}))
+                                        :weight 6})}])]]))}))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
