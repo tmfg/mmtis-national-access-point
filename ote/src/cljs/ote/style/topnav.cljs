@@ -5,7 +5,9 @@
                      :width "100%"
                      :top 0
                      :z-index 999
-                     :transition "all 300ms ease"})
+                     :transition "all 300ms ease"
+                     ::stylefy/vendors ["webkit" "moz" "ms"]
+                     ::stylefy/auto-prefix #{:transition}})
 
 (def topnav-dropdown {:width "100%"
                       :background-color "#323232"
@@ -14,57 +16,70 @@
                       :padding-bottom "20px"
                       :border-top "2px solid #646464"
                       :transition "visibility 300ms ease, opacity 300ms ease"
-                      :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"})
+                      :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
+                      ::stylefy/vendors ["webkit" "moz" "ms"]
+                      ::stylefy/auto-prefix #{:transition}})
 
 
 (def topnav {:min-height "56px"
              :background-color "#323232"
              :overflow "hidden"
              :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
-             :transition "all 300ms ease"})
+             :transition "all 300ms ease"
+             ::stylefy/vendors ["webkit" "moz" "ms"]
+             ::stylefy/auto-prefix #{:transition}})
 
 (def topnav-desktop (merge topnav {:height "80px"
                                    :line-height "80px"}))
 
 (def clear {:clear "both"})
 
-(def bottom-border {:-moz-box-sizing "border-box"
-                    :-webkit-box-sizing "border-box"
-                    :box-sizing "border-box"
-                    :height "80px"})
+(def bottom-border {:box-sizing "border-box"
+                    :height "80px"
+                    ::stylefy/vendors ["webkit" "moz" "ms"]
+                    ::stylefy/auto-prefix #{:box-sizing}})
 
-(def ul {:list-style-type "none" })
+(def ul {:list-style-type "none"})
 
 (def li-right {:font-size "0.875rem"
-                     :float "right"
-                     :padding-right "10px"})
+               :float "right"
+               :padding-right "10px"})
 
-(def li-right-div {:cursor  "pointer"
-                   :display "-webkit-box"
+(def li-right-div {:display "flex"
+                   :cursor "pointer"
                    :padding-right "10px"
-                   :margin-left "10px"})
+                   :margin-left "10px"
+                   ::stylefy/vendors ["webkit" "moz" "ms"]
+                   ::stylefy/auto-prefix #{:display}})
 
 (def li-right-div-blue (merge bottom-border li-right-div
-                              {:cursor  "pointer" :display "-webkit-box"
-                               :border-bottom "4px solid rgb(102,163,224)"}))
+                              {:display "flex"
+                               :cursor "pointer"
+                               :border-bottom "4px solid rgb(102,163,224)"
+                               ::stylefy/vendors ["webkit" "moz" "ms"]
+                               ::stylefy/auto-prefix #{:display}}))
 
-(def li-right-div-white  (merge bottom-border li-right-div
-                                {:cursor  "pointer"
-                         :display "-webkit-box"
-                         ::stylefy/mode {:hover {:border-bottom "4px solid #fafafa"}}}))
+(def li-right-div-white (merge bottom-border li-right-div
+                               {:display "flex"
+                                :cursor "pointer"
+                                ::stylefy/mode {:hover {:border-bottom "4px solid #fafafa"}}
+                                ::stylefy/vendors ["webkit" "moz" "ms"]
+                                ::stylefy/auto-prefix #{:display}}))
 
 (def mobile-li {:padding-top "10px" :padding-bottom "10px"})
 
-(def link {:transition "padding-top 300ms ease, height 300ms ease"
+(def link {:display "block"
+           :transition "padding-top 300ms ease, height 300ms ease"
            :bottom "0"
            :color "#ffffff"
            :text-align "center"
            :padding "10px 15px 10px 15px"
            :text-decoration "none"
            :font-size "0.875em"
-           :display "block"
            ::stylefy/mode {:hover {:padding-bottom "0px"
-                                   :border-bottom "4px solid #fafafa"}}})
+                                   :border-bottom "4px solid #fafafa"}}
+           ::stylefy/vendors ["webkit" "moz" "ms"]
+           ::stylefy/auto-prefix #{:transition}})
 
 (def topnav-dropdown-link
   {:color "#fafafa"
@@ -79,13 +94,17 @@
            :margin-left "-8px"
            :display "block"
            :height "35px"
-           :flex "0 auto"})
+           :flex "0 auto"
+           ::stylefy/vendors ["webkit" "moz" "ms"]
+           ::stylefy/auto-prefix #{:flex :transition}})
 
 (def logo-small
   (merge logo
          {:transition "margin-top 300ms ease, height 300ms ease"
           :margin-top "16px"
-          :height "24px"}))
+          :height "24px"
+          ::stylefy/vendors ["webkit" "moz" "ms"]
+          ::stylefy/auto-prefix #{:transition}}))
 
 
 (def link-left (merge link

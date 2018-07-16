@@ -201,8 +201,7 @@
            [:ul (stylefy/use-style style-topnav/ul)
             [:li
              (if (flags/enabled? :ote-login)
-               [:a (merge (stylefy/use-style
-                            style-topnav/topnav-dropdown-link)
+               [:a (merge (stylefy/use-style style-topnav/topnav-dropdown-link)
                           {:href "#"
                            :on-click #(do
                                         (.preventDefault %)
@@ -266,7 +265,10 @@
           [:li.hidden-xs.hidden-sm
            [:a
             (merge
-              (stylefy/use-style style-topnav/desktop-link)
+              (stylefy/use-style
+                (merge style-topnav/desktop-link
+                       (when @is-scrolled?
+                         {:height "56px"})))
               {:href     "#"
                :on-click #(do
                             (.preventDefault %)
@@ -278,10 +280,12 @@
              (tr label)]]]))
 
       [:li (stylefy/use-style style-topnav/li-right)
-       [:div {:on-click #(e! (fp-controller/->OpenLangMenu))
-              :class (:class (if (get-in app [:ote-service-flags :lang-menu-open])
-                               (stylefy/use-style style-topnav/li-right-div-blue)
-                               (stylefy/use-style style-topnav/li-right-div-white)))}
+       [:div (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :lang-menu-open])
+                                                style-topnav/li-right-div-blue
+                                                style-topnav/li-right-div-white)
+                                              (when @is-scrolled?
+                                                {:height "56px"})))
+                    {:on-click #(e! (fp-controller/->OpenLangMenu))})
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              (if @is-scrolled?
                                {:margin-top "15px"}
@@ -292,10 +296,12 @@
         [:span {:style {:color "#fff"}} (str/upper-case (name current-language))]]]
 
       [:li (stylefy/use-style style-topnav/li-right)
-       [:div.header-general-menu {:on-click #(e! (fp-controller/->OpenHeader))
-              :class (:class (if (get-in app [:ote-service-flags :header-open])
-                               (stylefy/use-style style-topnav/li-right-div-blue)
-                               (stylefy/use-style style-topnav/li-right-div-white)))}
+       [:div.header-general-menu (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :header-open])
+                                                                    style-topnav/li-right-div-blue
+                                                                    style-topnav/li-right-div-white)
+                                                                  (when @is-scrolled?
+                                                                    {:height "56px"})))
+                                        {:on-click #(e! (fp-controller/->OpenHeader))})
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              (if @is-scrolled?
                                {:margin-top "15px"}
@@ -307,10 +313,12 @@
 
       (when (get-in app [:user :username])
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div.header-user-menu {:on-click #(e! (fp-controller/->OpenUserMenu))
-                                 :class (:class (if (get-in app [:ote-service-flags :user-menu-open])
-                                          (stylefy/use-style style-topnav/li-right-div-blue)
-                                          (stylefy/use-style style-topnav/li-right-div-white)))}
+         [:div.header-user-menu (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :user-menu-open])
+                                                                   style-topnav/li-right-div-blue
+                                                                   style-topnav/li-right-div-white)
+                                                                 (when @is-scrolled?
+                                                                   {:height "56px"})))
+                                       {:on-click #(e! (fp-controller/->OpenUserMenu))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "15px"}
@@ -319,19 +327,25 @@
             [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
           [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])
+
       (when (nil? (get-in app [:user :username]))
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))
-                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
+                                                (when @is-scrolled?
+                                                  {:height "56px"})))
+                      {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "0px"}
                                  {:margin-top "0px"}))}
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-register])]]]])
+
       (when (and (nil? (get-in app [:user :username])) (flags/enabled? :ote-login))
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div {:on-click #(e! (login/->ShowLoginDialog))
-                :class (:class (stylefy/use-style style-topnav/li-right-div-white))}
+         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
+                                                (when @is-scrolled?
+                                                  {:height "56px"})))
+                      {:on-click #(e! (login/->ShowLoginDialog))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "0px"}
