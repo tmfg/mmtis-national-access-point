@@ -7,7 +7,7 @@
             [ote.app.controller.common :refer [->ServerError]]
             [clojure.string :as str]))
 
-(defrecord ShowLoginDialog [])
+(defrecord ShowLoginPage [])
 (defrecord UpdateLoginCredentials [credentials])
 (defrecord Login [])
 (defrecord LoginResponse [response])
@@ -75,9 +75,10 @@
 
 (extend-protocol tuck/Event
 
-  ShowLoginDialog
+  ShowLoginPage
   (process-event [_ app]
-    (assoc app :login {:show? true}))
+    (routes/navigate! :login)
+    app)
 
   UpdateLoginCredentials
   (process-event [{credentials :credentials} app]
