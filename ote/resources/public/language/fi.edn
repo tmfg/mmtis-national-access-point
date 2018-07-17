@@ -1196,7 +1196,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :show-all-information "Näytä kaikki tiedot"}
 
  :login
- {:label "Kirjautumistiedot"
+ {:label "Kirjaudu palveluun"
   :login-button "Kirjaudu sisään"
 
   :no-account? "Tarvitsetko käyttäjätilin?"

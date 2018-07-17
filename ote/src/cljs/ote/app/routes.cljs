@@ -14,6 +14,7 @@
 (def ote-router
   (r/router
    [["/" :front-page]
+    ["/login" :login]
     ["/register" :register]
     ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]

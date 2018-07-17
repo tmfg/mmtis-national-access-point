@@ -342,8 +342,12 @@
              tooltip-length (or (:tooltip-length options) "medium")
              classes (get col-classes columns)
              schemas (with-automatic-labels name->label schemas)
-             style (if (= :row (:layout options))
-                     style-form/form-group-row
+             layout (:layout options)
+             style (case layout
+                     :row style-form/form-group-row
+                     :raw {} ; no styling
+
+                     ;; Default
                      style-form/form-group-column)
              container-style (:container-style options)
              card-style (:card-style options)

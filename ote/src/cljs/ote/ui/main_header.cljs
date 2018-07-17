@@ -206,7 +206,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (fp-controller/->OpenHeader))
-                                        (e! (login/->ShowLoginDialog)))})
+                                        (e! (login/->ShowLoginPage)))})
                 (tr [:common-texts :navigation-login])]
                [linkify "/user/login" (tr [:common-texts :navigation-login])
                 (merge (stylefy/use-style
@@ -345,7 +345,7 @@
          [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
                                                 (when @is-scrolled?
                                                   {:height "56px"})))
-                      {:on-click #(e! (login/->ShowLoginDialog))})
+                      {:on-click #(e! (login/->ShowLoginPage))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                (if @is-scrolled?
                                  {:margin-top "0px"}
