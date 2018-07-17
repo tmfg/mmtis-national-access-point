@@ -34,7 +34,7 @@
 
 
 
-(defmethod gtfs-import/load-transit-interface-url :kalkati [_ url last-import-date saved-etag]
+(defmethod gtfs-import/load-transit-interface-url :kalkati [_ db interface-id url last-import-date saved-etag]
   (log/info "Loading kalkati interface: " url)
   (let [{:keys [statusCode headers] :as response}
         (kalkati-to-gtfs url {"if-modified-since" last-import-date})]
