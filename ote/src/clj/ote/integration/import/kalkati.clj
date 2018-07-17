@@ -5,10 +5,12 @@
             [compojure.core :refer [routes GET]]
             [clj-http.client :as http-client]
             [ote.integration.import.gtfs :as gtfs-import]
+            [ote.db.transport-service :as t-service]
             [amazonica.aws.lambda :as lambda]
             [cheshire.core :as cheshire]
             [clojure.walk :as walk]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [specql.core :as specql]))
 
 
 (defn- decode-payload [lambda-response]
@@ -39,11 +41,18 @@
   (let [{:keys [statusCode headers] :as response}
         (kalkati-to-gtfs url {"if-modified-since" last-import-date})]
     (log/debug "Got kalkati-to-gtfs response: " response)
+
     (if (= statusCode 303)
       (http-client/get (:Location headers) {:as :byte-array})
       (do
-        (log/warn "Kalkati to GTFS conversion failed, returned: " (pr-str response))
-        {:error (str "Kalkati - GTFS muunnos epäonnistui tiedostolle, joka löytyi osoitteesta: " url)}))))
+        (log/error "Kalkati-import: Kalkati to GTFS conversion failed, returned: " (pr-str response))
+        (specql/update! db ::t-service/external-interface-description
+                        ;; Note that the gtfs-imported field tells us when the interface was last checked.
+                        {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                         ;; Response body is a json string, so we'll just use it in our error message.
+                         ::t-service/gtfs-import-error (str "Kalkati->GTFS conversion failed, error: " (:body response))}
+                        {::t-service/id interface-id})
+        nil))))
 
 (defn load-kalkati [url headers]
   (let [json (kalkati-to-gtfs url headers)
@@ -55,11 +64,13 @@
     ;; get error headers and status code from Lambda function payload and pass them through.
     ;; Note: kalkati2gtfs Lambda returns 303 after a successful execution.
     (if-not (= status-code 303)
-      (merge
-        {:status status-code}
-        (when resp-headers
-          {:headers (walk/stringify-keys
-                      (dissoc resp-headers :Location))}))
+      (do
+        (log/error "GTFS-viewer: Kalkati to GTFS lambda failed, returned: " (pr-str (:body json)))
+        (merge
+          {:status status-code}
+          (when resp-headers
+            {:headers (walk/stringify-keys
+                        (dissoc resp-headers :Location))})))
       (gtfs-import/load-gtfs gtfs-url))))
 
 (defrecord KalkatiImport []
