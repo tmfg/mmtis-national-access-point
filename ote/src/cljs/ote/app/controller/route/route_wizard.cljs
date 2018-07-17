@@ -226,8 +226,9 @@
         from-dates (map first rule-dates)
         to-dates (map second rule-dates)]
 
-    [(js/Date. (apply min from-dates))
-     (js/Date. (apply max to-dates))]))
+    (when (and (seq from-dates) (seq to-dates))
+      [(js/Date. (apply min from-dates))
+       (js/Date. (apply max to-dates))])))
 
 (defn route-updated
   "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
