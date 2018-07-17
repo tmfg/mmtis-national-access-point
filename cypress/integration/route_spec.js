@@ -22,11 +22,6 @@ describe('Sea route tests', function () {
 
         cy.get('[id*="departure-point-name"]').type('Oulu').should('have.value', 'Oulu');
         cy.get('[id*="destination-point-name"]').type('Vaasa').should('have.value', 'Vaasa');
-
-        cy.get('[id*="Voimassaalkaen"]').click();
-        cy.document().its('body').type('{enter}');
-        cy.get('[id*="Voimassaasti"]').click();
-        cy.document().its('body').type('{downarrow}{downarrow}{enter}');
     });
 
     it('Add stops', function () {
