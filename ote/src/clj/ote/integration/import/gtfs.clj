@@ -180,10 +180,19 @@
 (defmulti load-transit-interface-url
   "Load transit interface from URL. Dispatches on type.
   Returns a response map or nil if it has not been modified."
-  (fn [type url last-import-date saved-etag] type))
+  (fn [type db interface-id url last-import-date saved-etag] type))
 
-(defmethod load-transit-interface-url :gtfs [_ url last-import-date saved-etag]
-  (load-file-from-url url last-import-date saved-etag))
+(defmethod load-transit-interface-url :gtfs [_ db interface-id url last-import-date saved-etag]
+  (try
+    (load-file-from-url url last-import-date saved-etag)
+    (catch Exception e
+      (log/debug "Error when loading gtfs package from url " url ": " (.getMessage e))
+      (specql/update! db ::t-service/external-interface-description
+                      ;; Note that the gtfs-imported field tells us when the interface was last checked.
+                      {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                       ::t-service/gtfs-import-error (.getMessage e)}
+                      {::t-service/id interface-id})
+      nil)))
 
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
@@ -194,37 +203,39 @@
                                                    #{:gtfs/etag}
                                                    {:gtfs/transport-operator-id operator-id
                                                     :gtfs/transport-service-id  ts-id})))
-        response (load-transit-interface-url interface-type url last-import-date saved-etag)
+        response (load-transit-interface-url interface-type db interface-id url last-import-date saved-etag)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
-    (if (nil? gtfs-file)
-      (do
-        (log/debug "Could not find new file version from given url " url)
-        (when (not (nil? response))
-          (specql/update! db ::t-service/external-interface-description
-                          {::t-service/gtfs-imported     (java.sql.Timestamp. (System/currentTimeMillis))
-                           ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
-                          {::t-service/id interface-id})))
-      (let [new-gtfs-hash (gtfs-hash gtfs-file)
-            old-gtfs-hash (specql/fetch db :gtfs/package
-                                        #{:gtfs/sha256}
-                                        {:gtfs/transport-operator-id operator-id
-                                         :gtfs/transport-service-id  ts-id})]
-        ;; IF hash doesn't match, save new and upload file to s3
-        (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
-          (do
-            (let [package (specql/insert! db :gtfs/package {:gtfs/sha256                new-gtfs-hash
-                                                            :gtfs/transport-operator-id operator-id
-                                                            :gtfs/transport-service-id  ts-id
-                                                            :gtfs/created               (java.sql.Timestamp. (System/currentTimeMillis))
-                                                            :gtfs/etag new-etag
-                                                            :gtfs/license license})]
-              (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
-              (log/debug "File: " filename " was uploaded to S3 successfully.")
 
-              ;; Parse gtfs package and save it to database.
-              (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id)))
-          (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying."))))))
+    (when-not (nil? response)
+      (if (nil? gtfs-file)
+        (do
+          (log/debug "Could not find new file version from given url " url)
+          (when (not (nil? response))
+            (specql/update! db ::t-service/external-interface-description
+                            {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                             ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
+                            {::t-service/id interface-id})))
+        (let [new-gtfs-hash (gtfs-hash gtfs-file)
+              old-gtfs-hash (specql/fetch db :gtfs/package
+                                          #{:gtfs/sha256}
+                                          {:gtfs/transport-operator-id operator-id
+                                           :gtfs/transport-service-id ts-id})]
+          ;; IF hash doesn't match, save new and upload file to s3
+          (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
+            (do
+              (let [package (specql/insert! db :gtfs/package {:gtfs/sha256 new-gtfs-hash
+                                                              :gtfs/transport-operator-id operator-id
+                                                              :gtfs/transport-service-id ts-id
+                                                              :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                                              :gtfs/etag new-etag
+                                                              :gtfs/license license})]
+                (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
+                (log/debug "File: " filename " was uploaded to S3 successfully.")
+
+                ;; Parse gtfs package and save it to database.
+                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id)))
+            (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying.")))))))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
