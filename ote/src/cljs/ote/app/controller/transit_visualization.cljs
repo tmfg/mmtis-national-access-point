@@ -212,3 +212,7 @@
 (define-event ToggleDifferent []
   {:path [:transit-visualization :compare :different?]}
   (not app))
+
+(define-event ToggleRouteDisplayStops []
+  {:path [:transit-visualization :compare :show-stops?]}
+  (not app))
