@@ -121,9 +121,12 @@
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
   (let [show?-atom (atom show-stops?)
+        inhibit-zoom (atom false)
         update (fn [this]
                  (update-marker-visibility this show?-atom)
-                 (leaflet/update-bounds-from-layers this))]
+                 (when-not @inhibit-zoom
+                   (leaflet/update-bounds-from-layers this))
+                 (reset! inhibit-zoom false))]
     (r/create-class
      {:component-did-update update
       :component-did-mount update
@@ -132,6 +135,9 @@
         ;; This is a bit of a kludge, but because the stops are in the
         ;; same GeoJSON layer as the lines, we can't easily control their
         ;; visibility using react components.
+        (when (not= @show?-atom show-stops?)
+          ;; Don't zoom if we changed stops visible/hidden toggle
+          (reset! inhibit-zoom true))
         (reset! show?-atom show-stops?))
       :reagent-render
       (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
