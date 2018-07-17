@@ -5,6 +5,12 @@
             [tuck.core :as tuck]
             [ote.util.fn :refer [flip]]))
 
+(def ga-tracking-code
+  (.getAttribute js/document.body "data-ga-tracking-code"))
+
+(def dev-mode?
+  (.getAttribute js/document.body "data-dev-mode?"))
+
 (def ote-router
   (r/router
    [["/" :front-page]
@@ -84,7 +90,7 @@
 
 (declare navigate!)
 
-(defn- on-navigate [go-to-url-event name params query]
+(defn- on-navigate [go-to-url-event route-name params query]
   (swap! state/app
          (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
            (if (and before-unload-message (not navigation-prompt-open?))
@@ -99,7 +105,7 @@
                  :navigation-confirm (go-to-url-event new-url)))
 
              (if (not= (:url app) js/window.location.href)
-               (let [navigation-data {:page name
+               (let [navigation-data {:page route-name
                                       :params params
                                       :query query
                                       :url js/window.location.href}
@@ -118,7 +124,17 @@
                    (do
                      ;; Send startup events (if any) immediately after returning from this swap
                      (when (or event-leave event-to)
-                       (.setTimeout js/window #(send-startup-events (vec (concat event-leave event-to))) 0))
+                       (.setTimeout
+                         js/window
+                         (fn []
+                           (send-startup-events (vec (concat event-leave event-to)))
+
+                           (when-not dev-mode?
+                             (js/gtag "config"
+                                      ga-tracking-code
+                                      #js {"anonymize_ip" true
+                                           "page_path" (subs js/window.location.hash 1)})))
+                         0))
                      app)))
                app)))))
 
