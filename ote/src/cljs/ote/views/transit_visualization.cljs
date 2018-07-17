@@ -155,16 +155,18 @@
              ^{:key (str date1 "_" route-short-name "_" route-long-name)}
              [leaflet/GeoJSON {:data date1-route-lines
                                :onEachFeature (initialize-route-features -3)
-                               :style (merge
-                                       {:color "black"
-                                        :weight 6})}])
+                               :style {:lineJoin "miter"
+                                       :lineCap "miter"
+                                       :color "black"
+                                       :weight 6}}])
            (when show-date2?
              ^{:key (str date2 "_" route-short-name "_" route-long-name)}
              [leaflet/GeoJSON {:data date2-route-lines
                                :onEachFeature (initialize-route-features 3)
-                               :style (merge
-                                       {:color "red"
-                                        :weight 6})}])]]))}))
+                               :style {:lineJoin "miter"
+                                       :lineCap "miter"
+                                       :color "red"
+                                       :weight 6}}])]]))}))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
