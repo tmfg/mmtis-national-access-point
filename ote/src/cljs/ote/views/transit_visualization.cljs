@@ -177,22 +177,19 @@
                                         :color "red"
                                         :weight 6}}])]]))})))
 
-(defn stop-listing [trips]
-  [:div {:style {:width "100%"}}
-   (for [{:keys [trip-id trip-headsign stops]} trips]
-     ^{:key trip-id}
-     [:table
-      [:thead
-       [:tr [:th {:width "75%"} "Pysäkki"] [:th {:width "25%"} "Lähtöaika"]]]
-      [:tbody
-       (map-indexed
-         (fn [i stoptime]
-           (let [[stop time] (str/split stoptime #"@")]
-             ^{:key i}
-             [:tr
-              [:td stop]
-              [:td time]]))
-         (str/split stops #"->"))]])])
+(defn stop-listing [stops]
+  [:table
+   [:thead
+    [:tr [:th {:width "75%"} "Pysäkki"] [:th {:width "25%"} "Lähtöaika"]]]
+   [:tbody
+    (map-indexed
+     (fn [i stoptime]
+       (let [[stop time] (str/split stoptime #"@")]
+         ^{:key i}
+         [:tr
+          [:td stop]
+          [:td time]]))
+     (str/split stops #"->"))]])
 
 (defn short-trip-description [{:keys [trip-headsign stops]}]
   (let [stops (mapv #(zipmap [:stop-name :time] (str/split % #"@"))
@@ -202,7 +199,9 @@
      :stops (count stops)
      :headsign trip-headsign}))
 
-(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips route-short-name route-long-name trip-headsign]}]
+(defn date-trips [e! {:keys [date1 date1-trips date2 date2-trips
+                             route-short-name route-long-name trip-headsign
+                             selected-trip-description]}]
   (let [date1-trip-descriptions (into #{} (map short-trip-description) date1-trips)
         date2-trip-descriptions (into #{} (map short-trip-description) date2-trips)
         all-trip-descriptions (into #{} (concat date1-trip-descriptions
@@ -212,7 +211,9 @@
       (when trip-headsign
         [:span " otsatunnuksella " [:b trip-headsign]])
       " valittuina päivinä:"]
-     [table/table {:height 300 :name->label str}
+     [table/table {:height 300 :name->label str
+                   :on-select #(e! (tv/->SelectTripDescription (first %)))
+                   :row-selected? (comp boolean #{selected-trip-description})}
       [{:name "Lähtö" :width "35%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
        {:name "Määränpää" :width "35%" :format #(str (:time %) " " (:stop-name %)) :read :destination}
        {:name "Pysäkkejä" :width "12%" :read :stops}
@@ -221,16 +222,22 @@
       (sort-by (juxt (comp :time :departure) (comp :stop-name :departure))
                all-trip-descriptions)]
 
-     #_[:table {:style {:width "100%"}}
-        [:thead
-         [:tr
-          [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
-        [:tbody
-         [:tr
-          [:td
-           [stop-listing date1-trips]]
-          [:td
-           [stop-listing date2-trips]]]]]]))
+     (when selected-trip-description
+       (let [matching-trip #(when (= selected-trip-description (short-trip-description %)) %)
+             date1-trip (some matching-trip date1-trips)
+             date2-trip (some matching-trip date2-trips)]
+         [:div
+          [:span "Valitun vuoron pysäkkilistaus: "]
+          [:table {:style {:width "100%"}}
+           [:thead
+            [:tr
+             [:th {:width "50%"} date1] [:th {:width "50%"} date2]]]
+           [:tbody
+            [:tr
+             [:td {:style {:vertical-align "top"}}
+              [stop-listing (:stops date1-trip)]]
+             [:td {:style {:vertical-align "top"}}
+              [stop-listing (:stops date2-trip)]]]]]]))]))
 
 (defn date-comparison [e! {:keys [date->hash hash->color compare]}]
   (let [date1 (:date1 compare)
