@@ -216,3 +216,7 @@
 (define-event ToggleRouteDisplayStops []
   {:path [:transit-visualization :compare :show-stops?]}
   (not app))
+
+(define-event SelectTripDescription [trip-description]
+  {:path [:transit-visualization :compare :selected-trip-description]}
+  trip-description)
