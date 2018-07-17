@@ -111,62 +111,71 @@
       ;; This feature has no name, it is the route line, apply pixel offset
       (.call (aget layer "setOffset") layer offset))))
 
-(defn update-marker-visibility-by-zoom [this]
+(defn update-marker-visibility [this show?-atom]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
-        show? (>= (.getZoom m) 13)]
+        show? @show?-atom]
     (.eachLayer m (fn [layer]
                     (when-let [icon (aget layer "_icon")]
                       (set! (.-visibility (aget icon "style"))
                             (if show? "" "hidden")))))))
 
-(defn- selected-route-map [_ _ _ _]
-  (r/create-class
-   {:component-did-update (fn [this]
-                            (update-marker-visibility-by-zoom this)
-                            (leaflet/update-bounds-from-layers this))
-    :component-did-mount (fn [this]
-                           (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
-                             (.on m "zoomend" (fn [_] (update-marker-visibility-by-zoom this)))
-                             (leaflet/update-bounds-from-layers this)))
-     :reagent-render
-     (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
-                                            date1 date1-route-lines date1-show?
-                                            date2 date2-route-lines date2-show?]}]
-       (let [show-date1? (and date1-show?
-                              (not (empty? (get date1-route-lines "features"))))
-             show-date2? (and date2-show?
-                              (not (empty? (get date2-route-lines "features"))))]
-         [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
+(defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
+  (let [show?-atom (atom show-stops?)
+        update (fn [this]
+                 (update-marker-visibility this show?-atom)
+                 (leaflet/update-bounds-from-layers this))]
+    (r/create-class
+     {:component-did-update update
+      :component-did-mount update
+      :component-will-receive-props
+      (fn [this [_ _ _ _ {show-stops? :show-stops?}]]
+        ;; This is a bit of a kludge, but because the stops are in the
+        ;; same GeoJSON layer as the lines, we can't easily control their
+        ;; visibility using react components.
+        (reset! show?-atom show-stops?))
+      :reagent-render
+      (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
+                                             date1 date1-route-lines date1-show?
+                                             date2 date2-route-lines date2-show?
+                                             show-stops?]}]
+        (let [show-date1? (and date1-show?
+                               (not (empty? (get date1-route-lines "features"))))
+              show-date2? (and date2-show?
+                               (not (empty? (get date2-route-lines "features"))))]
+          [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
-          (when date1-route-lines
-            [ui/checkbox {:label (str "Näytä " date1 " (musta)")
-                          :checked (boolean date1-show?)
-                          :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
-          (when date2-route-lines
-            [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
-                          :checked (boolean date2-show?)
-                          :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
-          [leaflet/Map {:ref "leaflet"
-                        :center #js [65 25]
-                        :zoomControl true
-                        :zoom 5}
-           (leaflet/background-tile-map)
-           (when show-date1?
-             ^{:key (str date1 "_" route-short-name "_" route-long-name)}
-             [leaflet/GeoJSON {:data date1-route-lines
-                               :onEachFeature (initialize-route-features -3)
-                               :style {:lineJoin "miter"
-                                       :lineCap "miter"
-                                       :color "black"
-                                       :weight 6}}])
-           (when show-date2?
-             ^{:key (str date2 "_" route-short-name "_" route-long-name)}
-             [leaflet/GeoJSON {:data date2-route-lines
-                               :onEachFeature (initialize-route-features 3)
-                               :style {:lineJoin "miter"
-                                       :lineCap "miter"
-                                       :color "red"
-                                       :weight 6}}])]]))}))
+           (when date1-route-lines
+             [ui/checkbox {:label (str "Näytä " date1 " (musta)")
+                           :checked (boolean date1-show?)
+                           :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
+           (when date2-route-lines
+             [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
+                           :checked (boolean date2-show?)
+                           :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
+           [ui/checkbox {:label "Näytä pysäkit"
+                         :checked (boolean show-stops?)
+                         :on-check #(e! (tv/->ToggleRouteDisplayStops))}]
+           [leaflet/Map {:ref "leaflet"
+                         :center #js [65 25]
+                         :zoomControl true
+                         :zoom 5}
+            (leaflet/background-tile-map)
+            (when show-date1?
+              ^{:key (str date1 "_" route-short-name "_" route-long-name)}
+              [leaflet/GeoJSON {:data date1-route-lines
+                                :onEachFeature (initialize-route-features -3)
+                                :style {:lineJoin "miter"
+                                        :lineCap "miter"
+                                        :color "black"
+                                        :weight 6}}])
+            (when show-date2?
+              ^{:key (str date2 "_" route-short-name "_" route-long-name)}
+              [leaflet/GeoJSON {:data date2-route-lines
+                                :onEachFeature (initialize-route-features 3)
+                                :style {:lineJoin "miter"
+                                        :lineCap "miter"
+                                        :color "red"
+                                        :weight 6}}])]]))})))
 
 (defn stop-listing [trips]
   [:div {:style {:width "100%"}}
