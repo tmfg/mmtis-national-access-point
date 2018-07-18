@@ -6,7 +6,8 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.util.url :as url-util]
-            [ote.util.fn :refer [flip]]))
+            [ote.util.fn :refer [flip]]
+            [ote.app.routes :as routes]))
 
 
 (defrecord UpdateSearchFilters [filters])
@@ -15,13 +16,23 @@
 (defrecord FacetsResponse [facets])
 (defrecord FetchMore [])
 
-(defrecord ShowServiceGeoJSON [url])
+(defrecord FetchServiceGeoJSON [url])
 (defrecord CloseServiceGeoJSON [])
 (defrecord GeoJSONFetched [response])
 (defrecord SetOperatorName [name])
 (defrecord OperatorCompletionsResponse [completions name])
 (defrecord AddOperator [business-id operator])
 (defrecord RemoveOperatorById [id])
+
+(defrecord SaveScrollPosition [])
+(defrecord RestoreScrollPosition [])
+
+(defmethod routes/on-navigate-event :service [{{:keys [transport-operator-id transport-service-id]} :params}]
+  (->FetchServiceGeoJSON (str js/document.location.protocol "//" js/document.location.host
+                              "/export/geojson/" transport-operator-id "/" transport-service-id)))
+
+(defmethod routes/on-navigate-event :services [_]
+  (->InitServiceSearch))
 
 (defn- search-params [{operators :operators
                        oa ::t-service/operation-area
@@ -88,12 +99,20 @@
 
   InitServiceSearch
   (process-event [_ app]
-    (comm/get! "service-search/facets"
-               {:on-success (tuck/send-async! ->FacetsResponse)})
-    ;; Immediately do a search without any parameters
-    (search (update-in app [:service-search :filters] merge
-                       {:limit page-size :offset 0})
-            false 0))
+    (if (seq (get-in app [:service-search :results]))
+      ;; We have already been in service search and coming back
+      ;; Don't fetch things again (we may be returning back from
+      ;; a service page.
+      app
+
+      ;; Otherwise fetch facets and do a search
+      (do
+        (comm/get! "service-search/facets"
+                   {:on-success (tuck/send-async! ->FacetsResponse)})
+        ;; Immediately do a search without any parameters
+        (search (update-in app [:service-search :filters] merge
+                           {:limit page-size :offset 0})
+                false 0))))
 
   FetchMore
   (process-event [_ app]
@@ -140,7 +159,7 @@
                 :fetching-more? false
                 :filter-service-count filter-service-count))))
 
-  ShowServiceGeoJSON
+  FetchServiceGeoJSON
   (process-event [{:keys [url]} app]
     (comm/get! "viewer" {:params {:url url}
                          :on-success (tuck/send-async! ->GeoJSONFetched)
@@ -194,4 +213,14 @@
                (fn [results]
                  (filterv
                    (fn [x] (not= id (get x :business-id)))
-                   results)))))
+                   results))))
+
+  SaveScrollPosition
+  (process-event [_ app]
+    (update app :service-search assoc :scroll-position js/window.scrollY))
+
+  RestoreScrollPosition
+  (process-event [_ app]
+    (when-let [p (get-in app [:service-search :scroll-position])]
+      (.scrollTo js/window 0 p))
+    (update app :service-search dissoc :scroll-position)))

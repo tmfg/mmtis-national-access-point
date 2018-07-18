@@ -146,13 +146,8 @@
                             (and service-companies (empty? companies)) service-companies
                             :else companies)
         open-link (fn [content]
-                    [:a {:style    (merge {:color "#fff"} style/result-card-header-link)
-                         :href     "#"
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (ss/->ShowServiceGeoJSON
-                                            (str js/document.location.protocol "//" js/document.location.host
-                                                 "/export/geojson/" transport-operator-id "/" id))))}
+                    [:a {:style (merge {:color "#fff"} style/result-card-header-link)
+                         :href (str "/#/service/" transport-operator-id "/" id)}
                      content])
         card-padding (if (< card-width 767) "15px" "30px")]
     [:div.result-card (stylefy/use-style style/result-card)
@@ -383,31 +378,26 @@
       filters]]))
 
 
-(defn service-search [e! app]
-  (e! (ss/->InitServiceSearch))
-  (fn [e! {{results :results
-            resource :resource
-            geojson :geojson
-            loading-geojson? :loading-geojson?
-            :as service-search} :service-search
-           params :params
-           :as app}]
-    [:div.service-search
-     (when (or geojson loading-geojson?)
-       [ui/dialog {:title (str (get-in resource ["features" 0 "properties" "transport-service" "name"]) " GeoJSON")
-                   :open true
-                   :modal false
-                   :content-style {:width "80%" :max-width "none"}
-                   :auto-scroll-body-content true
-                   :on-request-close #(e! (ss/->CloseServiceGeoJSON))
-                   :actions [(r/as-element
-                               [ui/flat-button {:on-click #(e! (ss/->CloseServiceGeoJSON))
-                                                :primary true}
-                                (tr [:buttons :close])])]}
-        [ckan-service-viewer/viewer e! {:resource resource
-                                        :geojson geojson
-                                        :loading? loading-geojson?}]])
-     [filters-form e! service-search]
-     (if (nil? results)
-       [:div (tr [:service-search :no-filters])]
-       [results-listing e! app])]))
+(defn service-geojson [e! {:keys [resource geojson loading-geojson?]}]
+  [:div.service-geojson
+   [:span
+    [:h3 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
+              " GeoJSON")]
+
+    (when (false? loading-geojson?)
+      [ckan-service-viewer/viewer e! {:resource resource
+                                      :geojson geojson}])]])
+
+(defn service-search [e! _]
+  (r/create-class
+   {:component-will-unmount #(e! (ss/->SaveScrollPosition))
+    :component-did-mount #(e! (ss/->RestoreScrollPosition))
+    :reagent-render
+    (fn [e! {{results :results :as service-search} :service-search
+             params :params
+             :as app}]
+      [:div.service-search
+       [filters-form e! service-search]
+       (if (nil? results)
+         [:div (tr [:service-search :no-filters])]
+         [results-listing e! app])])}))
