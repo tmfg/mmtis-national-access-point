@@ -213,10 +213,10 @@
                           :border "none"}
                   :src url}]])})))
 
-
-(stylefy/keyframes "fade-out"
-                   [:from {:opacity 1}]
-                   [:to {:opacity 0 :visibility "hidden"}])
+(defonce keyframes
+  (stylefy/keyframes "fade-out"
+                     [:from {:opacity 1}]
+                     [:to {:opacity 0 :visibility "hidden"}]))
 
 
 (defn rotate-device-notice []
@@ -233,21 +233,19 @@
                               :width "100%"
                               :margin "auto"
                               :z-index 9999
-                              :animation "5s linear 5s forwards fade-out"
-                              :stylefy/media {{:orientation "landscape"} {:display "none"}}})
+                              :animation "5s cubic-bezier(0.550, 0.085, 0.680, 0.530) 3s forwards fade-out"
+                              ::stylefy/media {{:orientation "landscape"} {:display "none"}}})
 
      [:div (stylefy/use-style {:display "flex"
                                :align-items "center"
                                :justify-content "space-between"
                                :flex-flow "column"
                                :width "66%"
-                               :height "40%"
                                :max-width "400px"
                                :max-height "300px"
                                :text-align "center"
                                :border-radius "15px"
                                :border "1px solid black"
-                               :margin-left "-2.5rem"
                                :padding "1rem"
                                :background-color "rgba(255, 255, 255, 0.85)"})
       [icons/screen-rotation {:font-size "10rem"
