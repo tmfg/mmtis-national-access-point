@@ -1181,7 +1181,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :data-content-search-label "Interface content"
   :other-involved-companies "Other companies providing the service"
   :other-company " other company"
-  :show-all-information "Show all information"}
+  :show-all-information "Show all information"
+  :back-link "Back to service catalog"}
 
  :login
  {:label "Login credentials"

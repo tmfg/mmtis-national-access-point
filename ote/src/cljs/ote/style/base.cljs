@@ -106,6 +106,8 @@
 (def link-icon-container {:float "left" :padding-right "10px"})
 (def link-icon {:color "#06c" :height 18 :width 18})
 
+(def link-color "#2D75B4")
+
 (def filters-form
   {:border "solid 1px #0046ad"})
 

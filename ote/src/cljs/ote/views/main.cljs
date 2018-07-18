@@ -136,7 +136,10 @@
                   :edit-service [t-service/edit-service-by-id e! app]
                   :new-service [t-service/create-new-service e! app]
 
+                  ;; service catalog page
                   :services [service-search/service-search e! app]
+                  ;; show single service GeoJSON
+                  :service [service-search/service-geojson e! (:service-search app)]
 
                   :admin [admin/admin-panel e! app]
 
