@@ -43,13 +43,5 @@
           :label (tr [:route-wizard-page :basic-info-departure-point-name])}
          {:name  ::transit/destination-point-name
           :type  :localized-text
-          :label (tr [:route-wizard-page :basic-info-destination-point-name])}
-
-         ;; Availability of this route
-         {:name  ::transit/available-from
-          :type  :date-picker
-          :label (tr [:route-wizard-page :basic-info-available-from])}
-         {:name  ::transit/available-to
-          :type  :date-picker
-          :label (tr [:route-wizard-page :basic-info-available-to])})]
+          :label (tr [:route-wizard-page :basic-info-destination-point-name])})]
       route]]))

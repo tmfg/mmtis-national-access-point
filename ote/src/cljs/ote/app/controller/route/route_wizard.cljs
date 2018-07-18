@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.time :as time]
+            [cljs-time.coerce :as coerce]
             [clojure.string :as str]
             [ote.app.controller.route.gtfs :as route-gtfs]
             [ote.app.controller.front-page :as fp]
@@ -213,6 +214,21 @@
           ensure-service-calendars
           (update-in [:route ::transit/stops] (fnil conj []) new-stop)
           (calculate-trip-sequence new-stop-idx new-stop)))))
+
+(defn route-validity-dates [calendars]
+  (let [rule-dates (mapcat (fn [cal]
+                             (mapv
+                               (juxt
+                                 (comp coerce/to-long time/date-fields->date-time ::transit/from-date)
+                                 (comp coerce/to-long time/date-fields->date-time ::transit/to-date))
+                               (::transit/service-rules cal)))
+                           calendars)
+        from-dates (map first rule-dates)
+        to-dates (map second rule-dates)]
+
+    (when (and (seq from-dates) (seq to-dates))
+      [(js/Date. (apply min from-dates))
+       (js/Date. (apply max to-dates))])))
 
 (defn route-updated
   "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
@@ -561,14 +577,17 @@
   SaveToDb
   (process-event [{published? :published?} app]
     (let [calendars (mapv form/without-form-metadata (get-in app [:route ::transit/service-calendars]))
-          deduped-cals (into [] (distinct calendars))
+          distinct-cals (into [] (distinct calendars))
+          validity-dates (route-validity-dates distinct-cals)
           cals-indices (mapv #(first (keep-indexed
                                        (fn [i cal] (when (= cal %1) i))
-                                       deduped-cals)) calendars)
+                                       distinct-cals)) calendars)
           route (-> app :route form/without-form-metadata
-                    (assoc ::transit/service-calendars deduped-cals)
+                    (assoc ::transit/service-calendars distinct-cals)
                     (assoc ::transit/published? (or published? false))
                     (assoc ::transit/route-type :ferry)
+                    (assoc ::transit/available-from (first validity-dates))
+                    (assoc ::transit/available-to (second validity-dates))
                     (update ::transit/stops (fn [stop]
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
@@ -584,6 +603,7 @@
                                         (nth cals-indices (::transit/service-calendar-idx %)))
                               trips)))
                   route)]
+
       (comm/post! "routes/new" route
                   {:on-success (tuck/send-async! ->SaveRouteResponse)
                    :on-failure (tuck/send-async! ->SaveRouteFailure)})
