@@ -380,6 +380,7 @@
 
 (defn service-geojson [e! {:keys [resource geojson loading-geojson?]}]
   [:div.service-geojson
+   [common-ui/linkify "/#/services" (tr [:service-search :back-link])]
    [:span
     [:h3 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
               " GeoJSON")]
