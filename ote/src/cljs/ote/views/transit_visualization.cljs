@@ -119,7 +119,7 @@
                       (set! (.-visibility (aget icon "style"))
                             (if show? "" "hidden")))))))
 
-(defn- selected-route-map [_ _ _ {show-stops? :show-stops?}] ;; defaulttina päälle
+(defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
   (let [show?-atom (atom show-stops?)
         inhibit-zoom (atom false)
         update (fn [this]
