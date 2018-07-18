@@ -8,5 +8,6 @@
   "all_out"
   "train"
   "developer_mode"
+  "arrow_back"
   ;; Add more font icons here
   )

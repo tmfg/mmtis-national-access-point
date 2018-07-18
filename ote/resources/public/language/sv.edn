@@ -1179,7 +1179,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :data-content-search-label "Gränssnittsinnehåll"
   :other-involved-companies "De företag som producerar tjänsten"
   :other-company " annat företag"
-  :show-all-information "Visa alla data"}
+  :show-all-information "Visa alla data"
+  :back-link "Tillbaka till tjänstekatalog"}
 
  :login
  {:label "Inloggning"

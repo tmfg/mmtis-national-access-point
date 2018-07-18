@@ -1193,7 +1193,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :data-content-search-label "Rajapinnan sisältö"
   :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
   :other-company " muuta yritystä"
-  :show-all-information "Näytä kaikki tiedot"}
+  :show-all-information "Näytä kaikki tiedot"
+  :back-link "Takaisin liikkumispalvelukatalogiin"}
 
  :login
  {:label "Kirjaudu palveluun"
