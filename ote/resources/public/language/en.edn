@@ -898,6 +898,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :loading                                    "Loading"
   :language                                   "Language"
 
+  :rotate-device-90 "Rotate device 90° to get the best user experience."
+
   :hours-placeholder "hh"
   :minutes-placeholder "mm"
 

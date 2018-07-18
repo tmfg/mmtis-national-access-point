@@ -251,4 +251,4 @@
       [icons/screen-rotation {:font-size "10rem"
                               :color "#969696"
                               :margin-bottom "1rem"}]
-      [:span "Käännä laitetta 90° saavuttaaksesi parhaan käyttökokemuksen"]]]))
+      [:span (tr [:common-texts :rotate-device-90])]]]))

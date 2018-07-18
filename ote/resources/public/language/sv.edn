@@ -899,6 +899,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :loading "Ladda"
   :language "Språk"
 
+  :rotate-device-90 "Vrid enheten 90 ° för att få den bästa användarupplevelsen."
+
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
