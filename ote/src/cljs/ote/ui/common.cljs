@@ -6,6 +6,7 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.form :as style-form]
+            [ote.ui.icons :as icons]
             [reagent.core :as r]
             [clojure.string :as str]
             [reagent.core :as reagent]
@@ -211,3 +212,43 @@
                           :height "400px"
                           :border "none"}
                   :src url}]])})))
+
+(defonce keyframes
+  (stylefy/keyframes "fade-out"
+                     [:from {:opacity 1}]
+                     [:to {:opacity 0 :visibility "hidden"}]))
+
+
+(defn rotate-device-notice []
+  (when mobile?
+    [:div (stylefy/use-style {:display "flex"
+                              :align-items "center"
+                              :justify-content "center"
+                              :position "fixed"
+                              :opacity 1
+                              :visibility "visible"
+                              :top 0
+                              :left 0
+                              :height "100%"
+                              :width "100%"
+                              :margin "auto"
+                              :z-index 9999
+                              :animation "5s cubic-bezier(0.550, 0.085, 0.680, 0.530) 3s forwards fade-out"
+                              ::stylefy/media {{:orientation "landscape"} {:display "none"}}})
+
+     [:div (stylefy/use-style {:display "flex"
+                               :align-items "center"
+                               :justify-content "space-between"
+                               :flex-flow "column"
+                               :width "66%"
+                               :max-width "400px"
+                               :max-height "300px"
+                               :text-align "center"
+                               :border-radius "15px"
+                               :border "1px solid black"
+                               :padding "1rem"
+                               :background-color "rgba(255, 255, 255, 0.85)"})
+      [icons/screen-rotation {:font-size "10rem"
+                              :color "#969696"
+                              :margin-bottom "1rem"}]
+      [:span (tr [:common-texts :rotate-device-90])]]]))
