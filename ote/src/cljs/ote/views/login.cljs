@@ -47,7 +47,7 @@
                  :padding "0.5em"
                  :background-color "#f5f5f5"}}
    [:div
-    [:h5 (tr [:login :no-account?])]
+    [:h5 {:style {:margin-top "0.5rem"}} (tr [:login :no-account?])]
     [:div (tr [:login :no-account-help])]
     [linkify "#/register" (tr [:login :no-account-button])]]
 
