@@ -382,7 +382,9 @@
 (defn service-geojson [e! {:keys [resource geojson loading-geojson?]}]
   [:div.service-geojson
    [common-ui/linkify "/#/services" [:span [icons/arrow-back {:position "relative"
-                                                              :top "6px"}]
+                                                              :top "6px"
+                                                              :padding-right "5px"
+                                                              :color "#2D75B4;"}]
                                      (tr [:service-search :back-link])]]
    [:span
     [:h3 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
