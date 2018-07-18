@@ -11,6 +11,7 @@
             [ote.ui.common :as common-ui]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.icons :as icons]
             [ote.app.controller.service-search :as ss]
             [ote.style.base :as style-base]
             [ote.style.service-search :as style]
@@ -380,7 +381,9 @@
 
 (defn service-geojson [e! {:keys [resource geojson loading-geojson?]}]
   [:div.service-geojson
-   [common-ui/linkify "/#/services" (tr [:service-search :back-link])]
+   [common-ui/linkify "/#/services" [:span [icons/arrow-back {:position "relative"
+                                                              :top "6px"}]
+                                     (tr [:service-search :back-link])]]
    [:span
     [:h3 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
               " GeoJSON")]
