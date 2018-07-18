@@ -194,7 +194,8 @@
               :date2-trips nil
               :route-short-name route-short-name
               :route-long-name route-long-name
-              :trip-headsign trip-headsign)))))
+              :trip-headsign trip-headsign
+              :show-stops? true)))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
