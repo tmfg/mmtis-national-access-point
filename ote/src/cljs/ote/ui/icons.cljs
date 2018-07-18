@@ -8,5 +8,6 @@
   "all_out"
   "train"
   "developer_mode"
+  "screen_rotation"
   ;; Add more font icons here
   )
