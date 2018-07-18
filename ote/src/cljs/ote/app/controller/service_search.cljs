@@ -17,7 +17,6 @@
 (defrecord FetchMore [])
 
 (defrecord FetchServiceGeoJSON [url])
-(defrecord CloseServiceGeoJSON [])
 (defrecord GeoJSONFetched [response])
 (defrecord SetOperatorName [name])
 (defrecord OperatorCompletionsResponse [completions name])
@@ -100,8 +99,8 @@
   InitServiceSearch
   (process-event [_ app]
     (if (seq (get-in app [:service-search :results]))
-      ;; We have already been in service search and coming back
-      ;; Don't fetch things again (we may be returning back from
+      ;; We have already been in service search and coming back.
+      ;; Don't fetch things again as we may be returning back from
       ;; a service page.
       app
 
@@ -168,10 +167,6 @@
             :resource nil
             :geojson nil
             :loading-geojson? true))
-
-  CloseServiceGeoJSON
-  (process-event [_ app]
-    (update app :service-search dissoc :resource :geojson :loading-geojson?))
 
   GeoJSONFetched
   (process-event [{response :response} app]
