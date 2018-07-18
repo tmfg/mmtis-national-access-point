@@ -108,7 +108,8 @@
     {:name ::t-operator/business-id
      :type :string
      :validate [[:business-id]]
-     :required? true}
+     :required? true
+     :hint-text "1234567-8"}
 
     {:name ::common/street
      :type :string

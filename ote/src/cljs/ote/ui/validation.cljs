@@ -124,8 +124,7 @@
                      (= "-" separator)
                      (nil? check-part))
         (or message
-            ;; FIXME: use tr to translate
-            "Y-tunnuksen pitää olla 7 numeroa, väliviiva, ja tarkastusnumero.")))))
+            (tr [:common-texts :invalid-business-id]))))))
 
 ;; Valid Finnish postal-code
 (defmethod validate-rule :postal-code [_ _ data _ _ & [message]]
