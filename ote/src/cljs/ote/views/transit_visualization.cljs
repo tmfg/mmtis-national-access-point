@@ -98,15 +98,15 @@
 
 (defn- initialize-route-features
   "Bind popup content and set marker icon for stop marker features."
-  [offset]
+  [offset [w h]]
   (fn [feature ^js/L.Layer layer]
     (if-let [name (aget feature "properties" "name")]
       ;; This features is a stop marker
       (do
         (aset (aget layer "options") "icon"
               (js/L.icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
-                               :iconSize #js [20 20]
-                               :iconAnchor #js [10 10]}))
+                               :iconSize #js [w h]
+                               :iconAnchor #js [(int (/ w 2)) (int (/ h 2))]}))
         (.bindPopup layer name))
       ;; This feature has no name, it is the route line, apply pixel offset
       (.call (aget layer "setOffset") layer offset))))
@@ -126,10 +126,16 @@
                  (update-marker-visibility this show?-atom)
                  (when-not @inhibit-zoom
                    (leaflet/update-bounds-from-layers this))
-                 (reset! inhibit-zoom false))]
+                 (reset! inhibit-zoom false))
+        zoom-level (r/atom 5)]
     (r/create-class
      {:component-did-update update
-      :component-did-mount update
+      :component-did-mount (fn [this]
+                             (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
+                               (.on m "zoomend" #(do
+                                                   (reset! inhibit-zoom true)
+                                                   (reset! zoom-level (.getZoom m)))))
+                             (update this))
       :component-will-receive-props
       (fn [this [_ _ _ _ {show-stops? :show-stops?}]]
         ;; This is a bit of a kludge, but because the stops are in the
@@ -147,7 +153,12 @@
         (let [show-date1? (and date1-show?
                                (not (empty? (get date1-route-lines "features"))))
               show-date2? (and date2-show?
-                               (not (empty? (get date2-route-lines "features"))))]
+                               (not (empty? (get date2-route-lines "features"))))
+              zoom @zoom-level
+              [line-weight offset icon-size] (cond
+                                               (< zoom 12) [3 2 [10 10]]
+                                               (< zoom 14) [5 2 [14 14]]
+                                               :default    [6 3 [20 20]])]
           [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
            (when date1-route-lines
@@ -167,21 +178,21 @@
                          :zoom 5}
             (leaflet/background-tile-map)
             (when show-date1?
-              ^{:key (str date1 "_" route-short-name "_" route-long-name)}
+              ^{:key (str date1 "_" route-short-name "_" route-long-name "_" zoom)}
               [leaflet/GeoJSON {:data date1-route-lines
-                                :onEachFeature (initialize-route-features -3)
+                                :onEachFeature (initialize-route-features (- offset) icon-size)
                                 :style {:lineJoin "miter"
                                         :lineCap "miter"
                                         :color "black"
-                                        :weight 6}}])
+                                        :weight line-weight}}])
             (when show-date2?
-              ^{:key (str date2 "_" route-short-name "_" route-long-name)}
+              ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
               [leaflet/GeoJSON {:data date2-route-lines
-                                :onEachFeature (initialize-route-features 3)
+                                :onEachFeature (initialize-route-features offset icon-size)
                                 :style {:lineJoin "miter"
                                         :lineCap "miter"
                                         :color "red"
-                                        :weight 6}}])]]))})))
+                                        :weight line-weight}}])]]))})))
 
 (defn stop-listing [stops]
   [:table
