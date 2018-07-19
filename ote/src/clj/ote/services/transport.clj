@@ -116,7 +116,7 @@
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (get-transport-services db {::t-service/transport-operator-id (op/in operator-ids)})]
-    {:user (dissoc user :apikey :email :id)
+    {:user (dissoc user :apikey :id)
      :transport-operators
      (map (fn [{id ::t-operator/id :as operator}]
             {:transport-operator operator
