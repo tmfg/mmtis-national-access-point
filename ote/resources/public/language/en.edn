@@ -1206,7 +1206,8 @@ You can also draw the operating area or point to the map with drawing tools. You
            :name "Full Name"
            :email "Email"
            :password "Password"
-           :confirm "Re-enter password"}
+           :confirm "Re-enter password"
+           :current-password "Current password"}
   :placeholder {:username "username"
                 :name "Joe Bloggs"
                 :email "joe@example.com"}
@@ -1216,7 +1217,8 @@ You can also draw the operating area or point to the map with drawing tools. You
            :email-taken "Email already exists"
            :logged-in ["You are already logged in as: " :name]
            :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
-  }
+  :confirm-changes "Confirm changes"
+  :change-password "Change password"}
 
  :gtfs-viewer
  {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}

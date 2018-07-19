@@ -1193,8 +1193,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :data-content-search-label "Rajapinnan sisältö"
   :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
   :other-company " muuta yritystä"
-  :show-all-information "Näytä kaikki tiedot"
-  :back-link "Takaisin liikkumispalvelukatalogiin"}
+  :show-all-information "Näytä kaikki tiedot"}
 
  :login
  {:label "Kirjaudu palveluun"
@@ -1220,8 +1219,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :name "Oma nimi"
            :email "Sähköposti"
            :password "Salasana"
-           :confirm "Syötä salasana uudelleen"}
-  :placeholder {:username "käyttäjänimi"
+           :confirm "Syötä salasana uudelleen"
+           :current-password "Nykyinen salasana"}
+  :placeholder {:username "matti"
                 :name "Matti Meikäläinen"
                 :email "matti@example.com"}
   :errors {:passwords-must-match "Antamasi salasana ei vastaa edellisen kentän salasanaa"
@@ -1230,8 +1230,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :email-taken "Tälle sähköpostiosoitteelle on jo käyttäjätili"
            :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
            :password-not-valid "Pituus vähintään 6 merkkiä. Salasanan tulee sisältää kirjaimia ja vähintään yksi numero."}
-
-  }
+  :confirm-changes "Varmista muutokset"
+  :change-password "Vaihda salasana"}
 
   :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
