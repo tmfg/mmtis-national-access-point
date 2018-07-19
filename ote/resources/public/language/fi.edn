@@ -880,6 +880,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
+  :invalid-business-id                        "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
   :invalid-file-type                          "Virheellinen tiedostotyyppi"
   :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
