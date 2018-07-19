@@ -22,6 +22,7 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.login :as login]
+            [ote.views.user :as user]
             [ote.views.admin :as admin]
             [ote.views.operators :as operators]
             [ote.views.route.route-list :as route-list]
@@ -126,6 +127,7 @@
                 (case (:page app)
                   :login [login/login e! (:login app)]
                   :register [register/register e! (:register app) (:user app)]
+                  :user [user/user e! (:user app)]
                   :front-page [fp/front-page e! app]
                   :own-services [fp/own-services e! app]
                   :transport-service [t-service/select-service-type e! app]

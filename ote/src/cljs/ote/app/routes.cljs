@@ -16,6 +16,7 @@
    [["/" :front-page]
     ["/login" :login]
     ["/register" :register]
+    ["/user" :user]
     ["/own-services" :own-services]
     ["/transport-operator" :transport-operator]
     ["/transport-operator/:id" :transport-operator]
