@@ -27,7 +27,7 @@
        [:li [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf"
              [:div {:style {:height "30px"}} [:span [ic/notification-sms-failed {:style style-front-page/footer-small-icon}] (tr [:common-texts :user-menu-nap-help])]] {:target "_blank"}]]
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
-             [:div {:style {:height "30px"}} [:span [ic/action-code {:style style-front-page/footer-small-icon}] "Developers"]] {:target "_blank"}]]
+             [:div {:style {:height "30px"}} [:span [ic/action-code {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-for-developers])]] {:target "_blank"}]]
        [:li [linkify "http://bit.ly/nap-palaute"
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]]
        [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"

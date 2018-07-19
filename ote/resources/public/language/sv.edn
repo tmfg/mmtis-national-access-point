@@ -861,7 +861,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-authority-pre-notices           "Inkomna ändringsmeddelanden"
   :navigation-privacy-policy                  "Registerbeskrivning"
   :navigation-general-menu                    "Meny"
-  :navigation-for-developers                  "Programmeringsgränssnitt för utvecklare\n"
+  :navigation-for-developers                  "Programmeringsgränssnitt för utvecklare"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"

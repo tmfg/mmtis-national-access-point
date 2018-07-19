@@ -860,7 +860,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-authority-pre-notices           "Saapuneet ilmoitukset"
   :navigation-privacy-policy                  "Privacy Policy"
   :navigation-general-menu                    "Menu"
-  :navigation-for-developers                  "For developers"
+  :navigation-for-developers                  "API for developers"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"
   :user-menu-log-out                          "Log out"
