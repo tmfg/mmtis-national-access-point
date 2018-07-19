@@ -10,9 +10,6 @@
 
             [ote.db.user :as user]))
 
-(let [c (atom 0)]
-  (defn always-update [_]
-    (swap! c inc)))
 
 ;; PENDING:
 ;; This form has a new ":show-errors?" flag in the schemas that only
@@ -25,13 +22,9 @@
   (let [edited (r/atom #{}) ; keep track of blurred fields
         edit! #(swap! edited conj %)]
     (fn [e! {:keys [form-data email-taken username-taken] :as register} user]
-      [:div {:style {:margin-top "40px"
-                     :display "flex"
-                     :flex-direction "column"
-                     :align-items "center"
-                     :width "100%"}}
+      [:div
        [:div.col-xs-12.col-md-6
-        [:h2 (tr [:register :label])]
+        [:h1 (tr [:register :label])]
         [form/form
          {:update! #(e! (lc/->UpdateRegistrationForm %))
           :name->label (tr-key [:register :fields])
@@ -45,7 +38,7 @@
                          (tr [:register :label])]])
           :hide-error-until-modified? true}
          [(form/group
-           {:expandable? false :columns 3}
+           {:expandable? false :columns 3 :card? false :layout :raw}
            {:name :username :type :string :required? true :full-width? true
             :placeholder (tr [:register :placeholder :username])
             :validate [(fn [data _]
@@ -60,7 +53,7 @@
             :show-errors? (or (and username-taken
                                    (username-taken (:username form-data)))
                               (@edited :username))
-            :should-update-check always-update}
+            :should-update-check form/always-update}
            {:type :component
             :name :spacer
             :component (fn [_]
@@ -69,7 +62,7 @@
             :placeholder (tr [:register :placeholder :name])
             :on-blur #(edit! :name)
             :show-errors? (@edited :name)
-            :should-update-check always-update}
+            :should-update-check form/always-update}
            {:name :email :type :string :autocomplete "email" :required? true
             :full-width? true :placeholder (tr [:register :placeholder :email])
             :validate [(fn [data _]
@@ -82,7 +75,7 @@
             :show-errors? (or (and email-taken
                                    (email-taken (:email form-data)))
                               (@edited :email))
-            :should-update-check always-update}
+            :should-update-check form/always-update}
            {:name :password :type :string :password? true :required? true
             :full-width? true
             :validate [(fn [data _]
@@ -90,7 +83,7 @@
                            (tr [:register :errors :password-not-valid])))]
             :on-blur #(edit! :password)
             :show-errors? (@edited :password)
-            :should-update-check always-update}
+            :should-update-check form/always-update}
            {:name :confirm :type :string :password? true :required? true
             :full-width? true
             :validate [(fn [data row]
@@ -98,5 +91,5 @@
                            (tr [:register :errors :passwords-must-match])))]
             :on-blur #(edit! :confirm)
             :show-errors? (@edited :confirm)
-            :should-update-check always-update})]
+            :should-update-check form/always-update})]
          form-data]]])))
