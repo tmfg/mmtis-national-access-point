@@ -105,10 +105,8 @@
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
-                       {:href     "#"
-                        :on-click #(do (.preventDefault %)
-                                       (e! (fp-controller/->OpenUserMenu))
-                                       (e! (fp-controller/->ToggleUserEditDialog)))})
+                       {:href     "#/user"
+                        :on-click #(e! (fp-controller/->OpenUserMenu))})
              (tr [:common-texts :user-menu-profile])]]
            [:li
             [:a (merge (stylefy/use-style

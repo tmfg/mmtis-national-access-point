@@ -190,8 +190,3 @@
   (assoc app
          :show-reset-dialog? false
          :flash-message (tr [:login :check-email-for-link])))
-
-(define-event ToggleUserEditDialog []
-  {}
-  (get-transport-operator-data
-   (update app :show-user-edit-dialog? not)))

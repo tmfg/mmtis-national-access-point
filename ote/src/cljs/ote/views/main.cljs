@@ -56,8 +56,7 @@
   ;; Render as an empty span
   [:span])
 
-(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog?
-                               show-user-edit-dialog? user]}]
+(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog? user]}]
   [:span
 
    (when show-register-dialog?
@@ -76,14 +75,7 @@
       (tr [:login :forgot-password?])
       "/user/reset"
       #(e! (fp-controller/->ToggleUserResetDialog))
-      #(e! (fp-controller/->UserResetRequested))])
-
-   (when show-user-edit-dialog?
-     ^{:key "ckan-user-edit"}
-     [ckan-iframe-dialog
-      (tr [:common-texts :user-menu-profile])
-      (str "/user/edit/" (:username user))
-      #(e! (fp-controller/->ToggleUserEditDialog))])])
+      #(e! (fp-controller/->UserResetRequested))])])
 
 (defn- scroll-to-page
   "Invisible component that scrolls to the top of the window whenever it is mounted."
