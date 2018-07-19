@@ -13,15 +13,17 @@
   [content to]
   #?(:cljs (let [zip (js/JSZip.)]
              (doseq [{:keys [name data]} content]
-               (.file zip name data))
+               (when data
+                 (.file zip name data)))
              (-> zip
                  (.generateAsync #js {:type "blob"})
                  (.then #(js/saveAs % to))))
      :clj (with-open [out (ZipOutputStream. to)]
             (doseq [{:keys [name data]} content]
-              (.putNextEntry out (ZipEntry. name))
-              (.write out (.getBytes data "UTF-8"))
-              (.closeEntry out)))))
+              (when data
+                (.putNextEntry out (ZipEntry. name))
+                (.write out (.getBytes data "UTF-8"))
+                (.closeEntry out))))))
 
 
 

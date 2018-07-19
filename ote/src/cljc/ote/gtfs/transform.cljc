@@ -9,6 +9,10 @@
             [taoensso.timbre :as log]
             [ote.time :as time]))
 
+;; NOTE: In case we have service calendars that have no rules, but only date additions, we'll use
+;; service_id 0 everywhere by default.
+
+
 (defn- agency-txt [{::t-operator/keys [id name homepage phone email] :as transport-operator}]
   [{:gtfs/agency-id id
     :gtfs/agency-name name
@@ -78,7 +82,9 @@
   (reduce
    (fn [services date]
      (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
-           service-idx (or (index-of #(not ((:rule-dates %) df)) services) 0)]
+           service-idx (or
+                         (index-of #(not ((or (:rule-dates %) #{}) df)) services)
+                         0)]
        (update-in services [service-idx :added-dates] (fnil conj #{}) (time/date-fields->date df))))
    services dates))
 
@@ -86,16 +92,19 @@
   "Generate GTFS services from service calendars. One service calendar can be
   expanded to multiple services."
   [{::transit/keys [service-calendars id]}]
+
   (for [{::transit/keys [service-rules service-added-dates service-removed-dates]
          service-calendar-id :service-calendar-id}
         (index-key :service-calendar-id str service-calendars)]
     ;; GTFS has 1 rule per service id, we need to create as many
     ;; services as there are rules, and distribute added/removed dates between them
+
     (-> (for [{::transit/keys [monday tuesday wednesday thursday
                                friday saturday sunday]
                :as service} (index-key :gtfs/service-id
                                        #(str id "_" service-calendar-id "_" %)
                                        service-rules)]
+
           {:rule-dates (into #{} (transit/rule-dates service))
            :gtfs/service-id (:gtfs/service-id service)
            :gtfs/monday (boolean monday)
@@ -121,7 +130,7 @@
                 (for [{service-id :gtfs/service-id} (nth services service-calendar-idx)]
                   {:gtfs/route-id id
                    :gtfs/trip-id (str id "_" i)
-                   :gtfs/service-id service-id}))
+                   :gtfs/service-id (or service-id 0)}))
               trips)))
    routes))
 
@@ -142,11 +151,11 @@
                       :as s}]
                   (concat
                    (for [d added-dates]
-                     {:gtfs/service-id service-id
+                     {:gtfs/service-id (or service-id 0)
                       :gtfs/date d
                       :gtfs/exception-type "1"})
                    (for [d removed-dates]
-                     {:gtfs/service-id service-id
+                     {:gtfs/service-id (or service-id 0)
                       :gtfs/date d
                       :gtfs/exception-type "2"})))
                 services))

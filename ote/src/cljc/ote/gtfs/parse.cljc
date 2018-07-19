@@ -161,9 +161,12 @@ This is only called with GTFS field names and cannot grow unbounded."}
 
 (defn unparse-gtfs-file [gtfs-file-type content]
   (let [{:keys [header fields]} (file-info gtfs-file-type)]
-    (str header "\n"
-         (csv->string
-          (mapv (fn [row]
-                  (mapv #(clj->gtfs (field-spec-description %) (get row %))
-                        fields))
-                content)))))
+
+    ;; If we have no content, do not try to create file data.
+    (when (seq (first content))
+      (str header "\n"
+           (csv->string
+             (mapv (fn [row]
+                     (mapv #(clj->gtfs (field-spec-description %) (get row %))
+                           fields))
+                   content))))))
