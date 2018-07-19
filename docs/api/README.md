@@ -101,6 +101,11 @@ Please note that "external-interface" links obtained from exported NAP GeoJSON s
 
 The Finnish Transport Agency assumes no responsibility for the correctness of the transport service information obtained by using the FINAP Service Catalog API.  If you encounter errors other than technical problems with service search API or the format of responses, please contact the service provider in question.
 
+### GeoJSON schema
+
+The up to date (json-schema)[http://json-schema.org/] of the GeoJSON is always available at `https://finap.fi/export/geojson/transport-service.schema.json`. The does not define the GeoJSON structures of the geometries, as those are in the GeoJSON specification. The schema contains the all the properties (and their values, like enums) of the different transport-service types. 
+
+
 ### Example GeoJSON output
 
 The following is a simple output example output for a terminal service.
