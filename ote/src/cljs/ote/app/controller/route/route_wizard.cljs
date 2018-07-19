@@ -216,19 +216,20 @@
           (calculate-trip-sequence new-stop-idx new-stop)))))
 
 (defn route-validity-dates [calendars]
-  (let [rule-dates (mapcat (fn [cal]
-                             (mapv
+  (let [date-fields->long (comp coerce/to-long time/date-fields->date-time)
+        rule-dates (mapcat (fn [cal]
+                             (mapcat
                                (juxt
-                                 (comp coerce/to-long time/date-fields->date-time ::transit/from-date)
-                                 (comp coerce/to-long time/date-fields->date-time ::transit/to-date))
+                                 (comp date-fields->long ::transit/from-date)
+                                 (comp date-fields->long ::transit/to-date))
                                (::transit/service-rules cal)))
                            calendars)
-        from-dates (map first rule-dates)
-        to-dates (map second rule-dates)]
+        added-dates (mapcat #(mapv date-fields->long (::transit/service-added-dates %)) calendars)
+        dates (distinct (concat rule-dates added-dates))]
 
-    (when (and (seq from-dates) (seq to-dates))
-      [(js/Date. (apply min from-dates))
-       (js/Date. (apply max to-dates))])))
+    (when (seq dates)
+      [(js/Date. (apply min dates))
+       (js/Date. (apply max dates))])))
 
 (defn route-updated
   "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."

@@ -120,6 +120,8 @@
     ;; This will prevent page render with "wrong" or "empty" transport-service data
     (when (= (get-in app [:params :id]) (str (get-in app [:transport-service ::t-service/id])))
       [:div
+       [ui-common/rotate-device-notice]
+
        [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
        ;; Passenger transport service has sub type, and here it is shown to users
        (when (= :passenger-transportation (keyword (::t-service/type service)))
@@ -132,6 +134,7 @@
        ;; Render the form
        [edit-service e! (::t-service/type service) app]])))
 
+
 (defn create-new-service
   "Render container and headers for empty service form"
   [e! app]
@@ -141,7 +144,9 @@
           new-header-text (new-service-header-text service-type)]
 
       [:div
-       [:h1 new-header-text ]
+       [ui-common/rotate-device-notice]
+
+       [:h1 new-header-text]
        ;; Passenger transport service has sub type, and here it is shown to users
        (when (= :passenger-transportation service-type)
          [:p (stylefy/use-style style-form/subheader)

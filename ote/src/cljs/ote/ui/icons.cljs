@@ -9,5 +9,6 @@
   "train"
   "developer_mode"
   "arrow_back"
+  "screen_rotation"
   ;; Add more font icons here
   )
