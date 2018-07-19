@@ -1,4 +1,5 @@
 (ns ote.app.controller.login
+  "Login, register and user edit controller"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
@@ -144,31 +145,52 @@
       (update :email (fnil str/trim ""))
       (update :username (fnil str/trim ""))))
 
-(define-event RegisterResponse [response]
-  {}
-  (let [{:keys [success? username-taken email-taken]} response]
+(defn- handle-user-save-response [app key response]
+  (let [{:keys [success? username-taken email-taken password-incorrect?]} response]
     (if success?
       (login-navigate->page app response)
       (-> app
-          (update-in [:register :username-taken]
+          (update-in [key :username-taken]
                      #(if username-taken
                         (conj (or % #{}) username-taken)
                         %))
-          (update-in [:register :email-taken]
+          (update-in [key :email-taken]
                      #(if email-taken
                         (conj (or % #{}) email-taken)
                         %))
+          (assoc-in [key :password-incorrect?] password-incorrect?)
           (assoc :flash-message-error
-                 (if (or username-taken email-taken)
+                 (if (or username-taken email-taken password-incorrect?)
                    ;; Expected form errors, don't show snackbar
                    nil
 
                    ;; Unexpected failure, show server error message
                    (tr [:common-texts :server-error])))))))
 
+(define-event RegisterResponse [response]
+  {}
+  (handle-user-save-response app :register response))
+
 (define-event Register [form-data]
   {}
   (comm/post! "register" form-data
               {:on-success (tuck/send-async! ->RegisterResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(define-event UpdateUser [user]
+  {:path [:user]}
+  (-> app
+      (assoc :form-data user)
+      (dissoc :password-incorrect?)))
+
+(define-event SaveUserResponse [response]
+  {}
+  (handle-user-save-response app :user response))
+
+(define-event SaveUser [form-data]
+  {}
+  (comm/post! "save-user" form-data
+              {:on-success (tuck/send-async! ->SaveUserResponse)
                :on-failure (tuck/send-async! ->ServerError)})
   app)
