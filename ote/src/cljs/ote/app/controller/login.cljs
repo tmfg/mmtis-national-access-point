@@ -195,9 +195,10 @@
                :on-failure (tuck/send-async! ->ServerError)})
   app)
 
-(define-event CancelUserEdit []
+(define-event CancelUserEdit [navigate-back?]
   {:path [:user]}
-  (.back js/history)
+  (when navigate-back?
+    (.back js/history))
   (dissoc app
           :form-data
           :username-taken
