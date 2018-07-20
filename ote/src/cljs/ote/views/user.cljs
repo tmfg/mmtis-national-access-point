@@ -40,7 +40,9 @@
                                                    user
                                                    (form/without-form-metadata data))))
                                   :disabled (form/disable-save? data)}
-                    (tr [:buttons :save])]])}
+                    (tr [:buttons :save])]
+                   [buttons/cancel {:on-click #(e! (lc/->CancelUserEdit))}
+                    (tr [:buttons :cancel])]])}
     [(form/group
       {:expandable? false :columns 3 :layout :raw :card? false}
 
@@ -71,6 +73,7 @@
 
       (form/subtitle :h3 (tr [:register :change-password]) {:margin-top "3rem"})
       {:name :password :type :string :password? true
+       :label (tr [:register :fields :new-password])
        :full-width? true
        :validate [(fn [data _]
                     (when (and (not (str/blank? data))

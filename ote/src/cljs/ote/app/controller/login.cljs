@@ -194,3 +194,12 @@
               {:on-success (tuck/send-async! ->SaveUserResponse)
                :on-failure (tuck/send-async! ->ServerError)})
   app)
+
+(define-event CancelUserEdit []
+  {:path [:user]}
+  (.back js/history)
+  (dissoc app
+          :form-data
+          :username-taken
+          :email-taken
+          :password-incorrect?))

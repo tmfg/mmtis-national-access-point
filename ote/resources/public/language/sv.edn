@@ -1210,7 +1210,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :email "E-post"
            :password "Lösenord"
            :confirm "Bekräfta lösenord"
-           :current-password "Nuvarande lösenord"}
+           :current-password "Nuvarande lösenord"
+           :new-password "Ny lösenord"}
   :placeholder {:username "användarnamn"
                 :name "Medel-Svensson"
                 :email "medel-svensson@epost.se"}
