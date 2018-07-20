@@ -299,7 +299,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
   :trip-editor-no-calendar  "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
   :trip-editor-no-stop-sequence "Please add stop sequence."
-  :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
+  :pre-notice-attatchment-info "Give detailed information about the route and timetable changes in your personal transport. You can add a web address which from the changes can be recognized. Alternatively you can add  attachments to the form, which from the detailed changes of the transport can be recognized."
   :autocomplete-hint "Type your own or choose from the list"
   :allowed-file-types "Accepted file formats are "
 
@@ -339,7 +339,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :add-new-service-exception "Add a new row"
   :add-new-company "Add a new row"
   :add-new-route "Add a new sea traffic route"
-  :add-new-pre-notice "Add new 60 day pre notice"
+  :add-new-pre-notice "Add a new report of change"
   :discard "Cancel"
 
   :next "Next"
@@ -360,7 +360,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-calendar-back-to-trips "Back to the list of departures"
   :route-calendar-clear "Clear calendar"
   :back-to-draft  "Change back to draft"
-  :add-new-effective-date "Add new change date"
+  :add-new-effective-date "Add a new change date"
   :transport-service-catalog "Transport service catalog"
   :register-to-service "Register"
   :check-out-the-service "Explore the information"
@@ -496,15 +496,15 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :ote.db.transit/pre-notice-type
   {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
-   :new             "Liikenteen lisääminen tai uusi reitti"
-   :schedule-change "Aikataulumuutos"
-   :route-change    "Reittimuutos"
-   :other           "Muu muutos, mikä?"}
+   :new             "Increasement of transport or a new traffic route/routes"
+   :schedule-change "Timetable change"
+   :route-change    "Route change/changes"
+   :other           "Other change, what?"}
 
   :ote.db.transit/pre-notice-state
-  {:draft "Luonnos"
-   :sent "Lähetetty"
-   :read "Luettu"}
+  {:draft "Draft"
+   :sent "Sent"
+   :read "Read"}
 
   }
   ;; ENUMS end
@@ -744,7 +744,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :basic-info-available-from "Valid from"
   :basic-info-available-to "Valid to"
 
-  :route-calendar-name "Reittikalenteri"
+  :route-calendar-name "Route calendar"
   :route-calendar-group-name ["Service calendar (Starting point: " :departure-stop ", time of departure: " :departure-time ")"]
   :route-calendar-from-date "Valid from"
   :route-calendar-to-date "Valid to"
@@ -759,12 +759,12 @@ You can also draw the operating area or point to the map with drawing tools. You
   }
 
  :pre-notice-list-page
- {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
-  :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
-  :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
-  :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
-  :sent-pre-notices "Lähetetyt muutosilmoitukset"
-  :no-pre-notices "Ei muutosilmoituksia"
+ {:header-pre-notice-list "Own reports of change in regular scheduled passenger transport"
+  :header-authority-pre-notice-list "Reports of change in regular scheduled passenger transport"
+  :no-pre-notices-for-operator "The selected transport operator has not created any reports of change in regular scheduled passenger transport."
+  :no-pre-notices-sent "The selected transport operator has not sent any reports of change in regular scheduled passenger transport."
+  :sent-pre-notices "Sent reports of change"
+  :no-pre-notices "No reports of change created"
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Regions"
@@ -774,14 +774,14 @@ You can also draw the operating area or point to the map with drawing tools. You
             :ote.db.modification/created "Created"
             :ote.db.modification/modified "Modified"
             :ote.db.transit/route-description "Route description"
-            :actions "Toiminnot"
+            :actions "Functions"
             :region-names "Regions"
             :ote.db.transit/attachments "Attached files"
             :ote.db.transport-operator/transport-operator "Transport operator"}
 
-  :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
-                      :comments-label "Viranomaisen kommentit (näkyvät vain viranomaiselle)"
-                      :new-comment-label "Kirjoita kommentti"}
+  :pre-notice-dialog {:label "Info of report of change"
+                      :comments-label "Comments from officials (visible only for the officials)"
+                      :new-comment-label "Write a comment"}
 
   :delete-pre-notice-dialog {:label "Delete draft pre notice?"
                              :content "Permanently delete this pre notice?"
@@ -789,22 +789,22 @@ You can also draw the operating area or point to the map with drawing tools. You
   }
 
  :pre-notice-page
- {:pre-notice-form-title "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :notice-type-title "Ilmoitettavan muutoksen tyyppi"
+ {:pre-notice-form-title "Report of change in regular scheduled passenger transport"
+  :notice-type-title "Type of change"
   :notice-description-hint "Describe briefly essential information about the change"
-  :effective-dates-title "Muutoksen alkamispäivä tai -päivät"
-  :attachment-section-title "Muutoksen tarkemmat tiedot"
-  :route-and-area-information-title "Reitin ja alueen tiedot"
-  :effective-date-from "Alkamispäivä"
-  :effective-date-description "Selitys"
-  :publish-missing-required "Et voi vielä julkaista ilmoitusta, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
-  :save-success-send "Ilmoituksen lähettäminen onnistui."
-  :save-success "Luonnoksen tallentaminen onnistui."
-  :save-failure "Luonnoksen tallentaminen epäonnistui."
-  :save-failure-send "Ilmoituksen lähettäminen epäonnistui."
+  :effective-dates-title "Start date/dates for the change/changes"
+  :attachment-section-title "More specific info of the change"
+  :route-and-area-information-title "Info of route and region"
+  :effective-date-from "Start date"
+  :effective-date-description "Clarification"
+  :publish-missing-required "You cannot publish the report yet, because you have not filled in all the required information. Fill in all the places which have a text \" Required field\"."
+  :save-success-send "The report was sent successfully"
+  :save-success "The draft was saved successfully"
+  :save-failure "Saving the draft failed!"
+  :save-failure-send "Sending the report failed!"
   :route-description-hint "eg. Tampere - Pori or Oulu - Seinäjoki"
-  :add-attachment "Uusi liite"
-  :select-attachment "Lisää liite"
+  :add-attachment "New attachment"
+  :select-attachment "Add an attachment"
   :effective-date-descriptions {:year-start "Year start"
                                 :school-start "The beginning of the school year"
                                 :school-end "The end of the school year"
