@@ -50,12 +50,15 @@
 
 (defn subtitle
   "Create a subtitle inside a form group."
-  [text]
-  {:name (keyword (str "subtitle" (swap! keyword-counter inc)))
-   :type :component
-   :container-style style-form/subtitle
-   :component (fn [_]
-                [:h4.form-subtitle (stylefy/use-style style-form/subtitle-h) text])})
+  ([text] (subtitle text style-form/subtitle))
+  ([text container-style]
+   (subtitle :h4 text container-style))
+  ([element text container-style]
+   {:name (keyword (str "subtitle" (swap! keyword-counter inc)))
+    :type :component
+    :container-style container-style
+    :component (fn [_]
+                 [element (stylefy/use-style style-form/subtitle-h {::stylefy/with-classes ["form-subtitle"]}) text])}))
 
 (defrecord Group [label options schemas])
 
@@ -251,7 +254,10 @@
                 show-errors? (or (not hide-error-until-modified?)
                                  (get modified name))]]
       ^{:key name}
-      [:div.form-field {:class container-class :style container-style}
+      [:div.form-field {:class container-class :style (merge (if (#{:string :localized-text} (:type s))
+                                                               {:margin-bottom "2rem"}
+                                                               {})
+                                                             container-style)}
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)
@@ -314,6 +320,11 @@
            ;; group is not closed and its data has changed
            (and (not new-closed)
                 (not= old-group-data new-group-data))))))))
+
+;; Utility to set as :should-update-check that always forces update
+(let [c (atom 0)]
+  (defn always-update [_]
+    (swap! c inc)))
 
 (def balloon-header-tooltip
   "A tooltip icon that shows balloon.css tooltip on hover."

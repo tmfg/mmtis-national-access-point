@@ -27,6 +27,7 @@ h1, h2, h3, h4, h5, h6,
 h1 {
     font-weight: 400;
     font-size: 180%;
+    padding-top: 1.5rem;
 }
 h2 {
     font-weight: 400;
@@ -155,6 +156,7 @@ footer {
     color: #ffffff;
     min-height: 100px;
     padding: 20px 0;
+    margin-top: 2.5rem;
 }
 .site-footer .container-fluid {
     position: relative;

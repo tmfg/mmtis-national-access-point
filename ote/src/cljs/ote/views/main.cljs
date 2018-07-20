@@ -22,6 +22,7 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.login :as login]
+            [ote.views.user :as user]
             [ote.views.admin :as admin]
             [ote.views.operators :as operators]
             [ote.views.route.route-list :as route-list]
@@ -55,8 +56,7 @@
   ;; Render as an empty span
   [:span])
 
-(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog?
-                               show-user-edit-dialog? user]}]
+(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog? user]}]
   [:span
 
    (when show-register-dialog?
@@ -75,14 +75,7 @@
       (tr [:login :forgot-password?])
       "/user/reset"
       #(e! (fp-controller/->ToggleUserResetDialog))
-      #(e! (fp-controller/->UserResetRequested))])
-
-   (when show-user-edit-dialog?
-     ^{:key "ckan-user-edit"}
-     [ckan-iframe-dialog
-      (tr [:common-texts :user-menu-profile])
-      (str "/user/edit/" (:username user))
-      #(e! (fp-controller/->ToggleUserEditDialog))])])
+      #(e! (fp-controller/->UserResetRequested))])])
 
 (defn- scroll-to-page
   "Invisible component that scrolls to the top of the window whenever it is mounted."
@@ -126,6 +119,7 @@
                 (case (:page app)
                   :login [login/login e! (:login app)]
                   :register [register/register e! (:register app) (:user app)]
+                  :user [user/user e! (:user app)]
                   :front-page [fp/front-page e! app]
                   :own-services [fp/own-services e! app]
                   :transport-service [t-service/select-service-type e! app]

@@ -14,7 +14,8 @@
             [specql.core :as specql]
             [ote.db.user :as user]
             [ote.time :as time]
-            [ote.util.feature :as feature])
+            [ote.util.feature :as feature]
+            [taoensso.timbre :as log])
   (:import (java.util UUID Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
@@ -116,6 +117,11 @@
        (user/username-valid? username)
        (string? name) (not (str/blank? name))))
 
+(defn valid-user-save? [{:keys [username name email]}]
+  (and (user/email-valid? email)
+       (user/username-valid? username)
+       (string? name) (not (str/blank? name))))
+
 (defn- register-user! [db auth-tkt-config {:keys [username name email password] :as form-data}]
   (if-not (valid-registration? form-data)
     ;; Check errors that should have been checked on the form
@@ -153,6 +159,56 @@
         ;; Registration failed, return errors
         (http/transit-response result)))))
 
+(defn save-user! [db auth-tkt-config user form-data]
+  (if-not (valid-user-save? form-data)
+    {:success? false}
+    (with-transaction db
+      (let [username-taken? (and (not= (:username user) (:username form-data))
+                                 (username-exists? db {:username (:username form-data)}))
+            email-taken? (and (not= (:email user) (:email form-data))
+                              (email-exists? db {:email (:email form-data)}))
+            require-current-password? (or (not= (:username user) (:username form-data))
+                                          (not= (:email user) (:email form-data))
+                                          (not (str/blank? (:password form-data))))
+            login-info (first (fetch-login-info db {:email (:email user)}))
+            password-incorrect? (or (str/blank? (:current-password form-data))
+                                    (not (hashers/check (:current-password form-data)
+                                                        (passlib->buddy (:password login-info)))))]
+        (if
+          ;; Password incorrect, username or email taken => return errors to form
+          (or username-taken? email-taken? password-incorrect?)
+          {:success? false
+           :username-taken (when username-taken? (:username form-data))
+           :email-taken (when email-taken? (:email form-data))
+           :password-incorrect? password-incorrect?}
+
+          ;; Request is valid, do update
+          (let [user (specql/update! db ::user/user
+                                     (merge
+                                      {::user/name (:username form-data)
+                                       ::user/fullname (:name form-data)
+                                       ::user/email (:email form-data)}
+
+                                      ;; If new password provided, change it
+                                      (when (not (str/blank? (:password form-data)))
+                                        {::user/password (buddy->passlib (encrypt (:password form-data)))}))
+                                     {::user/id (:id user)})]
+            {:success? true}))))))
+
+(defn save-user [db auth-tkt-config user form-data]
+
+  (let [result (save-user! db auth-tkt-config user form-data)]
+    (if (:success? result)
+      ;; User updated, re-login immediately with updated info
+      (login db auth-tkt-config
+             {:email (:email form-data)
+              :password (if (str/blank? (:password form-data))
+                          (:current-password form-data)
+                          (:password form-data))})
+
+      ;; Failed, return errors to form
+      (http/transit-response result))))
+
 (define-service-component LoginService
   {:fields [auth-tkt-config]}
 
@@ -172,4 +228,9 @@
           ;; Trying to register while logged in
           (http/transit-response {:success? false})
           (#'register db auth-tkt-config
-                      (http/transit-request form-data)))))
+                      (http/transit-request form-data))))
+
+  (POST "/save-user" {form-data :body
+                      user :user}
+        (#'save-user db auth-tkt-config (:user user)
+                     (http/transit-request form-data))))

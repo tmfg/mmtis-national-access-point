@@ -43,28 +43,21 @@
     credentials]])
 
 (defn login-action-cards [e!]
-  [:div {:style {:margin-top "2em"
-                 :padding "0.5em"
+  [:div {:style {:margin "2rem 0 2rem 0"
+                 :padding "1rem 0.5rem 1.5rem 1rem"
                  :background-color "#f5f5f5"}}
    [:div
-    [:h5 {:style {:margin-top "0.5rem"}} (tr [:login :no-account?])]
-    [:div (tr [:login :no-account-help])]
+    [:h3 {:style {:margin-top "0.5rem"}} (tr [:login :no-account?])]
     [linkify "#/register" (tr [:login :no-account-button])]]
 
-   [:div
-    [:h5 (tr [:login :forgot-password?])]
-    [:div (tr [:login :forgot-password-help])]
+   [:div {:style {:margin-top "2rem"}}
+    [:h3 (tr [:login :forgot-password?])]
     [linkify "#" (tr [:login :forgot-password-button])
      {:on-click #(do
                    (.preventDefault %)
                    (e! (fp-controller/->ToggleUserResetDialog)))}]]])
 
 (defn login [e! {:keys [credentials failed? error in-progress?] :as login}]
-  [:div {:style {:margin-top "40px"
-                 :display "flex"
-                 :flex-direction "column"
-                 :align-items "center"
-                 :width "100%"}}
-   [:div.col-xs-12.col-md-6
-    [login-form e! login]
-    [login-action-cards e!]]])
+  [:div.col-xs-12.col-md-6
+   [login-form e! login]
+   [login-action-cards e!]])
