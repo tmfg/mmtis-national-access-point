@@ -1193,9 +1193,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-account-help "Skapa ett konto, det tar bara en minut."
   :no-account-button "Skapa ett konto"
 
-  :forgot-password? "Glömt din lösenord?"
+  :forgot-password? "Glömt ditt lösenord?"
   :forgot-password-help "Inga problem, använd vårt formulär för återskapande av lösenord för att återställa det."
-  :forgot-password-button "Glömt ditt löseonrd?"
+  :forgot-password-button "Återställ ditt lösenord"
 
   :error {:no-such-user "Okänd konto"
           :incorrect-password "Fel lösenord"}
