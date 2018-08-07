@@ -1217,10 +1217,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                 :email "medel-svensson@epost.se"}
   :errors {:passwords-must-match "Lösenordet du angav matchar inte lösenordet för föregående fält"
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
-           :username-invalid "Använd små bokstäver utan mellanslag. Även streck (-) och punkt (.) tillåtna."
+           :username-invalid "Användarnamnet ej giltigt. Tillåtna tecken: små bokstäver (a-z), siffror (0-9) och symbolerna - och ."
            :email-taken "E-postadressen är redan i bruk"
            :logged-in ["Du är redan inloggad som: " :name]
-           :password-not-valid "Minsta längd 6 tecken. Lösenordet måste innehålla bokstäver och minst ett nummer."}
+           :password-not-valid "Minst 6 tecken krävs. Lösenordet bör innehålla bokstäver och minst en siffra."}
   :confirm-changes "Bekräfta ändringar"
   :change-password "Ändra lösenord"}
 
