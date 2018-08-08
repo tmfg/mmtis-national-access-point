@@ -194,7 +194,6 @@
                    published? :published?} app]
     (.error js/console "Save notice failed:" (pr-str response))
     ;; TODO: when published? true, use save-failure-send
-    (.log js/console response)
     (assoc app
       :flash-message-error
       (if published?
