@@ -1178,6 +1178,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
   :operator-no-services "Tjänsteproducenten har inga tjänster."
   :view-routes "Visa rutter"
+  :view-routes-failure "Reittejä ei voi katsella"
   :load-csv-file "Ladda csv"
   :data-content-search-label "Gränssnittsinnehåll"
   :other-involved-companies "De företag som producerar tjänsten"

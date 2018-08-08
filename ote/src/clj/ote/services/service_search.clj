@@ -111,6 +111,14 @@
     ::t-service/service-companies
     ::t-service/business-id})
 
+(defn- hide-import-errors [ei-link]
+  (if (or (::t-service/gtfs-import-error ei-link) (::t-service/gtfs-db-error ei-link))
+    (-> ei-link
+        (assoc :has-errors? true)
+        (dissoc ::t-service/gtfs-import-error
+                ::t-service/gtfs-db-error))
+    ei-link))
+
 (defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(operation-area-ids db operation-area)
@@ -135,7 +143,12 @@
         results (specql/fetch db ::t-service/transport-service-search-result
                               search-result-columns
                               {::t-service/id (op/in ids)}
-                              options)]
+                              options)
+        results (mapv (fn [result]
+                        (update-in result
+                                   [::t-service/external-interface-links]
+                                   #(mapv hide-import-errors %)))
+                      results)]
     {:empty-filters? empty-filters?
      :total-service-count (total-service-count db)
      :results results
