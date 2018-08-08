@@ -104,7 +104,7 @@
 (defrecord CloseSendModal [])
 (defrecord SaveToDb [published?])
 (defrecord SaveNoticeResponse [response])
-(defrecord SaveNoticeFailure [response])
+(defrecord SaveNoticeFailure [response published?])
 (defrecord CancelNotice [])
 (defrecord DeleteEffectiveDate [index])
 (defrecord LoadPreNotice [id])
@@ -175,13 +175,12 @@
                          n))]
       (comm/post! "pre-notice" notice
                   {:on-success (tuck/send-async! ->SaveNoticeResponse)
-                   :on-failure (tuck/send-async! ->SaveNoticeFailure)})
+                   :on-failure (tuck/send-async! ->SaveNoticeFailure published?)})
       app))
 
   SaveNoticeResponse
   (process-event [{response :response} app]
     (routes/navigate! :pre-notices)
-    ;; TODO: when published? true, use save-success-send
     (-> app
         (dissoc :pre-notice
                 :before-unload-message)
@@ -191,11 +190,16 @@
                  (tr [:pre-notice-page :save-success])))))
 
   SaveNoticeFailure
-  (process-event [{response :response} app]
+  (process-event [{response :response
+                   published? :published?} app]
     (.error js/console "Save notice failed:" (pr-str response))
     ;; TODO: when published? true, use save-failure-send
+    (.log js/console response)
     (assoc app
-      :flash-message-error (tr [:pre-notice-page :save-failure])))
+      :flash-message-error
+      (if published?
+        (tr [:pre-notice-page :save-failure-send])
+        (tr [:pre-notice-page :save-failure]))))
 
   CancelNotice
   (process-event [_ app]
