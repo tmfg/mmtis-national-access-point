@@ -62,20 +62,25 @@
   (let [comma (if (not (empty? street)) ", " " ")]
     (str street comma postal_code " " post_office)))
 
-(defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format}]
+(defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format
+                          has-errors? :has-errors?}]
   (when format
     (let [format (str/lower-case format)]
       (when (or (= "gtfs" format) (= "kalkati.net" format))
         [:span " | "
-         (common-ui/linkify
-           (str "#/routes/view-gtfs?url=" (.encodeURIComponent js/window
-                                                               (::t-service/url interface))
-                (when (= "kalkati.net" format)
-                  "&type=kalkati"))
+         (if-not has-errors?
+           (common-ui/linkify
+             (str "#/routes/view-gtfs?url=" (.encodeURIComponent js/window
+                                                                 (::t-service/url interface))
+                  (when (= "kalkati.net" format)
+                    "&type=kalkati"))
+             [:span
+              [ic/action-open-in-new {:style {:position "relative" :top "6px" :color "#06c" :padding-right "3px"}}]
+              (tr [:service-search :view-routes])]
+             {:target "_blank"})
            [:span
-            [ic/action-open-in-new {:style {:position "relative" :top "6px" :color "#06c" :padding-right "3px"}}]
-            (tr [:service-search :view-routes])]
-           {:target "_blank"})]))))
+            [ic/alert-warning {:style {:position "relative" :top "6px" :color "#f80" :padding-right "3px"}}]
+            (tr [:service-search :view-routes-failure])])]))))
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])

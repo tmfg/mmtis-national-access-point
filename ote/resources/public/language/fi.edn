@@ -1192,6 +1192,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
   :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
+  :view-routes-failure "Reittejä ei voi katsella"
   :load-csv-file "Lataa csv tiedosto"
   :data-content-search-label "Rajapinnan sisältö"
   :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
