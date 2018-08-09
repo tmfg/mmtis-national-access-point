@@ -299,7 +299,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
   :trip-editor-no-calendar  "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
   :trip-editor-no-stop-sequence "Please add stop sequence."
-  :pre-notice-attatchment-info "Give detailed information about the route and timetable changes in your personal transport. You can add a web address which from the changes can be recognized. Alternatively you can add  attachments to the form, which from the detailed changes of the transport can be recognized."
+  :pre-notice-attatchment-info "Give detailed information about the route and timetable changes in your personal transport. You can add a web address from which the changes can be recognized. Alternatively you can add  attachments to the form, from which the detailed changes of the transport can be recognized."
   :autocomplete-hint "Type your own or choose from the list"
   :allowed-file-types "Accepted file formats are "
 
@@ -495,7 +495,7 @@ You can also draw the operating area or point to the map with drawing tools. You
    :mandatory "Advance reservation is mandatory for this service."}
 
   :ote.db.transit/pre-notice-type
-  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+  {:termination     "Reduction of transport (partly or totally)"
    :new             "Increasement of transport or a new traffic route/routes"
    :schedule-change "Timetable change"
    :route-change    "Route change/changes"
