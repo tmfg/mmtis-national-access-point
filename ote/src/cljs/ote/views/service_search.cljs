@@ -78,7 +78,9 @@
               [ic/action-open-in-new {:style {:position "relative" :top "6px" :color "#06c" :padding-right "3px"}}]
               (tr [:service-search :view-routes])]
              {:target "_blank"})
-           (tr [:service-search :view-routes-failure]))]))))
+           [:span
+            [ic/alert-warning {:style {:position "relative" :top "6px" :color "#f80" :padding-right "3px"}}]
+            (tr [:service-search :view-routes-failure])])]))))
 
 (defn parse-content-value [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
