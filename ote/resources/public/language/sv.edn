@@ -295,7 +295,7 @@
                 "En förmedlingstjänst **förmedlar mot ersättning** andra aktörers enskilda resor. Förmedlingstjänsten kan dessutom också förmedla det egna företagets resor. En beställningscentral för taxiresor är ett exempel på en förmedlingstjänst. Ett företag som förmedlar en beställning till ett annat företag utan ersättning betraktas inte som en förmedlingstjänst.")
   :brokerage-link "Läs mer om skyldigheterna gällande förmedlingstjänster från och med 1.7.2018."
 
-  :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
+  :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
   :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
@@ -1164,6 +1164,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :text-search-placeholder "Sök med namn"
   :operator-search "Tjänsteproducent"
   :operator-search-placeholder "Sök med namn eller FO-nummer"
+  :operation-area-search-placeholder "Sök med finska nyckelord"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
   :result-count (:plural :count

@@ -336,7 +336,7 @@
          {:style style}))]))
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
-                                      max-length style hint-style
+                                      max-length style hint-style hint-text
                                       filter suggestions suggestions-config default-values max-results
                                       auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
@@ -357,7 +357,7 @@
        {:name name
         :floating-label-text (when-not table? label)
         :floating-label-fixed true
-        :hintText (placeholder field data)
+        :hintText (or hint-text (placeholder field data))
         :disabled disabled?
         :value chips
 
