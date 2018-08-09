@@ -287,7 +287,7 @@
   :brokerage? "A brokering service is a service that brokers single rides for other companies for remuneration. (Remuneration can be money or other benefits.) A brokering service can also broke its own rides at the same time. An example of a brokering service is a taxi centre. If a company only brokes its own rides to other companies with no remuneration, the company is not a brokering service."
   :brokerage-link "Read more about the obligations of a brogering services starting from 1st July 2018"
 
-  :operation-area "In this section you can add the operating area of your service by writing the name of the area into the text field called \"Search place by name\" and by choosing the area wanted from the opening list. You can search by using regions, communities and postal codes of Finland, or by using nations and continents. You can add more operating areas with the same way.
+  :operation-area "In this section you can add the operating area of your service by writing the name of the area into the text field called \"Search place by name\" and by choosing the area wanted from the opening list. You can search by using regions, communities and postal codes of Finland, or by using nations and continents. The search of areas works only with Finnish keywords. You can add more operating areas with the same way.
 You can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Area of operation in Southern Finland\"."
 
   :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
@@ -1164,6 +1164,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :text-search-placeholder "Search by name"
   :operator-search "Transport operator"
   :operator-search-placeholder "Search by name or business id"
+  :operation-area-search-placeholder "Search with Finnish keywords"
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
   :result-count (:plural :count

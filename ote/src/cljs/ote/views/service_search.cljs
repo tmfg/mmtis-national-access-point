@@ -339,6 +339,7 @@
          {:name ::t-service/operation-area
           :type :chip-input
           :container-class "col-xs-12 col-sm-4 col-md-4"
+          :hint-text (tr [:service-search :operation-area-search-placeholder])
           :full-width? true
           :full-width-input? false
           :filter (fn [query, key]
