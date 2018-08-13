@@ -684,7 +684,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :route-list-page
- {:header-route-list "Omat merenkulun reitti- ja aikataulutietot"
+ {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
   :delete-dialog-header "Haluatko poistaa laivareitin?"
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
