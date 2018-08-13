@@ -152,6 +152,7 @@
                                             {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
                                           t-service/interface-data-contents)
                        :suggestions-config {:text :text :value :value}
+                       :max-results (count t-service/interface-data-contents)
                        :write (fn [data vals]
                                 (assoc-in data [::t-service/data-content]
                                           ;; Values loose their keyword status inside the component, so we'll make
