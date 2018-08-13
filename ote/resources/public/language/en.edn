@@ -275,9 +275,9 @@
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
-  :companies-main-info (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**
+  :companies-main-info (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**\n\n
 If there are other companies involved in providing the service or the service is a brokering service, fill in all the names and business IDs of the companies involved. Only the companies coordinating the service fill in this part (e.g. taxi centres or transport producing authorities).
-**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**")
+\n\n**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**")
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
   :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
@@ -285,7 +285,8 @@ If there are other companies involved in providing the service or the service is
   :guaranteed-vehicle-accessibility "Here you can write about all the accessibility tools which are allways available in the service conducted and which do not require making a reservation beforehand. The accessibility tools announced have to be valid for all the vehicles."
   :limited-vehicle-accessibility "Here you can make an announcement about all the limited available accessibility tools. Limited in this part means that the accessibility tools announced are only available when making a reservation beforehand, or which are available only in some of the trasportation vehicles."
 
-  :brokerage? "A brokering service is a service that brokers single rides for other companies for remuneration. (Remuneration can be money or other benefits.) A brokering service can also broke its own rides at the same time. An example of a brokering service is a taxi centre. If a company only brokes its own rides to other companies with no remuneration, the company is not a brokering service."
+  :brokerage? (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**\n\n
+ A brokering service is a service that brokers single rides for other companies for remuneration. (Remuneration can be money or other benefits.) A brokering service can also broke its own rides at the same time. An example of a brokering service is a taxi centre. If a company only brokes its own rides to other companies with no remuneration, the company is not a brokering service.")
   :brokerage-link "Read more about the obligations of a brogering services starting from 1st July 2018"
 
   :operation-area "In this section you can add the operating area of your service by writing the name of the area into the text field called \"Search place by name\" and by choosing the area wanted from the opening list. You can search by using regions, communities and postal codes of Finland, or by using nations and continents. The search of areas works only with Finnish keywords. You can add more operating areas with the same way.
@@ -539,10 +540,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :title-transport-operator "Service provider"
   :title-developer "Service developer"
   :column-NAP (:md
-                "NAP service catalog is an open national access point, where to **transport service providers** have
-                to deliver data via digital machine-readable interfaces for **essential information** on their services.
-                NAP -service is a part of a larger whole which aims for development of new, combined and
-                user friendly mobile and info services. NAP is not meant for end users or passengers, but for transport service providers and developers.")
+                "NAP service catalog is an open national access point, where to **transport service providers** have to deliver data via digital machine-readable interfaces for **essential information** on their services. NAP -service is a part of a larger whole which aims for development of new, combined and user friendly mobile and info services. NAP is not meant for end users or passengers, but for transport service providers and developers.")
   :column-transport-services "Transport services are e.g. passenger transport services (road-, sea- and air traffic services); stations, ports and terminals; vehicle rental services and commercial shared vehicle solutions; general commercial parking services and brokering services."
   :column-essential-info "Essential information contains e.g. operating area, routes, time tables, prices, service times and accessibility information including also information about tickets, ticket reservation and sale channels and accepted payment methods. All the essential information is not valid for each service. The definition of essential information can be found from the regulation of the Finnish Government."
   :column-transport-operator "All the transport service providers are obligated to produce information on their transport services in a machine-readable format. Registration and logging in are required for publishing information in the NAP service catalog. NAP service instructs users how the essential information on their services should be published."

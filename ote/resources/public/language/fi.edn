@@ -274,9 +274,9 @@
                                  :view-routes "Katsele reittejä"}
   :RAE-link-text "Rae-työkalulla"
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
-  :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**
-Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen).
-**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**")
+  :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"
+"Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen)."
+"\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**")
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
   :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
@@ -540,11 +540,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :title-transport-operator "Palveluntuottaja"
   :title-developer "Sovelluskehittäjä"
   :column-NAP (:md
-                        "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon
-                         **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen**
-                        koneluettavista rajapinnoistaan.
-                        NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä
-                        liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
+                        "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
   :column-transport-services "Liikkumispalveluilla tarkoitetaan henkilöiden kuljetuspalveluita, kuten tieliikenteen, merenkulun ja ilmailun henkilökuljetuksia; asemia, satamia ja terminaaleja; liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita; yleisiä kaupallisia pysäköintipalveluita sekä välityspalveluita."
   :column-essential-info "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat, palvelun saatavuus, esteettömyys sekä varaus-, myynti-, lippu- ja maksutiedot. Kaikki tiedot eivät ole olennaisia jokaisen palvelun osalta.  Avattavat tiedot on määritetty valtioneuvoston asetuksessa."
   :column-transport-operator "Tietojen avaamisvelvollisuus koskee kaikkia liikkumispalveluita tarjoavia yrityksiä. Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii rekisteröitymisen ja kirjautumisen palveluun. NAP-palvelu ohjeistaa käyttäjää kirjaamaan tiettyä palvelua koskevat olennaiset tiedot."

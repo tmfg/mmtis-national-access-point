@@ -92,8 +92,7 @@
            :background-color "#DAEDF7"
            :padding "10px"
            :margin-bottom "10px"
-           :align-items "center"
-           :white-space "pre-wrap"})
+           :align-items "center"})
 
 ;; Full width generic help box
 (def generic-help (merge help
