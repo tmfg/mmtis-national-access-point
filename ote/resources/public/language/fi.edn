@@ -488,7 +488,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :service-hours "Palveluajat"
    :disruptions "Häiriötilanteet"
    :payment-interface "Lippu- ja myyntirajapinta"
-   :other "Muu"}
+   :other "Muu"
+   :map-and-location "Kartta- ja paikkatietoaineistot"}
 
   :ote.db.transport-service/advance-reservation
   {:no "Palvelun käyttöön ei liity ennakkovarausta."

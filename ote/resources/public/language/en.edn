@@ -487,7 +487,8 @@ You can also draw the operating area or point to the map with drawing tools. You
    :service-hours "Service hours"
    :disruptions "Fault situations"
    :payment-interface "Payment and sales interface"
-   :other "Other"}
+   :other "Other"
+   :map-and-location "Map and location data"}
 
   :ote.db.transport-service/advance-reservation
   {:no "Service does not have advance reservation."

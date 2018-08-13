@@ -81,9 +81,9 @@
 ;; Create order for transport_type
 (def passenger-transportation-sub-types [:taxi :request :schedule])
 
-(def interface-data-contents [:route-and-schedule :luggage-restrictions :realtime-interface :booking-interface
-                             :accessibility-services :other-services :pricing :service-hours :disruptions
-                             :payment-interface :other])
+(def interface-data-contents [:route-and-schedule :luggage-restrictions :realtime-interface
+                              :booking-interface :accessibility-services :other-services :pricing
+                              :service-hours :disruptions :payment-interface :map-and-location :other])
 
 ;; Create order for payment_method
 (def payment-methods [:cash :debit-card :credit-card :mobilepay :contactless-payment :invoice :other])

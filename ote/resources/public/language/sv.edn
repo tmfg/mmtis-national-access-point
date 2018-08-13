@@ -492,7 +492,8 @@
    :service-hours "Betjäningstider"
    :disruptions "Störningsinformation"
    :payment-interface "Biljett- och försäljningsgränssnitt"
-   :other "Övrigt"}
+   :other "Övrigt"
+   :map-and-location "Kart- och platsdata"}
 
   :ote.db.transport-service/advance-reservation
   {:no "Ingen förhandsbokning krävs."
