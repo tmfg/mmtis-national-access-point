@@ -115,7 +115,9 @@
                           :disabled (empty? operators)
                           :icon     (ic/content-add)}]]
       [t-operator-view/transport-operator-selection e! app]
-      [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf" (tr [:route-list-page :link-to-help-pdf])]]
+      [buttons/open-link
+       (tr [:route-list-page :link-to-help-pdf-url])
+       (tr [:route-list-page :link-to-help-pdf])]]
 
      (when routes
        [list-routes e! routes])
