@@ -155,7 +155,8 @@
    :ote.db.transport-service/additional-service-price  "Price (€)"
    :ote.db.transport-service/additional-service-unit   "Unit (f.e day, €/km, €/mile)"
    :rentals-pricing-info                               "Fill in specified price information."
-   :ote.db.transport-service/vehicle-price-url         "Vehicle and price info WWW address"}
+   :ote.db.transport-service/vehicle-price-url         "Vehicle and price info WWW address"
+   :ote.db.transport-service/pick-up-url               "Rental point information web address"}
 
   ;; Parking fields
   :parking
@@ -306,6 +307,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :allowed-file-types "Accepted file formats are "
 
   :real-time-info "Here, you can report real-time services related to your service such as \"cars on the map\" or \"free parking spaces\""
+  :pick-up-locations-url "If the table doesn´t fit for describing the location information of the rental points, you can fill in a web address where the information can be found."
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -988,6 +990,7 @@ You can also draw the operating area or point to the map with drawing tools. You
           "service-hours-info" "Additional information"
           "indoor-map" "Indoor map WWW-address"
           "pick-up-locations" "Pick-up and returning points"
+          "pick-up-url" "Rental point information web address"
           "rental-additional-services" "Additional services"
           "usage-area" "Usage area restrictions (country limitations)"
           "vehicle-price-url" "Vehicle and price info WWW address"

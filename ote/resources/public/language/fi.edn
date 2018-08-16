@@ -156,7 +156,8 @@
    :ote.db.transport-service/additional-service-price  "Hinta (€)"
    :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
    :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
-   :ote.db.transport-service/vehicle-price-url         "Ajoneuvot ja hintatiedot (WWW-osoite)"}
+   :ote.db.transport-service/vehicle-price-url         "Ajoneuvot ja hintatiedot (WWW-osoite)"
+   :ote.db.transport-service/pick-up-url               "Toimipisteiden tietojen web-osoite"}
 
 
   ;; Parking fields
@@ -305,6 +306,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :allowed-file-types "Hyväksyttyjä tiedostomuotoja ovat "
 
   :real-time-info "Tässä kohdassa voit ilmoittaa palveluusi liittyviä reaaliaikapalveluita, kuten \"autot kartalla\" tai \"vapaat pysäköintipaikat\"."
+  :pick-up-locations-url "Mikäli taulukko ei sovellu toimipisteiden kuvaamiseen, voit vaihtoehtoisesti kirjoittaa alapuolella olevaan kenttään web-osoitteen, josta tiedot löytyvät."
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -997,6 +999,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
           "service-hours-info" "Lisätiedot"
           "indoor-map" "Sisätilakartan osoitetiedot"
           "pick-up-locations" "Toimipisteet"
+          "pick-up-url" "Toimipisteiden tietojen web-osoite"
           "rental-additional-services" "Muut palvelut"
           "vehicle-price-url" "Ajoneuvot ja hintatiedot (WWW-osoite)"
           "usage-area" "Sallitut maat"
