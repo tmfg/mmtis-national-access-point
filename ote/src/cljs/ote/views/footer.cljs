@@ -24,7 +24,7 @@
              [:img {:style {:width "120px"} :src "/img/icons/nap-logo.svg" :alt "NAP"}]]]]]
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
       [:ul.unstyled {:style {:font-size "0.875em"}}
-       [:li [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf"
+       [:li [linkify (tr [:common-texts :user-menu-nap-help-link])
              [:div {:style {:height "30px"}} [:span [ic/notification-sms-failed {:style style-front-page/footer-small-icon}] (tr [:common-texts :user-menu-nap-help])]] {:target "_blank"}]]
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
              [:div {:style {:height "30px"}} [:span [ic/action-code {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-for-developers])]] {:target "_blank"}]]

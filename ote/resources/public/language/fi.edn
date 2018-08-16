@@ -876,6 +876,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :user-menu-profile                          "Käyttäjätilin muokkaus"
   :user-menu-summary                          "Yhteenveto"
   :user-menu-nap-help                         "Käyttöohje palveluntuottajille"
+  :user-menu-nap-help-link                    "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-user-guide-fi.pdf"
   :title-operator-basic-details               "Perustiedot"
   :data-not-found                             "Tietoja ei löytynyt"
   :required-field                             "Tieto vaaditaan"
