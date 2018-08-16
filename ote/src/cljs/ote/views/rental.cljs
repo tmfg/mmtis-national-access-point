@@ -291,7 +291,7 @@
 
      (form/info (tr [:form-help :pick-up-locations-url]))
 
-     {:name ::t-service/pick-up-url
+     {:name ::t-service/pick-up-locations-url
       :type :string
       :container-class "col-xs-12 col-sm-6 col-md-6"
       :full-width? true})))

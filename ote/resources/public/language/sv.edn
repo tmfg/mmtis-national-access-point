@@ -161,7 +161,7 @@
    :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
    :rentals-pricing-info                               "Fyll i tabellen prisuppgifter och/eller uppgifter om grunderna för hur priset bestäms."
    :ote.db.transport-service/vehicle-price-url         "Web-adress med uppgifter om fordon och priser"
-   :ote.db.transport-service/pick-up-url               "Web-adress för verksamhetsställen"}
+   :ote.db.transport-service/pick-up-locations-url               "Web-adress för verksamhetsställen"}
 
   ;; Parking fields
   :parking
@@ -993,7 +993,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "service-hours-info" "Tilläggsinfo"
           "indoor-map" "Inomhuskarta www-sidor"
           "pick-up-locations" "Verksamhetsställen"
-          "pick-up-url" "Web-adress för verksamhetsställen"
+          "pick-up-locations-url" "Web-adress för verksamhetsställen"
           "rental-additional-services" "Övriga tjänster"
           "usage-area" "Tillåtna länder"
           "vehicle-price-url" "Web-adress med uppgifter om fordon och priser"
