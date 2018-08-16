@@ -1104,6 +1104,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                    "service-hours" "Service hours"
                    "disruptions" "Fault situations"
                    "payment-interface" "Payment and sales interface"
+                   "map-and-location" "Map and location data"
 
                    ;; rentals
                    "pick-up" "Pick up"
@@ -1116,6 +1117,9 @@ You can also draw the operating area or point to the map with drawing tools. You
                    "rail" "Rail traffic"
                    "sea"  "Sea traffic"
                    "aviation"  "Air traffic"
+
+                   "mandatory" "Mandatory"
+                   "possible" "Possible"
                    }
 
           ;; External interfaces

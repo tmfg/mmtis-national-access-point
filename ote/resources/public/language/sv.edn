@@ -1106,6 +1106,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                    "service-hours" "Betjäningstider"
                    "disruptions" "Störningsinformation"
                    "payment-interface" "Biljett- och försäljningsgränssnit"
+                   "map-and-location" "Kart- och platsdata"
 
                    ;; rentals
                    "pick-up" "Avhämtning"
@@ -1117,7 +1118,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                    "road" "Vägtrafik"
                    "rail"      "Tågtrafik"
                    "sea"       "Sjötrafik"
-                   "aviation"  "Luftfart"}
+                   "aviation"  "Luftfart"
+
+                   "mandatory" "Obligatorisk"
+                   "possible" "Möjlig"}
 
           ;; External interfaces
           "external-interfaces" "Externa maskinläsbara gränssnitt"

@@ -1112,6 +1112,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    "service-hours" "Palveluajat"
                    "disruptions" "Häiriötilanteet"
                    "payment-interface" "Lippu- ja myyntirajapinta"
+                   "map-and-location" "Kartta- ja paikkatietoaineistot"
 
                    ;; rentals
                    "pick-up" "Nouto"
@@ -1123,7 +1124,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    "road" "Tieliikenne"
                    "rail"      "Rautatieliikenne"
                    "sea"       "Merenkulku"
-                   "aviation"  "Ilmailu"}
+                   "aviation"  "Ilmailu"
+
+                   "mandatory" "Pakollinen"
+                   "possible" "Mahdollinen"
+                   }
 
 
           ;; External interfaces

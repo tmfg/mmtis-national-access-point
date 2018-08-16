@@ -231,7 +231,7 @@
      :container-style style-form/full-width
      :component (fn [{pre-notice :data}]
                   [:div
-                   [:div.col-md-4
+                   [:div.col-md-5
                     [form-fields/field
                      {:id "route-description"
                       :label (tr [:field-labels :pre-notice ::transit/route-description])
@@ -268,7 +268,7 @@
                        (into #{}
                              (keep #(when (selected-ids (:id %)) %))
                              regions-with-show)])]
-                   [:div.col-md-8
+                   [:div.col-md-7
                     [notice-area-map pre-notice]]])}))
 
 (defn notice-attachments [e! sent?]
