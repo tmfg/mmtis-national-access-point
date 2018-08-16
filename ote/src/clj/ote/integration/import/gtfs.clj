@@ -186,7 +186,7 @@
   (try
     (load-file-from-url url last-import-date saved-etag)
     (catch Exception e
-      (log/debug "Error when loading gtfs package from url " url ": " (.getMessage e))
+      (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
       (specql/update! db ::t-service/external-interface-description
                       ;; Note that the gtfs-imported field tells us when the interface was last checked.
                       {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
@@ -210,17 +210,22 @@
     (when-not (nil? response)
       (if (nil? gtfs-file)
         (do
-          (log/debug "Could not find new file version from given url " url)
-          (when (not (nil? response))
-            (specql/update! db ::t-service/external-interface-description
-                            {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                             ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
-                            {::t-service/id interface-id})))
+          (log/warn "Got empty body as response when loading gtfs from: " url)
+          (specql/update! db ::t-service/external-interface-description
+                          {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                           ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
+                          {::t-service/id interface-id}))
         (let [new-gtfs-hash (gtfs-hash gtfs-file)
               old-gtfs-hash (specql/fetch db :gtfs/package
                                           #{:gtfs/sha256}
                                           {:gtfs/transport-operator-id operator-id
                                            :gtfs/transport-service-id ts-id})]
+
+          ;; No gtfs import errors catched. Remove old import errors.
+          (specql/update! db ::t-service/external-interface-description
+                          {::t-service/gtfs-import-error nil}
+                          {::t-service/id interface-id})
+
           ;; IF hash doesn't match, save new and upload file to s3
           (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
             (do
