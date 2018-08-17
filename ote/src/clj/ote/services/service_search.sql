@@ -45,7 +45,8 @@ SELECT COUNT(*)
         SELECT DISTINCT (x.c)."business-id"
           FROM (SELECT unnest(COALESCE(ts.companies, sc.companies)) c
                   FROM "transport-service" ts
-                  LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id) x) y;
+                  LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
+                 WHERE ts."published?" = TRUE) x) y;
 
 -- name: service-search-by-operator
 -- Finds operators by name and by business-id and services that have companies added as "operators.
