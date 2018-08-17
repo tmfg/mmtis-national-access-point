@@ -182,7 +182,7 @@
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
          [:li
-          [linkify "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-ohje.pdf" (tr [:common-texts :user-menu-nap-help])
+          [linkify (tr [:common-texts :user-menu-nap-help-link]) (tr [:common-texts :user-menu-nap-help])
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]

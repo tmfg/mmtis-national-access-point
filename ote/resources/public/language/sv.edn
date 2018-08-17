@@ -872,6 +872,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :user-menu-profile                          "Visa egen profil"
   :user-menu-summary                          "Sammandrag"
   :user-menu-nap-help                         "Användarinstruktioner"
+  :user-menu-nap-help-link                    "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-user-guide-sv.pdf"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"
