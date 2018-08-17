@@ -32,6 +32,21 @@ SELECT t.id, t.name, t.type, t."sub-type",
 -- single?: true
 SELECT COUNT(id) FROM "transport-service" WHERE "published?" = TRUE;
 
+-- name: total-company-count
+-- single?: true
+-- Count the total number of companies providing transport services
+-- this includes companies reported in CSV files
+SELECT COUNT(*)
+  FROM (SELECT DISTINCT op."business-id"
+          FROM "transport-service" ts
+          JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
+         WHERE ts."published?" = TRUE
+        UNION
+        SELECT DISTINCT (x.c)."business-id"
+          FROM (SELECT unnest(COALESCE(ts.companies, sc.companies)) c
+                  FROM "transport-service" ts
+                  LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id) x) y;
+
 -- name: service-search-by-operator
 -- Finds operators by name and by business-id and services that have companies added as "operators.
 SELECT op.name as "operator", op."business-id" as "business-id"

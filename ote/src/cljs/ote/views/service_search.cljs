@@ -195,7 +195,7 @@
        (list-service-companies service-companies service-search)]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
-  (let [{:keys [results empty-filters? total-service-count
+  (let [{:keys [results empty-filters? total-service-count total-company-count
                 filter-service-count fetching-more?]} service-search
         operator (:operator (:params app))]
     [:div.col-xs-12.col-md-12.col-lg-12
@@ -211,7 +211,8 @@
                                :result-count)]
             {:count filter-service-count}))
       " "
-      (tr [:service-search :total-services] {:total-service-count total-service-count})]
+      (tr [:service-search :total-services] {:total-service-count total-service-count
+                                             :total-company-count total-company-count})]
      (doall
        (for [result results]
          ^{:key (::t-service/id result)}
