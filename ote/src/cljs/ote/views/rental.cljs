@@ -287,7 +287,14 @@
                                    [service-hours-for-location update-form! data])}
                      ]
       :delete? true
-      :add-label (tr [:buttons :add-new-pick-up-location])})))
+      :add-label (tr [:buttons :add-new-pick-up-location])}
+
+     (form/info (tr [:form-help :pick-up-locations-url]))
+
+     {:name ::t-service/pick-up-locations-url
+      :type :string
+      :container-class "col-xs-12 col-sm-6 col-md-6"
+      :full-width? true})))
 
 (defn rental [e! service app]
   (with-let [groups [(ts-common/transport-type ::t-service/rentals)
