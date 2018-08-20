@@ -92,3 +92,15 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_operator_week_hash(INTEGER,DATE) IS
 E'Returns a string description of a week''s traffic hash for an operator.';
+
+CREATE OR REPLACE FUNCTION gtfs_package_finnish_regions(package_id INTEGER) RETURNS CHAR(2)[] AS $$
+SELECT array_agg(x.numero) AS "finnish-regions"
+  FROM (SELECT DISTINCT r.numero
+          FROM "gtfs-stop" s
+          JOIN finnish_regions r ON st_contains(r.location, st_setsrid(st_makepoint("stop-lon", "stop-lat"), 4326))
+         WHERE "package-id" = package_id) x;
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_package_finnish_regions(INTEGER) IS
+E'Returns an array of the finnish region numbers the given GTFS package operates in.
+The package operates in the area if any of its stops are contained in the region geometry.';
