@@ -28,32 +28,6 @@
          :saturday :SAT
          :sunday :SUN)]))
 
-
-(defn- change-description [{:keys [next-different-week week-start-date diff-week-start-date diff-days]}]
-  (when next-different-week
-    (let [{:keys [current-week different-week current-week-traffic
-                  different-week-traffic change-date]} next-different-week
-          current-week-start (time/format-date-opt week-start-date)
-          diff-week-start (time/format-date-opt diff-week-start-date)]
-      [:div
-       [:span (str diff-week-start " alkava viikko (" different-week ") eroaa " current-week-start " alkaneesta viikosta ("
-                   current-week "). \n")]
-       [:span (str
-                (cond
-                  (and (not (empty? (:days-with-traffic current-week-traffic)))
-                       (empty? (:days-with-traffic different-week-traffic)))
-                  "Mahdollinen liikennöinnin päättyminen"
-
-                  (and (empty? (:days-with-traffic current-week-traffic))
-                       (not (empty? (:days-with-traffic different-week-traffic))))
-                  "Mahdollinen liikennöinnin alkaminen"
-
-                  :default
-                  (str "Eri liikennöinti päivinä "
-                       (str/join ", "
-                                 (mapv week-day-short diff-days)) ".")))]])))
-
-
 (defn transit-changes-legend []
   [:div.transit-changes-legend (use-style style/transit-changes-legend)
    [:div [:b "Taulukon ikonien selitteet"]]
@@ -69,7 +43,8 @@
 
 (def change-keys #{:routes-added :routes-removed
                    :stop-sequence-changes :trip-count-difference
-                   :stop-time-changes})
+                   :stop-time-changes
+                   :next-different-week})
 
 (defn cap-number [n]
   [:div (use-style style/change-icon-value)
@@ -99,6 +74,27 @@
     [ic/action-timeline] (cap-number stop-sequence-changes)]
    [:div (use-style style/transit-changes-legend-icon)
     [ic/action-schedule] (cap-number stop-time-changes)]])
+
+(defn- change-description [{:keys [next-different-week] :as row}]
+  (when next-different-week
+    (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
+      [:span
+       (cond
+         (and (not (empty? (:days-with-traffic current-week-traffic)))
+              (empty? (:days-with-traffic different-week-traffic)))
+         [:div
+          [ic/communication-business {:color style/remove-color}]
+          [:div (use-style style/change-icon-value)
+           "Mahdollinen liikenteen päättyminen"]]
+
+         (and (empty? (:days-with-traffic current-week-traffic))
+              (not (empty? (:days-with-traffic different-week-traffic))))
+         [:div
+          [ic/communication-business {:color style/add-color}] ;; FIXME: Seems that there is no domain_disabled icon available in our MUI version
+          [:div (use-style style/change-icon-value)
+           "Mahdollinen liikenteen alkaminen"]]
+         :default
+         [change-icons row])])))
 
 
 (defn detected-transit-changes [e! {:keys [loading? changes] :as transit-changes}]
@@ -132,10 +128,11 @@
                  [:span (stylefy/use-style {:margin-left "5px"
                                             :color "gray"})
                   (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]])}
-     {:name "Muutokset" :read #(select-keys % change-keys) :width "50%"
+     {:name "Muutokset" :width "50%"
       :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
       :tooltip-len "min-medium"
-      :format change-icons
+      :read #(select-keys % change-keys)
+      :format change-description
       :col-style {:white-space "pre-wrap"}}]
     changes]])
 
