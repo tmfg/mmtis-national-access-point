@@ -56,7 +56,7 @@
 
 (defn transit-changes-legend []
   [:div.transit-changes-legend (use-style style/transit-changes-legend)
-   [:div [:b "Taulukon muutosikonien selitteet"]]
+   [:div [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                        [ic/content-remove-circle-outline " Päättyviä reittejä"]
                        [ic/editor-format-list-bulleted " Uusia/vähennettyjä vuoroja"]
@@ -123,11 +123,17 @@
                                 (e! (tc/->ShowChangesForOperator (:transport-operator-id change)
                                                                  (time/format-date-opt date1) (time/format-date-opt date2)))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
-     {:name "Palvelu" :read :transport-service-name :width "20%"}
-     {:name "Aikaa muutokseen" :width "10%"
+     {:name "Aikaa 1:seen muutokseen" :width "30%"
       :read (comp :change-date :next-different-week)
-      :format #(str (t/in-days (t/interval (t/now) %)) " pv")}
+      :format (fn [change-date]
+                [:span
+                 (str (t/in-days (t/interval (t/now) change-date)) " pv")
+                 [:span (stylefy/use-style {:margin-left "5px"
+                                            :color "gray"})
+                  (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]])}
      {:name "Muutokset" :read #(select-keys % change-keys) :width "50%"
+      :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
+      :tooltip-len "min-medium"
       :format change-icons
       :col-style {:white-space "pre-wrap"}}]
     changes]])
