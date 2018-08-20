@@ -114,6 +114,7 @@
                                     "Ladataan muutoksia, odota hetki..."
                                     "Ei löydettyjä muutoksia")
                  :name->label str
+                 :label-style {:font-weight "bold"}
                  :stripedRows    true
                  :row-style {:cursor "pointer"}
                  :show-row-hover? true
@@ -122,8 +123,8 @@
                                     {date1 :date1 date2 :date2} (:first-diff-dates change)]
                                 (e! (tc/->ShowChangesForOperator (:transport-operator-id change)
                                                                  (time/format-date-opt date1) (time/format-date-opt date2)))))}
-    [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
-     {:name "Aikaa 1:seen muutokseen" :width "30%"
+    [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
+     {:name "Aikaa 1:seen muutokseen" :width "25%"
       :read (comp :change-date :next-different-week)
       :format (fn [change-date]
                 [:span

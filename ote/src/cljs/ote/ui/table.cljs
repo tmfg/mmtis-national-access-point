@@ -15,6 +15,7 @@
        opts])))
 
 (defn table [{:keys [height name->label key-fn
+                     label-style
                      row-style show-row-hover?
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
   [ui/table (merge
@@ -40,7 +41,8 @@
                                   (merge
                                     (when width
                                       {:width width})
-                                    {:white-space "pre-wrap" :overflow "visible"})}
+                                    {:white-space "pre-wrap" :overflow "visible"}
+                                    label-style)}
           (name->label name)
           (when tooltip
             [tooltip-icon {:text tooltip :pos tooltip-pos :len tooltip-len}])]))]]
