@@ -148,15 +148,18 @@
       ;; If the response event has different search parameters than the
       ;; latest sent fetch, it is a stale response, do nothing
       app
-      (let [{:keys [empty-filters? results total-service-count filter-service-count]} response]
-        (update app :service-search assoc
-                :results (if append?
-                           (into (get-in app [:service-search :results]) results)
-                           (vec results))
-                :empty-filters? empty-filters?
-                :total-service-count total-service-count
-                :fetching-more? false
-                :filter-service-count filter-service-count))))
+      (let [{:keys [empty-filters? results total-service-count
+                    total-company-count filter-service-count]} response]
+        (update app :service-search
+                #(assoc %
+                        :results (if append?
+                                   (into (get-in app [:service-search :results]) results)
+                                   (vec results))
+                        :empty-filters? empty-filters?
+                        :total-service-count (or total-service-count (:total-service-count %))
+                        :total-company-count (or total-company-count (:total-company-count %))
+                        :fetching-more? false
+                        :filter-service-count filter-service-count)))))
 
   FetchServiceGeoJSON
   (process-event [{:keys [url]} app]

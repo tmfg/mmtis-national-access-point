@@ -149,10 +149,13 @@
                                    [::t-service/external-interface-links]
                                    #(mapv hide-import-errors %)))
                       results)]
-    {:empty-filters? empty-filters?
-     :total-service-count (total-service-count db)
-     :results results
-     :filter-service-count (count ids)}))
+    (merge
+     {:empty-filters? empty-filters?
+      :results results
+      :filter-service-count (count ids)}
+     (when empty-filters?
+       {:total-service-count (total-service-count db)
+        :total-company-count (total-company-count db)}))))
 
 (defn- service-search-parameters
   "Extract service search parameters from query parameters."
