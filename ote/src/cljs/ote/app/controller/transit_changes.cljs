@@ -5,7 +5,8 @@
             [ote.app.controller.common :refer [->ServerError]]
             [ote.app.routes :as routes]
             [ote.time :as time]
-            [cljs-time.core :as t]))
+            [cljs-time.core :as t]
+            [ote.db.places :as places]))
 
 (defn first-diff-date [diff-days week-start-date]
   (t/plus (time/native->date-time week-start-date)
@@ -27,11 +28,12 @@
                   :diff-week-start-date change-date)))
 
 
-(define-event TransitChangesResponse [changes]
+(define-event TransitChangesResponse [response]
   {:path [:transit-changes]}
   (assoc app
-    :changes (mapv process-change changes)
-    :loading? false))
+         :changes (mapv process-change (:changes response))
+         :finnish-regions (:finnish-regions response)
+         :loading? false))
 
 (define-event LoadTransitChanges []
   {:path [:transit-changes]}
@@ -48,3 +50,7 @@
   (routes/navigate! :transit-visualization {:operator-id id} {:compare-date1 date1
                                                               :compare-date2 date2})
   app)
+
+(define-event SetRegionFilter [regions]
+  {:path [:transit-changes :selected-finnish-regions]}
+  regions)
