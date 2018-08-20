@@ -26,17 +26,22 @@
   (with-open [in (:body (http-client/get url {:as :stream}))]
     (read-zip in)))
 
-(defn load-file-from-url [url last-import-date etag]
+(defn load-file-from-url [db interface-id url last-import-date etag]
   (let [query-headers {:headers (merge
-                                 (if (not (nil? etag))
-                                   {"If-None-Match" etag}
-                                   (when-not (nil? last-import-date)
-                                     {"If-Modified-Since" last-import-date})))
+                                  (if (not (nil? etag))
+                                    {"If-None-Match" etag}
+                                    (when-not (nil? last-import-date)
+                                      {"If-Modified-Since" last-import-date})))
                        :as :byte-array}
         response (http-client/get url query-headers)]
     (if (= 304 (:status response))
       ;; Not modified
-      nil
+      (do
+        ;; Remove old import errors, because the package can be loaded, but we already have the newest version.
+        (specql/update! db ::t-service/external-interface-description
+                        {::t-service/gtfs-import-error nil}
+                        {::t-service/id interface-id})
+        nil)
       response)))
 
 (defn load-gtfs [url]
@@ -184,7 +189,7 @@
 
 (defmethod load-transit-interface-url :gtfs [_ db interface-id url last-import-date saved-etag]
   (try
-    (load-file-from-url url last-import-date saved-etag)
+    (load-file-from-url db interface-id url last-import-date saved-etag)
     (catch Exception e
       (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
       (specql/update! db ::t-service/external-interface-description
