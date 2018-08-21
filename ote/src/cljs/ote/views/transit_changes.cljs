@@ -15,7 +15,9 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.style.transit-changes :as style]
             [stylefy.core :refer [use-style]]
-            [stylefy.core :as stylefy]))
+            [stylefy.core :as stylefy]
+            [ote.db.places :as places]
+            [ote.ui.form-fields :as form-fields]))
 
 (defn week-day-short [week-day]
   (tr [:enums :ote.db.transport-service/day :short
@@ -75,6 +77,23 @@
    [:div (use-style style/transit-changes-legend-icon)
     [ic/action-schedule] (cap-number stop-time-changes)]])
 
+
+(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions]}]
+  [:div
+   [form-fields/field {:label "Maakunta"
+                       :type :chip-input
+                       :suggestions (mapv (fn [{name ::places/nimi :as r}]
+                                            {:text name :value r}) finnish-regions)
+                       :suggestions-config {:text :text :value :value}
+                       :max-results (count finnish-regions)
+                       :auto-select? true
+                       :open-on-focus? true
+                       :allow-duplicates? false
+                       :show-option #(str (::places/numero %) " " (::places/nimi %))
+                       :show-option-short ::places/numero
+                       :update! #(e! (tc/->SetRegionFilter %))}
+    selected-finnish-regions]])
+
 (defn- change-description [{:keys [next-different-week] :as row}]
   (when next-different-week
     (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
@@ -96,8 +115,7 @@
          :default
          [change-icons row])])))
 
-
-(defn detected-transit-changes [e! {:keys [loading? changes] :as transit-changes}]
+(defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
   [:div.transit-changes
    [:h3 "Säännöllisen markkinaehtoisen reittiliikenteen tulevat muutokset"]
    [:p
@@ -105,6 +123,7 @@
     " palveluista havaittuja muutoksia. "
     "Voit tarkastella yksittäisessä palvelussa tapahtuvia muutoksia yksityiskohtaisemmin napsauttamalla taulukon riviä. "
     "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
+   [transit-change-filters e! transit-changes]
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
                                     "Ladataan muutoksia, odota hetki..."
@@ -134,7 +153,14 @@
       :read #(select-keys % change-keys)
       :format change-description
       :col-style {:white-space "pre-wrap"}}]
-    changes]])
+
+    (let [region-numbers (when (seq selected-finnish-regions)
+                           (into #{} (map (comp :numero :value)) selected-finnish-regions))
+          region-matches? (if region-numbers
+                            (fn [{regions :finnish-regions}]
+                              (some region-numbers regions))
+                            (constantly true))]
+      (filter region-matches? changes))]])
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
   [ui/tabs {:value (name page)

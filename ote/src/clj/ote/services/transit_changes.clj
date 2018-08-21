@@ -5,7 +5,10 @@
             [jeesql.core :refer [defqueries]]
             [ote.time :as time]
             [clojure.string :as str]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [ote.util.db :refer [PgArray->vec]]
+            [ote.db.places :as places]
+            [specql.core :as specql]))
 
 (defqueries "ote/services/transit_changes.sql")
 
@@ -35,17 +38,19 @@
 
 (defn list-current-changes [db]
   (let [now (java.util.Date.)]
-    (into []
-          (comp
-           (map (fn [{op-id :transport-operator-id :as row}]
-                  (assoc row :next-different-week
-                         (describe-week-difference
-                          (first (next-different-week-for-operator db
-                                                                   {:operator-id op-id}))))))
-           (filter (fn [{diff :next-different-week}]
-                     (not= (:current-week-traffic diff)
-                           (:different-week-traffic diff)))))
-          (list-current-operators db))))
+    {:finnish-regions (specql/fetch db ::places/finnish-regions #{::places/numero ::places/nimi} {})
+     :changes (into []
+                    (comp
+                     (map #(update % :finnish-regions PgArray->vec))
+                     (map (fn [{op-id :transport-operator-id :as row}]
+                            (assoc row :next-different-week
+                                   (describe-week-difference
+                                    (first (next-different-week-for-operator db
+                                                                             {:operator-id op-id}))))))
+                     (filter (fn [{diff :next-different-week}]
+                               (not= (:current-week-traffic diff)
+                                     (:different-week-traffic diff)))))
+                    (list-current-operators db))}))
 
 (define-service-component TransitChanges {}
 

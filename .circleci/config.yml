@@ -40,6 +40,8 @@ jobs:
             - ~/.m2
 
       # setup database
+      - run: aws s3 cp s3://ote-assets/places/finnish_municipalities.csv database/finnish_municipalities.csv
+      - run: aws s3 cp s3://ote-assets/places/maakunnat.csv database/maakunnat.csv
       - run: cd database && sh circleci_setup.sh
 
       # run tests!
