@@ -323,9 +323,15 @@ button[data-balloon] {
   [data-balloon][data-balloon-length='medium']:after {
     white-space: normal;
     width: 150px; }
+  [data-balloon][data-balloon-length='min-medium']:after {
+    white-space: normal;
+    min-width: 150px; }
   [data-balloon][data-balloon-length='large']:after {
     white-space: normal;
     width: 260px; }
+  [data-balloon][data-balloon-length='min-large']:after {
+    white-space: normal;
+    min-width: 260px; }
   [data-balloon][data-balloon-length='xlarge']:after {
     white-space: normal;
     width: 380px; }
