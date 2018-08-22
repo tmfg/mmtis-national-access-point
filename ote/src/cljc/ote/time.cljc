@@ -31,31 +31,37 @@
 (s/def ::specql-data-types/time #(instance? Time %))
 
 #?(:cljs
-(defn format-timestamp-for-ui [timestring]
-  (if  (nil? timestring)
-    " " ;: if nil - print empty string
-    (->> timestring
-         coerce/from-string
+   (defn format-timestamp-for-ui [timestamp]
+     (if (nil? timestamp)
+       " " ;: if nil - print empty string
+       (->>
+         (if (string? timestamp)
+           (coerce/from-string timestamp)
+           timestamp)
          t/to-default-time-zone
          (format/unparse (format/formatter "dd.MM.yyyy HH:mm"))))))
 
 #?(:cljs
-   (defn format-timestamp->date-for-ui [timestring]
-     (if  (nil? timestring)
+   (defn format-timestamp->date-for-ui [timestamp]
+     (if (nil? timestamp)
        " " ;: if nil - print empty string
-       (->> timestring
-            coerce/from-string
-            t/to-default-time-zone
-            (format/unparse (format/formatter "dd.MM.yyyy"))))))
+       (->>
+         (if (string? timestamp)
+           (coerce/from-string timestamp)
+           timestamp)
+         t/to-default-time-zone
+         (format/unparse (format/formatter "dd.MM.yyyy"))))))
 
 #?(:cljs
-   (defn date-fields-from-timestamp [timestring]
-     (if  (nil? timestring)
+   (defn date-fields-from-timestamp [timestamp]
+     (if (nil? timestamp)
        nil
-       (->> timestring
-            coerce/from-string
-            t/to-default-time-zone
-            (date-fields)))))
+       (->>
+         (if (string? timestamp)
+           (coerce/from-string timestamp)
+           timestamp)
+         t/to-default-time-zone
+         (date-fields)))))
 
 #?(:cljs
    (defn format-js-time [time]
