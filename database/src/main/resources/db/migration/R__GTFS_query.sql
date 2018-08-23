@@ -64,6 +64,7 @@ $$ LANGUAGE SQL STABLE;
 CREATE OR REPLACE FUNCTION gtfs_latest_package_for_date(operator_id INTEGER, date DATE) RETURNS INTEGER AS $$
 SELECT p.id FROM gtfs_package p
  WHERE p."transport-operator-id" = operator_id
+   AND p.created < date
    AND gtfs_package_date_range(p.id) @> date
  ORDER BY p.id DESC
  LIMIT 1;
@@ -104,3 +105,40 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_package_finnish_regions(INTEGER) IS
 E'Returns an array of the finnish region numbers the given GTFS package operates in.
 The package operates in the area if any of its stops are contained in the region geometry.';
+
+CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_id INTEGER, dt DATE)
+RETURNS SETOF RECORD
+AS $$
+SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
+       COUNT(trip."trip-id") AS trips,
+       string_agg(t.trips::TEXT,',') as tripdata
+  FROM "gtfs-route" r
+  JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+  JOIN LATERAL unnest(t.trips) trip ON true
+ WHERE t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
+   AND r."package-id" = package_id
+ GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
+$$ LANGUAGE SQL STABLE;
+
+CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_id INTEGER, dt DATE)
+RETURNS SETOF RECORD
+AS $$
+WITH
+date_trips AS (
+
+)
+SELECT x.* FROM (
+ SELECT COALESCE(d1."route-short-name",d2."route-short-name") AS "route-short-name",
+        COALESCE(d1."route-long-name",d2."route-long-name") AS "route-long-name",
+        COALESCE(d1."trip-headsign",d2."trip-headsign") AS "trip-headsign",
+        d1.trips as "date1-trips", d2.trips as "date2-trips",
+        CASE
+          WHEN d1.tripdata = d2.tripdata THEN false
+          ELSE true
+        END as "different?"
+   FROM date1_trips d1 FULL OUTER JOIN date2_trips d2
+        ON (COALESCE(d1."route-short-name",'') = COALESCE(d2."route-short-name", '') AND
+            COALESCE(d1."route-long-name",'') = COALESCE(d2."route-long-name", '') AND
+            COALESCE(d1."trip-headsign",'') = COALESCE(d2."trip-headsign",''))) x
+ORDER BY x."route-short-name";
+$$ LANGUAGE SQL STABLE;

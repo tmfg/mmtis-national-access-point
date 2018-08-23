@@ -387,3 +387,6 @@
   #?(:cljs (js/Date. year (dec month) date hours minutes seconds)
      :clj (let [gc (java.util.GregorianCalendar. year (dec month) date hours minutes seconds)]
             (.getTime gc))))
+
+(defn time-difference [time1 time2]
+  (Math/abs (- (minutes-from-midnight time1) (minutes-from-midnight time2))))
