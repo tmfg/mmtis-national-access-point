@@ -239,7 +239,8 @@
                                                               :gtfs/transport-service-id ts-id
                                                               :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
                                                               :gtfs/etag new-etag
-                                                              :gtfs/license license})]
+                                                              :gtfs/license license
+                                                              :gtfs/external-interface-description-id interface-id})]
                 (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
                 (log/debug "File: " filename " was uploaded to S3 successfully.")
 

@@ -20,7 +20,8 @@
             [reagent.core :as r]
             [ote.util.values :as values]
             cljsjs.leaflet
-            [ote.time :as time]))
+            [ote.time :as time]
+            [cljs-time.coerce :as coerce]))
 
 (defn ignore-key? [key]
   (let [ends-with-keys-to-ignore ["-imported" "-csv-url" "operator-id"]
@@ -37,8 +38,8 @@
 (defmethod transform-value "homepage" [_ value] (linkify value value {:target "_blank"}))
 (defmethod transform-value "csv-url" [_ value] (linkify value (tr [:service-search :load-csv-file]) {:target "_blank"}))
 (defmethod transform-value "contact-email" [_ value] (linkify (str "mailto:" value) value))
-(defmethod transform-value "available-to" [_ value] (time/format-timestamp->date-for-ui value))
-(defmethod transform-value "available-from" [_ value] (time/format-timestamp->date-for-ui value))
+(defmethod transform-value "available-to" [_ value] (time/format-timestamp->date-for-ui (coerce/from-string value)))
+(defmethod transform-value "available-from" [_ value] (time/format-timestamp->date-for-ui (coerce/from-string value)))
 (defmethod transform-value "maximum-stay" [_ value]
   (when value
     (let [interval (time/iso-8601-period->interval value)]
