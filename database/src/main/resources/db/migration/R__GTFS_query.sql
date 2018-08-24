@@ -128,7 +128,7 @@ CREATE TYPE service_ref AS (
 
 CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
 RETURNS SETOF service_ref AS $$
-SELECT DISTINCT ROW(c.package-id, c."service-id")::service_ref
+SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
   FROM "gtfs-calendar" c
   LEFT JOIN "gtfs-calendar-date" cd ON (c."package-id" = cd."package-id" AND c."service-id" = cd."service-id")
  WHERE c."package-id" = ANY(package_ids)
