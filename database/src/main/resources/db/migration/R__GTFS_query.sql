@@ -106,39 +106,80 @@ COMMENT ON FUNCTION gtfs_package_finnish_regions(INTEGER) IS
 E'Returns an array of the finnish region numbers the given GTFS package operates in.
 The package operates in the area if any of its stops are contained in the region geometry.';
 
-CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_id INTEGER, dt DATE)
-RETURNS SETOF RECORD
+-------------------------------------
+-- New per service query functions.
+-- A service can have multiple packages (different external interfaces) operating on the same day
+-- so we use an INTEGER[] to pass in all package ids to use.
+--------
+
+
+CREATE TYPE route_trips_for_date AS (
+ "route-short-name" TEXT,
+ "route-long-name" TEXT,
+ "trip-headsign" TEXT,
+ trips INTEGER,
+ tripdata "gtfs-trip-info"[]
+);
+
+CREATE TYPE service_ref AS (
+  "package-id" INTEGER,
+  "service-id" TEXT
+);
+
+CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
+RETURNS SETOF service_ref AS $$
+SELECT DISTINCT ROW(c.package-id, c."service-id")::service_ref
+  FROM "gtfs-calendar" c
+  LEFT JOIN "gtfs-calendar-date" cd ON (c."package-id" = cd."package-id" AND c."service-id" = cd."service-id")
+ WHERE c."package-id" = ANY(package_ids)
+   AND (dt BETWEEN c."start-date" AND c."end-date")
+   AND ((EXTRACT(DOW FROM dt) = 0 AND c.sunday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 1 AND c.monday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 2 AND c.tuesday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 3 AND c.wednesday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
+   AND (cd."exception-type" IS NULL OR cd."exception-type" != 2)
+UNION
+SELECT ROW(cd."package-id", cd."service-id")::service_ref
+  FROM "gtfs-calendar-date" cd
+ WHERE cd."package-id" = ANY(package_ids)
+   AND cd.date = dt
+   AND cd."exception-type" = 1;
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[], DATE) IS
+E'Given package ids and a date, fetch all services that are operating on that date. Returns service
+references which contain the package-id and the service-id.';
+
+CREATE OR REPLACE FUNCTION gtfs_service_packages_for_date(service_id INTEGER, dt DATE)
+RETURNS INTEGER[]
+AS $$
+SELECT array_agg(x.id)
+  FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
+          FROM gtfs_package p
+         WHERE "transport-service-id" = service_id
+           AND created <= dt
+         ORDER BY "external-interface-description-id", created DESC) x
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_service_packages_for_date(INTEGER, DATE) IS
+E'Returns an array of package ids that are in effect for the given service and date.';
+
+CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_ids INTEGER[], dt DATE)
+RETURNS SETOF route_trips_for_date
 AS $$
 SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
-       COUNT(trip."trip-id") AS trips,
-       string_agg(t.trips::TEXT,',') as tripdata
+       COUNT(trip."trip-id")::INTEGER AS trips,
+       array_agg(trip) as tripdata
   FROM "gtfs-route" r
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
- WHERE t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
-   AND r."package-id" = package_id
+ WHERE r."package-id" = ANY(package_ids)
+   AND ROW(r."package-id", t."service-id")::service_ref IN (SELECT * FROM gtfs_services_for_date(package_ids, dt))
  GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
 $$ LANGUAGE SQL STABLE;
 
-CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_id INTEGER, dt DATE)
-RETURNS SETOF RECORD
-AS $$
-WITH
-date_trips AS (
-
-)
-SELECT x.* FROM (
- SELECT COALESCE(d1."route-short-name",d2."route-short-name") AS "route-short-name",
-        COALESCE(d1."route-long-name",d2."route-long-name") AS "route-long-name",
-        COALESCE(d1."trip-headsign",d2."trip-headsign") AS "trip-headsign",
-        d1.trips as "date1-trips", d2.trips as "date2-trips",
-        CASE
-          WHEN d1.tripdata = d2.tripdata THEN false
-          ELSE true
-        END as "different?"
-   FROM date1_trips d1 FULL OUTER JOIN date2_trips d2
-        ON (COALESCE(d1."route-short-name",'') = COALESCE(d2."route-short-name", '') AND
-            COALESCE(d1."route-long-name",'') = COALESCE(d2."route-long-name", '') AND
-            COALESCE(d1."trip-headsign",'') = COALESCE(d2."trip-headsign",''))) x
-ORDER BY x."route-short-name";
-$$ LANGUAGE SQL STABLE;
+COMMENT ON FUNCTION gtfs_route_trips_for_date(INTEGER[], DATE) IS
+E'Return trips from given packages for the given date';
