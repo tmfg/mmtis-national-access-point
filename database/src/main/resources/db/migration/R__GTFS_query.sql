@@ -183,3 +183,106 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_route_trips_for_date(INTEGER[], DATE) IS
 E'Return trips from given packages for the given date';
+
+CREATE OR REPLACE FUNCTION gtfs_service_routes_with_trips_for_date(service_id INTEGER, dt DATE)
+RETURNS SETOF route_trips_for_date
+AS $$
+SELECT gtfs_route_trips_for_date((SELECT gtfs_service_packages_for_date(service_id, dt)), dt);
+$$ LANGUAGE SQL STABLE;
+
+CREATE OR REPLACE FUNCTION gtfs_route_differences("route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT, d1_trips "gtfs-trip-info"[], d2_trips "gtfs-trip-info"[])
+RETURNS "gtfs-route-change-info"
+AS $$
+DECLARE
+  chg "gtfs-route-change-info";
+BEGIN
+  chg."route-short-name" := "route-short-name";
+  chg."route-long-name" := "route-long-name";
+  chg."trip-headsign" := "trip-headsign";
+  chg."added-trips" := 666;
+  chg."removed-trips" := 42;
+  chg."trip-stop-sequence-changes" := 1;
+  chg."trip-stop-time-changes" := 44;
+  RETURN chg;
+END
+$$ LANGUAGE plpgsql;
+
+--select gtfs_route_differences('fpp','bar','61',ARRAY[]::"gtfs-trip-info"[], ARRAY[]::"gtfs-trip-info"[]);
+
+COMMENT ON FUNCTION gtfs_route_differences(TEXT,TEXT,TEXT,"gtfs-trip-info"[],"gtfs-trip-info"[]) IS
+E'Calculate differences in daily trips for route. Takes in two trip arrays for different dates.';
+
+CREATE OR REPLACE FUNCTION gtfs_date_differences(service_id INTEGER, date1 DATE, date2 DATE)
+RETURNS SETOF TEXT
+AS $$
+DECLARE
+  added_routes INTEGER;
+  removed_routes INTEGER;
+  added_trips INTEGER;
+  removed_trips INTEGER;
+  stop_seq_changes INTEGER;
+  stop_time_changes INTEGER;
+  route_change "gtfs-route-change-info";
+  route_changes "gtfs-route-change-info"[];
+  row RECORD;
+  package_ids INTEGER[];
+BEGIN
+  added_routes := 0;
+  removed_routes := 0;
+  added_trips := 0;
+  removed_trips := 0;
+  stop_seq_changes := 0;
+  stop_time_changes := 0;
+  route_changes := ARRAY[]::"gtfs-route-change-info"[];
+
+  -- Take all package ids used in calculation without duplicate values
+  package_ids := (SELECT array_agg(x.p) FROM (
+                   SELECT unnest(gtfs_service_packages_for_date(service_id, date1)) p
+                    UNION
+                   SELECT unnest(gtfs_service_packages_for_date(service_id, date2)) p) x);
+
+
+  FOR row IN
+      SELECT COALESCE(l."route-short-name",r."route-short-name") as "route-short-name",
+             COALESCE(l."route-long-name", r."route-long-name") as "route-long-name",
+             COALESCE(l."trip-headsign",r."trip-headsign") as "trip-headsign",
+             l."tripdata" as "date1-trips",
+             r."tripdata" as "date2-trips",
+             COALESCE(l.tripdata,ARRAY[]::"gtfs-trip-info"[]) != COALESCE(r.tripdata,ARRAY[]::"gtfs-trip-info"[]) as "different?"
+        FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(service_id, date1), date1) l
+        FULL OUTER JOIN gtfs_route_trips_for_date(gtfs_service_packages_for_date(service_id, date2), date2) r ON
+             (l."route-short-name"=r."route-short-name" AND l."route-long-name"=r."route-long-name" AND l."trip-headsign"=r."trip-headsign")
+  LOOP
+    IF row."date1-trips" IS NULL AND row."date2-trips" IS NOT NULL THEN
+      RETURN NEXT CONCAT('uusi reitti: ', row."route-long-name");
+      added_routes := added_routes + 1;
+    ELSIF row."date1-trips" IS NOT NULL AND row."date2-trips" IS NULL THEN
+      RETURN NEXT CONCAT('poistunut reitti: ', row."route-long-name");
+      removed_routes := removed_routes + 1;
+    ELSE
+      IF row."different?" THEN
+        route_change := gtfs_route_differences(row."route-short-name",row."route-long-name",row."trip-headsign", row."date1-trips", row."date2-trips");
+        route_changes := route_changes || route_change;
+        added_trips := added_trips + route_change."added-trips";
+        removed_trips := removed_trips + route_change."removed-trips";
+        stop_seq_changes := stop_seq_changes + route_change."trip-stop-sequence-changes";
+        stop_time_changes := stop_time_changes + route_change."trip-stop-time-changes";
+        RETURN NEXT CONCAT('muuttunut: ', to_json(route_change));
+      ELSE
+        RETURN NEXT CONCAT('sama: ', row."route-long-name");
+      END IF;
+    END IF;
+  END LOOP;
+  INSERT INTO "gtfs-transit-changes"
+         (date,"transport-service-id",
+          "current-week-date","different-week-date","change-date",
+          "added-routes","removed-routes","added-trips","removed-trips",
+          "trip-stop-sequence-changes","trip-stop-time-changes",
+          "route-changes","package-ids")
+  VALUES (CURRENT_DATE, service_id,
+          date1, date2, date_trunc('week',date2),
+          added_routes, removed_routes, added_trips, removed_trips,
+          stop_seq_changes, stop_time_changes,
+          route_changes, package_ids);
+END
+$$ LANGUAGE plpgsql;
