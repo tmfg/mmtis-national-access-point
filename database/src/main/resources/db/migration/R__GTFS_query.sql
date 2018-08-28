@@ -161,6 +161,8 @@ SELECT ROW(cd."package-id", cd."service-id")::service_ref
    AND cd."exception-type" = 1;
 $$ LANGUAGE SQL STABLE;
 
+COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
+E'Return set of (package-id, service-id) tuples of services operated by the given packages for the given date.';
 
 CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_ids INTEGER[], dt DATE)
 RETURNS SETOF route_trips_for_date
@@ -241,7 +243,7 @@ BEGIN
                 JOIN "gtfs-stop" s ON (s."package-id" = (d2_trip)."package-id" AND st."stop-id" = s."stop-id")) d2
           ON (d1."stop-sequence" = d2."stop-sequence")
   LOOP
-    RAISE NOTICE '%  (% / %) => (% / %)', row.stopname, row.d1_arr,row.d1_dep, row.d2_arr,row.d2_dep;
+    --RAISE NOTICE '%  (% / %) => (% / %)', row.stopname, row.d1_arr,row.d1_dep, row.d2_arr,row.d2_dep;
     IF row.d1_stop_id IS NULL OR row.d2_stop_id IS NULL THEN
       -- If either side is NULL, this is a stop sequence change
       chg."trip-stop-sequence-changes" := chg."trip-stop-sequence-changes" + 1;
@@ -255,7 +257,6 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-
 CREATE OR REPLACE FUNCTION gtfs_route_differences("route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT, d1_trips "gtfs-package-trip-info"[], d2_trips "gtfs-package-trip-info"[])
 RETURNS "gtfs-route-change-info"
 AS $$
@@ -267,11 +268,11 @@ DECLARE
   d1_trip_ids TEXT[];
   d2_trip_ids TEXT[];
   trip_chg "gtfs-trip-change-info";
-  trip_stop_sequence_changes INTEGER;
-  trip_stop_time_changes INTEGER;
+  trip_stop_seq_changes INT4RANGE;
+  trip_stop_time_changes INT4RANGE;
 BEGIN
-  trip_stop_sequence_changes := 0;
-  trip_stop_time_changes := 0;
+  trip_stop_seq_changes := NULL;
+  trip_stop_time_changes := NULL;
 
   -- Select all trips as array of "package-id:trip-id" strings
   all_trips := (SELECT array_agg(x.t)
@@ -295,7 +296,7 @@ BEGIN
            ORDER BY min_stop_seq
            LIMIT 1;
 
-   RAISE NOTICE '% / % / %   1. yhteinen pysäkki: %', "route-short-name", "route-long-name", "trip-headsign", first_common_stop;
+   --RAISE NOTICE '% / % / %   1. yhteinen pysäkki: %', "route-short-name", "route-long-name", "trip-headsign", first_common_stop;
 
    --------------------------
    -- Combine d1 and d2 trips based on the least amount of difference in departure for the 1st common stop
@@ -324,7 +325,7 @@ BEGIN
          (row."d2-trip")."trip-id" = ANY(d2_trip_ids)
       THEN
          -- Both trips are still unconsumed, mark this pair as the same
-         RAISE NOTICE '% = % aikaerolla %', (row."d1-trip")."trip-id", (row."d2-trip")."trip-id", row.timediff;
+         --RAISE NOTICE '% = % aikaerolla %', (row."d1-trip")."trip-id", (row."d2-trip")."trip-id", row.timediff;
          d1_trip_ids := array_remove(d1_trip_ids, (row."d1-trip")."trip-id");
          d2_trip_ids := array_remove(d2_trip_ids, (row."d2-trip")."trip-id");
 
@@ -332,19 +333,34 @@ BEGIN
          trip_chg := gtfs_trip_changes(ROW(row."d1-package-id", row."d1-trip")::"gtfs-package-trip-info",
                                        ROW(row."d2-package-id", row."d2-trip")::"gtfs-package-trip-info",
                                        first_common_stop);
-         trip_stop_sequence_changes := trip_stop_sequence_changes + trip_chg."trip-stop-sequence-changes";
-         trip_stop_time_changes := trip_stop_time_changes + trip_chg."trip-stop-time-changes";
+         IF trip_stop_seq_changes IS NULL THEN
+           trip_stop_seq_changes := int4range(trip_chg."trip-stop-sequence-changes",
+                                              trip_chg."trip-stop-sequence-changes", '[]');
+         ELSE
+           trip_stop_seq_changes := range_merge(trip_stop_seq_changes,
+                                                int4range(trip_chg."trip-stop-sequence-changes",
+                                                          trip_chg."trip-stop-sequence-changes", '[]'));
+         END IF;
+
+         IF trip_stop_time_changes IS NULL THEN
+           trip_stop_time_changes := int4range(trip_chg."trip-stop-time-changes",
+                                               trip_chg."trip-stop-time-changes", '[]');
+         ELSE
+           trip_stop_time_changes := range_merge(trip_stop_time_changes,
+                                                 int4range(trip_chg."trip-stop-time-changes",
+                                                           trip_chg."trip-stop-time-changes", '[]'));
+         END IF;
       END IF;
    END LOOP;
 
-   RAISE NOTICE 'yli jäi d1: % ja d2: % vuoroa', array_length(d1_trip_ids, 1), array_length(d2_trip_ids, 2);
+  RAISE NOTICE 'yli jäi d1: % ja d2: % vuoroa', array_length(d1_trip_ids, 1), array_length(d2_trip_ids, 2);
 
   chg."route-short-name" := "route-short-name";
   chg."route-long-name" := "route-long-name";
   chg."trip-headsign" := "trip-headsign";
   chg."added-trips" := COALESCE(array_length(d2_trip_ids,1), 0);
   chg."removed-trips" := COALESCE(array_length(d1_trip_ids,1), 0);
-  chg."trip-stop-sequence-changes" := trip_stop_sequence_changes;
+  chg."trip-stop-sequence-changes" := trip_stop_seq_changes;
   chg."trip-stop-time-changes" := trip_stop_time_changes;
   RETURN chg;
 END
@@ -356,10 +372,7 @@ AS $$
 DECLARE
   added_routes INTEGER;
   removed_routes INTEGER;
-  added_trips INTEGER;
-  removed_trips INTEGER;
-  stop_seq_changes INTEGER;
-  stop_time_changes INTEGER;
+  changed_routes INTEGER;
   route_change "gtfs-route-change-info";
   route_changes "gtfs-route-change-info"[];
   row RECORD;
@@ -367,10 +380,7 @@ DECLARE
 BEGIN
   added_routes := 0;
   removed_routes := 0;
-  added_trips := 0;
-  removed_trips := 0;
-  stop_seq_changes := 0;
-  stop_time_changes := 0;
+  changed_routes := 0;
   route_changes := ARRAY[]::"gtfs-route-change-info"[];
 
   -- Take all package ids used in calculation without duplicate values
@@ -398,10 +408,7 @@ BEGIN
     ELSIF row."different?" THEN
         route_change := gtfs_route_differences(row."route-short-name",row."route-long-name",row."trip-headsign", row."date1-trips", row."date2-trips");
         route_changes := route_changes || route_change;
-        added_trips := added_trips + route_change."added-trips";
-        removed_trips := removed_trips + route_change."removed-trips";
-        stop_seq_changes := stop_seq_changes + route_change."trip-stop-sequence-changes";
-        stop_time_changes := stop_time_changes + route_change."trip-stop-time-changes";
+        changed_routes := changed_routes + 1;
     END IF;
   END LOOP;
 
@@ -409,13 +416,11 @@ BEGIN
   INSERT INTO "gtfs-transit-changes"
          (date,"transport-service-id",
           "current-week-date","different-week-date","change-date",
-          "added-routes","removed-routes","added-trips","removed-trips",
-          "trip-stop-sequence-changes","trip-stop-time-changes",
+          "added-routes","removed-routes","changed-routes",
           "route-changes","package-ids")
   VALUES (CURRENT_DATE, service_id,
           date1, date2, date_trunc('week',date2),
-          added_routes, removed_routes, added_trips, removed_trips,
-          stop_seq_changes, stop_time_changes,
+          added_routes, removed_routes, changed_routes,
           route_changes, package_ids)
   ON CONFLICT (date,"transport-service-id") DO
   UPDATE SET "current-week-date" = date1,
@@ -423,11 +428,85 @@ BEGIN
           "change-date" = date_trunc('week',date2),
           "added-routes" = added_routes,
           "removed-routes" = removed_routes,
-          "added-trips" = added_trips,
-          "removed-trips" = removed_trips,
-          "trip-stop-sequence-changes" = stop_seq_changes,
-          "trip-stop-time-changes" = stop_time_changes,
+          "changed-routes" = changed_routes,
           "route-changes" = route_changes,
           "package-ids" = package_ids;
 END
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION gtfs_service_date_hash(service_id INTEGER, dt DATE)
+RETURNS TEXT
+AS $$
+SELECT string_agg(h.hash::TEXT,' ' ORDER BY h."package-id")
+  FROM "gtfs-date-hash" h
+ WHERE h.date = dt
+   AND h."package-id" = ANY(gtfs_service_packages_for_date(service_id, dt))
+$$ LANGUAGE SQL STABLE;
+
+CREATE OR REPLACE FUNCTION gtfs_service_week_hash(service_id INTEGER, dt DATE)
+RETURNS TEXT
+AS $$
+WITH week_dates AS (
+SELECT date_trunc('week', dt) + (CONCAT(days,' days'))::interval as date
+  FROM generate_series(0, 6) days
+)
+SELECT string_agg(concat(EXTRACT(ISODOW FROM date),'=', gtfs_service_date_hash(service_id, date::date)),',') as weekhash
+  FROM week_dates;
+$$ LANGUAGE SQL STABLE;
+
+
+CREATE OR REPLACE FUNCTION gtfs_service_next_different_week(service_id INTEGER)
+RETURNS RECORD
+AS $$
+WITH weeks AS (
+ SELECT (date_trunc('week',CURRENT_DATE) + (CONCAT(w,' weeks'))::interval)::date AS "beginning-of-week"
+   FROM generate_series(0, 52) w
+)
+SELECT chg."beginning-of-current-week", chg.curw AS "current-weekhash",
+       chg."beginning-of-different-week", chg.next1w AS "different-weekhash"
+  FROM (SELECT wh."beginning-of-week" AS "beginning-of-current-week",
+               wh.weekhash AS curw,
+               LEAD(wh."beginning-of-week", 1) OVER (ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) AS "beginning-of-different-week",
+               LEAD(wh.weekhash, 1) OVER (ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) AS next1w,
+               LEAD(wh.weekhash, 2) OVER (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING) AS next2w
+          FROM (SELECT w."beginning-of-week",
+                       gtfs_service_week_hash(service_id, w."beginning-of-week") as weekhash
+                  FROM weeks w
+                 ORDER BY "beginning-of-week") wh) chg
+ WHERE (chg.curw != chg.next1w AND chg.curw != chg.next2w) -- skip over single different week
+ LIMIT 1;
+$$ LANGUAGE SQL STABLE;
+
+CREATE OR REPLACE FUNCTION gtfs_detect_next_transit_change(service_id INTEGER)
+RETURNS VOID
+AS $$
+DECLARE
+  dw RECORD; -- different week
+  first_different_day CHAR(1); -- 1 - 7
+  row RECORD;
+BEGIN
+  dw := gtfs_service_next_different_week(service_id);
+  RAISE NOTICE 'muutos %', dw."beginning-of-current-week";
+
+  -- Determine the first different weekday
+  SELECT ((regexp_split_to_array(c.day,'='))[1])::integer - 1
+    INTO first_different_day
+    FROM (SELECT regexp_split_to_table(dw."current-weekhash", ',') AS day) c
+    JOIN (SELECT regexp_split_to_table(dw."different-weekhash", ',') AS day) d
+      ON (regexp_split_to_array(c.day,'='))[1] = (regexp_split_to_array(d.day,'='))[1]
+   WHERE c.day != d.day
+   LIMIT 1;
+  RAISE NOTICE 'eripäivä on %', first_different_day;
+
+  -- Calculate differences for the different date
+  PERFORM gtfs_date_differences(
+       service_id,
+       (dw."beginning-of-current-week" + CONCAT(first_different_day,' days')::interval)::date,
+       (dw."beginning-of-different-week" + CONCAT(first_different_day,' days')::interval)::date);
+
+  RETURN;
+END
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION gtfs_detect_next_transit_change(INTEGER) IS
+E'Detect and store the next upcoming change in traffic for the given transport service id.';
