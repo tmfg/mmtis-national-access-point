@@ -16,3 +16,6 @@ INSERT INTO "gtfs-date-hash" ("package-id", date, hash)
  SELECT :package-id::INTEGER, gtfs_package_dates,
         gtfs_hash_for_date(:package-id::INTEGER, gtfs_package_dates)
    FROM gtfs_package_dates(:package-id::INTEGER);
+
+-- name: gtfs-set-package-geometry
+SELECT gtfs_set_package_geometry(:package-id::INTEGER);
