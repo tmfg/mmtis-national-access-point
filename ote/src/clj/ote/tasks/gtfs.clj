@@ -12,7 +12,8 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [ote.time :as time]
-            [ote.tasks.util :refer [daily-at timezone]])
+            [ote.tasks.util :refer [daily-at timezone]]
+            [ote.db.lock :as lock])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -55,6 +56,15 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
+(defn detect-new-changes-task [db]
+  (lock/try-with-lock
+   db "gtfs-nightly-changes" 1800
+   (let [service-ids (map :id (services-for-nightly-change-detection db))]
+     (log/info "Detect transit changes for " (count service-ids) " services.")
+     (doseq [service-id service-ids]
+       (log/info "Detecting next transit changes for service: " service-id)
+       (upsert-service-transit-change db {:service-id service-id})))))
+
 (defrecord GtfsTasks [at config]
   component/Lifecycle
   (start [{db :db :as this}]
@@ -68,7 +78,7 @@
                  (#'update-one-gtfs! config db)))
               (chime-at (daily-at 5 15)
                         (fn [_]
-                          (refresh-nightly-transit-changes db)))]
+                          (detect-new-changes-task db)))]
              (do
                (log/debug "GTFS IMPORT IS NOT ENABLED!")
                nil))))

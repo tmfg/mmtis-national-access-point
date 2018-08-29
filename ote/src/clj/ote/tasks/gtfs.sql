@@ -11,5 +11,15 @@ SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
  ORDER BY "gtfs-imported" ASC LIMIT 1
    FOR UPDATE SKIP LOCKED;
 
--- name: refresh-nightly-transit-changes
-SELECT refresh_nightly_transit_changes();
+-- name: services-for-nightly-change-detection
+SELECT ts.id
+  FROM "transport-service" ts
+ WHERE EXISTS(SELECT id
+                FROM "external-interface-description" eid
+               WHERE ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
+                 AND 'route-and-schedule' = ANY(eid."data-content")
+                 AND eid."transport-service-id" = ts.id)
+   AND gtfs_should_calculate_transit_change(ts.id);
+
+-- name: upsert-service-transit-change
+SELECT gtfs_detect_next_transit_change(:service-id);
