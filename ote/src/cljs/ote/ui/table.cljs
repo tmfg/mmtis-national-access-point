@@ -20,7 +20,11 @@
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
   [ui/table (merge
               {:wrapperStyle {:overflow "visible"}
-               :bodyStyle {:overflow "visible"}}
+               ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
+               ;;        But, if any row includes tooltips, the body must also have visible overflow.
+               ;;        For now, leaving this commented out.
+               ;:bodyStyle {:overflow "visible"}
+               }
               (when on-select
                 {:on-row-selection (fn [selected-rows]
                                      (let [rows (vec rows)]
