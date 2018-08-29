@@ -222,7 +222,11 @@ BEGIN
   chg."trip-stop-sequence-changes" := 0;
   chg."trip-stop-time-changes" := 0;
 
-  -- Determine the positions of the first common stop
+  -- Determine the positions of the first common stop.
+  -- The stop seq position is used to "line up" the stops in both trips
+  -- by substracting it from the actual stop sequence number. This makes
+  -- the first common stop have the sequence number of 0 on both sides
+  -- and is used in the JOIN clause.
   d1_stop_seq_of_fcs := gtfs_trip_stop_sequence_by_name(d1_trip, first_common_stop);
   d2_stop_seq_of_fcs := gtfs_trip_stop_sequence_by_name(d2_trip, first_common_stop);
 
@@ -366,7 +370,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION gtfs_date_differences(service_id INTEGER, date1 DATE, date2 DATE)
+CREATE OR REPLACE FUNCTION gtfs_upsert_date_differences(service_id INTEGER, date1 DATE, date2 DATE)
 RETURNS VOID
 AS $$
 DECLARE
@@ -466,13 +470,14 @@ SELECT chg."beginning-of-current-week", chg.curw AS "current-weekhash",
        chg."beginning-of-different-week", chg.next1w AS "different-weekhash"
   FROM (SELECT wh."beginning-of-week" AS "beginning-of-current-week",
                wh.weekhash AS curw,
-               LEAD(wh."beginning-of-week", 1) OVER (ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) AS "beginning-of-different-week",
-               LEAD(wh.weekhash, 1) OVER (ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) AS next1w,
-               LEAD(wh.weekhash, 2) OVER (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING) AS next2w
+               LEAD(wh."beginning-of-week", 1) OVER w AS "beginning-of-different-week",
+               LEAD(wh.weekhash, 1) OVER w AS next1w,
+               LEAD(wh.weekhash, 2) OVER w AS next2w
           FROM (SELECT w."beginning-of-week",
                        gtfs_service_week_hash(service_id, w."beginning-of-week") as weekhash
                   FROM weeks w
-                 ORDER BY "beginning-of-week") wh) chg
+                 ORDER BY "beginning-of-week") wh
+         WINDOW w AS (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING)) chg
  WHERE (chg.curw != chg.next1w AND chg.curw != chg.next2w) -- skip over single different week
  LIMIT 1;
 $$ LANGUAGE SQL STABLE;
@@ -499,7 +504,7 @@ BEGIN
   RAISE NOTICE 'eripäivä on %', first_different_day;
 
   -- Calculate differences for the different date
-  PERFORM gtfs_date_differences(
+  PERFORM gtfs_upsert_date_differences(
        service_id,
        (dw."beginning-of-current-week" + CONCAT(first_different_day,' days')::interval)::date,
        (dw."beginning-of-different-week" + CONCAT(first_different_day,' days')::interval)::date);
