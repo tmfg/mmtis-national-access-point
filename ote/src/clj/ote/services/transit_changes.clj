@@ -37,20 +37,12 @@
          :different-week-traffic (parse-weekhash (:different-weekhash difference))))
 
 (defn list-current-changes [db]
-  (let [now (java.util.Date.)]
-    {:finnish-regions (specql/fetch db ::places/finnish-regions #{::places/numero ::places/nimi} {})
-     :changes (into []
-                    (comp
-                     (map #(update % :finnish-regions PgArray->vec))
-                     (map (fn [{op-id :transport-operator-id :as row}]
-                            (assoc row :next-different-week
-                                   (describe-week-difference
-                                    (first (next-different-week-for-operator db
-                                                                             {:operator-id op-id}))))))
-                     (filter (fn [{diff :next-different-week}]
-                               (not= (:current-week-traffic diff)
-                                     (:different-week-traffic diff)))))
-                    (list-current-operators db))}))
+  {:finnish-regions (specql/fetch db ::places/finnish-regions #{::places/numero ::places/nimi} {})
+   :changes (into []
+                  (map #(update % :finnish-regions (fn [region-list]
+                                                     (when region-list
+                                                       (into #{} (str/split region-list #","))))))
+                  (upcoming-changes db))})
 
 (define-service-component TransitChanges {}
 
