@@ -13,25 +13,10 @@
           (t/days (time/week-day-order
                     (first diff-days)))))
 
-(defn process-change [{next-different-week :next-different-week :as change}]
-  (let [{:keys [current-week-traffic different-week-traffic change-date]} next-different-week
-        current-week-start (t/minus (t/now) (t/days (dec (t/day-of-week (t/now)))))
-        diff-days (keep #(when (not= ((:day->hash current-week-traffic) %)
-                                     ((:day->hash different-week-traffic) %))
-                           %)
-                        time/week-days)]
-
-    (assoc change :first-diff-dates {:date1 (first-diff-date diff-days current-week-start)
-                                     :date2 (first-diff-date diff-days change-date)}
-                  :diff-days diff-days
-                  :week-start-date current-week-start
-                  :diff-week-start-date change-date)))
-
-
 (define-event TransitChangesResponse [response]
   {:path [:transit-changes]}
   (assoc app
-         :changes (mapv process-change (:changes response))
+         :changes (:changes response)
          :finnish-regions (:finnish-regions response)
          :loading? false))
 
