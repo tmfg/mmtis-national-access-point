@@ -60,7 +60,6 @@ SELECT digest(string_agg(concat(d.route, ':', d.times), '|'), 'sha256')
   GROUP BY x.route) d;
 $$ LANGUAGE SQL STABLE;
 
-
 CREATE OR REPLACE FUNCTION gtfs_latest_package_for_date(operator_id INTEGER, date DATE) RETURNS INTEGER AS $$
 SELECT p.id FROM gtfs_package p
  WHERE p."transport-operator-id" = operator_id
@@ -515,3 +514,63 @@ $$ LANGUAGE plpgsql;
 
 COMMENT ON FUNCTION gtfs_detect_next_transit_change(INTEGER) IS
 E'Detect and store the next upcoming change in traffic for the given transport service id.';
+
+CREATE OR REPLACE FUNCTION gtfs_package_date_hashes(package_id INTEGER, dt DATE)
+RETURNS VOID
+AS $$
+DECLARE
+  route_hashes "gtfs-route-hash"[];
+  date_hash bytea;
+BEGIN
+
+  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign", digest(d.times, 'sha256'))::"gtfs-route-hash")
+    INTO route_hashes
+    FROM (SELECT x."route-short-name",x."route-long-name",x."trip-headsign",
+                 string_agg(concat(x."stop-name", '@', x."departure-time"), '->') as times
+            FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
+                         COALESCE(r."route-long-name", '') as "route-long-name",
+                         COALESCE(trip."trip-headsign",'') AS "trip-headsign",
+                         stops."departure-time", s."stop-name"
+                    FROM "gtfs-trip" t
+                    LEFT JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
+                    LEFT JOIN LATERAL unnest(t.trips) trip ON TRUE
+                    LEFT JOIN LATERAL unnest(trip."stop-times") stops ON TRUE
+                    JOIN "gtfs-stop" s ON (s."package-id" = t."package-id" AND stops."stop-id" = s."stop-id")
+                   WHERE t."package-id" = package_id
+                     AND t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
+                   ORDER BY "route-short-name", "route-long-name", "trip-headsign", stops."trip-id", "stop-sequence") x
+    GROUP BY x."route-short-name",x."route-long-name",x."trip-headsign") d;
+
+    SELECT digest(string_agg(rh.hash::text, ','), 'sha256')
+      INTO date_hash
+      FROM unnest(route_hashes) rh;
+
+    INSERT INTO "gtfs-date-hash"
+           ("package-id", date, hash, "route-hashes")
+    VALUES (package_id, dt, date_hash, route_hashes)
+    ON CONFLICT ("package-id", date) DO
+    UPDATE SET "package-id" = package_id,
+               date = dt,
+               hash = date_hash,
+               "route-hashes" = route_hashes;
+
+END
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION gtfs_package_date_hashes (INTEGER,DATE) IS
+E'Calculate and store per route and per day hashes for the given package for the given date.';
+
+CREATE OR REPLACE FUNCTION gtfs_package_hashes (package_id INTEGER) RETURNS VOID AS $$
+DECLARE
+ row RECORD;
+BEGIN
+  FOR row IN
+      SELECT * FROM gtfs_package_dates(package_id)
+  LOOP
+    PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates);
+  END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION gtfs_package_hashes (INTEGER) IS
+E'Calculate and store per route and per day hashes for every day in the given package.';

@@ -4,6 +4,18 @@ DROP MATERIALIZED VIEW "nightly-transit-changes";
 ALTER TABLE gtfs_package ADD "finnish-regions" CHARACTER(2)[];
 ALTER TABLE gtfs_package ADD "envelope" geometry;
 
+-- Add per route hash to gtfs-date-hash
+CREATE TYPE "gtfs-route-hash" AS (
+  "route-short-name" TEXT,
+  "route-long-name" TEXT,
+  "trip-headsign" TEXT,
+  hash bytea
+);
+
+ALTER TABLE "gtfs-date-hash"
+  ADD "route-hashes" "gtfs-route-hash"[];
+
+
 CREATE TYPE "gtfs-route-change-info" AS (
   "route-short-name" TEXT,
   "route-long-name" TEXT,

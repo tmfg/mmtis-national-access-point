@@ -22,6 +22,7 @@
 
 (defqueries "ote/integration/import/stop_times.sql")
 
+
 (defn load-zip-from-url [url]
   (with-open [in (:body (http-client/get url {:as :stream}))]
     (read-zip in)))
@@ -151,7 +152,7 @@
       (import-stop-times db package-id stop-times-file)
 
       (log/info "Generating date hashes for package " package-id)
-      (generate-date-hashes! db {:package-id package-id})
+      (generate-package-hashes! db {:package-id package-id})
 
       (log/info "Generating finnish regions and envelope for package " package-id)
       (gtfs-set-package-geometry db {:package-id package-id})
@@ -178,7 +179,7 @@
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
-    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/gtfs_tampere (3).zip" #_"hsl_gtfs.zip")]
+    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/google_transit (4).zip" #_"hsl_gtfs.zip")]
                   (let [out (java.io.ByteArrayOutputStream.)]
                     (io/copy in out)
                     (.toByteArray out)))]
@@ -244,6 +245,7 @@
                                                               :gtfs/etag new-etag
                                                               :gtfs/license license
                                                               :gtfs/external-interface-description-id interface-id})]
+
                 (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
                 (log/debug "File: " filename " was uploaded to S3 successfully.")
 
