@@ -111,7 +111,7 @@
             external-interface-links))])]))
 
 (defn- list-service-companies [service-companies service-search]
-  (when (not (nil? service-companies))
+  (when (seq service-companies)
     (let [searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
           found-business-ids (keep (fn [sc]
                                      (let [s (keep #(when (= (::t-service/business-id sc) %) sc) searched-business-ids)]
