@@ -43,7 +43,7 @@ SELECT COUNT(*)
          WHERE ts."published?" = TRUE
         UNION
         SELECT DISTINCT (x.c)."business-id"
-          FROM (SELECT unnest(COALESCE(ts.companies, sc.companies)) c
+          FROM (SELECT unnest(COALESCE(sc.companies, ts.companies)) c
                   FROM "transport-service" ts
                   LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
                  WHERE ts."published?" = TRUE) x) y;
