@@ -104,9 +104,20 @@
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
 
-(defmethod routes/on-navigate-event :transit-visualization [{params :params query :query}]
-  [(->LoadInfo (:operator-id params))
-   (->LoadOperatorDates (:operator-id params) (:compare-date1 query) (:compare-date2 query))])
+(define-event LoadServiceChangesForDateResponse [response]
+  {:path [:transit-visualization]}
+  (.log js/console "saatiinpa " (pr-str response))
+  (assoc app
+         :loading? false
+         :changes response))
+
+(define-event LoadServiceChangesForDate [service-id date]
+  {}
+  (comm/get! (str "transit-visualization/" service-id "/" date)
+             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse)})
+  app)
+(defmethod routes/on-navigate-event :transit-visualization [{params :params}]
+  (->LoadServiceChangesForDate (:service-id params) (:date params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}

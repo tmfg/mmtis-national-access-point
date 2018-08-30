@@ -353,16 +353,46 @@
                               :font-weight "bold"}}]]])
 
 
-(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name]
+(defn route-changes [e! route-changes]
+  [:div.route-changes
+   [table/table {:no-rows-message "Ei reittejä"
+                 :height 300
+                 :name->label str
+                 :show-row-hover? true
+                 :on-select #(e! :D)}
+    [{:name "Reitti" :width "50%"
+      :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
+      :format (fn [[short long]]
+                (str short " " long))}
+     {:name "Otsatunnus" :width "20%"
+      :read :gtfs/trip-headsign}
+
+     {:name "Aikaa 1:seen muutokseen"
+      :read (constantly "FIXME")}
+
+     {:name "Muutokset" :width "15%"
+      :read (constantly "jepjep")}]
+
+    route-changes]])
+
+(defn route-calendar [e! ]
+  ;; FIXME: pitää hakea esilasketut per reitti hashit päiville
+  )
+
+(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name
+                                        changes]
                                  :as transit-visualization}]
   [:div
-   (when (and (not loading?) hash->color)
+   (when (not loading?)
      [:div.transit-visualization
-      [days-to-diff-info e! transit-visualization highlight]
-      [:h3 operator-name]
-      [highlight-mode-switch e! highlight]
-      [calendar-style-switch e! transit-visualization]
-      [service-calendar/service-calendar (merge {:view-mode (:calendar-mode transit-visualization)
+
+      ;; Route listing with number of changes
+      [route-changes e! (:gtfs/route-changes changes)]
+      #_[days-to-diff-info e! transit-visualization highlight]
+      #_[:h3 operator-name]
+      #_[highlight-mode-switch e! highlight]
+      #_[calendar-style-switch e! transit-visualization]
+      #_[service-calendar/service-calendar (merge {:view-mode (:calendar-mode transit-visualization)
                                                  :selected-date? (constantly false)
                                                  :on-select (r/partial select-day e!)}
                                                 (when (get highlight :mode)
@@ -371,4 +401,4 @@
                                                                        (:highlight transit-visualization))
                                                  :years (or (:years transit-visualization)
                                                             [2017 2018])})]
-      [date-comparison e! transit-visualization]])])
+      #_[date-comparison e! transit-visualization]])])

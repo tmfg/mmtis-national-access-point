@@ -4,10 +4,12 @@
             [ote.gtfs.spec]
             [ote.time :as time]
             [ote.gtfs.parse :as gtfs-parse]
-    #?(:clj [ote.db.specql-db :refer [define-tables]])
-    #?(:clj [specql.postgis])
+            #?(:clj [ote.db.specql-db :refer [define-tables]])
+            #?(:clj [specql.postgis])
             [specql.impl.registry]
-            [specql.data-types])
+            #?(:clj [specql.impl.composite :as composite])
+            [specql.data-types]
+            [clojure.string :as str])
   #?(:cljs
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
@@ -23,7 +25,28 @@
   ["gtfs-stop" :gtfs/stop]
   ["gtfs-transfer" :gtfs/transfer]
   ["gtfs-trip-info" :gtfs/trip-info]
-  ["gtfs-trip" :gtfs/trip])
+  ["gtfs-trip" :gtfs/trip]
+
+  ["gtfs-route-change-info" :gtfs/route-change-info]
+  ["gtfs-transit-changes" :gtfs/transit-changes])
+
+#?(:clj
+   (def ^:const int4range-pattern
+     #"^(\(|\[)([^,]*),(.*)(\)|\])$"))
+
+#?(:clj
+   ;; As of 2018-08-30 specql doesn't support int4range
+   (defmethod composite/parse-value "int4range" [_ string]
+     (let [[m lower-type lower upper upper-type]
+           (re-matches int4range-pattern string)]
+       (when m
+         (merge
+          {:lower-inclusive? (= "[" lower-type)
+           :upper-inclusive? (= "]" upper-type)}
+          (when-not (str/blank? lower)
+            {:lower (Integer/parseInt lower)})
+          (when-not (str/blank? upper)
+            {:upper (Integer/parseInt upper)}))))))
 
 (defn date? [dt]
   (satisfies? time/DateFields dt))

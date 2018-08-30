@@ -28,7 +28,27 @@
                     (str/split stops #"\|\|")))))
           rows))
 
+(defn service-changes-for-date [db service-id date]
+  (first
+   (specql/fetch db :gtfs/transit-changes
+                 (specql/columns :gtfs/transit-changes)
+                 {:gtfs/transport-service-id service-id
+                  :gtfs/date date})))
+
+
 (define-service-component TransitVisualization {}
+
+  ^{:unauthenticated true :format :transit}
+  (GET "/transit-visualization/:service-id/:date"
+       {{:keys [service-id date]} :params}
+       (service-changes-for-date db
+                                 (Long/parseLong service-id)
+                                 (-> date
+                                     time/parse-date-iso-8601
+                                     java.sql.Date/valueOf)))
+
+
+  ;;; FIXME: poista vanhat
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/info/:operator"
        {{operator :operator} :params}

@@ -30,10 +30,11 @@
 (defmethod routes/on-navigate-event :transit-changes [_]
   (->LoadTransitChanges))
 
-(define-event ShowChangesForOperator [id date1 date2]
+(define-event ShowChangesForService [id date]
   {}
-  (routes/navigate! :transit-visualization {:operator-id id} {:compare-date1 date1
-                                                              :compare-date2 date2})
+  (.log js/console "SHOW " id " " date)
+  (routes/navigate! :transit-visualization {:service-id id
+                                            :date (time/format-date-iso-8601 date)})
   app)
 
 (define-event SetRegionFilter [regions]

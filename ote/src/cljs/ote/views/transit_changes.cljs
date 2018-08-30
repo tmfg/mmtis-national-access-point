@@ -127,10 +127,9 @@
                  :row-style {:cursor "pointer"}
                  :show-row-hover? true
                  :on-select (fn [evt]
-                              (let [change (first evt)
-                                    {date1 :date1 date2 :date2} (:first-diff-dates change)]
-                                (e! (tc/->ShowChangesForOperator (:transport-operator-id change)
-                                                                 (time/format-date-opt date1) (time/format-date-opt date2)))))}
+                              (let [{:keys [transport-service-id current-date]} (first evt)]
+                                (e! (tc/->ShowChangesForService transport-service-id
+                                                                current-date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
      {:name "Palvelu" :read :transport-service-name :width "25%"}
      {:name "Aikaa 1:seen muutokseen" :width "25%"
