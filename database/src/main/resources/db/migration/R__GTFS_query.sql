@@ -563,9 +563,13 @@ E'Calculate and store per route and per day hashes for the given package for the
 CREATE OR REPLACE FUNCTION gtfs_package_hashes (package_id INTEGER) RETURNS VOID AS $$
 DECLARE
  row RECORD;
+ allowed_range tsrange;
 BEGIN
+  allowed_range := tsrange(CURRENT_DATE - '2 years'::interval,
+                           CURRENT_DATE + '2 years'::interval);
   FOR row IN
       SELECT * FROM gtfs_package_dates(package_id)
+       WHERE allowed_range @> gtfs_package_dates::timestamp
   LOOP
     PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates);
   END LOOP;
