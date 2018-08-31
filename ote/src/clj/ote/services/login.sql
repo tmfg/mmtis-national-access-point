@@ -1,7 +1,7 @@
 -- name: fetch-login-info
 SELECT name, email, password, fullname
   FROM "user"
- WHERE (name = :email OR email = :email) and state = 'active';
+ WHERE (lower(name) = lower(:email) OR lower(email) = lower(:email)) and state = 'active';
 
 -- name: username-exists?
 -- single?: true
