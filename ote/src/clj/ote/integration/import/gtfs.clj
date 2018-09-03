@@ -152,7 +152,7 @@
       (import-stop-times db package-id stop-times-file)
 
       (log/info "Generating date hashes for package " package-id)
-      (generate-package-hashes! db {:package-id package-id})
+      (generate-package-hashes db {:package-id package-id})
 
       (log/info "Generating finnish regions and envelope for package " package-id)
       (gtfs-set-package-geometry db {:package-id package-id})

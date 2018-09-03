@@ -23,7 +23,9 @@ CREATE TYPE "gtfs-route-change-info" AS (
   "added-trips" INTEGER,
   "removed-trips" INTEGER,
   "trip-stop-sequence-changes" INT4RANGE, -- Per trip range (min-max) of changes in stop sequences
-  "trip-stop-time-changes" INT4RANGE -- Per trip range of changes in stop times
+  "trip-stop-time-changes" INT4RANGE, -- Per trip range of changes in stop times
+  "different-week-date" DATE,
+  "change-date" DATE
 );
 
 CREATE TYPE "gtfs-trip-change-info" AS (
@@ -47,6 +49,13 @@ CREATE TYPE route_trips_for_date AS (
 CREATE TYPE service_ref AS (
   "package-id" INTEGER,
   "service-id" TEXT
+);
+
+CREATE TYPE gtfs_week_diff AS (
+  "beginning-of-current-week" DATE,
+  "current-weekhash" TEXT,
+  "beginning-of-different-week" DATE,
+  "different-weekhash" TEXT
 );
 
 CREATE TABLE "gtfs-transit-changes" (
