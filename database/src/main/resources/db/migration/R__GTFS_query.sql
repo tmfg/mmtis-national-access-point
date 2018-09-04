@@ -463,7 +463,7 @@ DECLARE
  row RECORD;
  allowed_range tsrange;
 BEGIN
-  allowed_range := tsrange(CURRENT_DATE - '2 years'::interval,
+  allowed_range := tsrange(CURRENT_DATE - '1 years'::interval,
                            CURRENT_DATE + '2 years'::interval);
   FOR row IN
       SELECT * FROM gtfs_package_dates(package_id)
