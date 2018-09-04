@@ -660,6 +660,16 @@ BEGIN
         -- Calculate differences in trips and stop sequences for this route
         route_change := gtfs_route_differences(row."route-short-name",row."route-long-name",row."trip-headsign",
                         row."date1-trips", row."date2-trips");
+        route_change := ROW(route_change."route-short-name",
+                            route_change."route-long-name",
+                            route_change."trip-headsign",
+                            route_change."added-trips",
+                            route_change."removed-trips",
+                            route_change."trip-stop-sequence-changes",
+                            route_change."trip-stop-time-changes",
+                            row.route_curr_date,
+                            row.route_diff_date,
+                            (row.diff_week)."beginning-of-different-week")::"gtfs-route-change-info";
         route_changes := route_changes || route_change;
 
       END IF;
@@ -671,6 +681,10 @@ BEGIN
                    SELECT unnest(gtfs_service_packages_for_date(service_id, current_week_date)) p
                     UNION
                    SELECT unnest(gtfs_service_packages_for_date(service_id, different_week_date)) p) x);
+
+  -- Make sure route changes are sorted change-date (newest first)
+  route_changes := (SELECT array_agg(rc ORDER BY rc."change-date", rc."route-short-name", rc."route-long-name", rc."trip-headsign")
+                      FROM unnest(route_changes) rc);
 
   -- Upsert detected change information
   INSERT INTO "gtfs-transit-changes"

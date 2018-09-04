@@ -24,6 +24,7 @@ CREATE TYPE "gtfs-route-change-info" AS (
   "removed-trips" INTEGER,
   "trip-stop-sequence-changes" INT4RANGE, -- Per trip range (min-max) of changes in stop sequences
   "trip-stop-time-changes" INT4RANGE, -- Per trip range of changes in stop times
+  "current-week-date" DATE,
   "different-week-date" DATE,
   "change-date" DATE
 );
