@@ -15,11 +15,13 @@ CREATE TYPE "gtfs-route-hash" AS (
 ALTER TABLE "gtfs-date-hash"
   ADD "route-hashes" "gtfs-route-hash"[];
 
+CREATE TYPE "gtfs-route-change-type" AS ENUM ('no-change','added','removed','changed');
 
 CREATE TYPE "gtfs-route-change-info" AS (
   "route-short-name" TEXT,
   "route-long-name" TEXT,
   "trip-headsign" TEXT,
+  "change-type" "gtfs-route-change-type",
   "added-trips" INTEGER,
   "removed-trips" INTEGER,
   "trip-stop-sequence-changes" INT4RANGE, -- Per trip range (min-max) of changes in stop sequences

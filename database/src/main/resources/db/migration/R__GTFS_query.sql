@@ -260,7 +260,9 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION gtfs_route_differences("route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT, d1_trips "gtfs-package-trip-info"[], d2_trips "gtfs-package-trip-info"[])
+CREATE OR REPLACE FUNCTION gtfs_route_differences(
+     "route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT,
+     d1_trips "gtfs-package-trip-info"[], d2_trips "gtfs-package-trip-info"[])
 RETURNS "gtfs-route-change-info"
 AS $$
 DECLARE
@@ -636,43 +638,60 @@ BEGIN
                    routerow.trip_headsign = difftrip."trip-headsign")
 
   LOOP
-    IF row.diff_week IS NOT NULL
+    IF row.diff_week IS NULL
     THEN
+      -- Mark "no-change" for this route
+      route_change := ROW();
+      route_change."route-short-name" := row."route-short-name";
+      route_change."route-long-name" := row."route-long-name";
+      route_change."trip-headsign" := row."trip-headsign";
+      route_change."change-type" := 'no-change';
+      route_changes := route_changes || route_change;
+
+    ELSE
+      -- If different week date is earlier than previous, use it
+      IF different_week_date IS NULL OR row.route_diff_date < different_week_date
+      THEN
+        current_week_date := row.route_curr_date;
+        different_week_date := row.route_diff_date;
+        change_date := (row.diff_week)."beginning-of-different-week";
+      END IF;
+
+      -- Check type of change (added route, removed route or changed route)
       IF (row.diff_week)."current-weekhash" = no_traffic AND
          (row.diff_week)."different-weekhash" != no_traffic
       THEN
         added_routes := added_routes + 1;
+        route_change := ROW();
+        route_change."change-type" := 'added';
       ELSIF (row.diff_week)."current-weekhash" != no_traffic AND
             (row.diff_week)."different-weekhash" = no_traffic
       THEN
         removed_routes := removed_routes + 1;
+        route_change := ROW();
+        route_change."change-type" := 'removed';
       ELSE
         changed_routes := changed_routes + 1;
 
-        -- If different week date is earlier than previous, use it
-        IF different_week_date IS NULL OR row.route_diff_date < different_week_date
-        THEN
-          current_week_date := row.route_curr_date;
-          different_week_date := row.route_diff_date;
-          change_date := (row.diff_week)."beginning-of-different-week";
-        END IF;
-
         -- Calculate differences in trips and stop sequences for this route
-        route_change := gtfs_route_differences(row."route-short-name",row."route-long-name",row."trip-headsign",
+        route_change := gtfs_route_differences(
+                        row."route-short-name", row."route-long-name", row."trip-headsign",
                         row."date1-trips", row."date2-trips");
-        route_change := ROW(route_change."route-short-name",
-                            route_change."route-long-name",
-                            route_change."trip-headsign",
-                            route_change."added-trips",
-                            route_change."removed-trips",
-                            route_change."trip-stop-sequence-changes",
-                            route_change."trip-stop-time-changes",
-                            row.route_curr_date,
-                            row.route_diff_date,
-                            (row.diff_week)."beginning-of-different-week")::"gtfs-route-change-info";
-        route_changes := route_changes || route_change;
+        route_change."change-type" := 'changed';
 
       END IF;
+
+      -- Set route names and change dates
+      route_change."route-short-name" := row."route-short-name";
+      route_change."route-long-name" := row."route-long-name";
+      route_change."trip-headsign" := row."trip-headsign";
+      route_change."current-week-date" := row.route_curr_date;
+      route_change."different-week-date" := row.route_diff_date;
+      route_change."change-date" := (row.diff_week)."beginning-of-different-week";
+
+      -- Add change to array
+      route_changes := route_changes || route_change;
+
     END IF;
   END LOOP;
 
