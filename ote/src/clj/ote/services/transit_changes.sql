@@ -14,8 +14,9 @@ SELECT ts.id AS "transport-service-id",
        "change-date",
        "change-date" - CURRENT_DATE AS "days-until-change",
        ("change-date" IS NOT NULL) AS "changes?",
-       (SELECT array_to_string(array_agg("finnish-regions"), ',')
-          FROM gtfs_package
+       (SELECT string_agg(fr, ',')
+          FROM gtfs_package p
+          JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
          WHERE id = ANY(c."package-ids")) AS "finnish-regions"
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
