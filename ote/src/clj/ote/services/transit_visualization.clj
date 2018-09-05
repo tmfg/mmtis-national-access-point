@@ -36,7 +36,12 @@
                   :gtfs/date date})))
 
 (defn service-calendar-for-route [db service-id route-short-name route-long-name trip-headsign]
-  ["heps" "ja" "kukkuu"])
+  (into {}
+        (map (juxt :date :hash))
+        (fetch-date-hashes-for-route db {:service-id service-id
+                                         :route-short-name route-short-name
+                                         :route-long-name route-long-name
+                                         :trip-headsign trip-headsign})))
 
 (define-service-component TransitVisualization {}
 

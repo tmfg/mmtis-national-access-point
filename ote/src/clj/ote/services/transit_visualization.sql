@@ -106,3 +106,30 @@ SELECT ST_AsGeoJSON(COALESCE(
          GROUP BY trip."shape-id", r."package-id", trip."trip-id") x
  -- Group same route lines to single row (aggregate departures to array)
  GROUP BY "route-line", "shape-id", "package-id";
+
+
+-- name: fetch-date-hashes-for-route
+-- Fetch the date/hash pairs for a given route
+WITH dates AS (
+  -- Calculate a series of dates from beginning of last year
+  -- to the end of the next year.
+  SELECT ts::date AS date
+    FROM generate_series(
+            (date_trunc('year', CURRENT_DATE) - '1 year'::interval)::date,
+            (date_trunc('year', CURRENT_DATE) + '2 years'::interval)::date,
+            '1 day'::interval) AS g(ts)
+)
+SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
+  FROM (SELECT d.date, package_id, rh.hash::text
+          FROM dates d
+          -- Join packages for each date
+          JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date))
+            AS ps (package_id) ON TRUE
+          -- Join all date hashes for packages
+          JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
+          -- Join unnested per route hashes
+          JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
+         WHERE rh."route-short-name" = :route-short-name
+           AND rh."route-long-name" = :route-long-name
+           AND rh."trip-headsign" = :trip-headsign) x
+ GROUP BY x.date;
