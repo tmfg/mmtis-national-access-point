@@ -178,9 +178,26 @@
     :default
     app))
 
+(define-event RouteResponse [route-info]
+  {:path [:transit-visualization]}
+  (.log js/console "route info: " (pr-str route-info))
+  (assoc app
+         :route-service-calendar (:calendar route-info)))
+
 (define-event SelectRouteForDisplay [route]
-  {:path [:transit-visualization :selected-route]}
-  route
+  {}
+  (let [service-id (get-in app [:params :service-id])]
+    (.log js/console "REITTI:" (pr-str route))
+    (comm/get! (str "transit-visualization/" service-id "/route/"
+                    (:gtfs/route-short-name route) "/"
+                    (:gtfs/route-long-name route) "/"
+                    (:gtfs/trip-headsign route))
+               {:on-success (tuck/send-async! ->RouteResponse)})
+
+    (-> app
+        (assoc-in [:transit-visualization :selected-route] route)
+        (assoc-in [:transit-visualization :route-service-calendar] nil)))
+
   #_(let [operator-id (:operator-id app)]
     (assoc app :selected-route route)
     (update

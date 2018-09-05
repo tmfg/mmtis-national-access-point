@@ -409,7 +409,8 @@
                  :height 300
                  :name->label str
                  :show-row-hover? true
-                 :on-select #(e! (tv/->SelectRouteForDisplay (first %)))
+                 :on-select #(when (first %)
+                               (e! (tv/->SelectRouteForDisplay (first %))))
                  :row-selected? #(= % selected-route)}
     [{:name "Reitti" :width "30%"
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
@@ -457,9 +458,18 @@
 
     route-changes]])
 
-(defn route-calendar [e! ]
-  ;; FIXME: pitää hakea esilasketut per reitti hashit päiville
-  )
+(defn route-service-calendar [e! route-service-calendar]
+  (let [current-year (time/year (time/now))]
+    ;; FIXME: pitää hakea esilasketut per reitti hashit päiville
+    [service-calendar/service-calendar {:selected-date? (constantly false)
+                                        :on-select :D
+                                        #_:day-style #_ (r/partial day-style hash->color date->hash
+                                                                   (:highlight transit-visualization))
+                                        :years (vec (concat (when (:show-previous-year? route-service-calendar)
+                                                              [(dec current-year)])
+                                                            [current-year]
+                                                            (when (:show-next-year? route-service-calendar)
+                                                              [(inc current-year)])))}]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name
                                         changes selected-route]
@@ -470,6 +480,15 @@
 
       ;; Route listing with number of changes
       [route-changes e! (:gtfs/route-changes changes) selected-route]
+
+      (when selected-route
+        [:div.transit-visualization-route
+         [:h3 "Valittu reitti: "
+          (:gtfs/route-short-name selected-route) " "
+          (:gtfs/route-long-name selected-route)
+          " (" (:gtfs/trip-headsign selected-route) ")"]
+
+         [route-service-calendar e! (:route-service-calendar transit-visualization)]])
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]

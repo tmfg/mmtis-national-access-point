@@ -35,6 +35,8 @@
                  {:gtfs/transport-service-id service-id
                   :gtfs/date date})))
 
+(defn service-calendar-for-route [db service-id route-short-name route-long-name trip-headsign]
+  ["heps" "ja" "kukkuu"])
 
 (define-service-component TransitVisualization {}
 
@@ -46,6 +48,12 @@
                                  (-> date
                                      time/parse-date-iso-8601
                                      java.sql.Date/valueOf)))
+
+  ^{:unauthenticated true :format :transit}
+  (GET "/transit-visualization/:service-id/route/:short-name/:long-name/:headsign"
+       {{:keys [service-id short-name long-name headsign]} :params}
+       {:calendar (service-calendar-for-route db (Long/parseLong service-id)
+                                              short-name long-name headsign)})
 
 
   ;;; FIXME: poista vanhat
