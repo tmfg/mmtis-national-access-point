@@ -390,3 +390,11 @@
 
 (defn time-difference [time1 time2]
   (Math/abs (- (minutes-from-midnight time1) (minutes-from-midnight time2))))
+
+(defn day-difference
+  "How many days from date1 to date2."
+  [date1 date2]
+  (t/in-days (t/interval date1 date2)))
+
+(defn days-until [date]
+  (day-difference (t/now) date))
