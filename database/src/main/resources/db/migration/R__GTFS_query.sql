@@ -642,9 +642,9 @@ BEGIN
     THEN
       -- Mark "no-change" for this route
       route_change := ROW();
-      route_change."route-short-name" := row."route-short-name";
-      route_change."route-long-name" := row."route-long-name";
-      route_change."trip-headsign" := row."trip-headsign";
+      route_change."route-short-name" := row.route_short_name;
+      route_change."route-long-name" := row.route_long_name;
+      route_change."trip-headsign" := row.trip_headsign;
       route_change."change-type" := 'no-change';
       route_changes := route_changes || route_change;
 
