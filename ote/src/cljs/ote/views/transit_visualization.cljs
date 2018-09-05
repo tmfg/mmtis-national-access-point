@@ -46,9 +46,8 @@
                                 inset 0 0 0 100px rgba(0,0,0,.25)"}))))))
 
 (defn day-style [hash->color date->hash highlight day selected?]
-  (let [d (time/format-date day)
+  (let [d (time/format-date-iso-8601 day)
         hash-color (hash->color (date->hash d))]
-
     (merge
       {:background-color hash-color
        :color "rgb (0, 255, 255)"
@@ -458,13 +457,12 @@
 
     route-changes]])
 
-(defn route-service-calendar [e! route-service-calendar]
+(defn route-service-calendar [e! date->hash hash->color]
   (let [current-year (time/year (time/now))]
-    ;; FIXME: pitää hakea esilasketut per reitti hashit päiville
     [service-calendar/service-calendar {:selected-date? (constantly false)
                                         :on-select :D
-                                        #_:day-style #_ (r/partial day-style hash->color date->hash
-                                                                   (:highlight transit-visualization))
+                                        :day-style (r/partial day-style hash->color date->hash
+                                                              nil #_(:highlight transit-visualization))
                                         :years (vec (concat (when (:show-previous-year? route-service-calendar)
                                                               [(dec current-year)])
                                                             [current-year]
@@ -488,7 +486,7 @@
           (:gtfs/route-long-name selected-route)
           " (" (:gtfs/trip-headsign selected-route) ")"]
 
-         [route-service-calendar e! (:route-service-calendar transit-visualization)]])
+         [route-service-calendar e! date->hash hash->color]])
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]

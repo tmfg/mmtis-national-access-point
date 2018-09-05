@@ -181,8 +181,13 @@
 (define-event RouteResponse [route-info]
   {:path [:transit-visualization]}
   (.log js/console "route info: " (pr-str route-info))
+
   (assoc app
-         :route-service-calendar (:calendar route-info)))
+         :date->hash (:calendar route-info)
+         :hash->color (zipmap (distinct (vals (:calendar route-info)))
+                              (cycle hash-colors
+                                     ;; FIXME: after all colors are consumed, add some pattern style
+                                     ))))
 
 (define-event SelectRouteForDisplay [route]
   {}
@@ -196,7 +201,7 @@
 
     (-> app
         (assoc-in [:transit-visualization :selected-route] route)
-        (assoc-in [:transit-visualization :route-service-calendar] nil)))
+        (update-in [:transit-visualization] dissoc :date->hash :hash->color)))
 
   #_(let [operator-id (:operator-id app)]
     (assoc app :selected-route route)
