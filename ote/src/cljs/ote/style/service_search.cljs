@@ -1,6 +1,7 @@
 (ns ote.style.service-search
   (:require [stylefy.core :as stylefy]
-            [ote.style.base :as base]))
+            [ote.style.base :as base]
+            [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def result-header {:width         "100%"
                     :display       "block"
@@ -36,23 +37,30 @@
 (def result-card-title {:display "flex"
                         :flex-flow "row nowrap"
                         :justify-content "space-between"
-                        :padding-top "20px"
-                        :padding-right "20px"
-                        :padding-bottom "15px"
+                        :padding-bottom "15px" ;; Only bottom is required, other "air" comes from the margins in the children
                         :color "#fff"
                         :background-color "#06c"
+                        ::stylefy/media {{:max-width (str width-xxs "px")} {:flex-flow "row wrap"}}
                         ::stylefy/sub-styles {:title {:font-size "1.125em"
                                                       :font-weight "700"
                                                       :max-width "65%"
                                                       :white-space "pre-line"
                                                       :word-break "break-all"
-                                                      :hyphens "auto"}
+                                                      :hyphens "auto"
+                                                      :margin "20px 20px 0 0" ;; We define proper margins here in case of row wrapping
+                                                      ::stylefy/vendors ["webkit" "moz" "ms"]
+                                                      ::stylefy/auto-prefix #{:hyphens}
+                                                      ::stylefy/media {{:max-width (str width-xxs "px")}
+                                                                       {:max-width "100%"}}}
                                               :actions {:display "flex"
                                                         :position "relative"
                                                         :top "-10px"
                                                         :flex-flow "row nowrap"
                                                         :margin-left "20px"
-                                                        :min-width "200px"}}})
+                                                        :min-width "200px"
+                                                        :margin "20px 20px 0 20px" ;; We define proper margins here in case of row wrapping
+                                                        ::stylefy/media {{:max-width (str width-xxs "px")}
+                                                                         {:margin-left "auto"}}}}})
 
 (def result-card-header {:font-size "1em"
                          :color "#323232"
