@@ -1,6 +1,9 @@
 (ns ote.views.transit-visualization
   "Visualization of transit data (GTFS)."
   (:require [reagent.core :as r]
+            [cljs-react-material-ui.icons :as ic]
+            [stylefy.core :as stylefy]
+            [ote.style.transit-changes :as style]
             [tuck.core :as tuck]
             [ote.ui.service-calendar :as service-calendar]
             [ote.app.controller.transit-visualization :as tv]
@@ -352,15 +355,62 @@
                               :font-size "12px"
                               :font-weight "bold"}}]]])
 
+(defn route-changes-legend []
+  [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend)
+   [:div [:b "Taulukon ikonien selitteet"]]
+   (for [[icon label] [[ic/content-add " Uusia vuoroja"]
+                       [ic/content-remove " Poistuvia vuoroja"]
+                       [ic/action-timeline " Pysäkkimuutoksia"]
+                       [ic/action-query-builder " Aikataulumuutoksia"]]]
+     ^{:key label}
+     [:div (stylefy/use-style style/transit-changes-legend-icon)
+      [icon]
+      [:div (stylefy/use-style style/change-icon-value) label]])])
+
+(defn format-range [{:keys [lower upper lower-inclusive? upper-inclusive?]}]
+  (if (and (nil? lower) (nil? upper))
+    "0"
+    (str lower "\u2014" (when upper
+                          (if upper-inclusive?
+                            upper
+                            (inc upper))))))
+
+(defn change-icons [{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}]
+  (let [seq-changes (format-range trip-stop-sequence-changes)
+        time-changes (format-range trip-stop-time-changes)]
+    [:div.transit-change-icons
+     [:div (stylefy/use-style style/transit-changes-legend-icon)
+      [ic/content-add-circle-outline {:color (if (= 0 added-trips)
+                                               style/no-change-color
+                                               style/add-color)}]
+      [:div (stylefy/use-style style/change-icon-value) added-trips]]
+     [:div (stylefy/use-style style/transit-changes-legend-icon)
+      [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
+                                                  style/no-change-color
+                                                  style/remove-color)}]
+      [:div (stylefy/use-style style/change-icon-value) removed-trips]]
+
+     [:div (stylefy/use-style style/transit-changes-legend-icon)
+      [ic/action-timeline {:color (when (= "0" seq-changes)
+                                    style/no-change-color)}]
+      [:div (stylefy/use-style style/change-icon-value)
+       seq-changes]]
+
+     [:div (stylefy/use-style style/transit-changes-legend-icon)
+      [ic/action-query-builder {:color (when (= "0" time-changes)
+                                         style/no-change-color)}]
+      [:div (stylefy/use-style style/change-icon-value)
+       time-changes]]]))
 
 (defn route-changes [e! route-changes]
   [:div.route-changes
+   [route-changes-legend]
    [table/table {:no-rows-message "Ei reittejä"
                  :height 300
                  :name->label str
                  :show-row-hover? true
                  :on-select #(e! :D)}
-    [{:name "Reitti" :width "50%"
+    [{:name "Reitti" :width "30%"
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
@@ -368,10 +418,41 @@
       :read :gtfs/trip-headsign}
 
      {:name "Aikaa 1:seen muutokseen"
-      :read (constantly "FIXME")}
+      :width "20%"
+      :read :gtfs/change-date
+      :format (fn [change-date]
+                (if-not change-date
+                  [:div
+                   [ic/navigation-check]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Ei muutoksia"]]
+                  [:span
+                   (str (time/days-until change-date) " pv")
+                   [:span (stylefy/use-style {:margin-left "5px"
+                                              :color "gray"})
+                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
 
-     {:name "Muutokset" :width "15%"
-      :read (constantly "jepjep")}]
+     {:name "Muutokset" :width "30%"
+      :read identity
+      :format (fn [{change-type :gtfs/change-type :as route-changes}]
+                (case change-type
+                  :added
+                  [:div [ic/content-add-circle-outline {:color style/add-color}]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Uusi reitti"]]
+
+                  :removed
+                  [:div [ic/content-remove-circle-outline {:color style/remove-color}]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Päättyvä reitti"]]
+
+                  :no-change
+                  [:div [ic/navigation-check]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Ei muutoksia"]]
+
+                  :changed
+                  [change-icons route-changes]))}]
 
     route-changes]])
 
