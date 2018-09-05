@@ -178,9 +178,11 @@
     :default
     app))
 
-(define-event SelectRouteForDisplay [route-short-name route-long-name trip-headsign]
-  {:path [:transit-visualization]}
-  (let [operator-id (:operator-id app)]
+(define-event SelectRouteForDisplay [route]
+  {:path [:transit-visualization :selected-route]}
+  route
+  #_(let [operator-id (:operator-id app)]
+    (assoc app :selected-route route)
     (update
      app :compare
      (fn [app]

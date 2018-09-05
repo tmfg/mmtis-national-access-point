@@ -74,7 +74,7 @@
                                        :saturday :SAT
                                        :sunday :SUN)]))
 
-(defn- route-listing [e! {:keys [date1 date2 different?] :as compare}]
+#_(defn- route-listing [e! {:keys [date1 date2 different?] :as compare}]
   [:div
    [ui/checkbox {:label "Näytä vain reitit, jotka erilaisia"
                  :checked different?
@@ -271,7 +271,7 @@
          [:div "Päivien liikenne on samanlaista"])
 
        ;; List routes and trip counts for seleted dates
-       [route-listing e! compare]
+       #_[route-listing e! compare]
 
        ;; If a route is selected, show map
        [selected-route-map e! date->hash hash->color compare]
@@ -402,14 +402,15 @@
       [:div (stylefy/use-style style/change-icon-value)
        time-changes]]]))
 
-(defn route-changes [e! route-changes]
+(defn route-changes [e! route-changes selected-route]
   [:div.route-changes
    [route-changes-legend]
    [table/table {:no-rows-message "Ei reittejä"
                  :height 300
                  :name->label str
                  :show-row-hover? true
-                 :on-select #(e! :D)}
+                 :on-select #(e! (tv/->SelectRouteForDisplay (first %)))
+                 :row-selected? #(= % selected-route)}
     [{:name "Reitti" :width "30%"
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
       :format (fn [[short long]]
@@ -461,14 +462,14 @@
   )
 
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name
-                                        changes]
+                                        changes selected-route]
                                  :as transit-visualization}]
   [:div
    (when (not loading?)
      [:div.transit-visualization
 
       ;; Route listing with number of changes
-      [route-changes e! (:gtfs/route-changes changes)]
+      [route-changes e! (:gtfs/route-changes changes) selected-route]
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]
