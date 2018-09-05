@@ -31,15 +31,28 @@
 
 (def result-card {:margin-top "20px"
                   :background-color "#fff"
-                  :box-shadow       "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
+                  :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
-(def result-card-title {:padding-top          "20px"
-                        :padding-right          "0px"
-                        :padding-bottom          "20px"
-                        :font-size        "1.125em"
-                        :font-weight      "700"
-                        :color            "#fff"
-                        :background-color "#06c"})
+(def result-card-title {:display "flex"
+                        :flex-flow "row nowrap"
+                        :justify-content "space-between"
+                        :padding-top "20px"
+                        :padding-right "20px"
+                        :padding-bottom "15px"
+                        :color "#fff"
+                        :background-color "#06c"
+                        ::stylefy/sub-styles {:title {:font-size "1.125em"
+                                                      :font-weight "700"
+                                                      :max-width "65%"
+                                                      :white-space "pre-line"
+                                                      :word-break "break-all"
+                                                      :hyphens "auto"}
+                                              :actions {:display "flex"
+                                                        :position "relative"
+                                                        :top "-10px"
+                                                        :flex-flow "row nowrap"
+                                                        :margin-left "20px"
+                                                        :min-width "200px"}}})
 
 (def result-card-header {:font-size "1em"
                          :color "#323232"
@@ -56,27 +69,18 @@
                            :font-weight 400
                            :color "#323232"})
 
-(def result-card-delete {:float "right"
-                         :position "relative"
-                         :top "-15px"
-                         :color "#fff"})
-
-(def result-card-chevron {:float "right"
-                          :position "relative"
-                          :top "-41px"
-                          :color "#fff"})
-
-(def result-card-show-data {:float "right"
-                            :position "relative"
-                            :top "-37px"
-                            :color "#fff"})
-
 (def result-card-header-link {:color "#fff"
                               ::stylefy/mode {:hover {:cursor          "pointer"
                                                       :text-decoration "underline"}}})
 
-(def delete-icon {:color         "rgba(0, 0, 0, 0,75)"
+(def delete-button {:padding "0"
+                    :margin-top "5px"
+                    :height "24px"
+                    :width "24px"})
+
+(def delete-icon {:color "rgba(0, 0, 0, 0,75)"
                   ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})
+
 (def partly-visible-delete-icon {:color "rgba(0, 0, 0, 0,75)"})
 
 (def service-link {:color "#06c" :text-decoration "none"})

@@ -26,6 +26,7 @@
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
    [ui/icon-button {:href "#"
+                    :style style/delete-button
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (admin/->DeleteTransportService id)))}
@@ -158,18 +159,17 @@
         card-padding (if (< card-width 767) "15px" "30px")]
     [:div.result-card (stylefy/use-style style/result-card)
      [:div
-      [:div.result-title {:style (merge {:padding-left card-padding} style/result-card-title)}
-       (open-link name)
-
-       (when admin?
-         [:div (stylefy/use-style style/result-card-delete)
-          [delete-service-action e! id name (get service :show-delete-modal?)]])]
-      (open-link
-        [:span [:div (stylefy/use-style style/result-card-chevron)
-                [ic/navigation-chevron-right {:color "#fff" :height 24}]]
-
-         [:div (stylefy/use-style style/result-card-show-data)
-          [:span {:style {:padding-top "10px"}} (tr [:service-search :show-all-information])]]])]
+      [:div.result-title (stylefy/use-style (merge {:padding-left card-padding} style/result-card-title))
+       [:div (stylefy/use-sub-style style/result-card-title :title)
+        (open-link name)]
+       [:div (stylefy/use-sub-style style/result-card-title :actions)
+        (open-link
+          [:div
+           (tr [:service-search :show-all-information])
+           [ic/navigation-chevron-right {:style {:position "relative" :top "6px"} :color "#fff" :height 24}]])
+        (when admin?
+          [:div {:style {:margin-left "20px"}}
+           [delete-service-action e! id name (get service :show-delete-modal?)]])]]]
 
 
      [:div.row.result-body (stylefy/use-style style/result-card-body)
