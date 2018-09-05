@@ -398,3 +398,6 @@
 
 (defn days-until [date]
   (day-difference (t/now) date))
+
+(defn now []
+  (t/now))
