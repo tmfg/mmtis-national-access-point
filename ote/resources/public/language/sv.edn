@@ -1186,7 +1186,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
-  :total-services ["Katalogen innehåller totalt " :total-service-count " tjänster och " :total-company-count " tjänsteproducenter."]
+  :total-services ["Katalogen innehåller totalt " :total-service-count " tjänster. Totalt " :total-company-count " företag är involverade i tillhandahållandet av tjänster."]
   :fetching-more "Sökning av tjänster pågår..."
   :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
   :operator-no-services "Tjänsteproducenten har inga tjänster."
