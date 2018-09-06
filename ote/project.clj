@@ -24,7 +24,7 @@
                  [specql "20180312"]
 
                  ;; http-kit HTTP server (and client)
-                 [http-kit "2.2.0"]
+                 [http-kit "2.3.0"]
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-anti-forgery "1.1.0"]
                  [clj-http "3.7.0"]
