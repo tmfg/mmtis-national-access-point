@@ -121,80 +121,7 @@
                       (set! (.-visibility (aget icon "style"))
                             (if show? "" "hidden")))))))
 
-(defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
-  (let [show?-atom (atom show-stops?)
-        inhibit-zoom (atom false)
-        update (fn [this]
-                 (update-marker-visibility this show?-atom)
-                 (when-not @inhibit-zoom
-                   (leaflet/update-bounds-from-layers this))
-                 (reset! inhibit-zoom false))
-        zoom-level (r/atom 5)]
-    (r/create-class
-     {:component-did-update update
-      :component-did-mount (fn [this]
-                             (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
-                               (.on m "zoomend" #(do
-                                                   (reset! inhibit-zoom true)
-                                                   (reset! zoom-level (.getZoom m)))))
-                             (update this))
-      :component-will-receive-props
-      (fn [this [_ _ _ _ {show-stops? :show-stops?}]]
-        ;; This is a bit of a kludge, but because the stops are in the
-        ;; same GeoJSON layer as the lines, we can't easily control their
-        ;; visibility using react components.
-        (when (not= @show?-atom show-stops?)
-          ;; Don't zoom if we changed stops visible/hidden toggle
-          (reset! inhibit-zoom true))
-        (reset! show?-atom show-stops?))
-      :reagent-render
-      (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
-                                             date1 date1-route-lines date1-show?
-                                             date2 date2-route-lines date2-show?
-                                             show-stops?]}]
-        (let [show-date1? (and date1-show?
-                               (not (empty? (get date1-route-lines "features"))))
-              show-date2? (and date2-show?
-                               (not (empty? (get date2-route-lines "features"))))
-              zoom @zoom-level
-              [line-weight offset icon-size] (cond
-                                               (< zoom 12) [3 2 [10 10]]
-                                               (< zoom 14) [5 2 [14 14]]
-                                               :default    [6 3 [20 20]])]
-          [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
-           (when date1-route-lines
-             [ui/checkbox {:label (str "Näytä " date1 " (musta)")
-                           :checked (boolean date1-show?)
-                           :on-check #(e! (tv/->ToggleRouteDisplayDate date1))}])
-           (when date2-route-lines
-             [ui/checkbox {:label (str "Näytä " date2 " (punainen)")
-                           :checked (boolean date2-show?)
-                           :on-check #(e! (tv/->ToggleRouteDisplayDate date2))}])
-           [ui/checkbox {:label "Näytä pysäkit"
-                         :checked (boolean show-stops?)
-                         :on-check #(e! (tv/->ToggleRouteDisplayStops))}]
-           [leaflet/Map {:ref "leaflet"
-                         :center #js [65 25]
-                         :zoomControl true
-                         :zoom 5}
-            (leaflet/background-tile-map)
-            (when show-date1?
-              ^{:key (str date1 "_" route-short-name "_" route-long-name "_" zoom)}
-              [leaflet/GeoJSON {:data date1-route-lines
-                                :onEachFeature (initialize-route-features (- offset) icon-size)
-                                :style {:lineJoin "miter"
-                                        :lineCap "miter"
-                                        :color "black"
-                                        :weight line-weight}}])
-            (when show-date2?
-              ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
-              [leaflet/GeoJSON {:data date2-route-lines
-                                :onEachFeature (initialize-route-features offset icon-size)
-                                :style {:lineJoin "miter"
-                                        :lineCap "miter"
-                                        :color "red"
-                                        :weight line-weight}}])]]))})))
 
 (defn stop-listing [stops]
   [:table
@@ -273,7 +200,7 @@
        #_[route-listing e! compare]
 
        ;; If a route is selected, show map
-       [selected-route-map e! date->hash hash->color compare]
+       #_[selected-route-map e! date->hash hash->color compare]
 
        ;; Show trip list
        [date-trips e! compare]])))
@@ -457,20 +384,126 @@
 
     route-changes]])
 
-(defn route-service-calendar [e! date->hash hash->color]
+(defn section [title help-content body-content]
+  [ui/card
+   [ui/card-title {:title title}]
+   [ui/card-header {:subtitle help-content}]
+   [ui/card-text
+    body-content]])
+
+(defn route-service-calendar [e! {:keys [date->hash hash->color
+                                         show-previous-year? show-next-year?]}]
   (let [current-year (time/year (time/now))]
-    [service-calendar/service-calendar {:selected-date? (constantly false)
-                                        :on-select :D
-                                        :day-style (r/partial day-style hash->color date->hash
-                                                              nil #_(:highlight transit-visualization))
-                                        :years (vec (concat (when (:show-previous-year? route-service-calendar)
-                                                              [(dec current-year)])
-                                                            [current-year]
-                                                            (when (:show-next-year? route-service-calendar)
-                                                              [(inc current-year)])))}]))
+    [:div.route-service-calendar
+     [section
+      "Kalenteri"
+      "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
+      [:div.route-service-calendar-content
+       [ui/checkbox {:label "Näytä myös edellinen vuosi"
+                     :checked show-previous-year?
+                     :on-check #(e! (tv/->ToggleShowPreviousYear))}]
+       [ui/checkbox {:label "Näytä myös tuleva vuosi"
+                     :checked show-next-year?
+                     :on-check #(e! (tv/->ToggleShowNextYear))}]
+
+       [service-calendar/service-calendar {:selected-date? (constantly false)
+                                           :on-select :D
+                                           :day-style (r/partial day-style hash->color date->hash
+                                                                 nil #_(:highlight transit-visualization))
+                                           :years (vec (concat (when show-previous-year?
+                                                                 [(dec current-year)])
+                                                               [current-year]
+                                                               (when show-next-year?
+                                                                 [(inc current-year)])))}]]]]))
+
+(defn route-trips [e! {:keys [trips date1 date2]}]
+  [section
+   "Vuorot"
+   "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
+   [:div.route-trips
+    "tännepä vuorolista ja muutokset"]
+   ])
+
+(defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
+  (let [show?-atom (atom show-stops?)
+        inhibit-zoom (atom false)
+        update (fn [this]
+                 (.log js/console "UPDATE, inhibit-zoom? " @inhibit-zoom)
+                 (update-marker-visibility this show?-atom)
+
+                 (when-not @inhibit-zoom
+                   (leaflet/update-bounds-from-layers this))
+                 (reset! inhibit-zoom false))
+        zoom-level (r/atom 5)]
+    (r/create-class
+     {:component-did-update (fn [this]
+                              (.log js/console "UPDATE!" this)
+                              (update this))
+      :component-did-mount (fn [this]
+                             (.log js/console "MOUNTED!" this)
+                             (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
+                               (.on m "zoomend" #(do
+                                                   (reset! inhibit-zoom true)
+                                                   (reset! zoom-level (.getZoom m)))))
+                             (update this))
+      :component-will-receive-props
+      (fn [this [_ _ _ _ {show-stops? :show-stops?}]]
+        ;; This is a bit of a kludge, but because the stops are in the
+        ;; same GeoJSON layer as the lines, we can't easily control their
+        ;; visibility using react components.
+        (when (not= @show?-atom show-stops?)
+          ;; Don't zoom if we changed stops visible/hidden toggle
+          (reset! inhibit-zoom true))
+        (reset! show?-atom show-stops?))
+      :reagent-render
+      (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
+                                             date1 date1-route-lines date1-show?
+                                             date2 date2-route-lines date2-show?
+                                             show-stops?]}]
+        (let [show-date1? (and date1-show?
+                               (not (empty? (get date1-route-lines "features"))))
+              show-date2? (and date2-show?
+                               (not (empty? (get date2-route-lines "features"))))
+              zoom @zoom-level
+              [line-weight offset icon-size] (cond
+                                               (< zoom 12) [3 2 [10 10]]
+                                               (< zoom 14) [5 2 [14 14]]
+                                               :default    [6 3 [20 20]])]
+          [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
+
+           [ui/checkbox {:label "Näytä pysäkit"
+                         :checked (boolean show-stops?)
+                         :on-check #(e! (tv/->ToggleRouteDisplayStops))}]
+           [leaflet/Map {:ref "leaflet"
+                         :center #js [65 25]
+                         :zoomControl true
+                         :zoom 5}
+            (leaflet/background-tile-map)
+            (when show-date1?
+              ^{:key (str date1 "_" route-short-name "_" route-long-name "_" zoom)}
+              [leaflet/GeoJSON {:data date1-route-lines
+                                :onEachFeature (initialize-route-features (- offset) icon-size)
+                                :style {:lineJoin "miter"
+                                        :lineCap "miter"
+                                        :color "black"
+                                        :weight line-weight}}])
+            (when show-date2?
+              ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
+              [leaflet/GeoJSON {:data date2-route-lines
+                                :onEachFeature (initialize-route-features offset icon-size)
+                                :style {:lineJoin "miter"
+                                        :lineCap "miter"
+                                        :color "red"
+                                        :weight line-weight}}])]]))})))
+
+(defn selected-route-map-section [e! date->hash hash->color compare]
+  [section
+   "Kartta"
+   "Kartalla näytetään valitsemasi reitin ja päivämäärien mukainen pysäkkiketju sekä ajoreitti, mikäli se on saatavilla."
+   [selected-route-map e! date->hash hash->color compare]])
 
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name
-                                        changes selected-route]
+                                        changes selected-route compare]
                                  :as transit-visualization}]
   [:div
    (when (not loading?)
@@ -486,7 +519,10 @@
           (:gtfs/route-long-name selected-route)
           " (" (:gtfs/trip-headsign selected-route) ")"]
 
-         [route-service-calendar e! date->hash hash->color]])
+         (when (and hash->color date->hash)
+           [:span
+            [route-service-calendar e! transit-visualization]
+            [selected-route-map-section e! date->hash hash->color compare]])])
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]

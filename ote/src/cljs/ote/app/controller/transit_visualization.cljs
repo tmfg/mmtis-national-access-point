@@ -180,14 +180,37 @@
 
 (define-event RouteResponse [route-info]
   {:path [:transit-visualization]}
-  (.log js/console "route info: " (pr-str route-info))
-
   (assoc app
          :date->hash (:calendar route-info)
          :hash->color (zipmap (distinct (vals (:calendar route-info)))
                               (cycle hash-colors
                                      ;; FIXME: after all colors are consumed, add some pattern style
                                      ))))
+
+(defn fetch-routes-for-dates [compare service-id route date1 date2]
+  (doseq [date [date1 date2]
+          :let [params (merge {:date (time/format-date-iso-8601 date)}
+                              (when-let [short (:gtfs/route-short-name route)]
+                                {:short short})
+                              (when-let [long (:gtfs/route-long-name route)]
+                                {:long long})
+                              (when-let [headsign (:gtfs/trip-headsign route)]
+                                {:headsign headsign}))]
+          :when date]
+    (comm/get! (str "transit-visualization/" service-id "/route-lines-for-date")
+               {:params params
+                :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
+    #_(comm/get! (str "transit-visualization/route-trips-for-date/" service-id)
+                 {:params params
+                  :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
+  (assoc compare
+         :date1 (:gtfs/current-week-date route)
+         :date2 (:gtfs/different-week-date route)
+         :date1-route-lines nil
+         :date2-route-lines nil
+         :date1-trips nil
+         :date2-trips nil
+         :show-stops? true))
 
 (define-event SelectRouteForDisplay [route]
   {}
@@ -201,36 +224,11 @@
 
     (-> app
         (assoc-in [:transit-visualization :selected-route] route)
-        (update-in [:transit-visualization] dissoc :date->hash :hash->color)))
-
-  #_(let [operator-id (:operator-id app)]
-    (assoc app :selected-route route)
-    (update
-     app :compare
-     (fn [app]
-       (doseq [date [(:date1 app) (:date2 app)]
-               :let [params (merge {:date date}
-                                   (when route-short-name
-                                     {:short route-short-name})
-                                   (when route-long-name
-                                     {:long route-long-name})
-                                   (when trip-headsign
-                                     {:headsign trip-headsign}))]]
-         (comm/get! (str "transit-visualization/route-lines-for-date/" operator-id)
-                    {:params params
-                     :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
-         (comm/get! (str "transit-visualization/route-trips-for-date/" operator-id)
-                    {:params params
-                     :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
-       (assoc app
-              :date1-route-lines nil
-              :date2-route-lines nil
-              :date1-trips nil
-              :date2-trips nil
-              :route-short-name route-short-name
-              :route-long-name route-long-name
-              :trip-headsign trip-headsign
-              :show-stops? true)))))
+        (update-in [:transit-visualization] dissoc :date->hash :hash->color)
+        (update-in [:transit-visualization :compare] fetch-routes-for-dates
+                   service-id route
+                   (:gtfs/current-week-date route)
+                   (:gtfs/different-week-date route)))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
@@ -256,3 +254,11 @@
 (define-event SelectTripDescription [trip-description]
   {:path [:transit-visualization :compare :selected-trip-description]}
   trip-description)
+
+(define-event ToggleShowPreviousYear []
+  {:path [:transit-visualization :show-previous-year?]}
+  (not app))
+
+(define-event ToggleShowNextYear []
+  {:path [:transit-visualization :show-next-year?]}
+  (not app))

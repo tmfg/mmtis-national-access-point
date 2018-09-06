@@ -8,7 +8,8 @@
             [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
             [specql.op :as op]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [taoensso.timbre :as log]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -46,7 +47,7 @@
 (define-service-component TransitVisualization {}
 
   ^{:unauthenticated true :format :transit}
-  (GET "/transit-visualization/:service-id/:date"
+  (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
        (service-changes-for-date db
                                  (Long/parseLong service-id)
@@ -60,6 +61,23 @@
        {:calendar (service-calendar-for-route db (Long/parseLong service-id)
                                               short-name long-name headsign)})
 
+
+    ^:unauthenticated
+  (GET "/transit-visualization/:service-id/route-lines-for-date"
+       {{service-id :service-id} :params
+        {:strs [date short long headsign]} :query-params}
+       (http/geojson-response
+        (cheshire/encode
+         {:type "FeatureCollection"
+          :features (route-line-features
+                     (fetch-route-trips-by-name-and-date
+                      db
+                      {:service-id (Long/parseLong service-id)
+                       :date (time/parse-date-iso-8601 date)
+                       :route-short-name short
+                       :route-long-name long
+                       :trip-headsign headsign}))}
+         {:key-fn name})))
 
   ;;; FIXME: poista vanhat
   ^{:unauthenticated true :format :transit}
@@ -83,21 +101,7 @@
                                    :date1 (time/parse-date-eu date1)
                                    :date2 (time/parse-date-eu date2)}))
 
-  ^:unauthenticated
-  (GET "/transit-visualization/route-lines-for-date/:operator"
-       {{operator :operator} :params
-        {:strs [date short long headsign]} :query-params}
-       (http/geojson-response
-        (cheshire/encode
-         {:type "FeatureCollection"
-          :features (route-line-features (fetch-route-trips-by-name-and-date
-                                          db
-                                          {:operator-id (Long/parseLong operator)
-                                           :date (time/parse-date-eu date)
-                                           :route-short-name short
-                                           :route-long-name long
-                                           :headsign headsign}))}
-         {:key-fn name})))
+
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/route-trips-for-date/:operator"

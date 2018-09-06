@@ -98,11 +98,11 @@ SELECT ST_AsGeoJSON(COALESCE(
           JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
          WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
            AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
-           AND COALESCE(:headsign::VARCHAR,'') = COALESCE(trip."trip-headsign",'')
-           AND t."service-id" IN (SELECT gtfs_services_for_date(
-                                  (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
-                                 :date::date))
-           AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE))
+           AND COALESCE(:trip-headsign::VARCHAR,'') = COALESCE(trip."trip-headsign",'')
+           AND ROW(r."package-id", t."service-id")::service_ref IN
+               (SELECT * FROM gtfs_services_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE),
+                          :date::DATE))
+           AND r."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE))
          GROUP BY trip."shape-id", r."package-id", trip."trip-id") x
  -- Group same route lines to single row (aggregate departures to array)
  GROUP BY "route-line", "shape-id", "package-id";
