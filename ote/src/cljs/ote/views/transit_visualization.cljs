@@ -61,12 +61,10 @@
        {:box-shadow "inset 0 0 0 2px black,
                      inset 0 0 0 3px transparent"})
      (cond (= (time/format-date-iso-8601 date1) d)
-           {:background (str "radial-gradient(circle at center, #353CD9 60%, " hash-color " 40%) 0px 0px")
-            :color "#E1E1F9"}
+           (style/date1-highlight-style hash-color)
 
            (= (time/format-date-iso-8601 date2) d)
-           {:background (str "radial-gradient(circle at center, #DB19A9 60%, " hash-color " 40%) 0px 0px")
-            :color "#F6C6EA"})
+           (style/date2-highlight-style hash-color))
      #_(when (:hash highlight)
         (highlight-style hash->color date->hash day highlight)))))
 
@@ -410,7 +408,7 @@
 
      route-changes]]])
 
-(defn route-service-calendar [e! {:keys [date->hash hash->color min-date max-date
+(defn route-service-calendar [e! {:keys [date->hash hash->color
                                          show-previous-year? show-next-year?
                                          compare]}]
   (let [current-year (time/year (time/now))]
@@ -436,7 +434,28 @@
                                                                  [(dec current-year)])
                                                                [current-year]
                                                                (when show-next-year?
-                                                                 [(inc current-year)])))}]]]]))
+                                                                 [(inc current-year)])))}]
+
+       [:h3 "Valittujen päivämäärien väliset muutokset"]
+       [:div (stylefy/use-style (merge (style-base/flex-container "row")
+                                       {:justify-content "space-between"
+                                        :width "20%"}))
+        [:div [:div {:style (merge {:display "inline-block"
+                                    :position "relative"
+                                    :top "5px"
+                                    :margin-right "0.5em"
+                                    :width "20px"
+                                    :height "20px"}
+                                   (style/date1-highlight-style))}]
+         (time/format-date (:date1 compare))]
+        [:div [:div {:style (merge {:display "inline-block"
+                                    :position "relative"
+                                    :top "5px"
+                                    :margin-right "0.5em"
+                                    :width "20px"
+                                    :height "20px"}
+                                   (style/date2-highlight-style))}] (time/format-date (:date2 compare))]]
+       ]]]))
 
 (defn route-trips [e! {:keys [trips date1 date2]}]
   [section

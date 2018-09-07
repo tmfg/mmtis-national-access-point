@@ -20,3 +20,17 @@
    :position "relative"
    :top "-0.5rem"
    :left "0.2rem"})
+
+(defn date1-highlight-style
+  ([]
+   (date1-highlight-style "rgba(0,0,0,0)"))
+  ([hash-color]
+   {:background (str "radial-gradient(circle at center, #353CD9 60%, " hash-color " 40%) 0px 0px")
+    :color "#E1E1F9"}))
+
+(defn date2-highlight-style
+  ([]
+   (date2-highlight-style "rgba(0,0,0,0)"))
+  ([hash-color]
+   {:background (str "radial-gradient(circle at center, #DB19A9 60%, " hash-color " 40%) 0px 0px")
+    :color "#F6C6EA"}))
