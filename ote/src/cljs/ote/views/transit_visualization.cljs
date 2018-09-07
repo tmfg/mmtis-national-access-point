@@ -4,6 +4,7 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
+            [ote.style.base :as style-base]
             [tuck.core :as tuck]
             [ote.ui.service-calendar :as service-calendar]
             [ote.app.controller.transit-visualization :as tv]
@@ -418,12 +419,14 @@
       "Kalenteri"
       "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
       [:div.route-service-calendar-content
-       [ui/checkbox {:label "Näytä myös edellinen vuosi"
-                     :checked show-previous-year?
-                     :on-check #(e! (tv/->ToggleShowPreviousYear))}]
-       [ui/checkbox {:label "Näytä myös tuleva vuosi"
-                     :checked show-next-year?
-                     :on-check #(e! (tv/->ToggleShowNextYear))}]
+
+       [:div (stylefy/use-style (style-base/flex-container "row"))
+        [ui/checkbox {:label "Näytä myös edellinen vuosi"
+                      :checked show-previous-year?
+                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]
+        [ui/checkbox {:label "Näytä myös tuleva vuosi"
+                      :checked show-next-year?
+                      :on-check #(e! (tv/->ToggleShowNextYear))}]]
 
        [service-calendar/service-calendar {:selected-date? (constantly false)
                                            :on-select :D
