@@ -12,14 +12,14 @@
 (def base-day-style {:width 30
                      :height 30
                      :text-align "center"
-                     :border "solid 1px black"
+                     :border "solid 1px lightgray" ;; "solid 1px black"
                      :cursor "pointer"
                      :user-select "none"})
 
 (def no-day-style (merge base-day-style
                          {:font-size "75%"
                           :color "gray"
-                          :background-color "lightGray"}))
+                          :background-color "#f9f9f9"}))
 
 (def selected-day-style (merge base-day-style
                                {:background-color "wheat"
@@ -56,7 +56,7 @@
         [:td.week-separator (stylefy/use-style week-separator-style)]
         ^{:key i}
         [:td (stylefy/use-style no-day-style)
-         (t/day day)]))
+         #_(t/day day)]))
      (separate-weeks (map #(t/plus start-date (t/days %))
                           (range n))))))
 
@@ -84,7 +84,9 @@
 
 (defn- month-name [month]
   (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
-    (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
+    (subs
+     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})
+     0 3)))
 
 (defn service-calendar-year [{:keys [selected-date? on-select on-hover
                                       day-style]} year]

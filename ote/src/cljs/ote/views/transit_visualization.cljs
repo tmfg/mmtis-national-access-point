@@ -45,15 +45,23 @@
                                 inset 0 0 0 3px transparent,
                                 inset 0 0 0 100px rgba(0,0,0,.25)"}))))))
 
-(defn day-style [hash->color date->hash highlight day selected?]
+(defn day-style [hash->color date->hash date1 date2 day]
   (let [d (time/format-date-iso-8601 day)
         hash-color (hash->color (date->hash d))]
     (merge
-      {:background-color hash-color
+     {:background-color hash-color
        :color "rgb (0, 255, 255)"
        :transition "box-shadow 0.25s"
-       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-      (when (:hash highlight)
+      :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
+     (cond (= (time/format-date-iso-8601 date1) d)
+           {:background (str "radial-gradient(circle at center, #353CD9 60%, " hash-color " 40%) 0px 0px")
+            :color "#E1E1F9"}
+
+           (= (time/format-date-iso-8601 date2) d)
+           {:background (str "radial-gradient(circle at center, #DB19A9 60%, " hash-color " 40%) 0px 0px")
+            :color "#F6C6EA"}
+           )
+     #_(when (:hash highlight)
         (highlight-style hash->color date->hash day highlight)))))
 
 (defn hover-day [e! date->hash day]
@@ -328,61 +336,7 @@
       [:div (stylefy/use-style style/change-icon-value)
        time-changes]]]))
 
-(defn route-changes [e! route-changes selected-route]
-  [:div.route-changes
-   [route-changes-legend]
-   [table/table {:no-rows-message "Ei reittejä"
-                 :height 300
-                 :name->label str
-                 :show-row-hover? true
-                 :on-select #(when (first %)
-                               (e! (tv/->SelectRouteForDisplay (first %))))
-                 :row-selected? #(= % selected-route)}
-    [{:name "Reitti" :width "30%"
-      :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
-      :format (fn [[short long]]
-                (str short " " long))}
-     {:name "Otsatunnus" :width "20%"
-      :read :gtfs/trip-headsign}
 
-     {:name "Aikaa 1:seen muutokseen"
-      :width "20%"
-      :read :gtfs/change-date
-      :format (fn [change-date]
-                (if-not change-date
-                  [:div
-                   [ic/navigation-check]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Ei muutoksia"]]
-                  [:span
-                   (str (time/days-until change-date) " pv")
-                   [:span (stylefy/use-style {:margin-left "5px"
-                                              :color "gray"})
-                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
-
-     {:name "Muutokset" :width "30%"
-      :read identity
-      :format (fn [{change-type :gtfs/change-type :as route-changes}]
-                (case change-type
-                  :added
-                  [:div [ic/content-add-circle-outline {:color style/add-color}]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Uusi reitti"]]
-
-                  :removed
-                  [:div [ic/content-remove-circle-outline {:color style/remove-color}]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Päättyvä reitti"]]
-
-                  :no-change
-                  [:div [ic/navigation-check]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Ei muutoksia"]]
-
-                  :changed
-                  [change-icons route-changes]))}]
-
-    route-changes]])
 
 (defn section [title help-content body-content]
   [ui/card
@@ -391,8 +345,68 @@
    [ui/card-text
     body-content]])
 
+(defn route-changes [e! route-changes selected-route]
+  [section
+   "Reitit"
+   "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
+   [:div.route-changes
+    [route-changes-legend]
+    [table/table {:no-rows-message "Ei reittejä"
+                  :height 300
+                  :name->label str
+                  :show-row-hover? true
+                  :on-select #(when (first %)
+                                (e! (tv/->SelectRouteForDisplay (first %))))
+                  :row-selected? #(= % selected-route)}
+     [{:name "Reitti" :width "30%"
+       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
+       :format (fn [[short long]]
+                 (str short " " long))}
+      {:name "Otsatunnus" :width "20%"
+       :read :gtfs/trip-headsign}
+
+      {:name "Aikaa 1:seen muutokseen"
+       :width "20%"
+       :read :gtfs/change-date
+       :format (fn [change-date]
+                 (if-not change-date
+                   [:div
+                    [ic/navigation-check]
+                    [:div (stylefy/use-style style/change-icon-value)
+                     "Ei muutoksia"]]
+                   [:span
+                    (str (time/days-until change-date) " pv")
+                    [:span (stylefy/use-style {:margin-left "5px"
+                                               :color "gray"})
+                     (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
+
+      {:name "Muutokset" :width "30%"
+       :read identity
+       :format (fn [{change-type :gtfs/change-type :as route-changes}]
+                 (case change-type
+                   :added
+                   [:div [ic/content-add-circle-outline {:color style/add-color}]
+                    [:div (stylefy/use-style style/change-icon-value)
+                     "Uusi reitti"]]
+
+                   :removed
+                   [:div [ic/content-remove-circle-outline {:color style/remove-color}]
+                    [:div (stylefy/use-style style/change-icon-value)
+                     "Päättyvä reitti"]]
+
+                   :no-change
+                   [:div [ic/navigation-check]
+                    [:div (stylefy/use-style style/change-icon-value)
+                     "Ei muutoksia"]]
+
+                   :changed
+                   [change-icons route-changes]))}]
+
+     route-changes]]])
+
 (defn route-service-calendar [e! {:keys [date->hash hash->color
-                                         show-previous-year? show-next-year?]}]
+                                         show-previous-year? show-next-year?
+                                         compare]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
      [section
@@ -409,7 +423,7 @@
        [service-calendar/service-calendar {:selected-date? (constantly false)
                                            :on-select :D
                                            :day-style (r/partial day-style hash->color date->hash
-                                                                 nil #_(:highlight transit-visualization))
+                                                                 (:date1 compare) (:date2 compare))
                                            :years (vec (concat (when show-previous-year?
                                                                  [(dec current-year)])
                                                                [current-year]
@@ -502,13 +516,16 @@
    "Kartalla näytetään valitsemasi reitin ja päivämäärien mukainen pysäkkiketju sekä ajoreitti, mikäli se on saatavilla."
    [selected-route-map e! date->hash hash->color compare]])
 
-(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight operator-name
+(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
                                         changes selected-route compare]
                                  :as transit-visualization}]
   [:div
    (when (not loading?)
      [:div.transit-visualization
 
+      [:h1 "Reittiliikenteen tunnistetut muutokset"]
+
+      [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
       ;; Route listing with number of changes
       [route-changes e! (:gtfs/route-changes changes) selected-route]
 
