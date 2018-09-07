@@ -185,7 +185,15 @@
      (let [[year month date]
            (map #(Integer/parseInt %)
                 (str/split date #"-"))]
-       (java.time.LocalDate/of year month date))))
+       (java.time.LocalDate/of year month date)))
+   :cljs
+   (defn parse-date-iso-8601
+     "Parse a date in ISO-8601 format."
+     [date]
+     (let [[year month date]
+           (map #(js/parseInt %)
+                (str/split date #"-"))]
+       (t/date-time year month date))))
 
 (defn parse-date-eu
   "Parse a EU formatted date (dd.MM.yyyy) to a local date"
@@ -401,3 +409,6 @@
 
 (defn now []
   (t/now))
+
+(defn days-from [date days]
+  (t/plus date (t/days days)))
