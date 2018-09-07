@@ -133,3 +133,14 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
            AND rh."route-long-name" = :route-long-name
            AND rh."trip-headsign" = :trip-headsign) x
  GROUP BY x.date;
+
+-- name: fetch-service-info
+-- Fetch service info for display in the UI
+SELECT ts.name AS "transport-service-name",
+       ts.id AS "transport-service-id",
+       op.name AS "transport-operator-name",
+       op.id AS "transport-operator-id"
+  FROM "transport-service" ts
+  JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
+ WHERE ts."published?" = TRUE
+   AND ts.id = :service-id;

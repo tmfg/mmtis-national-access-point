@@ -49,11 +49,13 @@
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
-       (service-changes-for-date db
-                                 (Long/parseLong service-id)
-                                 (-> date
-                                     time/parse-date-iso-8601
-                                     java.sql.Date/valueOf)))
+       (let [service-id (Long/parseLong service-id)]
+         {:service-info (first (fetch-service-info db {:service-id service-id}))
+          :changes (service-changes-for-date db
+                                             service-id
+                                             (-> date
+                                                 time/parse-date-iso-8601
+                                                 java.sql.Date/valueOf))}))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route/:short-name/:long-name/:headsign"
