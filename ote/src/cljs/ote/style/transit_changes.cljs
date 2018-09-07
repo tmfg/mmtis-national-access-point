@@ -34,3 +34,26 @@
   ([hash-color]
    {:background (str "radial-gradient(circle at center, #DB19A9 60%, " hash-color " 40%) 0px 0px")
     :color "#F6C6EA"}))
+
+(def section
+  {:border "solid 1px #646464"
+   :padding-bottom "1.25rem"
+   :margin-bottom "2.5rem"})
+
+(def section-title
+  {:background-color "#646464"
+   :color "white"
+   :font-size "1.125rem"
+   :font-family "Montserrat"
+   :padding "0.875rem 0.875rem 0.875rem 0.625rem"
+   :line-height 2
+   :font-weight "600"})
+
+(def section-header
+  {:padding "1rem"
+   :background-color "#F0F0F0"
+   :line-height 1.5})
+
+(def section-body
+  {:padding-left "1.25rem"
+   :padding-right "1.25rem"})

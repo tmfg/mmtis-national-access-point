@@ -252,3 +252,10 @@
                               :color "#969696"
                               :margin-bottom "1rem"}]
       [:span (tr [:common-texts :rotate-device-90])]]]))
+
+(defn back-link [url label]
+  [linkify url [:span [icons/arrow-back {:position "relative"
+                                         :top "6px"
+                                         :padding-right "5px"
+                                         :color style-base/link-color}]
+                label]])

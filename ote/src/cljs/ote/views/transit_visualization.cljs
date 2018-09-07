@@ -15,7 +15,9 @@
             [ote.db.transport-service :as t-service]
             [ote.localization :refer [tr]]
             [ote.ui.leaflet :as leaflet]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.ui.page :as page]
+            [ote.ui.common :as common]))
 
 (set! *warn-on-infer* true)
 
@@ -342,89 +344,96 @@
 
 
 
-(defn section [title help-content body-content]
-  [ui/card
-   [ui/card-title {:title title}]
-   [ui/card-header {:subtitle help-content}]
-   [ui/card-text
+(defn section [e! title help-content body-content]
+  [:div.transit-visualization-section (stylefy/use-style style/section)
+   [:div.transit-visualization-section-title (stylefy/use-style style/section-title)
+    [ic/navigation-expand-less {:color "white"
+                                :style {:position "relative"
+                                        :top "6px"
+                                        :margin-right "0.5rem"}}]
+    title]
+   [:div.transit-visualization-section-header (stylefy/use-style style/section-header)
+    help-content]
+   [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
     body-content]])
 
 (defn route-changes [e! route-changes selected-route]
-  [section
-   "Reitit"
-   "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
-   [:div.route-changes
-    [route-changes-legend]
-    [table/table {:no-rows-message "Ei reittejä"
-                  :height 300
-                  :name->label str
-                  :show-row-hover? true
-                  :on-select #(when (first %)
-                                (e! (tv/->SelectRouteForDisplay (first %))))
-                  :row-selected? #(= % selected-route)}
-     [{:name "Reitti" :width "30%"
-       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
-       :format (fn [[short long]]
-                 (str short " " long))}
-      {:name "Otsatunnus" :width "20%"
-       :read :gtfs/trip-headsign}
+  [:div.route-changes
+   [route-changes-legend]
+   [table/table {:no-rows-message "Ei reittejä"
+                 :height 300
+                 :name->label str
+                 :show-row-hover? true
+                 :on-select #(when (first %)
+                               (e! (tv/->SelectRouteForDisplay (first %))))
+                 :row-selected? #(= % selected-route)}
+    [{:name "Reitti" :width "30%"
+      :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
+      :format (fn [[short long]]
+                (str short " " long))}
+     {:name "Otsatunnus" :width "20%"
+      :read :gtfs/trip-headsign}
 
-      {:name "Aikaa 1:seen muutokseen"
-       :width "20%"
-       :read :gtfs/change-date
-       :format (fn [change-date]
-                 (if-not change-date
-                   [:div
-                    [ic/navigation-check]
-                    [:div (stylefy/use-style style/change-icon-value)
-                     "Ei muutoksia"]]
-                   [:span
-                    (str (time/days-until change-date) " pv")
-                    [:span (stylefy/use-style {:margin-left "5px"
-                                               :color "gray"})
-                     (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
+     {:name "Aikaa 1:seen muutokseen"
+      :width "20%"
+      :read :gtfs/change-date
+      :format (fn [change-date]
+                (if-not change-date
+                  [:div
+                   [ic/navigation-check]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Ei muutoksia"]]
+                  [:span
+                   (str (time/days-until change-date) " pv")
+                   [:span (stylefy/use-style {:margin-left "5px"
+                                              :color "gray"})
+                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
 
-      {:name "Muutokset" :width "30%"
-       :read identity
-       :format (fn [{change-type :gtfs/change-type :as route-changes}]
-                 (case change-type
-                   :added
-                   [:div [ic/content-add-circle-outline {:color style/add-color}]
-                    [:div (stylefy/use-style style/change-icon-value)
-                     "Uusi reitti"]]
+     {:name "Muutokset" :width "30%"
+      :read identity
+      :format (fn [{change-type :gtfs/change-type :as route-changes}]
+                (case change-type
+                  :added
+                  [:div [ic/content-add-circle-outline {:color style/add-color}]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Uusi reitti"]]
 
-                   :removed
-                   [:div [ic/content-remove-circle-outline {:color style/remove-color}]
-                    [:div (stylefy/use-style style/change-icon-value)
-                     "Päättyvä reitti"]]
+                  :removed
+                  [:div [ic/content-remove-circle-outline {:color style/remove-color}]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Päättyvä reitti"]]
 
-                   :no-change
-                   [:div [ic/navigation-check]
-                    [:div (stylefy/use-style style/change-icon-value)
-                     "Ei muutoksia"]]
+                  :no-change
+                  [:div [ic/navigation-check]
+                   [:div (stylefy/use-style style/change-icon-value)
+                    "Ei muutoksia"]]
 
-                   :changed
-                   [change-icons route-changes]))}]
+                  :changed
+                  [change-icons route-changes]))}]
 
-     route-changes]]])
+    route-changes]])
 
 (defn route-service-calendar [e! {:keys [date->hash hash->color
                                          show-previous-year? show-next-year?
                                          compare]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
-     [section
+     [section e!
       "Kalenteri"
-      "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
-      [:div.route-service-calendar-content
-
-       [:div (stylefy/use-style (style-base/flex-container "row"))
+      [:span
+       "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
+       [:div (stylefy/use-style (merge (style-base/flex-container "row")
+                                       {:margin-top "1rem"
+                                        :margin-bottom "1rem"}))
         [ui/checkbox {:label "Näytä myös edellinen vuosi"
                       :checked show-previous-year?
                       :on-check #(e! (tv/->ToggleShowPreviousYear))}]
         [ui/checkbox {:label "Näytä myös tuleva vuosi"
                       :checked show-next-year?
-                      :on-check #(e! (tv/->ToggleShowNextYear))}]]
+                      :on-check #(e! (tv/->ToggleShowNextYear))}]]]
+      [:div.route-service-calendar-content
+
+
 
        [service-calendar/service-calendar {:selected-date? (constantly false)
                                            :on-select :D
@@ -458,7 +467,7 @@
        ]]]))
 
 (defn route-trips [e! {:keys [trips date1 date2]}]
-  [section
+  [section e!
    "Vuorot"
    "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
    [:div.route-trips
@@ -512,9 +521,7 @@
                                                :default    [6 3 [20 20]])]
           [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
-           [ui/checkbox {:label "Näytä pysäkit"
-                         :checked (boolean show-stops?)
-                         :on-check #(e! (tv/->ToggleRouteDisplayStops))}]
+
            [leaflet/Map {:ref "leaflet"
                          :center #js [65 25]
                          :zoomControl true
@@ -538,9 +545,15 @@
                                         :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! date->hash hash->color compare]
-  [section
+  [section e!
    "Kartta"
-   "Kartalla näytetään valitsemasi reitin ja päivämäärien mukainen pysäkkiketju sekä ajoreitti, mikäli se on saatavilla."
+   [:span
+    "Kartalla näytetään valitsemasi reitin ja päivämäärien mukainen pysäkkiketju sekä ajoreitti, mikäli se on saatavilla."
+    [:div (stylefy/use-style {:margin-top "1.25rem"
+                              :margin-bottom "1.25rem"})
+     [ui/checkbox {:label "Näytä pysäkit"
+                   :checked (boolean (:show-stops? compare))
+                   :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]]
    [selected-route-map e! date->hash hash->color compare]])
 
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
@@ -550,11 +563,15 @@
    (when (not loading?)
      [:div.transit-visualization
 
-      [:h1 "Reittiliikenteen tunnistetut muutokset"]
+      [page/page-controls
+       [common/back-link "#/transit-changes" "Takaisin markkinaehtoisen liikenteen muutokset -näkymään"]
+       "Reittiliikenteen tunnistetut muutokset"
+       [:div
+        [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
+        ;; Route listing with number of changes
+        "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-      [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
-      ;; Route listing with number of changes
-      [route-changes e! (:gtfs/route-changes changes) selected-route]
+        [route-changes e! (:gtfs/route-changes changes) selected-route]]]
 
       (when selected-route
         [:div.transit-visualization-route
