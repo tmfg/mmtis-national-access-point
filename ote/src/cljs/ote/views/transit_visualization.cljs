@@ -46,21 +46,26 @@
                                 inset 0 0 0 100px rgba(0,0,0,.25)"}))))))
 
 (defn day-style [hash->color date->hash date1 date2 day]
-  (let [d (time/format-date-iso-8601 day)
-        hash-color (hash->color (date->hash d))]
+  (let [prev-week-date (time/format-date-iso-8601 (time/days-from day -7))
+        prev-week-hash (date->hash prev-week-date)
+        d (time/format-date-iso-8601 day)
+        hash (date->hash d)
+        hash-color (hash->color hash)]
     (merge
      {:background-color hash-color
-       :color "rgb (0, 255, 255)"
-       :transition "box-shadow 0.25s"
+      :color "rgb (0, 255, 255)"
+      :transition "box-shadow 0.25s"
       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
+     (when (and prev-week-hash hash (not= hash prev-week-hash))
+       {:box-shadow "inset 0 0 0 2px black,
+                     inset 0 0 0 3px transparent"})
      (cond (= (time/format-date-iso-8601 date1) d)
            {:background (str "radial-gradient(circle at center, #353CD9 60%, " hash-color " 40%) 0px 0px")
             :color "#E1E1F9"}
 
            (= (time/format-date-iso-8601 date2) d)
            {:background (str "radial-gradient(circle at center, #DB19A9 60%, " hash-color " 40%) 0px 0px")
-            :color "#F6C6EA"}
-           )
+            :color "#F6C6EA"})
      #_(when (:hash highlight)
         (highlight-style hash->color date->hash day highlight)))))
 
@@ -404,7 +409,7 @@
 
      route-changes]]])
 
-(defn route-service-calendar [e! {:keys [date->hash hash->color
+(defn route-service-calendar [e! {:keys [date->hash hash->color min-date max-date
                                          show-previous-year? show-next-year?
                                          compare]}]
   (let [current-year (time/year (time/now))]
