@@ -29,7 +29,8 @@
 
   ["gtfs-route-change-type" :gtfs/route-change-type (specql.transform/transform (specql.transform/to-keyword))]
   ["gtfs-route-change-info" :gtfs/route-change-info]
-  ["gtfs-transit-changes" :gtfs/transit-changes])
+  ["gtfs-transit-changes" :gtfs/transit-changes]
+  ["gtfs_stoptime_display" :gtfs/stoptime-display])
 
 #?(:clj
    (def ^:const int4range-pattern

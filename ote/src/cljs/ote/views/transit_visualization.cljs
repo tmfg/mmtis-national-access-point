@@ -576,7 +576,8 @@
          (when (and hash->color date->hash)
            [:span
             [route-service-calendar e! transit-visualization]
-            [selected-route-map-section e! open-sections date->hash hash->color compare]])])
+            [selected-route-map-section e! open-sections date->hash hash->color compare]
+            [route-trips e! open-sections compare]])])
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]

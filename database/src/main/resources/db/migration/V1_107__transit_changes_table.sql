@@ -61,6 +61,16 @@ CREATE TYPE gtfs_week_diff AS (
   "different-weekhash" TEXT
 );
 
+CREATE TYPE gtfs_stoptime_display AS (
+  "stop-sequence" INTEGER,
+  "stop-name" TEXT,
+  "arrival-time" INTERVAL,
+  "departure-time" INTERVAL
+);
+
+COMMENT ON TYPE gtfs_stoptime_display IS
+E'Type used for querying stoptimes to for display in the frontend';
+
 CREATE TABLE "gtfs-transit-changes" (
   date DATE,
   "transport-service-id" INTEGER REFERENCES "transport-service" (id),

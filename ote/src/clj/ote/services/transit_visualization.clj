@@ -9,7 +9,10 @@
             [specql.core :as specql]
             [specql.op :as op]
             [clojure.string :as str]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [specql.impl.composite :as composite]
+            [specql.impl.registry :as specql-registry]
+            [ote.util.fn :refer [flip]]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -44,6 +47,15 @@
                                          :route-long-name route-long-name
                                          :trip-headsign trip-headsign})))
 
+(defn parse-gtfs-stoptimes [pg-array]
+  (let [string (str pg-array)]
+    (if (str/blank? string)
+      nil
+      (composite/parse @specql-registry/table-info-registry
+                       {:category "A"
+                        :element-type :gtfs/stoptime-display}
+                       string))))
+
 (define-service-component TransitVisualization {}
 
   ^{:unauthenticated true :format :transit}
@@ -64,7 +76,7 @@
                                               short-name long-name headsign)})
 
 
-    ^:unauthenticated
+  ^:unauthenticated
   (GET "/transit-visualization/:service-id/route-lines-for-date"
        {{service-id :service-id} :params
         {:strs [date short long headsign]} :query-params}
@@ -81,36 +93,16 @@
                        :trip-headsign headsign}))}
          {:key-fn name})))
 
-  ;;; FIXME: poista vanhat
   ^{:unauthenticated true :format :transit}
-  (GET "/transit-visualization/info/:operator"
-       {{operator :operator} :params}
-    (first
-      (specql/fetch db
-                    ::t-operator/transport-operator
-                    #{::t-operator/id ::t-operator/name}
-                    {::t-operator/id (Long/parseLong operator)})))
-
-  ^{:unauthenticated true :format :transit}
-  (GET "/transit-visualization/dates/:operator" [operator]
-       (fetch-operator-date-hashes db {:operator-id (Long/parseLong operator)}))
-
-  ^{:unauthenticated true :format :transit}
-  (GET "/transit-visualization/routes-for-dates/:operator"
-       {{operator :operator} :params
-        {:strs [date1 date2]} :query-params}
-       (fetch-routes-for-dates db {:operator-id (Long/parseLong operator)
-                                   :date1 (time/parse-date-eu date1)
-                                   :date2 (time/parse-date-eu date2)}))
-
-
-
-  ^{:unauthenticated true :format :transit}
-  (GET "/transit-visualization/route-trips-for-date/:operator"
-       {{operator :operator} :params
+  (GET "/transit-visualization/:service-id/route-trips-for-date"
+       {{service-id :service-id} :params
         {:strs [date short long headsign]} :query-params}
-       (fetch-trip-stops-for-route-by-name-and-date db {:operator-id (Long/parseLong operator)
-                                                        :date (time/parse-date-eu date)
-                                                        :route-short-name short
-                                                        :route-long-name long
-                                                        :headsign headsign})))
+       (into []
+             (map #(update % :stoptimes parse-gtfs-stoptimes))
+             (fetch-route-trip-info-by-name-and-date
+              db
+              {:service-id (Long/parseLong service-id)
+               :date (time/parse-date-iso-8601 date)
+               :route-short-name short
+               :route-long-name long
+               :trip-headsign headsign}))))

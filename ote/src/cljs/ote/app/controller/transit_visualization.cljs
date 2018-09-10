@@ -201,7 +201,7 @@
     (comm/get! (str "transit-visualization/" service-id "/route-lines-for-date")
                {:params params
                 :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
-    #_(comm/get! (str "transit-visualization/route-trips-for-date/" service-id)
+    (comm/get! (str "transit-visualization/" service-id "/route-trips-for-date")
                  {:params params
                   :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
   (assoc compare

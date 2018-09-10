@@ -107,6 +107,23 @@ SELECT ST_AsGeoJSON(COALESCE(
  -- Group same route lines to single row (aggregate departures to array)
  GROUP BY "route-line", "shape-id", "package-id";
 
+-- name: fetch-route-trip-info-by-name-and-date
+-- Fetch listing of all trips by route name and date
+SELECT trip."package-id", (trip.trip)."trip-id",
+       array_agg(ROW(stoptime."stop-sequence",
+                     s."stop-name",
+                     stoptime."arrival-time",
+                     stoptime."departure-time")::gtfs_stoptime_display
+                 ORDER BY stoptime."stop-sequence") AS "stoptimes"
+ FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(1,'2018-09-07'::date), '2018-09-07'::date) rt
+ JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
+ JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
+ JOIN "gtfs-stop" s ON (s."package-id" = trip."package-id" AND s."stop-id" = stoptime."stop-id")
+ WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(rt."route-short-name",'')
+   AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(rt."route-long-name",'')
+   AND COALESCE(:trip-headsign::VARCHAR,'') = COALESCE(rt."trip-headsign",'')
+ GROUP BY trip."package-id", (trip.trip)."trip-id";
+
 
 -- name: fetch-date-hashes-for-route
 -- Fetch the date/hash pairs for a given route
