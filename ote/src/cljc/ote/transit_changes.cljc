@@ -53,18 +53,35 @@
             ;; One or both items not available, ignore this pair
             (recur left-items-set right-items-set pairs acc)))))))
 
-(def test-times-left
-  ["7:30"
-   "9:00"
-   "9:30"
-   "9:45"
-   "10:00"
-   "10:20"])
-(def test-times-right
-  ["8:56"
-   "9:15"
-   "10:00"
-   "12:20"
-   "14:50"])
+(defn time-for-stop [stoptimes-display stop-name]
+  (some #(when (= stop-name (:gtfs/stop-name %))
+           (:gtfs/departure-time %))
+        (:stoptimes stoptimes-display)))
 
-(println (merge-by-closest-time time/parse-time test-times-left test-times-right))
+(defn first-common-stop [stoptime-displays]
+  (let [distinct-stops (into #{}
+                             (mapcat (fn [stoptime-display]
+                                       (map #(select-keys % [:gtfs/stop-name :gtfs/stop-sequence])
+                                            (:stoptimes stoptime-display))))
+                             stoptime-displays)]
+    (some (fn [{:gtfs/keys [stop-name] :as common-stop-candidate}]
+            (when (every? #(time-for-stop % stop-name) stoptime-displays)
+              stop-name))
+          (sort-by :gtfs/stop-sequence distinct-stops))))
+
+(comment
+  (def test-times-left
+    ["7:30"
+     "9:00"
+     "9:30"
+     "9:45"
+     "10:00"
+     "10:20"])
+  (def test-times-right
+    ["8:56"
+     "9:15"
+     "10:00"
+     "12:20"
+     "14:50"])
+
+  (println (merge-by-closest-time time/parse-time test-times-left test-times-right)))
