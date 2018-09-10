@@ -229,7 +229,11 @@
         (update-in [:transit-visualization :compare] fetch-routes-for-dates
                    service-id route
                    (:gtfs/current-week-date route)
-                   (:gtfs/different-week-date route)))))
+                   (:gtfs/different-week-date route))
+        (assoc-in [:transit-visualization :compare :differences]
+                  (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
+                                       :gtfs/trip-stop-sequence-changes
+                                       :gtfs/trip-stop-time-changes})))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
@@ -263,3 +267,9 @@
 (define-event ToggleShowNextYear []
   {:path [:transit-visualization :show-next-year?]}
   (not app))
+
+(define-event ToggleSection [section]
+  {:path [:transit-visualization :open-sections]
+   :app open-sections}
+  (let [open? (get open-sections section true)]
+    (assoc open-sections section (not open?))))

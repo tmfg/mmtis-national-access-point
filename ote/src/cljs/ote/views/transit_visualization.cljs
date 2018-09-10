@@ -87,31 +87,6 @@
                                        :saturday :SAT
                                        :sunday :SUN)]))
 
-#_(defn- route-listing [e! {:keys [date1 date2 different?] :as compare}]
-  [:div
-   [ui/checkbox {:label "Näytä vain reitit, jotka erilaisia"
-                 :checked different?
-                 :on-check #(e! (tv/->ToggleDifferent))}]
-   [table/table {:no-rows-message "Ei reittejä"
-                 :height 300
-                 :name->label str
-                 :show-row-hover? true
-                 :on-select #(e! (tv/->SelectRouteForDisplay (:route-short-name (first %))
-                                                             (:route-long-name (first %))
-                                                             (:trip-headsign (first %))))}
-    [{:name "Nimi" :width "50%"
-      :read identity
-      :format #(str (:route-short-name %) " " (:route-long-name %))}
-     {:name "Otsatunnus" :width "20%"
-      :read :trip-headsign}
-     {:name (str "Vuoroja " date1) :width "15%"
-      :read :date1-trips}
-     {:name (str "Vuoroja " date2) :width "15%"
-      :read :date2-trips}]
-    (if different?
-      (filter :different? (:routes compare))
-      (:routes compare))]])
-
 (defn- initialize-route-features
   "Bind popup content and set marker icon for stop marker features."
   [offset [w h]]
@@ -315,47 +290,61 @@
                             upper
                             (inc upper))))))
 
-(defn change-icons [{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}]
-  (let [seq-changes (format-range trip-stop-sequence-changes)
-        time-changes (format-range trip-stop-time-changes)]
-    [:div.transit-change-icons
-     [:div (stylefy/use-style style/transit-changes-legend-icon)
-      [ic/content-add-circle-outline {:color (if (= 0 added-trips)
-                                               style/no-change-color
-                                               style/add-color)}]
-      [:div (stylefy/use-style style/change-icon-value) added-trips]]
-     [:div (stylefy/use-style style/transit-changes-legend-icon)
-      [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
-                                                  style/no-change-color
-                                                  style/remove-color)}]
-      [:div (stylefy/use-style style/change-icon-value) removed-trips]]
+(defn change-icons
+  ([diff]
+   [change-icons diff false])
+  ([{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}
+    with-labels?]
+   (let [seq-changes (format-range trip-stop-sequence-changes)
+         time-changes (format-range trip-stop-time-changes)]
+     [:div.transit-change-icons
+      [:div (stylefy/use-style style/transit-changes-legend-icon)
+       [ic/content-add-circle-outline {:color (if (= 0 added-trips)
+                                                style/no-change-color
+                                                style/add-color)}]
+       [:div (stylefy/use-style style/change-icon-value) added-trips
+        (when with-labels? " lisättyä vuoroa")]]
+      [:div (stylefy/use-style style/transit-changes-legend-icon)
+       [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
+                                                   style/no-change-color
+                                                   style/remove-color)}]
+       [:div (stylefy/use-style style/change-icon-value) removed-trips
+        (when with-labels? " poistettua vuoroa")]]
 
-     [:div (stylefy/use-style style/transit-changes-legend-icon)
-      [ic/action-timeline {:color (when (= "0" seq-changes)
-                                    style/no-change-color)}]
-      [:div (stylefy/use-style style/change-icon-value)
-       seq-changes]]
+      [:div (stylefy/use-style style/transit-changes-legend-icon)
+       [ic/action-timeline {:color (when (= "0" seq-changes)
+                                     style/no-change-color)}]
+       [:div (stylefy/use-style style/change-icon-value)
+        seq-changes
+        (when with-labels? " pysäkkimuutosta")]]
 
-     [:div (stylefy/use-style style/transit-changes-legend-icon)
-      [ic/action-query-builder {:color (when (= "0" time-changes)
-                                         style/no-change-color)}]
-      [:div (stylefy/use-style style/change-icon-value)
-       time-changes]]]))
+      [:div (stylefy/use-style style/transit-changes-legend-icon)
+       [ic/action-query-builder {:color (when (= "0" time-changes)
+                                          style/no-change-color)}]
+       [:div (stylefy/use-style style/change-icon-value)
+        time-changes
+        (when with-labels? " aikataulumuutosta")]]])))
 
 
 
-(defn section [e! title help-content body-content]
+(defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style style/section)
-   [:div.transit-visualization-section-title (stylefy/use-style style/section-title)
-    [ic/navigation-expand-less {:color "white"
-                                :style {:position "relative"
-                                        :top "6px"
-                                        :margin-right "0.5rem"}}]
+   [:div.transit-visualization-section-title (merge
+                                              (stylefy/use-style style/section-title)
+                                              {:on-click toggle!})
+    [(if open?
+       ic/navigation-expand-less
+       ic/navigation-expand-more) {:color "white"
+                                   :style {:position "relative"
+                                           :top "6px"
+                                           :margin-right "0.5rem"}}]
     title]
-   [:div.transit-visualization-section-header (stylefy/use-style style/section-header)
-    help-content]
-   [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
-    body-content]])
+   (when open?
+     [:span
+      [:div.transit-visualization-section-header (stylefy/use-style style/section-header)
+       help-content]
+      [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
+       body-content]])])
 
 (defn route-changes [e! route-changes selected-route]
   [:div.route-changes
@@ -415,10 +404,11 @@
 
 (defn route-service-calendar [e! {:keys [date->hash hash->color
                                          show-previous-year? show-next-year?
-                                         compare]}]
+                                         compare open-sections]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
-     [section e!
+     [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
+               :open? (get open-sections :route-service-calendar true)}
       "Kalenteri"
       [:span
        "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
@@ -464,10 +454,12 @@
                                     :width "20px"
                                     :height "20px"}
                                    (style/date2-highlight-style))}] (time/format-date (:date2 compare))]]
-       ]]]))
 
-(defn route-trips [e! {:keys [trips date1 date2]}]
-  [section e!
+       (when-let [diff (:differences compare)]
+         [change-icons diff true])]]]))
+
+(defn route-trips [e! open-sections {:keys [trips date1 date2]}]
+  [section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
    "Vuorot"
    "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
    [:div.route-trips
@@ -544,8 +536,9 @@
                                         :color "red"
                                         :weight line-weight}}])]]))})))
 
-(defn selected-route-map-section [e! date->hash hash->color compare]
-  [section e!
+(defn selected-route-map-section [e! open-sections date->hash hash->color compare]
+  [section {:toggle! #(e! (tv/->ToggleSection :route-map))
+            :open? (get open-sections :route-map true)}
    "Kartta"
    [:span
     "Kartalla näytetään valitsemasi reitin ja päivämäärien mukainen pysäkkiketju sekä ajoreitti, mikäli se on saatavilla."
@@ -557,7 +550,7 @@
    [selected-route-map e! date->hash hash->color compare]])
 
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
-                                        changes selected-route compare]
+                                        changes selected-route compare open-sections]
                                  :as transit-visualization}]
   [:div
    (when (not loading?)
@@ -583,7 +576,7 @@
          (when (and hash->color date->hash)
            [:span
             [route-service-calendar e! transit-visualization]
-            [selected-route-map-section e! date->hash hash->color compare]])])
+            [selected-route-map-section e! open-sections date->hash hash->color compare]])])
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]
