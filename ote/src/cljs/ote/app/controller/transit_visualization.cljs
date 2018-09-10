@@ -6,7 +6,8 @@
             [cljs-time.format :as tf]
             [ote.time :as time]
             [ote.db.transport-operator :as t-operator]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.transit-changes :as transit-changes]))
 
 (def hash-colors
   ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
@@ -167,17 +168,35 @@
     :default
     app))
 
+(defn combine-trips [{:keys [date1-trips date2-trips] :as compare}]
+  (if (and date1-trips date2-trips)
+    (when-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+      (.log js/console "FIRST COMMON STOP: " first-common-stop)
+      (let [first-common-stop-time #(assoc % :first-common-stop-time
+                                           (transit-changes/time-for-stop % first-common-stop))
+            date1-trips (mapv first-common-stop-time date1-trips)
+            date2-trips (mapv first-common-stop-time date2-trips)]
+        (assoc compare :combined-trips
+               (transit-changes/merge-by-closest-time
+                :first-common-stop-time
+                date1-trips date2-trips))))
+
+    ;; Both dates not fetched, don't try to calculate
+    (assoc compare :combined-trips nil)))
+
 (define-event RouteTripsForDateResponse [trips date]
   {:path [:transit-visualization :compare]}
-  (cond
-    (= date (:date1 app))
-    (assoc app :date1-trips trips)
+  (.log js/console (count trips) " for " date)
+  (combine-trips
+   (cond
+     (= date (:date1 app))
+     (assoc app :date1-trips trips)
 
-    (= date (:date2 app))
-    (assoc app :date2-trips trips)
+     (= date (:date2 app))
+     (assoc app :date2-trips trips)
 
-    :default
-    app))
+     :default
+     app)))
 
 (define-event RouteResponse [route-info]
   {:path [:transit-visualization]}
@@ -202,8 +221,8 @@
                {:params params
                 :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
     (comm/get! (str "transit-visualization/" service-id "/route-trips-for-date")
-                 {:params params
-                  :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
+               {:params params
+                :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
   (assoc compare
          :date1 (:gtfs/current-week-date route)
          :date2 (:gtfs/different-week-date route)
@@ -273,3 +292,7 @@
    :app open-sections}
   (let [open? (get open-sections section true)]
     (assoc open-sections section (not open?))))
+
+(define-event SelectTripPair [trip-pair]
+  {:path [:transit-visualization :compare :selected-trip-pair]}
+  trip-pair)

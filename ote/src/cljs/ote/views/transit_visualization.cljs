@@ -402,6 +402,34 @@
 
     route-changes]])
 
+(defn comparison-dates [{:keys [date1 date2]}]
+  [:div (stylefy/use-style (merge (style-base/flex-container "row")
+                                  {:justify-content "space-between"
+                                   :width "20%"}))
+   [:div [:div {:style (merge {:display "inline-block"
+                               :position "relative"
+                               :top "5px"
+                               :margin-right "0.5em"
+                               :width "20px"
+                               :height "20px"}
+                              (style/date1-highlight-style))}]
+    (time/format-date date1)]
+   [:div [:div {:style (merge {:display "inline-block"
+                               :position "relative"
+                               :top "5px"
+                               :margin-right "0.5em"
+                               :width "20px"
+                               :height "20px"}
+                              (style/date2-highlight-style))}]
+    (time/format-date date2)]])
+
+(defn comparison-date-changes [{diff :differences :as compare}]
+  [:span
+   [comparison-dates compare]
+
+   (when diff
+     [change-icons diff true])])
+
 (defn route-service-calendar [e! {:keys [date->hash hash->color
                                          show-previous-year? show-next-year?
                                          compare open-sections]}]
@@ -436,53 +464,70 @@
                                                                  [(inc current-year)])))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
-       [:div (stylefy/use-style (merge (style-base/flex-container "row")
-                                       {:justify-content "space-between"
-                                        :width "20%"}))
-        [:div [:div {:style (merge {:display "inline-block"
-                                    :position "relative"
-                                    :top "5px"
-                                    :margin-right "0.5em"
-                                    :width "20px"
-                                    :height "20px"}
-                                   (style/date1-highlight-style))}]
-         (time/format-date (:date1 compare))]
-        [:div [:div {:style (merge {:display "inline-block"
-                                    :position "relative"
-                                    :top "5px"
-                                    :margin-right "0.5em"
-                                    :width "20px"
-                                    :height "20px"}
-                                   (style/date2-highlight-style))}] (time/format-date (:date2 compare))]]
+       [comparison-date-changes compare]]]]))
 
-       (when-let [diff (:differences compare)]
-         [change-icons diff true])]]]))
+(defn format-stop-time [highlight-style interval]
+  (when interval
+    [:span
+     [:div (stylefy/use-style (merge highlight-style
+                                     {:display "inline-block"
+                                      :width "20px"
+                                      :height "5px"}))]
+     (time/format-interval-as-time interval)]))
 
-(defn route-trips [e! open-sections {:keys [trips date1 date2]}]
+(defn route-trips [e! open-sections {:keys [trips date1 date2 date1-trips date2-trips combined-trips
+                                            selected-trip-pair]}]
   [section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
    "Vuorot"
    "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
    [:div.route-trips
-    "tännepä vuorolista ja muutokset"]
+
+    [table/table {:name->label str
+                  :row-selected? #(= % selected-trip-pair)
+                  :on-select #(e! (tv/->SelectTripPair (first %)))}
+     [;; name of the first stop of the first trip (FIXME: should be first common?)
+      {:name (-> date1-trips first :stoptimes first :gtfs/stop-name)
+       :read #(-> % first :stoptimes first :gtfs/departure-time)
+       :format (partial format-stop-time (style/date1-highlight-style) )}
+      ;; name of the last stop of the first trip
+      {:name (-> date1-trips first :stoptimes last :gtfs/stop-name)
+       :read #(-> % first :stoptimes last :gtfs/departure-time)
+       :format (partial format-stop-time (style/date1-highlight-style))}
+
+      {:name (-> date2-trips first :stoptimes first :gtfs/stop-name)
+       :read (comp :gtfs/departure-time first :stoptimes second)
+       :format (partial format-stop-time (style/date2-highlight-style))}
+      {:name (-> date2-trips first :stoptimes last :gtfs/stop-name)
+       :read (comp :gtfs/departure-time last :stoptimes second)
+       :format (partial format-stop-time (style/date2-highlight-style))}
+
+      {:name "Muutokset" :read identity
+       :format (fn [[left right]]
+                 (cond
+                   (and left (nil? right))
+                   "Poistuva vuoro"
+
+                   (and (nil? left) right)
+                   "Lisätty vuoro"
+
+                   :default
+                   "jotain muutoksia FIXME"))}]
+     combined-trips
+     ]]
    ])
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
   (let [show?-atom (atom show-stops?)
         inhibit-zoom (atom false)
         update (fn [this]
-                 (.log js/console "UPDATE, inhibit-zoom? " @inhibit-zoom)
                  (update-marker-visibility this show?-atom)
-
                  (when-not @inhibit-zoom
                    (leaflet/update-bounds-from-layers this))
                  (reset! inhibit-zoom false))
         zoom-level (r/atom 5)]
     (r/create-class
-     {:component-did-update (fn [this]
-                              (.log js/console "UPDATE!" this)
-                              (update this))
+     {:component-did-update update
       :component-did-mount (fn [this]
-                             (.log js/console "MOUNTED!" this)
                              (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
                                (.on m "zoomend" #(do
                                                    (reset! inhibit-zoom true)
@@ -525,7 +570,7 @@
                                 :onEachFeature (initialize-route-features (- offset) icon-size)
                                 :style {:lineJoin "miter"
                                         :lineCap "miter"
-                                        :color "black"
+                                        :color style/date1-highlight-color
                                         :weight line-weight}}])
             (when show-date2?
               ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
@@ -533,7 +578,7 @@
                                 :onEachFeature (initialize-route-features offset icon-size)
                                 :style {:lineJoin "miter"
                                         :lineCap "miter"
-                                        :color "red"
+                                        :color style/date2-highlight-color
                                         :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
