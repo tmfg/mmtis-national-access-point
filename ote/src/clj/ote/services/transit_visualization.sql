@@ -115,7 +115,7 @@ SELECT trip."package-id", (trip.trip)."trip-id",
                      stoptime."arrival-time",
                      stoptime."departure-time")::gtfs_stoptime_display
                  ORDER BY stoptime."stop-sequence") AS "stoptimes"
- FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(1,'2018-09-07'::date), '2018-09-07'::date) rt
+ FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(:service-id::INTEGER,:date::date), :date::date) rt
  JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
  JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  JOIN "gtfs-stop" s ON (s."package-id" = trip."package-id" AND s."stop-id" = stoptime."stop-id")
