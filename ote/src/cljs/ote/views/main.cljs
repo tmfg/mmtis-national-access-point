@@ -95,7 +95,6 @@
     (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
       (let [desktop? (> (:width app) style-base/mobile-width-px)
             wide? (boolean (wide-pages (:page app)))]
-        (.log js/console "WIDE?" wide?)
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
           [:div.ote-sovellus
