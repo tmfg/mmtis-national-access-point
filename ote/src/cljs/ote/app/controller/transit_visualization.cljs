@@ -133,17 +133,17 @@
      app :compare
      (fn [app]
        (let [app (or app {})
-             last-selected (:last-selected app)
-             date (time/format-date date)
+             last-selected-date (:last-selected-date app 2)
+             ;;date (time/format-date date)
              app (merge app
-                        (if (not= 1 last-selected)
+                        (if (= 2 last-selected-date)
                           {:date1 date
                            ;; date1 = date2 by default. Date2 will be changed on the second click of day.
-                           :date2 date
-                           :last-selected 1}
+                           :last-selected-date 1}
                           {:date2 date
-                           :last-selected 2}))]
-         (if (and (:date1 app) (:date2 app))
+                           :last-selected-date 2}))]
+         app
+         #_(if (and (:date1 app) (:date2 app))
            (do
              (comm/get! (str "transit-visualization/routes-for-dates/" operator-id)
                         {:params (select-keys app [:date1 :date2])

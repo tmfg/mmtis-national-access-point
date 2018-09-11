@@ -474,14 +474,22 @@
 
 
        [service-calendar/service-calendar {:selected-date? (constantly false)
-                                           :on-select :D
+                                           :on-select #(e! (tv/->SelectDateForComparison %))
                                            :day-style (r/partial day-style hash->color date->hash
                                                                  (:date1 compare) (:date2 compare))
                                            :years (vec (concat (when show-previous-year?
                                                                  [(dec current-year)])
                                                                [current-year]
                                                                (when show-next-year?
-                                                                 [(inc current-year)])))}]
+                                                                 [(inc current-year)])))
+                                           :hover-style #(let [d (time/format-date-iso-8601 %)
+                                                               hash (date->hash d)
+                                                               hash-color (hash->color hash)]
+                                                           (if (= 2 (get compare :last-selected-date 2))
+                                                             (style/date1-highlight-style hash-color
+                                                                                          style/date1-highlight-color-hover)
+                                                             (style/date2-highlight-style hash-color
+                                                                                          style/date2-highlight-color-hover)))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))
@@ -678,18 +686,4 @@
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
             (when (:selected-trip-pair compare)
-              [trip-stop-sequence e! open-sections compare])])])
-      #_[days-to-diff-info e! transit-visualization highlight]
-      #_[:h3 operator-name]
-      #_[highlight-mode-switch e! highlight]
-      #_[calendar-style-switch e! transit-visualization]
-      #_[service-calendar/service-calendar (merge {:view-mode (:calendar-mode transit-visualization)
-                                                 :selected-date? (constantly false)
-                                                 :on-select (r/partial select-day e!)}
-                                                (when (get highlight :mode)
-                                                  {:on-hover (r/partial hover-day e! date->hash)})
-                                                {:day-style (r/partial day-style hash->color date->hash
-                                                                       (:highlight transit-visualization))
-                                                 :years (or (:years transit-visualization)
-                                                            [2017 2018])})]
-      #_[date-comparison e! transit-visualization]])])
+              [trip-stop-sequence e! open-sections compare])])])])])

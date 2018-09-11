@@ -7,7 +7,8 @@
             [ote.localization :as lang]
             [ote.db.transport-service :as t-service]
             [stylefy.core :as stylefy]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [taoensso.timbre :as log]))
 
 (def base-day-style {:width 30
                      :height 30
@@ -26,8 +27,8 @@
                                 :font-weight "bold"}))
 
 (def week-separator-style
-  {:background "repeating-linear-gradient(45deg, transparent, transparent 3px, #ccc 3px, #ccc 6px)"
-   :width "6px"})
+  {:background "white" ;; "repeating-linear-gradient(45deg, transparent, transparent 3px, #ccc 3px, #ccc 6px)"
+   :width "10px"})
 
 (defn month-days [year month]
   (let [first-date (t/first-day-of-the-month year month)
@@ -88,61 +89,78 @@
      (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})
      0 3)))
 
-(defn service-calendar-year [{:keys [selected-date? on-select on-hover
-                                      day-style]} year]
-  (let [day-style (or day-style (constantly nil))]
-    [:div.service-calendar-year
-     [:h3 year]
-     [:table
+;; PENDING: Service calendar year should be broken into smaller React components
+;; so that the whole element tree does not need to be regenerated on each render.
+;; Hover is somewhat slow now.
 
-      [week-days-header]
+(defn service-calendar-month [{:keys [selected-date? on-select on-hover hover-style
+                                      day-style] :as options} year month]
+  (r/with-let [hovered-date (r/atom nil)]
+    (let [current-hovered-date @hovered-date
+          day-style (or day-style (constantly nil))
+          start-date (t/first-day-of-the-month year month)
+          fill-days-before (dec (t/day-of-week start-date))
+          fill-days-after (- 37 (t/number-of-days-in-the-month year month)
+                             (dec (t/day-of-week start-date))) ]
 
-      [:tbody
+      [:tr
+       {:on-mouse-out #(reset! hovered-date nil)}
+       [:td {:style {:text-transform "capitalize"}}
+        (month-name (t/month start-date))]
+
+       ;; Fill days, so that first week days align
+       (fill-days (t/minus start-date (t/days fill-days-before))
+                  fill-days-before)
+
+       ;; Cell for each day in the month
        (doall
-        (for [month (range 1 13)
-              :let [start-date (t/first-day-of-the-month year month)
-                    fill-days-before (dec (t/day-of-week start-date))
-                    fill-days-after (- 37 (t/number-of-days-in-the-month year month)
-                                       (dec (t/day-of-week start-date))) ]]
-          ^{:key month}
-          [:tr
-           [:td {:style {:text-transform "capitalize"}}
-            (month-name (t/month start-date))]
+        (map-indexed
+         (fn [i day]
+           (if (= ::week-separator day)
+             ^{:key i}
+             [:td.week-separator (stylefy/use-style week-separator-style)]
+             ^{:key i}
+             [:td.day
+              (let [selected? (selected-date? day)]
+                (merge
+                 (stylefy/use-style
+                  (merge (if selected?
+                           selected-day-style
+                           base-day-style)
+                         (day-style day selected?)
+                         (when (and current-hovered-date hover-style (t/equal? current-hovered-date day))
+                           (hover-style day))))
+                 {:on-mouse-down #(do
+                                    (.preventDefault %)
+                                    (on-select day))
+                  :on-mouse-over #(do
+                                    (.preventDefault %)
+                                    (cond
+                                      (pos? (.-buttons %))
+                                      (on-select day)
 
-           ;; Fill days, so that first week days align
-           (fill-days (t/minus start-date (t/days fill-days-before))
-                      fill-days-before)
+                                      hover-style
+                                      (reset! hovered-date day)
 
-           ;; Cell for each day in the month
-           (doall
-            (map-indexed
-             (fn [i day]
-               (if (= ::week-separator day)
-                 ^{:key i}
-                 [:td.week-separator (stylefy/use-style week-separator-style)]
-                 ^{:key i}
-                 [:td.day
-                  (let [selected? (selected-date? day)]
-                    (merge
-                     (stylefy/use-style
-                      (merge (if selected?
-                               selected-day-style
-                               base-day-style)
-                             (day-style day selected?)))
-                     {:on-mouse-down #(do
-                                        (.preventDefault %)
-                                        (on-select day))
-                      :on-mouse-over #(do
-                                        (.preventDefault %)
-                                        (cond
-                                          (pos? (.-buttons %))
-                                          (on-select day)
+                                      on-hover
+                                      (on-hover day)))}))
+              (t/day day)]))
+         (separate-weeks (month-days year month))))
 
-                                          on-hover
-                                          (on-hover day)))}))
-                  (t/day day)]))
-             (separate-weeks (month-days year month))))
+       ;; Fill days to fill out table
+       (fill-days (t/plus (t/last-day-of-the-month year month) (t/days 1))
+                  fill-days-after)])))
 
-           ;; Fill days to fill out table
-           (fill-days (t/plus (t/last-day-of-the-month year month) (t/days 1))
-                      fill-days-after)]))]]]))
+(defn service-calendar-year [{:keys [selected-date? on-select on-hover hover-style
+                                     day-style] :as options} year]
+  [:div.service-calendar-year
+   [:h3 year]
+   [:table
+
+    [week-days-header]
+
+    [:tbody
+     (doall
+      (for [month (range 1 13)]
+        ^{:key month}
+        [service-calendar-month options year month]))]]])
