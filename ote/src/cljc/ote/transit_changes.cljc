@@ -2,7 +2,8 @@
   "Manipulate transit change times"
   (:require [ote.time :as time]
             [ote.util.collections :refer [index-of]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.set :as set]))
 
 (defn item-with-closest-time
   "Return a vector containing the given `item` and the item in `items`
@@ -54,6 +55,30 @@
 
             ;; One or both items not available, ignore this pair
             (recur left-items-set right-items-set pairs acc)))))))
+
+(defn trip-stop-differences
+  "Returns the amount of differences in stop times and stop sequence for the given trip pair."
+  [left right]
+  (let [left-stop-times (into {}
+                              (map (juxt :gtfs/stop-name :gtfs/departure-time))
+                              (:stoptimes left))
+        right-stop-times (into {}
+                               (map (juxt :gtfs/stop-name :gtfs/departure-time))
+                               (:stoptimes right))
+        left-stop-names (into #{} (keys left-stop-times))
+        right-stop-names (into #{} (keys right-stop-times))
+        all-stop-names (into #{}
+                             (set/union left-stop-names right-stop-names))]
+    (log/info "ALL STOPS: " all-stop-names)
+    {:stop-time-changes (reduce (fn [chg stop-name]
+                                  (if (not= (left-stop-times stop-name)
+                                            (right-stop-times stop-name))
+                                    (inc chg)
+                                    chg))
+                                0 all-stop-names)
+     :stop-seq-changes (+ (count (set/difference left-stop-names right-stop-names))
+                          (count (set/difference right-stop-names left-stop-names)))}))
+
 
 (defn time-for-stop [stoptimes-display stop-name]
   (some #(when (= stop-name (:gtfs/stop-name %))
