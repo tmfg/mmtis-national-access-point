@@ -1,6 +1,8 @@
 (ns ote.transit-changes
   "Manipulate transit change times"
-  (:require [ote.time :as time]))
+  (:require [ote.time :as time]
+            [ote.util.collections :refer [index-of]]
+            [taoensso.timbre :as log]))
 
 (defn item-with-closest-time
   "Return a vector containing the given `item` and the item in `items`
@@ -68,6 +70,36 @@
             (when (every? #(time-for-stop % stop-name) stoptime-displays)
               stop-name))
           (sort-by :gtfs/stop-sequence distinct-stops))))
+
+
+(defn normalize-stop-sequence-numbers [stop-seq-of-zero stop-seq]
+  (map (fn [stoptime]
+         (update stoptime :gtfs/stop-sequence - stop-seq-of-zero))
+       stop-seq))
+
+(defn combined-stop-sequence [first-common-stop [trip1 trip2]]
+  (let [stop-seq-of-fcs-trip1 (some #(when (= first-common-stop (:gtfs/stop-name %))
+                                       (:gtfs/stop-sequence %))
+                                    (:stoptimes trip1))
+        stop-seq-of-fcs-trip2 (some #(when (= first-common-stop (:gtfs/stop-name %))
+                                       (:gtfs/stop-sequence %))
+                                    (:stoptimes trip2))
+        trip1-normalized-stop-seq (map #(assoc % :trip 1)
+                                       (normalize-stop-sequence-numbers stop-seq-of-fcs-trip1
+                                                                        (:stoptimes trip1)))
+        trip2-normalized-stop-seq (map #(assoc % :trip 2)
+                                       (normalize-stop-sequence-numbers stop-seq-of-fcs-trip2
+                                                                        (:stoptimes trip2)))]
+    ;; Combine the same stops!
+    (mapv (fn [stop-times]
+            {:gtfs/stop-name (:gtfs/stop-name (first stop-times))
+             :gtfs/departure-time-date1 (:gtfs/departure-time
+                                         (first (filter #(= 1 (:trip %)) stop-times)))
+             :gtfs/departure-time-date2 (:gtfs/departure-time
+                                         (first (filter #(= 2 (:trip %)) stop-times)))})
+
+          (partition-by :gtfs/stop-name
+                        (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))
 
 (comment
   (def test-times-left
