@@ -349,17 +349,30 @@
     (fn [interval json-generator]
       (cheshire-generate/encode-map (pginterval->interval interval) json-generator))))
 
-(defn minutes-from-midnight [{:keys [minutes hours] :as time}]
-  (+ (* 60 hours) minutes))
+(defn minutes-from-midnight [{:keys [minutes hours seconds] :as time}]
+  (+ (* 60 hours) minutes
+     (if seconds
+       (/ seconds 60.0)
+       0)))
 
 (defn minutes-from-midnight->time [minutes]
   (let [hours (int (/ minutes 60))
-        minutes (- minutes (* 60 hours))]
-    (->Time hours minutes 0)))
+        seconds (int (* 60.0 (- minutes (int minutes))))
+        minutes (int (- (int minutes) (* 60 hours)))]
+    (->Time hours minutes seconds)))
 
 (defn minutes-elapsed [t1 t2]
   (- (minutes-from-midnight t2)
      (minutes-from-midnight t1)))
+
+(defn format-minutes-elapsed
+  "Format how long a time is elapsed in minutes and seconds."
+  [minutes-elapsed]
+  (let [seconds (int (* 60.0 (- minutes-elapsed (int minutes-elapsed))))
+        minutes (int minutes-elapsed)]
+    (#?(:clj format
+        :cljs gstr/format)
+     "%02d:%02d" minutes (Math/abs seconds))))
 
 (defn date-range [start end]
   (lazy-seq
