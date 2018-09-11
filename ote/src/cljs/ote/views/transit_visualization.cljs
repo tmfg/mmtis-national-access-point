@@ -512,9 +512,21 @@
 
                    :default
                    "jotain muutoksia FIXME"))}]
-     combined-trips
-     ]]
-   ])
+     combined-trips]]])
+
+(defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
+                                                   combined-stop-sequence] :as compare}]
+  [section {:open? (get open-sections :trip-stop-sequence true)
+            :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
+   "Pysäkit"
+   "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
+   [:div.trip-stop-sequence
+    [table/table {:name->label str}
+     [{:name "Pysäkki" :read :gtfs/stop-name}
+      {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
+      {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
+      {:name "Muutokset" :read (constantly "heps jee")}]
+     combined-stop-sequence]]])
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
   (let [show?-atom (atom show-stops?)
@@ -622,7 +634,9 @@
            [:span
             [route-service-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
-            [route-trips e! open-sections compare]])])
+            [route-trips e! open-sections compare]
+            (when (:selected-trip-pair compare)
+              [trip-stop-sequence e! open-sections compare])])])
       #_[days-to-diff-info e! transit-visualization highlight]
       #_[:h3 operator-name]
       #_[highlight-mode-switch e! highlight]

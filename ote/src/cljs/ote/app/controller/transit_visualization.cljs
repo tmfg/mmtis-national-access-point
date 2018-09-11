@@ -172,10 +172,12 @@
   (if (and date1-trips date2-trips)
     (when-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
       (.log js/console "FIRST COMMON STOP: " first-common-stop)
-      (let [first-common-stop-time #(assoc % :first-common-stop-time
-                                           (transit-changes/time-for-stop % first-common-stop))
-            date1-trips (mapv first-common-stop-time date1-trips)
-            date2-trips (mapv first-common-stop-time date2-trips)]
+      (let [first-common-stop
+            #(assoc %
+                    :first-common-stop first-common-stop
+                    :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
+            date1-trips (mapv first-common-stop date1-trips)
+            date2-trips (mapv first-common-stop date2-trips)]
         (assoc compare :combined-trips
                (transit-changes/merge-by-closest-time
                 :first-common-stop-time
@@ -294,5 +296,8 @@
     (assoc open-sections section (not open?))))
 
 (define-event SelectTripPair [trip-pair]
-  {:path [:transit-visualization :compare :selected-trip-pair]}
-  trip-pair)
+  {:path [:transit-visualization :compare]}
+  (assoc app
+         :selected-trip-pair trip-pair
+         :combined-stop-sequence (transit-changes/combined-stop-sequence
+                                  (:first-common-stop (first trip-pair)) trip-pair)))
