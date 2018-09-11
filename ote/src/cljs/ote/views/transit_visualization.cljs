@@ -21,6 +21,15 @@
 
 (set! *warn-on-infer* true)
 
+(defn labeled-icon
+  ([icon label]
+   [labeled-icon {} icon label])
+  ([wrapper-attrs icon label]
+   [:div wrapper-attrs
+    icon
+    [:div (stylefy/use-style style/change-icon-value)
+     label]]))
+
 (defn highlight-style [hash->color date->hash day highlight]
   (let [d (time/format-date day)
         d-hash (date->hash d)
@@ -50,18 +59,24 @@
 
 (defn day-style [hash->color date->hash date1 date2 day]
   (let [prev-week-date (time/format-date-iso-8601 (time/days-from day -7))
+        next-week-date (time/format-date-iso-8601 (time/days-from day 7))
         prev-week-hash (date->hash prev-week-date)
+        next-week-hash (date->hash next-week-date)
+
         d (time/format-date-iso-8601 day)
         hash (date->hash d)
         hash-color (hash->color hash)]
     (merge
-     {:background-color hash-color
+     {:font-size "0.75rem"
+      :background-color hash-color
       :color "rgb (0, 255, 255)"
       :transition "box-shadow 0.25s"
       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-     (when (and prev-week-hash hash (not= hash prev-week-hash))
-       {:box-shadow "inset 0 0 0 2px black,
-                     inset 0 0 0 3px transparent"})
+     (when (and prev-week-hash #_next-week-hash hash
+                (not= hash prev-week-hash)
+                #_(not= prev-week-hash next-week-hash))
+       {:box-shadow "inset 0 0 0 1px black,
+                     inset 0 0 0 2px transparent"})
      (cond (= (time/format-date-iso-8601 date1) d)
            (style/date1-highlight-style hash-color)
 
@@ -275,12 +290,10 @@
    [:div [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add " Uusia vuoroja"]
                        [ic/content-remove " Poistuvia vuoroja"]
-                       [ic/action-timeline " Pysäkkimuutoksia"]
-                       [ic/action-query-builder " Aikataulumuutoksia"]]]
+                       [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
+                       [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
      ^{:key label}
-     [:div (stylefy/use-style style/transit-changes-legend-icon)
-      [icon]
-      [:div (stylefy/use-style style/change-icon-value) label]])])
+     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label])])
 
 (defn format-range [{:keys [lower upper lower-inclusive? upper-inclusive?]}]
   (if (and (nil? lower) (nil? upper))
@@ -290,40 +303,50 @@
                             upper
                             (inc upper))))))
 
+(defn stop-seq-changes-icon [trip-stop-sequence-changes with-labels?]
+  (let [seq-changes (if (number? trip-stop-sequence-changes)
+                      trip-stop-sequence-changes
+                      (format-range trip-stop-sequence-changes))]
+    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+     [ic/action-timeline {:color (when (= "0" seq-changes)
+                                   style/no-change-color)}]
+     [:span
+      seq-changes
+      (when with-labels? " pysäkkimuutosta")]]))
+
+(defn stop-time-changes-icon [trip-stop-time-changes with-labels?]
+  (let [time-changes (if (number? trip-stop-time-changes)
+                       trip-stop-time-changes
+                       (format-range trip-stop-time-changes))]
+    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+     [ic/action-query-builder {:color (when (= "0" time-changes)
+                                        style/no-change-color)}]
+     [:span
+      time-changes
+      (when with-labels? " aikataulumuutosta")]]))
+
 (defn change-icons
   ([diff]
    [change-icons diff false])
   ([{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}
     with-labels?]
-   (let [seq-changes (format-range trip-stop-sequence-changes)
-         time-changes (format-range trip-stop-time-changes)]
-     [:div.transit-change-icons
-      [:div (stylefy/use-style style/transit-changes-legend-icon)
-       [ic/content-add-circle-outline {:color (if (= 0 added-trips)
-                                                style/no-change-color
-                                                style/add-color)}]
-       [:div (stylefy/use-style style/change-icon-value) added-trips
-        (when with-labels? " lisättyä vuoroa")]]
-      [:div (stylefy/use-style style/transit-changes-legend-icon)
-       [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
-                                                   style/no-change-color
-                                                   style/remove-color)}]
-       [:div (stylefy/use-style style/change-icon-value) removed-trips
-        (when with-labels? " poistettua vuoroa")]]
+   [:div.transit-change-icons
+    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+     [ic/content-add-circle-outline {:color (if (= 0 added-trips)
+                                              style/no-change-color
+                                              style/add-color)}]
+     [:span added-trips
+      (when with-labels? " lisättyä vuoroa")]]
+    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+     [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
+                                                 style/no-change-color
+                                                 style/remove-color)}]
+     [:span removed-trips
+      (when with-labels? " poistettua vuoroa")]]
 
-      [:div (stylefy/use-style style/transit-changes-legend-icon)
-       [ic/action-timeline {:color (when (= "0" seq-changes)
-                                     style/no-change-color)}]
-       [:div (stylefy/use-style style/change-icon-value)
-        seq-changes
-        (when with-labels? " pysäkkimuutosta")]]
+    [stop-seq-changes-icon trip-stop-sequence-changes with-labels?]
 
-      [:div (stylefy/use-style style/transit-changes-legend-icon)
-       [ic/action-query-builder {:color (when (= "0" time-changes)
-                                          style/no-change-color)}]
-       [:div (stylefy/use-style style/change-icon-value)
-        time-changes
-        (when with-labels? " aikataulumuutosta")]]])))
+    [stop-time-changes-icon trip-stop-time-changes with-labels?]]))
 
 
 
@@ -368,10 +391,7 @@
       :read :gtfs/change-date
       :format (fn [change-date]
                 (if-not change-date
-                  [:div
-                   [ic/navigation-check]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Ei muutoksia"]]
+                  [labeled-icon [ic/navigation-check] "Ei muutoksia"]
                   [:span
                    (str (time/days-until change-date) " pv")
                    [:span (stylefy/use-style {:margin-left "5px"
@@ -383,19 +403,19 @@
       :format (fn [{change-type :gtfs/change-type :as route-changes}]
                 (case change-type
                   :added
-                  [:div [ic/content-add-circle-outline {:color style/add-color}]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Uusi reitti"]]
+                  [labeled-icon
+                   [ic/content-add-circle-outline {:color style/add-color}]
+                   "Uusi reitti"]
 
                   :removed
-                  [:div [ic/content-remove-circle-outline {:color style/remove-color}]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Päättyvä reitti"]]
+                  [labeled-icon
+                   [ic/content-remove-circle-outline {:color style/remove-color}]
+                   "Päättyvä reitti"]
 
                   :no-change
-                  [:div [ic/navigation-check]
-                   [:div (stylefy/use-style style/change-icon-value)
-                    "Ei muutoksia"]]
+                  [labeled-icon
+                   [ic/navigation-check]
+                   "Ei muutoksia"]
 
                   :changed
                   [change-icons route-changes]))}]
@@ -502,16 +522,21 @@
        :format (partial format-stop-time (style/date2-highlight-style))}
 
       {:name "Muutokset" :read identity
-       :format (fn [[left right]]
+       :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
                  (cond
                    (and left (nil? right))
-                   "Poistuva vuoro"
+                   [labeled-icon [ic/content-remove] "Poistuva vuoro"]
 
                    (and (nil? left) right)
-                   "Lisätty vuoro"
+                   [labeled-icon [ic/content-add] "Lisätty vuoro"]
+
+                   (= 0 stop-time-changes stop-seq-changes)
+                   [labeled-icon [ic/navigation-check] "Ei muutoksia"]
 
                    :default
-                   "jotain muutoksia FIXME"))}]
+                   [:div
+                    [stop-seq-changes-icon stop-seq-changes]
+                    [stop-time-changes-icon stop-time-changes]]))}]
      combined-trips]]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
@@ -525,7 +550,24 @@
      [{:name "Pysäkki" :read :gtfs/stop-name}
       {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
       {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
-      {:name "Muutokset" :read (constantly "heps jee")}]
+      {:name "Muutokset" :read identity
+       :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
+                 (cond
+                   (and departure-time-date1 (nil? departure-time-date2))
+                   "Pysäkki ei kuulu reitille"
+
+                   (and (nil? departure-time-date1) departure-time-date2)
+                   "Uusi pysäkki reitillä"
+
+                   (not= departure-time-date1 departure-time-date2)
+                   [labeled-icon [ic/action-query-builder]
+                    (time/format-minutes-elapsed
+                     (time/minutes-elapsed departure-time-date1 departure-time-date2))]
+
+                   :default
+                   [labeled-icon {:style {:color "lightgray"}}
+                    [ic/action-query-builder {:color "lightgray"}]
+                    "00:00"]))}]
      combined-stop-sequence]]])
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
@@ -624,7 +666,7 @@
         [route-changes e! (:gtfs/route-changes changes) selected-route]]]
 
       (when selected-route
-        [:div.transit-visualization-route
+        [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: "
           (:gtfs/route-short-name selected-route) " "
           (:gtfs/route-long-name selected-route)

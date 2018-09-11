@@ -177,18 +177,21 @@
                     :first-common-stop first-common-stop
                     :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
             date1-trips (mapv first-common-stop date1-trips)
-            date2-trips (mapv first-common-stop date2-trips)]
+            date2-trips (mapv first-common-stop date2-trips)
+            combined-trips (transit-changes/merge-by-closest-time
+                            :first-common-stop-time
+                            date1-trips date2-trips)]
         (assoc compare :combined-trips
-               (transit-changes/merge-by-closest-time
-                :first-common-stop-time
-                date1-trips date2-trips))))
+               (mapv (fn [[l r]]
+                       [l r (transit-changes/trip-stop-differences l r)])
+                     combined-trips))))
 
     ;; Both dates not fetched, don't try to calculate
     (assoc compare :combined-trips nil)))
 
 (define-event RouteTripsForDateResponse [trips date]
   {:path [:transit-visualization :compare]}
-  (.log js/console (count trips) " for " date)
+  (log/info (count trips) " for " date ", 1st trip:" (first trips))
   (combine-trips
    (cond
      (= date (:date1 app))
