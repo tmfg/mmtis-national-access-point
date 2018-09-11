@@ -30,6 +30,22 @@
   {:background "white" ;; "repeating-linear-gradient(45deg, transparent, transparent 3px, #ccc 3px, #ccc 6px)"
    :width "10px"})
 
+(def header-row-style
+  {:background-color "#5A5A5A"
+   :color "white"
+   :height "30px"})
+
+(def header-cell-style
+  {:font-weight 100
+   :font-size "0.75rem"})
+
+(def month-name-style
+  {:font-weight 600
+   :font-size "0.75rem"
+   :text-transform "capitalize"
+   :padding "0px 5px 0px 5px"})
+
+
 (defn month-days [year month]
   (let [first-date (t/first-day-of-the-month year month)
         days (t/number-of-days-in-the-month year month)]
@@ -64,7 +80,7 @@
 (defn- week-days-header []
   [:thead
    ;; week days
-   [:tr
+   [:tr (stylefy/use-style header-row-style)
     [:th " "]
     (doall
      (map-indexed
@@ -76,7 +92,8 @@
 
           ;; Normal week day
           ^{:key i}
-          [:th (lang/tr [:enums ::t-service/day :short week-day])]))
+          [:th (stylefy/use-style header-cell-style)
+           (lang/tr [:enums ::t-service/day :short week-day])]))
 
       ;; Add week separators to repeating list of week days
       (apply concat
@@ -105,7 +122,7 @@
 
       [:tr
        {:on-mouse-out #(reset! hovered-date nil)}
-       [:td {:style {:text-transform "capitalize"}}
+       [:td (stylefy/use-style month-name-style)
         (month-name (t/month start-date))]
 
        ;; Fill days, so that first week days align
