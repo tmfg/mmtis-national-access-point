@@ -332,22 +332,29 @@
   ([{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}
     with-labels?]
    [:div.transit-change-icons
-    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/content-add-circle-outline {:color (if (= 0 added-trips)
-                                              style/no-change-color
-                                              style/add-color)}]
-     [:span added-trips
-      (when with-labels? " lisättyä vuoroa")]]
-    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
-                                                 style/no-change-color
-                                                 style/remove-color)}]
-     [:span removed-trips
-      (when with-labels? " poistettua vuoroa")]]
+    (stylefy/use-style (merge
+                        (style-base/flex-container "row")
+                        {:width "100%"}))
+    [:div {:style {:width "20%"}}
+     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+      [ic/content-add-circle-outline {:color (if (= 0 added-trips)
+                                               style/no-change-color
+                                               style/add-color)}]
+      [:span added-trips
+       (when with-labels? " lisättyä vuoroa")]]]
+    [:div {:style {:width "20%"}}
+     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+      [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
+                                                  style/no-change-color
+                                                  style/remove-color)}]
+      [:span removed-trips
+       (when with-labels? " poistettua vuoroa")]]]
 
-    [stop-seq-changes-icon trip-stop-sequence-changes with-labels?]
+    [:div {:style {:width "25%"}}
+     [stop-seq-changes-icon trip-stop-sequence-changes with-labels?]]
 
-    [stop-time-changes-icon trip-stop-time-changes with-labels?]]))
+    [:div {:style {:width "35%"}}
+     [stop-time-changes-icon trip-stop-time-changes with-labels?]]]))
 
 
 
