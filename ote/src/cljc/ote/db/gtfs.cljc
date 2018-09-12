@@ -13,6 +13,8 @@
   #?(:cljs
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
+(s/def :specql.data-types/int4range (s/keys))
+
 (define-tables
   ["gtfs_package" :gtfs/package]
   ["gtfs-agency" :gtfs/agency]
