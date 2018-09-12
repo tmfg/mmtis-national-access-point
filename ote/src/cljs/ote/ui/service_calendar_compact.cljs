@@ -106,10 +106,6 @@
      (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})
      0 3)))
 
-;; PENDING: Service calendar year should be broken into smaller React components
-;; so that the whole element tree does not need to be regenerated on each render.
-;; Hover is somewhat slow now.
-
 (defn service-calendar-month [{:keys [selected-date? on-select on-hover hover-style
                                       day-style] :as options} year month]
   (r/with-let [hovered-date (r/atom nil)]
