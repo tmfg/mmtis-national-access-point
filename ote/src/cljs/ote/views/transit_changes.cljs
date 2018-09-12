@@ -35,18 +35,13 @@
    [:div [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                        [ic/content-remove-circle-outline " Päättyviä reittejä"]
-                       [ic/editor-format-list-bulleted " Uusia/vähennettyjä vuoroja"]
-                       [ic/action-timeline " Pysäkkimuutoksia"]
-                       [ic/action-schedule " Aikataulumuutoksia"]]]
+                       [ic/editor-format-list-bulleted " Reittimuutoksia"]]]
      ^{:key label}
      [:div (use-style style/transit-changes-legend-icon)
       [icon]
       [:div (use-style style/change-icon-value) label]])])
 
-(def change-keys #{:routes-added :routes-removed
-                   :stop-sequence-changes :trip-count-difference
-                   :stop-time-changes
-                   :next-different-week})
+(def change-keys #{:added-routes :removed-routes :changed-routes :changes?})
 
 (defn cap-number [n]
   [:div (use-style style/change-icon-value)
@@ -54,28 +49,19 @@
      "500+"
      (str n))])
 
-(defn change-icons [{:keys [routes-added routes-removed
-                            stop-sequence-changes trip-count-difference
-                            stop-time-changes]}]
+(defn change-icons [{:keys [added-routes removed-routes changed-routes]}]
   [:div.transit-change-icons
    [:div (use-style style/transit-changes-legend-icon)
-    [ic/content-add-circle-outline {:color (if (= 0 routes-added)
+    [ic/content-add-circle-outline {:color (if (= 0 added-routes)
                                              style/no-change-color
-                                             style/add-color)}] (cap-number routes-added)]
+                                             style/add-color)}] (cap-number added-routes)]
    [:div (use-style style/transit-changes-legend-icon)
-    [ic/content-remove-circle-outline {:color (if (= 0 routes-removed)
+    [ic/content-remove-circle-outline {:color (if (= 0 removed-routes)
                                                 style/no-change-color
-                                                style/remove-color)}] (cap-number routes-removed)]
+                                                style/remove-color)}] (cap-number removed-routes)]
+
    [:div (use-style style/transit-changes-legend-icon)
-    [ic/editor-format-list-bulleted {:color
-                                     (cond (neg? trip-count-difference) style/remove-color
-                                           (pos? trip-count-difference) style/add-color
-                                           :default style/no-change-color)}]
-    (cap-number trip-count-difference)]
-   [:div (use-style style/transit-changes-legend-icon)
-    [ic/action-timeline] (cap-number stop-sequence-changes)]
-   [:div (use-style style/transit-changes-legend-icon)
-    [ic/action-schedule] (cap-number stop-time-changes)]])
+    [ic/editor-format-list-bulleted] (cap-number changed-routes)]])
 
 
 (defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions]}]
@@ -94,26 +80,33 @@
                        :update! #(e! (tc/->SetRegionFilter %))}
     selected-finnish-regions]])
 
-(defn- change-description [{:keys [next-different-week] :as row}]
-  (when next-different-week
-    (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
-      [:span
-       (cond
-         (and (not (empty? (:days-with-traffic current-week-traffic)))
+(defn- change-description [{:keys [changes? next-different-week] :as row}]
+  (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
+    [:span
+     (cond
+       (not changes?)
+       [:div
+        [ic/navigation-check]
+        [:div (use-style style/change-icon-value)
+         "Ei muutoksia"]]
+
+       ;; FIXME: lisää mahdollinen liikenteen päättyminen / alkaminen
+
+       #_(and (not (empty? (:days-with-traffic current-week-traffic)))
               (empty? (:days-with-traffic different-week-traffic)))
-         [:div
+       #_[:div
           [ic/communication-business {:color style/remove-color}]
           [:div (use-style style/change-icon-value)
            "Mahdollinen liikenteen päättyminen"]]
 
-         (and (empty? (:days-with-traffic current-week-traffic))
+       #_(and (empty? (:days-with-traffic current-week-traffic))
               (not (empty? (:days-with-traffic different-week-traffic))))
-         [:div
+       #_[:div
           [ic/communication-business {:color style/add-color}] ;; FIXME: Seems that there is no domain_disabled icon available in our MUI version
           [:div (use-style style/change-icon-value)
            "Mahdollinen liikenteen alkaminen"]]
-         :default
-         [change-icons row])])))
+       :default
+       [change-icons row])]))
 
 (defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
   [:div.transit-changes
@@ -134,19 +127,21 @@
                  :row-style {:cursor "pointer"}
                  :show-row-hover? true
                  :on-select (fn [evt]
-                              (let [change (first evt)
-                                    {date1 :date1 date2 :date2} (:first-diff-dates change)]
-                                (e! (tc/->ShowChangesForOperator (:transport-operator-id change)
-                                                                 (time/format-date-opt date1) (time/format-date-opt date2)))))}
+                              (let [{:keys [transport-service-id current-date]} (first evt)]
+                                (e! (tc/->ShowChangesForService transport-service-id
+                                                                current-date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
+     {:name "Palvelu" :read :transport-service-name :width "25%"}
      {:name "Aikaa 1:seen muutokseen" :width "25%"
-      :read (comp :change-date :next-different-week)
-      :format (fn [change-date]
-                [:span
-                 (str (t/in-days (t/interval (t/now) change-date)) " pv")
-                 [:span (stylefy/use-style {:margin-left "5px"
-                                            :color "gray"})
-                  (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]])}
+      :read (juxt :change-date :days-until-change)
+      :format (fn [[change-date days-until-change]]
+                (if change-date
+                  [:span
+                   (str days-until-change " pv")
+                   [:span (stylefy/use-style {:margin-left "5px"
+                                              :color "gray"})
+                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]
+                  "\u2015"))}
      {:name "Muutokset" :width "50%"
       :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
       :tooltip-len "min-medium"

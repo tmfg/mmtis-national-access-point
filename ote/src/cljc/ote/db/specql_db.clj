@@ -5,6 +5,7 @@
             [specql.rel :as rel]
             [ote.db.modification]))
 
+(def db {:connection-uri "jdbc:postgresql://localhost/napotetest_template?user=napotetest"})
 
 (defmacro define-tables [& tables]
   `(specql/define-tables

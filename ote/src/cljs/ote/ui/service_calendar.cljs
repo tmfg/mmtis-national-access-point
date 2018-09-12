@@ -14,7 +14,7 @@
         next-year (inc current-year)
         years (or years
                   [current-year next-year])]
-    [:div.service-calendar {:style {:padding "20px"}}
+    [:div.service-calendar
      (doall
        (for [year years]
          (with-meta

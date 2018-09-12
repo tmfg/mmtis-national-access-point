@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export AWS_PROFILE=napote-dev
 
-LATEST_DUMP=`aws s3 ls finap-backup | grep production | tail -n1 | awk '{ print $4; }'`
+LATEST_DUMP=`aws s3 ls finap-backup | grep staging | tail -n1 | awk '{ print $4; }'`
 
 echo "Copying latest finap dump: $LATEST_DUMP"
 

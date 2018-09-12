@@ -185,7 +185,15 @@
      (let [[year month date]
            (map #(Integer/parseInt %)
                 (str/split date #"-"))]
-       (java.time.LocalDate/of year month date))))
+       (java.time.LocalDate/of year month date)))
+   :cljs
+   (defn parse-date-iso-8601
+     "Parse a date in ISO-8601 format."
+     [date]
+     (let [[year month date]
+           (map #(js/parseInt %)
+                (str/split date #"-"))]
+       (t/date-time year month date))))
 
 (defn parse-date-eu
   "Parse a EU formatted date (dd.MM.yyyy) to a local date"
@@ -284,14 +292,14 @@
    (defn time->pginterval [time]
      (->PGInterval (time->interval time))))
 
-#?(:clj
-   (defn format-interval-as-time [interval]
-     (let [interval (if (instance? org.postgresql.util.PGInterval interval)
-                      (pginterval->interval interval)
-                      interval)]
-       (format-time-full
-         (update (select-keys interval [:hours :minutes :seconds])
-                 :seconds int)))))
+(defn format-interval-as-time [interval]
+  (let [interval #?(:cljs interval
+                    :clj (if (instance? org.postgresql.util.PGInterval interval)
+                           (pginterval->interval interval)
+                           interval))]
+    (format-time-full
+     (update (select-keys interval [:hours :minutes :seconds])
+             :seconds int))))
 
 #?(:clj
    (defmethod specql-composite/parse-value "interval" [_ string]
@@ -341,17 +349,30 @@
     (fn [interval json-generator]
       (cheshire-generate/encode-map (pginterval->interval interval) json-generator))))
 
-(defn minutes-from-midnight [{:keys [minutes hours] :as time}]
-  (+ (* 60 hours) minutes))
+(defn minutes-from-midnight [{:keys [minutes hours seconds] :as time}]
+  (+ (* 60 hours) minutes
+     (if seconds
+       (/ seconds 60.0)
+       0)))
 
 (defn minutes-from-midnight->time [minutes]
   (let [hours (int (/ minutes 60))
-        minutes (- minutes (* 60 hours))]
-    (->Time hours minutes 0)))
+        seconds (int (* 60.0 (- minutes (int minutes))))
+        minutes (int (- (int minutes) (* 60 hours)))]
+    (->Time hours minutes seconds)))
 
 (defn minutes-elapsed [t1 t2]
   (- (minutes-from-midnight t2)
      (minutes-from-midnight t1)))
+
+(defn format-minutes-elapsed
+  "Format how long a time is elapsed in minutes and seconds."
+  [minutes-elapsed]
+  (let [seconds (int (* 60.0 (- minutes-elapsed (int minutes-elapsed))))
+        minutes (int minutes-elapsed)]
+    (#?(:clj format
+        :cljs gstr/format)
+     "%02d:%02d" minutes (Math/abs seconds))))
 
 (defn date-range [start end]
   (lazy-seq
@@ -387,3 +408,20 @@
   #?(:cljs (js/Date. year (dec month) date hours minutes seconds)
      :clj (let [gc (java.util.GregorianCalendar. year (dec month) date hours minutes seconds)]
             (.getTime gc))))
+
+(defn time-difference [time1 time2]
+  (Math/abs (- (minutes-from-midnight time1) (minutes-from-midnight time2))))
+
+(defn day-difference
+  "How many days from date1 to date2."
+  [date1 date2]
+  (t/in-days (t/interval date1 date2)))
+
+(defn days-until [date]
+  (day-difference (t/now) date))
+
+(defn now []
+  (t/now))
+
+(defn days-from [date days]
+  (t/plus date (t/days days)))

@@ -39,7 +39,7 @@
     ["/edit-route/:id" :edit-route]
 
     ["/routes/view-gtfs" :view-gtfs]
-    ["/transit-visualization/:operator-id" :transit-visualization]
+    ["/transit-visualization/:service-id/:date" :transit-visualization]
     ["/transit-changes" :transit-changes]
 
     ;; 60 day pre-notice

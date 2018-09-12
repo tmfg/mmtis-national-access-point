@@ -101,7 +101,9 @@
                 (or (resources req)
                     (public-handler req)
                     (handler req)))
-              config))))
+              (merge config
+                     {:error-logger (fn [msg exception]
+                                      (log/error exception msg))})))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))

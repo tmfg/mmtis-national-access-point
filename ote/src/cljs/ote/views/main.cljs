@@ -86,12 +86,15 @@
     (fn [page]
       [:span])}))
 
+(def wide-pages #{:transit-visualization})
+
 (defn ote-application
   "OTE application main view"
   [e! app]
   (let [is-scrolled? (r/atom false)]
     (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
-      (let [desktop? (> (:width app) style-base/mobile-width-px)]
+      (let [desktop? (> (:width app) style-base/mobile-width-px)
+            wide? (boolean (wide-pages (:page app)))]
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
           [:div.ote-sovellus
@@ -101,13 +104,21 @@
             [ckan-dialogs e! app]
             (if (not loaded?)
               [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-              [:div.wrapper
-               (stylefy/use-style (merge
-                                   {:transition "margin-top 300ms ease"}
-                                   (if (or (not desktop?) @is-scrolled?)
-                                     {:margin-top "56px"})))
-               [:div (if (= :front-page (:page app))
+              [(if wide? :div :div.wrapper)
+               (if wide?
+                 {}
+                 (stylefy/use-style (merge
+                                     {:transition "margin-top 300ms ease"}
+                                     (if (or (not desktop?) @is-scrolled?)
+                                       {:margin-top "56px"}))))
+               [:div (cond
+                       (= :front-page (:page app))
                        {:class "container-fluid"}
+
+                       wide?
+                       {}
+
+                       :default
                        {:style {:padding-bottom "20px"}
                         :class "container"})
                 [document-title (:page app)]

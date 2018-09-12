@@ -98,11 +98,84 @@ SELECT ST_AsGeoJSON(COALESCE(
           JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
          WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(r."route-short-name",'')
            AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(r."route-long-name",'')
-           AND COALESCE(:headsign::VARCHAR,'') = COALESCE(trip."trip-headsign",'')
-           AND t."service-id" IN (SELECT gtfs_services_for_date(
-                                  (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE)),
-                                 :date::date))
-           AND r."package-id" = (SELECT gtfs_latest_package_for_date(:operator-id::INTEGER, :date::DATE))
+           AND COALESCE(:trip-headsign::VARCHAR,'') = COALESCE(trip."trip-headsign",'')
+           AND ROW(r."package-id", t."service-id")::service_ref IN
+               (SELECT * FROM gtfs_services_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE),
+                          :date::DATE))
+           AND r."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE))
          GROUP BY trip."shape-id", r."package-id", trip."trip-id") x
  -- Group same route lines to single row (aggregate departures to array)
  GROUP BY "route-line", "shape-id", "package-id";
+
+-- name: fetch-route-trip-info-by-name-and-date
+-- Fetch listing of all trips by route name and date
+SELECT trip."package-id", (trip.trip)."trip-id",
+       array_agg(ROW(stoptime."stop-sequence",
+                     s."stop-name",
+                     stoptime."arrival-time",
+                     stoptime."departure-time")::gtfs_stoptime_display
+                 ORDER BY stoptime."stop-sequence") AS "stoptimes"
+ FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(:service-id::INTEGER,:date::date), :date::date) rt
+ JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
+ JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
+ JOIN "gtfs-stop" s ON (s."package-id" = trip."package-id" AND s."stop-id" = stoptime."stop-id")
+ WHERE COALESCE(:route-short-name::VARCHAR,'') = COALESCE(rt."route-short-name",'')
+   AND COALESCE(:route-long-name::VARCHAR,'') = COALESCE(rt."route-long-name",'')
+   AND COALESCE(:trip-headsign::VARCHAR,'') = COALESCE(rt."trip-headsign",'')
+ GROUP BY trip."package-id", (trip.trip)."trip-id";
+
+
+-- name: fetch-date-hashes-for-route
+-- Fetch the date/hash pairs for a given route
+WITH dates AS (
+  -- Calculate a series of dates from beginning of last year
+  -- to the end of the next year.
+  SELECT ts::date AS date
+    FROM generate_series(
+            (date_trunc('year', CURRENT_DATE) - '1 year'::interval)::date,
+            (date_trunc('year', CURRENT_DATE) + '2 years'::interval)::date,
+            '1 day'::interval) AS g(ts)
+)
+SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
+  FROM (SELECT d.date, package_id, rh.hash::text
+          FROM dates d
+          -- Join packages for each date
+          JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date))
+            AS ps (package_id) ON TRUE
+          -- Join all date hashes for packages
+          JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
+          -- Join unnested per route hashes
+          JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
+         WHERE rh."route-short-name" = :route-short-name
+           AND rh."route-long-name" = :route-long-name
+           AND rh."trip-headsign" = :trip-headsign) x
+ GROUP BY x.date;
+
+-- name: fetch-service-info
+-- Fetch service info for display in the UI
+SELECT ts.name AS "transport-service-name",
+       ts.id AS "transport-service-id",
+       op.name AS "transport-operator-name",
+       op.id AS "transport-operator-id"
+  FROM "transport-service" ts
+  JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
+ WHERE ts."published?" = TRUE
+   AND ts.id = :service-id;
+
+-- name: fetch-route-differences
+-- single?: true
+-- Fetch the differences in the given route for the given dates
+SELECT gtfs_route_differences(
+          :route-short-name, :route-long-name, :trip-headsign,
+          (SELECT tripdata
+                     FROM gtfs_route_trips_for_date(
+                            gtfs_service_packages_for_date(:service-id::INTEGER, :date1::DATE), :date1::DATE) trips
+            WHERE trips."route-short-name" = :route-short-name
+              AND trips."route-long-name" = :route-long-name
+              AND trips."trip-headsign" = :trip-headsign),
+          (SELECT tripdata
+                     FROM gtfs_route_trips_for_date(
+                            gtfs_service_packages_for_date(:service-id::INTEGER, :date2::DATE), :date2::DATE) trips
+            WHERE trips."route-short-name" = :route-short-name
+              AND trips."route-long-name" = :route-long-name
+              AND trips."trip-headsign" = :trip-headsign))::TEXT;

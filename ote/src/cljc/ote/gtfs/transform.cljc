@@ -7,7 +7,8 @@
             [ote.db.transport-service :as t-service]
             [ote.localization :as localization]
             [taoensso.timbre :as log]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.util.collections :refer [index-of]]))
 
 ;; NOTE: In case we have service calendars that have no rules, but only date additions, we'll use
 ;; service_id 0 everywhere by default.
@@ -53,13 +54,6 @@
    (fn [i item]
      (assoc item key (val-fn i)))
    coll))
-
-(defn- index-of [pred vec]
-  (first (keep-indexed
-          (fn [i item]
-            (when (pred item)
-              i))
-          vec)))
 
 (defn- services-with-removed-dates
   "Returns GTFS services with removed dates"
