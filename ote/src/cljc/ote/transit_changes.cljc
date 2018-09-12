@@ -69,7 +69,6 @@
         right-stop-names (into #{} (keys right-stop-times))
         all-stop-names (into #{}
                              (set/union left-stop-names right-stop-names))]
-    (log/info "ALL STOPS: " all-stop-names)
     {:stop-time-changes (reduce (fn [chg stop-name]
                                   (if (not= (left-stop-times stop-name)
                                             (right-stop-times stop-name))
