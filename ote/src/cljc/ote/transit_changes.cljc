@@ -125,20 +125,3 @@
 
           (partition-by :gtfs/stop-name
                         (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))
-
-(comment
-  (def test-times-left
-    ["7:30"
-     "9:00"
-     "9:30"
-     "9:45"
-     "10:00"
-     "10:20"])
-  (def test-times-right
-    ["8:56"
-     "9:15"
-     "10:00"
-     "12:20"
-     "14:50"])
-
-  (println (merge-by-closest-time time/parse-time test-times-left test-times-right)))
