@@ -675,16 +675,16 @@ BEGIN
 
         -- Calculate differences in trips and stop sequences for this route
         route_change := gtfs_route_differences(
-                        row."route-short-name", row."route-long-name", row."trip-headsign",
+                        row.route_short_name, row.route_long_name, row.trip_headsign,
                         row."date1-trips", row."date2-trips");
         route_change."change-type" := 'changed';
 
       END IF;
 
       -- Set route names and change dates
-      route_change."route-short-name" := row."route-short-name";
-      route_change."route-long-name" := row."route-long-name";
-      route_change."trip-headsign" := row."trip-headsign";
+      route_change."route-short-name" := row.route_short_name;
+      route_change."route-long-name" := row.route_long_name;
+      route_change."trip-headsign" := row.trip_headsign;
       route_change."current-week-date" := row.route_curr_date;
       route_change."different-week-date" := row.route_diff_date;
       route_change."change-date" := (row.diff_week)."beginning-of-different-week";
