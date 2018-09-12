@@ -161,3 +161,21 @@ SELECT ts.name AS "transport-service-name",
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
  WHERE ts."published?" = TRUE
    AND ts.id = :service-id;
+
+-- name: fetch-route-differences
+-- single?: true
+-- Fetch the differences in the given route for the given dates
+SELECT gtfs_route_differences(
+          :route-short-name, :route-long-name, :trip-headsign,
+          (SELECT tripdata
+                     FROM gtfs_route_trips_for_date(
+                            gtfs_service_packages_for_date(:service-id::INTEGER, :date1::DATE), :date1::DATE) trips
+            WHERE trips."route-short-name" = :route-short-name
+              AND trips."route-long-name" = :route-long-name
+              AND trips."trip-headsign" = :trip-headsign),
+          (SELECT tripdata
+                     FROM gtfs_route_trips_for_date(
+                            gtfs_service_packages_for_date(:service-id::INTEGER, :date2::DATE), :date2::DATE) trips
+            WHERE trips."route-short-name" = :route-short-name
+              AND trips."route-long-name" = :route-long-name
+              AND trips."trip-headsign" = :trip-headsign))::TEXT;

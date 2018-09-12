@@ -105,4 +105,19 @@
                :date (time/parse-date-iso-8601 date)
                :route-short-name short
                :route-long-name long
-               :trip-headsign headsign}))))
+               :trip-headsign headsign})))
+
+  ^{:unauthenticated true :format :transit}
+  (GET "/transit-visualization/:service-id/route-differences"
+       {{service-id :service-id} :params
+        {:strs [date1 date2 short long headsign]} :query-params}
+       (composite/parse @specql-registry/table-info-registry
+                        {:type "gtfs-route-change-info"}
+                        (fetch-route-differences
+                         db
+                         {:service-id (Long/parseLong service-id)
+                          :date1 (time/parse-date-iso-8601 date1)
+                          :date2 (time/parse-date-iso-8601 date2)
+                          :route-short-name short
+                          :route-long-name long
+                          :trip-headsign headsign}))))

@@ -126,31 +126,7 @@
   (-> app
       (merge {:hash hash :day day})))
 
-(define-event SelectDateForComparison [date]
-  {:path [:transit-visualization]}
-  (let [operator-id (:operator-id app)]
-    (update
-     app :compare
-     (fn [app]
-       (let [app (or app {})
-             last-selected-date (:last-selected-date app 2)
-             ;;date (time/format-date date)
-             app (merge app
-                        (if (= 2 last-selected-date)
-                          {:date1 date
-                           ;; date1 = date2 by default. Date2 will be changed on the second click of day.
-                           :last-selected-date 1}
-                          {:date2 date
-                           :last-selected-date 2}))]
-         app
-         #_(if (and (:date1 app) (:date2 app))
-           (do
-             (comm/get! (str "transit-visualization/routes-for-dates/" operator-id)
-                        {:params (select-keys app [:date1 :date2])
-                         :on-success (tuck/send-async! ->RoutesForDatesResponse
-                                                       (select-keys app [:date1 :date2]))})
-             (assoc app :loading? true))
-           app))))))
+
 
 (define-event RouteLinesForDateResponse [geojson date]
   {:path [:transit-visualization :compare]}
@@ -171,7 +147,6 @@
 (defn combine-trips [{:keys [date1-trips date2-trips] :as compare}]
   (if (and date1-trips date2-trips)
     (when-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
-      (.log js/console "FIRST COMMON STOP: " first-common-stop)
       (let [first-common-stop
             #(assoc %
                     :first-common-stop first-common-stop
@@ -191,7 +166,6 @@
 
 (define-event RouteTripsForDateResponse [trips date]
   {:path [:transit-visualization :compare]}
-  (log/info (count trips) " for " date ", 1st trip:" (first trips))
   (combine-trips
    (cond
      (= date (:date1 app))
@@ -229,18 +203,50 @@
                {:params params
                 :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
   (assoc compare
-         :date1 (:gtfs/current-week-date route)
-         :date2 (:gtfs/different-week-date route)
+         :date1 date1
+         :date2 date2
          :date1-route-lines nil
          :date2-route-lines nil
          :date1-trips nil
          :date2-trips nil
          :show-stops? true))
 
+(define-event RouteDifferencesResponse [response]
+  {:path [:transit-visualization :compare :differences]}
+  response)
+
+(define-event SelectDateForComparison [date]
+  {}
+  (let [service-id (get-in app [:params :service-id])
+        compare (or (get-in app [:transit-visualization :compare]) {})
+        route (get-in app [:transit-visualization :selected-route])
+        last-selected-date (:last-selected-date compare 2)
+        compare (merge compare
+                       (if (= 2 last-selected-date)
+                         {:date1 date
+                          :last-selected-date 1}
+                         {:date2 date
+                          :last-selected-date 2}))]
+    (comm/get! (str "transit-visualization/" service-id "/route-differences")
+               {:params (merge
+                         {:date1 (time/format-date-iso-8601 (:date1 compare))
+                          :date2 (time/format-date-iso-8601 (:date2 compare))}
+                         (when-let [short (:gtfs/route-short-name route)]
+                           {:short short})
+                         (when-let [long (:gtfs/route-long-name route)]
+                           {:long long})
+                         (when-let [headsign (:gtfs/trip-headsign route)]
+                           {:headsign headsign}))
+                :on-success (tuck/send-async! ->RouteDifferencesResponse)})
+    (assoc-in app [:transit-visualization :compare]
+              (fetch-routes-for-dates compare service-id
+                                      route
+                                      (:date1 compare)
+                                      (:date2 compare)))))
+
 (define-event SelectRouteForDisplay [route]
   {}
   (let [service-id (get-in app [:params :service-id])]
-    (.log js/console "REITTI:" (pr-str route))
     (comm/get! (str "transit-visualization/" service-id "/route/"
                     (:gtfs/route-short-name route) "/"
                     (:gtfs/route-long-name route) "/"

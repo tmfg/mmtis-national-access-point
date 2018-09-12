@@ -288,12 +288,13 @@
 (defn route-changes-legend []
   [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend)
    [:div [:b "Taulukon ikonien selitteet"]]
-   (for [[icon label] [[ic/content-add " Uusia vuoroja"]
-                       [ic/content-remove " Poistuvia vuoroja"]
-                       [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                       [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
-     ^{:key label}
-     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label])])
+   (doall
+    (for [[icon label] [[ic/content-add " Uusia vuoroja"]
+                        [ic/content-remove " Poistuvia vuoroja"]
+                        [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
+                        [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
+      ^{:key label}
+      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label]))])
 
 (defn format-range [{:keys [lower upper lower-inclusive? upper-inclusive?]}]
   (if (and (nil? lower) (nil? upper))
@@ -383,7 +384,7 @@
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
-     {:name "Otsatunnus" :width "20%"
+     {:name "Määränpää" :width "20%"
       :read :gtfs/trip-headsign}
 
      {:name "Aikaa 1:seen muutokseen"
