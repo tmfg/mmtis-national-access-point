@@ -5,6 +5,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as tf]
             [ote.time :as time]
+            [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
             [ote.transit-changes :as transit-changes]))
@@ -248,9 +249,9 @@
   {}
   (let [service-id (get-in app [:params :service-id])]
     (comm/get! (str "transit-visualization/" service-id "/route/"
-                    (:gtfs/route-short-name route) "/"
-                    (:gtfs/route-long-name route) "/"
-                    (:gtfs/trip-headsign route))
+                    (url-util/encode-url-component (:gtfs/route-short-name route)) "/"
+                    (url-util/encode-url-component (:gtfs/route-long-name route)) "/"
+                    (url-util/encode-url-component (:gtfs/trip-headsign route)))
                {:on-success (tuck/send-async! ->RouteResponse)})
 
     (-> app

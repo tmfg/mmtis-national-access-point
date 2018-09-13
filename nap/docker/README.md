@@ -52,6 +52,8 @@ Restart napotedb
 Migrate latest db changes in `mmtis-national-access-point/database`  
 `sh devdb_migrate.sh`
 
+Start backend to REPL in IDE
+
 Go to `mmtis-national-access-point/ote`
 Start leiningen  
 `lein run`

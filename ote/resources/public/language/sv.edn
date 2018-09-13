@@ -875,6 +875,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :user-menu-summary                          "Sammandrag"
   :user-menu-nap-help                         "Användarinstruktioner"
   :user-menu-nap-help-link                    "https://s3.eu-central-1.amazonaws.com/ote-assets/nap-user-guide-sv.pdf"
+  :user-menu-video-tutorials                  "Undervisningsvideor"
+  :user-menu-video-tutorials-link             "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details               "Basinfo"
   :data-not-found                             "Inga uppgifter hittades"
   :required-field                             "Obligatorisk uppgift"

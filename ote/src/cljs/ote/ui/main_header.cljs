@@ -186,6 +186,11 @@
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]
+         [:li
+          [linkify (tr [:common-texts :user-menu-video-tutorials-link]) (tr [:common-texts :user-menu-video-tutorials])
+           (merge (stylefy/use-style
+                    style-topnav/topnav-dropdown-link)
+                  {:target "_blank"})]]
 
          [:li
           [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
