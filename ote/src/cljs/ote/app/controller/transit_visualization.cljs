@@ -249,10 +249,9 @@
   {}
   (let [service-id (get-in app [:params :service-id])]
     (comm/get! (str "transit-visualization/" service-id "/route/"
-                    (url-util/encode-url-component
-                      (str (:gtfs/route-short-name route) "/"
-                           (:gtfs/route-long-name route) "/"
-                           (:gtfs/trip-headsign route))))
+                    (url-util/encode-url-component (:gtfs/route-short-name route)) "/"
+                    (url-util/encode-url-component (:gtfs/route-long-name route)) "/"
+                    (url-util/encode-url-component (:gtfs/trip-headsign route)))
                {:on-success (tuck/send-async! ->RouteResponse)})
 
     (-> app
