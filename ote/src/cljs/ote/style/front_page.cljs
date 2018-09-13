@@ -65,6 +65,10 @@
                          fp-btn-hover
                          fp-btn-blue-hover))
 
+(def transport-service-btn (merge {:margin-left "auto"
+                                   :margin-right "auto"}
+                                  front-page-button))
+
 (def front-page-button-disabled (merge
                                   fp-btn-gray
                                   fp-btn))
