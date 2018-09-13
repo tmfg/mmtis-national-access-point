@@ -238,7 +238,9 @@
        [:a {:on-click   #(do
                             (.preventDefault %)
                             (e! (fp/->ChangePage :services nil)))}
-       [:button (stylefy/use-style style-front-page/front-page-button)
+       [:button {:style (merge  {:margin-left "auto"
+                               :margin-right "auto"}
+                       style-front-page/front-page-button)}
         [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
         (tr [:buttons :transport-service-catalog])]]]]]]
 
