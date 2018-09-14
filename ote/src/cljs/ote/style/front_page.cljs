@@ -65,6 +65,10 @@
                          fp-btn-hover
                          fp-btn-blue-hover))
 
+(def transport-service-btn (merge {:margin-left "auto"
+                                   :margin-right "auto"}
+                                  front-page-button))
+
 (def front-page-button-disabled (merge
                                   fp-btn-gray
                                   fp-btn))
@@ -119,16 +123,8 @@
                                                                                          :font-size "2.5rem"
                                                                                          :font-weight "400"}}})
 
-(def front-page-hero-text {:display "flex"
+(def front-page-hero-text {:display "block"
                            :margin-top "60px"
-                           :box-orient "vertical" ;; Old flex standard
-                           :box-direction "normal" ;; Old flex standard
-                           :flex-direction "column"
-                           :box-pack "start" ;; Old flex standard
-                           :flex-pack "start" ;; Old flex standard
-                           :justify-content "flex-start"
-                           :box-align "center" ;; Old flex standard
-                           :flex-align "center" ;; Old flex standard
                            :align-items "center"
                            :font-family "Montserrat, sans-serif"
                            :color "#fafafa"
@@ -138,8 +134,6 @@
                            :text-align "center"
                            :text-shadow "0 1px 5px rgba(0, 0, 0, .5)"
                            ::stylefy/vendors ["webkit" "moz" "ms"]
-                           ::stylefy/auto-prefix #{:box-orient :box-direction :flex-direction :box-pack :box-align
-                                                   :flex-pack :justify-content :align-items :flex-align}
                            ::stylefy/media {{:max-width (str width-sm "px")} {:margin-top "40px"
                                                                               :line-height "1.6rem"
                                                                               :font-size "1.6rem"
