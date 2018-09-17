@@ -32,7 +32,7 @@
   ([hash-color]
    (date1-highlight-style hash-color date1-highlight-color))
   ([hash-color highlight-color]
-   {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " hash-color " 40%) 0px 0px")
+   {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " (or hash-color "#FFF") " 40%) 0px 0px")
     :color "#E1E1F9"}))
 
 (defn date2-highlight-style
@@ -41,7 +41,7 @@
   ([hash-color]
    (date2-highlight-style hash-color date2-highlight-color))
   ([hash-color highlight-color]
-   {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " hash-color " 40%) 0px 0px")
+   {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " (or hash-color "#FFF") " 40%) 0px 0px")
     :color "#F6C6EA"}))
 
 (def section
