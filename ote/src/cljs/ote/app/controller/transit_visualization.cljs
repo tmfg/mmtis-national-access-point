@@ -115,10 +115,11 @@
          :changes (:changes response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
-  {}
+  {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/" service-id "/" date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse)})
-  app)
+  {:loading? true})
+
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->LoadServiceChangesForDate (:service-id params) (:date params)))
 

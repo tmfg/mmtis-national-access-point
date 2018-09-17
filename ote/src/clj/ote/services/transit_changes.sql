@@ -18,6 +18,7 @@ SELECT ts.id AS "transport-service-id",
        "added-routes", "removed-routes", "changed-routes",
        CURRENT_DATE as "current-date",
        "change-date",
+       "date",
        "change-date" - CURRENT_DATE AS "days-until-change",
        ("change-date" IS NOT NULL) AS "changes?",
        (SELECT string_agg(fr, ',')
