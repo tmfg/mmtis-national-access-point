@@ -147,7 +147,7 @@
 
 (defn combine-trips [{:keys [date1-trips date2-trips] :as compare}]
   (if (and date1-trips date2-trips)
-    (when-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+    (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
       (let [first-common-stop
             #(assoc %
                     :first-common-stop first-common-stop
@@ -160,7 +160,10 @@
         (assoc compare :combined-trips
                (mapv (fn [[l r]]
                        [l r (transit-changes/trip-stop-differences l r)])
-                     combined-trips))))
+                     combined-trips)))
+
+      ;; Can't find common stop
+      (assoc compare :combined-trips nil))
 
     ;; Both dates not fetched, don't try to calculate
     (assoc compare :combined-trips nil)))
