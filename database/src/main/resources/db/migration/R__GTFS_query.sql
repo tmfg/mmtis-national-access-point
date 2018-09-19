@@ -532,10 +532,10 @@ E'Return all routes in packages for the given service. Returns set of (route-sho
 
 CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT) RETURNS INTEGER
 AS $$
-SELECT ((regexp_split_to_array(c.day,'='))[1])::integer - 1
-  FROM (SELECT regexp_split_to_table(weekhash1, ',') AS day) c
-  JOIN (SELECT regexp_split_to_table(weekhash2, ',') AS day) d
-    ON (regexp_split_to_array(c.day,'='))[1] = (regexp_split_to_array(d.day,'='))[1]
+SELECT ((string_to_array(c.day,'='))[1])::integer - 1
+  FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
+  JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
+    ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
  WHERE c.day != d.day
  LIMIT 1;
 $$ LANGUAGE SQL STABLE;
