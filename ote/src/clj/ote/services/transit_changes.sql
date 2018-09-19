@@ -28,4 +28,6 @@ SELECT ts.id AS "transport-service-id",
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
   LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
+ WHERE 'road' = ANY(ts."transport-type")
+   AND 'schedule' = ts."sub-type"
  ORDER BY "change-date" ASC;
