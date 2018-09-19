@@ -245,7 +245,11 @@
    :ote.db.transit/route-description "Namn på rutten eller rutterna som ändras"
    :ote.db.transit/regions "Lägg till landskapen som ändringen gäller"
    :ote.db.transit/description "Detaljerade uppgifter om förändringen"}
- }
+
+ :email-notification-settings
+ {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+  :ote.db.user-notifications/service-changed-6-months-ago "Liikkumispalvelusi tietojen viimeisimmästä päivityksestä on kulunut vähintään 6 kuukautta. Ilmoitus lähetetään kerran kuukaudessa, kunnes tiedot on päivitetty."}
+}
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -819,6 +823,12 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
                                :season-schedule-change "Tidtabellsperioden ändras"}
  }
 
+ :email-notification-settings-page
+ {:page-title "Sähköposti-ilmoitusten asetukset"
+  :page-description "Tällä sivulla voit määritellä millaisissa tilanteissa saat sähköposti-ilmoituksia NAP-palvelusta"
+  :page-secondary-header "Maantieteelliset asetukset"
+  :regions-description-text "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."}
+
  :price-dialog
  {:header-dialog "Fordonspris"
   :close-dialog  "Stäng"}
@@ -868,6 +878,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-privacy-policy                  "Registerbeskrivning"
   :navigation-general-menu                    "Meny"
   :navigation-for-developers                  "Programmeringsgränssnitt för utvecklare"
+  :navigation-email-notification-settings     "Inställningar för e-postmeddelanden"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"

@@ -239,8 +239,11 @@
    :ote.db.transit/effective-dates "Change effective date or dates"
    :ote.db.transit/route-description "Description of changed route or routes"
    :ote.db.transit/regions "Regions that are affected by the change"
-   :ote.db.transit/description "Details of the change"
-   }
+   :ote.db.transit/description "Details of the change"}
+
+  :email-notification-settings
+  {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+   :ote.db.user-notifications/service-changed-6-months-ago "At least 6 months have passed since the last update of your transportation service. The notification is sent once a month until the information has been updated."}
  }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -814,6 +817,12 @@ You can also draw the operating area or point to the map with drawing tools. You
                                 :season-schedule-change "Season schedule change"}
   }
 
+ :email-notification-settings-page
+ {:page-title "Email notification settings"
+  :page-description "Select what kind of email notifications you want to get from NAP service."
+  :page-secondary-header "Regional settings"
+  :regions-description-text "Select the regions for which notifications you want to receive in your email."}
+
  :price-dialog
  {:header-dialog "Vehicle price information"
   :close-dialog  "Close"}
@@ -864,6 +873,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-privacy-policy                  "Privacy Policy"
   :navigation-general-menu                    "Menu"
   :navigation-for-developers                  "API for developers"
+  :navigation-email-notification-settings     "Email notification settings"
   :user-menu-service-guide                    "User guide"
   :user-menu-service-operator                 "Edit transport operator"
   :user-menu-log-out                          "Log out"

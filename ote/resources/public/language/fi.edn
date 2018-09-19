@@ -242,6 +242,10 @@
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"
    :ote.db.transit/description "Muutoksen tarkemmat tiedot"}
+
+  :email-notification-settings
+  {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+   :ote.db.user-notifications/service-changed-6-months-ago "Liikkumispalvelusi tietojen viimeisimmästä päivityksestä on kulunut vähintään 6 kuukautta. Ilmoitus lähetetään kerran kuukaudessa, kunnes tiedot on päivitetty."}
   }
 
  ;; Add form info elements here, these are textual help texts in the form
@@ -513,7 +517,26 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   }
   ;; ENUMS end
-
+ :regions
+ {:01 "Uusimaa"
+  :02 "Varsinais-Suomi"
+  :04 "Satakunta"
+  :05 "Kanta-Häme"
+  :06 "Pirkanmaa"
+  :07 "Päijät-Häme"
+  :08 "Kymenlaakso"
+  :09 "Etelä-Karjala"
+  :10 "Etelä-Savo"
+  :11 "Pohjois-Savo"
+  :12 "Pohjois-Karjala"
+  :13 "Keski-Suomi"
+  :14 "Etelä-Pohjanmaa"
+  :15 "Pohjanmaa"
+  :16 "Keski-Pohjanmaa"
+  :17 "Pohjois-Pohjanmaa"
+  :18 "Kainuu"
+  :19 "Lappi"
+  :21 "Ahvenanmaa"}
 
  ;; Per feature/page localization keys
  :place-search {:primary-name                "Paikan nimi"
@@ -818,6 +841,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                 :season-schedule-change "Aikataulukauden vaihtuminen"}
   }
 
+ :email-notification-settings-page
+ {:page-title "Sähköposti-ilmoitusten asetukset"
+  :page-description "Tällä sivulla voit määritellä millaisissa tilanteissa saat sähköposti-ilmoituksia NAP-palvelusta"
+  :page-secondary-header "Maantieteelliset asetukset"
+  :regions-description-text "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."}
+
  :price-dialog
  {:header-dialog "Ajoneuvon hintatiedot"
   :close-dialog  "Sulje"}
@@ -872,6 +901,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-privacy-policy                  "Rekisteriseloste"
   :navigation-general-menu                    "Valikko"
   :navigation-for-developers                  "Ohjelmointirajapinta kehittäjille"
+  :navigation-email-notification-settings     "Sähköposti-ilmoitusten asetukset"
   :user-menu-service-guide                    "Ohje"
   :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
   :user-menu-log-out                          "Kirjaudu ulos"
