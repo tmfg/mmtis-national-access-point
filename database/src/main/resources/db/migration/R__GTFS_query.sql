@@ -323,7 +323,7 @@ BEGIN
                       ABS(EXTRACT(EPOCH FROM gtfs_trip_stop_departure_time(d1t, first_common_stop)) -
                           EXTRACT(EPOCH FROM gtfs_trip_stop_departure_time(d2t, first_common_stop))) as timediff
                  FROM unnest(d1_trips) d1t CROSS JOIN unnest(d2_trips) d2t) x
-         WHERE timediff < 1800 -- only consider differences less than 30 minutes
+         WHERE timediff <= 1800 -- only consider differences less than 30 minutes
          ORDER BY timediff ASC
    LOOP
       IF (row."d1-trip")."trip-id" = ANY(d1_trip_ids) AND
