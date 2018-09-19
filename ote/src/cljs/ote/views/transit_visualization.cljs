@@ -458,7 +458,7 @@
   [:span
    [comparison-dates compare]
 
-   (when diff
+   (when (seq diff)
      [change-icons diff true])])
 
 (defn route-service-calendar [e! {:keys [date->hash hash->color
