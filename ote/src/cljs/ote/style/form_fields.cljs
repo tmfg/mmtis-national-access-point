@@ -26,7 +26,7 @@
   (merge localized-text-language
          {:background-color "#06c"}))
 
-(def checkbox-group-label {:margin-bottom "4px"})
+(def checkbox-group-label {:margin-bottom "4px" :width "100%"})
 
 (def table-header {:overflow "visible" :border-bottom "0px solid white"})
 (def table-header-row {:overflow "visible" :color "black" :border-bottom "0px solid white"})

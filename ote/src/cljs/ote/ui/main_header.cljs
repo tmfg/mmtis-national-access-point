@@ -105,6 +105,12 @@
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
+                       {:href "#/email-settings"
+                        :on-click #(e! (fp-controller/->OpenUserMenu))})
+             (tr [:common-texts :navigation-email-notification-settings])]]
+           [:li
+            [:a (merge (stylefy/use-style
+                         style-topnav/topnav-dropdown-link)
                        {:href     "#/user"
                         :on-click #(e! (fp-controller/->OpenUserMenu))})
              (tr [:common-texts :user-menu-profile])]]

@@ -1,4 +1,4 @@
-(ns ote.db.user_notification_regions
+(ns ote.db.user-notifications
   "Datamodel for user notification regions table"
   (:require [clojure.spec.alpha :as s]
     #?(:clj [ote.db.specql-db :refer [define-tables]])
@@ -10,10 +10,8 @@
             [ote.db.common]
             [ote.db.modification]
             [ote.db.transport-service]
-            [ote.time :as time]
             [ote.util.fn :refer [flip]]
-            [ote.db.transport-operator]
-            [clojure.string :as str])
+            [ote.db.transport-operator])
   #?(:cljs
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
