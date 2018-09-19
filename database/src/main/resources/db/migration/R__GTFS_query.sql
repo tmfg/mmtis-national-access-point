@@ -515,7 +515,7 @@ COMMENT ON FUNCTION gtfs_service_route_week_hash(INTEGER,DATE,TEXT,TEXT,TEXT) IS
 E'Fetch the combined hash of the whole week''s days for the given route by date and service.';
 
 
-CREATE FUNCTION gtfs_service_routes(service_id INTEGER)
+CREATE OR REPLACE FUNCTION gtfs_service_routes(service_id INTEGER)
 RETURNS SETOF RECORD
 AS $$
 SELECT r."route-short-name", r."route-long-name", trip."trip-headsign"
