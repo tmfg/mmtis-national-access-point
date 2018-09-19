@@ -253,7 +253,11 @@
 (define-event SelectRouteForDisplay [route]
   {}
   (let [service-id (get-in app [:params :service-id])
-        current-week-date (get-in app [:transit-visualization :changes :gtfs/current-week-date])]
+        current-week-date (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+        ;; Use dates in route, or default to current week date and 7 days after that.
+        date1 (or (:gtfs/current-week-date route) current-week-date)
+        date2 (or (:gtfs/different-week-date route)
+                  (time/days-from (tc/from-date current-week-date) 7))]
     (comm/get! (str "transit-visualization/" service-id "/route/"
                     (url-util/encode-url-component (:gtfs/route-short-name route)) "/"
                     (url-util/encode-url-component (:gtfs/route-long-name route)) "/"
@@ -265,14 +269,14 @@
         (update-in [:transit-visualization] dissoc :date->hash :hash->color)
         (update-in [:transit-visualization :compare] fetch-routes-for-dates
                    service-id route
-                   ;; Use dates in route, or default to current week date and 7 days after that.
-                   (or (:gtfs/current-week-date route) current-week-date)
-                   (or (:gtfs/different-week-date route)
-                       (time/days-from (tc/from-date current-week-date) 7)))
+                   date1 date2)
         (assoc-in [:transit-visualization :compare :differences]
                   (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
                                        :gtfs/trip-stop-sequence-changes
-                                       :gtfs/trip-stop-time-changes})))))
+                                       :gtfs/trip-stop-time-changes}))
+        ;; Show next year in calendar, if date2 is in next year.
+        (assoc-in [:transit-visualization :show-next-year?]
+                  (> (time/year date2) (time/year (time/now)))))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
