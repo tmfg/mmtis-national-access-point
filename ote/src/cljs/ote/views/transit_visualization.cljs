@@ -299,10 +299,13 @@
 (defn format-range [{:keys [lower upper lower-inclusive? upper-inclusive?]}]
   (if (and (nil? lower) (nil? upper))
     "0"
-    (str lower "\u2014" (when upper
-                          (if upper-inclusive?
-                            upper
-                            (inc upper))))))
+    (let [upper (when upper
+                  (if upper-inclusive?
+                    upper
+                    (dec upper)))]
+      (if (= lower upper)
+        (str lower)
+        (str lower "\u2014" upper)))))
 
 (defn stop-seq-changes-icon [trip-stop-sequence-changes with-labels?]
   (let [seq-changes (if (number? trip-stop-sequence-changes)
