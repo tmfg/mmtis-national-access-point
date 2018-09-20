@@ -28,6 +28,9 @@ SELECT ts.id AS "transport-service-id",
        NOT EXISTS(SELECT id
                     FROM "external-interface-description" eid
                    WHERE eid."transport-service-id" = ts.id) AS "no-interfaces?",
+       NOT EXISTS(SELECT id
+                    FROM "external-interface-description" eid
+                   WHERE eid."transport-service-id" = ts.id AND eid."gtfs-imported" IS NOT NULL) AS "no-interfaces-imported?",
        (SELECT string_agg(fr, ',')
           FROM gtfs_package p
           JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
