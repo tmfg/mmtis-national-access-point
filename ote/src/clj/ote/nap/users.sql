@@ -49,6 +49,26 @@ SELECT u.id as id,
                                          FROM "group" g
                                         WHERE g.title ILIKE :group))));
 
+-- name: list-authority-users
+SELECT u.id as id,
+       u.name as username,
+       u.fullname as name,
+       u.email as email,
+       u.sysadmin as "admin?",
+       un."finnish-regions"
+  FROM "user" u
+  LEFT JOIN user_notifications un ON u.id = un."created-by"
+ WHERE state = 'active'
+   AND EXISTS(SELECT m.group_id,m.table_id
+                FROM "member" m
+               WHERE m.table_name = 'user'
+                 AND m.state = 'active'
+                 AND m.table_id = u.id
+                 AND m.group_id IN (SELECT ge.group_id
+                                      FROM group_extra ge
+                                     WHERE ge.key = 'transit-authority?'
+                                       AND ge.value = 'true'));
+
 -- name: is-transit-authority-user?
 -- single?: true
 -- Given a user id, check if the user belongs to a transit authority group
