@@ -21,11 +21,11 @@ SELECT ts.id AS "transport-service-id",
        "date",
        "change-date" - CURRENT_DATE AS "days-until-change",
        ("change-date" IS NOT NULL) AS "changes?",
-       EXISTS(SELECT *
+       EXISTS(SELECT id
                 FROM "external-interface-description" eid
                WHERE eid."transport-service-id" = ts.id
-                 AND ("gtfs-db-error" NOTNULL OR "gtfs-import-error" NOTNULL)) AS "interfaces-has-errors?",
-       NOT EXISTS(SELECT *
+                 AND ("gtfs-db-error" IS NOT NULL OR "gtfs-import-error" IS NOT NULL)) AS "interfaces-has-errors?",
+       NOT EXISTS(SELECT id
                     FROM "external-interface-description" eid
                    WHERE eid."transport-service-id" = ts.id) AS "no-interfaces?",
        (SELECT string_agg(fr, ',')
