@@ -827,7 +827,9 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
  {:page-title "Sähköposti-ilmoitusten asetukset"
   :page-description "Tällä sivulla voit määritellä millaisissa tilanteissa saat sähköposti-ilmoituksia NAP-palvelusta"
   :page-secondary-header "Maantieteelliset asetukset"
-  :regions-description-text "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."}
+  :regions-description-text "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+  :save-success "Tallennus onnistui."
+  :save-failure "Tallennus epäonnistui."}
 
  :price-dialog
  {:header-dialog "Fordonspris"

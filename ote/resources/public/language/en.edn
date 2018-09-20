@@ -821,7 +821,9 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:page-title "Email notification settings"
   :page-description "Select what kind of email notifications you want to get from NAP service."
   :page-secondary-header "Regional settings"
-  :regions-description-text "Select the regions for which notifications you want to receive in your email."}
+  :regions-description-text "Select the regions for which notifications you want to receive in your email."
+  :save-success "Settings saved successfully."
+  :save-failure "Saving settings failed!"}
 
  :price-dialog
  {:header-dialog "Vehicle price information"

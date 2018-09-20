@@ -78,17 +78,14 @@
         (dissoc :email-settings
                 :before-unload-message)
         (assoc :flash-message
-               (if (::transit/sent response)
-                 (tr [:pre-notice-page :save-success-send])
-                 (tr [:pre-notice-page :save-success])))))
+                 (tr [:email-notification-settings-page :save-success]))))
 
   SaveEmailSettingsResponseFailure
   (process-event [{response :response} app]
     (.error js/console "Save settings failed:" (pr-str response))
     (assoc app
       :flash-message-error
-      (tr [:pre-notice-page :save-failure-send])
-      (tr [:pre-notice-page :save-failure])))
+      (tr [:email-notification-settings-page :save-failure])))
 
   UpdateSettings
   (process-event [{form-data :form-data} app]
