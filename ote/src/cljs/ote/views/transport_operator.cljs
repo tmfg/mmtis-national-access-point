@@ -146,7 +146,6 @@
 (defn- operator-form-options [e!]
   {:name->label (tr-key [:field-labels])
    :update!     #(e! (to/->EditTransportOperatorState %))
-   :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [:div
                    [buttons/save {:on-click #(e! (to/->SaveTransportOperator))

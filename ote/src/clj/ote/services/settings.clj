@@ -11,10 +11,10 @@
             [jeesql.core :refer [defqueries]]))
 
 (defn save-notifications! [user db form-data]
-  (let [data (-> form-data
-                 (assoc ::user-notifications/created-by (get-in user [:user :id]))
-                 (assoc ::user-notifications/created (java.sql.Timestamp. (System/currentTimeMillis)))
-                 (assoc ::user-notifications/modified (java.sql.Timestamp. (System/currentTimeMillis))))]
+  (let [data (merge form-data
+                    {::user-notifications/created-by (get-in user [:user :id])
+                     ::user-notifications/created (java.sql.Timestamp. (System/currentTimeMillis))
+                     ::user-notifications/modified (java.sql.Timestamp. (System/currentTimeMillis))})]
     (upsert! db ::user-notifications/user-notifications data)))
 
 (defn get-notifications [user db]

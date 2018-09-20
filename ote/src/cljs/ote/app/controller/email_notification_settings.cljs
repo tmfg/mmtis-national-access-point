@@ -56,7 +56,6 @@
   (process-event [{response :response} app]
     (-> app
         (assoc-in [:email-settings :user-notifications] response)
-        (update-in [:email-settings :user-notifications :ote.db.user-notifications/finnish-regions] str->keyword)
         (assoc-in [:email-settings :user-notifications-loading] false)))
 
   SaveEmailNotificationSettings
