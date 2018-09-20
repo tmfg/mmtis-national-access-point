@@ -102,12 +102,13 @@
          [:div.col-sm-2.col-md-4]
          [:div.col-sm-8.col-md-4
           [:ul (stylefy/use-style style-topnav/ul)
-           [:li
-            [:a (merge (stylefy/use-style
-                         style-topnav/topnav-dropdown-link)
-                       {:href "#/email-settings"
-                        :on-click #(e! (fp-controller/->OpenUserMenu))})
-             (tr [:common-texts :navigation-email-notification-settings])]]
+           (when (get-in app [:user :transit-authority?])
+             [:li
+              [:a (merge (stylefy/use-style
+                           style-topnav/topnav-dropdown-link)
+                         {:href     "#/email-settings"
+                          :on-click #(e! (fp-controller/->OpenUserMenu))})
+               (tr [:common-texts :navigation-email-notification-settings])]])
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
