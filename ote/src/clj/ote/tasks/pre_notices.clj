@@ -119,20 +119,19 @@
       (tx/with-transaction db
          (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
            (try
-             (when (not (empty? authority-users))
-               (doseq [u authority-users]
-                 (let [notification (user-notification-html db (:finnish-regions u))]
-                   (if notification
-                     (do
-                       (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
-                       (send-email
-                         server-opts
-                         {:bcc     (:email u)
-                          :from    (or (:from msg-opts) "NAP")
-                          :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                        (datetime-string (t/now) timezone))
-                          :body    [{:type "text/html;charset=utf-8" :content notification}]}))
-                     (log/info "Could not find notification for user with email: " (pr-str (:email u)))))))
+             (doseq [u authority-users]
+               (let [notification (user-notification-html db (:finnish-regions u))]
+                 (if notification
+                   (do
+                     (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
+                     (send-email
+                       server-opts
+                       {:bcc     (:email u)
+                        :from    (or (:from msg-opts) "NAP")
+                        :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                      (datetime-string (t/now) timezone))
+                        :body    [{:type "text/html;charset=utf-8" :content notification}]}))
+                   (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
              ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
              (Thread/sleep 5000)

@@ -521,7 +521,26 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
    :read "Läst"}
   }
   ;; ENUMS end
-
+ :regions
+ {:01 "Nyland"
+  :02 "Egentliga Finland"
+  :04 "Satakunta"
+  :05 "Egentliga Tavastland"
+  :06 "Birkaland"
+  :07 "Päijänne-Tavastland"
+  :08 "Kymmenedalen"
+  :09 "Södra Karelen"
+  :10 "Södra Savolax"
+  :11 "Norra Savolax"
+  :12 "Norra Karelen"
+  :13 "Mellersta Finland"
+  :14 "Södra Österbotten"
+  :15 "Österbotten"
+  :16 "Mellersta Österbotten"
+  :17 "Norra Österbotten"
+  :18 "Kajanaland"
+  :19 "Lappland"
+  :21 "Åland"}
 
  ;; Per feature/page localization keys
  :place-search {:primary-name                "Platsnamn"
@@ -824,12 +843,12 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
  }
 
  :email-notification-settings-page
- {:page-title "Sähköposti-ilmoitusten asetukset"
-  :page-description "Tällä sivulla voit määritellä millaisissa tilanteissa saat sähköposti-ilmoituksia NAP-palvelusta"
-  :page-secondary-header "Maantieteelliset asetukset"
-  :regions-description-text "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
-  :save-success "Tallennus onnistui."
-  :save-failure "Tallennus epäonnistui."}
+ {:page-title "Inställningar för e-postmeddelanden"
+  :page-description "Här kan du göra inställningar gällande NAP- tjänstens automatiska e-postmeddelanden."
+  :page-secondary-header "Område"
+  :regions-description-text "Välj de landskap du vill få information om"
+  :save-success "Sparad"
+  :save-failure "Sparade misslyckades"}
 
  :price-dialog
  {:header-dialog "Fordonspris"

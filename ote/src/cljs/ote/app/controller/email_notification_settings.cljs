@@ -73,10 +73,9 @@
 
   SaveEmailSettingsResponse
   (process-event [{response :response} app]
-    (routes/navigate! :front-page)
+    (routes/navigate! :email-settings)
     (-> app
-        (dissoc :email-settings
-                :before-unload-message)
+        (dissoc :before-unload-message)
         (assoc :flash-message
                  (tr [:email-notification-settings-page :save-success]))))
 

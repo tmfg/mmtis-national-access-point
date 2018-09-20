@@ -516,7 +516,26 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   }
   ;; ENUMS end
-
+ :regions
+ {:01 "Uusimaa"
+  :02 "Varsinais-Suomi"
+  :04 "Satakunta"
+  :05 "Kanta-Häme"
+  :06 "Pirkanmaa"
+  :07 "Päijät-Häme"
+  :08 "Kymenlaakso"
+  :09 "South Karelia"
+  :10 "Etelä-Savo"
+  :11 "Pohjois-Savo"
+  :12 "North Karelia"
+  :13 "Central Finland"
+  :14 "South Ostrobothnia"
+  :15 "Ostrobothnia"
+  :16 "Central Ostrobothnia"
+  :17 "North Ostrobothnia"
+  :18 "Kainuu"
+  :19 "Lapland"
+  :21 "Åland"}
 
  ;; Per feature/page localization keys
  :place-search {:primary-name                "Place name"
@@ -819,9 +838,9 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :email-notification-settings-page
  {:page-title "Email notification settings"
-  :page-description "Select what kind of email notifications you want to get from NAP service."
-  :page-secondary-header "Regional settings"
-  :regions-description-text "Select the regions for which notifications you want to receive in your email."
+  :page-description "On this page, you can specify in which situations you will receive e-mail notifications from NAP."
+  :page-secondary-header " Geographical settings"
+  :regions-description-text "Select the provinces for which notifications you want to receive in your email."
   :save-success "Settings saved successfully."
   :save-failure "Saving settings failed!"}
 

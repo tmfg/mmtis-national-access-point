@@ -846,8 +846,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :page-description "Tällä sivulla voit määritellä millaisissa tilanteissa saat sähköposti-ilmoituksia NAP-palvelusta"
   :page-secondary-header "Maantieteelliset asetukset"
   :regions-description-text "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
-  :save-success "Tallennus onnistui."
-  :save-failure "Tallennus epäonnistui."}
+  :save-success "Asetukset tallennettu onnistuneesti."
+  :save-failure "Asetukset tallentaminen epäonnistui!"}
 
  :price-dialog
  {:header-dialog "Ajoneuvon hintatiedot"

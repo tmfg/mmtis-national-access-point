@@ -855,7 +855,7 @@
                  is-addition-valid (and (not (nil? option-addition)) (= option (:value option-addition)) checked?)
                  addition (when is-addition-valid (:addition option-addition))]
              ^{:key i}
-             [:div {:style {:display "flex"}}
+             [:div {:style {:display "flex" :padding-top "10px"}}
               [:span
                [ui/checkbox {:id (str i "_" (name option))
                              :label      (when-not table? (show-option option))

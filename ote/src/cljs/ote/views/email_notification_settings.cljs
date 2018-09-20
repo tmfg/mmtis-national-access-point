@@ -16,7 +16,7 @@
       :card?   false
       :layout  :row}
 
-     {:label                (tr [:email-notification-settings-page :regions-description-text])
+     {:label                ""
       :name                 ::user-notifications/finnish-regions
       :type                 :checkbox-group
       :show-option          (tr-key [:regions])
@@ -47,8 +47,9 @@
   (let [form-data (get-in state [:email-settings :user-notifications])]
     [:div
      [:h1 (tr [:email-notification-settings-page :page-title])]
-     [:p (tr [:email-notification-settings-page :page-description])]
-     [:h2 (tr [:email-notification-settings-page :secondary-header])]
+     [:p {:style {:padding-top "20px"}} (tr [:email-notification-settings-page :page-description])]
+     [:h2 {:style {:padding-top "20px"}} (tr [:email-notification-settings-page :page-secondary-header])]
+     [:p (tr [:email-notification-settings-page :regions-description-text])]
      [form/form
       (form-options e!)
       (select-province e! (:email-settings state))
