@@ -177,21 +177,20 @@ SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
  GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
 $$ LANGUAGE SQL STABLE;
 
-CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(
+CREATE OR REPLACE FUNCTION gtfs_route_tripdata_for_date(
   package_ids INTEGER[],
   dt DATE,
   route_short_name TEXT,
   route_long_name TEXT,
   trip_headsign TEXT)
-RETURNS SETOF route_trips_for_date
+RETURNS "gtfs-package-trip-info"[]
 AS $$
-SELECT route_short_name AS "route-short-name", route_long_name AS "route-long-name", trip_headsign AS "trip-headsign",
-       COUNT(trip."trip-id")::INTEGER AS trips,
-       array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
+SELECT array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
   FROM "gtfs-route" r
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
  WHERE r."package-id" = ANY(package_ids)
+   AND ROW(r."package-id", t."service-id")::service_ref IN (SELECT * FROM gtfs_services_for_date(package_ids, dt))
    AND r."route-short-name" = route_short_name
    AND r."route-long-name" = route_long_name
    AND trip."trip-headsign" = trip_headsign;
@@ -623,7 +622,16 @@ BEGIN
 
   -- Fetch all routes for the service
   FOR row IN
-      SELECT routerow.*, currtrip.*, difftrip.*
+      SELECT routerow.*,
+             -- Fetch full trips for both dates (current and different week)
+             gtfs_route_tripdata_for_date(
+                 gtfs_service_packages_for_date(service_id, routerow.route_curr_date),
+                 routerow.route_curr_date,
+                  routerow.route_short_name, routerow.route_long_name, routerow.trip_headsign) AS "date1-trips",
+             gtfs_route_tripdata_for_date(
+                 gtfs_service_packages_for_date(service_id, routerow.route_diff_date),
+                 routerow.route_diff_date,
+                 routerow.route_short_name, routerow.route_long_name, routerow.trip_headsign) AS "date2-trips"
         FROM (SELECT z.*,
                      CASE
                        WHEN z.diff_day IS NOT NULL
@@ -643,23 +651,6 @@ BEGIN
                                 FROM (SELECT *
                                         FROM gtfs_service_routes(service_id)
                                           AS r(route_short_name TEXT, route_long_name TEXT, trip_headsign TEXT)) x) y) z) routerow
-        -- Join full trips for both dates (current and different week)
-        LEFT JOIN LATERAL
-             (SELECT l."route-short-name", l."route-long-name", l."trip-headsign", tripdata AS "date1-trips"
-                FROM gtfs_route_trips_for_date(
-                           gtfs_service_packages_for_date(service_id, routerow.route_curr_date),
-                           routerow.route_curr_date,
-                           routerow.route_short_name, routerow.route_long_name, routerow.trip_headsign) l) currtrip
-             ON TRUE
-        LEFT JOIN LATERAL
-             (SELECT r."route-short-name", r."route-long-name", r."trip-headsign",
-                     tripdata AS "date2-trips"
-                FROM gtfs_route_trips_for_date(
-                           gtfs_service_packages_for_date(service_id, routerow.route_diff_date),
-                           routerow.route_diff_date,
-                           routerow.route_short_name, routerow.route_long_name, routerow.trip_headsign) r) difftrip
-             ON TRUE
-
   LOOP
     IF row.diff_week IS NULL
     THEN
