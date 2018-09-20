@@ -25,6 +25,7 @@
             [ote.views.user :as user]
             [ote.views.admin :as admin]
             [ote.views.operators :as operators]
+            [ote.views.email-notification-settings :as email-settings]
             [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]
             [ote.views.gtfs-viewer :as gtfs-viewer]
@@ -149,6 +150,8 @@
                   :admin [admin/admin-panel e! app]
 
                   :operators [operators/operators e! app]
+
+                  :email-settings [email-settings/email-notification-settings e! app]
 
                   :routes [route-list/routes e! app]
                   :new-route [route/new-route e! app]

@@ -26,7 +26,6 @@
 (defn transportation-form-options [e! schemas app]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
-   :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas app])})
 

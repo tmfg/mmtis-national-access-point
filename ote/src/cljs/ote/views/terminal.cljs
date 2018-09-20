@@ -22,7 +22,6 @@
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service])
    :update!     #(e! (ts/->EditTransportService %))
-   :name        #(tr [:olennaiset-tiedot :otsikot %])
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas app])})
 

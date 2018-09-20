@@ -832,14 +832,18 @@
      (checkbox-container update! table? label warning error style checked? disabled?)]
     (checkbox-container update! table? label warning error style checked? disabled?)))
 
-(defmethod field :checkbox-group [{:keys [update! table? label show-option options help error warning header? option-enabled? option-addition]} data]
+(defmethod field :checkbox-group [{:keys
+                                   [update! table? label show-option options
+                                    help error warning header? option-enabled? option-addition
+                                    checkbox-group-style use-label-width?]} data]
   ;; Options:
   ;; :header? Show or hide the header element above the checkbox-group. Default: true.
   ;; :option-enabled? Is option checkable. Default: true
   ;; option-addition is a map, that knows which option needs additions and the addition. e.g. {:value: :other :addition [ReagentObject]}
   (let [selected (set (or data #{}))
-        option-enabled? (or option-enabled? (constantly true))]
-    [:div.checkbox-group
+        option-enabled? (or option-enabled? (constantly true))
+        label-style (if use-label-width? style-base/checkbox-label-with-width style-base/checkbox-label)]
+    [:div.checkbox-group {:style (if checkbox-group-style checkbox-group-style {})}
      (when (not (false? header?))
        [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
      (when help
@@ -851,13 +855,13 @@
                  is-addition-valid (and (not (nil? option-addition)) (= option (:value option-addition)) checked?)
                  addition (when is-addition-valid (:addition option-addition))]
              ^{:key i}
-             [:div {:style {:display "flex"}}
+             [:div {:style {:display "flex" :padding-top "10px"}}
               [:span
                [ui/checkbox {:id (str i "_" (name option))
                              :label      (when-not table? (show-option option))
                              :checked    checked?
                              :disabled   (not (option-enabled? option))
-                             :labelStyle (merge style-base/checkbox-label
+                             :labelStyle (merge label-style
                                                 (if (not (option-enabled? option))
                                                   style-base/disabled-color
                                                   {:color "rgb(33, 33, 33)"}))

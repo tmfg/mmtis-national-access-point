@@ -245,7 +245,11 @@
    :ote.db.transit/route-description "Namn på rutten eller rutterna som ändras"
    :ote.db.transit/regions "Lägg till landskapen som ändringen gäller"
    :ote.db.transit/description "Detaljerade uppgifter om förändringen"}
- }
+
+ :email-notification-settings
+ {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+  :ote.db.user-notifications/service-changed-6-months-ago "Liikkumispalvelusi tietojen viimeisimmästä päivityksestä on kulunut vähintään 6 kuukautta. Ilmoitus lähetetään kerran kuukaudessa, kunnes tiedot on päivitetty."}
+}
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -517,7 +521,26 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
    :read "Läst"}
   }
   ;; ENUMS end
-
+ :regions
+ {"01" "Nyland"
+  "02" "Egentliga Finland"
+  "04" "Satakunta"
+  "05" "Egentliga Tavastland"
+  "06" "Birkaland"
+  "07" "Päijänne-Tavastland"
+  "08" "Kymmenedalen"
+  "09" "Södra Karelen"
+  "10" "Södra Savolax"
+  "11" "Norra Savolax"
+  "12" "Norra Karelen"
+  "13" "Mellersta Finland"
+  "14" "Södra Österbotten"
+  "15" "Österbotten"
+  "16" "Mellersta Österbotten"
+  "17" "Norra Österbotten"
+  "18" "Kajanaland"
+  "19" "Lappland"
+  "21" "Åland"}
 
  ;; Per feature/page localization keys
  :place-search {:primary-name                "Platsnamn"
@@ -819,6 +842,14 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
                                :season-schedule-change "Tidtabellsperioden ändras"}
  }
 
+ :email-notification-settings-page
+ {:page-title "Inställningar för e-postmeddelanden"
+  :page-description "Här kan du göra inställningar gällande NAP- tjänstens automatiska e-postmeddelanden."
+  :page-secondary-header "Område"
+  :regions-description-text "Välj de landskap du vill få information om"
+  :save-success "Sparad"
+  :save-failure "Sparade misslyckades"}
+
  :price-dialog
  {:header-dialog "Fordonspris"
   :close-dialog  "Stäng"}
@@ -868,6 +899,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-privacy-policy                  "Registerbeskrivning"
   :navigation-general-menu                    "Meny"
   :navigation-for-developers                  "Programmeringsgränssnitt för utvecklare"
+  :navigation-email-notification-settings     "Inställningar för e-postmeddelanden"
   :user-menu-service-guide                    "Anvisning"
   :user-menu-service-operator                 "Tjänsteproducentens basinfo"
   :user-menu-log-out                          "Utloggning"

@@ -16,6 +16,7 @@
             [ote.services.login :as login-service]
             [ote.services.admin :as admin-service]
             [ote.services.operators :as operators-service]
+            [ote.services.settings :as settings-service]
             [ote.services.pre-notices :as pre-notices]
             [ote.services.transit-visualization :as transit-visualization]
             [ote.services.transit-changes :as transit-changes]
@@ -90,6 +91,8 @@
            [:db :http])
 
    :operators (component/using (operators-service/->Operators) [:db :http])
+
+   :settings (component/using (settings-service/->Settings) [:db :http])
 
    ;; Scheduled tasks
    :tasks-company (component/using (tasks-company/company-tasks) [:db])
