@@ -66,7 +66,6 @@
                          (form/without-form-metadata n)
                          (assoc n :ote.db.user-notifications/finnish-regions
                                   (into [] (map name (:ote.db.user-notifications/finnish-regions n)))))] ;; Change keywords to strings
-      (.log js/console "post to server " (clj->js settings) (clj->js (get-in app [:email-settings :user-notifications])))
       (comm/post! "settings/email-notifications" settings
                   {:on-success (tuck/send-async! ->SaveEmailSettingsResponse)
                    :on-failure (tuck/send-async! ->SaveEmailSettingsResponseFailure)})
@@ -93,7 +92,5 @@
 
   UpdateSettings
   (process-event [{form-data :form-data} app]
-    ;(.log js/console "form-data " (clj->js form-data))
-    ;(.log js/console "app email-settings " (clj->js (:email-settings app)))
     (-> app
         (update-in [:email-settings :user-notifications] merge form-data))))

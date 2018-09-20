@@ -26,14 +26,13 @@
       :use-label-width?     true
       :checkbox-group-style {:display "flex" :flex-wrap "wrap"}}
      )
-   (form/group
+   #_ (form/group
      {:label   ""
       :card?   false
       :columns 3
       :layout  :row}
      {:name ::user-notifications/service-changed-6-months-ago
-      :type :checkbox}
-     )])
+      :type :checkbox})])
 
 (defn- form-options [e!]
   {:name->label (tr-key [:field-labels :email-notification-settings])
