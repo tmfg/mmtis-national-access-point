@@ -41,7 +41,7 @@
       [icon]
       [:div (use-style style/change-icon-value) label]])])
 
-(def change-keys #{:added-routes :removed-routes :changed-routes :changes?})
+(def change-keys #{:added-routes :removed-routes :changed-routes :changes? :interfaces-has-errors? :no-interfaces?})
 
 (defn cap-number [n]
   [:div (use-style style/change-icon-value)
@@ -80,10 +80,20 @@
                        :update! #(e! (tc/->SetRegionFilter %))}
     selected-finnish-regions]])
 
-(defn- change-description [{:keys [changes? next-different-week] :as row}]
+(defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? next-different-week] :as row}]
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
     [:span
      (cond
+       interfaces-has-errors?
+       [:div
+        [ic/alert-error {:color "CC0000"}]
+        [:div (use-style style/change-icon-value)
+         "Virheitä rajapinnoissa"]]
+       no-interfaces?
+       [:div
+        [ic/alert-warning {:color "CCCC00"}]
+        [:div (use-style style/change-icon-value)
+         "Ei rajapintoja"]]
        (not changes?)
        [:div
         [ic/navigation-check]

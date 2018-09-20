@@ -21,6 +21,13 @@ SELECT ts.id AS "transport-service-id",
        "date",
        "change-date" - CURRENT_DATE AS "days-until-change",
        ("change-date" IS NOT NULL) AS "changes?",
+       EXISTS(SELECT id
+                FROM "external-interface-description" eid
+               WHERE eid."transport-service-id" = ts.id
+                 AND ("gtfs-db-error" IS NOT NULL OR "gtfs-import-error" IS NOT NULL)) AS "interfaces-has-errors?",
+       NOT EXISTS(SELECT id
+                    FROM "external-interface-description" eid
+                   WHERE eid."transport-service-id" = ts.id) AS "no-interfaces?",
        (SELECT string_agg(fr, ',')
           FROM gtfs_package p
           JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
@@ -30,4 +37,4 @@ SELECT ts.id AS "transport-service-id",
   LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
  WHERE 'road' = ANY(ts."transport-type")
    AND 'schedule' = ts."sub-type"
- ORDER BY "change-date" ASC;
+ ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC;
