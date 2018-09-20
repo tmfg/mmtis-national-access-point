@@ -6,12 +6,19 @@ SELECT "change-date",
  WHERE "transport-operator-id" = :operator-id;
 
 -- name: upcoming-changes
+WITH latest_transit_changes AS (
+  SELECT DISTINCT ON ("transport-service-id") *
+    FROM "gtfs-transit-changes"
+   WHERE "change-date" >= CURRENT_DATE
+   ORDER BY "transport-service-id", date desc
+)
 SELECT ts.id AS "transport-service-id",
        ts.name AS "transport-service-name",
        op.name AS "transport-operator-name",
        "added-routes", "removed-routes", "changed-routes",
        CURRENT_DATE as "current-date",
        "change-date",
+       "date",
        "change-date" - CURRENT_DATE AS "days-until-change",
        ("change-date" IS NOT NULL) AS "changes?",
        (SELECT string_agg(fr, ',')
@@ -20,18 +27,7 @@ SELECT ts.id AS "transport-service-id",
          WHERE id = ANY(c."package-ids")) AS "finnish-regions"
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
-  LEFT JOIN "gtfs-transit-changes" c ON (c."transport-service-id" = ts.id AND date = CURRENT_DATE)
+  LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
+ WHERE 'road' = ANY(ts."transport-type")
+   AND 'schedule' = ts."sub-type"
  ORDER BY "change-date" ASC;
-
--- name: vanha
-SELECT c."transport-service-id",
-       ts.name AS "transport-service-name",
-       op.name AS "transport-operator-name",
-       "added-routes", "removed-routes", "changed-routes",
-       CURRENT_DATE as "current-date",
-       "change-date",
-       "change-date" - CURRENT_DATE AS "days-until-change"
-  FROM "gtfs-transit-changes" c
-  JOIN "transport-service" ts ON c."transport-service-id" = ts.id
-  JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
- WHERE date = CURRENT_DATE;

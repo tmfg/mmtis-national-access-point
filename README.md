@@ -18,4 +18,12 @@ Directories:
 * `database` contains migrations and test data to setup the OTE database
 
 
+## Architecture
+
+Here is a overview of our AWS production architecture. CI and other development related parts are not included.
+
+![AWS Architecture Overview](./docs/images/aws_architecture_overview.png)
+
+
+
 <a href="https://www.browserstack.com" target="_blank" rel="noopener noreferrer"><img src="./Browserstack-logo.svg" width="200"></a>

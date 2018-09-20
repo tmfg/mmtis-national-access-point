@@ -4,6 +4,7 @@
             [ote.app.routes :as routes]
             [cljs-time.core :as t]
             [cljs-time.format :as tf]
+            [cljs-time.coerce :as tc]
             [ote.time :as time]
             [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
@@ -115,10 +116,11 @@
          :changes (:changes response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
-  {}
+  {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/" service-id "/" date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse)})
-  app)
+  {:loading? true})
+
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->LoadServiceChangesForDate (:service-id params) (:date params)))
 
@@ -147,7 +149,7 @@
 
 (defn combine-trips [{:keys [date1-trips date2-trips] :as compare}]
   (if (and date1-trips date2-trips)
-    (when-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+    (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
       (let [first-common-stop
             #(assoc %
                     :first-common-stop first-common-stop
@@ -160,7 +162,10 @@
         (assoc compare :combined-trips
                (mapv (fn [[l r]]
                        [l r (transit-changes/trip-stop-differences l r)])
-                     combined-trips))))
+                     combined-trips)))
+
+      ;; Can't find common stop
+      (assoc compare :combined-trips nil))
 
     ;; Both dates not fetched, don't try to calculate
     (assoc compare :combined-trips nil)))
@@ -247,7 +252,12 @@
 
 (define-event SelectRouteForDisplay [route]
   {}
-  (let [service-id (get-in app [:params :service-id])]
+  (let [service-id (get-in app [:params :service-id])
+        current-week-date (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+        ;; Use dates in route, or default to current week date and 7 days after that.
+        date1 (or (:gtfs/current-week-date route) current-week-date)
+        date2 (or (:gtfs/different-week-date route)
+                  (time/days-from (tc/from-date current-week-date) 7))]
     (comm/get! (str "transit-visualization/" service-id "/route/"
                     (url-util/encode-url-component (:gtfs/route-short-name route)) "/"
                     (url-util/encode-url-component (:gtfs/route-long-name route)) "/"
@@ -259,12 +269,14 @@
         (update-in [:transit-visualization] dissoc :date->hash :hash->color)
         (update-in [:transit-visualization :compare] fetch-routes-for-dates
                    service-id route
-                   (:gtfs/current-week-date route)
-                   (:gtfs/different-week-date route))
+                   date1 date2)
         (assoc-in [:transit-visualization :compare :differences]
                   (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
                                        :gtfs/trip-stop-sequence-changes
-                                       :gtfs/trip-stop-time-changes})))))
+                                       :gtfs/trip-stop-time-changes}))
+        ;; Show next year in calendar, if date2 is in next year.
+        (assoc-in [:transit-visualization :show-next-year?]
+                  (> (time/year date2) (time/year (time/now)))))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}

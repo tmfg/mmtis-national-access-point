@@ -323,7 +323,7 @@ BEGIN
                       ABS(EXTRACT(EPOCH FROM gtfs_trip_stop_departure_time(d1t, first_common_stop)) -
                           EXTRACT(EPOCH FROM gtfs_trip_stop_departure_time(d2t, first_common_stop))) as timediff
                  FROM unnest(d1_trips) d1t CROSS JOIN unnest(d2_trips) d2t) x
-         WHERE timediff < 1800 -- only consider differences less than 30 minutes
+         WHERE timediff <= 1800 -- only consider differences less than 30 minutes
          ORDER BY timediff ASC
    LOOP
       IF (row."d1-trip")."trip-id" = ANY(d1_trip_ids) AND
@@ -515,7 +515,7 @@ COMMENT ON FUNCTION gtfs_service_route_week_hash(INTEGER,DATE,TEXT,TEXT,TEXT) IS
 E'Fetch the combined hash of the whole week''s days for the given route by date and service.';
 
 
-CREATE FUNCTION gtfs_service_routes(service_id INTEGER)
+CREATE OR REPLACE FUNCTION gtfs_service_routes(service_id INTEGER)
 RETURNS SETOF RECORD
 AS $$
 SELECT r."route-short-name", r."route-long-name", trip."trip-headsign"
@@ -532,10 +532,10 @@ E'Return all routes in packages for the given service. Returns set of (route-sho
 
 CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT) RETURNS INTEGER
 AS $$
-SELECT ((regexp_split_to_array(c.day,'='))[1])::integer - 1
-  FROM (SELECT regexp_split_to_table(weekhash1, ',') AS day) c
-  JOIN (SELECT regexp_split_to_table(weekhash2, ',') AS day) d
-    ON (regexp_split_to_array(c.day,'='))[1] = (regexp_split_to_array(d.day,'='))[1]
+SELECT ((string_to_array(c.day,'='))[1])::integer - 1
+  FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
+  JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
+    ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
  WHERE c.day != d.day
  LIMIT 1;
 $$ LANGUAGE SQL STABLE;
