@@ -9,7 +9,7 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.email-notification-settings :as email-settings]))
 
-(defn select-province [e! email-settings]
+(defn select-province [e! regions]
   [(form/group
      {:label   ""
       :columns 3
@@ -20,7 +20,7 @@
       :name                 ::user-notifications/finnish-regions
       :type                 :checkbox-group
       :show-option          (tr-key [:regions])
-      :options              (map #(:id %) (get email-settings :regions))
+      :options              (map #(:id %) regions)
       :full-width?          true
       :container-class      "col-xs-12 col-sm-12 col-md-12"
       :use-label-width?     true
@@ -44,10 +44,10 @@
      [:p (tr [:email-notification-settings-page :regions-description-text])]
      [form/form
       (form-options e!)
-      (select-province e! (:email-settings state))
+      (select-province e! (get-in state [:email-settings :regions]))
       form-data]]))
 
 (defn email-notification-settings [e! state]
-  (if (and (not (get-in state [:email-settings :regions-loading])) (not (get-in state [:email-settings :user-notifications-loading])))
+  (if (not (get-in state [:email-settings :regions-loading]))
     [email-notification-settings-form e! state]
     [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]))
