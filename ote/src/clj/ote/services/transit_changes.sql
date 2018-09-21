@@ -40,4 +40,4 @@ SELECT ts.id AS "transport-service-id",
   LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
  WHERE 'road' = ANY(ts."transport-type")
    AND 'schedule' = ts."sub-type"
- ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC;
+ ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
