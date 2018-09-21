@@ -9,7 +9,7 @@ SELECT "change-date",
 WITH latest_transit_changes AS (
   SELECT DISTINCT ON ("transport-service-id") *
     FROM "gtfs-transit-changes"
-   WHERE "change-date" >= CURRENT_DATE
+   WHERE ("change-date" IS NULL OR "change-date" >= CURRENT_DATE)
    ORDER BY "transport-service-id", date desc
 )
 SELECT ts.id AS "transport-service-id",
