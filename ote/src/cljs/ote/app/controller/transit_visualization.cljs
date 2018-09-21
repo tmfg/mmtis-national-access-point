@@ -253,7 +253,8 @@
 (define-event SelectRouteForDisplay [route]
   {}
   (let [service-id (get-in app [:params :service-id])
-        current-week-date (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+        current-week-date (or (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+                              (t/now))
         ;; Use dates in route, or default to current week date and 7 days after that.
         date1 (or (:gtfs/current-week-date route) current-week-date)
         date2 (or (:gtfs/different-week-date route)
