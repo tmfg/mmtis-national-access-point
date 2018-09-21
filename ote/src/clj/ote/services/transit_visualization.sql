@@ -146,9 +146,9 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
           JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
           -- Join unnested per route hashes
           JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
-         WHERE rh."route-short-name" = :route-short-name
-           AND rh."route-long-name" = :route-long-name
-           AND rh."trip-headsign" = :trip-headsign) x
+         WHERE COALESCE(rh."route-short-name", '') = COALESCE(:route-short-name::VARCHAR, '')
+           AND COALESCE(rh."route-long-name", '') = COALESCE(:route-long-name::VARCHAR, '')
+           AND COALESCE(rh."trip-headsign", '') = COALESCE(:trip-headsign::VARCHAR, '')) x
  GROUP BY x.date;
 
 -- name: fetch-service-info
