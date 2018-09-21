@@ -26,5 +26,5 @@ SELECT id, "pre-notice-type", "route-description", created, modified, descriptio
   FROM "pre_notice" n
  WHERE "pre-notice-state" = 'sent'
    AND sent IS NOT NULL
-   AND ((:regions::int[])[1] IS NULL OR (:regions::int[])[1] = ANY(n.regions::integer[]))
+   AND ((:regions::int[])[1] IS NULL OR (:regions::int[]) && n.regions::integer[])
    AND (sent > (current_timestamp - :interval::interval));
