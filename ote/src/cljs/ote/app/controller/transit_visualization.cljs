@@ -196,9 +196,9 @@
   (doseq [date [date1 date2]
           :let [params (merge {:date (time/format-date-iso-8601 date)}
                               (when-let [short (:gtfs/route-short-name route)]
-                                {:short short})
+                                {:short-name short})
                               (when-let [long (:gtfs/route-long-name route)]
-                                {:long long})
+                                {:long-name long})
                               (when-let [headsign (:gtfs/trip-headsign route)]
                                 {:headsign headsign}))]
           :when date]
@@ -238,9 +238,9 @@
                          {:date1 (time/format-date-iso-8601 (:date1 compare))
                           :date2 (time/format-date-iso-8601 (:date2 compare))}
                          (when-let [short (:gtfs/route-short-name route)]
-                           {:short short})
+                           {:short-name short})
                          (when-let [long (:gtfs/route-long-name route)]
-                           {:long long})
+                           {:long-name long})
                          (when-let [headsign (:gtfs/trip-headsign route)]
                            {:headsign headsign}))
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
@@ -258,11 +258,15 @@
         date1 (or (:gtfs/current-week-date route) current-week-date)
         date2 (or (:gtfs/different-week-date route)
                   (time/days-from (tc/from-date current-week-date) 7))]
-    (comm/get! (str "transit-visualization/" service-id "/route/"
-                    (url-util/encode-url-component (:gtfs/route-short-name route)) "/"
-                    (url-util/encode-url-component (:gtfs/route-long-name route)) "/"
-                    (url-util/encode-url-component (:gtfs/trip-headsign route)))
-               {:on-success (tuck/send-async! ->RouteResponse)})
+    (comm/get! (str "transit-visualization/" service-id "/route")
+               {:params (merge
+                          (when-let [short (:gtfs/route-short-name route)]
+                            {:short-name short})
+                          (when-let [long (:gtfs/route-long-name route)]
+                            {:long-name long})
+                          (when-let [headsign (:gtfs/trip-headsign route)]
+                            {:headsign headsign}))
+                :on-success (tuck/send-async! ->RouteResponse)})
 
     (-> app
         (assoc-in [:transit-visualization :selected-route] route)
