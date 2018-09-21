@@ -10,22 +10,27 @@
 
 (declare ->LoadData ->RegionsResponse ->UserNotificationsResponse ->UpdateSettings)
 
+;; On Navigate to :email-settings -> load data
 (defmethod routes/on-navigate-event :email-settings [_ app]
   (->LoadData))
 
-(defn load-email-notifications-from-server! []
-  (comm/get! "pre-notices/regions"
-             {:on-success (tuck/send-async! ->RegionsResponse)
-              :on-failure (tuck/send-async! ->ServerError)}))
+(defn fill-selected-regions
+  "Fill selected regions if no settings saved"
+  [response]
+    (if (get-in response [:email-settings :user-notifications :ote.db.user-notifications/created-by])
+      ;; User have saved settings - so no need to do anything
+      response
+      ;; No settings in db, so act like all regions are selected
+      (assoc-in response [:email-settings :user-notifications :ote.db.user-notifications/finnish-regions]
+                      (map #(:id %) (get-in response [:email-settings :regions])))))
 
-(defn load-regions-from-server! []
+(defn load-email-notifications-from-server! []
   (comm/get! "settings/email-notifications"
              {:on-success (tuck/send-async! ->UserNotificationsResponse)
               :on-failure (tuck/send-async! ->ServerError)}))
 
 (tuck/define-event LoadData []
                    {:path [:email-settings]}
-                   (load-regions-from-server!)
                    (load-email-notifications-from-server!)
                    (-> app
                        (assoc :regions-loading true)
@@ -36,7 +41,6 @@
   (map #(keyword %) x))
 
 ;; Create new route
-(defrecord RegionsResponse [response])
 (defrecord UserNotificationsResponse [response])
 (defrecord SaveEmailNotificationSettings [])
 (defrecord UpdateSettings [form-data])
@@ -45,18 +49,13 @@
 
 (extend-protocol tuck/Event
 
-  RegionsResponse
-  (process-event [{response :response} app]
-    (-> app
-        (assoc-in [:email-settings :regions] response)
-        (assoc-in [:email-settings :regions-loading] false)))
-
-
   UserNotificationsResponse
   (process-event [{response :response} app]
-    (-> app
-        (assoc-in [:email-settings :user-notifications] response)
-        (assoc-in [:email-settings :user-notifications-loading] false)))
+    (let [r (fill-selected-regions response)]
+      (-> app
+        (assoc-in [:email-settings :regions] (get-in r [:email-settings :regions]))
+        (assoc-in [:email-settings :user-notifications] (get-in r [:email-settings :user-notifications]))
+        (assoc-in [:email-settings :regions-loading] false))))
 
   SaveEmailNotificationSettings
   (process-event [_ app]
