@@ -48,7 +48,7 @@
         (is (= to "admin@napoteadmin123.com"))
         (is (= subject "NAP - Reset your password"))
         (is (str/includes? body "admin"))
-        (is (str/includes? body "#reset-password?key="))))))
+        (is (str/includes? body "#/reset-password?key="))))))
 
 (deftest password-reset-request-for-unknown-user
   (let [response (http-post "request-password-reset" {:email "heps@kukkuu"
