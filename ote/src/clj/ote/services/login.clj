@@ -19,7 +19,10 @@
             [ote.db.modification :as modification]
             [ote.localization :as localization :refer [tr]]
             [ote.email :as email]
-            [ote.environment :as env])
+            [ote.environment :as env]
+            [specql.op :as op]
+            [clj-time.core :as t]
+            [clj-time.coerce :as tc])
   (:import (java.util UUID Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
@@ -227,8 +230,10 @@
                   :subject (tr [:email-templates :password-reset :subject])
                   :body (tr [:email-templates :password-reset :body]
                             {:name (:name user)
-                             :reset-link (str (env/base-url) "#reset-password?key="
-                                              (::user/reset-key password-reset-request))})})))
+                             :reset-link (str " " (env/base-url) "#reset-password?key="
+                                              (::user/reset-key password-reset-request)
+                                              "&id="
+                                              (:id user) " ")})})))
 
 (defn request-password-reset [db email form-data]
   (try
@@ -239,6 +244,36 @@
   ;; Always send :ok back, no matter what
   :ok)
 
+(defn reset-password! [db reset-request new-password]
+  (log/info "Reset password:" reset-request)
+  (specql/update! db ::user/user
+                  {::user/password (buddy->passlib (encrypt new-password))}
+                  {::user/id (::modification/created-by reset-request)})
+  (specql/update! db ::user/password-reset-request
+                  {::user/used (java.util.Date.)}
+                  {::user/request-id (::user/request-id reset-request)}))
+
+(defn reset-password [db {:keys [id key new-password] :as form-data}]
+  (if-not (user/password-valid? new-password)
+    {:success false :error :invalid-new-password}
+    (with-transaction db
+      (if-let [reset-request (first
+                              (specql/fetch db ::user/password-reset-request
+                                            (specql/columns ::user/password-reset-request)
+                                            {::modification/created-by id
+                                             ;; Only consider requests created within 1 hour
+                                             ::modification/created (op/>= (tc/to-sql-date (t/minus (t/now)
+                                                                                                    (t/hours 1))))
+                                             ;; that have not been used yet
+                                             ::user/used op/null?}))]
+        ;; Found a valid password reset request
+        (do (reset-password! db reset-request new-password)
+            {:success true})
+
+        ;; No valid password reset request
+        (do
+          (log/warn "Invalid password reset request, user: " id ", key: " key)
+          {:success false :error :password-reset-request-not-found})))))
 
 (define-service-component LoginService
   {:fields [auth-tkt-config]
@@ -269,4 +304,8 @@
 
   ^{:unauthenticated true :format :transit}
   (POST "/request-password-reset" {form-data :body}
-        (request-password-reset db email (http/transit-request form-data))))
+        (request-password-reset db email (http/transit-request form-data)))
+
+  ^{:unauthenticated true :format :transit}
+  (POST "/reset-password" {form-data :body}
+        (reset-password db (http/transit-request form-data))))
