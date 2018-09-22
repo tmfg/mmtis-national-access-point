@@ -49,3 +49,10 @@
         (is (= subject "NAP - Reset your password"))
         (is (str/includes? body "admin"))
         (is (str/includes? body "#reset-password?key="))))))
+
+(deftest password-reset-for-unknown-user
+  (let [response (http-post "request-password-reset" {:email "heps@kukkuu"
+                                                      :language "en"})
+        outbox @ote.test/outbox]
+    (is (= :ok (:transit response)))
+    (is (empty? outbox))))
