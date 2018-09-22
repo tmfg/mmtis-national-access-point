@@ -11,14 +11,14 @@
             [hiccup.core :refer [html]]
             [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
-            [ote.email :refer [send-email]]
             [ote.db.tx :as tx]
             [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
             [ote.nap.users :as nap-users]
             [ote.tasks.util :refer [daily-at]]
-            [ote.util.db :as db-util])
+            [ote.util.db :as db-util]
+            [ote.email :as email])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
@@ -109,7 +109,7 @@
     (catch Exception e
       (log/warn "Error while generating notification html for regions: " regions " ERROR: " e ))))
 
-(defn send-notification! [db {server-opts :server msg-opts :msg :as email-opts}]
+(defn send-notification! [db email]
   (log/info "Starting pre-notices notification task...")
 
   (lock/try-with-lock
@@ -124,13 +124,12 @@
                  (if notification
                    (do
                      (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
-                     (send-email
-                       server-opts
-                       {:bcc     (:email u)
-                        :from    (or (:from msg-opts) "NAP")
-                        :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                      (datetime-string (t/now) timezone))
-                        :body    [{:type "text/html;charset=utf-8" :content notification}]}))
+                     (email/send!
+                      email
+                      {:to (:email u)
+                       :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                     (datetime-string (t/now) timezone))
+                       :body [{:type "text/html;charset=utf-8" :content notification}]}))
                    (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
              ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
@@ -139,18 +138,18 @@
                (log/warn "Error while sending a notification" e))))))))
 
 
-(defrecord PreNoticesTasks [email-config]
+(defrecord PreNoticesTasks []
   component/Lifecycle
-  (start [{db :db :as this}]
+  (start [{db :db email :email :as this}]
     (assoc this
            ::stop-tasks [(chime-at (daily-at 8 15)
                                    (fn [_]
-                                     (#'send-notification! db email-config)))]))
+                                     (#'send-notification! db email)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks
-  [email-config]
-  (->PreNoticesTasks email-config))
+  []
+  (->PreNoticesTasks))
