@@ -18,6 +18,7 @@
 (defrecord LogoutResponse [response])
 (defrecord LogoutFailed [response])
 
+
 (defn unauthenticated
   "Init session without user."
   [app]
@@ -204,3 +205,25 @@
           :username-taken
           :email-taken
           :password-incorrect?))
+
+
+(define-event UpdateResetPasswordForm [form-data]
+  {:path [:reset-password]}
+  form-data)
+
+(define-event ResetPasswordResponse [response]
+  {}
+  (if (:success? response)
+    (do (routes/navigate! :login)
+        (dissoc app :reset-password))
+    (assoc-in app [:reset-password :error] (:error response))))
+
+(define-event ResetPassword []
+  {}
+  (let [payload {:key (get-in app [:query :key])
+                 :id (get-in app [:query :id])
+                 :new-password (get-in app [:reset-password :new-password])}]
+    (comm/post! "reset-password" payload
+                {:on-success (tuck/send-async! ->ResetPasswordResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    app))

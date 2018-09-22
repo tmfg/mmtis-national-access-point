@@ -130,6 +130,7 @@
 
                 (case (:page app)
                   :login [login/login e! (:login app)]
+                  :reset-password [login/reset-password e! (:reset-password app)]
                   :register [register/register e! (:register app) (:user app)]
                   :user [user/user e! (:user app)]
                   :front-page [fp/front-page e! app]

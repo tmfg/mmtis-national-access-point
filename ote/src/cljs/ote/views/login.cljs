@@ -10,7 +10,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :refer [linkify]]))
+            [ote.ui.common :refer [linkify]]
+            [ote.db.user :as user]))
 
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
@@ -61,3 +62,29 @@
   [:div.col-xs-12.col-md-6
    [login-form e! login]
    [login-action-cards e!]])
+
+(defn reset-password [e! {:keys [new-password confirm] :as form-data}]
+  [:div.reset-password
+   [:h1 (tr [:reset-password :label])]
+   [form/form {:name->label (tr-key [:register :fields])
+               :update! #(e! (lc/->UpdateResetPasswordForm %))
+               :footer-fn (fn [data]
+                            [:span.login-dialog-footer
+                             [ui/raised-button {:primary true
+                                                :disabled (or (not= new-password confirm)
+                                                              (not (user/password-valid? new-password)))
+                                                :on-click #(e! (lc/->ResetPassword))
+                                                :label (tr [:register :change-password])}]])}
+    [(form/group
+      {:expandable? false :columns 3 :layout :raw :card? false}
+      {:name :new-password
+       :autocomplete "password"
+       :type :string
+       :password? true
+       :full-width? true}
+      {:name :confirm
+       :autocomplete "password"
+       :type :string
+       :password? true
+       :full-width? true})]
+    form-data]])
