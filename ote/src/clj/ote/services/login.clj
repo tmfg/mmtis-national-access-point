@@ -230,7 +230,7 @@
                   :subject (tr [:email-templates :password-reset :subject])
                   :body (tr [:email-templates :password-reset :body]
                             {:name (:name user)
-                             :reset-link (str " " (env/base-url) "#reset-password?key="
+                             :reset-link (str " " (env/base-url) "#/reset-password?key="
                                               (::user/reset-key password-reset-request)
                                               "&id="
                                               (:id user) " ")})})))
@@ -255,7 +255,7 @@
 
 (defn reset-password [db {:keys [id key new-password] :as form-data}]
   (if-not (user/password-valid? new-password)
-    {:success false :error :invalid-new-password}
+    {:success? false :error :invalid-new-password}
     (with-transaction db
       (if-let [reset-request (first
                               (specql/fetch db ::user/password-reset-request
@@ -268,12 +268,12 @@
                                              ::user/used op/null?}))]
         ;; Found a valid password reset request
         (do (reset-password! db reset-request new-password)
-            {:success true})
+            {:success? true})
 
         ;; No valid password reset request
         (do
           (log/warn "Invalid password reset request, user: " id ", key: " key)
-          {:success false :error :password-reset-request-not-found})))))
+          {:success? false :error :password-reset-request-not-found})))))
 
 (define-service-component LoginService
   {:fields [auth-tkt-config]
