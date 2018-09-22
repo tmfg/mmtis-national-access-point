@@ -1282,6 +1282,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :confirm-changes "Varmista muutokset"
   :change-password "Vaihda salasana"}
 
+ :reset-password
+ {:label "Salasanan vaihto"}
+
   :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
 

@@ -1268,6 +1268,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :confirm-changes "Confirm changes"
   :change-password "Change password"}
 
+ :reset-password
+ {:label "Reset your password"}
+
  :gtfs-viewer
  {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}
 
