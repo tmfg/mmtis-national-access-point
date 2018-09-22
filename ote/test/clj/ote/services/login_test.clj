@@ -74,7 +74,7 @@
 
         (testing "Perform password reset"
           (let [old-pw-hash (pw-hash)]
-            (is (= {:success true}
+            (is (= {:success? true}
                    (:transit (http-post "reset-password"
                                         {:key key :id id :new-password new-password}))))
             (let [new-pw-hash (pw-hash)]
