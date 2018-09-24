@@ -135,7 +135,7 @@
 
 (defn pre-notices-listing [e! pre-notices]
   (if (= :loading pre-notices)
-    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+    [common/loading-spinner]
     [:div
      [:div.row
       [:div.col-xs-12.col-sm-12.col-md-12

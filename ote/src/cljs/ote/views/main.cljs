@@ -85,7 +85,7 @@
 
              [:span
               (if (not loaded?)
-                [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+                [common/loading-spinner]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}

@@ -321,5 +321,5 @@
 
 (defn edit-pre-notice-by-id [e! {:keys [pre-notice] :as app}]
   (if (or (nil? pre-notice) (:loading pre-notice))
-    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+    [common/loading-spinner]
     [pre-notice-form e! app]))

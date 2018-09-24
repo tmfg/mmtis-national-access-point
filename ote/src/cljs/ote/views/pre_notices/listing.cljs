@@ -13,7 +13,8 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.time :as time]
             [clojure.string :as str]
-            [ote.app.controller.front-page :as fp]))
+            [ote.app.controller.front-page :as fp]
+            [ote.ui.common :as common]))
 
 (defn pre-notice-type->str
   [types]
@@ -62,7 +63,7 @@
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]
   (if (= :loading pre-notices)
-    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+    [common/loading-spinner]
     (let [pre-notices (filter #(= (::t-operator/id transport-operator)
                                   (::t-operator/id %))
                               pre-notices)]
