@@ -234,7 +234,7 @@
 (defn route-updated
   "Call this fn when sea-route app-state changes to inform user that when leaving the from, there are unsaved changes."
   [app-state]
-  (assoc app-state :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))
+  (assoc app-state :before-unload-message [:dialog :navigation-prompt :unsaved-data]))
 
 (defn valid-calendar-rule? [{::transit/keys [from-date to-date]}]
   (and (time/valid-date? from-date)

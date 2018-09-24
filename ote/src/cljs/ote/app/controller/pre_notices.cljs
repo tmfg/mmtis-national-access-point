@@ -142,19 +142,19 @@
           (assoc
             :transport-operator (:transport-operator selected-operator)
             :transport-service-vector (:transport-service-vector selected-operator)
-            :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
+            :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
 
   EditSingleFormElement
   (process-event [{element :element data :data} app]
     (-> app
         (assoc-in [:pre-notice element] data)
-        (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
+        (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 
   EditForm
   (process-event [{form-data :form-data} app]
     (-> app
         (update :pre-notice merge form-data)
-        (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
+        (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 
   OpenSendModal
   (process-event [_ app]
@@ -228,7 +228,7 @@
     (load-region-geojson (:pre-notice app) region-ids)
     (-> app
         (assoc-in [:pre-notice ::transit/regions] region-ids)
-        (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
+        (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
 
 (define-event ShowPreNoticeResponse [response]
   {:path [:pre-notice-dialog]}
@@ -267,7 +267,7 @@
   (-> app
       (update-in [:pre-notice :attachments]
                  #(conj (or (vec (butlast %)) []) response))
-      (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
+      (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 
 (define-event UploadAttachment [input]
   {}
@@ -290,7 +290,7 @@
       (update-in [:pre-notice :attachments]
                  #(vec (concat (take row-index %)
                                (drop (inc row-index) %))))
-      (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data]))))
+      (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 
 (defn load-regions-from-server []
   (comm/get! "pre-notices/regions"

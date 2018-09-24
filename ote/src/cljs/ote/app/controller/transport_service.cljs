@@ -450,7 +450,7 @@
     (let [key (t-service/service-key-by-type (::t-service/type ts))]
       (-> app
           (update-in [:transport-service key] merge form-data)
-          (assoc :before-unload-message (tr [:dialog :navigation-prompt :unsaved-data])))))
+          (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
 
   CancelTransportServiceForm
   (process-event [_ app]
