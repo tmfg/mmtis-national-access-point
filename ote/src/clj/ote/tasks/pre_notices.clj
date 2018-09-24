@@ -115,9 +115,6 @@
 
   (lock/try-with-lock
     db "pre-notice-email" 300
-    ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
-    ;; same time. Using sleep, we can't exceed that limit.
-    (with-throttle-ms 200
       (localization/with-language
         "fi"
         (tx/with-transaction db
@@ -128,18 +125,21 @@
                    (if notification
                      (do
                        (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
-                       (email/send!
-                         email
-                         {:to      (:email u)
-                          :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                        (datetime-string (t/now) timezone))
-                          :body    [{:type "text/html;charset=utf-8" :content notification}]}))
+                       ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
+                       ;; same time. Using sleep, we can't exceed that limit.
+                       (with-throttle-ms 200
+                         (email/send!
+                           email
+                           {:to      (:email u)
+                            :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                          (datetime-string (t/now) timezone))
+                            :body    [{:type "text/html;charset=utf-8" :content notification}]})))
                      (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
                ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
                (Thread/sleep 5000)
                (catch Exception e
-                 (log/warn "Error while sending a notification" e)))))))))
+                 (log/warn "Error while sending a notification" e))))))))
 
 
 (defrecord PreNoticesTasks []
