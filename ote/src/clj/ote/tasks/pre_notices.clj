@@ -124,6 +124,9 @@
                  (if notification
                    (do
                      (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
+                     ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
+                     ;; same time. Using sleep, we can't exceed that limit.
+                     (Thread/sleep 200)
                      (send-email
                        server-opts
                        {:bcc     (:email u)
