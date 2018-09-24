@@ -81,8 +81,7 @@
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (fp-controller/->OpenLangMenu))
-                                  (e! (fp-controller/->SetLanguage lang)))
-                     })
+                                  (e! (fp-controller/->SetLanguage lang)))})
                (str (str/upper-case lang) " - " flag)]]))]]]]]))
 
 (defn- user-menu [e! app]
