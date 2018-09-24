@@ -22,7 +22,8 @@
             [ote.environment :as env]
             [specql.op :as op]
             [clj-time.core :as t]
-            [clj-time.coerce :as tc])
+            [clj-time.coerce :as tc]
+            [ote.util.throttle :refer [with-throttle-ms]])
   (:import (java.util UUID Base64 Base64$Decoder)))
 
 (defqueries "ote/services/login.sql")
@@ -236,13 +237,14 @@
                                               (:id user) " ")})})))
 
 (defn request-password-reset [db email form-data]
-  (try
-    (when-let [reset-request (request-password-reset! db form-data)]
-      (send-password-reset-email email reset-request (:language form-data)))
-    (catch Exception e
-      (log/error e "Unable to send password reset email")))
-  ;; Always send :ok back, no matter what
-  :ok)
+  (with-throttle-ms 1000 ; always take 1sec to prevent spamming requests
+    (try
+      (when-let [reset-request (request-password-reset! db form-data)]
+        (send-password-reset-email email reset-request (:language form-data)))
+      (catch Exception e
+        (log/error e "Unable to send password reset email")))
+    ;; Always send :ok back, no matter what
+    :ok))
 
 (defn reset-password! [db reset-request new-password]
   (log/info "Reset password:" reset-request)
