@@ -20,7 +20,7 @@
 (defrecord CloseHeaderMenus [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
-(defrecord ForceUpdateAll [app])
+(defrecord ForceUpdateAll [app scroll-y])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -158,21 +158,22 @@
 
   SetLanguage
   (process-event [{lang :lang} app]
-    (let [force-update-all (tuck/send-async! ->ForceUpdateAll)]
+    (let [force-update-all (tuck/send-async! ->ForceUpdateAll app js/window.scrollY)]
       (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
       (r/after-render
        #(localization/load-language! lang
                                      (fn [lang _]
                                        (reset! localization/selected-language lang)
                                        ;; Reset app state to re-render everything
-                                       (force-update-all app)))))
+                                       (force-update-all)))))
     ;; Return empty app state, until new language has been fetched
     ;; Just calling (r/force-update-all) is not enough because some components
     ;; implement component should update.
     nil)
 
   ForceUpdateAll
-  (process-event [{app :app} _]
+  (process-event [{app :app scroll-y :scroll-y} _]
+    (r/after-render #(.scrollTo js/window 0 scroll-y))
     app)
 
   ClearFlashMessage
