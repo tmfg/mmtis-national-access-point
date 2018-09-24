@@ -57,17 +57,26 @@
     (is (= :ok (:transit response)))
     (is (empty? outbox))))
 
+(defn pw-hash []
+  (first (ote.test/sql-query "SELECT password FROM \"user\" WHERE name='normaluser'")))
+
+(defn extract-key-and-id []
+  (let [body (:body (first @ote.test/outbox))
+        [_ key id] (when body
+                     (re-matches #"(?is).*reset-password\?key=([^&]+)&id=([^ ]+).*"
+                                 body))]
+    {:key key
+     :id id}))
+
 (deftest password-reset
   (testing "Full password reset process and login"
-    (let [pw-hash #(first (ote.test/sql-query "SELECT password FROM \"user\" WHERE name='normaluser'"))
-          new-password (str "newpass" (System/currentTimeMillis))]
+    (let [new-password (str "newpass" (System/currentTimeMillis))]
       (testing "Password reset request"
         (is (= :ok (:transit (http-post "request-password-reset" {:email "user.userson@example.com"
                                                                   :language "en"}))))
         (is (= 1 (count @ote.test/outbox))))
 
-      (let [[_ key id] (re-matches #"(?is).*reset-password\?key=([^&]+)&id=([^ ]+).*"
-                                   (:body (first @ote.test/outbox)))]
+      (let [{:keys [key id]} (extract-key-and-id)]
         (testing "Key and id are found in the link email"
           (is key)
           (is id))
@@ -84,3 +93,40 @@
         (let [login-response (http-post "login" {:email "user.userson@example.com"
                                                  :password new-password})]
           (is (:success? (:transit login-response))))))))
+
+(deftest password-reset-for-invalid-code
+
+  ;; Get link
+  (http-post "request-password-reset" {:email "user.userson@example.com" :language "en"})
+  (is (= 1 (count @ote.test/outbox)))
+
+  (let [{:keys [key id]} (extract-key-and-id)]
+    (is key)
+    (is id)
+
+    (let [old-pw-hash (pw-hash)]
+      (is (not (:success? (:transit (http-post "reset-password"
+                                               {:key (str (java.util.UUID/randomUUID))
+                                                :id id
+                                                :new-password "this won't be changed 1"})))))
+      (is (= old-pw-hash (pw-hash)) "password was not changed"))))
+
+(deftest password-reset-for-too-old-code
+  (http-post "request-password-reset" {:email "user.userson@example.com" :language "en"})
+  (is (= 1 (count @ote.test/outbox)))
+
+  (let [{:keys [key id]} (extract-key-and-id)]
+    (is key)
+    (is id)
+
+    (ote.test/sql-execute!
+     "UPDATE \"password-reset-request\" "
+     "   SET created = NOW() - '66 minutes'::interval"
+     " WHERE \"reset-key\" = '" key "'")
+
+    (let [old-pw-hash (pw-hash)]
+      (is (not (:success? (:transit (http-post "reset-password"
+                                               {:key key
+                                                :id id
+                                                :new-password "this won't be changed 2"})))))
+      (is (= old-pw-hash (pw-hash)) "password was not changed"))))
