@@ -18,7 +18,8 @@
             [ote.nap.users :as nap-users]
             [ote.tasks.util :refer [daily-at]]
             [ote.util.db :as db-util]
-            [ote.email :as email])
+            [ote.email :as email]
+            [ote.util.throttle :refer [with-throttle-ms]])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
@@ -114,28 +115,31 @@
 
   (lock/try-with-lock
     db "pre-notice-email" 300
-    (localization/with-language
-      "fi"
-      (tx/with-transaction db
-         (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
-           (try
-             (doseq [u authority-users]
-               (let [notification (user-notification-html db (:finnish-regions u))]
-                 (if notification
-                   (do
-                     (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
-                     (email/send!
-                      email
-                      {:to (:email u)
-                       :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                     (datetime-string (t/now) timezone))
-                       :body [{:type "text/html;charset=utf-8" :content notification}]}))
-                   (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
+      (localization/with-language
+        "fi"
+        (tx/with-transaction db
+           (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
+             (try
+               (doseq [u authority-users]
+                 (let [notification (user-notification-html db (:finnish-regions u))]
+                   (if notification
+                     (do
+                       (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
+                       ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
+                       ;; same time. Using sleep, we can't exceed that limit.
+                       (with-throttle-ms 200
+                         (email/send!
+                           email
+                           {:to      (:email u)
+                            :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                          (datetime-string (t/now) timezone))
+                            :body    [{:type "text/html;charset=utf-8" :content notification}]})))
+                     (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
-             ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
-             (Thread/sleep 5000)
-             (catch Exception e
-               (log/warn "Error while sending a notification" e))))))))
+               ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
+               (Thread/sleep 5000)
+               (catch Exception e
+                 (log/warn "Error while sending a notification" e))))))))
 
 
 (defrecord PreNoticesTasks []
