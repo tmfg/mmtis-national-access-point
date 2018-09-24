@@ -227,3 +227,19 @@
                 {:on-success (tuck/send-async! ->ResetPasswordResponse)
                  :on-failure (tuck/send-async! ->ServerError)})
     app))
+
+(define-event GoToResetPassword []
+  {}
+  (routes/navigate! :reset-password {})
+  app)
+
+(define-event RequestPasswordResetResponse [response email]
+  {:path [:reset-password]}
+  (assoc app :code-sent-for-email email))
+
+(define-event RequestPasswordReset []
+  {:path [:reset-password]}
+  (comm/post! "request-password-reset" {:email (:email app)}
+              {:on-success (tuck/send-async! ->RequestPasswordResetResponse (:email app))
+               :on-failure (tuck/send-async! ->ServerError)})
+  app)

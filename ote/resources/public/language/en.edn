@@ -1269,7 +1269,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :change-password "Change password"}
 
  :reset-password
- {:label "Reset your password"}
+ {:label "Reset your password"
+  :request-button "Request reset"}
 
  :gtfs-viewer
  {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}
@@ -1323,6 +1324,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                           "You have requested your password on NAP to be reset.\n"
                           "Please click the following link to confirm this request:\n"
                           :reset-link
+                          "\nThis link expires in one hour."
                           "\nP.S If you do not manage to reset your password, please contact NAP-HelpDesk,\n"
                           "email joukkoliikenne@liikennevirasto.fi or phone +358 295 34 3434 (Mon-Fri 10am-4pm)."
                           "\n\n------------\n"

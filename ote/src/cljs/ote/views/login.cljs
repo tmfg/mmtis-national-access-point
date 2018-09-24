@@ -6,12 +6,12 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.app.controller.login :as lc]
-            [ote.app.controller.front-page :as fp-controller]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form :as form]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :refer [linkify]]
-            [ote.db.user :as user]))
+            [ote.ui.common :refer [linkify] :as common-ui]
+            [ote.db.user :as user]
+            [clojure.string :as str]))
 
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
@@ -56,14 +56,14 @@
     [linkify "#" (tr [:login :forgot-password-button])
      {:on-click #(do
                    (.preventDefault %)
-                   (e! (fp-controller/->ToggleUserResetDialog)))}]]])
+                   (e! (lc/->GoToResetPassword)))}]]])
 
 (defn login [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.col-xs-12.col-md-6
    [login-form e! login]
    [login-action-cards e!]])
 
-(defn reset-password [e! {:keys [new-password confirm] :as form-data}]
+(defn reset-password-form [e! {:keys [new-password confirm] :as form-data}]
   [:div.reset-password
    [:h1 (tr [:reset-password :label])]
    [form/form {:name->label (tr-key [:register :fields])
@@ -88,3 +88,32 @@
        :password? true
        :full-width? true})]
     form-data]])
+
+(defn reset-password-request-form [e! {:keys [email code-sent-for-email] :as form-data}]
+  [:div.reset-password-request
+   [:h1 (tr [:login :forgot-password?])]
+   [form/form {:update! #(e! (lc/->UpdateResetPasswordForm %))
+               :footer-fn (fn [data]
+                            [:span.login-dialog-footer
+                             [ui/raised-button {:primary true
+                                                :disabled (or (str/blank? email)
+                                                              (= email code-sent-for-email))
+                                                :on-click #(e! (lc/->RequestPasswordReset))
+                                                :label (tr [:register :change-password])}]])}
+    [(form/group
+      {:expandable? false :columns 3 :layout :raw :card? false}
+      {:name :email
+       :label (tr [:field-labels :login :email-or-username])
+       :autocomplete "email"
+       :type :string
+       :full-width? true})]
+    form-data]
+
+   (when-not (str/blank? code-sent-for-email)
+     [:div (stylefy/use-style {:margin-top "1rem"})
+      [common-ui/help (tr [:login :check-email-for-link])]])])
+
+(defn reset-password [e! {:keys [reset-password query] :as app}]
+  (if (contains? query :key)
+    [reset-password-form e! reset-password]
+    [reset-password-request-form e! reset-password]))

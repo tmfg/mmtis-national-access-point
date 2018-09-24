@@ -1283,7 +1283,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :change-password "Vaihda salasana"}
 
  :reset-password
- {:label "Salasanan vaihto"}
+ {:label "Salasanan vaihto"
+  :request-button "Pyydä uudelleenasettamista"}
 
   :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
@@ -1337,6 +1338,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                           "Olette pyytänyt NAP-sovelluksen salasananne uudelleenasettamista.\n"
                           "Voitte vaihtaa salasanan klikkaamalla alla olevaa linkkiä:\n"
                           :reset-link
+                          "\nTämä linkki vanhenee tunnin kuluttua."
                           "\nP.S Mikäli salasanan vaihto ei onnistu, olkaa yhteydessä NAP-HelpDeskiin,\n"
                           "joukkoliikenne@liikennevirasto.fi tai 0295 34 3434 (arkisin 10-16)."
                           "\n\n------------\n"

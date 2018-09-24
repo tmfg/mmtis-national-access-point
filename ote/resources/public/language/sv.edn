@@ -1273,7 +1273,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :change-password "Ändra lösenord"}
 
  :reset-password
- {:label "Återställ ditt lösenord"}
+ {:label "Återställ ditt lösenord"
+  :request-button "Begär återställning"}
 
   :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
@@ -1328,6 +1329,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                           "Du har bett om återställning av ditt lösenord.\n"
                           "Var vänlig klicka på länken nedan för att bekräfta:\n"
                           :reset-link
+                          "\nDen här länken löper ut på en timme"
                           "\nP.S Om inte återställningen av ditt lösenord lyckades ta kontakt med NAP-HelpDesk,\n"
                           "joukkoliikenne@liikennevirasto.fi eller tfn 0295 34 3434 (Mån-Fre kl 10-16)."
                           "\n\n------------\n"
