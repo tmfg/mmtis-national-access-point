@@ -259,3 +259,6 @@
                                          :padding-right "5px"
                                          :color style-base/link-color}]
                 label]])
+
+(defn loading-spinner []
+  [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]])

@@ -4,7 +4,7 @@
   displays a map and data from the geojson file."
   (:require [ote.app.controller.ckan-service-viewer :as v]
             [ote.ui.leaflet :as leaflet]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :as common :refer [linkify]]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-or]]
             [stylefy.core :as stylefy]
@@ -204,9 +204,7 @@
   (e! (v/->StartViewer))
   (fn [e! {:keys [authorized? logged-in? loading? geojson resource] :as app}]
     (if loading?
-
-      [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-
+      [common/loading-spinner]
       [theme e! app
         [:div.transport-service-view
           [:div.row.pull-right

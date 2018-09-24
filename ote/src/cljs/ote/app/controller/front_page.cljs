@@ -5,7 +5,8 @@
             [ote.app.routes :as routes]
             [ote.app.controller.login :as login]
             [ote.app.controller.flags :as flags]
-            [ote.localization :refer [tr]]))
+            [ote.localization :as localization :refer [tr]]
+            [reagent.core :as r]))
 
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
@@ -19,6 +20,7 @@
 (defrecord CloseHeaderMenus [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
+(defrecord ForceUpdateAll [app scroll-y])
 
 (defrecord GetTransportOperator [])
 (defrecord TransportOperatorResponse [response])
@@ -156,8 +158,23 @@
 
   SetLanguage
   (process-event [{lang :lang} app]
-    (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
-    (.reload js/window.location))
+    (let [force-update-all (tuck/send-async! ->ForceUpdateAll app js/window.scrollY)]
+      (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
+      (r/after-render
+       #(localization/load-language! lang
+                                     (fn [lang _]
+                                       (reset! localization/selected-language lang)
+                                       ;; Reset app state to re-render everything
+                                       (force-update-all)))))
+    ;; Return empty app state, until new language has been fetched
+    ;; Just calling (r/force-update-all) is not enough because some components
+    ;; implement component should update.
+    nil)
+
+  ForceUpdateAll
+  (process-event [{app :app scroll-y :scroll-y} _]
+    (r/after-render #(.scrollTo js/window 0 scroll-y))
+    app)
 
   ClearFlashMessage
   (process-event [_ app]

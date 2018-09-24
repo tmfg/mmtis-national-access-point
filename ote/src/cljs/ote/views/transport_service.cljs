@@ -22,7 +22,6 @@
             [ote.ui.common :as ui-common]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
-            [ote.ui.common :as ui-common]
             [reagent.core :as r]))
 
 (def modified-transport-service-types
@@ -115,7 +114,7 @@
 
 (defn edit-service-by-id [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
   (if (or (nil? service) (not loaded?))
-    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+    [ui-common/loading-spinner]
     ;; Render transport service page only if given id matches with the loaded id
     ;; This will prevent page render with "wrong" or "empty" transport-service data
     (when (= (get-in app [:params :id]) (str (get-in app [:transport-service ::t-service/id])))

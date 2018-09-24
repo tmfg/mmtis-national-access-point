@@ -12,7 +12,9 @@
             [ote.views.route.stop-sequence :as route-stop-sequence]
             [ote.views.route.trips :as route-trips]
             [ote.style.base :as style-base]
-            [ote.app.controller.front-page :as fp-controller]))
+            [ote.app.controller.front-page :as fp-controller]
+
+            [ote.ui.common :as common]))
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
@@ -56,7 +58,7 @@
 
 (defn edit-route-by-id [e! {route :route :as app}]
   (if (or (nil? route) (:loading? route))
-    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
+    [common/loading-spinner]
     [:span
      [form-container e! app]
      [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}

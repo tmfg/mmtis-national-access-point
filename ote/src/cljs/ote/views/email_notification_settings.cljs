@@ -7,7 +7,8 @@
             [ote.localization :refer [tr tr-key]]
             [reagent.core :as r]
             [ote.ui.buttons :as buttons]
-            [ote.app.controller.email-notification-settings :as email-settings]))
+            [ote.app.controller.email-notification-settings :as email-settings]
+            [ote.ui.common :as common]))
 
 (defn select-province [e! regions]
   [(form/group
@@ -50,4 +51,4 @@
 (defn email-notification-settings [e! state]
   (if (not (get-in state [:email-settings :regions-loading]))
     [email-notification-settings-form e! state]
-    [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]))
+    [common/loading-spinner]))

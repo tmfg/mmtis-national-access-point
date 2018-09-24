@@ -47,7 +47,11 @@
     {:component-will-mount
      #(set! (.-onbeforeunload js/window)
             (fn [evt]
-              (let [{:keys [before-unload-message navigation-prompt-open?]} @state]
+              (let [{:keys [before-unload-message navigation-prompt-open?]} @state
+                    before-unload-message (if (vector? before-unload-message)
+                                            ;; If message is a translation path, translate it now
+                                            (tr before-unload-message)
+                                            before-unload-message)]
                 ;; Don't show browser's onbeforeunload dialog if internal
                 ;; prompt dialog is already open
 
@@ -72,7 +76,10 @@
                (select-keys app [:before-unload-message :navigation-prompt-open?])))}))
 
 (defn navigation-prompt [e! msg confirm]
-  (let [tr (tr-key [:dialog :navigation-prompt])]
+  (let [msg (if (vector? msg)
+              (tr msg)
+              msg)
+        tr (tr-key [:dialog :navigation-prompt])]
     [ui/dialog {:title (tr :title)
                 :modal true
                 :open true

@@ -78,75 +78,77 @@
             wide? (boolean (wide-pages (:page app)))]
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
-          [:div.ote-sovellus
-           [top-nav e! app is-scrolled? desktop?]
+          (if (nil? app)
+            [common/loading-spinner]
+            [:div.ote-sovellus
+             [top-nav e! app is-scrolled? desktop?]
 
-           [:span
-            (if (not loaded?)
-              [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
-              [(if wide? :div :div.wrapper)
-               (if wide?
-                 {}
-                 (stylefy/use-style (merge
-                                     {:transition "margin-top 300ms ease"}
-                                     (if (or (not desktop?) @is-scrolled?)
-                                       {:margin-top "56px"}))))
-               [:div (cond
-                       (= :front-page (:page app))
-                       {:class "container-fluid"}
+             [:span
+              (if (not loaded?)
+                [common/loading-spinner]
+                [(if wide? :div :div.wrapper)
+                 (if wide?
+                   {}
+                   (stylefy/use-style (merge
+                                       {:transition "margin-top 300ms ease"}
+                                       (if (or (not desktop?) @is-scrolled?)
+                                         {:margin-top "56px"}))))
+                 [:div (cond
+                         (= :front-page (:page app))
+                         {:class "container-fluid"}
 
-                       wide?
-                       {}
+                         wide?
+                         {}
 
-                       :default
-                       {:style {:padding-bottom "20px"}
-                        :class "container"})
-                [document-title (:page app)]
+                         :default
+                         {:style {:padding-bottom "20px"}
+                          :class "container"})
+                  [document-title (:page app)]
 
-                ;; Ensure that a new scroll-to-page component is created when page changes
-                ^{:key (name (:page app))}
-                [scroll-to-page (:page app)]
+                  ;; Ensure that a new scroll-to-page component is created when page changes
+                  ^{:key (name (:page app))}
+                  [scroll-to-page (:page app)]
 
-                (case (:page app)
-                  :login [login/login e! (:login app)]
-                  :reset-password [login/reset-password e! app]
-                  :register [register/register e! (:register app) (:user app)]
-                  :user [user/user e! (:user app)]
-                  :front-page [fp/front-page e! app]
-                  :own-services [fp/own-services e! app]
-                  :transport-service [t-service/select-service-type e! app]
-                  :transport-operator [to/operator e! app]
+                  (case (:page app)
+                    :login [login/login e! (:login app)]
+                    :reset-password [login/reset-password e! app]
+                    :register [register/register e! (:register app) (:user app)]
+                    :user [user/user e! (:user app)]
+                    :front-page [fp/front-page e! app]
+                    :own-services [fp/own-services e! app]
+                    :transport-service [t-service/select-service-type e! app]
+                    :transport-operator [to/operator e! app]
 
-                  ;; Routes for the service form, one for editing an existing one by id
-                  ;; and another when creating a new service
-                  :edit-service [t-service/edit-service-by-id e! app]
-                  :new-service [t-service/create-new-service e! app]
+                    ;; Routes for the service form, one for editing an existing one by id
+                    ;; and another when creating a new service
+                    :edit-service [t-service/edit-service-by-id e! app]
+                    :new-service [t-service/create-new-service e! app]
 
-                  ;; service catalog page
-                  :services [service-search/service-search e! app]
-                  ;; show single service GeoJSON
-                  :service [service-search/service-geojson e! (:service-search app)]
+                    ;; service catalog page
+                    :services [service-search/service-search e! app]
+                    ;; show single service GeoJSON
+                    :service [service-search/service-geojson e! (:service-search app)]
 
-                  :admin [admin/admin-panel e! app]
+                    :admin [admin/admin-panel e! app]
 
-                  :operators [operators/operators e! app]
+                    :operators [operators/operators e! app]
 
-                  :email-settings [email-settings/email-notification-settings e! app]
+                    :email-settings [email-settings/email-notification-settings e! app]
 
-                  :routes [route-list/routes e! app]
-                  :new-route [route/new-route e! app]
-                  :edit-route [route/edit-route-by-id e! app]
+                    :routes [route-list/routes e! app]
+                    :new-route [route/new-route e! app]
+                    :edit-route [route/edit-route-by-id e! app]
 
-                  ;; 60days pre notice views
-                  :new-notice [notice/new-pre-notice e! app]
-                  :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
-                  :pre-notices [pre-notices-listing/pre-notices e! app]
+                    ;; 60days pre notice views
+                    :new-notice [notice/new-pre-notice e! app]
+                    :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
+                    :pre-notices [pre-notices-listing/pre-notices e! app]
 
-                  :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                  :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
+                    :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
+                    :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
 
-                  (:transit-changes :authority-pre-notices)
-                  [transit-changes/transit-changes e! app]
+                    (:transit-changes :authority-pre-notices)
+                    [transit-changes/transit-changes e! app]
 
-                  [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])]
-           [footer/footer e!]]]]))))
+                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])]
+             [footer/footer e!]])]]))))
