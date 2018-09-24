@@ -4,7 +4,7 @@
             [ote.communication :as comm]
             [ote.app.routes :as routes]
             [ote.db.transport-operator :as t-operator]
-            [ote.localization :refer [tr]]
+            [ote.localization :as localization :refer [tr]]
             [ote.app.controller.common :refer [->ServerError]]
             [clojure.string :as str]))
 
@@ -17,6 +17,7 @@
 (defrecord Logout [])
 (defrecord LogoutResponse [response])
 (defrecord LogoutFailed [response])
+
 
 (defn unauthenticated
   "Init session without user."
@@ -204,3 +205,44 @@
           :username-taken
           :email-taken
           :password-incorrect?))
+
+
+(define-event UpdateResetPasswordForm [form-data]
+  {:path [:reset-password]}
+  form-data)
+
+(define-event ResetPasswordResponse [response]
+  {}
+  (if (:success? response)
+    (do (routes/navigate! :login)
+        (-> app
+            (dissoc :reset-password)
+            (assoc :flash-message (tr [:reset-password :password-changed]))))
+    (assoc app :flash-message-error (tr [:login :check-email-for-link]))))
+
+(define-event ResetPassword []
+  {}
+  (let [payload {:key (get-in app [:query :key])
+                 :id (get-in app [:query :id])
+                 :new-password (get-in app [:reset-password :new-password])}]
+    (comm/post! "reset-password" payload
+                {:on-success (tuck/send-async! ->ResetPasswordResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    app))
+
+(define-event GoToResetPassword []
+  {}
+  (routes/navigate! :reset-password {})
+  app)
+
+(define-event RequestPasswordResetResponse [response email]
+  {:path [:reset-password]}
+  (assoc app :code-sent-for-email email))
+
+(define-event RequestPasswordReset []
+  {:path [:reset-password]}
+  (comm/post! "request-password-reset" {:email (:email app)
+                                        :language @localization/selected-language}
+              {:on-success (tuck/send-async! ->RequestPasswordResetResponse (:email app))
+               :on-failure (tuck/send-async! ->ServerError)})
+  app)

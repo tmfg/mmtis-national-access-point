@@ -14,7 +14,8 @@
              [ring.middleware.anti-forgery :as anti-forgery]
              [cheshire.core :as cheshire]
              [clojure.string :as str]
-             [clojure.java.io :as io])
+             [clojure.java.io :as io]
+             [ote.email :as email])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)
            (java.io File)))
@@ -74,6 +75,20 @@
 (def anti-csrf-token "forge me not")
 (def session-key "cookie0123456789")
 
+(def outbox (atom nil))
+
+(defn- fake-email [outbox-atom]
+  (reify
+    component/Lifecycle
+    (start [this] this)
+    (stop [this] this)
+
+    email/Send
+    (send! [_ message]
+      (swap! outbox-atom
+             (fn [outbox]
+               (conj (or outbox []) message))))))
+
 (defn system-fixture [& system-map-entries]
   (fn [tests]
     (with-test-db
@@ -85,7 +100,9 @@
                                                         :auth-tkt auth-tkt-config
                                                         :session {:key session-key}})
                                      [:db])
+                              :email (fake-email outbox)
                               system-map-entries))]
+        (reset! outbox [])
         (tests)
         (component/stop *ote*)))))
 
@@ -106,20 +123,30 @@
     (getComment [_] nil)
     (getCommentURL [_] nil)))
 
-(defn- cookie-store-for-user [user]
+(defn cookie-store [& names-and-cookies]
   (reify CookieStore
     (getCookies [_]
-      [(cookie "auth_tkt"
-               (nap-cookie/unparse "0.0.0.0" "test"
-                                   {:digest-algorithm "MD5"
-                                    :timestamp (java.util.Date.)
-                                    :user-id user
-                                    :user-data ""}))
-       (cookie "ote-session"
-               (#'session-cookie/seal (.getBytes session-key)
-                                      {::anti-forgery/anti-forgery-token anti-csrf-token}))])
+      (vec
+       (for [[name c] (partition 2 names-and-cookies)]
+         (cookie name c))))
     (addCookie [_ c]
       (println "Adding cookie: " c))))
+
+(defn- cookie-store-for-unauthenticated []
+  (cookie-store "ote-session"
+                (#'session-cookie/seal (.getBytes session-key)
+                                       {::anti-forgery/anti-forgery-token anti-csrf-token})))
+(defn- cookie-store-for-user [user]
+  (cookie-store
+   "auth_tkt"
+   (nap-cookie/unparse "0.0.0.0" "test"
+                       {:digest-algorithm "MD5"
+                        :timestamp (java.util.Date.)
+                        :user-id user
+                        :user-data ""})
+   "ote-session"
+   (#'session-cookie/seal (.getBytes session-key)
+                          {::anti-forgery/anti-forgery-token anti-csrf-token})))
 
 (defn- read-response [res]
   (if (= (:status res) 200)
@@ -158,10 +185,11 @@
   ([user path payload]
    (-> path url-for-path
        (http-client/post (merge
-                          {:body (transit/clj->transit payload)}
-                          (when user
-                            {:headers {"X-CSRF-Token" anti-csrf-token}
-                             :cookie-store (cookie-store-for-user user)})))
+                          {:body (transit/clj->transit payload)
+                           :headers {"X-CSRF-Token" anti-csrf-token}}
+                          (if user
+                            {:cookie-store (cookie-store-for-user user)}
+                            {:cookie-store (cookie-store-for-unauthenticated)})))
        read-response)))
 
 (defn sql-query [& sql-string-parts]

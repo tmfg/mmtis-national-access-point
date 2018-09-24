@@ -179,11 +179,7 @@
         (assoc-in [:login :navigate-to] {:page :own-services})
         get-transport-operator-data)))
 
-(define-event ToggleUserResetDialog []
-  {}
-  (-> app
-      (update :show-reset-dialog? not)
-      (dissoc :login)))
+
 
 (define-event UserResetRequested []
   {}

@@ -18,7 +18,10 @@
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (define-tables
-  ["user" ::user])
+  ["user" ::user]
+  ["password-reset-request" ::password-reset-request
+   {"created" :ote.db.modification/created
+    "created-by" :ote.db.modification/created-by}])
 
 
 (defn username-valid? [username]
