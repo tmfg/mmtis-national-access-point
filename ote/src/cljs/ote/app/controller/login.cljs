@@ -4,7 +4,7 @@
             [ote.communication :as comm]
             [ote.app.routes :as routes]
             [ote.db.transport-operator :as t-operator]
-            [ote.localization :refer [tr]]
+            [ote.localization :as localization :refer [tr]]
             [ote.app.controller.common :refer [->ServerError]]
             [clojure.string :as str]))
 
@@ -215,8 +215,10 @@
   {}
   (if (:success? response)
     (do (routes/navigate! :login)
-        (dissoc app :reset-password))
-    (assoc-in app [:reset-password :error] (:error response))))
+        (-> app
+            (dissoc :reset-password)
+            (assoc :flash-message (tr [:reset-password :password-changed]))))
+    (assoc app :flash-message-error (tr [:login :check-email-for-link]))))
 
 (define-event ResetPassword []
   {}
@@ -239,7 +241,8 @@
 
 (define-event RequestPasswordReset []
   {:path [:reset-password]}
-  (comm/post! "request-password-reset" {:email (:email app)}
+  (comm/post! "request-password-reset" {:email (:email app)
+                                        :language @localization/selected-language}
               {:on-success (tuck/send-async! ->RequestPasswordResetResponse (:email app))
                :on-failure (tuck/send-async! ->ServerError)})
   app)

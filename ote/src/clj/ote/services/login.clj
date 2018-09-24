@@ -256,26 +256,28 @@
                   {::user/request-id (::user/request-id reset-request)}))
 
 (defn reset-password [db {:keys [id key new-password] :as form-data}]
-  (if-not (user/password-valid? new-password)
-    {:success? false :error :invalid-new-password}
-    (with-transaction db
-      (if-let [reset-request (first
-                              (specql/fetch db ::user/password-reset-request
-                                            (specql/columns ::user/password-reset-request)
-                                            {::modification/created-by id
-                                             ;; Only consider requests created within 1 hour
-                                             ::modification/created (op/>= (tc/to-sql-date (t/minus (t/now)
-                                                                                                    (t/hours 1))))
-                                             ;; that have not been used yet
-                                             ::user/used op/null?}))]
-        ;; Found a valid password reset request
-        (do (reset-password! db reset-request new-password)
-            {:success? true})
+  (with-throttle-ms 1000
+    (if-not (user/password-valid? new-password)
+      {:success? false :error :invalid-new-password}
+      (with-transaction db
+        (if-let [reset-request (first
+                                (specql/fetch db ::user/password-reset-request
+                                              (specql/columns ::user/password-reset-request)
+                                              {::modification/created-by id
+                                               ::user/reset-key (java.util.UUID/fromString key)
+                                               ;; Only consider requests created within 1 hour
+                                               ::modification/created (op/>= (tc/to-sql-date (t/minus (t/now)
+                                                                                                      (t/hours 1))))
+                                               ;; that have not been used yet
+                                               ::user/used op/null?}))]
+          ;; Found a valid password reset request
+          (do (reset-password! db reset-request new-password)
+              {:success? true})
 
-        ;; No valid password reset request
-        (do
-          (log/warn "Invalid password reset request, user: " id ", key: " key)
-          {:success? false :error :password-reset-request-not-found})))))
+          ;; No valid password reset request
+          (do
+            (log/warn "Invalid password reset request, user: " id ", key: " key)
+            {:success? false :error :password-reset-request-not-found}))))))
 
 (define-service-component LoginService
   {:fields [auth-tkt-config]
