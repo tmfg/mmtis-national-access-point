@@ -5,6 +5,8 @@
             [ote.services.transport :as transport-service]
             [ote.components.http :as http]
             [ote.components.db :as db]
+            [ote.email :as email]
+            [ote.environment :as env]
 
             [ote.services.index :as index]
             [ote.services.localization :as localization-service]
@@ -48,6 +50,7 @@
    :db (db/database (:db config))
    :http (component/using (http/http-server (:http config)) [:db])
    :ssl-upgrade (http/map->SslUpgrade (get-in config [:http :ssl-upgrade]))
+   :email (email/->Email (:email config))
 
    ;; Index page
    :index (component/using (index/->Index config)
@@ -84,7 +87,7 @@
 
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
-           [:db :http])
+           [:db :http :email])
 
    :admin (component/using
            (admin-service/->Admin (:nap config))
@@ -97,8 +100,8 @@
    ;; Scheduled tasks
    :tasks-company (component/using (tasks-company/company-tasks) [:db])
    :tasks-gtfs (component/using (tasks-gtfs/gtfs-tasks config) [:db])
-   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:email config))
-                                       [:db])))
+   :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks)
+                                       [:db :email])))
 
 (defn configure-logging [{:keys [level] :as log-config}]
   (log/merge-config!
@@ -113,6 +116,7 @@
    (fn [_]
      (let [config (read-string (slurp "config.edn"))]
        (configure-logging (:log config))
+       (env/merge-environment! (:environment config))
        (feature/set-enabled-features! (or (:enabled-features config) #{}))
        (when (:dev-mode? config)
          (autoreload/start-autoreload))

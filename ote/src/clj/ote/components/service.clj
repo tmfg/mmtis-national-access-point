@@ -11,22 +11,23 @@
     `(defrecord ~component-name [~@(:fields options)]
        component/Lifecycle
        (start [{~'db :db ~http :http :as this#}]
-         (assoc this#
-                :ote.components.service/stop-routes
-                [~@(for [[unauthenticated? paths]
-                         (group-by (comp boolean :unauthenticated meta)
-                                   paths)]
-                     `(http/publish!
-                       ~http {:authenticated? ~(not unauthenticated?)}
-                       (routes
-                        ~@(for [p paths
-                                :let [response-format (or (:format (meta p)) :raw)]]
-                            (case response-format
-                              :raw p
-                              :transit (let [[method path bindings & body] p]
-                                         `(~method ~path ~bindings
-                                           (http/no-cache-transit-response
-                                            (do ~@body)))))))))]))
+         (let [~(or (:dependencies options) (gensym "_")) this#]
+           (assoc this#
+                  :ote.components.service/stop-routes
+                  [~@(for [[unauthenticated? paths]
+                           (group-by (comp boolean :unauthenticated meta)
+                                     paths)]
+                       `(http/publish!
+                         ~http {:authenticated? ~(not unauthenticated?)}
+                         (routes
+                          ~@(for [p paths
+                                  :let [response-format (or (:format (meta p)) :raw)]]
+                              (case response-format
+                                :raw p
+                                :transit (let [[method path bindings & body] p]
+                                           `(~method ~path ~bindings
+                                             (http/no-cache-transit-response
+                                              (do ~@body)))))))))])))
 
        (stop [{stop-routes# :ote.components.service/stop-routes :as this#}]
          (doseq [stop-route# stop-routes#]

@@ -57,26 +57,6 @@
   ;; Render as an empty span
   [:span])
 
-(defn ckan-dialogs [e! {:keys [login show-register-dialog? show-reset-dialog? user]}]
-  [:span
-
-   (when show-register-dialog?
-     ^{:key "ckan-register"}
-     [ckan-iframe-dialog
-      (tr [:common-texts :navigation-register])
-      "/user/register"
-      ;; On modal close
-      #(e! (fp-controller/->ToggleRegistrationDialog))
-      ;; On ckan close i.e. user has been registered.
-      #(e! (fp-controller/->ToggleRegistrationDialog))])
-
-   (when show-reset-dialog?
-            ^{:key "ckan-reset"}
-     [ckan-iframe-dialog
-      (tr [:login :forgot-password?])
-      "/user/reset"
-      #(e! (fp-controller/->ToggleUserResetDialog))
-      #(e! (fp-controller/->UserResetRequested))])])
 
 (defn- scroll-to-page
   "Invisible component that scrolls to the top of the window whenever it is mounted."
@@ -102,7 +82,6 @@
            [top-nav e! app is-scrolled? desktop?]
 
            [:span
-            [ckan-dialogs e! app]
             (if (not loaded?)
               [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]]
               [(if wide? :div :div.wrapper)
@@ -130,6 +109,7 @@
 
                 (case (:page app)
                   :login [login/login e! (:login app)]
+                  :reset-password [login/reset-password e! app]
                   :register [register/register e! (:register app) (:user app)]
                   :user [user/user e! (:user app)]
                   :front-page [fp/front-page e! app]

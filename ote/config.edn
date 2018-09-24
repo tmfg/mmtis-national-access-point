@@ -1,4 +1,5 @@
-{:dev-mode? true
+{:environment {:base-url "http://localhost:3000/"}
+ :dev-mode? true
  :db {:url "jdbc:postgresql://localhost:5432/napote"
       :username "napote"
       :password ""}

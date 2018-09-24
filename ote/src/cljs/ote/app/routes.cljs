@@ -15,6 +15,7 @@
   (r/router
    [["/" :front-page]
     ["/login" :login]
+    ["/reset-password" :reset-password]
     ["/register" :register]
     ["/user" :user]
     ["/own-services" :own-services]
