@@ -167,6 +167,8 @@
                                        ;; Reset app state to re-render everything
                                        (force-update-all app)))))
     ;; Return empty app state, until new language has been fetched
+    ;; Just calling (r/force-update-all) is not enough because some components
+    ;; implement component should update.
     nil)
 
   ForceUpdateAll
