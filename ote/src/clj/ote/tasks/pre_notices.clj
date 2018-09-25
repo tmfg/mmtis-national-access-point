@@ -98,17 +98,17 @@
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
-  [db regions]
+  [db user]
   (try
-    (when-let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions regions})]
+    (when-let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})]
       (if-not (empty? notices)
         (do
-          (log/info "Found" (count notices) "new pre-notices from 24 hours for regions " regions)
+          (log/info "For user " (:email user) " we found" (count notices) "new pre-notices from 24 hours for regions " (:finnish-regions user))
           (html (notification-template notices)))
         (log/info "No new pre-notices found.")))
 
     (catch Exception e
-      (log/warn "Error while generating notification html for regions: " regions " ERROR: " e ))))
+      (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e ))))
 
 (defn send-notification! [db email]
   (log/info "Starting pre-notices notification task...")
@@ -119,15 +119,16 @@
         "fi"
         (tx/with-transaction db
            (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
+             (log/info "Authority users: " (pr-str (map :email authority-users)))
              (try
                (doseq [u authority-users]
-                 (let [notification (user-notification-html db (:finnish-regions u))]
+                 (let [notification (user-notification-html db u)]
                    (if notification
                      (do
                        (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
                        ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
                        ;; same time. Using sleep, we can't exceed that limit.
-                       (with-throttle-ms 200
+                       (with-throttle-ms 1200
                          (email/send!
                            email
                            {:to      (:email u)
@@ -137,7 +138,7 @@
                      (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
                ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
-               (Thread/sleep 5000)
+               (Thread/sleep 15000)
                (catch Exception e
                  (log/warn "Error while sending a notification" e))))))))
 
@@ -146,7 +147,7 @@
   component/Lifecycle
   (start [{db :db email :email :as this}]
     (assoc this
-           ::stop-tasks [(chime-at (daily-at 8 15)
+           ::stop-tasks [(chime-at (daily-at 9 45)
                                    (fn [_]
                                      (#'send-notification! db email)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
