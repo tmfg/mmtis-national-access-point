@@ -120,7 +120,6 @@
         (tx/with-transaction db
            (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
              (log/info "Authority users: " (pr-str (map :email authority-users)))
-             (try
                (doseq [u authority-users]
                  (let [notification (user-notification-html db u)]
                    (if notification
@@ -129,25 +128,26 @@
                        ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
                        ;; same time. Using sleep, we can't exceed that limit.
                        (with-throttle-ms 1200
-                         (email/send!
-                           email
-                           {:to      (:email u)
-                            :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                          (datetime-string (t/now) timezone))
-                            :body    [{:type "text/html;charset=utf-8" :content notification}]})))
+                           (try
+                             (email/send!
+                               email
+                               {:to      (:email u)
+                                :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                              (datetime-string (t/now) timezone))
+                                :body    [{:type "text/html;charset=utf-8" :content notification}]})
+                             (catch Exception e
+                               (log/warn "Error while sending a notification" e)))))
                      (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
-               ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
-               (Thread/sleep 15000)
-               (catch Exception e
-                 (log/warn "Error while sending a notification" e))))))))
+               ;; Sleep for 15 seconds to ensure that no other nodes are trying to send email at the same mail.
+               (Thread/sleep 15000))))))
 
 
 (defrecord PreNoticesTasks []
   component/Lifecycle
   (start [{db :db email :email :as this}]
     (assoc this
-           ::stop-tasks [(chime-at (daily-at 9 45)
+           ::stop-tasks [(chime-at (daily-at 10 24)
                                    (fn [_]
                                      (#'send-notification! db email)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
