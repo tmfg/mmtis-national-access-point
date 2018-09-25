@@ -147,7 +147,7 @@
   component/Lifecycle
   (start [{db :db email :email :as this}]
     (assoc this
-           ::stop-tasks [(chime-at (daily-at 10 24)
+           ::stop-tasks [(chime-at (daily-at 13 10)
                                    (fn [_]
                                      (#'send-notification! db email)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
