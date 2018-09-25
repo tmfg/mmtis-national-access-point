@@ -840,7 +840,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:page-title "Email notification settings"
   :page-description "On this page, you can specify in which situations you will receive e-mail notifications from NAP."
   :page-secondary-header " Geographical settings"
-  :regions-description-text "Select the provinces for which notifications you want to receive in your email."
+  :regions-description-text "Select the provinces you want to receive notifications about."
   :save-success "Settings saved successfully."
   :save-failure "Saving settings failed!"}
 
