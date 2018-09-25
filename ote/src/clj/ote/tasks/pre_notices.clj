@@ -127,7 +127,7 @@
                        (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
                        ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
                        ;; same time. Using sleep, we can't exceed that limit.
-                       (with-throttle-ms 1200
+                       (with-throttle-ms 200
                            (try
                              (email/send!
                                email
@@ -139,15 +139,15 @@
                                (log/warn "Error while sending a notification" e)))))
                      (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
-               ;; Sleep for 15 seconds to ensure that no other nodes are trying to send email at the same mail.
-               (Thread/sleep 15000))))))
+               ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
+               (Thread/sleep 5000))))))
 
 
 (defrecord PreNoticesTasks []
   component/Lifecycle
   (start [{db :db email :email :as this}]
     (assoc this
-           ::stop-tasks [(chime-at (daily-at 13 10)
+           ::stop-tasks [(chime-at (daily-at 8 15)
                                    (fn [_]
                                      (#'send-notification! db email)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
