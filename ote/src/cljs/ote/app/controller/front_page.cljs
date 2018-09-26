@@ -46,14 +46,16 @@
 
 (defn get-transport-operator-data [app]
   (if (:transport-operator-data-loaded? app true)
-     (do
-       (comm/post! "transport-operator/data" {}
-                   {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
-                    :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-       (assoc app
-              :transport-operator-data-loaded? false
-              :services-changed? false))
-     app))
+    (do
+      (comm/post! "transport-operator/data" {}
+                  {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                   :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
+      (-> app
+          (assoc
+            :transport-operator-data-loaded? false
+            :services-changed? false)
+          (dissoc :transport-operators-with-services)))
+    app))
 
 (extend-protocol tuck/Event
 
