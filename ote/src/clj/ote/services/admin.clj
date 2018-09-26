@@ -200,10 +200,25 @@
        transport-operator-id))))
 
 
-(defn- transport-operator-report [db ]
-  (let [operators (fetch-transport-operators-report db)]
-     (concat [["nimi" "id" "email"]]
-             (map (juxt :name :id :email) operators))))
+(defn- csv-data [header rows]
+  (concat [header] rows))
+
+(defn- transport-operator-report [db type]
+  (case type
+    "no-services"
+    (csv-data ["nimi" "id" "email"]
+              (map (juxt :name :id :email)
+                   (fetch-operators-no-services db)))
+
+    "brokerage"
+    (csv-data ["nimi" "y-tunnus" "puhelin" "email" "palvelun nimi"]
+              (map (juxt :name :business-id :phone :email :service-name)
+                   (fetch-operators-brokerage db)))
+
+    "unpublished-services"
+    (csv-data ["nimi" "puhelin" "email" "julkaisemattomia palveluita" "palvelut"]
+              (map (juxt :name :phone :email :unpublished-services-count :services)
+                   (fetch-operators-unpublished-services db)))))
 
 (defn- admin-routes [db http nap-config]
   (routes
@@ -238,10 +253,11 @@
 
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
-  (GET "/admin/reports/transport-operator"
-       {user :user}
+  (GET "/admin/reports/transport-operator/:type"
+       {{:keys [type]} :params
+        user :user}
     (require-admin-user "reports/transport-operator" (:user user))
-    (transport-operator-report db)))
+    (transport-operator-report db type)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle

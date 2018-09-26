@@ -19,10 +19,10 @@
             [cljs-time.core :as t]))
 
 (defn reports [e!]
-  [:div (stylefy/use-style (style-base/flex-container "row"))
-   [:div.col-md-12
-    [ui/raised-button {:label "Hae raportti test"
-                       :primary true
-                       :disabled (str/blank? filter)
-                       :href "/admin/reports/transport-operator"}]]])
+  [:div
+   [:h2 "Palveluntuottajaraportit"]
+   [:div (stylefy/use-style (style-base/flex-container "column"))
+    [linkify "/admin/reports/transport-operator/no-services" "Palveluntuottajat, joilla ei palveluita"]
+    [linkify "/admin/reports/transport-operator/brokerage" "Palveluntuottajat, jotka ovat välityspalveluita"]
+    [linkify "/admin/reports/transport-operator/unpublished-services" "Palveluntuottajat, joilla on julkaisemattomia palveluita"]]])
 
