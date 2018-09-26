@@ -16,6 +16,7 @@
             [reagent.core :as r]
             [ote.ui.common :as ui-common]
             [ote.views.admin.interfaces :as interfaces]
+            [ote.views.admin.reports :as reports]
             [ote.views.admin.users :as users]))
 
 (def id-filter-type [:operators :services :ALL])
@@ -294,4 +295,6 @@
      [ui/tab {:label "Palveluntuottajat" :value "operators"}
       [operator-list e! app]]
      [ui/tab {:label "Rajapinnat" :value "interfaces"}
-      [interfaces/interface-list e! app]]]))
+      [interfaces/interface-list e! app]]
+     [ui/tab {:label "CSV Raportit" :value "reports"}
+      [reports/reports  e! app]]]))

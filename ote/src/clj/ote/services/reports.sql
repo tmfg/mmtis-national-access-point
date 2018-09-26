@@ -1,5 +1,5 @@
 
--- TODO: This is just a placeholder report for testing. Real queries coming later.
+-- This is just a placeholder report for testing. Real queries coming later.
 -- name: fetch-transport-operators-report
 SELECT op.name, op.id,
        op.phone, COALESCE(NULLIF(op.email,''), u.email) as "email"

@@ -22,7 +22,9 @@
             [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [ring.util.io :as ring-io]
-            [ote.components.service :refer [define-service-component]]))
+            [ote.components.service :refer [define-service-component]]
+            [clj-time.core :as t]
+            [ote.time :as time]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -234,9 +236,11 @@
 (define-service-component CSVAdminReports
   {}
 
-  ^{:unauthenticated true :format :csv}
+  ^{:format :csv
+    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/transport-operator"
-       {}
+       {user :user}
+    (require-admin-user "reports/transport-operator" (:user user))
     (transport-operator-report db)))
 
 (defrecord Admin [nap-config]
