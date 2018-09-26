@@ -16,19 +16,6 @@
   (with-open [writer (io/writer output)]
     (csv/write-csv writer data)))
 
-(defmacro csv-export-route
-  "Routes that do not require authentication"
-  [path req db & body]
-  (let [output (gensym "output")]
-    `(GET ~path ~req
-          {:status 200
-           :headers {"Content-Type" "text/csv; charset=UTF-8"
-                     "Content-Disposition" "attachment;"}
-           :body (ring-io/piped-input-stream
-                   (fn [~output]
-                     ))}
-          )))
-
 (defmacro define-service-component
   "Define a service component that publishes HTTP routes."
   [component-name options & paths]
