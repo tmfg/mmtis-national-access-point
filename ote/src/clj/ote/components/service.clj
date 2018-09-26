@@ -33,7 +33,8 @@
                          ~http {:authenticated? ~(not unauthenticated?)}
                          (routes
                           ~@(for [p paths
-                                  :let [response-format (or (:format (meta p)) :raw)]]
+                                  :let [response-format (or (:format (meta p)) :raw)
+                                        filename (:filename (meta p))]]
                               (case response-format
                                 :raw p
                                 :transit (let [[method path bindings & body] p]
@@ -44,7 +45,7 @@
                                        `(~method ~path ~bindings
                                           {:status 200
                                            :headers {"Content-Type" "text/csv; charset=UTF-8"
-                                                     "Content-Disposition" "attachment;"}
+                                                     "Content-Disposition" (str "attachment;" ~(when filename `(str " filename=" ~filename)))}
                                            :body (ring-io/piped-input-stream
                                                    (fn [output#]
                                                      (export-csv output#
