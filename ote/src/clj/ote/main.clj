@@ -93,6 +93,10 @@
            (admin-service/->Admin (:nap config))
            [:db :http])
 
+   :admin-reports (component/using
+                    (admin-service/->CSVAdminReports)
+                    [:db :http])
+
    :operators (component/using (operators-service/->Operators) [:db :http])
 
    :settings (component/using (settings-service/->Settings) [:db :http])

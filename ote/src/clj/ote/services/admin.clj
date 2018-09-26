@@ -18,9 +18,14 @@
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.util.db :as db-util]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.data.csv :as csv]
+            [clojure.java.io :as io]
+            [ring.util.io :as ring-io]
+            [ote.components.service :refer [define-service-component]]))
 
 (defqueries "ote/services/admin.sql")
+(defqueries "ote/services/reports.sql")
 
 (def service-search-result-columns
   #{::t-service/contact-email
@@ -192,6 +197,12 @@
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
+
+(defn- transport-operator-report [db ]
+  (let [operators (fetch-transport-operators-report db)]
+     (concat [["nimi" "id" "email"]]
+             (map (juxt :name :id :email) operators))))
+
 (defn- admin-routes [db http nap-config]
   (routes
     (POST "/admin/users" req (admin-service "users" req db #'list-users))
@@ -218,6 +229,15 @@
       (http/transit-response
         (delete-transport-operator! db user
                                     (:id (http/transit-request form-data)))))))
+
+
+(define-service-component CSVAdminReports
+  {}
+
+  ^{:unauthenticated true :format :csv}
+  (GET "/admin/reports/transport-operator"
+       {}
+    (transport-operator-report db)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle
