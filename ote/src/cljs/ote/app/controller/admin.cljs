@@ -10,6 +10,7 @@
             [clojure.string :as str]
             [ote.util.text :as text]
             [ote.time :as time]
+            [ote.app.controller.common :refer [->ServerError]]
             cljsjs.filesaverjs))
 
 (defn- update-service-by-id [app id update-fn & args]

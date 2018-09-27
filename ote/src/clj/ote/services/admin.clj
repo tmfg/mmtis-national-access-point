@@ -18,9 +18,16 @@
             [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.util.db :as db-util]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.data.csv :as csv]
+            [clojure.java.io :as io]
+            [ring.util.io :as ring-io]
+            [ote.components.service :refer [define-service-component]]
+            [clj-time.core :as t]
+            [ote.time :as time]))
 
 (defqueries "ote/services/admin.sql")
+(defqueries "ote/services/reports.sql")
 
 (def service-search-result-columns
   #{::t-service/contact-email
@@ -192,6 +199,27 @@
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
+
+(defn- csv-data [header rows]
+  (concat [header] rows))
+
+(defn- transport-operator-report [db type]
+  (case type
+    "no-services"
+    (csv-data ["nimi" "id" "email"]
+              (map (juxt :name :id :email)
+                   (fetch-operators-no-services db)))
+
+    "brokerage"
+    (csv-data ["nimi" "y-tunnus" "puhelin" "email" "palvelun nimi"]
+              (map (juxt :name :business-id :phone :email :service-name)
+                   (fetch-operators-brokerage db)))
+
+    "unpublished-services"
+    (csv-data ["nimi" "puhelin" "email" "julkaisemattomia palveluita" "palvelut"]
+              (map (juxt :name :phone :email :unpublished-services-count :services)
+                   (fetch-operators-unpublished-services db)))))
+
 (defn- admin-routes [db http nap-config]
   (routes
     (POST "/admin/users" req (admin-service "users" req db #'list-users))
@@ -218,6 +246,18 @@
       (http/transit-response
         (delete-transport-operator! db user
                                     (:id (http/transit-request form-data)))))))
+
+
+(define-service-component CSVAdminReports
+  {}
+
+  ^{:format :csv
+    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/transport-operator/:type"
+       {{:keys [type]} :params
+        user :user}
+    (require-admin-user "reports/transport-operator" (:user user))
+    (transport-operator-report db type)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle
