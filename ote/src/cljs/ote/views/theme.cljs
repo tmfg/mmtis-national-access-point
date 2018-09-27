@@ -97,7 +97,7 @@
   "App container that sets the theme and common elements like flash message."
   [e! app content]
 
-  (progress/configure (tr [:common-texts :loading]))
+  (progress/configure)
 
   (r/create-class
    (merge
