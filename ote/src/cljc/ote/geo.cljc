@@ -179,7 +179,9 @@
 #?(:clj
    (def euref-wkt "PROJCS[\"EUREF_FIN_TM35FIN\", \n  GEOGCS[\"GCS_EUREF_FIN\", \n    DATUM[\"D_ETRS_1989\", \n      SPHEROID[\"GRS_1980\", 6378137.0, 298.257222101]], \n    PRIMEM[\"Greenwich\", 0.0], \n    UNIT[\"degree\", 0.017453292519943295], \n    AXIS[\"Longitude\", EAST], \n    AXIS[\"Latitude\", NORTH]], \n  PROJECTION[\"Transverse_Mercator\"], \n  PARAMETER[\"central_meridian\", 27.0], \n  PARAMETER[\"latitude_of_origin\", 0.0], \n  PARAMETER[\"scale_factor\", 0.9996], \n  PARAMETER[\"false_easting\", 500000.0], \n  PARAMETER[\"false_northing\", 0.0], \n  UNIT[\"m\", 1.0], \n  AXIS[\"x\", EAST], \n  AXIS[\"y\", NORTH]]"))
 
+#?(:clj (def kkj (org.geotools.referencing.CRS/decode "EPSG:2393")))
 #?(:clj (def wgs84 org.geotools.referencing.crs.DefaultGeographicCRS/WGS84))
+#?(:clj (def kkj->wgs84-transform (org.geotools.referencing.CRS/findMathTransform kkj wgs84 true)))
 #?(:clj (def euref (org.geotools.referencing.CRS/parseWKT euref-wkt)))
 #?(:clj (def euref->wgs84-transform (org.geotools.referencing.CRS/findMathTransform euref wgs84 true)))
 #?(:clj (def swap-coordinates
@@ -189,6 +191,22 @@
                     y (.-y c)]
                 (set! (.-x c) y)
                 (set! (.-y c) x))))))
+
+#?(:clj (def  geometry-factory (com.vividsolutions.jts.geom.GeometryFactory.)))
+
+#?(:clj
+   (defn kkj->wgs84
+     "Transform a coordinate FROM KKJ to WGS84 (GPS).
+  Y coordinate is North (P).
+  X coordinate is East (I)"
+     [{:keys [x y]}]
+     (let [transformed
+           (org.geotools.geometry.jts.JTS/transform
+            (.createPoint geometry-factory (com.vividsolutions.jts.geom.Coordinate. x y))
+            kkj->wgs84-transform)
+           coord (.getCoordinate transformed)]
+       {:x (.-x coord)
+        :y (.-y coord)})))
 
 #?(:clj
    (defn euref->wgs84
