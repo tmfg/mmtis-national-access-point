@@ -17,7 +17,8 @@
             [taoensso.timbre :as log]
             [specql.impl.composite :as specql-composite]
             [specql.impl.registry :refer [table-info-registry]]
-            [jeesql.core :refer [defqueries]])
+            [jeesql.core :refer [defqueries]]
+            [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs])
   (:import (java.io File)))
 
 (defqueries "ote/integration/import/stop_times.sql")
@@ -45,13 +46,19 @@
         nil)
       response)))
 
-(defn load-gtfs [url]
+(defn load-gtfs [url-or-response]
   (http/transit-response
     (into {}
           (keep (fn [{:keys [name data]}]
                   (when-let [gtfs-file-type (gtfs-spec/name->keyword name)]
                     [gtfs-file-type (gtfs-parse/parse-gtfs-file gtfs-file-type data)])))
-          (load-zip-from-url url))))
+          (if (and (map? url-or-response)
+                   (contains? url-or-response :body))
+            ;; This is an HTTP response, read body input stream
+            (read-zip (:body url-or-response))
+
+            ;; This is an URL, fetch and read it
+            (load-zip-from-url url-or-response)))))
 
 (defn gtfs-file-name [operator-id ts-id]
   (let [new-date (java.util.Date.)
@@ -191,7 +198,8 @@
   Returns a response map or nil if it has not been modified."
   (fn [type db interface-id url last-import-date saved-etag] type))
 
-(defmethod load-transit-interface-url :gtfs [_ db interface-id url last-import-date saved-etag]
+
+(defn- load-interface-url [db interface-id url last-import-date saved-etag]
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag)
     (catch Exception e
@@ -202,6 +210,13 @@
                        ::t-service/gtfs-import-error (.getMessage e)}
                       {::t-service/id interface-id})
       nil)))
+
+(defmethod load-transit-interface-url :gtfs [_ db interface-id url last-import-date saved-etag]
+  (load-interface-url db interface-id url last-import-date saved-etag))
+
+(defmethod load-transit-interface-url :kalkati [_ db interface-id url last-import-date saved-etag]
+  (update (load-file-from-url db interface-id url last-import-date saved-etag)
+          :body kalkati-to-gtfs/convert))
 
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.

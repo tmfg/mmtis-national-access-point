@@ -10,21 +10,18 @@
             [cheshire.core :as cheshire]
             [clojure.walk :as walk]
             [taoensso.timbre :as log]
-            [specql.core :as specql]))
+            [specql.core :as specql]
+            [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]))
 
 
-(defn- decode-payload [lambda-response]
-  (-> lambda-response
-      :payload
-      .array
-      (String. "UTF-8")
-      (cheshire/decode keyword)))
+
 
 (defn kalkati-to-gtfs
   "Invoke an kalkati_to_gtfs Lambda function directly through AWS SDK.
   Returns InvokeResult."
   [kalkati-url headers]
   (let [headers (select-keys headers ["if-modified-since"])]
+    ()
     (decode-payload
      (lambda/invoke :function-name "kalkati_to_gtfs"
                     :region "eu-central-1"
@@ -36,42 +33,14 @@
 
 
 
-(defmethod gtfs-import/load-transit-interface-url :kalkati [_ db interface-id url last-import-date saved-etag]
-  (log/info "Loading kalkati interface: " url)
-  (let [{:keys [statusCode headers] :as response}
-        (kalkati-to-gtfs url {"if-modified-since" last-import-date})]
-    (log/debug "Got kalkati-to-gtfs response: " response)
 
-    (if (= statusCode 303)
-      (http-client/get (:Location headers) {:as :byte-array})
-      (do
-        (log/error "Kalkati-import: Kalkati to GTFS conversion failed, returned: " (pr-str response))
-        (specql/update! db ::t-service/external-interface-description
-                        ;; Note that the gtfs-imported field tells us when the interface was last checked.
-                        {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                         ;; Response body is a json string, so we'll just use it in our error message.
-                         ::t-service/gtfs-import-error (str "Kalkati->GTFS conversion failed, error: " (:body response))}
-                        {::t-service/id interface-id})
-        nil))))
 
 (defn load-kalkati [url headers]
-  (let [json (kalkati-to-gtfs url headers)
-        resp-headers (:headers json)
-        status-code (:statusCode json)
-        gtfs-url (:Location resp-headers)]
-
-    ;; If lambda invocation has errors, or there are errors in the third-party kalkati interface
-    ;; get error headers and status code from Lambda function payload and pass them through.
-    ;; Note: kalkati2gtfs Lambda returns 303 after a successful execution.
-    (if-not (= status-code 303)
-      (do
-        (log/error "GTFS-viewer: Kalkati to GTFS lambda failed, returned: " (pr-str (:body json)))
-        (merge
-          {:status status-code}
-          (when resp-headers
-            {:headers (walk/stringify-keys
-                        (dissoc resp-headers :Location))})))
-      (gtfs-import/load-gtfs gtfs-url))))
+  (let [resp (http-client/get url {:headers headers
+                                   :as :stream})]
+    (if (= (:status resp) 200)
+      (gtfs-import/load-gtfs (update resp :body kalkati-to-gtfs/convert))
+      resp)))
 
 (defrecord KalkatiImport []
   component/Lifecycle
