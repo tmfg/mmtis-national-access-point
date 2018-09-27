@@ -22,7 +22,7 @@
   [:div
    [:h2 "Palveluntuottajaraportit"]
    [:div (stylefy/use-style (style-base/flex-container "column"))
-    [linkify "/admin/reports/transport-operator/no-services" "Palveluntuottajat, joilla ei palveluita"]
-    [linkify "/admin/reports/transport-operator/brokerage" "Palveluntuottajat, jotka ovat välityspalveluita"]
-    [linkify "/admin/reports/transport-operator/unpublished-services" "Palveluntuottajat, joilla on julkaisemattomia palveluita"]]])
+    [linkify "/admin/reports/transport-operator/no-services" "Ei palveluita"]
+    [linkify "/admin/reports/transport-operator/unpublished-services" "Julkaisemattomia palveluita"]
+    [linkify "/admin/reports/transport-operator/brokerage" "Välityspalvelut"]]])
 

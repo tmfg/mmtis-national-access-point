@@ -1,3 +1,5 @@
+-- TODO improvements for later could include parametrization of certain more generic queries.
+
 -- name: fetch-operators-no-services
 SELECT op.name, op.id, op.phone, COALESCE(NULLIF(op.email, ''), u.email) AS "email"
   FROM "transport-operator" op
