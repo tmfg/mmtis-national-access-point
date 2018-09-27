@@ -198,6 +198,28 @@ Kalkati Transport modes
         :gtfs/exception-type "1"}))
    (vals calendars)))
 
+(defn- gtfs-time [kalkati-time]
+  (str (subs kalkati-time 0 2) ":" (subs kalkati-time 2)))
+
+(defn stop-times-txt [routes-with-trips]
+  (mapcat
+   (fn [{:keys [id trips]}]
+     (mapcat
+      (fn [[footnote-id trips]]
+        (mapcat
+         (fn [{:keys [service-id stop-sequence] :as trip}]
+           (for [{:keys [stop-sequence arrival departure station-id] :as stop} stop-sequence
+                 :let [arr (when arrival (gtfs-time arrival))
+                       dep (when departure (gtfs-time departure))]]
+             {:gtfs/trip-id (str "t_" (:service-id trip) "_" footnote-id)
+              :gtfs/arrival-time (or arr dep)
+              :gtfs/departure-time (or dep arr)
+              :gtfs/stop-sequence stop-sequence
+              :gtfs/stop-id station-id}))
+         trips))
+      (group-by :validity-footnote-id trips)))
+   routes-with-trips))
+
 (defn kalkati->gtfs
   "Takes a parsed zipper of Kalkati.net XML and returns the equivalent
   contents as GTFS CSV-files. Returns a sequence of GTFS files as maps
@@ -220,6 +242,8 @@ Kalkati Transport modes
      {:name "trips.txt"
       :data (gtfs-parse/unparse-gtfs-file :gtfs/trips-txt (trips-txt routes))}
 
+     {:name "stop_times.txt"
+      :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt (stop-times-txt routes))}
      {:name "calendar_dates.txt"
       :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-dates-txt (calendar-dates-txt calendars))}]))
 
