@@ -4,12 +4,15 @@
   (:require
     [cljsjs.nprogress]))
 
-(defn configure [loading-msg]
+(defn configure []
   (.configure js/NProgress #js
-      {:template (str "<div class=\"bar\" role=\"bar\"><div class=\"peg\"></div></div>
-                                  <div class=\"spinner\" role=\"spinner\"><span class=\"loading-msg\">"
-                      loading-msg
-                      "...</span><div class=\"spinner-icon\"></div></div>")}))
+      {:template (str "<div class=\"bar\" role=\"bar\">
+                          <div class=\"peg\"></div>
+                      </div>
+                      <div class=\"spinner\" role=\"spinner\">
+                        <span class=\"loading-msg\"></span>
+                        <div class=\"spinner-icon\"></div>
+                      </div>")}))
 (defn start []
   (.start js/NProgress))
 
