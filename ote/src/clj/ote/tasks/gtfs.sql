@@ -22,4 +22,4 @@ SELECT ts.id
    AND gtfs_should_calculate_transit_change(ts.id);
 
 -- name: upsert-service-transit-change
-SELECT gtfs_upsert_service_transit_changes(:service-id);
+SELECT gtfs_upsert_service_transit_changes(:service-id::INTEGER);
