@@ -49,7 +49,7 @@
         (import-gtfs/download-and-store-transit-package
           (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id)
         (catch Exception e
-          (log/warn "Error when importing, uploading or saving gtfs package to db!" e))))))
+          (log/warn e "Error when importing, uploading or saving gtfs package to db!"))))))
 
 (def night-hours #{0 1 2 3 4})
 
