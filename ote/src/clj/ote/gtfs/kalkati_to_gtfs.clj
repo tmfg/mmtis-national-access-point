@@ -10,7 +10,8 @@
             [ring.util.io :as ring-io]
             [ote.gtfs.parse :as gtfs-parse]
             [ote.gtfs.spec :as gtfs-spec]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.util.collections :refer [map-by]]))
 
 (defn kalkati-zipper [input]
   (xml-zip
@@ -75,15 +76,14 @@ Kalkati Transport modes
 (defn stations-by-id
   "Extract Kalkati stations and map them by id"
   [root]
-  (into {}
-        (map (juxt :id identity))
-        (z/xml-> root :Station
-                 (fn [station]
-                   {:id (z/xml1-> station (z/attr :StationId))
-                    :name (z/xml1-> station (z/attr :Name))
-                    :coordinate (geo/kkj->wgs84
-                                 {:x (double-attr station :X)
-                                  :y (double-attr station :Y)})}))))
+  (map-by :id
+          (z/xml-> root :Station
+                   (fn [station]
+                     {:id (z/xml1-> station (z/attr :StationId))
+                      :name (z/xml1-> station (z/attr :Name))
+                      :coordinate (geo/kkj->wgs84
+                                   {:x (double-attr station :X)
+                                    :y (double-attr station :Y)})}))))
 
 (defn routes
   "Return all routes defined by the Kalkati file"
@@ -107,32 +107,33 @@ Kalkati Transport modes
   "Return all calendars mapped by footnote id.
   For some reason Kalkati service calendars are called 'footnotes'."
   [root]
-  (into {}
-        (map (juxt :id identity))
-        (z/xml-> root :Footnote
-                 (fn [c]
-                   (let [first-date (z/xml1-> c (z/attr :Firstdate) time/parse-date-iso-8601)
-                         date-vector (z/attr c :Vector)]
-                     (merge
-                      {:id (z/attr c :FootnoteId)
-                       :first-date first-date
-                       :vector date-vector}
-                      (when (and first-date date-vector)
-                        {:dates (into #{}
-                                      (remove
-                                       nil?
-                                       (map (fn [i valid?]
-                                              (when (= \1 valid?)
-                                                (.plusDays first-date i)))
-                                            (range) date-vector)))})))))))
+  (map-by
+   :id
+   (z/xml-> root :Footnote
+            (fn [c]
+              (let [first-date (z/xml1-> c (z/attr :Firstdate) time/parse-date-iso-8601)
+                    date-vector (z/attr c :Vector)]
+                (merge
+                 {:id (z/attr c :FootnoteId)
+                  :first-date first-date
+                  :vector date-vector}
+                 (when (and first-date date-vector)
+                   {:dates (into #{}
+                                 (remove
+                                  nil?
+                                  (map (fn [i valid?]
+                                         ;; valid? is a character (\1 for valid, \0 for not valid)
+                                         (when (= \1 valid?)
+                                           (.plusDays first-date i)))
+                                       (range) date-vector)))})))))))
 
 (defn companies-by-id [kz]
-  (into {}
-        (map (juxt :id identity))
-        (z/xml-> kz :Company
-                 (fn [c]
-                   {:id (z/attr c :CompanyId)
-                    :name (z/attr c :Name)}))))
+  (map-by
+   :id
+   (z/xml-> kz :Company
+            (fn [c]
+              {:id (z/attr c :CompanyId)
+               :name (z/attr c :Name)}))))
 
 (defn agency-txt [companies]
   (map (fn [{:keys [id name]}]
