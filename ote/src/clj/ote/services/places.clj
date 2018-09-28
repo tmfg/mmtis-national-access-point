@@ -7,7 +7,6 @@
             [compojure.core :refer [routes GET]]
             [clojure.string :as str]
             [taoensso.timbre :as log]
-            [ote.shapefile.reader :as shp]
             [ote.geo :as geo]
             [ote.util.functor :refer [fmap]]
             [specql.core :as specql]

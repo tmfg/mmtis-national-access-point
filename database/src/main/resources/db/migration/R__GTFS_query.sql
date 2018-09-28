@@ -508,9 +508,9 @@ AS $$
 SELECT string_agg(rh.hash::TEXT,' ' ORDER BY h."package-id")
   FROM "gtfs-date-hash" h
   JOIN LATERAL unnest(h."route-hashes") rh
-    ON (rh."route-short-name" = route_short_name AND
-        rh."route-long-name" = route_long_name AND
-        rh."trip-headsign" = trip_headsign)
+    ON (COALESCE(rh."route-short-name",'') = COALESCE(route_short_name,'') AND
+        COALESCE(rh."route-long-name",'') = COALESCE(route_long_name,'') AND
+        COALESCE(rh."trip-headsign",'') = COALESCE(trip_headsign,''))
  WHERE h.date = dt
    AND h."package-id" = ANY(gtfs_service_packages_for_date(service_id, dt))
 $$ LANGUAGE SQL STABLE;

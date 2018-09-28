@@ -83,12 +83,8 @@
                  [org.clojure/data.zip "0.1.2"]
 
                  ;; GeoTools
-                 [org.geotools/gt-shapefile "16.1"]
-                 [org.geotools/gt-process-raster "16.1"]
-                 [org.geotools/gt-epsg-wkt "16.1"]
-                 [org.geotools/gt-geometry "16.1"]
-                 [org.geotools/gt-xml "16.1"]
-                 [org.geotools/gt-geojson "16.1"]
+                 [org.geotools/gt-epsg-wkt "20.0"]
+                 [org.geotools/gt-geometry "20.0"]
 
                  ;; Data/file formats and file handling
                  ;; JSON
@@ -104,7 +100,6 @@
                                com.amazonaws/amazon-kinesis-client]]
                  [com.amazonaws/aws-java-sdk-core "1.11.312"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
-                 [com.amazonaws/aws-java-sdk-lambda "1.11.312"]
 
                  ;; override old guava version from deps
                  [com.google.guava/guava "21.0"]]

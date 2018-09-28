@@ -6,9 +6,7 @@
 
   (:require [clojure.spec.alpha :as s])
   #?(:clj
-     (:import (com.vividsolutions.jts.geom MultiPolygon Polygon Point LineString)
-              (org.postgis
-               PGgeometry))))
+     (:import (org.postgis PGgeometry))))
 
 
 ;;; clojure.spec definitions for geometry data
@@ -72,41 +70,6 @@
       (when (< idx len)
         (lazy-seq (cons (.getGeometryN gc idx)
                         (geometry-collection-seq gc len (inc idx))))))))
-
-#?(:clj
-
-   ;; Extend to-clj to JTS geometry types
-   (extend-protocol
-       GeometryToClojure
-
-     com.vividsolutions.jts.geom.Coordinate
-     (to-clj [^com.vividsolutions.jts.geom.Coordinate c]
-       [(.-x c) (.-y c)])
-
-     com.vividsolutions.jts.geom.Point
-     (to-clj [^com.vividsolutions.jts.geom.Point p]
-       {:type :point :coordinates (to-clj (.getCoordinate p))})
-
-     com.vividsolutions.jts.geom.Polygon
-     (to-clj [^com.vividsolutions.jts.geom.Polygon p]
-       {:type :polygon
-        :coordinates (mapv to-clj (.getCoordinates p))})
-
-     com.vividsolutions.jts.geom.LineString
-     (to-clj [^com.vividsolutions.jts.geom.LineString p]
-       {:type :line
-        :coordinates (mapv to-clj (.getCoordinates p))})
-
-     com.vividsolutions.jts.geom.MultiLineString
-     (to-clj [^com.vividsolutions.jts.geom.MultiLineString p]
-       {:type :multiline
-        :lines (mapv to-clj (geometry-collection-seq p))})
-
-
-     com.vividsolutions.jts.geom.MultiPolygon
-     (to-clj [^com.vividsolutions.jts.geom.MultiPolygon mp]
-       {:type :multipolygon
-        :polygons (mapv to-clj (geometry-collection-seq mp))})))
 
 
 #?(:clj
@@ -174,30 +137,35 @@
 
 
 
-;;; Conversion between WGS84 and Finnish EUREF-FIN systems
+;; Conversion from KKJ to WGS84 (needed for Kalkati station positions)
 
 #?(:clj
-   (def euref-wkt "PROJCS[\"EUREF_FIN_TM35FIN\", \n  GEOGCS[\"GCS_EUREF_FIN\", \n    DATUM[\"D_ETRS_1989\", \n      SPHEROID[\"GRS_1980\", 6378137.0, 298.257222101]], \n    PRIMEM[\"Greenwich\", 0.0], \n    UNIT[\"degree\", 0.017453292519943295], \n    AXIS[\"Longitude\", EAST], \n    AXIS[\"Latitude\", NORTH]], \n  PROJECTION[\"Transverse_Mercator\"], \n  PARAMETER[\"central_meridian\", 27.0], \n  PARAMETER[\"latitude_of_origin\", 0.0], \n  PARAMETER[\"scale_factor\", 0.9996], \n  PARAMETER[\"false_easting\", 500000.0], \n  PARAMETER[\"false_northing\", 0.0], \n  UNIT[\"m\", 1.0], \n  AXIS[\"x\", EAST], \n  AXIS[\"y\", NORTH]]"))
+   ;; We need to define our own KKJ CRS because the one defined in geotools
+   ;; has the wrong bursa wolf parameters (the TOWGS84 line below) that resulted
+   ;; in wrong coordinates for kalkati stations (~10 - 15 meters off).
+   ;; http://www.epsg-registry.org/
+   (def kkj
+          (org.geotools.referencing.CRS/parseWKT "PROJCS[\"KKJ / Finland Uniform Coordinate System\",
+GEOGCS[\"KKJ\",DATUM[\"Kartastokoordinaattijarjestelma_1966\",
+SPHEROID[\"International 1924\",6378388,297,AUTHORITY[\"EPSG\",\"7022\"]],
+TOWGS84[-90.7, -106.1, -119.2, 4.09, 0.218, -1.05, 1.37],
+AUTHORITY[\"EPSG\",\"6123\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4123\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",3500000],PARAMETER[\"false_northing\",0],AUTHORITY[\"EPSG\",\"2393\"],AXIS[\"Y\",EAST],AXIS[\"X\",NORTH]]")))
+#?(:clj (def wgs84 (org.geotools.referencing.CRS/decode "EPSG:4326")))
+#?(:clj
+   (def kkj->wgs84-transform
+     (org.geotools.referencing.CRS/findMathTransform kkj wgs84 false)))
 
-#?(:clj (def wgs84 org.geotools.referencing.crs.DefaultGeographicCRS/WGS84))
-#?(:clj (def euref (org.geotools.referencing.CRS/parseWKT euref-wkt)))
-#?(:clj (def euref->wgs84-transform (org.geotools.referencing.CRS/findMathTransform euref wgs84 true)))
-#?(:clj (def swap-coordinates
-          (reify com.vividsolutions.jts.geom.CoordinateFilter
-            (filter [_ c]
-              (let [x (.-x c)
-                    y (.-y c)]
-                (set! (.-x c) y)
-                (set! (.-y c) x))))))
 
 #?(:clj
-   (defn euref->wgs84
-     "Transform a coordinate from EUREF-FIN to WGS84 (GPS)."
-     [geometry]
-     (let [new-geometry
-           (org.geotools.geometry.jts.JTS/transform geometry euref->wgs84-transform)]
-       (.apply new-geometry swap-coordinates)
-       new-geometry)))
+   (defn kkj->wgs84
+     "Transform a coordinate FROM KKJ to WGS84 (GPS).
+  Y coordinate is North (P).
+  X coordinate is East (I)"
+     [{:keys [x y]}]
+     (let [kkj-pos (org.geotools.geometry.DirectPosition2D. kkj x y)
+           wgs84-pos (org.geotools.geometry.DirectPosition2D. wgs84)
+           transformed (.transform kkj->wgs84-transform kkj-pos wgs84-pos)]
+       transformed
 
-(def ETRS-TM35FIN "EPSG:3067")
-(def WGS84 "EPSG:4326")
+       {:x (.-x transformed)
+        :y (.-y transformed)})))
