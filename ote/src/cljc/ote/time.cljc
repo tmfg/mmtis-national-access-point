@@ -92,7 +92,7 @@
 
 (def valid-date? (complement empty-date?))
 
-(defn format-time-full [{::keys [hours minutes seconds]}]
+(defn format-time-full [{:keys [hours minutes seconds]}]
   (#?(:clj format
       :cljs gstr/format)
    "%02d:%02d:%02d" hours minutes (or seconds 0)))
