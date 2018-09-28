@@ -83,12 +83,8 @@
                  [org.clojure/data.zip "0.1.2"]
 
                  ;; GeoTools
-                 ;[org.geotools/gt-shapefile "20.0"]
-                 ;[org.geotools/gt-process-raster "20.0"]
                  [org.geotools/gt-epsg-wkt "20.0"]
                  [org.geotools/gt-geometry "20.0"]
-                 ;[org.geotools/gt-xml "20.0"]
-                 ;[org.geotools/gt-geojson "20.0"]
 
                  ;; Data/file formats and file handling
                  ;; JSON
