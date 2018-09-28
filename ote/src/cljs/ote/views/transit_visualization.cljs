@@ -394,7 +394,7 @@
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
-     {:name "Määränpää" :width "20%"
+     {:name "Reitti/määränpää" :width "20%"
       :read :gtfs/trip-headsign}
 
      {:name "Aikaa 1:seen muutokseen"
