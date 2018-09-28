@@ -226,11 +226,8 @@ Kalkati Transport modes
   [kz]
   (let [trans-modes (trans-modes-by-id kz)
         routes (routes-with-trips (routes kz))
-
         stations (stations-by-id kz)
-
         calendars (calendars kz)]
-
     [{:name "agency.txt"
       :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt (agency-txt (companies-by-id kz)))}
      {:name "routes.txt"
@@ -270,3 +267,11 @@ Kalkati Transport modes
     (let [kz (kalkati-zipper (java.io.ByteArrayInputStream. (.getBytes (:data lvm-xml) "UTF-8")))]
       (ring-io/piped-input-stream
        #(kalkati->gtfs-zip-file kz %)))))
+
+(defn convert-bytes
+  "Convert a byte array containing a Kalkati.net zipped XML to a GTFS zip file byte array."
+  [byte-array]
+  (let [out (java.io.ByteArrayOutputStream.)]
+    (io/copy (convert (java.io.ByteArrayInputStream. byte-array))
+             out)
+    (.toByteArray out)))
