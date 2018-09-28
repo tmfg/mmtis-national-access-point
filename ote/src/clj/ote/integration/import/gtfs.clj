@@ -215,8 +215,9 @@
   (load-interface-url db interface-id url last-import-date saved-etag))
 
 (defmethod load-transit-interface-url :kalkati [_ db interface-id url last-import-date saved-etag]
-  (update (load-file-from-url db interface-id url last-import-date saved-etag)
-          :body kalkati-to-gtfs/convert))
+  (let [response (load-interface-url db interface-id url last-import-date saved-etag)]
+    (when response
+      (update response :body kalkati-to-gtfs/convert-bytes))))
 
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
