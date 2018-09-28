@@ -143,6 +143,7 @@
    ;; We need to define our own KKJ CRS because the one defined in geotools
    ;; has the wrong bursa wolf parameters (the TOWGS84 line below) that resulted
    ;; in wrong coordinates for kalkati stations (~10 - 15 meters off).
+   ;; http://www.epsg-registry.org/
    (def kkj
           (org.geotools.referencing.CRS/parseWKT "PROJCS[\"KKJ / Finland Uniform Coordinate System\",
 GEOGCS[\"KKJ\",DATUM[\"Kartastokoordinaattijarjestelma_1966\",
