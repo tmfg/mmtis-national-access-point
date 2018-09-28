@@ -16,8 +16,6 @@
   (xml-zip
    (xml/parse input)))
 
-(def kz (kalkati-zipper (io/input-stream "/Users/tatuta/Downloads/kaj-forsblom-kalkati.xml")))
-
 (def
   ^{:doc
     "Convert a Kalkat.net transport mode to GTFS mode.
