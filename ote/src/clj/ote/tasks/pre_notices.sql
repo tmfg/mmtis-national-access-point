@@ -32,7 +32,9 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
           FROM finnish_regions fr
          WHERE fr.numero = ANY(chg."finnish-regions")) AS regions,
        op.name AS "operator-name",
-       ts.name AS "service-name"
+       ts.name AS "service-name",
+       to_char(date,'yyyy-mm-dd') as date,
+       ts.id AS "transport-service-id"
   FROM changes_with_regions chg
   JOIN "transport-service" ts ON ts.id = chg."transport-service-id"
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id"

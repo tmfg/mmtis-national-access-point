@@ -19,7 +19,8 @@
             [ote.tasks.util :refer [daily-at]]
             [ote.util.db :as db-util]
             [ote.email :as email]
-            [ote.util.throttle :refer [with-throttle-ms]])
+            [ote.util.throttle :refer [with-throttle-ms]]
+            [ote.environment :as environment])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
@@ -33,7 +34,7 @@
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                               first-effective-date description]}]
   [[:b id]
-   [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} (escape-html route-description)]
+   [:a {:href (str (environment/base-url) "#/authority-pre-notices/" id)} (escape-html route-description)]
    (str/join ",<br />" (db-util/PgArray->seqable regions))
    (escape-html operator-name)
    (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
@@ -54,6 +55,23 @@
       [:tr
        (for [cell row]
          [:td cell])])]])
+
+(defn detected-change-row [{:keys [service-name operator-name change-date days-until-change
+                                   added-routes removed-routes changed-routes regions
+                                   date transport-service-id]}]
+  [operator-name
+   (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
+        transport-service-id "/" date "\">" (escape-html service-name) "</a>")
+   (str/join ", " (db-util/PgArray->vec regions))
+   (str days-until-change " (" change-date ")")
+   (str/join ", "
+             (remove nil?
+                     [(when added-routes
+                        (str added-routes " uutta reittiä"))
+                      (when removed-routes
+                        (str removed-routes " päättyvää reittiä"))
+                      (when changed-routes
+                        (str changed-routes " muuttunutta reittiä"))]))])
 
 (defn notification-template [pre-notices detected-changes]
   [:html
@@ -92,19 +110,8 @@
          {:width "20%" :label "Alue"}
          {:width "20%" :label "Aikaa 1:seen muutokseen"}
          {:width "20%" :label "Muutokset"}]
-        (for [{:keys [service-name operator-name change-date days-until-change
-                      added-routes removed-routes changed-routes regions]} detected-changes]
-          [operator-name service-name
-           (str/join ", " (db-util/PgArray->vec regions))
-           (str days-until-change " (" change-date ")")
-           (str/join ", "
-                     (remove nil?
-                             [(when added-routes
-                                (str added-routes " uutta reittiä"))
-                              (when removed-routes
-                                (str removed-routes " päättyvää reittiä"))
-                              (when changed-routes
-                                (str changed-routes " muuttunutta reittiä"))]))]))
+        (for [chg  detected-changes]
+          (detected-change-row chg)))
        [:br]])
 
     [:p "Tämän viestin lähetti NAP."]
