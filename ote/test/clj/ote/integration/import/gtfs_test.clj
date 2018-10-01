@@ -13,13 +13,16 @@
             [ote.db.generators :as generators]
             [ote.integration.export.transform :as transform]
             [ote.time :as time]
+            [clj-time.core :as time-core]
+            [clj-time.coerce :as time-coerce]
             [webjure.json-schema.validator.macro :refer [make-validator]]
             [cheshire.core :as cheshire]
             [taoensso.timbre :as log]
             [clojure.string :as str]
             [clojure.java.io :as io]
             [ote.util.zip :as zip-file]
-            [ring.util.io :as ring-io]))
+            [ring.util.io :as ring-io]
+            [clj-time.coerce :as coerce]))
 
 
 (t/use-fixtures :each
@@ -58,10 +61,16 @@
 
 
 (deftest save-gtfs-to-db
-  (let [gtfs-zip (gtfs-zip 1)]
-    (upsert-gtfs-package 999)
-    (import-gtfs/save-gtfs-to-db (:db *ote*) (convert-bytes gtfs-zip) 999 1)
+  (let [gtfs-zip (gtfs-zip 1)
+        _ (upsert-gtfs-package 999)
+        _ (import-gtfs/save-gtfs-to-db (:db *ote*) (convert-bytes gtfs-zip) 999 1)
+        gtfs-package (fetch-gtfs-package 999)]
 
-    (println (fetch-gtfs-package 999))
-
-    (is (= 999 (:id (fetch-gtfs-package 999))))))
+    (is (= 999 (:id gtfs-package)))
+    (is (not (nil? (:envelope gtfs-package))))
+    (is (= 1 (:transport-operator-id gtfs-package)))
+    (is (= 1 (:transport-service-id gtfs-package)))
+    (is (= 1 (:external-interface-description-id gtfs-package)))
+    (is (= 1 (:external-interface-description-id gtfs-package)))
+    (is (= (time/date-fields (time/parse-date-iso-8601 "2017-01-01"))
+           (time/date-fields-only (time/native->date-time (:created gtfs-package)))))))
