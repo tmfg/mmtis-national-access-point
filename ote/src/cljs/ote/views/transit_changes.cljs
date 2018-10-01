@@ -2,6 +2,8 @@
   "Transit changes view. Shows when regular route based traffic schedules
   change with links to detailed view (transit visualization)"
   (:require [reagent.core :as r]
+            [cljs-react-material-ui.core :refer [color]]
+            [ote.ui.tabs :as tabs]
             [ote.app.controller.transit-changes :as tc]
             [ote.ui.common :as common]
             [ote.ui.table :as table]
@@ -32,7 +34,8 @@
 
 (defn transit-changes-legend []
   [:div.transit-changes-legend (use-style style/transit-changes-legend)
-   [:div [:b "Taulukon ikonien selitteet"]]
+   [:div {:style {:padding-bottom "10px"}}
+    [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                        [ic/content-remove-circle-outline " Päättyviä reittejä"]
                        [ic/editor-format-list-bulleted " Reittimuutoksia"]]]
@@ -125,7 +128,7 @@
        [change-icons row])]))
 
 (defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
-  [:div.transit-changes
+  [:div.transit-changes {:style {:padding-top "10px"}}
    [:h3 "Säännöllisen markkinaehtoisen reittiliikenteen tulevat muutokset"]
    [:p
     "Taulukossa on listattu " [:b "säännöllisen aikataulun mukaisen liikenteen"]
@@ -174,9 +177,15 @@
       (filter region-matches? changes))]])
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
-  [ui/tabs {:value (name page)
-            :on-change #(e! (fp/->ChangePage (keyword %) nil))}
-   [ui/tab {:label "Lomakeilmoitukset" :value "authority-pre-notices"}
-    [pre-notices-authority-listing/pre-notices e! app]]
-   [ui/tab {:label "Tunnistetut muutokset" :value "transit-changes"}
-    [detected-transit-changes e! transit-changes]]])
+  [:div
+   [:h1 "Markkinaehtoisen liikenteen muutokset"]
+   [ui/tabs {:value (name page)
+            :on-change #(e! (fp/->ChangePage (keyword %) nil))
+            :style {:color (color :gray900) :background-color "white"}
+            :inkBarStyle  {:background-color (color :blue700)}}
+   (tabs/tab {:label "Lomakeilmoitukset"
+              :value "authority-pre-notices"
+              :tab-content [pre-notices-authority-listing/pre-notices e! app]})
+   (tabs/tab {:label "Tunnistetut muutokset"
+              :value "transit-changes"
+              :tab-content [detected-transit-changes e! transit-changes]})]])

@@ -2,6 +2,8 @@
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.core :refer [color]]
+            [ote.ui.tabs :as tabs]
             [ote.ui.form-fields :as form-fields]
             [ote.app.controller.admin :as admin-controller]
             [ote.db.transport-service :as t-service]
@@ -284,17 +286,16 @@
 
 (defn admin-panel [e! app]
   (let [selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
+    [:div
     [ui/tabs {:value     selected-tab
-              :on-change #(e! (admin-controller/->ChangeAdminTab %))}
-     [ui/tab {:label "Käyttäjät" :value "users"}
-      [users/user-listing e! app]]
-     [ui/tab {:label "Palvelut" :value "services"}
-      [service-listing e! app]]
-     [ui/tab {:label "Y-tunnus raportti" :value "businessid"}
-      [business-id-report e! app]]
-     [ui/tab {:label "Palveluntuottajat" :value "operators"}
-      [operator-list e! app]]
-     [ui/tab {:label "Rajapinnat" :value "interfaces"}
-      [interfaces/interface-list e! app]]
-     [ui/tab {:label "CSV Raportit" :value "reports"}
-      [reports/reports  e! app]]]))
+              :on-change #(e! (admin-controller/->ChangeAdminTab %))
+              :style {:color "black" :background-color "white"}
+              :inkBarStyle  {:background-color (color :blue700)}}
+
+     (tabs/tab {:label "Käyttäjä" :value "users" :tab-content [users/user-listing e! app]})
+     (tabs/tab {:label "Palvelut" :value "services" :tab-content [service-listing e! app]})
+     (tabs/tab {:label "Y-tunnus raportti" :value "businessid" :tab-content [business-id-report e! app]})
+     (tabs/tab {:label "Palveluntuottajat" :value "operators" :tab-content [operator-list e! app]})
+     (tabs/tab {:label "Rajapinnat" :value "interfaces" :tab-content [interfaces/interface-list e! app]})
+     (tabs/tab {:label "CSV Raportit" :value "reports" :tab-content [reports/reports  e! app]})]
+    ]))
