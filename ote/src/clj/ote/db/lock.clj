@@ -26,3 +26,25 @@
            ~@body
            (finally
              (release-lock db# {:id lock-name#}))))))
+
+(def ^:dynamic *exclusive-task-wait-ms* 5000)
+
+(defmacro with-exclusive-lock
+  "Run body with an exclusive lock on 1 node only. This is meant for tasks that are timed
+  to run at a specific time. Waits `*exclusive-task-wait-ms*` milliseconds to make sure
+  that all nodes have tried the lock.
+
+  The parameters are the same `try-with-lock`."
+  [db lock-name timelimit & body]
+  `(try-with-lock
+    ~db ~lock-name ~timelimit
+    (try
+      ~@body
+      (finally
+        ;; Sleep to ensure that no other nodes are able to run this task at the same.
+        ;;
+        ;; This is needed if the task is "too fast" and there is some clock skew on the nodes
+        ;; so that they might fire the task at slightly different times. That would make it
+        ;; possible for the first runner to release the lock before the next one tries to
+        ;; acquire it. This sleep with the lock held prevents that.
+        (Thread/sleep *exclusive-task-wait-ms*)))))
