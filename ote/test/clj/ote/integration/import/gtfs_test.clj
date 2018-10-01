@@ -49,8 +49,8 @@
 
 
 
-(defn gtfs-zip [test-package-id]
-  (let [path (str "test/resources/gtfs/gtfs_package_" test-package-id "/")
+(defn gtfs-zip [test-id]
+  (let [path (str "test/resources/gtfs/test" test-id "/")
         files (mapv (fn [fname]
                       {:name fname :data (slurp (str path fname))})
                     gtfs-files)]
