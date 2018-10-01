@@ -15,7 +15,8 @@
              [cheshire.core :as cheshire]
              [clojure.string :as str]
              [clojure.java.io :as io]
-             [ote.email :as email])
+             [ote.email :as email]
+             [ote.db.lock :as lock])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)
            (java.io File)))
@@ -101,7 +102,10 @@
                                                         :session {:key session-key}})
                                      [:db])
                               :email (fake-email outbox)
-                              system-map-entries))]
+                              system-map-entries))
+
+                ;; When testing, we don't need to wait for other nodes
+                lock/*exclusive-task-wait-ms* 0]
         (reset! outbox [])
         (tests)
         (component/stop *ote*)))))
