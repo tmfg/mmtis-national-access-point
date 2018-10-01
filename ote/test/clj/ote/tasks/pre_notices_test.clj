@@ -9,7 +9,10 @@
             [clojure.string :as str]
             [ote.db.user-notifications :as user-notifications]
             [ote.services.settings :as settings]
-            [com.stuartsierra.component :as component]))
+            [com.stuartsierra.component :as component]
+            [ote.db.gtfs :as gtfs]
+            [ote.time :as time]
+            [clj-time.coerce :as tc]))
 
 
 (t/use-fixtures :each (system-fixture
@@ -29,6 +32,9 @@
                                                   ::transit/effective-date-description "this is happening right now"}]
                       ::modification/created (java.util.Date.)})
 
+(defn- email-content []
+  (get-in @outbox [0 :body 0 :content]))
+
 (deftest no-notices-to-send
   (testing "Default empty database, there are no notices to send"
     (send!)
@@ -39,7 +45,7 @@
                   test-pre-notice)
   (send!)
   (is (= 1 (count @outbox)))
-  (is (str/includes? (get-in @outbox [0 :body 0 :content]) "this is a test route")))
+  (is (str/includes? (email-content) "this is a test route")))
 
 (deftest send-region-preferences
   (specql/insert! (:db *ote*) ::transit/pre-notice
@@ -57,3 +63,24 @@
                {::user-notifications/finnish-regions ["01" "02"]})
     (send!)
     (is (= 1 (count @outbox)))))
+
+(deftest email-includes-detected-changes
+
+  (testing "nothing is sent before detected change"
+    (send!)
+    (is (empty? @outbox)))
+
+  (testing "inserted change is found and sent"
+    (specql/insert! (:db *ote*) :gtfs/transit-changes
+                    {:gtfs/transport-service-id 1
+                     :gtfs/date (java.util.Date.)
+                     :gtfs/current-week-date (java.util.Date.)
+                     :gtfs/different-week-date (tc/to-sql-date (time/days-from (time/now) 70))
+                     :gtfs/change-date (tc/to-sql-date (time/days-from (time/now) 67))
+                     :gtfs/package-ids [1]
+                     :gtfs/removed-routes 1
+                     :gtfs/added-routes 2
+                     :gtfs/changed-routes 3})
+    (send!)
+    (is (= 1 (count @outbox)))
+    (is (str/includes? (email-content) "tunnistetut"))))

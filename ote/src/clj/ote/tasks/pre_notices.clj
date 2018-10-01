@@ -30,29 +30,32 @@
   (when dt
     (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
 
-(defn date-string [dt timezone]
-  (when dt
-    (time/format-date (t/to-time-zone dt timezone))))
-
-(defn hours->seconds [hours]
-  (int (* 3600 hours)))
-
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
-                              effective-dates-asc description]}]
-  (let [effective-date-str (date-string (coerce/from-sql-date
-                                          (first (db-util/PgArray->seqable effective-dates-asc)))
-                                        timezone)]
-    [:tr
-     [:td [:b id]]
-     [:td [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} (escape-html route-description)]]
-     [:td (str/join ",<br />" (db-util/PgArray->seqable regions))]
-     [:td (escape-html operator-name)]
-     [:td (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
-                               (db-util/PgArray->seqable pre-notice-type)))]
-     [:td effective-date-str]
-     [:td (escape-html description)]]))
+                              first-effective-date description]}]
+  [[:b id]
+   [:a {:href (str "https://finap.fi/#/authority-pre-notices/" id)} (escape-html route-description)]
+   (str/join ",<br />" (db-util/PgArray->seqable regions))
+   (escape-html operator-name)
+   (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
+                             (db-util/PgArray->seqable pre-notice-type)))
+   first-effective-date
+   (escape-html description)])
 
-(defn notification-template [pre-notices]
+(defn- table [headers rows]
+  [:table
+   [:colgroup
+    (for [{width :width} headers]
+      [:col {:style (str "width: " width)}])]
+   [:tbody
+    [:tr
+     (for [{label :label} headers]
+       [:th [:b label]])]
+    (for [row rows]
+      [:tr
+       (for [cell row]
+         [:td cell])])]])
+
+(defn notification-template [pre-notices detected-changes]
   [:html
    [:head
     [:style
@@ -60,34 +63,50 @@
       table,td,tr,th { border: 1px solid black; }
       td,tr,th { padding: 5px; }"]]
    [:body
-    [:p [:b "Uudet 60 päivän muutosilmoitukset NAP:ssa"]]
-    [:ul
-     [:li
-      "Muutosilmoitukset on listattu voimaantulopäivämäärän mukaisesti."]
-     [:li
-      "Pääset tarkastelemaan muutosilmoitusta NAP:ssa klikkaamalla reitin nimeä taulukossa."]]
-    [:table
-     [:colgroup
-      [:col {:style "width: 5%"}]
-      [:col {:style "width: 10%"}]
-      [:col {:style "width: 10%"}]
-      [:col {:style "width: 10%"}]
-      [:col {:style "width: 20%"}]
-      [:col {:style "width: 15%"}]
-      [:col {:style "width: 30%"}]]
-     [:tbody
-      [:tr
-       [:th [:b "#"]]
-       [:th [:b "Reitin nimi"]]
-       [:th [:b "Alue"]]
-       [:th [:b "Palveluntuottajan nimi"]]
-       [:th [:b "Muutoksen tyyppi"]]
-       [:th [:b "Muutoksen ensimmäinen voimaantulopäivä"]]
-       [:th [:b "Muutoksen tarkemmat tiedot"]]]
-      (doall
+    (when (seq pre-notices)
+      [:span
+       [:p [:b "Uudet 60 päivän muutosilmoitukset NAP:ssa"]]
+       [:ul
+        [:li
+         "Muutosilmoitukset on listattu voimaantulopäivämäärän mukaisesti."]
+        [:li
+         "Pääset tarkastelemaan muutosilmoitusta NAP:ssa klikkaamalla reitin nimeä taulukossa."]]
+       (table
+        [{:width "5%" :label "#"}
+         {:width "10%" :label "Reitin nimi"}
+         {:width "10%" :label "Alue"}
+         {:width "10%" :label "Palveluntuottajan nimi"}
+         {:width "20%" :label "Muutoksen tyyppi"}
+         {:width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
+         {:width "30%" :label "Muutoksen tarkemmat tiedot"}]
         (for [n pre-notices]
-          (pre-notice-row n)))]]
-    [:br]
+          (pre-notice-row n)))
+       [:br]])
+
+    (when (seq detected-changes)
+      [:span
+       [:p [:b "Uudet tunnistetut liikennöintimuutokset NAP:ssa"]]
+       (table
+        [{:width "20%" :label "Palveluntuottaja"}
+         {:width "20%" :label "Palvelu"}
+         {:width "20%" :label "Alue"}
+         {:width "20%" :label "Aikaa 1:seen muutokseen"}
+         {:width "20%" :label "Muutokset"}]
+        (for [{:keys [service-name operator-name change-date days-until-change
+                      added-routes removed-routes changed-routes regions]} detected-changes]
+          [operator-name service-name
+           (str/join ", " (db-util/PgArray->vec regions))
+           (str days-until-change " (" change-date ")")
+           (str/join ", "
+                     (remove nil?
+                             [(when added-routes
+                                (str added-routes " uutta reittiä"))
+                              (when removed-routes
+                                (str removed-routes " päättyvää reittiä"))
+                              (when changed-routes
+                                (str changed-routes " muuttunutta reittiä"))]))]))
+       [:br]])
+
     [:p "Tämän viestin lähetti NAP."]
     [:p "Ongelmia? Ota yhteys NAP-Helpdeskiin," [:br]
      [:a
@@ -100,12 +119,16 @@
   "Every user can have their own set of notifications. Return notification html based on regions."
   [db user]
   (try
-    (when-let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})]
-      (if-not (empty? notices)
+    (let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})
+          detected-changes (fetch-current-detected-changes-by-regions db {:regions (:finnish-regions user)})]
+      (if (or (seq notices) (seq detected-changes))
         (do
-          (log/info "For user " (:email user) " we found" (count notices) "new pre-notices from 24 hours for regions " (:finnish-regions user))
-          (html (notification-template notices)))
-        (log/info "No new pre-notices found.")))
+          (log/info "For user " (:email user) " we found "
+                    (count notices) " new pre-notices and "
+                    (count detected-changes) " new detected changes "
+                    " from 24 hours for regions " (:finnish-regions user))
+          (html (notification-template notices detected-changes)))
+        (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
       (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e ))))
