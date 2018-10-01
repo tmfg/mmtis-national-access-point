@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<jp_database version="1.0">
+  <Delivery Firstday="2000-01-01T00:00:00+02:00" Lastday="2100-01-01T00:00:00+02:00" CompanyId="1" Version="2018-09-19T18:02:11.9+00:00"/>
+  <Language LanguageId="fi" Description="Suomi"/>
+  <Company CompanyId="1" Code="test1" Name="Test Company Ltd"/>
+  <Country CountryId="fi" Name="Suomi"/>
+  <Timezone TimezoneId="2">
+    <Period Difference="+02:00"
+            Firstday="2002-01-01T00:00:00.0+00:00"
+            Lastday="2030-01-01T00:00:00.0+00:00"/>
+  </Timezone>
+  <Station StationId="s1" Name="Test station 1" Minchangetime="0" TimezoneId="2" CountryId="fi"
+           X="3429772" Y="6695249"/>
+  <Station StationId="s2" Name="Test station 2" Minchangetime="0" TimezoneId="2" CountryId="fi"
+           X="3429792" Y="6696249"/>
+  <Station StationId="s3" Name="Test station 3" Minchangetime="0" TimezoneId="2" CountryId="fi"
+           X="3430772" Y="6696249"/>
+
+  <!-- This has schedule for 8 days between: 2018-09-28 - 2018-10-05
+       and operates on 5 of the days. -->
+  <Footnote FootnoteId="1" Firstdate="2018-09-28" Vector="11100011"/>
+
+  <!-- This is a bus route -->
+  <Trnsmode TrnsmodeId="1" Name="N/A" ModeType="5"/>
+
+  <Timetbls>
+    <Service ServiceId="srv1">
+      <ServiceNbr Variant="" ServiceNbr="1" Name="Test service" CompanyId="1"/>
+      <ServiceValidity FootnoteId="1"/>
+      <ServiceTrnsmode TrnsmodeId="1"/>
+      <Stop Ix="1" StationId="s1" Departure="0700"/>
+      <Stop Ix="2" StationId="s2" Departure="0730"/>
+      <Stop Ix="3" StationId="s3" Departure="0815"/>
+    </Service>
+  </Timetbls>
+</jp_database>
