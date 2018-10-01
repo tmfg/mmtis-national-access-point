@@ -39,6 +39,7 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
   JOIN "transport-service" ts ON ts.id = chg."transport-service-id"
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
  WHERE chg.date = CURRENT_DATE
+   AND chg."change-date" IS NOT NULL
    AND (chg."finnish-regions" IS NULL OR
         :regions::CHAR(2)[] IS NULL OR
         :regions::CHAR(2)[] && chg."finnish-regions");
