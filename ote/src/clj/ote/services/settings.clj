@@ -30,12 +30,12 @@
         (assoc-in [:email-settings :regions] regions)
         (assoc-in [:email-settings :user-notifications] user-settings))))
 
-    (define-service-component Settings {}
-      ^{:format :transit}
-      (POST "/settings/email-notifications" {form-data :body
-                                             user      :user}
+(define-service-component Settings {}
+  ^{:format :transit}
+  (POST "/settings/email-notifications" {form-data :body
+                                         user      :user}
         (save-notifications! user db
                              (http/transit-request form-data)))
-      ^{:format :transit}
-      (GET "/settings/email-notifications" {user :user}
-        (get-notifications user db)))
+  ^{:format :transit}
+  (GET "/settings/email-notifications" {user :user}
+       (get-notifications user db)))
