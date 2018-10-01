@@ -1,28 +1,23 @@
 (ns ote.integration.import.gtfs_test
   (:require [ote.integration.import.gtfs :as import-gtfs]
+            [ote.tasks.gtfs :refer [upsert-service-transit-change]]
             [clojure.test :as t :refer [use-fixtures deftest is testing]]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
             [ote.test :refer [system-fixture *ote* http-post http-get sql-query sql-execute!]]
             [com.stuartsierra.component :as component]
-            [ote.services.transport :as transport-service]
-            [ote.db.service-generators :as service-generators]
             [clojure.test.check.generators :as gen]
-            [ote.db.transport-service :as t-service]
+            [ote.db.gtfs :as gtfs]
             [ote.db.places :as places]
             [ote.db.generators :as generators]
             [ote.integration.export.transform :as transform]
             [ote.time :as time]
-            [clj-time.core :as time-core]
-            [clj-time.coerce :as time-coerce]
             [webjure.json-schema.validator.macro :refer [make-validator]]
-            [cheshire.core :as cheshire]
-            [taoensso.timbre :as log]
-            [clojure.string :as str]
             [clojure.java.io :as io]
             [ote.util.zip :as zip-file]
             [ring.util.io :as ring-io]
-            [clj-time.coerce :as coerce]))
+            [specql.impl.registry :as specql-registry]
+            [specql.impl.composite :as composite]))
 
 
 (t/use-fixtures :each
@@ -43,30 +38,42 @@
   (first (sql-query
            "SELECT * FROM gtfs_package WHERE id=" id "LIMIT 1")))
 
-(defn upsert-gtfs-package [id]
+(defn upsert-gtfs-package [id date]
   (set
     (sql-execute!
       "DELETE FROM gtfs_package WHERE id =" id ";"
       "INSERT INTO gtfs_package (id, \"transport-operator-id\", \"transport-service-id\", \"external-interface-description-id\", created)
-        VALUES (" id ", 1, 1, 1, '2017-01-01'::DATE)")))
+       VALUES (" id ", 1, 1, 1, '" date "'::DATE)")))
+
+
+(defn fetch-latest-transit-change []
+  (first (sql-query
+           "SELECT * FROM \"gtfs-transit-changes\"
+             WHERE \"transport-service-id\" = 1 AND date >= CURRENT_DATE
+             ORDER BY \"transport-service-id\", date desc
+             LIMIT 1")))
 
 
 
-(defn gtfs-zip [test-id]
-  (let [path (str "test/resources/gtfs/test" test-id "/")
+(defn gtfs-zip [test-package-name]
+  (let [path (str "test/resources/gtfs/" test-package-name "/")
         files (mapv (fn [fname]
                       {:name fname :data (slurp (str path fname))})
                     gtfs-files)]
     (ring-io/piped-input-stream #(zip-file/write-zip files %))))
 
+(defn import-gtfs [test-package-name id date]
+  (let [gtfs-zip (gtfs-zip test-package-name)]
+    (upsert-gtfs-package id date)
+    (import-gtfs/save-gtfs-to-db (:db *ote*) (convert-bytes gtfs-zip) id 1)))
+
 
 (deftest save-gtfs-to-db
-  (let [gtfs-zip (gtfs-zip 1)
-        _ (upsert-gtfs-package 999)
-        _ (import-gtfs/save-gtfs-to-db (:db *ote*) (convert-bytes gtfs-zip) 999 1)
-        gtfs-package (fetch-gtfs-package 999)]
+  (import-gtfs "test1" 1000 "2017-01-01")
 
-    (is (= 999 (:id gtfs-package)))
+  (let [gtfs-package (fetch-gtfs-package 1000)]
+
+    (is (= 1000 (:id gtfs-package)))
     (is (not (nil? (:envelope gtfs-package))))
     (is (= 1 (:transport-operator-id gtfs-package)))
     (is (= 1 (:transport-service-id gtfs-package)))
@@ -74,3 +81,26 @@
     (is (= 1 (:external-interface-description-id gtfs-package)))
     (is (= (time/date-fields (time/parse-date-iso-8601 "2017-01-01"))
            (time/date-fields-only (time/native->date-time (:created gtfs-package)))))))
+
+
+(deftest transit-changes-no-changes
+  ;; Add a new package for the same service. Use the same test package -> no changes should be occurring.
+  (import-gtfs "test1" 1001 "2017-01-02")
+
+  ;; Compute transit changes
+  (upsert-service-transit-change (:db *ote*) {:service-id 1})
+
+  (let [latest-change (fetch-latest-transit-change)
+        route-changes (composite/parse @specql-registry/table-info-registry
+                                       {:category "A"
+                                        :element-type :gtfs/route-change-info}
+                                       (str (:route-changes latest-change)))]
+
+    (is (zero? (:removed-routes latest-change)))
+    (is (zero? (:added-routes latest-change)))
+    (is (zero? (:changed-routes latest-change)))
+    (is (nil? (:different-week-date latest-change)))
+    (is (= (set route-changes)
+           (set [#:gtfs{:route-long-name "Stop29 MH - Stop32", :trip-headsign "Stop29 MH", :change-type :no-change}
+                 #:gtfs{:route-long-name "Stop32 - Stop29 MH", :trip-headsign "Stop32", :change-type :no-change}
+                 #:gtfs{:route-long-name "Stop32 - Stop32", :trip-headsign "Stop29 MH", :change-type :no-change}])))))
