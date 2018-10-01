@@ -113,34 +113,31 @@
 (defn send-notification! [db email]
   (log/info "Starting pre-notices notification task...")
 
-  (lock/try-with-lock
+  (lock/with-exclusive-lock
     db "pre-notice-email" 300
-      (localization/with-language
-        "fi"
-        (tx/with-transaction db
-           (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
-             (log/info "Authority users: " (pr-str (map :email authority-users)))
-               (doseq [u authority-users]
-                 (let [notification (user-notification-html db u)]
-                   (if notification
-                     (do
-                       (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
-                       ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
-                       ;; same time. Using sleep, we can't exceed that limit.
-                       (with-throttle-ms 200
-                           (try
-                             (email/send!
-                               email
-                               {:to      (:email u)
-                                :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                              (datetime-string (t/now) timezone))
-                                :body    [{:type "text/html;charset=utf-8" :content notification}]})
-                             (catch Exception e
-                               (log/warn "Error while sending a notification" e)))))
-                     (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
-
-               ;; Sleep for 5 seconds to ensure that no other nodes are trying to send email at the same mail.
-               (Thread/sleep 5000))))))
+    (localization/with-language
+      "fi"
+      (tx/with-transaction db
+        (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
+          (log/info "Authority users: " (pr-str (map :email authority-users)))
+          (doseq [u authority-users]
+            (let [notification (user-notification-html db u)]
+              (if notification
+                (do
+                  (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
+                  ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
+                  ;; same time. Using sleep, we can't exceed that limit.
+                  (with-throttle-ms 200
+                    (try
+                      (email/send!
+                       email
+                       {:to      (:email u)
+                        :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                      (datetime-string (t/now) timezone))
+                        :body    [{:type "text/html;charset=utf-8" :content notification}]})
+                      (catch Exception e
+                        (log/warn "Error while sending a notification" e)))))
+                (log/info "Could not find notification for user with email: " (pr-str (:email u)))))))))))
 
 
 (defrecord PreNoticesTasks []
