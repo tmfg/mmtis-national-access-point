@@ -1,0 +1,4 @@
+agency_id,route_id,route_short_name,route_long_name,route_type
+270488,10004828,,Stop32 - Stop32,3
+270488,10004831,,Stop29 MH - Stop32,3
+270488,10004832,,Stop32 - Stop29 MH,3
