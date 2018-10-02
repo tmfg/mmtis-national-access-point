@@ -73,6 +73,7 @@
 (defrecord EnsureServiceOperatorId [id ensured-id])
 
 (defrecord ToggleAddMemberDialog [id])
+(defrecord ChangeTab [tab-value])
 
 (defn- update-operator-by-id [app id update-fn & args]
   (update-in app [:admin :operator-list :results]
@@ -315,7 +316,6 @@
                  :on-failure (tuck/send-async! ->FailedDeleteTransportServiceResponse)})
     app)
 
-
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
     (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get-in app [:service-search :results]))]
@@ -376,7 +376,11 @@
     (let [show? (:show-add-member-dialog? (get-search-result-operator-by-id app id))]
       (update-operator-by-id
         app id
-        assoc :show-add-member-dialog? (not show?)))))
+        assoc :show-add-member-dialog? (not show?))))
+
+  ChangeTab
+  (process-event [{tab-value :tab-value} app]
+    (assoc-in app [:admin :tab :admin-page] tab-value)))
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
