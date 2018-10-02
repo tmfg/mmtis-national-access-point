@@ -1,5 +1,5 @@
 (ns ote.ui.tabs
-  "Simple Material UI data table"
+  "Simple custom tab component"
   (:require [stylefy.core :as stylefy]
             [ote.style.tabs :as style-tabs]))
 
