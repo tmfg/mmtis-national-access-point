@@ -12,7 +12,8 @@
             [taoensso.timbre :as log]
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
-            [ote.util.fn :refer [flip]]))
+            [ote.util.fn :refer [flip]]
+            [ote.db.transport-service :as t-service]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -56,18 +57,36 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
+(defn- fetch-gtfs-package-info [db where-clause]
+  (specql/fetch db :gtfs/package
+                #{:gtfs/created
+                  [:gtfs/external-interface-description #{::t-service/external-interface}]}
+                where-clause
+                {::specql/order-by :gtfs/created
+                 ::specql/order-direction :descending}))
+
+(defn gtfs-package-info [db transport-service-id package-ids]
+  (let [current-packages (fetch-gtfs-package-info db {:gtfs/transport-service-id transport-service-id
+                                                      :gtfs/id (op/in package-ids)})
+        previous-packages (fetch-gtfs-package-info db {:gtfs/transport-service-id transport-service-id
+                                                       :gtfs/id (op/not (op/in package-ids))})]
+    {:current-packages current-packages
+     :previous-packages previous-packages}))
+
 (define-service-component TransitVisualization {}
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
-       (let [service-id (Long/parseLong service-id)]
+       (let [service-id (Long/parseLong service-id)
+             changes (service-changes-for-date db
+                                               service-id
+                                               (-> date
+                                                   time/parse-date-iso-8601
+                                                   java.sql.Date/valueOf))]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
-          :changes (service-changes-for-date db
-                                             service-id
-                                             (-> date
-                                                 time/parse-date-iso-8601
-                                                 java.sql.Date/valueOf))}))
+          :changes changes
+          :gtfs-package-info (gtfs-package-info db service-id (:gtfs/package-ids changes))}))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route"
