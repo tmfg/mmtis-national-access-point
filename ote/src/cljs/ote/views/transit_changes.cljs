@@ -39,7 +39,7 @@
     [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                        [ic/content-remove-circle-outline " Päättyviä reittejä"]
-                       [ic/editor-format-list-bulleted " Uusia/vähennettyjä vuoroa"]]]
+                       [ic/editor-format-list-bulleted " Reittimuutoksia"]]]
      ^{:key label}
      [:div (use-style style/transit-changes-legend-icon)
       [icon]
