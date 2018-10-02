@@ -1,0 +1,3 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_phone
+14,agency1,http://www.agency1.fi/,Europe/Helsinki,
+270488,agency2,http://www.agency2.fi/,Europe/Helsinki,N/A
