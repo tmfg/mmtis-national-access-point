@@ -66,12 +66,12 @@
                  ::specql/order-direction :descending}))
 
 (defn gtfs-package-info [db transport-service-id package-ids]
-  (let [current-packages (fetch-gtfs-package-info db {:gtfs/transport-service-id transport-service-id
-                                                      :gtfs/id (op/in package-ids)})
-        previous-packages (fetch-gtfs-package-info db {:gtfs/transport-service-id transport-service-id
-                                                       :gtfs/id (op/not (op/in package-ids))})]
-    {:current-packages current-packages
-     :previous-packages previous-packages}))
+  (let [all-packages (fetch-gtfs-packages-for-service db {:service-id transport-service-id})
+
+        ;; Group by membership in package-ids to current and previous packages.
+        grouped-packages (group-by (comp boolean (set package-ids) :id) all-packages)]
+    {:current-packages (grouped-packages true [])
+     :previous-packages (grouped-packages false [])}))
 
 (define-service-component TransitVisualization {}
 

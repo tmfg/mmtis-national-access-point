@@ -179,3 +179,15 @@ SELECT gtfs_route_differences(
             WHERE trips."route-short-name" = :route-short-name
               AND trips."route-long-name" = :route-long-name
               AND trips."trip-headsign" = :trip-headsign))::TEXT;
+
+
+-- name: fetch-gtfs-packages-for-service
+SELECT p.id, p.created,
+       to_char(lower(dr.daterange), 'dd.mm.yyyy') as "min-date",
+       to_char(upper(dr.daterange), 'dd.mm.yyyy') as "max-date",
+       (eid."external-interface").url as "interface-url"
+  FROM gtfs_package p
+  JOIN LATERAL gtfs_package_date_range(p.id) as dr (daterange) ON TRUE
+  JOIN "external-interface-description" eid ON p."external-interface-description-id" = eid.id
+ WHERE p."transport-service-id" = :service-id
+ ORDER BY p.created DESC;
