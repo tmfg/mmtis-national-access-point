@@ -32,7 +32,7 @@
     (.toByteArray out)))
 
 
-(def gtfs-files ["agency.txt" "routes.txt" "stops.txt" "trips.txt" "stop_times.txt" "calendar_dates.txt"])
+(def gtfs-files ["agency.txt" "routes.txt" "stops.txt" "trips.txt" "stop_times.txt" "calendar.txt" "calendar_dates.txt"])
 
 (defn fetch-gtfs-package [id]
   (first (sql-query
@@ -91,7 +91,7 @@
 
 (deftest transit-changes-no-changes
   (truncate-gtfs-package-table!)
-  (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/now)))
+  (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/days-from (time/now) -7)))
   ;; Add a new package for the same service. Use the same test package -> no changes should be occurring.
   (import-gtfs "test1" 1001 (time/format-date-iso-8601 (time/days-from (time/now) 14)))
 
@@ -114,9 +114,9 @@
                  #:gtfs{:route-long-name "Stop32 - Stop32", :trip-headsign "Stop29 MH", :change-type :no-change}])))))
 
 
-#_(deftest transit-changes-has-changes
+(deftest transit-changes-has-changes
   (truncate-gtfs-package-table!)
-  (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/now)))
+  (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/days-from (time/now) -7)))
   ;; Add a new package for the same service. Use the same test package -> no changes should be occurring.
   (import-gtfs "test1_changes" 1001 (time/format-date-iso-8601 (time/days-from (time/now) 14)))
 
@@ -135,7 +135,7 @@
     (is (= 1 (:removed-routes latest-change)))
     (is (= 1 (:added-routes latest-change)))
     (is (zero? (:changed-routes latest-change)))
-    (is (nil? (:different-week-date latest-change)))
+    (is (not (nil? (:different-week-date latest-change))))
     #_(is (= (set route-changes)
              (set [#:gtfs{:route-long-name "Stop29 MH - Stop32", :trip-headsign "Stop29 MH", :change-type :no-change}
                    #:gtfs{:route-long-name "Stop32 - Stop29 MH", :trip-headsign "Stop32", :change-type :no-change}
