@@ -1,22 +1,9 @@
--- name: fetch-pre-notices-by-interval
-SELECT id, "pre-notice-type", "route-description", created, modified, description, regions as "region-ids",
-  (SELECT array_agg(eds."effective-date" ORDER BY eds."effective-date"::DATE ASC)
-     FROM unnest(n."effective-dates") eds) as "effective-dates-asc",
-  (SELECT array_agg(fr.nimi)
-    FROM "finnish_regions" fr
-   WHERE n.regions IS NOT NULL AND fr.numero = ANY(n.regions)) as "regions",
-  (SELECT op.name
-     FROM "transport-operator" op
-    WHERE op.id = n."transport-operator-id") as "operator-name"
-  FROM "pre_notice" n
- WHERE "pre-notice-state" = 'sent' AND
-       sent IS NOT NULL AND
-       (sent > (current_timestamp - :interval::interval));
-
 -- name: fetch-pre-notices-by-interval-and-regions
 SELECT id, "pre-notice-type", "route-description", created, modified, description, regions as "region-ids",
-  (SELECT array_agg(eds."effective-date" ORDER BY eds."effective-date"::DATE ASC)
-     FROM unnest(n."effective-dates") eds) as "effective-dates-asc",
+  (SELECT to_char(eds."effective-date", 'dd.mm.yyyy')
+     FROM unnest(n."effective-dates") eds
+     ORDER BY eds."effective-date" ASC
+     LIMIT 1) as "first-effective-date",
   (SELECT array_agg(fr.nimi)
     FROM "finnish_regions" fr
    WHERE n.regions IS NOT NULL AND fr.numero = ANY(n.regions)) as "regions",
@@ -28,3 +15,31 @@ SELECT id, "pre-notice-type", "route-description", created, modified, descriptio
    AND sent IS NOT NULL
    AND ((:regions::char(2)[]) IS NULL OR (:regions::char(2)[]) && n.regions)
    AND (sent > (current_timestamp - :interval::interval));
+
+-- name: fetch-current-detected-changes-by-regions
+WITH changes_with_regions AS (
+  SELECT chg.*,
+         (SELECT array_agg(x.reg)
+            FROM (SELECT DISTINCT unnest(p."finnish-regions") as reg
+                    FROM gtfs_package p
+                   WHERE p.id = ANY(chg."package-ids")) x) AS "finnish-regions"
+    FROM "gtfs-transit-changes" chg
+)
+SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
+       ("change-date" - CURRENT_DATE) AS "days-until-change",
+       chg."added-routes", chg."removed-routes", chg."changed-routes",
+       (SELECT array_agg(fr.nimi)
+          FROM finnish_regions fr
+         WHERE fr.numero = ANY(chg."finnish-regions")) AS regions,
+       op.name AS "operator-name",
+       ts.name AS "service-name",
+       to_char(date,'yyyy-mm-dd') as date,
+       ts.id AS "transport-service-id"
+  FROM changes_with_regions chg
+  JOIN "transport-service" ts ON ts.id = chg."transport-service-id"
+  JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
+ WHERE chg.date = CURRENT_DATE
+   AND chg."change-date" IS NOT NULL
+   AND (chg."finnish-regions" IS NULL OR
+        :regions::CHAR(2)[] IS NULL OR
+        :regions::CHAR(2)[] && chg."finnish-regions");
