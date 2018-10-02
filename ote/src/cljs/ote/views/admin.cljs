@@ -287,20 +287,17 @@
                [ui/table-row-column {:style {:width "15%"}}  (time/format-timestamp-for-ui created)]]))]]])]]))
 
 (defn admin-panel [e! app]
-  (let [selected-tab (or (get-in app [:admin :tab :admin-page]) "users")
-        tabs [{:label "Käyttäjä" :value "users"}
+  (let [tabs [{:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
               {:label "Palveluntuottajat" :value "operators"}
               {:label "Rajapinnat" :value "interfaces"}
               {:label "CSV Raportit" :value "reports"}]]
     [:div
-      [page/page-controls "" "Ylläpitopaneeli"
+     [page/page-controls "" "Ylläpitopaneeli"
 
-       [:div {:style {:padding-bottom "20px"}}
-        [tabs/tabs #(e! (admin-controller/->ChangeTab %)) tabs (get-in app [:admin :tab :admin-page])]
-        #_ (when (= "transit-changes" (get-in app [:transit-changes :selected-tab]))
-          [detected-transit-changes-page-controls e! transit-changes])]]
+      [:div {:style {:padding-bottom "20px"}}
+       [tabs/tabs #(e! (admin-controller/->ChangeTab %)) tabs (get-in app [:admin :tab :admin-page])]]]
      [:div.container {:style {:margin-top "20px"}}
       (case (get-in app [:admin :tab :admin-page])
         "users" [users/user-listing e! app]
@@ -311,16 +308,3 @@
         "reports" [report-view/reports  e! app]
         ;;default
         [users/user-listing e! app])]]))
-
-    #_ [ui/tabs {:value     selected-tab
-              :on-change #(e! (admin-controller/->ChangeAdminTab %))
-              :style {:color "black" :background-color "white"}
-              :inkBarStyle  {:background-color (color :blue700)}}
-
-     (tabs/tab {:label "Käyttäjä" :value "users" :tab-content [users/user-listing e! app]})
-     (tabs/tab {:label "Palvelut" :value "services" :tab-content [service-listing e! app]})
-     (tabs/tab {:label "Y-tunnus raportti" :value "businessid" :tab-content [business-id-report e! app]})
-     (tabs/tab {:label "Palveluntuottajat" :value "operators" :tab-content [operator-list e! app]})
-     (tabs/tab {:label "Rajapinnat" :value "interfaces" :tab-content [interfaces/interface-list e! app]})
-     (tabs/tab {:label "CSV Raportit" :value "reports" :tab-content [reports/reports  e! app]})]
-    ;]))

@@ -137,8 +137,7 @@
     " palveluista havaittuja muutoksia. "
     "Voit tarkastella yksittäisessä palvelussa tapahtuvia muutoksia yksityiskohtaisemmin napsauttamalla taulukon riviä. "
     "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
-   [transit-change-filters e! transit-changes]
-   ])
+   [transit-change-filters e! transit-changes]])
 
 (defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
   [:div.transit-changes {:style {:padding-top "10px"}}
