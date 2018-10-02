@@ -132,16 +132,7 @@
 
            ;; This determines the width of dialogs (12 * desktop-keyline-increment)
            ;; original value is 64
-           :spacing {:desktop-keyline-increment 80}
-
-          :tabs {
-                 :backgroundColor "#FFFFFF"
-                 :textColor "#000000"
-                 :selectedTextColor (color :blue700)
-                 :activeTabIndicatorColor (color :blue700)
-                 }
-
-           })}
+           :spacing {:desktop-keyline-increment 80}})}
           [:span
 
              (when error-msg
