@@ -57,14 +57,6 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-(defn- fetch-gtfs-package-info [db where-clause]
-  (specql/fetch db :gtfs/package
-                #{:gtfs/created
-                  [:gtfs/external-interface-description #{::t-service/external-interface}]}
-                where-clause
-                {::specql/order-by :gtfs/created
-                 ::specql/order-direction :descending}))
-
 (defn gtfs-package-info [db transport-service-id package-ids]
   (let [all-packages (fetch-gtfs-packages-for-service db {:service-id transport-service-id})
 
