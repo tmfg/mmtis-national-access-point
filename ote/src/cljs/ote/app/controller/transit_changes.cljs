@@ -40,3 +40,8 @@
 (define-event SetRegionFilter [regions]
   {:path [:transit-changes :selected-finnish-regions]}
   regions)
+
+(define-event ChangeTab [tab-value]
+  {:path [:transit-changes :selected-tab]}
+              (routes/navigate! (keyword tab-value))
+              tab-value)
