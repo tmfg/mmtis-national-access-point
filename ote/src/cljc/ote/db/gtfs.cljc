@@ -9,14 +9,19 @@
             [specql.impl.registry]
             #?(:clj [specql.impl.composite :as composite])
             [specql.data-types]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [ote.db.transport-service :as t-service]
+            [specql.rel :as rel])
   #?(:cljs
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (s/def :specql.data-types/int4range (s/keys))
 
 (define-tables
-  ["gtfs_package" :gtfs/package]
+  ["gtfs_package" :gtfs/package
+   {:gtfs/external-interface-description (rel/has-one :gtfs/external-interface-description-id
+                                                      ::t-service/external-interface-description
+                                                      ::t-service/id)}]
   ["gtfs-agency" :gtfs/agency]
   ["gtfs-route" :gtfs/route]
   ["gtfs-calendar" :gtfs/calendar]
