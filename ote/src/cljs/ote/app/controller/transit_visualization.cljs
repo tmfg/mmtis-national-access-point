@@ -113,7 +113,8 @@
   (assoc app
          :loading? false
          :service-info (:service-info response)
-         :changes (:changes response)))
+         :changes (:changes response)
+         :gtfs-package-info (:gtfs-package-info response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
   {:path [:transit-visualization]}

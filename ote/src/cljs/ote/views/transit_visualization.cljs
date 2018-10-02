@@ -667,6 +667,11 @@
                    :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]]
    [selected-route-map e! date->hash hash->color compare]])
 
+(defn gtfs-package-info [e! open-sections gtfs-package-info]
+  [section {:toggle! #(e! (tv/->ToggleSection :gtfs-package-info))
+            :open? (get open-sections :gtfs-package-info false)}
+   "Aineiston lisätiedot"
+   ])
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
                                         changes selected-route compare open-sections]
                                  :as transit-visualization}]
@@ -679,6 +684,9 @@
        "Reittiliikenteen tunnistetut muutokset"
        [:div
         [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
+
+        [gtfs-package-info open-sections (:gtfs-package-info transit-visualization)]
+
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
