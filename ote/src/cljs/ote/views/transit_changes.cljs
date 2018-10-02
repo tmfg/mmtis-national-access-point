@@ -38,7 +38,7 @@
     [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                        [ic/content-remove-circle-outline " Päättyviä reittejä"]
-                       [ic/editor-format-list-bulleted " Reittimuutoksia"]]]
+                       [ic/editor-format-list-bulleted " Uusia/vähennettyjä vuoroa"]]]
      ^{:key label}
      [:div (use-style style/transit-changes-legend-icon)
       [icon]
@@ -151,7 +151,7 @@
                                                                 date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
      {:name "Palvelu" :read :transport-service-name :width "25%"}
-     {:name "Aikaa 1:seen muutokseen" :width "25%"
+     {:name "Aikaa muutokseen" :width "25%"
       :read (juxt :change-date :days-until-change)
       :format (fn [[change-date days-until-change]]
                 (if change-date
