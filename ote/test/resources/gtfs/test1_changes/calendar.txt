@@ -1,3 +1,2 @@
 service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
-2399,1,1,1,1,1,0,0,20180101,20180930
-2400,1,1,1,1,1,0,0,20180931,20190601
+2399,1,1,0,1,1,0,0,20180101,21000930
