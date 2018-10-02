@@ -11,7 +11,7 @@
   Assumes that first tab is selected by default."
 
   [update-fn tabs selected-tab]
-  [:div {:style {:padding-bottom "20px"}}
+  [:div.tab {:style {:padding-bottom "20px"}}
    [:ul {:style {:list-style "none" :padding-bottom "12px"}}
     (doall
       (for [{:keys [label value]} tabs]
@@ -24,5 +24,5 @@
                   (stylefy/use-style style-tabs/tab))
           label]]))]
    ;; Add grey bottom border
-   [:div {:style {:width "100%" :height "1px" :background-color "gray" :z-index 1}}]])
+   [:div (stylefy/use-style style-tabs/grey-border)]])
 
