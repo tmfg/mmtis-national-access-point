@@ -17,7 +17,8 @@
             [ote.util.zip :as zip-file]
             [ring.util.io :as ring-io]
             [specql.impl.registry :as specql-registry]
-            [specql.impl.composite :as composite]))
+            [specql.impl.composite :as composite]
+            [clojure.string :as string]))
 
 
 (t/use-fixtures :each
@@ -30,6 +31,10 @@
   (let [out (java.io.ByteArrayOutputStream.)]
     (io/copy input-stream out)
     (.toByteArray out)))
+
+(defn date->gtfs-date-str [dt]
+  (let [{::time/keys [year month date]} (time/date-fields dt)]
+    (format "%04d%02d%02d" year month date)))
 
 
 (def gtfs-files ["agency.txt" "routes.txt" "stops.txt" "trips.txt" "stop_times.txt" "calendar.txt" "calendar_dates.txt"])
@@ -57,19 +62,30 @@
              ORDER BY \"transport-service-id\", date desc
              LIMIT 1")))
 
+(defn calendar-txt [start-date end-date]
+  (str
+    "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date\n"
+    "2399,1,1,1,1,1,0,0," start-date "," end-date "\n"))
 
+(defn calendar-dates-txt [exceptions]
+  (str "service_id,date,exception_type\n"
+       (string/join "\n" exceptions)))
 
-(defn gtfs-zip [test-package-name]
+(defn gtfs-zip [test-package-name & [custom-data]]
   (let [path (str "test/resources/gtfs/" test-package-name "/")
         files (mapv (fn [fname]
-                      {:name fname :data (slurp (str path fname))})
+                      {:name fname :data (or (when custom-data
+                                               (custom-data fname))
+                                             (slurp (str path fname)))})
                     gtfs-files)]
     (ring-io/piped-input-stream #(zip-file/write-zip files %))))
 
-(defn import-gtfs [test-package-name id date]
-  (let [gtfs-zip (gtfs-zip test-package-name)]
+(defn import-gtfs [test-package-name id date & [custom-data]]
+  (let [gtfs-zip (gtfs-zip test-package-name custom-data)]
     (upsert-gtfs-package! id date)
     (import-gtfs/save-gtfs-to-db (:db *ote*) (convert-bytes gtfs-zip) id 999)))
+
+
 
 
 (deftest save-gtfs-to-db
@@ -77,9 +93,6 @@
   (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/now)))
 
   (let [gtfs-package (fetch-gtfs-package 1000)]
-
-    (println gtfs-package)
-
     (is (= 1000 (:id gtfs-package)))
     (is (not (nil? (:envelope gtfs-package))))
     (is (= 1 (:transport-operator-id gtfs-package)))
@@ -93,7 +106,7 @@
   (truncate-gtfs-package-table!)
   (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/days-from (time/now) -7)))
   ;; Add a new package for the same service. Use the same test package -> no changes should be occurring.
-  (import-gtfs "test1" 1001 (time/format-date-iso-8601 (time/days-from (time/now) 14)))
+  (import-gtfs "test1" 1001 (time/format-date-iso-8601 (time/now)))
 
   ;; Compute transit changes
   (upsert-service-transit-change (:db *ote*) {:service-id 2})
@@ -116,9 +129,11 @@
 
 (deftest transit-changes-has-changes
   (truncate-gtfs-package-table!)
-  (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/days-from (time/now) -7)))
+  (import-gtfs "test1" 1000 (time/format-date-iso-8601 (time/days-from (time/now) -14)))
   ;; Add a new package for the same service. Use the same test package -> no changes should be occurring.
-  (import-gtfs "test1_changes" 1001 (time/format-date-iso-8601 (time/days-from (time/now) 14)))
+  (import-gtfs "test1_changes" 1001 (time/format-date-iso-8601 (time/now))
+               {"calendar_dates.txt"
+                (calendar-dates-txt [(str "2399," (date->gtfs-date-str (time/days-from (time/now) 13)) ",2")])})
 
   ;; Compute transit changes
   (upsert-service-transit-change (:db *ote*) {:service-id 2})
