@@ -297,7 +297,8 @@
      [page/page-controls "" "Ylläpitopaneeli"
 
       [:div {:style {:padding-bottom "20px"}}
-       [tabs/tabs #(e! (admin-controller/->ChangeTab %)) tabs (get-in app [:admin :tab :admin-page])]]]
+       [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))
+                        :selected-tab (get-in app [:admin :tab :admin-page])}]]]
      [:div.container {:style {:margin-top "20px"}}
       (case (get-in app [:admin :tab :admin-page])
         "users" [users/user-listing e! app]

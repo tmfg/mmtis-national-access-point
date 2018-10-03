@@ -10,15 +10,14 @@
   should do when tab is changed.
   Assumes that first tab is selected by default."
 
-  [update-fn tabs selected-tab]
+  [tabs {:keys [update-fn selected-tab] :as actions}]
   [:div.tab {:style {:padding-bottom "20px"}}
    [:ul {:style {:list-style "none" :padding-bottom "12px"}}
     (doall
       (for [{:keys [label value]} tabs]
         ^{:key (str label)}
         [:li {:style    {:display "inline"}
-              :on-click #(update-fn value)
-              }
+              :on-click #(update-fn value)}
          [:span (if (or (= value selected-tab) (and (nil? selected-tab) (= value (:value (first tabs)))))
                   (stylefy/use-style style-tabs/tab-selected)
                   (stylefy/use-style style-tabs/tab))

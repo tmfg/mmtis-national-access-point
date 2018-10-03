@@ -189,7 +189,8 @@
      [page/page-controls "" "Markkinaehtoisen liikenteen muutokset"
 
       [:div {:style {:padding-bottom "20px"}}
-       [tabs/tabs #(e! (tc/->ChangeTab %)) tabs (get-in app [:transit-changes :selected-tab])]
+       [tabs/tabs tabs {:update-fn #(e! (tc/->ChangeTab %))
+                        :selected-tab (get-in app [:transit-changes :selected-tab])}]
       (when (= "transit-changes" (get-in app [:transit-changes :selected-tab]))
         [detected-transit-changes-page-controls e! transit-changes])]]
      [:div.container {:style {:margin-top "20px"}}

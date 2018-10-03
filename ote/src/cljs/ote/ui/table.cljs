@@ -79,9 +79,7 @@
                  ^{:key (str name)}
                  [ui/table-row-column {:style (merge
                                                 {:white-space "pre-wrap"
-                                                 :overflow "visible"
-
-                                                 }
+                                                 :overflow "visible"}
                                                 (when width {:width width})
                                                 (when col-style col-style))}
                   (cond

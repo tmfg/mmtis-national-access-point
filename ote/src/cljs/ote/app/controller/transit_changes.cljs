@@ -43,5 +43,5 @@
 
 (define-event ChangeTab [tab-value]
   {:path [:transit-changes :selected-tab]}
-              (routes/navigate! (keyword tab-value))
-              tab-value)
+  (routes/navigate! (keyword tab-value))
+  tab-value)
