@@ -37,6 +37,7 @@
  :ga {:tracking-code "UA-5406842-15"}
  :gtfs {:bucket "{{gtfs_bucket}}"}
  :enabled-features {{flags}}
- :pre-notices {:bucket "{{pre_notice_attachment_bucket}}"}
+ :pre-notices {:bucket "{{pre_notice_attachment_bucket}}"
+	       :detected-changes-recipients "{{vault_pre_notice_detected_changes_recipients}}"}
  :no-gtfs-update-for-operators {{no_gtfs_update_for_operators}}
 }

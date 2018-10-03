@@ -20,7 +20,8 @@
             [ote.util.db :as db-util]
             [ote.email :as email]
             [ote.util.throttle :refer [with-throttle-ms]]
-            [ote.environment :as environment])
+            [ote.environment :as environment]
+            [clojure.string :as string])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/pre_notices.sql")
@@ -124,10 +125,11 @@
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
-  [db user]
+  [db user detected-changes-recipients]
   (try
     (let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})
-          detected-changes (fetch-current-detected-changes-by-regions db {:regions (:finnish-regions user)})]
+          detected-changes (when (detected-changes-recipients (:email user))
+                             (fetch-current-detected-changes-by-regions db {:regions (:finnish-regions user)}))]
       (if (or (seq notices) (seq detected-changes))
         (do
           (log/info "For user " (:email user) " we found "
@@ -140,7 +142,7 @@
     (catch Exception e
       (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e ))))
 
-(defn send-notification! [db email]
+(defn send-notification! [db email detected-changes-recipients]
   (log/info "Starting pre-notices notification task...")
 
   (lock/with-exclusive-lock
@@ -151,7 +153,7 @@
         (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
           (log/info "Authority users: " (pr-str (map :email authority-users)))
           (doseq [u authority-users]
-            (let [notification (user-notification-html db u)]
+            (let [notification (user-notification-html db u detected-changes-recipients)]
               (if notification
                 (do
                   (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
@@ -170,18 +172,21 @@
                 (log/info "Could not find notification for user with email: " (pr-str (:email u)))))))))))
 
 
-(defrecord PreNoticesTasks []
+(defrecord PreNoticesTasks [detected-changes-recipients]
   component/Lifecycle
   (start [{db :db email :email :as this}]
     (assoc this
            ::stop-tasks [(chime-at (daily-at 8 15)
                                    (fn [_]
-                                     (#'send-notification! db email)))]))
+                                     (#'send-notification! db email detected-changes-recipients)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
-(defn pre-notices-tasks
-  []
-  (->PreNoticesTasks))
+(defn pre-notices-tasks [config]
+  (let [detected-changes-recipients (or (some->> config :detected-changes-recipients
+                                                 (string/split ",")
+                                                 set)
+                                        identity)]
+    (->PreNoticesTasks detected-changes-recipients)))
