@@ -1,6 +1,7 @@
 (ns ote.ui.table
   "Simple Material UI data table"
   (:require [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.core :refer [color]]
             [ote.ui.common :as common]
             [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]))
@@ -34,7 +35,7 @@
                  :fixed-header true})
               (when class
                 {:class class}))
-   [ui/table-header {:style {:overflow "visible"}
+   [ui/table-header {:style {:overflow "visible" :background-color (color :grey300)}
                      :adjust-for-checkbox false :display-select-all false}
     [ui/table-row {:style {:overflow "visible"}
                    :selectable false}
@@ -45,7 +46,11 @@
                                   (merge
                                     (when width
                                       {:width width})
-                                    {:white-space "pre-wrap" :overflow "visible"}
+                                    {:white-space "pre-wrap"
+                                     :overflow "visible"
+                                     :color (color :grey900)
+                                     :font-size "1em"
+                                     :font-weight "bold"}
                                     label-style)}
           (name->label name)
           (when tooltip
@@ -59,18 +64,22 @@
         (map-indexed
           (fn [i row]
             ^{:key (if key-fn (key-fn row) i)}
-            [ui/table-row (merge
-                            {:selectable (boolean on-select)
-                             :selected (if row-selected? (row-selected? row) false)
-                             :display-border false}
-                            (when row-style
-                              {:style row-style}))
+            [ui/table-row {:selectable     (boolean on-select)
+                           :selected       (if row-selected? (row-selected? row) false)
+                           :display-border false
+
+                           :style          (merge
+                                             ;; Add Stripes
+                                             {:background-color (if (= 0 (rem i 2)) "#FFFFFF" (color :grey200))}
+                                             (when row-style row-style))}
+
              (doall
                (for [{:keys [name width col-style format read]} headers
                      :let [value ((or format identity) (if read (read row) (get row name)))]]
                  ^{:key (str name)}
                  [ui/table-row-column {:style (merge
-                                                {:white-space "pre-wrap" :overflow "visible"}
+                                                {:white-space "pre-wrap"
+                                                 :overflow "visible"}
                                                 (when width {:width width})
                                                 (when col-style col-style))}
                   (cond

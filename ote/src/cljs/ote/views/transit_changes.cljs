@@ -2,6 +2,8 @@
   "Transit changes view. Shows when regular route based traffic schedules
   change with links to detailed view (transit visualization)"
   (:require [reagent.core :as r]
+            [cljs-react-material-ui.core :refer [color]]
+            [ote.ui.tabs :as tabs]
             [ote.app.controller.transit-changes :as tc]
             [ote.ui.common :as common]
             [ote.ui.table :as table]
@@ -17,7 +19,8 @@
             [stylefy.core :refer [use-style]]
             [stylefy.core :as stylefy]
             [ote.db.places :as places]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.page :as page]))
 
 (defn week-day-short [week-day]
   (tr [:enums :ote.db.transport-service/day :short
@@ -32,7 +35,8 @@
 
 (defn transit-changes-legend []
   [:div.transit-changes-legend (use-style style/transit-changes-legend)
-   [:div [:b "Taulukon ikonien selitteet"]]
+   [:div {:style {:padding-bottom "15px"}}
+    [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                        [ic/content-remove-circle-outline " Päättyviä reittejä"]
                        [ic/editor-format-list-bulleted " Reittimuutoksia"]]]
@@ -66,7 +70,8 @@
 
 
 (defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions]}]
-  [:div
+  [:div {:style {:padding-top "10px"}}
+   [:h3 "Rajaa taulukkoa"]
    [form-fields/field {:label "Maakunta"
                        :type :chip-input
                        :suggestions (mapv (fn [{name ::places/nimi :as r}]
@@ -124,7 +129,7 @@
        :default
        [change-icons row])]))
 
-(defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
+(defn detected-transit-changes-page-controls [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
   [:div.transit-changes
    [:h3 "Säännöllisen markkinaehtoisen reittiliikenteen tulevat muutokset"]
    [:p
@@ -132,7 +137,10 @@
     " palveluista havaittuja muutoksia. "
     "Voit tarkastella yksittäisessä palvelussa tapahtuvia muutoksia yksityiskohtaisemmin napsauttamalla taulukon riviä. "
     "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
-   [transit-change-filters e! transit-changes]
+   [transit-change-filters e! transit-changes]])
+
+(defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
+  [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
                                     "Ladataan muutoksia, odota hetki..."
@@ -148,7 +156,7 @@
                                                                 date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
      {:name "Palvelu" :read :transport-service-name :width "25%"}
-     {:name "Aikaa 1:seen muutokseen" :width "25%"
+     {:name "Aikaa 1:seen muutokseen" :width "20%"
       :read (juxt :change-date :days-until-change)
       :format (fn [[change-date days-until-change]]
                 (if change-date
@@ -158,7 +166,7 @@
                                               :color "gray"})
                     (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]
                   "\u2015"))}
-     {:name "Muutokset" :width "50%"
+     {:name "Muutokset" :width "30%"
       :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
       :tooltip-len "min-medium"
       :read #(select-keys % change-keys)
@@ -174,9 +182,20 @@
       (filter region-matches? changes))]])
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
-  [ui/tabs {:value (name page)
-            :on-change #(e! (fp/->ChangePage (keyword %) nil))}
-   [ui/tab {:label "Lomakeilmoitukset" :value "authority-pre-notices"}
-    [pre-notices-authority-listing/pre-notices e! app]]
-   [ui/tab {:label "Tunnistetut muutokset" :value "transit-changes"}
-    [detected-transit-changes e! transit-changes]]])
+  (let [tabs [{:label "Lomakeilmoitukset" :value "authority-pre-notices"}
+              {:label "Tunnistetut muutokset"
+               :value "transit-changes"}]]
+    [:div
+     [page/page-controls "" "Markkinaehtoisen liikenteen muutokset"
+
+      [:div {:style {:padding-bottom "20px"}}
+       [tabs/tabs tabs {:update-fn #(e! (tc/->ChangeTab %))
+                        :selected-tab (get-in app [:transit-changes :selected-tab])}]
+      (when (= "transit-changes" (get-in app [:transit-changes :selected-tab]))
+        [detected-transit-changes-page-controls e! transit-changes])]]
+     [:div.container {:style {:margin-top "20px"}}
+     (case (get-in app [:transit-changes :selected-tab])
+       "authority-pre-notices" [pre-notices-authority-listing/pre-notices e! app]
+       "transit-changes" [detected-transit-changes e! transit-changes]
+       ;;default
+       [pre-notices-authority-listing/pre-notices e! app])]]))

@@ -2,6 +2,8 @@
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.core :refer [color]]
+            [ote.ui.tabs :as tabs]
             [ote.ui.form-fields :as form-fields]
             [ote.app.controller.admin :as admin-controller]
             [ote.db.transport-service :as t-service]
@@ -16,8 +18,9 @@
             [reagent.core :as r]
             [ote.ui.common :as ui-common]
             [ote.views.admin.interfaces :as interfaces]
-            [ote.views.admin.reports :as reports]
-            [ote.views.admin.users :as users]))
+            [ote.views.admin.reports :as report-view]
+            [ote.views.admin.users :as users]
+            [ote.ui.page :as page]))
 
 (def id-filter-type [:operators :services :ALL])
 (def published-types [:YES :NO :ALL])
@@ -88,12 +91,12 @@
            [ui/table-row
             [ui/table-header-column {:style {:width "7%" :padding-left "15px" :padding-right "15px"}} "Id"]
             [ui/table-header-column {:style {:width "9%" :padding-left "15px" :padding-right "15px"}} "Y-tunnus"]
-            [ui/table-header-column {:width "20%" :padding-left "15px" :padding-right "15px"} "Nimi"]
-            [ui/table-header-column {:width "10%" :padding-left "15px" :padding-right "15px"} "GSM"]
-            [ui/table-header-column {:width "10%" :padding-left "15px" :padding-right "15px"} "Puhelin"]
-            [ui/table-header-column {:width "18%" :padding-left "15px" :padding-right "15px"} "Sähköposti"]
-            [ui/table-header-column {:width "13%" :padding-left "15px" :padding-right "15px"} "Käyttäjähallinta"]
-            [ui/table-header-column {:width "12%" :padding-left "15px" :padding-right "15px"} "Toiminnot"]]]
+            [ui/table-header-column {:style {:width "20%" :padding-left "15px" :padding-right "15px"}} "Nimi"]
+            [ui/table-header-column {:style {:width "10%" :padding-left "15px" :padding-right "15px"}} "GSM"]
+            [ui/table-header-column {:style {:width "10%" :padding-left "15px" :padding-right "15px"}} "Puhelin"]
+            [ui/table-header-column {:style {:width "18%" :padding-left "15px" :padding-right "15px"}} "Sähköposti"]
+            [ui/table-header-column {:style {:width "13%" :padding-left "15px" :padding-right "15px"}} "Käyttäjähallinta"]
+            [ui/table-header-column {:style {:width "12%" :padding-left "15px" :padding-right "15px"}} "Toiminnot"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
              (for [{::t-operator/keys [id name gsm phone business-id ckan-group-id email ]
@@ -189,21 +192,22 @@
           [ui/table-header {:adjust-for-checkbox false
                             :display-select-all false}
            [ui/table-row
-            [ui/table-header-column {:width "3%"   } "Id"]
-            [ui/table-header-column {:width "10%"  } "Yritys"]
+            [ui/table-header-column {:width "3%"  } "Id"]
+            [ui/table-header-column {:width "10%" } "Yritys"]
             [ui/table-header-column {:width "6%"  :style {:padding 10}} "Y-tunnus"]
             [ui/table-header-column {:width "8%"  :style {:padding 10}} "Palvelu"]
             [ui/table-header-column {:width "7%"  :style {:padding 10}} "Liikennemuoto"]
-            [ui/table-header-column {:width "10%"  :style {:padding 10}} "Palvelutyyppi"]
+            [ui/table-header-column {:width "10%" :style {:padding 10}} "Palvelutyyppi"]
             [ui/table-header-column {:width "7%"  :style {:padding 10}} "Välityspalvelu"]
-            [ui/table-header-column {:width "10%"  :style {:padding 10}} "Toiminta-alue"]
+            [ui/table-header-column {:width "10%" :style {:padding 10}} "Toiminta-alue"]
             [ui/table-header-column {:width "7%"  } "GSM"]
             [ui/table-header-column {:width "7%"  } "Puhelin"]
-            [ui/table-header-column {:width "10%"  } "Sähköposti"]
+            [ui/table-header-column {:width "10%" } "Sähköposti"]
             [ui/table-header-column {:width "8%"  } "Lähde"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
             (for [{:keys [id operator business-id services gsm phone email source]} results]
+              ^{:key (str "report-" business-id)}
               [ui/table-row {:selectable false}
                [ui/table-row-column {:width "3%"} id]
                [ui/table-row-column {:width "10%" :style services-row-style}
@@ -283,18 +287,25 @@
                [ui/table-row-column {:style {:width "15%"}}  (time/format-timestamp-for-ui created)]]))]]])]]))
 
 (defn admin-panel [e! app]
-  (let [selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
-    [ui/tabs {:value     selected-tab
-              :on-change #(e! (admin-controller/->ChangeAdminTab %))}
-     [ui/tab {:label "Käyttäjät" :value "users"}
-      [users/user-listing e! app]]
-     [ui/tab {:label "Palvelut" :value "services"}
-      [service-listing e! app]]
-     [ui/tab {:label "Y-tunnus raportti" :value "businessid"}
-      [business-id-report e! app]]
-     [ui/tab {:label "Palveluntuottajat" :value "operators"}
-      [operator-list e! app]]
-     [ui/tab {:label "Rajapinnat" :value "interfaces"}
-      [interfaces/interface-list e! app]]
-     [ui/tab {:label "CSV Raportit" :value "reports"}
-      [reports/reports  e! app]]]))
+  (let [tabs [{:label "Käyttäjä" :value "users"}
+              {:label "Palvelut" :value "services"}
+              {:label "Y-tunnus raportti" :value "businessid"}
+              {:label "Palveluntuottajat" :value "operators"}
+              {:label "Rajapinnat" :value "interfaces"}
+              {:label "CSV Raportit" :value "reports"}]]
+    [:div
+     [page/page-controls "" "Ylläpitopaneeli"
+
+      [:div {:style {:padding-bottom "20px"}}
+       [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))
+                        :selected-tab (get-in app [:admin :tab :admin-page])}]]]
+     [:div.container {:style {:margin-top "20px"}}
+      (case (get-in app [:admin :tab :admin-page])
+        "users" [users/user-listing e! app]
+        "services" [service-listing e! app]
+        "businessid" [business-id-report e! app]
+        "operators" [operator-list e! app]
+        "interfaces" [interfaces/interface-list e! app]
+        "reports" [report-view/reports  e! app]
+        ;;default
+        [users/user-listing e! app])]]))

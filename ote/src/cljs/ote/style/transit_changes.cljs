@@ -7,7 +7,8 @@
 (def no-change-color "rgb(235,235,235)")
 
 (def transit-changes-legend
-  {:display "block"
+  {:margin-top "20px"
+   :display "block"
    :padding "1em"
    :background-color "rgb(235,235,235)"})
 
@@ -48,6 +49,9 @@
   {:border "solid 1px #646464"
    :padding-bottom "1.25rem"
    :margin-bottom "2.5rem"})
+
+(def section-closed
+  (dissoc section :padding-bottom))
 
 (def section-title
   {:background-color "#646464"

@@ -362,7 +362,9 @@
 
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
-  [:div.transit-visualization-section (stylefy/use-style style/section)
+  [:div.transit-visualization-section (stylefy/use-style (if open?
+                                                           style/section
+                                                           style/section-closed))
    [:div.transit-visualization-section-title (merge
                                               (stylefy/use-style style/section-title)
                                               {:on-click toggle!})
@@ -667,6 +669,31 @@
                    :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]]
    [selected-route-map e! date->hash hash->color compare]])
 
+(defn gtfs-package-info [e! open-sections {:keys [current-packages previous-packages]}]
+  (let [pkg (fn [{:keys [created min-date max-date interface-url]}]
+              [:div.gtfs-package
+               interface-url
+               " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
+               "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
+    [section {:toggle! #(e! (tv/->ToggleSection :gtfs-package-info))
+              :open? (get open-sections :gtfs-package-info false)}
+     "Aineiston lisätiedot"
+     [:div
+      [:b "Käytetyt aineistot"]
+      [:div
+       (doall
+        (for [{id :id :as p} current-packages]
+          ^{:key id}
+          [:div [pkg p]]))]
+      [:br]
+      (when (seq previous-packages)
+        [:div
+         [:b "Aiemmat aineistot"]
+         [:ul
+          (doall
+           (for [{id :id :as p} previous-packages]
+             ^{:key id}
+             [:li [pkg p]]))]])]]))
 (defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
                                         changes selected-route compare open-sections]
                                  :as transit-visualization}]
@@ -679,6 +706,9 @@
        "Reittiliikenteen tunnistetut muutokset"
        [:div
         [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
+
+        [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization)]
+
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
