@@ -185,8 +185,8 @@
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks [config]
-  (let [detected-changes-recipients (or (some->> config :detected-changes-recipients
-                                                 (string/split #",")
-                                                 set)
+  (let [detected-changes-recipients (or (some-> config :detected-changes-recipients
+                                                (string/split #",")
+                                                set)
                                         identity)]
     (->PreNoticesTasks detected-changes-recipients)))
