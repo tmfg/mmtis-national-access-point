@@ -50,6 +50,9 @@
    :padding-bottom "1.25rem"
    :margin-bottom "2.5rem"})
 
+(def section-closed
+  (dissoc section :padding-bottom))
+
 (def section-title
   {:background-color "#646464"
    :color "white"
