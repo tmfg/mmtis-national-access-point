@@ -15,7 +15,9 @@
                   (http-server/send! response-ch
                                      {:status status
                                       :body body
-                                      :headers {"Content-Type" (:content-type headers)}}
+                                      :headers (merge
+                                              {"Content-Type" (:content-type headers)}
+                                              http/no-cache-headers)}
                                      true)))))
 
 
