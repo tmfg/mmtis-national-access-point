@@ -186,7 +186,7 @@
 
 (defn pre-notices-tasks [config]
   (let [detected-changes-recipients (or (some->> config :detected-changes-recipients
-                                                 (string/split ",")
+                                                 (string/split #",")
                                                  set)
                                         identity)]
     (->PreNoticesTasks detected-changes-recipients)))
