@@ -7,7 +7,8 @@
 (def no-change-color "rgb(235,235,235)")
 
 (def transit-changes-legend
-  {:display "block"
+  {:margin-top "20px"
+   :display "block"
    :padding "1em"
    :background-color "rgb(235,235,235)"})
 

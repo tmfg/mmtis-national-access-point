@@ -182,16 +182,25 @@
 
 ;; PENDING: this is for local testing, truncates *ALL* GTFS data from the database
 ;;          and reads in a local GTFS zip file
+
+;; Create Transport Service with :sheduled sub_tybe
+;; Add gtfs url for the service.
+;; Keep this method commented away and when you want to manually use this, start REPL first, and then run this in REPL only.
+;; Also! Change from gtfs-package table columns transport-service-id, transport-operator-id and external-interface-description-id to what they should be.
+;; Also! Change from gtfs_package column created to be earlier than today.
+;; And then run SELECT gtfs_upsert_service_transit_changes(<service_id>);
 #_(defn test-hsl-gtfs []
   (let [db (:db ote.main/ote)]
     (clojure.java.jdbc/execute! db ["TRUNCATE TABLE gtfs_package RESTART IDENTITY CASCADE"])
     (clojure.java.jdbc/execute! db ["INSERT INTO gtfs_package (id) VALUES (1)"])
-    (let [bytes (with-open [in (io/input-stream "/Users/tatuta/Downloads/google_transit (4).zip" #_"hsl_gtfs.zip")]
+    (let [bytes (with-open [in (io/input-stream "/Users/markusva/Downloads/google_transit (1).zip" #_"hsl_gtfs.zip")]
                   (let [out (java.io.ByteArrayOutputStream.)]
                     (io/copy in out)
                     (.toByteArray out)))]
+      (println "**************************** START test-hsl-gtfs *********************")
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
-      (save-gtfs-to-db db bytes 1 1))))
+      (save-gtfs-to-db db bytes 1 1)
+      (println "******************* test-hsl-gtfs end *********************"))))
 
 (defmulti load-transit-interface-url
   "Load transit interface from URL. Dispatches on type.
