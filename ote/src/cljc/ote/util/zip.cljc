@@ -36,8 +36,8 @@
                                 {:expected-magic-bytes [0x50 0x4b]
                                  :read-magic-byets [b1 b2]}))))
             (.reset input)
-            input))
-   ())
+            input)))
+
 #?(:clj
    (defn read-zip-with
      "Reads a zip file. Calls `file-callback` with each file in the zip.
