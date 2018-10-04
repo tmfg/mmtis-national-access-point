@@ -61,3 +61,14 @@
                                                          (io/copy input out)
                                                          (String. (.toByteArray out) "UTF-8"))})))
        @files)))
+
+
+#?(:clj
+   (defn list-zip
+     "List files in a zip file without extracting it.
+     Returns a set containing the file names."
+     [input]
+     (let [file-names (atom [])]
+       (read-zip-with input (fn [{:keys [name]}]
+                              (swap! file-names conj name)))
+       (set @file-names))))
