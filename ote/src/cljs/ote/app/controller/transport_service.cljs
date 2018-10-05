@@ -122,7 +122,7 @@
 (defrecord EnsureCsvFileResponse [response])
 (defrecord FailedCsvFileResponse [response])
 
-(defrecord EnsureExternalInterfaceUrl [url])
+(defrecord EnsureExternalInterfaceUrl [url format])
 (defrecord EnsureExternalInterfaceUrlResponse [response url])
 (defrecord FailedExternalInterfaceUrlResponse [])
 
@@ -313,8 +313,8 @@
     )
 
   EnsureExternalInterfaceUrl
-  (process-event [{url :url} app]
-    (comm/post! (str "check-external-api") {:url url}
+  (process-event [{url :url format :format} app]
+    (comm/post! (str "check-external-api") {:url url :format format}
                 {:on-success (tuck/send-async! ->EnsureExternalInterfaceUrlResponse url)
                  :on-failure (tuck/send-async! ->FailedExternalInterfaceUrlResponse)})
     app)

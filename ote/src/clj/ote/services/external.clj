@@ -5,6 +5,7 @@
             [ote.util.csv :as csv-util]
             [ote.db.transport-service :as t-service]
             [ote.db.modification :as modification]
+            [ote.integration.import.gtfs :as import-gtfs]
             [clj-http.client :as http-client]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
@@ -81,16 +82,32 @@
       {:status :failed
        :error :url-parse-failed})))
 
+(defn interface-type [format]
+  (case format
+    "GTFS" :gtfs
+    "Kalkati.net" :kalkati
+    nil))
+
 (defn- check-external-api
-  [url-data]
+  [{:keys [url format]}]
   (try
-    (let [url (ensure-url (get url-data :url))
-          response (http-client/get url {:as "UTF-8"
+    (let [url (ensure-url url)
+          response (http-client/get url {:as :byte-array
                                          :socket-timeout 30000
                                          :conn-timeout 10000})]
+
       (if (= 200 (:status response))
-        {:status :success}
-        {:status :failed}))
+
+        (try
+          (when format
+            (import-gtfs/validate-interface-zip-package (interface-type format)
+                                                        (java.io.ByteArrayInputStream. (:body response))))
+          {:status :success}
+          (catch Exception e
+            {:status :failed
+             :error :zip-validation-failed}))
+        {:status :failed
+         :error :connection-failed}))
     (catch Exception e
       {:status :failed})))
 
@@ -101,10 +118,9 @@
    (POST  "/check-company-csv" {url-data :body}
           (http/transit-response
            (check-csv (http/transit-request url-data ))))
-   (POST  "/check-external-api" {url-data :body}
-          (http/transit-response
-           (check-external-api
-            (http/transit-request url-data ))))))
+   (POST  "/check-external-api" {form-data :body}
+     (http/transit-response
+       (check-external-api (http/transit-request form-data))))))
 
 (defrecord External [nap-config]
   component/Lifecycle

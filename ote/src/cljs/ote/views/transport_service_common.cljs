@@ -170,7 +170,7 @@
                        :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
                        :width "20%"
                        :full-width? true
-                       :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value)))
+                       :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) "GTFS")) ;; TODO: Get format from state
                        :read (comp ::t-service/url ::t-service/external-interface)
                        :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
                        :required? true}
