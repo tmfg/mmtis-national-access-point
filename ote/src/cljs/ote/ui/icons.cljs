@@ -10,5 +10,9 @@
   "developer_mode"
   "arrow_back"
   "screen_rotation"
+  "add_box"
   ;; Add more font icons here
   )
+
+(defn outline-ballot []
+  [:img {:src "/img/icons/outline-ballot-24px.svg"}])

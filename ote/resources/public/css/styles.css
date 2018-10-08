@@ -15,6 +15,7 @@ body {
     padding-bottom: 176px;
     font-size: 16px;
     color: #444444;
+    background-color: #fafafa;
 }
 
 
@@ -26,12 +27,23 @@ h1, h2, h3, h4, h5, h6,
 
 h1 {
     font-weight: 400;
-    font-size: 180%;
-    padding-top: 1.5rem;
+    font-size: 3rem;
 }
+
 h2 {
     font-weight: 400;
-    font-size: 120%;
+    font-size: 1.5rem;
+}
+
+@media (max-width: 767px) {
+    h1 {
+        font-weight: 400;
+        font-size: 1.5rem;
+    }
+    h2 {
+        font-weight: 400;
+        font-size: 1.25rem;
+    }
 }
 
 
