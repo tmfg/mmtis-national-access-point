@@ -541,6 +541,24 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_first_different_day(TEXT,TEXT) IS
 E'Compare two week hashes and return the first different day of week index (monday is zero).';
 
+CREATE OR REPLACE FUNCTION gtfs_compare_weeks_excluding_no_traffic(wh1 TEXT, wh2 TEXT) RETURNS BOOLEAN
+AS $$
+SELECT NOT EXISTS(
+  SELECT d1.day
+    FROM (SELECT (string_to_array(w1.dh, '='))[1] as day,
+                 (string_to_Array(w1.dh, '='))[2] as dayhash
+           FROM unnest(string_to_array(wh1, ',')) AS w1 (dh)) d1
+    JOIN (SELECT (string_to_array(w2.dh, '='))[1] as day,
+                 (string_to_Array(w2.dh, '='))[2] as dayhash
+           FROM unnest(string_to_array(wh2, ',')) AS w2 (dh)) d2
+      ON d1.day = d2.day
+   WHERE d1.dayhash != '' AND d2.dayhash != ''
+     AND d1.dayhash != d2.dayhash
+);
+$$ LANGUAGE SQL IMMUTABLE;
+
+COMMENT ON FUNCTION gtfs_compare_weeks_excluding_no_traffic(TEXT,TEXT) IS
+E'Returns TRUE if all days where both given weekhashes have traffic, are the same';
 
 CREATE OR REPLACE FUNCTION gtfs_route_next_different_week(
     service_id INTEGER,
@@ -557,21 +575,36 @@ SELECT date_trunc('week', CURRENT_DATE)::date AS "beginning-of-current-week",
   FROM (SELECT wh."beginning-of-week" AS "beginning-of-different-week",
                wh.weekhash AS "different-weekhash",
                gtfs_service_route_week_hash(service_id, CURRENT_DATE, route_short_name, route_long_name, trip_headsign) AS curwh,
-               LEAD(wh.weekhash, 2) OVER w AS nextwh
+               LEAD(wh.weekhash, 2) OVER w AS nextwh,
           FROM (SELECT w."beginning-of-week",
                        gtfs_service_route_week_hash(service_id, w."beginning-of-week", route_short_name, route_long_name, trip_headsign) as weekhash
                   FROM weeks w
                  ORDER BY "beginning-of-week") wh
          WINDOW w AS (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING)) chg
  WHERE (-- Find first week with a different hash than current week
-        chg."different-weekhash" != gtfs_service_route_week_hash(service_id, CURRENT_DATE, route_short_name, route_long_name, trip_headsign) AND
+        not gtfs_compare_weeks_excluding_no_traffic(chg."different-weekhash", chg.curw) AND
         -- But skip over two different weeks (like bank holiday, christmas vacation)
-        chg.curwh != chg.nextwh)
+        not gtfs_compare_weeks_excluding_no_traffic(chg.curwh, chg.nextwh))
  LIMIT 1;
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_route_next_different_week(INTEGER,TEXT,TEXT,TEXT) IS
 E'Returns the next different week for the given service and route.';
+
+CREATE OR REPLACE FUNCTION gtfs_service_routes_with_daterange(service_id INTEGER)
+RETURNS SETOF gtfs_route_with_daterange AS $$
+SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
+       COALESCE(rh."route-long-name",'') AS "route-long-name",
+       COALESCE(rh."trip-headsign",'') AS "trip-headsign",
+       MIN(date), MAX(date)
+  FROM "gtfs-date-hash" h
+  JOIN LATERAL unnest(h."route-hashes") AS rh ON TRUE
+ WHERE h."package-id" IN (SELECT id FROM gtfs_package p WHERE p."transport-service-id" = service_id)
+   AND h.date BETWEEN (current_date - '1 year'::interval) AND (current_date + '1 year'::interval)
+   AND rh.hash IS NOT NULL
+ GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign";
+$$ LANGUAGE SQL STABLE;
+
 
 CREATE OR REPLACE FUNCTION gtfs_upsert_service_transit_changes(service_id INTEGER)
 RETURNS VOID
