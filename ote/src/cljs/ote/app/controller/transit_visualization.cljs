@@ -317,6 +317,10 @@
         (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
         (assoc-in [:transit-visualization :route-trips-for-date2-loading?] true)
         (assoc-in [:transit-visualization :selected-route] route)
+        (update-in [:transit-visualization :compare] dissoc
+                   :selected-trip-pair
+                   :combined-trips
+                   :combined-stop-sequence)
         (update-in [:transit-visualization] dissoc :date->hash :hash->color)
         (update-in [:transit-visualization :compare] fetch-routes-for-dates
                    service-id route
@@ -325,7 +329,6 @@
                   (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
                                        :gtfs/trip-stop-sequence-changes
                                        :gtfs/trip-stop-time-changes}))
-        ;TODO: Dissoc selected route
         ;; Show next year in calendar, if date2 is in next year.
         (assoc-in [:transit-visualization :show-next-year?]
                   (> (time/year date2) (time/year (time/now)))))))
