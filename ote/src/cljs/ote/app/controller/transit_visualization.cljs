@@ -23,12 +23,12 @@
                                    service-changes-for-dates-loading?]
                             :as   transit-visualization}]
   (and (not route-lines-for-date-loading?)
-  (not route-trips-for-date1-loading?)
-  (not route-trips-for-date2-loading?)
-  (not route-calendar-hash-loading?)
-  (not route-differences-loading?)
-  (not routes-for-dates-loading?)
-  (not service-changes-for-dates-loading?)))
+       (not route-trips-for-date1-loading?)
+       (not route-trips-for-date2-loading?)
+       (not route-calendar-hash-loading?)
+       (not route-differences-loading?)
+       (not routes-for-dates-loading?)
+       (not service-changes-for-dates-loading?)))
 
 (defn parse-date [date-str]
   (tf/parse (tf/formatter "dd.MM.yyyy") date-str))
