@@ -413,29 +413,6 @@ SELECT string_agg(concat(EXTRACT(ISODOW FROM date),'=', gtfs_service_date_hash(s
 $$ LANGUAGE SQL STABLE;
 
 
-CREATE OR REPLACE FUNCTION gtfs_service_next_different_week(service_id INTEGER)
-RETURNS RECORD
-AS $$
-WITH weeks AS (
- SELECT (date_trunc('week',CURRENT_DATE) + (CONCAT(w,' weeks'))::interval)::date AS "beginning-of-week"
-   FROM generate_series(0, 52) w
-)
-SELECT chg."beginning-of-current-week", chg.curw AS "current-weekhash",
-       chg."beginning-of-different-week", chg.next1w AS "different-weekhash"
-  FROM (SELECT wh."beginning-of-week" AS "beginning-of-current-week",
-               wh.weekhash AS curw,
-               LEAD(wh."beginning-of-week", 1) OVER w AS "beginning-of-different-week",
-               LEAD(wh.weekhash, 1) OVER w AS next1w,
-               LEAD(wh.weekhash, 2) OVER w AS next2w
-          FROM (SELECT w."beginning-of-week",
-                       gtfs_service_week_hash(service_id, w."beginning-of-week") as weekhash
-                  FROM weeks w
-                 ORDER BY "beginning-of-week") wh
-         WINDOW w AS (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING)) chg
- WHERE (chg.curw != chg.next1w AND chg.curw != chg.next2w) -- skip over single different week
- LIMIT 1;
-$$ LANGUAGE SQL STABLE;
-
 CREATE OR REPLACE FUNCTION gtfs_package_date_hashes(package_id INTEGER, dt DATE)
 RETURNS VOID
 AS $$
@@ -579,17 +556,17 @@ SELECT date_trunc('week', CURRENT_DATE)::date AS "beginning-of-current-week",
        chg."beginning-of-different-week", chg."different-weekhash"
   FROM (SELECT wh."beginning-of-week" AS "beginning-of-different-week",
                wh.weekhash AS "different-weekhash",
-               LAG(wh.weekhash, 1) OVER w AS prevwh,
-               LEAD(wh.weekhash, 1) OVER w AS nextwh
+               gtfs_service_route_week_hash(service_id, CURRENT_DATE, route_short_name, route_long_name, trip_headsign) AS curwh,
+               LEAD(wh.weekhash, 2) OVER w AS nextwh
           FROM (SELECT w."beginning-of-week",
                        gtfs_service_route_week_hash(service_id, w."beginning-of-week", route_short_name, route_long_name, trip_headsign) as weekhash
                   FROM weeks w
                  ORDER BY "beginning-of-week") wh
-         WINDOW w AS (ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING)) chg
+         WINDOW w AS (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING)) chg
  WHERE (-- Find first week with a different hash than current week
         chg."different-weekhash" != gtfs_service_route_week_hash(service_id, CURRENT_DATE, route_short_name, route_long_name, trip_headsign) AND
-        -- But skip over single different week (like bank holiday)
-        chg.prevwh != chg.nextwh)
+        -- But skip over two different weeks (like bank holiday, christmas vacation)
+        chg.curwh != chg.nextwh)
  LIMIT 1;
 $$ LANGUAGE SQL STABLE;
 
