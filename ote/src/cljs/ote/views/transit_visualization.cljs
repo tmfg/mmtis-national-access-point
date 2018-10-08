@@ -694,11 +694,22 @@
            (for [{id :id :as p} previous-packages]
              ^{:key id}
              [:li [pkg p]]))]])]]))
-(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
+(defn transit-visualization [e! {:keys [hash->color date->hash route-lines-for-date-loading? route-trips-for-date1-loading?
+                                        route-trips-for-date2-loading?
+                                        route-calendar-hash-loading? route-differences-loading? routes-for-dates-loading?
+                                        service-changes-for-dates-loading?
+                                        highlight service-info
                                         changes selected-route compare open-sections]
-                                 :as transit-visualization}]
+                                 :as   transit-visualization}]
   [:div
-   (when (not loading?)
+   (when (and
+           (not route-lines-for-date-loading?)
+           (not route-trips-for-date1-loading?)
+           (not route-trips-for-date2-loading?)
+           (not route-calendar-hash-loading?)
+           (not route-differences-loading?)
+           (not routes-for-dates-loading?)
+           (not service-changes-for-dates-loading?))
      [:div.transit-visualization
 
       [page/page-controls
@@ -723,8 +734,8 @@
 
          (when (and hash->color date->hash)
            [:span
+            ;; Select first trip to show stops
             [route-service-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
-            (when (:selected-trip-pair compare)
-              [trip-stop-sequence e! open-sections compare])])])])])
+            [trip-stop-sequence e! open-sections compare]])])])])
