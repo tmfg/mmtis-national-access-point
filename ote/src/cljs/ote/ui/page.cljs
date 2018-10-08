@@ -20,5 +20,5 @@
    [:div.container ; (stylefy/use-style style/content)
     top-link
     [:h1 title]
-    [:div.page-controls-content
+    [:div.page-controls-content {:style {:padding-bottom "1.25rem"}}
      content]]])
