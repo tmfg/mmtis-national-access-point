@@ -722,7 +722,6 @@
 
          (when (and hash->color date->hash)
            [:span
-            ;; Select first trip to show stops
             [route-service-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
