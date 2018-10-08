@@ -10,4 +10,4 @@
    :box-shadow "3px 3px 8px -1px rgba(0, 0, 0, .2)"})
 
 (def content
-  {:margin "0 auto"})
+  {:padding-bottom "1.25rem"})

@@ -28,8 +28,9 @@
                }
               (when on-select
                 {:on-row-selection (fn [selected-rows]
-                                     (when (not (empty? selected-rows)) (let [rows (vec rows)]
-                                       (on-select (map (partial nth rows) selected-rows)))))})
+                                     (when (seq selected-rows)
+                                       (let [rows (vec rows)]
+                                         (on-select (map (partial nth rows) selected-rows)))))})
               (when height
                 {:height height
                  :fixed-header true})
