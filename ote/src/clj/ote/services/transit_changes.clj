@@ -8,7 +8,9 @@
             [clojure.set :as set]
             [ote.util.db :refer [PgArray->vec]]
             [ote.db.places :as places]
-            [specql.core :as specql]))
+            [specql.core :as specql]
+            [ote.authorization :as authorization]
+            [ote.tasks.gtfs :as gtfs-tasks]))
 
 (defqueries "ote/services/transit_changes.sql")
 
@@ -48,4 +50,9 @@
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-changes/current" []
-       (#'list-current-changes db)))
+       (#'list-current-changes db))
+
+  (POST "/transit-changes/force-detect" req
+        (when (authorization/admin? (:user req))
+          (gtfs-tasks/detect-new-changes-task db)
+          "OK")))

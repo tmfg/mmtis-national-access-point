@@ -30,12 +30,13 @@
 
 (defn load-file-from-url [db interface-id url last-import-date etag]
   (let [query-headers {:headers (merge
-                                  (if (not (nil? etag))
-                                    {"If-None-Match" etag}
-                                    (when-not (nil? last-import-date)
-                                      {"If-Modified-Since" last-import-date})))
+                                 (if (not (nil? etag))
+                                   {"If-None-Match" etag}
+                                   (when-not (nil? last-import-date)
+                                     {"If-Modified-Since" last-import-date})))
                        :as :byte-array}
         response (http-client/get url query-headers)]
+    (log/info "Fetching transit interface" interface-id  ", URL:" url ", etag:" etag ", last-import-date:" last-import-date "=> status" (:status response))
     (if (= 304 (:status response))
       ;; Not modified
       (do

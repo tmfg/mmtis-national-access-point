@@ -409,3 +409,7 @@
        csv/write-csv
        (download-csv "rajapinnat.csv"))
   app)
+
+(defn ^:export force-detect-transit-changes []
+  (comm/post! "/transit-changes/force-detect" nil
+              {:on-success #(.log js/console %)}))
