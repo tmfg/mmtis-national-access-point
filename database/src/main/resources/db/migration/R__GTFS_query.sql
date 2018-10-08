@@ -192,9 +192,9 @@ SELECT array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
   JOIN LATERAL unnest(t.trips) trip ON true
  WHERE r."package-id" = ANY(package_ids)
    AND ROW(r."package-id", t."service-id")::service_ref IN (SELECT * FROM gtfs_services_for_date(package_ids, dt))
-   AND r."route-short-name" = route_short_name
-   AND r."route-long-name" = route_long_name
-   AND trip."trip-headsign" = trip_headsign;
+   AND COALESCE(r."route-short-name",'') = COALESCE(route_short_name,'')
+   AND COALESCE(r."route-long-name",'') = COALESCE(route_long_name,'')
+   AND COALESCE(trip."trip-headsign",'') = COALESCE(trip_headsign,'');
 $$ LANGUAGE SQL STABLE;
 
 
