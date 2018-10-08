@@ -56,14 +56,17 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
-(defn detect-new-changes-task [db]
-  (lock/try-with-lock
-   db "gtfs-nightly-changes" 1800
-   (let [service-ids (map :id (services-for-nightly-change-detection db))]
-     (log/info "Detect transit changes for " (count service-ids) " services.")
-     (doseq [service-id service-ids]
-       (log/info "Detecting next transit changes for service: " service-id)
-       (upsert-service-transit-change db {:service-id service-id})))))
+(defn detect-new-changes-task
+  ([db]
+   (detect-new-changes-task db false))
+  ([db force?]
+   (lock/try-with-lock
+    db "gtfs-nightly-changes" 1800
+    (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
+      (log/info "Detect transit changes for " (count service-ids) " services.")
+      (doseq [service-id service-ids]
+        (log/info "Detecting next transit changes for service: " service-id)
+        (upsert-service-transit-change db {:service-id service-id}))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
