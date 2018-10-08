@@ -245,7 +245,7 @@
 (define-event RouteDifferencesResponse [response]
   {:path [:transit-visualization]}
   (-> app
-      (assoc-in :route-differences-loading? false)
+      (assoc :route-differences-loading? false)
       (assoc-in [:compare :differences] response)))
 
 (define-event SelectDateForComparison [date]
@@ -272,7 +272,7 @@
                            {:headsign headsign}))
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
     (-> app
-        (assoc-in [:transit-visualization :compare :route-differences-loading?] true)
+        (assoc-in [:transit-visualization :route-differences-loading?] true)
         (assoc-in [:transit-visualization :compare]
                   (fetch-routes-for-dates compare service-id
                                           route
