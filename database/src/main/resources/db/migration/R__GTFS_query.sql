@@ -638,11 +638,11 @@ BEGIN
              gtfs_route_tripdata_for_date(
                  gtfs_service_packages_for_date(service_id, routerow.route_curr_date),
                  routerow.route_curr_date,
-                  routerow.route_short_name, routerow.route_long_name, routerow.trip_headsign) AS "date1-trips",
+                  routerow."route-short-name", routerow."route-long-name", routerow."trip-headsign") AS "date1-trips",
              gtfs_route_tripdata_for_date(
                  gtfs_service_packages_for_date(service_id, routerow.route_diff_date),
                  routerow.route_diff_date,
-                 routerow.route_short_name, routerow.route_long_name, routerow.trip_headsign) AS "date2-trips"
+                 routerow."route-short-name", routerow."route-long-name", routerow."trip-headsign") AS "date2-trips"
         FROM (SELECT z.*,
                      CASE
                        WHEN z.diff_day IS NOT NULL
@@ -658,19 +658,38 @@ BEGIN
                              gtfs_first_different_day((y.diff_week)."current-weekhash",
                                                       (y.diff_week)."different-weekhash") AS diff_day
                         FROM (SELECT x.*, gtfs_route_next_different_week(service_id,
-                                     x.route_short_name, x.route_long_name, x.trip_headsign) AS diff_week
+                                                 x."route-short-name", x."route-long-name",
+                                                 x."trip-headsign") AS diff_week
                                 FROM (SELECT *
-                                        FROM gtfs_service_routes(service_id)
-                                          AS r(route_short_name TEXT, route_long_name TEXT, trip_headsign TEXT)) x) y) z) routerow
+                                        FROM gtfs_service_routes_with_daterange(service_id)) x
+                               -- Filter out routes that have already been discontinued
+                               WHERE x."max-date" >= CURRENT_DATE) y) z) routerow
   LOOP
+
     IF row.diff_week IS NULL
     THEN
-      -- Mark "no-change" for this route
+      -- No change detected, check if this is starting or ending route
+
       route_change := ROW();
-      route_change."route-short-name" := row.route_short_name;
-      route_change."route-long-name" := row.route_long_name;
-      route_change."trip-headsign" := row.trip_headsign;
-      route_change."change-type" := 'no-change';
+      route_change."route-short-name" := row."route-short-name";
+      route_change."route-long-name" := row."route-long-name";
+      route_change."trip-headsign" := row."trip-headsign";
+
+      IF row."min-date" > CURRENT_DATE
+      THEN
+        -- If min-date is in the future, mark this route as added
+        route_change."change-type" := 'added';
+        added_routes := added_routes + 1;
+      ELSIF (row."max-date" - CURRENT_DATE) < 90
+      THEN
+        -- If max-date is within 90 days, mark this route as removed
+        route_change."change-type" := 'removed';
+        removed_routes := removed_routes + 1;
+      ELSE
+        -- Mark "no-change" for this route
+        route_change."change-type" := 'no-change';
+      END IF;
+
       route_changes := route_changes || route_change;
 
     ELSE
@@ -682,34 +701,17 @@ BEGIN
         change_date := (row.diff_week)."beginning-of-different-week";
       END IF;
 
-      -- Check type of change (added route, removed route or changed route)
-      IF (row.diff_week)."current-weekhash" = no_traffic AND
-         (row.diff_week)."different-weekhash" != no_traffic
-      THEN
-        added_routes := added_routes + 1;
-        route_change := ROW();
-        route_change."change-type" := 'added';
-      ELSIF (row.diff_week)."current-weekhash" != no_traffic AND
-            (row.diff_week)."different-weekhash" = no_traffic
-      THEN
-        removed_routes := removed_routes + 1;
-        route_change := ROW();
-        route_change."change-type" := 'removed';
-      ELSE
-        changed_routes := changed_routes + 1;
-
-        -- Calculate differences in trips and stop sequences for this route
-        route_change := gtfs_route_differences(
-                        row.route_short_name, row.route_long_name, row.trip_headsign,
+      changed_routes := changed_routes + 1;
+      -- Calculate differences in trips and stop sequences for this route
+      route_change := gtfs_route_differences(
+                        row."route-short-name", row."route-long-name", row."trip-headsign",
                         row."date1-trips", row."date2-trips");
-        route_change."change-type" := 'changed';
-
-      END IF;
+      route_change."change-type" := 'changed';
 
       -- Set route names and change dates
-      route_change."route-short-name" := row.route_short_name;
-      route_change."route-long-name" := row.route_long_name;
-      route_change."trip-headsign" := row.trip_headsign;
+      route_change."route-short-name" := row."route-short-name";
+      route_change."route-long-name" := row."route-long-name";
+      route_change."trip-headsign" := row."trip-headsign";
       route_change."current-week-date" := row.route_curr_date;
       route_change."different-week-date" := row.route_diff_date;
       route_change."change-date" := (row.diff_week)."beginning-of-different-week";
