@@ -679,12 +679,20 @@ BEGIN
       THEN
         -- If min-date is in the future, mark this route as added
         route_change."change-type" := 'added';
+        route_change."current-week-date" := row.route_curr_date;
+        route_change."different-week-date" := row."min-date";
+        route_change."change-date" := row."min-date";
         added_routes := added_routes + 1;
+
       ELSIF (row."max-date" - CURRENT_DATE) < 90
       THEN
         -- If max-date is within 90 days, mark this route as removed
         route_change."change-type" := 'removed';
+        route_change."current-week-date" := row.route_curr_date;
+        route_change."different-week-date" := row."max-date" + '1 days'::interval;
+        route_change."change-date" := row."max-date" + '1 days'::interval;
         removed_routes := removed_routes + 1;
+
       ELSE
         -- Mark "no-change" for this route
         route_change."change-type" := 'no-change';
