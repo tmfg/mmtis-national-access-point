@@ -1215,6 +1215,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operation-area-search-placeholder "Sök med finska nyckelord"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
+  :limit-search-results "Begränsar katalogen"
   :result-count (:plural :count
                          "Inga resultat"
                          "Hittades en tjänst."

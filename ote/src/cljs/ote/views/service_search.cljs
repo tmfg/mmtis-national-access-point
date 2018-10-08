@@ -306,14 +306,13 @@
                                                           :value val)))
                                         data))]
     [:div
-     [:h2 {:style {:font-weight 500 }} "Rajaa katalogia"]
+     [:h2 {:style {:font-weight 500 }} (tr [:service-search :limit-search-results])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]
                                       [:field-labels :transport-service])}
       [(form/group
-         {;:label (tr [:service-search :filters-label])
-          :columns 3
+         {:columns 3
           :layout :raw
           :card? false}
 
@@ -341,8 +340,7 @@
           :open-on-focus? true})
 
          (form/group
-           {;:label (tr [:service-search :filters-label])
-            :columns 3
+           {:columns 3
             :layout :raw
             :card? false}
 

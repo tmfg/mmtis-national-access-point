@@ -1223,6 +1223,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :operation-area-search-placeholder "Hae suomenkielisillä hakusanoilla"
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
   :type-search "Liikkumispalvelun tyyppi"
+  :limit-search-results "Rajaa katalogia"
 
   :result-count ["Hakuehdoille "
                  (:plural :count
