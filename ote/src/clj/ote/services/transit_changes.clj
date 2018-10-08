@@ -54,5 +54,5 @@
 
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
-          (gtfs-tasks/detect-new-changes-task db)
+          (gtfs-tasks/detect-new-changes-task db true)
           "OK")))
