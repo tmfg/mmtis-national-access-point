@@ -99,7 +99,7 @@
       (if (= 200 (:status response))
 
         (try
-          (when format
+          (when (interface-type format)
             (import-gtfs/validate-interface-zip-package (interface-type format)
                                                         (java.io.ByteArrayInputStream. (:body response))))
           {:status :success}
