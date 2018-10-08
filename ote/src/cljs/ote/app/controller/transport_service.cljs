@@ -314,21 +314,40 @@
 
   EnsureExternalInterfaceUrl
   (process-event [{url :url format :format} app]
-    (comm/post! (str "check-external-api") {:url url :format format}
-                {:on-success (tuck/send-async! ->EnsureExternalInterfaceUrlResponse url format)
-                 :on-failure (tuck/send-async! ->FailedExternalInterfaceUrlResponse)})
-    app)
+    (let [on-success (tuck/send-async! ->EnsureExternalInterfaceUrlResponse url format)
+          on-failure (tuck/send-async! ->FailedExternalInterfaceUrlResponse)]
+      (update-in app [:transport-service (t-service/service-key-by-type (::t-service/type (:transport-service app)))
+                      ::t-service/external-interfaces]
+                 (fn [external-interfaces]
+                   (mapv (fn [{eif ::t-service/external-interface eif-format ::t-service/format :as row}]
+                           (if (and (= (::t-service/url eif) url) (= (first eif-format) format))
+                             (do
+                               (when-let [validation-timeout (:eif-validation-timeout row)]
+                                 (.clearTimeout js/window validation-timeout))
+
+                               ;; Debounce the validation to prevent unnecessary validation requests as they
+                               ;; can hog server resources.
+                               (assoc row :eif-validation-timeout
+                                          (.setTimeout
+                                            js/window
+                                            #(comm/post! (str "check-external-api") {:url url :format format}
+                                                         {:on-success on-success
+                                                          :on-failure on-failure})
+                                            1000)))
+                             row))
+                         external-interfaces)))))
 
   EnsureExternalInterfaceUrlResponse
   (process-event [{url :url format :format response :response :as e} app]
     (update-in app [:transport-service (t-service/service-key-by-type (::t-service/type (:transport-service app)))
                     ::t-service/external-interfaces]
                (fn [external-interfaces]
-                 (mapv (fn [{eif ::t-service/external-interface eif-format ::t-service/format :as external-interface}]
+                 (mapv (fn [{eif ::t-service/external-interface eif-format ::t-service/format :as row}]
                          (if (and (= (::t-service/url eif) url) (= (first eif-format) format))
-                           (assoc external-interface ::t-service/external-interface
-                                                     (assoc eif :url-status response))
-                           external-interface))
+                           (-> row
+                               (assoc ::t-service/external-interface (assoc eif :url-status response))
+                               (dissoc :eif-validation-timeout))
+                           row))
                        external-interfaces))))
 
   FailedExternalInterfaceUrlResponse

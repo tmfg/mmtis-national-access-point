@@ -172,12 +172,10 @@
                        :width "28%"
                        :read #(identity %)
                        :write (fn [row val]
-                                (println "here")
                                 (assoc-in row [::t-service/external-interface ::t-service/url] val))
                        :component (fn [{{external-interface ::t-service/external-interface format ::t-service/format
                                          :as service} :data
-                                        update-form! :update-form!
-                                        row-number :row-number}]
+                                        update-form! :update-form!}]
 
                                     [:div {:style {:display "flex" :flex-flow "row nowrap"}}
                                      [form-fields/field
@@ -227,7 +225,16 @@
                        :full-width? true
                        :required? true
                        ;; Wrap value with vector to support current type of format field in the database.
-                       :write #(assoc-in %1 [::t-service/format] #{%2})
+                       :write (fn [row val]
+                                (let [{eif ::t-service/external-interface} row]
+                                  ;; validate external interface again, if changing format.
+                                  (do
+                                    ;; Invoke event asynchronously so that the value will be update before sending the
+                                    ;; validation request to prevent stuttering user interface.
+                                    (.setTimeout
+                                      js/window
+                                      #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
+                                    (assoc row ::t-service/format #{val}))))
                        :read #(first (get-in % [::t-service/format]))}
                       {:name ::t-service/license
                        :type :autocomplete
