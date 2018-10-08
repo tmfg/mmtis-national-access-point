@@ -123,7 +123,7 @@
 (defrecord FailedCsvFileResponse [response])
 
 (defrecord EnsureExternalInterfaceUrl [url format])
-(defrecord EnsureExternalInterfaceUrlResponse [response url])
+(defrecord EnsureExternalInterfaceUrlResponse [response url format])
 (defrecord FailedExternalInterfaceUrlResponse [])
 
 (defrecord AddImportedCompaniesToService [csv filename])
@@ -315,19 +315,19 @@
   EnsureExternalInterfaceUrl
   (process-event [{url :url format :format} app]
     (comm/post! (str "check-external-api") {:url url :format format}
-                {:on-success (tuck/send-async! ->EnsureExternalInterfaceUrlResponse url)
+                {:on-success (tuck/send-async! ->EnsureExternalInterfaceUrlResponse url format)
                  :on-failure (tuck/send-async! ->FailedExternalInterfaceUrlResponse)})
     app)
 
   EnsureExternalInterfaceUrlResponse
-  (process-event [{url :url response :response :as e} app]
+  (process-event [{url :url format :format response :response :as e} app]
     (update-in app [:transport-service (t-service/service-key-by-type (::t-service/type (:transport-service app)))
                     ::t-service/external-interfaces]
                (fn [external-interfaces]
-                 (mapv (fn [{eif ::t-service/external-interface :as external-interface}]
-                         (if (= (::t-service/url eif) url)
+                 (mapv (fn [{eif ::t-service/external-interface eif-format ::t-service/format :as external-interface}]
+                         (if (and (= (::t-service/url eif) url) (= (first eif-format) format))
                            (assoc external-interface ::t-service/external-interface
-                                  (assoc eif :url-status response))
+                                                     (assoc eif :url-status response))
                            external-interface))
                        external-interfaces))))
 

@@ -78,7 +78,8 @@
    :ote.db.transport-service/license "Licens"
    :ote.db.transport-service/notice-external-interfaces? "Jag har läst anvisningarna ovan gällande externa maskinläsbara gränssnitt."
    :external-interfaces-warning "Kontakt fås inte till den angivna adressen"
-   :external-interfaces-ok "Kontakten till den angivna adressen fungerar"
+   :external-interfaces-ok "Inga fel upptäcks i gränssnittet"
+   :external-interfaces-validation-error "Fel i gränssnittsdatapaket"
    :table-header-external-interface "Gränssnitt"
 
    ;; Service hours

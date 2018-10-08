@@ -16,7 +16,8 @@
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
-            [goog.string :as gstr]))
+            [goog.string :as gstr]
+            [ote.app.controller.transport-service :as ts]))
 
 
 
@@ -783,6 +784,8 @@
                                                       {:width width})}
                    (if (= :component type)
                      (component {:update-form! #(update! (update-fn %))
+                                 :table? true
+                                 :row-number i
                                  :data value})
                      [field (merge (assoc tf
                                           :table? true

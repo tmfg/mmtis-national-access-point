@@ -77,7 +77,8 @@
    :ote.db.transport-service/license "License"
    :ote.db.transport-service/notice-external-interfaces? "I have read all the information labels and filled in information about machine-readable interfaces that contain essential data about my service."
    :external-interfaces-warning "Connection to address failed"
-   :external-interfaces-ok "Connecting to address succeeded"
+   :external-interfaces-ok "No errors detected in the interface"
+   :external-interfaces-validation-error "Errors detected in the provided data."
    :table-header-external-interface "Interface"
 
    ;; Service hours
