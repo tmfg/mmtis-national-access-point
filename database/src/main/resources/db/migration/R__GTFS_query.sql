@@ -582,7 +582,7 @@ SELECT date_trunc('week', CURRENT_DATE)::date AS "beginning-of-current-week",
                  ORDER BY "beginning-of-week") wh
          WINDOW w AS (ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING)) chg
  WHERE (-- Find first week with a different hash than current week
-        not gtfs_compare_weeks_excluding_no_traffic(chg."different-weekhash", chg.curw) AND
+        not gtfs_compare_weeks_excluding_no_traffic(chg."different-weekhash", chg.curwh) AND
         -- But skip over two different weeks (like bank holiday, christmas vacation)
         not gtfs_compare_weeks_excluding_no_traffic(chg.curwh, chg.nextwh))
  LIMIT 1;
