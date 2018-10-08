@@ -575,8 +575,7 @@ SELECT date_trunc('week', CURRENT_DATE)::date AS "beginning-of-current-week",
   FROM (SELECT wh."beginning-of-week" AS "beginning-of-different-week",
                wh.weekhash AS "different-weekhash",
                gtfs_service_route_week_hash(service_id, CURRENT_DATE, route_short_name, route_long_name, trip_headsign) AS curwh,
-               LEAD(wh.weekhash, 2) OVER w AS nextwh,
-               gtfs_service_route_week_hash(service_id, CURRENT_DATE, route_short_name, route_long_name, trip_headsign) AS curw
+               LEAD(wh.weekhash, 2) OVER w AS nextwh
           FROM (SELECT w."beginning-of-week",
                        gtfs_service_route_week_hash(service_id, w."beginning-of-week", route_short_name, route_long_name, trip_headsign) as weekhash
                   FROM weeks w
@@ -585,8 +584,7 @@ SELECT date_trunc('week', CURRENT_DATE)::date AS "beginning-of-current-week",
  WHERE (-- Find first week with a different hash than current week
         not gtfs_compare_weeks_excluding_no_traffic(chg."different-weekhash", chg.curw) AND
         -- But skip over two different weeks (like bank holiday, christmas vacation)
-        not gtfs_compare_weeks_excluding_no_traffic(chg.curwh, chg.nextwh)
-        )
+        not gtfs_compare_weeks_excluding_no_traffic(chg.curwh, chg.nextwh))
  LIMIT 1;
 $$ LANGUAGE SQL STABLE;
 
