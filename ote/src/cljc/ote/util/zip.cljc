@@ -26,13 +26,24 @@
                 (.closeEntry out))))))
 
 
+#?(:clj (defn ensure-zip-input [input]
+          (let [input (java.io.BufferedInputStream. input)]
+            (.mark input 3)
+            (let [b1 (.read input)
+                  b2 (.read input)]
+              (when (not= [b1 b2] [0x50 0x4b])
+                (throw (ex-info "Input is not a valid ZIP stream."
+                                {:expected-magic-bytes [0x50 0x4b]
+                                 :read-magic-byets [b1 b2]}))))
+            (.reset input)
+            input)))
 
 #?(:clj
    (defn read-zip-with
      "Reads a zip file. Calls `file-callback` with each file in the zip.
   File callback is called with a map containing `:name` and `:input` keys."
      [input file-callback]
-     (with-open [in (ZipInputStream. input)]
+     (with-open [in (ZipInputStream. (ensure-zip-input input))]
        (loop []
          (when-let [entry (.getNextEntry in)]
            (file-callback {:name (.getName entry)
@@ -50,3 +61,14 @@
                                                          (io/copy input out)
                                                          (String. (.toByteArray out) "UTF-8"))})))
        @files)))
+
+
+#?(:clj
+   (defn list-zip
+     "List files in a zip file without extracting it.
+     Returns a set containing the file names."
+     [input]
+     (let [file-names (atom [])]
+       (read-zip-with input (fn [{:keys [name]}]
+                              (swap! file-names conj name)))
+       (set @file-names))))

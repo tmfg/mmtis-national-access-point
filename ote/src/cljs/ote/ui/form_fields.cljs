@@ -783,6 +783,8 @@
                                                       {:width width})}
                    (if (= :component type)
                      (component {:update-form! #(update! (update-fn %))
+                                 :table? true
+                                 :row-number i
                                  :data value})
                      [field (merge (assoc tf
                                           :table? true

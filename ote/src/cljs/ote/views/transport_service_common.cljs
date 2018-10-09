@@ -19,7 +19,8 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [cljs-react-material-ui.icons :as ic]
-            [ote.app.controller.flags :as flags]))
+            [ote.app.controller.flags :as flags]
+            [ote.ui.form-fields :as form-fields]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -100,7 +101,7 @@
                (when (= "kalkati.net" format)
                  "&type=kalkati"))
           [ui/icon-button
-           [(tooltip-wrapper ic/action-visibility) {:style style-base/icon-medium}
+           [(tooltip-wrapper ic/action-visibility) {:style style-base/icon-small}
             {:text (tr [:form-help :external-interfaces-tooltips :view-routes])}]]
           {:target "_blank"})))))
 
@@ -115,7 +116,7 @@
 
       (form/info
         [:div
-         [:div {:style {:margin-bottom "5px"}}
+         [:div {:margin-bottom "5px"}
           [:b (if (= :schedule sub-type)
                 [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
                  [linkify "https://liikennevirasto.fi/rae" (str (tr [:form-help :RAE-link-text]) ". ")
@@ -165,32 +166,57 @@
                                           data))
                        :required? true
                        :is-empty? validation/empty-enum-dropdown?}
-                      {:name ::t-service/external-service-url
-                       :type :string
-                       :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
-                       :width "20%"
-                       :full-width? true
-                       :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value)))
-                       :read (comp ::t-service/url ::t-service/external-interface)
-                       :write #(assoc-in %1 [::t-service/external-interface ::t-service/url] %2)
-                       :required? true}
-                      {:name :ext-validation
+
+                      {:name :external-service-url
                        :type :component
-                       :component (fn [{{external-interface ::t-service/external-interface :as service} :data}]
-                                    (let [url-status (get-in external-interface [:url-status :status])]
-                                      [:span
-                                       (if-not url-status
-                                         [gtfs-viewer-link service]
-                                         (if (= :success url-status)
-                                           [:span [(tooltip-wrapper ic/action-done) {:style (merge style-base/icon-small
-                                                                                                   {:color "green"})}
-                                                   {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
-                                            [gtfs-viewer-link service]]
-                                           [(tooltip-wrapper ic/alert-warning) {:style (merge style-base/icon-small
-                                                                                              {:color "cccc00"})}
-                                            {:text (tr [:field-labels :transport-service-common :external-interfaces-warning])}]))]))
+                       :width "28%"
                        :read #(identity %)
-                       :width "8%"}
+                       :write (fn [row val]
+                                (assoc-in row [::t-service/external-interface ::t-service/url] val))
+                       :component (fn [{{external-interface ::t-service/external-interface format ::t-service/format
+                                         :as service} :data
+                                        update-form! :update-form!}]
+
+                                    [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
+                                     [form-fields/field
+                                      (merge
+                                        {:name ::t-service/external-service-url
+                                         :type :string
+                                         :width "70%"
+                                         :required? true
+                                         :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
+                                         :full-width? true
+                                         :update! #(update-form! %)
+                                         :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) (first format)))}
+                                        (when (empty? (::t-service/url external-interface))
+                                          {:warning (tr [:common-texts :required-field])}))
+                                      (::t-service/url external-interface)]
+
+                                     [:span (stylefy/use-style {:width "30%" :margin-left "10px"})
+                                      (let [url-status (get-in external-interface [:url-status :status])
+                                            url-error (get-in external-interface [:url-status :error])]
+                                        (if-not url-status
+                                          [gtfs-viewer-link service]
+
+                                          (if (= :success url-status)
+                                            [:span (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
+                                             [(tooltip-wrapper ic/action-done)
+                                              {:style (merge style-base/icon-small
+                                                             {:color "green"
+                                                              :position "relative"
+                                                              :top "15px"})}
+                                              {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
+                                             [gtfs-viewer-link service]]
+                                            [:span [(tooltip-wrapper ic/alert-warning)
+                                                    {:style (merge style-base/icon-small
+                                                                   {:color "cccc00"
+                                                                    :position "relative"
+                                                                    :top "15px"})}
+
+                                                    {:text (tr [:field-labels :transport-service-common
+                                                                (if (= :zip-validation-failed url-error)
+                                                                  :external-interfaces-validation-error
+                                                                  :external-interfaces-warning)])}]])))]])}
                       {:name ::t-service/format
                        :type :autocomplete
                        :tooltip (tr [:form-help :external-interfaces-tooltips :format])
@@ -201,7 +227,16 @@
                        :full-width? true
                        :required? true
                        ;; Wrap value with vector to support current type of format field in the database.
-                       :write #(assoc-in %1 [::t-service/format] #{%2})
+                       :write (fn [row val]
+                                (let [{eif ::t-service/external-interface} row]
+                                  ;; validate external interface again, if changing format.
+                                  (do
+                                    ;; Invoke event asynchronously so that the value will be update before sending the
+                                    ;; validation request to prevent stuttering user interface.
+                                    (.setTimeout
+                                      js/window
+                                      #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
+                                    (assoc row ::t-service/format #{val}))))
                        :read #(first (get-in % [::t-service/format]))}
                       {:name ::t-service/license
                        :type :autocomplete
