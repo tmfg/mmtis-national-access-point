@@ -116,7 +116,7 @@
 
       (form/info
         [:div
-         [:div {:style {:margin-bottom "5px"}}
+         [:div {:margin-bottom "5px"}
           [:b (if (= :schedule sub-type)
                 [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
                  [linkify "https://liikennevirasto.fi/rae" (str (tr [:form-help :RAE-link-text]) ". ")
@@ -177,7 +177,7 @@
                                          :as service} :data
                                         update-form! :update-form!}]
 
-                                    [:div {:style {:display "flex" :flex-flow "row nowrap"}}
+                                    [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
                                      [form-fields/field
                                       (merge
                                         {:name ::t-service/external-service-url
@@ -192,24 +192,26 @@
                                           {:warning (tr [:common-texts :required-field])}))
                                       (::t-service/url external-interface)]
 
-                                     [:span {:style {:width "30%" :margin-left "10px"}}
+                                     [:span (stylefy/use-style {:width "30%" :margin-left "10px"})
                                       (let [url-status (get-in external-interface [:url-status :status])
                                             url-error (get-in external-interface [:url-status :error])]
                                         (if-not url-status
                                           [gtfs-viewer-link service]
 
                                           (if (= :success url-status)
-                                            [:span {:style {:display "flex" :flex-flow "row nowrap"}}
-                                             [(tooltip-wrapper ic/action-done) {:style (merge style-base/icon-small
-                                                                                              {:color "green"
-                                                                                               :position "relative"
-                                                                                               :top "15px"})}
+                                            [:span (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
+                                             [(tooltip-wrapper ic/action-done)
+                                              {:style (merge style-base/icon-small
+                                                             {:color "green"
+                                                              :position "relative"
+                                                              :top "15px"})}
                                               {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
                                              [gtfs-viewer-link service]]
-                                            [:span [(tooltip-wrapper ic/alert-warning) {:style (merge style-base/icon-small
-                                                                                                      {:color "cccc00"
-                                                                                                       :position "relative"
-                                                                                                       :top "15px"})}
+                                            [:span [(tooltip-wrapper ic/alert-warning)
+                                                    {:style (merge style-base/icon-small
+                                                                   {:color "cccc00"
+                                                                    :position "relative"
+                                                                    :top "15px"})}
 
                                                     {:text (tr [:field-labels :transport-service-common
                                                                 (if (= :zip-validation-failed url-error)
