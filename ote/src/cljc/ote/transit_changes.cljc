@@ -70,10 +70,11 @@
         all-stop-names (into #{}
                              (set/union left-stop-names right-stop-names))]
     {:stop-time-changes (reduce (fn [chg stop-name]
-                                  (if (not= (left-stop-times stop-name)
-                                            (right-stop-times stop-name))
+                                  (let [left (left-stop-times stop-name)
+                                        right (right-stop-times stop-name)]
+                                  (if (and left right (not= left right))
                                     (inc chg)
-                                    chg))
+                                    chg)))
                                 0 all-stop-names)
      :stop-seq-changes (+ (count (set/difference left-stop-names right-stop-names))
                           (count (set/difference right-stop-names left-stop-names)))}))

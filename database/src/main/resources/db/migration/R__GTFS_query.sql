@@ -265,7 +265,7 @@ BEGIN
                      st."stop-id"
                 FROM unnest((d2_trip.trip)."stop-times") st
                 JOIN "gtfs-stop" s ON (s."package-id" = (d2_trip)."package-id" AND st."stop-id" = s."stop-id")) d2
-          ON (d1."stop-sequence" = d2."stop-sequence")
+          ON (d1."stop-sequence" = d2."stop-sequence" AND d1."stop-name" = d2."stop-name")
   LOOP
     --RAISE NOTICE '%  (% / %) => (% / %)', row.stopname, row.d1_arr,row.d1_dep, row.d2_arr,row.d2_dep;
     IF row.d1_stop_id IS NULL OR row.d2_stop_id IS NULL THEN
