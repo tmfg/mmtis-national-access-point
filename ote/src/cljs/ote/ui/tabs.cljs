@@ -15,7 +15,6 @@
                        selected-tab
                        (if (not (nil? current-page))
                          (name current-page)
-
                          nil))]
     [:div.tab {:style {:padding-bottom "20px"}}
      [:ul {:style {:list-style "none" :padding-bottom "12px"}}
