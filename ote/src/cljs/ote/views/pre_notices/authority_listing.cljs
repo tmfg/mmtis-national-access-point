@@ -139,7 +139,7 @@
     [:div
      [:div.row
       [:div.col-xs-12.col-sm-12.col-md-12
-       [:h1 (tr [:pre-notice-list-page :header-authority-pre-notice-list])]]]
+       [:h2 (tr [:pre-notice-list-page :header-authority-pre-notice-list])]]]
      [:div.row.authority-pre-notice-table
 
       [table/table {:name->label     (tr-key [:pre-notice-list-page :headers])
