@@ -184,17 +184,19 @@
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
   (let [tabs [{:label "Lomakeilmoitukset" :value "authority-pre-notices"}
-              {:label "Tunnistetut muutokset" :value "transit-changes"}]]
+              {:label "Tunnistetut muutokset" :value "transit-changes"}]
+        selected-tab (or (get-in app [:transit-changes :selected-tab])
+                         (when page
+                           (name page)))]
     [:div
      [page/page-controls "" "Markkinaehtoisen liikenteen muutokset"
       [:div {:style {:padding-bottom "20px"}}
        [tabs/tabs tabs {:update-fn    #(e! (tc/->ChangeTab %))
-                        :selected-tab (get-in app [:transit-changes :selected-tab])
-                        :current-page (:page app)}]
-       (when (= "transit-changes" (get-in app [:transit-changes :selected-tab]))
+                        :selected-tab selected-tab}]
+       (when (= "transit-changes" selected-tab)
          [detected-transit-changes-page-controls e! transit-changes])]]
      [:div.container {:style {:margin-top "20px"}}
-      (case (get-in app [:transit-changes :selected-tab])
+      (case selected-tab
         "authority-pre-notices" [pre-notices-authority-listing/pre-notices e! app]
         "transit-changes" [detected-transit-changes e! transit-changes]
         ;;default
