@@ -16,8 +16,7 @@
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
-            [goog.string :as gstr]
-            [ote.app.controller.transport-service :as ts]))
+            [goog.string :as gstr]))
 
 
 
