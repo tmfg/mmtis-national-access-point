@@ -229,15 +229,23 @@
     (when response
       (update response :body kalkati-to-gtfs/convert-bytes))))
 
+(defn interface-latest-saved-etag [db interface-id]
+  (when interface-id
+    (:gtfs/etag
+     (first
+      (specql/fetch db :gtfs/package
+                    #{:gtfs/etag}
+                    {:gtfs/external-interface-description-id interface-id}
+                    {::specql/order-by :gtfs/created
+                     ::specql/order-direction :descending
+                     ::specql/limit 1})))))
+
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
   [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id]
   (let [filename (gtfs-file-name operator-id ts-id)
-        saved-etag (:gtfs/etag (last (specql/fetch db :gtfs/package
-                                                   #{:gtfs/etag}
-                                                   {:gtfs/transport-operator-id operator-id
-                                                    :gtfs/transport-service-id  ts-id})))
+        saved-etag (interface-latest-saved-etag db interface-id)
         response (load-transit-interface-url interface-type db interface-id url last-import-date saved-etag)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
