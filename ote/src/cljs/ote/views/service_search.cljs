@@ -21,7 +21,8 @@
             [ote.app.controller.admin :as admin]
             [tuck.core :as tuck]
             [ote.ui.validation :as validation]
-            [ote.util.text :as text]))
+            [ote.util.text :as text]
+            [ote.ui.page :as page]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -198,30 +199,31 @@
   (let [{:keys [results empty-filters? total-service-count total-company-count
                 filter-service-count fetching-more?]} service-search
         operator (:operator (:params app))]
-    [:div.col-xs-12.col-md-12.col-lg-12
-     [:span
-      (if operator
-        (tr (if (zero? filter-service-count)
-              [:service-search :operator-no-services]
-              [:service-search :operator-services])
-            {:name (::t-service/operator-name (first results))
-             :count filter-service-count})
-        (tr [:service-search (if empty-filters?
-                               :showing-latest-services
-                               :result-count)]
-            {:count filter-service-count}))
-      " "
-      (tr [:service-search :total-services] {:total-service-count total-service-count
-                                             :total-company-count total-company-count})]
-     (doall
-       (for [result results]
-         ^{:key (::t-service/id result)}
-         [result-card e! (:admin? user) result service-search (:width app)]))
+    [:div.container
+      [:div.col-xs-12.col-md-12.col-lg-12
+       [:span
+        (if operator
+          (tr (if (zero? filter-service-count)
+                [:service-search :operator-no-services]
+                [:service-search :operator-services])
+              {:name (::t-service/operator-name (first results))
+               :count filter-service-count})
+          (tr [:service-search (if empty-filters?
+                                 :showing-latest-services
+                                 :result-count)]
+              {:count filter-service-count}))
+        " "
+        (tr [:service-search :total-services] {:total-service-count total-service-count
+                                               :total-company-count total-company-count})]
+       (doall
+         (for [result results]
+           ^{:key (::t-service/id result)}
+           [result-card e! (:admin? user) result service-search (:width app)]))
 
-     (if fetching-more?
-       [:span (tr [:service-search :fetching-more])]
-       (when (> filter-service-count (count results))
-         [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]))
+       (if fetching-more?
+         [:span (tr [:service-search :fetching-more])]
+         (when (> filter-service-count (count results))
+           [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]]))
 
 (defn operator-result-chips [e! chip-results]
   (fn [e! chip-results]
@@ -304,15 +306,15 @@
                                                           :value val)))
                                         data))]
     [:div
-     [:h1 (tr [:service-search :label])]
+     [:h2 {:style {:font-weight 500 }} (tr [:service-search :limit-search-results])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]
                                       [:field-labels :transport-service])}
       [(form/group
-         {:label (tr [:service-search :filters-label])
-          :columns 3
-          :layout :row}
+         {:columns 3
+          :layout :raw
+          :card? false}
 
          {:type :component
           :name :operators
@@ -335,7 +337,12 @@
           :full-width-input? false
           :suggestions-config {:text :text :value :text}
           :suggestions (transport-types-to-list transport-types)
-          :open-on-focus? true}
+          :open-on-focus? true})
+
+         (form/group
+           {:columns 3
+            :layout :raw
+            :card? false}
 
          {:name ::t-service/operation-area
           :type :chip-input
@@ -403,14 +410,17 @@
 
 (defn service-search [e! _]
   (r/create-class
-   {:component-will-unmount #(e! (ss/->SaveScrollPosition))
-    :component-did-mount #(e! (ss/->RestoreScrollPosition))
-    :reagent-render
-    (fn [e! {{results :results :as service-search} :service-search
-             params :params
-             :as app}]
-      [:div.service-search
-       [filters-form e! service-search]
-       (if (nil? results)
-         [:div (tr [:service-search :no-filters])]
-         [results-listing e! app])])}))
+    {:component-will-unmount #(e! (ss/->SaveScrollPosition))
+     :component-did-mount    #(e! (ss/->RestoreScrollPosition))
+     :reagent-render
+       (fn [e! {{results :results :as service-search} :service-search
+                params                                :params
+                :as                                   app}]
+         [:div.service-search
+          [page/page-controls
+           ""
+           (tr [:service-search :label])
+           [filters-form e! service-search]]
+           (if (nil? results)
+             [:div (tr [:service-search :no-filters])]
+             [results-listing e! app])])}))

@@ -694,11 +694,10 @@
            (for [{id :id :as p} previous-packages]
              ^{:key id}
              [:li [pkg p]]))]])]]))
-(defn transit-visualization [e! {:keys [hash->color date->hash loading? highlight service-info
-                                        changes selected-route compare open-sections]
-                                 :as transit-visualization}]
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
+                                 :as   transit-visualization}]
   [:div
-   (when (not loading?)
+   (when (tv/loaded-from-server? transit-visualization)
      [:div.transit-visualization
 
       [page/page-controls
@@ -726,5 +725,4 @@
             [route-service-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
-            (when (:selected-trip-pair compare)
-              [trip-stop-sequence e! open-sections compare])])])])])
+            [trip-stop-sequence e! open-sections compare]])])])])

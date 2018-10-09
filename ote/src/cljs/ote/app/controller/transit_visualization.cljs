@@ -17,6 +17,19 @@
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
 
+(defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
+                                   route-trips-for-date2-loading? route-calendar-hash-loading?
+                                   route-differences-loading? routes-for-dates-loading?
+                                   service-changes-for-dates-loading?]
+                            :as   transit-visualization}]
+  (and (not route-lines-for-date-loading?)
+       (not route-trips-for-date1-loading?)
+       (not route-trips-for-date2-loading?)
+       (not route-calendar-hash-loading?)
+       (not route-differences-loading?)
+       (not routes-for-dates-loading?)
+       (not service-changes-for-dates-loading?)))
+
 (defn parse-date [date-str]
   (tf/parse (tf/formatter "dd.MM.yyyy") date-str))
 
@@ -36,12 +49,22 @@
       {:days (t/in-days (t/interval dt diff-date))
        :date diff-date})))
 
+(defn select-first-trip
+  "When route is selected first trip needs to be selected as well. Set selected-trip-pair and combined-stop-sequence."
+  [transit-visualization]
+  (let [trip-pair (first (get-in transit-visualization [:compare :combined-trips]))]
+    (-> transit-visualization
+        (assoc-in [:compare :selected-trip-pair] trip-pair)
+        (assoc-in [:compare :combined-stop-sequence]
+                  (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+        (assoc-in [:open-sections :trip-stop-sequence] true))))
+
 (define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
   (if (= dates (select-keys app [:date1 :date2]))
     (-> app
         (assoc :routes routes)
-        (dissoc :loading?))
+        (dissoc :routes-for-dates-loading?))
     app))
 
 (define-event LoadOperatorDatesResponse [dates]
@@ -70,16 +93,16 @@
                                {:params (select-keys compare [:date1 :date2])
                                 :on-success (tuck/send-async! ->RoutesForDatesResponse
                                                               (select-keys compare [:date1 :date2]))})
-                    (assoc compare :loading? true)))))
+                    (assoc compare :routes-for-dates-loading? true)))))
 
-      (dissoc :loading?)))
+      (dissoc :routes-for-dates-loading?)))
 
 (define-event LoadOperatorDates [operator-id compare-date1 compare-date2]
   {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/dates/" operator-id)
              {:on-success (tuck/send-async! ->LoadOperatorDatesResponse)})
   (assoc app
-         :loading? true
+         :operator-dates-loading? true
          :operator-id operator-id
          :compare {:date1 compare-date1
                    :date2 compare-date2}))
@@ -111,7 +134,7 @@
 (define-event LoadServiceChangesForDateResponse [response]
   {:path [:transit-visualization]}
   (assoc app
-         :loading? false
+         :service-changes-for-date-loading? false
          :service-info (:service-info response)
          :changes (:changes response)
          :gtfs-package-info (:gtfs-package-info response)))
@@ -120,7 +143,7 @@
   {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/" service-id "/" date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse)})
-  {:loading? true})
+  {:service-changes-for-date-loading? true})
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->LoadServiceChangesForDate (:service-id params) (:date params)))
@@ -133,22 +156,27 @@
 
 
 (define-event RouteLinesForDateResponse [geojson date]
-  {:path [:transit-visualization :compare]}
+  {:path [:transit-visualization]}
   (cond
-    (= date (:date1 app))
-    (assoc app
-           :date1-route-lines geojson
-           :date1-show? true)
+    (= date (get-in app [:compare :date1]))
+    (-> app
+        (assoc :route-lines-for-date-loading? false)
+        (assoc-in [:compare :date1-route-lines] geojson)
+        (assoc-in [:compare :date1-show?] true))
 
-    (= date (:date2 app))
-    (assoc app
-           :date2-route-lines geojson
-           :date2-show? true)
+    (= date (get-in app [:compare :date2]))
+    (-> app
+        (assoc :route-lines-for-date-loading? false)
+        (assoc-in [:compare :date2-route-lines] geojson)
+        (assoc-in [:compare :date2-show?] true))
 
     :default
-    app))
+    (assoc app :route-lines-for-date-loading? false)))
 
-(defn combine-trips [{:keys [date1-trips date2-trips] :as compare}]
+(defn combine-trips [transit-visualization]
+  (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
+        date2-trips (get-in transit-visualization [:compare :date2-trips])]
+
   (if (and date1-trips date2-trips)
     (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
       (let [first-common-stop
@@ -160,33 +188,42 @@
             combined-trips (transit-changes/merge-by-closest-time
                             :first-common-stop-time
                             date1-trips date2-trips)]
-        (assoc compare :combined-trips
+        (assoc-in transit-visualization [:compare :combined-trips]
                (mapv (fn [[l r]]
                        [l r (transit-changes/trip-stop-differences l r)])
                      combined-trips)))
 
       ;; Can't find common stop
-      (assoc compare :combined-trips nil))
+      (assoc-in transit-visualization [:compare :combined-trips] nil))
 
     ;; Both dates not fetched, don't try to calculate
-    (assoc compare :combined-trips nil)))
+    (assoc-in transit-visualization [:compare :combined-trips] nil))))
 
+;; Routes trip data
 (define-event RouteTripsForDateResponse [trips date]
-  {:path [:transit-visualization :compare]}
-  (combine-trips
-   (cond
-     (= date (:date1 app))
-     (assoc app :date1-trips trips)
+  {:path [:transit-visualization]}
+  (let [app (combine-trips
+              (cond
+                (= date (get-in app [:compare :date1]))
+                (-> app
+                    (assoc :route-trips-for-date1-loading? false)
+                    (assoc-in [:compare :date1-trips] trips))
 
-     (= date (:date2 app))
-     (assoc app :date2-trips trips)
+                (= date (get-in app [:compare :date2] app))
+                (-> app
+                    (assoc :route-trips-for-date2-loading? false)
+                    (assoc-in [:compare :date2-trips] trips))
 
-     :default
-     app)))
+                :default
+                app))]
+    (select-first-trip app)))
 
-(define-event RouteResponse [route-info]
+
+;; Passes data to calendar component
+(define-event RouteCalendarHashResponse [route-info]
   {:path [:transit-visualization]}
   (assoc app
+         :route-calendar-hash-loading? false
          :date->hash (:calendar route-info)
          :hash->color (zipmap (distinct (vals (:calendar route-info)))
                               (cycle hash-colors
@@ -219,8 +256,10 @@
          :show-stops? true))
 
 (define-event RouteDifferencesResponse [response]
-  {:path [:transit-visualization :compare :differences]}
-  response)
+  {:path [:transit-visualization]}
+  (-> app
+      (assoc :route-differences-loading? false)
+      (assoc-in [:compare :differences] response)))
 
 (define-event SelectDateForComparison [date]
   {}
@@ -245,11 +284,13 @@
                          (when-let [headsign (:gtfs/trip-headsign route)]
                            {:headsign headsign}))
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
-    (assoc-in app [:transit-visualization :compare]
-              (fetch-routes-for-dates compare service-id
-                                      route
-                                      (:date1 compare)
-                                      (:date2 compare)))))
+    (-> app
+        (assoc-in [:transit-visualization :route-differences-loading?] true)
+        (assoc-in [:transit-visualization :compare]
+                  (fetch-routes-for-dates compare service-id
+                                          route
+                                          (:date1 compare)
+                                          (:date2 compare))))))
 
 (define-event SelectRouteForDisplay [route]
   {}
@@ -268,10 +309,18 @@
                             {:long-name long})
                           (when-let [headsign (:gtfs/trip-headsign route)]
                             {:headsign headsign}))
-                :on-success (tuck/send-async! ->RouteResponse)})
+                :on-success (tuck/send-async! ->RouteCalendarHashResponse)})
 
     (-> app
+        (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
+        (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
+        (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
+        (assoc-in [:transit-visualization :route-trips-for-date2-loading?] true)
         (assoc-in [:transit-visualization :selected-route] route)
+        (update-in [:transit-visualization :compare] dissoc
+                   :selected-trip-pair
+                   :combined-trips
+                   :combined-stop-sequence)
         (update-in [:transit-visualization] dissoc :date->hash :hash->color)
         (update-in [:transit-visualization :compare] fetch-routes-for-dates
                    service-id route
@@ -324,8 +373,9 @@
     (assoc open-sections section (not open?))))
 
 (define-event SelectTripPair [trip-pair]
-  {:path [:transit-visualization :compare]}
-  (assoc app
-         :selected-trip-pair trip-pair
-         :combined-stop-sequence (transit-changes/combined-stop-sequence
-                                  (:first-common-stop (first trip-pair)) trip-pair)))
+  {}
+  (-> app
+      (assoc-in [:transit-visualization :compare :selected-trip-pair] trip-pair)
+      (assoc-in [:transit-visualization :compare :combined-stop-sequence]
+                (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+      (assoc-in [:transit-visualization :open-sections :trip-stop-sequence] true)))

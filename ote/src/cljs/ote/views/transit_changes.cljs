@@ -4,6 +4,7 @@
   (:require [reagent.core :as r]
             [cljs-react-material-ui.core :refer [color]]
             [ote.ui.tabs :as tabs]
+            [ote.ui.icons :as ui-icons]
             [ote.app.controller.transit-changes :as tc]
             [ote.ui.common :as common]
             [ote.ui.table :as table]
@@ -37,12 +38,12 @@
   [:div.transit-changes-legend (use-style style/transit-changes-legend)
    [:div {:style {:padding-bottom "15px"}}
     [:b "Taulukon ikonien selitteet"]]
-   (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
-                       [ic/content-remove-circle-outline " Päättyviä reittejä"]
-                       [ic/editor-format-list-bulleted " Reittimuutoksia"]]]
+   (for [[icon label] [[[ic/content-add-circle-outline] " Uusia reittejä"]
+                       [[ic/content-remove-circle-outline] " Päättyviä reittejä"]
+                        [[ui-icons/outline-ballot]  " Reittimuutoksia"]]]
      ^{:key label}
      [:div (use-style style/transit-changes-legend-icon)
-      [icon]
+      icon
       [:div (use-style style/change-icon-value) label]])])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :changes?
@@ -66,7 +67,7 @@
                                                 style/remove-color)}] (cap-number removed-routes)]
 
    [:div (use-style style/transit-changes-legend-icon)
-    [ic/editor-format-list-bulleted] (cap-number changed-routes)]])
+    [ui-icons/outline-ballot] (cap-number changed-routes)]])
 
 
 (defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions]}]

@@ -17,8 +17,8 @@
   the rest of the page."
   [top-link title content]
   [:div.page-controls (stylefy/use-style style/page-controls)
-   [:div.container ; (stylefy/use-style style/content)
+   [:div.container
     top-link
     [:h1 title]
-    [:div.page-controls-content
+    [:div.page-controls-content (stylefy/use-style style/content)
      content]]])

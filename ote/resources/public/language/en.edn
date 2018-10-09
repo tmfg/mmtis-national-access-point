@@ -1211,6 +1211,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :operation-area-search-placeholder "Search with Finnish keywords"
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
+  :limit-search-results "Limit search results"
   :result-count (:plural :count
                          "No services found"
                          "One service found"
