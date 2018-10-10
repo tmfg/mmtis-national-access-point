@@ -78,7 +78,8 @@
    :ote.db.transport-service/license "Lisenssi"
    :ote.db.transport-service/notice-external-interfaces? "Olen lukenut tämän osion ohjetekstit ja lisännyt taulukkoon mahdolliset olennaisia tietoa sisältävät rajapinnat."
    :external-interfaces-warning "Annettuun osoitteeseen ei saada yhteyttä"
-   :external-interfaces-ok "Annettuun osoitteeseen saatiin yhteys"
+   :external-interfaces-ok "Rajapinnassa ei havaittu ongelmia"
+   :external-interfaces-validation-error "Virheitä rajapinnan sisällössä"
    :table-header-external-interface "Rajapinta"
 
    ;; Service hours

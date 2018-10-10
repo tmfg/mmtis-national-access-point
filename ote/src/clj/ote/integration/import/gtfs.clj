@@ -5,7 +5,7 @@
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET]]
             [clj-http.client :as http-client]
-            [ote.util.zip :refer [read-zip read-zip-with]]
+            [ote.util.zip :refer [read-zip read-zip-with list-zip]]
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
             [specql.core :as specql]
@@ -18,7 +18,8 @@
             [specql.impl.composite :as specql-composite]
             [specql.impl.registry :refer [table-info-registry]]
             [jeesql.core :refer [defqueries]]
-            [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs])
+            [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
+            [clojure.string :as string])
   (:import (java.io File)))
 
 (defqueries "ote/integration/import/stop_times.sql")
@@ -135,6 +136,7 @@
                                     :stop-times stop-times}))
           (recur (inc i) ps))))))
 
+
 (defn save-gtfs-to-db [db gtfs-file package-id interface-id]
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
@@ -203,12 +205,6 @@
       (save-gtfs-to-db db bytes 1 1)
       (println "******************* test-hsl-gtfs end *********************"))))
 
-(defmulti load-transit-interface-url
-  "Load transit interface from URL. Dispatches on type.
-  Returns a response map or nil if it has not been modified."
-  (fn [type db interface-id url last-import-date saved-etag] type))
-
-
 (defn- load-interface-url [db interface-id url last-import-date saved-etag]
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag)
@@ -221,13 +217,63 @@
                       {::t-service/id interface-id})
       nil)))
 
-(defmethod load-transit-interface-url :gtfs [_ db interface-id url last-import-date saved-etag]
-  (load-interface-url db interface-id url last-import-date saved-etag))
+(defmulti validate-interface-zip-package
+          (fn [type byte-array-input] type))
 
-(defmethod load-transit-interface-url :kalkati [_ db interface-id url last-import-date saved-etag]
+
+(defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
+  (let [file-list (list-zip byte-array-input)]
+
+    (when-not (or
+                (every? file-list ["agency.txt" "stops.txt" "calendar.txt" "trips.txt"])
+                (every? file-list ["agency.txt" "stops.txt" "calendar_dates.txt" "trips.txt"]))
+      (throw (ex-info "Missing required files in gtfs zip file" {:file-names file-list})))))
+
+(defmethod validate-interface-zip-package :kalkati [_ byte-array-input]
+  (let [file-list (list-zip byte-array-input)]
+
+    (when-not (contains? file-list "LVM.xml")
+      (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
+
+
+(defn check-interface-zip [type db interface-id url byte-array-data]
+  (try
+    (validate-interface-zip-package type byte-array-data)
+
+    (catch Exception e
+      (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
+      (specql/update! db ::t-service/external-interface-description
+                      {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
+                       ::t-service/gtfs-import-error (str "Invalid interface package: " (.getMessage e))}
+                      {::t-service/id interface-id})
+      (throw (ex-info (str "Invalid interface package: " (.getMessage e)) {})))))
+
+(defmulti load-transit-interface-url
+          "Load transit interface from URL. Dispatches on type.
+          Returns a response map or nil if it has not been modified."
+          (fn [type db interface-id url last-import-date saved-etag] type))
+
+(defmethod load-transit-interface-url :gtfs [type db interface-id url last-import-date saved-etag]
   (let [response (load-interface-url db interface-id url last-import-date saved-etag)]
     (when response
-      (update response :body kalkati-to-gtfs/convert-bytes))))
+      (try
+        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
+        response
+
+        ;; Return nil response in case of error
+        (catch Exception e
+          nil)))))
+
+(defmethod load-transit-interface-url :kalkati [type db interface-id url last-import-date saved-etag]
+  (let [response (load-interface-url db interface-id url last-import-date saved-etag)]
+    (when response
+      (try
+        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
+        (update response :body kalkati-to-gtfs/convert-bytes)
+
+        ;; Return nil response in case of error
+        (catch Exception e
+          nil)))))
 
 (defn interface-latest-saved-etag [db interface-id]
   (when interface-id
