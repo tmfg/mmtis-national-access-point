@@ -523,42 +523,49 @@
    "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
    [:div.route-trips
 
-    [table/table {:name->label str
-                  :row-selected? #(= % selected-trip-pair)
-                  :on-select #(e! (tv/->SelectTripPair (first %)))}
-     [;; name of the first stop of the first trip (FIXME: should be first common?)
-      {:name (-> date1-trips first :stoptimes first :gtfs/stop-name)
-       :read #(-> % first :stoptimes first :gtfs/departure-time)
-       :format (partial format-stop-time (style/date1-highlight-style) )}
-      ;; name of the last stop of the first trip
-      {:name (-> date1-trips first :stoptimes last :gtfs/stop-name)
-       :read #(-> % first :stoptimes last :gtfs/departure-time)
-       :format (partial format-stop-time (style/date1-highlight-style))}
+    ;; Group by different (d1 start, d1 stop, d2 start, d2 stop) stops
+    (for [[_ trips] (group-by (juxt (comp :gtfs/stop-name first :stoptimes first)
+                                    (comp :gtfs/stop-name last :stoptimes first)
+                                    (comp :gtfs/stop-name first :stoptimes second)
+                                    (comp :gtfs/stop-name last :stoptimes second))
+                              combined-trips)]
+      [:div.routes-table {:style {:margin-top "1em"}}
+       [table/table {:name->label str
+                     :row-selected? #(= % selected-trip-pair)
+                     :on-select #(e! (tv/->SelectTripPair (first %)))}
+        [;; name of the first stop of the first trip (FIXME: should be first common?)
+         {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
+          :read #(-> % first :stoptimes first :gtfs/departure-time)
+          :format (partial format-stop-time (style/date1-highlight-style) )}
+         ;; name of the last stop of the first trip
+         {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
+          :read #(-> % first :stoptimes last :gtfs/departure-time)
+          :format (partial format-stop-time (style/date1-highlight-style))}
 
-      {:name (-> date2-trips first :stoptimes first :gtfs/stop-name)
-       :read (comp :gtfs/departure-time first :stoptimes second)
-       :format (partial format-stop-time (style/date2-highlight-style))}
-      {:name (-> date2-trips first :stoptimes last :gtfs/stop-name)
-       :read (comp :gtfs/departure-time last :stoptimes second)
-       :format (partial format-stop-time (style/date2-highlight-style))}
+         {:name (-> trips first second :stoptimes first :gtfs/stop-name)
+          :read (comp :gtfs/departure-time first :stoptimes second)
+          :format (partial format-stop-time (style/date2-highlight-style))}
+         {:name (-> trips first second :stoptimes last :gtfs/stop-name)
+          :read (comp :gtfs/departure-time last :stoptimes second)
+          :format (partial format-stop-time (style/date2-highlight-style))}
 
-      {:name "Muutokset" :read identity
-       :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
-                 (cond
-                   (and left (nil? right))
-                   [labeled-icon [ic/content-remove] "Poistuva vuoro"]
+         {:name "Muutokset" :read identity
+          :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
+                    (cond
+                      (and left (nil? right))
+                      [labeled-icon [ic/content-remove] "Poistuva vuoro"]
 
-                   (and (nil? left) right)
-                   [labeled-icon [ic/content-add] "Lisätty vuoro"]
+                      (and (nil? left) right)
+                      [labeled-icon [ic/content-add] "Lisätty vuoro"]
 
-                   (= 0 stop-time-changes stop-seq-changes)
-                   [labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                      (= 0 stop-time-changes stop-seq-changes)
+                      [labeled-icon [ic/navigation-check] "Ei muutoksia"]
 
-                   :default
-                   [:div
-                    [stop-seq-changes-icon stop-seq-changes]
-                    [stop-time-changes-icon stop-time-changes]]))}]
-     combined-trips]]])
+                      :default
+                      [:div
+                       [stop-seq-changes-icon stop-seq-changes]
+                       [stop-time-changes-icon stop-time-changes]]))}]
+        trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
                                                    combined-stop-sequence] :as compare}]
