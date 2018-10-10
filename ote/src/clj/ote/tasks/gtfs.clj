@@ -38,7 +38,7 @@
                         {::t-service/id (:id gtfs-data)}))
       gtfs-data)))
 
-(defn update-one-gtfs! [config db]
+(defn update-one-gtfs! [config db upload-s3?]
   ;; Ensure that gtfs-import flag is enabled
   (let [{:keys [id url operator-id ts-id last-import-date format license] :as gtfs-data}
         (fetch-and-mark-gtfs-interface! config db)]
@@ -47,9 +47,11 @@
       (try
         (log/debug "GTFS File url found. " (pr-str gtfs-data))
         (import-gtfs/download-and-store-transit-package
-          (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id)
+          (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id upload-s3?)
         (catch Exception e
-          (log/warn e "Error when importing, uploading or saving gtfs package to db!"))))))
+          (log/warn e "Error when importing, uploading or saving gtfs package to db!"))
+        (finally
+          (log/debug "GTFS file imported and uploaded successfully!"))))))
 
 (def night-hours #{0 1 2 3 4})
 
@@ -78,7 +80,7 @@
                (filter night-time?
                        (drop 1 (periodic-seq (t/now) (t/minutes 1))))
                (fn [_]
-                 (#'update-one-gtfs! config db)))
+                 (#'update-one-gtfs! config db true)))
               (chime-at (daily-at 5 15)
                         (fn [_]
                           (detect-new-changes-task db)))]

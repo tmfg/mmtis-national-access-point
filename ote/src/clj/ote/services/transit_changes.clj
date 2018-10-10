@@ -46,7 +46,7 @@
                                                        (into #{} (str/split region-list #","))))))
                   (upcoming-changes db))})
 
-(define-service-component TransitChanges {}
+(define-service-component TransitChanges {:fields [config]}
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-changes/current" []
@@ -55,4 +55,8 @@
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
           (gtfs-tasks/detect-new-changes-task db true)
-          "OK")))
+          "OK"))
+  (POST "/transit-changes/force-interface-import" req
+    (when (authorization/admin? (:user req))
+      (gtfs-tasks/update-one-gtfs! config db false)
+      "OK")))

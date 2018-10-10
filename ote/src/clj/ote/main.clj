@@ -64,7 +64,7 @@
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
    :transit-visualization (component/using (transit-visualization/->TransitVisualization) [:http :db])
-   :transit-changes (component/using (transit-changes/->TransitChanges) [:http :db])
+   :transit-changes (component/using (transit-changes/->TransitChanges config) [:http :db])
 
    ;; Return localization information to frontend
    :localization (component/using
