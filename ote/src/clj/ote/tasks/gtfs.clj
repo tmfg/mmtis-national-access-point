@@ -40,6 +40,7 @@
 
 (defn update-one-gtfs! [config db upload-s3?]
   ;; Ensure that gtfs-import flag is enabled
+  ;; upload-s3? should be false when using local environment
   (let [{:keys [id url operator-id ts-id last-import-date format license] :as gtfs-data}
         (fetch-and-mark-gtfs-interface! config db)]
     (if (nil? gtfs-data)
