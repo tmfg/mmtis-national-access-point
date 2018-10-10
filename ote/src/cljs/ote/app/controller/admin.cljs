@@ -413,3 +413,7 @@
 (defn ^:export force-detect-transit-changes []
   (comm/post! "/transit-changes/force-detect" nil
               {:on-success #(.log js/console %)}))
+
+(defn ^:export force-interface-import []
+  (comm/post! "/transit-changes/force-interface-import" nil
+              {:on-success #(.log js/console %)}))
