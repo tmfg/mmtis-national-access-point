@@ -17,20 +17,32 @@
 
 (defqueries "ote/services/transit_visualization.sql")
 
+(defn- parse-stops [stops]
+  (mapv (fn [stop]
+          (let [[lat lon & name] (str/split stop #",")]
+            {:lat (Double/parseDouble lat)
+             :lon (Double/parseDouble lon)
+             :name (str/join "," name)}))
+        (str/split stops #"\|\|")))
+
 (defn route-line-features [rows]
   (mapcat (fn [{:keys [route-line departures stops] :as foo}]
-            (vec (into
-                  #{{:type "Feature"
-                     :properties {:departures (mapv time/format-interval-as-time (.getArray departures))}
-                     :geometry (cheshire/decode route-line keyword)}}
-                  (map (fn [stop]
-                         (let [[lon lat name] (str/split stop #",")]
-                           {:type "Point"
-                            :coordinates [(Double/parseDouble lon)
-                                          (Double/parseDouble lat)]
-                            :properties {"name" name}})))
-                  (when (not (str/blank? stops))
-                    (str/split stops #"\|\|")))))
+            (let [all-stops (parse-stops stops)
+                  first-stop (first all-stops)
+                  last-stop (last all-stops)]
+              (vec (into
+                    #{{:type "Feature"
+                       :properties {:departures (mapv time/format-interval-as-time (.getArray departures))
+                                    :routename (str (:name first-stop) " \u2192 " (:name last-stop))}
+                       :geometry (cheshire/decode route-line keyword)}}
+                    (map (fn [stop]
+                           (let [[lon lat name] (str/split stop #",")]
+                             {:type "Point"
+                              :coordinates [(Double/parseDouble lon)
+                                            (Double/parseDouble lat)]
+                              :properties {"name" name}})))
+                    (when (not (str/blank? stops))
+                      (str/split stops #"\|\|"))))))
           rows))
 
 (defn service-changes-for-date [db service-id date]

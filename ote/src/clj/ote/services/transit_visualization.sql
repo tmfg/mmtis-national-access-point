@@ -89,7 +89,7 @@ SELECT ST_AsGeoJSON(COALESCE(
        string_agg(stops, '||') as stops
   FROM (SELECT (array_agg(stoptime."departure-time"))[1] as "departure",
                ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence") as "route-line",
-               string_agg(DISTINCT CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name"), '||') as stops,
+               string_agg(CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name"), '||' ORDER BY stoptime."stop-sequence") as stops,
                trip."shape-id", r."package-id"
           FROM "gtfs-route" r
           JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
