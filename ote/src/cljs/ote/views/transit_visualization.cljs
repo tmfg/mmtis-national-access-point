@@ -628,9 +628,10 @@
                                (not (empty? (get date2-route-lines "features"))))
               zoom @zoom-level
               [line-weight offset icon-size] (cond
-                                               (< zoom 12) [3 2 [10 10]]
-                                               (< zoom 14) [5 2 [14 14]]
-                                               :default    [6 3 [20 20]])]
+                                               (< zoom 7)  [3 3 [12 12]]
+                                               (< zoom 12) [3 2 [14 14]]
+                                               (< zoom 14) [3 2 [16 16]]
+                                               :default    [3 2 [18 18]])]
           [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
 
 
