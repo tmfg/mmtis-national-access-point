@@ -117,13 +117,39 @@
       ;; This feature has no name, it is the route line, apply pixel offset
       (.call (aget layer "setOffset") layer offset))))
 
-(defn update-marker-visibility [this show?-atom]
+(defn update-marker-visibility [this show-atom removed-route-layers]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
-        show? @show?-atom]
+        show @show-atom]
+
+    ;; add layers that should be shown
+    (doseq [[name layers] @removed-route-layers
+            :when (show name)]
+      (doseq [layer layers]
+        (.addLayer m layer)))
+
+    ;; Remove from atom the layers that were just added
+    (swap! removed-route-layers
+           #(reduce (fn [layers [name show?]]
+                      (if show?
+                        (dissoc layers name)
+                        layers))
+                    % show))
+
     (.eachLayer m (fn [layer]
-                    (when-let [icon (aget layer "_icon")]
+                    (if-let [icon (aget layer "_icon")]
+                      ;; This is a stop, set the icon visibility
                       (set! (.-visibility (aget icon "style"))
-                            (if show? "" "hidden")))))))
+                            (if (:stops show) "" "hidden"))
+
+                      (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
+                        (when-not (show routename)
+                          ;; This is a layer for a routeline that should be removed
+                          (swap! removed-route-layers update routename conj layer))))))
+
+    ;; Remove layers that were added to removed-route-layers
+    (doseq [[_ layers] @removed-route-layers]
+      (doseq [layer layers]
+        (.removeLayer m layer)))))
 
 
 
@@ -598,11 +624,13 @@
                     "00:00"]))}]
      combined-stop-sequence]]])
 
-(defn- selected-route-map [_ _ _ {show-stops? :show-stops?}]
-  (let [show?-atom (atom show-stops?)
+(defn- selected-route-map [_ _ _ {show-stops? :show-stops?
+                                  show-route-lines :show-route-lines}]
+  (let [show-atom (atom (assoc show-route-lines :stops show-stops?))
+        removed-route-layers (atom {})
         inhibit-zoom (atom false)
         update (fn [this]
-                 (update-marker-visibility this show?-atom)
+                 (update-marker-visibility this show-atom removed-route-layers)
                  (when-not @inhibit-zoom
                    (leaflet/update-bounds-from-layers this))
                  (reset! inhibit-zoom false))
@@ -616,19 +644,22 @@
                                                    (reset! zoom-level (.getZoom m)))))
                              (update this))
       :component-will-receive-props
-      (fn [this [_ _ _ _ {show-stops? :show-stops?}]]
+      (fn [this [_ _ _ _ {show-stops? :show-stops?
+                          show-route-lines :show-route-lines}]]
         ;; This is a bit of a kludge, but because the stops are in the
         ;; same GeoJSON layer as the lines, we can't easily control their
         ;; visibility using react components.
-        (when (not= @show?-atom show-stops?)
-          ;; Don't zoom if we changed stops visible/hidden toggle
-          (reset! inhibit-zoom true))
-        (reset! show?-atom show-stops?))
+        (let [show (assoc show-route-lines :stops show-stops?)]
+          (when (not= @show-atom show)
+            ;; Don't zoom if we changed stops or route lines visible/hidden toggle
+            (reset! inhibit-zoom true))
+          (reset! show-atom show)))
       :reagent-render
       (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
                                              date1 date1-route-lines date1-show?
                                              date2 date2-route-lines date2-show?
-                                             show-stops?]}]
+                                             show-stops?
+                                             show-route-lines]}]
         (let [show-date1? (and date1-show?
                                (not (empty? (get date1-route-lines "features"))))
               show-date2? (and date2-show?
@@ -673,7 +704,15 @@
                               :margin-bottom "1.25rem"})
      [ui/checkbox {:label "Näytä pysäkit"
                    :checked (boolean (:show-stops? compare))
-                   :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]]
+                   :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
+    (when (> (count (:show-route-lines compare)) 1)
+      ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
+      (doall
+       (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
+         ^{:key routename}
+         [ui/checkbox {:label routename
+                       :checked show?
+                       :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]
    [selected-route-map e! date->hash hash->color compare]])
 
 (defn gtfs-package-info [e! open-sections {:keys [current-packages previous-packages]}]

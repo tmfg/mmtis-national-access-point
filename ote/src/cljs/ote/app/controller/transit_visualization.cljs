@@ -9,7 +9,8 @@
             [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
-            [ote.transit-changes :as transit-changes]))
+            [ote.transit-changes :as transit-changes]
+            [clojure.set :as set]))
 
 (def hash-colors
   ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
@@ -157,21 +158,28 @@
 
 (define-event RouteLinesForDateResponse [geojson date]
   {:path [:transit-visualization]}
-  (cond
-    (= date (get-in app [:compare :date1]))
-    (-> app
-        (assoc :route-lines-for-date-loading? false)
-        (assoc-in [:compare :date1-route-lines] geojson)
-        (assoc-in [:compare :date1-show?] true))
+  (let [route-line-names (into #{}
+                               (keep #(get-in % ["properties" "routename"]))
+                               (get geojson "features"))]
+    (update-in
+     (cond
+       (= date (get-in app [:compare :date1]))
+       (-> app
+           (assoc :route-lines-for-date-loading? false)
+           (assoc-in [:compare :date1-route-lines] geojson)
+           (assoc-in [:compare :date1-show?] true))
 
-    (= date (get-in app [:compare :date2]))
-    (-> app
-        (assoc :route-lines-for-date-loading? false)
-        (assoc-in [:compare :date2-route-lines] geojson)
-        (assoc-in [:compare :date2-show?] true))
+       (= date (get-in app [:compare :date2]))
+       (-> app
+           (assoc :route-lines-for-date-loading? false)
+           (assoc-in [:compare :date2-route-lines] geojson)
+           (assoc-in [:compare :date2-show?] true))
 
-    :default
-    (assoc app :route-lines-for-date-loading? false)))
+       :default
+       (assoc app :route-lines-for-date-loading? false))
+
+     ;; Add all received routes to shown map
+     [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
@@ -247,6 +255,7 @@
                {:params params
                 :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
   (assoc compare
+         :show-route-lines {}
          :date1 date1
          :date2 date2
          :date1-route-lines nil
@@ -379,3 +388,7 @@
       (assoc-in [:transit-visualization :compare :combined-stop-sequence]
                 (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
       (assoc-in [:transit-visualization :open-sections :trip-stop-sequence] true)))
+
+(define-event ToggleShowRouteLine [routename]
+  {:path [:transit-visualization :compare :show-route-lines]}
+  (update app routename not))
