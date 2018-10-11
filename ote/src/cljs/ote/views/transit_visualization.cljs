@@ -735,7 +735,6 @@
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
           :on-click #(do (.preventDefault %)
-                         (.log js/console "hep")
                          (e! (tv/->ToggleSection :gtfs-package-info)))}]
         (when open?
           [:ul
