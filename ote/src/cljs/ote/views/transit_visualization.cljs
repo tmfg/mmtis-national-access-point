@@ -716,31 +716,34 @@
                        :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]
    [selected-route-map e! date->hash hash->color compare]])
 
-(defn gtfs-package-info [e! open-sections {:keys [current-packages previous-packages]}]
-  (let [pkg (fn [{:keys [created min-date max-date interface-url]}]
+(defn gtfs-package-info [e! open-sections packages]
+  (let [[latest-package & previous-packages] packages
+        open? (get open-sections :gtfs-package-info false)
+        pkg (fn [{:keys [created min-date max-date interface-url]}]
               [:div.gtfs-package
                interface-url
                " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
                "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
-    [section {:toggle! #(e! (tv/->ToggleSection :gtfs-package-info))
-              :open? (get open-sections :gtfs-package-info false)}
-     "Aineiston lisätiedot"
-     [:div
-      [:b "Käytetyt aineistot"]
-      [:div
-       (doall
-        (for [{id :id :as p} current-packages]
-          ^{:key id}
-          [:div [pkg p]]))]
-      [:br]
-      (when (seq previous-packages)
-        [:div
-         [:b "Aiemmat aineistot"]
-         [:ul
-          (doall
-           (for [{id :id :as p} previous-packages]
-             ^{:key id}
-             [:li [pkg p]]))]])]]))
+    [:div (stylefy/use-style style/light-section)
+     [:b "Viimeisin aineisto"]
+     [pkg latest-package]
+     (when (seq previous-packages)
+       [:div
+        [:br]
+        [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
+         {:icon (if open?
+                  [ic/navigation-expand-less]
+                  [ic/navigation-expand-more])
+          :on-click #(do (.preventDefault %)
+                         (.log js/console "hep")
+                         (e! (tv/->ToggleSection :gtfs-package-info)))}]
+        (when open?
+          [:ul
+           (doall
+            (for [{id :id :as p} previous-packages]
+              ^{:key id}
+              [:li [pkg p]]))])])]))
+
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
                                  :as   transit-visualization}]
   [:div
