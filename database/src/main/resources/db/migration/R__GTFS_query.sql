@@ -593,15 +593,29 @@ E'Returns the next different week for the given service and route.';
 
 CREATE OR REPLACE FUNCTION gtfs_service_routes_with_daterange(service_id INTEGER)
 RETURNS SETOF gtfs_route_with_daterange AS $$
+WITH dates AS (
+  -- Calculate a series of dates from beginning of last year
+  -- to the end of the next year.
+  SELECT ts::date AS date
+    FROM generate_series(
+            (date_trunc('year', CURRENT_DATE) - '1 year'::interval)::date,
+            (date_trunc('year', CURRENT_DATE) + '2 years'::interval)::date,
+            '1 day'::interval) AS g(ts)
+)
 SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-long-name",'') AS "route-long-name",
-       COALESCE(rh."trip-headsign",'') AS "trip-headsign",
-       MIN(date), MAX(date)
-  FROM "gtfs-date-hash" h
-  JOIN LATERAL unnest(h."route-hashes") AS rh ON TRUE
- WHERE h."package-id" IN (SELECT id FROM gtfs_package p WHERE p."transport-service-id" = service_id)
-   AND h.date BETWEEN (current_date - '1 year'::interval) AND (current_date + '1 year'::interval)
-   AND rh.hash IS NOT NULL
+       COALESCE(rh."trip-headsign", '') AS "trip-headsign",
+       MIN(d.date) AS "min-date",
+       MAX(d.date) AS "max-date"
+  FROM dates d
+  -- Join packages for each date
+  JOIN LATERAL unnest(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
+    AS ps (package_id) ON TRUE
+  -- Join all date hashes for packages
+  JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
+  -- Join unnested per route hashes
+  JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
+ WHERE rh.hash IS NOT NULL
  GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign";
 $$ LANGUAGE SQL STABLE;
 
