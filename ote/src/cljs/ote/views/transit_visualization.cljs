@@ -698,7 +698,6 @@
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
                                  :as   transit-visualization}]
   [:div
-   (when (tv/loaded-from-server? transit-visualization)
      [:div.transit-visualization
 
       [page/page-controls
@@ -721,9 +720,9 @@
           (:gtfs/route-long-name selected-route)
           " (" (:gtfs/trip-headsign selected-route) ")"]
 
-         (when (and hash->color date->hash)
+         (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
             [route-service-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
-            [trip-stop-sequence e! open-sections compare]])])])])
+            [trip-stop-sequence e! open-sections compare]])])]])
