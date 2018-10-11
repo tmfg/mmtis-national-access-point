@@ -142,7 +142,6 @@ CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE
 RETURNS SETOF service_ref AS $$
 SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
   FROM "gtfs-calendar" c
-  LEFT JOIN "gtfs-calendar-date" cd ON (c."package-id" = cd."package-id" AND c."service-id" = cd."service-id")
  WHERE c."package-id" = ANY(package_ids)
    AND (dt BETWEEN c."start-date" AND c."end-date")
    AND ((EXTRACT(DOW FROM dt) = 0 AND c.sunday = TRUE) OR
@@ -152,7 +151,11 @@ SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
         (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
         (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
         (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
-   AND (cd."exception-type" IS NULL OR cd."exception-type" != 2)
+    AND NOT EXISTS (SELECT id
+                      FROM "gtfs-calendar-date" cd
+                     WHERE cd."exception-type" = 2
+                       AND cd."package-id" = c."package-id" AND cd.date = dt)
+
 UNION
 SELECT ROW(cd."package-id", cd."service-id")::service_ref
   FROM "gtfs-calendar-date" cd
