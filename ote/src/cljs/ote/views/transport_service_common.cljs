@@ -174,9 +174,10 @@
                        :write (fn [row val]
                                 (assoc-in row [::t-service/external-interface ::t-service/url] val))
                        :component (fn [{{external-interface ::t-service/external-interface format ::t-service/format
-                                         :as service} :data
-                                        update-form! :update-form!}]
-
+                                         :as row} :data
+                                        update-form! :update-form!
+                                        row-number :row-number}]
+                                    (println row row-number)
                                     [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
                                      [form-fields/field
                                       (merge
@@ -188,7 +189,10 @@
                                          :full-width? true
                                          :update! #(update-form! %)
                                          :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) (first format)))}
-                                        (when (empty? (::t-service/url external-interface))
+                                        ;; For first row: If there is data in other fields, show this required field warning
+                                        ;; For other rows, if this required field is missing, show the warning.
+                                        (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
+                                                  (and (> row-number 0) (empty? (::t-service/url external-interface))))
                                           {:warning (tr [:common-texts :required-field])}))
                                       (::t-service/url external-interface)]
 
@@ -196,7 +200,7 @@
                                       (let [url-status (get-in external-interface [:url-status :status])
                                             url-error (get-in external-interface [:url-status :error])]
                                         (if-not url-status
-                                          [gtfs-viewer-link service]
+                                          [gtfs-viewer-link row]
 
                                           (if (= :success url-status)
                                             [:span (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
@@ -206,7 +210,7 @@
                                                               :position "relative"
                                                               :top "15px"})}
                                               {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
-                                             [gtfs-viewer-link service]]
+                                             [gtfs-viewer-link row]]
                                             [:span [(tooltip-wrapper ic/alert-warning)
                                                     {:style (merge style-base/icon-small
                                                                    {:color "cccc00"
