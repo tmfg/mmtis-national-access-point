@@ -42,9 +42,9 @@ SELECT ts.id AS "transport-service-id",
           JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
          WHERE id = ANY(c."package-ids")) AS "finnish-regions",
        (SELECT (upper(gtfs_package_date_range(p.id)) - '1 day'::interval)::date
-                               FROM gtfs_package p
-                              WHERE p."transport-service-id" = ts.id
-                              ORDER BY p.id DESC limit 1) as "max-date"
+          FROM gtfs_package p
+         WHERE p."transport-service-id" = ts.id
+         ORDER BY p.id DESC limit 1) as "max-date"
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
   LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
