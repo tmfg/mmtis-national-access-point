@@ -107,19 +107,25 @@
    :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:pre-notices config))
                                        [:db :email])))
 
-(defn configure-logging [{:keys [level] :as log-config}]
+(defn configure-logging [dev-mode? {:keys [level] :as log-config}]
   (log/merge-config!
    {:level (or level :debug)
     :appenders
-    {:rolling
-     (timbre-rolling/rolling-appender {:path "logs/ote.log" :pattern :daily})}}))
+    (if dev-mode?
+      ;; In dev-mode only do println logging
+      {:println {:enabled? true}}
+
+      ;; In production only do file logging (so that logs don't end up in /var/log/messages)
+      {:println {:enabled? false}
+       :rolling
+       (timbre-rolling/rolling-appender {:path "logs/ote.log" :pattern :daily})})}))
 
 (defn start []
   (alter-var-root
    #'ote
    (fn [_]
      (let [config (read-string (slurp "config.edn"))]
-       (configure-logging (:log config))
+       (configure-logging (:dev-mode? config) (:log config))
        (env/merge-environment! (:environment config))
        (feature/set-enabled-features! (or (:enabled-features config) #{}))
        (when (:dev-mode? config)
@@ -141,3 +147,5 @@
 (defn log-level-info! []
   (log/merge-config!
     {:appenders {:println {:min-level :info}}}))
+Wrong type argument: integer-or-marker-p, nil
+x
