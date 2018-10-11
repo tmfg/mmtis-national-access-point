@@ -147,5 +147,3 @@
 (defn log-level-info! []
   (log/merge-config!
     {:appenders {:println {:min-level :info}}}))
-Wrong type argument: integer-or-marker-p, nil
-x
