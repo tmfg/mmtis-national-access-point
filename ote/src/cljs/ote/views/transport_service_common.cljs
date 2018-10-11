@@ -167,8 +167,9 @@
                        :required? true
                        :is-empty? validation/empty-enum-dropdown?}
 
-                      {:name :external-service-url
+                      {:name ::t-service/external-service-url
                        :type :component
+                       :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
                        :width "28%"
                        :read #(identity %)
                        :write (fn [row val]
@@ -185,7 +186,6 @@
                                          :type :string
                                          :width "70%"
                                          :required? true
-                                         :tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
                                          :full-width? true
                                          :update! #(update-form! %)
                                          :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) (first format)))}
