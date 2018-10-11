@@ -46,6 +46,36 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_services_for_date (INTEGER, DATE) IS
 E'Returns the service ids of all services having trips on the given date';
 
+CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
+  RETURNS SETOF service_ref AS $$
+SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
+  FROM "gtfs-calendar" c
+ WHERE c."package-id" = ANY(package_ids)
+   AND (dt BETWEEN c."start-date" AND c."end-date")
+   AND ((EXTRACT(DOW FROM dt) = 0 AND c.sunday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 1 AND c.monday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 2 AND c.tuesday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 3 AND c.wednesday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
+   AND NOT EXISTS (SELECT id
+                     FROM "gtfs-calendar-date" cd
+                    WHERE cd."exception-type" = 2
+                      AND cd."package-id" = c."package-id" AND cd.date = dt)
+
+ UNION
+SELECT ROW(cd."package-id", cd."service-id")::service_ref
+  FROM "gtfs-calendar-date" cd
+ WHERE cd."package-id" = ANY(package_ids)
+   AND cd.date = dt
+   AND cd."exception-type" = 1;
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
+  E'Return set of (package-id, service-id) tuples of services operated by the given packages for the given date.';
+
+
 CREATE OR REPLACE FUNCTION gtfs_hash_for_date(package_id INTEGER, date DATE) RETURNS bytea AS $$
 SELECT digest(string_agg(concat(d.route, ':', d.times), '|'), 'sha256')
   FROM (SELECT x.route, string_agg(concat(x."stop-name", '@', x."departure-time"), '->') as times
@@ -137,35 +167,6 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_should_calculate_transit_change(INTEGER) IS
 E'Check if transit changes should be calculated for the given transport-service-id.';
-
-CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
-RETURNS SETOF service_ref AS $$
-SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
-  FROM "gtfs-calendar" c
- WHERE c."package-id" = ANY(package_ids)
-   AND (dt BETWEEN c."start-date" AND c."end-date")
-   AND ((EXTRACT(DOW FROM dt) = 0 AND c.sunday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 1 AND c.monday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 2 AND c.tuesday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 3 AND c.wednesday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
-    AND NOT EXISTS (SELECT id
-                      FROM "gtfs-calendar-date" cd
-                     WHERE cd."exception-type" = 2
-                       AND cd."package-id" = c."package-id" AND cd.date = dt)
-
-UNION
-SELECT ROW(cd."package-id", cd."service-id")::service_ref
-  FROM "gtfs-calendar-date" cd
- WHERE cd."package-id" = ANY(package_ids)
-   AND cd.date = dt
-   AND cd."exception-type" = 1;
-$$ LANGUAGE SQL STABLE;
-
-COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
-E'Return set of (package-id, service-id) tuples of services operated by the given packages for the given date.';
 
 CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_ids INTEGER[], dt DATE)
 RETURNS SETOF route_trips_for_date
