@@ -177,7 +177,7 @@
                                          :as row} :data
                                         update-form! :update-form!
                                         row-number :row-number}]
-                                    (println row row-number)
+
                                     [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
                                      [form-fields/field
                                       (merge
