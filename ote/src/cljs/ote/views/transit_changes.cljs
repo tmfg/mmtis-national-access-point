@@ -157,7 +157,7 @@
                                                                 date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
      {:name "Palvelu" :read :transport-service-name :width "20%"}
-     {:name "Aikaa 1:seen muutokseen" :width "20%"
+     {:name "Aikaa 1:seen muutokseen" :width "15%"
       :read (juxt :change-date :days-until-change)
       :format (fn [[change-date days-until-change]]
                 (if change-date
@@ -167,8 +167,8 @@
                                               :color "gray"})
                     (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]
                   "\u2015"))}
-     {:name "Tiedot saatavilla (asti)" :read (comp time/format-timestamp->date-for-ui :max-date) :width "20%"}
-     {:name "Muutokset" :width "20%"
+     {:name "Tiedot saatavilla (asti)" :read (comp time/format-timestamp->date-for-ui :max-date) :width "15%"}
+     {:name "Muutokset" :width "30%"
       :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
       :tooltip-len "min-medium"
       :read #(select-keys % change-keys)
