@@ -23,13 +23,13 @@
 (defn linkify
   ([url label]
    (linkify url label nil))
-  ([url label {:keys [icon target] :as props}]
+  ([url label {:keys [icon target style] :as props}]
    (let [a-props (dissoc
                   (if (= target "_blank")
                     ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
                     (assoc props :rel "noopener noreferrer")
                     props)
-                  :icon)]
+                  :icon :style)]
 
      (if-not url
        [:span]
@@ -46,14 +46,18 @@
                    ;; Internal relative link, like "pre-notice/attachment/1"
                    :default
                    url)]
-         [:a (merge {:href url} a-props)
+         [:a (merge
+              (when style
+                (stylefy/use-style style))
+              {:href url}
+              a-props)
           (if icon
             (let [[icon-elt icon-attrs] icon]
               [:span [icon-elt (merge icon-attrs
-                                      {:position "relative"
-                                       :top "6px"
-                                       :padding-right "5px"
-                                       :color style-base/link-color})]
+                                      {:style {:position "relative"
+                                               :top "6px"
+                                               :padding-right "5px"
+                                               :color style-base/link-color}})]
                label])
             label)])))))
 
