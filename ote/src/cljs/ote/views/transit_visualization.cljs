@@ -427,15 +427,15 @@
 
      {:name "Aikaa 1:seen muutokseen"
       :width "20%"
-      :read :gtfs/change-date
-      :format (fn [change-date]
-                (if-not change-date
+      :read :gtfs/different-week-date
+      :format (fn [different-week-date]
+                (if-not different-week-date
                   [labeled-icon [ic/navigation-check] "Ei muutoksia"]
                   [:span
-                   (str (time/days-until change-date) " pv")
+                   (str (time/days-until different-week-date) " pv")
                    [:span (stylefy/use-style {:margin-left "5px"
                                               :color "gray"})
-                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
+                    (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
 
      {:name "Muutokset" :width "30%"
       :read identity

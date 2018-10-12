@@ -158,14 +158,14 @@
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "25%"}
      {:name "Palvelu" :read :transport-service-name :width "25%"}
      {:name "Aikaa 1:seen muutokseen" :width "20%"
-      :read (juxt :change-date :days-until-change)
-      :format (fn [[change-date days-until-change]]
-                (if change-date
+      :read (juxt :different-week-date :days-until-change)
+      :format (fn [[different-week-date days-until-change]]
+                (if different-week-date
                   [:span
                    (str days-until-change " pv")
                    [:span (stylefy/use-style {:margin-left "5px"
                                               :color "gray"})
-                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]
+                    (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]
                   "\u2015"))}
      {:name "Muutokset" :width "30%"
       :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
