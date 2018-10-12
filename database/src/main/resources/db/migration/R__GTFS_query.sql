@@ -532,20 +532,33 @@ COMMENT ON FUNCTION gtfs_service_routes (INTEGER) IS
 E'Return all routes in packages for the given service. Returns set of (route-short-name, route-long-name, trip-headsign) tuples.';
 
 
-CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT) RETURNS INTEGER
+CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT)
+RETURNS INTEGER
 AS $$
-SELECT ((string_to_array(c.day,'='))[1])::integer - 1
-  FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
-  JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
-    ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
- WHERE c.day != d.day
- LIMIT 1;
+SELECT COALESCE(
+ -- First try to find a different day where both weeks have traffic
+ (SELECT ((string_to_array(c.day,'='))[1])::integer - 1
+    FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
+    JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
+      ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
+   WHERE (string_to_array(c.day,'='))[2] != ''
+     AND (string_to_array(d.day,'='))[2] != ''
+     AND c.day != d.day
+   LIMIT 1),
+ -- Fallback: consider difference where other day has no traffic
+ (SELECT ((string_to_array(c.day,'='))[1])::integer - 1
+    FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
+    JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
+      ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
+   WHERE c.day != d.day
+   LIMIT 1));
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_first_different_day(TEXT,TEXT) IS
 E'Compare two week hashes and return the first different day of week index (monday is zero).';
 
-CREATE OR REPLACE FUNCTION gtfs_compare_weeks_excluding_no_traffic(wh1 TEXT, wh2 TEXT) RETURNS BOOLEAN
+CREATE OR REPLACE FUNCTION gtfs_compare_weeks_excluding_no_traffic(wh1 TEXT, wh2 TEXT)
+RETURNS BOOLEAN
 AS $$
 SELECT NOT EXISTS(
   SELECT d1.day
