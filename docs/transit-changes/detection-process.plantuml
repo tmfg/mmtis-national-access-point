@@ -1,0 +1,22 @@
+@startuml
+
+actor "Transport operator" as OPER
+participant "NAP UI" as UI
+participant "Interface server" as IFACE
+participant "NAP DB" as DB
+participant "Import process" as IMP
+participant "Package archive (S3)" as S3
+participant "Detection process" as DEP
+
+group Background detection process
+DEP->DB: Fetch services for detection
+DB->DEP: Services
+loop For each service
+DEP->DB: Detect next changes for service
+end
+end
+
+
+
+
+@enduml
