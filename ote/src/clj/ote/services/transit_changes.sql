@@ -36,11 +36,15 @@ SELECT ts.id AS "transport-service-id",
                     FROM "external-interface-description" eid
                    WHERE eid."transport-service-id" = ts.id
                      AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
-                     AND 'route-and-schedule' = ANY(eid."data-content")AND eid."gtfs-imported" IS NOT NULL) AS "no-interfaces-imported?",
+                     AND 'route-and-schedule' = ANY(eid."data-content") AND eid."gtfs-imported" IS NOT NULL) AS "no-interfaces-imported?",
        (SELECT string_agg(fr, ',')
           FROM gtfs_package p
           JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
-         WHERE id = ANY(c."package-ids")) AS "finnish-regions"
+         WHERE id = ANY(c."package-ids")) AS "finnish-regions",
+       (SELECT (upper(gtfs_package_date_range(p.id)) - '1 day'::interval)::date
+          FROM gtfs_package p
+         WHERE p."transport-service-id" = ts.id
+         ORDER BY p.id DESC limit 1) as "max-date"
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
   LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
