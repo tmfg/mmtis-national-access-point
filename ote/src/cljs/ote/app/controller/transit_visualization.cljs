@@ -161,6 +161,7 @@
   (let [route-line-names (into #{}
                                (keep #(get-in % ["properties" "routename"]))
                                (get geojson "features"))]
+    (.log js/console " RouteLinesForDateResponse ****** route-line-names " (pr-str route-line-names) (pr-str date))
     (update-in
      (cond
        (= date (get-in app [:compare :date1]))

@@ -5,15 +5,12 @@
             [cheshire.core :as cheshire]
             [ote.components.http :as http]
             [ote.components.service :refer [define-service-component]]
-            [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
-            [specql.op :as op]
             [clojure.string :as str]
             [taoensso.timbre :as log]
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
-            [ote.util.fn :refer [flip]]
-            [ote.db.transport-service :as t-service]))
+            [ote.util.fn :refer [flip]]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -25,7 +22,8 @@
              :name (str/join "," name)}))
         (str/split stops #"\|\|")))
 
-(defn route-line-features [rows]
+(defn route-line-features [trips]
+  (log/info "************* trips " (pr-str trips))
   (mapcat (fn [{:keys [route-line departures stops] :as foo}]
             (let [all-stops (parse-stops stops)
                   first-stop (first all-stops)
@@ -43,7 +41,7 @@
                               :properties {"name" name}})))
                     (when (not (str/blank? stops))
                       (str/split stops #"\|\|"))))))
-          rows))
+          trips))
 
 (defn service-changes-for-date [db service-id date]
   (first
