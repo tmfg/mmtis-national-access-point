@@ -12,6 +12,11 @@ from interfaces provided by transport operators and stores them.
 
 ## Data gathering
 
+### Interfaces
+
+Interfaces are added by transport operators to their service info.
+![add new interface](new-interface.png)
+
 ### Storage
 
 ### Background process
