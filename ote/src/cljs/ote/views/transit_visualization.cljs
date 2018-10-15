@@ -724,24 +724,25 @@
                interface-url
                " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
                "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
-    [:div (stylefy/use-style style/light-section)
-     [:b "Viimeisin aineisto"]
-     [pkg latest-package]
+    [:div (stylefy/use-style style/infobox)
+     [:div (stylefy/use-style style/infobox-text)
+      [:b "Viimeisin aineisto"]
+      [pkg latest-package]]
      (when (seq previous-packages)
        [:div
-        [:br]
         [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
          {:icon (if open?
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
           :on-click #(do (.preventDefault %)
-                         (e! (tv/->ToggleSection :gtfs-package-info)))}]
+                         (e! (tv/->ToggleSection :gtfs-package-info)))
+          :style style/infobox-more-link}]
         (when open?
-          [:ul
+          [:div
            (doall
             (for [{id :id :as p} previous-packages]
               ^{:key id}
-              [:li [pkg p]]))])])]))
+              [pkg p]))])])]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
                                  :as   transit-visualization}]
