@@ -62,6 +62,10 @@
    :line-height 2
    :font-weight "600"})
 
+(def light-section {:background-color "#FAFAFA"
+                    :margin-bottom "1.25rem"
+                    :padding "0.5rem"})
+
 (def section-header
   {:padding "1rem"
    :background-color "#F0F0F0"

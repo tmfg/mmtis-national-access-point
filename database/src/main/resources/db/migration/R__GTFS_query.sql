@@ -46,6 +46,36 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_services_for_date (INTEGER, DATE) IS
 E'Returns the service ids of all services having trips on the given date';
 
+CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
+  RETURNS SETOF service_ref AS $$
+SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
+  FROM "gtfs-calendar" c
+ WHERE c."package-id" = ANY(package_ids)
+   AND (dt BETWEEN c."start-date" AND c."end-date")
+   AND ((EXTRACT(DOW FROM dt) = 0 AND c.sunday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 1 AND c.monday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 2 AND c.tuesday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 3 AND c.wednesday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
+        (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
+   AND NOT EXISTS (SELECT id
+                     FROM "gtfs-calendar-date" cd
+                    WHERE cd."exception-type" = 2
+                      AND cd."package-id" = c."package-id" AND cd.date = dt)
+
+ UNION
+SELECT ROW(cd."package-id", cd."service-id")::service_ref
+  FROM "gtfs-calendar-date" cd
+ WHERE cd."package-id" = ANY(package_ids)
+   AND cd.date = dt
+   AND cd."exception-type" = 1;
+$$ LANGUAGE SQL STABLE;
+
+COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
+  E'Return set of (package-id, service-id) tuples of services operated by the given packages for the given date.';
+
+
 CREATE OR REPLACE FUNCTION gtfs_hash_for_date(package_id INTEGER, date DATE) RETURNS bytea AS $$
 SELECT digest(string_agg(concat(d.route, ':', d.times), '|'), 'sha256')
   FROM (SELECT x.route, string_agg(concat(x."stop-name", '@', x."departure-time"), '->') as times
@@ -137,32 +167,6 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_should_calculate_transit_change(INTEGER) IS
 E'Check if transit changes should be calculated for the given transport-service-id.';
-
-CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
-RETURNS SETOF service_ref AS $$
-SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
-  FROM "gtfs-calendar" c
-  LEFT JOIN "gtfs-calendar-date" cd ON (c."package-id" = cd."package-id" AND c."service-id" = cd."service-id")
- WHERE c."package-id" = ANY(package_ids)
-   AND (dt BETWEEN c."start-date" AND c."end-date")
-   AND ((EXTRACT(DOW FROM dt) = 0 AND c.sunday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 1 AND c.monday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 2 AND c.tuesday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 3 AND c.wednesday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 4 AND c.thursday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 5 AND c.friday = TRUE) OR
-        (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
-   AND (cd."exception-type" IS NULL OR cd."exception-type" != 2)
-UNION
-SELECT ROW(cd."package-id", cd."service-id")::service_ref
-  FROM "gtfs-calendar-date" cd
- WHERE cd."package-id" = ANY(package_ids)
-   AND cd.date = dt
-   AND cd."exception-type" = 1;
-$$ LANGUAGE SQL STABLE;
-
-COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
-E'Return set of (package-id, service-id) tuples of services operated by the given packages for the given date.';
 
 CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_ids INTEGER[], dt DATE)
 RETURNS SETOF route_trips_for_date
@@ -528,20 +532,33 @@ COMMENT ON FUNCTION gtfs_service_routes (INTEGER) IS
 E'Return all routes in packages for the given service. Returns set of (route-short-name, route-long-name, trip-headsign) tuples.';
 
 
-CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT) RETURNS INTEGER
+CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT)
+RETURNS INTEGER
 AS $$
-SELECT ((string_to_array(c.day,'='))[1])::integer - 1
-  FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
-  JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
-    ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
- WHERE c.day != d.day
- LIMIT 1;
+SELECT COALESCE(
+ -- First try to find a different day where both weeks have traffic
+ (SELECT ((string_to_array(c.day,'='))[1])::integer - 1
+    FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
+    JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
+      ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
+   WHERE (string_to_array(c.day,'='))[2] != ''
+     AND (string_to_array(d.day,'='))[2] != ''
+     AND c.day != d.day
+   LIMIT 1),
+ -- Fallback: consider difference where other day has no traffic
+ (SELECT ((string_to_array(c.day,'='))[1])::integer - 1
+    FROM unnest(string_to_array(weekhash1, ',')) AS c (day)
+    JOIN unnest(string_to_array(weekhash2, ',')) AS d (day)
+      ON (string_to_array(c.day,'='))[1] = (string_to_array(d.day,'='))[1]
+   WHERE c.day != d.day
+   LIMIT 1));
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_first_different_day(TEXT,TEXT) IS
 E'Compare two week hashes and return the first different day of week index (monday is zero).';
 
-CREATE OR REPLACE FUNCTION gtfs_compare_weeks_excluding_no_traffic(wh1 TEXT, wh2 TEXT) RETURNS BOOLEAN
+CREATE OR REPLACE FUNCTION gtfs_compare_weeks_excluding_no_traffic(wh1 TEXT, wh2 TEXT)
+RETURNS BOOLEAN
 AS $$
 SELECT NOT EXISTS(
   SELECT d1.day
@@ -593,15 +610,29 @@ E'Returns the next different week for the given service and route.';
 
 CREATE OR REPLACE FUNCTION gtfs_service_routes_with_daterange(service_id INTEGER)
 RETURNS SETOF gtfs_route_with_daterange AS $$
+WITH dates AS (
+  -- Calculate a series of dates from beginning of last year
+  -- to the end of the next year.
+  SELECT ts::date AS date
+    FROM generate_series(
+            (date_trunc('year', CURRENT_DATE) - '1 year'::interval)::date,
+            (date_trunc('year', CURRENT_DATE) + '2 years'::interval)::date,
+            '1 day'::interval) AS g(ts)
+)
 SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-long-name",'') AS "route-long-name",
-       COALESCE(rh."trip-headsign",'') AS "trip-headsign",
-       MIN(date), MAX(date)
-  FROM "gtfs-date-hash" h
-  JOIN LATERAL unnest(h."route-hashes") AS rh ON TRUE
- WHERE h."package-id" IN (SELECT id FROM gtfs_package p WHERE p."transport-service-id" = service_id)
-   AND h.date BETWEEN (current_date - '1 year'::interval) AND (current_date + '1 year'::interval)
-   AND rh.hash IS NOT NULL
+       COALESCE(rh."trip-headsign", '') AS "trip-headsign",
+       MIN(d.date) AS "min-date",
+       MAX(d.date) AS "max-date"
+  FROM dates d
+  -- Join packages for each date
+  JOIN LATERAL unnest(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
+    AS ps (package_id) ON TRUE
+  -- Join all date hashes for packages
+  JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
+  -- Join unnested per route hashes
+  JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
+ WHERE rh.hash IS NOT NULL
  GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign";
 $$ LANGUAGE SQL STABLE;
 
