@@ -67,13 +67,6 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-(defn gtfs-package-info [db transport-service-id package-ids]
-  (let [all-packages (fetch-gtfs-packages-for-service db {:service-id transport-service-id})
-
-        ;; Group by membership in package-ids to current and previous packages.
-        grouped-packages (group-by (comp boolean (set package-ids) :id) all-packages)]
-    {:current-packages (grouped-packages true [])
-     :previous-packages (grouped-packages false [])}))
 
 (define-service-component TransitVisualization {}
 
@@ -88,7 +81,7 @@
                                                    java.sql.Date/valueOf))]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
           :changes changes
-          :gtfs-package-info (gtfs-package-info db service-id (:gtfs/package-ids changes))}))
+          :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route"

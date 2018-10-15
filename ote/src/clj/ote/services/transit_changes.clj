@@ -56,6 +56,8 @@
         (when (authorization/admin? (:user req))
           (gtfs-tasks/detect-new-changes-task db true)
           "OK"))
+  ;; Delete  row from gtfs_package to make this work. Don't know why, but it must do.
+  ;; Also change external-interface-description.gtfs-imported to past to make import work.
   (POST "/transit-changes/force-interface-import" req
     (when (authorization/admin? (:user req))
       (gtfs-tasks/update-one-gtfs! config db false)

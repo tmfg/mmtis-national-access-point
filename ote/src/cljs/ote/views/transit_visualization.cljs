@@ -427,15 +427,15 @@
 
      {:name "Aikaa 1:seen muutokseen"
       :width "20%"
-      :read :gtfs/change-date
-      :format (fn [change-date]
-                (if-not change-date
+      :read :gtfs/different-week-date
+      :format (fn [different-week-date]
+                (if-not different-week-date
                   [labeled-icon [ic/navigation-check] "Ei muutoksia"]
                   [:span
-                   (str (time/days-until change-date) " pv")
+                   (str (time/days-until different-week-date) " pv")
                    [:span (stylefy/use-style {:margin-left "5px"
                                               :color "gray"})
-                    (str  "(" (time/format-timestamp->date-for-ui change-date) ")")]]))}
+                    (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
 
      {:name "Muutokset" :width "30%"
       :read identity
@@ -716,35 +716,37 @@
                        :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]
    [selected-route-map e! date->hash hash->color compare]])
 
-(defn gtfs-package-info [e! open-sections {:keys [current-packages previous-packages]}]
-  (let [pkg (fn [{:keys [created min-date max-date interface-url]}]
+(defn gtfs-package-info [e! open-sections packages]
+  (let [[latest-package & previous-packages] packages
+        open? (get open-sections :gtfs-package-info false)
+        pkg (fn [{:keys [created min-date max-date interface-url]}]
               [:div.gtfs-package
                interface-url
                " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
                "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
-    [section {:toggle! #(e! (tv/->ToggleSection :gtfs-package-info))
-              :open? (get open-sections :gtfs-package-info false)}
-     "Aineiston lisätiedot"
-     [:div
-      [:b "Käytetyt aineistot"]
-      [:div
-       (doall
-        (for [{id :id :as p} current-packages]
-          ^{:key id}
-          [:div [pkg p]]))]
-      [:br]
-      (when (seq previous-packages)
-        [:div
-         [:b "Aiemmat aineistot"]
-         [:ul
-          (doall
-           (for [{id :id :as p} previous-packages]
-             ^{:key id}
-             [:li [pkg p]]))]])]]))
+    [:div (stylefy/use-style style/infobox)
+     [:div (stylefy/use-style style/infobox-text)
+      [:b "Viimeisin aineisto"]
+      [pkg latest-package]]
+     (when (seq previous-packages)
+       [:div
+        [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
+         {:icon (if open?
+                  [ic/navigation-expand-less]
+                  [ic/navigation-expand-more])
+          :on-click #(do (.preventDefault %)
+                         (e! (tv/->ToggleSection :gtfs-package-info)))
+          :style style/infobox-more-link}]
+        (when open?
+          [:div
+           (doall
+            (for [{id :id :as p} previous-packages]
+              ^{:key id}
+              [pkg p]))])])]))
+
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
                                  :as   transit-visualization}]
   [:div
-   (when (tv/loaded-from-server? transit-visualization)
      [:div.transit-visualization
 
       [page/page-controls
@@ -767,9 +769,9 @@
           (:gtfs/route-long-name selected-route)
           " (" (:gtfs/trip-headsign selected-route) ")"]
 
-         (when (and hash->color date->hash)
+         (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
             [route-service-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
-            [trip-stop-sequence e! open-sections compare]])])])])
+            [trip-stop-sequence e! open-sections compare]])])]])

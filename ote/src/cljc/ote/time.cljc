@@ -415,7 +415,9 @@
 (defn day-difference
   "How many days from date1 to date2."
   [date1 date2]
-  (t/in-days (t/interval date1 date2)))
+  (if (t/before? date1 date2)
+    (t/in-days (t/interval date1 date2))
+    (- (t/in-days (t/interval date2 date1)))))
 
 (defn days-until [date]
   (day-difference (t/now) date))

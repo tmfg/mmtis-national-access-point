@@ -186,7 +186,7 @@
 ;; PENDING: this is for local testing, truncates *ALL* GTFS data from the database
 ;;          and reads in a local GTFS zip file
 
-;; Create Transport Service with :sheduled sub_tybe
+;; Create Transport Service with :sheduled sub_type
 ;; Add gtfs url for the service.
 ;; Keep this method commented away and when you want to manually use this, start REPL first, and then run this in REPL only.
 ;; Also! Change from gtfs-package table columns transport-service-id, transport-operator-id and external-interface-description-id to what they should be.

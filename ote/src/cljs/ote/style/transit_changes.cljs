@@ -62,6 +62,25 @@
    :line-height 2
    :font-weight "600"})
 
+(def infobox {:background-color "#FAFAFA"
+              :border "solid 1px #e1e1e1"
+              :margin-bottom "1.25rem"
+              :padding "0.7rem 0.875rem 0.75rem"
+              :font-size "0.875rem"
+              :font-family "Roboto, sans-serif"
+              :color "#505050"})
+
+(def infobox-text {:margin-bottom "0.25rem"
+                   :line-height "1.5em"})
+
+(def infobox-more-link {:color "#06c"
+                        :font-weight 400
+                        :text-decoration "none"
+                        :display "flex"
+                        :flex-direction "row"
+                        :align-items "flex-start"
+                        :justify-content "flex-start"})
+
 (def section-header
   {:padding "1rem"
    :background-color "#F0F0F0"
