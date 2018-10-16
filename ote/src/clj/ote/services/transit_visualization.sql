@@ -86,12 +86,10 @@ SELECT ST_AsGeoJSON(COALESCE(
           -- Otherwise use line generated from the stop sequence
           x."route-line")) as "route-line",
        array_agg(departure) as departures,
-       string_agg(stops, '||') as stops,
-       concat(x."route-short-name", '-', x."route-long-name") as "route-name"
+       string_agg(stops, '||') as stops
   FROM (SELECT (array_agg(stoptime."departure-time"))[1] as "departure",
                ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence") as "route-line",
-               string_agg(CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name", ',',
-               CONCAT(COALESCE(r."route-short-name",''),' ', COALESCE(r."route-long-name",''))), '||' ORDER BY stoptime."stop-sequence") as stops,
+               string_agg(CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name"), '||' ORDER BY stoptime."stop-sequence") as stops,
                trip."shape-id", r."package-id"
           FROM "gtfs-route" r
           JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
@@ -105,9 +103,9 @@ SELECT ST_AsGeoJSON(COALESCE(
                (SELECT * FROM gtfs_services_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE),
                           :date::DATE))
            AND r."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE))
-         GROUP BY trip."shape-id", r."package-id", trip."trip-id", r."route-short-name", r."route-long-name") x
+         GROUP BY trip."shape-id", r."package-id", trip."trip-id") x
  -- Group same route lines to single row (aggregate departures to array)
- GROUP BY "route-line", "shape-id", "package-id", "route-short-name", "route-long-name";
+ GROUP BY "route-line", "shape-id", "package-id";
 
 -- name: fetch-route-trip-info-by-name-and-date
 -- Fetch listing of all trips by route name and date
