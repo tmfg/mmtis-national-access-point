@@ -1,0 +1,19 @@
+@startuml
+
+actor "Transport operator" as OPER
+participant "NAP UI" as UI
+participant "Interface server" as IFACE
+participant "NAP DB" as DB
+
+
+group Adding new transit interface
+OPER->UI: Add interface
+        UI->IFACE: Fetch data for validation
+        IFACE->UI: Data / error
+                UI->OPER: Validation response
+
+                OPER->UI: Save interface
+UI->DB: Save interface
+end
+
+@enduml
