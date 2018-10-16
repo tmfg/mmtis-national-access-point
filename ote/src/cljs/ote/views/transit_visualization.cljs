@@ -106,16 +106,23 @@
   "Bind popup content and set marker icon for stop marker features."
   [offset [w h]]
   (fn [feature ^js/L.Layer layer]
-    (if-let [name (aget feature "properties" "name")]
+    (let [stop-name (aget feature "properties" "name")
+          trip-name (aget feature "properties" "trip-name")
+          popup-html (str "Pysäkki: " stop-name " <br> Kuuluu vuorolle: " trip-name)]
+      (if stop-name
       ;; This features is a stop marker
       (do
+        ;; Add trip-name for every stop marker to find them when the trip whom they belong to is hidden.
+        (aset (aget layer "feature" "properties") "trip-name" trip-name)
+        ;; Add icon for every stop marker
         (aset (aget layer "options") "icon"
               (js/L.icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
                                :iconSize #js [w h]
                                :iconAnchor #js [(int (/ w 2)) (int (/ h 2))]}))
-        (.bindPopup layer name))
+        ;; Add popup
+        (.bindPopup layer popup-html))
       ;; This feature has no name, it is the route line, apply pixel offset
-      (.call (aget layer "setOffset") layer offset))))
+      (.call (aget layer "setOffset") layer offset)))))
 
 (defn update-marker-visibility [this show-atom removed-route-layers]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
@@ -139,12 +146,13 @@
                     (if-let [icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
                       (set! (.-visibility (aget icon "style"))
-                            (if (:stops show) "" "hidden"))
+                            (if (and (:stops show) (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                              "" "hidden")))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
                           ;; This is a layer for a routeline that should be removed
-                          (swap! removed-route-layers update routename conj layer))))))
+                          (swap! removed-route-layers update routename conj layer)))))
 
     ;; Remove layers that were added to removed-route-layers
     (doseq [[_ layers] @removed-route-layers]
@@ -384,8 +392,6 @@
 
     [:div {:style {:width "35%"}}
      [stop-time-changes-icon trip-stop-time-changes with-labels?]]]))
-
-
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?

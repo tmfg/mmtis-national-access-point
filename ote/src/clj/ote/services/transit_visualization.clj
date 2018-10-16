@@ -16,14 +16,14 @@
 
 (defn- parse-stops [stops]
   (mapv (fn [stop]
-          (let [[lat lon & name] (str/split stop #",")]
+          (let [[lat lon stop-name trip-id] (str/split stop #",")]
             {:lat (Double/parseDouble lat)
              :lon (Double/parseDouble lon)
-             :name (str/join "," name)}))
+             :name stop-name
+             :trip-id trip-id}))
         (str/split stops #"\|\|")))
 
 (defn route-line-features [trips]
-  (log/info "************* trips " (pr-str trips))
   (mapcat (fn [{:keys [route-line departures stops] :as foo}]
             (let [all-stops (parse-stops stops)
                   first-stop (first all-stops)
@@ -38,7 +38,7 @@
                              {:type "Point"
                               :coordinates [(Double/parseDouble lon)
                                             (Double/parseDouble lat)]
-                              :properties {"name" name}})))
+                              :properties {"name" name "trip-name" (str (:name first-stop) " \u2192 " (:name last-stop))}})))
                     (when (not (str/blank? stops))
                       (str/split stops #"\|\|"))))))
           trips))
