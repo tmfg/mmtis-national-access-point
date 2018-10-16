@@ -23,3 +23,18 @@ SELECT ts.id
 
 -- name: upsert-service-transit-change
 SELECT gtfs_upsert_service_transit_changes(:service-id::INTEGER);
+
+-- name: service-routes-with-hashes
+-- Return all routes for the given service with date hashes aggregated for
+-- the given date range.
+WITH dates AS (
+  -- Return all dates between :start-date and :end-date (both inclusive)
+  SELECT :start-date::DATE + d AS date
+    FROM generate_series(0, :end-date::DATE - :start-date::DATE) s (d)
+)
+SELECT rd.*,
+       (SELECT string_agg(COALESCE(gtfs_service_route_date_hash(
+                   :service-id::INTEGER, d.date,
+                   rd."route-short-name", rd."route-long-name", rd."trip-headsign"), 'N/A'), ',')
+          FROM dates d) AS hashes
+  FROM gtfs_service_routes_with_daterange(:service-id::INTEGER) rd;

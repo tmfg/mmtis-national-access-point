@@ -13,7 +13,9 @@
             [specql.core :as specql]
             [ote.time :as time]
             [ote.tasks.util :refer [daily-at timezone]]
-            [ote.db.lock :as lock])
+            [ote.db.lock :as lock]
+            [clojure.string :as str]
+            [ote.util.functor :refer [fmap]])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -59,17 +61,87 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
+
+;;; FIXME: move this to its own ns... like ote.gtfs.change-detection
+
+(defn extract-first-hash [{s :hashes}]
+  (let [pos (.indexOf s (int \,))]
+    (if (neg? pos)
+      s
+      (subs s 0 pos))))
+
+(defn skip-first-hash [{s :hashes :as route}]
+  (let [pos (.indexOf s (int \,))]
+    (assoc route :hashes (if (neg? pos)
+                           ""
+                           (subs s (inc pos))))))
+
+(defn routes-by-date [routes-with-hashes start-date]
+  (loop [date start-date
+         dates []
+         routes routes-with-hashes]
+    (if (str/blank? (:hashes (first routes)))
+      ;; No more hashes, return all dates
+      dates
+
+      ;; More hashes, extract first from each route
+      (recur (.plusDays date 1)
+             (conj dates
+                   {:date date
+                    :routes (into {}
+                                  (map (juxt (juxt :route-short-name :route-long-name :trip-headsign)
+                                             #(let [h (extract-first-hash %)]
+                                                ;; If hash is "N/A" (no hash could be calculated, use nil
+                                                (when (not= "N/A" h)
+                                                  h))))
+                                  routes)})
+             (map skip-first-hash routes)))))
+
+(defn combine-weeks
+  "Combine list of date based hashes into weeks."
+  [routes-by-date]
+  (for [days (partition 7 routes-by-date)
+        :let [bow (:date (first days))
+              eow (:date (last days))]]
+    {:beginning-of-week bow
+     :end-of-week eow
+     :routes (apply merge-with (fn [v1 v2]
+                                 (if (vector? v1)
+                                   (conj v1 v2)
+                                   [v1 v2]))
+                    (map :routes days))}))
+
+(defn next-different-weeks
+  "Detect the next different week in each route. Takes a list of weeks that have week hashes for each route.
+  Returns map from route [short long headsign] to next different week info."
+  [route-weeks]
+  (reduce
+   (fn [route-detection-state [prev curr next]]
+
+     ;; do detection per route
+
+     )
+   (partition 3 1 route-weeks))
+  )
+
+(defn route-changes [db {start-date :start-date :as route-query-params}]
+  (combine-weeks (routes-by-date (service-routes-with-hashes db route-query-params)
+                                 start-date)))
+
 (defn detect-new-changes-task
   ([db]
    (detect-new-changes-task db false))
   ([db force?]
-   (lock/try-with-lock
-    db "gtfs-nightly-changes" 1800
-    (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
-      (log/info "Detect transit changes for " (count service-ids) " services.")
-      (doseq [service-id service-ids]
-        (log/info "Detecting next transit changes for service: " service-id)
-        (upsert-service-transit-change db {:service-id service-id}))))))
+   (let [start-date (time/beginning-of-week (time/now))
+         end-date (time/days-from start-date (dec (* 7 15)))]
+     (lock/try-with-lock
+      db "gtfs-nightly-changes" 1800
+      (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
+        (log/info "Detect transit changes for " (count service-ids) " services.")
+        (doseq [service-id service-ids]
+          (log/info "Detecting next transit changes for service: " service-id)
+          (let [changes (route-changes )])
+          (upsert-service-transit-change db {:service-id service-id})))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle

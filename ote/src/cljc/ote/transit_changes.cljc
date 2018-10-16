@@ -125,3 +125,6 @@
 
           (partition-by :gtfs/stop-name
                         (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))
+
+
+;; Detect changes in all routes for a given service
