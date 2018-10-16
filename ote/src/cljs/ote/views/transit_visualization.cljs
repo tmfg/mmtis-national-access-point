@@ -108,7 +108,7 @@
   (fn [feature ^js/L.Layer layer]
     (let [stop-name (aget feature "properties" "name")
           trip-name (aget feature "properties" "trip-name")
-          popup-html (str "Pysäkki: " stop-name " <br> Kuuluu vuorolle: " trip-name)]
+          popup-html (str "Pysäkki: " stop-name " <br> Vuoro: " trip-name)]
       (if stop-name
       ;; This features is a stop marker
       (do
@@ -695,7 +695,7 @@
             (when show-date2?
               ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
               [leaflet/GeoJSON {:data date2-route-lines
-                                :onEachFeature (initialize-route-features offset icon-size)
+                                :onEachFeature (initialize-route-features (+ 2 offset) icon-size)
                                 :style {:lineJoin "miter"
                                         :lineCap "miter"
                                         :color style/date2-highlight-color
