@@ -127,4 +127,18 @@
                         (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))
 
 
+(defn combine-trips [date1-trips date2-trips]
+  (when (and date1-trips date2-trips)
+    (when-let [first-common-stop (first-common-stop (concat date1-trips date2-trips))]
+      (let [first-common-stop
+            #(assoc %
+                    :first-common-stop first-common-stop
+                    :first-common-stop-time (time-for-stop % first-common-stop))
+            date1-trips (mapv first-common-stop date1-trips)
+            date2-trips (mapv first-common-stop date2-trips)
+            combined-trips (merge-by-closest-time :first-common-stop-time date1-trips date2-trips)]
+        (mapv (fn [[l r]]
+                [l r (trip-stop-differences l r)])
+              combined-trips)))))
+
 ;; Detect changes in all routes for a given service
