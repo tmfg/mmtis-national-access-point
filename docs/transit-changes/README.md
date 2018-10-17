@@ -63,6 +63,17 @@ After GTFS data has been imported into our database and hashes are computed, we 
 The detection algorithm tries to detect changes in traffic patterns in 60 days in future. The main point of this detection process is to provide transport authorities enough information,
 so they can decide when to order more traffic if so required. Transport authorities also use this change information for oversee that all changes are reported before 60 day time period as required by law.
 
+### Background process
+
+![background detection process](detection-process.png)
+
+The change detection process runs every night after the data gathering process.
+First, it fetches a list of regular scheduled passenger transport services that have
+a previously calculated change somewhere in future (or it has not yet computed at all)
+and have a package that is newer than a previously computed change.
+
+Transit changes are computed one by one for each fetched service using the detection algorithm.
+
 ### Detection algorithm
 
 ![Detection algorithm flow diagram](change-detection-flow.png)
@@ -115,13 +126,8 @@ so they can decide when to order more traffic if so required. Transport authorit
       matching stop pair.
  
 
-### Background process
-
-![background detection process](detection-process.png)
-
-TODO: 
 
 ### Notifications
 
-TODO:
+Notifications about newly detected transit changes are sent via email to transit authorities each day.
 
