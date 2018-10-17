@@ -222,7 +222,11 @@
                                      (and (some? l)
                                           (nil? r))) combined-trips))]
         {:added-trips added-trips
-         :removed-trips removed-trips}))))
+         :removed-trips removed-trips
+         :trip-changes (keep (fn [[l r]]
+                               (when (and l r)
+                                 (transit-changes/trip-stop-differences l r)))
+                             combined-trips)}))))
 
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
@@ -266,8 +270,11 @@
         (log/info "Detect transit changes for " (count service-ids) " services.")
         (doseq [service-id service-ids]
           (log/info "Detecting next transit changes for service: " service-id)
-          (let [changes (route-changes )])
-          (upsert-service-transit-change db {:service-id service-id})))))))
+          (let [changes (route-changes db {:service-id service-id
+                                           :start-date start-date
+                                           :end-date end-date})]
+            ;; PENDING: store changes to db
+            #_(upsert-service-transit-change db {:service-id service-id}))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
