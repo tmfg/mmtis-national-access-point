@@ -31,3 +31,36 @@
          (-> (detection/next-different-weeks test-traffic-no-run)
              (get route-name)
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
+
+
+(def test-traffic-2-different-weeks
+  (weeks (d 2018 10 8)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; starting point
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7" ]} ; wednesday different
+         {route-name ["h1" "h2" "h3" "!!" "h5" "h6" "h7" ]} ; thursday different
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})) ; back to normal
+
+(deftest two-week-difference-is-skipped
+  (is (nil?
+       (get-in (detection/next-different-weeks test-traffic-2-different-weeks)
+               [route-name :different-week]))))
+
+
+(def test-traffic-normal-difference
+  (weeks (d 2018 10 8)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; starting point
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7" ]} ; wednesday different
+         {route-name ["h1" "h2" "h3" "!!" "h5" "h6" "h7" ]} ; thursday different
+         {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "h7"]} ; friday different
+         {route-name ["h1" "h2" "h3" "!!" "!!" "h6" "h7"]})) ;; thu and fri different
+
+(deftest normal-difference
+  (is (= {:starting-week-hash ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]
+          :starting-week {:beginning-of-week (d 2018 10 15)
+                          :end-of-week (d 2018 10 21)}
+          :different-week-hash  ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
+          :different-week {:beginning-of-week (d 2018 10 22)
+                           :end-of-week (d 2018 10 28)}}
+         (get (detection/next-different-weeks test-traffic-normal-difference) route-name))))
