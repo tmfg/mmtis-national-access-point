@@ -6,6 +6,11 @@
             [clojure.set :as set]
             [clojure.spec.alpha :as s]))
 
+;; Define data type specs
+(s/def ::day-hash (s/nilable string?))
+(s/def ::week-hash (s/every ::day-hash :count 7))
+
+
 (defn item-with-closest-time
   "Return a vector containing the given `item` and the item in `items`
   which has the closest time to the given `item`."
@@ -142,6 +147,23 @@
                 [l r (trip-stop-differences l r)])
               combined-trips)))))
 
+(defn week=
+  "Compare week hashes. Returns true if they represent the same traffic
+  (excluding no-traffic days).
+  Both `w1` and `w2` are vectors of strings that must be the same length."
+  [w1 w2]
+  (every? true?
+          (map (fn [h1 h2]
+                 ;; Only compare hashes where both days have traffic (not nil)
+                 (or (nil? h1)
+                     (nil? h2)
+                     (= h1 h2)))
+               w1 w2)))
+
+(s/fdef week=
+  :args (s/cat :w1 ::week-hash :w2 ::week-hash)
+  :ret boolean?)
+
 (defn first-different-day
   "Return the index of first different day in two week hash vectors.
   A day is considered different if both weeks have a hash (non nil)
@@ -158,8 +180,6 @@
              week-hash-2)))
 
 
-(s/def ::day-hash (s/nilable string?))
-(s/def ::week-hash (s/coll-of ::day-hash))
 
 (s/fdef first-different-day
   :args (s/cat :week-hash-1 ::week-hash
