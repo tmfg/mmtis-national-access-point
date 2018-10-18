@@ -64,3 +64,19 @@
           :different-week {:beginning-of-week (d 2018 10 22)
                            :end-of-week (d 2018 10 28)}}
          (get (detection/next-different-weeks test-traffic-normal-difference) route-name))))
+
+
+(def test-traffic-starting-point-anomalous
+  (weeks (d 2018 10 8)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h5!" "h7!"]} ; starting week is an exception
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; next week same as previous
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
+(deftest anomalous-starting-point-is-ignore
+  (let [{:keys [starting-week different-week] :as res}
+        (get (detection/next-different-weeks test-traffic-starting-point-anomalous) route-name)]
+    (is (= (d 2018 10 22) (:beginning-of-week starting-week)))
+    (is (nil? different-week))))
