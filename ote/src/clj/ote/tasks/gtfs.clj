@@ -64,10 +64,6 @@
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
 
-;;; FIXME: move this to its own ns... like ote.gtfs.change-detection
-
-
-
 (defn detect-new-changes-task
   ([db]
    (detect-new-changes-task db false))
