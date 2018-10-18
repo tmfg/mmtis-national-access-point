@@ -3,7 +3,8 @@
   (:require [ote.time :as time]
             [ote.util.collections :refer [index-of]]
             [taoensso.timbre :as log]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.spec.alpha :as s]))
 
 (defn item-with-closest-time
   "Return a vector containing the given `item` and the item in `items`
@@ -141,4 +142,26 @@
                 [l r (trip-stop-differences l r)])
               combined-trips)))))
 
-;; Detect changes in all routes for a given service
+(defn first-different-day
+  "Return the index of first different day in two week hash vectors.
+  A day is considered different if both weeks have a hash (non nil)
+  for that day and the hash is different."
+  [week-hash-1 week-hash-2]
+  (some identity
+        (map (fn [i d1 d2]
+               (and (some? d1)
+                    (some? d2)
+                    (not= d1 d2)
+                    i))
+             (iterate inc 0)
+             week-hash-1
+             week-hash-2)))
+
+
+(s/def ::day-hash (s/nilable string?))
+(s/def ::week-hash (s/coll-of ::day-hash))
+
+(s/fdef first-different-day
+  :args (s/cat :week-hash-1 ::week-hash
+               :week-hash-2 ::week-hash)
+  :ret (s/nilable integer?))

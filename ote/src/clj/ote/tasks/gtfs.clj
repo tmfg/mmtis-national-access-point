@@ -189,44 +189,32 @@
                           :gtfs/departure-time (time/pginterval->interval departure-time)})
                        trip-stops)})))
 
+
 (defn compare-route-days [db service-id [short long headsign :as route]
                           {:keys [starting-week starting-week-hash
                                   different-week different-week-hash] :as r}]
-  (let [first-different-day (some identity
-                                  (map (fn [i d1 d2]
-                                         (and (some? d1)
-                                              (some? d2)
-                                              (not= d1 d2)
-                                              i))
-                                       (iterate inc 0)
-                                       starting-week-hash
-                                       different-week-hash))
+  (let [first-different-day (transit-changes/first-different-day starting-week-hash
+                                                                 different-week-hash)
         starting-week-date (.plusDays (:beginning-of-week starting-week) first-different-day)
         different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)]
     (log/debug "Route: " route ", comparing dates: " starting-week-date " and " different-week-date)
-    (let [params {:service-id service-id
-                  :route-short-name short
-                  :route-long-name long
-                  :trip-headsign headsign}
-          date1-trips (route-trips-for-date db service-id route starting-week-date)
+    (let [date1-trips (route-trips-for-date db service-id route starting-week-date)
           date2-trips (route-trips-for-date db service-id route different-week-date)]
 
       (log/debug "trips " (count date1-trips) " vs " (count date2-trips))
       (let [combined-trips (transit-changes/combine-trips date1-trips date2-trips)
-            added-trips (count
-                         (filter (fn [[l r]]
-                                   (and (nil? l)
-                                        (some? r))) combined-trips))
-            removed-trips (count
-                           (filter (fn [[l r]]
-                                     (and (some? l)
-                                          (nil? r))) combined-trips))]
-        {:added-trips added-trips
-         :removed-trips removed-trips
-         :trip-changes (keep (fn [[l r]]
-                               (when (and l r)
-                                 (transit-changes/trip-stop-differences l r)))
-                             combined-trips)}))))
+            {:keys [added removed changed]}
+            (group-by (fn [[l r]]
+                        (cond
+                          (nil? l) :added
+                          (nil? r) :removed
+                          :default :changed))
+                      combined-trips)]
+        {:added-trips (count added)
+         :removed-trips (count removed)
+         :trip-changes (map (fn [[l r]]
+                              (transit-changes/trip-stop-differences l r))
+                             changed)}))))
 
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
