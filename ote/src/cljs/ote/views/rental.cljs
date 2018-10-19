@@ -49,7 +49,8 @@
 
                    {:name ::t-service/unit
                     :type :string
-                    :required? true}]
+                    :required? true
+                    :max-length 128}]
     :delete? true
     :add-label (tr [:buttons :add-new-price-class])}
    ))
@@ -148,7 +149,8 @@
     {:name ::t-service/accessibility-info-url
     :type :string
     :container-class "col-md-6"
-    :full-width? true}))
+    :full-width? true
+     :max-length 200}))
 
 (defn additional-services []
   (form/group

@@ -108,7 +108,8 @@
    {:name ::t-service/accessibility-info-url
     :type :string
     :container-class "col-xs-12 col-sm-6 col-md-6"
-    :full-width? true}
+    :full-width? true
+    :max-length 200}
 
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
@@ -140,10 +141,19 @@
     :name         ::t-service/price-classes
     :type         :table
     :prepare-for-save values/without-empty-rows
-    :table-fields [{:name ::t-service/name :type :string :label price-class-name-label}
-                   {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+    :table-fields [{:name ::t-service/name
+                    :type :string
+                    :label price-class-name-label
+                    :max-length 200}
+                   {:name ::t-service/price-per-unit
+                    :type :number
+                    :currency? true
+                    :style {:width "100px"}
                     :input-style {:text-align "right" :padding-right "5px"}}
-                   {:name ::t-service/unit :type :string :style {:width "100px"}}]
+                   {:name ::t-service/unit
+                    :type :string
+                    :style {:width "100px"}
+                    :max-length 128}]
     :add-label (tr [:buttons :add-new-price-class])
     :delete?      true}
 
