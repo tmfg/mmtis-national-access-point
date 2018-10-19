@@ -52,8 +52,7 @@
                     :required? true
                     :max-length 128}]
     :delete? true
-    :add-label (tr [:buttons :add-new-price-class])}
-   ))
+    :add-label (tr [:buttons :add-new-price-class])}))
 
 (defn price-classes [update-form! data]
   (reagent/with-let [open? (reagent/atom false)]
@@ -72,8 +71,7 @@
                                        [:field-labels :transport-service]
                                        [:field-labels])}
        [(assoc-in (price-group) [:options :card?] false)]
-       data]]
-     ]))
+       data]]]))
 
 (defn vehicle-group []
   (form/group
@@ -150,7 +148,7 @@
     :type :string
     :container-class "col-md-6"
     :full-width? true
-     :max-length 200}))
+    :max-length 200}))
 
 (defn additional-services []
   (form/group
