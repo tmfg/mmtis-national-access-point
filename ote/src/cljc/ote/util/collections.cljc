@@ -24,3 +24,14 @@
   (into {}
         (map (juxt key-fn identity))
         coll))
+
+(defn count-matching
+  "Count the number of elements in `coll` where `pred` returns truthy.
+  Returns the count."
+  [pred coll]
+  (loop [c 0
+         coll coll]
+    (if (empty? coll)
+      c
+      (recur (+ c (if (pred (first coll)) 1 0))
+             (rest coll)))))
