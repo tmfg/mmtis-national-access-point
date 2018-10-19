@@ -1262,7 +1262,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :error {:no-such-user "Tuntematon käyttäjä"
           :incorrect-password "Väärä salasana"}
 
-  :check-email-for-link "Ole hyvä ja tarkista sähköpostisi resetointikoodia varten"
+  :check-email-for-link "Salasanan vaihtopyyntösi on vastaanotettu. Olemme nyt lähettäneet salasanan vaihtamiseen tarvittavan linkin sähköpostiisi."
   :logged-out "Olet kirjautunut ulos."}
 
  :register
