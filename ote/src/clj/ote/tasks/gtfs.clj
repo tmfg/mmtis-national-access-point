@@ -79,11 +79,12 @@
         (log/info "Detect transit changes for " (count service-ids) " services.")
         (doseq [service-id service-ids]
           (log/info "Detecting next transit changes for service: " service-id)
-          (let [changes (detection/route-changes db {:service-id service-id
-                                                     :start-date start-date
-                                                     :end-date end-date})]
-            ;; PENDING: store changes to db
-            #_(upsert-service-transit-change db {:service-id service-id}))))))))
+          #_(upsert-service-transit-change db {:service-id service-id})
+
+          ;; FIXME: separate change calculation from upsert
+          (detection/route-changes db {:service-id service-id
+                                       :start-date start-date
+                                       :end-date end-date})))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
