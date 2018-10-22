@@ -118,7 +118,6 @@
      [:h1 (tr [:operators :title])]
      [:div.row.form-field {:class "col-xs-12 col-md-6"}
       [form-fields/field {:type :string
-
                          :full-width? true
                          :label (tr [:operators :filter])
                          :update! #(e! (operators-controller/->UpdateOperatorFilter %))}

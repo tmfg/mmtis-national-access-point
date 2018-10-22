@@ -41,13 +41,21 @@
     {:name         ::t-service/price-classes
      :type         :table
      :prepare-for-save values/without-empty-rows
-     :table-fields [{:name  ::t-service/name :type :string
+     :table-fields [{:name  ::t-service/name
+                     :type :string
                      :label (tr [:field-labels :parking ::t-service/price-class-name])
-                     :required? true}
-                    {:name ::t-service/price-per-unit :type :number :currency? true :style {:width "100px"}
+                     :required? true
+                     :max-length 200}
+                    {:name ::t-service/price-per-unit
+                     :type :number
+                     :currency? true
+                     :style {:width "100px"}
                      :input-style {:text-align "right" :padding-right "5px"}
                      :required? true}
-                    {:name ::t-service/unit :type :string :style {:width "100px"}}]
+                    {:name ::t-service/unit
+                     :type :string
+                     :style {:width "100px"}
+                     :max-length 128}]
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
@@ -212,7 +220,8 @@
     {:name            ::t-service/accessibility-info-url
      :type            :string
      :container-class "col-md-5"
-     :full-width?     true}))
+     :full-width?     true
+     :max-length 200}))
 
 (defn parking [e! {form-data ::t-service/parking} app]
   (r/with-let [groups [(ts-common/transport-type ::t-service/parking)
