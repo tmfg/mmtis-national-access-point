@@ -225,47 +225,6 @@
          (when (> filter-service-count (count results))
            [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]]))
 
-(defn operator-result-chips [e! chip-results]
-  (fn [e! chip-results]
-    [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-     (for [{:keys [operator business-id]} chip-results]
-       ^{:key (str "transport-operator-" business-id)}
-       [:span
-        [ui/chip {:ref business-id
-                  :style {:margin 4}
-                  :on-request-delete #(do
-                                        (e! (ss/->RemoveOperatorById business-id))
-                                        (e! (ss/->UpdateSearchFilters nil)))}
-         operator]])]))
-
-(defn- parse-operator-data-source [completions]
-  (into-array
-    (map (fn [{:keys [business-id operator]}]
-           #js {:text operator
-                :business-id business-id
-                :value (r/as-element
-                         [ui/menu-item {:primary-text operator}])})
-         completions)))
-
-(defn operator-search [e! {:keys [results chip-results name] :as data}]
-  [:div
-   [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
-                      :floating-label-fixed true
-                      :hintText (tr [:service-search :operator-search-placeholder])
-                      :hint-style style-base/placeholder
-                      :style {:width "100%"}
-                      :filter (constantly true)          ;; no filter, backend returns what we want
-                      :maxSearchResults 12
-                      :dataSource (parse-operator-data-source results)
-                      :on-update-input #(e! (ss/->SetOperatorName %))
-                      :search-text (or name "")
-                      :on-new-request #(do
-                                         (e! (ss/->AddOperator
-                                              (aget % "business-id")
-                                              (aget % "text")))
-                                         (e! (ss/->UpdateSearchFilters nil)))}]
-
-   [operator-result-chips e! chip-results]])
 
 (defn- capitalize-operation-area-postal-code [sentence]
   (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
@@ -305,6 +264,7 @@
                                                 (assoc {} :text (tr [:enums ::t-service/transport-type val])
                                                           :value val)))
                                         data))]
+
     [:div
      [:h2 {:style {:font-weight 500 }} (tr [:service-search :limit-search-results])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
@@ -320,8 +280,33 @@
           :name :operators
           :full-width? true
           :container-class "col-xs-12 col-sm-4 col-md-4"
+          :container-style {:padding-right "10px"}
           :component (fn [{data :data}]
-                       [:span [operator-search e! data]])}
+                       [form-fields/field
+                        {:type :chip-input
+                         :label (tr [:service-search :operator-search])
+                         :full-width? true
+                         :full-width-input? false
+                         :hint-text (tr [:service-search :operator-search-placeholder])
+                         :hint-style {:top "20px"}
+                         ;; No filter, back-end returns what we want
+                         :filter (constantly true)
+                         :suggestions-config {:text :operator :value :business-id}
+                         :suggestions (:results data)
+                         :open-on-focus? true
+                         :on-update-input #(e! (ss/->SetOperatorName %))
+                         ;; Select first match from autocomplete filter result list after pressing enter
+                         :auto-select? true
+                         :on-request-add (fn [chip]
+                                           (e! (ss/->AddOperator
+                                                 (:business-id chip)
+                                                 (:operator chip)))
+                                           (e! (ss/->UpdateSearchFilters nil))
+                                           chip)
+                         :on-request-delete (fn [chip-val]
+                                              (e! (ss/->RemoveOperatorById chip-val))
+                                              (e! (ss/->UpdateSearchFilters nil)))}
+                        (:chip-results data)])}
 
          {:name :text-search
           :type :string
@@ -348,6 +333,7 @@
           :type :chip-input
           :container-class "col-xs-12 col-sm-4 col-md-4"
           :hint-text (tr [:service-search :operation-area-search-placeholder])
+          :hint-style {:top "20px"}
           :full-width? true
           :full-width-input? false
           :filter (fn [query, key]
