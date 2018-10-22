@@ -9,15 +9,15 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                     "Transport operator name"
+  :ote.db.transport-operator/name "Transport operator name"
   :ote.db.transport-operator/ckan-description "Transport operator description"
-  :ote.db.transport-operator/business-id              "Business ID"
-  :ote.db.transport-operator/phone                    "Phone 1"
-  :ote.db.transport-operator/gsm                      "Phone 2"
-  :ote.db.transport-operator/email                    "Email address"
-  :ote.db.transport-operator/homepage                 "WWW-address"
-  :ote.db.transport-operator/visiting-address         "Postal address"
-  :ote.db.transport-operator/billing-address          "Billing address"
+  :ote.db.transport-operator/business-id "Business ID"
+  :ote.db.transport-operator/phone "Phone 1"
+  :ote.db.transport-operator/gsm "Phone 2"
+  :ote.db.transport-operator/email "Email address"
+  :ote.db.transport-operator/homepage "WWW-address"
+  :ote.db.transport-operator/visiting-address "Postal address"
+  :ote.db.transport-operator/billing-address "Billing address"
 
   :ote.db.transport-operator/facebook "Facebook"
   :ote.db.transport-operator/twitter "Twitter"
@@ -25,15 +25,15 @@
 
   ;; Transport service fields
   :transport-service-type-subtype "Select mode of transport service"
-  :select-transport-operator      "Select transport operator"
+  :select-transport-operator "Select transport operator"
 
   :transport-service-common
   {:ote.db.transport-service/transport-type "Transport type"
    :ote.db.transport-service/name "Service name"
-   :ote.db.transport-service/accessibility-tool        "Accessibility tools"
+   :ote.db.transport-service/accessibility-tool "Accessibility tools"
    :ote.db.transport-service/accessibility-description "Accessibility description"
 
-   :ote.db.transport-service/accessibility     "Accessibility"
+   :ote.db.transport-service/accessibility "Accessibility"
    :ote.db.transport-service/information-service-accessibility "Info service accessibility"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Vehicle accessibility (guaranteed availability)"
@@ -42,9 +42,9 @@
    :ote.db.transport-service/guaranteed-info-service-accessibility "Info service accessibility (guaranteed availability)"
    :ote.db.transport-service/limited-info-service-accessibility "Info service accessibility (limited availability)"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "Always available accessibility tools"
+   :ote.db.transport-service/guaranteed-accessibility-tool "Always available accessibility tools"
    :ote.db.transport-service/guaranteed-accessibility-description "Describe more information about always available accessibility tools when needed"
-   :ote.db.transport-service/limited-accessibility-tool        "Limited available accessibility tools"
+   :ote.db.transport-service/limited-accessibility-tool "Limited available accessibility tools"
    :ote.db.transport-service/limited-accessibility-description "Describe more information about limited available accessibility tools when needed"
 
    :ote.db.transport-service/guaranteed-transportable-aid "Transportable aid (guaranteed availability)"
@@ -53,13 +53,13 @@
    :ote.db.transport-service/accessibility-info-url "Accessibility description (WWW)"
 
    ;; Contact details
-   :ote.db.transport-service/contact-address          "Address"
-   :ote.db.transport-service/contact-phone             "Phone"
-   :ote.db.transport-service/contact-email             "Email"
-   :ote.db.transport-service/homepage                  "WWW-address"
+   :ote.db.transport-service/contact-address "Address"
+   :ote.db.transport-service/contact-phone "Phone"
+   :ote.db.transport-service/contact-email "Email"
+   :ote.db.transport-service/homepage "WWW-address"
 
-   :ote.db.transport-service/operation-area            "Operating area"
-   :ote.db.transport-service/location                  "Location"
+   :ote.db.transport-service/operation-area "Operating area"
+   :ote.db.transport-service/location "Location"
 
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "External machine-readable interfaces"
@@ -95,21 +95,21 @@
 
   ;; Passenger transportation fields
   :passenger-transportation
-  {:ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
-   :ote.db.transport-service/real-time-information     "Realtime information WWW-address"
-   :ote.db.transport-service/booking-service           "Booking service WWW-address"
-   :ote.db.transport-service/payment-methods           "Accepted payment methods"
-   :ote.db.transport-service/price-class               "Pricing"
-   :ote.db.transport-service/service-hours             "Service hours"
-   :ote.db.transport-service/operation-area            "Operating area"
+  {:ote.db.transport-service/luggage-restrictions "Luggage restrictions"
+   :ote.db.transport-service/real-time-information "Realtime information WWW-address"
+   :ote.db.transport-service/booking-service "Booking service WWW-address"
+   :ote.db.transport-service/payment-methods "Accepted payment methods"
+   :ote.db.transport-service/price-class "Pricing"
+   :ote.db.transport-service/service-hours "Service hours"
+   :ote.db.transport-service/operation-area "Operating area"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name-taxi     "Price class"
-   :ote.db.transport-service/price-class-name-request  "Price class"
+   :ote.db.transport-service/price-class-name-taxi "Price class"
+   :ote.db.transport-service/price-class-name-request "Price class"
    :ote.db.transport-service/price-class-name-schedule "Price class"
-   :ote.db.transport-service/price-per-unit            "Price per unit (€)"
-   :ote.db.transport-service/unit                      "Unit (zone, ride, €/km, €/mile)"
-   :ote.db.transport-service/currency                  "Currency"
+   :ote.db.transport-service/price-per-unit "Price per unit (€)"
+   :ote.db.transport-service/unit "Unit (zone, ride, €/km, €/mile)"
+   :ote.db.transport-service/currency "Currency"
 
    :ote.db.transport-service/pricing-description "Price description"
    :ote.db.transport-service/pricing-description-taxi "Price description"
@@ -120,103 +120,103 @@
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Indoor map"
-   :ote.db.transport-service/url                       "Service WWW-address"
-   :ote.db.transport-service/description               "Service description"
+   :ote.db.transport-service/url "Service WWW-address"
+   :ote.db.transport-service/description "Service description"
    :ote.db.transport-service/information-service-accessibility "Information service accessibility"
-   :ote.db.transport-service/accessibility     "Accessibility"
+   :ote.db.transport-service/accessibility "Accessibility"
 
 
    ;; assistance_notification_requirement fields
-   :ote.db.transport-service/hours-before           "Service requires reservation (hours) before"
-   :ote.db.transport-service/telephone              "Reservation phone number"
-   :ote.db.transport-service/email                  "Reservation email"
-   :ote.db.transport-service/assistance-url         "Reservation WWW-address"
+   :ote.db.transport-service/hours-before "Service requires reservation (hours) before"
+   :ote.db.transport-service/telephone "Reservation phone number"
+   :ote.db.transport-service/email "Reservation email"
+   :ote.db.transport-service/assistance-url "Reservation WWW-address"
    :ote.db.transport-service/assistance-description "Assistance service description"
    :ote.db.transport-service/assistance-place-description "Assistance service location"
    :ote.db.transport-service/assistance-by-reservation "The assistance service must be reserved in advance."}
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
-   :ote.db.transport-service/payment-methods           "Accepted payment methods"
-   :ote.db.transport-service/usage-area                "Usage area restrictions (country limitations)"
-   :ote.db.transport-service/real-time-information     "Realtime information WWW-address"
-   :ote.db.transport-service/booking-service           "Booking service address"
-   :ote.db.transport-service/vehicle-classes           "Rental vehicles"
-   :ote.db.transport-service/vehicle-type              "Vehicle type"
-   :ote.db.transport-service/license-required          "Required driving licence"
-   :ote.db.transport-service/minimum-age               "Mininmum driving age"
-   :ote.db.transport-service/price-per-unit            "Price (€)"
-   :ote.db.transport-service/unit                      "Unit (e.g. day, €/km, €/mile)"
-   :ote.db.transport-service/price-classes             "Price information"
-   :ote.db.transport-service/pick-up-name              "Service point name"
-   :ote.db.transport-service/pick-up-type              "Service point type"
+  {:ote.db.transport-service/luggage-restrictions "Luggage restrictions"
+   :ote.db.transport-service/payment-methods "Accepted payment methods"
+   :ote.db.transport-service/usage-area "Usage area restrictions (country limitations)"
+   :ote.db.transport-service/real-time-information "Realtime information WWW-address"
+   :ote.db.transport-service/booking-service "Booking service address"
+   :ote.db.transport-service/vehicle-classes "Rental vehicles"
+   :ote.db.transport-service/vehicle-type "Vehicle type"
+   :ote.db.transport-service/license-required "Required driving licence"
+   :ote.db.transport-service/minimum-age "Mininmum driving age"
+   :ote.db.transport-service/price-per-unit "Price (€)"
+   :ote.db.transport-service/unit "Unit (e.g. day, €/km, €/mile)"
+   :ote.db.transport-service/price-classes "Price information"
+   :ote.db.transport-service/pick-up-name "Service point name"
+   :ote.db.transport-service/pick-up-type "Service point type"
    :ote.db.transport-service/rental-additional-services "Additional services"
-   :ote.db.transport-service/additional-service-type   "Service"
-   :ote.db.transport-service/additional-service-price  "Price (€)"
-   :ote.db.transport-service/additional-service-unit   "Unit (f.e day, €/km, €/mile)"
-   :rentals-pricing-info                               "Fill in specified price information."
-   :ote.db.transport-service/vehicle-price-url         "Vehicle and price info WWW address"
-   :ote.db.transport-service/pick-up-locations-url     "Rental point information web address"}
+   :ote.db.transport-service/additional-service-type "Service"
+   :ote.db.transport-service/additional-service-price "Price (€)"
+   :ote.db.transport-service/additional-service-unit "Unit (f.e day, €/km, €/mile)"
+   :rentals-pricing-info "Fill in specified price information."
+   :ote.db.transport-service/vehicle-price-url "Vehicle and price info WWW address"
+   :ote.db.transport-service/pick-up-locations-url "Rental point information web address"}
 
   ;; Parking fields
   :parking
-  {:parking-areas  "Parking area locations"
-   :ote.db.transport-service/luggage-restrictions      "Luggage restrictions"
-   :ote.db.transport-service/url                       "Service WWW-address"
-   :ote.db.transport-service/description               "Service description"
-   :ote.db.transport-service/real-time-information     "Realtime information WWW-address"
-   :ote.db.transport-service/booking-service           "Booking service WWW-address"
-   :ote.db.transport-service/payment-methods           "Accepted payment methods"
-   :ote.db.transport-service/additional-service-links  "Additional services"
-   :ote.db.transport-service/price-class               "Pricing and payment methods"
-   :ote.db.transport-service/service-hours             "Service hours and parking time"
-   :ote.db.transport-service/operation-area            "Operating area"
+  {:parking-areas "Parking area locations"
+   :ote.db.transport-service/luggage-restrictions "Luggage restrictions"
+   :ote.db.transport-service/url "Service WWW-address"
+   :ote.db.transport-service/description "Service description"
+   :ote.db.transport-service/real-time-information "Realtime information WWW-address"
+   :ote.db.transport-service/booking-service "Booking service WWW-address"
+   :ote.db.transport-service/payment-methods "Accepted payment methods"
+   :ote.db.transport-service/additional-service-links "Additional services"
+   :ote.db.transport-service/price-class "Pricing and payment methods"
+   :ote.db.transport-service/service-hours "Service hours and parking time"
+   :ote.db.transport-service/operation-area "Operating area"
 
    ;; Parking facilities and capacity
-   :ote.db.transport-service/parking-facility          "Parking space type"
-   :ote.db.transport-service/capacity                  "Number of parking spaces"
+   :ote.db.transport-service/parking-facility "Parking space type"
+   :ote.db.transport-service/capacity "Number of parking spaces"
 
    ;; Charging point fields
-   :ote.db.transport-service/charging-points           "Charging points description"
+   :ote.db.transport-service/charging-points "Charging points description"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name          "Price class name"
-   :ote.db.transport-service/price-per-unit            "Price per unit (€)"
-   :ote.db.transport-service/unit                      "Unit (e.g. hour, date, month)"
-   :ote.db.transport-service/currency                  "Currency"
+   :ote.db.transport-service/price-class-name "Price class name"
+   :ote.db.transport-service/price-per-unit "Price per unit (€)"
+   :ote.db.transport-service/unit "Unit (e.g. hour, date, month)"
+   :ote.db.transport-service/currency "Currency"
 
-   :ote.db.transport-service/pricing-description       "Price description"
-   :ote.db.transport-service/pricing-url               "Price information WWW-address"
+   :ote.db.transport-service/pricing-description "Price description"
+   :ote.db.transport-service/pricing-url "Price information WWW-address"
    :ote.db.transport-service/payment-method-description "Additional information about payment methods"
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Day of the week"
-   :ote.db.transport-service/from                      "Opening time"
-   :ote.db.transport-service/to                        "Closing time"
-   :ote.db.transport-service/all-day                   "24 hours"
-   :ote.db.transport-service/maximum-stay              "Maximum duration for parking"
+   :ote.db.transport-service/week-days "Day of the week"
+   :ote.db.transport-service/from "Opening time"
+   :ote.db.transport-service/to "Closing time"
+   :ote.db.transport-service/all-day "24 hours"
+   :ote.db.transport-service/maximum-stay "Maximum duration for parking"
    :maximum-stay-limited "Duration for parking is limited"}
 
 
   :transport-service
-  {:ote.db.transport-service/name                "Service name"
+  {:ote.db.transport-service/name "Service name"
    :ote.db.transport-service/additional-services "Additional services"
-   :ote.db.transport-service/url                 "Service WWW-address"
-   :ote.db.transport-service/description         "Service description"
-   :ote.db.transport-service/type                "Transport service mode"
-   :ote.db.transport-service/sub-type            "Transport service sub mode"
-   :ote.db.transport-service/published?          "NAP-status"
-   :ote.db.transport-service/published?-values   {true  "Published"
-                                                  false "Not published"}
+   :ote.db.transport-service/url "Service WWW-address"
+   :ote.db.transport-service/description "Service description"
+   :ote.db.transport-service/type "Transport service mode"
+   :ote.db.transport-service/sub-type "Transport service sub mode"
+   :ote.db.transport-service/published? "NAP-status"
+   :ote.db.transport-service/published?-values {true "Published"
+                                                false "Not published"}
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days           "Day of the week"
-   :ote.db.transport-service/from                "Opening time"
-   :ote.db.transport-service/to                  "Closing time"
-   :ote.db.transport-service/all-day             "24 hours"
+   :ote.db.transport-service/week-days "Day of the week"
+   :ote.db.transport-service/from "Opening time"
+   :ote.db.transport-service/to "Closing time"
+   :ote.db.transport-service/all-day "24 hours"
 
-   :ote.db.transport-service/brokerage?  "The transport service announced is a brokering service which will also be reported to The Finnish Transport Safety Agency - Trafi."
+   :ote.db.transport-service/brokerage? "The transport service announced is a brokering service which will also be reported to The Finnish Transport Safety Agency - Trafi."
 
    :ote.db.transport-service/available-from-and-to-title "Service availability date"
    :ote.db.transport-service/available-from "Available from"
@@ -226,26 +226,26 @@
 
 
   ;; Common fields
-  :ote.db.common/street                               "Street address"
-  :ote.db.common/post_office                          "Post office"
-  :ote.db.common/postal_code                          "Postal code"
+  :ote.db.common/street "Street address"
+  :ote.db.common/post_office "Post office"
+  :ote.db.common/postal_code "Postal code"
 
   :login {:email-or-username "Email or username"
           :password "Password"}
 
   :pre-notice
   {:ote.db.transit/other-type-description "Other change"
-   :ote.db.transit/url                    "Web address"
-   :ote.db.transit/attachment-file-name   "Attachment"
+   :ote.db.transit/url "Web address"
+   :ote.db.transit/attachment-file-name "Attachment"
    :ote.db.transit/effective-dates "Change effective date or dates"
    :ote.db.transit/route-description "Description of changed route or routes"
    :ote.db.transit/regions "Regions that are affected by the change"
    :ote.db.transit/description "Details of the change"}
 
   :email-notification-settings
-  {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+  {:ote.db.user-notifications/finnish-regions "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
    :ote.db.user-notifications/service-changed-6-months-ago "At least 6 months have passed since the last update of your transportation service. The notification is sent once a month until the information has been updated."}
- }
+  }
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -258,17 +258,16 @@
   :external-interfaces-read-more {:link "Read more about the machine-readable interfaces in NAP catalog."
                                   :dialog-title "Machine-readable interfaces in the NAP catalog"
                                   :dialog-text (:md
-                                                "## General\n"
-                                                "Service-related machine-readable interfaces are meant e.g. for developers of journey planners and other digital transport services. They provide information or functions in a technical machina-readable format (e.g. GTFS, GTFS-Realtime, NeTEx, SIRI or REST/XML/JSON). Please note: This section of the NAP form is not meant for adding links to human readable application or information sites (e.g. web-based journey planner application or ticket sales site)."
+                                                 "## General\n"
+                                                 "Service-related machine-readable interfaces are meant e.g. for developers of journey planners and other digital transport services. They provide information or functions in a technical, machine-readable format (e.g. GTFS, GTFS-Realtime, NeTEx, SIRI or REST/XML/JSON)."
 
-                                                "\n\n## Interface information and services\n"
-                                                "External machine-readable interfaces may contain the same essential information as other sections of the NAP form. In this case filling in this information in the following sections is optional. It is however beneficial to also fill in the following sections because it helps finding the service with the search functionality in the NAP catalog."
-                                                "\n\nRoad and railway operators who have an electronic ticket/payment system also have to open their system so that at least a single trip ticket can be purchased via an interface."
-                                                "\n\nListing other interfaces (like a more comprehensive ticket sales API or vehicle realtime locations API) is possible but not mandatory. Opening up more comprehensive APIs can bring new business opportunities of new digital mobility services."
-                                                "\n\n## License information\n"
-                                                "In order to use the listed interfaces or the information they provide, developers need to know the license or the terms of use."
-                                                "\n\nYou can select an existing license or use your own but the information mandated by the MMTIS directive must be open and the minimum level service interfaces must be licensed with reasonable and nondiscriminatory terms. Minimum service interfaces include single ticket sales interfaces of road and railway operators who have an electronic ticket/payment system."
-                                                "\n\nIf the interface only contains downloadable information (e.g. routes and timetables as a GTFS package) it is often appropriate to use an open data license, for example CC BY 4.0 (Creative Commons Attribution 4.0 International, https://creativecommons.org/licenses/by/4.0/deed.en). CC BY 4.0 is a very permissive license that allows dissemination, use, derivative works, combination and distribution of the data - even commercially. It also requires mentioning the original source of the data and maintaining a change history.")}
+                                                 "\n\n## Interface publishing requirements and impacts\n"
+                                                 "If you publish information on your service-related machine-readable interfaces in this section, you don´t have to fill in the respective parts in the NAP form."
+                                                 "\n\nIf you are a road or a railway traffic operator and you have an electric ticket/payment system, you have to publish your payment and sales interface so that at least a single trip ticket can be purchased via the interface. Publishing other interfaces (e.g a more comprehensive ticket sales interface or a vehicle real time locations interface) is possible but not yet mandatory according to legislation. However, providing more comprehensive interfaces in NAP-service already now, can bring you new business opportunities of new digital mobility services."
+                                                 "\n\nNote! Starting from 1.1.2019, legislation on acting on behalf of a person will come into effect. It obligates providing interfaces for purchasing all the ticket products available."
+                                                 "\n\n## License information\n"
+                                                 "In order to use the interfaces you have announced in the form or the information they provide, developers need to know the license or the terms of use. Please keep in mind that all the transport service related information and interface addresses published in NAP will be published as open data. Also minimum level service interfaces have to be licensed with reasonable and nondiscriminatory terms. Requirement of opening up minimum service interfaces (single ticket sales interfaces), is a legal obligation for the road and railway operators who have an electronic ticket/payment system."
+                                                 "\n\nIf the interface published in NAP only contains downloadable information (e.g. routes and timetables as a GTFS package) it is often appropriate to use an open data license, for example CC BY 4.0 (Creative Commons Attribution 4.0 International, https://creativecommons.org/licenses/by/4.0/deed.en). CC BY 4.0 is a very permissive license that allows dissemination, use, derivative works, combination and distribution of the data - even commercially. It also requires mentioning the original source of the data and maintaining a change history.")}
 
   :external-interfaces-payment-systems "Road and rail operators who have an electronic ticket/sales system must fill information about their machine-readable sales and ticket interface."
   :external-interfaces-tooltips {:data-content "Select the type of information this machine-readable interface provides. You can choose multiple options. If no selection is appropriate, choose \"other\" and fill in additional information."
@@ -304,7 +303,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
 
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
-  :trip-editor-no-calendar  "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
+  :trip-editor-no-calendar "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
   :trip-editor-no-stop-sequence "Please add stop sequence."
   :pre-notice-attatchment-info "Give detailed information about the route and timetable changes in your personal transport. You can add a web address from which the changes can be recognized. Alternatively you can add  attachments to the form, from which the detailed changes of the transport can be recognized."
   :autocomplete-hint "Type your own or choose from the list"
@@ -351,10 +350,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :discard "Cancel"
 
   :next "Next"
-  :add-transport-service  "Add a new service"
+  :add-transport-service "Add a new service"
   :add-external-interface "Add a new row"
   :add-new-service-link "Add a new row"
-  :add-add-new-row         "Add a new row"
+  :add-add-new-row "Add a new row"
   :add-new-pick-up-location "Add a new row"
   :add-new-additional-service "Add a new row"
   :add-new-vehicle "Add a new row"
@@ -367,7 +366,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :next-step "Next"
   :route-calendar-back-to-trips "Back to the list of departures"
   :route-calendar-clear "Clear calendar"
-  :back-to-draft  "Change back to draft"
+  :back-to-draft "Change back to draft"
   :add-new-effective-date "Add a new change date"
   :transport-service-catalog "Transport service catalog"
   :register-to-service "Register"
@@ -377,52 +376,52 @@ You can also draw the operating area or point to the map with drawing tools. You
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
-  {:road      "Road traffic"
-   :rail      "Rail traffic"
-   :sea       "Sea traffic"
-   :aviation  "Air traffic"}
+  {:road "Road traffic"
+   :rail "Rail traffic"
+   :sea "Sea traffic"
+   :aviation "Air traffic"}
 
   :ote.db.transport-service/type
-  {:terminal                 "Stations, ports and other terminals"
+  {:terminal "Stations, ports and other terminals"
    :passenger-transportation "Passenger transportation"
-   :rentals                  "Vehicle rentals and commercial shared vehicle solutions"
-   :parking                  "General commercial parking services"
-   :brokerage                "Brokering service companies"}
+   :rentals "Vehicle rentals and commercial shared vehicle solutions"
+   :parking "General commercial parking services"
+   :brokerage "Brokering service companies"}
 
   :ote.db.transport-service/sub-type
-  {:terminal      "Stations, ports and other terminals"
-   :taxi          "Taxi service (road traffic)"
-   :request       "Charter traffic and other request based traffic"
-   :schedule      "Regular scheduled traffic"
-   :rentals       "Vehicle rentals and commercial shared vehicle solutions"
-   :parking       "General commercial parking services"
-   :brokerage     "Brokering services"}
+  {:terminal "Stations, ports and other terminals"
+   :taxi "Taxi service (road traffic)"
+   :request "Charter traffic and other request based traffic"
+   :schedule "Regular scheduled traffic"
+   :rentals "Vehicle rentals and commercial shared vehicle solutions"
+   :parking "General commercial parking services"
+   :brokerage "Brokering services"}
 
   :ote.db.transport-service/payment-methods
-  {:cash                "Cash"
-   :debit-card          "Debit-card"
-   :credit-card         "Credit-card"
-   :mobilepay           "Mobilepay"
+  {:cash "Cash"
+   :debit-card "Debit-card"
+   :credit-card "Credit-card"
+   :mobilepay "Mobilepay"
    :contactless-payment "Contactless payment"
-   :invoice             "Invoice"
-   :other               "Other"}
+   :invoice "Invoice"
+   :other "Other"}
 
   :ote.db.transport-service/additional-services
-  {:child-seat       "Child safety seat"
+  {:child-seat "Child safety seat"
    :animal-transport "Animal transport"
-   :other            "Other"}
+   :other "Other"}
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair       "Wheelchair"
-   :walkingstick     "Walking stick"
-   :audio-navigator  "Audio navigation"
+  {:wheelchair "Wheelchair"
+   :walkingstick "Walking stick"
+   :audio-navigator "Audio navigation"
    :visual-navigator "Visual navigation"
-   :passenger-cart   "Henkilökuljetuskärryt"
-   :pushchair        "Lastenrattaat"
-   :umbrella         "Sateenvarjo"
-   :buggy            "Lastenvaunut"
-   :other            "Other"}
+   :passenger-cart "Henkilökuljetuskärryt"
+   :pushchair "Lastenrattaat"
+   :umbrella "Sateenvarjo"
+   :buggy "Lastenvaunut"
+   :other "Other"}
 
   :ote.db.transport-service/day
   {:short {:MON "Mon" :TUE "Tue" :WED "Wed" :THU "Thu" :FRI "Fri" :SAT "Sat" :SUN "Sun"}
@@ -448,7 +447,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
    :step-free-access "Step-free access"
    :suitable-for-wheelchairs "Suitable for wheelchair"
-   :tactile-platform-edges  "Tactile platform edges"
+   :tactile-platform-edges "Tactile platform edges"
    :tactile-guiding-strips "Tactile guiding strips"}
 
   :ote.db.transport-service/transportable-aid
@@ -504,11 +503,11 @@ You can also draw the operating area or point to the map with drawing tools. You
    :mandatory "Advance reservation is mandatory for this service."}
 
   :ote.db.transit/pre-notice-type
-  {:termination     "Reduction of transport (partly or totally)"
-   :new             "Increasement of transport or a new traffic route/routes"
+  {:termination "Reduction of transport (partly or totally)"
+   :new "Increasement of transport or a new traffic route/routes"
    :schedule-change "Timetable change"
-   :route-change    "Route change/changes"
-   :other           "Other change, what?"}
+   :route-change "Route change/changes"
+   :other "Other change, what?"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Draft"
@@ -516,7 +515,7 @@ You can also draw the operating area or point to the map with drawing tools. You
    :read "Read"}
 
   }
-  ;; ENUMS end
+ ;; ENUMS end
  :regions
  {"01" "Uusimaa"
   "02" "Varsinais-Suomi"
@@ -539,8 +538,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   "21" "Åland"}
 
  ;; Per feature/page localization keys
- :place-search {:primary-name                "Place name"
-                :secondary-name                "Place name"
+ :place-search {:primary-name "Place name"
+                :secondary-name "Place name"
                 :place-auto-complete-primary "Search place by name"
                 :place-auto-complete-secondary "Search place by name"
                 :rename-place "Rename (Use Enter for saving)"
@@ -552,11 +551,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                 :draw-secondary "Add secondary operating area by drawing"
                 :hide-draw-tools "Stop using drawing tools"}
 
- :titles {:terminal                 "Stations, ports and other terminals"
+ :titles {:terminal "Stations, ports and other terminals"
           :passenger-transportation "Passenger transportation"
-          :rentals                  "Vehicle rentals and commercial shared vehicle solutions"
-          :parking                  "General commerial parking services"
-          :brokerage                "Brokering service companies"}
+          :rentals "Vehicle rentals and commercial shared vehicle solutions"
+          :parking "General commerial parking services"
+          :brokerage "Brokering service companies"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -573,50 +572,50 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :front-page-content
   (:md "# **What is NAP?**\n"
-       "The NAP transport service catalog is an open National Access Point (NAP) where all mobility service providers (transport operators) regardless of their mode of transport shall publish essential information on their services in the form of machine-readable open interfaces. NAP is an important part of an EU-wide goal to give rise to new and easily utilizable combined transport services and information services.\n"
-       "The NAP catalog is meant for transport operators and service developers - not for end users or passengers.\n"
+    "The NAP transport service catalog is an open National Access Point (NAP) where all mobility service providers (transport operators) regardless of their mode of transport shall publish essential information on their services in the form of machine-readable open interfaces. NAP is an important part of an EU-wide goal to give rise to new and easily utilizable combined transport services and information services.\n"
+    "The NAP catalog is meant for transport operators and service developers - not for end users or passengers.\n"
 
-       "## **What is a transport service?**\n"
-       "A transport service can be:\n"
-       "1. a passenger transport service (e.g. bus or a taxi service),\n"
-       "2. a station, a port or a terminal,\n"
-       "3. a general commercial parking service,\n"
-       "4. a vehicle rental service or a commercial ridesharing service, or\n"
-       "5. a brokering service or a dispatch service."
+    "## **What is a transport service?**\n"
+    "A transport service can be:\n"
+    "1. a passenger transport service (e.g. bus or a taxi service),\n"
+    "2. a station, a port or a terminal,\n"
+    "3. a general commercial parking service,\n"
+    "4. a vehicle rental service or a commercial ridesharing service, or\n"
+    "5. a brokering service or a dispatch service."
 
-       "## **What is essential information?**\n"
-       "Essential information is e.g. data that includes routes, stops, timetables, prices and fares as well as information on the availability and accessibility of services.\n\n"
+    "## **What is essential information?**\n"
+    "Essential information is e.g. data that includes routes, stops, timetables, prices and fares as well as information on the availability and accessibility of services.\n\n"
 
-       "## **NAP site map**\n"
-       "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
-       "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
-       "To digitize and publish a transport service login is required.")
+    "## **NAP site map**\n"
+    "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
+    "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
+    "To digitize and publish a transport service login is required.")
   :hero-title "Finnish national open transport service catalog."
 
   :new-user? "New user?"
-  :table-header-service-name      "Service name"
-  :table-header-service-url       "Service WWW-address"
-  :table-header-NAP-status        "NAP-status"
-  :table-header-modified          "Modified"
-  :table-header-created           "Created"
-  :table-header-actions           "Functions"
+  :table-header-service-name "Service name"
+  :table-header-service-url "Service WWW-address"
+  :table-header-NAP-status "NAP-status"
+  :table-header-modified "Modified"
+  :table-header-created "Created"
+  :table-header-actions "Functions"
   :do-you-want-to-publish-service "You already have an own, self mantained interface (e.g. in GTFS-form), which you want to publish."
-  :header-explain-more            "Now I don´t understand, can you be more specific?"
-  :move-to-services-page          "Move to own transport services - page"
-  :move-to-organizations-page     "Move to transport operators page"
-  :hello                          "Hey"
-  :NAP-service-short-description  "In the NAP-service, you register and mantain essential data about your transport service,
+  :header-explain-more "Now I don´t understand, can you be more specific?"
+  :move-to-services-page "Move to own transport services - page"
+  :move-to-organizations-page "Move to transport operators page"
+  :hello "Hey"
+  :NAP-service-short-description "In the NAP-service, you register and mantain essential data about your transport service,
     and also publish the data in NAP - transport service catalog."
   :own-services-short-description " -view you can see, what services you have registered so far and which of the data has been
     published also in the public NAP-transport service catalog."
-  :right-corner-description       "From the \"Own transport services\"-view, by choosing \"modify\", you can transport "
+  :right-corner-description "From the \"Own transport services\"-view, by choosing \"modify\", you can transport "
   :service-operator-short-description " -to a view, where you can make changes to the basic information of your transport operator. Basic information should always be up to date,
     because it is used in service view for utilisers."
-  :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
-  :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
+  :publish-new-service "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
+  :help-more-explanation1 "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
    joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
-  :help-more-explanation2         "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
+  :help-more-explanation2 "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
@@ -633,72 +632,72 @@ You can also draw the operating area or point to the map with drawing tools. You
 
 
  :organization-page
- {:contact-types           "Phone and email"
+ {:contact-types "Phone and email"
   :organization-form-title "Basic information"
-  :organization-new-title  "Create a new transport operator"
-  :help-desc-1             "The information given in this form will seen in the public pages of NAP-service."
-  :help-desc-2             (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
-  :basic-info-tooltip      "Fill in to Basic information -section information about the company, community or organization you are representing."
-  :contact-types-tooltip   "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
+  :organization-new-title "Create a new transport operator"
+  :help-desc-1 "The information given in this form will seen in the public pages of NAP-service."
+  :help-desc-2 (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
+  :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing."
+  :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
   }
 
  :passenger-transportation-page
- {:header-new-passenger-transportation     "Add a new transport service"
-  :header-edit-passenger-transportation    "Edit transport service"
-  :header-service-info                     "Service information"
-  :header-restrictions                     "Luggage restrictions"
-  :header-contact-details                  "Contact information"
+ {:header-new-passenger-transportation "Add a new transport service"
+  :header-edit-passenger-transportation "Edit transport service"
+  :header-service-info "Service information"
+  :header-restrictions "Luggage restrictions"
+  :header-contact-details "Contact information"
   :header-other-services-and-accessibility "Accessibility and additional services"
-  :header-price-information                "Price information"
-  :header-service-hours                    "Service hours"
-  :header-pick-up-locations                "Pick-up and returning points"
-  :header-select-company-list-type         "Select the type of notification"
-  :header-brokerage                        "Brokering service information"
-  :radio-button-no-companies               "There are no other companies involved in providing this transport service."
-  :radio-button-url-companies              "Enter a web address from which the company information can be found as a .csv file."
-  :radio-button-csv-companies              "Load a .csv file from your computer with the company information."
-  :radio-button-form-companies             "Add company information manually using the form."
+  :header-price-information "Price information"
+  :header-service-hours "Service hours"
+  :header-pick-up-locations "Pick-up and returning points"
+  :header-select-company-list-type "Select the type of notification"
+  :header-brokerage "Brokering service information"
+  :radio-button-no-companies "There are no other companies involved in providing this transport service."
+  :radio-button-url-companies "Enter a web address from which the company information can be found as a .csv file."
+  :radio-button-csv-companies "Load a .csv file from your computer with the company information."
+  :radio-button-form-companies "Add company information manually using the form."
   }
 
 
  :rentals-page
- {:header-edit-rentals                     "Edit rental information"
-  :header-new-rentals                      "Add information about vehicle rental services or commercial shared vehicle solutions"
-  :header-service-info                     "Service information"
-  :header-rental-service                   "Fill in information about rental service."
-  :header-usage-area                       "Usage area restrictions (country limitations)"
-  :header-restrictions-payments            "Luggage restrictions and payment methods"
-  :header-vehicles                         "Rental vehicles"
-  :header-accessibility                    "Accessibility"
-  :header-additional-services              "Additional services"
-  :open-service-hours-and-exceptions       "Service hours"
-  :open-rental-prices                      "Rental prices"}
+ {:header-edit-rentals "Edit rental information"
+  :header-new-rentals "Add information about vehicle rental services or commercial shared vehicle solutions"
+  :header-service-info "Service information"
+  :header-rental-service "Fill in information about rental service."
+  :header-usage-area "Usage area restrictions (country limitations)"
+  :header-restrictions-payments "Luggage restrictions and payment methods"
+  :header-vehicles "Rental vehicles"
+  :header-accessibility "Accessibility"
+  :header-additional-services "Additional services"
+  :open-service-hours-and-exceptions "Service hours"
+  :open-rental-prices "Rental prices"}
 
 
  :terminal-page
- {:header-service-info                "Service information"
-  :header-contact-details             "Contact information"
-  :header-new-terminal                "Add information about station, port or other terminal"
-  :header-edit-terminal               "Edit information about station, port or other terminal"
-  :header-assistance                  "Assistance service information"
-  :header-accessibility               "Accessibility and information service accessibility"
-  :header-checkboxlist-accessibility  "Accessibility"}
+ {:header-service-info "Service information"
+  :header-contact-details "Contact information"
+  :header-new-terminal "Add information about station, port or other terminal"
+  :header-edit-terminal "Edit information about station, port or other terminal"
+  :header-assistance "Assistance service information"
+  :header-accessibility "Accessibility and information service accessibility"
+  :header-checkboxlist-accessibility "Accessibility"}
 
 
  :parking-page
- {:header-new-parking                       "Add information about general commercial parking"
-  :header-edit-parking                      "Edit information about general commercial parking"
-  :header-service-info                      "Service information"
-  :header-contact-details                   "Contact information"
-  :header-payment-methods                   "Accepted payment methods"
-  :header-add-new-parking                   "Add information about general commercial parking."
-  :header-accessibility                     "Accessibility and information service accessibility"
-  :header-accessibility-description         "Accessibility description"
-  :header-price-and-payment-methods         "Pricing and payment methods"
-  :header-facilities-and-capacities         "Parking capacity"
-  :header-charging-points                   "Charging points"
-  :header-service-hours                     "Service hours and maximum parking time"}
+ {:header-new-parking "Add information about general commercial parking"
+  :header-edit-parking "Edit information about general commercial parking"
+  :header-service-info "Service information"
+  :header-contact-details "Contact information"
+  :header-payment-methods "Accepted payment methods"
+  :header-add-new-parking "Add information about general commercial parking."
+  :header-accessibility "Accessibility and information service accessibility"
+  :header-accessibility-description "Accessibility description"
+  :header-price-and-payment-methods "Pricing and payment methods"
+  :header-facilities-and-capacities "Parking capacity"
+  :header-charging-points "Charging points"
+  :header-service-hours "Service hours and maximum parking time"}
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"
@@ -706,8 +705,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :delete-dialog-remove-route "Removing route "
   :route-list-table-name "Name"
   :route-list-published? "Route status"
-  :route-list-published?-values   {true  "Published"
-                                   false "Not published"}
+  :route-list-published?-values {true "Published"
+                                 false "Not published"}
   :route-list-table-starting-point "Starting point"
   :route-list-table-destination-point "Destination point"
   :route-list-table-valid-from "Valid from"
@@ -717,7 +716,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-list-active-routes "Transport operator’s valid routes: "
   :route-list-gtfs-zip-file "GTFS.Zip file"
   :route-list-copy-link "Copy address: "
-  :link-to-help-pdf   "Sea traffic route and timetable editor user guide"
+  :link-to-help-pdf "Sea traffic route and timetable editor user guide"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
   :create-new-route-disabled "Create new transport operator in \"Own services\" page first"
   }
@@ -746,7 +745,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :stop-sequence-custom-dialog-title "Add new port"
   :stop-sequence-custom-dialog-add "Add"
   :stop-sequence-custom-dialog-name "Name"
-  :stop-sequence-custom-dialog-help  "You can change location of the port or remove it using map tools. When port is saved it cannot be changed or removed."
+  :stop-sequence-custom-dialog-help "You can change location of the port or remove it using map tools. When port is saved it cannot be changed or removed."
   :stop-sequence-leaflet-button-marker "Add new port"
   :stop-sequence-leaflet-button-start "Click to add a new port."
   :stop-sequence-port-header "Berths"
@@ -847,7 +846,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :price-dialog
  {:header-dialog "Vehicle price information"
-  :close-dialog  "Close"}
+  :close-dialog "Close"}
 
 
  :opening-hours-dialog
@@ -856,7 +855,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
 
  :select-service-type-page
- {:title-required-data               "Start creating a new transport service by choosing the mode of the transport service"
+ {:title-required-data "Start creating a new transport service by choosing the mode of the transport service"
   :transport-service-type-selection-help-text "You can save the essential data of your transport service by first choosing the mode of the transport service and the transport operator, and after that by filling the form that opens up to your screen. If you provide many types of transport services, fill up an own form from each service."
   :transport-service-type-selection-help-example "Example: There is a transpor operator \"Example Bus Ltd.\", which provides two different transport services, \"Example Bus Charter Traffic\" in Tampere and \"Example Bus Taxi Service\" in Helsinki. The company has to fill up a separate form from each of the services.
 
@@ -870,72 +869,72 @@ You can also draw the operating area or point to the map with drawing tools. You
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}}
 
  :common-texts
- {:front-page-help-text                       "You have not yet registered any transport services to NAP-service catalog.
+ {:front-page-help-text "You have not yet registered any transport services to NAP-service catalog.
         You can register an external interface about your service or essential data about your service by using
         the NAP-service which Finnish Transport Aggency has developed for this purpose."
-  :front-page-start-ote-query-header          "Do you want to register essential data of your transport service?"
-  :link-add-new-api                           "Add a new service"
-  :own-api-list                               "Service information"
-  :passenger-transportation-service-text      "Passenger transportation"
-  :api-name                                   "Interface name"
-  :api-url                                    "Interface WWW-address"
-  :finap-status                               "NAP-status"
-  :header-nap-official-name                   "Transport service catalog"
-  :navigation-own-service-list                "Own transport services"
-  :navigation-front-page                      "Front page"
-  :navigation-organizations                   "Transport operator"
-  :navigation-dataset                         "Transport service catalog"
-  :navigation-give-feedback                   "Give feedback"
-  :navigation-login                           "Login"
-  :navigation-register                        "Register"
-  :navigation-admin                           "Admin panel"
-  :navigation-route                           "Sea traffic route and timetable editor"
-  :navigation-pre-notice                      "Report changes in regular scheduled passenger transport"
-  :navigation-authority-pre-notices           "Saapuneet ilmoitukset"
-  :navigation-privacy-policy                  "Privacy Policy"
-  :navigation-general-menu                    "Menu"
-  :navigation-for-developers                  "API for developers"
-  :navigation-email-notification-settings     "Email notification settings"
-  :user-menu-service-guide                    "User guide"
-  :user-menu-service-operator                 "Edit transport operator"
-  :user-menu-log-out                          "Log out"
-  :user-menu-profile                          "Edit user account"
-  :user-menu-summary                          "Summary"
-  :user-menu-nap-help                         "NAP instructions and announcements"
-  :user-menu-nap-help-link                    "https://www.liikennevirasto.fi/web/en/transport-system/nap"
-  :user-menu-video-tutorials                  "Video tutorials for service providers"
-  :user-menu-video-tutorials-link             "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
-  :title-operator-basic-details               "Basic information"
-  :data-not-found                             "Data is not found"
-  :required-field                             "Required field"
-  :invalid-business-id                        "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
-  :invalid-postal-code                        "Please, check the postalcode (5 numbers)"
-  :invalid-file-type                          "Invalid file type"
-  :transport-service-saved                    "Transport service information has been saved!"
-  :transport-operator-saved                   "Transport operator information has been saved!"
-  :footer-livi-logo                           "Finnish Transport Aggency Logo"
-  :footer-livi-url                            "Liikennevirasto.fi"
+  :front-page-start-ote-query-header "Do you want to register essential data of your transport service?"
+  :link-add-new-api "Add a new service"
+  :own-api-list "Service information"
+  :passenger-transportation-service-text "Passenger transportation"
+  :api-name "Interface name"
+  :api-url "Interface WWW-address"
+  :finap-status "NAP-status"
+  :header-nap-official-name "Transport service catalog"
+  :navigation-own-service-list "Own transport services"
+  :navigation-front-page "Front page"
+  :navigation-organizations "Transport operator"
+  :navigation-dataset "Transport service catalog"
+  :navigation-give-feedback "Give feedback"
+  :navigation-login "Login"
+  :navigation-register "Register"
+  :navigation-admin "Admin panel"
+  :navigation-route "Sea traffic route and timetable editor"
+  :navigation-pre-notice "Report changes in regular scheduled passenger transport"
+  :navigation-authority-pre-notices "Saapuneet ilmoitukset"
+  :navigation-privacy-policy "Privacy Policy"
+  :navigation-general-menu "Menu"
+  :navigation-for-developers "API for developers"
+  :navigation-email-notification-settings "Email notification settings"
+  :user-menu-service-guide "User guide"
+  :user-menu-service-operator "Edit transport operator"
+  :user-menu-log-out "Log out"
+  :user-menu-profile "Edit user account"
+  :user-menu-summary "Summary"
+  :user-menu-nap-help "NAP instructions and announcements"
+  :user-menu-nap-help-link "https://www.liikennevirasto.fi/web/en/transport-system/nap"
+  :user-menu-video-tutorials "Video tutorials for service providers"
+  :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
+  :title-operator-basic-details "Basic information"
+  :data-not-found "Data is not found"
+  :required-field "Required field"
+  :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
+  :invalid-postal-code "Please, check the postalcode (5 numbers)"
+  :invalid-file-type "Invalid file type"
+  :transport-service-saved "Transport service information has been saved!"
+  :transport-operator-saved "Transport operator information has been saved!"
+  :footer-livi-logo "Finnish Transport Aggency Logo"
+  :footer-livi-url "Liikennevirasto.fi"
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/en/transport-system/nap"
-  :footer-ckan-software                       "CKAN-software"
-  :footer-made-width                          "Made with"
+  :footer-ckan-software "CKAN-software"
+  :footer-made-width "Made with"
   :footer-copyright-disclaimer (:md "Finap.fi-service, made by  [Liikennevirasto](https://www.liikennevirasto.fi/), is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
-  :footer-funded  (:md "Financed partly by EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
+  :footer-funded (:md "Financed partly by EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "NAP utilizes open source code from [CKAN.](https://ckan.org/)")
-  :no-such-page                               "Page not found: "
-  :time-unit                                  "Time unit"
-  :time-units {:minutes  "Minutes"
-               :hours    "Hours"
-               :days     "Days"
-               :seconds  "Seconds"}
-  :save-failed                                "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
-  :delete-operator-success                    "The service provider was deleted successfully."
-  :delete-service-success                     "The service was deleted successfully."
-  :delete-service-error                       "Deleting the service has failed. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
-  :delete-route-success                       "Reitti poistettiin onnistuneesti."
-  :delete-route-error                         "Reitin poisto epäonnistui. Jos ongelma toistuu "
-  :logged-in                                  "You were logged in successfully!"
-  :loading                                    "Loading"
-  :language                                   "Language"
+  :no-such-page "Page not found: "
+  :time-unit "Time unit"
+  :time-units {:minutes "Minutes"
+               :hours "Hours"
+               :days "Days"
+               :seconds "Seconds"}
+  :save-failed "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
+  :delete-operator-success "The service provider was deleted successfully."
+  :delete-service-success "The service was deleted successfully."
+  :delete-service-error "Deleting the service has failed. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
+  :delete-route-success "Reitti poistettiin onnistuneesti."
+  :delete-route-error "Reitin poisto epäonnistui. Jos ongelma toistuu "
+  :logged-in "You were logged in successfully!"
+  :loading "Loading"
+  :language "Language"
 
   :rotate-device-90 "Rotate device 90° to get the best user experience."
 
@@ -1037,7 +1036,7 @@ You can also draw the operating area or point to the map with drawing tools. You
           "charging-points" "Charging points description"
           "parking-capacities" "Parking capacity"
 
-                    "available-from" "Available from"
+          "available-from" "Available from"
           "available-to" "Available to"
 
           "maximum-stay" "Maximum parking time"
@@ -1050,7 +1049,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
           "transport-type" "Transport type"
           "advance-reservation" "Advance reservation"
-          "visiting-address"  "Postal address"
+          "visiting-address" "Postal address"
 
           :values {"passenger-transportation" "Passenger transportation"
                    true "Yes"
@@ -1101,7 +1100,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
                    ;; additional services
                    "animal-transport" "Animal transport"
-                   "child-seat"       "Child safety seat"
+                   "child-seat" "Child safety seat"
 
                    ;; parking types
                    "unknown" "Unknown"
@@ -1152,8 +1151,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                    "no" "no"
                    "road" "Road traffic"
                    "rail" "Rail traffic"
-                   "sea"  "Sea traffic"
-                   "aviation"  "Air traffic"
+                   "sea" "Sea traffic"
+                   "aviation" "Air traffic"
 
                    "mandatory" "Mandatory"
                    "possible" "Possible"
@@ -1214,9 +1213,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :type-search "Transport service mode"
   :limit-search-results "Limit search results"
   :result-count (:plural :count
-                         "No services found"
-                         "One service found"
-                         [:count " services found"])
+                  "No services found"
+                  "One service found"
+                  [:count " services found"])
   :nap-interface ["An interface containing essential data saved in NAP-service: "]
   :external-interfaces ["Other external interfaces"]
   :showing-latest-services "No search filters. Showing latest modified services."
@@ -1286,42 +1285,42 @@ You can also draw the operating area or point to the map with drawing tools. You
   :zoom-out "Zoom Out"}
 
 
- :leaflet-draw  {:toolbar  {:buttons {:polyline  "Draw a line"
-                                      :polygon   "Draw a polygon"
-                                      :rectangle "Draw a rectangle"
-                                      :marker    "Draw a marker"}
-                            :actions {:title "Cancel drawing"
-                                      :text  "Cancel"}
-                            :finish  {:title "Finish drawing"
-                                      :text  "Finish"}
-                            :undo    {:title "Delete last drawing"
-                                      :text  "Delete last drawing"}}
-                 :handlers {:marker      {:tooltip {:start "Click map to insert a point."}}
-                            :polygon     {:tooltip {:start "Click to start the drawing of a polygon."
-                                                    :cont  "Click to continue the drawing of the polygon."
-                                                    :end   "Click the starting point to finnish the drawing of the polygon."}}
-                            :polyline    {:error   "<strong>Error:</strong> the lines drawn cannot cross each other!"
-                                          :tooltip {:start "Click to start drawing a line."
-                                                    :cont  "Click to continue line drawing."
-                                                    :end   "Click last point to finnish line drawing."}}
-                            :rectangle   {:tooltip {:start "Click and drag to draw a rectangle."}}
-                            :simpleshape {:tooltip {:end "Release mouse button to finnish drawing."}}
-                            :circle {:tooltip {:start "Click and drag to draw a circle."}
-                                     :radius "Radius"}
-                            :circlemarker {:tooltip {:start "Click map to set a circle marker."}}}}
- :leaflet-port-edit {:toolbar { :actions {:save {:title "Save changes"
-                                            :text "Save changes"}
-                                     :cancel {:title "Cancel changes"
-                                              :text "Cancel"}
-                                     :clearAll {:title "Clear all"
-                                                :text "Clear all"}}
-                          :buttons {:edit "Edit"
-                                    :editDisabled "No layers to edit"
-                                    :remove "Delete"
-                                    :removeDisabled "No layers to delete"}}
-                :handlers {:edit {:tooltip {:text "Drag handles or markers to edit features."
-                                            :subtext "Click cancel to undo changes"}}
-                           :remove {:tooltip {:text "Click on a feature to remove."}}}}
+ :leaflet-draw {:toolbar {:buttons {:polyline "Draw a line"
+                                    :polygon "Draw a polygon"
+                                    :rectangle "Draw a rectangle"
+                                    :marker "Draw a marker"}
+                          :actions {:title "Cancel drawing"
+                                    :text "Cancel"}
+                          :finish {:title "Finish drawing"
+                                   :text "Finish"}
+                          :undo {:title "Delete last drawing"
+                                 :text "Delete last drawing"}}
+                :handlers {:marker {:tooltip {:start "Click map to insert a point."}}
+                           :polygon {:tooltip {:start "Click to start the drawing of a polygon."
+                                               :cont "Click to continue the drawing of the polygon."
+                                               :end "Click the starting point to finnish the drawing of the polygon."}}
+                           :polyline {:error "<strong>Error:</strong> the lines drawn cannot cross each other!"
+                                      :tooltip {:start "Click to start drawing a line."
+                                                :cont "Click to continue line drawing."
+                                                :end "Click last point to finnish line drawing."}}
+                           :rectangle {:tooltip {:start "Click and drag to draw a rectangle."}}
+                           :simpleshape {:tooltip {:end "Release mouse button to finnish drawing."}}
+                           :circle {:tooltip {:start "Click and drag to draw a circle."}
+                                    :radius "Radius"}
+                           :circlemarker {:tooltip {:start "Click map to set a circle marker."}}}}
+ :leaflet-port-edit {:toolbar {:actions {:save {:title "Save changes"
+                                                :text "Save changes"}
+                                         :cancel {:title "Cancel changes"
+                                                  :text "Cancel"}
+                                         :clearAll {:title "Clear all"
+                                                    :text "Clear all"}}
+                               :buttons {:edit "Edit"
+                                         :editDisabled "No layers to edit"
+                                         :remove "Delete"
+                                         :removeDisabled "No layers to delete"}}
+                     :handlers {:edit {:tooltip {:text "Drag handles or markers to edit features."
+                                                 :subtext "Click cancel to undo changes"}}
+                                :remove {:tooltip {:text "Click on a feature to remove."}}}}
 
  :email-templates
  {:password-reset {:subject "NAP - Reset your password"

@@ -10,15 +10,15 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                     "Palveluntuottajan nimi"
+  :ote.db.transport-operator/name "Palveluntuottajan nimi"
   :ote.db.transport-operator/ckan-description "Palveluntuottajan kuvaus"
-  :ote.db.transport-operator/business-id              "Y-tunnus"
-  :ote.db.transport-operator/phone                    "Puhelinnumero 1"
-  :ote.db.transport-operator/gsm                      "Puhelinnumero 2"
-  :ote.db.transport-operator/email                    "Sähköpostiosoite"
-  :ote.db.transport-operator/homepage                 "WWW-osoite"
-  :ote.db.transport-operator/visiting-address         "Käyntiosoite"
-  :ote.db.transport-operator/billing-address          "Laskutusosoite"
+  :ote.db.transport-operator/business-id "Y-tunnus"
+  :ote.db.transport-operator/phone "Puhelinnumero 1"
+  :ote.db.transport-operator/gsm "Puhelinnumero 2"
+  :ote.db.transport-operator/email "Sähköpostiosoite"
+  :ote.db.transport-operator/homepage "WWW-osoite"
+  :ote.db.transport-operator/visiting-address "Käyntiosoite"
+  :ote.db.transport-operator/billing-address "Laskutusosoite"
 
   :ote.db.transport-operator/facebook "Facebook"
   :ote.db.transport-operator/twitter "Twitter"
@@ -26,15 +26,15 @@
 
   ;; Transport service fields
   :transport-service-type-subtype "Valitse liikkumispalvelun tyyppi"
-  :select-transport-operator      "Valitse palveluntuottaja"
+  :select-transport-operator "Valitse palveluntuottaja"
 
   :transport-service-common
   {:ote.db.transport-service/transport-type "Palvelun liikennemuoto"
    :ote.db.transport-service/name "Palvelun nimi"
-   :ote.db.transport-service/accessibility-tool        "Esteettömyysvälineet"
+   :ote.db.transport-service/accessibility-tool "Esteettömyysvälineet"
    :ote.db.transport-service/accessibility-description "Kuvaus palvelun esteettömyydestä"
 
-   :ote.db.transport-service/accessibility     "Esteettömyys"
+   :ote.db.transport-service/accessibility "Esteettömyys"
    :ote.db.transport-service/information-service-accessibility "Infopalveluiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
@@ -43,9 +43,9 @@
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "Aina saatavilla olevat esteettömyysvälineet"
+   :ote.db.transport-service/guaranteed-accessibility-tool "Aina saatavilla olevat esteettömyysvälineet"
    :ote.db.transport-service/guaranteed-accessibility-description "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
-   :ote.db.transport-service/limited-accessibility-tool        "Rajoitetusti saatavilla olevat esteettömyysvälineet"
+   :ote.db.transport-service/limited-accessibility-tool "Rajoitetusti saatavilla olevat esteettömyysvälineet"
    :ote.db.transport-service/limited-accessibility-description "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
 
    :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
@@ -54,21 +54,21 @@
    :ote.db.transport-service/accessibility-info-url "Esteettömyyspalveluiden kuvaus (WWW)"
 
    ;; Contact details
-   :ote.db.transport-service/contact-address          "Osoitetiedot"
-   :ote.db.transport-service/contact-phone             "Puhelin"
-   :ote.db.transport-service/contact-email             "Sähköposti"
-   :ote.db.transport-service/homepage                  "Kotisivu"
+   :ote.db.transport-service/contact-address "Osoitetiedot"
+   :ote.db.transport-service/contact-phone "Puhelin"
+   :ote.db.transport-service/contact-email "Sähköposti"
+   :ote.db.transport-service/homepage "Kotisivu"
 
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
-   :ote.db.transport-service/location                  "Sijainti"
+   :ote.db.transport-service/operation-area "Toiminta-alue"
+   :ote.db.transport-service/location "Sijainti"
 
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "Ulkoiset koneluettavat rajapinnat"
    :ote.db.transport-service/data-content "Tietosisältö"
    :ote.db.transport-service/external-service-description "Lisätietoja"
    :ote.db.transport-service/external-service-url "Web-osoite"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/rental-service            "Vuokrauspalvelun osoitetiedot"
+   :ote.db.transport-service/booking-service "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/rental-service "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Formaatti"
    :ote.db.transport-service/format-short "Formaatti"
    :ote.db.transport-service/companies "Palvelun tuottamiseen osallistuvat muut yritykset"
@@ -96,21 +96,21 @@
 
   ;; Passenger transportation fields
   :passenger-transportation
-  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/price-class               "Hinnoittelu"
-   :ote.db.transport-service/service-hours             "Palveluajat"
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
+  {:ote.db.transport-service/luggage-restrictions "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/real-time-information "Reaaliaikapalvelun verkko-osoitetiedot"
+   :ote.db.transport-service/booking-service "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/payment-methods "Valitse maksutavat"
+   :ote.db.transport-service/price-class "Hinnoittelu"
+   :ote.db.transport-service/service-hours "Palveluajat"
+   :ote.db.transport-service/operation-area "Toiminta-alue"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name-taxi     "Tuote"
-   :ote.db.transport-service/price-class-name-request  "Hintaryhmä"
+   :ote.db.transport-service/price-class-name-taxi "Tuote"
+   :ote.db.transport-service/price-class-name-request "Hintaryhmä"
    :ote.db.transport-service/price-class-name-schedule "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-   :ote.db.transport-service/currency                  "Valuutta"
+   :ote.db.transport-service/price-per-unit "Hinta per yksikkö (€)"
+   :ote.db.transport-service/unit "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
+   :ote.db.transport-service/currency "Valuutta"
 
    :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
    :ote.db.transport-service/pricing-description-taxi "Hinnoittelun kuvaus"
@@ -121,104 +121,104 @@
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
-   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
-   :ote.db.transport-service/description               "Palvelun kuvaus"
+   :ote.db.transport-service/url "Palvelun verkko-osoite"
+   :ote.db.transport-service/description "Palvelun kuvaus"
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
-   :ote.db.transport-service/accessibility     "Saavutettavuus"
+   :ote.db.transport-service/accessibility "Saavutettavuus"
 
 
    ;; assistance_notification_requirement fields
-   :ote.db.transport-service/hours-before           "Palvelu on varattava (tuntia) ennen"
-   :ote.db.transport-service/telephone              "Varaa palvelu numerosta"
-   :ote.db.transport-service/email                  "Varaa palvelu sähköpostilla (email)"
-   :ote.db.transport-service/assistance-url         "Tee varaus osoitteesta (www)"
+   :ote.db.transport-service/hours-before "Palvelu on varattava (tuntia) ennen"
+   :ote.db.transport-service/telephone "Varaa palvelu numerosta"
+   :ote.db.transport-service/email "Varaa palvelu sähköpostilla (email)"
+   :ote.db.transport-service/assistance-url "Tee varaus osoitteesta (www)"
    :ote.db.transport-service/assistance-description "Avustuspalveluja koskeva kuvaus"
    :ote.db.transport-service/assistance-place-description "Avustuspalvelujen sijaintien kuvaus"
    :ote.db.transport-service/assistance-by-reservation "Avustuspalvelu täytyy varata etukäteen."}
 
   ;; Rental fields
   :rentals
-  {:ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/usage-area                "Sallitut maat"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/vehicle-classes           "Vuokrattavat ajoneuvot"
-   :ote.db.transport-service/vehicle-type              "Ajoneuvon tyyppi"
-   :ote.db.transport-service/license-required          "Ajokorttiluokka"
-   :ote.db.transport-service/minimum-age               "Alaikäraja"
-   :ote.db.transport-service/price-per-unit            "Hinta (€)"
-   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-   :ote.db.transport-service/price-classes             "Hinta"
-   :ote.db.transport-service/pick-up-name              "Toimipisteen nimi"
-   :ote.db.transport-service/pick-up-type              "Tyyppi"
+  {:ote.db.transport-service/luggage-restrictions "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/payment-methods "Valitse maksutavat"
+   :ote.db.transport-service/usage-area "Sallitut maat"
+   :ote.db.transport-service/real-time-information "Reaaliaikapalvelun verkko-osoitetiedot"
+   :ote.db.transport-service/booking-service "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/vehicle-classes "Vuokrattavat ajoneuvot"
+   :ote.db.transport-service/vehicle-type "Ajoneuvon tyyppi"
+   :ote.db.transport-service/license-required "Ajokorttiluokka"
+   :ote.db.transport-service/minimum-age "Alaikäraja"
+   :ote.db.transport-service/price-per-unit "Hinta (€)"
+   :ote.db.transport-service/unit "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
+   :ote.db.transport-service/price-classes "Hinta"
+   :ote.db.transport-service/pick-up-name "Toimipisteen nimi"
+   :ote.db.transport-service/pick-up-type "Tyyppi"
    :ote.db.transport-service/rental-additional-services "Muut palvelut"
-   :ote.db.transport-service/additional-service-type   "Palvelu"
-   :ote.db.transport-service/additional-service-price  "Hinta (€)"
-   :ote.db.transport-service/additional-service-unit   "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-   :rentals-pricing-info                               "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
-   :ote.db.transport-service/vehicle-price-url         "Ajoneuvot ja hintatiedot (WWW-osoite)"
-   :ote.db.transport-service/pick-up-locations-url               "Toimipisteiden tietojen web-osoite"}
+   :ote.db.transport-service/additional-service-type "Palvelu"
+   :ote.db.transport-service/additional-service-price "Hinta (€)"
+   :ote.db.transport-service/additional-service-unit "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
+   :rentals-pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
+   :ote.db.transport-service/vehicle-price-url "Ajoneuvot ja hintatiedot (WWW-osoite)"
+   :ote.db.transport-service/pick-up-locations-url "Toimipisteiden tietojen web-osoite"}
 
 
   ;; Parking fields
   :parking
-  {:parking-areas  "Parkkipaikkojen sijainnit"
-   :ote.db.transport-service/luggage-restrictions      "Matkatavaroita koskevat rajoitukset"
-   :ote.db.transport-service/url                       "Palvelun verkko-osoite"
-   :ote.db.transport-service/description               "Palvelun kuvaus"
-   :ote.db.transport-service/real-time-information     "Reaaliaikapalvelun verkko-osoitetiedot"
-   :ote.db.transport-service/booking-service           "Varauspalvelun osoitetiedot"
-   :ote.db.transport-service/payment-methods           "Valitse maksutavat"
-   :ote.db.transport-service/additional-service-links  "Muut palvelut"
-   :ote.db.transport-service/price-class               "Hinnoittelu"
-   :ote.db.transport-service/service-hours             "Palveluajat"
-   :ote.db.transport-service/operation-area            "Toiminta-alue"
+  {:parking-areas "Parkkipaikkojen sijainnit"
+   :ote.db.transport-service/luggage-restrictions "Matkatavaroita koskevat rajoitukset"
+   :ote.db.transport-service/url "Palvelun verkko-osoite"
+   :ote.db.transport-service/description "Palvelun kuvaus"
+   :ote.db.transport-service/real-time-information "Reaaliaikapalvelun verkko-osoitetiedot"
+   :ote.db.transport-service/booking-service "Varauspalvelun osoitetiedot"
+   :ote.db.transport-service/payment-methods "Valitse maksutavat"
+   :ote.db.transport-service/additional-service-links "Muut palvelut"
+   :ote.db.transport-service/price-class "Hinnoittelu"
+   :ote.db.transport-service/service-hours "Palveluajat"
+   :ote.db.transport-service/operation-area "Toiminta-alue"
 
    ;; Parking facilities and capacity
-   :ote.db.transport-service/parking-facility          "Pysäköintipaikan tyyppi"
-   :ote.db.transport-service/capacity                  "Paikkojen määrä"
+   :ote.db.transport-service/parking-facility "Pysäköintipaikan tyyppi"
+   :ote.db.transport-service/capacity "Paikkojen määrä"
 
    ;; Charging point fields
-   :ote.db.transport-service/charging-points           "Kuvaus latauspisteistä"
+   :ote.db.transport-service/charging-points "Kuvaus latauspisteistä"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name          "Hintaryhmä"
-   :ote.db.transport-service/price-per-unit            "Hinta per yksikkö (€)"
-   :ote.db.transport-service/unit                      "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
-   :ote.db.transport-service/currency                  "Valuutta"
+   :ote.db.transport-service/price-class-name "Hintaryhmä"
+   :ote.db.transport-service/price-per-unit "Hinta per yksikkö (€)"
+   :ote.db.transport-service/unit "Hinnoitteluperuste (esim. vyöhyke, matka, €/km)"
+   :ote.db.transport-service/currency "Valuutta"
 
-   :ote.db.transport-service/pricing-description       "Hinnoittelun kuvaus"
-   :ote.db.transport-service/pricing-url               "Hinnoittelun verkkosivu"
+   :ote.db.transport-service/pricing-description "Hinnoittelun kuvaus"
+   :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
    :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Viikonpäivät"
-   :ote.db.transport-service/from                      "Aukeamisaika"
-   :ote.db.transport-service/to                        "Kiinnimenoaika"
-   :ote.db.transport-service/all-day                   "24h"
-   :ote.db.transport-service/maximum-stay              "Maksimi pysäköintiaika"
+   :ote.db.transport-service/week-days "Viikonpäivät"
+   :ote.db.transport-service/from "Aukeamisaika"
+   :ote.db.transport-service/to "Kiinnimenoaika"
+   :ote.db.transport-service/all-day "24h"
+   :ote.db.transport-service/maximum-stay "Maksimi pysäköintiaika"
    :maximum-stay-limited "Pysäköintiaika rajoitettu"}
 
 
   :transport-service
-  {:ote.db.transport-service/name                "Palvelun nimi"
+  {:ote.db.transport-service/name "Palvelun nimi"
    :ote.db.transport-service/additional-services "Muut palvelut"
-   :ote.db.transport-service/url                 "Palvelun verkko-osoite"
-   :ote.db.transport-service/description         "Palvelun kuvaus"
-   :ote.db.transport-service/type                "Liikkumispalvelun tyyppi"
-   :ote.db.transport-service/sub-type            "Liikkumispalvelun alatyyppi"
-   :ote.db.transport-service/published?          "NAP-tila"
-   :ote.db.transport-service/published?-values   {true  "Julkaistu"
-                                                  false "Ei julkaistu"}
+   :ote.db.transport-service/url "Palvelun verkko-osoite"
+   :ote.db.transport-service/description "Palvelun kuvaus"
+   :ote.db.transport-service/type "Liikkumispalvelun tyyppi"
+   :ote.db.transport-service/sub-type "Liikkumispalvelun alatyyppi"
+   :ote.db.transport-service/published? "NAP-tila"
+   :ote.db.transport-service/published?-values {true "Julkaistu"
+                                                false "Ei julkaistu"}
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days           "Viikonpäivät"
-   :ote.db.transport-service/from                "Aukeamisaika"
-   :ote.db.transport-service/to                  "Kiinnimenoaika"
-   :ote.db.transport-service/all-day             "24h"
+   :ote.db.transport-service/week-days "Viikonpäivät"
+   :ote.db.transport-service/from "Aukeamisaika"
+   :ote.db.transport-service/to "Kiinnimenoaika"
+   :ote.db.transport-service/all-day "24h"
 
-   :ote.db.transport-service/brokerage?  "Ilmoittamani palvelu on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu."
+   :ote.db.transport-service/brokerage? "Ilmoittamani palvelu on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu."
 
    :ote.db.transport-service/available-from-and-to-title "Palvelun voimassaoloaika"
    :ote.db.transport-service/available-from "Saatavilla alkaen"
@@ -228,24 +228,24 @@
 
 
   ;; Common fields
-  :ote.db.common/street                               "Osoite"
-  :ote.db.common/post_office                          "Postitoimipaikka"
-  :ote.db.common/postal_code                          "Postinumero"
+  :ote.db.common/street "Osoite"
+  :ote.db.common/post_office "Postitoimipaikka"
+  :ote.db.common/postal_code "Postinumero"
 
   :login {:email-or-username "Sähköpostiosoite tai käyttäjätunnus"
           :password "Salasana"}
 
   :pre-notice
   {:ote.db.transit/other-type-description "Selitys"
-   :ote.db.transit/url                    "Web-osoite"
-   :ote.db.transit/attachment-file-name   "Liitetiedosto"
+   :ote.db.transit/url "Web-osoite"
+   :ote.db.transit/attachment-file-name "Liitetiedosto"
    :ote.db.transit/effective-dates "Muutoksen alkamispäivä tai -päivät"
    :ote.db.transit/route-description "Muuttuvan reitin tai reittien nimet / kuvaukset"
    :ote.db.transit/regions "Lisää maakunta tai maakunnat, joita muutos koskee"
    :ote.db.transit/description "Muutoksen tarkemmat tiedot"}
 
   :email-notification-settings
-  {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+  {:ote.db.user-notifications/finnish-regions "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
    :ote.db.user-notifications/service-changed-6-months-ago "Liikkumispalvelusi tietojen viimeisimmästä päivityksestä on kulunut vähintään 6 kuukautta. Ilmoitus lähetetään kerran kuukaudessa, kunnes tiedot on päivitetty."}
   }
 
@@ -261,15 +261,14 @@
                                   :dialog-title "Koneluettavat rajapinnat NAP-katalogissa"
                                   :dialog-text (:md
                                                  "## Yleistä\n"
-                                                 "Palveluun liittyvät palveluntuottajan tai yhteistyöyrityksen koneluettavat rajapinnat on tarkoitettu esimerkiksi reittioppaiden ja muiden digitaalisten liikkumisen palveluiden kehittäjille. Ne tarjoavat tietoa tai toimintoja teknisessä, koneen ymmärtämässä formaatissa (esim. GTFS, GTFS-Realtime, NeTEx, SIRI, tai REST/XML/JSON). Tässä osiossa ei tarkoitus lisätä linkkejä ihmiskäyttäjille tarjottaviin valmiisiin sovelluksiin (esim. web-reittiopas ja web-lippukauppa)."
-                                                 "\n\n## Rajapintojen tiedot ja toiminnot\n"
-                                                 "Rajapinnat saattavat sisältää samoja tietoja, jotka voi ilmoittaa tällä lomakkeella (liikkumispalvelun olennaisia tietoja). Tässä tapauksessa vastaavien tietojen täyttäminen lomakkeelle on vapaaehtoista. Täyttäminen kuitenkin usein kannattaa, koska se edesauttaa tietojen löytymistä palvelun hakutoiminnoilla."
-                                                 "\n\nSellaisten tie- ja raideliikenteen toimijoiden, joilla on käytössään lippu- ja maksujärjestelmä, tulee avata lisäksi varaus- ja myyntirajapintansa niin, että vähintään kertalipun ostaminen on mahdollista."
-                                                 "\n\nMuut rajapinnat (esim. kertalippurajapintaa laajempi myyntirajapinta, ajoneuvojen reaaliaikatietoja välittävä rajapinta) ovat asetuksen mukaan mahdollisia, mutta eivät pakollisia. Sellaisia avaamalla palveluntarjoaja voi hyötyä uusien digitaalisten liikkumisen palveluiden tuomista liiketoimintamahdollisuuksista."
+                                                 "Liikkumispalveluun liittyvät koneluettavat rajapinnat on tarkoitettu esimerkiksi reittioppaiden ja muiden digitaalisten liikkumisen palveluiden kehittäjille. Ne tarjoavat tietoa tai toimintoja teknisessä, koneen ymmärtämässä formaatissa (esim. GTFS, GTFS-Realtime, NeTEx, SIRI, tai REST/XML/JSON)."
+                                                 "\n\n## Rajapintatietojen julkaisuvaatimukset ja vaikutukset\n"
+                                                 "Mikäli julkaiset ”ulkoiset koneluettavat rajapinnat” -osiossa tiedot palveluusi liittyvistä koneluettavista rajapinnoista, sinun ei tarvitse täyttää vastaavia kohtia uudestaan lomakkeelle."
+                                                 "\n\nMikäli olet tie- tai raideliikenteen toimija, jolla on käytössään lippu- ja maksujärjestelmä, tulee sinun avata varaus- ja myyntirajapintasi siten, että vähintään kertalipun ostaminen on mahdollista. Muiden rajapintojen avaaminen (esim. kertalippurajapintaa laajempi myyntirajapinta tai ajoneuvojen reaaliaikatietoja välittävä rajapinta) on liikkumispalveluita koskevan olennaisten tietojen asetuksen mukaan mahdollista, mutta ei vielä pakollista. Avaamalla rajapintoja laajemmin NAP-palvelussa kuitenkin jo nyt, voit hyötyä uusien digitaalisten liikkumisen palveluiden tuomista liiketoimintamahdollisuuksista."
+                                                 "\n\nHUOM: 1.1.2019 astuu voimaan ns. puolesta-asiointia koskeva säädös, joka velvoittaa kaikkia lipputuotteita sisältävien rajapintojen avaamiseen. "
                                                  "\n\n## Lisenssitiedot\n"
-                                                 "Rajapintojen hyödyntäjät tarvitsevat tiedon siitä, millä ehdoilla he voivat käyttää rajapintoja ja niiden sisältämiä tietoja."
-                                                 "\n\nRajapinnan tarjoaja voi valita käyttämänsä lisenssin tai muotoilla omat ehtonsa, mutta kaikki liikkumispalvelua koskevat olennaiset tiedot on kuitenkin tarjottava vapaasti käytettäväksi (avoin rajapinta) ja lisäksi minimipalvelurajapinnat on tarjottava kaikille oikeudenmukaisin, kohtuullisin ja syrjimättömin ehdoin. Minimipalvelurajapinnoilla tarkoitetaan tilaus- ja kertalippurajapintoja ja ne koskevat sellaisia tie- ja raideliikenteen toimijoita, joilla on käytössään lippu- ja maksujärjestelmä."
-                                                 "\n\nJos rajapinta on vain ladattavaksi tarjottavaa tietoa, esimerkiksi reittejä ja aikatauluja kuvaava GTFS-paketti, on usein tarkoituksenmukaista käyttää jotakin yleistä avoimen datan lisenssiä. Tällainen on esim. Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fi), joka on hyvin salliva aineiston levittämisen, hyödyntämisen, muuntelun, yhdistämisen ja jakelun suhteen - myös kaupallisesti. Ko. lisenssi edellyttää kuitenkin lähteen mainitsemista, muuntelun merkitsemistä ja muutoshistorian säilyttämistä.")}
+                                                 "Rajapintojen hyödyntäjät tarvitsevat tiedon siitä, millä käyttöehdoilla liikkumispalveluun liittyviä rajapintoja ja niiden sisältämiä tietoja voi hyödyntää. Ilmoita siis käyttämäsi lisenssi tai julkaise omat käyttöehtosi selkeästi. Muista kuitenkin, että kaikki NAP:ssa julkaissut liikkumispalvelua koskevat olennaiset tiedot on tarjottava vapaasti käytettäväksi (avoin rajapinta). Lisäksi minimipalvelurajapinnat on tarjottava kaikille oikeudenmukaisin, kohtuullisin ja syrjimättömin ehdoin. Minimipalvelurajapinnoilla tarkoitetaan kertalipun tilaamisen ja oston mahdollistavia rajapintoja, joiden avaamisvelvoite koskee sellaisia tie- ja raideliikenteen toimijoita, joilla on käytössään lippu- ja maksujärjestelmä."
+                                                 "\n\nMikäli julkaisemasi rajapinta sisältää vain ladattavaksi tarjottavaa tietoa (esim. reitti- ja aikataulutietoja sisältävä GTFS-paketti), on usein tarkoituksenmukaista käyttää jotakin yleistä avoimen datan lisenssiä. Tällainen on esimerkiksi Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fi), joka on hyvin salliva aineiston levittämisen, hyödyntämisen, muuntelun, yhdistämisen ja jakelun suhteen - myös kaupallisesti. Kyseinen lisenssi edellyttää kuitenkin lähteen mainitsemista, muuntelun merkitsemistä ja muutoshistorian säilyttämistä.")}
 
   :external-interfaces-payment-systems "Sellaisten tie- ja raideliikenteen toimijoiden, joilla on käytössään lippu- ja maksujärjestelmä, tulee lisäksi ilmoittaa tässä osiossa koneluettavan tilaus- ja kertalippurajapinnan tiedot."
   :external-interfaces-tooltips {:data-content "Valitse millaisia tietoja koneluettava rajapinta tarjoaa. Voit valita listalta useita vaihtoehtoja. Mikäli valintalistalta ei löydy sopivia vaihtoehtoja, valitse “muu” ja kerro tietosisällöistä “Lisätietoja”-kentässä."
@@ -281,8 +280,8 @@
   :RAE-link-text "Rae-työkalulla"
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"
-"Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen)."
-"\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**")
+                         "Mikäli palvelun tuottamiseen osallistuu muita yrityksiä tai palvelussa välitetään useiden yritysten palveluita, ilmoita kyseisten yritysten nimet ja y-tunnukset tässä osiossa. Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen)."
+                         "\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**")
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
   :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
@@ -304,7 +303,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
-  :trip-editor-no-calendar  "Lisää tämän vuoron kulkupäivät ennen kuin lisäät reitille muita vuoroja. Samat kulkupäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä kulkupäiviä kalentereihin vuorokohtaisesti."
+  :trip-editor-no-calendar "Lisää tämän vuoron kulkupäivät ennen kuin lisäät reitille muita vuoroja. Samat kulkupäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä kulkupäiviä kalentereihin vuorokohtaisesti."
   :trip-editor-no-stop-sequence "Lisää pysäkkiketju ennen vuoroja."
   :pre-notice-attatchment-info "Ilmoita henkilöliikennepalvelusi yksityiskohtaiset reitti- ja aikataulumuutokset. Voit lisätä web-osoitteen, josta tiedot ovat luettavissa. Vaihtoehtoisesti voit lisätä tälle lomakkeelle liitteitä, joista muutokset käyvät ilmi."
   :autocomplete-hint "Kirjoita oma tai valitse listalta"
@@ -351,10 +350,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :discard "Peruuta"
 
   :next "Jatka"
-  :add-transport-service  "Lisää uusi palvelu"
+  :add-transport-service "Lisää uusi palvelu"
   :add-external-interface "Lisää rivi"
   :add-new-service-link "Lisää rivi"
-  :add-add-new-row         "Lisää uusi rivi"
+  :add-add-new-row "Lisää uusi rivi"
   :add-new-pick-up-location "Lisää rivi"
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
@@ -367,7 +366,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :next-step "Seuraava"
   :route-calendar-back-to-trips "Takaisin vuorolistaan"
   :route-calendar-clear "Tyhjennä kalenteri"
-  :back-to-draft  "Muuta luonnokseksi"
+  :back-to-draft "Muuta luonnokseksi"
   :add-new-effective-date "Lisää uusi päivämäärä"
   :transport-service-catalog "Liikkumispalvelukatalogi"
   :register-to-service "Rekisteröidy palveluun"
@@ -377,53 +376,53 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
-  {:road      "Tieliikenne"
-   :rail      "Rautatieliikenne"
-   :sea       "Merenkulku"
-   :aviation  "Ilmailu"}
+  {:road "Tieliikenne"
+   :rail "Rautatieliikenne"
+   :sea "Merenkulku"
+   :aviation "Ilmailu"}
 
   :ote.db.transport-service/type
-  {:terminal                 "Asemat, satamat ja muut terminaalit"
+  {:terminal "Asemat, satamat ja muut terminaalit"
    :passenger-transportation "Henkilöiden kuljetuspalvelut"
-   :rentals                  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-   :brokerage                "Välityspalvelut"}
+   :rentals "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :parking "Yleiset kaupalliset pysäköintipalvelut"
+   :brokerage "Välityspalvelut"}
 
   :ote.db.transport-service/sub-type
-  {:terminal     "Asemat, satamat ja muut terminaalit"
-   :taxi         "Taksiliikenne (tieliikenne)"
-   :request      "Tilausliikenne ja muu kutsuun perustuva liikenne"
-   :schedule     "Säännöllinen aikataulun mukainen liikenne"
-   :rentals      "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-   :parking      "Yleiset kaupalliset pysäköintipalvelut"
-   :brokerage    "Välityspalvelut"}
+  {:terminal "Asemat, satamat ja muut terminaalit"
+   :taxi "Taksiliikenne (tieliikenne)"
+   :request "Tilausliikenne ja muu kutsuun perustuva liikenne"
+   :schedule "Säännöllinen aikataulun mukainen liikenne"
+   :rentals "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+   :parking "Yleiset kaupalliset pysäköintipalvelut"
+   :brokerage "Välityspalvelut"}
 
 
   :ote.db.transport-service/payment-methods
-  {:cash                "Käteinen"
-   :debit-card          "Pankkikortti"
-   :credit-card         "Luottokortti"
-   :mobilepay           "Mobiilimaksu"
+  {:cash "Käteinen"
+   :debit-card "Pankkikortti"
+   :credit-card "Luottokortti"
+   :mobilepay "Mobiilimaksu"
    :contactless-payment "Lähimaksu"
-   :invoice             "Lasku"
-   :other               "Muu"}
+   :invoice "Lasku"
+   :other "Muu"}
 
   :ote.db.transport-service/additional-services
-  {:child-seat       "Lastenistuin"
+  {:child-seat "Lastenistuin"
    :animal-transport "Eläinkuljetus"
-   :other            "Muu"}
+   :other "Muu"}
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair       "Pyörätuoli"
-   :walkingstick     "Kävelykeppi"
-   :audio-navigator  "Ääniopastus"
+  {:wheelchair "Pyörätuoli"
+   :walkingstick "Kävelykeppi"
+   :audio-navigator "Ääniopastus"
    :visual-navigator "Visuaaliset opasteet"
-   :passenger-cart   "Henkilökuljetuskärryt"
-   :pushchair        "Lastenrattaat"
-   :umbrella         "Sateenvarjo"
-   :buggy            "Lastenvaunut"
-   :other            "Muu"}
+   :passenger-cart "Henkilökuljetuskärryt"
+   :pushchair "Lastenrattaat"
+   :umbrella "Sateenvarjo"
+   :buggy "Lastenvaunut"
+   :other "Muu"}
 
   :ote.db.transport-service/day
   {:short {:MON "Ma" :TUE "Ti" :WED "Ke" :THU "To" :FRI "Pe" :SAT "La" :SUN "Su"}
@@ -449,7 +448,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
    :step-free-access "Portaaton pääsy"
    :suitable-for-wheelchairs "Sopii pyörätuolille"
-   :tactile-platform-edges  "Kosketukseen perustuva varoitus laiturin reunassa"
+   :tactile-platform-edges "Kosketukseen perustuva varoitus laiturin reunassa"
    :tactile-guiding-strips "Kosketukseen perustuvat ohjausliuskat"}
 
   :ote.db.transport-service/transportable-aid
@@ -505,11 +504,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :mandatory "Palvelun ennakkovaraus on pakollista."}
 
   :ote.db.transit/pre-notice-type
-  {:termination     "Liikenteen lakkauttaminen (osittain tai kokonaan)"
-   :new             "Liikenteen lisääminen tai uusi reitti"
+  {:termination "Liikenteen lakkauttaminen (osittain tai kokonaan)"
+   :new "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"
-   :route-change    "Reittimuutos"
-   :other           "Muu muutos, mikä?"}
+   :route-change "Reittimuutos"
+   :other "Muu muutos, mikä?"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Luonnos"
@@ -517,7 +516,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :read "Luettu"}
 
   }
-  ;; ENUMS end
+ ;; ENUMS end
  :regions
  {"01" "Uusimaa"
   "02" "Varsinais-Suomi"
@@ -540,8 +539,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   "21" "Ahvenanmaa"}
 
  ;; Per feature/page localization keys
- :place-search {:primary-name                "Paikan nimi"
-                :secondary-name                "Paikan nimi"
+ :place-search {:primary-name "Paikan nimi"
+                :secondary-name "Paikan nimi"
                 :place-auto-complete-primary "Hae paikka nimellä"
                 :place-auto-complete-secondary "Hae paikka nimellä"
                 :rename-place "Anna uusi nimi (Enter hyväksyy)"
@@ -553,11 +552,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                 :draw-secondary "Lisää toissijainen toiminta-alue piirtämällä"
                 :hide-draw-tools "Lopeta piirtotyökalujen käyttäminen"}
 
- :titles {:terminal                 "Asemat, satamat ja muut terminaalit"
+ :titles {:terminal "Asemat, satamat ja muut terminaalit"
           :passenger-transportation "Henkilöiden kuljetuspalvelut"
-          :rentals                  "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-          :parking                  "Yleiset kaupalliset pysäköintipalvelut"
-          :brokerage                "Välityspalvelut"}
+          :rentals "Ajoneuvojen vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+          :parking "Yleiset kaupalliset pysäköintipalvelut"
+          :brokerage "Välityspalvelut"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -566,62 +565,62 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :title-transport-operator "Palveluntuottaja"
   :title-developer "Sovelluskehittäjä"
   :column-NAP (:md
-                        "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
+                "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
   :column-transport-services "Liikkumispalveluilla tarkoitetaan henkilöiden kuljetuspalveluita, kuten tieliikenteen, merenkulun ja ilmailun henkilökuljetuksia; asemia, satamia ja terminaaleja; liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita; yleisiä kaupallisia pysäköintipalveluita sekä välityspalveluita."
   :column-essential-info "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat, palvelun saatavuus, esteettömyys sekä varaus-, myynti-, lippu- ja maksutiedot. Kaikki tiedot eivät ole olennaisia jokaisen palvelun osalta.  Avattavat tiedot on määritetty valtioneuvoston asetuksessa."
   :column-transport-operator "Tietojen avaamisvelvollisuus koskee kaikkia liikkumispalveluita tarjoavia yrityksiä. Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii rekisteröitymisen ja kirjautumisen palveluun. NAP-palvelu ohjeistaa käyttäjää kirjaamaan tiettyä palvelua koskevat olennaiset tiedot."
   :column-developer "NAP on palveluiden kehittäjille tarkoitettu katalogi, josta kehittäjät löytävät tarvitsemiaan tietoja ja rajapintoja. Tietojen hyödyntäminen ei vaadi rekisteröitymistä. NAP mahdollistaa esimerkiksi nykyistä laajempien reittioppaiden ja liikennepalveluiden kehittämisen."
 
- :front-page-content (:md
-                       "\n"
-                       "# **Mikä on NAP?**\n"
-                       "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon "
-                       " **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** "
-                       "koneluettavista rajapinnoistaan. \n"
-                       "NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on aikaansaada mahdollisimman "
-                       "helppokäyttöisiä uusia yhdistettyjä liikkumispalveluita ja infopalveluita.\n"
-                       "\n"
-                       "## **Mitä ovat liikkumispalvelut?**\n"
-                       "Liikkumispalveluilla tarkoitetaan:\n\n"
-                       "1. henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)\n"
-                       "2. asemia, satamia ja terminaaleja\n"
-                       "3. pysäköintilaitoksia\n"
-                       "4. liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita\n"
-                       "5. välityspalveluita\n"
-                       "\n\n"
-                       "## **Mitä tarkoitetaan olennaisilla tiedoilla?**\n"
-                       "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat ja esteettömyystiedot. NAP ei "
-                       "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
-                       "kehittäjille.\n\n"
-                       "## **NAP-palvelun rakenne**\n"
-                       "[Palvelukatalogi](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
-                       "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
+  :front-page-content (:md
+                        "\n"
+                        "# **Mikä on NAP?**\n"
+                        "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon "
+                        " **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** "
+                        "koneluettavista rajapinnoistaan. \n"
+                        "NAP-palvelu on oleellinen osa kokonaisuutta, jonka tavoitteena on aikaansaada mahdollisimman "
+                        "helppokäyttöisiä uusia yhdistettyjä liikkumispalveluita ja infopalveluita.\n"
+                        "\n"
+                        "## **Mitä ovat liikkumispalvelut?**\n"
+                        "Liikkumispalveluilla tarkoitetaan:\n\n"
+                        "1. henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne)\n"
+                        "2. asemia, satamia ja terminaaleja\n"
+                        "3. pysäköintilaitoksia\n"
+                        "4. liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita\n"
+                        "5. välityspalveluita\n"
+                        "\n\n"
+                        "## **Mitä tarkoitetaan olennaisilla tiedoilla?**\n"
+                        "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat ja esteettömyystiedot. NAP ei "
+                        "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
+                        "kehittäjille.\n\n"
+                        "## **NAP-palvelun rakenne**\n"
+                        "[Palvelukatalogi](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
+                        "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
   :hero-title "Suomen liikkumispalveluiden tietojen avoin yhteyspiste palveluiden kehitykseen."
   :new-user? "Uusi käyttäjä?"
 
-  :table-header-service-name      "Palvelun nimi"
-  :table-header-service-url       "Palvelun verkko-osoite"
-  :table-header-NAP-status        "NAP tila"
-  :table-header-modified          "Muokattu"
-  :table-header-created           "Luotu"
-  :table-header-actions           "Toiminnot"
+  :table-header-service-name "Palvelun nimi"
+  :table-header-service-url "Palvelun verkko-osoite"
+  :table-header-NAP-status "NAP tila"
+  :table-header-modified "Muokattu"
+  :table-header-created "Luotu"
+  :table-header-actions "Toiminnot"
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
-  :header-explain-more            "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page          "Siirry omat palvelutiedot -näkymään"
-  :move-to-organizations-page     "Siirry palveluntuottajat-näkymään"
-  :hello                          "Hei "
-  :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
+  :header-explain-more "Nyt en ymmärrä, selittäisitkö tarkemmin?"
+  :move-to-services-page "Siirry omat palvelutiedot -näkymään"
+  :move-to-organizations-page "Siirry palveluntuottajat-näkymään"
+  :hello "Hei "
+  :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittäimsen, sekä tietojen julkaisun NAP -palvelukatalogiin."
   :own-services-short-description "-näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
-  :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
+  :right-corner-description "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
   :service-operator-short-description "-näkymään, jossa voit täydentää tilisi perusitietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
-  :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
-  :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
+  :publish-new-service "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
+  :help-more-explanation1 "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
    joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
-  :help-more-explanation2         "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
+  :help-more-explanation2 "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
@@ -638,72 +637,72 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :organization-page
- {:contact-types           "Yhteystavat"
+ {:contact-types "Yhteystavat"
   :organization-form-title "Palveluntuottajan tiedot"
-  :organization-new-title  "Lisää palveluntuottaja"
-  :help-desc-1             "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
-  :help-desc-2             (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
-  :basic-info-tooltip      "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
-  :contact-types-tooltip   "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
+  :organization-new-title "Lisää palveluntuottaja"
+  :help-desc-1 "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
+  :help-desc-2 (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
+  :basic-info-tooltip "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
+  :contact-types-tooltip "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
   }
 
  :passenger-transportation-page
- {:header-new-passenger-transportation     "Lisää uusi henkilöiden kuljetuspalvelu"
-  :header-edit-passenger-transportation    "Muokkaa henkilöiden kuljetuspalvelua"
-  :header-service-info                     "Palvelun perustiedot"
-  :header-restrictions                     "Matkatavaroita koskevat rajoitukset"
-  :header-contact-details                  "Palvelun yhteystiedot"
+ {:header-new-passenger-transportation "Lisää uusi henkilöiden kuljetuspalvelu"
+  :header-edit-passenger-transportation "Muokkaa henkilöiden kuljetuspalvelua"
+  :header-service-info "Palvelun perustiedot"
+  :header-restrictions "Matkatavaroita koskevat rajoitukset"
+  :header-contact-details "Palvelun yhteystiedot"
   :header-other-services-and-accessibility "Esteettömyys ja muut palvelut"
-  :header-price-information                "Hintatiedot"
-  :header-service-hours                    "Palveluajat"
-  :header-pick-up-locations                "Toimipisteet"
-  :header-select-company-list-type         "Valitse ilmoittamistapa"
-  :header-brokerage                        "Välityspalvelua koskevat tiedot"
-  :radio-button-no-companies               "Tämän palvelun tuottamiseen ei osallistu muita yrityksiä."
-  :radio-button-url-companies              "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona."
-  :radio-button-csv-companies              "Lataa yritysten tiedot csv-tiedostona lomakkeelle."
-  :radio-button-form-companies             "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
+  :header-price-information "Hintatiedot"
+  :header-service-hours "Palveluajat"
+  :header-pick-up-locations "Toimipisteet"
+  :header-select-company-list-type "Valitse ilmoittamistapa"
+  :header-brokerage "Välityspalvelua koskevat tiedot"
+  :radio-button-no-companies "Tämän palvelun tuottamiseen ei osallistu muita yrityksiä."
+  :radio-button-url-companies "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona."
+  :radio-button-csv-companies "Lataa yritysten tiedot csv-tiedostona lomakkeelle."
+  :radio-button-form-companies "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
   }
 
 
  :rentals-page
- {:header-edit-rentals                     "Muokkaa vuokraukseen liittyvät tiedot"
-  :header-new-rentals                      "Lisää ajoneuvojen vuokrauspalveluihin tai kaupallisiin yhteiskäyttöpalveluihin liittyvät tiedot"
-  :header-service-info                     "Palvelun perustiedot"
-  :header-rental-service                   "Täydennä vuokraukseen liittyvät tiedot."
-  :header-usage-area                       "Maarajoitukset"
-  :header-restrictions-payments            "Rajoitukset ja maksutavat"
-  :header-vehicles                         "Vuokrattavat ajoneuvot"
-  :header-accessibility                    "Esteettömyys"
-  :header-additional-services              "Lisäpalvelut"
-  :open-service-hours-and-exceptions       "Palveluajat"
-  :open-rental-prices                      "Hintatiedot"}
+ {:header-edit-rentals "Muokkaa vuokraukseen liittyvät tiedot"
+  :header-new-rentals "Lisää ajoneuvojen vuokrauspalveluihin tai kaupallisiin yhteiskäyttöpalveluihin liittyvät tiedot"
+  :header-service-info "Palvelun perustiedot"
+  :header-rental-service "Täydennä vuokraukseen liittyvät tiedot."
+  :header-usage-area "Maarajoitukset"
+  :header-restrictions-payments "Rajoitukset ja maksutavat"
+  :header-vehicles "Vuokrattavat ajoneuvot"
+  :header-accessibility "Esteettömyys"
+  :header-additional-services "Lisäpalvelut"
+  :open-service-hours-and-exceptions "Palveluajat"
+  :open-rental-prices "Hintatiedot"}
 
 
  :terminal-page
- {:header-service-info                "Palvelun perustiedot"
-  :header-contact-details             "Palvelun yhteystiedot"
-  :header-new-terminal                "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
-  :header-edit-terminal               "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
-  :header-assistance                  "Avustuspalveluiden tiedot"
-  :header-accessibility               "Palvelun saavutettavuus ja esteettömyys"
-  :header-checkboxlist-accessibility  "Esteettömyys"}
+ {:header-service-info "Palvelun perustiedot"
+  :header-contact-details "Palvelun yhteystiedot"
+  :header-new-terminal "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
+  :header-edit-terminal "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
+  :header-assistance "Avustuspalveluiden tiedot"
+  :header-accessibility "Palvelun saavutettavuus ja esteettömyys"
+  :header-checkboxlist-accessibility "Esteettömyys"}
 
 
  :parking-page
- {:header-new-parking                       "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
-  :header-edit-parking                      "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
-  :header-service-info                      "Palvelun perustiedot"
-  :header-contact-details                   "Palvelun yhteystiedot"
-  :header-payment-methods                   "Maksutavat"
-  :header-add-new-parking                   "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
-  :header-accessibility                     "Palvelun esteettömyystiedot"
-  :header-accessibility-description         "Kuvaus esteettömyyspalveluista"
-  :header-price-and-payment-methods         "Hintatiedot ja maksutavat"
-  :header-facilities-and-capacities         "Pysäköintialueet ja parkkipaikkojen määrä"
-  :header-charging-points                   "Latauspisteet"
-  :header-service-hours                     "Palveluajat ja pysäköintiaika"}
+ {:header-new-parking "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-edit-parking "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+  :header-service-info "Palvelun perustiedot"
+  :header-contact-details "Palvelun yhteystiedot"
+  :header-payment-methods "Maksutavat"
+  :header-add-new-parking "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot."
+  :header-accessibility "Palvelun esteettömyystiedot"
+  :header-accessibility-description "Kuvaus esteettömyyspalveluista"
+  :header-price-and-payment-methods "Hintatiedot ja maksutavat"
+  :header-facilities-and-capacities "Pysäköintialueet ja parkkipaikkojen määrä"
+  :header-charging-points "Latauspisteet"
+  :header-service-hours "Palveluajat ja pysäköintiaika"}
 
 
  :route-list-page
@@ -712,8 +711,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
   :route-list-published? "Reitin tila"
-  :route-list-published?-values   {true  "Julkaistu"
-                                   false "Ei julkaistu"}
+  :route-list-published?-values {true "Julkaistu"
+                                 false "Ei julkaistu"}
   :route-list-table-starting-point "Lähtöpaikka"
   :route-list-table-destination-point "Määränpää"
   :route-list-table-valid-from "Voimassa lähtien"
@@ -723,7 +722,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
   :route-list-copy-link "Kopioi osoite: "
-  :link-to-help-pdf   "Merenkulun reittityökalun käyttöohje"
+  :link-to-help-pdf "Merenkulun reittityökalun käyttöohje"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
   :create-new-route-disabled "Luo palveluntuottaja \"Omat palvelutiedot\"-sivulta ensin"
   }
@@ -752,13 +751,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :stop-sequence-custom-dialog-title "Lisää uusi satama tai laituri"
   :stop-sequence-custom-dialog-add "Lisää"
   :stop-sequence-custom-dialog-name "Nimi"
-  :stop-sequence-custom-dialog-help  "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla. Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."
+  :stop-sequence-custom-dialog-help "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla. Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."
   :stop-sequence-leaflet-button-marker "Lisää uusi satama/laituri"
   :stop-sequence-leaflet-button-start "Klikkaa karttaa lisätäksesi satama/laituri"
   :stop-sequence-port-header "Pysähtymispaikka"
   :stop-sequence-arrival-header "Saapumisaika"
   :stop-sequence-departure-header "Lähtöaika"
-  :stop-sequence-map-help  "Muodosta reitti valitsemalla pysähdyspaikkoja kartalta. Voit tarvittaessa lisätä pysähdyspaikkoja myös itse."
+  :stop-sequence-map-help "Muodosta reitti valitsemalla pysähdyspaikkoja kartalta. Voit tarvittaessa lisätä pysähdyspaikkoja myös itse."
   :stop-sequence-delete "Poista pysäkki ketjusta"
   :stop-sequence-edit-map-help "Muokkaustilassa voit lisätä puuttuvia pysähtymispaikkoja kartalle. Voit myös siirtää ja poistaa juuri lisäämiäsi pysähtymispaikkoja. Kartan muita pysähtymispaikkoja et voi muokata. Muokkauspainikkeet löydät kartan vasemmasta reunasta."
 
@@ -852,7 +851,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :price-dialog
  {:header-dialog "Ajoneuvon hintatiedot"
-  :close-dialog  "Sulje"}
+  :close-dialog "Sulje"}
 
 
  :opening-hours-dialog
@@ -861,7 +860,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :select-service-type-page
- {:title-required-data               "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
+ {:title-required-data "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
                 Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
@@ -879,72 +878,72 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :common-texts
- {:front-page-help-text                       "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
+ {:front-page-help-text "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
-  :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
-  :link-add-new-api                           "Lisää uusi palvelu"
-  :own-api-list                               "Omat palvelutiedot"
-  :passenger-transportation-service-text      "Henkilöiden kuljetuspalvelut"
-  :api-name                                   "Rajapinnan nimi"
-  :api-url                                    "Rajapinnan verkko-osoite"
-  :finap-status                               "NAP tila"
-  :header-nap-official-name                   "Palvelukatalogi"
-  :navigation-own-service-list                "Omat palvelutiedot"
-  :navigation-front-page                      "Etusivu"
-  :navigation-organizations                   "Palveluntuottajat"
-  :navigation-dataset                         "Liikkumispalvelukatalogi"
-  :navigation-give-feedback                   "Palautelomake"
-  :navigation-login                           "Kirjaudu"
-  :navigation-register                        "Rekisteröidy"
-  :navigation-admin                           "Ylläpitopaneeli"
-  :navigation-route                           "Merenkulun reitti- ja aikataulueditori"
-  :navigation-pre-notice                      "Säännöllisen henkilöliikenteen muutosilmoitus"
-  :navigation-authority-pre-notices           "Saapuneet muutosilmoitukset"
-  :navigation-privacy-policy                  "Rekisteriseloste"
-  :navigation-general-menu                    "Valikko"
-  :navigation-for-developers                  "Ohjelmointirajapinta kehittäjille"
-  :navigation-email-notification-settings     "Sähköposti-ilmoitusten asetukset"
-  :user-menu-service-guide                    "Ohje"
-  :user-menu-service-operator                 "Muokkaa palveluntuottajaa"
-  :user-menu-log-out                          "Kirjaudu ulos"
-  :user-menu-profile                          "Käyttäjätilin muokkaus"
-  :user-menu-summary                          "Yhteenveto"
-  :user-menu-nap-help                         "NAP-ohjeet ja -tiedotteet"
-  :user-menu-nap-help-link                    "https://www.liikennevirasto.fi/liikennejarjestelma/liikennepalvelulaki/kayttoohjeet#.W5uNaugzY2w"
-  :user-menu-video-tutorials                  "Opetusvideot palveluntuottajille"
-  :user-menu-video-tutorials-link             "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
-  :title-operator-basic-details               "Perustiedot"
-  :data-not-found                             "Tietoja ei löytynyt"
-  :required-field                             "Tieto vaaditaan"
-  :invalid-business-id                        "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
-  :invalid-postal-code                        "Tarkista postinumero (5 numeroa)"
-  :invalid-file-type                          "Virheellinen tiedostotyyppi"
-  :transport-service-saved                    "Liikkumispalvelun tiedot tallennettu!"
-  :transport-operator-saved                   "Palveluntarjoajan tiedot tallennettu!"
-  :footer-livi-logo                           "Liikennevirasto Logo"
-  :footer-livi-url                            "Liikennevirasto.fi"
+  :front-page-start-ote-query-header "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
+  :link-add-new-api "Lisää uusi palvelu"
+  :own-api-list "Omat palvelutiedot"
+  :passenger-transportation-service-text "Henkilöiden kuljetuspalvelut"
+  :api-name "Rajapinnan nimi"
+  :api-url "Rajapinnan verkko-osoite"
+  :finap-status "NAP tila"
+  :header-nap-official-name "Palvelukatalogi"
+  :navigation-own-service-list "Omat palvelutiedot"
+  :navigation-front-page "Etusivu"
+  :navigation-organizations "Palveluntuottajat"
+  :navigation-dataset "Liikkumispalvelukatalogi"
+  :navigation-give-feedback "Palautelomake"
+  :navigation-login "Kirjaudu"
+  :navigation-register "Rekisteröidy"
+  :navigation-admin "Ylläpitopaneeli"
+  :navigation-route "Merenkulun reitti- ja aikataulueditori"
+  :navigation-pre-notice "Säännöllisen henkilöliikenteen muutosilmoitus"
+  :navigation-authority-pre-notices "Saapuneet muutosilmoitukset"
+  :navigation-privacy-policy "Rekisteriseloste"
+  :navigation-general-menu "Valikko"
+  :navigation-for-developers "Ohjelmointirajapinta kehittäjille"
+  :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"
+  :user-menu-service-guide "Ohje"
+  :user-menu-service-operator "Muokkaa palveluntuottajaa"
+  :user-menu-log-out "Kirjaudu ulos"
+  :user-menu-profile "Käyttäjätilin muokkaus"
+  :user-menu-summary "Yhteenveto"
+  :user-menu-nap-help "NAP-ohjeet ja -tiedotteet"
+  :user-menu-nap-help-link "https://www.liikennevirasto.fi/liikennejarjestelma/liikennepalvelulaki/kayttoohjeet#.W5uNaugzY2w"
+  :user-menu-video-tutorials "Opetusvideot palveluntuottajille"
+  :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
+  :title-operator-basic-details "Perustiedot"
+  :data-not-found "Tietoja ei löytynyt"
+  :required-field "Tieto vaaditaan"
+  :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
+  :invalid-postal-code "Tarkista postinumero (5 numeroa)"
+  :invalid-file-type "Virheellinen tiedostotyyppi"
+  :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
+  :transport-operator-saved "Palveluntarjoajan tiedot tallennettu!"
+  :footer-livi-logo "Liikennevirasto Logo"
+  :footer-livi-url "Liikennevirasto.fi"
   :footer-livi-url-link "https://www.liikennevirasto.fi/nap"
-  :footer-ckan-software                       "CKAN-ohjelmistolla"
-  :footer-made-width                          "Toteutettu"
+  :footer-ckan-software "CKAN-ohjelmistolla"
+  :footer-made-width "Toteutettu"
   :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
-  :footer-funded  (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
+  :footer-funded (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "Toteutuksessa on hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
-  :no-such-page                               "Valittua sivua ei löydy: "
-  :time-unit                                  "Aikayksikkö"
-  :time-units {:minutes  "Minuuttia"
-               :hours    "Tuntia"
-               :days     "Päivää"
-               :seconds  "Sekuntia"}
-  :save-failed                                "Tallennettaessa sattui virhe. Jos ongelma toistuu "
-  :delete-operator-success                    "Palveluntuottaja poistettiin onnistuneesti."
-  :delete-service-success                     "Palvelu poistettiin onnistuneesti."
-  :delete-service-error                       "Palvelun poisto epäonnistui. Jos ongelma toistuu "
-  :delete-route-success                       "Reitti poistettiin onnistuneesti."
-  :delete-route-error                         "Reitin poisto epäonnistui. Jos ongelma toistuu "
-  :logged-in                                  "Kirjauduit sisään onnistuneesti!"
-  :loading                                    "Lataa"
-  :language                                   "Kieli"
+  :no-such-page "Valittua sivua ei löydy: "
+  :time-unit "Aikayksikkö"
+  :time-units {:minutes "Minuuttia"
+               :hours "Tuntia"
+               :days "Päivää"
+               :seconds "Sekuntia"}
+  :save-failed "Tallennettaessa sattui virhe. Jos ongelma toistuu "
+  :delete-operator-success "Palveluntuottaja poistettiin onnistuneesti."
+  :delete-service-success "Palvelu poistettiin onnistuneesti."
+  :delete-service-error "Palvelun poisto epäonnistui. Jos ongelma toistuu "
+  :delete-route-success "Reitti poistettiin onnistuneesti."
+  :delete-route-error "Reitin poisto epäonnistui. Jos ongelma toistuu "
+  :logged-in "Kirjauduit sisään onnistuneesti!"
+  :loading "Lataa"
+  :language "Kieli"
 
   :rotate-device-90 "Käännä laitetta 90° saavuttaaksesi parhaan käyttökokemuksen."
 
@@ -1059,18 +1058,18 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
           "years" "Vuotta"
           "transport-type" "Palvelun liikennemuoto"
           "advance-reservation" "Ennakkovaraus"
-          "visiting-address"  "Käyntiosoite"
+          "visiting-address" "Käyntiosoite"
 
           :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
                    true "Kyllä"
                    false "Ei"
 
-                   "taxi"     "Taksiliikenne (tieliikenne)"
-                   "request"  "Tilausliikenne ja muu kutsuun perustuva liikenne"
+                   "taxi" "Taksiliikenne (tieliikenne)"
+                   "request" "Tilausliikenne ja muu kutsuun perustuva liikenne"
                    "schedule" "Säännöllinen aikataulun mukainen liikenne"
                    "terminal" "Asemat, satamat ja muut terminaalit"
-                   "rentals"  "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                   "parking"  "Yleiset kaupalliset pysäköintipalvelut"
+                   "rentals" "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
+                   "parking" "Yleiset kaupalliset pysäköintipalvelut"
 
                    ;; accessibility tools
                    "wheelchair" "Pyörätuoli"
@@ -1160,9 +1159,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    "advance-reservation" "Ennakkovaraus"
                    "no" "ei"
                    "road" "Tieliikenne"
-                   "rail"      "Rautatieliikenne"
-                   "sea"       "Merenkulku"
-                   "aviation"  "Ilmailu"
+                   "rail" "Rautatieliikenne"
+                   "sea" "Merenkulku"
+                   "aviation" "Ilmailu"
 
                    "mandatory" "Pakollinen"
                    "possible" "Mahdollinen"
@@ -1228,9 +1227,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :result-count ["Hakuehdoille "
                  (:plural :count
-                          "ei löytynyt palveluita"
-                          "löytyi yksi palvelu"
-                          ["löytyi " :count " palvelua"]) "."]
+                   "ei löytynyt palveluita"
+                   "löytyi yksi palvelu"
+                   ["löytyi " :count " palvelua"]) "."]
   :nap-interface ["NAP-palvelussa tallennettujen tietojen koneluettava rajapinta: "]
   :external-interfaces ["Palvelun muut koneluettavat rajapinnat"]
   :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
@@ -1291,7 +1290,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :request-button "Pyydä uudelleenasettamista"
   :password-changed "Salasana vaihdettu"}
 
-  :gtfs-viewer
+ :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
 
 
@@ -1300,42 +1299,42 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :zoom-out "Loitonna"}
 
 
- :leaflet-draw  {:toolbar  {:buttons {:polyline  "Piirrä viiva"
-                                      :polygon   "Piirrä monikulmio"
-                                      :rectangle "Piirrä neliö"
-                                      :marker    "Lisää piste"}
-                            :actions {:title "Peruuta piirros"
-                                      :text  "Peruuta"}
-                            :finish  {:title "Lopeta piirtäminen"
-                                      :text  "Lopeta"}
-                            :undo    {:title "Poista viimeksi piirretty piste"
-                                      :text  "Poista viimeisin piste"}}
-                 :handlers {:marker      {:tooltip {:start "Klikkaa karttaa lisääksesi pisteen."}}
-                            :polygon     {:tooltip {:start "Klikkaa aloittaaksesi monikulmion piirtäminen."
-                                                    :cont  "Klikkaa jatkaaksesi monikulmion piirtämistä."
-                                                    :end   "Klikkaa ensimmäistä pistettä sulkeaksesi monikulmion."}}
-                            :polyline    {:error   "<strong>Virhe:</strong> viivat eivät saa ylittää toisiaan!"
-                                          :tooltip {:start "Klikkaa aloittaaksesi viivan piirtäminen."
-                                                    :cont  "Klikkaa jatkaaksesi viivan piirtämistä."
-                                                    :end   "Klikkaa viimeistä pistettä piirtämisen lopettamiseksi."}}
-                            :rectangle   {:tooltip {:start "Klikkaa ja raahaa piirtääksesi neliön."}}
-                            :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
-                            :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
-                                     :radius "Säde"}
-                            :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
- :leaflet-port-edit {:toolbar { :actions {:save {:title "Tallenna muutokset"
-                                            :text "Tallenna muutokset"}
-                                    :cancel {:title "Peruuta tehdyt muutokset"
-                                             :text "Peruuta"}
-                                    :clearAll {:title "Poista kaikki lisäämäsi pysähdyspaikat"
-                                               :text "Poista kaikki lisäämäsi pysähdyspaikat"}}
-                          :buttons {:edit "Muokkaa"
-                                    :editDisabled "Muokkaustila on poissa käytöstä"
-                                    :remove "Poista"
-                                    :removeDisabled "Poistotila on poissa käytöstä"}}
-                :handlers {:edit {:tooltip {:text "Siirrä pysähtymispaikkaa klikkaamalla niitä ja liikuttamalla samalla hiirtä"
-                                            :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
-                           :remove {:tooltip {:text "Merkitse pysähtymispaikka poistettavaksi klikkaamalla."}}}}
+ :leaflet-draw {:toolbar {:buttons {:polyline "Piirrä viiva"
+                                    :polygon "Piirrä monikulmio"
+                                    :rectangle "Piirrä neliö"
+                                    :marker "Lisää piste"}
+                          :actions {:title "Peruuta piirros"
+                                    :text "Peruuta"}
+                          :finish {:title "Lopeta piirtäminen"
+                                   :text "Lopeta"}
+                          :undo {:title "Poista viimeksi piirretty piste"
+                                 :text "Poista viimeisin piste"}}
+                :handlers {:marker {:tooltip {:start "Klikkaa karttaa lisääksesi pisteen."}}
+                           :polygon {:tooltip {:start "Klikkaa aloittaaksesi monikulmion piirtäminen."
+                                               :cont "Klikkaa jatkaaksesi monikulmion piirtämistä."
+                                               :end "Klikkaa ensimmäistä pistettä sulkeaksesi monikulmion."}}
+                           :polyline {:error "<strong>Virhe:</strong> viivat eivät saa ylittää toisiaan!"
+                                      :tooltip {:start "Klikkaa aloittaaksesi viivan piirtäminen."
+                                                :cont "Klikkaa jatkaaksesi viivan piirtämistä."
+                                                :end "Klikkaa viimeistä pistettä piirtämisen lopettamiseksi."}}
+                           :rectangle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi neliön."}}
+                           :simpleshape {:tooltip {:end "Vapauta hiiri piirtämisen lopettamiseksi."}}
+                           :circle {:tooltip {:start "Klikkaa ja raahaa piirtääksesi ympyrän."}
+                                    :radius "Säde"}
+                           :circlemarker {:tooltip {:start "Klikkaa karttaa asettaaksesi ympyrämarkkerin."}}}}
+ :leaflet-port-edit {:toolbar {:actions {:save {:title "Tallenna muutokset"
+                                                :text "Tallenna muutokset"}
+                                         :cancel {:title "Peruuta tehdyt muutokset"
+                                                  :text "Peruuta"}
+                                         :clearAll {:title "Poista kaikki lisäämäsi pysähdyspaikat"
+                                                    :text "Poista kaikki lisäämäsi pysähdyspaikat"}}
+                               :buttons {:edit "Muokkaa"
+                                         :editDisabled "Muokkaustila on poissa käytöstä"
+                                         :remove "Poista"
+                                         :removeDisabled "Poistotila on poissa käytöstä"}}
+                     :handlers {:edit {:tooltip {:text "Siirrä pysähtymispaikkaa klikkaamalla niitä ja liikuttamalla samalla hiirtä"
+                                                 :subtext "Mikäli haluat peruuttaa muutokset, valitse \"peruuta\"."}}
+                                :remove {:tooltip {:text "Merkitse pysähtymispaikka poistettavaksi klikkaamalla."}}}}
 
  :email-templates
  {:password-reset {:subject "NAP - Salasanan vaihto"
