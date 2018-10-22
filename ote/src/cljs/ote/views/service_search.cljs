@@ -280,6 +280,7 @@
           :name :operators
           :full-width? true
           :container-class "col-xs-12 col-sm-4 col-md-4"
+          :container-style {:padding-right "10px"}
           :component (fn [{data :data}]
                        [form-fields/field
                         {:type :chip-input
@@ -287,6 +288,7 @@
                          :full-width? true
                          :full-width-input? false
                          :hint-text (tr [:service-search :operator-search-placeholder])
+                         :hint-style {:top "20px"}
                          ;; No filter, back-end returns what we want
                          :filter (constantly true)
                          :suggestions-config {:text :operator :value :business-id}
@@ -331,6 +333,7 @@
           :type :chip-input
           :container-class "col-xs-12 col-sm-4 col-md-4"
           :hint-text (tr [:service-search :operation-area-search-placeholder])
+          :hint-style {:top "20px"}
           :full-width? true
           :full-width-input? false
           :filter (fn [query, key]
