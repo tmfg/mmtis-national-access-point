@@ -335,14 +335,14 @@
        (when style
          {:style style}))]))
 
-(defmethod field :chip-input [{:keys [update! label name error warning regex on-blur
+(defmethod field :chip-input [{:keys [update! label name error warning regex
+                                      on-blur on-update-input on-request-add on-request-delete
                                       max-length style hint-style hint-text
                                       filter suggestions suggestions-config default-values max-results
                                       auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
                                       form? table? full-width? full-width-input? disabled?] :as field}
                               data]
-
   (let [chips (set (or data #{}))
         handle-add! #(let [v (js->clj % :keywordize-keys true)]
                        (if regex
@@ -394,8 +394,9 @@
                      (when (and add-on-blur? (not (str/blank? val)))
                        (handle-add! val)))
                    (when on-blur (on-blur event)))
-        :on-request-add handle-add!
-        :on-request-delete handle-del!}
+        :on-request-add (or on-request-add handle-add!)
+        :on-request-delete (or on-request-delete handle-del!)
+        :on-update-input on-update-input}
        ;; Define suggestions data element format.
        ;; Will be used internally like:
        ;;   dataSourceConfig: {:value :key}
