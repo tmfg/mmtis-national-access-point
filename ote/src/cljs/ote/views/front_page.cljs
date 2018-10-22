@@ -66,7 +66,6 @@
              ::modification/keys [created modified] :as row}]
        ^{:key i}
        [ui/table-row {:selectable false :display-border false}
-        [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "70px"}} (get row :ote.db.transport-service/id)]
         [ui/table-row-column
          [:a {:href "#" :on-click  #(do
                                       (.preventDefault %)
@@ -98,7 +97,6 @@
        [ui/table-header {:adjust-for-checkbox false
                          :display-select-all false}
         [ui/table-row {:selectable false}
-         [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "10px"}} "Id"]
          [ui/table-header-column (tr [:front-page :table-header-service-name])]
          [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-service-url])]
          [ui/table-header-column {:class "hidden-xs "} (tr [:front-page :table-header-NAP-status])]
@@ -107,7 +105,6 @@
          [ui/table-header-column (tr [:front-page :table-header-actions])]]]
 
        (transport-services-table-rows e! services transport-operator-id)]]]))
-
 
 (defn warn-about-test-server []
   (let [page-url (-> (.-location js/window))]
