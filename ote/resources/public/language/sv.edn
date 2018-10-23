@@ -1252,7 +1252,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :error {:no-such-user "Okänd konto"
           :incorrect-password "Fel lösenord"}
 
-  :check-email-for-link "Återställningskoden har skickats per e-post."
+  :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
 
  :register
