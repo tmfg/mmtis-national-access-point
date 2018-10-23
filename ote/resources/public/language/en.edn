@@ -790,6 +790,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-pre-notices-sent "The selected transport operator has not sent any reports of change in regular scheduled passenger transport."
   :sent-pre-notices "Sent reports of change"
   :no-pre-notices "No reports of change created"
+  :only-for-authorities "Change notifications are for official use only."
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Regions"
@@ -1247,7 +1248,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :error {:no-such-user "Unknown user"
           :incorrect-password "Incorrect password"}
 
-  :check-email-for-link "Please check your inbox for a reset code."
+  :check-email-for-link "Your request for changing password has been received. A link for resetting your password has now been sent to your email address."
   :logged-out "You have been logged out."}
 
  :register
