@@ -114,32 +114,40 @@
 
 (defn- list-service-companies [service-companies service-search]
   (when (seq service-companies)
-    (let [searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
+    (let [company-list-max-size 3
+          service-company-count (count service-companies)
+          searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
           found-business-ids (keep (fn [sc]
                                      (let [s (keep #(when (= (::t-service/business-id sc) %) sc) searched-business-ids)]
                                        (when (not (empty? s)) (first s))))
                                    service-companies)
           presented-companies-count (if (not (empty? found-business-ids))
                                       (count found-business-ids)
-                                      2)
-          extra-companies (- (count service-companies) presented-companies-count)]
+                                      company-list-max-size)
+          extra-companies (- service-company-count presented-companies-count)]
       [:div
        [:h4 (tr [:service-search :other-involved-companies])]
+       ;; Show searched companies or list involved companies
        (if (not (empty? found-business-ids))
-         (doall (for [c found-business-ids]
-                  (when (::t-service/name c)
-                    [:div.row (merge {:key (::t-service/business-id c)}
-                                     (stylefy/use-style style/simple-result-card-row))
-                     (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))
-         (doall
-           (for [c (take 2 service-companies)]
-             (when (::t-service/name c)
-               [:div.row (merge {:key (::t-service/business-id c)}
-                                (stylefy/use-style style/simple-result-card-row))
-                (str (::t-service/name c) " (" (::t-service/business-id c) ")")]))))
-       (when (> extra-companies 0)
-         [:div.row (stylefy/use-style style/simple-result-card-row)
-          (str " + " extra-companies (tr [:service-search :other-company]))])])))
+         [:div
+          (doall (for [c found-business-ids]
+                   (when (::t-service/name c)
+                     [:div.row (merge {:key (::t-service/business-id c)}
+                                      (stylefy/use-style style/simple-result-card-row))
+                      (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))
+          (when (> extra-companies 0)
+            [:div.row (stylefy/use-style style/simple-result-card-row)
+             (str " + " extra-companies (tr [:service-search :other-company]))])]
+         ;; List only three or show company count
+         (if (> service-company-count company-list-max-size)
+           [:div.row (stylefy/use-style style/simple-result-card-row)
+            (str service-company-count (tr [:service-search :other-company]))]
+           (doall
+             (for [c (take company-list-max-size service-companies)]
+               (when (::t-service/name c)
+                 [:div.row (merge {:key (::t-service/business-id c)}
+                                  (stylefy/use-style style/simple-result-card-row))
+                  (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))))])))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
