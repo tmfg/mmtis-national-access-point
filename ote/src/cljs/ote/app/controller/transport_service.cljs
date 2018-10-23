@@ -434,6 +434,7 @@
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
+              (update-in [key ::t-service/external-interfaces] dissoc :eif-validation-timeout)
               transform-save-by-type)]
 
       ;; Disable post if concurrent save event is in progress

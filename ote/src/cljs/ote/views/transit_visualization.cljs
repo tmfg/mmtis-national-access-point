@@ -491,9 +491,7 @@
    (when (seq diff)
      [change-icons diff true])])
 
-(defn route-service-calendar [e! {:keys [date->hash hash->color
-                                         show-previous-year? show-next-year?
-                                         compare open-sections]}]
+(defn route-service-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
      [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
@@ -506,10 +504,7 @@
                                         :margin-bottom "1rem"}))
         [ui/checkbox {:label "Näytä myös edellinen vuosi"
                       :checked show-previous-year?
-                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]
-        [ui/checkbox {:label "Näytä myös tuleva vuosi"
-                      :checked show-next-year?
-                      :on-check #(e! (tv/->ToggleShowNextYear))}]]]
+                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]]]
       [:div.route-service-calendar-content
 
 
@@ -521,8 +516,7 @@
                                            :years (vec (concat (when show-previous-year?
                                                                  [(dec current-year)])
                                                                [current-year]
-                                                               (when show-next-year?
-                                                                 [(inc current-year)])))
+                                                               [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
                                                                hash (date->hash d)
                                                                hash-color (hash->color hash)]
