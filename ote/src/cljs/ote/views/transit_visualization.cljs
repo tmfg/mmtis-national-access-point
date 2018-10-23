@@ -530,11 +530,13 @@
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
                                                                hash (date->hash d)
                                                                hash-color (hash->color hash)]
-                                                           (if (= 2 (get compare :last-selected-date 2))
-                                                             (style/date1-highlight-style hash-color
-                                                                                          style/date1-highlight-color-hover)
-                                                             (style/date2-highlight-style hash-color
-                                                                                          style/date2-highlight-color-hover)))}]
+                                                           (when-not (or (= (time/format-date-iso-8601 (:date1 compare)) d)
+                                                                         (= (time/format-date-iso-8601 (:date2 compare)) d))
+                                                             (if (= 2 (get compare :last-selected-date 2))
+                                                               (style/date1-highlight-style hash-color
+                                                                                            style/date1-highlight-color-hover)
+                                                               (style/date2-highlight-style hash-color
+                                                                                            style/date2-highlight-color-hover))))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))
