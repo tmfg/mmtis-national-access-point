@@ -38,6 +38,7 @@
     ::t-service/name
     ::t-service/type
     ::modification/created
+    ::modification/modified
     ::t-service/published?
     ::t-service/transport-operator-id
     ::t-service/contact-phone

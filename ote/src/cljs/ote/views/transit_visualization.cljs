@@ -72,18 +72,14 @@
       :color "rgb (0, 255, 255)"
       :transition "box-shadow 0.25s"
       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-     (when (and prev-week-hash #_next-week-hash hash
-                (not= hash prev-week-hash)
-                #_(not= prev-week-hash next-week-hash))
+     (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
        {:box-shadow "inset 0 0 0 1px black,
                      inset 0 0 0 2px transparent"})
      (cond (= (time/format-date-iso-8601 date1) d)
            (style/date1-highlight-style hash-color)
 
            (= (time/format-date-iso-8601 date2) d)
-           (style/date2-highlight-style hash-color))
-     #_(when (:hash highlight)
-        (highlight-style hash->color date->hash day highlight)))))
+           (style/date2-highlight-style hash-color)))))
 
 (defn hover-day [e! date->hash day]
   (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
@@ -495,9 +491,7 @@
    (when (seq diff)
      [change-icons diff true])])
 
-(defn route-service-calendar [e! {:keys [date->hash hash->color
-                                         show-previous-year? show-next-year?
-                                         compare open-sections]}]
+(defn route-service-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
      [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
@@ -510,10 +504,7 @@
                                         :margin-bottom "1rem"}))
         [ui/checkbox {:label "Näytä myös edellinen vuosi"
                       :checked show-previous-year?
-                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]
-        [ui/checkbox {:label "Näytä myös tuleva vuosi"
-                      :checked show-next-year?
-                      :on-check #(e! (tv/->ToggleShowNextYear))}]]]
+                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]]]
       [:div.route-service-calendar-content
 
 
@@ -525,16 +516,17 @@
                                            :years (vec (concat (when show-previous-year?
                                                                  [(dec current-year)])
                                                                [current-year]
-                                                               (when show-next-year?
-                                                                 [(inc current-year)])))
+                                                               [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
                                                                hash (date->hash d)
                                                                hash-color (hash->color hash)]
-                                                           (if (= 2 (get compare :last-selected-date 2))
-                                                             (style/date1-highlight-style hash-color
-                                                                                          style/date1-highlight-color-hover)
-                                                             (style/date2-highlight-style hash-color
-                                                                                          style/date2-highlight-color-hover)))}]
+                                                           (when-not (or (= (time/format-date-iso-8601 (:date1 compare)) d)
+                                                                         (= (time/format-date-iso-8601 (:date2 compare)) d))
+                                                             (if (= 2 (get compare :last-selected-date 2))
+                                                               (style/date1-highlight-style hash-color
+                                                                                            style/date1-highlight-color-hover)
+                                                               (style/date2-highlight-style hash-color
+                                                                                            style/date2-highlight-color-hover))))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))

@@ -337,10 +337,7 @@
         (assoc-in [:transit-visualization :compare :differences]
                   (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
                                        :gtfs/trip-stop-sequence-changes
-                                       :gtfs/trip-stop-time-changes}))
-        ;; Show next year in calendar, if date2 is in next year.
-        (assoc-in [:transit-visualization :show-next-year?]
-                  (> (time/year date2) (time/year (time/now)))))))
+                                       :gtfs/trip-stop-time-changes})))))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
@@ -369,10 +366,6 @@
 
 (define-event ToggleShowPreviousYear []
   {:path [:transit-visualization :show-previous-year?]}
-  (not app))
-
-(define-event ToggleShowNextYear []
-  {:path [:transit-visualization :show-next-year?]}
   (not app))
 
 (define-event ToggleSection [section]
