@@ -797,6 +797,7 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
   :no-pre-notices-sent "Den valda tjänsteproducenten har inte skickat några meddelanden om ändring i regelbunden persontrafik till mundigheterna."
   :sent-pre-notices "Skickade ändringsmeddelanden"
   :no-pre-notices "Inga ändringsmeddelanden"
+  :only-for-authorities "Ändringsmeddelanden är endast för officiell användning."
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Landskap"

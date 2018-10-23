@@ -795,6 +795,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
   :sent-pre-notices "Lähetetyt muutosilmoitukset"
   :no-pre-notices "Ei muutosilmoituksia"
+  :only-for-authorities "Muutosilmoitukset ovat vain viranomaiskäyttöön."
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Maakunta"
