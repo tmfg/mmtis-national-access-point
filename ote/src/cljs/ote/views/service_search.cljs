@@ -292,7 +292,8 @@
                          ;; No filter, back-end returns what we want
                          :filter (constantly true)
                          :suggestions-config {:text :operator :value :business-id}
-                         :suggestions (:results data)
+                         ;; Filter away transport-operators that have no business-id. (Note: It should be mandatory!)
+                         :suggestions (filter :business-id (:results data))
                          :open-on-focus? true
                          :on-update-input #(e! (ss/->SetOperatorName %))
                          ;; Select first match from autocomplete filter result list after pressing enter
