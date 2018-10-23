@@ -138,7 +138,7 @@
             [:div.row (stylefy/use-style style/simple-result-card-row)
              (str " + " extra-companies (tr [:service-search :other-company]))])]
          ;; List only three or show company count
-         (if (> (count service-companies) 3)
+         (if (> (count service-companies) company-list-size)
            [:div.row (stylefy/use-style style/simple-result-card-row)
             (str (count service-companies) (tr [:service-search :other-company]))]
            (doall
