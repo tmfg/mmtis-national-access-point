@@ -72,18 +72,14 @@
       :color "rgb (0, 255, 255)"
       :transition "box-shadow 0.25s"
       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-     (when (and prev-week-hash #_next-week-hash hash
-                (not= hash prev-week-hash)
-                #_(not= prev-week-hash next-week-hash))
+     (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
        {:box-shadow "inset 0 0 0 1px black,
                      inset 0 0 0 2px transparent"})
      (cond (= (time/format-date-iso-8601 date1) d)
            (style/date1-highlight-style hash-color)
 
            (= (time/format-date-iso-8601 date2) d)
-           (style/date2-highlight-style hash-color))
-     #_(when (:hash highlight)
-        (highlight-style hash->color date->hash day highlight)))))
+           (style/date2-highlight-style hash-color)))))
 
 (defn hover-day [e! date->hash day]
   (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
