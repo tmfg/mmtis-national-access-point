@@ -24,9 +24,7 @@
     seconds: 10
 
 - name: Install required packages
-  yum: name={{item}} state=installed
-  with_items:
-    - java-1.8.0-openjdk
+  yum: name=[u'java-1.8.0-openjdk'] state=installed
 
 - name: Create OTE app folder
   file: path=/opt/ote state=directory owner=napote group=napote
