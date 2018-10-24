@@ -1,5 +1,5 @@
 - name: Gathering ec2 facts
-  action: ec2_facts
+  action: ec2_metadata_facts
 
 - name: Fetch ALB Target group ARN
   delegate_to: 127.0.0.1
