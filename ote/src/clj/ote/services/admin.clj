@@ -139,6 +139,9 @@
                                                 :db-error         (when db-error true)
                                                 :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}))))
 
+(defn- list-sea-routes [db user query]
+  (vec (search-sea-routes db {:operator-name (str "%" query "%")})))
+
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
     (map #(first (groups %)) (distinct (map f coll)))))
@@ -235,7 +238,9 @@
 
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
-    (POST "/admin/interfaces" req (admin-service "interfaces-by-operator" req db #'list-interfaces))
+    (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
+
+    (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db
