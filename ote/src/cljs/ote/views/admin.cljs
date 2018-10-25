@@ -21,7 +21,8 @@
             [ote.views.admin.reports :as report-view]
             [ote.views.admin.users :as users]
             [ote.views.admin.service-list :as service-list]
-            [ote.ui.page :as page]))
+            [ote.ui.page :as page]
+            [ote.views.admin.sea-routes :as sea-routes]))
 
 (def id-filter-type [:operators :services :ALL])
 
@@ -224,14 +225,14 @@
                [ui/table-row-column {:width "8%" :style services-row-style} (if (= "service" source) "Palvelu" "Palveluntuottaja")]]))]]]]
        [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
-
 (defn admin-panel [e! app]
   (let [tabs [{:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
               {:label "Palveluntuottajat" :value "operators"}
               {:label "Rajapinnat" :value "interfaces"}
-              {:label "CSV Raportit" :value "reports"}]]
+              {:label "CSV Raportit" :value "reports"}
+              {:label "Merireitit" :value "sea-routes"}]]
     [:div
      [page/page-controls "" "Ylläpitopaneeli"
 
@@ -246,5 +247,6 @@
         "operators" [operator-list e! app]
         "interfaces" [interfaces/interface-list e! app]
         "reports" [report-view/reports  e! app]
+        "sea-routes" [sea-routes/sea-routes e! app]
         ;;default
         [users/user-listing e! app])]]))
