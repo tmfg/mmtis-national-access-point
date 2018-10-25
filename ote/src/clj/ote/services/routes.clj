@@ -105,15 +105,23 @@
 
 (defn get-route
   "Get single route by id"
-  [db id]
-  (let [route (-> (fetch db ::transit/route
-                         (specql/columns ::transit/route)
-                         {::transit/id id})
-                  first
-                  (update ::transit/service-calendars (flip mapv) transit/service-calendar-date-fields)
-                  (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))]
-    (log/debug  "**************** route" (pr-str route))
-    route))
+  [db user route-id]
+  (authorization/with-transport-operator-check
+    db user
+    (::transit/transport-operator-id (first
+                                       (fetch db ::transit/route
+                                              #{::transit/transport-operator-id}
+                                              {::transit/id route-id})))
+    (fn []
+      (tx/with-transaction
+        db
+        (let [route (-> (fetch db ::transit/route
+                               (specql/columns ::transit/route)
+                               {::transit/id route-id})
+                        first
+                        (update ::transit/service-calendars (flip mapv) transit/service-calendar-date-fields)
+                        (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))]
+          route)))))
 
 (defn delete-route!
   "Delete single route by id"
@@ -142,11 +150,12 @@
       (http/transit-response
         (save-route nap-config db user (http/transit-request form-data))))
 
-    (GET "/routes/:id" [id]
-      (let [route (get-route db (Long/parseLong id))]
-        (if-not route
-          {:status 404}
-          (http/no-cache-transit-response route))))
+    (GET "/routes/:id" [id :as {user :user}]
+      (let [route (get-route db user (Long/parseLong id))]
+        (cond
+          (not route) {:status 404}
+          (= "Forbidden" (:body route)) route
+          :else (http/no-cache-transit-response route))))
 
     (POST "/routes/delete" {form-data :body
                             user      :user}
