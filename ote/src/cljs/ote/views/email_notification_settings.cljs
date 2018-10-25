@@ -39,7 +39,7 @@
 (defn email-notification-settings-form [e! state]
   (let [form-data (get-in state [:email-settings :user-notifications])]
     [:div
-     [:h1 (tr [:email-notification-settings-page :page-title])]
+     [ote.ui.list-header/header state (tr [:email-notification-settings-page :page-title])]
      [:p {:style {:padding-top "20px"}} (tr [:email-notification-settings-page :page-description])]
      [:h2 {:style {:padding-top "20px"}} (tr [:email-notification-settings-page :page-secondary-header])]
      [:p (tr [:email-notification-settings-page :regions-description-text])]
