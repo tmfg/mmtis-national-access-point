@@ -22,7 +22,8 @@
             [ote.db.modification :as modification]
             [ote.access-rights :as access]
             [clojure.string :as str]
-            [ote.nap.ckan :as ckan])
+            [ote.nap.ckan :as ckan]
+            [clojure.set :as set])
   (:import (java.time LocalTime)
            (java.sql Timestamp)))
 
@@ -57,22 +58,24 @@
                                                                db {:id (::t-operator/ckan-group-id operator)})
                                                              "")))))))
 
-(def transport-services-columns
-  #{::t-service/id
-    ::t-service/transport-operator-id
-    ::t-service/name
-    ::t-service/type
-    ::t-service/sub-type
-    ::t-service/published?
-    ::modification/created
-    ::modification/modified})
+(def transport-services-column-keys
+  {:id ::t-service/id
+    :transport-operator-id ::t-service/transport-operator-id
+    :name ::t-service/name
+    :type ::t-service/type
+    :sub-type ::t-service/sub-type
+    :published? ::t-service/published?
+    :created ::modification/created
+    :modified ::modification/modified})
 
-(defn get-transport-services [db where]
+(defn get-transport-services
   "Return Vector of transport-services"
-  (fetch db ::t-service/transport-service
-                transport-services-columns
-                where
-                {::specql/order-by ::t-service/type ::specql/order-direction :desc}))
+  [db operators]
+  (let [services (fetch-transport-services db {:operator-ids operators})
+        ;; Add namespace for non namespaced keywords because sql query returns values without namespace
+        modified-services (mapv (fn [x] (set/rename-keys x transport-services-column-keys)) services)]
+    ;; For some reason type must be a keyword and query returns it as a string so make it keyword.
+    (mapv #(update % ::t-service/type keyword) modified-services)))
 
 (defn get-transport-service
   "Get single transport service by id"
@@ -115,7 +118,7 @@
 (defn get-user-transport-operators-with-services [db groups user]
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
-        operator-services (get-transport-services db {::t-service/transport-operator-id (op/in operator-ids)})]
+        operator-services (get-transport-services db operator-ids)]
     {:user (dissoc user :apikey :id)
      :transport-operators
      (map (fn [{id ::t-operator/id :as operator}]
@@ -127,7 +130,7 @@
 
 (defn get-transport-operator-data [db {:keys [title id] :as ckan-group} user]
   (let [transport-operator (get-transport-operator db {::t-operator/ckan-group-id (:id ckan-group)})
-        transport-services-vector (get-transport-services db {::t-service/transport-operator-id (::t-operator/id transport-operator)})
+        transport-services-vector (get-transport-services db transport-operator)
         ;; Clean up user data
         cleaned-user (dissoc user
                              :apikey
@@ -193,7 +196,7 @@
      update-transport-operator) nap-config db user data))
 
 (defn ensure-bigdec [value]
-      (when (not (nil? value )) (bigdec value)))
+  (when (not (nil? value )) (bigdec value)))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
@@ -350,55 +353,55 @@
   [db nap-config]
   (routes
 
-   (GET "/transport-service/:id" [id]
-        (let [ts (get-transport-service db (Long/parseLong id))]
-          (if-not ts
-            {:status 404}
-            (http/no-cache-transit-response ts))))
+    (GET "/transport-service/:id" [id]
+      (let [ts (get-transport-service db (Long/parseLong id))]
+        (if-not ts
+          {:status 404}
+          (http/no-cache-transit-response ts))))
 
-   (GET "/t-operator/:id" [id :as {user :user}]
-     (let [to (edit-transport-operator db user (Long/parseLong id))]
-       (if-not to
-         {:status 404}
-         (http/no-cache-transit-response to))))
+    (GET "/t-operator/:id" [id :as {user :user}]
+      (let [to (edit-transport-operator db user (Long/parseLong id))]
+        (if-not to
+          {:status 404}
+          (http/no-cache-transit-response to))))
 
-   (POST "/transport-operator/group" {user :user}
-     (http/transit-response
-       (get-transport-operator db {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
+    (POST "/transport-operator/group" {user :user}
+      (http/transit-response
+        (get-transport-operator db {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
 
-   (POST "/transport-operator/data" {user :user}
-         (http/transit-response
-           (get-user-transport-operators-with-services db (:groups user) (:user user))))
+    (POST "/transport-operator/data" {user :user}
+      (http/transit-response
+        (get-user-transport-operators-with-services db (:groups user) (:user user))))
 
-   (POST "/transport-operator" {form-data :body
-                                user :user}
-         (http/transit-response
-          (save-transport-operator nap-config db user
-                                   (http/transit-request form-data))))
+    (POST "/transport-operator" {form-data :body
+                                 user      :user}
+      (http/transit-response
+        (save-transport-operator nap-config db user
+                                 (http/transit-request form-data))))
 
-   (POST "/transport-service" {form-data :body
-                               user :user}
-         (save-transport-service-handler nap-config db user (http/transit-request form-data)))
+    (POST "/transport-service" {form-data :body
+                                user      :user}
+      (save-transport-service-handler nap-config db user (http/transit-request form-data)))
 
-   (POST "/transport-service/delete" {form-data :body
-                                      user :user}
-        (http/transit-response
-         (delete-transport-service! nap-config db user
-                                    (:id (http/transit-request form-data)))))
+    (POST "/transport-service/delete" {form-data :body
+                                       user      :user}
+      (http/transit-response
+        (delete-transport-service! nap-config db user
+                                   (:id (http/transit-request form-data)))))
 
-   (POST "/transport-operator/delete" {form-data :body
-                                       user :user}
-     (http/transit-response
-       (delete-transport-operator! nap-config db user
-                                   (:id (http/transit-request form-data)))))))
+    (POST "/transport-operator/delete" {form-data :body
+                                        user      :user}
+      (http/transit-response
+        (delete-transport-operator! nap-config db user
+                                    (:id (http/transit-request form-data)))))))
 
 (defn- transport-routes
   "Unauthenticated routes"
   [db nap-config]
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
-         (http/transit-response
-          (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
+      (http/transit-response
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
 
 (defrecord Transport [nap-config]
   component/Lifecycle
