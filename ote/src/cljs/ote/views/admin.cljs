@@ -67,18 +67,20 @@
                            :update! #(e! (admin-controller/->EnsureServiceOperatorId id %))}
         (:ensured-id operator)]]])])
 
-(defn operator-list [e! app]
-  (let [{:keys [loading? results operator-filter]} (get-in app [:admin :operator-list])]
-    [:div.row
-     [:div.row.col-md-12
-      [form-fields/field {:type :string :label "Hae palveluntuottajan nimellä tai sen osalla"
-                          :update! #(e! (admin-controller/->UpdateOperatorFilter %))}
-       operator-filter]
+(defn operator-page-controls [e! app]
+  [:div.row
+   [form-fields/field {:type :string
+                       :label "Hae palveluntuottajan nimellä tai sen osalla"
+                       :update! #(e! (admin-controller/->UpdateOperatorFilter %))
+                       :on-enter #(e! (admin-controller/->SearchOperators))}
+    (get-in app [:admin :operator-list :operator-filter])]
+   [ui/raised-button {:primary true
+                      :disabled (str/blank? filter)
+                      :on-click #(e! (admin-controller/->SearchOperators))
+                      :label "Hae palveluntuottajia"}]])
 
-      [ui/raised-button {:primary true
-                         :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->SearchOperators))
-                         :label "Hae palveluntuottajia"}]]
+(defn operator-list [e! app]
+  (let [{:keys [loading? results]} (get-in app [:admin :operator-list])]
      [:div.row
       (when loading?
         [:span "Ladataan palveluntuottajia..."])
@@ -130,7 +132,7 @@
                                                                                            (.preventDefault %)
                                                                                            (e! (fp/->ChangePage :transport-operator {:id id})))}
                                                               [ic/content-create]]
-                 [delete-transport-operator-action e! result]]]))]]])]]))
+                 [delete-transport-operator-action e! result]]]))]]])]))
 
 (def services-row-style {:height "20px" :padding "0 0 0px 1px"})
 
@@ -163,25 +165,27 @@
                     :line-height "48px"}}
       "Ei palveluja."])])
 
-(defn business-id-report [e! app]
-  (let [{:keys [loading? business-id-filter results]} (get-in app [:admin :business-id-report])]
-    [:div
-     [:div.row
-      [:h1 "Y-tunnus raportti"]
-      [:p "Listataan joko Palveluntuottajien y-tunnukset, palveluihin lisättyjen yritysten y-tunnukset tai molemmat.
+(defn business-id-page-controls [e! app]
+  [:div
+   [:div.row
+    [:p "Listataan joko Palveluntuottajien y-tunnukset, palveluihin lisättyjen yritysten y-tunnukset tai molemmat.
        Palveluista mukaan on otettu vain jo julkaistut palvelut."]]
-     [:div.row
-      [form-fields/field {:type :selection
-                          :label "Y-tunnuksen lähde"
-                          :options id-filter-type
-                          :show-option (tr-key [:admin-page :business-id-filter])
-                          :update! #(e! (admin-controller/->UpdateBusinessIdFilter %))}
-       business-id-filter]
-      [ui/raised-button {:label "Hae raportti"
-                         :primary true
-                         :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->GetBusinessIdReport))}]]
+   [:div.row
+    [form-fields/field {:type        :selection
+                        :label       "Y-tunnuksen lähde"
+                        :options     id-filter-type
+                        :show-option (tr-key [:admin-page :business-id-filter])
+                        :update!     #(e! (admin-controller/->UpdateBusinessIdFilter %))
+                        :on-enter    #(e! (admin-controller/->GetBusinessIdReport))}
+     (get-in app [:admin :business-id-report :business-id-filter])]
+    [ui/raised-button {:label    "Hae raportti"
+                       :primary  true
+                       :disabled (str/blank? filter)
+                       :on-click #(e! (admin-controller/->GetBusinessIdReport))}]]])
 
+(defn business-id-report [e! app]
+  (let [{:keys [loading? results]} (get-in app [:admin :business-id-report])]
+    [:div
      (when loading?
        [:div.row "Ladataan raporttia..."])
 
@@ -226,21 +230,34 @@
        [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn admin-panel [e! app]
-  (let [tabs [{:label "Käyttäjä" :value "users"}
+  (let [page (:page app)
+        tabs [{:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
               {:label "Palveluntuottajat" :value "operators"}
               {:label "Rajapinnat" :value "interfaces"}
               {:label "CSV Raportit" :value "reports"}
-              {:label "Merireitit" :value "sea-routes"}]]
+              {:label "Merireitit" :value "sea-routes"}]
+        selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
     [:div
      [page/page-controls "" "Ylläpitopaneeli"
-
       [:div {:style {:padding-bottom "20px"}}
        [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))
-                        :selected-tab (get-in app [:admin :tab :admin-page])}]]]
+                        :selected-tab (get-in app [:admin :tab :admin-page])}]
+      ;; Show search parameters in page-controls section
+      (when (= "users" selected-tab)
+        [users/users-page-controls e! app])
+      (when (= "services" selected-tab)
+        [service-list/service-list-page-controls e! app])
+      (when (= "businessid" selected-tab)
+        [business-id-page-controls e! app])
+      (when (= "operators" selected-tab)
+        [operator-page-controls e! app])
+      (when (= "sea-routes" selected-tab)
+        [sea-routes/sea-routes-page-controls e! app])
+       ]]
      [:div.container {:style {:margin-top "20px"}}
-      (case (get-in app [:admin :tab :admin-page])
+      (case selected-tab
         "users" [users/user-listing e! app]
         "services" [service-list/service-listing e! app]
         "businessid" [business-id-report e! app]

@@ -11,26 +11,26 @@
             [ote.app.controller.front-page :as fp]
             [ote.ui.form-fields :as form-fields]))
 
+(defn sea-routes-page-controls [e! app]
+  [:div.row {:style {:padding-top "20px"}}
+   [form-fields/field {:update!         #(e! (admin-controller/->UpdateSeaRouteFilters %))
+                       :on-enter        #(e! (admin-controller/->SearchSeaRoutes))
+                       :name            :operator-name
+                       :label           "Palveluntuottaja"
+                       :type            :string
+                       :hint-text       "Palveluntuottajan nimi tai sen osa"
+                       :container-class "col-xs-12 col-sm-4 col-md-4"}
+    (get-in app [:admin :sea-routes :filters])]
+
+   [ui/raised-button {:primary  true
+                      :disabled (str/blank? filter)
+                      :on-click #(e! (admin-controller/->SearchSeaRoutes))
+                      :label    "Hae merireitit"}]])
+
 (defn sea-routes [e! app]
   (let [{:keys [loading? results filters]}
         (get-in app [:admin :sea-routes])
         loc (.-location js/document)]
-    [:div.row
-     [:div.row.col-md-12 {:style {:padding-top "20px"}}
-      [form-fields/field {:update!         #(e! (admin-controller/->UpdateSeaRouteFilters %))
-                          :name            :operator-name
-                          :label           "Palveluntuottaja"
-                          :type            :string
-                          :hint-text       "Palveluntuottajan nimi tai sen osa"
-                          :full-width?     true
-                          :container-class "col-xs-12 col-sm-4 col-md-4"}
-       filters]
-
-      [ui/raised-button {:primary  true
-                         :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->SearchSeaRoutes))
-                         :label    "Hae merireitit"}]]
-
      [:div.row {:style {:padding-top "40px"}}
       (when loading?
         [:span "Ladataan merireittejä..."])
@@ -62,4 +62,4 @@
                 [ui/table-row-column {:style {:width "20%"}}
                  [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
                      "export/gtfs/" operator-id)}
-                  "Lataa gtfs"]]]))]]])]]))
+                  "Lataa gtfs"]]]))]]])]))
