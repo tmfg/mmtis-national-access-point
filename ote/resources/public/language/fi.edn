@@ -952,6 +952,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :minutes-placeholder "mm"
 
   :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."
+  :forbidden "Käyttöoikeutesi eivät riitä sisällön katseluun."
 
   :nap-data-license (:md "Tälle lomakkeelle täytetyt tiedot julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")
 
