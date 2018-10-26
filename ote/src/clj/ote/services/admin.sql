@@ -64,7 +64,7 @@ i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "imp
 -- name: search-sea-routes
 -- Find sea routes that are created using OTE's sea route editor
 SELECT op.id AS "operator-id", op.name AS "operator-name", tr.id AS "route-id",
-       array_to_string(tr.name, ',') AS "route-name", tr."published?"
+       array_to_string(tr.name, ';') AS "route-name", tr."published?"
   FROM "transport-operator" as op, "transit_route" as tr
  WHERE tr."transport-operator-id" = op.id
    AND op.name ilike :operator-name;
