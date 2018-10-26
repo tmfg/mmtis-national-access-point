@@ -17,15 +17,16 @@
 (defn service-list-page-controls [e! app]
   [:div.row
    [:div.row.col-md-5
-    [form-fields/field {:type    :string :label "Hae palvelun nimellä tai sen osalla"
-                        :update! #(e! (admin-controller/->UpdateServiceFilter %))}
+    [form-fields/field {:type    :string
+                        :label "Hae palvelun nimellä tai sen osalla"
+                        :update! #(e! (admin-controller/->UpdateServiceFilter %))
+                        :on-enter #(e! (admin-controller/->SearchServices))}
      (get-in app [:admin :service-listing :service-filter])]
 
     [ui/raised-button {:label    "Hae"
                        :primary  true
                        :disabled (str/blank? filter)
-                       :on-click #(e! (admin-controller/->SearchServices))
-                       :on-enter #(e! (admin-controller/->SearchServicesByOperator))}]]
+                       :on-click #(e! (admin-controller/->SearchServices))}]]
    [:div.col-md-5
 
     [form-fields/field {:type    :string :label "Hae palveluntuottajan nimellä tai sen osalla"
