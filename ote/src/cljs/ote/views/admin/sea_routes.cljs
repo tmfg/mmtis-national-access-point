@@ -6,10 +6,15 @@
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :refer [linkify]]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.ui.form :as form]
+            [ote.localization :refer [selected-language]]
             [ote.app.controller.front-page :as fp]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.db.transport-service :as t-service]))
+
+(defn- localized-string->array [route-name]
+  (let [r (str/split route-name ";")
+        r-array (map #(str/split (str/replace % #"\(|\"|\)" "") ",") r)]
+    r-array))
 
 (defn sea-routes-page-controls [e! app]
   [:div.row {:style {:padding-top "20px"}}
@@ -57,7 +62,8 @@
                                                                   :on-click #(do
                                                                                (.preventDefault %)
                                                                                (e! (admin-controller/->ChangeRedirectTo :admin))
-                                                                               (e! (fp/->ChangePage :edit-route {:id route-id})))} route-name]]
+                                                                               (e! (fp/->ChangePage :edit-route {:id route-id})))}
+                                                              (t-service/localized-text-without-namespace @selected-language (localized-string->array route-name))]]
                 [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei") ]
                 [ui/table-row-column {:style {:width "20%"}}
                  [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
