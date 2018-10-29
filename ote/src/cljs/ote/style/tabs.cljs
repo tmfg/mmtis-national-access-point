@@ -5,7 +5,7 @@
 
 
 (def tab {:font-weight "bold"
-          :font-size "1em"
+          :font-size "1rem"
           :white-space "nowrap"
           :text-align "center"
           :padding "10px 20px 10px 20px"
