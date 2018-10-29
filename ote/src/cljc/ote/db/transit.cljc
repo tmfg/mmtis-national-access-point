@@ -34,7 +34,8 @@
   ["transit_stop_time" ::stop-time]
   ["transit_trip" ::trip]
   ["transit_route" ::route
-   ote.db.modification/modification-fields]
+   ote.db.modification/modification-fields
+   {::operator (specql.rel/has-one ::transport-operator-id :ote.db.transport-operator/transport-operator :ote.db.transport-operator/id)}]
 
   ["finnish_ports" ::finnish-ports
    ote.db.modification/modification-fields]

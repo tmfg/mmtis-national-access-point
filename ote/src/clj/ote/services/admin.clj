@@ -12,6 +12,7 @@
             [ote.db.auditlog :as auditlog]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]
             [ote.services.operators :as operators]
@@ -140,7 +141,10 @@
                                                 :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}))))
 
 (defn- list-sea-routes [db user query]
-  (vec (search-sea-routes db {:operator-name (str "%" query "%")})))
+  (specql/fetch db ::transit/route
+                #{::transit/id ::transit/transport-operator-id ::transit/name ::transit/published?
+                  [::transit/operator #{::t-operator/name}]}
+                {::transit/operator {::t-operator/name (op/ilike (str "%" query "%"))}}))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
