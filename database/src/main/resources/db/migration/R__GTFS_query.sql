@@ -425,14 +425,18 @@ DECLARE
   date_hash bytea;
 BEGIN
 
-  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign", digest(d.times, 'sha256'))::"gtfs-route-hash")
+
+  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign",
+                       digest(d.times, 'sha256'))::"gtfs-route-hash"
+                   ORDER BY d."route-short-name",d."route-long-name",d."trip-headsign")
     INTO route_hashes
     FROM (SELECT x."route-short-name",x."route-long-name",x."trip-headsign",
-                 string_agg(concat(x."stop-name", '@', x."departure-time"), '->') as times
+                 string_agg(x.trip_times, ',' ORDER BY x.trip_times) as times
             FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
                          COALESCE(trip."trip-headsign",'') AS "trip-headsign",
-                         stops."departure-time", s."stop-name"
+                         string_agg(concat(s."stop-name",'@',stops."departure-time"), '->'
+                                    ORDER BY stops."stop-sequence") as trip_times
                     FROM "gtfs-trip" t
                     LEFT JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
                     LEFT JOIN LATERAL unnest(t.trips) trip ON TRUE
@@ -440,7 +444,7 @@ BEGIN
                     JOIN "gtfs-stop" s ON (s."package-id" = t."package-id" AND stops."stop-id" = s."stop-id")
                    WHERE t."package-id" = package_id
                      AND t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
-                   ORDER BY "route-short-name", "route-long-name", "trip-headsign", stops."trip-id", "stop-sequence") x
+                   GROUP BY "route-short-name", "route-long-name", "trip-headsign", stops."trip-id") x
     GROUP BY x."route-short-name",x."route-long-name",x."trip-headsign") d;
 
     SELECT digest(string_agg(rh.hash::text, ','), 'sha256')
