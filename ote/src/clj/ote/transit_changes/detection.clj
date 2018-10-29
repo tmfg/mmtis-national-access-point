@@ -70,7 +70,7 @@
     ;; If current week does not equal starting week...
     (and (not (week= starting-week-hash curr))
          ;; ...and traffic does not revert back to previous in two weeks
-         (not (week= prev next2)))
+         (not (week= starting-week-hash next2)))
     ;; this is a change
     (assoc state :different-week-hash curr)
 

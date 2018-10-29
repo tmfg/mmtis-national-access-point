@@ -39,7 +39,9 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; starting point
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7" ]} ; wednesday different
          {route-name ["h1" "h2" "h3" "!!" "h5" "h6" "h7" ]} ; thursday different
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})) ; back to normal
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ; back to normal
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest two-week-difference-is-skipped
   (is (nil?
