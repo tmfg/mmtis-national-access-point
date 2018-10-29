@@ -131,21 +131,11 @@
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) (str/upper-case (name language))) (::text %)) localized-text))
 
-(defn localized-without-namespace-text-for [language localized-text]
-  (some #(when (= (first %) (str/upper-case (name language))) (second %)) localized-text))
-
 (defn localized-text-with-fallback [language localized-text]
   (let [text (localized-text-for language localized-text)]
     (if (str/blank? text)
       (some #(when-not (str/blank? %) %)
             (map #(localized-text-for % localized-text) ["EN" "FI" "SV"]))
-      text)))
-
-(defn localized-text-without-namespace [default-language localized-text-array]
-  (let [text (localized-without-namespace-text-for default-language localized-text-array)]
-    (if (str/blank? text)
-      (some #(when-not (str/blank? %) %)
-            (map #(localized-text-for % localized-text-array) ["EN" "FI" "SV"]))
       text)))
 
 (def transportable-aid

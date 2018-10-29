@@ -616,7 +616,6 @@
 
   SaveRouteResponse
   (process-event [{response :response} app]
-    (.log js/console "Redirect to " (clj->js (:redirect-to app)))
     (if (:redirect-to app)
       (routes/navigate! (:redirect-to app))
       (routes/navigate! :routes))

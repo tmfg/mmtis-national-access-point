@@ -254,8 +254,7 @@
       (when (= "operators" selected-tab)
         [operator-page-controls e! app])
       (when (= "sea-routes" selected-tab)
-        [sea-routes/sea-routes-page-controls e! app])
-       ]]
+        [sea-routes/sea-routes-page-controls e! app])]]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
         "users" [users/user-listing e! app]

@@ -9,12 +9,9 @@
             [ote.localization :refer [selected-language]]
             [ote.app.controller.front-page :as fp]
             [ote.ui.form-fields :as form-fields]
-            [ote.db.transport-service :as t-service]))
-
-(defn- localized-string->array [route-name]
-  (let [r (str/split route-name ";")
-        r-array (map #(str/split (str/replace % #"\(|\"|\)" "") ",") r)]
-    r-array))
+            [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.transit :as transit]))
 
 (defn sea-routes-page-controls [e! app]
   [:div.row {:style {:padding-top "20px"}}
@@ -54,18 +51,18 @@
             ]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{:keys [route-id route-name operator-name operator-id published?] :as sea-route} results]
-               ^{:key (str "link_" route-id)}
+             (for [{::transit/keys [id name operator published?] :as sea-route} results]
+               ^{:key (str "link_" id)}
                [ui/table-row {:selectable false}
-                [ui/table-row-column {:style {:width "30%"}} operator-name]
+                [ui/table-row-column {:style {:width "30%"}} (::t-operator/name operator)]
                 [ui/table-row-column {:style {:width "40%"}} [:a {:href "#"
                                                                   :on-click #(do
                                                                                (.preventDefault %)
                                                                                (e! (admin-controller/->ChangeRedirectTo :admin))
-                                                                               (e! (fp/->ChangePage :edit-route {:id route-id})))}
-                                                              (t-service/localized-text-without-namespace @selected-language (localized-string->array route-name))]]
+                                                                               (e! (fp/->ChangePage :edit-route {:id id})))}
+                                                              (t-service/localized-text-with-fallback @selected-language name)]]
                 [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei") ]
                 [ui/table-row-column {:style {:width "20%"}}
                  [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                     "export/gtfs/" operator-id)}
+                     "export/gtfs/" (::t-operator/id operator))}
                   "Lataa gtfs"]]]))]]])]))
