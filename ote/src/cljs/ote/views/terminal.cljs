@@ -79,7 +79,8 @@
      :write #(assoc-in %1 [::t-service/assistance ::t-service/notification-requirements ::t-service/email] %2)
      :read (comp ::t-service/email ::t-service/notification-requirements ::t-service/assistance)
      :full-width? true
-     :container-class "col-xs-12 col-sm-6 col-md-3"}
+     :container-class "col-xs-12 col-sm-6 col-md-3"
+     :max-length 200}
     {:name ::t-service/assistance-url
      :type :string
      :write #(assoc-in %1 [::t-service/assistance ::t-service/notification-requirements ::t-service/url] %2)
@@ -103,7 +104,8 @@
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/accessibility-info-url
     :type :string
-    :full-width? true}
+    :full-width? true
+    :max-length 200}
 
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name        ::t-service/accessibility

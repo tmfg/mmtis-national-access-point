@@ -62,7 +62,8 @@
        :write  (fn [data url]
                  (assoc-in data [service-url-field ::t-service/url] url))
        :full-width? true
-       :container-class "col-xs-12 col-sm-6 col-md-6"}
+       :container-class "col-xs-12 col-sm-6 col-md-6"
+       :max-length 200}
 
       {:name ::t-service/description
        :type  :localized-text
@@ -188,7 +189,8 @@
                                          :required? true
                                          :full-width? true
                                          :update! #(update-form! %)
-                                         :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) (first format)))}
+                                         :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) (first format)))
+                                         :max-length 200}
                                         ;; For first row: If there is data in other fields, show this required field warning
                                         ;; For other rows, if this required field is missing, show the warning.
                                         (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
@@ -315,7 +317,8 @@
     :write (fn [data street]
              (assoc-in data [::t-service/contact-address ::common/street] street))
     :label (tr [:field-labels ::common/street])
-    :required? true}
+    :required? true
+    :max-length 128}
 
    {:name        ::common/postal_code
     :type        :string
@@ -337,12 +340,14 @@
     :write (fn [data post-office]
              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
     :label (tr [:field-labels ::common/post_office])
-    :required? true}
+    :required? true
+    :max-length 64}
 
    {:name        ::t-service/contact-email
     :type        :string
     :container-class "col-xs-12 col-sm-6 col-md-4"
-    :full-width?  true}
+    :full-width?  true
+    :max-length 200}
 
    {:name        ::t-service/contact-phone
     :type        :string
@@ -353,7 +358,8 @@
    {:name        ::t-service/homepage
     :type        :string
     :container-class "col-xs-12 col-sm-6 col-md-5"
-    :full-width?  true}))
+    :full-width?  true
+    :max-length 200}))
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
@@ -475,7 +481,8 @@
     :type           :string
     :full-width?    true
     :container-class "col-xs-12 col-sm-12 col-md-6"
-    :required?      true}
+    :required?      true
+    :max-length 200}
 
    {:name ::t-service/description
     :type :localized-text

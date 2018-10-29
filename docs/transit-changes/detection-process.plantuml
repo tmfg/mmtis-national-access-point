@@ -1,0 +1,18 @@
+@startuml
+
+participant "Detection process" as DEP
+participant "NAP DB" as DB
+
+
+group Background detection process
+DEP->DB: Fetch services for detection
+DB->DEP: Services
+loop For each service
+DEP->DB: Detect next changes for service
+end
+end
+
+
+
+
+@enduml

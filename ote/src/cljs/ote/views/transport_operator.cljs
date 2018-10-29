@@ -96,7 +96,8 @@
      :tooltip-length "large"}
     {:name ::t-operator/name
      :type :string
-     :required? true}
+     :required? true
+     :max-length 70}
 
     {:name ::t-operator/ckan-description
      :type :text-area
@@ -113,6 +114,7 @@
 
     {:name ::common/street
      :type :string
+     :max-length 128
      :read (comp ::common/street ::t-operator/visiting-address)
      :write (fn [data street]
               (assoc-in data [::t-operator/visiting-address ::common/street] street))}
@@ -126,12 +128,14 @@
 
     {:name :ote.db.common/post_office
      :type :string
+     :max-length 64
      :read (comp :ote.db.common/post_office :ote.db.transport-operator/visiting-address)
      :write (fn [data post-office]
               (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
 
     {:name ::t-operator/homepage
-       :type :string})
+     :type :string
+     :max-length 200})
 
    (form/group
     {:label (tr [:organization-page :contact-types])
@@ -141,7 +145,7 @@
 
     {:name ::t-operator/phone :type :string :regex ui-validation/phone-number-regex}
     {:name ::t-operator/gsm :type :string :regex ui-validation/phone-number-regex}
-    {:name ::t-operator/email :type :string})])
+    {:name ::t-operator/email :type :string :max-length 200})])
 
 (defn- operator-form-options [e!]
   {:name->label (tr-key [:field-labels])

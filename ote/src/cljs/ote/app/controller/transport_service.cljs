@@ -434,8 +434,10 @@
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
+              (update ::t-service/external-interfaces
+                       (fn [d]
+                         (mapv #(dissoc % :eif-validation-timeout) d)))
               transform-save-by-type)]
-
       ;; Disable post if concurrent save event is in progress
       (if (not (:service-save-in-progress app))
         (do

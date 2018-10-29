@@ -10,15 +10,15 @@
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
-  :ote.db.transport-operator/name                     "Tjästeproducentens namn"
+  :ote.db.transport-operator/name "Tjästeproducentens namn"
   :ote.db.transport-operator/ckan-description "Tjänsteproducentens beskrivning"
-  :ote.db.transport-operator/business-id              "FO-nummer"
-  :ote.db.transport-operator/phone                    "Telefon 1"
-  :ote.db.transport-operator/gsm                      "Telefon 2"
-  :ote.db.transport-operator/email                    "E-post"
-  :ote.db.transport-operator/homepage                 "WWW-adress"
-  :ote.db.transport-operator/visiting-address         "Besöksadress"
-  :ote.db.transport-operator/billing-address          "Faktureringsadress"
+  :ote.db.transport-operator/business-id "FO-nummer"
+  :ote.db.transport-operator/phone "Telefon 1"
+  :ote.db.transport-operator/gsm "Telefon 2"
+  :ote.db.transport-operator/email "E-post"
+  :ote.db.transport-operator/homepage "WWW-adress"
+  :ote.db.transport-operator/visiting-address "Besöksadress"
+  :ote.db.transport-operator/billing-address "Faktureringsadress"
 
   :ote.db.transport-operator/facebook "Facebook"
   :ote.db.transport-operator/twitter "Twitter"
@@ -26,15 +26,15 @@
 
   ;; Transport service fields
   :transport-service-type-subtype "Välj tjänstetyp"
-  :select-transport-operator      "Välj tjänsteproducent"
+  :select-transport-operator "Välj tjänsteproducent"
 
   :transport-service-common
   {:ote.db.transport-service/transport-type "Trafikslag"
    :ote.db.transport-service/name "Tjänstens namn"
-   :ote.db.transport-service/accessibility-tool        "Tillgänglighetsredskap"
+   :ote.db.transport-service/accessibility-tool "Tillgänglighetsredskap"
    :ote.db.transport-service/accessibility-description "Beskrivning av tjänstens tillgänglighet"
 
-   :ote.db.transport-service/accessibility     "Tillgänglighet"
+   :ote.db.transport-service/accessibility "Tillgänglighet"
    :ote.db.transport-service/information-service-accessibility "Tjänstens tillgänglighet"
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Färmedlens tillgänglighet (garanterad)"
@@ -43,9 +43,9 @@
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (garanterad)"
    :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (inte garanterad, kontakta tjänsteproducenten)"
 
-   :ote.db.transport-service/guaranteed-accessibility-tool        "garanteras alltid"
+   :ote.db.transport-service/guaranteed-accessibility-tool "garanteras alltid"
    :ote.db.transport-service/guaranteed-accessibility-description "Beskriving av garanterad tillgänglighet"
-   :ote.db.transport-service/limited-accessibility-tool        "Begränsad tillgång till följande tillgänglighetsredskap"
+   :ote.db.transport-service/limited-accessibility-tool "Begränsad tillgång till följande tillgänglighetsredskap"
    :ote.db.transport-service/limited-accessibility-description "Beskrivning av tillgänglighetsredskap med begränsad tillgång"
 
    :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (alltid)"
@@ -54,21 +54,21 @@
    :ote.db.transport-service/accessibility-info-url "Beskrivning av tillgänglighetstjänsterna (WWW)"
 
    ;; Contact details
-   :ote.db.transport-service/contact-address          "Adressuppgifter"
-   :ote.db.transport-service/contact-phone             "Telefon"
-   :ote.db.transport-service/contact-email             "E-post"
-   :ote.db.transport-service/homepage                  "www-adress"
+   :ote.db.transport-service/contact-address "Adressuppgifter"
+   :ote.db.transport-service/contact-phone "Telefon"
+   :ote.db.transport-service/contact-email "E-post"
+   :ote.db.transport-service/homepage "www-adress"
 
-   :ote.db.transport-service/operation-area            "Verksamhetsområde"
-   :ote.db.transport-service/location                  "Plats"
+   :ote.db.transport-service/operation-area "Verksamhetsområde"
+   :ote.db.transport-service/location "Plats"
 
    ;; External interfaces
    :ote.db.transport-service/external-interfaces "Externa maskinläsbara gränssnitt"
    :ote.db.transport-service/data-content "Informationsinnehåll"
    :ote.db.transport-service/external-service-description "Tilläggsuppgifter"
    :ote.db.transport-service/external-service-url "WWW-adress"
-   :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
-   :ote.db.transport-service/rental-service            "Hyrtjänstens adress"
+   :ote.db.transport-service/booking-service "Bokningstjänstens adress"
+   :ote.db.transport-service/rental-service "Hyrtjänstens adress"
    :ote.db.transport-service/format "Format"
    :ote.db.transport-service/format-short "Format"
    :ote.db.transport-service/companies "De företag som producerar tjänsten"
@@ -97,21 +97,21 @@
 
   ;; Passenger transportation fields
   :passenger-transportation
-  {:ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resegods"
-   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
-   :ote.db.transport-service/booking-service           "Bokningstjänst www-adress"
-   :ote.db.transport-service/payment-methods           "Välj betalsätt"
-   :ote.db.transport-service/price-class               "Prissättning"
-   :ote.db.transport-service/service-hours             "Tjänstetider"
-   :ote.db.transport-service/operation-area            "Verksamhetsområde"
+  {:ote.db.transport-service/luggage-restrictions "Begränsningar gällande resegods"
+   :ote.db.transport-service/real-time-information "Realtidsinfo www-adress"
+   :ote.db.transport-service/booking-service "Bokningstjänst www-adress"
+   :ote.db.transport-service/payment-methods "Välj betalsätt"
+   :ote.db.transport-service/price-class "Prissättning"
+   :ote.db.transport-service/service-hours "Tjänstetider"
+   :ote.db.transport-service/operation-area "Verksamhetsområde"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name-taxi     "Produkt"
-   :ote.db.transport-service/price-class-name-request  "Priskategori"
+   :ote.db.transport-service/price-class-name-taxi "Produkt"
+   :ote.db.transport-service/price-class-name-request "Priskategori"
    :ote.db.transport-service/price-class-name-schedule "Priskategori"
-   :ote.db.transport-service/price-per-unit            "Pris per enhet"
-   :ote.db.transport-service/unit                      "Enhet tex per resa eller per timme etc."
-   :ote.db.transport-service/currency                  "Valuta"
+   :ote.db.transport-service/price-per-unit "Pris per enhet"
+   :ote.db.transport-service/unit "Enhet tex per resa eller per timme etc."
+   :ote.db.transport-service/currency "Valuta"
 
    :ote.db.transport-service/pricing-description "Beskriv prissättningen"
    :ote.db.transport-service/pricing-description-taxi "Beskriv prissättningen"
@@ -122,106 +122,106 @@
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Inomhuskarta www-sidor"
-   :ote.db.transport-service/url                       "Tjänstens www-sidor"
-   :ote.db.transport-service/description               "Tjänstebeskriving"
+   :ote.db.transport-service/url "Tjänstens www-sidor"
+   :ote.db.transport-service/description "Tjänstebeskriving"
    :ote.db.transport-service/information-service-accessibility "Information (tillgänglighet)"
-   :ote.db.transport-service/accessibility     "Tillgänglighet"
+   :ote.db.transport-service/accessibility "Tillgänglighet"
 
 
 
    ;; assistance_notification_requirement fields
-   :ote.db.transport-service/hours-before           "Tjänsten måste beställas (timmar) i förväg"
-   :ote.db.transport-service/telephone              "Beställ tjänsten på nummer"
-   :ote.db.transport-service/email                  "beställ tjänsten per e-mail (email)"
-   :ote.db.transport-service/assistance-url         "Gör bokning på adressen (www)"
+   :ote.db.transport-service/hours-before "Tjänsten måste beställas (timmar) i förväg"
+   :ote.db.transport-service/telephone "Beställ tjänsten på nummer"
+   :ote.db.transport-service/email "beställ tjänsten per e-mail (email)"
+   :ote.db.transport-service/assistance-url "Gör bokning på adressen (www)"
    :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
-   :ote.db.transport-service/assistance-place-description  "Assistanstjänsternas placering i terminalen/stationen"
+   :ote.db.transport-service/assistance-place-description "Assistanstjänsternas placering i terminalen/stationen"
    :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör beställas på förhand."}
 
 
   ;; Rental fields
   :rentals
   {;:ote.db.transport-service/eligibility-requirements  "Duglighetskrav"
-   :ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resgods"
-   :ote.db.transport-service/payment-methods           "Väl betalsätt"
-   :ote.db.transport-service/usage-area                "Tillåtna länder"
-   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
-   :ote.db.transport-service/booking-service           "Bokningstjänstens adress"
-   :ote.db.transport-service/vehicle-classes           "Fordon som uthyres"
-   :ote.db.transport-service/vehicle-type              "Fordonstyp"
-   :ote.db.transport-service/license-required          "Körkortskategori"
-   :ote.db.transport-service/minimum-age               "Undre åldersgräns "
-   :ote.db.transport-service/price-per-unit            "Pris (€)"
-   :ote.db.transport-service/unit                      "Prissättningsgrund (tex. zon, resa, km)"
-   :ote.db.transport-service/price-classes             "Pris"
-   :ote.db.transport-service/pick-up-name              "Verksamhetsställes namn"
-   :ote.db.transport-service/pick-up-type              "Typ"
+   :ote.db.transport-service/luggage-restrictions "Begränsningar gällande resgods"
+   :ote.db.transport-service/payment-methods "Väl betalsätt"
+   :ote.db.transport-service/usage-area "Tillåtna länder"
+   :ote.db.transport-service/real-time-information "Realtidsinfo www-adress"
+   :ote.db.transport-service/booking-service "Bokningstjänstens adress"
+   :ote.db.transport-service/vehicle-classes "Fordon som uthyres"
+   :ote.db.transport-service/vehicle-type "Fordonstyp"
+   :ote.db.transport-service/license-required "Körkortskategori"
+   :ote.db.transport-service/minimum-age "Undre åldersgräns "
+   :ote.db.transport-service/price-per-unit "Pris (€)"
+   :ote.db.transport-service/unit "Prissättningsgrund (tex. zon, resa, km)"
+   :ote.db.transport-service/price-classes "Pris"
+   :ote.db.transport-service/pick-up-name "Verksamhetsställes namn"
+   :ote.db.transport-service/pick-up-type "Typ"
    :ote.db.transport-service/rental-additional-services "Övriga tjänster"
-   :ote.db.transport-service/additional-service-type   "Tjänst"
-   :ote.db.transport-service/additional-service-price  "Pris (€)"
-   :ote.db.transport-service/additional-service-unit   "Prissättningsgrund (tex. zon, resa, km)"
-   :rentals-pricing-info                               "Fyll i tabellen prisuppgifter och/eller uppgifter om grunderna för hur priset bestäms."
-   :ote.db.transport-service/vehicle-price-url         "Web-adress med uppgifter om fordon och priser"
-   :ote.db.transport-service/pick-up-locations-url               "Web-adress för verksamhetsställen"}
+   :ote.db.transport-service/additional-service-type "Tjänst"
+   :ote.db.transport-service/additional-service-price "Pris (€)"
+   :ote.db.transport-service/additional-service-unit "Prissättningsgrund (tex. zon, resa, km)"
+   :rentals-pricing-info "Fyll i tabellen prisuppgifter och/eller uppgifter om grunderna för hur priset bestäms."
+   :ote.db.transport-service/vehicle-price-url "Web-adress med uppgifter om fordon och priser"
+   :ote.db.transport-service/pick-up-locations-url "Web-adress för verksamhetsställen"}
 
   ;; Parking fields
   :parking
-  {:parking-areas  "P-platsernas läge"
-   :ote.db.transport-service/luggage-restrictions      "Begränsningar gällande resgods"
-   :ote.db.transport-service/url                       "Tjänstens www-adress"
-   :ote.db.transport-service/description               "Tjänstebeskrivning"
-   :ote.db.transport-service/real-time-information     "Realtidsinfo www-adress"
-   :ote.db.transport-service/booking-service           "Bokningstjänstens www-adress"
-   :ote.db.transport-service/payment-methods           "Välj betalsätt"
-   :ote.db.transport-service/additional-service-links  "Andra tjänster"
-   :ote.db.transport-service/price-class               "Prissättning"
-   :ote.db.transport-service/service-hours             "Tjänstetider"
-   :ote.db.transport-service/operation-area            "Verksamhetsområde"
+  {:parking-areas "P-platsernas läge"
+   :ote.db.transport-service/luggage-restrictions "Begränsningar gällande resgods"
+   :ote.db.transport-service/url "Tjänstens www-adress"
+   :ote.db.transport-service/description "Tjänstebeskrivning"
+   :ote.db.transport-service/real-time-information "Realtidsinfo www-adress"
+   :ote.db.transport-service/booking-service "Bokningstjänstens www-adress"
+   :ote.db.transport-service/payment-methods "Välj betalsätt"
+   :ote.db.transport-service/additional-service-links "Andra tjänster"
+   :ote.db.transport-service/price-class "Prissättning"
+   :ote.db.transport-service/service-hours "Tjänstetider"
+   :ote.db.transport-service/operation-area "Verksamhetsområde"
 
    ;; Parking facilities and capacity
-   :ote.db.transport-service/parking-facility          "Parkeringsplatsen typ"
-   :ote.db.transport-service/capacity                  "Antalet platser"
+   :ote.db.transport-service/parking-facility "Parkeringsplatsen typ"
+   :ote.db.transport-service/capacity "Antalet platser"
 
    ;; Charging point fields
-   :ote.db.transport-service/charging-points           "Beskriving av laddningspunkterna"
+   :ote.db.transport-service/charging-points "Beskriving av laddningspunkterna"
 
    ;; Price Class fields
-   :ote.db.transport-service/price-class-name          "Priskategori"
-   :ote.db.transport-service/price-per-unit            "Pris per enhet"
-   :ote.db.transport-service/unit                      "per enhet tex resa/km etc.)"
-   :ote.db.transport-service/currency                  "Valuta"
+   :ote.db.transport-service/price-class-name "Priskategori"
+   :ote.db.transport-service/price-per-unit "Pris per enhet"
+   :ote.db.transport-service/unit "per enhet tex resa/km etc.)"
+   :ote.db.transport-service/currency "Valuta"
 
-   :ote.db.transport-service/pricing-description       "Beskrivning av prissättning"
-   :ote.db.transport-service/pricing-url               "Prissättning www-adress"
+   :ote.db.transport-service/pricing-description "Beskrivning av prissättning"
+   :ote.db.transport-service/pricing-url "Prissättning www-adress"
    :ote.db.transport-service/payment-method-description "Betalsätt info"
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days                 "Veckodagar"
-   :ote.db.transport-service/from                      "Öppnas kl"
-   :ote.db.transport-service/to                        "Stängs kl"
-   :ote.db.transport-service/all-day                   "24h"
-   :ote.db.transport-service/maximum-stay              "Max parkeringstid"
+   :ote.db.transport-service/week-days "Veckodagar"
+   :ote.db.transport-service/from "Öppnas kl"
+   :ote.db.transport-service/to "Stängs kl"
+   :ote.db.transport-service/all-day "24h"
+   :ote.db.transport-service/maximum-stay "Max parkeringstid"
    :maximum-stay-limited "Parkeringstid begränsad"}
 
 
   :transport-service
-  {:ote.db.transport-service/name                "Tjänstens namn"
+  {:ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/additional-services "Övriga tjänster"
-   :ote.db.transport-service/url                 "Tjänstens www-adress"
-   :ote.db.transport-service/description         "Tjänstebeskrivning"
-   :ote.db.transport-service/type                "Tjänstetyp"
-   :ote.db.transport-service/sub-type            "Kategori"
-   :ote.db.transport-service/published?          "NAP-status"
-   :ote.db.transport-service/published?-values   {true  "Publicerad"
-                                                  false "Ej publicerad"}
+   :ote.db.transport-service/url "Tjänstens www-adress"
+   :ote.db.transport-service/description "Tjänstebeskrivning"
+   :ote.db.transport-service/type "Tjänstetyp"
+   :ote.db.transport-service/sub-type "Kategori"
+   :ote.db.transport-service/published? "NAP-status"
+   :ote.db.transport-service/published?-values {true "Publicerad"
+                                                false "Ej publicerad"}
 
    ;; Service hour fields
-   :ote.db.transport-service/week-days           "Veckodagar"
-   :ote.db.transport-service/from                "Öppnas kl"
-   :ote.db.transport-service/to                  "Stänger kl"
-   :ote.db.transport-service/all-day             "24h"
+   :ote.db.transport-service/week-days "Veckodagar"
+   :ote.db.transport-service/from "Öppnas kl"
+   :ote.db.transport-service/to "Stänger kl"
+   :ote.db.transport-service/all-day "24h"
 
-   :ote.db.transport-service/brokerage?  "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Trafiksäkerhetsverket Trafi."
+   :ote.db.transport-service/brokerage? "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Trafiksäkerhetsverket Trafi."
 
    :ote.db.transport-service/available-from-and-to-title "Tjänstens giltighetstid"
    :ote.db.transport-service/available-from "Startdatum"
@@ -231,26 +231,26 @@
 
 
   ;; Common fields
-  :ote.db.common/street                               "Adress"
-  :ote.db.common/post_office                          "Postkontor"
-  :ote.db.common/postal_code                          "Postnummer"
+  :ote.db.common/street "Adress"
+  :ote.db.common/post_office "Postkontor"
+  :ote.db.common/postal_code "Postnummer"
 
   :login {:email-or-username "Epost eller användarnamn"
           :password "Lösenord"}
 
   :pre-notice
   {:ote.db.transit/other-type-description "Förklaring"
-   :ote.db.transit/url                    "Webbadress"
-   :ote.db.transit/attachment-file-name   "Bifogad fil"
+   :ote.db.transit/url "Webbadress"
+   :ote.db.transit/attachment-file-name "Bifogad fil"
    :ote.db.transit/effective-dates "Ändringens begynnelsedatum"
    :ote.db.transit/route-description "Namn på rutten eller rutterna som ändras"
    :ote.db.transit/regions "Lägg till landskapen som ändringen gäller"
    :ote.db.transit/description "Detaljerade uppgifter om förändringen"}
 
- :email-notification-settings
- {:ote.db.user-notifications/finnish-regions  "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
-  :ote.db.user-notifications/service-changed-6-months-ago "Liikkumispalvelusi tietojen viimeisimmästä päivityksestä on kulunut vähintään 6 kuukautta. Ilmoitus lähetetään kerran kuukaudessa, kunnes tiedot on päivitetty."}
-}
+  :email-notification-settings
+  {:ote.db.user-notifications/finnish-regions "Valitse maakunnat, joihin liittyviä ilmoituksia haluat saada sähköpostiisi."
+   :ote.db.user-notifications/service-changed-6-months-ago "Liikkumispalvelusi tietojen viimeisimmästä päivityksestä on kulunut vähintään 6 kuukautta. Ilmoitus lähetetään kerran kuukaudessa, kunnes tiedot on päivitetty."}
+  }
 
  ;; Add form info elements here, these are textual help texts in the form
  :form-help
@@ -269,15 +269,15 @@
                                   :dialog-title "Maskinläsbara gränssnitt i NAP-katalogen"
                                   :dialog-text (:md
                                                  "## Allmänt\n"
-                                                 "Tjänsteproducentens eller samarbetspartens maskinläsbara gränssnitt gällande tjänsten är avsedda för dem som utvecklar till exempel ruttguider och andra digitala mobilitetstjänster. Det maskinläsbara gränssnittet erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON). I den här sektionen ska man inte lägga till länkar till färdiga applikationer avsedda för vanliga användare (t.ex. webbaserade ruttguider och webbutiker för biljettförsäljning)."
-                                                 "\n\n## Gränssnittens data och funktioner\n"
-                                                 "Gränssnitten kan innehålla samma uppgifter, som man kan meddela på denna blankett (väsentliga uppgifter om mobilitetstjänsten). I så fall är det frivilligt att fylla i motsvarande uppgifter i den senare delen av blanketten. Det lönar sig ändå att fylla i uppgifterna, eftersom detta gör det lättare att hitta uppgifterna med NAP-tjänstens sökfunktioner."
-                                                 "\n\nSådana tjänsteproducenter inom vägtrafiken eller den spårbundna trafiken som använder ett biljett- och betalningssystem, ska dessutom öppna ett försäljningsgränssnitt så att det är möjlighet att åtminstone köpa en engångsbiljett."
-                                                 "\n\nEnligt förordningen är det möjligt, men inte obligatoriskt, att skapa övriga gränssnitt (t.ex. försäljningsgränssnitt som är mer omfattande än gränssnittet för enkelbiljetter, gränssnitt som förmedlar fordonens realtidsdata). Genom att öppna sådana gränssnitt kan tjänsteproducenten dra nytta av de affärsmöjligheter som de nya digitala mobilitetstjänsterna medför."
+                                                 "Maskinläsbara gränssnitt gällande tjänsten är avsedda för dem som utvecklar till exempel ruttplanerare och andra digitala mobilitetstjänster. Maskinläsbara gränssnitt erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON). "
+                                                 "\n\n## Krav gällande publicering av gränssnittsdata och dess inverkan\n"
+                                                 "Om du publicerar information om de maskinläsbara gränssnitten som gäller din tjänst i sektionen ”externa maskinläsbara gränssnitt”, behöver du inte fylla i de delarna på nytt i blanketten."
+                                                 "\n\nOm du är en tjänsteproducent inom vägtrafiken eller den spårbundna trafiken, som använder ett biljett- och betalningssystem, ska du dela ditt boknings- och försäljningsgränssnitt så att det åtminstone är möjligt att köpa en engångsbiljett via det."
+                                                 "\n\nEnligt Statsrådets förordning om väsentlig information om mobilitetstjänster är det möjligt, men inte obligatoriskt, att dela övriga gränssnitt (t.ex. försäljningsgränssnitt som är mer omfattande än det för enkelbiljetter eller gränssnitt som förmedlar fordonens realtidsdata). Genom att dela fler gränssnitt i NAP-tjänsten kan du dra nytta av affärsmöjligheterna som de nya digitala mobilitetstjänsterna medför."
+                                                 "\n\nOBS: Enligt lagen om transportservice ska de maskinläsbara gränssnitten omfatta alla biljettprodukter fr o m 1.1 2019. (se Lagen om transportservice 301/2018 avd. III, 2 a §)"
                                                  "\n\n## Licensuppgifter\n"
-                                                 "De som använder gränssnitten behöver få information om villkoren för att använda gränssnitten och uppgifterna som dessa innehåller."
-                                                 "\n\nDen som erbjuder ett gränssnitt kan välja vilken licens som används eller ställa egna villkor, men all väsentlig information om mobilitetstjänsten ska ändå vara fritt tillgänglig (öppet gränssnitt) och gränssnitten för minimitjänster ska erbjudas åt alla på samma rättvisa, rimliga och icke-diskriminerande villkor. Med gränssnitt för minimitjänster avses gränssnitt för bokningar och enkelbiljetter och dessa gäller sådana producenter inom vägtrafik och spårbunden trafik, som använder ett biljett- och betalningssystem."
-                                                 "\n\nOm gränssnittet består av information som kan laddas ner, till exempel ett GTFS-paket som beskriver rutter och tidtabeller, är det ofta ändamålsenligt att använda någon allmän licens för öppna data. En sådan licens är till exempel Creative Commons Erkännande 4.0 Internationell (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fi), som är mycket tillåtande vad gäller att sprida, använda, bearbeta, kombinera och dela material, också i kommersiellt syfte. Ifrågavarande licens förutsätter dock att källan nämns samt att eventuella förändringar och förändringshistorik sparas.")}
+                                                 "Gränssnittens användare behöver information om användarvillkoren för gränssnitten i anknytning till mobilitetstjänsten och informationen som de innehåller. Meddela alltså vilken licens du använder eller publicera dina egna tydliga användarvillkor. Kom ihåg att all väsentlig information om mobilitetstjänsten som publicerats i NAP ska vara fritt tillgänglig (öppet gränssnitt). Dessutom ska gränssnitten för minimitjänsterna erbjudas åt alla på rättvisa, rimliga och icke-diskriminerande villkor. Med gränssnitt för minimitjänster avses gränssnitt som gör det möjligt att beställa och köpa en engångsbiljett. Skyldigheten att öppna gränssnitt gäller sådana producenter inom vägtrafik och spårbunden trafik som använder ett biljett- och betalningssystem. OBS. Enligt lagen om transportservice ska de maskinläsbara gränssnitten omfatta alla biljettprodukter fr o m 1.1.2019."
+                                                 "\n\nOm gränssnittet som du publicerar bara innehåller sådan information som kan laddas ner (t.ex. ett GTFS-paket som innehåller rutt- och tidtabellsinformation) är det ofta ändamålsenligt att använda någon allmän licens för öppna data. Ett exempel på en sådan licens är Creative Commons Erkännande 4.0 Internationell (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fi), som är mycket tillåtande vad gäller att sprida, använda, bearbeta, kombinera och dela material, också i kommersiellt syfte. Licensen förutsätter dock att källan nämns samt att eventuella förändringar och förändringshistorik sparas.")}
 
   ;; Needs a new translation
   :external-interfaces-tooltips {:data-content "Välj typ av innehåll. Du kan välja flera typer samtidigt för samma gränssnitt. Ifall lämpligt alternativ saknas välj ”Övrigt” och beskriv innehållet i ”Tilläggsuppgifter”."
@@ -312,7 +312,7 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
-  :trip-editor-no-calendar  "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
+  :trip-editor-no-calendar "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
   :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
   :pre-notice-attatchment-info "Meddela de detaljerade rutt- och tidtabellsändringarna i din transporttjänst inom persontrafik. Du kan lägga till en webbadress där uppgifterna framgår. Du kan också bifoga filer som visar ändringarna till denna blankett."
   :autocomplete-hint "Ange egen eller välj från listan"
@@ -359,10 +359,10 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
   :discard "Ångra"
 
   :next "Fortsätt"
-  :add-transport-service  "Lägg till ny tjänst"
+  :add-transport-service "Lägg till ny tjänst"
   :add-external-interface "Lägg till externt gränssnitt"
   :add-new-service-link "Lägg till ny tjänst"
-  :add-add-new-row         "Lägg till ny rad"
+  :add-add-new-row "Lägg till ny rad"
   :add-new-pick-up-location "Lägg till verksamhetsställe"
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
@@ -375,7 +375,7 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
   :next-step "Fortsätt"
   :route-calendar-back-to-trips "Tillbaka till turlistan"
   :route-calendar-clear "Töm kalendern"
-  :back-to-draft  "Ändra status till utkast"
+  :back-to-draft "Ändra status till utkast"
   :add-new-effective-date "Lägg till nytt datum"
   :transport-service-catalog "Tjänstekatalogen"
   :register-to-service "Registrering"
@@ -385,52 +385,52 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
-  {:road      "Vägtrafik"
-   :rail      "Tågtrafik"
-   :sea       "Sjötrafik"
-   :aviation  "Luftfart"}
+  {:road "Vägtrafik"
+   :rail "Tågtrafik"
+   :sea "Sjötrafik"
+   :aviation "Luftfart"}
 
   :ote.db.transport-service/type
-  {:terminal                 "Stationer, hamnar och övriga terminaler"
+  {:terminal "Stationer, hamnar och övriga terminaler"
    :passenger-transportation "Persontransporttjänster"
-   :rentals                  "Fordonsuthyrning och kommersiella samanvändningstjänster"
-   :parking                  "Almmänna kommersiella parkeringstjänster"
-   :brokerage                "Förmedlingstjänster"}
+   :rentals "Fordonsuthyrning och kommersiella samanvändningstjänster"
+   :parking "Almmänna kommersiella parkeringstjänster"
+   :brokerage "Förmedlingstjänster"}
 
   :ote.db.transport-service/sub-type
-  {:terminal    "Stationer, hamnar och övriga terminaler"
-   :taxi        "Taxitjänst (i vägtrafik)"
-   :request     "Abbonerad trafik eller annan anropsstyrd trafik"
-   :schedule    "Regelbunden ruttbaserad trafik"
-   :rentals     "Fordonsuthyrning och kommersiella samanvändningstjänster"
-   :parking     "Allmänna kommersiella parkeringstjänster"
-   :brokerage   "Förmedlingstjänster"}
+  {:terminal "Stationer, hamnar och övriga terminaler"
+   :taxi "Taxitjänst (i vägtrafik)"
+   :request "Abbonerad trafik eller annan anropsstyrd trafik"
+   :schedule "Regelbunden ruttbaserad trafik"
+   :rentals "Fordonsuthyrning och kommersiella samanvändningstjänster"
+   :parking "Allmänna kommersiella parkeringstjänster"
+   :brokerage "Förmedlingstjänster"}
 
   :ote.db.transport-service/payment-methods
-  {:cash                "Kontant"
-   :debit-card          "Bankkort"
-   :credit-card         "Kreditkort"
-   :mobilepay           "Mobilbetalning"
+  {:cash "Kontant"
+   :debit-card "Bankkort"
+   :credit-card "Kreditkort"
+   :mobilepay "Mobilbetalning"
    :contactless-payment "Närbetalning"
-   :invoice             "Faktura"
-   :other               "Annat"}
+   :invoice "Faktura"
+   :other "Annat"}
 
   :ote.db.transport-service/additional-services
-  {:child-seat       "Barnstol"
+  {:child-seat "Barnstol"
    :animal-transport "Djur tillåtet"
-   :other            "Annat"}
+   :other "Annat"}
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair       "Rullstol"
-   :walkingstick     "Käpp"
-   :audio-navigator  "Audioinfo"
+  {:wheelchair "Rullstol"
+   :walkingstick "Käpp"
+   :audio-navigator "Audioinfo"
    :visual-navigator "Visuell skyltning"
-   :passenger-cart   "Persontransportvagn"
-   :pushchair        "Barnvagn"
-   :umbrella         "Paraply"
-   :buggy            "Barnvagn"
-   :other            "Annan"}
+   :passenger-cart "Persontransportvagn"
+   :pushchair "Barnvagn"
+   :umbrella "Paraply"
+   :buggy "Barnvagn"
+   :other "Annan"}
 
   :ote.db.transport-service/day
   {:short {:MON "Må" :TUE "Ti" :WED "On" :THU "To" :FRI "Fr" :SAT "Lö" :SUN "Sö"}
@@ -455,7 +455,7 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
    :wheelchair-access-toilet "Inva WC"
    :step-free-access "Inga trappsteg"
    :suitable-for-wheelchairs "Lämplig för rullstol"
-   :tactile-platform-edges  "Varning vid perrongkanten"
+   :tactile-platform-edges "Varning vid perrongkanten"
    :tactile-guiding-strips "Beröringstyrda följlinjer"}
 
   :ote.db.transport-service/transportable-aid
@@ -510,18 +510,18 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
    :mandatory "Obligatorisk förhandsbokning."}
 
   :ote.db.transit/pre-notice-type
-  {:termination     "Trafiken upphör (delvis eller helt)"
-   :new             "Trafiken utökas eller ny rutt"
+  {:termination "Trafiken upphör (delvis eller helt)"
+   :new "Trafiken utökas eller ny rutt"
    :schedule-change "Tidtabellsändring"
-   :route-change    "Ruttändring"
-   :other           "Annan ändring, vilken?"}
+   :route-change "Ruttändring"
+   :other "Annan ändring, vilken?"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Utkast"
    :sent "Skickat"
    :read "Läst"}
   }
-  ;; ENUMS end
+ ;; ENUMS end
  :regions
  {"01" "Nyland"
   "02" "Egentliga Finland"
@@ -544,8 +544,8 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
   "21" "Åland"}
 
  ;; Per feature/page localization keys
- :place-search {:primary-name                "Platsnamn"
-                :secondary-name                "Platsnamn"
+ :place-search {:primary-name "Platsnamn"
+                :secondary-name "Platsnamn"
                 :place-auto-complete-primary "Sök plats"
                 :place-auto-complete-secondary "Sök plats"
                 :rename-place "Ange nytt namn (Enter godkänn)"
@@ -557,11 +557,11 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
                 :draw-secondary "Rita sekundärt verksamhetsområde"
                 :hide-draw-tools "Göm ritverktyget"}
 
- :titles {:terminal                 "Stationer, hamnar och övriga terminaler"
+ :titles {:terminal "Stationer, hamnar och övriga terminaler"
           :passenger-transportation "Persontransporttjänster"
-          :rentals                  "Fordonsuthyrning och komersiella samanvändningstjänster"
-          :parking                  "Allmänna kommersiella parkeringstjänster"
-          :brokerage                "Förmedlingstjänst"}
+          :rentals "Fordonsuthyrning och komersiella samanvändningstjänster"
+          :parking "Allmänna kommersiella parkeringstjänster"
+          :brokerage "Förmedlingstjänst"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -577,55 +577,55 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
 
   :front-page-content
   (:md
-   "# **Vad är NAP?**
+    "# **Vad är NAP?**
 
-Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken mobilitetstjänsteproducenter ska lämna in data om sina digitala maskinläsbara gränssnitt för väsentlig information. NAP-tjänsten är en väsentlig del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.
+ Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken mobilitetstjänsteproducenter ska lämna in data om sina digitala maskinläsbara gränssnitt för väsentlig information. NAP-tjänsten är en väsentlig del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.
 
-## **Vad är mobilitetstjänster?**
+ ## **Vad är mobilitetstjänster?**
 
-Med mobilitetstjänster avses:
-1. persontransporttjänster (t.ex. taxi- och busstrafik)
-2. stationer, hamnar och andra terminaler
-3. parkeringsanläggningar
-4. tjänster för uthyrning av färdmedel och kommersiella samavändningstjänster
-5. förmedlingstjänster
+ Med mobilitetstjänster avses:
+ 1. persontransporttjänster (t.ex. taxi- och busstrafik)
+ 2. stationer, hamnar och andra terminaler
+ 3. parkeringsanläggningar
+ 4. tjänster för uthyrning av färdmedel och kommersiella samavändningstjänster
+ 5. förmedlingstjänster
 
-## **Vad avses med väsentlig information?**
+ ## **Vad avses med väsentlig information?**
 
-Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.
+ Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.
 
-## **NAP-tjänstens uppbyggnad**
+ ## **NAP-tjänstens uppbyggnad**
 
-På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
+ På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
 
-På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
+ På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
 
-Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
+ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
   :hero-title "Katalogen med Finlands mobilitetstjänster avsedd för tjänsteutvecklare."
   :new-user? "Ny användare?"
-  :table-header-service-name      "Tjänstens namn"
-  :table-header-service-url       "Tjänstens www-adress"
-  :table-header-NAP-status        "NAP status"
-  :table-header-modified          "Redigerat"
-  :table-header-created           "Skapat"
-  :table-header-actions           "Funktioner"
+  :table-header-service-name "Tjänstens namn"
+  :table-header-service-url "Tjänstens www-adress"
+  :table-header-NAP-status "NAP status"
+  :table-header-modified "Redigerat"
+  :table-header-created "Skapat"
+  :table-header-actions "Funktioner"
   :do-you-want-to-publish-service "Du har redan ett eget maskinläsbart gränssnitt (tex GTFS-format), som du vill publicera."
-  :header-explain-more            "Nu förstår jag inte riktigt, kan du förklara närmare?"
-  :move-to-services-page          "Gå till Egna tjänster"
-  :move-to-organizations-page     "Gå till vyn Tjänsteproducent"
-  :hello                          "Hej "
-  :NAP-service-short-description  "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
+  :header-explain-more "Nu förstår jag inte riktigt, kan du förklara närmare?"
+  :move-to-services-page "Gå till Egna tjänster"
+  :move-to-organizations-page "Gå till vyn Tjänsteproducent"
+  :hello "Hej "
+  :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
     päivittämisen, sekä tietojen julkaisun NAP -palvelukatalogiin."
   :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
      julkaistu myös julkisessa NAP -palvelukatalogissa."
-  :right-corner-description       "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
+  :right-corner-description "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
   :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perustietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
      sillä niitä hyödynnetään lomakenäkymissä."
-  :publish-new-service            "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
-  :help-more-explanation1         "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
+  :publish-new-service "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
+  :help-more-explanation1 "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
   sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
    joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
-  :help-more-explanation2         "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
+  :help-more-explanation2 "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
      Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
      Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
      olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
@@ -641,71 +641,71 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
 
 
  :organization-page
- {:contact-types            "Kontaktalternativ"
-  :organization-form-title  "Tjänsteproducentens uppgifter"
-  :organization-new-title   "Lägg till tjänsteproducent"
-  :help-desc-1              "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
-  :help-desc-2              (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
-  :basic-info-tooltip       "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
-  :contact-types-tooltip    "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
+ {:contact-types "Kontaktalternativ"
+  :organization-form-title "Tjänsteproducentens uppgifter"
+  :organization-new-title "Lägg till tjänsteproducent"
+  :help-desc-1 "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
+  :help-desc-2 (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
+  :basic-info-tooltip "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
+  :contact-types-tooltip "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
   :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
   }
 
 
-  :passenger-transportation-page
- {:header-new-passenger-transportation     "Lägg till persontransporttjänst"
-  :header-edit-passenger-transportation    "Redigera persontransporttjänst"
-  :header-service-info                     "Tjänstens basinfo"
-  :header-restrictions                     "Begränsning gällande resgods"
-  :header-contact-details                  "Tjänstens kontaktuppgifter"
+ :passenger-transportation-page
+ {:header-new-passenger-transportation "Lägg till persontransporttjänst"
+  :header-edit-passenger-transportation "Redigera persontransporttjänst"
+  :header-service-info "Tjänstens basinfo"
+  :header-restrictions "Begränsning gällande resgods"
+  :header-contact-details "Tjänstens kontaktuppgifter"
   :header-other-services-and-accessibility "Tillgänglighet"
-  :header-price-information                "Prisinformation"
-  :header-service-hours                    "Betjäningstider"
-  :header-pick-up-locations                "Verksamhetsställen"
-  :header-select-company-list-type         "Välj meddelandesätt"
-  :header-brokerage                        "Förmedlingstjänst"
-  :radio-button-no-companies               "Inga andra företag deltar i tillhandahållandet av denna tjänst."
-  :radio-button-url-companies              "Ange en web-adress för .csv-filen."
-  :radio-button-csv-companies              "Ladda upp .csv-filen."
-  :radio-button-form-companies             "Lägg till uppgifter om företagen i formuläret."}
+  :header-price-information "Prisinformation"
+  :header-service-hours "Betjäningstider"
+  :header-pick-up-locations "Verksamhetsställen"
+  :header-select-company-list-type "Välj meddelandesätt"
+  :header-brokerage "Förmedlingstjänst"
+  :radio-button-no-companies "Inga andra företag deltar i tillhandahållandet av denna tjänst."
+  :radio-button-url-companies "Ange en web-adress för .csv-filen."
+  :radio-button-csv-companies "Ladda upp .csv-filen."
+  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."}
 
  :rentals-page
- {:header-edit-rentals                     "Redigera uppgifterna gällande uthyrning"
-  :header-new-rentals                      "Lägg till uppgifter gällande färdmedelsuthyrning eller kommersiella samanvändningstjänster"
-  :header-service-info                     "Tjänstens basinformation"
-  :header-rental-service                   "Komplettera uppgifterna gällande uthyrning."
-  :header-usage-area                       "Landbegränsning"
-  :header-restrictions-payments            "Begränsningar och betalsätt"
-  :header-vehicles                         "Fordon som uthyrs"
-  :header-accessibility                    "Tillgänglighet"
-  :header-additional-services              "Tilläggsinfo"
-  :open-service-hours-and-exceptions       "Betjäningstider"
-  :open-rental-prices                      "Prisuppgifter"}
+ {:header-edit-rentals "Redigera uppgifterna gällande uthyrning"
+  :header-new-rentals "Lägg till uppgifter gällande färdmedelsuthyrning eller kommersiella samanvändningstjänster"
+  :header-service-info "Tjänstens basinformation"
+  :header-rental-service "Komplettera uppgifterna gällande uthyrning."
+  :header-usage-area "Landbegränsning"
+  :header-restrictions-payments "Begränsningar och betalsätt"
+  :header-vehicles "Fordon som uthyrs"
+  :header-accessibility "Tillgänglighet"
+  :header-additional-services "Tilläggsinfo"
+  :open-service-hours-and-exceptions "Betjäningstider"
+  :open-rental-prices "Prisuppgifter"}
 
 
  :terminal-page
- {:header-service-info                "Tjänstens basinfo"
-  :header-contact-details             "Tjänstens kontaktuppgifter"
-  :header-new-terminal                "Lägg till uppgifter om hamn, station eller övrig terminal"
-  :header-edit-terminal               "Redigera uppgifter om hamn, station eller övrig terminal"
-  :header-assistance                  "Information on assistanstjänst"
-  :header-accessibility               "Tillgänglihet"
-  :header-checkboxlist-accessibility  "Tillgänglighet"}
+ {:header-service-info "Tjänstens basinfo"
+  :header-contact-details "Tjänstens kontaktuppgifter"
+  :header-new-terminal "Lägg till uppgifter om hamn, station eller övrig terminal"
+  :header-edit-terminal "Redigera uppgifter om hamn, station eller övrig terminal"
+  :header-assistance "Information on assistanstjänst"
+  :header-accessibility "Tillgänglihet"
+  :header-checkboxlist-accessibility "Tillgänglighet"}
 
 
  :parking-page
- {:header-new-parking                       "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
-  :header-edit-parking                      "Redigera uppgifter om allmän kommersiell parkeringstjänst"
-  :header-service-info                      "Tjänstens basinfo"
-  :header-contact-details                   "Tjänstens kontaktuppgifter"
-  :header-payment-methods                   "Betalsätt"
-  :header-add-new-parking                   "Lägg till uppgifter om allmän kommersiell parkeringstjänst."
-  :header-accessibility                     "Tjänstens tillgänglighet"
-  :header-accessibility-description         "Beskrivning av tillgänglighetstjänster"
-  :header-price-and-payment-methods         "Prisuppgifter och betalsätt"
-  :header-facilities-and-capacities         "Parkeringsområden och antaler P-platser"
-  :header-charging-points                   "Laddningspunkter"
-  :header-service-hours                     "Tjänstens öppettider och parkeringstid"}
+ {:header-new-parking "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
+  :header-edit-parking "Redigera uppgifter om allmän kommersiell parkeringstjänst"
+  :header-service-info "Tjänstens basinfo"
+  :header-contact-details "Tjänstens kontaktuppgifter"
+  :header-payment-methods "Betalsätt"
+  :header-add-new-parking "Lägg till uppgifter om allmän kommersiell parkeringstjänst."
+  :header-accessibility "Tjänstens tillgänglighet"
+  :header-accessibility-description "Beskrivning av tillgänglighetstjänster"
+  :header-price-and-payment-methods "Prisuppgifter och betalsätt"
+  :header-facilities-and-capacities "Parkeringsområden och antaler P-platser"
+  :header-charging-points "Laddningspunkter"
+  :header-service-hours "Tjänstens öppettider och parkeringstid"}
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
@@ -713,8 +713,8 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
   :route-list-published? "Ruttens status"
-  :route-list-published?-values    {true  "Publicerad"
-                                    false "Ej publicerad"}
+  :route-list-published?-values {true "Publicerad"
+                                 false "Ej publicerad"}
   :route-list-table-starting-point "Avgångsplats"
   :route-list-table-destination-point "Destination"
   :route-list-table-valid-from "Gäller från och med"
@@ -724,7 +724,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
-  :link-to-help-pdf   "Användarinstruktioner för kartverktyget för sjötrafik"
+  :link-to-help-pdf "Användarinstruktioner för kartverktyget för sjötrafik"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide-sv.pdf"
   :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
   }
@@ -753,13 +753,13 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :stop-sequence-custom-dialog-title "Lägg till en ny hamn eller kaj"
   :stop-sequence-custom-dialog-add "Lägg till"
   :stop-sequence-custom-dialog-name "Namn"
-  :stop-sequence-custom-dialog-help  "Du kan ändra kajens/hamnens position eller ta bort den med kartverktyget. Efter att du sparat rutten, kan hamnen/kajen inte längre ändras."
+  :stop-sequence-custom-dialog-help "Du kan ändra kajens/hamnens position eller ta bort den med kartverktyget. Efter att du sparat rutten, kan hamnen/kajen inte längre ändras."
   :stop-sequence-leaflet-button-marker "Lägg till en ny hamn/kaj"
   :stop-sequence-leaflet-button-start "Klicka på kartan för att lägga till en hamn/kaj"
   :stop-sequence-port-header "Anlöpshamn"
   :stop-sequence-arrival-header "Ankomsttid"
   :stop-sequence-departure-header "Avgångstid"
-  :stop-sequence-map-help  "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
+  :stop-sequence-map-help "Skapa en egen rutt genom att klicka på anlöpshamnarna på kartan."
   :stop-sequence-delete "Ta bort en hamn från rutten"
   :stop-sequence-edit-map-help "I editeringsläget kan du lägga till sådana anlöpshamnar som saknas på kartan. Du kan också flytta och ta bort anlöpshamnar som du just har lagt till. Kartans övriga anlöpshamnar kan inte editeras. Du hittar editeringsknapparna till vänster på kartan."
 
@@ -797,6 +797,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
   :no-pre-notices-sent "Den valda tjänsteproducenten har inte skickat några meddelanden om ändring i regelbunden persontrafik till mundigheterna."
   :sent-pre-notices "Skickade ändringsmeddelanden"
   :no-pre-notices "Inga ändringsmeddelanden"
+  :only-for-authorities "Ändringsmeddelanden är endast för officiell användning."
 
   :headers {:ote.db.transit/id "ID"
             :ote.db.transit/regions "Landskap"
@@ -820,28 +821,28 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
                              :success-message "Ändringsmeddelandet har tagits bort"}
   }
 
-:pre-notice-page
-{:pre-notice-form-title "Meddelande om ändring i regelbunden persontrafik"
- :notice-type-title "Typ av ändring som meddelas"
- :notice-description-hint "Beskriv ändringen kortfattat här"
- :effective-dates-title "Ändringens begynnelsedatum"
- :attachment-section-title "Noggrannare uppgifter om ändringen"
- :route-and-area-information-title "Uppgifter om rutten och området"
- :effective-date-from "Begynnelsedatum"
- :effective-date-description "Förklaring"
- :publish-missing-required "Du kan inte skicka meddelandet ännu, eftersom det ännu saknas obligatoriska uppgifter i blanketten. Fyll i de ställen där det står \"Uppgift krävs\"."
- :save-success-send "Meddelandet har skickats."
- :save-success "Utkastet har sparats."
- :save-failure "Utkastet har inte sparats."
- :save-failure-send "Meddelandet har inte skickats."
- :route-description-hint "t.ex. Tammerfors–Björneborg"
- :add-attachment "Ny bilaga"
- :select-attachment "Lägg till bilaga"
- :effective-date-descriptions {:year-start "Början av året"
-                               :school-start "Början av läsåret"
-                               :school-end "Slutet av läsåret"
-                               :season-schedule-change "Tidtabellsperioden ändras"}
- }
+ :pre-notice-page
+ {:pre-notice-form-title "Meddelande om ändring i regelbunden persontrafik"
+  :notice-type-title "Typ av ändring som meddelas"
+  :notice-description-hint "Beskriv ändringen kortfattat här"
+  :effective-dates-title "Ändringens begynnelsedatum"
+  :attachment-section-title "Noggrannare uppgifter om ändringen"
+  :route-and-area-information-title "Uppgifter om rutten och området"
+  :effective-date-from "Begynnelsedatum"
+  :effective-date-description "Förklaring"
+  :publish-missing-required "Du kan inte skicka meddelandet ännu, eftersom det ännu saknas obligatoriska uppgifter i blanketten. Fyll i de ställen där det står \"Uppgift krävs\"."
+  :save-success-send "Meddelandet har skickats."
+  :save-success "Utkastet har sparats."
+  :save-failure "Utkastet har inte sparats."
+  :save-failure-send "Meddelandet har inte skickats."
+  :route-description-hint "t.ex. Tammerfors–Björneborg"
+  :add-attachment "Ny bilaga"
+  :select-attachment "Lägg till bilaga"
+  :effective-date-descriptions {:year-start "Början av året"
+                                :school-start "Början av läsåret"
+                                :school-end "Slutet av läsåret"
+                                :season-schedule-change "Tidtabellsperioden ändras"}
+  }
 
  :email-notification-settings-page
  {:page-title "Inställningar för e-postmeddelanden"
@@ -853,7 +854,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
 
  :price-dialog
  {:header-dialog "Fordonspris"
-  :close-dialog  "Stäng"}
+  :close-dialog "Stäng"}
 
 
  :opening-hours-dialog
@@ -862,7 +863,7 @@ Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänst
 
 
  :select-service-type-page
- {:title-required-data               "Börja med att välja tjänstetyp"
+ {:title-required-data "Börja med att välja tjänstetyp"
   :transport-service-type-selection-help-text "Du kan spara väsentlig information om mobilitetstjänsten genom att först välja tjänstetyp och tjänsteproducent och därefter fylla i det formulär som öppnas.
                 Fyll i en ny blankett för varje tjänst."
   :transport-service-type-brokerage-help-text "Gör på samma sätt om du erbjuder en förmedlingstjänst."
@@ -875,69 +876,69 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :common-texts
- {:front-page-help-text                       "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
+ {:front-page-help-text "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
-  :front-page-start-ote-query-header          "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
-  :link-add-new-api                           "Lägg till ny tjänst"
-  :own-api-list                               "Egna tjänsteuppgifter"
-  :passenger-transportation-service-text      "Persontransporttjänster"
-  :api-name                                   "Gränssnittets namn"
-  :api-url                                    "Gränsnittets tekniska adress"
-  :finap-status                               "NAP status"
-  :header-nap-official-name                   "Tjänstekatalog"
-  :navigation-own-service-list                "Egna tjänsteuppgifter"
-  :navigation-front-page                      "Framsida"
-  :navigation-organizations                   "Tjänsteproducenter"
-  :navigation-dataset                         "Tjänstekatalog"
-  :navigation-give-feedback                   "Respons"
-  :navigation-login                           "Logga in"
-  :navigation-register                        "Registrera"
-  :navigation-admin                           "Admin panel"
-  :navigation-route                           "Kartverktyg för sjötrafik"
-  :navigation-pre-notice                      "Meddelande om ändring i regelbunden persontrafik"
-  :navigation-authority-pre-notices           "Inkomna ändringsmeddelanden"
-  :navigation-privacy-policy                  "Registerbeskrivning"
-  :navigation-general-menu                    "Meny"
-  :navigation-for-developers                  "Programmeringsgränssnitt för utvecklare"
-  :navigation-email-notification-settings     "Inställningar för e-postmeddelanden"
-  :user-menu-service-guide                    "Anvisning"
-  :user-menu-service-operator                 "Tjänsteproducentens basinfo"
-  :user-menu-log-out                          "Utloggning"
-  :user-menu-profile                          "Visa egen profil"
-  :user-menu-summary                          "Sammandrag"
-  :user-menu-nap-help                         "NAP-anvisningar och -meddelanden"
-  :user-menu-nap-help-link                    "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/anvisningar#.W5uNi-gzY2w"
-  :user-menu-video-tutorials                  "Undervisningsvideor"
-  :user-menu-video-tutorials-link             "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
-  :title-operator-basic-details               "Basinfo"
-  :data-not-found                             "Inga uppgifter hittades"
-  :required-field                             "Obligatorisk uppgift"
-  :invalid-business-id                        "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
-  :invalid-postal-code                        "Kolla postnumret (5 siffror)"
-  :invalid-file-type                          "Ogiltig filtyp"
-  :transport-service-saved                    "Uppgifterna sparade!"
-  :transport-operator-saved                   "Uppgifterna sparade!"
-  :footer-livi-logo                           "Liikennevirasto Logo"
-  :footer-livi-url                            "Liikennevirasto.fi"
+  :front-page-start-ote-query-header "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
+  :link-add-new-api "Lägg till ny tjänst"
+  :own-api-list "Egna tjänsteuppgifter"
+  :passenger-transportation-service-text "Persontransporttjänster"
+  :api-name "Gränssnittets namn"
+  :api-url "Gränsnittets tekniska adress"
+  :finap-status "NAP status"
+  :header-nap-official-name "Tjänstekatalog"
+  :navigation-own-service-list "Egna tjänsteuppgifter"
+  :navigation-front-page "Framsida"
+  :navigation-organizations "Tjänsteproducenter"
+  :navigation-dataset "Tjänstekatalog"
+  :navigation-give-feedback "Respons"
+  :navigation-login "Logga in"
+  :navigation-register "Registrera"
+  :navigation-admin "Admin panel"
+  :navigation-route "Kartverktyg för sjötrafik"
+  :navigation-pre-notice "Meddelande om ändring i regelbunden persontrafik"
+  :navigation-authority-pre-notices "Inkomna ändringsmeddelanden"
+  :navigation-privacy-policy "Registerbeskrivning"
+  :navigation-general-menu "Meny"
+  :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
+  :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
+  :user-menu-service-guide "Anvisning"
+  :user-menu-service-operator "Tjänsteproducentens basinfo"
+  :user-menu-log-out "Utloggning"
+  :user-menu-profile "Visa egen profil"
+  :user-menu-summary "Sammandrag"
+  :user-menu-nap-help "NAP-anvisningar och -meddelanden"
+  :user-menu-nap-help-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/anvisningar#.W5uNi-gzY2w"
+  :user-menu-video-tutorials "Undervisningsvideor"
+  :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
+  :title-operator-basic-details "Basinfo"
+  :data-not-found "Inga uppgifter hittades"
+  :required-field "Obligatorisk uppgift"
+  :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
+  :invalid-postal-code "Kolla postnumret (5 siffror)"
+  :invalid-file-type "Ogiltig filtyp"
+  :transport-service-saved "Uppgifterna sparade!"
+  :transport-operator-saved "Uppgifterna sparade!"
+  :footer-livi-logo "Liikennevirasto Logo"
+  :footer-livi-url "Liikennevirasto.fi"
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
-  :footer-ckan-software                       "CKAN"
-  :footer-made-width                          "Made with"
+  :footer-ckan-software "CKAN"
+  :footer-made-width "Made with"
   :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
-  :footer-funded  (:md "Delvis finansierat av EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
+  :footer-funded (:md "Delvis finansierat av EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "NAP utnyttjar öppen källkod från [CKAN.](https://ckan.org/)")
-  :no-such-page                               "Valda sidan hittas ej: "
-  :time-unit                                  "Tidsenhet"
-  :time-units {:minutes  "Minuter"
-               :hours    "Timmar"
-               :days     "Dagar"
-               :seconds  "Sekunder"}
+  :no-such-page "Valda sidan hittas ej: "
+  :time-unit "Tidsenhet"
+  :time-units {:minutes "Minuter"
+               :hours "Timmar"
+               :days "Dagar"
+               :seconds "Sekunder"}
   :save-failed "Ett fel inträffade"
-  :delete-operator-success    "Tjänsteproducenter borttagen."
-  :delete-service-success     "Tjänsten borttagen."
-  :delete-service-error       "Tjänsten gick inte att ta bort "
-  :delete-route-success                       "Rutten togs bort."
-  :delete-route-error                         "Rutten kunde inte tas bort. "
+  :delete-operator-success "Tjänsteproducenter borttagen."
+  :delete-service-success "Tjänsten borttagen."
+  :delete-service-error "Tjänsten gick inte att ta bort "
+  :delete-route-success "Rutten togs bort."
+  :delete-route-error "Rutten kunde inte tas bort. "
   :logged-in "Inloggningen lyckades!"
   :loading "Ladda"
   :language "Språk"
@@ -1053,7 +1054,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "years" "År"
           "transport-type" "Trafikslag"
           "advance-reservation" "Förhandsbokning"
-          "visiting-address"  "Besöksadress"
+          "visiting-address" "Besöksadress"
 
           :values {"passenger-transportation" "Persontransport"
                    true "Ja"
@@ -1104,7 +1105,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
                    ;; additional services
                    "animal-transport" "Djurtransport tillåten"
-                   "child-seat"       "Barnstol"
+                   "child-seat" "Barnstol"
 
                    ;; parking types
                    "unknown" "Okänd"
@@ -1154,9 +1155,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                    "advance-reservation" "förhandsbokning"
                    "no" "Inte"
                    "road" "Vägtrafik"
-                   "rail"      "Tågtrafik"
-                   "sea"       "Sjötrafik"
-                   "aviation"  "Luftfart"
+                   "rail" "Tågtrafik"
+                   "sea" "Sjötrafik"
+                   "aviation" "Luftfart"
 
                    "mandatory" "Obligatorisk"
                    "possible" "Möjlig"}
@@ -1218,9 +1219,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :type-search "Tjänstetyp"
   :limit-search-results "Begränsar katalogen"
   :result-count (:plural :count
-                         "Inga resultat"
-                         "Hittades en tjänst."
-                         ["Hittades " :count " tjänst."])
+                  "Inga resultat"
+                  "Hittades en tjänst."
+                  ["Hittades " :count " tjänst."])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
@@ -1252,7 +1253,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :error {:no-such-user "Okänd konto"
           :incorrect-password "Fel lösenord"}
 
-  :check-email-for-link "Återställningskoden har skickats per e-post."
+  :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
 
  :register
@@ -1281,7 +1282,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :request-button "Begär återställning"
   :password-changed "Lösenordet har ändrats"}
 
-  :gtfs-viewer
+ :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
 
 
@@ -1291,42 +1292,42 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
 
  :leaflet-draw
- {:toolbar  {:buttons {:polyline  "Rita sträck"
-                       :polygon   "Rita månghörning"
-                       :rectangle "Rita kvadrat"
-                       :marker    "Lägg till punkt"}
-             :actions {:title "Annulera"
-                       :text  "Ångra"}
-             :finish  {:title "Sluta rita"
-                       :text  "Sluta"}
-             :undo    {:title "Ta bort den senast ritade punkten"
-                       :text  "Ta bort den senast ritade punkten"}}
-  :handlers {:marker      {:tooltip {:start "Klicka på kartan för att lägga till punkt."}}
-             :polygon     {:tooltip {:start "Klicka på kartan för att rita månhörning."
-                                     :cont  "Klicka för att fortsätta rita månghörning."
-                                     :end   "Klicka på den första punkten för att sluta månghörningen."}}
-             :polyline    {:error   "<strong>Fel:</strong> strecken får inte korsa varandra"
-                           :tooltip {:start "Klicka på kartan för att börja rita streck."
-                                     :cont  "Klicka för att fortsätta rita streck."
-                                     :end   "Klicka på den sista punkten för att avsluta ritandet."}}
-             :rectangle   {:tooltip {:start "Klicka och dra för att rita en fyrkant."}}
+ {:toolbar {:buttons {:polyline "Rita sträck"
+                      :polygon "Rita månghörning"
+                      :rectangle "Rita kvadrat"
+                      :marker "Lägg till punkt"}
+            :actions {:title "Annulera"
+                      :text "Ångra"}
+            :finish {:title "Sluta rita"
+                     :text "Sluta"}
+            :undo {:title "Ta bort den senast ritade punkten"
+                   :text "Ta bort den senast ritade punkten"}}
+  :handlers {:marker {:tooltip {:start "Klicka på kartan för att lägga till punkt."}}
+             :polygon {:tooltip {:start "Klicka på kartan för att rita månhörning."
+                                 :cont "Klicka för att fortsätta rita månghörning."
+                                 :end "Klicka på den första punkten för att sluta månghörningen."}}
+             :polyline {:error "<strong>Fel:</strong> strecken får inte korsa varandra"
+                        :tooltip {:start "Klicka på kartan för att börja rita streck."
+                                  :cont "Klicka för att fortsätta rita streck."
+                                  :end "Klicka på den sista punkten för att avsluta ritandet."}}
+             :rectangle {:tooltip {:start "Klicka och dra för att rita en fyrkant."}}
              :simpleshape {:tooltip {:end "Släpp musknappen för att avsluta."}}
              :circle {:tooltip {:start "Klicka och dra för att rita en cirkel."}
                       :radius "Radie"}
              :circlemarker {:tooltip {:start "Klicka på kartan för att rita en liten cirkelmarkering."}}}}
- :leaflet-port-edit {:toolbar { :actions {:save {:title "Spara ändringarna"
-                                            :text "Spara ändringarna"}
-                                     :cancel {:title "Ångra ändringarna"
-                                              :text "Ångra"}
-                                     :clearAll {:title "Ta bort alla anlöpshamnar som du lagt till"
-                                                :text "Ta bort alla anlöpshamnar som du lagt till"}}
-                          :buttons {:edit "Editera"
-                                    :editDisabled "Det finns inget att editera"
-                                    :remove "Ta bort"
-                                    :removeDisabled "Det finns inget att ta bort"}}
-                :handlers {:edit {:tooltip {:text "Flytta anlöpshamnen genom att klicka på den och samtidigt dra musen"
-                                            :subtext "Om du vill ångra ändringarna, välj \"ångra\"."}}
-                           :remove {:tooltip {:text "Markera anlöpshamnen som kan tas bort genom att klicka på den."}}}}
+ :leaflet-port-edit {:toolbar {:actions {:save {:title "Spara ändringarna"
+                                                :text "Spara ändringarna"}
+                                         :cancel {:title "Ångra ändringarna"
+                                                  :text "Ångra"}
+                                         :clearAll {:title "Ta bort alla anlöpshamnar som du lagt till"
+                                                    :text "Ta bort alla anlöpshamnar som du lagt till"}}
+                               :buttons {:edit "Editera"
+                                         :editDisabled "Det finns inget att editera"
+                                         :remove "Ta bort"
+                                         :removeDisabled "Det finns inget att ta bort"}}
+                     :handlers {:edit {:tooltip {:text "Flytta anlöpshamnen genom att klicka på den och samtidigt dra musen"
+                                                 :subtext "Om du vill ångra ändringarna, välj \"ångra\"."}}
+                                :remove {:tooltip {:text "Markera anlöpshamnen som kan tas bort genom att klicka på den."}}}}
 
  :email-templates
  {:password-reset {:subject "NAP - Återställ ditt lösenord"

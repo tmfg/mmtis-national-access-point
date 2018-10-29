@@ -114,32 +114,40 @@
 
 (defn- list-service-companies [service-companies service-search]
   (when (seq service-companies)
-    (let [searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
+    (let [company-list-max-size 3
+          service-company-count (count service-companies)
+          searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
           found-business-ids (keep (fn [sc]
                                      (let [s (keep #(when (= (::t-service/business-id sc) %) sc) searched-business-ids)]
                                        (when (not (empty? s)) (first s))))
                                    service-companies)
           presented-companies-count (if (not (empty? found-business-ids))
                                       (count found-business-ids)
-                                      2)
-          extra-companies (- (count service-companies) presented-companies-count)]
+                                      company-list-max-size)
+          extra-companies (- service-company-count presented-companies-count)]
       [:div
        [:h4 (tr [:service-search :other-involved-companies])]
+       ;; Show searched companies or list involved companies
        (if (not (empty? found-business-ids))
-         (doall (for [c found-business-ids]
-                  (when (::t-service/name c)
-                    [:div.row (merge {:key (::t-service/business-id c)}
-                                     (stylefy/use-style style/simple-result-card-row))
-                     (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))
-         (doall
-           (for [c (take 2 service-companies)]
-             (when (::t-service/name c)
-               [:div.row (merge {:key (::t-service/business-id c)}
-                                (stylefy/use-style style/simple-result-card-row))
-                (str (::t-service/name c) " (" (::t-service/business-id c) ")")]))))
-       (when (> extra-companies 0)
-         [:div.row (stylefy/use-style style/simple-result-card-row)
-          (str " + " extra-companies (tr [:service-search :other-company]))])])))
+         [:div
+          (doall (for [c found-business-ids]
+                   (when (::t-service/name c)
+                     [:div.row (merge {:key (::t-service/business-id c)}
+                                      (stylefy/use-style style/simple-result-card-row))
+                      (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))
+          (when (> extra-companies 0)
+            [:div.row (stylefy/use-style style/simple-result-card-row)
+             (str " + " extra-companies (tr [:service-search :other-company]))])]
+         ;; List only three or show company count
+         (if (> service-company-count company-list-max-size)
+           [:div.row (stylefy/use-style style/simple-result-card-row)
+            (str service-company-count (tr [:service-search :other-company]))]
+           (doall
+             (for [c (take company-list-max-size service-companies)]
+               (when (::t-service/name c)
+                 [:div.row (merge {:key (::t-service/business-id c)}
+                                  (stylefy/use-style style/simple-result-card-row))
+                  (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))))])))
 
 (defn- result-card [e! admin?
                     {::t-service/keys [id name sub-type contact-address
@@ -225,47 +233,6 @@
          (when (> filter-service-count (count results))
            [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]]))
 
-(defn operator-result-chips [e! chip-results]
-  (fn [e! chip-results]
-    [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-     (for [{:keys [operator business-id]} chip-results]
-       ^{:key (str "transport-operator-" business-id)}
-       [:span
-        [ui/chip {:ref business-id
-                  :style {:margin 4}
-                  :on-request-delete #(do
-                                        (e! (ss/->RemoveOperatorById business-id))
-                                        (e! (ss/->UpdateSearchFilters nil)))}
-         operator]])]))
-
-(defn- parse-operator-data-source [completions]
-  (into-array
-    (map (fn [{:keys [business-id operator]}]
-           #js {:text operator
-                :business-id business-id
-                :value (r/as-element
-                         [ui/menu-item {:primary-text operator}])})
-         completions)))
-
-(defn operator-search [e! {:keys [results chip-results name] :as data}]
-  [:div
-   [ui/auto-complete {:floating-label-text (tr [:service-search :operator-search])
-                      :floating-label-fixed true
-                      :hintText (tr [:service-search :operator-search-placeholder])
-                      :hint-style style-base/placeholder
-                      :style {:width "100%"}
-                      :filter (constantly true)          ;; no filter, backend returns what we want
-                      :maxSearchResults 12
-                      :dataSource (parse-operator-data-source results)
-                      :on-update-input #(e! (ss/->SetOperatorName %))
-                      :search-text (or name "")
-                      :on-new-request #(do
-                                         (e! (ss/->AddOperator
-                                              (aget % "business-id")
-                                              (aget % "text")))
-                                         (e! (ss/->UpdateSearchFilters nil)))}]
-
-   [operator-result-chips e! chip-results]])
 
 (defn- capitalize-operation-area-postal-code [sentence]
   (str/replace sentence #"([^A-Öa-ö0-9_])(\w)"
@@ -305,6 +272,7 @@
                                                 (assoc {} :text (tr [:enums ::t-service/transport-type val])
                                                           :value val)))
                                         data))]
+
     [:div
      [:h2 {:style {:font-weight 500 }} (tr [:service-search :limit-search-results])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
@@ -320,8 +288,34 @@
           :name :operators
           :full-width? true
           :container-class "col-xs-12 col-sm-4 col-md-4"
+          :container-style {:padding-right "10px"}
           :component (fn [{data :data}]
-                       [:span [operator-search e! data]])}
+                       [form-fields/field
+                        {:type :chip-input
+                         :label (tr [:service-search :operator-search])
+                         :full-width? true
+                         :full-width-input? false
+                         :hint-text (tr [:service-search :operator-search-placeholder])
+                         :hint-style {:top "20px"}
+                         ;; No filter, back-end returns what we want
+                         :filter (constantly true)
+                         :suggestions-config {:text :operator :value :business-id}
+                         ;; Filter away transport-operators that have no business-id. (Note: It should be mandatory!)
+                         :suggestions (filter :business-id (:results data))
+                         :open-on-focus? true
+                         :on-update-input #(e! (ss/->SetOperatorName %))
+                         ;; Select first match from autocomplete filter result list after pressing enter
+                         :auto-select? true
+                         :on-request-add (fn [chip]
+                                           (e! (ss/->AddOperator
+                                                 (:business-id chip)
+                                                 (:operator chip)))
+                                           (e! (ss/->UpdateSearchFilters nil))
+                                           chip)
+                         :on-request-delete (fn [chip-val]
+                                              (e! (ss/->RemoveOperatorById chip-val))
+                                              (e! (ss/->UpdateSearchFilters nil)))}
+                        (:chip-results data)])}
 
          {:name :text-search
           :type :string
@@ -348,6 +342,7 @@
           :type :chip-input
           :container-class "col-xs-12 col-sm-4 col-md-4"
           :hint-text (tr [:service-search :operation-area-search-placeholder])
+          :hint-style {:top "20px"}
           :full-width? true
           :full-width-input? false
           :filter (fn [query, key]

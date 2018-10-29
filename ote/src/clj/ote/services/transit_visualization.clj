@@ -5,27 +5,24 @@
             [cheshire.core :as cheshire]
             [ote.components.http :as http]
             [ote.components.service :refer [define-service-component]]
-            [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
-            [specql.op :as op]
             [clojure.string :as str]
             [taoensso.timbre :as log]
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
-            [ote.util.fn :refer [flip]]
-            [ote.db.transport-service :as t-service]))
+            [ote.util.fn :refer [flip]]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
 (defn- parse-stops [stops]
   (mapv (fn [stop]
-          (let [[lat lon & name] (str/split stop #",")]
+          (let [[lat lon stop-name] (str/split stop #",")]
             {:lat (Double/parseDouble lat)
              :lon (Double/parseDouble lon)
-             :name (str/join "," name)}))
+             :name stop-name}))
         (str/split stops #"\|\|")))
 
-(defn route-line-features [rows]
+(defn route-line-features [trips]
   (mapcat (fn [{:keys [route-line departures stops] :as foo}]
             (let [all-stops (parse-stops stops)
                   first-stop (first all-stops)
@@ -40,10 +37,11 @@
                              {:type "Point"
                               :coordinates [(Double/parseDouble lon)
                                             (Double/parseDouble lat)]
-                              :properties {"name" name}})))
+                              :properties {"name" name
+                                           "trip-name" (str (:name first-stop) " \u2192 " (:name last-stop))}})))
                     (when (not (str/blank? stops))
                       (str/split stops #"\|\|"))))))
-          rows))
+          trips))
 
 (defn service-changes-for-date [db service-id date]
   (first

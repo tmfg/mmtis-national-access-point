@@ -72,18 +72,14 @@
       :color "rgb (0, 255, 255)"
       :transition "box-shadow 0.25s"
       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-     (when (and prev-week-hash #_next-week-hash hash
-                (not= hash prev-week-hash)
-                #_(not= prev-week-hash next-week-hash))
+     (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
        {:box-shadow "inset 0 0 0 1px black,
                      inset 0 0 0 2px transparent"})
      (cond (= (time/format-date-iso-8601 date1) d)
            (style/date1-highlight-style hash-color)
 
            (= (time/format-date-iso-8601 date2) d)
-           (style/date2-highlight-style hash-color))
-     #_(when (:hash highlight)
-        (highlight-style hash->color date->hash day highlight)))))
+           (style/date2-highlight-style hash-color)))))
 
 (defn hover-day [e! date->hash day]
   (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
@@ -106,16 +102,23 @@
   "Bind popup content and set marker icon for stop marker features."
   [offset [w h]]
   (fn [feature ^js/L.Layer layer]
-    (if-let [name (aget feature "properties" "name")]
+    (let [stop-name (aget feature "properties" "name")
+          trip-name (aget feature "properties" "trip-name")
+          popup-html (str "Pysäkki: " stop-name " <br> Vuoro: " trip-name)]
+      (if stop-name
       ;; This features is a stop marker
       (do
+        ;; Add trip-name for every stop marker to find them when the trip whom they belong to is hidden.
+        (aset (aget layer "feature" "properties") "trip-name" trip-name)
+        ;; Add icon for every stop marker
         (aset (aget layer "options") "icon"
               (js/L.icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
                                :iconSize #js [w h]
                                :iconAnchor #js [(int (/ w 2)) (int (/ h 2))]}))
-        (.bindPopup layer name))
+        ;; Add popup
+        (.bindPopup layer popup-html))
       ;; This feature has no name, it is the route line, apply pixel offset
-      (.call (aget layer "setOffset") layer offset))))
+      (.call (aget layer "setOffset") layer offset)))))
 
 (defn update-marker-visibility [this show-atom removed-route-layers]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
@@ -139,12 +142,13 @@
                     (if-let [icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
                       (set! (.-visibility (aget icon "style"))
-                            (if (:stops show) "" "hidden"))
+                            (if (and (:stops show) (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                              "" "hidden")))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
                           ;; This is a layer for a routeline that should be removed
-                          (swap! removed-route-layers update routename conj layer))))))
+                          (swap! removed-route-layers update routename conj layer)))))
 
     ;; Remove layers that were added to removed-route-layers
     (doseq [[_ layers] @removed-route-layers]
@@ -385,8 +389,6 @@
     [:div {:style {:width "35%"}}
      [stop-time-changes-icon trip-stop-time-changes with-labels?]]]))
 
-
-
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
                                                            style/section
@@ -489,9 +491,7 @@
    (when (seq diff)
      [change-icons diff true])])
 
-(defn route-service-calendar [e! {:keys [date->hash hash->color
-                                         show-previous-year? show-next-year?
-                                         compare open-sections]}]
+(defn route-service-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
      [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
@@ -504,10 +504,7 @@
                                         :margin-bottom "1rem"}))
         [ui/checkbox {:label "Näytä myös edellinen vuosi"
                       :checked show-previous-year?
-                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]
-        [ui/checkbox {:label "Näytä myös tuleva vuosi"
-                      :checked show-next-year?
-                      :on-check #(e! (tv/->ToggleShowNextYear))}]]]
+                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]]]
       [:div.route-service-calendar-content
 
 
@@ -519,16 +516,17 @@
                                            :years (vec (concat (when show-previous-year?
                                                                  [(dec current-year)])
                                                                [current-year]
-                                                               (when show-next-year?
-                                                                 [(inc current-year)])))
+                                                               [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
                                                                hash (date->hash d)
                                                                hash-color (hash->color hash)]
-                                                           (if (= 2 (get compare :last-selected-date 2))
-                                                             (style/date1-highlight-style hash-color
-                                                                                          style/date1-highlight-color-hover)
-                                                             (style/date2-highlight-style hash-color
-                                                                                          style/date2-highlight-color-hover)))}]
+                                                           (when-not (or (= (time/format-date-iso-8601 (:date1 compare)) d)
+                                                                         (= (time/format-date-iso-8601 (:date2 compare)) d))
+                                                             (if (= 2 (get compare :last-selected-date 2))
+                                                               (style/date1-highlight-style hash-color
+                                                                                            style/date1-highlight-color-hover)
+                                                               (style/date2-highlight-style hash-color
+                                                                                            style/date2-highlight-color-hover))))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))
@@ -689,7 +687,7 @@
             (when show-date2?
               ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
               [leaflet/GeoJSON {:data date2-route-lines
-                                :onEachFeature (initialize-route-features offset icon-size)
+                                :onEachFeature (initialize-route-features (+ 2 offset) icon-size)
                                 :style {:lineJoin "miter"
                                         :lineCap "miter"
                                         :color style/date2-highlight-color
