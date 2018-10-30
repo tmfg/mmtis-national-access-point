@@ -21,15 +21,23 @@
   "Route key is a vector of [short-name long-name headsign]"
   (juxt :route-short-name :route-long-name :trip-headsign))
 
+(def empty-route-key [nil nil nil])
+
 (defn routes-by-date [date-route-hashes all-routes]
   ;; date-route-hashes contains all hashes for date range and is sorted
   ;; by date so we can partition by :date to get each date's hashes
   (for [hashes-for-date (partition-by :date date-route-hashes)
         :let [date (:date (first hashes-for-date))]]
     {:date (.toLocalDate date)
-     :routes (into (zipmap all-routes (repeat nil))
-                   (map (juxt route-key :hash))
-                   hashes-for-date)}))
+     :routes (dissoc
+              (into (zipmap all-routes (repeat nil))
+                    (map (juxt route-key :hash))
+                    hashes-for-date)
+
+              ;; If there is no traffic for the service on a given date, the
+              ;; result set will contain a single row with nil values for route.
+              ;; Remove the empty-route-key so we don't get an extra route.
+              empty-route-key)}))
 
 (defn merge-week-hash
   "Merges multiple maps containing route day hashes.
@@ -176,7 +184,6 @@
   (let [routes (into #{}
                      (map first)
                      (:routes (first route-weeks)))]
-
     (reduce
      (fn [route-detection-state [_ curr _ _ :as weeks]]
        (reduce
@@ -199,9 +206,9 @@
                trip-id (:trip-id (first trip-stops))]]
      {:gtfs/package-id package-id
       :gtfs/trip-id trip-id
-      :stoptimes (mapv (fn [{:keys [stop-id departure-time stop-sequence]}]
+      :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence]}]
                          {:gtfs/stop-id stop-id
-                          :gtfs/stop-name stop-id ; we don't fetch name, use id
+                          :gtfs/stop-name stop-name
                           :gtfs/stop-sequence stop-sequence
                           :gtfs/departure-time (time/pginterval->interval departure-time)})
                        trip-stops)})))
@@ -233,7 +240,7 @@
          :removed-trips (count removed)
          :trip-changes (map (fn [[l r]]
                               (transit-changes/trip-stop-differences l r))
-                             changed)}))))
+                            changed)}))))
 
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
@@ -250,13 +257,16 @@
         routes))
 
 (defn- max-date-in-the-past? [{max-date :max-date}]
-  (.isBefore (.toLocalDate max-date) (java.time.LocalDate/now)))
+  (and max-date
+       (.isBefore (.toLocalDate max-date) (java.time.LocalDate/now))))
 
 (defn- max-date-within-90-days? [{max-date :max-date}]
-  (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 90)))
+  (and max-date
+       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 90))))
 
 (defn- min-date-in-the-future? [{min-date :min-date}]
-  (.isAfter (.toLocalDate min-date) (java.time.LocalDate/now)))
+  (and min-date
+       (.isAfter (.toLocalDate min-date) (java.time.LocalDate/now))))
 
 (defn- update-min-max-range [range val]
   (merge {:lower-inclusive? true
@@ -296,33 +306,46 @@
       :gtfs/route-long-name (:route-long-name route)
       :gtfs/trip-headsign (:trip-headsign route)
 
-      ;; Change classification
-      :gtfs/change-type (cond
-                          no-traffic? :no-traffic
-                          added? :added
-                          removed? :removed
-                          changes :changed
-                          :default :no-change)
-
       ;; Trip change counts
       :gtfs/added-trips added-trips
       :gtfs/removed-trips removed-trips
       :gtfs/trip-stop-sequence-changes trip-stop-seq-changes
       :gtfs/trip-stop-time-changes trip-stop-time-changes}
 
-     ;; Dates
-     (if no-traffic?
-       ;; If the change is a no-traffic period, the different day is the first day that has no traffic
-       {:gtfs/current-week-date (sql-date
-                                 (.plusDays no-traffic-start-date -1)
-                                 #_(week-day-in-week (:beginning-of-week starting-week) (.getDayOfWeek no-traffic-start-date)))
+     ;; Change type and type specific dates
+     (cond
+       no-traffic?
+       {:gtfs/change-type :no-traffic
+
+        ;; If the change is a no-traffic period, the different day is the first day that has no traffic
+        :gtfs/current-week-date (sql-date
+                                 (.plusDays no-traffic-start-date -1))
         :gtfs/different-week-date (sql-date no-traffic-start-date)
         :gtfs/change-date (sql-date no-traffic-start-date)}
 
-       ;; If this is a change
-       {:gtfs/current-week-date (sql-date starting-week-date)
+       added?
+       {:gtfs/change-type :added
+
+        ;; For an added route, the change-date is the date when traffic starts
+        :gtfs/different-week-date (:min-date route)
+        :gtfs/change-date (:min-date route)
+        :gtfs/current-week-date (sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
+
+       removed?
+       {:gtfs/change-type :removed
+        ;; For a removed route, the change-date is the day after traffic stops
+        :gtfs/change-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+        :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+        :gtfs/current-week-date (:max-date route)}
+
+       changes
+       {:gtfs/change-type :changed
+        :gtfs/current-week-date (sql-date starting-week-date)
         :gtfs/different-week-date (sql-date different-week-date)
-        :gtfs/change-date (sql-date different-week-date)}))))
+        :gtfs/change-date (sql-date different-week-date)}
+
+       :default
+       {:gtfs/change-type :no-change}))))
 
 (defn- debug-print-change-stats [all-routes route-changes]
   (doseq [r all-routes
@@ -376,10 +399,5 @@
              ;; Fetch detailed route comparison if a change was found
              (route-day-changes db service-id routes)))}))
 
-
-(def db (:db ote.main/ote))
-(def query-params {:start-date (LocalDate/of 2018 10 29)
-                            :end-date (LocalDate/of 2019 2 17)
-                            :service-id 1454})
-(def chg (route-changes db query-params))
-(store-transit-changes! db 1454 (mapv :id (service-packages-for-date-range db query-params)) chg)
+(defn service-package-ids-for-date-range [db query-params]
+  (mapv :id (service-packages-for-date-range db query-params)))
