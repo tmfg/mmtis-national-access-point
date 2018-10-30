@@ -79,12 +79,14 @@
         (log/info "Detect transit changes for " (count service-ids) " services.")
         (doseq [service-id service-ids]
           (log/info "Detecting next transit changes for service: " service-id)
-          #_(upsert-service-transit-change db {:service-id service-id})
-
-          ;; FIXME: separate change calculation from upsert
-          (detection/route-changes db {:service-id service-id
-                                       :start-date start-date
-                                       :end-date end-date})))))))
+          (try
+            (->> {:service-id service-id
+                  :start-date start-date
+                  :end-date end-date}
+                 (detection/route-changes db)
+                 (detection/store-transit-changes! db service-id))
+            (catch Exception e
+              (log/warn e "Change detection failed for service " service-id)))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
