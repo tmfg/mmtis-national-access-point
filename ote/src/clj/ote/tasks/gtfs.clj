@@ -72,7 +72,11 @@
          start-date (time/days-from (time/beginning-of-week (time/now)) -7)
 
          ;; Continue 15 weeks from the current week
-         end-date (time/days-from start-date (dec (* 7 16)))]
+         end-date (time/days-from start-date (dec (* 7 16)))
+
+         ;; Convert to LocalDate instances
+         [start-date end-date] (map (comp time/date-fields->date time/date-fields)
+                                    [start-date end-date])]
      (lock/try-with-lock
       db "gtfs-nightly-changes" 1800
       (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
@@ -80,11 +84,13 @@
         (doseq [service-id service-ids]
           (log/info "Detecting next transit changes for service: " service-id)
           (try
-            (->> {:service-id service-id
-                  :start-date start-date
-                  :end-date end-date}
-                 (detection/route-changes db)
-                 (detection/store-transit-changes! db service-id))
+            (let [query-params {:service-id service-id
+                                :start-date start-date
+                                :end-date end-date}]
+              (detection/store-transit-changes!
+               db service-id
+               (detection/service-package-ids-for-date-range db query-params)
+               (detection/route-changes db query-params)))
             (catch Exception e
               (log/warn e "Change detection failed for service " service-id)))))))))
 
