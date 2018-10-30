@@ -128,10 +128,11 @@
           (dissoc :no-traffic-run)
           (assoc :no-traffic-change (+ no-traffic-run beginning-run)))
 
-      ;; If no run is in progress but current week ends in no traffic, start new run
-      (and (nil? no-traffic-run)
-           (pos? end-run))
-      (assoc state :no-traffic-run end-run)
+      ;; Current week ends in no traffic, start new run
+      (pos? end-run)
+      (-> state
+          (assoc :no-traffic-run end-run)
+          (dissoc :no-traffic-start-date))
 
       ;; No condition matched, remove any partial run
       :default
@@ -154,7 +155,8 @@
     (nil? no-traffic-run)
     (dissoc state :no-traffic-start)
 
-    :default state))
+    :default
+    state))
 
 (defn- route-next-different-week
   [{diff :different-week no-traffic-end-date :no-traffic-end-date
