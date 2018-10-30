@@ -15,7 +15,7 @@
            :routes routes}) route-maps)))
 
 
-(def test-traffic-no-run
+(def test-no-traffic-run
   (weeks (d 2018 10 8)
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" "h3" nil nil nil nil]} ; 4 day run
@@ -28,7 +28,30 @@
 (deftest no-traffic-run-is-detected
   (is (= {:no-traffic-start-date (d 2018 10 18)
           :no-traffic-end-date (d 2018 11 2)}
-         (-> (detection/next-different-weeks test-traffic-no-run)
+         (-> (detection/next-different-weeks test-no-traffic-run)
+             (get route-name)
+             (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
+
+(def test-no-traffic-run-weekdays
+  (weeks (d 2018 10 8)
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 8.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 15.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 22.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 29.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 5.11.
+         {route-name ["h1" "h2" nil nil nil nil nil]} ; 5 day run
+         {route-name [nil nil nil nil nil nil nil]} ; 7 days
+         {route-name [nil nil nil nil "h5" nil nil]} ; 4 days => sum 16
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}))
+
+(deftest no-traffic-run-weekdays-is-detected
+  ;; Test that traffic that has normal "no-traffic" days (like no traffic on weekends)
+  ;; is still detected.
+  (is (= {:no-traffic-start-date (d 2018 11 14)
+          :no-traffic-end-date (d 2018 11 30)}
+         (-> (detection/next-different-weeks test-no-traffic-run-weekdays)
              (get route-name)
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
 
