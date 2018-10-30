@@ -443,6 +443,11 @@
       :read identity
       :format (fn [{change-type :gtfs/change-type :as route-changes}]
                 (case change-type
+                  :no-traffic
+                  [labeled-icon
+                   [ic/av-not-interested]
+                   "Tauko liikennöinnissä"]
+
                   :added
                   [labeled-icon
                    [ic/content-add-circle-outline {:color style/add-color}]
