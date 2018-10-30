@@ -3,7 +3,13 @@
   (:require [ote.time :as time]
             [ote.util.collections :refer [index-of]]
             [taoensso.timbre :as log]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.spec.alpha :as s]))
+
+;; Define data type specs
+(s/def ::day-hash (s/nilable string?))
+(s/def ::week-hash (s/every ::day-hash :count 7))
+
 
 (defn item-with-closest-time
   "Return a vector containing the given `item` and the item in `items`
@@ -125,3 +131,57 @@
 
           (partition-by :gtfs/stop-name
                         (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))
+
+
+(defn combine-trips [date1-trips date2-trips]
+  (when (and date1-trips date2-trips)
+    (when-let [first-common-stop (first-common-stop (concat date1-trips date2-trips))]
+      (let [first-common-stop
+            #(assoc %
+                    :first-common-stop first-common-stop
+                    :first-common-stop-time (time-for-stop % first-common-stop))
+            date1-trips (mapv first-common-stop date1-trips)
+            date2-trips (mapv first-common-stop date2-trips)
+            combined-trips (merge-by-closest-time :first-common-stop-time date1-trips date2-trips)]
+        (mapv (fn [[l r]]
+                [l r (trip-stop-differences l r)])
+              combined-trips)))))
+
+(defn week=
+  "Compare week hashes. Returns true if they represent the same traffic
+  (excluding no-traffic days).
+  Both `w1` and `w2` are vectors of strings that must be the same length."
+  [w1 w2]
+  (every? true?
+          (map (fn [h1 h2]
+                 ;; Only compare hashes where both days have traffic (not nil)
+                 (or (nil? h1)
+                     (nil? h2)
+                     (= h1 h2)))
+               w1 w2)))
+
+(s/fdef week=
+  :args (s/cat :w1 ::week-hash :w2 ::week-hash)
+  :ret boolean?)
+
+(defn first-different-day
+  "Return the index of first different day in two week hash vectors.
+  A day is considered different if both weeks have a hash (non nil)
+  for that day and the hash is different."
+  [week-hash-1 week-hash-2]
+  (some identity
+        (map (fn [i d1 d2]
+               (and (some? d1)
+                    (some? d2)
+                    (not= d1 d2)
+                    i))
+             (iterate inc 0)
+             week-hash-1
+             week-hash-2)))
+
+
+
+(s/fdef first-different-day
+  :args (s/cat :week-hash-1 ::week-hash
+               :week-hash-2 ::week-hash)
+  :ret (s/nilable integer?))

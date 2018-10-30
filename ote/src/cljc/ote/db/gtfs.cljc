@@ -40,17 +40,26 @@
 
 #?(:clj
    ;; As of 2018-08-30 specql doesn't support int4range
-   (defmethod composite/parse-value "int4range" [_ string]
-     (let [[m lower-type lower upper upper-type]
-           (re-matches int4range-pattern string)]
-       (when m
-         (merge
-          {:lower-inclusive? (= "[" lower-type)
-           :upper-inclusive? (= "]" upper-type)}
-          (when-not (str/blank? lower)
-            {:lower (Integer/parseInt lower)})
-          (when-not (str/blank? upper)
-            {:upper (Integer/parseInt upper)}))))))
+   (do
+     (defmethod composite/parse-value "int4range" [_ string]
+       (let [[m lower-type lower upper upper-type]
+             (re-matches int4range-pattern string)]
+         (when m
+           (merge
+            {:lower-inclusive? (= "[" lower-type)
+             :upper-inclusive? (= "]" upper-type)}
+            (when-not (str/blank? lower)
+              {:lower (Integer/parseInt lower)})
+            (when-not (str/blank? upper)
+              {:upper (Integer/parseInt upper)})))))
+
+     (defmethod composite/stringify-value "int4range" [_ {:keys [lower lower-inclusive?
+                                                                 upper upper-inclusive?]}]
+       (str (if lower-inclusive? "[" "(")
+            lower ","
+            upper
+            (if upper-inclusive? "]" ")")))))
+
 
 (defn date? [dt]
   (satisfies? time/DateFields dt))

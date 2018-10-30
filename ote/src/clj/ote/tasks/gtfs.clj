@@ -13,7 +13,11 @@
             [specql.core :as specql]
             [ote.time :as time]
             [ote.tasks.util :refer [daily-at timezone]]
-            [ote.db.lock :as lock])
+            [ote.db.lock :as lock]
+            [clojure.string :as str]
+            [ote.util.functor :refer [fmap]]
+            [ote.util.collections :refer [map-by]]
+            [ote.transit-changes.detection :as detection])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -59,17 +63,36 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
+
 (defn detect-new-changes-task
   ([db]
    (detect-new-changes-task db false))
   ([db force?]
-   (lock/try-with-lock
-    db "gtfs-nightly-changes" 1800
-    (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
-      (log/info "Detect transit changes for " (count service-ids) " services.")
-      (doseq [service-id service-ids]
-        (log/info "Detecting next transit changes for service: " service-id)
-        (upsert-service-transit-change db {:service-id service-id}))))))
+   (let [;; Start from the beginning of last week
+         start-date (time/days-from (time/beginning-of-week (time/now)) -7)
+
+         ;; Continue 15 weeks from the current week
+         end-date (time/days-from start-date (dec (* 7 16)))
+
+         ;; Convert to LocalDate instances
+         [start-date end-date] (map (comp time/date-fields->date time/date-fields)
+                                    [start-date end-date])]
+     (lock/try-with-lock
+      db "gtfs-nightly-changes" 1800
+      (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
+        (log/info "Detect transit changes for " (count service-ids) " services.")
+        (doseq [service-id service-ids]
+          (log/info "Detecting next transit changes for service: " service-id)
+          (try
+            (let [query-params {:service-id service-id
+                                :start-date start-date
+                                :end-date end-date}]
+              (detection/store-transit-changes!
+               db service-id
+               (detection/service-package-ids-for-date-range db query-params)
+               (detection/route-changes db query-params)))
+            (catch Exception e
+              (log/warn e "Change detection failed for service " service-id)))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle

@@ -427,3 +427,8 @@
 
 (defn days-from [date days]
   (t/plus date (t/days days)))
+
+(defn beginning-of-week [d]
+  (if (= :monday (day-of-week d))
+    d
+    (recur (days-from d -1))))
