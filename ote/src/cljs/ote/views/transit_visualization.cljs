@@ -414,7 +414,7 @@
   [:div.route-changes
    [route-changes-legend]
    [table/table {:no-rows-message "Ei reittejä"
-                 :height 300
+                 :height 500
                  :name->label str
                  :show-row-hover? true
                  :on-select #(when (first %)
