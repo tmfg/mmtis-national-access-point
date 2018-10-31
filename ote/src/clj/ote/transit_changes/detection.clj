@@ -389,9 +389,7 @@
 (defn override-static-holidays [date-route-hashes]
   (map (fn [{:keys [date] :as row}]
          (if-let [holiday-id (transit-changes/is-holiday? date)]
-           (do
-             (println "changed holiday hash " (:hash row) " => " holiday-id " for " date)
-             (assoc row :hash holiday-id))
+           (assoc row :hash holiday-id)
            row))
        date-route-hashes))
 
