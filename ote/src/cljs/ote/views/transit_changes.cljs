@@ -185,7 +185,7 @@
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
   (let [tabs [{:label "Lomakeilmoitukset" :value "authority-pre-notices"}
-              {:label "Tunnistetut muutokset" :value "transit-changes"}]
+              {:label "Tunnistetut muutokset (testi)" :value "transit-changes"}]
         selected-tab (or (get-in app [:transit-changes :selected-tab])
                          (when page
                            (name page)))]
