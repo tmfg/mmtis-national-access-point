@@ -12,7 +12,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.place-search :as place-search]
             [clojure.string :as str]
-            [testdouble.cljs.csv :as csv]))
+            [testdouble.cljs.csv :as csv]
+            [ote.ui.validation :as validation]))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
@@ -309,8 +310,7 @@
 
   FailedCsvFileResponse
   (process-event [{response :response} app]
-    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response)
-    )
+    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response))
 
   EnsureExternalInterfaceUrl
   (process-event [{url :url format :format} app]
@@ -356,10 +356,21 @@
 
   AddImportedCompaniesToService
   (process-event [{csv :csv filename :filename} app]
-      (-> app
-        (assoc-in [:transport-service ::t-service/passenger-transportation ::t-service/companies] csv)
-        (assoc-in [:transport-service ::t-service/passenger-transportation ::t-service/company-csv-filename] filename)
-        (assoc-in [:transport-service ::t-service/passenger-transportation :csv-imported] true)))
+    (let [valid? (not (some #(or (empty? (::t-service/name %))
+                                 (or (empty? (::t-service/business-id %))
+                                     (validation/validate-rule :business-id nil (::t-service/business-id %))))
+                            csv))]
+
+      (if valid?
+        (update-in app [:transport-service ::t-service/passenger-transportation] assoc
+                   ::t-service/companies csv
+                   ::t-service/company-csv-filename filename
+                   :csv-imported? true
+                   :csv-valid? true)
+        (update-in app [:transport-service ::t-service/passenger-transportation] assoc
+                   ::t-service/company-csv-filename filename
+                   :csv-imported? true
+                   :csv-valid? false))))
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage
@@ -535,9 +546,8 @@
         companies (map (fn [[business-id name]]
            {::t-service/business-id (clean-up-csv-value business-id)
             ::t-service/name        (clean-up-csv-value name)})
-         (rest csv-data))
-        valid-companies (filter #(csv-util/valid-business-id? (::t-service/business-id %)) companies)]
-    valid-companies))
+         (rest csv-data))]
+    companies))
 
 (defn read-companies-csv! [e! file-input]
   (let [fr (js/FileReader.)]

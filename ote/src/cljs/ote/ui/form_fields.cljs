@@ -931,12 +931,14 @@
     (when (get data ::t-service/company-csv-filename)
       [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
     [:div.row {:style {:padding-top "20px"}}
-     (let [success (boolean (:csv-imported data))
-           amount (if (get data ::t-service/companies)
-                    (count (get data ::t-service/companies))
-                    nil)]
-       (when success
-         [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]])
+     (let [imported? (:csv-imported? data)
+           valid? (:csv-valid? data)]
+       (when-not (nil? imported?)
+         (cond
+           (and imported? valid?) [:span {:style {:color "green"}} (tr [:csv :parsing-success]
+                                                                       {:count (count (get data ::t-service/companies))})]
+           (and imported? (not valid?)) [:span {:style {:color "red"}} "CSV tiedostosta puuttuu y-tunnuksia tai yritysten nimiä tai se sisältää virheellisiä y-tunnuksia."]
+           (not imported?) [:span {:style {:color "red"}} "CSV tiedoston parsinta epäonnistui"])))]]])
 
 (defn company-input-fields [update! companies data]
   (let [table-fields [{:name ::t-service/name
@@ -968,7 +970,13 @@
 
 (defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
                                   {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
-  (let [select-type #(update! {::t-service/company-source %})
+  (let [select-type #(update! (merge {::t-service/company-source %}
+                                     ;; Remove csv file processing statuses if switching away from file import views
+                                     ;; this removes unnecessary status messages that may not be valid anymore
+                                     ;; if editing companies after import.
+                                     (when-not (or (= :csv-file %) (= :csv-url %))
+                                       {:csv-imported? nil
+                                        :csv-valid? nil})))
         selected-type (if company-source
                         (name company-source)
                         "none")]
