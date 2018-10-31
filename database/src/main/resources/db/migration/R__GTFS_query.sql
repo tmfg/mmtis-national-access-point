@@ -34,7 +34,10 @@ SELECT DISTINCT c."service-id"
         (EXTRACT(DOW FROM dt) = 6 AND c.saturday = TRUE))
    AND NOT EXISTS(SELECT id
                     FROM "gtfs-calendar-date" cd
-                   WHERE cd."exception-type" = 2 AND cd."package-id" = package_id AND cd.date = dt)
+                   WHERE cd."exception-type" = 2
+                     AND cd."service-id" = c."service-id"
+                     AND cd."package-id" = package_id
+                     AND cd.date = dt)
 UNION
 SELECT cd."service-id"
   FROM "gtfs-calendar-date" cd
@@ -44,7 +47,7 @@ SELECT cd."service-id"
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_services_for_date (INTEGER, DATE) IS
-E'Returns the service ids of all services having trips on the given date';
+E'Returns the GTFS calendar service ids of all services having trips on the given date';
 
 CREATE OR REPLACE FUNCTION gtfs_services_for_date(package_ids INTEGER[], dt DATE)
   RETURNS SETOF service_ref AS $$
@@ -62,6 +65,7 @@ SELECT DISTINCT ROW(c."package-id", c."service-id")::service_ref
    AND NOT EXISTS (SELECT id
                      FROM "gtfs-calendar-date" cd
                     WHERE cd."exception-type" = 2
+                      AND cd."service-id" = c."service-id"
                       AND cd."package-id" = c."package-id" AND cd.date = dt)
 
  UNION
@@ -73,7 +77,7 @@ SELECT ROW(cd."package-id", cd."service-id")::service_ref
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
-  E'Return set of (package-id, service-id) tuples of services operated by the given packages for the given date.';
+  E'Return set of (package-id, calendar service-id) tuples of services operated by the given packages for the given date.';
 
 
 CREATE OR REPLACE FUNCTION gtfs_hash_for_date(package_id INTEGER, date DATE) RETURNS bytea AS $$
