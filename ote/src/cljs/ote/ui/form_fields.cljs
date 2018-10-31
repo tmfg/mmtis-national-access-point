@@ -940,8 +940,8 @@
          (cond
            (and imported? valid?) [:span {:style {:color "green"}} (tr [:csv :parsing-success]
                                                                        {:count (count (get data ::t-service/companies))})]
-           (and imported? (not valid?)) [:span {:style {:color "red"}} "CSV tiedostosta puuttuu y-tunnuksia tai yritysten nimiä tai se sisältää virheellisiä y-tunnuksia."]
-           (not imported?) [:span {:style {:color "red"}} "CSV tiedoston parsinta epäonnistui"])))]]])
+           (and imported? (not valid?)) [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
+           (not imported?) [:span {:style {:color "red"}} (tr [:csv :csv-parse-failed])])))]]])
 
 (defn company-input-fields [update! companies data]
   (let [table-fields [{:name ::t-service/name

@@ -332,6 +332,8 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
   :csv-parse-failed "Felaktigt format. .csv-filen gick inte att läsa"
   :parsing-success ["I listan hittades " :count " företag."]}
 
+ :companies-csv
+ {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."}
 
  ;; Action buttons
  :buttons

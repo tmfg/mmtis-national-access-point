@@ -323,6 +323,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :csv-parse-failed "Failed to parse .csv file."
   :parsing-success ["Found  " :count " companies."]}
 
+ :companies-csv
+ {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."}
+
 
  ;; Action buttons
  :buttons
