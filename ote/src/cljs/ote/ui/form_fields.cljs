@@ -180,7 +180,11 @@
            {:id "hidden-file-input"
             :type "file"
             :name name
-            :on-change on-change
+            :on-change #(do
+                          ;; Pass filename before setting target value to nil, or it will become inaccessible.
+                          (on-change % (-> (aget (.-files (.-target %)) 0) .-name))
+                          ;; Set file input value to nil to allow uploading a file with a same name again.
+                          (aset (.-target %) "value" nil))
             ;; Hack to hide file input tooltip on different browsers.
             ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
             :title " "}
@@ -926,8 +930,7 @@
                           (tr [:buttons :update-csv])
                           (tr [:buttons :upload-csv]))
              :accept    ".csv"
-             :on-change on-file-selected
-             }]]
+             :on-change on-file-selected}]]
     (when (get data ::t-service/company-csv-filename)
       [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
     [:div.row {:style {:padding-top "20px"}}

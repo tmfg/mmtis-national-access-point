@@ -549,12 +549,11 @@
          (rest csv-data))]
     companies))
 
-(defn read-companies-csv! [e! file-input]
+(defn read-companies-csv! [e! file-input filename]
   (let [fr (js/FileReader.)]
     (set! (.-onload fr)
           (fn [e]
-            (let [filename (-> (aget (.-files file-input) 0) .-name)
-                  txt (-> e .-target .-result)
+            (let [txt (-> e .-target .-result)
                   separator (csv-util/csv-separator txt)
                   csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator separator))]
               (e! (->AddImportedCompaniesToService csv filename)))))

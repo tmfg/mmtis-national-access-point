@@ -284,7 +284,8 @@
      :type :company-source
      :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
      :container-style style-form/full-width
-     :on-file-selected #(ts/read-companies-csv! e! (.-target %))
+     :on-file-selected (fn [evt filename]
+                         (ts/read-companies-csv! e! (.-target evt) filename))
      :on-url-given #(e! (ts/->EnsureCsvFile))
      :validate [(fn [data row]
                   (let [companies (::t-service/companies row)]
