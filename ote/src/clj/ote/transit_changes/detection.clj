@@ -183,7 +183,7 @@
   Returns map from route [short long headsign] to next different week info."
   [route-weeks]
   ;; Take routes from the first week (they are the same in all weeks)
-  (let [routes (into #{}
+  (let [route-names (into #{}
                      (map first)
                      (:routes (first route-weeks)))]
     (reduce
@@ -192,7 +192,7 @@
         (fn [route-detection-state route]
           (update route-detection-state route
                   route-next-different-week route weeks curr))
-        route-detection-state routes))
+        route-detection-state route-names))
      {} ; initial route detection state is empty
      (partition 4 1 route-weeks))))
 
@@ -386,6 +386,13 @@
 
                      :gtfs/package-ids package-ids})))
 
+(defn override-static-holidays [date-route-hashes]
+  (map (fn [{:keys [date] :as row}]
+         (if-let [holiday-id (transit-changes/is-holiday? date)]
+           (assoc row :hash holiday-id)
+           row))
+       date-route-hashes))
+
 (defn route-changes [db {:keys [start-date service-id] :as route-query-params}]
   (let [all-routes (map-by (juxt :route-short-name :route-long-name :trip-headsign)
                            (service-routes-with-date-range db {:service-id service-id}))
@@ -394,6 +401,7 @@
      :route-changes
      (-> db
          (service-route-hashes-for-date-range route-query-params)
+         (override-static-holidays)
          (routes-by-date all-route-keys)
          combine-weeks
          (next-different-weeks)
