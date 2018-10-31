@@ -142,7 +142,11 @@
         ::year (.getYear this)
         ::hours (.getHourOfDay this)
         ::minutes (.getMinuteOfHour this)
-        ::seconds (.getSecondOfMinute this)})))
+        ::seconds (.getSecondOfMinute this)})
+
+     java.sql.Date
+     (date-fields [this]
+       (date-fields (.toLocalDate this)))))
 
 (def midnight {::hours 0 ::minutes 0 ::seconds 0})
 
