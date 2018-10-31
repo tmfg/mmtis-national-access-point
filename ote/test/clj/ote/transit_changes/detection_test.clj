@@ -1,6 +1,7 @@
 (ns ote.transit-changes.detection-test
   (:require [ote.transit-changes.detection :as detection]
-            [clojure.test :as t :refer [deftest testing is]]))
+            [clojure.test :as t :refer [deftest testing is]]
+            [ote.transit-changes :as transit-changes]))
 
 (defn d [year month date]
   (java.time.LocalDate/of year month date))
@@ -105,3 +106,24 @@
         (get (detection/next-different-weeks test-traffic-starting-point-anomalous) route-name)]
     (is (= (d 2018 10 22) (:beginning-of-week starting-week)))
     (is (nil? different-week))))
+
+(def test-traffic-static-holidays
+  (weeks (d 2018 12 3)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 3.12
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 10.12
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 17.12
+         {route-name [:xmas-eve :xmas-day "h3" "h4" "h5" "h6" "h7"]} ; Week having static-holidays - 24.12
+         {route-name ["h1" :new-year "h3!" "h4!" "h5!" "h6!" "h7!"]} ; Week having static-holidays (1.1.) 31.12
+         {route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h6!" "h7!"]} ;; 7.1
+         {route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h6!" "h7!"]} ;; 14.1
+         {route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h6!" "h7!"]})) ;; 21.1
+
+(deftest static-holidays-are-skipped
+  (let [{:keys [starting-week different-week] :as res}
+        (get (detection/next-different-weeks test-traffic-static-holidays) route-name)]
+
+    (testing "detection skipped christmas week"
+      (is (= (d 2018 12 31) (:beginning-of-week different-week))))
+
+    (testing "first different day is wednesday because tuesday is new year"
+     (is (= 2 (transit-changes/first-different-day (:starting-week-hash res) (:different-week-hash res)))))))

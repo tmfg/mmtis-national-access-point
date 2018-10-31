@@ -149,14 +149,16 @@
 
 (defn week=
   "Compare week hashes. Returns true if they represent the same traffic
-  (excluding no-traffic days).
+  (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
   [w1 w2]
   (every? true?
           (map (fn [h1 h2]
                  ;; Only compare hashes where both days have traffic (not nil)
-                 (or (nil? h1)
-                     (nil? h2)
+                 (or (nil? h1) ;; h1 is no-traffic day due to nil value
+                     (nil? h2) ;; h2 is no-traffic day due to nil value
+                     (keyword? h1) ;; h1 is static-holiday due to value is keyword
+                     (keyword? h2) ;; h2 is static-holiday due to value is keyword
                      (= h1 h2)))
                w1 w2)))
 
@@ -167,12 +169,15 @@
 (defn first-different-day
   "Return the index of first different day in two week hash vectors.
   A day is considered different if both weeks have a hash (non nil)
+  that is not a static-holiday (keyword)
   for that day and the hash is different."
   [week-hash-1 week-hash-2]
   (some identity
         (map (fn [i d1 d2]
                (and (some? d1)
                     (some? d2)
+                    (not (keyword? d1))
+                    (not (keyword? d2))
                     (not= d1 d2)
                     i))
              (iterate inc 0)
@@ -185,3 +190,20 @@
   :args (s/cat :week-hash-1 ::week-hash
                :week-hash-2 ::week-hash)
   :ret (s/nilable integer?))
+
+
+(def static-holidays
+  "Static holidays e.g. Christmas that are skipped in. Key is a vector [day month] and value is the holiday id"
+  {[1 1] :new-year
+   [6 1] :epifania
+   [1 5] :first-of-may
+   [6 12] :finnish-independence-day
+   [24 12] :xmas-eve
+   [25 12] :xmas-day
+   [26 12] :boxing-day})
+
+(defn is-holiday?
+  "Check if given date is a holiday to be skipped. Returns holiday id if it is or nil otherwise."
+  [date]
+  (let [{::time/keys [month date]} (time/date-fields date)]
+    (static-holidays [date month])))
