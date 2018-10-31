@@ -285,7 +285,17 @@
      :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
      :container-style style-form/full-width
      :on-file-selected #(ts/read-companies-csv! e! (.-target %))
-     :on-url-given #(e! (ts/->EnsureCsvFile))}))
+     :on-url-given #(e! (ts/->EnsureCsvFile))
+     :validate [(fn [data row]
+                  (let [companies (::t-service/companies row)]
+                    (case (::t-service/company-source data)
+                      :form
+                      (when (some #(or (empty? (::t-service/name %))
+                                       (or (empty? (::t-service/business-id %))
+                                           (validation/validate-rule :business-id nil (::t-service/business-id %))))
+                                  companies)
+                        (tr [:common-texts :required-field]))
+                      nil)))]}))
 
 (defn brokerage-group
   "Creates a form group for brokerage selection."

@@ -16,7 +16,8 @@
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
-            [goog.string :as gstr]))
+            [goog.string :as gstr]
+            [ote.ui.validation :as validation]))
 
 
 
@@ -938,29 +939,32 @@
          [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]])
 
 (defn company-input-fields [update! companies data]
-  [:div.row
-   [:div.row (stylefy/use-style style-base/divider)]
-   [:div.row
-    [field {:name                ::t-service/companies
-            :type                :table
-            :update!             #(update! {::t-service/companies %})
-            :table-wrapper-style {:max-height "300px" :overflow "scroll"}
-            :prepare-for-save    values/without-empty-rows
-            :table-fields        [{:name      ::t-service/name
-                                   :type      :string
-                                   :label     (tr [:field-labels :transport-service-common ::t-service/company-name])
-                                   :required? true
-                                   }
-                                  {:name      ::t-service/business-id
-                                   :type      :string
-                                   :label     (tr [:field-labels :transport-service-common ::t-service/business-id])
-                                   :validate  [[:business-id]]
-                                   :required? true
-                                   :regex     #"\d{0,7}(-\d?)?"}]
-            :delete?             true
-            :add-label           (tr [:buttons :add-new-company])
-            :error-data          (::t-service/companies (:ote.ui.form/warnings data))}
-     companies]]])
+  (let [table-fields [{:name ::t-service/name
+                       :type :string
+                       :label (tr [:field-labels :transport-service-common ::t-service/company-name])
+                       :required? true}
+
+                      {:name ::t-service/business-id
+                       :type :string
+                       :label (tr [:field-labels :transport-service-common ::t-service/business-id])
+                       :validate [[:business-id]]
+                       :required? true
+                       :regex #"\d{0,7}(-\d?)?"}]
+        error-data (validation/validate-table companies table-fields)]
+    [:div.row
+     [:div.row (stylefy/use-style style-base/divider)]
+     [:div.row
+      [field {:name ::t-service/companies
+              :type :table
+              :update! #(update! {::t-service/companies %})
+              :table-wrapper-style {:max-height "300px" :overflow "scroll"}
+              :prepare-for-save values/without-empty-rows
+              :required true
+              :table-fields table-fields
+              :delete? true
+              :add-label (tr [:buttons :add-new-company])
+              :error-data error-data}
+       companies]]]))
 
 (defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
                                   {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
