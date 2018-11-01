@@ -890,7 +890,7 @@
     (ote.ui.common/linkify "/ote/csv/palveluyritykset.csv"  (tr [:form-help :csv-file-example]) {:target "_blank"})]])
 
 
-(defn company-csv-url-input [update! on-url-given companies-csv-url data]
+(defn company-csv-url-input [update! on-url-given companies-csv-url {data :csv-count}]
   [:div
    [:div.row (stylefy/use-style style-base/divider)]
    [:div.row
@@ -906,17 +906,18 @@
              :type            :string}
       companies-csv-url]]]
 
-   (let [success (if (= :success (get-in data [:csv-count :status]))
-                   true
-                   false)
-         amount (if (get-in data [:csv-count :count])
-                  (get-in data [:csv-count :count])
-                  nil)]
-     (cond
-       (and data success) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]
-       (and data (= false success)) [:div.row (stylefy/use-style style-base/required-element)
-                                     (tr [:csv (get-in data [:csv-count :error])])]
-       :else [:span]))])
+   (let [success? (= :success (:status data))
+         companies-count (:count data)
+         invalid-count (:failed-count data)
+         valid? (= 0 invalid-count)]
+
+     (when data
+       (cond
+         (and success? valid?) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count companies-count})]
+         (and success? (not valid?)) [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
+         (not success?) [:div.row (stylefy/use-style style-base/required-element)
+                                   (tr [:csv (get-in data [:csv-count :error])])]
+         :else [:span])))])
 
 (defn company-csv-file-input [on-file-selected data]
   [:div
