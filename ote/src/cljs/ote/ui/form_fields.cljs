@@ -16,7 +16,8 @@
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
-            [goog.string :as gstr]))
+            [goog.string :as gstr]
+            [ote.ui.validation :as validation]))
 
 
 
@@ -179,7 +180,11 @@
            {:id "hidden-file-input"
             :type "file"
             :name name
-            :on-change on-change
+            :on-change #(do
+                          ;; Pass filename before setting target value to nil, or it will become inaccessible.
+                          (on-change % (-> (aget (.-files (.-target %)) 0) .-name))
+                          ;; Set file input value to nil to allow uploading a file with a same name again.
+                          (aset (.-target %) "value" nil))
             ;; Hack to hide file input tooltip on different browsers.
             ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
             :title " "}
@@ -885,7 +890,7 @@
     (ote.ui.common/linkify "/ote/csv/palveluyritykset.csv"  (tr [:form-help :csv-file-example]) {:target "_blank"})]])
 
 
-(defn company-csv-url-input [update! on-url-given companies-csv-url data]
+(defn company-csv-url-input [update! on-url-given companies-csv-url {data :csv-count}]
   [:div
    [:div.row (stylefy/use-style style-base/divider)]
    [:div.row
@@ -901,17 +906,18 @@
              :type            :string}
       companies-csv-url]]]
 
-   (let [success (if (= :success (get-in data [:csv-count :status]))
-                   true
-                   false)
-         amount (if (get-in data [:csv-count :count])
-                  (get-in data [:csv-count :count])
-                  nil)]
-     (cond
-       (and data success) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]
-       (and data (= false success)) [:div.row (stylefy/use-style style-base/required-element)
-                                     (tr [:csv (get-in data [:csv-count :error])])]
-       :else [:span]))])
+   (let [success? (= :success (:status data))
+         companies-count (:count data)
+         invalid-count (:failed-count data)
+         valid? (= 0 invalid-count)]
+
+     (when data
+       (cond
+         (and success? valid?) [:div.row {:style {:color "green"}} (tr [:csv :parsing-success] {:count companies-count})]
+         (and success? (not valid?)) [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
+         (not success?) [:div.row (stylefy/use-style style-base/required-element)
+                                   (tr [:csv (get-in data [:csv-count :error])])]
+         :else [:span])))])
 
 (defn company-csv-file-input [on-file-selected data]
   [:div
@@ -925,46 +931,56 @@
                           (tr [:buttons :update-csv])
                           (tr [:buttons :upload-csv]))
              :accept    ".csv"
-             :on-change on-file-selected
-             }]]
+             :on-change on-file-selected}]]
     (when (get data ::t-service/company-csv-filename)
       [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
     [:div.row {:style {:padding-top "20px"}}
-     (let [success (boolean (:csv-imported data))
-           amount (if (get data ::t-service/companies)
-                    (count (get data ::t-service/companies))
-                    nil)]
-       (when success
-         [:span {:style {:color "green"}} (tr [:csv :parsing-success] {:count amount})]))]]])
+     (let [imported? (:csv-imported? data)
+           valid? (:csv-valid? data)]
+       (when-not (nil? imported?)
+         (cond
+           (and imported? valid?) [:span {:style {:color "green"}} (tr [:csv :parsing-success]
+                                                                       {:count (count (get data ::t-service/companies))})]
+           (and imported? (not valid?)) [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
+           (not imported?) [:span {:style {:color "red"}} (tr [:csv :csv-parse-failed])])))]]])
 
 (defn company-input-fields [update! companies data]
-  [:div.row
-   [:div.row (stylefy/use-style style-base/divider)]
-   [:div.row
-    [field {:name                ::t-service/companies
-            :type                :table
-            :update!             #(update! {::t-service/companies %})
-            :table-wrapper-style {:max-height "300px" :overflow "scroll"}
-            :prepare-for-save    values/without-empty-rows
-            :table-fields        [{:name      ::t-service/name
-                                   :type      :string
-                                   :label     (tr [:field-labels :transport-service-common ::t-service/company-name])
-                                   :required? true
-                                   }
-                                  {:name      ::t-service/business-id
-                                   :type      :string
-                                   :label     (tr [:field-labels :transport-service-common ::t-service/business-id])
-                                   :validate  [[:business-id]]
-                                   :required? true
-                                   :regex     #"\d{0,7}(-\d?)?"}]
-            :delete?             true
-            :add-label           (tr [:buttons :add-new-company])
-            :error-data          (::t-service/companies (:ote.ui.form/warnings data))}
-     companies]]])
+  (let [table-fields [{:name ::t-service/name
+                       :type :string
+                       :label (tr [:field-labels :transport-service-common ::t-service/company-name])
+                       :required? true}
+
+                      {:name ::t-service/business-id
+                       :type :string
+                       :label (tr [:field-labels :transport-service-common ::t-service/business-id])
+                       :validate [[:business-id]]
+                       :required? true
+                       :regex #"\d{0,7}(-\d?)?"}]
+        error-data (validation/validate-table companies table-fields)]
+    [:div.row
+     [:div.row (stylefy/use-style style-base/divider)]
+     [:div.row
+      [field {:name ::t-service/companies
+              :type :table
+              :update! #(update! {::t-service/companies %})
+              :table-wrapper-style {:max-height "300px" :overflow "scroll"}
+              :prepare-for-save values/without-empty-rows
+              :required true
+              :table-fields table-fields
+              :delete? true
+              :add-label (tr [:buttons :add-new-company])
+              :error-data error-data}
+       companies]]]))
 
 (defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
                                   {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
-  (let [select-type #(update! {::t-service/company-source %})
+  (let [select-type #(update! (merge {::t-service/company-source %}
+                                     ;; Remove csv file processing statuses if switching away from file import views
+                                     ;; this removes unnecessary status messages that may not be valid anymore
+                                     ;; if editing companies after import.
+                                     (when-not (or (= :csv-file %) (= :csv-url %))
+                                       {:csv-imported? nil
+                                        :csv-valid? nil})))
         selected-type (if company-source
                         (name company-source)
                         "none")]

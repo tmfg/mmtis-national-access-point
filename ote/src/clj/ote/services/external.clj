@@ -35,7 +35,7 @@
                                {::t-service/business-id business-id
                                 ::t-service/name name}))
                             (rest csv-data)))
-        validated-data (filter #(csv-util/valid-business-id? (::t-service/business-id %)) parsed-data)]
+        validated-data (filter #(and (csv-util/valid-business-id? (::t-service/business-id %)) (not (empty? (::t-service/name %)))) parsed-data)]
     {:result validated-data
      :failed-count (- (count parsed-data) (count validated-data))}))
 
