@@ -316,14 +316,6 @@
 
      ;; Change type and type specific dates
      (cond
-       no-traffic?
-       {:gtfs/change-type :no-traffic
-
-        ;; If the change is a no-traffic period, the different day is the first day that has no traffic
-        :gtfs/current-week-date (sql-date
-                                 (.plusDays no-traffic-start-date -1))
-        :gtfs/different-week-date (sql-date no-traffic-start-date)
-        :gtfs/change-date (sql-date no-traffic-start-date)}
 
        added?
        {:gtfs/change-type :added
@@ -339,6 +331,15 @@
         :gtfs/change-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
         :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
         :gtfs/current-week-date (:max-date route)}
+
+       no-traffic?
+       {:gtfs/change-type :no-traffic
+
+        ;; If the change is a no-traffic period, the different day is the first day that has no traffic
+        :gtfs/current-week-date (sql-date
+                                  (.plusDays no-traffic-start-date -1))
+        :gtfs/different-week-date (sql-date no-traffic-start-date)
+        :gtfs/change-date (sql-date no-traffic-start-date)}
 
        changes
        {:gtfs/change-type :changed
