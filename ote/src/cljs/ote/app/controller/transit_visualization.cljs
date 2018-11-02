@@ -2,6 +2,7 @@
   (:require [ote.communication :as comm]
             [tuck.core :as tuck :refer-macros [define-event]]
             [ote.app.routes :as routes]
+            [ote.util.fn :refer [flip]]
             [cljs-time.core :as t]
             [cljs-time.format :as tf]
             [cljs-time.coerce :as tc]
@@ -59,6 +60,27 @@
         (assoc-in [:compare :combined-stop-sequence]
                   (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
         (assoc-in [:open-sections :trip-stop-sequence] true))))
+
+(defn future-changes
+  "Filter routes changes that are in the future. (or no changes)"
+  [package-detection-date changes]
+  (let [package-detection-date (time/parse-date-iso-8601 package-detection-date)]
+    (filter
+      (fn [{:gtfs/keys [change-date]}]
+            (or (nil? change-date)
+                (t/after? (time/native->date-time change-date) package-detection-date)))
+      changes)))
+
+(defn sorted-route-changes
+  "Sort route changes according to change date: Earliest first and missing date last."
+  [changes]
+  (sort-by :gtfs/change-date
+           (fn [a b]
+             (if (and a b)
+               (compare a b)
+               (if a
+                 -1
+                 1))) changes))
 
 (define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
@@ -132,18 +154,19 @@
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
 
-(define-event LoadServiceChangesForDateResponse [response]
+(define-event LoadServiceChangesForDateResponse [response package-detection-date]
   {:path [:transit-visualization]}
-  (assoc app
+    (assoc app
          :service-changes-for-date-loading? false
          :service-info (:service-info response)
-         :changes (:changes response)
+         :changes-all (:changes response)
+         :changes (update (:changes response) :gtfs/route-changes (comp sorted-route-changes (partial future-changes package-detection-date)))
          :gtfs-package-info (:gtfs-package-info response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
   {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/" service-id "/" date)
-             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse)})
+             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse date)})
   {:service-changes-for-date-loading? true})
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
