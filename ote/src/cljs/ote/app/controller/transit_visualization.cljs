@@ -67,8 +67,8 @@
   (let [package-detection-date (time/parse-date-iso-8601 package-detection-date)]
     (filter
       (fn [{:gtfs/keys [change-date]}]
-            (or (nil? change-date)
-                (t/after? (time/native->date-time change-date) package-detection-date)))
+        (or (nil? change-date)
+              (not (t/before? (time/native->date-time change-date) package-detection-date))))
       changes)))
 
 (defn sorted-route-changes
