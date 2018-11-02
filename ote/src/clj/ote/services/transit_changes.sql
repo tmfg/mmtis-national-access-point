@@ -14,7 +14,7 @@ WITH latest_transit_changes AS (
 SELECT ts.id AS "transport-service-id",
        ts.name AS "transport-service-name",
        op.name AS "transport-operator-name",
-       "added-routes", "removed-routes", "changed-routes",
+       "added-routes", "removed-routes", "changed-routes", "no-traffic-routes",
        CURRENT_DATE as "current-date",
        "different-week-date", "change-date",
        "date",
