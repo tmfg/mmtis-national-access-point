@@ -258,9 +258,9 @@
                  [route detection-result])))
         routes))
 
-(defn- max-date-in-the-past? [{max-date :max-date}]
-  (and max-date
-       (.isBefore (.toLocalDate max-date) (java.time.LocalDate/now))))
+(defn- date-in-the-past? [^LocalDate date]
+  (and date
+       (.isBefore date (java.time.LocalDate/now))))
 
 (defn- max-date-within-90-days? [{max-date :max-date}]
   (and max-date
@@ -367,7 +367,10 @@
                                   (transform-route-change all-routes route-key detection-result))
                                 route-changes)
         change-count-by-type (fmap count (group-by :gtfs/change-type route-change-infos))
-        earliest-route-change (first (drop-while (complement :gtfs/change-date)
+        earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
+                                                   ;; Remove change-date from the route-changes-infos list if it is nil or it is in the past
+                                                   (or (nil? change-date)
+                                                       (date-in-the-past? (.toLocalDate change-date))))
                                                  (sort-by :gtfs/change-date route-change-infos)))]
     #_(debug-print-change-stats all-routes route-changes)
     (specql/upsert! db :gtfs/transit-changes

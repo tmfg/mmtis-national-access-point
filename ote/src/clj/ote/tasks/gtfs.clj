@@ -79,10 +79,12 @@
                                     [start-date end-date])]
      (lock/try-with-lock
       db "gtfs-nightly-changes" 1800
-      (let [service-ids (map :id (services-for-nightly-change-detection db {:force force?}))]
+      (let [service-ids (mapv :id (services-for-nightly-change-detection db {:force force?}))
+            service-count (count service-ids)]
         (log/info "Detect transit changes for " (count service-ids) " services.")
-        (doseq [service-id service-ids]
-          (log/info "Detecting next transit changes for service: " service-id)
+        (dotimes [i (count service-ids)]
+          (let [service-id (nth service-ids i)]
+          (log/info "Detecting next transit changes for service (" (inc i) " / " service-count " ): " service-id)
           (try
             (let [query-params {:service-id service-id
                                 :start-date start-date
@@ -92,7 +94,7 @@
                (detection/service-package-ids-for-date-range db query-params)
                (detection/route-changes db query-params)))
             (catch Exception e
-              (log/warn e "Change detection failed for service " service-id)))))))))
+              (log/warn e "Change detection failed for service " service-id))))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
