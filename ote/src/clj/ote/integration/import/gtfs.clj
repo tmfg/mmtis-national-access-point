@@ -275,24 +275,23 @@
         (catch Exception e
           nil)))))
 
-(defn interface-latest-saved-etag [db interface-id]
+(defn interface-latest-package [db interface-id]
   (when interface-id
-    (:gtfs/etag
      (first
       (specql/fetch db :gtfs/package
-                    #{:gtfs/etag}
+                    #{:gtfs/etag :gtfs/sha256}
                     {:gtfs/external-interface-description-id interface-id}
                     {::specql/order-by :gtfs/created
                      ::specql/order-direction :descending
-                     ::specql/limit 1})))))
+                     ::specql/limit 1}))))
 
 (defn download-and-store-transit-package
   "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
   [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3?]
   (let [filename (gtfs-file-name operator-id ts-id)
-        saved-etag (interface-latest-saved-etag db interface-id)
-        response (load-transit-interface-url interface-type db interface-id url last-import-date saved-etag)
+        latest-package (interface-latest-package db interface-id)
+        response (load-transit-interface-url interface-type db interface-id url last-import-date (:gtfs/etag latest-package))
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
@@ -305,10 +304,7 @@
                            ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
                           {::t-service/id interface-id}))
         (let [new-gtfs-hash (gtfs-hash gtfs-file)
-              old-gtfs-hash (specql/fetch db :gtfs/package
-                                          #{:gtfs/sha256}
-                                          {:gtfs/transport-operator-id operator-id
-                                           :gtfs/transport-service-id ts-id})]
+              old-gtfs-hash (:gtfs/sha256 latest-package)]
 
           ;; No gtfs import errors catched. Remove old import errors.
           (specql/update! db ::t-service/external-interface-description
@@ -318,14 +314,16 @@
           ;; IF hash doesn't match, save new and upload file to s3
           (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
             (do
-              (let [package (specql/insert! db :gtfs/package {:gtfs/sha256 new-gtfs-hash
-                                                              :gtfs/transport-operator-id operator-id
-                                                              :gtfs/transport-service-id ts-id
-                                                              :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
-                                                              :gtfs/etag new-etag
-                                                              :gtfs/license license
-                                                              :gtfs/external-interface-description-id interface-id})]
-
+              (let [
+                    package (specql/insert! db :gtfs/package
+                                            {:gtfs/sha256 new-gtfs-hash
+                                             :gtfs/first_package (nil? latest-package)
+                                             :gtfs/transport-operator-id operator-id
+                                             :gtfs/transport-service-id ts-id
+                                             :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                             :gtfs/etag new-etag
+                                             :gtfs/license license
+                                             :gtfs/external-interface-description-id interface-id})]
                 (when upload-s3?
                   (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)}))
                 (log/debug "File: " filename " was uploaded to S3 successfully.")
