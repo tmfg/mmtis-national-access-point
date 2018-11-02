@@ -40,13 +40,14 @@
     [:b "Taulukon ikonien selitteet"]]
    (for [[icon label] [[[ic/content-add-circle-outline] " Uusia reittejä"]
                        [[ic/content-remove-circle-outline] " Päättyviä reittejä"]
-                        [[ui-icons/outline-ballot]  " Reittimuutoksia"]]]
+                        [[ui-icons/outline-ballot]  " Reittimuutoksia"]
+                        [[ic/av-not-interested] "Reittejä, joissa tauko liikenteessä"]]]
      ^{:key label}
      [:div (use-style style/transit-changes-legend-icon)
       icon
       [:div (use-style style/change-icon-value) label]])])
 
-(def change-keys #{:added-routes :removed-routes :changed-routes :changes?
+(def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
                    :interfaces-has-errors? :no-interfaces? :no-interfaces-imported?})
 
 (defn cap-number [n]
@@ -55,7 +56,7 @@
      "500+"
      (str n))])
 
-(defn change-icons [{:keys [added-routes removed-routes changed-routes]}]
+(defn change-icons [{:keys [added-routes removed-routes changed-routes no-traffic-routes]}]
   [:div.transit-change-icons
    [:div (use-style style/transit-changes-legend-icon)
     [ic/content-add-circle-outline {:color (if (= 0 added-routes)
@@ -67,7 +68,12 @@
                                                 style/remove-color)}] (cap-number removed-routes)]
 
    [:div (use-style style/transit-changes-legend-icon)
-    [ui-icons/outline-ballot] (cap-number changed-routes)]])
+    [ui-icons/outline-ballot] (cap-number changed-routes)]
+
+   [:div (use-style style/transit-changes-legend-icon)
+    [ic/av-not-interested {:color (if (= 0 no-traffic-routes)
+                                                style/no-change-color
+                                                style/remove-color)}] (cap-number no-traffic-routes)]])
 
 
 (defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions]}]
