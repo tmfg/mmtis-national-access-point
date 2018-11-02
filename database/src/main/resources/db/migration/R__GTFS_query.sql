@@ -205,8 +205,6 @@ SELECT array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
    AND COALESCE(trip."trip-headsign",'') = COALESCE(trip_headsign,'');
 $$ LANGUAGE SQL STABLE;
 
-
-
 CREATE OR REPLACE FUNCTION gtfs_service_packages_for_date(service_id INTEGER, dt DATE)
 RETURNS INTEGER[]
 AS $$
@@ -214,7 +212,7 @@ SELECT array_agg(x.id)
   FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
           FROM gtfs_package p
          WHERE "transport-service-id" = service_id
-           AND created <= dt
+           AND ( p.created <= dt OR p.first_package = TRUE)
          ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
 
