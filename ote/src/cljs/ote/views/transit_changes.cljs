@@ -81,6 +81,7 @@
    [:h3 "Rajaa taulukkoa"]
    [form-fields/field {:label "Maakunta"
                        :type :chip-input
+                       :list-style {:max-height "400px" :overflow "auto"}
                        :suggestions (mapv (fn [{name ::places/nimi :as r}]
                                             {:text name :value r}) finnish-regions)
                        :suggestions-config {:text :text :value :value}
