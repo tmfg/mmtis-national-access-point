@@ -411,10 +411,13 @@
        body-content]])])
 
 (defn route-changes [e! route-changes selected-route]
+  (let [table-height (if (> 10 (count route-changes))
+                       (* 50 (count route-changes))
+                       500)]
   [:div.route-changes
    [route-changes-legend]
    [table/table {:no-rows-message "Ei reittejä"
-                 :height 500
+                 :height table-height
                  :name->label str
                  :show-row-hover? true
                  :on-select #(when (first %)
@@ -466,7 +469,7 @@
                   :changed
                   [change-icons route-changes]))}]
 
-    route-changes]])
+    route-changes]]))
 
 (defn comparison-dates [{:keys [date1 date2]}]
   [:div (stylefy/use-style (merge (style-base/flex-container "row")
