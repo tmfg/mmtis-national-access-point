@@ -167,7 +167,8 @@
   {:path [:transit-visualization]}
   (comm/get! (str "transit-visualization/" service-id "/" date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse date)})
-  {:service-changes-for-date-loading? true})
+  {:service-changes-for-date-loading? true
+   :open-sections {:gtfs-package-info false}})
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->LoadServiceChangesForDate (:service-id params) (:date params)))
