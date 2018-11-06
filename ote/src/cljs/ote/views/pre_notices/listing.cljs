@@ -70,6 +70,7 @@
       [:div
        [:div {:style {:margin-bottom "20px"}}
         [list-header/header
+         app
          (tr [:pre-notice-list-page :header-pre-notice-list])
          [ui/raised-button {:id "add-new-pre-notice"
                             :label (tr [:buttons :add-new-pre-notice])

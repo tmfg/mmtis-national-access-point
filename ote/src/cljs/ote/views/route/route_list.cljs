@@ -102,6 +102,7 @@
   (fn [e! {routes :routes-vector operator :transport-operator :as app}]
     [:div
      [list-header/header
+      app
       (tr [:route-list-page :header-route-list])
       [common/tooltip
        {:text (if (empty? operators)

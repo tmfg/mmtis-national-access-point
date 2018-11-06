@@ -19,7 +19,9 @@
             [ote.util.collections :as collections]
             [clojure.set :as set]
             [ote.localization :refer [selected-language]]
-            [ote.ui.validation :as validation]))
+            [ote.ui.validation :as validation]
+            [tuck.core :refer [define-event send-async! Event]]
+            [ote.app.controller.common :refer [->ServerError]]))
 
 (declare ->LoadRoute)
 
@@ -262,7 +264,8 @@
   (process-event [{id :id} app]
     (let [on-success (tuck/send-async! ->LoadRouteResponse)]
       (comm/get! (str "routes/" id)
-                 {:on-success on-success})
+                 {:on-success on-success
+                  :on-failure (send-async! ->ServerError)})
       (-> app
           (assoc-in [:route :loading?] true))))
 
@@ -613,11 +616,13 @@
 
   SaveRouteResponse
   (process-event [{response :response} app]
-    (routes/navigate! :routes)
+    (if (:redirect-to app)
+      (routes/navigate! (:redirect-to app))
+      (routes/navigate! :routes))
     (-> app
         (assoc :flash-message (tr [:route-wizard-page :save-success]))
         ;; Remove warning only after a successful save
-        (dissoc :route :before-unload-message)))
+        (dissoc :route :before-unload-message :redirect-to)))
 
   SaveRouteFailure
   (process-event [{response :response} app]

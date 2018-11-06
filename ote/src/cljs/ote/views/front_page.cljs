@@ -120,6 +120,7 @@
   [:div
    (warn-about-test-server)
    [list-header/header
+    state
     (tr [:common-texts :own-api-list])
     (when (not (empty? operator-services))
       [ui/raised-button {:label    (tr [:buttons :add-transport-service])

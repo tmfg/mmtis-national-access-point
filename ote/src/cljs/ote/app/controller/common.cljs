@@ -5,4 +5,6 @@
 
 (tuck/define-event ServerError [response]
   {}
-  (assoc app :flash-message-error (tr [:common-texts :server-error])))
+                   (if (= 403 (:status response))
+                     (assoc app :flash-message-error (tr [:common-texts :forbidden]))
+                     (assoc app :flash-message-error (tr [:common-texts :server-error]))))

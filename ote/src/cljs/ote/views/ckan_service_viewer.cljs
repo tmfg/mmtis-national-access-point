@@ -180,6 +180,7 @@
      :component-did-update leaflet/update-bounds-from-layers
      :reagent-render
      (fn [e! {:keys [geojson] :as app}]
+       [:div {:style {:z-index 99 :position "relative"}}
        [leaflet/Map {:ref         "leaflet"
                      :center      #js [65 25]
                      :zoomControl false
@@ -198,7 +199,7 @@
             ^{:key i}
             [leaflet/GeoJSON {:data geom
                               :style {:color (aget geom "style" "fill")}}])
-          (seq (aget geojson "features" 0 "geometry" "geometries"))))])}))
+          (seq (aget geojson "features" 0 "geometry" "geometries"))))]])}))
 
 (defn viewer [e! _]
   (e! (v/->StartViewer))

@@ -12,6 +12,7 @@
             [ote.db.auditlog :as auditlog]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.services.transport :as transport]
             [ote.services.operators :as operators]
@@ -139,6 +140,12 @@
                                                 :db-error         (when db-error true)
                                                 :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}))))
 
+(defn- list-sea-routes [db user query]
+  (specql/fetch db ::transit/route
+                #{::transit/id ::transit/transport-operator-id ::transit/name ::transit/published?
+                  [::transit/operator #{::t-operator/name ::t-operator/id}]}
+                {::transit/operator {::t-operator/name (op/ilike (str "%" query "%"))}}))
+
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
     (map #(first (groups %)) (distinct (map f coll)))))
@@ -235,7 +242,9 @@
 
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
-    (POST "/admin/interfaces" req (admin-service "interfaces-by-operator" req db #'list-interfaces))
+    (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
+
+    (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db

@@ -150,3 +150,5 @@
                      :line-height "24p";
                      :font-family "Roboto, sans-serif"})
 (def checkbox-label-with-width (assoc checkbox-label :width "260px"))
+
+(def mobile-extra-padding {::stylefy/media {{:max-width (str mobile-width-px "px")} {:padding-top "20px"}}})

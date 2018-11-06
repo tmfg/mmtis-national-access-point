@@ -29,7 +29,7 @@
 
 (defn form-container [e! app]
   [:div
-   [:h1 (tr [:common-texts :navigation-route])]
+   [ote.ui.list-header/header app (tr [:common-texts :navigation-route])]
    [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf" (tr [:route-list-page :link-to-help-pdf])]
    [route-components e! app]
    (when (not (rw/valid-route? (:route app)))

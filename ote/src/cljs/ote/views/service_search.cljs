@@ -396,7 +396,7 @@
                                                               :color style-base/link-color}]
                                      (tr [:service-search :back-link])]]
    [:span
-    [:h3 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
+    [:h1 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
               " GeoJSON")]
 
     (when (false? loading-geojson?)
