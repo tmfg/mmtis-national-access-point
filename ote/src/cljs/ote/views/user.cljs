@@ -26,15 +26,15 @@
 
 (defn user
   "Edit own user info"
-  [e! _]
+  [e! app]
   (r/create-class
    {:component-will-unmount #(e! (lc/->CancelUserEdit false))
     :reagent-render
     (fn
       [e! {:keys [form-data email-taken username-taken password-incorrect?] :as user}]
 
-      [:div.user-edit.col-xs-12.col-md-6
-       [:h1 (tr [:common-texts :user-menu-profile])]
+      [:div.user-edit.col-xs-12.col-sm-8.col-md-8.col-lg-6
+       [ote.ui.list-header/header app (tr [:common-texts :user-menu-profile])]
        [form/form
         {:update! #(e! (lc/->UpdateUser %))
          :name->label (tr-key [:register :fields])

@@ -11,17 +11,13 @@
   Assumes that first tab is selected by default."
 
   [tabs {:keys [update-fn selected-tab] :as actions}]
-  [:div.tab {:style {:padding-bottom "20px"}}
-   [:ul {:style {:list-style "none" :padding-bottom "12px"}}
+  [:div.tab {:style {:padding-bottom "40px"}}
     (doall
       (for [{:keys [label value]} tabs]
         ^{:key (str label)}
-        [:li {:style    {:display "inline"}
-              :on-click #(update-fn value)}
-         [:span (if (or (= value selected-tab) (and (nil? selected-tab) (= value (:value (first tabs)))))
+        [:div {:class-name (str " " (str "col-md-" (/ 12 (count tabs))))
+                :on-click #(update-fn value)}
+         [:div (if (or (= value selected-tab) (and (nil? selected-tab) (= value (:value (first tabs)))))
                   (stylefy/use-style style-tabs/tab-selected)
                   (stylefy/use-style style-tabs/tab))
-          label]]))]
-   ;; Add grey bottom border
-   [:div (stylefy/use-style style-tabs/grey-border)]])
-
+          label]]))])

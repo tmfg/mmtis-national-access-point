@@ -1,12 +1,14 @@
 (ns ote.ui.list-header
   "Header component for OTE list pages"
   (:require [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
-(defn header [title add-button operator-selection user-guide-button]
+(defn header [app title add-button operator-selection user-guide-button]
   [:div
    (when title
-     [:div.row [:h1 title]])
+     [:div.row (stylefy/use-style style-base/mobile-extra-padding) [:h1 title]])
    (when user-guide-button
      [:div.row user-guide-button])
    (when operator-selection
