@@ -28,7 +28,8 @@ SELECT * FROM gtfs_service_routes_with_daterange(:service-id::INTEGER);
 
 -- name: fetch-route-trips-for-date
 SELECT t."package-id", trip."trip-id",
-       stoptime."stop-id", stop."stop-name", stoptime."departure-time", stoptime."stop-sequence"
+       stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
+        stop."stop-name", stop."stop-lat", stop."stop-lon"
   FROM "gtfs-route" r
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
