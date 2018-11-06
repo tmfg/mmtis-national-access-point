@@ -54,6 +54,7 @@
 (defrecord DeleteTransportServiceResponse [response])
 (defrecord FailedDeleteTransportServiceResponse [response])
 (defrecord ChangeAdminTab [tab])
+(defrecord ChangeRedirectTo [new-page])
 
 ;; Interface tab
 (defrecord UpdateInterfaceFilters [filter])
@@ -63,6 +64,11 @@
 (defrecord CloseInterfaceErrorModal [id])
 (defrecord OpenOperatorModal [id])
 (defrecord CloseOperatorModal [id])
+
+;; Sea route tab
+(defrecord UpdateSeaRouteFilters [filter])
+(defrecord SearchSeaRoutes [])
+(defrecord SearchSeaRoutesResponse [response])
 
 ;; Delete Transport Operator
 (defrecord OpenDeleteOperatorModal [id])
@@ -296,6 +302,22 @@
       app id
       dissoc :show-operator-modal?))
 
+  UpdateSeaRouteFilters
+  (process-event [{filter :filter} app]
+    (update-in app [:admin :sea-routes] assoc :filters filter))
+
+  SearchSeaRoutes
+  (process-event [_ app]
+    (comm/post! "admin/sea-routes" (get-in app [:admin :sea-routes :filters])
+                {:on-success (tuck/send-async! ->SearchSeaRoutesResponse)})
+    (assoc-in app [:admin :sea-routes :loading?] true))
+
+  SearchSeaRoutesResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :sea-routes] assoc
+               :loading? false
+               :results response))
+
   DeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
@@ -331,6 +353,10 @@
   ChangeAdminTab
   (process-event [{tab :tab} app]
     (assoc-in app [:admin :tab :admin-page] tab))
+
+  ChangeRedirectTo
+  (process-event [{new-page :new-page} app]
+    (assoc app :redirect-to new-page))
 
   OpenDeleteOperatorModal
   (process-event [{id :id} app]

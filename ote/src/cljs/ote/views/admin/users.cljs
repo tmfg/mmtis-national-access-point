@@ -104,20 +104,22 @@
                     :line-height  "48px"}}
       "Ei palveluntuottajia."])])
 
+(defn users-page-controls [e! app]
+  [:div {:style {:margin-bottom "25px"}}
+   [form-fields/field {:style   {:margin-right "10px"}
+                       :type    :string :label "Nimen tai sähköpostiosoitteen osa"
+                       :update! #(e! (admin-controller/->UpdateUserFilter %))
+                       :on-enter #(e! (admin-controller/->SearchUsers))}
+    (get-in app [:admin :user-listing :user-filter])]
+
+   [ui/raised-button {:primary  true
+                      :disabled (str/blank? filter)
+                      :on-click #(e! (admin-controller/->SearchUsers))
+                      :label    "Hae käyttäjiä"}]])
+
 (defn user-listing [e! app]
-  (let [{:keys [loading? results user-filter]} (get-in app [:admin :user-listing])]
+  (let [{:keys [loading? results]} (get-in app [:admin :user-listing])]
     [:div
-     [:div {:style {:margin-bottom "25px"}}
-      [form-fields/field {:style   {:margin-right "10px"}
-                          :type    :string :label "Nimen tai sähköpostiosoitteen osa"
-                          :update! #(e! (admin-controller/->UpdateUserFilter %))}
-       user-filter]
-
-      [ui/raised-button {:primary  true
-                         :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->SearchUsers))
-                         :label    "Hae käyttäjiä"}]]
-
      (if loading?
        [:span "Ladataan käyttäjiä..."]
        [:div {:style {:margin-bottom "10px"}} "Hakuehdoilla löytyi " (count results) " käyttäjää."])

@@ -60,3 +60,4 @@ i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "imp
    AND ('gtfs' = ANY(lower(i.format::text)::text[]) OR 'kalkati.net' = ANY(lower(i.format::text)::text[]))
  GROUP BY ts.id, op.id, i.id
  ORDER BY i.format ASC, i."gtfs-import-error" DESC;
+
