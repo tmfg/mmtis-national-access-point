@@ -62,28 +62,36 @@
             ;; One or both items not available, ignore this pair
             (recur left-items-set right-items-set pairs acc)))))))
 
+(defn stop-key
+  "Use lat and lon values as stop-key. Stop-key is used to determine is the stop remain the same in different gtfs packages.
+  Was earlier stop-name, now changed to lat lon pair."
+  [stop]
+  [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop)])
+
 (defn trip-stop-differences
-  "Returns the amount of differences in stop times and stop sequence for the given trip pair."
+  "Returns the amount of differences in stop times and stop sequence and stop names for the given trip pair."
   [left right]
   (let [left-stop-times (into {}
-                              (map (juxt :gtfs/stop-name :gtfs/departure-time))
+                              (map (juxt stop-key :gtfs/departure-time))
                               (:stoptimes left))
         right-stop-times (into {}
-                               (map (juxt :gtfs/stop-name :gtfs/departure-time))
+                               (map (juxt stop-key :gtfs/departure-time))
                                (:stoptimes right))
-        left-stop-names (into #{} (keys left-stop-times))
-        right-stop-names (into #{} (keys right-stop-times))
-        all-stop-names (into #{}
-                             (set/union left-stop-names right-stop-names))]
+        left-stop-keys (into #{} (keys left-stop-times))
+        right-stop-keys (into #{} (keys right-stop-times))
+        all-stop-keys (into #{}
+                             (set/union left-stop-keys right-stop-keys))
+        left-different-stop-keys (set/difference left-stop-keys right-stop-keys)
+        right-different-stop-keys (set/difference right-stop-keys left-stop-keys)]
     {:stop-time-changes (reduce (fn [chg stop-name]
                                   (let [left (left-stop-times stop-name)
                                         right (right-stop-times stop-name)]
                                   (if (and left right (not= left right))
                                     (inc chg)
                                     chg)))
-                                0 all-stop-names)
-     :stop-seq-changes (+ (count (set/difference left-stop-names right-stop-names))
-                          (count (set/difference right-stop-names left-stop-names)))}))
+                                0 all-stop-keys)
+     :stop-seq-changes (+ (count left-different-stop-keys)
+                          (count right-different-stop-keys))}))
 
 
 (defn time-for-stop [stoptimes-display stop-name]
@@ -108,6 +116,14 @@
          (update stoptime :gtfs/stop-sequence - stop-seq-of-zero))
        stop-seq))
 
+(defn earliest-departure-time [stop]
+  (let [minutes-from-midnight1 (some-> stop :gtfs/departure-time-date1 (time/minutes-from-midnight))
+        minutes-from-midnight2 (some-> stop :gtfs/departure-time-date2 (time/minutes-from-midnight))]
+    (cond
+      (nil? minutes-from-midnight1) minutes-from-midnight2
+      (nil? minutes-from-midnight2) minutes-from-midnight1
+      :default (min minutes-from-midnight1 minutes-from-midnight2))))
+
 (defn combined-stop-sequence [first-common-stop [trip1 trip2]]
   (let [stop-seq-of-fcs-trip1 (some #(when (= first-common-stop (:gtfs/stop-name %))
                                        (:gtfs/stop-sequence %))
@@ -122,15 +138,17 @@
                                        (normalize-stop-sequence-numbers stop-seq-of-fcs-trip2
                                                                         (:stoptimes trip2)))]
     ;; Combine the same stops!
-    (mapv (fn [stop-times]
+    (sort-by
+      earliest-departure-time
+      (mapv (fn [[_ stop-times]]
             {:gtfs/stop-name (:gtfs/stop-name (first stop-times))
              :gtfs/departure-time-date1 (:gtfs/departure-time
                                          (first (filter #(= 1 (:trip %)) stop-times)))
              :gtfs/departure-time-date2 (:gtfs/departure-time
                                          (first (filter #(= 2 (:trip %)) stop-times)))})
 
-          (partition-by :gtfs/stop-name
-                        (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))
+          (group-by :gtfs/stop-name
+                        (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq)))))))
 
 
 (defn combine-trips [date1-trips date2-trips]

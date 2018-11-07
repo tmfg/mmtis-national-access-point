@@ -208,13 +208,33 @@
                trip-id (:trip-id (first trip-stops))]]
      {:gtfs/package-id package-id
       :gtfs/trip-id trip-id
-      :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence]}]
+      :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon]}]
                          {:gtfs/stop-id stop-id
                           :gtfs/stop-name stop-name
+                          :gtfs/stop-lat stop-lat
+                          :gtfs/stop-lon stop-lon
                           :gtfs/stop-sequence stop-sequence
                           :gtfs/departure-time (time/pginterval->interval departure-time)})
                        trip-stops)})))
 
+
+(defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
+  (let [combined-trips (transit-changes/combine-trips date1-trips date2-trips)
+        {:keys [added removed changed]}
+        (group-by (fn [[l r]]
+                    (cond
+                      (nil? l) :added
+                      (nil? r) :removed
+                      :default :changed))
+                  combined-trips)]
+
+    {:starting-week-date starting-week-date
+     :different-week-date different-week-date
+     :added-trips (count added)
+     :removed-trips (count removed)
+     :trip-changes (map (fn [[l r]]
+                          (transit-changes/trip-stop-differences l r))
+                        changed)}))
 
 (defn compare-route-days [db service-id [short long headsign :as route]
                           {:keys [starting-week starting-week-hash
@@ -226,23 +246,7 @@
     (log/debug "Route: " route ", comparing dates: " starting-week-date " and " different-week-date)
     (let [date1-trips (route-trips-for-date db service-id route starting-week-date)
           date2-trips (route-trips-for-date db service-id route different-week-date)]
-
-      (log/debug "trips " (count date1-trips) " vs " (count date2-trips))
-      (let [combined-trips (transit-changes/combine-trips date1-trips date2-trips)
-            {:keys [added removed changed]}
-            (group-by (fn [[l r]]
-                        (cond
-                          (nil? l) :added
-                          (nil? r) :removed
-                          :default :changed))
-                      combined-trips)]
-        {:starting-week-date starting-week-date
-         :different-week-date different-week-date
-         :added-trips (count added)
-         :removed-trips (count removed)
-         :trip-changes (map (fn [[l r]]
-                              (transit-changes/trip-stop-differences l r))
-                            changed)}))))
+      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
 
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
@@ -404,10 +408,14 @@
     {:all-routes all-routes
      :route-changes
      (-> db
+         ;; Get route hashes from database
          (service-route-hashes-for-date-range route-query-params)
+         ;; Change hashes that are at static holiday to a keyword
          (override-static-holidays)
          (routes-by-date all-route-keys)
+         ;; Create week hashes so we can find out the differences between weeks
          combine-weeks
+         ;; Search next week (for every route) that is different
          (next-different-weeks)
          (as-> routes
              ;; Fetch detailed route comparison if a change was found
