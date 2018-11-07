@@ -5,18 +5,18 @@
 
 (defn tabs
 
-  "Simble tab component that updates app-state using given function.
+  "Tab component that updates app-state using given function.
   We need to let the parent give the update function, because there are endless variations what tab component
   should do when tab is changed.
   Assumes that first tab is selected by default."
 
   [tabs {:keys [update-fn selected-tab] :as actions}]
-  [:div.tab {:style {:padding-bottom "40px"}}
+  [:div.tab {:style {:padding-bottom "40px" :display "flex" :flex-flow "row nowrap"}}
     (doall
       (for [{:keys [label value]} tabs]
         ^{:key (str label)}
-        [:div {:class-name (str " " (str "col-md-" (/ 12 (count tabs))))
-                :on-click #(update-fn value)}
+        [:div {:style {:flex "1 0"}
+               :on-click #(update-fn value)}
          [:div (if (or (= value selected-tab) (and (nil? selected-tab) (= value (:value (first tabs)))))
                   (stylefy/use-style style-tabs/tab-selected)
                   (stylefy/use-style style-tabs/tab))

@@ -10,7 +10,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.login :as lc]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.ui.list-header :as list-header]))
 
 (defn require-current-password? [user form-data]
   (or (and (not (str/blank? (:username form-data)))
@@ -34,7 +35,7 @@
       [e! {:keys [form-data email-taken username-taken password-incorrect?] :as user}]
 
       [:div.user-edit.col-xs-12.col-sm-8.col-md-8.col-lg-6
-       [ote.ui.list-header/header app (tr [:common-texts :user-menu-profile])]
+       [list-header/header app (tr [:common-texts :user-menu-profile])]
        [form/form
         {:update! #(e! (lc/->UpdateUser %))
          :name->label (tr-key [:register :fields])
