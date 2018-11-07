@@ -4,6 +4,7 @@
             [ote.util.collections :refer [index-of]]
             [taoensso.timbre :as log]
             [clojure.set :as set]
+            [clojure.string :as str]
             [clojure.spec.alpha :as s]))
 
 ;; Define data type specs
@@ -141,13 +142,13 @@
     (sort-by
       earliest-departure-time
       (mapv (fn [[_ stop-times]]
-            {:gtfs/stop-name (:gtfs/stop-name (first stop-times))
+            {:gtfs/stop-name (str/join ", " (into #{} (map :gtfs/stop-name stop-times)))
              :gtfs/departure-time-date1 (:gtfs/departure-time
                                          (first (filter #(= 1 (:trip %)) stop-times)))
              :gtfs/departure-time-date2 (:gtfs/departure-time
                                          (first (filter #(= 2 (:trip %)) stop-times)))})
 
-          (group-by :gtfs/stop-name
+          (group-by stop-key
                         (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq)))))))
 
 
