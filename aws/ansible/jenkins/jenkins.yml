@@ -28,5 +28,7 @@
       - markussak
       - tonida
       - villeliski
+      - tommik
+      - ernok
   roles:
     - solita.jenkins
