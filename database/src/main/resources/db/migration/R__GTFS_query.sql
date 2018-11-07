@@ -437,7 +437,7 @@ BEGIN
             FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
                          COALESCE(trip."trip-headsign",'') AS "trip-headsign",
-                         string_agg(concat(s."stop-name",'@',stops."departure-time"), '->'
+                         string_agg(concat(s."stop-lat",'-',s."stop-lon",'@',stops."departure-time"), '->'
                                     ORDER BY stops."stop-sequence") as trip_times
                     FROM "gtfs-trip" t
                     LEFT JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
