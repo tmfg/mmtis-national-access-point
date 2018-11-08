@@ -112,7 +112,7 @@
                                   [webjure/json-schema "0.7.4"]]
                    :test-paths ["test/clj"]}}
 
-  :repositories [["osgeo" "http://download.osgeo.org/webdav/geotools/"]
+  :repositories [["osgeo" "https://download.osgeo.org/webdav/geotools/"]
                  ["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.13"]]
