@@ -56,6 +56,34 @@
              (get route-name)
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
 
+(def no-traffic-run-full-detection-window
+  (weeks (d 2018 10 8)
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 8.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 15.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 22.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 29.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 5.11.
+         {route-name ["h1" nil nil nil nil nil nil]} ; 6 day run
+         {route-name [nil nil nil nil nil nil nil]} ; 7 days
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}))
+
+(deftest test-no-traffic-run-full-detection-window
+  ;; Test that traffic that has normal "no-traffic" days (like no traffic on weekends)
+  ;; is still detected.
+  (let [result (-> (detection/next-different-weeks no-traffic-run-full-detection-window)
+                   (get route-name))]
+    (is (= {:no-traffic-start-date (d 2018 11 13)}
+           (select-keys result [:no-traffic-start-date :no-traffic-end-date])))))
 
 (def test-traffic-2-different-weeks
   (weeks (d 2018 10 8)
