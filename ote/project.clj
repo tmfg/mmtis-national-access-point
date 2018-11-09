@@ -157,4 +157,5 @@
   :repl-options {:init-ns ote.main
                  :init (ote.main/start)}
   :main ote.main
-  :figwheel {:server-ip "localhost"})
+  :figwheel {:server-ip "localhost"
+             :nrepl-host "localhost"})
