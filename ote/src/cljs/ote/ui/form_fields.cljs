@@ -342,7 +342,7 @@
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex
                                       on-blur on-update-input on-request-add on-request-delete
-                                      max-length style hint-style hint-text
+                                      max-length style list-style hint-style hint-text
                                       filter suggestions suggestions-config default-values max-results
                                       auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
@@ -412,7 +412,9 @@
        (when max-length
          {:max-length max-length})
        (when style
-         {:style style}))]))
+         {:style style})
+       (when list-style
+         {:listStyle list-style}))]))
 
 (defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
                        data]
