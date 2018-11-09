@@ -76,9 +76,10 @@
                                                 style/remove-color)}] (cap-number no-traffic-routes)]])
 
 
-(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions]}]
+(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions show-all]}]
   [:div {:style {:padding-top "10px"}}
    [:h3 "Rajaa taulukkoa"]
+   [:div.col-md-6
    [form-fields/field {:label "Maakunta"
                        :type :chip-input
                        :suggestions (mapv (fn [{name ::places/nimi :as r}]
@@ -91,7 +92,12 @@
                        :show-option #(str (::places/numero %) " " (::places/nimi %))
                        :show-option-short ::places/numero
                        :update! #(e! (tc/->SetRegionFilter %))}
-    selected-finnish-regions]])
+    selected-finnish-regions]]
+   [:div.col-md-6 {:style {:margin-top "10px"}}
+    [form-fields/field {:label "Näytä virheelliset"
+                        :type :checkbox
+                        :update! #(e! (tc/->ToggleShowAllChanges))}
+     show-all]]])
 
 (defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week] :as row}]
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
@@ -146,7 +152,10 @@
     "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
    [transit-change-filters e! transit-changes]])
 
-(defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions] :as transit-changes}]
+(defn detected-transit-changes [e! {:keys [loading? changes changes-all selected-finnish-regions show-all]
+                                    :as transit-changes}]
+  (let [change-list (sort-by (juxt :no-interfaces-imported? :interfaces-has-errors?)
+                              (if show-all changes-all changes))]
   [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
@@ -187,7 +196,7 @@
                             (fn [{regions :finnish-regions}]
                               (some region-numbers regions))
                             (constantly true))]
-      (filter region-matches? changes))]])
+      (filter region-matches? change-list))]]))
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
   (let [tabs [{:label "Lomakeilmoitukset" :value "authority-pre-notices"}

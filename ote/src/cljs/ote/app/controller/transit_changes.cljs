@@ -16,7 +16,13 @@
 (define-event TransitChangesResponse [response]
   {:path [:transit-changes]}
   (assoc app
-         :changes (:changes response)
+         :changes-all (:changes response)
+         :changes (remove
+                    (fn [change]
+                      (or
+                          (:interfaces-has-errors? change)
+                          (:no-interfaces-imported? change)))
+                    (:changes response))
          :finnish-regions (:finnish-regions response)
          :loading? false))
 
@@ -40,6 +46,11 @@
 (define-event SetRegionFilter [regions]
   {:path [:transit-changes :selected-finnish-regions]}
   regions)
+
+(define-event ToggleShowAllChanges []
+  {:path [:transit-changes :show-all]
+   :app show?}
+  (not show?))
 
 (define-event ChangeTab [tab-value]
   {:path [:transit-changes :selected-tab]}
