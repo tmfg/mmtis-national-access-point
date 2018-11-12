@@ -223,10 +223,25 @@
               (map (juxt :name :business-id :phone :email :service-name)
                    (fetch-operators-brokerage db)))
 
+    "taxi-operators"
+    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus"]
+              (map (juxt :operator :business-id :sub-company :sub-business-id)
+                   (fetch-operators-with-sub-contractors db {:subtype "taxi"})))
+
+    "request-operators"
+    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus"]
+              (map (juxt :operator :business-id :sub-company :sub-business-id)
+                   (fetch-operators-with-sub-contractors db {:subtype "request"})))
+
     "unpublished-services"
     (csv-data ["nimi" "puhelin" "email" "julkaisemattomia palveluita" "palvelut"]
               (map (juxt :name :phone :email :unpublished-services-count :services)
-                   (fetch-operators-unpublished-services db)))))
+                   (fetch-operators-unpublished-services db)))
+
+    "payment-interfaces"
+    (csv-data ["Palveluntuottaja", "Y-tunnus" "Palvelu" "Palvelun osoite" "Palvelun tyyppi" "Rajapinnan osoite" "Formaatti" "Lisenssi"]
+              (map (juxt :operator :business-id :service-name :service-address :service-type :url :format :licence)
+                   (fetch-operators-with-payment-services db)))))
 
 (defn- admin-routes [db http nap-config]
   (routes
