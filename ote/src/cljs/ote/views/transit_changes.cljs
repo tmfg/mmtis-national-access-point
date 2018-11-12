@@ -173,7 +173,7 @@
                                                                 date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
      {:name "Palvelu" :read :transport-service-name :width "20%"}
-     {:name "Aikaa 1:seen muutokseen" :width "15%"
+     {:name "Aikaa 1. muutokseen" :width "15%"
       :read (juxt :different-week-date :days-until-change)
       :format (fn [[different-week-date days-until-change]]
                 (if different-week-date
