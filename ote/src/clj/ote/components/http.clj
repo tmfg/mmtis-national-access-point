@@ -182,14 +182,15 @@
   [in]
   (transit/transit->clj in))
 
-(defrecord SslUpgrade [port url]
+(defrecord SslUpgrade [ip port url]
   component/Lifecycle
   (start [this]
     (assoc this ::stop
            (server/run-server
             (constantly {:status 301
                          :headers {"Location" url}})
-            {:port port})))
+            {:port port
+             :ip (or ip "0.0.0.0")})))
 
   (stop [{stop ::stop :as this}]
     (stop)
