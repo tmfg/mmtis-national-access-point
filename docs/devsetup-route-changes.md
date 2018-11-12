@@ -1,8 +1,8 @@
-How to populate route changes view in dev setup:
+How to populate route changes view in dev setup. (Note to audience following along at home: The invoked functions from JS console are calling the backend through normal admin access checks, just like other frontend operations).
 
 1. create transit service
 2. scheduled service, ok to use existing provider
-3. fill out mandatory fields (toiminta-alue, address, etc)
+3. fill out mandatory fields (primary operating area, address, etc)
 4. go to production site and look for api contents with scheduled routes
 5. find gtfs link and paste it to your dev setup creation page, selecting the matching data conten type (eg gtfs)
 6. go to your JS console
