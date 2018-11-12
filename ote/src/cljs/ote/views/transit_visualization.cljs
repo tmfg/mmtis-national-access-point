@@ -430,7 +430,7 @@
      {:name "Reitti/määränpää" :width "20%"
       :read :gtfs/trip-headsign}
 
-     {:name "Aikaa 1:seen muutokseen"
+     {:name "Aikaa 1. muutokseen"
       :width "20%"
       :read :gtfs/different-week-date
       :format (fn [different-week-date]
