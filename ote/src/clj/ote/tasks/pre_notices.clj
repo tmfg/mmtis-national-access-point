@@ -109,7 +109,7 @@
         [{:width "20%" :label "Palveluntuottaja"}
          {:width "20%" :label "Palvelu"}
          {:width "20%" :label "Alue"}
-         {:width "20%" :label "Aikaa 1:seen muutokseen"}
+         {:width "20%" :label "Aikaa 1. muutokseen"}
          {:width "20%" :label "Muutokset"}]
         (for [chg  detected-changes]
           (detected-change-row chg)))
