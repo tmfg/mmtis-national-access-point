@@ -50,4 +50,4 @@ SELECT ts.id AS "transport-service-id",
  WHERE 'road' = ANY(ts."transport-type")
    AND 'schedule' = ts."sub-type"
    AND ts."published?" = TRUE
- ORDER BY "change-date" ASC, "max-date", "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
+ ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;

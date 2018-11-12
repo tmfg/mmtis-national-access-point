@@ -95,7 +95,7 @@
                        :update! #(e! (tc/->SetRegionFilter %))}
     selected-finnish-regions]]
    [:div.col-md-6 {:style {:margin-top "10px"}}
-    [form-fields/field {:label "Näytä virheelliset"
+    [form-fields/field {:label "Näytä palvelut, joiden rajapinta on virheellinen tai rajapinta puuttuu"
                         :type :checkbox
                         :update! #(e! (tc/->ToggleShowAllChanges))}
      show-all]]])
@@ -155,8 +155,7 @@
 
 (defn detected-transit-changes [e! {:keys [loading? changes changes-all selected-finnish-regions show-all]
                                     :as transit-changes}]
-  (let [change-list (sort-by (juxt :no-interfaces-imported? :interfaces-has-errors?)
-                              (if show-all changes-all changes))]
+  (let [change-list (if show-all changes-all changes)]
   [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
