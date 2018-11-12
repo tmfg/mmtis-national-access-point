@@ -41,7 +41,7 @@
    (for [[icon label] [[[ic/content-add-circle-outline] " Uusia reittejä"]
                        [[ic/content-remove-circle-outline] " Päättyviä reittejä"]
                        [[ui-icons/outline-ballot]  " Reittimuutoksia"]
-                       [[ic/av-not-interested] "Reittejä, joissa tauko liikenteessä"]]]
+                       [[ic/av-not-interested] " Reittejä, joissa tauko liikenteessä"]]]
      ^{:key label}
      [:div (use-style style/transit-changes-legend-icon)
       icon
