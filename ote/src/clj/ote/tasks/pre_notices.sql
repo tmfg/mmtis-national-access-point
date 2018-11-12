@@ -42,4 +42,4 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
    AND chg."change-date" IS NOT NULL
    AND (chg."finnish-regions" IS NULL OR
         :regions::CHAR(2)[] IS NULL OR
-        :regions::CHAR(2)[] && chg."finnish-regions");
+        :regions::CHAR(2)[] && chg."finnish-regions") ORDER BY chg."change-date" ASC;
