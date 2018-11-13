@@ -77,15 +77,15 @@
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-           ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)
-           (http/publish! http {:authenticated? true}
-                          (routes                           
-                           (GET "/fetch/ytj" [company-id]
-                                ;; (println "got company-id" company-id)
-                                
-                                (let [r (fetch-by-company-id company-id)]
-                                  ;; (println "sending as transit:" (pr-str r))
-                                  (http/transit-response r)))))))
+           (when (feature/feature-enabled? config :ytj-fetch)
+             ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)
+             (http/publish! http {:authenticated? true}
+                            (routes                           
+                             (GET "/fetch/ytj" [company-id]
+                                  (let [r (fetch-by-company-id company-id)]
+                                    ;; (println "YTJ: sending as transit:" (pr-str r))
+                                    (http/transit-response r))))))))
   (stop [{stop ::stop :as this}]
-    (stop)
+    (when stop
+      (stop))
     (dissoc this ::stop)))

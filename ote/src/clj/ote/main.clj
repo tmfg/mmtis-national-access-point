@@ -29,6 +29,7 @@
             [ote.integration.export.csv :as export-csv]
             [ote.integration.import.gtfs :as import-gtfs]
             [ote.integration.import.kalkati :as import-kalkati]
+            [ote.integration.import.ytj :as fetch-ytj]
 
             [ote.tasks.company :as tasks-company]
             [ote.tasks.pre-notices :as tasks-pre-notices]
@@ -78,6 +79,9 @@
                     (service-search/->ServiceSearch)
                     [:http :db])
 
+   ;; Integration: Fetch company data from YTJ
+   :fetch-ytj (component/using (ytj-fetch/->YTJFetch (:ytj config)) [:db :http])
+   
    ;; Integration: export GeoJSON, GTFS and CSV
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
    :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
