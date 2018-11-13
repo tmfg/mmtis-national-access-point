@@ -24,7 +24,7 @@
 
 (def http-get http-client/get) ;; redef'd to mock in test
 
-(defn without-expired-items [result]
+(defn without-expired-items [ytj-map]
   (let [now (t/now)        
         date-in-past? (fn [d]
                         (if (nil? d)
@@ -36,18 +36,10 @@
                                       (parse-iso8601-date ds))]
                               (date-in-past? d)))
         walk-fn (fn [x]
-                  (if (and (vector?
-                            x) (map? (first x)))
+                  (if (and (vector? x) (map? (first x)))
                      (filterv (complement end-date-expired?) x)
                      x))]
-    
-    (walk/postwalk walk-fn result)))
-
-(defn without-expired [result]
-  (-> result
-      (update :names without-expired)
-      (update :auxiliaryNames without-expired)
-      (update :addresses without-expired)))
+    (walk/postwalk walk-fn ytj-map)))
 
 (comment 
   (def company-id-regex #"[0-9-]{2,20}")
@@ -57,25 +49,27 @@
     :ret map?))
 
 (defn fetch-by-company-id [company-id]
-  {:pre [(string? company-id)]
-   :post [(or (map? %) (nil? %))]}
-  (when (re-matches #"[0-9-]{2,20}" company-id)
+  (when (and (string? company-id) (re-matches #"[0-9-]{2,20}" company-id))
     (let [url (str "https://avoindata.prh.fi/bis/v1?totalResults=false&maxResults=10&resultsFrom=0&businessId=" company-id)
           response (try
                      (http-get url {:accept :json
-                                           :as :json})
+                                    :as :json})
                      (catch clojure.lang.ExceptionInfo e
-                       ;; clj-http wants to communicate status as excpetions :P
+                       ;; sadly clj-http wants to communicate status as excpetions
                        (-> e ex-data)))]
+      ;; (println "ytj fetch: got response" (pr-str response))
       (if (and (-> response :status (= 200))
                (-> response :body :totalResults str (= "1")))
-        (-> response
-            :body
-            :results
-            first
-            (select-keys [:name :auxiliaryNames :businessId :addresses])
-            without-expired-items)
         (do
+          ;; (println "all is good")
+          (-> response
+                 :body
+                 :results
+                 first
+                 (select-keys [:name :auxiliaryNames :businessId :addresses])
+                 without-expired-items))
+        (do
+          ;; (println "all is not good - " (-> response :status (= 200)) (-> response :body pr-str ))
           (log/info (str "YTJ-vastaus ei ok, status: " (:status response))) ;; jos 200, :totalResults oli != 1
           nil)))))
 
@@ -84,13 +78,13 @@
   (start [{db :db http :http :as this}]
     (assoc this ::stop
            ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)
-           (http/publish! http {:authenticated? false}
+           (http/publish! http {:authenticated? true}
                           (routes                           
                            (GET "/fetch/ytj" [company-id]
-                                (println "got company-id" company-id)
+                                ;; (println "got company-id" company-id)
                                 
                                 (let [r (fetch-by-company-id company-id)]
-                                  (println "sending as transit:" (pr-str r))
+                                  ;; (println "sending as transit:" (pr-str r))
                                   (http/transit-response r)))))))
   (stop [{stop ::stop :as this}]
     (stop)

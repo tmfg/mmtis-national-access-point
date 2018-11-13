@@ -12,9 +12,12 @@
 
 (t/deftest expired-removal
   (let [test-input {:foo [{:stuff 1 :endDate nil}
-                     {:stuff 2 :endDate "2012-12-12"}
-                          {:stuff 3 :endDate "2077-12-21"}]}
-        reference-output {:foo [{:stuff 1, :endDate nil} {:stuff 3, :endDate "2077-12-21"}]}]
+                          {:stuff 2 :endDate "2012-12-12"}
+                          {:stuff 3 :endDate "2077-12-21"}]
+                    :bar {:stuff 4 :endDate "12-12-12"}} ;; left alone because not in vector
+        reference-output {:foo [{:stuff 1, :endDate nil}
+                                {:stuff 3, :endDate "2077-12-21"}]
+                          :bar {:stuff 4 :endDate "12-12-12"}}]
     (t/is (= reference-output (sut/without-expired-items test-input)))))
 
 
@@ -23,13 +26,13 @@
   (with-redefs [sut/http-get (fn [url opts]
                                {:status 200
                                 :headers {"Content-Type" "application/json"}
-                                :body (encode {:totalResults "1"
-                                               :results [{:name "Acme"}]})})]
+                                :body {:totalResults "1"
+                                       :results [{:name "Acme"
+                                                  :addresses {:endDate "2012-12-12"}
+                                                  :auxiliaryNames [{:endDate "2012-12-12"}]}
+                                                 ]}})]
     (let [result (ote-test/http-get "normaluser" "fetch/ytj?company-id=123132-12")]
-      ;;(t/is (=  {:name "Acme"}))
-      (println "result was" (pr-str result))
-      (t/is (= (:name result) "Acme"))
-      )
-    )
-  )
+      (t/is (= "Acme" (-> result :transit :name)))
+      (t/is (not-empty (-> result :transit :addresses)))
+      (t/is (empty? (-> result :transit :auxiliaryNames))))))
 
