@@ -9,7 +9,8 @@
             [ote.components.http :as http]
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET]]
-            [clojure.spec.alpha :as s]))
+            [clojure.spec.alpha :as s]
+            [ote.util.feature :as feature]))
 
 
 ;; ui needs:
@@ -77,7 +78,7 @@
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-           (when (feature/feature-enabled? config :ytj-fetch)
+           (when (feature/feature-enabled? config :open-ytj-integration)
              ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)
              (http/publish! http {:authenticated? true}
                             (routes                           
