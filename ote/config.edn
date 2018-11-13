@@ -42,7 +42,7 @@
  :gtfs {:bucket "napote-gtfs-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
 
- ;; add features to the set to enable them in production
+ ;; add features to the set to enable them in in this environment
  :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register}
 
  :no-gtfs-update-for-operators #{}
