@@ -22,6 +22,7 @@
   (when (string? s)
     (format/parse (:date format/formatters) s)))
 
+(def http-get http-client/get) ;; redef'd to mock in test
 
 (defn without-expired-items [result]
   (let [now (t/now)        
@@ -35,7 +36,8 @@
                                       (parse-iso8601-date ds))]
                               (date-in-past? d)))
         walk-fn (fn [x]
-                   (if (and (vector? x) (map? (first x)))
+                  (if (and (vector?
+                            x) (map? (first x)))
                      (filterv (complement end-date-expired?) x)
                      x))]
     
@@ -59,28 +61,37 @@
    :post [(or (map? %) (nil? %))]}
   (when (re-matches #"[0-9-]{2,20}" company-id)
     (let [url (str "https://avoindata.prh.fi/bis/v1?totalResults=false&maxResults=10&resultsFrom=0&businessId=" company-id)
-          response (http-client/get url {:accept :json
-                                         :as :json})]
+          response (try
+                     (http-get url {:accept :json
+                                           :as :json})
+                     (catch clojure.lang.ExceptionInfo e
+                       ;; clj-http wants to communicate status as excpetions :P
+                       (-> e ex-data)))]
       (if (and (-> response :status (= 200))
-               (-> response :body :totalResults (= "1")))
+               (-> response :body :totalResults str (= "1")))
         (-> response
             :body
             :results
             first
             (select-keys [:name :auxiliaryNames :businessId :addresses])
-            walk-removing-expired-items)
+            without-expired-items)
         (do
           (log/info (str "YTJ-vastaus ei ok, status: " (:status response))) ;; jos 200, :totalResults oli != 1
           nil)))))
 
-(comment defrecord YTJFetch [config]
+(defrecord YTJFetch []
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-      (http/publish! http {:authenticated? false}
-                     (routes
-                       (GET "/fetch/ytj" {params :query-params}
-                         (load-ytj (get params "url")))))))
+           ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)
+           (http/publish! http {:authenticated? false}
+                          (routes                           
+                           (GET "/fetch/ytj" [company-id]
+                                (println "got company-id" company-id)
+                                
+                                (let [r (fetch-by-company-id company-id)]
+                                  (println "sending as transit:" (pr-str r))
+                                  (http/transit-response r)))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
