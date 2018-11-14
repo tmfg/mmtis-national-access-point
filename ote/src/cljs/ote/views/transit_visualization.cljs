@@ -319,10 +319,11 @@
   [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend)
    [:div [:b "Taulukon ikonien selitteet"]]
    (doall
-    (for [[icon label] [[ic/content-add " Uusia vuoroja"]
-                        [ic/content-remove " Poistuvia vuoroja"]
+    (for [[icon label] [[ic/content-add-circle-outline " Uusia vuoroja"]
+                        [ic/content-remove-circle-outline " Poistuvia vuoroja"]
                         [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                        [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
+                        [ic/action-query-builder " Aikataulumuutoksia per vuoro"]
+                        [ic/av-not-interested " Reittejä, joissa tauko liikenteessä"]]]
       ^{:key label}
       [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label]))])
 

@@ -31,7 +31,9 @@
   (comm/get! "transit-changes/current"
              {:on-success (tuck/send-async! ->TransitChangesResponse)
               :on-failure (tuck/send-async! ->ServerError)})
-  (assoc app :loading? true))
+  (-> app
+      (assoc :loading? true)
+      (assoc :show-all true)))
 
 (defmethod routes/on-navigate-event :transit-changes [_]
   (->LoadTransitChanges))

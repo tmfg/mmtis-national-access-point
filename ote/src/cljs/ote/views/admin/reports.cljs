@@ -24,5 +24,8 @@
    [:div (stylefy/use-style (style-base/flex-container "column"))
     [linkify "/admin/reports/transport-operator/no-services" "Ei palveluita"]
     [linkify "/admin/reports/transport-operator/unpublished-services" "Julkaisemattomia palveluita"]
-    [linkify "/admin/reports/transport-operator/brokerage" "Välityspalvelut"]]])
+    [linkify "/admin/reports/transport-operator/brokerage" "Välityspalvelut"]
+    [linkify "/admin/reports/transport-operator/taxi-operators" "Taksipalveluita tuottavat yritykset ja aliyritykset"]
+    [linkify "/admin/reports/transport-operator/request-operators" "Tilausliikennettä tuottavat yritykset ja aliyritykset"]
+    [linkify "/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]]])
 

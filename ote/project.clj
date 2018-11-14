@@ -155,5 +155,8 @@
             "postbuild" ["run" "-m" "ote.tools.postbuild"]
             }
   :repl-options {:init-ns ote.main
-                 :init (ote.main/start)}
-  :main ote.main)
+                 :init (ote.main/start)
+                 :host "localhost"}
+  :main ote.main
+  :figwheel {:server-ip "localhost"
+             :nrepl-host "localhost"})
