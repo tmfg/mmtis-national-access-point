@@ -173,7 +173,7 @@
   "Helper for HTTP GET requests to the test system. If user is specified the request
   contains an authentication cookie and anti-CSRF token.
   If no user is specified, the request is done unauthenticated.
-  According to conten-type, decoded response data is placed under :json or :transit keys."
+  According to content-type, decoded response data is placed under :json or :transit keys."
   ([path] (http-get nil path))
   ([user path]
    (-> path
