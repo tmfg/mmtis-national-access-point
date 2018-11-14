@@ -540,6 +540,16 @@
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))
 
+(defn format-stop-name [stop-name]
+  (let [splitted-stop-name (if (str/includes? stop-name "->")
+                             (str/split stop-name #"->")
+                             stop-name)
+        formatted-name (if (and (vector? splitted-stop-name) (> (count splitted-stop-name) 1))
+                         [:span (second splitted-stop-name)
+                          [:br] (str "(Vanha nimi: " (first splitted-stop-name) ")")]
+                         splitted-stop-name)]
+    formatted-name))
+
 (defn format-stop-time [highlight-style interval]
   (when interval
     [:span
@@ -607,8 +617,8 @@
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
    [:div.trip-stop-sequence
-    [table/table {:name->label str}
-     [{:name "Pysäkki" :read :gtfs/stop-name}
+    [table/table {:name->label str :key-fn :gtfs/stop-name}
+     [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
       {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
       {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
       {:name "Muutokset" :read identity
