@@ -541,7 +541,7 @@
        [comparison-date-changes compare]]]]))
 
 (defn format-stop-name [stop-name]
-  (let [splitted-stop-name (if (.includes stop-name "->")
+  (let [splitted-stop-name (if (str/includes? stop-name "->")
                              (str/split stop-name #"->")
                              stop-name)
         formatted-name (if (and (vector? splitted-stop-name) (> (count splitted-stop-name) 1))
