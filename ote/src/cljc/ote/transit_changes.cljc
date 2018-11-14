@@ -142,7 +142,7 @@
     (sort-by
       earliest-departure-time
       (mapv (fn [[_ stop-times]]
-            {:gtfs/stop-name (str/join ", " (into #{} (map :gtfs/stop-name stop-times)))
+            {:gtfs/stop-name (str/join "->" (into #{} (map :gtfs/stop-name stop-times)))
              :gtfs/departure-time-date1 (:gtfs/departure-time
                                          (first (filter #(= 1 (:trip %)) stop-times)))
              :gtfs/departure-time-date2 (:gtfs/departure-time
