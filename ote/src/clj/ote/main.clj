@@ -87,7 +87,7 @@
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
 
    ;; Integration: Fetch company data from YTJ
-   :fetch-ytj (component/using (fetch-ytj/->YTJFetch (:ytj config)) [:db :http])
+   :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])
    
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
