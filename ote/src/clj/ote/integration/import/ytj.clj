@@ -74,12 +74,12 @@
           (log/info (str "YTJ-vastaus ei ok, status: " (:status response))) ;; jos 200, :totalResults oli != 1
           nil)))))
 
-(defrecord YTJFetch []
+(defrecord YTJFetch [config]
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
            (when (feature/feature-enabled? config :open-ytj-integration)
-             ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)
+             ;; require authentication because we don't want to be an open proxy for PRH API (and also there may be rate limits)             
              (http/publish! http {:authenticated? true}
                             (routes                           
                              (GET "/fetch/ytj" [company-id]

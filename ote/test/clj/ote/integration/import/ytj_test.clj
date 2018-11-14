@@ -8,7 +8,7 @@
 
 (t/use-fixtures :each
   (ote-test/system-fixture
-   :operators (component/using (ytj/->YTJFetch) [:db :http])))
+   :operators (component/using (ytj/->YTJFetch {:enabled-features #{:open-ytj-integration}}) [:db :http])))
 
 (t/deftest expired-removal
   (let [test-input {:foo [{:stuff 1 :endDate nil}
@@ -29,8 +29,7 @@
                                 :body {:totalResults "1"
                                        :results [{:name "Acme"
                                                   :addresses {:endDate "2012-12-12"}
-                                                  :auxiliaryNames [{:endDate "2012-12-12"}]}
-                                                 ]}})]
+                                                  :auxiliaryNames [{:endDate "2012-12-12"}]}]}})]
     (let [result (ote-test/http-get "normaluser" "fetch/ytj?company-id=123132-12")]
       (t/is (= "Acme" (-> result :transit :name)))
       (t/is (not-empty (-> result :transit :addresses)))

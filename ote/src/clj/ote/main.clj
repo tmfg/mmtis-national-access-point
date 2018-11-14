@@ -79,9 +79,6 @@
                     (service-search/->ServiceSearch)
                     [:http :db])
 
-   ;; Integration: Fetch company data from YTJ
-   :fetch-ytj (component/using (ytj-fetch/->YTJFetch (:ytj config)) [:db :http])
-   
    ;; Integration: export GeoJSON, GTFS and CSV
    :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
    :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
@@ -89,6 +86,9 @@
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
 
+   ;; Integration: Fetch company data from YTJ
+   :fetch-ytj (component/using (fetch-ytj/->YTJFetch (:ytj config)) [:db :http])
+   
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
            [:db :http :email])
