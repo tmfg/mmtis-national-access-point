@@ -42,13 +42,6 @@
                      x))]
     (walk/postwalk walk-fn ytj-map)))
 
-(comment 
-  (def company-id-regex #"[0-9-]{2,20}")
-  (s/def ::company-id-spec (s/and string? #(re-matches company-id-regex %)))
-  (s/fdef fetch-by-company-id
-    :args (:company-id ::company-id-spec)
-    :ret map?))
-
 (defn fetch-by-company-id [company-id]
   (when (and (string? company-id) (re-matches #"[0-9-]{2,20}" company-id))
     (let [url (str "https://avoindata.prh.fi/bis/v1?totalResults=false&maxResults=10&resultsFrom=0&businessId=" company-id)
@@ -71,7 +64,7 @@
                  without-expired-items))
         (do
           ;; (println "all is not good - " (-> response :status (= 200)) (-> response :body pr-str ))
-          (log/info (str "YTJ-vastaus ei ok, status: " (:status response))) ;; jos 200, :totalResults oli != 1
+          (log/info (str "YTJ respnse not ok, status: " (:status response))) ;; if 200, :totalResults was != 1
           nil)))))
 
 (defrecord YTJFetch [config]
