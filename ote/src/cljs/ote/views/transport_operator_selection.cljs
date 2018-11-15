@@ -4,12 +4,6 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
 
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
-            [ote.ui.validation :as ui-validation]
-            [stylefy.core :as stylefy]
-            [ote.style.form :as style-form]
             [ote.ui.common :as ui-common]
             [ote.ui.form-fields :as form-fields]
 
@@ -17,7 +11,6 @@
             [ote.app.controller.front-page :as fp]
 
             [ote.db.transport-operator :as t-operator]
-            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]))
 
 (defn transport-operator-selection [e! {operator :transport-operator
