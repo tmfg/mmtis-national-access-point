@@ -72,7 +72,9 @@
                       (when removed-routes
                         (str removed-routes " päättyvää reittiä"))
                       (when changed-routes
-                        (str changed-routes " muuttunutta reittiä"))]))])
+                        (str changed-routes " muuttunutta reittiä"))
+                      (when no-traffic-routes
+                        (str no-traffic-routes " taukoa liikenteessä"))]))])
 
 (defn notification-template [pre-notices detected-changes]
   [:html
