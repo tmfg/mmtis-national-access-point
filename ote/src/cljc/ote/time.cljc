@@ -423,8 +423,16 @@
     (t/in-days (t/interval date1 date2))
     (- (t/in-days (t/interval date2 date1)))))
 
+#?(:cljs
+(defn to-local-js-date [date]
+  (let [d (date-fields-from-timestamp date)]
+    (new js/goog.date.DateTime (:ote.time/year d) (:ote.time/month d) (:ote.time/date d)))))
+
+#?(:cljs
 (defn days-until [date]
-  (day-difference (t/now) date))
+  (if date
+    (day-difference (to-local-js-date (t/now)) (to-local-js-date date))
+    0)))
 
 (defn now []
   (t/now))
