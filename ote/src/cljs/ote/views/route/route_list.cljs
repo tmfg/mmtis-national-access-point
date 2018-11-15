@@ -5,7 +5,7 @@
     [cljs-react-material-ui.reagent :as ui]
     [ote.app.controller.route.route-list :as route-list]
     [cljs-react-material-ui.icons :as ic]
-    [ote.views.transport-operator :as t-operator-view]
+    [ote.views.transport-operator-selection :as t-operator-sel]
     [ote.app.controller.transport-operator :as to]
     [ote.db.transport-operator :as t-operator]
     [ote.ui.form-fields :as form-fields]
@@ -115,7 +115,7 @@
                           :primary  true
                           :disabled (empty? operators)
                           :icon     (ic/content-add)}]]
-      [t-operator-view/transport-operator-selection e! app]
+      [t-operator-sel/transport-operator-selection e! app]
       [buttons/open-link
        (tr [:route-list-page :link-to-help-pdf-url])
        (tr [:route-list-page :link-to-help-pdf])]]
