@@ -67,13 +67,13 @@
    (str days-until-change " (" change-date ")")
    (str/join ", "
              (remove nil?
-                     [(when added-routes
+                     [(when (and added-routes (> added-routes 0))
                         (str added-routes " uutta reittiä"))
-                      (when removed-routes
+                      (when (and removed-routes (> removed-routes 0))
                         (str removed-routes " päättyvää reittiä"))
-                      (when changed-routes
+                      (when (and changed-routes (> changed-routes 0))
                         (str changed-routes " muuttunutta reittiä"))
-                      (when no-traffic-routes
+                      (when (and no-traffic-routes (> no-traffic-routes 0))
                         (str no-traffic-routes " taukoa liikenteessä"))]))])
 
 (defn notification-template [pre-notices detected-changes]
