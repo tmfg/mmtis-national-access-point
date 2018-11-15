@@ -58,7 +58,7 @@
          [:td cell])])]])
 
 (defn detected-change-row [{:keys [service-name operator-name change-date days-until-change
-                                   added-routes removed-routes changed-routes regions
+                                   added-routes removed-routes changed-routes no-traffic-routes regions
                                    date transport-service-id]}]
   [operator-name
    (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
