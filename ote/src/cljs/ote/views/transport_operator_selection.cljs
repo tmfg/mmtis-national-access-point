@@ -30,8 +30,8 @@
                         (tr [:buttons :add-new-transport-operator])
                         (::t-operator/name %))
         :update!     #(if (nil? %)
-                        (e! (to/->CreateTransportOperator)) ; dropdownist napiksi
-                        (e! (to/->SelectOperatorForService %))) ; nimeä
+                        (e! (to/->CreateTransportOperator))
+                        (e! (to/->SelectOperator %)))
         :options     (into (mapv :transport-operator operators)
                            [:divider nil])
         :auto-width? true}
