@@ -28,7 +28,7 @@
              :on-failure (send-async! ->ServerError)})
   app)
 
-(defrecord SelectOperatorForService [data])
+(defrecord SelectOperator [data])
 (defrecord SelectOperatorForTransit [data])
 (defrecord EditTransportOperator [id])
 (defrecord EditTransportOperatorResponse [response])
@@ -53,7 +53,7 @@
            :transport-operator {:new? true}
            :services-changed? true))
 
-  SelectOperatorForService
+  SelectOperator
   (process-event [{data :data} app]
     (let [id (get data ::t-operator/id)
           service-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))

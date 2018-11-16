@@ -26,7 +26,7 @@
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
-            [ote.views.transport-operator :as t-operator-view]
+            [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
             [clojure.string :as str]))
 
@@ -129,8 +129,8 @@
                                       (e! (ts/->OpenTransportServiceTypePage)))
                          :primary  true
                          :icon     (ic/content-add)}])
-    [t-operator-view/transport-operator-selection e! state true]]
-    [:div.row
+    [t-operator-sel/transport-operator-selection e! state true]]
+   [:div.row
     [:div {:class "col-xs-12 col-md-12"}
      (if (and has-services? (not (empty? operator-services)))
        ;; TRUE -> Table for transport services
