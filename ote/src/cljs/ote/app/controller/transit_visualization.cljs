@@ -71,16 +71,15 @@
               (not (t/before? (time/native->date-time change-date) package-detection-date))))
       changes)))
 
+
 (defn sorted-route-changes
-  "Sort route changes according to change date: Earliest first and missing date last."
+  "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [changes]
-  (sort-by :gtfs/change-date
-           (fn [a b]
-             (if (and a b)
-               (compare a b)
-               (if a
-                 -1
-                 1))) changes))
+  (let [no-changes (filterv #(nil? (:gtfs/change-date %)) changes)
+        only-changes (filterv :gtfs/change-date changes)
+        sorted-changes (sort-by (juxt :gtfs/change-date :gtfs/route-long-name) only-changes)
+        all-sorted-changes (concat sorted-changes no-changes)]
+    all-sorted-changes))
 
 (define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
