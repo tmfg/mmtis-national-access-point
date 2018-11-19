@@ -29,6 +29,7 @@
             [ote.integration.export.csv :as export-csv]
             [ote.integration.import.gtfs :as import-gtfs]
             [ote.integration.import.kalkati :as import-kalkati]
+            [ote.integration.import.ytj :as fetch-ytj]
 
             [ote.tasks.company :as tasks-company]
             [ote.tasks.pre-notices :as tasks-pre-notices]
@@ -85,6 +86,9 @@
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
 
+   ;; Integration: Fetch company data from YTJ
+   :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])
+   
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
            [:db :http :email])

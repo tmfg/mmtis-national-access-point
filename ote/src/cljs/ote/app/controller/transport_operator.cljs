@@ -79,9 +79,10 @@
 
   EditTransportOperator
   (process-event [{id :id} app]
-    (comm/get! (str "t-operator/" id)
-               {:on-success (send-async! ->EditTransportOperatorResponse)})
-    (assoc app :transport-operator-loaded? false))
+    (when id
+      (comm/get! (str "t-operator/" id)
+                 {:on-success (send-async! ->EditTransportOperatorResponse)})
+      (assoc app :transport-operator-loaded? false)))
 
   EditTransportOperatorResponse
   (process-event [{response :response} app]
