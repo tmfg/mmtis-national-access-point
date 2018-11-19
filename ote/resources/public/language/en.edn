@@ -872,6 +872,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :published-types {:YES "Published" :NO "Not published" :ALL "All"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}}
 
+ :transit-visualization-page
+ {:loading-routes "Loading service routes."}
+
  :common-texts
  {:front-page-help-text "You have not yet registered any transport services to NAP-service catalog.
         You can register an external interface about your service or essential data about your service by using
