@@ -8,7 +8,7 @@
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
-            [ote.views.transport-operator :as t-operator-view]
+            [ote.views.transport-operator-selection :as t-operator-sel]
             [cljs-react-material-ui.icons :as ic]
             [cljs-react-material-ui.reagent :as ui]
             [ote.time :as time]
@@ -79,7 +79,7 @@
                                          (e! (pre-notice/->CreateNewPreNotice)))
                             :primary true
                             :icon (ic/content-add)}]
-         [t-operator-view/transport-operator-selection e! app]]]
+         [t-operator-sel/transport-operator-selection e! app]]]
        [:div {:style {:margin-bottom "40px"}}
         [pre-notices-table e! pre-notices :draft]
         (when delete-pre-notice-dialog
