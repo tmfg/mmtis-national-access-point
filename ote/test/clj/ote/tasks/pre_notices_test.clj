@@ -83,8 +83,8 @@
 
     (specql/insert! (:db *ote*) :gtfs/transit-changes
                     {:gtfs/transport-service-id 1
-                     :gtfs/date                 (java.util.Date.)
-                     :gtfs/current-week-date    (java.util.Date.)
+                     :gtfs/date                 (tc/to-sql-date (time/now))
+                     :gtfs/current-week-date    (tc/to-sql-date (time/now))
                      :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
                      :gtfs/change-date          (tc/to-sql-date (time/days-from (time/now) 67))
                      :gtfs/package-ids          [1]

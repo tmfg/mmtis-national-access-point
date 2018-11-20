@@ -42,7 +42,7 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id",
        gtfs_package p
  WHERE chg.date = CURRENT_DATE
-    AND p.id = ANY(chg."package-ids")
+   AND p.id = ANY(chg."package-ids")
    AND p.created > CURRENT_DATE - interval '8 hours'
    AND chg."change-date" IS NOT NULL
    AND (chg."finnish-regions" IS NULL OR
