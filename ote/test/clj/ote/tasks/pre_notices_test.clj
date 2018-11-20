@@ -71,16 +71,27 @@
     (is (empty? @outbox)))
 
   (testing "inserted change is found and sent"
+    ;; Stupid way to clean up database. But package is hard coded to these test. So it must remain the same.
+    (specql/delete! (:db *ote*) :gtfs/package
+                    {:gtfs/id 1})
+    ;; Create package-id (email content is dependent on this id)
+    (specql/insert! (:db *ote*) :gtfs/package
+                    {:gtfs/id 1
+                     :gtfs/transport-operator-id 1
+                     :gtfs/transport-service-id  1
+                     :gtfs/created               (tc/to-sql-date (time/now))})
+
     (specql/insert! (:db *ote*) :gtfs/transit-changes
                     {:gtfs/transport-service-id 1
-                     :gtfs/date (java.util.Date.)
-                     :gtfs/current-week-date (java.util.Date.)
-                     :gtfs/different-week-date (tc/to-sql-date (time/days-from (time/now) 70))
-                     :gtfs/change-date (tc/to-sql-date (time/days-from (time/now) 67))
-                     :gtfs/package-ids [1]
-                     :gtfs/removed-routes 1
-                     :gtfs/added-routes 2
-                     :gtfs/changed-routes 3})
+                     :gtfs/date                 (tc/to-sql-date (time/now))
+                     :gtfs/current-week-date    (tc/to-sql-date (time/now))
+                     :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
+                     :gtfs/change-date          (tc/to-sql-date (time/days-from (time/now) 67))
+                     :gtfs/package-ids          [1]
+                     :gtfs/removed-routes       1
+                     :gtfs/added-routes         2
+                     :gtfs/changed-routes       3})
+
     (send!)
     (is (= 1 (count @outbox)))
     (is (str/includes? (email-content) "tunnistetut"))))
