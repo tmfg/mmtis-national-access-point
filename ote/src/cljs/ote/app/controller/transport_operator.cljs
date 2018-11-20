@@ -87,8 +87,7 @@
                :transport-operator-loaded? false))
       (do
         (assoc app
-               :transport-operator-loaded? true
-               :transport-operator nil))))
+               :transport-operator-loaded? true))))
 
   EditTransportOperatorResponse
   (process-event [{response :response} app]
