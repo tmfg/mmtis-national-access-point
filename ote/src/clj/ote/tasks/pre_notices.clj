@@ -74,7 +74,7 @@
                       (when (and changed-routes (> changed-routes 0))
                         (str changed-routes " muuttunutta reittiä"))
                       (when (and no-traffic-routes (> no-traffic-routes 0))
-                        (str no-traffic-routes " taukoa liikenteessä"))]))])
+                        (str no-traffic-routes " reitillä tauko liikennöinnissä"))]))])
 
 (defn notification-template [pre-notices detected-changes]
   [:html
