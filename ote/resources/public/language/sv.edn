@@ -877,6 +877,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
+ :transit-visualization-page
+ {:loading-routes "Laddar rutterna för tjänsten."}
+
  :common-texts
  {:front-page-help-text "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
