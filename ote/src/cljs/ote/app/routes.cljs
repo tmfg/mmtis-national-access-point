@@ -52,6 +52,7 @@
     ["/authority-pre-notices/:id" :authority-pre-notices]
 
     ["/admin" :admin]
+    ["/admin/detected-changes" :admin-detected-changes]
     ["/admin/:admin-page" :admin]]))
 
 ;; Add pages that needs authenticating to this list

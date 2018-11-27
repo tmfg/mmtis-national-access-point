@@ -19,10 +19,13 @@
             [specql.impl.registry :refer [table-info-registry]]
             [jeesql.core :refer [defqueries]]
             [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [ote.transit-changes.detection :as detection])
   (:import (java.io File)))
 
 (defqueries "ote/integration/import/stop_times.sql")
+(defqueries "ote/integration/import/import_gtfs.sql")
+(defqueries "ote/transit_changes/detection.sql")
 
 
 (defn load-zip-from-url [url]
@@ -137,7 +140,7 @@
           (recur (inc i) ps))))))
 
 
-(defn save-gtfs-to-db [db gtfs-file package-id interface-id]
+(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id]
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
     (try
@@ -161,8 +164,12 @@
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
 
+      ;; Handle detection-routes
+      ;; Calculate route-hash-id for the service using previous 100 packages
+      (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
+
       (log/info "Generating date hashes for package " package-id)
-      (generate-package-hashes db {:package-id package-id})
+      (generate-date-hashes db {:package-id package-id :route-name-type (detection/db-route-detection-type db service-id)})
 
       (log/info "Generating finnish regions and envelope for package " package-id)
       (gtfs-set-package-geometry db {:package-id package-id})
@@ -329,7 +336,7 @@
                 (log/debug "File: " filename " was uploaded to S3 successfully.")
 
                 ;; Parse gtfs package and save it to database.
-                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id)))
+                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id)))
             (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying.")))))))
 
 (defrecord GTFSImport [config]

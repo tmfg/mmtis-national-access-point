@@ -10,9 +10,12 @@
             [ote.db.places :as places]
             [specql.core :as specql]
             [ote.authorization :as authorization]
-            [ote.tasks.gtfs :as gtfs-tasks]))
+            [ote.tasks.gtfs :as gtfs-tasks]
+            [taoensso.timbre :as log]
+            [ote.transit-changes.detection :as detection]))
 
 (defqueries "ote/services/transit_changes.sql")
+(defqueries "ote/integration/import/import_gtfs.sql")
 
 (defn- parse-weekhash [weekhash]
   (if (nil? weekhash)
@@ -52,12 +55,22 @@
   (GET "/transit-changes/current" []
        (#'list-current-changes db))
 
+  (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
+    (when (authorization/admin? user)
+      (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count))
+      "OK"))
+
+  (GET "/transit-changes/force-calculate-route-hash-id/:service-id/:package-count/:type" [service-id package-count type :as {user :user}]
+    (when (authorization/admin? user)
+        (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
+        "OK"))
+
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
           (gtfs-tasks/detect-new-changes-task db true)
           "OK"))
-  ;; Delete  row from gtfs_package to make this work. Don't know why, but it must do.
-  ;; Also change external-interface-description.gtfs-imported to past to make import work.
+  ;; Delete row from gtfs_package to make this work. Don't know why, but it must be done.
+  ;; Also change external-interface-description.gtfs-imported to past to make import work because we only import new packages.
   (POST "/transit-changes/force-interface-import" req
     (when (authorization/admin? (:user req))
       (gtfs-tasks/update-one-gtfs! config db false)

@@ -16,28 +16,88 @@
   16)
 
 (defqueries "ote/transit_changes/detection.sql")
+(defqueries "ote/services/transit_changes.sql")
 
-(def route-key
+(defn get-gtfs-packages [db service-id package-count]
+  (into [] (map :gtfs/id (specql/fetch db :gtfs/package
+                                       #{:gtfs/id}
+                                       {:gtfs/transport-service-id service-id}
+                                       {:specql.core/order-by        :gtfs/id
+                                        :specql.core/order-direction :desc
+                                        :specql.core/limit           package-count}))))
+
+(defn calculate-package-hashes-for-service [db service-id package-count]
+  (let [package-ids (get-gtfs-packages db service-id package-count)]
+    (log/debug "Found " (count package-ids) " For service " service-id)
+    (doall
+      (for [package-id package-ids]
+        (generate-date-hashes db {:package-id package-id})))))
+
+(defn db-route-detection-type [db service-id]
+  (let [type (first (specql/fetch db :gtfs/detection-service-route-type
+                                  #{:gtfs/route-hash-id-type}
+                                  {:gtfs/transport-service-id service-id}))]
+    ;; If type is saved to database return it. If not, return default "short-long-headsign"
+    (if type
+      (:gtfs/route-hash-id-type type)
+      "short-long-headsign")))
+
+(defn use-old-route-key [type]
+  (if (or (= type "short-long") (= type "route-id"))
+    false
+    true))
+
+(defn route-key
   "Route key is a vector of [short-name long-name headsign]"
-  (juxt :route-short-name :route-long-name :trip-headsign))
+  [type]
+  (if (use-old-route-key type)
+    (juxt :route-short-name :route-long-name :trip-headsign)
+    :route-hash-id))
+
+(defn calculate-route-hash-id-for-service
+  "We support only few different hash calculation types. [short-long-headsign, short-long, route-id]"
+  [db service-id package-count type]
+  (let [package-ids (get-gtfs-packages db service-id package-count)]
+    ;; Delete / insert type to db
+    (specql/delete! db :gtfs/detection-service-route-type {:gtfs/transport-service-id service-id})
+    (specql/insert! db :gtfs/detection-service-route-type
+                    {:gtfs/transport-service-id service-id
+                     :gtfs/route-hash-id-type type})
+    (doall
+      ;; Calculate route-hash-id:s again to detection-route table for given service.
+      (for [package-id package-ids]
+        (do
+          (cond
+            (= type "short-long-headsign")
+              (calculate-routes-route-hashes-using-headsign db {:package-id package-id})
+            (= type "short-long")
+              (calculate-routes-route-hashes-using-short-and-long db {:package-id package-id})
+            (= type "route-id")
+              (calculate-routes-route-hashes-using-short-and-long db {:package-id package-id})
+            :else
+              (calculate-routes-route-hashes-using-short-and-long db {:package-id package-id})))))))
 
 (def empty-route-key [nil nil nil])
+(def empty-hash-route-key nil)
 
-(defn routes-by-date [date-route-hashes all-routes]
+(defn routes-by-date [date-route-hashes all-routes service-id type]
   ;; date-route-hashes contains all hashes for date range and is sorted
   ;; by date so we can partition by :date to get each date's hashes
   (for [hashes-for-date (partition-by :date date-route-hashes)
-        :let [date (:date (first hashes-for-date))]]
-    {:date (.toLocalDate date)
-     :routes (dissoc
-              (into (zipmap all-routes (repeat nil))
-                    (map (juxt route-key :hash))
-                    hashes-for-date)
+        :let [date (:date (first hashes-for-date))
+              route-hashes (into (zipmap all-routes (repeat nil))
+                                 (map (juxt (route-key type) :hash))
+                                 hashes-for-date)
+              cleaned-route-hashes (dissoc route-hashes
 
-              ;; If there is no traffic for the service on a given date, the
-              ;; result set will contain a single row with nil values for route.
-              ;; Remove the empty-route-key so we don't get an extra route.
-              empty-route-key)}))
+                                           ;; If there is no traffic for the service on a given date, the
+                                           ;; result set will contain a single row with nil values for route.
+                                           ;; Remove the empty-route-key so we don't get an extra route.
+                                           (if (use-old-route-key type)
+                                             empty-route-key
+                                             empty-hash-route-key))]]
+    {:date   (.toLocalDate date)
+     :routes cleaned-route-hashes}))
 
 (defn merge-week-hash
   "Merges multiple maps containing route day hashes.
@@ -236,7 +296,7 @@
                           (transit-changes/trip-stop-differences l r))
                         changed)}))
 
-(defn compare-route-days [db service-id [short long headsign :as route]
+(defn compare-route-days [db service-id [short long headsign route-hash-id :as route]
                           {:keys [starting-week starting-week-hash
                                   different-week different-week-hash] :as r}]
   (let [first-different-day (transit-changes/first-different-day starting-week-hash
@@ -321,6 +381,7 @@
       :gtfs/route-short-name (:route-short-name route)
       :gtfs/route-long-name (:route-long-name route)
       :gtfs/trip-headsign (:trip-headsign route)
+      :gtfs/route-hash-id (:route-hash-id route)
 
       ;; Trip change counts
       :gtfs/added-trips added-trips
@@ -365,9 +426,9 @@
         :default
         {:gtfs/change-type :no-change})))))
 
-(defn- debug-print-change-stats [all-routes route-changes]
+(defn- debug-print-change-stats [all-routes route-changes type]
   (doseq [r all-routes
-          :let [key (route-key r)
+          :let [key ((route-key type) r)
                 {:keys [changes no-traffic-start-date no-traffic-end-date]
                  :as route} (route-changes key)]]
     (println key " has traffic " (:min-date r) " - " (:max-date r)
@@ -377,7 +438,8 @@
                (str " has changes")))))
 
 (defn store-transit-changes! [db service-id package-ids {:keys [all-routes route-changes]}]
-  (let [today (java.time.LocalDate/now)
+  (let [type (db-route-detection-type db service-id)
+        today (java.time.LocalDate/now)
         route-change-infos (map (fn [[route-key detection-result]]
                                   (transform-route-change all-routes route-key detection-result))
                                 route-changes)
@@ -387,7 +449,7 @@
                                                    (or (nil? change-date)
                                                        (date-in-the-past? (.toLocalDate change-date))))
                                                  (sort-by :gtfs/change-date route-change-infos)))]
-    #_(debug-print-change-stats all-routes route-changes)
+    #_ (debug-print-change-stats all-routes route-changes type)
     (specql/upsert! db :gtfs/transit-changes
                     #{:gtfs/transport-service-id :gtfs/date}
                     {:gtfs/transport-service-id service-id
@@ -403,7 +465,8 @@
                      :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
                      :gtfs/route-changes route-change-infos
 
-                     :gtfs/package-ids package-ids})))
+                     :gtfs/package-ids package-ids
+                     :gtfs/created (java.util.Date.)})))
 
 (defn override-static-holidays [date-route-hashes]
   (map (fn [{:keys [date] :as row}]
@@ -413,9 +476,11 @@
        date-route-hashes))
 
 (defn route-changes [db {:keys [start-date service-id] :as route-query-params}]
-  (let [all-routes (map-by (juxt :route-short-name :route-long-name :trip-headsign)
+  (let [type (db-route-detection-type db service-id)
+        all-routes (map-by (route-key type)
                            (service-routes-with-date-range db {:service-id service-id}))
         all-route-keys (set (keys all-routes))]
+    (try
     {:all-routes all-routes
      :route-changes
      (-> db
@@ -423,14 +488,16 @@
          (service-route-hashes-for-date-range route-query-params)
          ;; Change hashes that are at static holiday to a keyword
          (override-static-holidays)
-         (routes-by-date all-route-keys)
+         (routes-by-date all-route-keys service-id type)
          ;; Create week hashes so we can find out the differences between weeks
          combine-weeks
          ;; Search next week (for every route) that is different
          (next-different-weeks)
          (as-> routes
              ;; Fetch detailed route comparison if a change was found
-             (route-day-changes db service-id routes)))}))
+             (route-day-changes db service-id routes)))}
+    (catch Exception e
+      (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
 (defn service-package-ids-for-date-range [db query-params]
   (mapv :id (service-packages-for-date-range db query-params)))

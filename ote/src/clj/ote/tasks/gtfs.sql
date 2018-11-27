@@ -20,6 +20,3 @@ SELECT ts.id
                  AND 'route-and-schedule' = ANY(eid."data-content")
                  AND eid."transport-service-id" = ts.id)
    AND (:force = TRUE OR gtfs_should_calculate_transit_change(ts.id));
-
--- name: upsert-service-transit-change
-SELECT gtfs_upsert_service_transit_changes(:service-id::INTEGER);

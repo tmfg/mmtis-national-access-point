@@ -269,7 +269,9 @@
                               (when-let [long (:gtfs/route-long-name route)]
                                 {:long-name long})
                               (when-let [headsign (:gtfs/trip-headsign route)]
-                                {:headsign headsign}))]
+                                {:headsign headsign})
+                              (when-let [route-hash-id (:gtfs/route-hash-id route)]
+                                {:route-hash-id route-hash-id}))]
           :when date]
     (comm/get! (str "transit-visualization/" service-id "/route-lines-for-date")
                {:params params
@@ -314,7 +316,9 @@
                          (when-let [long (:gtfs/route-long-name route)]
                            {:long-name long})
                          (when-let [headsign (:gtfs/trip-headsign route)]
-                           {:headsign headsign}))
+                           {:headsign headsign})
+                         (when-let [route-hash-id (:gtfs/route-hash-id route)]
+                           {:route-hash-id route-hash-id}))
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
     (-> app
         (assoc-in [:transit-visualization :route-differences-loading?] true)
@@ -340,7 +344,9 @@
                           (when-let [long (:gtfs/route-long-name route)]
                             {:long-name long})
                           (when-let [headsign (:gtfs/trip-headsign route)]
-                            {:headsign headsign}))
+                            {:headsign headsign})
+                          (when-let [route-hash-id (:gtfs/route-hash-id route)]
+                            {:route-hash-id route-hash-id}))
                 :on-success (tuck/send-async! ->RouteCalendarHashResponse)})
 
     (-> app
