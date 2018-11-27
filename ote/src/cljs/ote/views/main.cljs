@@ -24,6 +24,7 @@
             [ote.views.login :as login]
             [ote.views.user :as user]
             [ote.views.admin :as admin]
+            [ote.views.admin.detected-changes :as admin-detected-changes]
             [ote.views.operators :as operators]
             [ote.views.email-notification-settings :as email-settings]
             [ote.views.route.route-list :as route-list]
@@ -130,6 +131,7 @@
                     :service [service-search/service-geojson e! (:service-search app)]
 
                     :admin [admin/admin-panel e! app]
+                    :admin-detected-changes [admin-detected-changes/configure-detected-changes e! app]
 
                     :operators [operators/operators e! app]
 

@@ -436,10 +436,46 @@
        (download-csv "rajapinnat.csv"))
   app)
 
-(defn ^:export force-detect-transit-changes []
+;; admin tools
+(define-event UpdateHashCalculationValues [values]
+  {}
+  (update-in app [:admin :transit-changes :daily-hash-values] merge values))
+
+(define-event UpdateRouteHashCalculationValues [values]
+  {}
+  (update-in app [:admin :transit-changes :route-hash-values] merge values))
+
+(define-event ForceDetectTransitChanges []
+  {}
   (comm/post! "/transit-changes/force-detect" nil
-              {:on-success #(.log js/console %)}))
+              {:on-success #(.log js/console %)})
+  app)
+
+(define-event ForceInterfaceImport []
+  {}
+  (comm/post! "/transit-changes/force-interface-import" nil
+              {:on-success #(.log js/console %)})
+  app)
+
+(define-event ForceHashCalculationForService []
+  {}
+  (comm/get! (str "/transit-changes/force-calculate-hashes/"
+                  (get-in app [:admin :transit-changes :daily-hash-values :service-id]) "/"
+                  (get-in app [:admin :transit-changes :daily-hash-values :package-count]))
+              {:on-success #(.log js/console %)})
+  app)
+
+(define-event ForceRouteHashCalculationForService []
+  {}
+  (comm/get! (str "/transit-changes/force-calculate-route-hash-id/"
+                  (get-in app [:admin :transit-changes :route-hash-values :service-id]) "/"
+                  (get-in app [:admin :transit-changes :route-hash-values :package-count]) "/"
+                  (get-in app [:admin :transit-changes :route-hash-values :route-id-type]))
+             {:on-success #(.log js/console %)})
+  app)
+
+(defn ^:export force-detect-transit-changes []
+  (->ForceDetectTransitChanges))
 
 (defn ^:export force-interface-import []
-  (comm/post! "/transit-changes/force-interface-import" nil
-              {:on-success #(.log js/console %)}))
+  (->ForceInterfaceImport))
