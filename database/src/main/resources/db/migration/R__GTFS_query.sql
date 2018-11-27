@@ -688,7 +688,7 @@ BEGIN
   DELETE FROM "detection-route" WHERE "package-id" = package_id;
 
   INSERT INTO "detection-route" ("gtfs-route-id", "package-id", "route-id", "route-short-name", "route-long-name", "route-hash-id", "trip-headsign")
-    SELECT r.id, r."package-id", r."route-id", r."route-short-name", r."route-long-name", r."route-id"), trip."trip-headsign"
+    SELECT r.id, r."package-id", r."route-id", r."route-short-name", r."route-long-name", r."route-id", trip."trip-headsign"
       FROM "gtfs-route" r
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
