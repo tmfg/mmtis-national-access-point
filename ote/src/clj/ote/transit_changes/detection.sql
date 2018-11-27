@@ -4,14 +4,14 @@ WITH dates AS (
   SELECT :start-date::DATE + d AS date
     FROM generate_series(0, :end-date::DATE - :start-date::DATE) s (d)
 )
-SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign",
+SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id",
        string_agg(rh.hash::text, ' ') as hash
   FROM dates d
   LEFT JOIN "gtfs-date-hash" dh
     ON (dh.date = d.date AND
         dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
   LEFT JOIN LATERAL unnest(dh."route-hashes") AS rh ON TRUE
- GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", dh."package-id"
+ GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id", dh."package-id"
  ORDER BY d.date;
 
 -- name: service-packages-for-date-range
@@ -43,3 +43,6 @@ SELECT t."package-id", trip."trip-id",
    AND COALESCE(r."route-long-name",'') = COALESCE(:route-long-name::TEXT,'')
    AND COALESCE(trip."trip-headsign",'') = COALESCE(:trip-headsign::TEXT,'')
  ORDER BY t."package-id", trip."trip-id", stoptime."stop-sequence";
+
+-- name: generate-date-hashes
+SELECT gtfs_generate_date_hashes(:package-id::INTEGER);
