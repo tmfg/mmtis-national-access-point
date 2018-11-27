@@ -798,3 +798,22 @@ BEGIN
           "package-ids" = package_ids;
 END
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION calculate_route_hash_id_using_headsign(package_id INTEGER)
+RETURNS VOID
+AS $$
+BEGIN
+
+  DELETE FROM "detection-route" WHERE "package-id" = package_id;
+
+  INSERT INTO "detection-route" ("gtfs-route-id", "package-id", "route-id", "route-short-name", "route-long-name", "route-hash-id", "trip-headsign")
+    SELECT r.id, r."package-id", r."route-id", r."route-short-name", r."route-long-name",
+           concat(trim(r."route-short-name"), '-', trim(r."route-long-name"), '-', trim(trip."trip-headsign")), trip."trip-headsign"
+     FROM "gtfs-route" r
+     JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+     JOIN LATERAL unnest(t.trips) trip ON true
+    WHERE r."package-id" = package_id
+    GROUP BY r.id, trip."trip-headsign";
+
+END
+$$ LANGUAGE plpgsql;
