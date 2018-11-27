@@ -177,13 +177,13 @@ RETURNS SETOF route_trips_for_date
 AS $$
 SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
        COUNT(trip."trip-id")::INTEGER AS trips,
-       array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
-  FROM "gtfs-route" r
+       array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata, r."route-hash-id"
+  FROM "detection-route" r
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
  WHERE r."package-id" = ANY(package_ids)
    AND ROW(r."package-id", t."service-id")::service_ref IN (SELECT * FROM gtfs_services_for_date(package_ids, dt))
- GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
+ GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign", r."route-hash-id"
 $$ LANGUAGE SQL STABLE;
 
 CREATE OR REPLACE FUNCTION gtfs_route_tripdata_for_date(
@@ -629,7 +629,8 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-long-name",'') AS "route-long-name",
        COALESCE(rh."trip-headsign", '') AS "trip-headsign",
        MIN(d.date) AS "min-date",
-       MAX(d.date) AS "max-date"
+       MAX(d.date) AS "max-date",
+       COALESCE(rh."route-hash-id", '') AS "route-hash-id"
   FROM dates d
   -- Join packages for each date
   JOIN LATERAL unnest(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
@@ -639,7 +640,7 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
   -- Join unnested per route hashes
   JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
  WHERE rh.hash IS NOT NULL
- GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign";
+ GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id";
 $$ LANGUAGE SQL STABLE;
 
 
