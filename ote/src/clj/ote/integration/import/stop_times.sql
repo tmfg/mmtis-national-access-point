@@ -10,9 +10,3 @@ UPDATE "gtfs-trip"
    SET trips[:index]."stop-times" = :stop-times::"gtfs-stop-time-info"[]
  WHERE "gtfs-trip".id = :trip-row-id
    AND "package-id" = :package-id;
-
--- name: generate-package-hashes
-SELECT gtfs_package_hashes(:package-id::INTEGER);
-
--- name: gtfs-set-package-geometry
-SELECT gtfs_set_package_geometry(:package-id::INTEGER);
