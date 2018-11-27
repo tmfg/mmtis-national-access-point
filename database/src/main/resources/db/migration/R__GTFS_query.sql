@@ -426,42 +426,39 @@ DECLARE
   route_hashes "gtfs-route-hash"[];
   date_hash bytea;
 BEGIN
-
-
-  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign",
-                       digest(d.times, 'sha256'))::"gtfs-route-hash"
+  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign", digest(d.times, 'sha256'), d."route-hash-id")::"gtfs-route-hash"
                    ORDER BY d."route-short-name",d."route-long-name",d."trip-headsign")
     INTO route_hashes
-    FROM (SELECT x."route-short-name",x."route-long-name",x."trip-headsign",
+    FROM (SELECT x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id",
                  string_agg(x.trip_times, ',' ORDER BY x.trip_times) as times
             FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
-                         COALESCE(trip."trip-headsign",'') AS "trip-headsign",
-                         string_agg(concat(s."stop-lat",'-',s."stop-lon",'@',stops."departure-time"), '->'
-                                    ORDER BY stops."stop-sequence") as trip_times
+                         COALESCE(r."trip-headsign",'') AS "trip-headsign",
+                         string_agg(concat(s."stop-lat",'-',s."stop-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
+                         COALESCE(r."route-hash-id", '') as "route-hash-id"
                     FROM "gtfs-trip" t
-                    LEFT JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
+                    LEFT JOIN "detection-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
                     LEFT JOIN LATERAL unnest(t.trips) trip ON TRUE
                     LEFT JOIN LATERAL unnest(trip."stop-times") stops ON TRUE
                     JOIN "gtfs-stop" s ON (s."package-id" = t."package-id" AND stops."stop-id" = s."stop-id")
                    WHERE t."package-id" = package_id
                      AND t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
-                   GROUP BY "route-short-name", "route-long-name", "trip-headsign", stops."trip-id") x
-    GROUP BY x."route-short-name",x."route-long-name",x."trip-headsign") d;
+                   GROUP BY "route-short-name", "route-long-name", r."trip-headsign", "route-hash-id", stops."trip-id") x
+    GROUP BY x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id") d;
+
 
     SELECT digest(string_agg(rh.hash::text, ','), 'sha256')
       INTO date_hash
       FROM unnest(route_hashes) rh;
 
-    INSERT INTO "gtfs-date-hash"
-           ("package-id", date, hash, "route-hashes")
-    VALUES (package_id, dt, date_hash, route_hashes)
+    INSERT INTO "gtfs-date-hash" ("package-id", date, hash, "route-hashes", "created")
+    VALUES (package_id, dt, date_hash, route_hashes, now())
     ON CONFLICT ("package-id", date) DO
     UPDATE SET "package-id" = package_id,
                date = dt,
                hash = date_hash,
-               "route-hashes" = route_hashes;
-
+               "route-hashes" = route_hashes,
+               modified = now();
 END
 $$ LANGUAGE plpgsql;
 
