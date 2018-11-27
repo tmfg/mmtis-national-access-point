@@ -10,7 +10,8 @@
             [taoensso.timbre :as log]
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
-            [ote.util.fn :refer [flip]]))
+            [ote.util.fn :refer [flip]]
+            [ote.transit-changes.detection :as detection]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -50,13 +51,17 @@
                  {:gtfs/transport-service-id service-id
                   :gtfs/date date})))
 
-(defn service-calendar-for-route [db service-id route-short-name route-long-name trip-headsign]
-  (into {}
-        (map (juxt :date :hash))
-        (fetch-date-hashes-for-route db {:service-id service-id
-                                         :route-short-name route-short-name
-                                         :route-long-name route-long-name
-                                         :trip-headsign trip-headsign})))
+(defn service-calendar-for-route [db service-id route-short-name route-long-name trip-headsign route-hash-id]
+  (let [type (detection/db-route-detection-type db service-id)]
+    (into {}
+          (map (juxt :date :hash))
+          (if (detection/use-old-route-key type)
+            (fetch-date-hashes-for-route-with-route-names db {:service-id       service-id
+                                                              :route-short-name route-short-name
+                                                              :route-long-name  route-long-name
+                                                              :trip-headsign    trip-headsign})
+            (fetch-date-hashes-for-route-with-route-hash-id db {:service-id    service-id
+                                                                :route-hash-id route-hash-id})))))
 
 (defn parse-gtfs-stoptimes [pg-array]
   (let [string (str pg-array)]
@@ -70,6 +75,7 @@
 
 (define-service-component TransitVisualization {}
 
+  ;; Get transit changes, service info and package info for given date and service
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
@@ -86,15 +92,15 @@
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
-        {:strs [short-name long-name headsign]} :query-params}
-       {:calendar (service-calendar-for-route db (Long/parseLong service-id)
-                                              short-name long-name headsign)})
+        {:strs [short-name long-name headsign route-hash-id]} :query-params}
+      {:calendar (service-calendar-for-route db (Long/parseLong service-id)
+                                             short-name long-name headsign route-hash-id)})
 
 
   ^:unauthenticated
   (GET "/transit-visualization/:service-id/route-lines-for-date"
        {{service-id :service-id} :params
-        {:strs [date short-name long-name headsign]} :query-params}
+        {:strs [date short-name long-name headsign route-hash-id]} :query-params}
        (http/geojson-response
         (cheshire/encode
          {:type "FeatureCollection"
@@ -112,20 +118,20 @@
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
         {:strs [date short-name long-name headsign]} :query-params}
-       (into []
-             (map #(update % :stoptimes parse-gtfs-stoptimes))
-             (fetch-route-trip-info-by-name-and-date
+      (into []
+            (map #(update % :stoptimes parse-gtfs-stoptimes))
+            (fetch-route-trip-info-by-name-and-date
               db
-              {:service-id (Long/parseLong service-id)
-               :date (time/parse-date-iso-8601 date)
+              {:service-id       (Long/parseLong service-id)
+               :date             (time/parse-date-iso-8601 date)
                :route-short-name short-name
-               :route-long-name long-name
-               :trip-headsign headsign})))
+               :route-long-name  long-name
+               :trip-headsign    headsign})))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
-        {:strs [date1 date2 short-name long-name headsign]} :query-params}
+        {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params}
        (composite/parse @specql-registry/table-info-registry
                         {:type "gtfs-route-change-info"}
                         (fetch-route-differences
@@ -135,4 +141,5 @@
                           :date2 (time/parse-date-iso-8601 date2)
                           :route-short-name short-name
                           :route-long-name long-name
-                          :trip-headsign headsign}))))
+                          :trip-headsign headsign
+                          :route-hash-id route-hash-id}))))
