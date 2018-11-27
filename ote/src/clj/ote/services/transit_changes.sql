@@ -51,3 +51,10 @@ SELECT ts.id AS "transport-service-id",
    AND 'schedule' = ts."sub-type"
    AND ts."published?" = TRUE
  ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
+
+-- name: calculate-routes-route-hashes-using-headsign
+SELECT calculate_route_hash_id_using_headsign(:package-id);
+-- name: calculate-routes-route-hashes-using-short-and-long
+SELECT calculate_route_hash_id_using_short_long(:package-id);
+-- name: calculate-routes-route-hashes-using-route-id
+SELECT calculate_route_hash_id_using_route_id(:package-id);
