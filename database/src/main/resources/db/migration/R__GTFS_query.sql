@@ -177,13 +177,13 @@ RETURNS SETOF route_trips_for_date
 AS $$
 SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
        COUNT(trip."trip-id")::INTEGER AS trips,
-       array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
-  FROM "gtfs-route" r
+       array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata, r."route-hash-id"
+  FROM "detection-route" r
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
  WHERE r."package-id" = ANY(package_ids)
    AND ROW(r."package-id", t."service-id")::service_ref IN (SELECT * FROM gtfs_services_for_date(package_ids, dt))
- GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
+ GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign", r."route-hash-id"
 $$ LANGUAGE SQL STABLE;
 
 CREATE OR REPLACE FUNCTION gtfs_route_tripdata_for_date(
@@ -191,7 +191,8 @@ CREATE OR REPLACE FUNCTION gtfs_route_tripdata_for_date(
   dt DATE,
   route_short_name TEXT,
   route_long_name TEXT,
-  trip_headsign TEXT)
+  trip_headsign TEXT,
+  route_hash_id TEXT)
 RETURNS "gtfs-package-trip-info"[]
 AS $$
 SELECT array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
@@ -212,7 +213,7 @@ SELECT array_agg(x.id)
   FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
           FROM gtfs_package p
          WHERE "transport-service-id" = service_id
-           AND ( p.created <= dt OR p.first_package = TRUE)
+           AND ( p.created::DATE <= dt OR p.first_package = TRUE)
          ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
 
@@ -288,13 +289,13 @@ END
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION gtfs_route_differences(
-     "route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT,
+     "route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT, "route-hash-id" TEXT,
      d1_trips "gtfs-package-trip-info"[], d2_trips "gtfs-package-trip-info"[])
 RETURNS "gtfs-route-change-info"
 AS $$
 DECLARE
   first_common_stop TEXT;
-  chg "gtfs-route-change-info";
+  route_changes "gtfs-route-change-info";
   row RECORD;
   all_trips TEXT[];
   d1_trip_ids TEXT[];
@@ -387,14 +388,15 @@ BEGIN
 
   --RAISE NOTICE 'yli jäi d1: % ja d2: % vuoroa', array_length(d1_trip_ids, 1), array_length(d2_trip_ids, 2);
 
-  chg."route-short-name" := "route-short-name";
-  chg."route-long-name" := "route-long-name";
-  chg."trip-headsign" := "trip-headsign";
-  chg."added-trips" := COALESCE(array_length(d2_trip_ids,1), 0);
-  chg."removed-trips" := COALESCE(array_length(d1_trip_ids,1), 0);
-  chg."trip-stop-sequence-changes" := trip_stop_seq_changes;
-  chg."trip-stop-time-changes" := trip_stop_time_changes;
-  RETURN chg;
+  route_changes."route-short-name" := "route-short-name";
+  route_changes."route-long-name" := "route-long-name";
+  route_changes."trip-headsign" := "trip-headsign";
+  route_changes."route-hash-id" := "route-hash-id";
+  route_changes."added-trips" := COALESCE(array_length(d2_trip_ids,1), 0);
+  route_changes."removed-trips" := COALESCE(array_length(d1_trip_ids,1), 0);
+  route_changes."trip-stop-sequence-changes" := trip_stop_seq_changes;
+  route_changes."trip-stop-time-changes" := trip_stop_time_changes;
+  RETURN route_changes;
 END
 $$ LANGUAGE plpgsql;
 
@@ -426,49 +428,48 @@ DECLARE
   route_hashes "gtfs-route-hash"[];
   date_hash bytea;
 BEGIN
-
-
-  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign",
-                       digest(d.times, 'sha256'))::"gtfs-route-hash"
+  SELECT array_agg(ROW(d."route-short-name", d."route-long-name", d."trip-headsign", digest(d.times, 'sha256'), d."route-hash-id")::"gtfs-route-hash"
                    ORDER BY d."route-short-name",d."route-long-name",d."trip-headsign")
     INTO route_hashes
-    FROM (SELECT x."route-short-name",x."route-long-name",x."trip-headsign",
+    FROM (SELECT x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id",
                  string_agg(x.trip_times, ',' ORDER BY x.trip_times) as times
             FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
-                         COALESCE(trip."trip-headsign",'') AS "trip-headsign",
-                         string_agg(concat(s."stop-lat",'-',s."stop-lon",'@',stops."departure-time"), '->'
-                                    ORDER BY stops."stop-sequence") as trip_times
+                         COALESCE(r."trip-headsign",'') AS "trip-headsign",
+                         string_agg(concat(s."stop-lat",'-',s."stop-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
+                         COALESCE(r."route-hash-id", '') as "route-hash-id"
                     FROM "gtfs-trip" t
-                    LEFT JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
+                    LEFT JOIN "detection-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
                     LEFT JOIN LATERAL unnest(t.trips) trip ON TRUE
                     LEFT JOIN LATERAL unnest(trip."stop-times") stops ON TRUE
                     JOIN "gtfs-stop" s ON (s."package-id" = t."package-id" AND stops."stop-id" = s."stop-id")
                    WHERE t."package-id" = package_id
                      AND t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
-                   GROUP BY "route-short-name", "route-long-name", "trip-headsign", stops."trip-id") x
-    GROUP BY x."route-short-name",x."route-long-name",x."trip-headsign") d;
+                   GROUP BY "route-short-name", "route-long-name", r."trip-headsign", "route-hash-id", stops."trip-id") x
+    GROUP BY x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id") d;
+
+RAISE NOTICE '      route_hashes   %    ',route_hashes;
 
     SELECT digest(string_agg(rh.hash::text, ','), 'sha256')
       INTO date_hash
       FROM unnest(route_hashes) rh;
 
-    INSERT INTO "gtfs-date-hash"
-           ("package-id", date, hash, "route-hashes")
-    VALUES (package_id, dt, date_hash, route_hashes)
+    INSERT INTO "gtfs-date-hash" ("package-id", date, hash, "route-hashes", "created")
+    VALUES (package_id, dt, date_hash, route_hashes, now())
     ON CONFLICT ("package-id", date) DO
     UPDATE SET "package-id" = package_id,
                date = dt,
                hash = date_hash,
-               "route-hashes" = route_hashes;
-
+               "route-hashes" = route_hashes,
+               modified = now();
 END
 $$ LANGUAGE plpgsql;
 
 COMMENT ON FUNCTION gtfs_package_date_hashes (INTEGER,DATE) IS
 E'Calculate and store per route and per day hashes for the given package for the given date.';
 
-CREATE OR REPLACE FUNCTION gtfs_package_hashes (package_id INTEGER) RETURNS VOID AS $$
+-- Generate date hashes for given package
+CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes (package_id INTEGER) RETURNS VOID AS $$
 DECLARE
  row RECORD;
  allowed_range tsrange;
@@ -484,7 +485,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-COMMENT ON FUNCTION gtfs_package_hashes (INTEGER) IS
+COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER) IS
 E'Calculate and store per route and per day hashes for every day in the given package.';
 
 
@@ -526,16 +527,16 @@ E'Fetch the combined hash of the whole week''s days for the given route by date 
 CREATE OR REPLACE FUNCTION gtfs_service_routes(service_id INTEGER)
 RETURNS SETOF RECORD
 AS $$
-SELECT r."route-short-name", r."route-long-name", trip."trip-headsign"
+SELECT r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign"
   FROM "gtfs-route" r
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
  WHERE r."package-id" = ANY(gtfs_service_packages_for_date(service_id, CURRENT_DATE))
- GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign"
+ GROUP BY r."route-id", r."route-short-name", r."route-long-name", trip."trip-headsign"
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_service_routes (INTEGER) IS
-E'Return all routes in packages for the given service. Returns set of (route-short-name, route-long-name, trip-headsign) tuples.';
+E'Return all routes in packages for the given service. Returns set of (route-id, route-short-name, route-long-name, trip-headsign) tuples.';
 
 
 CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT)
@@ -629,7 +630,8 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-long-name",'') AS "route-long-name",
        COALESCE(rh."trip-headsign", '') AS "trip-headsign",
        MIN(d.date) AS "min-date",
-       MAX(d.date) AS "max-date"
+       MAX(d.date) AS "max-date",
+       COALESCE(rh."route-hash-id", '') AS "route-hash-id"
   FROM dates d
   -- Join packages for each date
   JOIN LATERAL unnest(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
@@ -639,162 +641,60 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
   -- Join unnested per route hashes
   JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
  WHERE rh.hash IS NOT NULL
- GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign";
+ GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id";
 $$ LANGUAGE SQL STABLE;
 
-
-CREATE OR REPLACE FUNCTION gtfs_upsert_service_transit_changes(service_id INTEGER)
+CREATE OR REPLACE FUNCTION calculate_route_hash_id_using_headsign(package_id INTEGER)
 RETURNS VOID
 AS $$
-DECLARE
-  row RECORD;
-  changed_routes INTEGER;
-  added_routes INTEGER;
-  removed_routes INTEGER;
-  change_date DATE;
-  current_week_date DATE;
-  different_week_date DATE;
-  route_next_different_week RECORD;
-  no_traffic TEXT DEFAULT '1=,2=,3=,4=,5=,6=,7=';
-  route_change "gtfs-route-change-info";
-  route_changes "gtfs-route-change-info"[];
-  package_ids INTEGER[];
 BEGIN
-  changed_routes := 0;
-  added_routes := 0;
-  removed_routes := 0;
-  change_date := NULL;
-  different_week_date := NULL;
-  route_change := NULL;
-  route_changes = ARRAY[]::"gtfs-route-change-info"[];
 
-  -- Fetch all routes for the service
-  FOR row IN
-      SELECT routerow.*,
-             -- Fetch full trips for both dates (current and different week)
-             gtfs_route_tripdata_for_date(
-                 gtfs_service_packages_for_date(service_id, routerow.route_curr_date),
-                 routerow.route_curr_date,
-                  routerow."route-short-name", routerow."route-long-name", routerow."trip-headsign") AS "date1-trips",
-             gtfs_route_tripdata_for_date(
-                 gtfs_service_packages_for_date(service_id, routerow.route_diff_date),
-                 routerow.route_diff_date,
-                 routerow."route-short-name", routerow."route-long-name", routerow."trip-headsign") AS "date2-trips"
-        FROM (SELECT z.*,
-                     CASE
-                       WHEN z.diff_day IS NOT NULL
-                       THEN ((z.diff_week)."beginning-of-different-week" + CONCAT(z.diff_day, ' days')::INTERVAL)::DATE
-                       ELSE NULL
-                     END AS route_diff_date,
-                     CASE
-                       WHEN z.diff_day IS NOT NULL
-                       THEN ((z.diff_week)."beginning-of-current-week" + CONCAT(z.diff_day, ' days')::INTERVAL)::DATE
-                       ELSE NULL
-                     END AS route_curr_date
-                FROM (SELECT y.*,
-                             gtfs_first_different_day((y.diff_week)."current-weekhash",
-                                                      (y.diff_week)."different-weekhash") AS diff_day
-                        FROM (SELECT x.*, gtfs_route_next_different_week(service_id,
-                                                 x."route-short-name", x."route-long-name",
-                                                 x."trip-headsign") AS diff_week
-                                FROM (SELECT *
-                                        FROM gtfs_service_routes_with_daterange(service_id)) x
-                               -- Filter out routes that have already been discontinued
-                               WHERE x."max-date" >= CURRENT_DATE) y) z) routerow
-  LOOP
+  DELETE FROM "detection-route" WHERE "package-id" = package_id;
 
-    IF row.diff_week IS NULL
-    THEN
-      -- No change detected, check if this is starting or ending route
+  INSERT INTO "detection-route" ("gtfs-route-id", "package-id", "route-id", "route-short-name", "route-long-name", "route-hash-id", "trip-headsign")
+    SELECT r.id, r."package-id", r."route-id", r."route-short-name", r."route-long-name",
+           concat(trim(r."route-short-name"), '-', trim(r."route-long-name"), '-', trim(trip."trip-headsign")), trip."trip-headsign"
+     FROM "gtfs-route" r
+     JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+     JOIN LATERAL unnest(t.trips) trip ON true
+    WHERE r."package-id" = package_id
+    GROUP BY r.id, trip."trip-headsign";
 
-      route_change := ROW();
-      route_change."route-short-name" := row."route-short-name";
-      route_change."route-long-name" := row."route-long-name";
-      route_change."trip-headsign" := row."trip-headsign";
+END
+$$ LANGUAGE plpgsql;
 
-      IF row."min-date" > CURRENT_DATE
-      THEN
-        -- If min-date is in the future, mark this route as added
-        route_change."change-type" := 'added';
-        route_change."current-week-date" := row.route_curr_date;
-        route_change."different-week-date" := row."min-date";
-        route_change."change-date" := row."min-date";
-        added_routes := added_routes + 1;
+CREATE OR REPLACE FUNCTION calculate_route_hash_id_using_short_long(package_id INTEGER)
+RETURNS VOID
+AS $$
+BEGIN
 
-      ELSIF (row."max-date" - CURRENT_DATE) < 90
-      THEN
-        -- If max-date is within 90 days, mark this route as removed
-        route_change."change-type" := 'removed';
-        route_change."current-week-date" := row.route_curr_date;
-        route_change."different-week-date" := row."max-date" + '1 days'::interval;
-        route_change."change-date" := row."max-date" + '1 days'::interval;
-        removed_routes := removed_routes + 1;
+  DELETE FROM "detection-route" WHERE "package-id" = package_id;
 
-      ELSE
-        -- Mark "no-change" for this route
-        route_change."change-type" := 'no-change';
-      END IF;
+  INSERT INTO "detection-route" ("gtfs-route-id", "package-id", "route-id", "route-short-name", "route-long-name", "route-hash-id", "trip-headsign")
+    SELECT r.id, r."package-id", r."route-id", r."route-short-name", r."route-long-name", concat(trim(r."route-short-name"), '-', trim(r."route-long-name")), trip."trip-headsign"
+    FROM "gtfs-route" r
+    JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+    JOIN LATERAL unnest(t.trips) trip ON true
+   WHERE r."package-id" = package_id
+   GROUP BY r.id, trip."trip-headsign";
 
-      route_changes := route_changes || route_change;
+END
+$$ LANGUAGE plpgsql;
 
-    ELSE
-      -- If different week date is earlier than previous, use it
-      IF different_week_date IS NULL OR row.route_diff_date < different_week_date
-      THEN
-        current_week_date := row.route_curr_date;
-        different_week_date := row.route_diff_date;
-        change_date := (row.diff_week)."beginning-of-different-week";
-      END IF;
+CREATE OR REPLACE FUNCTION calculate_route_hash_id_using_route_id(package_id INTEGER)
+RETURNS VOID
+AS $$
+BEGIN
 
-      changed_routes := changed_routes + 1;
-      -- Calculate differences in trips and stop sequences for this route
-      route_change := gtfs_route_differences(
-                        row."route-short-name", row."route-long-name", row."trip-headsign",
-                        row."date1-trips", row."date2-trips");
-      route_change."change-type" := 'changed';
+  DELETE FROM "detection-route" WHERE "package-id" = package_id;
 
-      -- Set route names and change dates
-      route_change."route-short-name" := row."route-short-name";
-      route_change."route-long-name" := row."route-long-name";
-      route_change."trip-headsign" := row."trip-headsign";
-      route_change."current-week-date" := row.route_curr_date;
-      route_change."different-week-date" := row.route_diff_date;
-      route_change."change-date" := (row.diff_week)."beginning-of-different-week";
+  INSERT INTO "detection-route" ("gtfs-route-id", "package-id", "route-id", "route-short-name", "route-long-name", "route-hash-id", "trip-headsign")
+    SELECT r.id, r."package-id", r."route-id", r."route-short-name", r."route-long-name", r."route-id"), trip."trip-headsign"
+      FROM "gtfs-route" r
+      JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+      JOIN LATERAL unnest(t.trips) trip ON true
+     WHERE r."package-id" = package_id
+     GROUP BY r.id, trip."trip-headsign";
 
-      -- Add change to array
-      route_changes := route_changes || route_change;
-
-    END IF;
-  END LOOP;
-
-  -- Take all package ids used in calculation for next change (without duplicate values)
-  package_ids := (SELECT array_agg(x.p) FROM (
-                   SELECT unnest(gtfs_service_packages_for_date(service_id, current_week_date)) p
-                    UNION
-                   SELECT unnest(gtfs_service_packages_for_date(service_id, different_week_date)) p) x);
-
-  -- Make sure route changes are sorted change-date (newest first)
-  route_changes := (SELECT array_agg(rc ORDER BY rc."change-date", rc."route-short-name", rc."route-long-name", rc."trip-headsign")
-                      FROM unnest(route_changes) rc);
-
-  -- Upsert detected change information
-  INSERT INTO "gtfs-transit-changes"
-         (date,"transport-service-id",
-          "current-week-date","different-week-date","change-date",
-          "added-routes","removed-routes","changed-routes",
-          "route-changes","package-ids")
-  VALUES (CURRENT_DATE, service_id,
-          current_week_date, different_week_date, change_date,
-          added_routes, removed_routes, changed_routes,
-          route_changes, package_ids)
-  ON CONFLICT (date,"transport-service-id") DO
-  UPDATE SET "current-week-date" = current_week_date,
-          "different-week-date" = different_week_date,
-          "change-date" = change_date,
-          "added-routes" = added_routes,
-          "removed-routes" = removed_routes,
-          "changed-routes" = changed_routes,
-          "route-changes" = route_changes,
-          "package-ids" = package_ids;
 END
 $$ LANGUAGE plpgsql;
