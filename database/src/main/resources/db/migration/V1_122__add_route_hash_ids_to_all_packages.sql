@@ -4,10 +4,7 @@ DECLARE
  p_id RECORD;
 BEGIN
 
-  -- Delete all
-  DELETE FROM "detection-route";
-
-  -- Generate new
+  -- Generate new route-hash-ids for all packages
   FOR p_id IN SELECT id FROM "gtfs_package"
    LOOP PERFORM
     calculate_route_hash_id_using_headsign(p_id.id);
