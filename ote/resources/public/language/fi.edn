@@ -881,6 +881,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
+ :transit-visualization-page
+ {:loading-routes "Palvelun reittejä ladataan."}
+
  :common-texts
  {:front-page-help-text "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä

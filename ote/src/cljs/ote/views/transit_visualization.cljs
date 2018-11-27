@@ -17,6 +17,7 @@
             [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]
             [ote.ui.page :as page]
+            [ote.ui.scroll :as scroll]
             [ote.ui.common :as common]))
 
 (set! *warn-on-infer* true)
@@ -412,18 +413,22 @@
        body-content]])])
 
 (defn route-changes [e! route-changes selected-route]
-  (let [table-height (if (> 10 (count route-changes))
-                       (* 50 (count route-changes))
-                       500)]
+  (let [route-count (count route-changes)
+        table-height (cond
+                       (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
+                       (= 0 route-count) 100
+                       :else 500)]; 10+
   [:div.route-changes
    [route-changes-legend]
-   [table/table {:no-rows-message "Ei reittejä"
-                 :height table-height
-                 :name->label str
+   [table/table {:no-rows-message (tr [:transit-visualization-page :loading-routes])
+                 :height          table-height
+                 :name->label     str
                  :show-row-hover? true
-                 :on-select #(when (first %)
-                               (e! (tv/->SelectRouteForDisplay (first %))))
-                 :row-selected? #(= % selected-route)}
+                 :on-select       #(when (first %)
+                                     (do
+                                       (e! (tv/->SelectRouteForDisplay (first %)))
+                                       (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
+                 :row-selected?   #(= % selected-route)}
     [{:name "Reitti" :width "30%"
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
       :format (fn [[short long]]
@@ -470,7 +475,8 @@
                   :changed
                   [change-icons route-changes]))}]
 
-    route-changes]]))
+    route-changes]
+   [:div {:id "route-calendar-anchor"} ]]))
 
 (defn comparison-dates [{:keys [date1 date2]}]
   [:div (stylefy/use-style (merge (style-base/flex-container "row")
@@ -500,7 +506,7 @@
    (when (seq diff)
      [change-icons diff true])])
 
-(defn route-service-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections]}]
+(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections]}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
      [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
@@ -788,7 +794,7 @@
 
          (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
-            [route-service-calendar e! transit-visualization]
+            [route-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
             [trip-stop-sequence e! open-sections compare]])])]])
