@@ -448,7 +448,6 @@ BEGIN
                    GROUP BY "route-short-name", "route-long-name", r."trip-headsign", "route-hash-id", stops."trip-id") x
     GROUP BY x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id") d;
 
-RAISE NOTICE '      route_hashes   %    ',route_hashes;
 
     SELECT digest(string_agg(rh.hash::text, ','), 'sha256')
       INTO date_hash
