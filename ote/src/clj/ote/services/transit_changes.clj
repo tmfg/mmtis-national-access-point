@@ -97,6 +97,9 @@
           {:status 500
            :body   msg})))))
 
+(defn services-with-route-hash-id [db]
+  (fetch-services-with-route-hash-id db))
+
 (define-service-component TransitChanges {:fields [config]}
 
   ^{:unauthenticated true :format :transit}
@@ -112,6 +115,10 @@
     (when (authorization/admin? user)
         (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
         "OK"))
+
+  (GET "/transit-changes/load-services-with-route-hash-id" req
+    (when (authorization/admin? (:user req))
+      (http/transit-response (services-with-route-hash-id db))))
 
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
