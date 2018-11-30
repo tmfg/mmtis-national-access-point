@@ -80,6 +80,7 @@
 
 (defrecord ToggleAddMemberDialog [id])
 (defrecord ChangeTab [tab-value])
+(defrecord ChangeDetectionTab [tab-value])
 
 (defn- update-operator-by-id [app id update-fn & args]
   (update-in app [:admin :operator-list :results]
@@ -406,7 +407,11 @@
 
   ChangeTab
   (process-event [{tab-value :tab-value} app]
-    (assoc-in app [:admin :tab :admin-page] tab-value)))
+    (assoc-in app [:admin :tab :admin-page] tab-value))
+
+  ChangeDetectionTab
+  (process-event [{tab-value :tab-value} app]
+               (assoc-in app [:admin :transit-changes :tab] tab-value)))
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
