@@ -505,6 +505,19 @@
                           {:error (str (tr [:common-texts :invalid-file-type]) ": " filename)}))
         (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
 
+
+
+(define-event LoadRouteHashServicesResponse [response]
+  {}
+  (assoc-in app [:admin :transit-changes :route-hash-services] response))
+
+(define-event LoadRouteHashServices []
+  {}
+  (comm/get! "transit-changes/load-services-with-route-hash-id"
+             {:on-success (tuck/send-async! ->LoadRouteHashServicesResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))
 
