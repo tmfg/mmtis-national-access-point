@@ -12,7 +12,11 @@
             [ote.authorization :as authorization]
             [ote.tasks.gtfs :as gtfs-tasks]
             [taoensso.timbre :as log]
-            [ote.transit-changes.detection :as detection]))
+            [ote.transit-changes.detection :as detection]
+            [ote.db.transport-service :as t-service]
+            [ote.time :as time]
+            [ote.integration.import.gtfs :as import]
+            [clj-time.core :as t]))
 
 (defqueries "ote/services/transit_changes.sql")
 (defqueries "ote/integration/import/import_gtfs.sql")
@@ -49,6 +53,50 @@
                                                        (into #{} (str/split region-list #","))))))
                   (upcoming-changes db))})
 
+(defn to-byte-array
+  "Convert file to byte[] array"
+  [file]
+  (let [ary (byte-array (.length file))
+        is (java.io.FileInputStream. file)]
+    (.read is ary)
+    (.close is)
+    ary))
+
+(defn upload-gtfs
+  "Upload gtfs file, parse and calculate date hashes. Set package created column to the date that is given to
+  simulate production situation where package is handled at given day."
+  [db service-id date req]
+  (try
+    (let [uploaded-file (get-in req [:multipart-params "file"])
+          _ (assert (and (:filename uploaded-file)
+                         (:tempfile uploaded-file))
+                    "No uploaded file")
+          operator-id (::t-service/transport-operator-id (first (specql/fetch
+                                                                  db ::t-service/transport-service
+                                                                  #{::t-service/transport-operator-id}
+                                                                  {::t-service/id service-id})))
+          interface-id (::t-service/id (first (specql/fetch db ::t-service/external-interface-description
+                                                            #{::t-service/id}
+                                                            {::t-service/transport-service-id service-id})))
+          latest-package (import/interface-latest-package db interface-id)
+          package (specql/insert! db :gtfs/package
+                                  {:gtfs/first_package                     (nil? latest-package)
+                                   :gtfs/transport-operator-id             operator-id
+                                   :gtfs/transport-service-id              service-id
+                                   :gtfs/created                           (time/date-string->inst-date date)
+                                   :gtfs/external-interface-description-id interface-id})
+          result (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id)]
+      "OK")
+    (catch Exception e
+      (let [msg (.getMessage e)]
+        (log/error "upload-gtfs ERROR" msg)
+        (case msg
+          "Invalid file type"
+          {:status 422
+           :body   "Invalid file type."}
+          {:status 500
+           :body   msg})))))
+
 (define-service-component TransitChanges {:fields [config]}
 
   ^{:unauthenticated true :format :transit}
@@ -67,8 +115,17 @@
 
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
-          (gtfs-tasks/detect-new-changes-task db true)
+          (gtfs-tasks/detect-new-changes-task db (time/now) true)
           "OK"))
+
+  (POST "/transit-changes/force-detect-date/:date"
+        {{:keys [date]} :params
+         user           :user
+         :as            req}
+    (when (authorization/admin? user)
+      (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true)
+      "OK"))
+
   ;; Delete row from gtfs_package to make this work. Don't know why, but it must be done.
   ;; Also change external-interface-description.gtfs-imported to past to make import work because we only import new packages.
   (POST "/transit-changes/force-interface-import" req

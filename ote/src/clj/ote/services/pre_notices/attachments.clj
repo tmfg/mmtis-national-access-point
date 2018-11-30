@@ -11,7 +11,12 @@
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.components.http :as http]
-            [ote.nap.users :as users])
+            [ote.nap.users :as users]
+            [ote.services.transit-changes :as transit-changes]
+            [ote.services.admin :as admin]
+            [ote.time :as time]
+            [clj-time.core :as t]
+            [ote.tasks.gtfs :as gtfs-tasks])
   (:import (java.nio.file Files)))
 
 (def allowed-mime-types #{"application/pdf" "image/jpeg" "image/png"})
@@ -89,4 +94,12 @@
       (POST "/pre-notice/upload" req
             (upload-attachment db config req))
       (GET "/pre-notice/attachment/:id" req
-           (download-attachment db config req))))))
+           (download-attachment db config req))
+      (POST "/transit-changes/upload-gtfs/:service-id/:date"
+            {{:keys [service-id date]} :params
+             user                 :user
+             :as                  req}
+        (admin/require-admin-user "/transit-changes/upload-gtfs/:service-id/:date" (:user user))
+        (do
+          (transit-changes/upload-gtfs db (Long/parseLong service-id) date req)
+          (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true)))))))
