@@ -95,6 +95,41 @@
      (get-in app-state [:admin :transit-changes :route-hash-values])]]
 
    [:div
-    [linkify "/transit-changes/force-calculate-route-hash-id/2/100/short-long" "Laske route hash id palvelulle 2 short-long tunnistuksella"]
-    [:div "Tyypit: " "short-long" "short-long-headsign"]]])
+    [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
+    [form/form
+     {:update!   #(e! (admin-controller/->UpdateUploadValues %))
+      :footer-fn (fn [data]
+                   [:span
+                    [ui/raised-button {:primary  true
+                                       :on-click #(e! (admin-controller/->ForceRouteHashCalculationForService))
+                                       :label    "Käynnistä gtfs lataus"}]])}
+     [(form/group
+        {:label   ""
+         :columns 3
+         :layout  :raw
+         :card?   false}
+
+        {:name      :service-id
+         :type      :string
+         :label     "Palvelun id"
+         :hint-text "Palvelun id"
+         }
+        {:name      :date
+         :type      :string
+         :label     "Latauspäivä"
+         :hint-text "Latauspäivä"
+         }
+        {:name         :attachments
+         :type         :table
+         :add-label    "Ladattava tiedosto"
+         :table-fields [{:name      :attachment-file-name
+                         :type      :string
+                         :disabled? true}
+
+                        {:name               :attachment-file
+                         :button-label       "Lataa"
+                         :type               :file-and-delete
+                         :allowed-file-types [".zip"]
+                         :on-change          #(e! (admin-controller/->UploadAttachment (.-target %)))}]})]
+     (get-in app-state [:admin :transit-changes :upload-gtfs])]]])
 

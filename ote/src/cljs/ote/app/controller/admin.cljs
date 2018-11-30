@@ -445,6 +445,10 @@
   {}
   (update-in app [:admin :transit-changes :route-hash-values] merge values))
 
+(define-event UpdateUploadValues [values]
+  {}
+  (update-in app [:admin :transit-changes :upload-gtfs] merge values))
+
 (define-event ForceDetectTransitChanges []
   {}
   (comm/post! "/transit-changes/force-detect" nil
@@ -473,6 +477,28 @@
                   (get-in app [:admin :transit-changes :route-hash-values :route-id-type]))
              {:on-success #(.log js/console %)})
   app)
+
+(define-event UploadResponse [response]
+  {}
+  (assoc app :flash-message "Paketti ladattu"))
+
+(define-event UploadAttachment [input-html-element]
+  {}
+  (let [filename (.-name (first (array-seq (.-files input-html-element))))
+        service-id (get-in app [:admin :transit-changes :upload-gtfs :service-id])
+        date (get-in app [:admin :transit-changes :upload-gtfs :date])]
+    (if (re-matches #".*\.(zip)" filename)
+      (do
+        (comm/upload! (str "transit-changes/upload-gtfs/" service-id "/" date) input-html-element
+                      {:on-success (tuck/send-async! ->UploadResponse)
+                       :on-failure (tuck/send-async! ->ServerError)})
+        app)
+      (->
+        app
+        (update-in [:admin :transit-changes :upload-gtfs]
+                   #(conj (or (vec (butlast %)) [])
+                          {:error (str (tr [:common-texts :invalid-file-type]) ": " filename)}))
+        (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
 
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))
