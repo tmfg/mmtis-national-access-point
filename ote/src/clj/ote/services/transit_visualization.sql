@@ -136,12 +136,14 @@ WITH dates AS (
             (date_trunc('year', CURRENT_DATE) + '2 years'::interval)::date,
             '1 day'::interval) AS g(ts)
 )
-SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
-  FROM (SELECT d.date, package_id, rh.hash::text
+SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
+  FROM (SELECT d.date, package_id, rh.hash::text, p."external-interface-description-id" as e_id
           FROM dates d
           -- Join packages for each date
           JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date))
             AS ps (package_id) ON TRUE
+          -- Join gtfs_package to get external-interface-description-id
+          JOIN gtfs_package p ON p.id = package_id
           -- Join all date hashes for packages
           JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
           -- Join unnested per route hashes
@@ -149,7 +151,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
          WHERE COALESCE(rh."route-short-name", '') = COALESCE(:route-short-name::VARCHAR, '')
            AND COALESCE(rh."route-long-name", '') = COALESCE(:route-long-name::VARCHAR, '')
            AND COALESCE(rh."trip-headsign", '') = COALESCE(:trip-headsign::VARCHAR, '')) x
- GROUP BY x.date;
+ GROUP BY x.date, x.e_id;
 
 -- name: fetch-date-hashes-for-route-with-route-hash-id
 -- Fetch the date/hash pairs for a given route using route-hash-id which isn't used for all services
@@ -162,18 +164,20 @@ WITH dates AS (
             (date_trunc('year', CURRENT_DATE) + '2 years'::interval)::date,
             '1 day'::interval) AS g(ts)
 )
-SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.package_id) as hash
-  FROM (SELECT d.date, package_id, rh.hash::text
+SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
+  FROM (SELECT d.date, package_id, rh.hash::text, p."external-interface-description-id" as e_id
           FROM dates d
           -- Join packages for each date
           JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date))
             AS ps (package_id) ON TRUE
+          -- Join gtfs_package to get external-interface-description-id
+          JOIN gtfs_package p ON p.id = package_id
           -- Join all date hashes for packages
           JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
           -- Join unnested per route hashes
           JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
          WHERE COALESCE(rh."route-hash-id", '') = COALESCE(:route-hash-id::VARCHAR, '')) x
- GROUP BY x.date;
+ GROUP BY x.date, x.e_id;
 
 
 -- name: fetch-service-info
