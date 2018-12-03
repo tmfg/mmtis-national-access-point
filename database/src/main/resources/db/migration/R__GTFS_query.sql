@@ -98,7 +98,7 @@ $$ LANGUAGE SQL STABLE;
 CREATE OR REPLACE FUNCTION gtfs_latest_package_for_date(operator_id INTEGER, date DATE) RETURNS INTEGER AS $$
 SELECT p.id FROM gtfs_package p
  WHERE p."transport-operator-id" = operator_id
-   AND p.created < date
+   AND p.created::date <= date
    AND gtfs_package_date_range(p.id) @> date
  ORDER BY p.id DESC
  LIMIT 1;
