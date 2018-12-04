@@ -121,7 +121,7 @@
               [::transit/attachments attachment-list]]))
       [:div
        [:h3 (tr* ::transit/description)]
-       [:p {:style {:white-space "pre"}}
+       [:p
         (::transit/description pre-notice)]]
       [:div.pre-notice-comments (stylefy/use-style styles/comment-container)
        [:h3 (tr [:pre-notice-list-page :pre-notice-dialog :comments-label])]
