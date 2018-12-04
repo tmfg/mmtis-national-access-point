@@ -63,20 +63,17 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
-
-(defn detect-new-changes-task
-  ([db]
-   (detect-new-changes-task db false))
-  ([db force?]
-   (let [;; Start from the beginning of last week
-         start-date (time/days-from (time/beginning-of-week (time/now)) -7)
+(defn detect-new-changes-task [db detection-date force?] ;; db (time/now) false
+   (let [today detection-date ;; Today is the default but detection may be run "in the past" if admin wants to
+         ;; Start from the beginning of last week
+         start-date (time/days-from (time/beginning-of-week detection-date) -7)
 
          ;; Continue 15 weeks from the current week
          end-date (time/days-from start-date (dec (* 7 16)))
 
          ;; Convert to LocalDate instances
-         [start-date end-date] (map (comp time/date-fields->date time/date-fields)
-                                    [start-date end-date])]
+         [start-date end-date today] (map (comp time/date-fields->date time/date-fields)
+                                    [start-date end-date today])]
      (lock/try-with-lock
       db "gtfs-nightly-changes" 1800
       (let [service-ids (mapv :id (services-for-nightly-change-detection db {:force force?}))
@@ -90,11 +87,11 @@
                                 :start-date start-date
                                 :end-date end-date}]
               (detection/store-transit-changes!
-               db service-id
+               db today service-id
                (detection/service-package-ids-for-date-range db query-params)
                (detection/detect-route-changes-for-service db query-params)))
             (catch Exception e
-              (log/warn e "Change detection failed for service " service-id))))))))))
+              (log/warn e "Change detection failed for service " service-id)))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
@@ -109,7 +106,7 @@
                  (#'update-one-gtfs! config db true)))
               (chime-at (daily-at 5 15)
                         (fn [_]
-                          (detect-new-changes-task db)))]
+                          (detect-new-changes-task (time/now) db false)))] ;; Run from repl: (detect-new-changes-task (:db ote.main/ote) (t/date-time 2018 11 11) true)
              (do
                (log/debug "GTFS IMPORT IS NOT ENABLED!")
                nil))))

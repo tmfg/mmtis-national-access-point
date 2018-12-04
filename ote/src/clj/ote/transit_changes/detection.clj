@@ -432,9 +432,8 @@
              (when changes
                (str " has changes")))))
 
-(defn store-transit-changes! [db service-id package-ids {:keys [all-routes route-changes]}]
+(defn store-transit-changes! [db today service-id package-ids {:keys [all-routes route-changes]}]
   (let [type (db-route-detection-type db service-id)
-        today (java.time.LocalDate/now)
         route-change-infos (map (fn [[route-key detection-result]]
                                   (transform-route-change all-routes route-key detection-result))
                                 route-changes)

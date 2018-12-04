@@ -80,6 +80,7 @@
 
 (defrecord ToggleAddMemberDialog [id])
 (defrecord ChangeTab [tab-value])
+(defrecord ChangeDetectionTab [tab-value])
 
 (defn- update-operator-by-id [app id update-fn & args]
   (update-in app [:admin :operator-list :results]
@@ -406,7 +407,11 @@
 
   ChangeTab
   (process-event [{tab-value :tab-value} app]
-    (assoc-in app [:admin :tab :admin-page] tab-value)))
+    (assoc-in app [:admin :tab :admin-page] tab-value))
+
+  ChangeDetectionTab
+  (process-event [{tab-value :tab-value} app]
+               (assoc-in app [:admin :transit-changes :tab] tab-value)))
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
@@ -445,6 +450,10 @@
   {}
   (update-in app [:admin :transit-changes :route-hash-values] merge values))
 
+(define-event UpdateUploadValues [values]
+  {}
+  (update-in app [:admin :transit-changes :upload-gtfs] merge values))
+
 (define-event ForceDetectTransitChanges []
   {}
   (comm/post! "/transit-changes/force-detect" nil
@@ -472,6 +481,41 @@
                   (get-in app [:admin :transit-changes :route-hash-values :package-count]) "/"
                   (get-in app [:admin :transit-changes :route-hash-values :route-id-type]))
              {:on-success #(.log js/console %)})
+  app)
+
+(define-event UploadResponse [response]
+  {}
+  (assoc app :flash-message "Paketti ladattu"))
+
+(define-event UploadAttachment [input-html-element]
+  {}
+  (let [filename (.-name (first (array-seq (.-files input-html-element))))
+        service-id (get-in app [:admin :transit-changes :upload-gtfs :service-id])
+        date (get-in app [:admin :transit-changes :upload-gtfs :date])]
+    (if (re-matches #".*\.(zip)" filename)
+      (do
+        (comm/upload! (str "transit-changes/upload-gtfs/" service-id "/" date) input-html-element
+                      {:on-success (tuck/send-async! ->UploadResponse)
+                       :on-failure (tuck/send-async! ->ServerError)})
+        app)
+      (->
+        app
+        (update-in [:admin :transit-changes :upload-gtfs]
+                   #(conj (or (vec (butlast %)) [])
+                          {:error (str (tr [:common-texts :invalid-file-type]) ": " filename)}))
+        (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
+
+
+
+(define-event LoadRouteHashServicesResponse [response]
+  {}
+  (assoc-in app [:admin :transit-changes :route-hash-services] response))
+
+(define-event LoadRouteHashServices []
+  {}
+  (comm/get! "transit-changes/load-services-with-route-hash-id"
+             {:on-success (tuck/send-async! ->LoadRouteHashServicesResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
   app)
 
 (defn ^:export force-detect-transit-changes []

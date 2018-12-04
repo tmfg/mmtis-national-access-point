@@ -444,3 +444,19 @@
   (if (= :monday (day-of-week d))
     d
     (recur (days-from d -1))))
+
+(defn date-string->inst-date [date-string]
+  (let [df (date-fields-only (parse-date-iso-8601 date-string))
+        date1 (-> df
+                  date-fields->date
+                  (.atStartOfDay (java.time.ZoneId/of "Europe/Helsinki"))
+                  .toInstant
+                  java.util.Date/from)]
+    date1))
+
+(defn date-string->date-time [date-string]
+  (let [df (date-fields-only (parse-date-iso-8601 date-string))
+        year (:ote.time/year df)
+        month (:ote.time/month df)
+        day (:ote.time/date df)]
+    (t/date-time year month day)))

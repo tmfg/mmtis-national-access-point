@@ -47,7 +47,7 @@
     ;; Information JOINed from other tables
     ::t-service/operator-name})
 
-(defn- require-admin-user [route user]
+(defn require-admin-user [route user]
   (when (not (:admin? user))
     (throw (SecurityException. "admin only"))))
 
