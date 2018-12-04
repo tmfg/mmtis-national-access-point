@@ -25,7 +25,10 @@
 (defn merge-by-closest-time [time-fn left-items right-items]
   (let [left-items-with-closest (mapv #(item-with-closest-time time-fn % right-items) left-items)
         right-items-with-closest (mapv (comp flip-vec #(item-with-closest-time time-fn % left-items)) right-items)
-        time-diff (fn [[l r]] (time/time-difference (time-fn l) (time-fn r)))
+        time-diff (fn [[l r]]
+                    (if (and (nil? (complement r)) (nil? (complement l)))
+                      (time/time-difference (time-fn l) (time-fn r))
+                      0))
         sorted-pairs (remove
                       ;; Remove pairs whose time-difference is over 30 minutes
                       #(> (time-diff %) 30)

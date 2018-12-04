@@ -55,13 +55,8 @@
   (let [type (detection/db-route-detection-type db service-id)]
     (into {}
           (map (juxt :date :hash))
-          (if (detection/use-old-route-key type)
-            (fetch-date-hashes-for-route-with-route-names db {:service-id       service-id
-                                                              :route-short-name route-short-name
-                                                              :route-long-name  route-long-name
-                                                              :trip-headsign    trip-headsign})
             (fetch-date-hashes-for-route-with-route-hash-id db {:service-id    service-id
-                                                                :route-hash-id route-hash-id})))))
+                                                                :route-hash-id route-hash-id}))))
 
 (defn parse-gtfs-stoptimes [pg-array]
   (let [string (str pg-array)]
@@ -105,28 +100,24 @@
         (cheshire/encode
          {:type "FeatureCollection"
           :features (route-line-features
-                     (fetch-route-trips-by-name-and-date
+                     (fetch-route-trips-by-hash-and-date
                       db
                       {:service-id (Long/parseLong service-id)
                        :date (time/parse-date-iso-8601 date)
-                       :route-short-name short-name
-                       :route-long-name long-name
-                       :trip-headsign headsign}))}
+                       :route-hash-id route-hash-id}))}
          {:key-fn name})))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
-        {:strs [date short-name long-name headsign]} :query-params}
+        {:strs [date short-name long-name headsign route-hash-id]} :query-params}
       (into []
             (map #(update % :stoptimes parse-gtfs-stoptimes))
             (fetch-route-trip-info-by-name-and-date
               db
               {:service-id       (Long/parseLong service-id)
                :date             (time/parse-date-iso-8601 date)
-               :route-short-name short-name
-               :route-long-name  long-name
-               :trip-headsign    headsign})))
+               :route-hash-id route-hash-id})))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route-differences"
