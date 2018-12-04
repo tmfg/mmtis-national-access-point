@@ -58,3 +58,7 @@ SELECT calculate_route_hash_id_using_headsign(:package-id);
 SELECT calculate_route_hash_id_using_short_long(:package-id);
 -- name: calculate-routes-route-hashes-using-route-id
 SELECT calculate_route_hash_id_using_route_id(:package-id);
+-- name: calculate-routes-route-hashes-using-long-headsign
+SELECT calculate_route_hash_id_using_long_headsign(:package-id);
+-- name: calculate-routes-route-hashes-using-long
+SELECT calculate_route_hash_id_using_long(:package-id);

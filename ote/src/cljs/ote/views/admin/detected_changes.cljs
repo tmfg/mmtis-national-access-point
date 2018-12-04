@@ -89,12 +89,8 @@
          :required? true}
         {:name        :route-id-type
          :type        :selection
-         :options     ["short-long" "short-long-headsign" "route-id"]
+         :options     ["short-long" "short-long-headsign" "route-id" "long-headsign" "long"]
          :show-option (fn [x] x)
          :required?   true})]
-     (get-in app-state [:admin :transit-changes :route-hash-values])]]
-
-   [:div
-    [linkify "/transit-changes/force-calculate-route-hash-id/2/100/short-long" "Laske route hash id palvelulle 2 short-long tunnistuksella"]
-    [:div "Tyypit: " "short-long" "short-long-headsign"]]])
+     (get-in app-state [:admin :transit-changes :route-hash-values])]]])
 
