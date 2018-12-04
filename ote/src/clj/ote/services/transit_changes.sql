@@ -58,3 +58,10 @@ SELECT calculate_route_hash_id_using_headsign(:package-id);
 SELECT calculate_route_hash_id_using_short_long(:package-id);
 -- name: calculate-routes-route-hashes-using-route-id
 SELECT calculate_route_hash_id_using_route_id(:package-id);
+
+-- name: fetch-services-with-route-hash-id
+SELECT ts.id as "service-id", ts.name as service, op.name as operator, d."route-hash-id-type" as type
+  FROM "detection-service-route-type" d, "transport-service" ts, "transport-operator" op
+ WHERE d."transport-service-id" = ts.id
+   AND op.id = ts."transport-operator-id"
+   ORDER BY d."route-hash-id-type" , ts.id;
