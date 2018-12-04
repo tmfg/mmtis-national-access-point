@@ -92,7 +92,7 @@
               (detection/store-transit-changes!
                db service-id
                (detection/service-package-ids-for-date-range db query-params)
-               (detection/route-changes db query-params)))
+               (detection/detect-route-changes-for-service db query-params)))
             (catch Exception e
               (log/warn e "Change detection failed for service " service-id))))))))))
 
