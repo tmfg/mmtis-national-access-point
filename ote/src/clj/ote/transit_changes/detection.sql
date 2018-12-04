@@ -30,7 +30,8 @@ SELECT * FROM gtfs_service_routes_with_daterange(:service-id::INTEGER);
 SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
         stop."stop-name", stop."stop-lat", stop."stop-lon"
-  FROM "gtfs-route" r
+  FROM "detection-route" r
+  JOIN "gtfs_package" p ON p.id = r."package-id"
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
   JOIN LATERAL unnest(trip."stop-times") as stoptime ON TRUE
@@ -39,10 +40,8 @@ SELECT t."package-id", trip."trip-id",
    AND ROW(r."package-id", t."service-id")::service_ref IN
        (SELECT * FROM gtfs_services_for_date(
         (SELECT gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE)), :date::DATE))
-   AND COALESCE(r."route-short-name",'') = COALESCE(:route-short-name::TEXT,'')
-   AND COALESCE(r."route-long-name",'') = COALESCE(:route-long-name::TEXT,'')
-   AND COALESCE(trip."trip-headsign",'') = COALESCE(:trip-headsign::TEXT,'')
- ORDER BY t."package-id", trip."trip-id", stoptime."stop-sequence";
+   AND r."route-hash-id" = :route-hash-id::TEXT
+ ORDER BY p."external-interface-description-id", t."package-id", trip."trip-id", stoptime."stop-sequence";
 
 -- name: generate-date-hashes
 SELECT gtfs_generate_date_hashes(:package-id::INTEGER);

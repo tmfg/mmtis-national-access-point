@@ -256,13 +256,11 @@
      {} ; initial route detection state is empty
      (partition 4 1 route-weeks))))
 
-(defn route-trips-for-date [db service-id [short long headsign] date]
+(defn route-trips-for-date [db service-id route-hash-id date]
   (vec
    (for [trip-stops (partition-by (juxt :package-id :trip-id)
                                   (fetch-route-trips-for-date db {:service-id service-id
-                                                                  :route-short-name short
-                                                                  :route-long-name long
-                                                                  :trip-headsign headsign
+                                                                  :route-hash-id route-hash-id
                                                                   :date date}))
          :let [package-id (:package-id (first trip-stops))
                trip-id (:trip-id (first trip-stops))]]
@@ -278,7 +276,7 @@
                        trip-stops)})))
 
 
-(defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
+(defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date route-hash-id]
   (let [combined-trips (transit-changes/combine-trips date1-trips date2-trips)
         {:keys [added removed changed]}
         (group-by (fn [[l r]]
@@ -287,6 +285,12 @@
                       (nil? r) :removed
                       :default :changed))
                   combined-trips)]
+    (println " compare-selected-trips/route-hash-id => " route-hash-id )
+    (when (= route-hash-id "215-Jyväskylä-Hankasalmi")
+      (do
+        (println " combined-trips for route " route-hash-id (prn-str combined-trips))
+        )
+      )
 
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
@@ -303,24 +307,26 @@
                                                                  different-week-hash)
         starting-week-date (.plusDays (:beginning-of-week starting-week) first-different-day)
         different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)]
-    (log/debug "Route: " route ", comparing dates: " starting-week-date " and " different-week-date)
+    (log/debug "Route: " route ", comparing dates: " starting-week-date " and " different-week-date " route-hash-id " route)
     (let [date1-trips (route-trips-for-date db service-id route starting-week-date)
           date2-trips (route-trips-for-date db service-id route different-week-date)]
-      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
+      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date route))))
 
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
   [db service-id routes]
-  (into {}
-        (map (fn [[route {diff :different-week :as detection-result}]]
-               (if diff
-                 ;; If a different week was found, do detailed trip analysis
-                 [route (assoc detection-result
-                               :changes (compare-route-days db service-id route detection-result))]
+  (do
+    (println " route-day-changes routes " (pr-str routes))
+    (into {}
+          (map (fn [[route {diff :different-week :as detection-result}]]
+                 (if diff
+                   ;; If a different week was found, do detailed trip analysis
+                   [route (assoc detection-result
+                            :changes (compare-route-days db service-id route detection-result))]
 
-                 ;; Otherwise return as is
-                 [route detection-result])))
-        routes))
+                   ;; Otherwise return as is
+                   [route detection-result])))
+          routes)))
 
 (defn- date-in-the-past? [^LocalDate date]
   (and date
