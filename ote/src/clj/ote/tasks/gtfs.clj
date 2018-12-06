@@ -106,7 +106,7 @@
                  (#'update-one-gtfs! config db true)))
               (chime-at (daily-at 5 15)
                         (fn [_]
-                          (detect-new-changes-task (time/now) db false)))] ;; Run from repl: (detect-new-changes-task (:db ote.main/ote) (t/date-time 2018 11 11) true)
+                          (detect-new-changes-task db (time/now) false)))] ;; Run from repl: (detect-new-changes-task (:db ote.main/ote) (t/date-time 2018 11 11) true)
              (do
                (log/debug "GTFS IMPORT IS NOT ENABLED!")
                nil))))
