@@ -147,9 +147,7 @@
   [:div
     [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
     [form/form
-     {:update!   #(e! (admin-controller/->UpdateUploadValues %))
-      :footer-fn (fn [data]
-                   [:span])}
+     {:update!   #(e! (admin-controller/->UpdateUploadValues %))}
      [(form/group
         {:label   ""
          :columns 3
