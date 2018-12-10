@@ -629,22 +629,25 @@
       {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
       {:name "Muutokset" :read identity
        :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
-                 (cond
-                   (and departure-time-date1 (nil? departure-time-date2))
-                   "Pysäkki ei kuulu reitille"
+                 (let [check-vals (fn []
+                                    (js/console.log "test" combined-stop-sequence))]
+                   (check-vals)
+                   (cond
+                     (and departure-time-date1 (nil? departure-time-date2))
+                     "Pysäkki ei kuulu reitille"
 
-                   (and (nil? departure-time-date1) departure-time-date2)
-                   "Uusi pysäkki reitillä"
+                     (and (nil? departure-time-date1) departure-time-date2)
+                     "Uusi pysäkki reitillä"
 
-                   (not= departure-time-date1 departure-time-date2)
-                   [labeled-icon [ic/action-query-builder]
-                    (time/format-minutes-elapsed
-                     (time/minutes-elapsed departure-time-date1 departure-time-date2))]
+                     (not= departure-time-date1 departure-time-date2)
+                     [labeled-icon [ic/action-query-builder]
+                      (time/format-minutes-elapsed
+                        (time/minutes-elapsed departure-time-date1 departure-time-date2))]
 
-                   :default
-                   [labeled-icon {:style {:color "lightgray"}}
-                    [ic/action-query-builder {:color "lightgray"}]
-                    "00:00"]))}]
+                     :default
+                     [labeled-icon {:style {:color "lightgray"}}
+                      [ic/action-query-builder {:color "lightgray"}]
+                      "00:00"])))}]
      combined-stop-sequence]]])
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?
