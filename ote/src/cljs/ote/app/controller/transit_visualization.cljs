@@ -333,6 +333,9 @@
   (let [service-id (get-in app [:params :service-id])
         current-week-date (or (get-in app [:transit-visualization :changes :gtfs/current-week-date])
                               (t/now))
+        route-hash-id (if (:gtfs/route-hash-id route)
+                        (:gtfs/route-hash-id route)
+                        (str (:gtfs/route-short-name route) "-" (:gtfs/route-long-name route) "-" (:gtfs/trip-headsign route)))
         ;; Use dates in route, or default to current week date and 7 days after that.
         date1 (or (:gtfs/current-week-date route) current-week-date)
         date2 (or (:gtfs/different-week-date route)
@@ -345,8 +348,7 @@
                             {:long-name long})
                           (when-let [headsign (:gtfs/trip-headsign route)]
                             {:headsign headsign})
-                          (when-let [route-hash-id (:gtfs/route-hash-id route)]
-                            {:route-hash-id route-hash-id}))
+                            {:route-hash-id route-hash-id})
                 :on-success (tuck/send-async! ->RouteCalendarHashResponse)})
 
     (-> app
