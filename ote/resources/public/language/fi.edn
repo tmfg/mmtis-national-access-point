@@ -496,6 +496,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :other-services "Muut palvelut"
    :pricing "Hintatiedot"
    :service-hours "Palveluajat"
+   :on-behalf-errand "Puolesta-asiointi"
+   :customer-account-info "Asiakastilin tiedot"
    :disruptions "Häiriötilanteet"
    :payment-interface "Lippu- ja myyntirajapinta"
    :other "Muu"

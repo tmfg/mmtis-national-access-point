@@ -501,6 +501,8 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
    :other-services "Övriga tjänster"
    :pricing "Prisinformation"
    :service-hours "Betjäningstider"
+   :on-behalf-errand "På uppdrag av ärendet"
+   :customer-account-info "Kundkonto info"
    :disruptions "Störningsinformation"
    :payment-interface "Biljett- och försäljningsgränssnitt"
    :other "Övrigt"
