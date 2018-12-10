@@ -70,7 +70,7 @@
            :required? true}
           {:name        :route-id-type
            :type        :selection
-           :options     ["short-long" "short-long-headsign" "route-id"]
+           :options     ["short-long" "short-long-headsign" "route-id" "long-headsign" "long"]
            :show-option (fn [x] x)
            :required?   true})]
        (get-in app-state [:admin :transit-changes :route-hash-values])]]
@@ -141,19 +141,13 @@
              [ui/table-row-column (:operator s)]
              [ui/table-row-column (:service-id s)]
              [ui/table-row-column (:service s)]
-             [ui/table-row-column (:type s)]
-             ]))]]]]))
+             [ui/table-row-column (:type s)]]))]]]]))
 
 (defn upload-gtfs [e! app-state]
   [:div
     [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
     [form/form
-     {:update!   #(e! (admin-controller/->UpdateUploadValues %))
-      :footer-fn (fn [data]
-                   [:span
-                    #_ [ui/raised-button {:primary  true
-                                       :on-click #(e! (admin-controller/->ForceRouteHashCalculationForService))
-                                       :label    "Käynnistä gtfs lataus"}]])}
+     {:update!   #(e! (admin-controller/->UpdateUploadValues %))}
      [(form/group
         {:label   ""
          :columns 3
