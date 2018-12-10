@@ -39,6 +39,22 @@
        (fn [_]
          [:span {:ref "sensor"}])})))
 
+(defn esc-press-listener [e! app]
+  "Listens to keydown events on document. If esc is clicked call CloseHeaderMenus"
+  (let [esc-press (fn [event]
+                      (if (= event.keyCode 27)
+                        (e! (fp-controller/->CloseHeaderMenus))))]
+    (r/create-class
+      {:component-did-mount
+       (fn [_]
+         (.addEventListener js/document "keydown" #(esc-press %)))
+       :component-will-unmount
+       (fn [_]
+         (.removeEventListener js/document "keydown" #(esc-press %)))
+       :reagent-render
+       (fn [_]
+         [:span {:ref "clicksensor"}])})))
+
 (defn logged-in? [app]
   (not-empty (get-in app [:user :username])))
 
@@ -362,8 +378,9 @@
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-login])]]]])]]))
 
 (defn- top-nav [e! app is-scrolled?]
-  [:span
+  [:div
    [header-scroll-sensor is-scrolled? -250]
+   [esc-press-listener e! app]
    [:div (stylefy/use-style style-topnav/topnav-wrapper)
     [:div
      (stylefy/use-style (merge
