@@ -61,6 +61,7 @@
                  [webjure/tuck "20180327"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
+                 [cljsjs/chartjs "2.7.3-0"]
                  [cljs-react-material-ui "0.2.48"]
                  [cljsjs/material-ui-chip-input "0.17.2-0"]
                  [figwheel "0.5.13"]
@@ -127,7 +128,7 @@
                 :source-paths ["src/cljs" "src/cljc"]
                 :figwheel {:on-jsload "ote.main/reload-hook"}
                 :compiler {:optimizations :none
-                           ;;:verbose true
+                           ;; :verbose true
                            :source-map true
                            :output-to "resources/public/js/ote.js"
                            :output-dir "resources/public/js/out"}}
