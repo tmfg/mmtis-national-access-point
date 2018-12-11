@@ -617,17 +617,12 @@
         trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
-                                                   combined-stop-sequence date1-trips date2-trips] :as compare}]
+                                                   combined-stop-sequence selected-trip-pair] :as compare}]
   [section {:open? (get open-sections :trip-stop-sequence true)
             :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
-   (let [trip1-ids (set (map #(:trip-id %) date1-trips))
-         trip2-ids (set (map #(:trip-id %) date2-trips))
-         matching-trips (= trip1-ids trip2-ids)]
-     (println trip1-ids)
-     (println trip2-ids)
-     (println matching-trips)
+   (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
      [:div.trip-stop-sequence
       [table/table {:name->label str :key-fn :gtfs/stop-name}
        [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
@@ -637,7 +632,7 @@
          :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
                    (cond
                      (and departure-time-date1 (nil? departure-time-date2))
-                     (if matching-trips "Pysäkki ei kuulu reitille" "Poistuva vuoro")
+                     (if second-stops-empty? "Poistuva vuoro" "Pysäkki ei kuulu reitille")
 
                      (and (nil? departure-time-date1) departure-time-date2)
                      "Uusi pysäkki reitillä"
