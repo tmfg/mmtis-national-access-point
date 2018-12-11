@@ -617,35 +617,36 @@
         trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
-                                                   combined-stop-sequence] :as compare}]
+                                                   combined-stop-sequence selected-trip-pair] :as compare}]
   [section {:open? (get open-sections :trip-stop-sequence true)
             :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
-   [:div.trip-stop-sequence
-    [table/table {:name->label str :key-fn :gtfs/stop-name}
-     [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
-      {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
-      {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
-      {:name "Muutokset" :read identity
-       :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
-                 (cond
-                   (and departure-time-date1 (nil? departure-time-date2))
-                   "Pysäkki ei kuulu reitille"
+   (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
+     [:div.trip-stop-sequence
+      [table/table {:name->label str :key-fn :gtfs/stop-name}
+       [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
+        {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
+        {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
+        {:name "Muutokset" :read identity
+         :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
+                   (cond
+                     (and departure-time-date1 (nil? departure-time-date2))
+                     (if second-stops-empty? "Poistuva vuoro" "Pysäkki ei kuulu reitille")
 
-                   (and (nil? departure-time-date1) departure-time-date2)
-                   "Uusi pysäkki reitillä"
+                     (and (nil? departure-time-date1) departure-time-date2)
+                     "Uusi pysäkki reitillä"
 
-                   (not= departure-time-date1 departure-time-date2)
-                   [labeled-icon [ic/action-query-builder]
-                    (time/format-minutes-elapsed
-                     (time/minutes-elapsed departure-time-date1 departure-time-date2))]
+                     (not= departure-time-date1 departure-time-date2)
+                     [labeled-icon [ic/action-query-builder]
+                      (time/format-minutes-elapsed
+                        (time/minutes-elapsed departure-time-date1 departure-time-date2))]
 
-                   :default
-                   [labeled-icon {:style {:color "lightgray"}}
-                    [ic/action-query-builder {:color "lightgray"}]
-                    "00:00"]))}]
-     combined-stop-sequence]]])
+                     :default
+                     [labeled-icon {:style {:color "lightgray"}}
+                      [ic/action-query-builder {:color "lightgray"}]
+                      "00:00"]))}]
+       combined-stop-sequence]])])
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?
                                   show-route-lines :show-route-lines}]
