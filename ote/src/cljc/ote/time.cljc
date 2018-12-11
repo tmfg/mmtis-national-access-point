@@ -445,6 +445,7 @@
     d
     (recur (days-from d -1))))
 
+#?(:clj
 (defn date-string->inst-date [date-string]
   (let [df (date-fields-only (parse-date-iso-8601 date-string))
         date1 (-> df
@@ -452,7 +453,7 @@
                   (.atStartOfDay (java.time.ZoneId/of "Europe/Helsinki"))
                   .toInstant
                   java.util.Date/from)]
-    date1))
+    date1)))
 
 (defn date-string->date-time [date-string]
   (let [df (date-fields-only (parse-date-iso-8601 date-string))
