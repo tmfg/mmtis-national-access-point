@@ -2,6 +2,7 @@
   "Visualization of transit data (GTFS)."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
+            [ote.ui.icons :as ote-icons]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
@@ -320,11 +321,10 @@
   [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend)
    [:div [:b "Taulukon ikonien selitteet"]]
    (doall
-    (for [[icon label] [[ic/content-add-circle-outline " Uusia vuoroja"]
-                        [ic/content-remove-circle-outline " Poistuvia vuoroja"]
+    (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
+                        [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
                         [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                        [ic/action-query-builder " Aikataulumuutoksia per vuoro"]
-                        [ic/av-not-interested " Reittejä, joissa tauko liikenteessä"]]]
+                        [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
       ^{:key label}
       [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label]))])
 
@@ -372,14 +372,14 @@
                         {:width "100%"}))
     [:div {:style {:width "20%"}}
      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-      [ic/content-add-circle-outline {:color (if (= 0 added-trips)
-                                               style/no-change-color
-                                               style/add-color)}]
+      [ote-icons/outline-add-box {:color (if (= 0 added-trips)
+                                           style/no-change-color
+                                           style/add-color)}]
       [:span added-trips
        (when with-labels? " lisättyä vuoroa")]]]
     [:div {:style {:width "20%"}}
      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-      [ic/content-remove-circle-outline {:color (if (= 0 removed-trips)
+      [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                   style/no-change-color
                                                   style/remove-color)}]
       [:span removed-trips
@@ -459,12 +459,12 @@
 
                   :added
                   [labeled-icon
-                   [ic/content-add-circle-outline {:color style/add-color}]
+                   [ic/content-add-box {:color style/add-color}]
                    "Uusi reitti"]
 
                   :removed
                   [labeled-icon
-                   [ic/content-remove-circle-outline {:color style/remove-color}]
+                   [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
                    "Päättyvä reitti"]
 
                   :no-change

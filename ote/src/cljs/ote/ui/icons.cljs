@@ -16,3 +16,10 @@
 
 (defn outline-ballot []
   [:img {:src "/img/icons/outline-ballot-24px.svg"}])
+
+(defn outline-add-box []
+  [:img {:src "/img/icons/outline-add-box.svg"}])
+
+(defn outline-indeterminate-checkbox []
+  [:img {:src "/img/icons/outline-indeterminate-checkbox.svg"}])
+
