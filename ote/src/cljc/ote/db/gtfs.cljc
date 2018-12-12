@@ -32,6 +32,8 @@
   ["gtfs-route-change-type" :gtfs/route-change-type (specql.transform/transform (specql.transform/to-keyword))]
   ["gtfs-route-change-info" :gtfs/route-change-info]
   ["gtfs-transit-changes" :gtfs/transit-changes]
+  ["gtfs-route-hash" :gtfs/route-hash]
+  ["gtfs-date-hash" :gtfs/date-hash]
   ["gtfs_stoptime_display" :gtfs/stoptime-display]
   ["detection-route" :gtfs/detection-route]
   ["detection-service-route-type" :gtfs/detection-service-route-type])
@@ -60,7 +62,12 @@
        (str (if lower-inclusive? "[" "(")
             lower ","
             upper
-            (if upper-inclusive? "]" ")")))))
+            (if upper-inclusive? "]" ")")))
+
+
+     ;; bytea
+     (defmethod composite/parse-value "bytea" [_ string]
+         string)))
 
 
 (defn date? [dt]

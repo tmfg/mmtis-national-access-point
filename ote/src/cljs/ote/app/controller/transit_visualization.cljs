@@ -13,6 +13,13 @@
             [ote.transit-changes :as transit-changes]
             [clojure.set :as set]))
 
+(defn ensure-route-hash-id
+  "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
+  [route]
+  (if (:gtfs/route-hash-id route)
+    (:gtfs/route-hash-id route)
+    (str (:gtfs/route-short-name route) "-" (:gtfs/route-long-name route) "-" (:gtfs/trip-headsign route))))
+
 (def hash-colors
   ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
   #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
@@ -263,15 +270,14 @@
 
 (defn fetch-routes-for-dates [compare service-id route date1 date2]
   (doseq [date [date1 date2]
-          :let [params (merge {:date (time/format-date-iso-8601 date)}
+          :let [params (merge {:date (time/format-date-iso-8601 date)
+                               :route-hash-id (ensure-route-hash-id route)}
                               (when-let [short (:gtfs/route-short-name route)]
                                 {:short-name short})
                               (when-let [long (:gtfs/route-long-name route)]
                                 {:long-name long})
                               (when-let [headsign (:gtfs/trip-headsign route)]
-                                {:headsign headsign})
-                              (when-let [route-hash-id (:gtfs/route-hash-id route)]
-                                {:route-hash-id route-hash-id}))]
+                                {:headsign headsign}))]
           :when date]
     (comm/get! (str "transit-visualization/" service-id "/route-lines-for-date")
                {:params params
@@ -310,15 +316,14 @@
     (comm/get! (str "transit-visualization/" service-id "/route-differences")
                {:params (merge
                          {:date1 (time/format-date-iso-8601 (:date1 compare))
-                          :date2 (time/format-date-iso-8601 (:date2 compare))}
+                          :date2 (time/format-date-iso-8601 (:date2 compare))
+                          :route-hash-id (ensure-route-hash-id route)}
                          (when-let [short (:gtfs/route-short-name route)]
                            {:short-name short})
                          (when-let [long (:gtfs/route-long-name route)]
                            {:long-name long})
                          (when-let [headsign (:gtfs/trip-headsign route)]
-                           {:headsign headsign})
-                         (when-let [route-hash-id (:gtfs/route-hash-id route)]
-                           {:route-hash-id route-hash-id}))
+                           {:headsign headsign}))
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
     (-> app
         (assoc-in [:transit-visualization :route-differences-loading?] true)
@@ -339,14 +344,13 @@
                   (time/days-from (tc/from-date current-week-date) 7))]
     (comm/get! (str "transit-visualization/" service-id "/route")
                {:params (merge
+                          {:route-hash-id (ensure-route-hash-id route)}
                           (when-let [short (:gtfs/route-short-name route)]
                             {:short-name short})
                           (when-let [long (:gtfs/route-long-name route)]
                             {:long-name long})
                           (when-let [headsign (:gtfs/trip-headsign route)]
-                            {:headsign headsign})
-                          (when-let [route-hash-id (:gtfs/route-hash-id route)]
-                            {:route-hash-id route-hash-id}))
+                            {:headsign headsign}))
                 :on-success (tuck/send-async! ->RouteCalendarHashResponse)})
 
     (-> app

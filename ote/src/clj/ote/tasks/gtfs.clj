@@ -63,7 +63,13 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
-(defn detect-new-changes-task [db detection-date force?] ;; db (time/now) false
+
+;; To speed up detection, call this with vector of service-ids:
+;; e.g.: (detect-new-changes-task db (time/now) true [1289])
+(defn detect-new-changes-task
+  ([db detection-date force?]
+   (detect-new-changes-task db detection-date force? nil))
+  ([db detection-date force? service-ids] ;; db (time/now) false
    (let [today detection-date ;; Today is the default but detection may be run "in the past" if admin wants to
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
@@ -76,7 +82,10 @@
                                     [start-date end-date today])]
      (lock/try-with-lock
       db "gtfs-nightly-changes" 1800
-      (let [service-ids (mapv :id (services-for-nightly-change-detection db {:force force?}))
+      (let [;; run detection only for given services or all
+            service-ids (if service-ids
+                          service-ids
+                          (mapv :id (services-for-nightly-change-detection db {:force force?})))
             service-count (count service-ids)]
         (log/info "Detect transit changes for " (count service-ids) " services.")
         (dotimes [i (count service-ids)]
@@ -91,7 +100,7 @@
                (detection/service-package-ids-for-date-range db query-params)
                (detection/detect-route-changes-for-service db query-params)))
             (catch Exception e
-              (log/warn e "Change detection failed for service " service-id)))))))))
+              (log/warn e "Change detection failed for service " service-id))))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle

@@ -144,7 +144,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
           JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
           -- Join unnested per route hashes
           JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
-         WHERE COALESCE(rh."route-hash-id", '') = COALESCE(:route-hash-id::VARCHAR, '')) x
+         WHERE rh."route-hash-id" = :route-hash-id::VARCHAR) x
  GROUP BY x.date, x.e_id;
 
 

@@ -262,7 +262,7 @@
     (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
 
 (defn save-external-companies
-  "Service can contain an url that contains company nmes and business-id. Sevice can also contain an imported csv file
+  "Service can contain an url that contains company names and business-id. Sevice can also contain an imported csv file
   with company names and business-ids."
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
