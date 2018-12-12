@@ -38,6 +38,9 @@
 
 (def full-width {:width "100%"})
 
+(def half-width {:width "50%"})
+
+
 (def subtitle (merge full-width
                      {:margin "1em 0 0 0.5em"}))
 (def subtitle-h {:margin "0"})
