@@ -84,7 +84,7 @@
             [:div.ote-sovellus
              [top-nav e! app is-scrolled? desktop?]
 
-             [:span
+             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))}
               (if (not loaded?)
                 [common/loading-spinner]
                 [(if wide? :div :div.wrapper)
