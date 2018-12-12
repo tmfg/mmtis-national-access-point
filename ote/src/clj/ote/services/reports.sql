@@ -5,7 +5,7 @@ SELECT op.name, op.id, op.phone, COALESCE(NULLIF(op.email, ''), u.email) AS "ema
   FROM "transport-operator" op
          JOIN "user" u ON u.name = (SELECT author
                                       FROM "revision" r
-                                             JOIN "group" g ON op."ckan-group-id" = g.id
+                                             JOIN "group" g ON op."ckang-roup-id" = g.id
                                      WHERE r.id = g."revision_id"
                                      LIMIT 1)
  WHERE (SELECT COUNT(*) FROM "transport-service" ts WHERE ts."transport-operator-id" = op.id) = 0
@@ -99,3 +99,25 @@ END	AS "service-type",
   JOIN "transport-service" ts ON top.id = ts."transport-operator-id" AND ts."published?" = TRUE
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
+
+-- name: monthly-registered-operators
+-- returns a cumulative sum of operators created up until the row's month.
+select
+  extract(year from created) || '-' || lpad(extract(month from created)::text, 2, '0') as month,
+  sum(count(name)) over (order by (extract(year from created) || '-' || lpad(extract(month from created)::text, 2, '0')))
+  from "group"
+  group by month
+  order by month;
+
+-- name: operator-type-distribution
+-- returns a distrubution of transport-service sub-types among all transport services
+-- XXX fixme- currently doesn't return transport operator counts, but transport-service counts
+select
+  "sub-type",
+  count("sub-type")::float / (select count(*)
+                               from "transport-service") as share
+  from "transport-service"
+  group by "sub-type";
+
+-- name: monthly-producer-counts-by-sub-type
+-- TBD

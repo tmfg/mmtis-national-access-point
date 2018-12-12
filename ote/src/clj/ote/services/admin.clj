@@ -284,6 +284,23 @@
     (require-admin-user "reports/transport-operator" (:user user))
     (transport-operator-report db type)))
 
+(define-service-component MonitorReport []
+  {}
+  (GET "/admin/reports/monitor-report"
+       {user :user}
+    (require-admin-user "reports/transport-operator" (:user user))
+    (transport-operator-report db type)))
+
+#_(define-service-component MonitorReport
+  {}
+  ^{:format :csv
+    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/monitor/:type"
+       {{:keys [type]} :params
+        user :user}
+    (require-admin-user "reports/transport-operator" (:user user))
+    (monitor-report db type)))
+
 (defrecord Admin [nap-config]
   component/Lifecycle
   (start [{db :db http :http :as this}]
