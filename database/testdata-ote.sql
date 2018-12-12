@@ -11,6 +11,15 @@ VALUES
       E'123456', NULL, NULL, E'www.solita.fi',E'Taksi', NULL, NULL, E'taxi', NULL, FALSE,NULL, NULL, NULL, TRUE, NULL,
       NULL, NULL, E'{road}');
 
+INSERT INTO "public"."transport-service" ("transport-operator-id", type, terminal, "passenger-transportation", rentals, parking, brokerage, created, "created-by", modified, "modified-by", "published?", "contact-address", "contact-phone", "contact-gsm", "contact-email", homepage, name, "ckan-dataset-id", "ckan-resource-id", "sub-type", companies, "brokerage?", description, "available-from", "available-to", "notice-external-interfaces?", "companies-csv-url", "company-source", "company-csv-filename", "transport-type")
+VALUES
+  (1, E'passenger-transportation', NULL,
+      E'({},"(,{})","(,{})",{},"{""(starting,5.9,trip,)"",""(\\\\""basic fare\\\\"",4.9,km,)""}",{},"{""(\\\\""{MON,TUE,WED,THU,FRI,SAT,SUN}\\\\"",00:00:00,24:00:00,{},t)""}",{},{},{},"(,{})",{},{},,{},{},{},{},{},{},{},"{""(FI,*FI*)"",""(SV,*SV*)"",""(EN,*EN*)""}",mandatory)',
+      NULL, NULL, NULL, E'2017-12-04 14:51:06.539000 +02:00', E'401139db-8f3e-4371-8233-5d51d4c4c8b6',
+      E'2018-06-11 16:12:50.550000', E'401139db-8f3e-4371-8233-5d51d4c4c8b6', TRUE, E'("Street 1",90100,Oulu)',
+      E'123456', NULL, NULL, E'www.solita.fi',E'Säännöllinen aikataulun mukainen liikenne', NULL, NULL, E'schedule', NULL, FALSE,NULL, NULL, NULL, TRUE, NULL,
+      NULL, NULL, E'{road}');
+
 INSERT INTO "transport-operator" (name, "business-id", homepage, "visiting-address", "ckan-group-id")
 VALUES ('Terminaali Oy', '1234567-8', 'http://www.example.com',
 ROW('Terminaalitie 1','90100','Terminaalikaupunki')::address, 'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4');
