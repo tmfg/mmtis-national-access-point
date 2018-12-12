@@ -80,11 +80,11 @@
     (specql/insert! (:db *ote*) :gtfs/package
                     {:gtfs/id 1
                      :gtfs/transport-operator-id 1
-                     :gtfs/transport-service-id  1
+                     :gtfs/transport-service-id  2
                      :gtfs/created               (tc/to-sql-date (time/now))})
 
     (specql/insert! (:db *ote*) :gtfs/transit-changes
-                    {:gtfs/transport-service-id 1
+                    {:gtfs/transport-service-id 2
                      :gtfs/date                 (tc/to-sql-date (time/now))
                      :gtfs/current-week-date    (tc/to-sql-date (time/now))
                      :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))

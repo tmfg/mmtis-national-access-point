@@ -494,7 +494,7 @@ You can also draw the operating area or point to the map with drawing tools. You
    :other-services "Other services"
    :pricing "Pricing"
    :service-hours "Service hours"
-   :on-behalf-errand "On behalf errand"
+   :on-behalf-errand "Acting on behalf of customer"
    :customer-account-info "Customer account information"
    :disruptions "Fault situations"
    :payment-interface "Payment and sales interface"
