@@ -21,6 +21,7 @@
             [ote.app.controller.flags :as flags]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
+            [ote.views.own-services :as os]
             [ote.views.login :as login]
             [ote.views.user :as user]
             [ote.views.admin :as admin]
@@ -116,7 +117,7 @@
                     :register [register/register e! (:register app) (:user app)]
                     :user [user/user e! (:user app)]
                     :front-page [fp/front-page e! app]
-                    :own-services [fp/own-services e! app]
+                    :own-services [os/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
                     :transport-operator [to/operator e! app]
 
