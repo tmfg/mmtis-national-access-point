@@ -464,30 +464,41 @@
            row))
        date-route-hashes))
 
-(defn- set-route-hash-id [_ x]
-  (let [short (:route-short-name x)
-        long (:route-long-name x)
-        headsign (:trip-headsign x)]
-    (str short "-" long "-" headsign)))
+(defn- set-route-hash-id [_ route type]
+  (let [short (:route-short-name route)
+        long (:route-long-name route)
+        headsign (:trip-headsign route)]
+    (cond
+      (= type "short-long-headsign")
+        (str short "-" long "-" headsign)
+      (= type "short-long")
+        (str short "-" long)
+      (= type "long-headsign")
+        (str long "-" headsign)
+      (= type "long")
+        (str long)
+      :else
+        (str short "-" long "-" headsign))))
 
 (defn add-route-hash-id-as-a-map-key
   "Add default route-hash-id (long-short-headsign) to routes"
-  [routes]
+  [routes type]
   (map
     (fn [x]
-      (update x :route-hash-id #(set-route-hash-id % x)))
+      (update x :route-hash-id #(set-route-hash-id % x type)))
     routes))
 
-(defn map-by-route-key [service-routes]
+(defn map-by-route-key [service-routes type]
   (let [service-routes (if (empty? (:route-hash-id (first service-routes)))
-                         (add-route-hash-id-as-a-map-key service-routes)
+                         (add-route-hash-id-as-a-map-key service-routes type)
                          service-routes)]
     (map-by :route-hash-id service-routes)))
 
 (defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
   (let [type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        all-routes (map-by-route-key (service-routes-with-date-range db {:service-id service-id}))
+        service-routes (service-routes-with-date-range db {:service-id service-id})
+        all-routes (map-by-route-key service-routes type)
         all-route-keys (set (keys all-routes))
         ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db route-query-params)
