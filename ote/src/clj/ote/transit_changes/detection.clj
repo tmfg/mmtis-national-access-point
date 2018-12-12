@@ -8,9 +8,7 @@
             [specql.core :as specql]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
-            [ote.db.gtfs :as gtfs]
-            [specql.op :as op]
-            [clojure.pprint])
+            [ote.db.gtfs :as gtfs])
   (:import (java.time LocalDate DayOfWeek)))
 
 (def ^:const no-traffic-detection-threshold
@@ -48,11 +46,6 @@
       (:gtfs/route-hash-id-type type)
       "short-long-headsign")))
 
-(defn use-old-route-key [type]
-  (if (= type "short-long-headsign")
-    true
-    false))
-
 (defn calculate-route-hash-id-for-service
   "We support only few different hash calculation types. [short-long-headsign, short-long, route-id]"
   [db service-id package-count type]
@@ -80,12 +73,6 @@
             :else
               (calculate-routes-route-hashes-using-headsign db {:package-id package-id})))))))
 
-(def empty-route-key [nil nil nil])
-(def empty-hash-route-key nil)
-(def route-key
-  "Route key is a vector of [short-name long-name headsign]"
-  (juxt :route-short-name :route-long-name :trip-headsign))
-
 (defn routes-by-date [date-route-hashes all-routes type]
   ;; date-route-hashes contains all hashes for date range and is sorted
   ;; by date so we can partition by :date to get each date's hashes
@@ -94,13 +81,11 @@
               route-hashes (into (zipmap all-routes (repeat nil))
                                    (map (juxt :route-hash-id :hash))
                                    hashes-for-date)
-
               cleaned-route-hashes (dissoc route-hashes
-
                                            ;; If there is no traffic for the service on a given date, the
                                            ;; result set will contain a single row with nil values for route.
                                            ;; Remove the empty-route-key so we don't get an extra route.
-                                           empty-hash-route-key)]]
+                                           nil)]]
     {:date   (.toLocalDate date)
      :routes cleaned-route-hashes}))
 
@@ -146,12 +131,7 @@
            ;; ...and traffic does not revert back to previous in two weeks
            (not (week= starting-week-hash next2)))
       ;; this is a change
-      (do
-        (println "Löyty muutos " route " state " (pr-str state))
-        (println "Löyty muutos " route " starting-week-hash " (pr-str starting-week-hash))
-        (println "Löyty muutos " route " curr " (pr-str curr))
-        (println "Löyty muutos " route " next2 " (pr-str next2))
-        (assoc state :different-week-hash curr))
+        (assoc state :different-week-hash curr)
 
       ;; No change found, return state as is
       :default state))
@@ -331,7 +311,6 @@
                        ;; Otherwise return as is
                        [route detection-result])))
               routes)]
-    ;(println " Palautetaan route day changes " (pr-str route-day-changes))
     route-day-changes))
 
 (defn- date-in-the-past? [^LocalDate date]
@@ -459,7 +438,7 @@
                                                    (or (nil? change-date)
                                                        (date-in-the-past? (.toLocalDate change-date))))
                                                  (sort-by :gtfs/change-date route-change-infos)))]
-    #_ (debug-print-change-stats all-routes route-changes type)
+    #_(debug-print-change-stats all-routes route-changes type)
     (specql/upsert! db :gtfs/transit-changes
                     #{:gtfs/transport-service-id :gtfs/date}
                     {:gtfs/transport-service-id service-id
@@ -485,17 +464,21 @@
            row))
        date-route-hashes))
 
-(defn- set-route-hash-id [old x]
+(defn- set-route-hash-id [_ x]
   (let [short (:route-short-name x)
         long (:route-long-name x)
         headsign (:trip-headsign x)]
     (str short "-" long "-" headsign)))
 
-(defn add-route-hash-id-as-a-map-key [coll]
-  (map (fn [x]
-         (update x :route-hash-id #(set-route-hash-id % x))) coll))
+(defn add-route-hash-id-as-a-map-key
+  "Add default route-hash-id (long-short-headsign) to routes"
+  [routes]
+  (map
+    (fn [x]
+      (update x :route-hash-id #(set-route-hash-id % x)))
+    routes))
 
-(defn map-by-route-key [type service-routes]
+(defn map-by-route-key [service-routes]
   (let [service-routes (if (empty? (:route-hash-id (first service-routes)))
                          (add-route-hash-id-as-a-map-key service-routes)
                          service-routes)]
@@ -504,29 +487,26 @@
 (defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
   (let [type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        all-routes (map-by-route-key type (service-routes-with-date-range db {:service-id service-id}))
+        all-routes (map-by-route-key (service-routes-with-date-range db {:service-id service-id}))
         all-route-keys (set (keys all-routes))
         ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db route-query-params)
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)]
-
-    (println " route-query-params " route-query-params)
-    (println " rall-route-keys => " (pr-str all-route-keys))
-             (try
-               {:all-routes all-routes
-                :route-changes
-                  (-> routes-by-date
-                      ;; Create week hashes so we can find out the differences between weeks
-                      (combine-weeks)
-                      ;; Search next week (for every route) that is different
-                      (next-different-weeks)
-                      (as-> routes
-                            ;; Fetch detailed route comparison if a change was found
-                            (route-day-changes db service-id routes)))}
-               (catch Exception e
-                 (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
+    (try
+      {:all-routes all-routes
+       :route-changes
+                   (-> routes-by-date
+                       ;; Create week hashes so we can find out the differences between weeks
+                       (combine-weeks)
+                       ;; Search next week (for every route) that is different
+                       (next-different-weeks)
+                       (as-> routes
+                             ;; Fetch detailed route comparison if a change was found
+                             (route-day-changes db service-id routes)))}
+      (catch Exception e
+        (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
 (defn- update-hash [old x]
   (let [short (:gtfs/route-short-name x)
@@ -540,8 +520,7 @@
 ;; This is only for local development
 ;; Add route-hash-id for all routes in gtfs-transit-changes table in column route-hashes.
 (defn update-date-hash-with-null-route-hash-id [db service-id]
-  (let [;package-list (fetch-services-packages db {:service-id service-id})
-        transit-changes (specql/fetch db :gtfs/transit-changes
+  (let [transit-changes (specql/fetch db :gtfs/transit-changes
                                       (specql/columns :gtfs/transit-changes)
                                       {:gtfs/transport-service-id service-id})]
     (for [t transit-changes]
@@ -555,10 +534,10 @@
                            :gtfs/route-changes        chg-routes}
                            ;; where
                            {:gtfs/transport-service-id service-id
-                            :gtfs/date (:gtfs/date t)}
-                           )
+                            :gtfs/date (:gtfs/date t)})
           (println "service id " service-id "date " (:gtfs/date t)))))))
 
+;;Use only in local environment and for debugging purposes!
 (defn update-route-hashes [db]
   (let [service-ids (fetch-distinct-services-from-transit-changes db)]
     (doall
@@ -579,11 +558,7 @@
         (let [route-hashes (:gtfs/route-hashes h)
               chg-hashes (map (fn [x]
                                 (update x :gtfs/route-hash-id #(update-hash % x))) route-hashes)]
-
-          (do
-            (when (and route-hashes
-                       (:gtfs/hash h)
-                       #_ (nil? (:gtfs/route-hash-id (first chg-hashes)))) ;; if first have hash-id all others have too.
+            (when (and route-hashes (:gtfs/hash h))
               (do
                 (specql/update! db :gtfs/date-hash
                                 {:gtfs/date         (:gtfs/date h)
@@ -593,4 +568,4 @@
                                 ; where
                                 {:gtfs/package-id package-id
                                  :gtfs/date       (:gtfs/date h)})
-                (println "package-id " package-id "date " (:gtfs/date h))))))))))
+                (println "package-id " package-id "date " (:gtfs/date h)))))))))
