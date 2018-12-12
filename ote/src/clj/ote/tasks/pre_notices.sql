@@ -38,7 +38,7 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
        to_char(date,'yyyy-mm-dd') as date,
        ts.id AS "transport-service-id"
   FROM changes_with_regions chg
-  JOIN "transport-service" ts ON ts.id = chg."transport-service-id"
+  JOIN "transport-service" ts ON ts.id = chg."transport-service-id" AND ts."sub-type" = 'schedule'
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id",
        gtfs_package p
  WHERE chg.date = CURRENT_DATE
