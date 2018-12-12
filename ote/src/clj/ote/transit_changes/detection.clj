@@ -266,7 +266,7 @@
                               trip-stops)})))
 
 
-(defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date route-hash-id]
+(defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
   (let [combined-trips (transit-changes/combine-trips date1-trips date2-trips)
         {:keys [added removed changed]}
         (group-by (fn [[l r]]
@@ -293,7 +293,7 @@
     (log/debug "Found changes in trips for route: " route-hash-id ", comparing dates: " starting-week-date " and " different-week-date " route-hash-id " route-hash-id)
     (let [date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
           date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
-      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date route-hash-id))))
+      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
 
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
