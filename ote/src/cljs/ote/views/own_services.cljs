@@ -1,4 +1,4 @@
-(ns ote.views.own_services
+(ns ote.views.own-services
   (:require [clojure.string :as s]
             [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
@@ -25,6 +25,7 @@
             [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
+            [ote.ui.info :as info]
             [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
             [clojure.string :as str]))
@@ -116,7 +117,7 @@
         [:br]
         "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]]])))
 
-(defn table-container-for-front-page [e! has-services? operator-services state]
+(defn table-container-for-own-services [e! has-services? operator-services state]
   [:div
    (warn-about-test-server)
    [list-header/header
@@ -201,7 +202,8 @@
                                 (:transport-service-vector (first (:transport-operators-with-services state)))
                                 (:transport-service-vector state))]
         [:div
+         [info/info-toggle "test" "test2"]
          (if has-services?
-           [table-container-for-front-page e! has-services? operator-services state]
+           [table-container-for-own-services e! has-services? operator-services state]
            ;; Render service type selection page if no services added
            [transport-service/select-service-type e! state])]))))
