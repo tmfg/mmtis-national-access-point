@@ -22,8 +22,9 @@ WITH changes_with_regions AS (
          (SELECT array_agg(x.reg)
             FROM (SELECT DISTINCT unnest(p."finnish-regions") as reg
                     FROM gtfs_package p
-                   WHERE p.id = ANY(chg."package-ids")) x) AS "finnish-regions"
-                     AND p."deleted?" = FALSE
+                   WHERE p.id = ANY(chg."package-ids")
+                     AND p."deleted?" = FALSE) x) AS "finnish-regions"
+
     FROM "gtfs-transit-changes" chg
     WHERE chg.date = CURRENT_DATE
 
