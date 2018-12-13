@@ -230,12 +230,26 @@
         update-rental-price-classes)
     service))
 
+(defn mark-package-as-deleted
+  "When external interface is deleted (when it is delted or service is delted) we don't want to
+  remove all gtfs data that we have aquired. So we only mark gtfs_packages.deleted = TRUE for those packages and
+  remove the interface url."
+  [db external-interface-description-id]
+
+  ;; set all found packages as deleted
+  (specql/update! db :gtfs/package
+                  {:gtfs/deleted? true}
+                  {:gtfs/external-interface-description-id external-interface-description-id}))
+
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removed-resources]
 
   ;; Delete removed services from OTE db
   (doseq [{id ::t-service/id} removed-resources]
+    ;; Mark possible gtfs_packages to removed and then remove interface
+    (mark-package-as-deleted db id)
+
     (specql/delete! db ::t-service/external-interface-description
                     {::t-service/id id}))
 
