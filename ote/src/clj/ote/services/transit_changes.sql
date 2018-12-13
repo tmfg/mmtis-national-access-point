@@ -42,7 +42,7 @@ SELECT ts.id AS "transport-service-id",
          WHERE id = ANY(c."package-ids")) AS "finnish-regions",
        (SELECT (upper(gtfs_package_date_range(p.id)) - '1 day'::interval)::date
           FROM gtfs_package p
-         WHERE p."transport-service-id" = ts.id
+         WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
          ORDER BY p.id DESC limit 1) as "max-date"
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id

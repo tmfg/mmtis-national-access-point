@@ -23,6 +23,7 @@ WITH changes_with_regions AS (
             FROM (SELECT DISTINCT unnest(p."finnish-regions") as reg
                     FROM gtfs_package p
                    WHERE p.id = ANY(chg."package-ids")) x) AS "finnish-regions"
+                     AND p."deleted?" = FALSE
     FROM "gtfs-transit-changes" chg
     WHERE chg.date = CURRENT_DATE
 
@@ -43,6 +44,7 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
        gtfs_package p
  WHERE chg.date = CURRENT_DATE
    AND p.id = ANY(chg."package-ids")
+   AND p."deleted?" = FALSE
    AND p.created > CURRENT_DATE - interval '8 hours'
    AND chg."change-date" IS NOT NULL
    AND (chg."finnish-regions" IS NULL OR
@@ -58,6 +60,7 @@ WITH changes_with_regions AS (
             FROM (SELECT DISTINCT unnest(p."finnish-regions") as reg
                     FROM gtfs_package p
                    WHERE p.id = ANY(chg."package-ids")) x) AS "finnish-regions"
+                     AND p."deleted?" = FALSE
     FROM "gtfs-transit-changes" chg
 )
 SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",

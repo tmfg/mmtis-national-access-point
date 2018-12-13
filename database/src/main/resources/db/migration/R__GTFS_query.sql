@@ -99,6 +99,7 @@ CREATE OR REPLACE FUNCTION gtfs_latest_package_for_date(operator_id INTEGER, dat
 SELECT p.id FROM gtfs_package p
  WHERE p."transport-operator-id" = operator_id
    AND p.created::date <= date
+   AND p."deleted?" = FALSE
    AND gtfs_package_date_range(p.id) @> date
  ORDER BY p.id DESC
  LIMIT 1;
@@ -115,7 +116,7 @@ SELECT string_agg(concat(x.weekday,'=',x.hash::TEXT),',') as weekhash
                hash,
                row_number() OVER (PARTITION BY h.date ORDER BY p.created DESC)
           FROM "gtfs-date-hash" h
-          JOIN "gtfs_package" p ON h."package-id" = p.id
+          JOIN "gtfs_package" p ON h."package-id" = p.id AND p."deleted?" = FALSE
          WHERE p."transport-operator-id" = operator_id
            AND (EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM dt) AND
                 EXTRACT(WEEK FROM date) = EXTRACT(WEEK FROM dt))
@@ -166,6 +167,7 @@ SELECT NOT EXISTS(
      AND NOT EXISTS(SELECT id
                       FROM gtfs_package p
                      WHERE p."transport-service-id" = gtc."transport-service-id"
+                       AND p."deleted?" = FALSE
                        AND p.created > gtc.date));
 $$ LANGUAGE SQL STABLE;
 
@@ -213,6 +215,7 @@ SELECT array_agg(x.id)
   FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
           FROM gtfs_package p
          WHERE "transport-service-id" = service_id
+           AND p."deleted?" = FALSE
            AND ( p.created::DATE <= dt OR p.first_package = TRUE)
          ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;

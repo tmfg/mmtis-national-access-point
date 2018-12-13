@@ -11,7 +11,7 @@ SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", 
     ON (dh.date = d.date AND
         dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
   -- Join gtfs_package to get external-interface-description-id
-  JOIN gtfs_package p ON p.id = dh."package-id"
+  JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
   LEFT JOIN LATERAL unnest(dh."route-hashes") AS rh ON TRUE
  GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id"
  ORDER BY d.date;
@@ -33,7 +33,7 @@ SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
         stop."stop-name", stop."stop-lat", stop."stop-lon"
   FROM "detection-route" r
-  JOIN "gtfs_package" p ON p.id = r."package-id"
+  JOIN "gtfs_package" p ON p.id = r."package-id" AND p."deleted?" = FALSE
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
   JOIN LATERAL unnest(trip."stop-times") as stoptime ON TRUE

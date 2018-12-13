@@ -21,7 +21,8 @@
 (defn get-gtfs-packages [db service-id package-count]
   (let [id-map (map :gtfs/id (specql/fetch db :gtfs/package
                                            #{:gtfs/id}
-                                           {:gtfs/transport-service-id service-id}
+                                           {:gtfs/transport-service-id service-id
+                                            :gtfs/deleted? false}
                                            {:specql.core/order-by        :gtfs/id
                                             :specql.core/order-direction :desc
                                             :specql.core/limit           package-count}))
