@@ -22,6 +22,7 @@
   [:div
    [:h2 "Palveluntuottajaraportit"]
    [:div (stylefy/use-style (style-base/flex-container "column"))
+    [linkify "/admin/reports/transport-operator/all-emails" "Käytössä olevien käyttäjien ja palveluiden sähköpostit"]
     [linkify "/admin/reports/transport-operator/no-services" "Ei palveluita"]
     [linkify "/admin/reports/transport-operator/unpublished-services" "Julkaisemattomia palveluita"]
     [linkify "/admin/reports/transport-operator/brokerage" "Välityspalvelut"]
