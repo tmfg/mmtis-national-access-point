@@ -14,20 +14,21 @@ SELECT op.name, op.id, op.phone, COALESCE(NULLIF(op.email, ''), u.email) AS "ema
 --name: fetch-all-emails
 SELECT u."email" as email
   FROM public.user u
-WHERE email IS NOT NULL
-AND u.state = 'active'
+ WHERE email IS NOT NULL
+   AND u.state = 'active'
 
 UNION
+
 SELECT t."contact-email" AS email
   FROM "transport-service" t
-WHERE t."contact-email" IS NOT NULL
+ WHERE t."contact-email" IS NOT NULL
 
 UNION
 
 SELECT o.email AS email
   FROM "transport-operator" o
-  WHERE o."deleted?" = FALSE
-  AND o.email IS NOT NULL;
+ WHERE o."deleted?" = FALSE
+   AND o.email IS NOT NULL;
 
 --name: fetch-operators-brokerage
 SELECT op.name,
