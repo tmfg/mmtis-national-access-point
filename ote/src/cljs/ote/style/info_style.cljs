@@ -16,7 +16,9 @@
    :background-color "blue"
    :transform-origin "top"
    :display "block"
-   :color "orange"})
+   :color "orange"
+   :margin 0
+   :padding "1rem"})
 
 (def info-open
   (merge info-text

@@ -85,16 +85,20 @@
             [:div.ote-sovellus
              [top-nav e! app is-scrolled? desktop?]
 
-             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))}
+             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))
+                    :style {:min-height "100%"
+                            :display "flex"
+                            :flex-direction "column"
+                            :justify-content "space-between"}}
               (if (not loaded?)
                 [common/loading-spinner]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
                    (stylefy/use-style (merge
-                                       {:transition "margin-top 300ms ease"}
-                                       (if (or (not desktop?) @is-scrolled?)
-                                         {:margin-top "56px"}))))
+                                        {:transition "margin-top 300ms ease"}
+                                        (if (or (not desktop?) @is-scrolled?)
+                                          {:margin-top "56px"}))))
                  [:div (cond
                          (= :front-page (:page app))
                          {:class "container-fluid"}
@@ -153,5 +157,5 @@
                     (:transit-changes :authority-pre-notices)
                     [transit-changes/transit-changes e! app]
 
-                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])]
-             [footer/footer e!]])]]))))
+                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+              [footer/footer e!]]])]]))))
