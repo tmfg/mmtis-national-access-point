@@ -9,14 +9,23 @@
    :border "none"
    :text-align "left"
    :transition "background-color 0.15s ease-in-out"
+   :display "flex"
+   :align-items "center"
+   :color "#323232"
    ::stylefy/mode {:hover {:background-color "#CCCCCC"}}})
+
+(def info-container
+  {:margin-bottom "1rem"})
+
+(def info-icon
+  {:color "#505050"
+   :margin-right "5px"})
 
 (def info-text
   {:transition "max-height 0.2s ease-in-out"
-   :background-color "blue"
+   :background-color "#F0F0F0"
    :transform-origin "top"
    :display "block"
-   :color "orange"
    :margin 0
    :padding "1rem"})
 
