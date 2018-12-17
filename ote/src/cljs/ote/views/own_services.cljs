@@ -202,8 +202,9 @@
                                 (:transport-service-vector (first (:transport-operators-with-services state)))
                                 (:transport-service-vector state))]
         [:div
-         [info/info-toggle "test" "test2"]
          (if has-services?
            [table-container-for-own-services e! has-services? operator-services state]
            ;; Render service type selection page if no services added
            [transport-service/select-service-type e! state])]))))
+
+

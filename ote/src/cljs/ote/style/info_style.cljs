@@ -19,15 +19,15 @@
 
 (def info-icon
   {:color "#505050"
-   :margin-right "5px"})
+   :margin-right "0.5rem"})
 
 (def info-text
-  {:transition "max-height 0.2s ease-in-out"
-   :background-color "#F0F0F0"
+  {:background-color "#F0F0F0"
    :transform-origin "top"
    :display "block"
    :margin 0
-   :padding "1rem"})
+   :padding "1rem"
+   ::stylefy/mode {:hover {:background-color "#CCCCCC"}}})
 
 (def info-open
   (merge info-text
