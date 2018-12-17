@@ -142,6 +142,8 @@
                     :new-route [route/new-route e! app]
                     :edit-route [route/edit-route-by-id e! app]
 
+                    :monitor [monitor/monitor-main e! app]
+                    
                     ;; 60days pre notice views
                     :new-notice [notice/new-pre-notice e! app]
                     :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
@@ -152,8 +154,5 @@
 
                     (:transit-changes :authority-pre-notices)
                     [transit-changes/transit-changes e! app]
-
-                    :monitor [monitor/monitor-main]
-
                     [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])]
              [footer/footer e!]])]]))))

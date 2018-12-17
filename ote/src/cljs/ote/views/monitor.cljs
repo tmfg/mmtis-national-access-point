@@ -1,10 +1,11 @@
 (ns ote.views.monitor
   (:require [reagent.core :as r]
+            [ote.ui.common :as common]
+            [ote.app.controller.monitor :as controller]
             [cljsjs.chartjs]))
 
 ;; Patterned after the advice at
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
-
 
 ;; todo: use time type x axis
 
@@ -55,21 +56,21 @@
                                               (update comp)))
                      :component-did-update update})))
 
-
-
-
 (defn monitor-main [e! {:keys [page monitor-data] :as app}]
-  (let [companies-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
-                                 :datasets [{:label "juttuja" :data [1742 3121 4311]}]}
-        type-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
-                            :datasets [{:label "hommia" :data  [1742 3121 4311] :backgroundColor "red"}
-                                       {:label "jutskia" :data [111 222 333] :backgroundColor "blue"}]}
-        provider-count-by-type-data {:labels ["Taksiliikenne" "Tilausliikenne ja muu kutsuun perustuva liikenne" "Säännöllinen aikataulun mukainen liikenne"]
-                                     :datasets [{:data [500 200 50]
-                                                 :backgroundColor ["red" "orange" "blue"]
-                                                 :label "Tuottajat tyypeittäin"}]}]
-    (fn []
-      [:div {:style {:width "50%"}}
-       [barchart-inner "chart-companies-by-month" companies-by-month-data]
-       [doughnut-inner "chart-count-by-type" provider-count-by-type-data]
-       [barchart-inner "chart-type-by-month" type-by-month-data]])))
+  (e! (controller/->QueryMonitorReport))
+  (if monitor-data
+    (let [companies-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
+                                   :datasets [{:label "juttuja" :data [1742 3121 4311]}]}
+          type-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
+                              :datasets [{:label "hommia" :data  [1742 3121 4311] :backgroundColor "red"}
+                                         {:label "jutskia" :data [111 222 333] :backgroundColor "blue"}]}
+          provider-count-by-type-data {:labels ["Taksiliikenne" "Tilausliikenne ja muu kutsuun perustuva liikenne" "Säännöllinen aikataulun mukainen liikenne"]
+                                       :datasets [{:data [500 200 50]
+                                                   :backgroundColor ["red" "orange" "blue"]
+                                                   :label "Tuottajat tyypeittäin"}]}]
+      (fn []
+        [:div {:style {:width "50%"}}
+         [barchart-inner "chart-companies-by-month" companies-by-month-data]
+         [doughnut-inner "chart-count-by-type" provider-count-by-type-data]
+         [barchart-inner "chart-type-by-month" type-by-month-data]]))
+    [common/loading-spinner]))

@@ -207,6 +207,11 @@
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
+(defn monitor-report [db type]
+  (println "monitor-report called, returning composite map")
+  {:monthly-operators  (monthly-registered-operators db)
+   :operator-types (operator-type-distribution db)
+   :by-sub-type nil #_(monthly-producer-counts-by-sub-type)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
@@ -275,7 +280,6 @@
 
 (define-service-component CSVAdminReports
   {}
-
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/transport-operator/:type"
@@ -288,17 +292,17 @@
   {}
   (GET "/admin/reports/monitor-report"
        {user :user}
-    (require-admin-user "reports/transport-operator" (:user user))
-    (transport-operator-report db type)))
+    (require-admin-user "reports/monitor" (:user user))
+    (http/transit-response (monitor-report db "all"))))
 
-#_(define-service-component MonitorReport
+(define-service-component MonitorReportCSV
   {}
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/monitor/:type"
        {{:keys [type]} :params
         user :user}
-    (require-admin-user "reports/transport-operator" (:user user))
+    (require-admin-user "reports/monitor" (:user user))
     (monitor-report db type)))
 
 (defrecord Admin [nap-config]
