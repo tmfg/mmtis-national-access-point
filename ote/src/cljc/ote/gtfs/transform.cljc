@@ -175,11 +175,11 @@
            concat
            (map-indexed
              (fn [i {stop-times ::transit/stop-times :as trip}]
-               (for [{::transit/keys [stop-idx arrival-time departure-time
+               (for [{::transit/keys [arrival-time departure-time
                                       pickup-type drop-off-type]
                       idx            :idx} (index-key :idx identity stop-times)]
                  {:gtfs/trip-id (str id "_" i)
-                  :gtfs/stop-id (::transit/code (nth stops stop-idx))
+                  :gtfs/stop-id        (::transit/code (nth stops idx))
                   :gtfs/arrival-time (time/format-interval-as-time (time/time->pginterval (or arrival-time departure-time)))
                   :gtfs/departure-time (time/format-interval-as-time (time/time->pginterval (or departure-time arrival-time)))
                   :gtfs/pickup-type (stopping-type pickup-type)
