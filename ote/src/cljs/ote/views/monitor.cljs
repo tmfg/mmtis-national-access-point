@@ -16,8 +16,7 @@
         stacked-chart-options {:scales {:yAxes [{:stacked true}]
                                         :xAxes [{:stacked true}]}}]
     (r/create-class {:reagent-render (fn []
-                                       (println "using dom name" dom-name)
-                                       [:div "tää ois niinku se kuvaaja"
+                                       [:div
                                         [:canvas {:id dom-name :width 400 :height 400}]])
                      :component-did-mount (fn [comp]
                                             (println "did-mount: saaatiin comp" (pr-str comp))
@@ -40,7 +39,7 @@
                  (println "doughnut update fn called"))]
     (r/create-class {:reagent-render (fn []
                                        (println "using dom name" dom-name)
-                                       [:div "tää ois niinku se kuvaaja"
+                                       [:div
                                         [:canvas {:id dom-name :width 400 :height 400}]])
                      :component-did-mount (fn [comp]
                                             (println "did-mount: saaatiin comp" (pr-str comp))
@@ -59,18 +58,18 @@
 (defn monitor-main [e! {:keys [page monitor-data] :as app}]
   (e! (controller/->QueryMonitorReport))
   (if monitor-data
-    (let [companies-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
-                                   :datasets [{:label "juttuja" :data [1742 3121 4311]}]}
+    (let [companies-by-month-data {:labels (mapv :month (:monthly-operators monitor-data))
+                                   :datasets [{:label "Rekisteröityneitä palveluntuottajia" :data (mapv :sum (:monthly-operators monitor-data))}]}
           type-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
                               :datasets [{:label "hommia" :data  [1742 3121 4311] :backgroundColor "red"}
                                          {:label "jutskia" :data [111 222 333] :backgroundColor "blue"}]}
-          provider-count-by-type-data {:labels ["Taksiliikenne" "Tilausliikenne ja muu kutsuun perustuva liikenne" "Säännöllinen aikataulun mukainen liikenne"]
-                                       :datasets [{:data [500 200 50]
+          provider-share-by-type-data {:labels (mapv :sub-type (:operator-types monitor-data))
+                                       :datasets [{:data (mapv :share (:operator-types monitor-data))
                                                    :backgroundColor ["red" "orange" "blue"]
-                                                   :label "Tuottajat tyypeittäin"}]}]
+                                                   :label "Palvelut tyypeittäin"}]}]
       (fn []
         [:div {:style {:width "50%"}}
          [barchart-inner "chart-companies-by-month" companies-by-month-data]
-         [doughnut-inner "chart-count-by-type" provider-count-by-type-data]
-         [barchart-inner "chart-type-by-month" type-by-month-data]]))
+         [doughnut-inner "chart-share-by-type" provider-share-by-type-data]
+         #_[barchart-inner "chart-type-by-month" type-by-month-data]]))
     [common/loading-spinner]))
