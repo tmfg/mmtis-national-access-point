@@ -10,8 +10,7 @@
             [ote.style.info-style :as style-info]))
 
 (defn info-toggle
-  "Displays a clickable area that opens to show more info
-   Inner component can be any html component."
+  "Displays a clickable area that opens to show more info. Can be given default parameter for open state."
   ([title inner-component]
    (info-toggle title inner-component false))
   ([title inner-component default-open?]
