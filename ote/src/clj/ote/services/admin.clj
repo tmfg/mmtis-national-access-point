@@ -210,8 +210,8 @@
 (defn monthly-types-for-monitor-report [db]
   (create-temp-view-for-monthly-producer-counts-by-sub-type! db)
   (let [type-month-count-table (monthly-producer-counts-by-sub-type db)
-        months (distinct (map :month type-month-count-table)) ;; order is important
-        subtypes (distinct (map :sub-type type-month-count-table))
+        months (distinct (keep :month type-month-count-table)) ;; order is important
+        subtypes (distinct (keep :sub-type type-month-count-table))
         by-month (group-by :month type-month-count-table) 
         by-subtype (group-by :subtype type-month-count-table)
         type-colors {"taxi" "rgb(242, 195, 19)"
@@ -224,7 +224,10 @@
         monthly-series-for-type (fn [t]
                                   (vec 
                                    (for [month months]
-                                     (:count (first (filter #(= t (:sub-type %)) (get by-month month)))))))
+                                     (let [tc (filter #(= t (:sub-type %)) (get by-month month))]
+                                       (if (empty? tc)
+                                         0
+                                         (:count (first tc)))))))
         type-dataset (fn [t]
                        {:label t
                         :data (monthly-series-for-type t)
