@@ -64,7 +64,7 @@
                               :datasets [{:label "hommia" :data  [1742 3121 4311] :backgroundColor "red"}
                                          {:label "jutskia" :data [111 222 333] :backgroundColor "blue"}]}
           provider-share-by-type-data {:labels (mapv :sub-type (:operator-types monitor-data))
-                                       :datasets [{:data (mapv :share (:operator-types monitor-data))
+                                       :datasets [{:data (mapv :count (:operator-types monitor-data))
                                                    :backgroundColor ["red" "orange" "blue"]
                                                    :label "Palvelut tyypeittäin"}]}]
       (fn []

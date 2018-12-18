@@ -111,12 +111,10 @@ select
 
 -- name: operator-type-distribution
 -- returns a distrubution of transport-service sub-types among all transport services
--- XXX fixme- currently doesn't return transport operator counts, but transport-service counts
 select
   "sub-type",
-  count("sub-type")::float / (select count(*)
-                               from "transport-service") as share
-  from "transport-service"
+  count("sub-type") as count
+  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id") as unusedname
   group by "sub-type";
 
 -- name: monthly-producer-counts-by-sub-type
