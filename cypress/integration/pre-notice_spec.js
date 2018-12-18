@@ -48,7 +48,7 @@ describe('Pre notice tests', () => {
         cy.get('#add-new-pre-notice').click({"force": true});
 
         // Select type
-        cy.get('#0_termination').click();
+        cy.get('[type="checkbox"]').first().click();
 
         // Give a description
 
