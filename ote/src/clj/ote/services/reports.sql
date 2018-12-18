@@ -117,3 +117,36 @@ END	AS "service-type",
   JOIN "transport-service" ts ON top.id = ts."transport-operator-id" AND ts."published?" = TRUE
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
+
+-- name: monthly-registered-operators
+-- returns a cumulative sum of operators created up until the row's month.
+select
+  extract(year from created) || '-' || lpad(extract(month from created)::text, 2, '0') as month,
+  sum(count(name)) over (order by (extract(year from created) || '-' || lpad(extract(month from created)::text, 2, '0')))
+  from "group"
+  group by month
+  order by month;
+
+-- name: operator-type-distribution
+-- returns a distrubution of transport-service sub-types among all transport services
+select
+  "sub-type",
+  count("sub-type") as count
+  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id") as unusedname
+  group by "sub-type";
+
+-- name: create-temp-view-for-monthly-producer-counts-by-sub-type!
+create or replace temporary view
+    monitor_producers_by_type as
+    select extract(year from gr.created) || '-' || lpad(extract(month from gr.created)::text, 2, '0') as month,
+    ts.id as tsid,
+    top.id as toid,
+    ts."sub-type"
+    from
+    "transport-service" ts,
+    "transport-operator" top,
+    "group" gr
+    where top.id = ts."transport-operator-id" and gr.id = top."ckan-group-id" and gr.created is not null;
+
+-- name: monthly-producer-counts-by-sub-type
+select month, "sub-type", count("sub-type") from monitor_producers_by_type group by "sub-type", month order by month, "sub-type";

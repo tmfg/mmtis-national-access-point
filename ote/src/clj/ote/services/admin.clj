@@ -207,6 +207,37 @@
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
+(defn monthly-types-for-monitor-report [db]
+  (create-temp-view-for-monthly-producer-counts-by-sub-type! db)
+  (let [type-month-count-table (monthly-producer-counts-by-sub-type db)
+        months (distinct (map :month type-month-count-table)) ;; order is important
+        subtypes (distinct (map :sub-type type-month-count-table))
+        by-month (group-by :month type-month-count-table) 
+        by-subtype (group-by :subtype type-month-count-table)
+        type-colors {"taxi" "rgb(242, 195, 19)"
+                     "request" "rgb(233, 76, 59)"
+                     "schedule" "rgb(24, 189, 155)"
+                     "terminal" "rgb(157, 88, 181)"
+                     "rentals" "rgb(255, 255, 42)"
+                     "parking" "rgb(255, 108, 84)"
+                     "brokerage" "rgb(53, 152, 220)"} 
+        monthly-series-for-type (fn [t]
+                                  (vec 
+                                   (for [month months]
+                                     (:count (first (filter #(= t (:sub-type %)) (get by-month month)))))))
+        type-dataset (fn [t]
+                       {:label t
+                        :data (monthly-series-for-type t)
+                        :backgroundColor (get type-colors t)})]
+    
+    {:labels (vec months)
+     :datasets (mapv type-dataset subtypes)}))
+
+(defn monitor-report [db type]
+  (println "monitor-report called, returning composite map")
+  {:monthly-operators  (monthly-registered-operators db)
+   :operator-types (operator-type-distribution db)
+   :monthly-types (monthly-types-for-monitor-report db)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
@@ -280,7 +311,6 @@
 
 (define-service-component CSVAdminReports
   {}
-
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/transport-operator/:type"
@@ -288,6 +318,23 @@
         user :user}
     (require-admin-user "reports/transport-operator" (:user user))
     (transport-operator-report db type)))
+
+(define-service-component MonitorReport []
+  {}
+  (GET "/admin/reports/monitor-report"
+       {user :user}
+    (require-admin-user "reports/monitor" (:user user))
+    (http/transit-response (monitor-report db "all"))))
+
+(define-service-component MonitorReportCSV
+  {}
+  ^{:format :csv
+    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/monitor/:type"
+       {{:keys [type]} :params
+        user :user}
+    (require-admin-user "reports/monitor" (:user user))
+    (monitor-report db type)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle

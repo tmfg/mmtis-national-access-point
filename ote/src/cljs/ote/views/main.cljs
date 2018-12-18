@@ -38,6 +38,7 @@
             [ote.views.transit-visualization :as transit-visualization]
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
+            [ote.views.monitor :as monitor]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
@@ -147,6 +148,8 @@
                     :new-route [route/new-route e! app]
                     :edit-route [route/edit-route-by-id e! app]
 
+                    :monitor [monitor/monitor-main e! app]
+                    
                     ;; 60days pre notice views
                     :new-notice [notice/new-pre-notice e! app]
                     :edit-pre-notice [notice/edit-pre-notice-by-id e! app]

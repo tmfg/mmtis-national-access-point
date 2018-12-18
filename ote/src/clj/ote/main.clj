@@ -101,6 +101,14 @@
                     (admin-service/->CSVAdminReports)
                     [:db :http])
 
+   :monitor (component/using
+                    (admin-service/->MonitorReport)
+                    [:db :http])
+
+   :monitor-csv (component/using
+                    (admin-service/->MonitorReportCSV)
+                    [:db :http])
+
    :operators (component/using (operators-service/->Operators) [:db :http])
 
    :settings (component/using (settings-service/->Settings) [:db :http])
