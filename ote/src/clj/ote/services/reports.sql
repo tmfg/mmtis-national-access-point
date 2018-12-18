@@ -5,7 +5,7 @@ SELECT op.name, op.id, op.phone, COALESCE(NULLIF(op.email, ''), u.email) AS "ema
   FROM "transport-operator" op
          JOIN "user" u ON u.name = (SELECT author
                                       FROM "revision" r
-                                             JOIN "group" g ON op."ckang-roup-id" = g.id
+                                             JOIN "group" g ON op."ckan-roup-id" = g.id
                                      WHERE r.id = g."revision_id"
                                      LIMIT 1)
  WHERE (SELECT COUNT(*) FROM "transport-service" ts WHERE ts."transport-operator-id" = op.id) = 0
