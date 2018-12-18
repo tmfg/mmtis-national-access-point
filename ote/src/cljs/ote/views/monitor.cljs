@@ -46,7 +46,8 @@
                                             (let [canvas (.getElementById js/document dom-name)
                                                   config {:type "doughnut"
                                                           :options {:responsive true
-                                                                    :legend {:position "bottom"}}
+                                                                    ;; :legend {:position "bottom"}
+                                                                    }
                                                           :data {:labels (:labels data)
                                                                  :datasets (:datasets data)}}
                                                   new-chart (js/Chart. canvas (clj->js config))]
@@ -59,10 +60,9 @@
   (e! (controller/->QueryMonitorReport))
   (if monitor-data
     (let [companies-by-month-data {:labels (mapv :month (:monthly-operators monitor-data))
-                                   :datasets [{:label "Rekisteröityneitä palveluntuottajia" :data (mapv :sum (:monthly-operators monitor-data))}]}
-          type-by-month-data {:labels ["11/2018" "12/2018" "1/2019"]
-                              :datasets [{:label "hommia" :data  [1742 3121 4311] :backgroundColor "red"}
-                                         {:label "jutskia" :data [111 222 333] :backgroundColor "blue"}]}
+                                   :datasets [{:label "Rekisteröityneitä palveluntuottajia"
+                                               :data (mapv :sum (:monthly-operators monitor-data))
+                                               :backgroundColor "rgb(0, 170, 187)"}]}
           provider-share-by-type-data {:labels (mapv :sub-type (:operator-types monitor-data))
                                        :datasets [{:data (mapv :count (:operator-types monitor-data))
                                                    :backgroundColor ["red" "orange" "blue"]
@@ -71,5 +71,6 @@
         [:div {:style {:width "50%"}}
          [barchart-inner "chart-companies-by-month" companies-by-month-data]
          [doughnut-inner "chart-share-by-type" provider-share-by-type-data]
-         #_[barchart-inner "chart-type-by-month" type-by-month-data]]))
+         (println "doughnut data is " (pr-str provider-share-by-type-data))
+         [barchart-inner "chart-type-by-month" (:monthly-types monitor-data)]]))
     [common/loading-spinner]))
