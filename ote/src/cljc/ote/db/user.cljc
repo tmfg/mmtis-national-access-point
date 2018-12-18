@@ -21,8 +21,8 @@
   ["user" ::user]
   ["password-reset-request" ::password-reset-request
    {"created" :ote.db.modification/created
-    "created-by" :ote.db.modification/created-by}])
-
+    "created-by" :ote.db.modification/created-by}]
+  ["member" ::member])
 
 (defn username-valid? [username]
   (boolean (and (string? username)
