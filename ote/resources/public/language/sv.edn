@@ -289,8 +289,7 @@
   :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
   :SEA-ROUTE-link-text " (Öppna rutteditorn för sjötrafik här)"
   ;; FIXME: Partially Google translated: please improve
-  :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**\n\n
-Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjänsten förmedlar flera företags tjänster, fyll i företagens namn och FO-nummer här.
+  :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**
 \n\n**Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.**")
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
   :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
@@ -501,8 +500,8 @@ Om tjänsten tillhandahålls av flera tjänsteproducenter eller om man via tjän
    :other-services "Övriga tjänster"
    :pricing "Prisinformation"
    :service-hours "Betjäningstider"
-   :on-behalf-errand "På uppdrag av ärendet"
-   :customer-account-info "Kundkonto info"
+   :on-behalf-errand "Acting on behalf of customer"
+   :customer-account-info "Användarkonto"
    :disruptions "Störningsinformation"
    :payment-interface "Biljett- och försäljningsgränssnitt"
    :other "Övrigt"
@@ -883,7 +882,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  {:loading-routes "Laddar rutterna för tjänsten."}
 
  :common-texts
- {:front-page-help-text "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
+ {:business-id-and-aux-names "Företagsnamn och hjälpnamn"
+  :contact-details-plural "Kontaktuppgifter för företagsnamn"
+  :contact-details "Kontaktuppgifter"
+  :fetch-from-ytj "Hämta data från YTJ"
+  :check-your-input "Please check that the details you entered are correct."
+  :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
+
+  :front-page-help-text "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
   :front-page-start-ote-query-header "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
@@ -956,7 +962,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :minutes-placeholder "mm"
 
   :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."
+  :server-error-try-later "Problem med tjänsten. Vänligen försök igen senare."
+
   :forbidden "Du har inte behörighet att visa innehållet."
+  :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"
+  
   :nap-data-license (:md "Informationen Du ger i detta formulär publiceras i NAP-katalogen som öppen data med licensen [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
 
   :save-user-success "Profil sparad"
@@ -970,6 +980,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :delete-transport-operator
   {:title "Ta bort hela tjänsteproducenter?"
+   :title-base-view "Palveluntuottajan poistaminen"
    :confirm ["Vill du ta bort tjänsteproducenter \"" :name "\" slutgiltigt?"]}
 
   :navigation-prompt

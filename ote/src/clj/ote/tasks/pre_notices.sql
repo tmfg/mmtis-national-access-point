@@ -22,7 +22,9 @@ WITH changes_with_regions AS (
          (SELECT array_agg(x.reg)
             FROM (SELECT DISTINCT unnest(p."finnish-regions") as reg
                     FROM gtfs_package p
-                   WHERE p.id = ANY(chg."package-ids")) x) AS "finnish-regions"
+                   WHERE p.id = ANY(chg."package-ids")
+                     AND p."deleted?" = FALSE) x) AS "finnish-regions"
+
     FROM "gtfs-transit-changes" chg
     WHERE chg.date = CURRENT_DATE
 
@@ -38,11 +40,12 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
        to_char(date,'yyyy-mm-dd') as date,
        ts.id AS "transport-service-id"
   FROM changes_with_regions chg
-  JOIN "transport-service" ts ON ts.id = chg."transport-service-id"
+  JOIN "transport-service" ts ON ts.id = chg."transport-service-id" AND ts."sub-type" = 'schedule'
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id",
        gtfs_package p
  WHERE chg.date = CURRENT_DATE
    AND p.id = ANY(chg."package-ids")
+   AND p."deleted?" = FALSE
    AND p.created > CURRENT_DATE - interval '8 hours'
    AND chg."change-date" IS NOT NULL
    AND (chg."finnish-regions" IS NULL OR
@@ -58,6 +61,7 @@ WITH changes_with_regions AS (
             FROM (SELECT DISTINCT unnest(p."finnish-regions") as reg
                     FROM gtfs_package p
                    WHERE p.id = ANY(chg."package-ids")) x) AS "finnish-regions"
+                     AND p."deleted?" = FALSE
     FROM "gtfs-transit-changes" chg
 )
 SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",

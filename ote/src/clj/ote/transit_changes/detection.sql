@@ -5,13 +5,15 @@ WITH dates AS (
     FROM generate_series(0, :end-date::DATE - :start-date::DATE) s (d)
 )
 SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id",
-       string_agg(rh.hash::text, ' ') as hash
+       string_agg(rh.hash::text, ' ' ORDER BY p."external-interface-description-id" ASC) as hash
   FROM dates d
   LEFT JOIN "gtfs-date-hash" dh
     ON (dh.date = d.date AND
         dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
+  -- Join gtfs_package to get external-interface-description-id
+  JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
   LEFT JOIN LATERAL unnest(dh."route-hashes") AS rh ON TRUE
- GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id", dh."package-id"
+ GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id"
  ORDER BY d.date;
 
 -- name: service-packages-for-date-range
@@ -31,6 +33,7 @@ SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
         stop."stop-name", stop."stop-lat", stop."stop-lon"
   FROM "detection-route" r
+  JOIN "gtfs_package" p ON p.id = r."package-id" AND p."deleted?" = FALSE
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
   JOIN LATERAL unnest(t.trips) trip ON true
   JOIN LATERAL unnest(trip."stop-times") as stoptime ON TRUE
@@ -39,8 +42,18 @@ SELECT t."package-id", trip."trip-id",
    AND ROW(r."package-id", t."service-id")::service_ref IN
        (SELECT * FROM gtfs_services_for_date(
         (SELECT gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE)), :date::DATE))
-   AND COALESCE(r."route-hash-id",'') = COALESCE(:route-hash-id::TEXT,'')
- ORDER BY t."package-id", trip."trip-id", stoptime."stop-sequence";
+   AND r."route-hash-id" = :route-hash-id
+ ORDER BY p."external-interface-description-id", t."package-id", trip."trip-id", stoptime."stop-sequence";
 
 -- name: generate-date-hashes
 SELECT gtfs_generate_date_hashes(:package-id::INTEGER);
+
+-- name: fetch-services-packages
+SELECT p.id as "package-id"
+  FROM "external-interface-description" e, "gtfs_package" p
+ WHERE e.id = p."external-interface-description-id"
+   AND e."transport-service-id" = :service-id;
+
+-- name: fetch-distinct-services-from-transit-changes
+SELECT distinct t."transport-service-id" as id
+  FROM "gtfs-transit-changes" t;

@@ -244,6 +244,11 @@
 
 (defn- transport-operator-report [db type]
   (case type
+    "all-emails"
+    (csv-data ["email"]
+              (map (juxt :email)
+                   (fetch-all-emails db)))
+
     "no-services"
     (csv-data ["nimi" "id" "email"]
               (map (juxt :name :id :email)

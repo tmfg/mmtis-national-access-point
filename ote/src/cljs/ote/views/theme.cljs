@@ -133,7 +133,7 @@
            ;; This determines the width of dialogs (12 * desktop-keyline-increment)
            ;; original value is 64
            :spacing {:desktop-keyline-increment 80}})}
-          [:span
+          [:div
 
              (when error-msg
                [flash-message-error e! error-msg])

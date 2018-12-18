@@ -287,7 +287,8 @@
      (first
       (specql/fetch db :gtfs/package
                     #{:gtfs/etag :gtfs/sha256}
-                    {:gtfs/external-interface-description-id interface-id}
+                    {:gtfs/external-interface-description-id interface-id
+                     :gtfs/deleted? false}
                     {::specql/order-by :gtfs/created
                      ::specql/order-direction :descending
                      ::specql/limit 1}))))

@@ -8,6 +8,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
+            [ote.db.user :as user]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
@@ -23,9 +24,13 @@
             [ote.access-rights :as access]
             [clojure.string :as str]
             [ote.nap.ckan :as ckan]
-            [clojure.set :as set])
+            [clojure.set :as set]
+            [ote.util.feature :as feature])
   (:import (java.time LocalTime)
-           (java.sql Timestamp)))
+           (java.sql Timestamp)
+           (java.util UUID)))
+
+; TODO: split file to transport-service and transport-operator
 
 (defqueries "ote/services/places.sql")
 (defqueries "ote/services/transport.sql")
@@ -140,8 +145,45 @@
      :transport-service-vector transport-services-vector
      :user cleaned-user}))
 
+(defn- create-group!
+  "Takes `op` operator and `user` and pairs user to organization in db using the member table. Sets role (Capacity) to 'admin'"
+  [db op user]
+  {:pre [(some? op)]}
+  (let [group (specql/insert! db ::t-operator/group
+                              {::t-operator/group-id (str (UUID/randomUUID))
+                               ::t-operator/group-name (str "transport-operator-" (::t-operator/id op))
+                               ::t-operator/is_organization true ;; TODO: verify is this needed?
+                               ::t-operator/type "organization"
+                               ::t-operator/description (or (::t-operator/ckan-description op) "")
+                               ::t-operator/title (::t-operator/name op)})
+        member (specql/insert! db ::user/member
+                               {::user/id (str (UUID/randomUUID))
+                                ::user/table_id (get-in user [:user :id])
+                                ::user/group_id (:ote.db.transport-operator/group-id group)
+                                ::user/table_name "user"
+                                ::user/capacity "admin"
+                                ::user/state "active"})]
+    (log/debug "create-group!: op=" op "\n user=" user "\n group=" group "\n member=" member)
+    group))
+
+(defn- update-group!
+  "Takes `op` operator and updates the group table for matching row. Returns number of affected rows."
+  [db op]
+  {:pre [(coll? op)
+         (and (some? (::t-operator/ckan-group-id op)) (string? (::t-operator/ckan-group-id op)))]}
+  (log/debug "update-group!: op=" op)
+  (let [group-resp (update! db ::t-operator/group
+                            {::t-operator/title       (::t-operator/name op)
+                             ::t-operator/description (or (::t-operator/ckan-description op) "")}
+                            {::t-operator/group-id (::t-operator/ckan-group-id op)})]
+
+    (when (not= 1 group-resp) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" group-resp)))
+    group-resp))
+
 (defn- create-transport-operator [nap-config db user data]
   ;; Create new transport operator
+  (log/debug (prn-str "create-transport-operator: data=" data))
+
   (tx/with-transaction db
     (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
 
@@ -163,8 +205,29 @@
                {::t-operator/id (::t-operator/id operator)})
       operator)))
 
+(defn- create-transport-operator-nap
+  "Takes `db`, `user` and operator `data`. Creates a new transport-operator and a group (organization) for it.
+   Links the transport-operator to group via member table"
+  [db user data]
+  {:pre [(some? data)]}
+  (log/debug (prn-str "create-transport-operator-nap: data=" data))
+  (tx/with-transaction db
+    (let [op (insert! db ::t-operator/transport-operator
+                      (dissoc data
+                              ::t-operator/id
+                              ::t-operator/ckan-description
+                              ::t-operator/ckan-group-id))
+          group (create-group! db op user)]
+
+      (update! db ::t-operator/transport-operator
+               {::t-operator/ckan-group-id (::t-operator/group-id group)} ;;TODO: miksi alias, me niskö suoraan id:llä?
+               {::t-operator/id (::t-operator/id op)})
+      op)))
+
 (defn- update-transport-operator [nap-config db user {id ::t-operator/id :as data}]
   ;; Edit transport operator
+  (log/debug (prn-str "update-transport-operator: data=" data))
+
   (authorization/with-transport-operator-check
     db user id
     #(tx/with-transaction db
@@ -180,6 +243,7 @@
                (fetch db ::t-operator/transport-operator
                       #{::t-operator/ckan-group-id}
                       {::t-operator/id id})))]
+
          ;; We show only title in ckan side - so no need to update other values
          (ckan/update-organization!
           ckan
@@ -190,10 +254,51 @@
          ;; Return operator
          operator))))
 
-(defn- save-transport-operator [nap-config db user data]
-  ((if (:new? data)
-     create-transport-operator
-     update-transport-operator) nap-config db user data))
+(defn- select-op-keys-to-update [op]
+  (select-keys op
+               [::t-operator/name
+                ::t-operator/billing-address
+                ::t-operator/visiting-address
+                ::t-operator/phone
+                ::t-operator/gsm
+                ::t-operator/email
+                ::t-operator/homepage]))
+
+(defn- update-transport-operator-nap [db user {id ::t-operator/id :as data}]
+  ;; Edit transport operator
+  {:pre [(coll? data)
+         (number? (::t-operator/id data))]}
+  (log/debug (prn-str "update-transport-operator: data=" data))
+  (authorization/with-transport-operator-check
+    db user id
+    #(tx/with-transaction
+       db
+       (update! db ::t-operator/transport-operator
+                (select-op-keys-to-update data)
+                {::t-operator/id (::t-operator/id data)})
+       (update-group! db data))))
+
+(defn- upsert-transport-operator
+  "Creates or updates a transport operator for each company name. Operators will have the same details, except the name"
+  [nap-config db user data]
+  {:pre [(some? data)]}
+  ;(log/debug (prn-str "upsert-transport-operator: data= " data " \n   user=" user " \n   config=" nap-config))
+  (let [operator data]
+      ;(log/debug (prn-str "upsert-transport-operator: operator= " operator))
+      (if (::t-operator/id operator)
+        (update-transport-operator-nap db user operator)
+        (create-transport-operator-nap db user operator))))
+
+(defn- save-transport-operator [config db user data]
+  {:pre [(some? data)]}
+  (log/debug (prn-str "save-transport-operator " data))
+
+  (if (feature/feature-enabled? config :open-ytj-integration)
+    (upsert-transport-operator (:nap config) db user data)
+    ((if (:new? data)
+       create-transport-operator
+       update-transport-operator) (:nap config) db user data))
+  )
 
 (defn ensure-bigdec [value]
   (when (not (nil? value )) (bigdec value)))
@@ -230,12 +335,26 @@
         update-rental-price-classes)
     service))
 
+(defn mark-package-as-deleted
+  "When external interface is deleted (when it is delted or service is delted) we don't want to
+  remove all gtfs data that we have aquired. So we only mark gtfs_packages.deleted = TRUE for those packages and
+  remove the interface url."
+  [db external-interface-description-id]
+
+  ;; set all found packages as deleted
+  (specql/update! db :gtfs/package
+                  {:gtfs/deleted? true}
+                  {:gtfs/external-interface-description-id external-interface-description-id}))
+
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removed-resources]
 
   ;; Delete removed services from OTE db
   (doseq [{id ::t-service/id} removed-resources]
+    ;; Mark possible gtfs_packages to removed and then remove interface
+    (mark-package-as-deleted db id)
+
     (specql/delete! db ::t-service/external-interface-description
                     {::t-service/id id}))
 
@@ -262,7 +381,7 @@
     (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
 
 (defn save-external-companies
-  "Service can contain an url that contains company nmes and business-id. Sevice can also contain an imported csv file
+  "Service can contain an url that contains company names and business-id. Sevice can also contain an imported csv file
   with company names and business-ids."
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
@@ -349,67 +468,69 @@
 
 (defn- transport-routes-auth
   "Routes that require authentication"
+  [db config]
+  (let [nap-config (:nap config)]
+    (routes
 
-  [db nap-config]
-  (routes
+      (GET "/transport-service/:id" [id]
+        (let [ts (get-transport-service db (Long/parseLong id))]
+          (if-not ts
+            {:status 404}
+            (http/no-cache-transit-response ts))))
 
-    (GET "/transport-service/:id" [id]
-      (let [ts (get-transport-service db (Long/parseLong id))]
-        (if-not ts
-          {:status 404}
-          (http/no-cache-transit-response ts))))
+      (GET "/t-operator/:id" [id :as {user :user}]
+        (let [to (edit-transport-operator db user (Long/parseLong id))]
+          (if-not to
+            {:status 404}
+            (http/no-cache-transit-response to))))
 
-    (GET "/t-operator/:id" [id :as {user :user}]
-      (let [to (edit-transport-operator db user (Long/parseLong id))]
-        (if-not to
-          {:status 404}
-          (http/no-cache-transit-response to))))
+      (POST "/transport-operator/group" {user :user}
+        (http/transit-response
+          (get-transport-operator db {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
 
-    (POST "/transport-operator/group" {user :user}
-      (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
+      (POST "/transport-operator/data" {user :user}
+        (http/transit-response
+          (get-user-transport-operators-with-services db (:groups user) (:user user))))
 
-    (POST "/transport-operator/data" {user :user}
-      (http/transit-response
-        (get-user-transport-operators-with-services db (:groups user) (:user user))))
+      (POST "/transport-operator" {form-data :body
+                                   user      :user}
+        (http/transit-response
+          (save-transport-operator config db user
+                                   (http/transit-request form-data))))
 
-    (POST "/transport-operator" {form-data :body
-                                 user      :user}
-      (http/transit-response
-        (save-transport-operator nap-config db user
-                                 (http/transit-request form-data))))
+      (POST "/transport-service" {form-data :body
+                                  user      :user}
+        (save-transport-service-handler nap-config db user (http/transit-request form-data)))
 
-    (POST "/transport-service" {form-data :body
-                                user      :user}
-      (save-transport-service-handler nap-config db user (http/transit-request form-data)))
+      (POST "/transport-service/delete" {form-data :body
+                                         user      :user}
+        (http/transit-response
+          (delete-transport-service! nap-config db user
+                                     (:id (http/transit-request form-data)))))
 
-    (POST "/transport-service/delete" {form-data :body
-                                       user      :user}
-      (http/transit-response
-        (delete-transport-service! nap-config db user
-                                   (:id (http/transit-request form-data)))))
-
-    (POST "/transport-operator/delete" {form-data :body
-                                        user      :user}
-      (http/transit-response
-        (delete-transport-operator! nap-config db user
-                                    (:id (http/transit-request form-data)))))))
+      (POST "/transport-operator/delete" {form-data :body
+                                          user      :user}
+        (http/transit-response
+          (delete-transport-operator! nap-config db user
+                                      (:id (http/transit-request form-data))))))))
 
 (defn- transport-routes
   "Unauthenticated routes"
-  [db nap-config]
+  [db config]
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
       (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
 
-(defrecord Transport [nap-config]
+    ))
+
+(defrecord Transport [config]
   component/Lifecycle
   (start [{:keys [db http] :as this}]
     (assoc
       this ::stop
-      [(http/publish! http (transport-routes-auth db nap-config))
-       (http/publish! http {:authenticated? false} (transport-routes db nap-config))]))
+      [(http/publish! http (transport-routes-auth db config))
+       (http/publish! http {:authenticated? false} (transport-routes db config))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]
       (s))

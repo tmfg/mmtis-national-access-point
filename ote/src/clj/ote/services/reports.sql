@@ -11,6 +11,24 @@ SELECT op.name, op.id, op.phone, COALESCE(NULLIF(op.email, ''), u.email) AS "ema
  WHERE (SELECT COUNT(*) FROM "transport-service" ts WHERE ts."transport-operator-id" = op.id) = 0
  ORDER BY op.name ASC;
 
+--name: fetch-all-emails
+SELECT u."email" as email
+  FROM public.user u
+ WHERE email IS NOT NULL
+   AND u.state = 'active'
+
+UNION
+
+SELECT t."contact-email" AS email
+  FROM "transport-service" t
+ WHERE t."contact-email" IS NOT NULL
+
+UNION
+
+SELECT o.email AS email
+  FROM "transport-operator" o
+ WHERE o."deleted?" = FALSE
+   AND o.email IS NOT NULL;
 
 --name: fetch-operators-brokerage
 SELECT op.name,

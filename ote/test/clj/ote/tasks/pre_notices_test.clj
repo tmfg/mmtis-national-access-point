@@ -72,17 +72,19 @@
 
   (testing "inserted change is found and sent"
     ;; Stupid way to clean up database. But package is hard coded to these test. So it must remain the same.
+    (specql/delete! (:db *ote*) :gtfs/detection-route
+                    {:gtfs/package-id 1}) ;; Clean detection-route to prevent foreign key problems
     (specql/delete! (:db *ote*) :gtfs/package
                     {:gtfs/id 1})
     ;; Create package-id (email content is dependent on this id)
     (specql/insert! (:db *ote*) :gtfs/package
                     {:gtfs/id 1
                      :gtfs/transport-operator-id 1
-                     :gtfs/transport-service-id  1
+                     :gtfs/transport-service-id  2
                      :gtfs/created               (tc/to-sql-date (time/now))})
 
     (specql/insert! (:db *ote*) :gtfs/transit-changes
-                    {:gtfs/transport-service-id 1
+                    {:gtfs/transport-service-id 2
                      :gtfs/date                 (tc/to-sql-date (time/now))
                      :gtfs/current-week-date    (tc/to-sql-date (time/now))
                      :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
