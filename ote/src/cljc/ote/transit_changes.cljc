@@ -69,6 +69,11 @@
   [stop]
   [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop)])
 
+(defn stop-key-for-stop-list
+  "Use lat, lon and stop-sequence values as stop-key. Otherwice same stop can't be shown twice in stop list."
+  [stop]
+  [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop) (:gtfs/stop-sequence stop)])
+
 (defn trip-stop-differences
   "Returns the amount of differences in stop times and stop sequence and stop names for the given trip pair."
   [left right]
@@ -141,15 +146,19 @@
     ;; Combine the same stops!
     (sort-by
       earliest-departure-time
-      (mapv (fn [[_ stop-times]]
-            {:gtfs/stop-name (str/join "->" (into #{} (map :gtfs/stop-name stop-times)))
-             :gtfs/departure-time-date1 (:gtfs/departure-time
-                                         (first (filter #(= 1 (:trip %)) stop-times)))
-             :gtfs/departure-time-date2 (:gtfs/departure-time
-                                         (first (filter #(= 2 (:trip %)) stop-times)))})
+      (sort-by :gtfs/stop-name
+               (mapv (fn [[_ stop-times]]
+                       {:gtfs/stop-name (str/join "->"
+                                                  (into #{} (map
+                                                              #(str (inc (:gtfs/stop-sequence %)) " " (:gtfs/stop-name %))
+                                                              stop-times)))
+                        :gtfs/departure-time-date1 (:gtfs/departure-time
+                                                     (first (filter #(= 1 (:trip %)) stop-times)))
+                        :gtfs/departure-time-date2 (:gtfs/departure-time
+                                                     (first (filter #(= 2 (:trip %)) stop-times)))})
 
-          (group-by stop-key
-                        (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq)))))))
+                     (group-by stop-key-for-stop-list
+                               (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))))
 
 
 (defn combine-trips [date1-trips date2-trips]
