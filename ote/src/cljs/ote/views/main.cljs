@@ -22,6 +22,7 @@
             [ote.app.controller.flags :as flags]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
+            [ote.views.own-services :as os]
             [ote.views.login :as login]
             [ote.views.user :as user]
             [ote.views.admin :as admin]
@@ -85,16 +86,20 @@
             [:div.ote-sovellus
              [top-nav e! app is-scrolled? desktop?]
 
-             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))}
+             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))
+                    :style {:min-height "100%"
+                            :display "flex"
+                            :flex-direction "column"
+                            :justify-content "space-between"}}
               (if (not loaded?)
                 [common/loading-spinner]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
                    (stylefy/use-style (merge
-                                       {:transition "margin-top 300ms ease"}
-                                       (if (or (not desktop?) @is-scrolled?)
-                                         {:margin-top "56px"}))))
+                                        {:transition "margin-top 300ms ease"}
+                                        (if (or (not desktop?) @is-scrolled?)
+                                          {:margin-top "56px"}))))
                  [:div (cond
                          (= :front-page (:page app))
                          {:class "container-fluid"}
@@ -117,7 +122,7 @@
                     :register [register/register e! (:register app) (:user app)]
                     :user [user/user e! (:user app)]
                     :front-page [fp/front-page e! app]
-                    :own-services [fp/own-services e! app]
+                    :own-services [os/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
                     :transport-operator (if (flags/enabled? :open-ytj-integration) [to-ytj/operator-ytj e! app] [to/operator e! app]) ; TODO: ytj replaces old solution when ready
 
@@ -153,5 +158,5 @@
                     (:transit-changes :authority-pre-notices)
                     [transit-changes/transit-changes e! app]
 
-                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])]
-             [footer/footer e!]])]]))))
+                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+              [footer/footer e!]]])]]))))
