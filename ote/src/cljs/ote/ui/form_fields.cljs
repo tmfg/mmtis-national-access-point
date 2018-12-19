@@ -867,7 +867,7 @@
              ^{:key i}
              [:div {:style {:display "flex" :padding-top "10px"}}
               [:span
-               [ui/checkbox {:id (str i "_" (name option))
+               [ui/checkbox {:id (str i "_" (str option))
                              :label      (when-not table? (show-option option))
                              :checked    checked?
                              :disabled   (not (option-enabled? option))
@@ -1017,3 +1017,27 @@
           :form [company-input-fields update! companies data]
           ;; default
           ""))]]))
+
+(defmethod field :external-button [{:keys [label on-click disabled primary secondary style]}]
+  ;; Options
+  ; :label Button label text for displaying
+  ; :on-click On-click callback fn
+  ; :disabled Boolean property for disabling button
+  ; primary
+  ; secondary
+  [:div
+   [ui/raised-button
+    {:label     label
+     :primary   primary
+     :secondary secondary
+     :on-click  #(on-click)
+     :disabled  disabled
+     :style     style
+     }]]
+  )
+
+(defmethod field :text-label [{:keys [label style h-style]}]
+  ;; Options
+  ; :label Text for displaying
+  [:div (when style {:style style}) (if h-style [h-style label] [:p label])]
+  )

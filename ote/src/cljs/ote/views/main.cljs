@@ -6,6 +6,7 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.common :refer [linkify ckan-iframe-dialog]]
             [ote.views.transport-operator :as to]
+            [ote.views.transport-operator-ytj :as to-ytj]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
@@ -21,6 +22,7 @@
             [ote.app.controller.flags :as flags]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
+            [ote.views.own-services :as os]
             [ote.views.login :as login]
             [ote.views.user :as user]
             [ote.views.admin :as admin]
@@ -36,6 +38,7 @@
             [ote.views.transit-visualization :as transit-visualization]
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
+            [ote.views.monitor :as monitor]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
@@ -84,16 +87,20 @@
             [:div.ote-sovellus
              [top-nav e! app is-scrolled? desktop?]
 
-             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))}
+             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))
+                    :style {:min-height "100%"
+                            :display "flex"
+                            :flex-direction "column"
+                            :justify-content "space-between"}}
               (if (not loaded?)
                 [common/loading-spinner]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
                    (stylefy/use-style (merge
-                                       {:transition "margin-top 300ms ease"}
-                                       (if (or (not desktop?) @is-scrolled?)
-                                         {:margin-top "56px"}))))
+                                        {:transition "margin-top 300ms ease"}
+                                        (if (or (not desktop?) @is-scrolled?)
+                                          {:margin-top "56px"}))))
                  [:div (cond
                          (= :front-page (:page app))
                          {:class "container-fluid"}
@@ -116,9 +123,9 @@
                     :register [register/register e! (:register app) (:user app)]
                     :user [user/user e! (:user app)]
                     :front-page [fp/front-page e! app]
-                    :own-services [fp/own-services e! app]
+                    :own-services [os/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
-                    :transport-operator [to/operator e! app]
+                    :transport-operator (if (flags/enabled? :open-ytj-integration) [to-ytj/operator-ytj e! app] [to/operator e! app]) ; TODO: ytj replaces old solution when ready
 
                     ;; Routes for the service form, one for editing an existing one by id
                     ;; and another when creating a new service
@@ -141,6 +148,8 @@
                     :new-route [route/new-route e! app]
                     :edit-route [route/edit-route-by-id e! app]
 
+                    :monitor [monitor/monitor-main e! app]
+                    
                     ;; 60days pre notice views
                     :new-notice [notice/new-pre-notice e! app]
                     :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
@@ -152,5 +161,5 @@
                     (:transit-changes :authority-pre-notices)
                     [transit-changes/transit-changes e! app]
 
-                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])]
-             [footer/footer e!]])]]))))
+                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+              [footer/footer e!]]])]]))))

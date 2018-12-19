@@ -2,7 +2,7 @@
 SELECT date, hash::text
   FROM "gtfs-date-hash"
  WHERE hash IS NOT NULL
-   AND "package-id" IN (SELECT id FROM gtfs_package WHERE "transport-operator-id" = :operator-id)
+   AND "package-id" IN (SELECT id FROM gtfs_package WHERE "transport-operator-id" = :operator-id AND p."deleted?" = FALSE)
    -- Take dates from two months ago two 1 year in the future (but always full years)
    AND date >= make_date(EXTRACT(YEAR FROM (current_date - '2 months'::interval)::date)::integer, 1, 1)
    AND date <= make_date(EXTRACT(YEAR FROM (current_date + '1 year'::interval)::date)::integer, 12, 31);
@@ -139,7 +139,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
           JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date))
             AS ps (package_id) ON TRUE
           -- Join gtfs_package to get external-interface-description-id
-          JOIN gtfs_package p ON p.id = package_id
+          JOIN gtfs_package p ON p.id = package_id AND p."deleted?" = FALSE
           -- Join all date hashes for packages
           JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
           -- Join unnested per route hashes
@@ -186,5 +186,5 @@ SELECT p.id, p.created,
   FROM gtfs_package p
   JOIN LATERAL gtfs_package_date_range(p.id) as dr (daterange) ON TRUE
   JOIN "external-interface-description" eid ON p."external-interface-description-id" = eid.id
- WHERE p."transport-service-id" = :service-id
+ WHERE p."transport-service-id" = :service-id AND p."deleted?" = FALSE
  ORDER BY p.created DESC;

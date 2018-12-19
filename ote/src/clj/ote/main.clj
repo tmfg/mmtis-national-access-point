@@ -59,7 +59,7 @@
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
 
    ;; Services for the frontend
-   :transport (component/using (transport-service/->Transport (:nap config)) [:http :db])
+   :transport (component/using (transport-service/->Transport config) [:http :db])
    :viewer (component/using (viewer/->Viewer) [:http])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
@@ -99,6 +99,14 @@
 
    :admin-reports (component/using
                     (admin-service/->CSVAdminReports)
+                    [:db :http])
+
+   :monitor (component/using
+                    (admin-service/->MonitorReport)
+                    [:db :http])
+
+   :monitor-csv (component/using
+                    (admin-service/->MonitorReportCSV)
                     [:db :http])
 
    :operators (component/using (operators-service/->Operators) [:db :http])
