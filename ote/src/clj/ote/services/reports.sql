@@ -121,8 +121,8 @@ END	AS "service-type",
 -- name: monthly-registered-operators
 -- returns a cumulative sum of operators created up until the row's month.
 select
-  extract(year from created) || '-' || lpad(extract(month from created)::text, 2, '0') as month,
-  sum(count(name)) over (order by (extract(year from created) || '-' || lpad(extract(month from created)::text, 2, '0')))
+  to_char(created, 'YYYY-MM') as month,
+  sum(count(name)) over (order by to_char(created, 'YYYY-MM'))
   from "group"
   group by month
   order by month;
@@ -138,7 +138,7 @@ select
 -- name: create-temp-view-for-monthly-producer-counts-by-sub-type!
 create or replace temporary view
     monitor_producers_by_type as
-    select extract(year from gr.created) || '-' || lpad(extract(month from gr.created)::text, 2, '0') as month,
+    select to_char(gr.created, 'YYYY-MM') as month,
     ts.id as tsid,
     top.id as toid,
     ts."sub-type"

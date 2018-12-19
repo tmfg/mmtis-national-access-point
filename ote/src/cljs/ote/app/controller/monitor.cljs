@@ -9,8 +9,6 @@
 
 (define-event MonitorReportResponse [response]
   {}
-  (println "app monitor data:" (pr-str response))
-  
   (assoc app
          :monitor-data response
          :monitor-loading? false))
