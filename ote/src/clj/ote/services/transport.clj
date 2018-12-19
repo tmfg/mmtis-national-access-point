@@ -147,20 +147,22 @@
   [db op user]
   {:pre [(some? op)]}
   (let [group (specql/insert! db ::t-operator/group
-                              {::t-operator/group-id (str (UUID/randomUUID))
-                               ::t-operator/group-name (str "transport-operator-" (::t-operator/id op))
-                               ::t-operator/is_organization true ;; TODO: verify is this needed?
-                               ::t-operator/type "organization"
-                               ::t-operator/description (or (::t-operator/ckan-description op) "")
-                               ::t-operator/title (::t-operator/name op)})
+                              {::t-operator/group-id        (str (UUID/randomUUID))
+                               ::t-operator/group-name      (str "transport-operator-" (::t-operator/id op))
+                               ::t-operator/title           (::t-operator/name op)
+                               ::t-operator/description     (or (::t-operator/ckan-description op) "")
+                               ::t-operator/created         (java.util.Date.)
+                               ::t-operator/state           "active"
+                               ::t-operator/type            "organization"
+                               ::t-operator/approval_status "approved"
+                               ::t-operator/is_organization true})
         member (specql/insert! db ::user/member
-                               {::user/id (str (UUID/randomUUID))
-                                ::user/table_id (get-in user [:user :id])
-                                ::user/group_id (:ote.db.transport-operator/group-id group)
+                               {::user/id         (str (UUID/randomUUID))
+                                ::user/table_id   (get-in user [:user :id])
+                                ::user/group_id   (:ote.db.transport-operator/group-id group)
                                 ::user/table_name "user"
-                                ::user/capacity "admin"
-                                ::user/state "active"})]
-    (log/debug "create-group!: op=" op "\n user=" user "\n group=" group "\n member=" member)
+                                ::user/capacity   "admin"
+                                ::user/state      "active"})]
     group))
 
 (defn- update-group!
@@ -171,14 +173,13 @@
   (let [count (update! db ::t-operator/group
                        {::t-operator/title       (::t-operator/name op)
                         ::t-operator/description (or (::t-operator/ckan-description op) "")}
-                       {::t-operator/group-id (::t-operator/ckan-group-id) op})
-        (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))]
+                       {::t-operator/group-id (::t-operator/ckan-group-id op)})]
+    (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))
     count))
 
 (defn- create-transport-operator [nap-config db user data]
   ;; Create new transport operator
   (log/debug (prn-str "create-transport-operator: data=" data))
-
   (tx/with-transaction db
     (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
 
