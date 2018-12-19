@@ -44,9 +44,9 @@ SELECT op.name,
  ORDER BY op.name ASC;
 
 -- name: fetch-operators-with-sub-contractors
--- The first select operators that does not have sub companies on their services,
--- then all operators that have sub companeis but do not have anything in service_company table
--- then select all that are.
+-- In the first selection select operators that do not have any sub companies.
+-- Then select all operators that have sub companies in transport-service table, but don't have anything in service_company table.
+-- And finally select all operators that have sub companies from external url or from csv upload.
 SELECT op.name as "operator", op."business-id" as "business-id", '-' as "sub-company", '-' as "sub-business-id",
        ts.name as "service-name",
         replace(
