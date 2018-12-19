@@ -69,8 +69,11 @@
                                                    :label "Palvelut tyypeittäin"}]}]
       (fn []
         [:div {:style {:width "50%"}}
+         [:p "Liikkumispalveluiden tuottamiseen osallistuvat yritykset"]
          [barchart-inner "chart-companies-by-month" companies-by-month-data]
+         [:p "Palveluntuottajien tämän hetkinen lukumäärä liikkumispalvelutyypeittäin"]
          [doughnut-inner "chart-share-by-type" provider-share-by-type-data]
          (println "doughnut data is " (pr-str provider-share-by-type-data))
+         [:p "Tuottajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan"]
          [barchart-inner "chart-type-by-month" (:monthly-types monitor-data)]]))
     [common/loading-spinner]))
