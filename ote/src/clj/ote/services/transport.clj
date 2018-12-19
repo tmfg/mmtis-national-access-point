@@ -168,14 +168,12 @@
   [db op]
   {:pre [(coll? op)
          (and (some? (::t-operator/ckan-group-id op)) (string? (::t-operator/ckan-group-id op)))]}
-  (log/debug "update-group!: op=" op)
-  (let [group-resp (update! db ::t-operator/group
-                            {::t-operator/title       (::t-operator/name op)
-                             ::t-operator/description (or (::t-operator/ckan-description op) "")}
-                            {::t-operator/group-id (::t-operator/ckan-group-id op)})]
-
-    (when (not= 1 group-resp) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" group-resp)))
-    group-resp))
+  (let [count (update! db ::t-operator/group
+                       {::t-operator/title       (::t-operator/name op)
+                        ::t-operator/description (or (::t-operator/ckan-description op) "")}
+                       {::t-operator/group-id (::t-operator/ckan-group-id) op})
+        (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))]
+    count))
 
 (defn- create-transport-operator [nap-config db user data]
   ;; Create new transport operator
@@ -207,7 +205,6 @@
    Links the transport-operator to group via member table"
   [db user data]
   {:pre [(some? data)]}
-  (log/debug (prn-str "create-transport-operator-nap: data=" data))
   (tx/with-transaction db
     (let [op (insert! db ::t-operator/transport-operator
                       (dissoc data
@@ -217,7 +214,7 @@
           group (create-group! db op user)]
 
       (update! db ::t-operator/transport-operator
-               {::t-operator/ckan-group-id (::t-operator/group-id group)} ;;TODO: miksi alias, me niskö suoraan id:llä?
+               {::t-operator/ckan-group-id (::t-operator/group-id group)}
                {::t-operator/id (::t-operator/id op)})
       op)))
 
@@ -263,9 +260,7 @@
 
 (defn- update-transport-operator-nap [db user {id ::t-operator/id :as data}]
   ;; Edit transport operator
-  {:pre [(coll? data)
-         (number? (::t-operator/id data))]}
-  (log/debug (prn-str "update-transport-operator: data=" data))
+  {:pre [(coll? data) (number? (::t-operator/id data))]}
   (authorization/with-transport-operator-check
     db user id
     #(tx/with-transaction
@@ -279,9 +274,7 @@
   "Creates or updates a transport operator for each company name. Operators will have the same details, except the name"
   [nap-config db user data]
   {:pre [(some? data)]}
-  ;(log/debug (prn-str "upsert-transport-operator: data= " data " \n   user=" user " \n   config=" nap-config))
   (let [operator data]
-      ;(log/debug (prn-str "upsert-transport-operator: operator= " operator))
       (if (::t-operator/id operator)
         (update-transport-operator-nap db user operator)
         (create-transport-operator-nap db user operator))))
