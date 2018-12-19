@@ -3,7 +3,6 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
-            [clj-time.core :as time]
             [specql.op :as op]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
@@ -26,9 +25,7 @@
             [ote.nap.ckan :as ckan]
             [clojure.set :as set]
             [ote.util.feature :as feature])
-  (:import (java.time LocalTime)
-           (java.sql Timestamp)
-           (java.util UUID)))
+  (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
 
@@ -148,22 +145,24 @@
 (defn- create-group!
   "Takes `op` operator and `user` and pairs user to organization in db using the member table. Sets role (Capacity) to 'admin'"
   [db op user]
-  {:pre [(some? op)]}
+  {:pre [(some? op) (some? (::t-operator/name op))]}
   (let [group (specql/insert! db ::t-operator/group
-                              {::t-operator/group-id (str (UUID/randomUUID))
-                               ::t-operator/group-name (str "transport-operator-" (::t-operator/id op))
-                               ::t-operator/is_organization true ;; TODO: verify is this needed?
-                               ::t-operator/type "organization"
-                               ::t-operator/description (or (::t-operator/ckan-description op) "")
-                               ::t-operator/title (::t-operator/name op)})
+                              {::t-operator/group-id        (str (UUID/randomUUID))
+                               ::t-operator/group-name      (str "transport-operator-" (::t-operator/id op))
+                               ::t-operator/title           (::t-operator/name op)
+                               ::t-operator/description     (or (::t-operator/ckan-description op) "")
+                               ::t-operator/created         (java.util.Date.)
+                               ::t-operator/state           "active"
+                               ::t-operator/type            "organization"
+                               ::t-operator/approval_status "approved"
+                               ::t-operator/is_organization true})
         member (specql/insert! db ::user/member
-                               {::user/id (str (UUID/randomUUID))
-                                ::user/table_id (get-in user [:user :id])
-                                ::user/group_id (:ote.db.transport-operator/group-id group)
+                               {::user/id         (str (UUID/randomUUID))
+                                ::user/table_id   (get-in user [:user :id])
+                                ::user/group_id   (:ote.db.transport-operator/group-id group)
                                 ::user/table_name "user"
-                                ::user/capacity "admin"
-                                ::user/state "active"})]
-    (log/debug "create-group!: op=" op "\n user=" user "\n group=" group "\n member=" member)
+                                ::user/capacity   "admin"
+                                ::user/state      "active"})]
     group))
 
 (defn- update-group!
@@ -171,19 +170,16 @@
   [db op]
   {:pre [(coll? op)
          (and (some? (::t-operator/ckan-group-id op)) (string? (::t-operator/ckan-group-id op)))]}
-  (log/debug "update-group!: op=" op)
-  (let [group-resp (update! db ::t-operator/group
-                            {::t-operator/title       (::t-operator/name op)
-                             ::t-operator/description (or (::t-operator/ckan-description op) "")}
-                            {::t-operator/group-id (::t-operator/ckan-group-id op)})]
-
-    (when (not= 1 group-resp) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" group-resp)))
-    group-resp))
+  (let [count (update! db ::t-operator/group
+                       {::t-operator/title       (::t-operator/name op)
+                        ::t-operator/description (or (::t-operator/ckan-description op) "")}
+                       {::t-operator/group-id (::t-operator/ckan-group-id op)})]
+    (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))
+    count))
 
 (defn- create-transport-operator [nap-config db user data]
   ;; Create new transport operator
   (log/debug (prn-str "create-transport-operator: data=" data))
-
   (tx/with-transaction db
     (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
 
@@ -210,7 +206,6 @@
    Links the transport-operator to group via member table"
   [db user data]
   {:pre [(some? data)]}
-  (log/debug (prn-str "create-transport-operator-nap: data=" data))
   (tx/with-transaction db
     (let [op (insert! db ::t-operator/transport-operator
                       (dissoc data
@@ -220,7 +215,7 @@
           group (create-group! db op user)]
 
       (update! db ::t-operator/transport-operator
-               {::t-operator/ckan-group-id (::t-operator/group-id group)} ;;TODO: miksi alias, me niskö suoraan id:llä?
+               {::t-operator/ckan-group-id (::t-operator/group-id group)}
                {::t-operator/id (::t-operator/id op)})
       op)))
 
@@ -266,9 +261,7 @@
 
 (defn- update-transport-operator-nap [db user {id ::t-operator/id :as data}]
   ;; Edit transport operator
-  {:pre [(coll? data)
-         (number? (::t-operator/id data))]}
-  (log/debug (prn-str "update-transport-operator: data=" data))
+  {:pre [(coll? data) (number? (::t-operator/id data))]}
   (authorization/with-transport-operator-check
     db user id
     #(tx/with-transaction
@@ -282,9 +275,7 @@
   "Creates or updates a transport operator for each company name. Operators will have the same details, except the name"
   [nap-config db user data]
   {:pre [(some? data)]}
-  ;(log/debug (prn-str "upsert-transport-operator: data= " data " \n   user=" user " \n   config=" nap-config))
   (let [operator data]
-      ;(log/debug (prn-str "upsert-transport-operator: operator= " operator))
       (if (::t-operator/id operator)
         (update-transport-operator-nap db user operator)
         (create-transport-operator-nap db user operator))))
