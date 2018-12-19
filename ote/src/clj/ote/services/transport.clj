@@ -145,7 +145,7 @@
 (defn- create-group!
   "Takes `op` operator and `user` and pairs user to organization in db using the member table. Sets role (Capacity) to 'admin'"
   [db op user]
-  {:pre [(some? op)]}
+  {:pre [(some? op) (some? (::t-operator/name op))]}
   (let [group (specql/insert! db ::t-operator/group
                               {::t-operator/group-id        (str (UUID/randomUUID))
                                ::t-operator/group-name      (str "transport-operator-" (::t-operator/id op))
