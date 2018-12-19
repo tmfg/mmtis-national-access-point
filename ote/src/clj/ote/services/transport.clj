@@ -3,7 +3,6 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
-            [clj-time.core :as time]
             [specql.op :as op]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
@@ -26,9 +25,7 @@
             [ote.nap.ckan :as ckan]
             [clojure.set :as set]
             [ote.util.feature :as feature])
-  (:import (java.time LocalTime)
-           (java.sql Timestamp)
-           (java.util UUID)))
+  (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
 
