@@ -887,7 +887,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :front-page-help-text "You have not yet registered any transport services to NAP-service catalog.
         You can register an external interface about your service or essential data about your service by using
-        the NAP-service which Finnish Transport Aggency has developed for this purpose."
+        the NAP-service which is developed for this purpose."
   :front-page-start-ote-query-header "Do you want to register essential data of your transport service?"
   :link-add-new-api "Add a new service"
   :own-api-list "Service information"
@@ -933,7 +933,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/en/transport-system/nap"
   :footer-ckan-software "CKAN-software"
   :footer-made-width "Made with"
-  :footer-copyright-disclaimer (:md "Finap.fi-service, made by  [Liikennevirasto](https://www.liikennevirasto.fi/), is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
+  :footer-copyright-disclaimer (:md "Finap.fi-service is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
   :footer-funded (:md "Financed partly by EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "NAP utilizes open source code from [CKAN.](https://ckan.org/)")
   :no-such-page "Page not found: "

@@ -203,6 +203,7 @@
              (tr [:document-title :admin])]])]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
+         ;;TODO: Trafi
          [:li
           [linkify (tr [:common-texts :user-menu-nap-help-link]) (tr [:common-texts :user-menu-nap-help])
            (merge (stylefy/use-style
@@ -246,6 +247,7 @@
                                       (e! (fp-controller/->ToggleRegistrationDialog)))})
               (tr [:common-texts :navigation-register])]]])
 
+         ;;TODO: Trafi
          [:li
           [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" (tr [:common-texts :navigation-privacy-policy])
            (merge (stylefy/use-style

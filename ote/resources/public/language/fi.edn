@@ -254,7 +254,7 @@
  {:transport-type-info "Ilmoita tässä osiossa liikkumispalvelusi liikennemuoto tai liikennemuodot. Tätä tietoa hyödynnetään Palvelukatalogi-sivun hakutoiminnoissa."
   :name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
   :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
-  :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen Liikenneviraston"
+  :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen "
   :external-interfaces-intro-2 "Merenkulun reitti- ja aikataulutiedot voit luoda NAP-palvelun"
   :external-interfaces "Koneluettava rajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa (esim. muodossa csv, xml, json tai gtfs). Ulkoiset rajapinnat on tarkoitettu yhteistyökumppaneille ja kehittäjille, jotka voivat käyttää niitä lisenssi- ja sopimusehtojen mukaisesti omissa palveluissaan."
   :external-interfaces-read-more {:link "Lue lisää NAP-katalogin koneluettavista rajapinnoista."
@@ -896,7 +896,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :front-page-help-text "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
-        Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
+        tähän tarkoitukseen kehitettyä OTE-palvelua."
   :front-page-start-ote-query-header "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
   :link-add-new-api "Lisää uusi palvelu"
   :own-api-list "Omat palvelutiedot"
@@ -942,7 +942,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :footer-livi-url-link "https://www.liikennevirasto.fi/nap"
   :footer-ckan-software "CKAN-ohjelmistolla"
   :footer-made-width "Toteutettu"
-  :footer-copyright-disclaimer (:md "Finap.fi-sivusto, jonka tekijä on [Liikennevirasto](https://www.liikennevirasto.fi/), on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
+  :footer-copyright-disclaimer (:md "Finap.fi-sivusto on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
   :footer-funded (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "Toteutuksessa on hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page "Valittua sivua ei löydy: "

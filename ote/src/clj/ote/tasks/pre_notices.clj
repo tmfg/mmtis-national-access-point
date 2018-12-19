@@ -119,7 +119,8 @@
 
     [:p "Tämän viestin lähetti NAP."]
     [:p "Ongelmia? Ota yhteys NAP-Helpdeskiin," [:br]
-     [:a
+     ;; TODO: Trafi
+     #_ [:a
       {:href "mailto:joukkoliikenne@liikennevirasto.fi"}
       "joukkoliikenne@liikennevirasto.fi"]
      [:span " tai 0295 34 3434 (arkisin 10-16)"]]]])
