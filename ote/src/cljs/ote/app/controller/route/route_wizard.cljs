@@ -170,7 +170,7 @@
                (mapv
                  (fn [trip]
                    (assoc trip ::transit/stop-times
-                               (conj (::transit/stop-times trip)
+                               (conj (vec (::transit/stop-times trip))
                                      {::transit/stop-idx stop-idx
                                       ::transit/drop-off-type :regular
                                       ::transit/pickup-type :regular
