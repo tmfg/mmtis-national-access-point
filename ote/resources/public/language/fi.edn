@@ -642,7 +642,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :organization-page
- {:contact-types "Yhteystavat"
+ {:business-id-and-aux-names "Toiminimi ja aputoiminimet"
+  :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
+  :contact-details "Yhteystiedot"
+  :fetch-from-ytj "Hae tiedot YTJ:stä"
+  :no-aux-names-for-business-id "Y-tunnukselle ei löytynyt aputoiminimiä"
+  :contact-types "Yhteystavat"
   :organization-form-title "Palveluntuottajan tiedot"
   :organization-new-title "Lisää palveluntuottaja"
   :help-desc-1 "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
@@ -650,6 +655,17 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :basic-info-tooltip "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
   :contact-types-tooltip "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
+  :help-ytj-integration-desc "Palveluntuottajan tiedot haetaan Yritys- ja yhteisötietojärjestelmästä (YTJ) Y-tunnuksen perusteella. Mikäli tiedoissa on virheitä tai puutteita, voit tehdä niihin muutoksia PRH:n ja Verohallinnon yhteisessä YTJ-palvelussa. YTJ-palvelussa tehdyt muutokset (esim. osoitemuutos tai uuden aputoiminimen rekisteröinti) näkyvät tällä sivulla sen jälkeen, kun ne on YTJ:n rekisteriin kirjattu."
+  :heading-operator-edit "Aiemmin ilmoitettujen palveluntuottajanimien muuttaminen"
+  :help-operator-edit "Olet aiemmin luonut NAP-palveluun yhden tai useamman palveluntuottajan, joiden nimet eivät vastaa Y-tunnukselle rekisteröityjä toiminimiä tai aputoiminimiä. Valitse alasvetovalikoista toiminimi, jolla haluat korvata aiemmin ilmoittamasi palveluntuottajan nimen."
+  :business-id-heading "Y-tunnus:"
+  :help-operator-edit-selection "Alla olevasta listasta näet Y-tunnukselle rekisteröidyn toiminimen ja aputoiminimet. Valitse listalta vain ne nimet, joiden alaisuudessa haluat julkaista liikkumispalveluita NAP:ssa."
+  :help-operator-contact-entry (:md "Alla olevat yhteystiedot ovat Y-tunnuskohtaisia, eli ne ovat **kaikille Y-tunnuksen alaisille toiminimille samat**. Yhteystiedot haetaan YTJ:stä, eikä niitä voi NAP:ssa muokata. Mikäli tiedoissa on virheitä tai puutteita, voit tehdä niihin muutoksia ja täydennyksiä PRH:n ja Verohallinnon yhteisessä YTJ-palvelussa. Tyhjien yhteystietokenttien osalta sinulla on kaksi vaihtoehtoa. 1) täydennä tiedot YTJ-palvelussa, jonka jälkeen ne ovat myös NAPin käytettävissä (suositeltavaa). 2) Täydennä tiedot suoraan alla oleviin lomakekenttiin (tiedot tallentuvat vain NAPiin, eivätkä edelleenkään ole YTJ:n rekisterissä).")
+  :help-operator-how-delete (:md "Voit poistaa palveluntuottajan tiedot NAP:sta napsauttamalla **Poista palveluntuottaja** -painiketta. Palveluntuottajan poistaminen on mahdollista, kun yhdelläkään kyseisen Y-tunnuksen alaisella palveluntuottajalla ei ole enää julkaistuja palveluita NAP:ssa. Mikäli haluat poistaa palveluntuottajan, käy ensin poistamassa kaikki sille lisätyt palvelut **Omat palvelutiedot** -sivun kautta.")
+  :help-about-ytj-link-desc "Lue lisää Yritys- ja yhteisötietojärjestelmästä (YTJ)"
+  :help-about-ytj-link "https://www.ytj.fi/index/tietoapalvelusta.html"
+  :help-ytj-contact-change-link-desc "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"
+  :help-ytj-contact-change-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html"
   }
 
  :passenger-transportation-page
@@ -887,13 +903,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:loading-routes "Palvelun reittejä ladataan."}
 
  :common-texts
- {:business-id-and-aux-names "Toiminimi ja aputoiminimet"
-  :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
-  :contact-details "Yhteystiedot"
-  :fetch-from-ytj "Hae tiedot YTJ:stä"
-  :check-your-input "Ole hyvä ja arkista, että syötit tiedot oikein."
-  :no-aux-names-for-business-id "Y-tunnukselle ei löytynyt aputoiminimiä"
-
+ {:check-your-input "Ole hyvä ja tarkista, että syötit tiedot oikein."
   :front-page-help-text "Et ole vielä kirjannut liikkumispalvelutietoja NAP-palveluun.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         tähän tarkoitukseen kehitettyä OTE-palvelua."
@@ -905,6 +915,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :api-url "Rajapinnan verkko-osoite"
   :finap-status "NAP tila"
   :header-nap-official-name "Palvelukatalogi"
+  :instructions "Ohjeet"
   :navigation-own-service-list "Omat palvelutiedot"
   :navigation-front-page "Etusivu"
   :navigation-organizations "Palveluntuottajat"
