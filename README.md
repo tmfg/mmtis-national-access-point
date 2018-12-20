@@ -1,4 +1,4 @@
-# Finnish Transport Agency: National Access Point and digitizing tools
+# Transport and Communications Agency (Finland): National Access Point and digitizing tools
 
 The Finnish National Access Point as defined in [MMTIS directive](https://ec.europa.eu/transport/sites/transport/files/c20173574-multimodaltravelinformationservices-delegatedregulation.pdf). Contains a service catalogue for transportation service data and APIs as well as tools for digitizing transportation service data. The catalogue portal is partially based on CKAN.
 
