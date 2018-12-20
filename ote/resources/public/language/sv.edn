@@ -891,7 +891,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :front-page-help-text "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
-        Liikenneviraston tähän tarkoitukseen kehittämää OTE-palvelua."
+        tähän tarkoitukseen kehitettyä OTE-palvelua."
   :front-page-start-ote-query-header "Haluat tallentaa liikkumispalvelusi olennaisia tietoja?"
   :link-add-new-api "Lägg till ny tjänst"
   :own-api-list "Egna tjänsteuppgifter"
@@ -937,7 +937,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer-livi-url-link "https://www.liikennevirasto.fi/web/sv/trafiksystemet/transportservicelagen/nap"
   :footer-ckan-software "CKAN"
   :footer-made-width "Made with"
-  :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som [Trafikverket](https://www.liikennevirasto.fi/) upprätthåller, publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
+  :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som är publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
   :footer-funded (:md "Delvis finansierat av EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :footer-ckan (:md "NAP utnyttjar öppen källkod från [CKAN.](https://ckan.org/)")
   :no-such-page "Valda sidan hittas ej: "

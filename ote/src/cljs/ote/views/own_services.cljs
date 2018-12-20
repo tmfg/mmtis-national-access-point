@@ -113,9 +113,11 @@
       [:div {:style {:border "red 4px dashed"}}
        [:p {:style {:padding "10px"}} "TÄMÄ ON TESTIPALVELU!"
         [:br]
-        "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/ote/#/services"} "finap.fi" ]
-        [:br]
-        "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]]])))
+        "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/#/services"} "finap.fi" ]
+        ;;TODO: Trafi
+        ;[:br]
+        ;"Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
+        ]])))
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
   [:div
