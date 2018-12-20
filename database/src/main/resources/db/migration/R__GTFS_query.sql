@@ -169,7 +169,7 @@ SELECT EXISTS(
                       FROM gtfs_package p
                      WHERE p."deleted?" = FALSE
                        AND p."transport-service-id" = service_id
-                       AND p.created::date >= CURRENT_DATE));
+                       AND p.created > CURRENT_DATE - interval '4 hours'));
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_should_calculate_transit_change(INTEGER) IS
