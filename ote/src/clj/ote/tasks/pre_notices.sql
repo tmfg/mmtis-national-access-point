@@ -27,7 +27,6 @@ WITH changes_with_regions AS (
 
     FROM "gtfs-transit-changes" chg
     WHERE chg.date = CURRENT_DATE
-
 )
 SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
        ("change-date" - CURRENT_DATE) AS "days-until-change",
@@ -41,12 +40,8 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
        ts.id AS "transport-service-id"
   FROM changes_with_regions chg
   JOIN "transport-service" ts ON ts.id = chg."transport-service-id" AND ts."sub-type" = 'schedule'
-  JOIN "transport-operator" op ON op.id = ts."transport-operator-id",
-       gtfs_package p
+  JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
  WHERE chg.date = CURRENT_DATE
-   AND p.id = ANY(chg."package-ids")
-   AND p."deleted?" = FALSE
-   AND p.created > CURRENT_DATE - interval '8 hours'
    AND chg."change-date" IS NOT NULL
    AND (chg."finnish-regions" IS NULL OR
         :regions::CHAR(2)[] IS NULL OR
