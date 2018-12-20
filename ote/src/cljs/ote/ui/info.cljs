@@ -12,7 +12,7 @@
 (defn info-toggle
   "Displays a clickable area that opens to show more info. Can be given default parameter for open state."
   ([title inner-component]
-   (info-toggle title inner-component false))
+   (info-toggle title inner-component true))
   ([title inner-component default-open?]
    (let [is-open? (r/atom default-open?)]
      (fn []
