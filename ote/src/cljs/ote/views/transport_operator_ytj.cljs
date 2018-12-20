@@ -180,7 +180,7 @@
          :label         (tr [:common-texts :instructions])
          :body          [:div
                          (tr [:organization-page :help-operator-contact-entry])
-                         [uicommon/extended-help-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html" "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"]]
+                         [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]
          :default-state true})
 
       {:name ::ote.db.transport-operator/billing-address
