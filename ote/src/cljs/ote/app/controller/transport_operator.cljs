@@ -144,7 +144,7 @@
              {:on-success (send-async! ->FetchYtjOperatorResponse)
               :on-failure (send-async! ->FetchYtjOperatorResponse)})
   (-> app
-      (dissoc :ytj-response)
+      (strip-ytj-metadata)
       (assoc :ytj-response-loading true)))
 
 (define-event FetchYtjOperator [id]
