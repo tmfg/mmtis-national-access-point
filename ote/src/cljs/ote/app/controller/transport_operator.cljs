@@ -28,11 +28,11 @@
   "Returns a filtered a collection of maps based on :type key"
   (first (filter #(some (fn [pred] (pred %)) [(comp #{type} :type)]) collection)))
 
-(defn- preferred-ytj-contact [types contacts]
+(defn- preferred-ytj-field [types contacts]
   "Takes 'types' vector of key names as strings in order of preference, 'contacts' collection of maps
   and finds the first contacts map which has a key with a matching name.
   Key names are searched in the order they are in `types`.
-  Returns the value of the forst matching key from the first matching map"
+  Returns the value of the first matching key from the first matching map"
   (loop [[type & remaining] types
          result []]
     (if (and type (empty? result))
@@ -92,28 +92,41 @@
 ;; Edit op, business id not found in YTJ
 (defn- process-ytj-data [app response]
   ;(.debug js/console "process-ytj-data response=" (clj->js response))
-  (let [ytj-business-id-hit? (= 200 (:status response))
+  (let [t-op (:transport-operator app)
+        ytj-business-id-hit? (= 200 (:status response))
         ytj-address-billing (address-of-type 1 (:addresses response))
         use-ytj-addr-billing? ytj-business-id-hit?
         ytj-address-visiting (address-of-type 2 (:addresses response))
         use-ytj-addr-visiting? ytj-business-id-hit?
-        ytj-contact-phone (first (preferred-ytj-contact ["Puhelin" "Telefon" "Telephone"] (:contactDetails response)))
-        use-ytj-phone? (and (not-empty ytj-contact-phone) (empty? (::t-operator/phone app)))
-        ytj-contact-gsm (preferred-ytj-contact ["Matkapuhelin" "Mobiltelefon" "Mobile phone"] (:contactDetails response))
-        use-ytj-gsm? (and (not-empty ytj-contact-gsm) (empty? (::t-operator/gsm app)))
-        ;ytj-contact-email (first (preferred-ytj-contact ["Matkapuhelin" "Mobiltelefon" "Mobile phone"] (:contactDetails response))) ;TODO: check ytj field types, does it return email?
+        ytj-contact-phone (preferred-ytj-field ["Puhelin" "Telefon" "Telephone"] (:contactDetails response))
+        use-ytj-phone? (not (empty? ytj-contact-phone))
+        ytj-contact-gsm (preferred-ytj-field ["Matkapuhelin" "Mobiltelefon" "Mobile phone"] (:contactDetails response))
+        use-ytj-gsm? (not (empty? ytj-contact-gsm))
+        ;ytj-contact-email Not read because not known in what field it is available
         use-ytj-email? false
-        ytj-contact-web (first (preferred-ytj-contact ["Kotisivun www-osoite" "www-adress" "Website address"] (:contactDetails response)))
-        use-ytj-web? (and (not-empty ytj-contact-web) (empty? (::t-operator/homepage app)))
+        ytj-contact-web (preferred-ytj-field ["Kotisivun www-osoite" "www-adress" "Website address"] (:contactDetails response))
+        use-ytj-web? (not (empty? ytj-contact-web))
         ytj-company-names (when (some? (:name response)) (ytj->nap-companies
                                                            (into [{:name (:name response)}] (:auxiliaryNames response)) ; Insert company name first to checkbox list before aux names
-                                                           (:transport-operators-with-services app)))]
-    (.debug js/console "process-ytj-data ytj-company-names=" (clj->js ytj-company-names) " app=" (clj->js app))
+                                                           (:transport-operators-with-services app)))
+        ytj-changed-fields? (and ytj-business-id-hit?
+                                 (or (not= ytj-address-billing (::t-operator/billing-address t-op))
+                                     (not= ytj-address-visiting (::t-operator/visiting-address t-op))
+                                     (not= ytj-contact-phone (::t-operator/phone t-op))
+                                     (not= ytj-contact-gsm (::t-operator/gsm t-op))
+                                     ;(not= ytj-contact-email (::t-operator/email t-op)) ;; TODO: take email into account when it's clear if YTJ api provides that
+                                     (not= ytj-contact-web (::t-operator/homepage t-op))
+                                     ;;(not= ytj-contact-name (::t-operator/name t-op)) Name not taken into account because that is handled in the name resolution wizard and name list
+                                     (not= ytj-address-billing (::t-operator/billing-address t-op))))
+        ]
+    ;(.debug js/console "process-ytj-data ytj-company-names=" (clj->js ytj-company-names) " \n app=" (clj->js app))
     (cond-> app
             true (assoc
                    :ytj-response response
                    :ytj-response-loading false
                    :transport-operator-loaded? true)
+            ;; Enable saving when YTJ changed a relevant field
+            (and (not (:new? t-op)) ytj-changed-fields?) (assoc-in [:transport-operator ::form/modified] #{::t-operator/name})
             true (assoc-in [:transport-operator :transport-operators-to-save] []) ;; Init to empty vector to allow populating it in different scenarios
             ;; Set data sources for form fields and if user allowed to edit
             use-ytj-addr-billing? (assoc-in [:transport-operator ::t-operator/billing-address] ytj-address-billing)
