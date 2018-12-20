@@ -159,20 +159,21 @@ $$ LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION gtfs_should_calculate_transit_change(service_id INTEGER)
 RETURNS BOOLEAN
 AS $$
-SELECT NOT EXISTS(
-  SELECT date
+SELECT EXISTS(
+  SELECT gtc.date
     FROM "gtfs-transit-changes" gtc
-   WHERE "change-date" > CURRENT_DATE
-     AND "transport-service-id" = service_id
-     AND NOT EXISTS(SELECT id
+   WHERE (gtc."change-date" IS NOT NULL
+     AND gtc."change-date" < CURRENT_DATE
+     AND gtc."transport-service-id" = service_id)
+     OR EXISTS(SELECT id
                       FROM gtfs_package p
-                     WHERE p."transport-service-id" = gtc."transport-service-id"
-                       AND p."deleted?" = FALSE
-                       AND p.created > gtc.date));
+                     WHERE p."deleted?" = FALSE
+                       AND p."transport-service-id" = service_id
+                       AND p.created::date >= CURRENT_DATE));
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_should_calculate_transit_change(INTEGER) IS
-E'Check if transit changes should be calculated for the given transport-service-id.';
+E'Check if transit changes should be calculated for the given transport-service-id. New calculation is required if earliest change-date is in the past or if service have got new package.';
 
 CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_ids INTEGER[], dt DATE)
 RETURNS SETOF route_trips_for_date
