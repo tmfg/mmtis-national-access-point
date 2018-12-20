@@ -199,7 +199,7 @@
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
   [:div {:class "col-xs-12 col-md-12"}
-   [:h3 (tr [:own-services-page :own-services])]
+   [:h3 {:style {:margin-bottom "2rem"}} (tr [:own-services-page :own-services])]
    [info/info-toggle (tr [:own-services-page :own-services-directions-short]) [:p (tr [:own-services-page :own-services-info-long])]]
    [:a (merge {:href "#"
                :on-click #(do
@@ -216,7 +216,9 @@
          ^{:key type}
          [transport-services-listing
           e! (get-in state [:transport-operator ::t-operator/id])
-          services (tr [:titles type])])))])
+          services (tr [:titles type])])))
+   [:hr {:style {:border-bottom "0"
+                 :margin "2rem 0"}}]])
 
 
 (defn service-provider-controls

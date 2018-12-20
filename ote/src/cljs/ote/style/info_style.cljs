@@ -17,7 +17,7 @@
    ::stylefy/mode {:hover {:background-color colors/gray300}}})
 
 (def info-container
-  {:margin-bottom "1rem"})
+  {:margin-bottom "2rem"})
 
 (def info-icon
   {:color colors/gray600
