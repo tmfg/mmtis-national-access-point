@@ -46,7 +46,6 @@
                           :cursor "pointer"
                           :padding "0"
                           :display "inline-flex"
-                          :padding-bottom "1px"
                           ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/primary)
                                                   :margin-bottom "-1px"}}})
 
@@ -77,9 +76,17 @@
 ;; Front page
 
 (def front-page-add-service {:border-right "1px solid grey"})
-(def front-page-service-table {:a
-                               {:text-decoration "none"
-                                ::stylefy/mode {:visited {:text-decoration "none"}}}})
+(def front-page-service-table (merge {:border "1px solid grey"}
+                                     {::stylefy/sub-styles {:link {:text-decoration "none"
+                                                                   ::stylefy/mode {:visited {:text-decoration "none"}
+                                                                                   :hover {:text-decoration "underline"}}}}}))
+
+(stylefy/class "table-header"
+  {:background-color (str colors/gray300 " !important")
+   :color (str colors/gray900 " !important")
+   :font-weight "bold !important"
+   :position "inherit !important"})
+
 (def header-font {:font-size "18px"
                   :padding-top "20px"
                   :font-weight "600"})
