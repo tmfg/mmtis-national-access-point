@@ -13,6 +13,7 @@
             [ote.time :as time]
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
+            [ote.ui.info :as info]
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
@@ -1039,5 +1040,10 @@
 (defmethod field :text-label [{:keys [label style h-style]}]
   ;; Options
   ; :label Text for displaying
-  [:div (when style {:style style}) (if h-style [h-style label] [:p label])]
-  )
+  [:div (when style {:style style}) (if h-style [h-style label] [:p label])])
+
+
+(defmethod field :info-toggle [{:keys [label body default-state]}]
+  [info/info-toggle label body default-state])
+
+
