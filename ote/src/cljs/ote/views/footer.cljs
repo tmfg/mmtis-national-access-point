@@ -19,7 +19,7 @@
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
       [:ul.unstyled (stylefy/use-style style-front-page/footer-logo-ul)
        ;; TODO: Trafi
-       [:li [:a.logo {:href "https://www.liikennevirasto.fi/liikennejarjestelma/liikennepalvelulaki/nap"}
+       #_ [:li [:a.logo {:href "https://www.liikennevirasto.fi/liikennejarjestelma/liikennepalvelulaki/nap"}
              [:img {:class (:class (stylefy/use-style style-front-page/footer-logo)) :src "/img/icons/livi_logo_valkoinen.svg" :alt (tr [:common-texts :footer-livi-logo])}]]]
        [:li [:a.logo {:href "#"}
              [:img {:style {:width "120px"} :src "/img/icons/nap-logo.svg" :alt "NAP"}]]]]]
