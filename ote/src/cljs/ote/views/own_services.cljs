@@ -72,18 +72,23 @@
          ^{:key i}
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column
-           [:a {:href "#" :on-click  #(do
-                                        (.preventDefault %)
-                                        (e! (fp/->ChangePage :edit-service {:id id})))} name]]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "}
-           (if published?
-             (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
-               [linkify url url {:target "_blank"}])
-             [:span.draft
-              (tr [:field-labels :transport-service ::t-service/published?-values false])])]
+           [:a (merge {:href "#" :on-click #(do
+                                              (.preventDefault %)
+                                              (e! (fp/->ChangePage :edit-service {:id id})))}
+                      (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
           [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "}
+           (if published?
+             (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
+               [linkify url
+                (tr [:own-services-page :open-geojson])
+                {:target "_blank"
+                 :style {:text-decoration "none"
+                         ::stylefy/mode {:hover {:text-decoration "underline"}}}}])
+             [:span.draft
+              (tr [:field-labels :transport-service ::t-service/published?-values false])])]
           [ui/table-row-column
            [ui/icon-button {:href "#" :on-click #(do
                                                    (.preventDefault %)
@@ -97,17 +102,16 @@
     [:div.row (stylefy/use-style style-base/section-margin)
      [:div {:class "col-xs-12 col-md-12"}
       [:h3 section-label]
-
       [ui/table (stylefy/use-style style-base/front-page-service-table)
        [ui/table-header {:adjust-for-checkbox false
                          :display-select-all false}
         [ui/table-row {:selectable false}
-         [ui/table-header-column (tr [:front-page :table-header-service-name])]
-         [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-service-url])]
-         [ui/table-header-column {:class "hidden-xs "} (tr [:front-page :table-header-NAP-status])]
-         [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-modified])]
-         [ui/table-header-column {:class "hidden-xs hidden-sm "} (tr [:front-page :table-header-created])]
-         [ui/table-header-column (tr [:front-page :table-header-actions])]]]
+         [ui/table-header-column {:class "table-header"} (tr [:front-page :table-header-service-name])]
+         [ui/table-header-column {:class "hidden-xs table-header "} (tr [:front-page :table-header-NAP-status])]
+         [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-modified])]
+         [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-created])]
+         [ui/table-header-column {:class "hidden-xs hidden-sm table-header"} (tr [:front-page :table-header-service-url])]
+         [ui/table-header-column {:class "table-header "}(tr [:front-page :table-header-actions])]]]
 
        (transport-services-table-rows e! services transport-operator-id)]]]))
 
@@ -195,15 +199,14 @@
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
   [:div {:class "col-xs-12 col-md-12"}
-   [info/info-toggle "test" [:p "Tässä ois tämmöstä testiä"
-                             [:b "ja boldi"]]]
-   (when (not (empty? operator-services))
-     [ui/raised-button {:label (tr [:buttons :add-transport-service])
-                        :on-click #(do
-                                     (.preventDefault %)
-                                     (e! (ts/->OpenTransportServiceTypePage)))
-                        :primary true
-                        :icon (ic/content-add)}])
+   [:h3 (tr [:own-services-page :own-services])]
+   [info/info-toggle (tr [:own-services-page :own-services-directions-short]) [:p (tr [:own-services-page :own-services-info-long])]]
+   [:a (merge {:href "#"
+               :on-click #(do
+                            (.preventDefault %)
+                            (e! (ts/->OpenTransportServiceTypePage)))}
+              (stylefy/use-style style-buttons/primary-button))
+    (tr [:buttons :add-transport-service])]
    (if (and has-services? (not (empty? operator-services)))
      ;; TRUE -> Table for transport services
      (doall
@@ -213,19 +216,7 @@
          ^{:key type}
          [transport-services-listing
           e! (get-in state [:transport-operator ::t-operator/id])
-          services (tr [:titles type])]))
-
-     ;; FALSE -> explain user why table is empty
-     [:div
-      [:br]
-      [:p (tr [:front-page :operator-dont-have-any-services])]
-      [:div {:style {:padding-top "20px"}}]
-      [ui/raised-button {:label (tr [:buttons :add-transport-service])
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (ts/->OpenTransportServiceTypePage)))
-                         :primary true
-                         :icon (ic/content-add)}]])])
+          services (tr [:titles type])])))])
 
 
 (defn service-provider-controls
@@ -263,7 +254,14 @@
         [ui-common/ckan-iframe-dialog (::t-operator/name operator)
          (str "/organization/member_new/" (::t-operator/ckan-group-id operator))
          #(e! (fp/->ToggleAddMemberDialog))])]
-     [:p (tr [:form-help :own-services-new-provider] {:name operator-name})]
+
+     [:div
+      (if (not (and has-services? (not (empty? operator-services))))
+        [:p
+         [:div {:style {:float "left"}}                     ;;this is done because translations with variables don't support markdown and we have to fix md and variables
+          (tr [:own-services-page :own-services-new-provider1])
+          [:strong operator-name]]
+         (tr [:own-services-page :own-services-new-provider2])])]
      [:hr {:style {:border-bottom "0"}}]]))
 
 (defn operator-info-container
@@ -308,6 +306,7 @@
 
 (defn own-services [e! state]
   (e! (fp/->EnsureTransportOperator))
+
   (fn [e! state]
     (if (and (:transport-operator-data-loaded? state)
              (not (contains? state :transport-operators-with-services)))
