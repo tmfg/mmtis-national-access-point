@@ -116,7 +116,6 @@ In order to our OTE menu to render correctly work, we need to reset margin and p
 
 .wrapper {
     padding: 20px 0px 0px 0px;
-    min-height: 100%;
     margin-top: 80px;
 }
 
@@ -278,3 +277,21 @@ span.search-card-title {
     height: 24px;
     font-size: 24px;
 }
+
+.mui-select-button button {
+    fill: #000 !important;
+}
+
+.mui-select-button hr {
+    border-color: #969696 !important;
+    -webkit-transition: all 150ms ease-in-out;
+    -moz-transition: all 150ms ease-in-out;
+    -ms-transition: all 150ms ease-in-out;
+    -o-transition: all 150ms ease-in-out;
+    transition: all 150ms ease-in-out;
+}
+
+.mui-select-button:hover hr {
+    border-width: medium medium 3px !important;
+}
+
