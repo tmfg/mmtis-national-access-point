@@ -201,7 +201,8 @@
   [:div {:class "col-xs-12 col-md-12"}
    [:h3 {:style {:margin-bottom "2rem"}} (tr [:own-services-page :own-services])]
    [info/info-toggle (tr [:own-services-page :own-services-directions-short]) [:p (tr [:own-services-page :own-services-info-long])]]
-   [:a (merge {:href "#"
+   [:a (merge {:href (str "#/new-service/" (::t-operator/id (:transport-operator state)))
+               :id "new-service-button"
                :on-click #(do
                             (.preventDefault %)
                             (e! (ts/->OpenTransportServiceTypePage)))}
