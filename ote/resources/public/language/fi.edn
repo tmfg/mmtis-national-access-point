@@ -311,6 +311,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :real-time-info "Tässä kohdassa voit ilmoittaa palveluusi liittyviä reaaliaikapalveluita, kuten \"autot kartalla\" tai \"vapaat pysäköintipaikat\"."
   :pick-up-locations-url "Mikäli taulukko ei sovellu toimipisteiden kuvaamiseen, voit vaihtoehtoisesti kirjoittaa alapuolella olevaan kenttään web-osoitteen, josta tiedot löytyvät."
+  :own-services-new-provider [(:md "Hienoa! Olet nyt lisännyt!! ") :name (:md " -nimisen palveluntuottajan NAP:iin.  Huomioithan, että pelkät palveluntuottajan tiedot eivät sisällä lain vaatimia olennaisia tietoja (esim. toiminta-alue, hintatiedot ja esteettömyystiedot) tarjoamastasi palvelusta/palveluista.\n\nLisää seuraavaksi tarkemmat tiedot tarjoamastasi palvelusta/palveluista kohdassa Omat palvelut ja/tai kohdassa Muiden tuottamat palvelut, joissa olet mukana.\n\nMikäli omistat taksiyrityksen ja ajat kyytejä vain välityskeskuksen kautta, riittää, että täytät välityskeskuksen tiedot kohtaan Muiden tuottamat palvelut, joissa olet mukana.")]
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
@@ -338,6 +339,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :edit-service "Muokkaa palvelun tietoja"
   :edit "Muokkaa"
   :approve "Hyväksy"
+  :manage-access-rights "Hallinnoi käyttäjäoikeuksia"
 
   :save-and-publish "Tallenna ja julkaise"
   :save-and-send "Tallenna ja lähetä"

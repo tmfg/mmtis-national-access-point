@@ -345,6 +345,7 @@
   :edit-service "Redigera tjänstens info"
   :edit "Redigera"
   :approve "Godkänn"
+  :manage-access-rights "Hanterar användarrättigheter"
 
   :save-and-publish "Spara och publicera"
   :save-as-draft "Spara utkast"

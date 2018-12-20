@@ -337,6 +337,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :edit-service "Edit service"
   :edit "Edit"
   :approve "Approve"
+  :manage-access-rights "Manage access rights"
 
   :save-and-publish "Save and publish"
   :save-and-send "Save and send"
