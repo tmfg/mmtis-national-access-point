@@ -31,12 +31,13 @@
 
 (defn calculate-package-hashes-for-service [db service-id package-count]
   (let [package-ids (get-gtfs-packages db service-id package-count)]
-    (log/debug "Found " (count package-ids) " For service " service-id)
+    (log/info "Found " (count package-ids) " For service " service-id)
     (doall
       (for [package-id package-ids]
         (do
-          (log/debug "Generating hashes for package " package-id "  (service " service-id ")")
-          (generate-date-hashes db {:package-id package-id}))))))
+          (log/info "Generating hashes for package " package-id "  (service " service-id ")")
+          (generate-date-hashes db {:package-id package-id})
+          (log/info "Generation ready! (package " package-id " service " service-id ")"))))))
 
 (defn db-route-detection-type [db service-id]
   (let [type (first (specql/fetch db :gtfs/detection-service-route-type
