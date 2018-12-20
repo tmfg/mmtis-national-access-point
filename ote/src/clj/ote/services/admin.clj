@@ -263,14 +263,19 @@
                    (fetch-operators-brokerage db)))
 
     "taxi-operators"
-    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus"]
-              (map (juxt :operator :business-id :sub-company :sub-business-id)
+    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus" "Palvelu" "Liikennemuoto"]
+              (map (juxt :operator :business-id :sub-company :sub-business-id :service-name :transport-type)
                    (fetch-operators-with-sub-contractors db {:subtype "taxi"})))
 
     "request-operators"
-    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus"]
-              (map (juxt :operator :business-id :sub-company :sub-business-id)
+    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus" "Palvelu" "Liikennemuoto"]
+              (map (juxt :operator :business-id :sub-company :sub-business-id :service-name :transport-type)
                    (fetch-operators-with-sub-contractors db {:subtype "request"})))
+
+    "schedule-operators"
+    (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus" "Palvelu" "Liikennemuoto"]
+              (map (juxt :operator :business-id :sub-company :sub-business-id :service-name :transport-type)
+                   (fetch-operators-with-sub-contractors db {:subtype "schedule"})))
 
     "unpublished-services"
     (csv-data ["nimi" "puhelin" "email" "julkaisemattomia palveluita" "palvelut"]

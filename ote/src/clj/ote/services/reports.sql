@@ -44,8 +44,40 @@ SELECT op.name,
  ORDER BY op.name ASC;
 
 -- name: fetch-operators-with-sub-contractors
--- The first select operators and all companies that are not in service_table then select all that are.
-SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-company", c."business-id" as "sub-business-id"
+-- In the first selection select operators that do not have any sub companies.
+-- Then select all operators that have sub companies in transport-service table, but don't have anything in service_company table.
+-- And finally select all operators that have sub companies from external url or from csv upload.
+SELECT op.name as "operator", op."business-id" as "business-id", '-' as "sub-company", '-' as "sub-business-id",
+       ts.name as "service-name",
+        replace(
+          replace(
+            replace(
+             replace(array_to_string(ts."transport-type",','),
+             'road' , 'Tieliikenne')
+             ,'sea', 'Merenkulku')
+             ,'aviation', 'Ilmailu')
+             ,'rail', 'Raideliikenne') as "transport-type"
+
+  FROM "transport-operator" op, "transport-service" ts
+ WHERE op.id = ts."transport-operator-id"
+   AND ts."sub-type" = :subtype::transport_service_subtype
+   AND op."deleted?" = FALSE
+   AND ts."published?" = TRUE
+   AND (ts.companies = '{}' OR ts.companies = '{"(,)"}' OR ts.companies IS NULL)
+
+UNION
+
+SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-company", c."business-id" as "sub-business-id",
+       ts.name as "service-name",
+        replace(
+          replace(
+            replace(
+             replace(array_to_string(ts."transport-type",','),
+             'road' , 'Tieliikenne')
+             ,'sea', 'Merenkulku')
+             ,'aviation', 'Ilmailu')
+             ,'rail', 'Raideliikenne') as "transport-type"
+
   FROM "transport-operator" op, "transport-service" ts, unnest(ts.companies) with ordinality c
  WHERE op.id = ts."transport-operator-id"
    AND ts."sub-type" = :subtype::transport_service_subtype
@@ -59,7 +91,17 @@ SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-
  UNION
 
  SELECT * FROM (
-   SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-company", c."business-id" as "sub-business-id"
+   SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-company", c."business-id" as "sub-business-id",
+         ts.name as "service-name",
+          replace(
+            replace(
+              replace(
+               replace(array_to_string(ts."transport-type",','),
+               'road' , 'Tieliikenne')
+               ,'sea', 'Merenkulku')
+               ,'aviation', 'Ilmailu')
+               ,'rail', 'Raideliikenne') as "transport-type"
+
      FROM "transport-operator" op, "transport-service" ts, service_company sc, unnest(sc.companies) with ordinality c
     WHERE op.id = ts."transport-operator-id"
       AND ts."sub-type" = :subtype::transport_service_subtype
