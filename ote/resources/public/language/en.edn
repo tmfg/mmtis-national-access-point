@@ -644,7 +644,12 @@ You can also draw the operating area or point to the map with drawing tools. You
 
 
  :organization-page
- {:contact-types "Phone and email"
+ {:business-id-and-aux-names "Company name and auxiliary names"
+  :contact-details-plural "Contact information related to the Business ID"
+  :contact-details "Contact details"
+  :fetch-from-ytj "Fetch data from YTJ"
+  :no-aux-names-for-business-id "There were no auxiliary business names for the business id."
+  :contact-types "Phone and email"
   :organization-form-title "Basic information"
   :organization-new-title "Create a new transport operator"
   :help-desc-1 "The information given in this form will seen in the public pages of NAP-service."
@@ -652,6 +657,17 @@ You can also draw the operating area or point to the map with drawing tools. You
   :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing."
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
+  :help-ytj-integration-desc "The service provider information is received from the _Business Information System (BIS) on the basis of the Business ID. If the information is incorrect or incomplete, you can make changes to it in the _BIS service_. Changes made in the BIS service (e.g. changing the street address or registering a new auxiliary trade name) will appear on this page after they are registered in the BIS register."
+  :heading-operator-edit "Change the previously created service provider names"
+  :help-operator-edit "You have previously created one or more service providers in the NAP service, whose names do not match to the business name or auxiliary names registered to your Business ID. Please, select a name from the drop-down menu to replace the name of the service provider you have previously created."
+  :business-id-heading "Business id:"
+  :help-operator-edit-selection "In the list below you can see the business name and auxiliary names registered to your Business ID. Please, select only the names from the list which to you want to release services in the NAP service."
+  :help-operator-contact-entry (:md "The contact information below are Business ID specific, which means that they are the **same for the Business name and for every auxiliary name**. Contact information is retrieved from the BIS and can not be edited in the NAP service. If there are any errors or omissions in the information, you can make changes to it in the BIS service. For empty contact fields, you have two choices. 1) Complete the information to the BIS register, after which they are also available in the NAP service (recommended). 2) Complete the information directly into the form fields below (the information given will be stored only in the NAP service - it  will not transfer to the BIS register).")
+  :help-operator-how-delete (:md "To remove the service provider information from the NAP service, click the **Delete service provider** -button. Deleting the service provider is possible only when none of the service providers created (for the business name or for the auxiliary names) under the Business ID have any published services in the NAP service. If you want to delete the service provider, please, first delete all the transport services on the **Own transport services** page.")
+  :help-about-ytj-link-desc "Lue lisää Yritys- ja yhteisötietojärjestelmästä (YTJ)"
+  :help-about-ytj-link "https://www.ytj.fi/en/index/whatisbis.html"
+  :help-ytj-contact-change-link-desc "Change details of your business online"
+  :help-ytj-contact-change-link "https://www.ytj.fi/en/index/whatisbis/onlinefiling/changedetailsofyourbusiness.html"
   }
 
  :passenger-transportation-page
@@ -885,14 +901,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:loading-routes "Loading service routes."}
 
  :common-texts
- {:business-id-and-aux-names "Company name and auxiliary names"
-  :contact-details-plural "Contact details for company and auxiliary names"
-  :contact-details "Contact details"
-  :fetch-from-ytj "Fetch data from YTJ"
-  :check-your-input "Please check that the details you entered are correct."
-  :no-aux-names-for-business-id "There were no auxiliary business names for the business id."
-
-
+ {:check-your-input "Please check that the details you entered are correct."
   :front-page-help-text "You have not yet registered any transport services to NAP-service catalog.
         You can register an external interface about your service or essential data about your service by using
         the NAP-service which is developed for this purpose."
@@ -904,6 +913,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :api-url "Interface WWW-address"
   :finap-status "NAP-status"
   :header-nap-official-name "Transport service catalog"
+  :instructions "Instructions"
   :navigation-own-service-list "Own transport services"
   :navigation-front-page "Front page"
   :navigation-organizations "Transport operator"

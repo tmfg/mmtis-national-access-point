@@ -652,7 +652,12 @@
 
 
  :organization-page
- {:contact-types "Kontaktalternativ"
+ {:business-id-and-aux-names "Företagsnamn och hjälpnamn"
+  :contact-details-plural "Kontaktuppgifter för företagsnamn"
+  :contact-details "Kontaktuppgifter"
+  :fetch-from-ytj "Hämta data från YTJ"
+  :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
+  :contact-types "Kontaktalternativ"
   :organization-form-title "Tjänsteproducentens uppgifter"
   :organization-new-title "Lägg till tjänsteproducent"
   :help-desc-1 "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
@@ -660,8 +665,18 @@
   :basic-info-tooltip "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
   :contact-types-tooltip "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
   :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
+  :help-ytj-integration-desc "Palveluntuottajan tiedot haetaan Yritys- ja yhteisötietojärjestelmästä (YTJ) Y-tunnuksen perusteella. Mikäli tiedoissa on virheitä tai puutteita, voit tehdä niihin muutoksia PRH:n ja Verohallinnon yhteisessä YTJ-palvelussa. YTJ-palvelussa tehdyt muutokset (esim. osoitemuutos tai uuden aputoiminimen rekisteröinti) näkyvät tällä sivulla sen jälkeen, kun ne on YTJ:n rekisteriin kirjattu."
+  :heading-operator-edit "Aiemmin ilmoitettujen palveluntuottajanimien muuttaminen"
+  :help-operator-edit "Olet aiemmin luonut NAP-palveluun yhden tai useamman palveluntuottajan, joiden nimet eivät vastaa Y-tunnukselle rekisteröityjä toiminimiä tai aputoiminimiä. Valitse alasvetovalikoista toiminimi, jolla haluat korvata aiemmin ilmoittamasi palveluntuottajan nimen."
+  :business-id-heading "Y-tunnus:"
+  :help-operator-edit-selection "Alla olevasta listasta näet Y-tunnukselle rekisteröidyn toiminimen ja aputoiminimet. Valitse listalta vain ne nimet, joiden alaisuudessa haluat julkaista liikkumispalveluita NAP:ssa."
+  :help-operator-contact-entry (:md "Alla olevat yhteystiedot ovat Y-tunnuskohtaisia, eli ne ovat **kaikille Y-tunnuksen alaisille toiminimille samat**. Yhteystiedot haetaan YTJ:stä, eikä niitä voi NAP:ssa muokata. Mikäli tiedoissa on virheitä tai puutteita, voit tehdä niihin muutoksia ja täydennyksiä PRH:n ja Verohallinnon yhteisessä YTJ-palvelussa. Tyhjien yhteystietokenttien osalta sinulla on kaksi vaihtoehtoa. 1) täydennä tiedot YTJ-palvelussa, jonka jälkeen ne ovat myös NAPin käytettävissä (suositeltavaa). 2) Täydennä tiedot suoraan alla oleviin lomakekenttiin (tiedot tallentuvat vain NAPiin, eivätkä edelleenkään ole YTJ:n rekisterissä).")
+  :help-operator-how-delete (:md "Voit poistaa palveluntuottajan tiedot NAP:sta napsauttamalla **Poista palveluntuottaja** -painiketta. Palveluntuottajan poistaminen on mahdollista, kun yhdelläkään kyseisen Y-tunnuksen alaisella palveluntuottajalla ei ole enää julkaistuja palveluita NAP:ssa. Mikäli haluat poistaa palveluntuottajan, käy ensin poistamassa kaikki sille lisätyt palvelut **Omat palvelutiedot** -sivun kautta.")
+  :help-about-ytj-link-desc "Företags- och organisationsdatasystemet (FODS)"
+  :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
+  :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
+  :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
   }
-
 
  :passenger-transportation-page
  {:header-new-passenger-transportation "Lägg till persontransporttjänst"
@@ -890,13 +905,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  {:loading-routes "Laddar rutterna för tjänsten."}
 
  :common-texts
- {:business-id-and-aux-names "Företagsnamn och hjälpnamn"
-  :contact-details-plural "Kontaktuppgifter för företagsnamn"
-  :contact-details "Kontaktuppgifter"
-  :fetch-from-ytj "Hämta data från YTJ"
-  :check-your-input "Please check that the details you entered are correct."
-  :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
-
+ {:check-your-input "Kolla att uppgifterna du skrev in är korrekta."
   :front-page-help-text "Du har inte ännu sparat mobilitetstjänster i NAP-tjänsten.
         Voit lisätä olemassaolevan palvelurajapintasi tai täyttää palvelusi olennaiset tiedot käyttämällä
         tähän tarkoitukseen kehitettyä OTE-palvelua."
@@ -908,6 +917,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :api-url "Gränsnittets tekniska adress"
   :finap-status "NAP status"
   :header-nap-official-name "Tjänstekatalog"
+  :instructions "Instruktioner"
   :navigation-own-service-list "Egna tjänsteuppgifter"
   :navigation-front-page "Framsida"
   :navigation-organizations "Tjänsteproducenter"
