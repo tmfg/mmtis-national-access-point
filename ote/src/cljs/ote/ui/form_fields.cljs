@@ -442,23 +442,24 @@
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
                                error warning auto-width? disabled?
-                               option-value] :as field}
+                               option-value class-name] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-value (or option-value identity)
         option-idx (zipmap (map option-value options) (range))]
     [ui/select-field
      (merge
-      {:auto-width (boolean auto-width?)
-       :style style
-       :floating-label-text (when-not table? label)
-       :floating-label-fixed true
-       :value (option-idx data)
-       :on-change #(update! (option-value (nth options %2)))
-       :error-text        (or error warning "") ;; Show error text or warning text or empty string
-       :error-style       (if error             ;; Error is more critical than required - showing it first
-                            style-base/error-element
-                            style-base/required-element)}
+       {:auto-width (boolean auto-width?)
+        :style style
+        :floating-label-text (when-not table? label)
+        :floating-label-fixed true
+        :value (option-idx data)
+        :on-change #(update! (option-value (nth options %2)))
+        :error-text (or error warning "") ;; Show error text or warning text or empty string
+        :error-style (if error             ;; Error is more critical than required - showing it first
+                       style-base/error-element
+                       style-base/required-element)}
+      (when class-name {:className class-name})
       (when disabled?
         {:disabled true}))
      (doall
