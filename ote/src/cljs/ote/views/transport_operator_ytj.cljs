@@ -8,6 +8,7 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
+            [ote.ui.info :as info]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
             [ote.ui.common :as ui-common]
@@ -19,7 +20,8 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.ui.common :as uicommon]))
 
 (defn- delete-operator [e! operator]
   (when (:show-delete-dialog? operator)
@@ -67,7 +69,7 @@
 
       {:name      ::t-operator/btn-submit-business-id
        :type      :external-button
-       :label     (tr [:common-texts :fetch-from-ytj])
+       :label     (tr [:organization-page :fetch-from-ytj])
        :primary   true
        :secondary true
        :on-click  #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
@@ -114,15 +116,29 @@
        :container-style (style-base/flex-container2)
        }
 
-      {:name       :msg-business-id
+      {:name        :heading1
+       :label       (str (tr [:organization-page :business-id-heading]) " " (get-in state [:transport-operator ::t-operator/business-id]))
+       :type        :text-label
+       :h-style     :h2
+       :full-width? true
+       }
+
+      {:name       :heading2
        :label      (if ytj-company-names-found?
-                     (tr [:common-texts :business-id-and-aux-names])
+                     (tr [:organization-page :business-id-and-aux-names])
                      "Toiminimi")
        :type       :text-label
        :h-style    :h3
        :max-length 70
        :full-width? true
        }
+
+      (when response-ok?
+        {:name          :help-checkbox-group
+         :type          :info-toggle
+         :label         (tr [:common-texts :instructions])
+         :body          [:div (tr [:organization-page :help-operator-edit-selection])]
+         :default-state true})
 
       (if response-ok?                                      ; Input field if not YTJ results, checkbox-group otherwise
         {:name                :transport-operators-to-save
@@ -145,18 +161,27 @@
 
       (when (and response-ok? (not ytj-company-names-found?))
         {:name :msg-no-aux-names-for-business-id
-         :label (tr [:common-texts :no-aux-names-for-business-id])
+         :label (tr [:organization-page :no-aux-names-for-business-id])
          :type :text-label
          :max-length 128})
 
       {:name       :msg-business-id-contact-details
        :label      (if ytj-company-names-found?
-                     (tr [:common-texts :contact-details-plural])
-                     (tr [:common-texts :contact-details])
+                     (tr [:organization-page :contact-details-plural])
+                     (tr [:organization-page :contact-details])
                      )
        :type       :text-label
        :max-length 128
        :h-style    :h3}
+
+      (when response-ok?
+        {:name          :help-operator-contact-details
+         :type          :info-toggle
+         :label         (tr [:common-texts :instructions])
+         :body          [:div
+                         (tr [:organization-page :help-operator-contact-entry])
+                         [uicommon/extended-help-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html" "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"]]
+         :default-state true})
 
       {:name ::ote.db.transport-operator/billing-address
        :type :text-label
@@ -236,35 +261,35 @@
 (defn- allow-manual-creation? [state] (some? (:ytj-response state)))
 
 (defn- operator-form-options [e! state show-actions?]
-  {:name->label (tr-key [:field-labels])
+  {:name->label     (tr-key [:field-labels])
    ;:layout :row
    ;:style style-form/form-group-row
    :container-style (style-base/flex-container2)
-   :update!     #(e! (to/->EditTransportOperatorState %))
-   :footer-fn   (fn [data]
-                  [:div
-                   [:div
-                    (when show-actions?
-                      [buttons/save {:on-click #(e! (to/->SaveTransportOperator))
-                                     :disabled (form/disable-save? data)}
-                       (tr [:buttons :save])])
-
-                    [buttons/save {:on-click #(e! (to/->CancelTransportOperator))}
-                     (tr [:buttons :cancel])]]
-
-                   (when show-actions?
-                     (when (not (get-in state [:transport-operator :new?]))
+   :update!         #(e! (to/->EditTransportOperatorState %))
+   :footer-fn       (fn [data]
+                      [:div
                        [:div
-                        [:br]
-                        [ui/divider]
-                        [:br]
-                        [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
-                        [buttons/save {:on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))
-                                         :disabled (if (::t-operator/id data) false true)}
-                         (tr [:buttons :delete-operator])]]))])})
+                        (when show-actions?
+                          [buttons/save {:on-click #(e! (to/->SaveTransportOperator))
+                                         :disabled (form/disable-save? data)}
+                           (tr [:buttons :save])])
+
+                        [buttons/save {:on-click #(e! (to/->CancelTransportOperator))}
+                         (tr [:buttons :cancel])]]
+
+                       (when show-actions?
+                         (when (not (get-in state [:transport-operator :new?]))
+                           [:div
+                            [:br]
+                            [ui/divider]
+                            [:br]
+                            [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
+                            [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
+                            [buttons/save {:on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))
+                                           :disabled (if (::t-operator/id data) false true)}
+                             (tr [:buttons :delete-operator])]]))])})
 
 (defn operator-ytj [e! {operator :transport-operator :as state}]
-  ;(e! (to/->EditTransportOperator (get-in state [:params :id])))
   (fn [e! {operator :transport-operator :as state}]
     (let [show-id-entry? (empty? (get-in state [:params :id]))
           show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
@@ -279,10 +304,13 @@
                    (if (:new? operator)
                      :organization-new-title
                      :organization-form-title)])]]]
-
-       [:div.row {:style {:white-space "pre-wrap"}}
-        [:p (tr [:organization-page :help-desc-1])]
-        [:p (tr [:organization-page :help-desc-2])]]
+       [:div
+        [info/info-toggle (tr [:common-texts :instructions])
+         [:div
+          [:div (tr [:organization-page :help-ytj-integration-desc])]
+          [:div (tr [:organization-page :help-desc-1])]
+          [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
+          [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
        [ui/divider]
        [delete-operator e! operator]
         [form/form
