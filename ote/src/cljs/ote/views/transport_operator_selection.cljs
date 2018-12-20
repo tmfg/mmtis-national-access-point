@@ -16,7 +16,7 @@
 (defn transport-operator-selection [e! {operator :transport-operator
                                         operators :transport-operators-with-services
                                         show-add-member-dialog? :show-add-member-dialog?} & extended]
-  [:span
+  [:div
    ;; Show operator selection if there are operators and we are not creating a new one
    (when (and (not (empty? operators))
               (not (:new? operator)))
