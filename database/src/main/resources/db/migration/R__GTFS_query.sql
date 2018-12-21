@@ -173,7 +173,7 @@ SELECT EXISTS(
 $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_should_calculate_transit_change(INTEGER) IS
-E'Check if transit changes should be calculated for the given transport-service-id. New calculation is required if earliest change-date is in the past or if service have got new package.';
+E'Check if transit changes should be calculated for the given transport-service-id. New calculation is required if earliest change-date is in the past or if service have got new package. 4 hour window is due to utc times vs server time';
 
 CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(package_ids INTEGER[], dt DATE)
 RETURNS SETOF route_trips_for_date
