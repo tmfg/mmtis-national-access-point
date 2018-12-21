@@ -956,7 +956,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :invalid-file-type "Virheellinen tiedostotyyppi"
   :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
   :transport-operator-saved "Palveluntarjoajan tiedot tallennettu!"
-  :footer-livi-logo "Liikennevirasto Logo"
+  :footer-livi-logo "Traficom"
   :footer-livi-url "Traficom.fi"
   :footer-livi-url-link "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"
   :footer-ckan-software "CKAN-ohjelmistolla"

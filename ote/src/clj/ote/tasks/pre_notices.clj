@@ -119,7 +119,6 @@
 
     [:p "Tämän viestin lähetti NAP."]
     [:p "Ongelmia? Ota yhteys NAP-Helpdeskiin," [:br]
-     ;; TODO: Trafi
      [:a {:href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
      [:span " tai 029 534 5454 (arkisin 10-16)"]]]])
 

@@ -946,7 +946,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :invalid-file-type "Invalid file type"
   :transport-service-saved "Transport service information has been saved!"
   :transport-operator-saved "Transport operator information has been saved!"
-  :footer-livi-logo "Finnish Transport Aggency Logo"
+  :footer-livi-logo "Finnish Transport and Communications Agency"
   :footer-livi-url "Traficom.fi"
   :footer-livi-url-link "https://www.traficom.fi/en/services/how-submit-your-transport-service-information-nap-service-catalog"
   :footer-ckan-software "CKAN-software"
