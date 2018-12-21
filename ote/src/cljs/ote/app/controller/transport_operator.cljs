@@ -107,7 +107,7 @@
         ytj-contact-web (preferred-ytj-field ["Kotisivun www-osoite" "www-adress" "Website address"] (:contactDetails response))
         use-ytj-web? (not (empty? ytj-contact-web))
         ytj-company-names (when (some? (:name response)) (ytj->nap-companies
-                                                           (into [{:name (:name response)}] (:auxiliaryNames response)) ; Insert company name first to checkbox list before aux names
+                                                           (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
                                                            (:transport-operators-with-services app)))
         ytj-changed-fields? (and ytj-business-id-hit?
                                  (or (not= ytj-address-billing (::t-operator/billing-address t-op))
