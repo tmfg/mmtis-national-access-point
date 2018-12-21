@@ -100,9 +100,6 @@
 (defn flex-container [dir]
   {:display "flex" :flex-direction dir})
 
-(defn flex-container2 []
-  {:display "flex" :flex-direction "row" :width "100%"})
-
 (def flex-child {:flex 1 })
 
 (def item-list-container
