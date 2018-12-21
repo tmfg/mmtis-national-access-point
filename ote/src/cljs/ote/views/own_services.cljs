@@ -82,7 +82,7 @@
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "}
            (if published?
-             (let [url (str "/ote/export/geojson/" transport-operator-id "/" id)]
+             (let [url (str "/export/geojson/" transport-operator-id "/" id)]
                [linkify url
                 (tr [:own-services-page :open-geojson])
                 {:target "_blank"
@@ -185,49 +185,45 @@
 
 
 (defn service-provider-controls
-  [e! has-services? operator-services state]
-  (let [operator (:transport-operator state)
-        show-add-member-dialog? (:show-add-member-dialog? state)
-        operator-id (::t-operator/id operator)
-        operator-name (::t-operator/name operator)]
-    [:div.col-xs-12
-     [:div
-      [:h2 {:style {:margin-bottom "2rem"}}
-       operator-name]
-      [:div {:style {:margin-bottom "2rem"}}
-       [:a (merge {:href (str "#/transport-operator/" operator-id)
-                   :style {:margin-right "2rem"}
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (fp/->ChangePage :transport-operator {:id operator-id})))}
-                  (stylefy/use-style style-base/blue-link-with-icon))
-        (ic/content-create {:style {:width 20
-                                    :height 20
-                                    :margin-right "0.5rem"
-                                    :color colors/primary}})
-        (tr [:buttons :edit])]
-       [:button (merge {:on-click #(do
-                                     (.preventDefault %)
-                                     (e! (fp/->ToggleAddMemberDialog)))}
-                       (stylefy/use-style style-base/blue-link-with-icon))
-        (ic/social-person {:style {:width 20
-                                   :height 20
-                                   :margin-right "0.5rem"
-                                   :color colors/primary}})
-        (tr [:buttons :manage-access-rights])]]
-      (when show-add-member-dialog?
-        [ui-common/ckan-iframe-dialog (::t-operator/name operator)
-         (str "/organization/member_new/" (::t-operator/ckan-group-id operator))
-         #(e! (fp/->ToggleAddMemberDialog))])]
+  [e! has-services? operator-services {::t-operator/keys [id name ckan-group-id] :as operator} show-add-member-dialog?]
+  [:div.col-xs-12
+   [:div
+    [:h2 {:style {:margin-bottom "2rem"}}
+     name]
+    [:div {:style {:margin-bottom "2rem"}}
+     [:a (merge {:href (str "#/transport-operator/" id)
+                 :style {:margin-right "2rem"}
+                 :on-click #(do
+                              (.preventDefault %)
+                              (e! (fp/->ChangePage :transport-operator {:id id})))}
+                (stylefy/use-style style-base/blue-link-with-icon))
+      (ic/content-create {:style {:width 20
+                                  :height 20
+                                  :margin-right "0.5rem"
+                                  :color colors/primary}})
+      (tr [:buttons :edit])]
+     [:button (merge {:on-click #(do
+                                   (.preventDefault %)
+                                   (e! (fp/->ToggleAddMemberDialog)))}
+                     (stylefy/use-style style-base/blue-link-with-icon))
+      (ic/social-person {:style {:width 20
+                                 :height 20
+                                 :margin-right "0.5rem"
+                                 :color colors/primary}})
+      (tr [:buttons :manage-access-rights])]]
+    (when show-add-member-dialog?
+      [ui-common/ckan-iframe-dialog name
+       (str "/organization/member_new/" ckan-group-id)
+       #(e! (fp/->ToggleAddMemberDialog))])]
 
-     [:div
-      (if (not (and has-services? (not (empty? operator-services))))
-        [:p
-         [:div {:style {:float "left"}}                     ;;this is done because translations with variables don't support markdown and we have to fix md and variables
-          (tr [:own-services-page :own-services-new-provider1])
-          [:strong operator-name]]
-         (tr [:own-services-page :own-services-new-provider2])])]
-     [:hr {:style {:border-bottom "0"}}]]))
+   [:div
+    (if (not (and has-services? (not (empty? operator-services))))
+      [:p
+       [:div {:style {:float "left"}}                       ;;this is done because translations with variables don't support markdown and we have to fix md and variables
+        (tr [:own-services-page :own-services-new-provider1])
+        [:strong name]]
+       (tr [:own-services-page :own-services-new-provider2])])]
+   [:hr {:style {:border-bottom "0"}}]])
 
 (defn operator-info-container
   [e! has-services? operator-services state]
@@ -236,8 +232,9 @@
     [own-services-header e! has-services? operator-services state]]
    [:div.container
     [:div.row
-     [service-provider-controls e! has-services? operator-services state]
+     [service-provider-controls e! has-services? operator-services (:transport-operator state) (:show-add-member-dialog? state) ]
      [table-container-for-own-services e! has-services? operator-services state]]]])
+
 
 (defn no-operator
   "If user haven't added service-operator, we will ask to do so."
