@@ -17,7 +17,7 @@
                            (base/flex-container "row")
                            {:flex-wrap "wrap"}))
 
-(def form-group-container {:padding-bottom "1em"})
+(def form-group-container {:padding-bottom "1em" :width "100%"})
 
 (def form-card {:background-color "#fff"
                 :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
