@@ -54,3 +54,8 @@
                  :left "0"
                  :top "0"
                  :opacity "0"}}})
+
+(def form-field
+  {:width "100%"
+   :max-width "35rem"})
+
