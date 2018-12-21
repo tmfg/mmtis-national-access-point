@@ -128,45 +128,6 @@
         ;"Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
         ]])))
 
-(defn table-container-for-own-services-old [e! has-services? operator-services state]
-  [:div
-   (warn-about-test-server)
-   [list-header/header
-    state
-    (tr [:common-texts :own-api-list])
-    (when (not (empty? operator-services))
-      [ui/raised-button {:label (tr [:buttons :add-transport-service])
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (ts/->OpenTransportServiceTypePage)))
-                         :primary true
-                         :icon (ic/content-add)}])
-    [t-operator-sel/transport-operator-selection e! state true]]
-   [:div.row
-    [:div {:class "col-xs-12 col-md-12"}
-     (if (and has-services? (not (empty? operator-services)))
-       ;; TRUE -> Table for transport services
-       (doall
-         (for [type t-service/transport-service-types
-               :let [services (filter #(= (:ote.db.transport-service/type %) type) operator-services)]
-               :when (not (empty? services))]
-           ^{:key type}
-           [transport-services-listing
-            e! (get-in state [:transport-operator ::t-operator/id])
-            services (tr [:titles type])]))
-
-       ;; FALSE -> explain user why table is empty
-       [:div
-        [:br]
-        [:p (tr [:front-page :operator-dont-have-any-services])]
-        [:div {:style {:padding-top "20px"}}]
-        [ui/raised-button {:label (tr [:buttons :add-transport-service])
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (ts/->OpenTransportServiceTypePage)))
-                           :primary true
-                           :icon (ic/content-add)}]])]]])
-
 (defn own-services-header
   [e! has-services? operator-services state]
   (let [operator (:transport-operator state)
