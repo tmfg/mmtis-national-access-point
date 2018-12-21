@@ -11,6 +11,7 @@
             [ote.ui.info :as info]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
+            [ote.style.form-fields :as style-fields]
             [ote.ui.common :as ui-common]
             [ote.ui.form-fields :as form-fields]
 
@@ -50,22 +51,14 @@
         status (get-in state [:ytj-response :status])
         ytj-loading? (fn [state] (:ytj-response-loading state))]
     (form/group
-      {
-       ;:columns         1
-       :card?           false
-       :container-style (style-base/flex-container2)  ;Full-width to have groups stack vertically
-       ;:container-style style-form/full-width
-       }
+      {:card?           false}
 
       {:name      ::t-operator/business-id
        :type      :string
        :validate  [[:business-id]]
        :required? true
        :warning   (tr [:common-texts :required-field])
-       :should-update-check form/always-update
-       ;:style style-form/half-width
-       :style style-base/flex-child
-       }
+       :should-update-check form/always-update}
 
       {:name      ::t-operator/btn-submit-business-id
        :type      :external-button
@@ -73,10 +66,7 @@
        :primary   true
        :secondary true
        :on-click  #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
-       :disabled  (ytj-loading? state)
-       ;:style style-form/half-width
-       :style style-base/flex-child
-       }
+       :disabled  (ytj-loading? state)}
 
       (when (:ytj-response state); label composition for error message
         (cond
@@ -89,15 +79,13 @@
           :else
           {:name  :ytj-msq-query-error
            :type  :text-label
-           :label (tr [:common-texts :server-error-try-later])})
-        )
+           :label (tr [:common-texts :server-error-try-later])}))
 
       ; label composition for user instructions how to continue
       (when (and (:ytj-response state) (not= 200 status))
         {:name  :ytj-query-tip-whatnext
          :type  :text-label
-         :label (str (tr [:common-texts :check-your-input]) " " (tr [:common-texts :optionally-fill-manually]))})
-      )))
+         :label (str (tr [:common-texts :check-your-input]) " " (tr [:common-texts :optionally-fill-manually]))}))))
 
 (defn- operator-form-groups [e! state]
   "Creates a napote form and resolves data to fields. Assumes expired fields are already filtered from ytj-response."
@@ -112,16 +100,13 @@
        :columns 1
        :tooltip (tr [:organization-page :basic-info-tooltip])
        :tooltip-length "large"
-       :card? false
-       :container-style (style-base/flex-container2)
-       }
+       :card? false}
 
       {:name        :heading1
        :label       (str (tr [:organization-page :business-id-heading]) " " (get-in state [:transport-operator ::t-operator/business-id]))
        :type        :text-label
        :h-style     :h2
-       :full-width? true
-       }
+       :full-width? true}
 
       {:name       :heading2
        :label      (if ytj-company-names-found?
@@ -129,9 +114,7 @@
                      "Toiminimi")
        :type       :text-label
        :h-style    :h3
-       :max-length 70
-       :full-width? true
-       }
+       :full-width? true}
 
       (when response-ok?
         {:name          :help-checkbox-group
@@ -142,22 +125,18 @@
 
       (if response-ok?                                      ; Input field if not YTJ results, checkbox-group otherwise
         {:name                :transport-operators-to-save
-         ;:label
-         ;:help
          :type                :checkbox-group
          :show-option         ::t-operator/name
          :option-enabled?     #(nil? (::t-operator/id %))
          :options             ytj-company-names
          :full-width?         true
          :should-update-check form/always-update
-         :required?           true
-         }
+         :required?           true}
         {:name       ::t-operator/name
          :label      ""
          :type       :string
          :required?  true
-         :full-width? true
-         :max-length 70})
+         :style      style-fields/form-field})
 
       (when (and response-ok? (not ytj-company-names-found?))
         {:name :msg-no-aux-names-for-business-id
@@ -185,15 +164,13 @@
 
       {:name ::ote.db.transport-operator/billing-address
        :type :text-label
-       :max-length 128
        :h-style :h4}
 
       {:name        ::common/billing-street
        :label       (tr [:field-labels :ote.db.common/street])
        :type        :string
        :disabled?   disable-ytj-address-billing?
-       :max-length  128
-       :full-width? true
+       :style       style-fields/form-field
        :read        (comp ::common/street ::t-operator/billing-address)
        :write       (fn [data street]
                       (assoc-in data [::t-operator/billing-address ::common/street] street))}
@@ -202,7 +179,7 @@
        :label (tr [:field-labels :ote.db.common/postal_code])
        :type :string
        :disabled? disable-ytj-address-billing?
-       :full-width? true
+       :style style-fields/form-field
        :regex #"\d{0,5}"
        :read (comp ::common/postal_code ::t-operator/billing-address)
        :write (fn [data postal-code]
@@ -212,22 +189,20 @@
        :label (tr [:field-labels :ote.db.common/post_office])
        :type :string
        :disabled? disable-ytj-address-billing?
-       :full-width? true
-       :max-length 64
+       :style style-fields/form-field
        :read (comp :ote.db.common/post_office :ote.db.transport-operator/billing-address)
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/billing-address :ote.db.common/post_office] post-office))}
 
       {:name ::ote.db.transport-operator/visiting-address
        :type :text-label
-       :max-length 128
+       :style style-fields/form-field
        :h-style :h4}
 
       {:name ::common/street
        :type :string
        :disabled? disable-ytj-address-visiting?
-       :full-width? true
-       :max-length 128
+       :style style-fields/form-field
        :read (comp ::common/street ::t-operator/visiting-address)
        :write (fn [data street]
                 (assoc-in data [::t-operator/visiting-address ::common/street] street))}
@@ -235,7 +210,7 @@
       {:name ::common/postal_code
        :type :string
        :disabled? disable-ytj-address-visiting?
-       :full-width? true
+       :style style-fields/form-field
        :regex #"\d{0,5}"
        :read (comp ::common/postal_code ::t-operator/visiting-address)
        :write (fn [data postal-code]
@@ -244,27 +219,23 @@
       {:name :ote.db.common/post_office
        :type :string
        :disabled? disable-ytj-address-visiting?
-       :full-width? true
-       :max-length 64
+       :style style-fields/form-field
        :read (comp :ote.db.common/post_office :ote.db.transport-operator/visiting-address)
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
 
-      {:name ::t-operator/phone :type :string :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false) :full-width? true :regex ui-validation/phone-number-regex}
+      {:name ::t-operator/phone :type :string :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false) :style style-fields/form-field :regex ui-validation/phone-number-regex}
 
-      {:name ::t-operator/gsm :type :string :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false) :full-width? true :regex ui-validation/phone-number-regex}
+      {:name ::t-operator/gsm :type :string :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false) :style style-fields/form-field :regex ui-validation/phone-number-regex}
 
-      {:name ::t-operator/email :type :string :disabled? (get-in state [:ytj-flags :use-ytj-email?] false) :full-width? true :max-length 200}
+      {:name ::t-operator/email :type :string :disabled? (get-in state [:ytj-flags :use-ytj-email?] false) :style style-fields/form-field}
 
-      {:name ::t-operator/homepage :type :string :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false) :full-width? true :max-length 200})))
+      {:name ::t-operator/homepage :type :string :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false) :style style-fields/form-field})))
 
 (defn- allow-manual-creation? [state] (some? (:ytj-response state)))
 
 (defn- operator-form-options [e! state show-actions?]
   {:name->label     (tr-key [:field-labels])
-   ;:layout :row
-   ;:style style-form/form-group-row
-   :container-style (style-base/flex-container2)
    :update!         #(e! (to/->EditTransportOperatorState %))
    :footer-fn       (fn [data]
                       [:div
