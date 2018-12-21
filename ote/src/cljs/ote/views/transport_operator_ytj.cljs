@@ -290,31 +290,29 @@
                              (tr [:buttons :delete-operator])]]))])})
 
 (defn operator-ytj [e! {operator :transport-operator :as state}]
-  (fn [e! {operator :transport-operator :as state}]
-    (let [show-id-entry? (empty? (get-in state [:params :id]))
-          show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
-          form-options (operator-form-options e! state show-details?)
-          form-groups (cond-> []
-                              show-id-entry? (conj (operator-selection-group e! state))
-                              show-details? (conj (operator-form-groups e! state)))]
+  (let [show-id-entry? (empty? (get-in state [:params :id]))
+        show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
+        form-options (operator-form-options e! state show-details?)
+        form-groups (cond-> []
+                            show-id-entry? (conj (operator-selection-group e! state))
+                            show-details? (conj (operator-form-groups e! state)))]
+    [:div
+     [:div
       [:div
+       [:h1 (tr [:organization-page
+                 (if (:new? operator)
+                   :organization-new-title
+                   :organization-form-title)])]]]
+     [:div
+      [info/info-toggle (tr [:common-texts :instructions])
        [:div
-        [:div
-         [:h1 (tr [:organization-page
-                   (if (:new? operator)
-                     :organization-new-title
-                     :organization-form-title)])]]]
-       [:div
-        [info/info-toggle (tr [:common-texts :instructions])
-         [:div
-          [:div (tr [:organization-page :help-ytj-integration-desc])]
-          [:div (tr [:organization-page :help-desc-1])]
-          [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
-          [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
-       [ui/divider]
-       [delete-operator e! operator]
-        [form/form
-         form-options
-         form-groups
-         operator]
-       ])))
+        [:div (tr [:organization-page :help-ytj-integration-desc])]
+        [:div (tr [:organization-page :help-desc-1])]
+        [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
+        [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
+     [ui/divider]
+     [delete-operator e! operator]
+     [form/form
+      form-options
+      form-groups
+      operator]]))
