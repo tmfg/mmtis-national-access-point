@@ -235,35 +235,22 @@
      [table-container-for-own-services e! has-services? operator-services state]]]])
 
 
+(defn no-operator-texts
+  [e! state]
+  [:div {:style {:margin "3rem 0"}}
+   [:p (tr [:own-services-page :own-services-no-providers])]
+   [:a (merge {:href "#/transport-operator"
+               :on-click #(do
+                            (.preventDefault %)
+                            (e! (to/->CreateTransportOperator)))}
+              (stylefy/use-style style-buttons/outline-button))
+    (tr [:buttons :create-new-transport-operator])]])
+
 (defn no-operator
   "If user haven't added service-operator, we will ask to do so."
   [e! state]
-  [:div.container
-   [:div.row
-    [:div {:class "col-xs-12 col-sm-12 col-md-12"}
-
-     [:h1 (tr [:front-page :header-no-operator])]
-     [:h3 (tr [:front-page :desc-to-add-new-operator])]
-     (warn-about-test-server)
-
-     [:p (tr [:front-page :desc-to-add-new-operator-2])]
-     [:p (tr [:front-page :desc-to-add-new-operator-3])]
-     [ui/raised-button {:label (tr [:front-page :move-to-organizations-page])
-                        :primary true
-                        :on-click #(do
-                                     (.preventDefault %)
-                                     (e! (fp/->ChangePage :operators nil)))
-                        :style {:margin "20px 0px 20px 0px"}}]
-     [:p (tr [:front-page :desc-to-add-new-operator-4])]
-
-     [:div.row {:style {:padding-top "60px"}}
-      [:p (tr [:front-page :desc-to-add-new-operator-5])]
-      [ui/raised-button {:label (tr [:buttons :add-new-transport-operator])
-                         :primary true
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (to/->CreateTransportOperator)))
-                         :style {:margin-top "20px"}}]]]]])
+  [page/page-controls "" (tr [:common-texts :own-api-list])
+   [no-operator-texts e! state]])
 
 (defn own-services [e! state]
   (e! (fp/->EnsureTransportOperator))
