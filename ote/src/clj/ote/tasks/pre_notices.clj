@@ -120,10 +120,8 @@
     [:p "Tämän viestin lähetti NAP."]
     [:p "Ongelmia? Ota yhteys NAP-Helpdeskiin," [:br]
      ;; TODO: Trafi
-     #_ [:a
-      {:href "mailto:joukkoliikenne@liikennevirasto.fi"}
-      "joukkoliikenne@liikennevirasto.fi"]
-     [:span " tai 0295 34 3434 (arkisin 10-16)"]]]])
+     [:a {:href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
+     [:span " tai 029 534 5454 (arkisin 10-16)"]]]])
 
 
 (defn user-notification-html
