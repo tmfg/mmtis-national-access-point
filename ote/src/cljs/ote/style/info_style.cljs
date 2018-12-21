@@ -1,9 +1,10 @@
 (ns ote.style.info-style
-  (:require [stylefy.core :as stylefy]))
+  (:require [stylefy.core :as stylefy]
+            [ote.theme.colors :as colors]))
 
 
 (def info-button
-  {:background-color "#E6E6E6"
+  {:background-color colors/gray200
    :width "100%"
    :padding "1rem"
    :border "none"
@@ -11,23 +12,23 @@
    :transition "background-color 0.15s ease-in-out"
    :display "flex"
    :align-items "center"
-   :color "#323232"
-   ::stylefy/mode {:hover {:background-color "#CCCCCC"}}})
+   :cursor "pointer"
+   :color colors/gray900
+   ::stylefy/mode {:hover {:background-color colors/gray300}}})
 
 (def info-container
-  {:margin-bottom "1rem"})
+  {:margin-bottom "2rem"})
 
 (def info-icon
-  {:color "#505050"
+  {:color colors/gray600
    :margin-right "0.5rem"})
 
 (def info-text
-  {:background-color "#F0F0F0"
+  {:background-color colors/gray100
    :transform-origin "top"
    :display "block"
    :margin 0
-   :padding "1rem"
-   ::stylefy/mode {:hover {:background-color "#CCCCCC"}}})
+   :padding "1rem"})
 
 (def info-open
   (merge info-text

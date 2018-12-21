@@ -71,7 +71,7 @@
     (fn [page]
       [:span])}))
 
-(def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices :admin :services})
+(def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices :own-services :admin :services})
 
 (defn ote-application
   "OTE application main view"
@@ -84,14 +84,11 @@
          [theme e! app
           (if (nil? app)
             [common/loading-spinner]
-            [:div.ote-sovellus
+            [:div.ote-sovellus {:style {:display "flex"
+                                        :flex-direction "column"}}
              [top-nav e! app is-scrolled? desktop?]
-
-             [:div {:on-click #(e! (fp-controller/->CloseHeaderMenus))
-                    :style {:min-height "100%"
-                            :display "flex"
-                            :flex-direction "column"
-                            :justify-content "space-between"}}
+             [:div (merge (stylefy/use-style style-base/sticky-footer)
+                     {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
               (if (not loaded?)
                 [common/loading-spinner]
                 [(if wide? :div :div.wrapper)

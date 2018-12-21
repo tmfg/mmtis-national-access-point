@@ -25,9 +25,6 @@ describe('Own services basic tests', function () {
     });
 
     it('should redirect to add new service provider view', function () {
-        // Get the service selector with partial id (i.e. id-attribute contains the desired "Valitsepalveluntuottaja"-substring).
-        cy.get('[id*="Valitsepalveluntuottaja"]')
-            .click();
         cy.contains('Lisää uusi palveluntuottaja')
             .click();
     });
@@ -60,7 +57,7 @@ describe('Add a new service', function () {
             cy.route('POST', '/transport-service').as('addService');
 
             cy.visit('/#/own-services');
-            cy.contains('Lisää uusi palvelu').click();
+            cy.get('a[id*="new-service-button"]').click();
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
                 .click();

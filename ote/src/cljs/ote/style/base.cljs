@@ -1,7 +1,8 @@
 (ns ote.style.base
   "Base styles for OTE application. Everything that affects the overall look and feel of the app."
   (:require
-    [stylefy.core :as stylefy :refer [use-style use-sub-style]]))
+    [stylefy.core :as stylefy :refer [use-style use-sub-style]]
+    [ote.theme.colors :as colors]))
 
 (def body {:margin 0
            :padding 0})
@@ -37,8 +38,18 @@
                   :font-size "12px"
                   :font-weight "bold"})
 
-(def delete-button (merge base-button {:background-color "rgb(221,0,0)"}))
+(def blue-link-with-icon {:color colors/primary
+                          :text-decoration "none"
+                          :margin-bottom "1px"
+                          :border "none"
+                          :background "none"
+                          :cursor "pointer"
+                          :padding "0"
+                          :display "inline-flex"
+                          ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/primary)
+                                                  :margin-bottom "-1px"}}})
 
+(def delete-button (merge base-button {:background-color "rgb(221,0,0)"}))
 
 (def disabled-button (merge base-button {:background-color "#CCCCCC"}))
 
@@ -46,7 +57,13 @@
                          :font-weight "bold"
                          :text-transform "uppercase"
                          :color "#FFFFFF"})
+
 (def button-add-row {:margin "15px 0 20px 0"})
+
+(def sticky-footer {:min-height "100%"
+                    :display "flex"
+                    :flex-direction "column"
+                    :justify-content "space-between"})
 
 ;; Form elements
 (def required-element {:color "#B71C1C"
@@ -59,9 +76,17 @@
 ;; Front page
 
 (def front-page-add-service {:border-right "1px solid grey"})
-(def front-page-service-table {:a
-                               {:text-decoration "none"
-                                ::stylefy/mode {:visited {:text-decoration "none"}}}})
+(def front-page-service-table (merge {:border "1px solid grey"}
+                                     {::stylefy/sub-styles {:link {:text-decoration "none"
+                                                                   ::stylefy/mode {:visited {:text-decoration "none"}
+                                                                                   :hover {:text-decoration "underline"}}}}}))
+
+(stylefy/class "table-header"
+  {:background-color (str colors/gray300 " !important")
+   :color (str colors/gray900 " !important")
+   :font-weight "bold !important"
+   :position "inherit !important"})
+
 (def header-font {:font-size "18px"
                   :padding-top "20px"
                   :font-weight "600"})
