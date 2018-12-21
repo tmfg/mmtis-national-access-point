@@ -21,7 +21,9 @@
    :display "inline-block"
    :transition "all 200ms ease"
    :text-decoration "none"
-   :box-shadow "4px 4px 8px 0 rgba(0, 0, 0, .2)"})
+   :box-shadow "4px 4px 8px 0 rgba(0, 0, 0, .2)"
+   ::stylefy/vendors ["webkit" "moz" "o"]
+   ::stylefy/auto-prefix #{:transition}})
 
 (def primary-button
   (merge button-common
@@ -38,8 +40,5 @@
           :border "1px solid"
           :border-color colors/primary
           ::stylefy/mode {:hover outline-btn-hover-focus
-                          :focus outline-btn-hover-focus}
-          ::stylefy/vendors ["webkit" "moz" "ms"]
-          ::stylefy/auto-prefix #{:transition
-                                  :transform}}))
+                          :focus outline-btn-hover-focus}}))
 

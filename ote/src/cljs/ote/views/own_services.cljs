@@ -72,9 +72,10 @@
          ^{:key i}
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column
-           [:a (merge {:href "#" :on-click #(do
-                                              (.preventDefault %)
-                                              (e! (fp/->ChangePage :edit-service {:id id})))}
+           [:a (merge {:href (str "/#/edit-service/" id)
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (fp/->ChangePage :edit-service {:id id})))}
                       (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
           [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
@@ -111,17 +112,17 @@
          [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-modified])]
          [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-created])]
          [ui/table-header-column {:class "hidden-xs hidden-sm table-header"} (tr [:front-page :table-header-service-url])]
-         [ui/table-header-column {:class "table-header "}(tr [:front-page :table-header-actions])]]]
+         [ui/table-header-column {:class "table-header "} (tr [:front-page :table-header-actions])]]]
 
        (transport-services-table-rows e! services transport-operator-id)]]]))
 
 (defn warn-about-test-server []
   (let [page-url (-> (.-location js/window))]
-    (when (s/includes? (str page-url) "testi") ;; if url contains "testi" show message -> testi.finap.fi
+    (when (s/includes? (str page-url) "testi")              ;; if url contains "testi" show message -> testi.finap.fi
       [:div {:style {:border "red 4px dashed"}}
        [:p {:style {:padding "10px"}} "TÄMÄ ON TESTIPALVELU!"
         [:br]
-        "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "  [:a {:href "https://finap.fi/#/services"} "finap.fi" ]
+        "Julkinen NAP-palvelukatalogi löytyy osoitteesta: " [:a {:href "https://finap.fi/#/services"} "finap.fi"]
         ;;TODO: Trafi
         ;[:br]
         ;"Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
@@ -134,12 +135,12 @@
     state
     (tr [:common-texts :own-api-list])
     (when (not (empty? operator-services))
-      [ui/raised-button {:label    (tr [:buttons :add-transport-service])
+      [ui/raised-button {:label (tr [:buttons :add-transport-service])
                          :on-click #(do
                                       (.preventDefault %)
                                       (e! (ts/->OpenTransportServiceTypePage)))
-                         :primary  true
-                         :icon     (ic/content-add)}])
+                         :primary true
+                         :icon (ic/content-add)}])
     [t-operator-sel/transport-operator-selection e! state true]]
    [:div.row
     [:div {:class "col-xs-12 col-md-12"}
@@ -163,7 +164,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (ts/->OpenTransportServiceTypePage)))
-                           :primary  true
+                           :primary true
                            :icon (ic/content-add)}]])]]])
 
 (defn own-services-header
@@ -245,13 +246,13 @@
                                     :color colors/primary}})
         (tr [:buttons :edit])]
        [:button (merge {:on-click #(do
-                                (.preventDefault %)
-                                (e! (fp/->ToggleAddMemberDialog)))}
-                  (stylefy/use-style style-base/blue-link-with-icon))
+                                     (.preventDefault %)
+                                     (e! (fp/->ToggleAddMemberDialog)))}
+                       (stylefy/use-style style-base/blue-link-with-icon))
         (ic/social-person {:style {:width 20
-                                    :height 20
-                                    :margin-right "0.5rem"
-                                    :color colors/primary}})
+                                   :height 20
+                                   :margin-right "0.5rem"
+                                   :color colors/primary}})
         (tr [:buttons :manage-access-rights])]]
       (when show-add-member-dialog?
         [ui-common/ckan-iframe-dialog (::t-operator/name operator)
