@@ -109,10 +109,10 @@
                 [ui/table-row-column {:style {:width "7%" :padding-left "15px" :padding-right "15px"}} id]
                 [ui/table-row-column {:style {:width "9%" :padding-left "15px" :padding-right "15px"}} business-id]
                 [ui/table-row-column {:style {:width "20%" :padding-left "15px" :padding-right "15px"}}
-                 [:a {:href     "#"
+                 [:a {:href     (str "#/transport-operator/" id)
                       :on-click #(do
                                    (.preventDefault %)
-                                   (e! (fp/->ChangePage :transport-operator {:id id})))} name]]
+                                   (e! (admin-controller/->EditTransportOperator business-id)))} name]]
                 [ui/table-row-column {:style {:width "10%" :padding-left "15px" :padding-right "15px"}} gsm]
                 [ui/table-row-column {:style {:width "10%" :padding-left "15px" :padding-right "15px"}} phone]
                 [ui/table-row-column {:style {:width "18%" :padding-left "15px" :padding-right "15px"}} email]
