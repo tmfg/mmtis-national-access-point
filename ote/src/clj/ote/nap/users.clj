@@ -32,8 +32,7 @@
   (fn [{username :user-id :as req}]
     (if-let [user (when username
                     (find-user db username))]
-      (do (log/debug "User found: " (pr-str user))
-          (handler (assoc req :user user)))
+      (handler (assoc req :user user))
       (if allow-unauthenticated?
         (handler req)
         (do (log/info "No user info, return 401")
