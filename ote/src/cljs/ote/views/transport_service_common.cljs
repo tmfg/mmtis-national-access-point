@@ -120,7 +120,8 @@
          [:div {:margin-bottom "5px"}
           [:b (if (= :schedule sub-type)
                 [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
-                 [linkify "https://liikennevirasto.fi/rae" (str (tr [:form-help :RAE-link-text]) ". ")
+                 [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
+                  (str (tr [:form-help :RAE-link-text]) ". ")
                   {:target "_blank"}]
                  (when (flags/enabled? :sea-routes)
                   [:span

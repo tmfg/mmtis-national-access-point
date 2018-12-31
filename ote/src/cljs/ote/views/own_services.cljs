@@ -123,10 +123,9 @@
        [:p {:style {:padding "10px"}} "TÄMÄ ON TESTIPALVELU!"
         [:br]
         "Julkinen NAP-palvelukatalogi löytyy osoitteesta: " [:a {:href "https://finap.fi/#/services"} "finap.fi"]
-        ;;TODO: Trafi
-        ;[:br]
-        ;"Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.liikennevirasto.fi/nap"} "www.liikennevirasto.fi/nap" ]
-        ]])))
+        [:br]
+        "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"}
+                                                                        "www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa" ]]])))
 
 (defn own-services-header
   [e! has-services? operator-services state]

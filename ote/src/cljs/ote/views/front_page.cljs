@@ -45,10 +45,10 @@
    [:p {:style {:margin "10px"}}
     "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "
     [linkify "https://finap.fi/ote/#/services" "finap.fi"]]
-   ;; TODO: Trafi
-   #_ [:p {:style {:margin "10px"}}
+   [:p {:style {:margin "10px"}}
     "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta "
-    [linkify "http://www.liikennevirasto.fi/nap" "www.liikennevirasto.fi/nap"]]])
+    [linkify "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"
+     "www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"]]])
 
 (defn front-page
   "Front page info"
