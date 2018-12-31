@@ -108,6 +108,9 @@
        :h-style     :h2
        :full-width? true}
 
+      {:name        :heading1-divider
+       :type        :divider}
+
       {:name       :heading2
        :label      (if ytj-company-names-found?
                      (tr [:organization-page :business-id-and-aux-names])
@@ -281,7 +284,6 @@
         [:div (tr [:organization-page :help-desc-1])]
         [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
         [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
-     [ui/divider]
      [delete-operator e! operator]
      [form/form
       form-options
