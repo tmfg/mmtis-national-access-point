@@ -45,7 +45,7 @@
                     :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}])]}
      (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})]))
 
-(defn- operator-selection-group [e! state]
+(defn- business-id-selection [e! state]
   "Form group for querying business id from user and triggering data fetch for it from YTJ"
   (let [operator (:transport-operator state)
         status (get-in state [:ytj-response :status])
@@ -268,7 +268,7 @@
         show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
         form-options (operator-form-options e! state show-details?)
         form-groups (cond-> []
-                            show-id-entry? (conj (operator-selection-group e! state))
+                            show-id-entry? (conj (business-id-selection e! state))
                             show-details? (conj (operator-form-groups e! state)))]
     [:div
      [:div
