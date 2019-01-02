@@ -61,16 +61,16 @@
        :should-update-check form/always-update
        :on-blur #(e! (to/->EnsureUniqueBusinessId (-> % .-target .-value)))}
 
-      ; show ytj-button only if business-id is not taken and if business-id is valid
-      (when (and (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id]))
-              (not (get-in state [:transport-operator :business-id-exists])))
-        {:name      ::t-operator/btn-submit-business-id
-         :type      :external-button
-         :label     (tr [:organization-page :fetch-from-ytj])
-         :primary   true
-         :secondary true
-         :on-click  #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
-         :disabled  (ytj-loading? state)})
+      ;disabled when business-id is taken or if business-id is not valid or if loading is ongoing
+      {:name ::t-operator/btn-submit-business-id
+       :type :external-button
+       :label (tr [:organization-page :fetch-from-ytj])
+       :primary true
+       :secondary true
+       :on-click #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
+       :disabled (or (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
+                     (get-in state [:transport-operator :business-id-exists])
+                     (ytj-loading? state))}
 
       (when (:ytj-response state); label composition for error message
         (cond
