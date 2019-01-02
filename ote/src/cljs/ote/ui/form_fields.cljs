@@ -448,7 +448,6 @@
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-value (or option-value identity)
         option-idx (zipmap (map option-value options) (range))]
-    (.log js/console "selection indentity " (clj->js identity))
     [ui/select-field
      (merge
        {:auto-width (boolean auto-width?)
@@ -927,7 +926,6 @@
                  [ui/icon-button {:href     "#"
                                   :on-click #(do
                                                (.preventDefault %)
-                                               (.log js/console " tää tulee formista option " (pr-str option))
                                                (on-delete option))}
                   [ic/action-delete]]])]))
          options))
