@@ -448,6 +448,7 @@
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-value (or option-value identity)
         option-idx (zipmap (map option-value options) (range))]
+    (.log js/console "selection indentity " (clj->js identity))
     [ui/select-field
      (merge
        {:auto-width (boolean auto-width?)
@@ -880,6 +881,55 @@
                              :on-check   #(update! ((if checked? disj conj) selected option))}]]
               (when is-addition-valid
                 [:span {:style {:padding-left "20px"}} addition])]))
+         options))
+     (when (or error warning)
+       [:div
+        (stylefy/use-sub-style style-form-fields/radio-selection :required)
+        (if error error warning)])]))
+
+(defmethod field :checkbox-group-with-delete [{:keys
+                                               [update! table? label show-option options
+                                                help error warning header? option-enabled? option-addition
+                                                checkbox-group-style use-label-width? on-delete]} data]
+  ;; Options:
+  ;; :header? Show or hide the header element above the checkbox-group. Default: true.
+  ;; :option-enabled? Is option checkable. Default: true
+  ;; option-addition is a map, that knows which option needs additions and the addition. e.g. {:value: :other :addition [ReagentObject]}
+  (let [selected (set (or data #{}))
+        option-enabled? (or option-enabled? (constantly true))
+        label-style (if use-label-width? style-base/checkbox-label-with-width style-base/checkbox-label)]
+    [:div.checkbox-group {:style (if checkbox-group-style checkbox-group-style {})}
+     (when (not (false? header?))
+       [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
+     (when help
+       [common/help help])
+     (doall
+       (map-indexed
+         (fn [i option]
+           (let [checked? (boolean (selected option))]
+             ^{:key i}
+             [:div {:style {:display "flex" :flex-wrap "wrap" :justify-content "flex-start" :align-items "center" :padding-top "10px"}}
+              [ui/checkbox {:id         (str i "_" (str option))
+                            :label      (when-not table? (show-option option))
+                            :checked    checked?
+                            :disabled   (not (option-enabled? option))
+                            :style      {:width "auto"}
+                            :labelStyle (merge
+                                          {:padding-top "4px"}
+                                          label-style
+                                          (if (not (option-enabled? option))
+                                            style-base/disabled-color
+                                            {:color "rgb(33, 33, 33)"}))
+                            :on-check   #(update! ((if checked? disj conj) selected option))}]
+              ;; Show delete icon only if value is selected.
+              (when (and checked? (not (option-enabled? option)))
+                [:span (stylefy/use-style style-base/checkbox-addition)
+                 [ui/icon-button {:href     "#"
+                                  :on-click #(do
+                                               (.preventDefault %)
+                                               (.log js/console " tää tulee formista option " (pr-str option))
+                                               (on-delete option))}
+                  [ic/action-delete]]])]))
          options))
      (when (or error warning)
        [:div
