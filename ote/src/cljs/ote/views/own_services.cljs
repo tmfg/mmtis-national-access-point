@@ -244,7 +244,7 @@
                             (.preventDefault %)
                             (e! (to/->CreateTransportOperator)))}
               (stylefy/use-style style-buttons/outline-button))
-    (tr [:buttons :create-new-transport-operator])]])
+    (tr [:buttons :add-new-transport-operator])]])
 
 (defn no-operator
   "If user haven't added service-operator, we will ask to do so."
