@@ -177,7 +177,18 @@
                 (routes/navigate! :own-services))
               app)
 
-(define-event ToggleTransportOperatorDeleteDialog []
+(define-event ToggleListTransportOperatorDeleteDialog [operator]
+              {}
+              (update-in app [:transport-operator :transport-operators-to-save]
+                         (fn [coll]
+                           (for [c coll]
+                             (update c :show-delete-dialog?
+                                     #(if (and (or (nil? (:show-delete-dialog? operator)) (= false (:show-delete-dialog? operator)))
+                                               (= (::t-operator/id operator) (::t-operator/id c)))
+                                        true
+                                        false))))))
+
+(define-event ToggleSingleTransportOperatorDeleteDialog []
               {:path [:transport-operator :show-delete-dialog?]
                :app show?}
               (not show?))
