@@ -24,7 +24,14 @@
             [ote.style.base :as style-base]
             [ote.ui.common :as uicommon]))
 
-(defn- delete-operator [e! operator]
+(defn- delete-operator [e! operator service-vector]
+  ;; When operator is passed from :transport-operators-to-save list they do not have business-id
+  (let [toggle-dialog (if (nil? (::t-operator/business-id operator))
+                        (to/->ToggleListTransportOperatorDeleteDialog operator)
+                        (to/->ToggleSingleTransportOperatorDeleteDialog))
+        operator-services (:transport-service-vector (some #(when (= (::t-operator/id operator) (get-in % [:transport-operator ::t-operator/id]))
+                                                                %)
+                                                             service-vector))]
   (when (:show-delete-dialog? operator)
     [ui/dialog
      {:id "delete-transport-operator-dialog"
@@ -34,7 +41,7 @@
                   [ui/flat-button
                    {:label    (tr [:buttons :cancel])
                     :primary  true
-                    :on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))}])
+                    :on-click #(e! toggle-dialog)}])
                 (r/as-element
                   [ui/raised-button
                    {:id "confirm-operator-delete"
@@ -42,8 +49,14 @@
                     :icon      (ic/action-delete-forever)
                     :secondary true
                     :primary   true
+                    :disabled  (if (empty? operator-services)
+                                 false
+                                 true)
                     :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}])]}
-     (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})]))
+     [:div
+      (if (empty? operator-services)
+        (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})
+        (tr [:organization-page :help-operator-how-delete]))]])))
 
 (defn- operator-selection-group [e! state]
   "Form group for querying business id from user and triggering data fetch for it from YTJ"
@@ -125,13 +138,17 @@
 
       (if response-ok?                                      ; Input field if not YTJ results, checkbox-group otherwise
         {:name                :transport-operators-to-save
-         :type                :checkbox-group
+         :type                :checkbox-group-with-delete
          :show-option         ::t-operator/name
          :option-enabled?     #(nil? (::t-operator/id %))
          :options             ytj-company-names
-         :full-width?         true
+         ;:full-width?         true
          :should-update-check form/always-update
-         :required?           true}
+         :required?           true
+         :on-delete (fn [data]
+                      (do
+                        (e! (to/->ToggleListTransportOperatorDeleteDialog data))
+                        (delete-operator e! data (:transport-operators-with-services state))))}
         {:name       ::t-operator/name
          :label      ""
          :type       :string
@@ -247,8 +264,7 @@
 
                         [buttons/save {:on-click #(e! (to/->CancelTransportOperator))}
                          (tr [:buttons :cancel])]]
-
-                       (when show-actions?
+                        (when (and show-actions? (nil? (:ytj-company-names state)))
                          (when (not (get-in state [:transport-operator :new?]))
                            [:div
                             [:br]
@@ -256,8 +272,12 @@
                             [:br]
                             [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
                             [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
-                            [buttons/save {:on-click #(e! (to/->ToggleTransportOperatorDeleteDialog))
-                                           :disabled (if (::t-operator/id data) false true)}
+                            [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
+                                           :disabled (if (and
+                                                           (empty? (:transport-service-vector state))
+                                                           (::t-operator/id data))
+                                                       false
+                                                       true)}
                              (tr [:buttons :delete-operator])]]))])})
 
 (defn operator-ytj [e! {operator :transport-operator :as state}]
@@ -282,7 +302,11 @@
         [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
         [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
      [ui/divider]
-     [delete-operator e! operator]
+     ;; When business-id has multiple companies create list of delete-operator dialogs. Otherwise add only one
+     (if (nil? (:ytj-company-names state))
+       [delete-operator e! operator (:transport-operators-with-services state)]
+       (for [o (get-in state [:transport-operator :transport-operators-to-save])]
+         [delete-operator e! o (:transport-operators-with-services state)]))
      [form/form
       form-options
       form-groups
