@@ -45,7 +45,7 @@
                     :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}])]}
      (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})]))
 
-(defn- operator-selection-group [e! state]
+(defn- business-id-selection [e! state]
   "Form group for querying business id from user and triggering data fetch for it from YTJ"
   (let [operator (:transport-operator state)
         status (get-in state [:ytj-response :status])
@@ -117,6 +117,9 @@
        :type        :text-label
        :h-style     :h2
        :full-width? true}
+
+      {:name        :heading1-divider
+       :type        :divider}
 
       {:name       :heading2
        :label      (if ytj-company-names-found?
@@ -275,7 +278,7 @@
         show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
         form-options (operator-form-options e! state show-details?)
         form-groups (cond-> []
-                            show-id-entry? (conj (operator-selection-group e! state))
+                            show-id-entry? (conj (business-id-selection e! state))
                             show-details? (conj (operator-form-groups e! state)))]
     [:div
      [:div
@@ -291,7 +294,6 @@
         [:div (tr [:organization-page :help-desc-1])]
         [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
         [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
-     [ui/divider]
      [delete-operator e! operator]
      [form/form
       form-options
