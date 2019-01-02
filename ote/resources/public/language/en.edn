@@ -361,7 +361,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :add-new-additional-service "Add a new row"
   :add-new-vehicle "Add a new row"
   :add-new-transport-operator "Create a new transport operator"
-  :create-new-transport-operator "Create a new transport operator"
   :add-new-member "Add member"
   :upload-csv "Add CSV"
   :update-csv "Update CSV"

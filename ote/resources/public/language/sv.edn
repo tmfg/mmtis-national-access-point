@@ -369,7 +369,6 @@
   :add-new-additional-service "Lägg till"
   :add-new-vehicle "Lägg till"
   :add-new-transport-operator "Lägg till ny tjänsteproducent"
-  :create-new-transport-operator "Lägg till ny tjänsteproducent"
   :add-new-member "Lägg till användare"
   :upload-csv "Lägg till CSV"
   :update-csv "Uppdatera CSV"
