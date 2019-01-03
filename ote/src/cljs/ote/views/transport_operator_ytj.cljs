@@ -59,7 +59,7 @@
        :required? true
        :warning   (tr [:common-texts :required-field])
        :should-update-check form/always-update
-       :on-blur #(e! (to/->EnsureUniqueBusinessId (-> % .-target .-value)))}
+       :on-change #(e! (to/->EnsureUniqueBusinessId %))}
 
       ;disabled when business-id is taken or if business-id is not valid or if loading is ongoing
       {:name ::t-operator/btn-submit-business-id
@@ -95,7 +95,7 @@
       (when (get-in state [:transport-operator :business-id-exists])
         {:name :business-id-is-not-unique
          :type :text-label
-         :label (tr :common-text :business-id-is-not-unique)}))))
+         :label (tr [:common-texts :business-id-is-not-unique])}))))
 
 (defn- operator-form-groups [e! state]
   "Creates a napote form and resolves data to fields. Assumes expired fields are already filtered from ytj-response."

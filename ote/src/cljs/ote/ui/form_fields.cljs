@@ -110,7 +110,7 @@
       ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-blur form? error warning table? full-width?
+                                  focus on-blur on-change form? error warning table? full-width?
                                   style input-style hint-style password? on-enter
                                   hint-text autocomplete disabled? id]
                            :as   field} data]
@@ -122,11 +122,6 @@
      :floating-label-fixed true
      :on-blur           on-blur
      :hint-text         (or hint-text (placeholder field data) "")
-     :on-change         #(let [v %2]
-                           (if regex
-                             (when (re-matches regex v)
-                               (update! v))
-                             (update! v)))
      :value             (or data "")
      :error-text        (or error warning "") ;; Show error text or warning text or empty string
      :error-style       (if error ;; Error is more critical than required - showing it first
@@ -134,6 +129,22 @@
                           style-base/required-element)
      :hint-style (merge style-base/placeholder
                         hint-style)}
+    (if on-change
+      {:on-change #(let [v %2]
+                     (if regex
+                       (when (re-matches regex v)
+                         (do
+                           (on-change v)
+                           (update! v)))
+                       (do
+                         (on-change v)
+                         (update! v)))
+                     on-change)}
+      {:on-change #(let [v %2]
+                     (if regex
+                       (when (re-matches regex v)
+                         (update! v))
+                       (update! v)))})
     (when max-length
       {:max-length max-length})
     (when full-width?
