@@ -30,5 +30,6 @@
       - villeliski
       - tommik
       - ernok
+      - jonik
   roles:
     - solita.jenkins
