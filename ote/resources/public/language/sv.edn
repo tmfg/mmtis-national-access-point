@@ -568,10 +568,13 @@
           :parking "Allmänna kommersiella parkeringstjänster"
           :brokerage "Förmedlingstjänst"}
 
- :own-services-page {:own-services "Omat palvelut"
+ :own-services-page {:filling-info "Täyttöohje"
+                     :filling-info-content (:md "Lisää **Palvelut**-kenttään tiedot muiden tuottamista palveluista, joiden tuottamiseen osallistut. (Esim.taksien tilausvälityskeskus)\n\nKirjoita kohtaan Lisää palvelu joko palveluntuottajan nimi, palvelun nimi tai palveluntuottajan Y-tunnus. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu.\n\nMikäli Palvelut-kentässä on jo valmiina joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet teidät palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, voit tarvittaessa poistaa kohdassa näkyvät palvelut palvelun perässä olevaa ruksi-symbolia napsauttamalla.\n\nJos et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi")
+                     :other-services-where-involved "Muut palvelut, joissa olet mukana"
+                     :open-geojson "Avaa geojson"
+                     :own-services "Omat palvelut"
                      :own-services-info-long (:md "**Lisää uusi palvelu** -painikkeesta pääset lisäämään tarjoamasi **liikkumispalvelun tarkemmat tiedot**.\n\nMikäli et tarjoa lainkaan **omia** liikkumispalveluita asiakkaille (esim. ajat kyytejä vain välityskeskuksen kautta), voit hypätä tämän kohdan yli. Valitse sen sijaan yksi tai useampi muun toimijan tuottama palvelu kohdassa **Muiden tuottamat palvelut, joissa olet mukana**")
                      :own-services-directions-short "Ohjeet"
-                     :open-geojson "Avaa geojson"
                      :own-services-new-provider1 "Hienoa! Olet nyt lisännyt "
                      :own-services-new-provider2 (:md " -nimisen palveluntuottajan NAP:iin.  Huomioithan, että pelkät palveluntuottajan tiedot eivät sisällä lain vaatimia olennaisia tietoja (esim. toiminta-alue, hintatiedot ja esteettömyystiedot) tarjoamastasi palvelusta/palveluista.\n\nLisää seuraavaksi tarkemmat tiedot tarjoamastasi palvelusta/palveluista kohdassa **Omat palvelut** ja/tai kohdassa **Muiden tuottamat palvelut, joissa olet mukana**.\n\nMikäli omistat taksiyrityksen ja ajat kyytejä vain välityskeskuksen kautta, riittää, että täytät välityskeskuksen tiedot kohtaan **Muiden tuottamat palvelut, joissa olet mukana**.")
                      :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")}
