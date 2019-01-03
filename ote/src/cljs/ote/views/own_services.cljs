@@ -35,7 +35,7 @@
             [ote.app.controller.front-page :as fp]))
 
 
-(defn- delete-service-action [e! {::t-service/keys [id name]
+(defn delete-service-action [e! {::t-service/keys [id name]
                                   :keys [show-delete-modal?]
                                   :as service}]
   [:span
@@ -102,7 +102,7 @@
   (when (> (count services) 0)
     [:div.row (stylefy/use-style style-base/section-margin)
      [:div {:class "col-xs-12 col-md-12"}
-      [:h3 section-label]
+      [:h4 section-label]
       [ui/table (stylefy/use-style style-base/front-page-service-table)
        [ui/table-header {:adjust-for-checkbox false
                          :display-select-all false}
@@ -227,7 +227,19 @@
        (tr [:own-services-page :own-services-new-provider2])])]
    [:hr {:style {:border-bottom "0"}}]])
 
-(defn operator-info-container
+
+(defn- other-services
+  [e! state]
+  [:div
+   [:h3 (tr [:own-services-page :other-services-where-involved])]
+   [info/info-toggle
+    (tr [:own-services-page :filling-info])
+    [:p (tr [:own-services-page :filling-info-content])]
+    false]
+   [:hr {:style {:border-bottom "0"
+                 :margin "2rem 0"}}]])
+
+(defn- operator-info-container
   [e! has-services? operator-services state]
   [:div
    [page/page-controls "" (tr [:common-texts :own-api-list])
@@ -235,10 +247,11 @@
    [:div.container
     [:div.row
      [service-provider-controls e! has-services? operator-services (:transport-operator state) (:show-add-member-dialog? state) ]
-     [table-container-for-own-services e! has-services? operator-services state]]]])
+     [table-container-for-own-services e! has-services? operator-services state]
+     [other-services]]]])
 
 
-(defn no-operator-texts
+(defn- no-operator-texts
   [e! state]
   [:div {:style {:margin "3rem 0"}}
    [:p (tr [:own-services-page :own-services-no-providers])]
@@ -249,8 +262,8 @@
               (stylefy/use-style style-buttons/outline-button))
     (tr [:buttons :add-new-transport-operator])]])
 
-(defn no-operator
-  "If user haven't added service-operator, we will ask to do so."
+(defn- no-operator
+  "If the user has not added service-operator, we will ask to do so."
   [e! state]
   [page/page-controls "" (tr [:common-texts :own-api-list])
    [no-operator-texts e! state]])
