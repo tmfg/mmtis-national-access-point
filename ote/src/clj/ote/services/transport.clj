@@ -291,6 +291,11 @@
        update-transport-operator) (:nap config) db user data))
   )
 
+(defn- business-id-exists [db business-id]
+  (if (empty? (does-business-id-exists db {:business-id business-id}))
+    {:business-id-exists false}
+    {:business-id-exists true}))
+
 (defn ensure-bigdec [value]
   (when (not (nil? value )) (bigdec value)))
 
@@ -474,6 +479,10 @@
           (if-not to
             {:status 404}
             (http/no-cache-transit-response to))))
+
+      (GET "/transport-operator/ensure-unique-business-id/:business-id" [business-id :as {user :user}]
+        (http/transit-response
+          (business-id-exists db business-id)))
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response

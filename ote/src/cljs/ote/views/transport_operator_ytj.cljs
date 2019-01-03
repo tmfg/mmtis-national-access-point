@@ -58,15 +58,19 @@
        :validate  [[:business-id]]
        :required? true
        :warning   (tr [:common-texts :required-field])
-       :should-update-check form/always-update}
+       :should-update-check form/always-update
+       :on-blur #(e! (to/->EnsureUniqueBusinessId (-> % .-target .-value)))}
 
-      {:name      ::t-operator/btn-submit-business-id
-       :type      :external-button
-       :label     (tr [:organization-page :fetch-from-ytj])
-       :primary   true
+      ;disabled when business-id is taken or if business-id is not valid or if loading is ongoing
+      {:name ::t-operator/btn-submit-business-id
+       :type :external-button
+       :label (tr [:organization-page :fetch-from-ytj])
+       :primary true
        :secondary true
-       :on-click  #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
-       :disabled  (ytj-loading? state)}
+       :on-click #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
+       :disabled (or (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
+                     (get-in state [:transport-operator :business-id-exists])
+                     (ytj-loading? state))}
 
       (when (:ytj-response state); label composition for error message
         (cond
@@ -85,7 +89,13 @@
       (when (and (:ytj-response state) (not= 200 status))
         {:name  :ytj-query-tip-whatnext
          :type  :text-label
-         :label (str (tr [:common-texts :check-your-input]) " " (tr [:common-texts :optionally-fill-manually]))}))))
+         :label (str (tr [:common-texts :check-your-input]) " " (tr [:common-texts :optionally-fill-manually]))})
+
+      ; label composition for existing business-id
+      (when (get-in state [:transport-operator :business-id-exists])
+        {:name :business-id-is-not-unique
+         :type :text-label
+         :label (tr :common-text :business-id-is-not-unique)}))))
 
 (defn- operator-form-groups [e! state]
   "Creates a napote form and resolves data to fields. Assumes expired fields are already filtered from ytj-response."
