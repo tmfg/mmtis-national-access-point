@@ -64,7 +64,8 @@
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 (defn transport-services-table-rows [e! services transport-operator-id]
-  [ui/table-body {:display-row-checkbox false}
+  [ui/table-body (merge {:class "table-body"}
+                   {:display-row-checkbox false})
    (doall
      (map-indexed
        (fn [i {::t-service/keys [id type published? name]
@@ -146,10 +147,10 @@
           :type :selection
           :show-option #(::t-operator/name %)
           :update! #(e! (to/->SelectOperator %))
-          :options (mapv :transport-operator operators)
+          :options (mapv to/take-operator-api-keys (mapv :transport-operator operators))
           :auto-width? true
           :class-name "mui-select-button"}
-         operator]]
+         (to/take-operator-api-keys operator)]]
        [:div.col-sm-6.col-md-6
         [:a (merge {:href "#/transport-operator"
                     :on-click #(do
@@ -221,7 +222,7 @@
    [:div
     (if (not (and has-services? (not (empty? operator-services))))
       [:p
-       [:div {:style {:float "left"}}                       ;;this is done because translations with variables don't support markdown and we have to fix md and variables
+       [:span {:style {:float "left"}}                       ;;this is done because translations with variables don't support markdown and we have to fix md and variables
         (tr [:own-services-page :own-services-new-provider1])
         [:strong name]]
        (tr [:own-services-page :own-services-new-provider2])])]
