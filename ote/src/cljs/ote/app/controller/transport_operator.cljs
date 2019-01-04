@@ -109,6 +109,8 @@
         ytj-company-names (when (some? (:name response)) (ytj->nap-companies
                                                            (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
                                                            (:transport-operators-with-services app)))
+        ;; Add :show-delete-dialog? false to all companies to make :transport-operators-to-save values constant when adding them to checkboxes and checking if option is selected.
+        ytj-company-names (map #(assoc % :show-delete-dialog? false) ytj-company-names)
         ytj-changed-fields? (and ytj-business-id-hit?
                                  (or (not= ytj-address-billing (::t-operator/billing-address t-op))
                                      (not= ytj-address-visiting (::t-operator/visiting-address t-op))
