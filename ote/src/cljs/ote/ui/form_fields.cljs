@@ -907,7 +907,7 @@
          (fn [i option]
            (let [checked? (boolean (selected option))]
              ^{:key i}
-             [:div {:style {:display "flex" :flex-wrap "wrap" :justify-content "flex-start" :align-items "center" :padding-top "10px"}}
+             [:div {:style {:display "flex" :flex-wrap "wrap" :justify-content "flex-start" :align-items "center" :padding-top "0.625rem"}}
               [ui/checkbox {:id         (str i "_" (str option))
                             :label      (when-not table? (show-option option))
                             :checked    checked?

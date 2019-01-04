@@ -180,5 +180,5 @@
 
 (def mobile-extra-padding {::stylefy/media {{:max-width (str mobile-width-px "px")} {:padding-top "20px"}}})
 
-(def checkbox-addition {:padding-left "20px"
+(def checkbox-addition {:padding-left "1.25rem"
                         :padding-bottom "2px"})

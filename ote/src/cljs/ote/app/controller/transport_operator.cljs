@@ -183,8 +183,9 @@
                          (fn [coll]
                            (for [c coll]
                              (update c :show-delete-dialog?
-                                     #(if (and (or (nil? (:show-delete-dialog? operator)) (= false (:show-delete-dialog? operator)))
-                                               (= (::t-operator/id operator) (::t-operator/id c)))
+                                     #(if (and
+                                            (not (true? (:show-delete-dialog? operator)))
+                                            (= (::t-operator/id operator) (::t-operator/id c)))
                                         true
                                         false))))))
 

@@ -114,15 +114,15 @@
   (let [operator-services (specql/fetch db
                                         ::t-service/transport-service
                                         #{::t-service/id}
-                                        {:t-service/transport-operator-id id})]
+                                        {::t-service/transport-operator-id id})]
     ;; delete only if operator-services = nil
-    (if (nil? operator-services)
+    (if (empty? operator-services)
       (authorization/with-transport-operator-check
         db user id
         #(do
            (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" id)})
            id))
-    {:status 401
+    {:status 403
      :body "Operator has services and it cannot be removed."})))
 
 (defn get-user-transport-operators-with-services [db groups user]
