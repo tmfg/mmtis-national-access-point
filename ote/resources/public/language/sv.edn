@@ -221,7 +221,7 @@
    :ote.db.transport-service/to "Stänger kl"
    :ote.db.transport-service/all-day "24h"
 
-   :ote.db.transport-service/brokerage? "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Trafiksäkerhetsverket Trafi."
+   :ote.db.transport-service/brokerage? "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Transport- och kommunikationsverket, Traficom."
 
    :ote.db.transport-service/available-from-and-to-title "Tjänstens giltighetstid"
    :ote.db.transport-service/available-from "Startdatum"

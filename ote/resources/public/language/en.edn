@@ -216,7 +216,7 @@
    :ote.db.transport-service/to "Closing time"
    :ote.db.transport-service/all-day "24 hours"
 
-   :ote.db.transport-service/brokerage? "The transport service announced is a brokering service which will also be reported to The Finnish Transport Safety Agency - Trafi."
+   :ote.db.transport-service/brokerage? "The transport service I´m announcing is a brokering service which will also be announced to the Finnish Communications and Transport Agency, Traficom."
 
    :ote.db.transport-service/available-from-and-to-title "Service availability date"
    :ote.db.transport-service/available-from "Available from"
