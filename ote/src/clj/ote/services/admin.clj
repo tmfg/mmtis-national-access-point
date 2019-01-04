@@ -287,6 +287,12 @@
               (map (juxt :operator :business-id :service-name :service-address :service-type :url :format :licence)
                    (fetch-operators-with-payment-services db)))))
 
+(defn- get-user-operators-by-business-id [db business-id]
+  (let [result (specql/fetch db ::t-operator/transport-operator
+                (specql/columns ::t-operator/transport-operator)
+                {::t-operator/business-id business-id})]
+    (map #(assoc {} :transport-operator %) result)))
+
 (defn- admin-routes [db http nap-config]
   (routes
     (POST "/admin/users" req (admin-service "users" req db #'list-users))
@@ -314,7 +320,10 @@
     (POST "/admin/transport-operator/delete" {form-data :body user :user}
       (http/transit-response
         (delete-transport-operator! db user
-                                    (:id (http/transit-request form-data)))))))
+                                    (:id (http/transit-request form-data)))))
+    (GET "/admin/user-operators-by-business-id/:business-id" [business-id]
+      (http/transit-response
+        (get-user-operators-by-business-id db business-id)))))
 
 
 (define-service-component CSVAdminReports
