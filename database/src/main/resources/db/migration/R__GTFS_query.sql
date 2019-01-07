@@ -163,7 +163,7 @@ SELECT EXISTS(
   SELECT gtc.date
     FROM "gtfs-transit-changes" gtc
    WHERE (gtc."change-date" IS NOT NULL
-     AND gtc."change-date" < CURRENT_DATE
+     AND gtc."change-date" = CURRENT_DATE
      AND gtc."transport-service-id" = service_id)
      OR EXISTS(SELECT id
                       FROM gtfs_package p
