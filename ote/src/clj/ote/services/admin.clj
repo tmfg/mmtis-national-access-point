@@ -208,8 +208,7 @@
        transport-operator-id))))
 
 (defn monthly-types-for-monitor-report [db]
-  (create-temp-view-for-monthly-producer-counts-by-sub-type! db)
-  (let [type-month-count-table (monthly-producer-counts-by-sub-type db)
+  (let [type-month-count-table (monthly-producer-types-and-counts db)
         months (distinct (keep :month type-month-count-table)) ;; order is important
         subtypes (distinct (keep :sub-type type-month-count-table))
         by-month (group-by :month type-month-count-table) 

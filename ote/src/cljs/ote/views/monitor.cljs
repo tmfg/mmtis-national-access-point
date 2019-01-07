@@ -49,7 +49,6 @@
                                                           :data {:labels (:labels data)
                                                                  :datasets (:datasets data)}}
                                                   new-chart (js/Chart. canvas (clj->js config))]
-                                              (.log js/console (str "doughnut config:" (pr-str config)))
                                               (reset! chart {:chart new-chart :config config})
                                               (update comp)))
                      :component-did-update update})))
