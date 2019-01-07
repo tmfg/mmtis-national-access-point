@@ -11,6 +11,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.place-search :as place-search]
+            [ote.app.controller.front-page :as front-page]
             [clojure.string :as str]
             [testdouble.cljs.csv :as csv]
             [ote.ui.validation :as validation]))
@@ -419,10 +420,12 @@
 
   DeleteTransportServiceResponse
   (process-event [{response :response} app]
-    (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))]
-      (assoc app :transport-service-vector filtered-map
-                 :flash-message (tr [:common-texts :delete-service-success])
-                 :services-changed? true)))
+    (let [filtered-map (filter #(not= (:ote.db.transport-service/id %) (int response)) (get app :transport-service-vector))
+          app (assoc app :transport-service-vector filtered-map
+                         :flash-message (tr [:common-texts :delete-service-success])
+                         :services-changed? true)]
+      (front-page/get-transport-operator-data app)
+      app))
 
   FailedDeleteTransportServiceResponse
   (process-event [{response :response} app]

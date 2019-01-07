@@ -111,11 +111,19 @@
 (defn delete-transport-operator!
   "Delete transport operator by id"
   [nap-config db user id]
-    (authorization/with-transport-operator-check
-      db user id
-      #(do
-         (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" id)})
-         id)))
+  (let [operator-services (specql/fetch db
+                                        ::t-service/transport-service
+                                        #{::t-service/id}
+                                        {::t-service/transport-operator-id id})]
+    ;; delete only if operator-services = nil
+    (if (empty? operator-services)
+      (authorization/with-transport-operator-check
+        db user id
+        #(do
+           (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" id)})
+           id))
+    {:status 403
+     :body "Operator has services and it cannot be removed."})))
 
 (defn get-user-transport-operators-with-services [db groups user]
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)

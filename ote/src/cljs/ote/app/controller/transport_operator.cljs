@@ -112,6 +112,8 @@
                                                            (if (and (get-in app [:user :admin?]) (:admin-transport-operators app))
                                                              (:admin-transport-operators app)
                                                              (:transport-operators-with-services app))))
+        ;; Add :show-delete-dialog? false to all companies to make :transport-operators-to-save values constant when adding them to checkboxes and checking if option is selected.
+        ytj-company-names (map #(assoc % :show-delete-dialog? false) ytj-company-names)
         ytj-changed-fields? (and ytj-business-id-hit?
                                  (or (not= ytj-address-billing (::t-operator/billing-address t-op))
                                      (not= ytj-address-visiting (::t-operator/visiting-address t-op))
@@ -180,7 +182,19 @@
                 (routes/navigate! :own-services))
               app)
 
-(define-event ToggleTransportOperatorDeleteDialog []
+(define-event ToggleListTransportOperatorDeleteDialog [operator]
+              {}
+              (update-in app [:transport-operator :transport-operators-to-save]
+                         (fn [coll]
+                           (for [c coll]
+                             (update c :show-delete-dialog?
+                                     #(if (and
+                                            (not (true? (:show-delete-dialog? operator)))
+                                            (= (::t-operator/id operator) (::t-operator/id c)))
+                                        true
+                                        false))))))
+
+(define-event ToggleSingleTransportOperatorDeleteDialog []
               {:path [:transport-operator :show-delete-dialog?]
                :app show?}
               (not show?))
@@ -218,7 +232,7 @@
 ;; Returns a new app state.
 (defn- save-next-operator! [app]
   (let [ops-to-save (:transport-operator-save-q app)
-        op-next (first ops-to-save)
+        op-next (form/without-form-metadata (first ops-to-save))
         ops-rest (rest ops-to-save)]
     (.debug js/console "save-next-operator! app=" (clj->js app) " \n next=" (clj->js op-next) " \n in queue=" (count ops-rest)) ;; TODO: disable from production
 
