@@ -155,7 +155,6 @@
          :show-option         ::t-operator/name
          :option-enabled?     #(nil? (::t-operator/id %))
          :options             ytj-company-names
-         ;:full-width?         true
          :should-update-check form/always-update
          :required?           true
          :on-delete (fn [data]

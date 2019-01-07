@@ -130,7 +130,7 @@
                 [ui/table-row-column {:style {:width "12%" :padding-left "15px" :padding-right "15px"}} [ui/icon-button {:href     "#"
                                                                               :on-click #(do
                                                                                            (.preventDefault %)
-                                                                                           (e! (fp/->ChangePage :transport-operator {:id id})))}
+                                                                                           (e! (admin-controller/->EditTransportOperator business-id)))}
                                                               [ic/content-create]]
                  [delete-transport-operator-action e! result]]]))]]])]))
 
