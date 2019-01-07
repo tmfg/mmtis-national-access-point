@@ -8,7 +8,8 @@
             [tuck.core :refer [define-event send-async! Event]]
             [ote.app.controller.common :refer [->ServerError]]
             [ote.app.controller.flags :as flags]
-            [ote.db.common :as common]))
+            [ote.db.common :as common]
+            [ote.ui.validation :as validation]))
 
 ;; TODO: serialize ytj fetches? What if user back-forwards on UI, would old resp complete and mix up app state?
 
@@ -108,7 +109,9 @@
         use-ytj-web? (not (empty? ytj-contact-web))
         ytj-company-names (when (some? (:name response)) (ytj->nap-companies
                                                            (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
-                                                           (:transport-operators-with-services app)))
+                                                           (if (and (get-in app [:user :admin?]) (:admin-transport-operators app))
+                                                             (:admin-transport-operators app)
+                                                             (:transport-operators-with-services app))))
         ;; Add :show-delete-dialog? false to all companies to make :transport-operators-to-save values constant when adding them to checkboxes and checking if option is selected.
         ytj-company-names (map #(assoc % :show-delete-dialog? false) ytj-company-names)
         ytj-changed-fields? (and ytj-business-id-hit?
@@ -219,6 +222,8 @@
 (defrecord SaveTransportOperator [])
 (defrecord SaveTransportOperatorResponse [data])
 (defrecord FailedTransportOperatorResponse [response])
+(defrecord EnsureUniqueBusinessId [business-id])
+(defrecord EnsureUniqueBusinessIdResponse [response])
 
 (defrecord TransportOperatorResponse [response])
 (defrecord CreateTransportOperator [])
@@ -375,7 +380,19 @@
   (process-event [{response :response} app]
     (assoc app
       :transport-operator (assoc response
-                            :loading? false))))
+                            :loading? false)))
+
+  EnsureUniqueBusinessId
+  (process-event [{business-id :business-id} app]
+    (let [business-id-validation-error (validation/validate-rule :business-id nil business-id)]
+      (when (nil? business-id-validation-error)
+        (comm/get! (str "transport-operator/ensure-unique-business-id/" business-id)
+                   {:on-success (send-async! ->EnsureUniqueBusinessIdResponse)}))
+      (assoc-in app [:transport-operator :business-id-exists] false)))
+
+  EnsureUniqueBusinessIdResponse
+  (process-event [{response :response} app]
+    (assoc-in app [:transport-operator :business-id-exists] (:business-id-exists response))))
 
 (defmethod routes/on-navigate-event :transport-operator [{id :params}]
   (.debug js/console "transport-operator/on-navigate-event: id=" (clj->js id))

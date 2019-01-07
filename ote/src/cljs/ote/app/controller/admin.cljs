@@ -11,7 +11,8 @@
             [ote.util.text :as text]
             [ote.time :as time]
             [ote.app.controller.common :refer [->ServerError]]
-            cljsjs.filesaverjs))
+            cljsjs.filesaverjs
+            [ote.app.routes :as routes]))
 
 (defn- update-service-by-id [app id update-fn & args]
   (update-in app [:service-search :results]
@@ -77,6 +78,8 @@
 (defrecord DeleteOperatorResponse [response])
 (defrecord DeleteOperatorResponseFailed [response])
 (defrecord EnsureServiceOperatorId [id ensured-id])
+(defrecord EditTransportOperator [business-id])
+(defrecord EditTransportOperatorResponse [response])
 
 (defrecord ToggleAddMemberDialog [id])
 (defrecord ChangeTab [tab-value])
@@ -397,6 +400,18 @@
     (update-operator-by-id
       app id
       assoc :ensured-id ensured-id))
+
+  EditTransportOperator
+  (process-event [{business-id :business-id} app]
+    (comm/get! (str "admin/user-operators-by-business-id/" business-id)
+                {:on-success (tuck/send-async! ->EditTransportOperatorResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    app)
+
+  EditTransportOperatorResponse
+  (process-event [{response :response} app ]
+    (routes/navigate! :transport-operator {:id (::t-operator/id (:transport-operator (first response)))})
+    (assoc app :admin-transport-operators response))
 
   ToggleAddMemberDialog
   (process-event [{id :id} app]

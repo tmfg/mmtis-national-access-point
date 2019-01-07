@@ -22,3 +22,9 @@ SELECT COUNT(id)
 -- name: delete-transport-operator
 -- Delete all operator data except published external interface data from ckan
 SELECT del_operator(:operator-group-name);
+
+-- name: does-business-id-exists
+-- We need to prevent users to create multiple companies with the same business-id, so check if business id is already added
+SELECT id FROM "transport-operator" op
+ WHERE op."business-id" = :business-id
+ LIMIT 1;

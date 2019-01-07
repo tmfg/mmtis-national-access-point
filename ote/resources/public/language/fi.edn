@@ -218,7 +218,7 @@
    :ote.db.transport-service/to "Kiinnimenoaika"
    :ote.db.transport-service/all-day "24h"
 
-   :ote.db.transport-service/brokerage? "Ilmoittamani palvelu on Liikenteen turvallisuusvirasto Trafille ilmoitettava välityspalvelu."
+   :ote.db.transport-service/brokerage? "Ilmoittamani palvelu on Liikenne- ja viestintävirasto Traficomille ilmoitettava välityspalvelu."
 
    :ote.db.transport-service/available-from-and-to-title "Palvelun voimassaoloaika"
    :ote.db.transport-service/available-from "Saatavilla alkaen"
@@ -994,7 +994,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :nap-data-license (:md "Tälle lomakkeelle täytetyt tiedot julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")
 
-  :save-user-success "Käyttäjätiedot tallennettu"}
+  :save-user-success "Käyttäjätiedot tallennettu"
+  :business-id-is-not-unique "Y-tunnus on jo syötetty."}
 
 
  :dialog

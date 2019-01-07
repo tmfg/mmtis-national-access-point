@@ -216,7 +216,7 @@
    :ote.db.transport-service/to "Closing time"
    :ote.db.transport-service/all-day "24 hours"
 
-   :ote.db.transport-service/brokerage? "The transport service announced is a brokering service which will also be reported to The Finnish Transport Safety Agency - Trafi."
+   :ote.db.transport-service/brokerage? "The transport service I´m announcing is a brokering service which will also be announced to the Finnish Communications and Transport Agency, Traficom."
 
    :ote.db.transport-service/available-from-and-to-title "Service availability date"
    :ote.db.transport-service/available-from "Available from"
@@ -985,7 +985,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :nap-data-license (:md "The information you fill in on this form will be published in the NAP service catalog as open data. The published data will be licensed with [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en).")
 
   :save-user-success "Account info saved"
-  }
+  :business-id-is-not-unique "Business id is not unique."}
 
 
  :dialog

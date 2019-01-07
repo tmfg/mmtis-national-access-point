@@ -221,7 +221,7 @@
    :ote.db.transport-service/to "Stänger kl"
    :ote.db.transport-service/all-day "24h"
 
-   :ote.db.transport-service/brokerage? "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Trafiksäkerhetsverket Trafi."
+   :ote.db.transport-service/brokerage? "Tjänsten som jag meddelat är en förmedlingstjänst som ska meddelas till Transport- och kommunikationsverket, Traficom."
 
    :ote.db.transport-service/available-from-and-to-title "Tjänstens giltighetstid"
    :ote.db.transport-service/available-from "Startdatum"
@@ -989,7 +989,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :nap-data-license (:md "Informationen Du ger i detta formulär publiceras i NAP-katalogen som öppen data med licensen [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
 
   :save-user-success "Profil sparad"
-  }
+  :business-id-is-not-unique "FO-nummer är inte unikt."}
 
 
  :dialog
