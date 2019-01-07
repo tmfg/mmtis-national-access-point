@@ -174,7 +174,7 @@ select
 select
   "sub-type",
   count("sub-type") as count
-  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id") as unusedname
+  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id" and ts."sub-type" is not null) as unusedname
   group by "sub-type";
 
 -- name: create-temp-view-for-monthly-producer-counts-by-sub-type!
