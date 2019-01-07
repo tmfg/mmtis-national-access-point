@@ -146,7 +146,8 @@
           ::closed-groups
           :loading?
           :csv-count
-          :map-controls))
+          :map-controls
+          :show-delete-dialog?))
 
 (defrecord ^:private Label [label])
 (defn- label? [x]

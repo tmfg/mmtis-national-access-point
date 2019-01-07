@@ -232,7 +232,7 @@
 ;; Returns a new app state.
 (defn- save-next-operator! [app]
   (let [ops-to-save (:transport-operator-save-q app)
-        op-next (first ops-to-save)
+        op-next (form/without-form-metadata (first ops-to-save))
         ops-rest (rest ops-to-save)]
     (.debug js/console "save-next-operator! app=" (clj->js app) " \n next=" (clj->js op-next) " \n in queue=" (count ops-rest)) ;; TODO: disable from production
 
