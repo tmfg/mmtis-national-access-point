@@ -107,7 +107,7 @@ SELECT ST_AsGeoJSON(COALESCE(
 
 -- name: fetch-route-trip-info-by-name-and-date
 -- Fetch listing of all trips by route name and date
-SELECT trip."package-id", (trip.trip)."trip-id",
+SELECT trip."package-id", (trip.trip)."trip-id", (trip.trip)."trip-headsign" as headsign,
        array_agg(ROW(stoptime."stop-sequence",
                      s."stop-name",
                      stoptime."arrival-time",
@@ -118,8 +118,8 @@ SELECT trip."package-id", (trip.trip)."trip-id",
  JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
  JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  JOIN "gtfs-stop" s ON (s."package-id" = trip."package-id" AND s."stop-id" = stoptime."stop-id")
- WHERE COALESCE(:route-hash-id::VARCHAR,'') = COALESCE(rt."route-hash-id",'')
- GROUP BY trip."package-id", (trip.trip)."trip-id";
+ WHERE rt."route-hash-id" = :route-hash-id
+ GROUP BY trip."package-id", (trip.trip)."trip-id", (trip.trip)."trip-headsign";
 
 -- name: fetch-date-hashes-for-route-with-route-hash-id
 -- Fetch the date/hash pairs for a given route using route-hash-id which isn't used for all services

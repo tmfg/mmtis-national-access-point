@@ -582,22 +582,38 @@
       [:div.routes-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
-                     :on-select #(e! (tv/->SelectTripPair (first %)))}
+                     :on-select #(e! (tv/->SelectTripPair (first %)))
+                     :row-style {:padding-right "1px"}}
+
         [;; name of the first stop of the first trip (FIXME: should be first common?)
+         {:name (if (-> trips first first :stoptimes first :gtfs/stop-name)
+                  "Reittitunnus"
+                  "")
+          :read :read #(:headsign (first %))
+          :col-style {:padding-left "10px" :padding-right "5px"}}
          {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
           :read #(-> % first :stoptimes first :gtfs/departure-time)
-          :format (partial format-stop-time (style/date1-highlight-style) )}
+          :format (partial format-stop-time (style/date1-highlight-style) )
+          :col-style {:padding-left "10px" :padding-right "5px"}}
          ;; name of the last stop of the first trip
          {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
           :read #(-> % first :stoptimes last :gtfs/departure-time)
-          :format (partial format-stop-time (style/date1-highlight-style))}
+          :format (partial format-stop-time (style/date1-highlight-style))
+          :col-style {:padding-left "10px" :padding-right "5px"}}
 
+         {:name (if (-> trips first second :stoptimes first :gtfs/stop-name)
+                    "Reittitunnus"
+                    "")
+          :read #(:headsign (second %))
+          :col-style {:padding-left "10px" :padding-right "5px"}}
          {:name (-> trips first second :stoptimes first :gtfs/stop-name)
           :read (comp :gtfs/departure-time first :stoptimes second)
-          :format (partial format-stop-time (style/date2-highlight-style))}
+          :format (partial format-stop-time (style/date2-highlight-style))
+          :col-style {:padding-left "10px" :padding-right "5px"}}
          {:name (-> trips first second :stoptimes last :gtfs/stop-name)
           :read (comp :gtfs/departure-time last :stoptimes second)
-          :format (partial format-stop-time (style/date2-highlight-style))}
+          :format (partial format-stop-time (style/date2-highlight-style))
+          :col-style {:padding-left "10px" :padding-right "5px"}}
 
          {:name "Muutokset" :read identity
           :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
@@ -614,7 +630,8 @@
                       :default
                       [:div
                        [stop-seq-changes-icon stop-seq-changes]
-                       [stop-time-changes-icon stop-time-changes]]))}]
+                       [stop-time-changes-icon stop-time-changes]]))
+          :col-style {:padding-left "10px" :padding-right "5px"}}]
         trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
