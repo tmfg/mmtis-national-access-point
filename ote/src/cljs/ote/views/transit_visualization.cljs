@@ -582,14 +582,13 @@
       [:div.routes-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
-                     :on-select #(e! (tv/->SelectTripPair (first %)))
-                     :row-style {:padding-right "1px"}}
+                     :on-select #(e! (tv/->SelectTripPair (first %)))}
 
         [;; name of the first stop of the first trip (FIXME: should be first common?)
          {:name (if (-> trips first first :stoptimes first :gtfs/stop-name)
                   "Reittitunnus"
                   "")
-          :read :read #(:headsign (first %))
+          :read #(:headsign (first %))
           :col-style {:padding-left "10px" :padding-right "5px"}}
          {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
           :read #(-> % first :stoptimes first :gtfs/departure-time)
