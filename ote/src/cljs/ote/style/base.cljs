@@ -180,6 +180,9 @@
                                :width "48px"
                                :margin-bottom "8px"}}})
 
+(def disabled-control {:opacity 0.5
+                       :pointer-events "none"})
+
 (def disabled-color {:color "rgba(0, 0, 0, 0.247059)"})
 (def checkbox-label {:float "left"
                      :position "relative"
