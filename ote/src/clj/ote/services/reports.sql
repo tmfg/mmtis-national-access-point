@@ -178,6 +178,7 @@ select
   group by "sub-type";
 
 -- subquery name legend is: stq = subtype grouping query, biq = business-id grouping query
+-- 
 -- name: monthly-producer-types-and-counts
 select stq.month, sum(stq.count), stq."sub-type" from
     (select biq.month, count(biq.bid), "sub-type" from (select to_char(gr.created, 'YYYY-MM') as month,
