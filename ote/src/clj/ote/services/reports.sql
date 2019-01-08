@@ -180,17 +180,17 @@ select
 -- subquery name legend is: stq = subtype grouping query, biq = business-id grouping query
 -- 
 -- name: monthly-producer-types-and-counts
-select stq.month, sum(stq.count), stq."sub-type" from
-    (select biq.month, count(biq.bid), "sub-type" from (select to_char(gr.created, 'YYYY-MM') as month,
-          ts.id as tsid,
-          top.id as toid,
-          top."business-id" as bid,
-          ts."sub-type"
-          from
-          "transport-service" ts,
-          "transport-operator" top,
-	  "group" gr
-	  where top.id = ts."transport-operator-id" and gr.id = top."ckan-group-id" and gr.created is not null and "sub-type" is not null and top."business-id" is not null)
-	as biq group by month, bid, "sub-type" order by month, "sub-type", count)
-    as stq group by (month, "sub-type") order by month, "sub-type";
+ select stq.month, sum(stq.count), stq."sub-type"
+   from
+
+(select biq.month, count(biq.bid), "sub-type"
+   from
+
+(select to_char(gr.created, 'YYYY-MM') as month,
+        ts.id as tsid, top.id as toid, top."business-id" as bid, ts."sub-type"
+   from "transport-service" ts, "transport-operator" top, "group" gr
+   where top.id = ts."transport-operator-id" and gr.id = top."ckan-group-id" and
+         gr.created is not null and "sub-type" is not null and top."business-id" is not null)
+	 as biq group by month, bid, "sub-type" order by month, "sub-type", count)
+         as stq group by (month, "sub-type") order by month, "sub-type";
 
