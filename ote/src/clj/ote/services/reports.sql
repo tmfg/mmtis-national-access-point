@@ -163,9 +163,9 @@ END	AS "service-type",
 -- name: monthly-registered-operators
 -- returns a cumulative sum of operators created up until the row's month.
 select
-  to_char(created, 'YYYY-MM') as month,
-  sum(count(name)) over (order by to_char(created, 'YYYY-MM'))
-  from "group"
+  to_char(g.created, 'YYYY-MM') as month,
+  sum(count(top."business-id")) over (order by to_char(g.created, 'YYYY-MM'))
+  from "group" g, "transport-operator" top where g.id = top."ckan-group-id" and g.created is not null
   group by month
   order by month;
 
@@ -174,21 +174,23 @@ select
 select
   "sub-type",
   count("sub-type") as count
-  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id") as unusedname
+  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id" and ts."sub-type" is not null) as unusedname
   group by "sub-type";
 
--- name: create-temp-view-for-monthly-producer-counts-by-sub-type!
-create or replace temporary view
-    monitor_producers_by_type as
-    select to_char(gr.created, 'YYYY-MM') as month,
-    ts.id as tsid,
-    top.id as toid,
-    ts."sub-type"
-    from
-    "transport-service" ts,
-    "transport-operator" top,
-    "group" gr
-    where top.id = ts."transport-operator-id" and gr.id = top."ckan-group-id" and gr.created is not null;
+-- subquery name legend is: stq = subtype grouping query, biq = business-id grouping query
+-- 
+-- name: monthly-producer-types-and-counts
+ select stq.month, sum(stq.count), stq."sub-type"
+   from
 
--- name: monthly-producer-counts-by-sub-type
-select month, "sub-type", count("sub-type") from monitor_producers_by_type group by "sub-type", month order by month, "sub-type";
+(select biq.month, count(biq.bid), "sub-type"
+   from
+
+(select to_char(gr.created, 'YYYY-MM') as month,
+        ts.id as tsid, top.id as toid, top."business-id" as bid, ts."sub-type"
+   from "transport-service" ts, "transport-operator" top, "group" gr
+   where top.id = ts."transport-operator-id" and gr.id = top."ckan-group-id" and
+         gr.created is not null and "sub-type" is not null and top."business-id" is not null)
+	 as biq group by month, bid, "sub-type" order by month, "sub-type", count)
+         as stq group by (month, "sub-type") order by month, "sub-type";
+

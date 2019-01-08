@@ -1,6 +1,7 @@
 (ns ote.views.monitor
   (:require [reagent.core :as r]
             [ote.ui.common :as common]
+            [ote.localization :refer [tr tr-key]]
             [ote.app.controller.monitor :as controller]
             [cljsjs.chartjs]))
 
@@ -55,13 +56,16 @@
 (defn monitor-main [e! {:keys [page monitor-data] :as app}]
   (e! (controller/->QueryMonitorReport))
   (if monitor-data
-    (let [companies-by-month-data {:labels (mapv :month (:monthly-operators monitor-data))
+    (let [translate-typekw (fn [type]                             
+                             (tr [:enums :ote.db.transport-service/sub-type (keyword type)]))
+          companies-by-month-data {:labels (mapv :month (:monthly-operators monitor-data))
                                    :datasets [{:label "Rekisteröityneitä palveluntuottajia"
                                                :data (mapv :sum (:monthly-operators monitor-data))
                                                :backgroundColor "rgb(0, 170, 187)"}]}
-          provider-share-by-type-data {:labels (mapv :sub-type (:operator-types monitor-data))
+          provider-share-by-type-data {:labels (mapv translate-typekw
+                                                     (mapv :sub-type (:operator-types monitor-data)))
                                        :datasets [{:data (mapv :count (:operator-types monitor-data))
-                                                   :backgroundColor ["red" "orange" "blue"]
+                                                   :backgroundColor ["red" "orange" "blue" "yellow" "green" "brown" "grey" "purple" "pink"]
                                                    :label "Palvelut tyypeittäin"}]}]
       (fn []
         [:div {:style {:width "50%"}}
