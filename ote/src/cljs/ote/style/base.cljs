@@ -192,3 +192,7 @@
                           (align-items "center")))
 
 (def msg-item-column-margin {:margin-left "0.25rem"})
+
+(def msg-warning
+  {:color (str colors/warning)
+   :fill (str colors/warning)})
