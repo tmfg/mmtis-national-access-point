@@ -196,3 +196,7 @@
 (def msg-warning
   {:color (str colors/warning)
    :fill (str colors/warning)})
+
+(def msg-success
+  {:color (str colors/success)
+   :fill (str colors/success)})
