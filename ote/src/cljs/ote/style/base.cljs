@@ -105,6 +105,12 @@
 (defn justify-content [dir]
   {:justify-content dir})
 
+(def wizard-container
+  {:border-style "solid"
+   :border-width "2px"
+   :border-color colors/orange-basic
+   :padding "0rem 1.25rem 2rem 1.25rem"})
+
 (def flex-child {:flex 1 })
 
 (def item-list-container
