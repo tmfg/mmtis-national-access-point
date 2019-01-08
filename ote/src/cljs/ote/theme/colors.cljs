@@ -10,7 +10,18 @@
 (def gray600 "#505050")
 (def gray900 "#323232")
 
+(def green-basic "#00AA00")
+
 (def primary blue)
 (def primary-light blue-light)
+
+(def red-basic "#DD0000")
+
 (def secondary gray900)
+
+(def orange-basic "#FF8800")
+
+(def warning red-basic)
+
+(def success green-basic)
 
