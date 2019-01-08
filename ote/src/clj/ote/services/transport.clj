@@ -174,16 +174,11 @@
                                ::t-operator/type            "organization"
                                ::t-operator/approval_status "approved"
                                ::t-operator/is_organization true})
-        member (create-member! db user-id group)
-        ;; Ensure that other users get permissions to new operator as well
-        ;; Get other possible users that need permissions
-        other-users (fetch-users-within-same-business-id-family db {:business-id (::t-operator/business-id op)
-                                                           :user-id user-id})]
-    (when other-users
-      (doall
-        (map
-          #(create-member! db (:user-id %) group)
-          other-users)))
+        ;; Ensure that all users are given permissions to new operator
+        users (fetch-users-within-same-business-id-family db {:business-id (::t-operator/business-id op)})]
+    (doall
+      (for [u users]
+        (create-member! db (:user-id u) group)))
     group))
 
 (defn- update-group!
