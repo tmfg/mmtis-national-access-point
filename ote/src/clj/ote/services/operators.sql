@@ -39,3 +39,8 @@ SELECT u.id as "user-id"
  WHERE op."business-id" = :business-id
    AND u.id != :user-id
  GROUP BY "user-id";
+ 
+-- name: group-id-for-op
+SELECT "ckan-group-id" FROM "transport-operator" op
+ WHERE op."id" = :id
+ LIMIT 1;
