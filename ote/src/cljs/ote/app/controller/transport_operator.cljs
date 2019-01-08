@@ -362,7 +362,6 @@
                         true (assoc
                                :flash-message (tr [:common-texts :transport-operator-saved]))
                         sending-done? (assoc
-                                        :transport-operator data
                                         :transport-operators-with-services (map (fn [{:keys [transport-operator] :as operator-with-services}]
                                                                                   (if (= (::t-operator/id data) (::t-operator/id transport-operator))
                                                                                     (assoc operator-with-services :transport-operator data)
