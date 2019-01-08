@@ -96,9 +96,14 @@
 
 (def title {:font-weight "bold"})
 
-
 (defn flex-container [dir]
   {:display "flex" :flex-direction dir})
+
+(defn align-items [dir]
+  {:align-items dir})
+
+(defn justify-content [dir]
+  {:justify-content dir})
 
 (def flex-child {:flex 1 })
 
