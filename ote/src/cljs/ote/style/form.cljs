@@ -59,3 +59,6 @@
 (def organization-padding {:padding-top "20px"})
 
 (def padding-top {:padding-top "20px"})
+
+(def action-control-section-margin {:margin-top "2rem"})
+
