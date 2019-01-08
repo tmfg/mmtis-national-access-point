@@ -24,8 +24,8 @@
           :error-text (or error warning "")                 ;; Show error text or warning text or empty string
           :error-style (if error                            ;; Error is more critical than required - showing it first
                          style-base/error-element
-                         style-base/required-element)}
-         (when class-name {:className class-name})
+                         style-base/required-element)
+          :className (if class-name class-name "mui-select-button")}
          (when disabled?
            {:disabled true}))
        (doall
