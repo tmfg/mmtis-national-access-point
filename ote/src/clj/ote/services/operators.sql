@@ -29,8 +29,8 @@ SELECT id FROM "transport-operator" op
  WHERE op."business-id" = :business-id
  LIMIT 1;
 
--- name: fetch-users-with-same-business-id
--- We give user permissions for all users that have permissions for one or more operator with the same business-id.
+-- name: fetch-users-within-same-business-id-family
+-- We give user permissions for all users that have permissions for one or more operator with the same business-id. So we fetch to users.
 SELECT u.id as "user-id"
   FROM "transport-operator" op
    JOIN "group" g ON g.id = op."ckan-group-id"

@@ -177,7 +177,7 @@
         member (create-member! db user-id group)
         ;; Ensure that other users get permissions to new operator as well
         ;; Get other possible users that need permissions
-        other-users (fetch-users-with-same-business-id db {:business-id (::t-operator/business-id op)
+        other-users (fetch-users-within-same-business-id-family db {:business-id (::t-operator/business-id op)
                                                            :user-id user-id})]
     (when other-users
       (doall
