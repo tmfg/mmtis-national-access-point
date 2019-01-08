@@ -338,6 +338,7 @@
  :buttons
  {:save "Spara"
   :cancel "Ångra"
+  :continue "Fortsätta"
   :delete "Ta bort"
   :delete-operator "Ta bort tjänsteproducent"
   :close "Stäng"
@@ -663,6 +664,7 @@
   :organization-new-title "Lägg till tjänsteproducent"
   :help-desc-1 "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
   :help-desc-2 (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
+  :help-merge-company-names "Du har tidigare skapat en eller flera NAP-tjänsteleverantörer vars namn inte stämmer med företagsnamn eller hjälpnamn som registrerats för företags-ID. \nVänligen välja NAP-tjänsteleverantörens namn som du vill ersätta med ett namn hämtade från YTJ-registret"
   :basic-info-tooltip "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
   :contact-types-tooltip "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
   :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
@@ -949,6 +951,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"
+  :save-failure "Sparade misslyckades."
+  :save-success "Sparad."
   :transport-service-saved "Uppgifterna sparade!"
   :transport-operator-saved "Uppgifterna sparade!"
   :footer-livi-logo "Traficom"
@@ -981,7 +985,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :minutes-placeholder "mm"
 
   :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."
-  :server-error-try-later "Problem med tjänsten. Vänligen försök igen senare."
+  :server-error-try-later "Vänligen försök igen senare."
 
   :forbidden "Du har inte behörighet att visa innehållet."
   :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"

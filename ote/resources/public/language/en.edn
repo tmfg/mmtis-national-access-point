@@ -330,6 +330,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  :buttons
  {:save "Save"
   :cancel "Cancel"
+  :continue "Continue"
   :delete "Delete"
   :delete-operator "Delete transport operator"
   :close "Close"
@@ -655,6 +656,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :organization-new-title "Create a new transport operator"
   :help-desc-1 "The information given in this form will seen in the public pages of NAP-service."
   :help-desc-2 (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
+  :help-merge-company-names "You have previously created one or more NAP service providers whose names do not correspond to the business names or auxiliary names registered for the business ID. \nPlease select the NAP service provider name which you want to replace using a name fetched from YTJ registry"
   :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing."
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
@@ -945,6 +947,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
+  :save-failure "Saving failed."
+  :save-success "Successfully saved."
   :transport-service-saved "Transport service information has been saved!"
   :transport-operator-saved "Transport operator information has been saved!"
   :footer-livi-logo "Finnish Transport and Communications Agency"
@@ -977,7 +981,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :minutes-placeholder "mm"
 
   :server-error "Error in server call. Contact support if the problem persists."
-  :server-error-try-later "Problems with a service. Please try again later."
+  :server-error-try-later "Please try again later."
 
   :forbidden "Forbidden"
   :optionally-fill-manually "Optionally you may proceed to enter details manually."
