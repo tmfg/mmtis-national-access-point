@@ -64,7 +64,8 @@
         status (get-in state [:ytj-response :status])
         ytj-loading? (fn [state] (:ytj-response-loading state))]
     (form/group
-      {:card?           false}
+      {:card?  false
+       :layout :row}
 
       {:name      ::t-operator/business-id
        :type      :string
