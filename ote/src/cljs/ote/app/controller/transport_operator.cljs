@@ -1,6 +1,7 @@
 (ns ote.app.controller.transport-operator
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
-  (:require [ote.communication :as comm]
+  (:require  [tuck.core :as tuck :refer-macros [define-event]]
+             [ote.communication :as comm]
             [ote.ui.form :as form]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transport-operator :as t-operator]
@@ -15,6 +16,24 @@
 
 (if (flags/enabled? :open-ytj-integration) ;;;;;;;;;;;;;;;;;;; TODO: remove condition check when feature is approved
 (do
+
+(defrecord SelectOperator [data])
+(defrecord SelectOperatorForTransit [data])
+(defrecord EditTransportOperator [id])
+(defrecord EditTransportOperatorResponse [response])
+(defrecord EditTransportOperatorState [data])
+(defrecord SaveTransportOperator [])
+(defrecord SaveTransportOperatorResponse [data])
+(defrecord FailedTransportOperatorResponse [response])
+(defrecord EnsureUniqueBusinessId [business-id])
+(defrecord EnsureUniqueBusinessIdResponse [response])
+(defrecord RenameOperator [operator selection])
+(defrecord RenameOperatorResponse [response operator])
+(defrecord UserCloseMergeSection [data])
+(defrecord OperatorDataRefreshResponse [response])
+
+(defrecord TransportOperatorResponse [response])
+(defrecord CreateTransportOperator [])
 
 (defn- strip-ytj-metadata [app] (dissoc app :ytj-response :ytj-company-names :ytj-flags :transport-operator-save-q))
 
@@ -70,21 +89,77 @@
     (:transport-operator nap-item)))
 
 (defn- ytj->nap-companies [operators-ytj operators-nap]
-  "Takes `operators-ytj` and if there's a name match to an item in `operators-nap`,
+  "Takes `operators-ytj` and if there's a name match to its name in `operators-nap`,
   copies into the ytj item nap keys which are not shared with other nap companies which have the same business-id."
-  ;(.debug js/console "ytj->nap-companies operators-ytj=" (clj->js operators-ytj) " \n operators-nap=" (clj->js operators-nap))
   (doall
-    (map (fn [ytj]
-           (let [nap-item (name->nap-operator (:name ytj) operators-nap)
+    (map (fn [ytj-item]
+           (let [nap-item (name->nap-operator (:name ytj-item) operators-nap)
                  nap-id (::t-operator/id nap-item)]
-             (cond-> ytj
-                     true (assoc ::t-operator/name (:name ytj)) ;; All operators must have name set to allow updating operator and group data if necessary
+             (cond-> ytj-item
+                     true (assoc ::t-operator/name (:name ytj-item)) ;; All operators must have name set to allow updating operator and group data if necessary
                      true (dissoc :name)                        ;; Remove ytj namespace key
                      (some? nap-id) (merge (take-update-op-keys nap-item)) ;; nap fields user is allowed to edit
-                     ;(some? nap-id) (assoc ::t-operator/id nap-id) ;; Set id of existing operators so they get updated and not created by nap service
                      ;; Remove keys not supported by nap service
                      true (take-operator-api-keys))))
          operators-ytj)))
+
+;; Takes `app`, POSTs the next transport operator in queue and updates the queue.
+;; Returns a new app state.
+(defn- save-next-operator! [app]
+  (let [ops-to-save (:transport-operator-save-q app)
+        op-next (form/without-form-metadata (first ops-to-save))
+        ops-rest (rest ops-to-save)]
+    ;(.debug js/console "save-next-operator! app=" (clj->js app) " \n next=" (clj->js op-next) " \n in queue=" (count ops-rest)) ;; TODO: disable from production
+    (if (some? op-next)
+      (do (comm/post! "transport-operator" op-next
+                      {:on-success (send-async! ->SaveTransportOperatorResponse)
+                       :on-failure (send-async! ->FailedTransportOperatorResponse)})
+          (assoc app :transport-operator-save-q ops-rest))
+      (dissoc app :transport-operator-save-q))))
+
+;; Takes app state and updates state whether renaming and orphan nap-operator (using an ytj name) was successful or not.
+;; Returns new app state
+(defn- update-rename-op-result [app response nap-op]
+  (.debug js/console "update-rename-op-result \n response=" (clj->js response) " \n orphans=" (clj->js (get-in app [:transport-operator :ytj-orphan-nap-operators])))
+  (let [orphans (get-in app [:transport-operator :ytj-orphan-nap-operators])
+        orphans-result (doall (map (fn [orphan]
+                                     (.debug js/console "update-rename-op-result loop: \n orphan=" (clj->js orphan) " \n napop=" (clj->js nap-op))
+                                     (if (= (::t-operator/id (:transport-operator orphan)) (::t-operator/id nap-op))
+                                       (assoc-in orphan [:transport-operator :save-success] (pos-int? response)) ;;(= (:status response) 200)
+                                       orphan))
+                                   orphans))]
+    ;(.debug js/console "update-rename-op-result result: \n orphans=" (clj->js orphans-result))
+    (assoc-in app [:transport-operator :ytj-orphan-nap-operators] orphans-result)))
+
+(defn- compose-orphan-nap-operators [bid ytj-ops nap-ops]
+  ;; Function takes bid (business-id) and nap-ops (vector of nap operator maps)
+  ;; and returns a vector of those nap-ops items whose business-id matches to bid but which don not have a name match it ytj-ops.
+  (let [nap-ops-for-bid (filter #(= (get-in % [:transport-operator ::t-operator/business-id]) bid) nap-ops)]
+    (filter
+      (fn [ytj-item]
+        (not (some (fn [nap-item]
+                     (= (::t-operator/name nap-item) (::t-operator/name (:transport-operator ytj-item)))) ytj-ops)))
+      nap-ops-for-bid)))
+
+;; Resolves nap metadata for ytj-fetched companies, e.g. what already exist in nap
+;; Returns a vector of enriched ytj operator maps
+(defn- compose-ytj-company-names [app response]
+  (.debug js/console "compose-ytj-company-names \n app=" (clj->js app) " \n response=" (clj->js response))
+  (let [companies (when (some? (:name response))
+                    (ytj->nap-companies
+                      (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
+                      (if (and (get-in app [:user :admin?]) (:admin-transport-operators app))
+                        (:admin-transport-operators app)
+                        (:transport-operators-with-services app))))]
+    ;; Add :show-delete-dialog? false to all companies to make :transport-operators-to-save values constant when adding them to checkboxes and checking if option is selected.
+    (map #(assoc % :show-delete-dialog? false) companies)))
+
+;; Composes the model for selecting operators and whether they are disabled for user selection
+;; Sets results in app state and returns new app state
+(defn- compose-appstate-ytj-companies-and-operators [app ytj-company-names]
+  (-> app
+      (assoc :ytj-company-names ytj-company-names)
+      (assoc-in [:transport-operator :transport-operators-to-save] (filterv ::t-operator/id ytj-company-names))))
 
 ;; Use-cases:
 ;; Create new op, business-id found in YTJ
@@ -107,31 +182,23 @@
         use-ytj-email? false
         ytj-contact-web (preferred-ytj-field ["Kotisivun www-osoite" "www-adress" "Website address"] (:contactDetails response))
         use-ytj-web? (not (empty? ytj-contact-web))
-        ytj-company-names (when (some? (:name response)) (ytj->nap-companies
-                                                           (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
-                                                           (if (and (get-in app [:user :admin?]) (:admin-transport-operators app))
-                                                             (:admin-transport-operators app)
-                                                             (:transport-operators-with-services app))))
-        ;; Add :show-delete-dialog? false to all companies to make :transport-operators-to-save values constant when adding them to checkboxes and checking if option is selected.
-        ytj-company-names (map #(assoc % :show-delete-dialog? false) ytj-company-names)
-        ytj-changed-fields? (and ytj-business-id-hit?
-                                 (or (not= ytj-address-billing (::t-operator/billing-address t-op))
-                                     (not= ytj-address-visiting (::t-operator/visiting-address t-op))
-                                     (not= ytj-contact-phone (::t-operator/phone t-op))
-                                     (not= ytj-contact-gsm (::t-operator/gsm t-op))
-                                     ;(not= ytj-contact-email (::t-operator/email t-op)) ;; TODO: take email into account when it's clear if YTJ api provides that
-                                     (not= ytj-contact-web (::t-operator/homepage t-op))
-                                     ;;(not= ytj-contact-name (::t-operator/name t-op)) Name not taken into account because that is handled in the name resolution wizard and name list
-                                     (not= ytj-address-billing (::t-operator/billing-address t-op))))
-        ]
-    ;(.debug js/console "process-ytj-data ytj-company-names=" (clj->js ytj-company-names) " \n app=" (clj->js app))
+        ytj-company-names (compose-ytj-company-names app response)
+        ytj-changed-contact-input-fields? (and ytj-business-id-hit?
+                                               (or (not= ytj-address-billing (::t-operator/billing-address t-op))
+                                                   (not= ytj-address-visiting (::t-operator/visiting-address t-op))
+                                                   (not= ytj-contact-phone (::t-operator/phone t-op))
+                                                   (not= ytj-contact-gsm (::t-operator/gsm t-op))
+                                                   ;(not= ytj-contact-email (::t-operator/email t-op)) ;; TODO: take email into account when it's clear if YTJ api provides that
+                                                   (not= ytj-contact-web (::t-operator/homepage t-op))
+                                                   ;;(not= ytj-contact-name (::t-operator/name t-op)) Name not taken into account because that is handled in the name resolution wizard and name list
+                                                   (not= ytj-address-billing (::t-operator/billing-address t-op))))]
     (cond-> app
             true (assoc
                    :ytj-response response
                    :ytj-response-loading false
                    :transport-operator-loaded? true)
             ;; Enable saving when YTJ changed a relevant field
-            (and (not (:new? t-op)) ytj-changed-fields?) (assoc-in [:transport-operator ::form/modified] #{::t-operator/name})
+            (and (not (:new? t-op)) ytj-changed-contact-input-fields?) (assoc-in [:transport-operator ::form/modified] #{::t-operator/name})
             true (assoc-in [:transport-operator :transport-operators-to-save] []) ;; Init to empty vector to allow populating it in different scenarios
             ;; Set data sources for form fields and if user allowed to edit
             use-ytj-addr-billing? (assoc-in [:transport-operator ::t-operator/billing-address] ytj-address-billing)
@@ -142,14 +209,16 @@
             use-ytj-phone? (assoc-in [:ytj-flags :use-ytj-phone?] true)
             use-ytj-gsm? (assoc-in [:transport-operator ::t-operator/gsm] ytj-contact-gsm)
             use-ytj-gsm? (assoc-in [:ytj-flags :use-ytj-gsm?] true)
-            ;use-ytj-email? (assoc-in [:transport-operator ::t-operator/email] ytj-contact-email) ;TODO: check ytj field types, does it return email?
+            ;use-ytj-email? (assoc-in [:transport-operator ::t-operator/email] ytj-contact-email) ; Not set because not known in what field it is available
             use-ytj-email? (assoc-in [:ytj-flags :use-ytj-email?] true)
             use-ytj-web? (assoc-in [:transport-operator ::t-operator/homepage] ytj-contact-web)
             use-ytj-web? (assoc-in [:ytj-flags :use-ytj-homepage?] true)
             ;; Set data source for company selection list
-            (not-empty ytj-company-names) (assoc :ytj-company-names ytj-company-names)
-            ;; Set checkbox list items selected if they have an ytj name match in nap:
-            (not-empty ytj-company-names) (assoc-in [:transport-operator :transport-operators-to-save] (filterv ::t-operator/id ytj-company-names)))))
+            true (assoc-in [:transport-operator :ytj-orphan-nap-operators]
+                           (compose-orphan-nap-operators (get-in app [:transport-operator ::t-operator/business-id])
+                                                         ytj-company-names
+                                                         (:transport-operators-with-services app)))
+            true (compose-appstate-ytj-companies-and-operators ytj-company-names))))
 
 (define-event FetchYtjOperatorResponse [response]
               {}
@@ -214,37 +283,25 @@
                            :on-failure (send-async! ->ServerError)})
               app)
 
-(defrecord SelectOperator [data])
-(defrecord SelectOperatorForTransit [data])
-(defrecord EditTransportOperator [id])
-(defrecord EditTransportOperatorResponse [response])
-(defrecord EditTransportOperatorState [data])
-(defrecord SaveTransportOperator [])
-(defrecord SaveTransportOperatorResponse [data])
-(defrecord FailedTransportOperatorResponse [response])
-(defrecord EnsureUniqueBusinessId [business-id])
-(defrecord EnsureUniqueBusinessIdResponse [response])
-
-(defrecord TransportOperatorResponse [response])
-(defrecord CreateTransportOperator [])
-
-;; Takes `app`, POSTs the next transport operator in queue and updates the queue.
-;; Returns a new app state.
-(defn- save-next-operator! [app]
-  (let [ops-to-save (:transport-operator-save-q app)
-        op-next (form/without-form-metadata (first ops-to-save))
-        ops-rest (rest ops-to-save)]
-    (.debug js/console "save-next-operator! app=" (clj->js app) " \n next=" (clj->js op-next) " \n in queue=" (count ops-rest)) ;; TODO: disable from production
-
-    (if (some? op-next)
-      (do (comm/post! "transport-operator" op-next
-                      {:on-success (send-async! ->SaveTransportOperatorResponse)
-                       :on-failure (send-async! ->FailedTransportOperatorResponse)})
-          (assoc app :transport-operator-save-q ops-rest))
-      (dissoc app :transport-operator-save-q))))
-
 (defn transport-operator-by-ckan-group-id[id]
   (comm/get! (str "transport-operator/" id) {:on-success (send-async! ->TransportOperatorResponse)}))
+
+(defn- update-transport-operator-data [app {:keys [transport-operators] :as response}]
+  (assoc app
+    :transport-operator-data-loaded? true
+    :transport-operators-with-services transport-operators))
+
+;; GETs transport operator data from service. Returns new app state.
+(defn- get-transport-operator-data [app]
+  (if (:transport-operator-data-loaded? app true)
+    (do
+      (comm/post! "transport-operator/data" {}
+                  {:on-success (tuck/send-async! ->OperatorDataRefreshResponse)
+                   :on-failure (tuck/send-async! ->OperatorDataRefreshResponse)});;TODO: HOW TO HANDLE ERROR?
+      (-> app
+          (assoc :services-changed? false)
+          (dissoc :transport-operators-with-services)))
+    app))
 
 (extend-protocol Event
 
@@ -285,7 +342,6 @@
 
   EditTransportOperator
   (process-event [{id :id} app]
-    ;(.debug js/console "EditTransportOperator id=" (clj->js id))
     (if id
       (do
         (comm/get! (str "t-operator/" id)
@@ -304,9 +360,7 @@
 
       (if op-ytj-cache-miss?
         (send-fetch-ytj state nap-business-id)
-        (process-ytj-data state (:ytj-response state))
-        )
-      ))
+        (process-ytj-data state (:ytj-response state)))))
 
   EditTransportOperatorState
   (process-event [{data :data} app]
@@ -336,7 +390,6 @@
                                              (when op-update-nap?) (take-update-op-keys data-fields)))
                               ;; Copy only fields allowed for user to edit to ytj-matching operator maps because other values are already set
                               (mapv #(merge % (take-common-op-keys data-fields)) ytj-ops-selected))]
-      ;(.debug js/console "SaveTransportOperator data-fields=" (clj->js data-fields) " \n ytj-ops-selected=" (clj->js ytj-ops-selected) " \n operators-to-save=" (clj->js operators-to-save) )
       (save-next-operator!
         (assoc app :transport-operator-save-q operators-to-save))))
 
@@ -380,6 +433,39 @@
     (assoc app
       :transport-operator (assoc response
                             :loading? false)))
+
+  OperatorDataRefreshResponse
+  (process-event [{response :response} app]
+    (.debug js/console "OperatorDataRefreshResponse response:" (clj->js response))
+    ;; Operator not updated to app state because of assumption editing uses :ytj-company-names and :transport-operators-to-save vectors
+    ;; operator could be merged to :transport-operator, but more consistent with service would be to re-fetch and re-parse the results
+    ;; which is close to refreshing the page.
+    (let [app (update-transport-operator-data app response)
+          ytj-company-names (compose-ytj-company-names app (:ytj-response app))]
+      (compose-appstate-ytj-companies-and-operators app ytj-company-names)))
+
+  RenameOperatorResponse
+  (process-event [{response :response operator :operator} app]
+    (.debug js/console "RenameOperatorResponse response:" (clj->js response) " \n operator=" (clj->js operator))
+    (cond-> app
+            true (update-rename-op-result response operator)
+            ;; Refresh app state only if saving was ok, fail means data was not changed. Service returns a status object on error, count of changed records on success
+            (pos-int? response) (get-transport-operator-data)))
+
+  RenameOperator
+  (process-event [{operator :operator selection :selection :as data} app]
+    ;; Set only required keys to payload eliminate any chance for modifying any other keys than what is wanted
+    (let [payload {::t-operator/id (::t-operator/id operator)
+                   ::t-operator/name (::t-operator/name selection)}]
+      (comm/post! "transport-operator" payload
+                  {:on-success (send-async! ->RenameOperatorResponse operator)
+                   :on-failure (send-async! ->RenameOperatorResponse operator)})
+      app))
+
+  UserCloseMergeSection
+  (process-event [_ app]
+    (.debug js/console "UserCloseMergeSection")
+    (assoc-in app [:transport-operator :ytj-orphan-nap-operators] nil))
 
   EnsureUniqueBusinessId
   (process-event [{business-id :business-id} app]
