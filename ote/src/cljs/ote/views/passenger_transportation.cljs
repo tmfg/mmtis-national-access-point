@@ -188,10 +188,10 @@
     })))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service} app]
-  (with-let [form-groups
+  (let [form-groups
              [(ts-common/transport-type (::t-service/sub-type service))
               (ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
-              (ts-common/contact-info-group)
+              (ts-common/contact-info-group (:transport-service app))
               (ts-common/companies-group e!)
               (ts-common/brokerage-group e!)
               (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/passenger-transportation)

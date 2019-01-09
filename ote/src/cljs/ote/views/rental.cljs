@@ -298,7 +298,7 @@
 (defn rental [e! service app]
   (with-let [groups [(ts-common/transport-type ::t-service/rentals)
                      (ts-common/name-group (tr [:rentals-page :header-service-info]))
-                     (ts-common/contact-info-group)
+                     (ts-common/contact-info-group (:transport-service app))
                      (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/rentals)
                      (ts-common/external-interfaces e!)
                      (vehicle-group)
