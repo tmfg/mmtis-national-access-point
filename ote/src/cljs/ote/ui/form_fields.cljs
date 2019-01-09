@@ -908,7 +908,7 @@
   (let [selected (set (or data #{}))
         option-enabled? (or option-enabled? (constantly true))
         label-style (if use-label-width? style-base/checkbox-label-with-width style-base/checkbox-label)]
-    [:div.checkbox-group {:style (if checkbox-group-style checkbox-group-style {})}
+    [:div.checkbox-group {:style (if checkbox-group-style checkbox-group-style style-form-fields/checkbox-group-base)}
      (when (not (false? header?))
        [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
      (when help
