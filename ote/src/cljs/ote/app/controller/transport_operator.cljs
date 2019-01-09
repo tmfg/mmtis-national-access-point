@@ -198,7 +198,8 @@
                    :ytj-response-loading false
                    :transport-operator-loaded? true)
             ;; Enable saving when YTJ changed a relevant field
-            (and (not (:new? t-op)) ytj-changed-contact-input-fields?) (assoc-in [:transport-operator ::form/modified] #{::t-operator/name})
+            (and (not (:new? t-op))
+                 ytj-changed-contact-input-fields?) (assoc-in [:transport-operator ::form/modified] #{::t-operator/name})
             true (assoc-in [:transport-operator :transport-operators-to-save] []) ;; Init to empty vector to allow populating it in different scenarios
             ;; Set data sources for form fields and if user allowed to edit
             use-ytj-addr-billing? (assoc-in [:transport-operator ::t-operator/billing-address] ytj-address-billing)
@@ -364,9 +365,10 @@
 
   EditTransportOperatorState
   (process-event [{data :data} app]
-    (dissoc
-      (update app :transport-operator merge data)
-      :transport-operator-save-q))
+    (-> app
+        (update :transport-operator merge data)
+        (dissoc :transport-operator-save-q)
+        (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 
   ;; Start saving sequence after user action.
   ;; Two categories of operators:
@@ -390,8 +392,10 @@
                                              (when op-update-nap?) (take-update-op-keys data-fields)))
                               ;; Copy only fields allowed for user to edit to ytj-matching operator maps because other values are already set
                               (mapv #(merge % (take-common-op-keys data-fields)) ytj-ops-selected))]
-      (save-next-operator!
-        (assoc app :transport-operator-save-q operators-to-save))))
+      (-> app
+          (dissoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])
+          (assoc :transport-operator-save-q operators-to-save)
+          (save-next-operator!))))
 
   FailedTransportOperatorResponse
   (process-event [{response :response} app]
