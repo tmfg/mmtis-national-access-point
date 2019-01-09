@@ -69,13 +69,15 @@
                                                    :label "Palvelut tyypeittäin"}]}]
       (fn []
         [:div {:style {:width "50%"}}
+         [:h2 "Valvontanäkymä"]
+         [:p "Valvontanäkymässä voit tarkastellla liikkumispalveluiden tuottamiseen osallistuvien yritysten kokonaismäärää, sekä määriä jaoteltuina liikkumispalvelutyyppien mukaan. Voit myös ladata kaikkien esitettyjen kuvaajien tiedot, sekä liikkumispalveluiden tuottamiseen osallistuvien yritysten tiedot (Y-tunnus, toiminimi sekä tuotetut liikkumispalvelutyypit) CSV-tiedostona."]
          [:p "Liikkumispalveluiden tuottamiseen osallistuvat yritykset"]
+         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies" "Lataa kuvaajan tiedot CSV:nä"]
          [barchart-inner "chart-companies-by-month" companies-by-month-data]
-         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies" "Lataa CSV"]
-         [:p "Palveluntuottajien tämän hetkinen lukumäärä liikkumispalvelutyypeittäin"]
+         [:p "Palveluntuottajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin"]
+         [ui-common/linkify "/admin/reports/monitor/csv/company-service-types" "Lataa kuvaajan tiedot CSV:nä"]
          [doughnut-inner "chart-share-by-type" provider-share-by-type-data]
-         [ui-common/linkify "/admin/reports/monitor/csv/company-service-types" "Lataa CSV"]
-         [:p "Tuottajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan"]         
-         [barchart-inner "chart-type-by-month" (:monthly-types monitor-data)]
-         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies-by-service-type" "Lataa CSV"]]))
+         [:p "Tuottajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan"]
+         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies-by-service-type" "Lataa kuvaajan tiedot CSV:nä"]
+         [barchart-inner "chart-type-by-month" (:monthly-types monitor-data)]]))
     [ui-common/loading-spinner]))
