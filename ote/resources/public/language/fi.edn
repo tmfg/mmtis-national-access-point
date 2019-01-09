@@ -955,6 +955,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :title-operator-basic-details "Perustiedot"
   :data-not-found "Tietoja ei löytynyt"
   :required-field "Tieto vaaditaan"
+  :required-field-missing "Pakollisia tietoja syöttämättä"
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"

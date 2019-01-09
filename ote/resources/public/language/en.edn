@@ -945,6 +945,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :title-operator-basic-details "Basic information"
   :data-not-found "Data is not found"
   :required-field "Required field"
+  :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
