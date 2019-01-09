@@ -57,11 +57,8 @@
          result []]
     (if (and type (empty? result))
       (let [match (:value (filter-coll-type type contacts))]
-        ;(.debug js/console "Contact match=" (clj->js match))
         (recur remaining (if match (conj result match) result)))
-      (do
-        ;(.debug js/console "Contact result=" (clj->js result))
-        (first result)))))                                  ;; Return first because expected value is string not vector
+      (first result))))                                  ;; Return first because expected value is string not vector
 
 ;; Keys for saving fields common with all companies sharing the same Y-tunnus/business-id
 (defn- take-common-op-keys [coll] (select-keys coll [::t-operator/business-id
@@ -83,7 +80,6 @@
 
 ;; Takes 'ytj-name' and finds the first from `nap-operators` whose name is a match, or nil.
 (defn- name->nap-operator [ytj-name nap-operators]
-  ;(.debug js/console "name->nap-operator: " "ytj-name=" (clj->js ytj-name) "nap-names=" (clj->js nap-operators))
   (let [nap-item (some  #(when (= (get-in % [:transport-operator ::t-operator/name]) ytj-name) %) ;; Return whole item or nil
                    nap-operators)]
     (:transport-operator nap-item)))
@@ -109,7 +105,6 @@
   (let [ops-to-save (:transport-operator-save-q app)
         op-next (form/without-form-metadata (first ops-to-save))
         ops-rest (rest ops-to-save)]
-    ;(.debug js/console "save-next-operator! app=" (clj->js app) " \n next=" (clj->js op-next) " \n in queue=" (count ops-rest)) ;; TODO: disable from production
     (if (some? op-next)
       (do (comm/post! "transport-operator" op-next
                       {:on-success (send-async! ->SaveTransportOperatorResponse)
@@ -120,15 +115,12 @@
 ;; Takes app state and updates state whether renaming and orphan nap-operator (using an ytj name) was successful or not.
 ;; Returns new app state
 (defn- update-rename-op-result [app response nap-op]
-  (.debug js/console "update-rename-op-result \n response=" (clj->js response) " \n orphans=" (clj->js (get-in app [:transport-operator :ytj-orphan-nap-operators])))
   (let [orphans (get-in app [:transport-operator :ytj-orphan-nap-operators])
         orphans-result (doall (map (fn [orphan]
-                                     (.debug js/console "update-rename-op-result loop: \n orphan=" (clj->js orphan) " \n napop=" (clj->js nap-op))
                                      (if (= (::t-operator/id (:transport-operator orphan)) (::t-operator/id nap-op))
                                        (assoc-in orphan [:transport-operator :save-success] (pos-int? response)) ;;(= (:status response) 200)
                                        orphan))
                                    orphans))]
-    ;(.debug js/console "update-rename-op-result result: \n orphans=" (clj->js orphans-result))
     (assoc-in app [:transport-operator :ytj-orphan-nap-operators] orphans-result)))
 
 (defn- compose-orphan-nap-operators [bid ytj-ops nap-ops]
@@ -144,7 +136,6 @@
 ;; Resolves nap metadata for ytj-fetched companies, e.g. what already exist in nap
 ;; Returns a vector of enriched ytj operator maps
 (defn- compose-ytj-company-names [app response]
-  (.debug js/console "compose-ytj-company-names \n app=" (clj->js app) " \n response=" (clj->js response))
   (let [companies (when (some? (:name response))
                     (ytj->nap-companies
                       (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
@@ -167,7 +158,6 @@
 ;; Edit op, business id found in YTJ
 ;; Edit op, business id not found in YTJ
 (defn- process-ytj-data [app response]
-  ;(.debug js/console "process-ytj-data response=" (clj->js response))
   (let [t-op (:transport-operator app)
         ytj-business-id-hit? (= 200 (:status response))
         ytj-address-billing (address-of-type 1 (:addresses response))
@@ -241,7 +231,6 @@
 
 (define-event CancelTransportOperator []
               {}
-              (.debug js/console "transport-operator/CancelTransportOperator")
               (routes/navigate! :own-services)
               (update-in app [:transport-operator] dissoc :new?))
 
@@ -308,7 +297,6 @@
 
   CreateTransportOperator
   (process-event [_ app]
-    (.debug js/console "transport-operator: CreateTransportOperator")
     (let [res (-> app
                     (strip-ytj-metadata)
                     (assoc
@@ -352,8 +340,6 @@
 
   EditTransportOperatorResponse                             ;; todo: pois
   (process-event [{response :response} app]
-    ;(.debug js/console "EditTransportOperatorResponse response=" (clj->js response))
-
     (let [state (assoc app :transport-operator response
                            :transport-operator-loaded? true)
           nap-business-id (get-in state [:transport-operator ::t-operator/business-id])
@@ -412,8 +398,6 @@
 
   SaveTransportOperatorResponse
   (process-event [{data :data} app]
-    (.debug js/console "SaveTransportOperatorResponse: sending?=" (clj->js (:transport-operator-save-q app)))
-
     (let [sending-done? (empty? (:transport-operator-save-q app))
           state (cond-> app
                         true (assoc
@@ -429,7 +413,6 @@
       ;; Stay on page as long as there's items to send - otherwise there will be app state inconsistency problems
       (when sending-done?
         (routes/navigate! :own-services))
-
       state))
 
   TransportOperatorResponse
@@ -440,7 +423,6 @@
 
   OperatorDataRefreshResponse
   (process-event [{response :response} app]
-    (.debug js/console "OperatorDataRefreshResponse response:" (clj->js response))
     ;; Operator not updated to app state because of assumption editing uses :ytj-company-names and :transport-operators-to-save vectors
     ;; operator could be merged to :transport-operator, but more consistent with service would be to re-fetch and re-parse the results
     ;; which is close to refreshing the page.
@@ -450,7 +432,6 @@
 
   RenameOperatorResponse
   (process-event [{response :response operator :operator} app]
-    (.debug js/console "RenameOperatorResponse response:" (clj->js response) " \n operator=" (clj->js operator))
     (cond-> app
             true (update-rename-op-result response operator)
             ;; Refresh app state only if saving was ok, fail means data was not changed. Service returns a status object on error, count of changed records on success
@@ -468,7 +449,6 @@
 
   UserCloseMergeSection
   (process-event [_ app]
-    (.debug js/console "UserCloseMergeSection")
     (assoc-in app [:transport-operator :ytj-orphan-nap-operators] nil))
 
   EnsureUniqueBusinessId
@@ -484,7 +464,6 @@
     (assoc-in app [:transport-operator :business-id-exists] (:business-id-exists response))))
 
 (defmethod routes/on-navigate-event :transport-operator [{id :params}]
-  (.debug js/console "transport-operator/on-navigate-event: id=" (clj->js id))
   (if (some? (:id id))
     (->EditTransportOperator (:id id))
     (->VerifyCreateState)
