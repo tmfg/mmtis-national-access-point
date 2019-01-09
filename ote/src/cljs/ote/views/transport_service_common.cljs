@@ -116,7 +116,7 @@
 
       (form/info
         [:div
-         [:div {:margin-bottom "5px"}
+         [:div
           [:b (if (= :schedule sub-type)
                 [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
                  [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
@@ -404,8 +404,8 @@
     (when true ;show-footer? - Take owner check away for now
       [:div.row
        (when (not (form/can-save? data))
-         [ui/card {:style {:margin-bottom "1em"}}
-          [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+         [ui/card {:style {:margin-bottom "1rem"}}
+          [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6rem"}} (tr [:form-help :publish-missing-required])]])
 
        (if published?
          ;; True
