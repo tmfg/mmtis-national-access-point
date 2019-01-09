@@ -677,6 +677,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :help-about-ytj-link "https://www.ytj.fi/index/tietoapalvelusta.html"
   :help-ytj-contact-change-link-desc "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"
   :help-ytj-contact-change-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html"
+  :merge-operator-to-ytj "korvataan nimellä"
   }
 
  :passenger-transportation-page

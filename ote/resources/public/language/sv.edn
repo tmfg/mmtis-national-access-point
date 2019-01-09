@@ -679,6 +679,7 @@
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
   :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
+  :merge-operator-to-ytj "kommer att namnas som"
   }
 
  :passenger-transportation-page

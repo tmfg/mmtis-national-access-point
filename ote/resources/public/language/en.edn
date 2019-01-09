@@ -671,6 +671,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :help-about-ytj-link "https://www.ytj.fi/en/index/whatisbis.html"
   :help-ytj-contact-change-link-desc "Change details of your business online"
   :help-ytj-contact-change-link "https://www.ytj.fi/en/index/notifications/notificationsofchanges.html"
+  :merge-operator-to-ytj "will be renamed as"
   }
 
  :passenger-transportation-page
