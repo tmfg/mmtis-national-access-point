@@ -266,14 +266,22 @@
 
       {:name ::t-operator/homepage :type :string :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false) :style style-fields/form-field})))
 
-(defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as op} ytj-company-names app]
-  [:div {:style style-base/wizard-container}
+;; Hide options of YTJ operators which already exist in nap,
+;; except if selected item is same as item which control represents so it won't disappear after selection (because it got added to nap).
+(defn- allowed-names-to-merge [ytj-company-names my-id]
+  (filterv (fn [item] (or
+                        (nil? (::t-operator/id item))
+                        (= (::t-operator/id item) my-id)))
+           ytj-company-names))
 
+(defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators ops-to-save :transport-operators-to-save :as operator} ytj-company-names app]
+  [:div {:style style-base/wizard-container}
    [:div [:h3 (tr [:organization-page :heading-operator-edit])]]
    [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-merge-company-names]) true]
    (for [n nap-orphans
          :let [nap-op (:transport-operator n)
-               control-disabled? false                      ; (not= n (first nap-orphans))
+               control-disabled? false
+               ops-to-save1 (:transport-operators-to-save operator)
                ]
          :when n]
      ^{:key (str "operator-merge-section-item-" (::t-operator/name nap-op))}
@@ -282,17 +290,13 @@
                      (style-base/align-items "center")
                      (style-base/justify-content "flex-start")
                      (when control-disabled? style-base/disabled-control))}
-      [:div "\"" [:strong (::t-operator/name nap-op)] "\" korvataan nimellä"]
-
+      [:div "\"" [:strong (::t-operator/name nap-op)] "\" " (tr [:organization-page :merge-operator-to-ytj])]
       [:div {:style style-base/item-list-row-margin}]
-
       [sf/select-field
-       {:options (mapv to/take-operator-api-keys            ;; Take only a known set of keys to operate with, just for the sake of clarity
-                       (filterv #(nil? (::t-operator/id %)) ytj-company-names)) ;; Hide YTJ operators which already exist in NAP
+       {:options (mapv to/take-operator-api-keys (allowed-names-to-merge ytj-company-names (::t-operator/id nap-op)))
         :show-option #(::t-operator/name %)
+        :style style-base/item-list-row-margin
         :update! #(e! (to/->RenameOperator nap-op %))}]
-
-      [:div {:style style-base/item-list-row-margin}]
 
       (when (= false (:save-success nap-op))
         [msg-warn/warning-msg (str (tr [:common-texts :save-failure])
@@ -339,7 +343,8 @@
 (defn operator-ytj [e! {operator :transport-operator :as state}]
   (let [show-id-entry? (empty? (get-in state [:params :id]))
         show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
-        show-merge-companies? (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
+        show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
+                                   (pos-int? (count (:ytj-company-names state))))
         ;form-options (operator-form-options e! state show-details?)
         form-groups (cond-> []
                             show-id-entry? (conj (business-id-selection e! state))
