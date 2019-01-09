@@ -1097,10 +1097,18 @@
      }]]
   )
 
-(defmethod field :text-label [{:keys [label style h-style]}]
+(defmethod field :text-label [{:keys [label style h-style full-width?]}]
   ;; Options
   ; :label Text for displaying
-  [:div (when style {:style style}) (if h-style [h-style label] [:p label])])
+  [:div
+   {:style (merge
+             (when full-width?
+               {:width "100%"})
+             (when style
+               style))}
+   (if h-style
+     [h-style label]
+     [:p label])])
 
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
