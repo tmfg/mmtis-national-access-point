@@ -254,10 +254,12 @@
 
 
 (defn monitor-report [db type]
-  (println "monitor-report called, returning composite map")
   {:monthly-companies  (monthly-registered-companies db)
    :companies-by-service-type (operator-type-distribution db)
    :monthly-types (monthly-types-for-monitor-report db)})
+
+(defn- csv-data [header rows]
+  (concat [header] rows))
 
 (defn monitor-csv-report [db type]
   (case type
@@ -266,21 +268,20 @@
               (map (juxt :month :sum) (monthly-registered-companies db)))
 
     "company-service-types"
-    (csv-data ["tuottaja-tyyppi" "tuottaja-tyunnus-lkm"]
+    (csv-data ["tuottaja-tyyppi" "tuottaja-ytunnus-lkm"]
               (map (juxt :sub-type :count) (operator-type-distribution db)))
 
     "monthly-companies-by-service-type"
-    (csv-data ["kuukausi" "tyyppi" "lkm"]
+    (csv-data ["kuukausi" "tuottaja-tyyppi" "lkm"]
+              ;; the copious vec calls are here because sort blows up on lazyseqs,
+              ;; and we end up with nested lazyseqs here despite using mapv etc.
               (let [r (monthly-types-for-monitor-report db)
                     months (:labels r)
                     ds (:datasets r)
                     sums-by-type (into {}  (map (juxt :label :data) ds))
-                    type-month-count-tbl (for [[t vs] sums-by-type] (interleave months (repeat t) vs))]
-                type-month-count-tbl)              
-              )))
-
-(defn- csv-data [header rows]
-  (concat [header] rows))
+                    type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
+                    final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
+                (sort (vec (map vec (apply concat final-table))))))))
 
 (defn- transport-operator-report [db type]
   (case type
@@ -388,7 +389,6 @@
        {{:keys [type]} :params
         user :user}
        (require-admin-user "reports/monitor" (:user user))
-       (println "calling monitor-csv-report, rv:" (pr-str (monitor-csv-report db type)))
        (monitor-csv-report db type)))
 
 (defrecord Admin [nap-config]
