@@ -37,4 +37,5 @@ SELECT u.id as "user-id"
   JOIN "member" m ON g.id = m.group_id AND m.table_name = 'user'
   JOIN "user" u ON m.table_id = u.id
  WHERE op."business-id" = :business-id
+   AND u.id != :user-id
  GROUP BY "user-id";
