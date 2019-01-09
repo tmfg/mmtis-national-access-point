@@ -150,11 +150,21 @@
      :transport-service-vector transport-services-vector
      :user cleaned-user}))
 
-(defn- create-group!
+(defn- create-member! [db user-id group]
+  (specql/insert! db ::user/member
+                  {::user/id         (str (UUID/randomUUID))
+                   ::user/table_id   user-id
+                   ::user/group_id   (:ote.db.transport-operator/group-id group)
+                   ::user/table_name "user"
+                   ::user/capacity   "admin"
+                   ::user/state      "active"}))
+
+(defn- give-permissions!
   "Takes `op` operator and `user` and pairs user to organization in db using the member table. Sets role (Capacity) to 'admin'"
   [db op user]
   {:pre [(some? op) (some? (::t-operator/name op))]}
-  (let [group (specql/insert! db ::t-operator/group
+  (let [user-id (get-in user [:user :id])
+        group (specql/insert! db ::t-operator/group
                               {::t-operator/group-id        (str (UUID/randomUUID))
                                ::t-operator/group-name      (str "transport-operator-" (::t-operator/id op))
                                ::t-operator/title           (::t-operator/name op)
@@ -164,13 +174,11 @@
                                ::t-operator/type            "organization"
                                ::t-operator/approval_status "approved"
                                ::t-operator/is_organization true})
-        member (specql/insert! db ::user/member
-                               {::user/id         (str (UUID/randomUUID))
-                                ::user/table_id   (get-in user [:user :id])
-                                ::user/group_id   (:ote.db.transport-operator/group-id group)
-                                ::user/table_name "user"
-                                ::user/capacity   "admin"
-                                ::user/state      "active"})]
+        ;; Ensure that all users are given permissions to new operator
+        users (fetch-users-within-same-business-id-family db {:business-id (::t-operator/business-id op)})]
+    (doall
+      (for [u users]
+        (create-member! db (:user-id u) group)))
     group))
 
 (defn- update-group!
@@ -220,7 +228,7 @@
                               ::t-operator/id
                               ::t-operator/ckan-description
                               ::t-operator/ckan-group-id))
-          group (create-group! db op user)]
+          group (give-permissions! db op user)]
 
       (update! db ::t-operator/transport-operator
                {::t-operator/ckan-group-id (::t-operator/group-id group)}

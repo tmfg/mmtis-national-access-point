@@ -28,3 +28,13 @@ SELECT del_operator(:operator-group-name);
 SELECT id FROM "transport-operator" op
  WHERE op."business-id" = :business-id
  LIMIT 1;
+
+-- name: fetch-users-within-same-business-id-family
+-- We give user permissions for all users that have permissions for one or more operator with the same business-id.
+SELECT u.id as "user-id"
+  FROM "transport-operator" op
+  JOIN "group" g ON g.id = op."ckan-group-id"
+  JOIN "member" m ON g.id = m.group_id AND m.table_name = 'user'
+  JOIN "user" u ON m.table_id = u.id
+ WHERE op."business-id" = :business-id
+ GROUP BY "user-id";
