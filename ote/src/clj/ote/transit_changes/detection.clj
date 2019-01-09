@@ -87,7 +87,7 @@
                                            ;; If there is no traffic for the service on a given date, the
                                            ;; result set will contain a single row with nil values for route.
                                            ;; Remove the empty-route-key so we don't get an extra route.
-                                           nil)]]
+                                           "" nil)]]
     {:date   (.toLocalDate date)
      :routes cleaned-route-hashes}))
 
