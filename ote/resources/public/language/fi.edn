@@ -57,7 +57,7 @@
    :ote.db.transport-service/contact-address "Osoitetiedot"
    :ote.db.transport-service/contact-phone "Puhelin"
    :ote.db.transport-service/contact-email "Sähköposti"
-   :ote.db.transport-service/homepage "Kotisivu"
+   :ote.db.transport-service/homepage "Verkkosivujen osoite"
 
    :ote.db.transport-service/operation-area "Toiminta-alue"
    :ote.db.transport-service/location "Sijainti"
@@ -228,7 +228,7 @@
 
 
   ;; Common fields
-  :ote.db.common/street "Osoite"
+  :ote.db.common/street "Katuosoite"
   :ote.db.common/post_office "Postitoimipaikka"
   :ote.db.common/postal_code "Postinumero"
 
@@ -297,7 +297,7 @@
 Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
-  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
+  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla teihin yhteydessä. Täytä vähintään yksi seuraavista tiedoista: osoite (katuosoite, postinumero, postitoimipaikka), sähköposti tai puhelinnumero."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
