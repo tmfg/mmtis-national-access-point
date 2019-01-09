@@ -48,7 +48,7 @@
         parsed-response (:transit response)
         id (::t-service/id parsed-response)
         deleted-response  (http-post "admin" (str "admin/transport-service/delete") {:id id})
-        auditlog (first (fetch
+        auditlog (last (fetch
                    (:db ote.test/*ote*)
                    ::auditlog/auditlog
                    #{::auditlog/id ::auditlog/event-attributes ::auditlog/event-type}
