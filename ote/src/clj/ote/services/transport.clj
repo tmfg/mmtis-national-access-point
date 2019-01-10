@@ -281,8 +281,7 @@
 
 ;; Takes db and transport-operator. Resolves optional data for updating operator and returns a transport-operator map.
 (defn resolve-update-operator-data [db op]
-  (let [ckan-id (when (nil? (::t-operator/ckan-group-id op))
-                  (group-id-for-op db {:id (::t-operator/id op)}))]
+  (let [ckan-id (group-id-for-op db {:id (::t-operator/id op)})]
     ;; cond used just in case there are mode fields to handle in the future
     (cond-> op
             (some? ckan-id) (assoc ::t-operator/ckan-group-id (:ckan-group-id (first ckan-id))))))
