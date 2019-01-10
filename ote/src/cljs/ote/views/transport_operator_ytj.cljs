@@ -345,7 +345,6 @@
         show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
         show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
                                    (pos-int? (count (:ytj-company-names state))))
-        ;form-options (operator-form-options e! state show-details?)
         form-groups (cond-> []
                             show-id-entry? (conj (business-id-selection e! state))
                             show-details? (conj (operator-form-groups e! state)))]
