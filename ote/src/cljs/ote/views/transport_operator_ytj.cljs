@@ -317,6 +317,7 @@
      (if (nil? (:ytj-company-names state))
        [delete-operator e! operator (:transport-operators-with-services state)]
        (for [o (get-in state [:transport-operator :transport-operators-to-save])]
+         ^{:key (str "operator-delete-control-" (::t-operator/name o) "-" (::t-operator/id o) )}
          [delete-operator e! o (:transport-operators-with-services state)]))
      [form/form
       form-options
