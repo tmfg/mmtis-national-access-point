@@ -274,15 +274,13 @@
                         (= (::t-operator/id item) my-id)))
            ytj-company-names))
 
-(defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators ops-to-save :transport-operators-to-save :as operator} ytj-company-names app]
+(defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as operator} ytj-company-names app]
   [:div {:style style-base/wizard-container}
    [:div [:h3 (tr [:organization-page :heading-operator-edit])]]
    [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-merge-company-names]) true]
    (for [n nap-orphans
          :let [nap-op (:transport-operator n)
-               control-disabled? false
-               ops-to-save1 (:transport-operators-to-save operator)
-               ]
+               control-disabled? false]
          :when n]
      ^{:key (str "operator-merge-section-item-" (::t-operator/name nap-op))}
      [:div {:style (merge
