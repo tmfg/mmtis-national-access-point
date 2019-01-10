@@ -563,10 +563,11 @@ You can also draw the operating area or point to the map with drawing tools. You
           :parking "General commerial parking services"
           :brokerage "Brokering service companies"}
 
- :own-services-page {:filling-info "Täyttöohje"
+ :own-services-page {:filling-info "Filling instructions"
                      :filling-info-content (:md "Lisää **Palvelut**-kenttään tiedot muiden tuottamista palveluista, joiden tuottamiseen osallistut. (Esim.taksien tilausvälityskeskus)\n\nKirjoita kohtaan Lisää palvelu joko palveluntuottajan nimi, palvelun nimi tai palveluntuottajan Y-tunnus. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu.\n\nMikäli Palvelut-kentässä on jo valmiina joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet teidät palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, voit tarvittaessa poistaa kohdassa näkyvät palvelut palvelun perässä olevaa ruksi-symbolia napsauttamalla.\n\nJos et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi")
                      :open-geojson "Open GeoJson"
                      :other-services-where-involved "Muut palvelut, joissa olet mukana"
+                     :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
                      :own-services "Own transport services"
                      :own-services-info-long (:md "By clicking the button **Add a new service** you can give more detailed information of the transport service you are providing. If you do not provide any of your **own** transport services directly to customers (e.g. you only operate rides through a brokering centre), you can skip this part and go directly to the section **Other services in which you are involved in.**")
                      :own-services-directions-short "Instructions"
@@ -574,7 +575,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :own-services-new-provider2 (:md " to the NAP service catalog. Please notice that only creating a service provider does not cover the essential information of your transport service/services determined in the legislation (e.g. operating area, pricing and accessibility). \n\nPlease, provide next more detailed information on your transport service or services in section **Own transport services** and/or **Other services in which you are involved in**. If you are a taxi company and you only operate rides through a brokering centre, go directly to the section **Other services in which you are involved in** and give information about the brokering centre. In such a case, you don´t necessarily have to create a transport service of your own in the NAP service catalog.")
                      :own-services-no-providers (:md "You are not yet a member of any transport operator. To be able to publish transport service information, you have to first **create a new transport operator** to the NAP service or **join as a member to some transport operator that already exists in the NAP service by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 10 am to 4 pm) or joukkoliikenne@traficom.fi).\n\nA transport operator is a company, community or other organization, which provides it´s own transport services or participates in conducting of other company´s transport services, A transport operator can be e.g. a taxi company, a buss company, a parking facility operator or a municipality.")
                      :service "Service"
-                     :add-service "Add a service"}
+                     :add-service "Add a service"
+                     :edit-business-id ["Edit information for business-id " :business-id]}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
