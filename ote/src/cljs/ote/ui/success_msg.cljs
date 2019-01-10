@@ -7,5 +7,5 @@
   [:div
    {:style (merge style-base/msg-container style-base/msg-success)}
    [ic/action-check-circle {:style style-base/msg-success}]
-   [:div {:style style-base/msg-item-column-margin} content]])
+   (when content [:div {:style style-base/msg-item-column-margin} content])])
 
