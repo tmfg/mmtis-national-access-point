@@ -338,7 +338,6 @@
  :buttons
  {:save "Spara"
   :cancel "Ångra"
-  :continue "Fortsätta"
   :delete "Ta bort"
   :delete-operator "Ta bort tjänsteproducent"
   :close "Stäng"
