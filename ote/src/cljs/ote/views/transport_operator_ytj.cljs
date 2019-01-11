@@ -12,6 +12,7 @@
             [ote.ui.select_field :as sf]
             [ote.ui.warning_msg :as msg-warn]
             [ote.ui.success_msg :as msg-succ]
+            [ote.ui.circular_progress :as prog]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
             [ote.style.form-fields :as style-fields]
@@ -70,17 +71,21 @@
   "Form group for querying business id from user and triggering data fetch for it from YTJ"
   (let [operator (:transport-operator state)
         status (get-in state [:ytj-response :status])
-        ytj-loading? (fn [state] (:ytj-response-loading state))]
+        ytj-loading? (fn [state] (:ytj-response-loading state)) ;; Declared as function because a form field needs a fn
+        ytj-response? (:ytj-response state)
+        ytj-success? (= 200 status)]
     (form/group
-      {:card?  false
+      {:card? false
        :layout :row}
 
-      {:name      ::t-operator/business-id
-       :type      :string
-       :validate  [[:business-id]]
+      {:name ::t-operator/business-id
+       :type :string
+       :validate [[:business-id]]
        :required? true
-       :warning   (tr [:common-texts :required-field])
+       :warning (tr [:common-texts :required-field])
        :should-update-check form/always-update
+       :disabled? (ytj-loading? state)
+       :style (when (ytj-loading? state) style-base/disabled-control)
        :on-change #(e! (to/->EnsureUniqueBusinessId %))}
 
       ;; Disabled when business-id is taken or if business-id is not valid or if loading is ongoing
@@ -94,26 +99,23 @@
                      (get-in state [:transport-operator :business-id-exists])
                      (ytj-loading? state))}
 
-      (when (:ytj-response state); label composition for error message
-        (cond
-          (= 200 status)
-          (do )
-          (= 404 status)
-          {:name  :ytj-msg-results-not-found
-           :type  :text-label
-           :label (tr [:common-texts :data-not-found])}
-          :else
-          {:name  :ytj-msq-query-error
-           :type  :text-label
-           :label (str (tr [:common-texts :server-error])
-                       " "
-                       (tr [:common-texts :server-error-try-later]))}))
+      {:name :loading-spinner-ytj
+       :type :loading-spinner
+       :display? (ytj-loading? state)}
 
-      ; label composition for user instructions how to continue
-      (when (and (:ytj-response state) (not= 200 status))
-        {:name  :ytj-query-tip-whatnext
-         :type  :text-label
-         :label (str (tr [:common-texts :check-your-input]) " " (tr [:common-texts :optionally-fill-manually]))})
+      (when ytj-response?
+        (if ytj-success?
+          {:name :ytj-result-msg
+           :type :result-msg-success
+           :content (tr [:organization-page :fetch-from-ytj-success])}
+          {:name :ytj-result-msg
+           :type :result-msg-warning
+           :content (if (= 404 status)
+                      (str (tr [:common-texts :data-not-found])
+                           " " (tr [:common-texts :optionally-fill-manually]))
+                      (str (tr [:common-texts :server-error])
+                           " " (tr [:common-texts :server-error-try-later])
+                           " " (tr [:common-texts :optionally-fill-manually])))}))
 
       ; label composition for existing business-id
       (when (get-in state [:transport-operator :business-id-exists])
@@ -340,7 +342,8 @@
 
 (defn operator-ytj [e! {operator :transport-operator :as state}]
   (let [show-id-entry? (empty? (get-in state [:params :id]))
-        show-details? (and (:transport-operator-loaded? state) (some? (:ytj-response state)))
+        show-details? (and (:transport-operator-loaded? state)
+                           (some? (:ytj-response state)))
         show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
                                    (pos-int? (count (:ytj-company-names state))))
         form-groups (cond-> []
