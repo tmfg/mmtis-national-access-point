@@ -1,6 +1,6 @@
 (ns ote.communication
   "Communication with OTE server. Wrappers for AJAX calls and helpers for URL paths."
-  (:require [ajax.core :as ajax :refer [GET POST]]
+  (:require [ajax.core :as ajax :refer [GET POST DELETE]]
             [cognitect.transit :as t]
             [ote.ui.nprogress :as progress]
             [ote.transit :as transit]))
@@ -64,6 +64,23 @@
   (progress/start)
   (swap! query-counter inc)
   (POST (request-url url)
+        {:headers (anti-csrf-token-header)
+         :params          body
+         :handler         (response-handler! on-success)
+         :error-handler   (response-handler! on-failure)
+         :format          (transit-request-format)
+         :response-format (or response-format (transit-response-format))}))
+
+(defn delete!
+  "Make a DELETE request to the given URL.
+  URL parameters can be given with the `:body` key.
+  Callbacks for successful and failure are provided with `:on-success` and `:on-failure`
+  keys respectively"
+  [url body {:keys [on-success on-failure response-format]}]
+
+  (progress/start)
+  (swap! query-counter inc)
+  (DELETE (request-url url)
         {:headers (anti-csrf-token-header)
          :params          body
          :handler         (response-handler! on-success)
