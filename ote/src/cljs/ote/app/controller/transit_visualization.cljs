@@ -84,7 +84,7 @@
   [changes]
   (let [no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(nil? (:gtfs/change-date %)) changes))
         only-changes (filterv :gtfs/change-date changes)
-        sorted-changes (sort-by (juxt :gtfs/change-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
+        sorted-changes (sort-by (juxt :gtfs/different-week-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
         all-sorted-changes (concat sorted-changes no-changes)]
     all-sorted-changes))
 
@@ -314,14 +314,22 @@
                               (t/now))
         ;; Use dates in route, or default to current week date and 7 days after that.
         date1 (or (:gtfs/current-week-date route) current-week-date)
-        date1 (if (and
-                    (= :no-change (:gtfs/change-type route))
-                    (nil? (get (:calendar response) (str (time/date-to-str-date date1)))))
-                  (get-next-best-day-for-no-change date1 date1 "plus" (into {} (sort-by key < (:calendar response))))
-                  date1)
-        date2 (or (:gtfs/different-week-date route)
-                  (time/days-from (tc/from-date date1) 7))]
+        date1 (cond
+                (and
+                  (= :no-change (:gtfs/change-type route))
+                  (nil? (get (:calendar response) (str (time/date-to-str-date date1)))))
+                (get-next-best-day-for-no-change date1 date1 "plus" (into {} (sort-by key < (:calendar response))))
 
+                (= :no-traffic (:gtfs/change-type route))
+                (time/now)
+
+                :else
+                date1)
+        date2 (if (and
+                    (:gtfs/different-week-date route)
+                    (not (= :no-traffic (:gtfs/change-type route))))
+                  (:gtfs/different-week-date route)
+                  (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
         (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
         (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)

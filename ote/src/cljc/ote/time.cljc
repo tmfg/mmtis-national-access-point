@@ -452,6 +452,8 @@
 (defn now []
   (t/now))
 
+;; Please! find out what type on date and days these parameters are!
+;; Return goog.date.UTCDateTime object to to front end and Joda DateTime object to backend
 (defn days-from [date days]
   (t/plus date (t/days days)))
 
