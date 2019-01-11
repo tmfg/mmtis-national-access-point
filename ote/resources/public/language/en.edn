@@ -650,6 +650,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :contact-details "Contact details"
   :fetch-from-ytj "Fetch data from YTJ"
   :fetch-from-ytj-success "Details successfully fetched from YTJ."
+  :field-phone-mobile "Mobile phone"
+  :field-phone-telephone "Telephone"
   :no-aux-names-for-business-id "There were no auxiliary business names for the business id."
   :contact-types "Phone and email"
   :organization-form-title "Basic information"
