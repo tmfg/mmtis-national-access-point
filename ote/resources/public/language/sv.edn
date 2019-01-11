@@ -659,6 +659,8 @@
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
   :fetch-from-ytj-success "Detaljer hämtade från YTJ."
+  :field-phone-mobile "Mobiltelefon"
+  :field-phone-telephone "Telefon"
   :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
   :contact-types "Kontaktalternativ"
   :organization-form-title "Tjänsteproducentens uppgifter"
