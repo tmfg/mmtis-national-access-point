@@ -21,7 +21,8 @@
 
 (def orange-basic "#FF8800")
 
+(def progress primary)
+(def success green-basic)
 (def warning red-basic)
 
-(def success green-basic)
 
