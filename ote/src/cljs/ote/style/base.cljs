@@ -197,10 +197,11 @@
 (def checkbox-addition {:padding-left "1.25rem"
                         :padding-bottom "2px"})
 
+(def icon-label {:margin-left "0.3rem"})
+
 (def msg-container (merge (flex-container "row")
                           (align-items "center")))
 
-(def msg-item-column-margin {:margin-left "0.25rem"})
 
 (def msg-warning
   {:color (str colors/warning)
