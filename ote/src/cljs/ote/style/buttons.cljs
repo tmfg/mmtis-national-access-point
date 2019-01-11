@@ -7,7 +7,8 @@
   {:text-decoration "none"
    :border-width "2px"
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
-   :padding "19px"})
+   :padding "19px"
+   :transform "scale(0.98)"})
 
 (def primary-btn-hover-focus
   {:text-decoration "none"
