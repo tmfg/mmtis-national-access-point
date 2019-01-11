@@ -578,7 +578,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
                      :service "Palvelu"
                      :add-service "Lisää palvelu"
-                     :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]}
+                     :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
+                     :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

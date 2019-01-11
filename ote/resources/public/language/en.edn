@@ -576,7 +576,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :own-services-no-providers (:md "You are not yet a member of any transport operator. To be able to publish transport service information, you have to first **create a new transport operator** to the NAP service or **join as a member to some transport operator that already exists in the NAP service by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 10 am to 4 pm) or joukkoliikenne@traficom.fi).\n\nA transport operator is a company, community or other organization, which provides it´s own transport services or participates in conducting of other company´s transport services, A transport operator can be e.g. a taxi company, a buss company, a parking facility operator or a municipality.")
                      :service "Service"
                      :add-service "Add a service"
-                     :edit-business-id ["Edit information for business-id " :business-id]}
+                     :edit-business-id ["Edit information for business-id " :business-id]
+                     :no-associations [:operator-name " isn't reported as an associate to any other service."]}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
