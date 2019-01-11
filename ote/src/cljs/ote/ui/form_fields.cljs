@@ -14,6 +14,9 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
             [ote.ui.info :as info]
+            [ote.ui.warning_msg :as msg-warn]
+            [ote.ui.success_msg :as msg-succ]
+            [ote.ui.circular_progress :as prog]
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
@@ -1117,4 +1120,12 @@
 (defmethod field :divider [{:keys [_]}]
   [ui/divider])
 
+(defmethod field :result-msg-success [{:keys [content]}]
+  [msg-succ/success-msg content])
 
+(defmethod field :result-msg-warning [{:keys [content]}]
+  [msg-warn/warning-msg content])
+
+(defmethod field :loading-spinner [{:keys [content display?]}]
+  (when display?
+    [:div [prog/circular-progress content]]))
