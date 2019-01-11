@@ -655,6 +655,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
   :fetch-from-ytj "Hae tiedot YTJ:stä"
+  :fetch-from-ytj-success "Tiedot haettu onnistuneesti YTJ:stä."
   :no-aux-names-for-business-id "Y-tunnukselle ei löytynyt aputoiminimiä"
   :contact-types "Yhteystavat"
   :organization-form-title "Palveluntuottajan tiedot"
@@ -952,7 +953,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :user-menu-video-tutorials "Opetusvideot palveluntuottajille"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Perustiedot"
-  :data-not-found "Tietoja ei löytynyt"
+  :data-not-found "Tietoja ei löytynyt."
   :required-field "Tieto vaaditaan"
   :required-field-missing "Pakollisia tietoja syöttämättä"
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
@@ -983,7 +984,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :delete-route-success "Reitti poistettiin onnistuneesti."
   :delete-route-error "Reitin poisto epäonnistui. Jos ongelma toistuu "
   :logged-in "Kirjauduit sisään onnistuneesti!"
-  :loading "Lataa"
+  :loading "Ladataan"
   :language "Kieli"
 
   :rotate-device-90 "Käännä laitetta 90° saavuttaaksesi parhaan käyttökokemuksen."
@@ -991,7 +992,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."
+  :server-error "Ongelma palvelinkutsussa."
   :server-error-try-later "Yritä hetken kuluttua uudelleen."
 
   :forbidden "Käyttöoikeutesi eivät riitä sisällön katseluun."
