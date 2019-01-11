@@ -28,10 +28,10 @@
   (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
-
 (defqueries "ote/services/places.sql")
 (defqueries "ote/services/transport.sql")
 (defqueries "ote/services/operators.sql")
+(defqueries "ote/services/associations.sql")
 
 (def transport-operator-columns
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
@@ -41,11 +41,16 @@
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
         operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
-                               where {::specql/limit 1}))]
+                               where {::specql/limit 1}))
+        associated-to-services-others (services-associated-to-operator db {:business-id (::t-operator/business-id operator)})
+        own-associations (fetch-operators-associated-services db {:operator-id (::t-operator/id operator)})]
     (when operator
-      (assoc operator ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
-                                                         db {:id (::t-operator/ckan-group-id operator)})
-                                                        "")))))
+      (-> operator
+        (assoc ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
+                                                            db {:id (::t-operator/ckan-group-id operator)})
+                                                          ""))
+        (assoc ::t-operator/associated-services associated-to-services-others)
+        (assoc ::t-operator/own-associations own-associations)))))
 
 (defn edit-transport-operator [db user transport-operator-id]
   (authorization/with-transport-operator-check
@@ -489,6 +494,20 @@
       #(http/transit-response
         (save-transport-service nap-config db user request))))
 
+(defn- save-associated-operator
+  "Save association between transport service and transport operator"
+  [db service-id data]
+  (specql/insert! db ::t-service/associated-service-operators
+                  {::t-service/service-id (Long/parseLong service-id)
+                   ::t-service/operator-id (:operator-id data)}))
+
+(defn- delete-associated-operator
+  "remove association between trasport service and transport operator"
+  [db service-id operator-id]
+  (specql/delete! db ::t-service/associated-service-operators
+                  {::t-service/service-id (Long/parseLong service-id)
+                   ::t-service/operator-id (Long/parseLong operator-id)}))
+
 (defn- transport-routes-auth
   "Routes that require authentication"
   [db config]
@@ -510,6 +529,22 @@
       (GET "/transport-operator/ensure-unique-business-id/:business-id" [business-id :as {user :user}]
         (http/transit-response
           (business-id-exists db business-id)))
+
+      (POST "/transport-service/:service-id/associated-operators"
+        {{:keys [service-id]} :params
+         data :body}
+        (try
+          (http/transit-response
+            (save-associated-operator db service-id (http/transit-request data)))
+          (catch Exception e
+            {:status 403})))
+
+      (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
+              {{:keys [service-id operator-id]} :params}
+        (if (= (delete-associated-operator db service-id operator-id) 1)
+          (http/transit-response "Delete successful")
+          {:status 403
+           :body {:message "Nothing deleted"}}))
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response
