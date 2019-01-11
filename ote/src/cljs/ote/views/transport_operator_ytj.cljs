@@ -262,9 +262,18 @@
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
 
-      {:name ::t-operator/phone :type :string :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false) :style style-fields/form-field :regex ui-validation/phone-number-regex}
+      {:name ::t-operator/phone
+       :label (tr [:organization-page :field-phone-telephone] )
+       :type :string
+       :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false)
+       :style style-fields/form-field
+       :regex ui-validation/phone-number-regex}
 
-      {:name ::t-operator/gsm :type :string :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false) :style style-fields/form-field :regex ui-validation/phone-number-regex}
+      {:name ::t-operator/gsm
+       :label (tr [:organization-page :field-phone-mobile] )
+       :type :string :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false)
+       :style style-fields/form-field
+       :regex ui-validation/phone-number-regex}
 
       {:name ::t-operator/email :type :string :disabled? (get-in state [:ytj-flags :use-ytj-email?] false) :style style-fields/form-field}
 
