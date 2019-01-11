@@ -307,7 +307,7 @@
    [buttons/save {:on-click #(e! (to/->UserCloseMergeSection nil))
                   :disabled (unmerged-ytj-nap-ops? nap-orphans)
                   :style style-form/action-control-section-margin}
-    (tr [:buttons :continue])]])
+    (tr [:buttons :next])]])
 
 (defn- operator-form-options [e! state show-actions?]
   {:name->label     (tr-key [:field-labels])

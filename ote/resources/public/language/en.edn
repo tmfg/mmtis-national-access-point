@@ -330,7 +330,6 @@ You can also draw the operating area or point to the map with drawing tools. You
  :buttons
  {:save "Save"
   :cancel "Cancel"
-  :continue "Continue"
   :delete "Delete"
   :delete-operator "Delete transport operator"
   :close "Close"

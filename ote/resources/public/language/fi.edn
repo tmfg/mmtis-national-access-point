@@ -331,7 +331,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  :buttons
  {:save "Tallenna"
   :cancel "Peruuta"
-  :continue "Jatka"
   :delete "Poista"
   :delete-operator "Poista palveluntuottaja"
   :close "Sulje"
