@@ -313,7 +313,7 @@
   {:name->label     (tr-key [:field-labels])
    :update!         #(e! (to/->EditTransportOperatorState %))
    :footer-fn       (fn [data]
-                      [:div
+                      [:div {:style style-form/action-control-section-margin}
                        [:div
                         (when show-actions?
                           [buttons/save {:on-click #(e! (to/->SaveTransportOperator))
