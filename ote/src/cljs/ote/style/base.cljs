@@ -210,3 +210,9 @@
 (def msg-success
   {:color (str colors/success)
    :fill (str colors/success)})
+
+(def circular-progress
+  {:color (str colors/progress)})
+
+(def circular-progress-label
+  {:margin-left "1rem"})
