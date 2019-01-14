@@ -82,7 +82,9 @@
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [changes]
-  (let [no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(nil? (:gtfs/change-date %)) changes))
+  (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
+        removed-in-past (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(and (= :removed (:gtfs/change-type %)) (nil? (:gtfs/change-date %))) changes))
+        no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(= :no-change (:gtfs/change-type %)) changes))
         only-changes (filterv :gtfs/change-date changes)
         sorted-changes (sort-by (juxt :gtfs/different-week-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
         all-sorted-changes (concat sorted-changes no-changes)]
