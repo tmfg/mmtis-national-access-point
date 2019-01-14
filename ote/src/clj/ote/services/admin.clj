@@ -210,7 +210,6 @@
 
 (defn monthly-types-for-monitor-report [db]
   (let [type-month-count-table (monthly-producer-types-and-counts db)
-        
         months (distinct (keep :month type-month-count-table)) ;; order is important
         subtypes (distinct (keep :sub-type type-month-count-table))
         by-subtype (group-by :sub-type type-month-count-table)
@@ -255,13 +254,34 @@
 
 
 (defn monitor-report [db type]
-  ;; (println "monitor-report called, returning composite map")
-  {:monthly-operators  (monthly-registered-operators db)
-   :operator-types (operator-type-distribution db)
+  {:monthly-companies  (monthly-registered-companies db)
+   :companies-by-service-type (operator-type-distribution db)
    :monthly-types (monthly-types-for-monitor-report db)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
+
+(defn monitor-csv-report [db type]
+  (case type
+    "monthly-companies"
+    (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
+              (map (juxt :month :sum) (monthly-registered-companies db)))
+
+    "company-service-types"
+    (csv-data ["tuottaja-tyyppi" "tuottaja-ytunnus-lkm"]
+              (map (juxt :sub-type :count) (operator-type-distribution db)))
+
+    "monthly-companies-by-service-type"
+    (csv-data ["kuukausi" "tuottaja-tyyppi" "lkm"]
+              ;; the copious vec calls are here because sort blows up on lazyseqs,
+              ;; and we end up with nested lazyseqs here despite using mapv etc.
+              (let [r (monthly-types-for-monitor-report db)
+                    months (:labels r)
+                    ds (:datasets r)
+                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
+                    final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
+                (sort (vec (map vec (apply concat final-table))))))))
 
 (defn- transport-operator-report [db type]
   (case type
@@ -365,11 +385,11 @@
   {}
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
-  (GET "/admin/reports/monitor/:type"
+  (GET "/admin/reports/monitor/csv/:type"
        {{:keys [type]} :params
         user :user}
-    (require-admin-user "reports/monitor" (:user user))
-    (monitor-report db type)))
+       (require-admin-user "reports/monitor" (:user user))
+       (monitor-csv-report db type)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle

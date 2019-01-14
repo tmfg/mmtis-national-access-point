@@ -1,6 +1,6 @@
 (ns ote.views.monitor
   (:require [reagent.core :as r]
-            [ote.ui.common :as common]
+            [ote.ui.common :as ui-common]
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.monitor :as controller]
             [cljsjs.chartjs]))
@@ -55,24 +55,29 @@
 
 (defn monitor-main [e! {:keys [page monitor-data] :as app}]
   (e! (controller/->QueryMonitorReport))
-  (if monitor-data
+  (if monitor-data    
     (let [translate-typekw (fn [type]                             
                              (tr [:enums :ote.db.transport-service/sub-type (keyword type)]))
-          companies-by-month-data {:labels (mapv :month (:monthly-operators monitor-data))
+          companies-by-month-data {:labels (mapv :month (:monthly-companies monitor-data))
                                    :datasets [{:label "Rekisteröityneitä palveluntuottajia"
-                                               :data (mapv :sum (:monthly-operators monitor-data))
+                                               :data (mapv :sum (:monthly-companies monitor-data))
                                                :backgroundColor "rgb(0, 170, 187)"}]}
           provider-share-by-type-data {:labels (mapv translate-typekw
-                                                     (mapv :sub-type (:operator-types monitor-data)))
-                                       :datasets [{:data (mapv :count (:operator-types monitor-data))
+                                                     (mapv :sub-type (:companies-by-service-type monitor-data)))
+                                       :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
                                                    :backgroundColor ["red" "orange" "blue" "yellow" "green" "brown" "grey" "purple" "pink"]
                                                    :label "Palvelut tyypeittäin"}]}]
       (fn []
         [:div {:style {:width "50%"}}
+         [:h2 "Valvontanäkymä"]
+         [:p "Valvontanäkymässä voit tarkastellla liikkumispalveluiden tuottamiseen osallistuvien yritysten kokonaismäärää, sekä määriä jaoteltuina liikkumispalvelutyyppien mukaan. Voit myös ladata kaikkien esitettyjen kuvaajien tiedot, sekä liikkumispalveluiden tuottamiseen osallistuvien yritysten tiedot (Y-tunnus, toiminimi sekä tuotetut liikkumispalvelutyypit) CSV-tiedostona."]
          [:p "Liikkumispalveluiden tuottamiseen osallistuvat yritykset"]
+         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies" "Lataa kuvaajan tiedot CSV:nä"]
          [barchart-inner "chart-companies-by-month" companies-by-month-data]
-         [:p "Palveluntuottajien tämän hetkinen lukumäärä liikkumispalvelutyypeittäin"]
+         [:p "Palveluntuottajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin"]
+         [ui-common/linkify "/admin/reports/monitor/csv/company-service-types" "Lataa kuvaajan tiedot CSV:nä"]
          [doughnut-inner "chart-share-by-type" provider-share-by-type-data]
          [:p "Tuottajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan"]
+         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies-by-service-type" "Lataa kuvaajan tiedot CSV:nä"]
          [barchart-inner "chart-type-by-month" (:monthly-types monitor-data)]]))
-    [common/loading-spinner]))
+    [ui-common/loading-spinner]))
