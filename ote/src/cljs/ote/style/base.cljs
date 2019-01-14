@@ -96,9 +96,20 @@
 
 (def title {:font-weight "bold"})
 
-
 (defn flex-container [dir]
   {:display "flex" :flex-direction dir})
+
+(defn align-items [dir]
+  {:align-items dir})
+
+(defn justify-content [dir]
+  {:justify-content dir})
+
+(def wizard-container
+  {:border-style "solid"
+   :border-width "2px"
+   :border-color colors/orange-basic
+   :padding "0rem 1.25rem 2rem 1.25rem"})
 
 (def flex-child {:flex 1 })
 
@@ -169,6 +180,9 @@
                                :width "48px"
                                :margin-bottom "8px"}}})
 
+(def disabled-control {:opacity 0.5
+                       :pointer-events "none"})
+
 (def disabled-color {:color "rgba(0, 0, 0, 0.247059)"})
 (def checkbox-label {:float "left"
                      :position "relative"
@@ -182,3 +196,23 @@
 
 (def checkbox-addition {:padding-left "1.25rem"
                         :padding-bottom "2px"})
+
+(def icon-label {:margin-left "0.3rem"})
+
+(def msg-container (merge (flex-container "row")
+                          (align-items "center")))
+
+
+(def msg-warning
+  {:color (str colors/warning)
+   :fill (str colors/warning)})
+
+(def msg-success
+  {:color (str colors/success)
+   :fill (str colors/success)})
+
+(def circular-progress
+  {:color (str colors/progress)})
+
+(def circular-progress-label
+  {:margin-left "1rem"})

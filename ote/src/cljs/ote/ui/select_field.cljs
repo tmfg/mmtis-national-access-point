@@ -9,10 +9,10 @@
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [int-value-atom (r/atom 0)
         int-cb (fn [ix]
-                 (reset! int-value-atom ix)
-                 (update! (nth options ix)))]
+                 (reset! int-value-atom ix))]
     ;; Wrapper fn required to get reagent re-render element after changes
-    (fn []
+    (fn [{label :label options :options :as all}]
+
       [ui/select-field
        (merge
          {:auto-width (boolean auto-width?)
@@ -20,12 +20,13 @@
           :floating-label-text (when-not table? label)
           :floating-label-fixed true
           :value @int-value-atom
-          :on-change #(int-cb %2)
+          :on-change #(do (int-cb %2)
+                         (update! (nth options %2)))
           :error-text (or error warning "")                 ;; Show error text or warning text or empty string
           :error-style (if error                            ;; Error is more critical than required - showing it first
                          style-base/error-element
-                         style-base/required-element)}
-         (when class-name {:className class-name})
+                         style-base/required-element)
+          :className (if class-name class-name "mui-select-button")}
          (when disabled?
            {:disabled true}))
        (doall

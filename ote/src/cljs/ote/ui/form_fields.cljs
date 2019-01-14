@@ -14,6 +14,9 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :as common]
             [ote.ui.info :as info]
+            [ote.ui.warning_msg :as msg-warn]
+            [ote.ui.success_msg :as msg-succ]
+            [ote.ui.circular_progress :as prog]
             [ote.style.form :as style-form]
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
@@ -908,7 +911,7 @@
   (let [selected (set (or data #{}))
         option-enabled? (or option-enabled? (constantly true))
         label-style (if use-label-width? style-base/checkbox-label-with-width style-base/checkbox-label)]
-    [:div.checkbox-group {:style (if checkbox-group-style checkbox-group-style {})}
+    [:div.checkbox-group {:style (if checkbox-group-style checkbox-group-style style-form-fields/checkbox-group-base)}
      (when (not (false? header?))
        [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
      (when help
@@ -1097,10 +1100,18 @@
      }]]
   )
 
-(defmethod field :text-label [{:keys [label style h-style]}]
+(defmethod field :text-label [{:keys [label style h-style full-width?]}]
   ;; Options
   ; :label Text for displaying
-  [:div (when style {:style style}) (if h-style [h-style label] [:p label])])
+  [:div
+   {:style (merge
+             (when full-width?
+               {:width "100%"})
+             (when style
+               style))}
+   (if h-style
+     [h-style label]
+     [:p label])])
 
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
@@ -1109,4 +1120,12 @@
 (defmethod field :divider [{:keys [_]}]
   [ui/divider])
 
+(defmethod field :result-msg-success [{:keys [content]}]
+  [msg-succ/success-msg content])
 
+(defmethod field :result-msg-warning [{:keys [content]}]
+  [msg-warn/warning-msg content])
+
+(defmethod field :loading-spinner [{:keys [content display?]}]
+  (when display?
+    [:div [prog/circular-progress content]]))

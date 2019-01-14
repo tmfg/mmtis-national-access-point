@@ -279,6 +279,13 @@
                 ::t-operator/email
                 ::t-operator/homepage]))
 
+;; Takes db and transport-operator. Resolves optional data for updating operator and returns a transport-operator map.
+(defn resolve-update-operator-data [db op]
+  (let [ckan-id (group-id-for-op db {:id (::t-operator/id op)})]
+    ;; cond used just in case there are mode fields to handle in the future
+    (cond-> op
+            (some? ckan-id) (assoc ::t-operator/ckan-group-id (:ckan-group-id (first ckan-id))))))
+
 (defn- update-transport-operator-nap [db user {id ::t-operator/id :as data}]
   ;; Edit transport operator
   {:pre [(coll? data) (number? (::t-operator/id data))]}
@@ -289,7 +296,7 @@
        (update! db ::t-operator/transport-operator
                 (select-op-keys-to-update data)
                 {::t-operator/id (::t-operator/id data)})
-       (update-group! db data))))
+       (update-group! db (resolve-update-operator-data db data)))))
 
 (defn- upsert-transport-operator
   "Creates or updates a transport operator for each company name. Operators will have the same details, except the name"

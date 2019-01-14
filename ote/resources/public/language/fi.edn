@@ -4,7 +4,8 @@
   :services "Palvelukatalogi"
   :operators "Palveluntuottajat"
   :own-services "Omat palvelutiedot"
-  :admin "Ylläpitopaneeli"}
+  :admin "Ylläpitopaneeli"
+  :monitor "Valvontanäkymä"}
 
 
  ;; Labels for database fields
@@ -57,7 +58,7 @@
    :ote.db.transport-service/contact-address "Osoitetiedot"
    :ote.db.transport-service/contact-phone "Puhelin"
    :ote.db.transport-service/contact-email "Sähköposti"
-   :ote.db.transport-service/homepage "Kotisivu"
+   :ote.db.transport-service/homepage "Verkkosivujen osoite"
 
    :ote.db.transport-service/operation-area "Toiminta-alue"
    :ote.db.transport-service/location "Sijainti"
@@ -228,7 +229,7 @@
 
 
   ;; Common fields
-  :ote.db.common/street "Osoite"
+  :ote.db.common/street "Katuosoite"
   :ote.db.common/post_office "Postitoimipaikka"
   :ote.db.common/postal_code "Postinumero"
 
@@ -297,7 +298,7 @@
 Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
-  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla yhteydessä teihin."
+  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla teihin yhteydessä. Täytä vähintään yksi seuraavista tiedoista: osoite (katuosoite, postinumero, postitoimipaikka), sähköposti tai puhelinnumero."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
@@ -655,12 +656,16 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
   :fetch-from-ytj "Hae tiedot YTJ:stä"
+  :fetch-from-ytj-success "Tiedot haettu onnistuneesti YTJ:stä."
+  :field-phone-mobile "Matkapuhelin"
+  :field-phone-telephone "Puhelin"
   :no-aux-names-for-business-id "Y-tunnukselle ei löytynyt aputoiminimiä"
   :contact-types "Yhteystavat"
   :organization-form-title "Palveluntuottajan tiedot"
   :organization-new-title "Lisää palveluntuottaja"
   :help-desc-1 "Tämän sivun lomakkeella syötettävät tiedot tulevat näkyviin NAP-palvelukatalogin julkisille sivuille."
   :help-desc-2 (:md "**Palveluntuottajia** ovat yritykset, yhteisöt ja organisaatiot, joiden palveluntarjontaan kuuluu liikkumispalveluita. Liikkumispalveluilla tarkoitetaan 1) henkilöiden kuljetuspalveluita (esim. taksi- ja linja-autoliikenne), 2) asemia, satamia ja terminaaleja, 3) pysäköintilaitoksia, 4) liikennevälineiden vuokrauspalveluita ja kaupallisia yhteiskäyttöpalveluita, sekä 5) välityspalveluita.")
+  :help-merge-company-names "Olet aiemmin luonut NAP-palveluun yhden tai useamman palveluntuottajan, joiden nimet eivät vastaa Y-tunnukselle rekisteröityjä toiminimiä tai aputoiminimiä. Valitse alasvetovalikoista toiminimi, jolla haluat korvata aiemmin ilmoittamasi palveluntuottajan nimen."
   :basic-info-tooltip "Täytä Perustiedot-osioon edustamasi yrityksen, yhteisön tai organisaation tiedot."
   :contact-types-tooltip "Yhteystavat-osion tiedot on tarkoitettu NAP-rajapintojen hyödyntäjille, ei liikkumispalvelunne loppukäyttäjille."
   :ckan-description-tooltip "Palveluntuottajan kuvauksen on tarkoitus antaa NAP-tietojen hyödyntäjille käsitys siitä, minkälaisen palveluntuottajan kanssa hän on tekemisissä. Esim. \"Parasbussi Oy on säännöllistä reittiliikennettä ja tilausliikennettä harjoittava Porin kaupunkiliikenteen omistama yhtiö\"."
@@ -675,6 +680,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :help-about-ytj-link "https://www.ytj.fi/index/tietoapalvelusta.html"
   :help-ytj-contact-change-link-desc "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"
   :help-ytj-contact-change-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html"
+  :merge-operator-to-ytj "korvataan nimellä"
   }
 
  :passenger-transportation-page
@@ -950,11 +956,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :user-menu-video-tutorials "Opetusvideot palveluntuottajille"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Perustiedot"
-  :data-not-found "Tietoja ei löytynyt"
+  :data-not-found "Tietoja ei löytynyt."
   :required-field "Tieto vaaditaan"
+  :required-field-missing "Pakollisia tietoja syöttämättä"
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"
+  :save-failure "Tallennus ei onnistunut."
+  :save-success "Tallennus onnistui."
   :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
   :transport-operator-saved "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo "Traficom"
@@ -978,7 +987,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :delete-route-success "Reitti poistettiin onnistuneesti."
   :delete-route-error "Reitin poisto epäonnistui. Jos ongelma toistuu "
   :logged-in "Kirjauduit sisään onnistuneesti!"
-  :loading "Lataa"
+  :loading "Ladataan"
   :language "Kieli"
 
   :rotate-device-90 "Käännä laitetta 90° saavuttaaksesi parhaan käyttökokemuksen."
@@ -986,8 +995,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Virhe palvelinkutsussa. Jos ongelma jatkuu, ota yhteyttä tukeen."
-  :server-error-try-later "Ongelmia palvelussa. Yritä hetken kuluttua uudelleen."
+  :server-error "Ongelma palvelinkutsussa."
+  :server-error-try-later "Yritä hetken kuluttua uudelleen."
 
   :forbidden "Käyttöoikeutesi eivät riitä sisällön katseluun."
   :optionally-fill-manually "Vaihtoehtoisesti voit jatkaa tietojen syöttämistä käsin."

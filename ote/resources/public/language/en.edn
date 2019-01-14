@@ -4,7 +4,8 @@
   :services "Transport service catalog"
   :operators "Transport operators"
   :own-services "Own transport services"
-  :admin "Adminstration panel"}
+  :admin "Adminstration panel"
+  :monitor "Monitor view"}
 
  ;; Labels for database fields
  :field-labels
@@ -296,7 +297,7 @@
 You can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Area of operation in Southern Finland\"."
 
   :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
-  :description-why-contact-info "Fill in contact information, so that customers can contact you."
+  :description-why-contact-info "Fill in contact information that passengers or service end users can use to contact you. Please fill in at least one of the following fields: address (street address, postcode, post office), email or phone number."
   :pricing-info "Fill in price information and/or the basis for pricing in to the table.\nIf the table is not suitable for price announcment, you can tell about pricing in the field \"price determination\". \nIf all the price information is already in a website (WWW), you can simpy just fill in the WWW-address into the field \"Price information WWW-address\"."
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
@@ -649,12 +650,16 @@ You can also draw the operating area or point to the map with drawing tools. You
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
   :fetch-from-ytj "Fetch data from YTJ"
+  :fetch-from-ytj-success "Details successfully fetched from YTJ."
+  :field-phone-mobile "Mobile phone"
+  :field-phone-telephone "Telephone"
   :no-aux-names-for-business-id "There were no auxiliary business names for the business id."
   :contact-types "Phone and email"
   :organization-form-title "Basic information"
   :organization-new-title "Create a new transport operator"
   :help-desc-1 "The information given in this form will seen in the public pages of NAP-service."
   :help-desc-2 (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
+  :help-merge-company-names "You have previously created one or more NAP service providers whose names do not correspond to the business names or auxiliary names registered for the business ID. \nPlease select the NAP service provider name which you want to replace using a name fetched from YTJ registry"
   :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing."
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
@@ -669,6 +674,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :help-about-ytj-link "https://www.ytj.fi/en/index/whatisbis.html"
   :help-ytj-contact-change-link-desc "Change details of your business online"
   :help-ytj-contact-change-link "https://www.ytj.fi/en/index/notifications/notificationsofchanges.html"
+  :merge-operator-to-ytj "will be renamed as"
   }
 
  :passenger-transportation-page
@@ -940,11 +946,14 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-video-tutorials "Video tutorials for service providers"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basic information"
-  :data-not-found "Data is not found"
+  :data-not-found "Data is not found."
   :required-field "Required field"
+  :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
+  :save-failure "Saving failed."
+  :save-success "Successfully saved."
   :transport-service-saved "Transport service information has been saved!"
   :transport-operator-saved "Transport operator information has been saved!"
   :footer-livi-logo "Finnish Transport and Communications Agency"
@@ -976,8 +985,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :hours-placeholder "hh"
   :minutes-placeholder "mm"
 
-  :server-error "Error in server call. Contact support if the problem persists."
-  :server-error-try-later "Problems with a service. Please try again later."
+  :server-error "Error in service invocation."
+  :server-error-try-later "Please try again later."
 
   :forbidden "Forbidden"
   :optionally-fill-manually "Optionally you may proceed to enter details manually."

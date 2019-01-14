@@ -4,7 +4,8 @@
   :services "Tjänstekatalog"
   :operators "Tjänsteproducenter"
   :own-services "Egna tjänsteuppgifter"
-  :admin "Admin"}
+  :admin "Admin"
+  :monitor "Övervakning"}
 
 
  ;; Labels for database fields
@@ -305,7 +306,7 @@
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
-  :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
+  :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten. Vänligen fyll i minst ett av följande: adress (gatuadress, postnummer, postkontor), e-post eller telefonnummer."
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
@@ -657,12 +658,16 @@
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
+  :fetch-from-ytj-success "Detaljer hämtade från YTJ."
+  :field-phone-mobile "Mobiltelefon"
+  :field-phone-telephone "Telefon"
   :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
   :contact-types "Kontaktalternativ"
   :organization-form-title "Tjänsteproducentens uppgifter"
   :organization-new-title "Lägg till tjänsteproducent"
   :help-desc-1 "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
   :help-desc-2 (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
+  :help-merge-company-names "Du har tidigare skapat en eller flera NAP-tjänsteleverantörer vars namn inte stämmer med företagsnamn eller hjälpnamn som registrerats för företags-ID. \nVänligen välja NAP-tjänsteleverantörens namn som du vill ersätta med ett namn hämtade från YTJ-registret"
   :basic-info-tooltip "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
   :contact-types-tooltip "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
   :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
@@ -677,6 +682,7 @@
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
   :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
+  :merge-operator-to-ytj "kommer att namnas som"
   }
 
  :passenger-transportation-page
@@ -944,11 +950,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :user-menu-video-tutorials "Undervisningsvideor"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basinfo"
-  :data-not-found "Inga uppgifter hittades"
+  :data-not-found "Inga uppgifter hittades."
   :required-field "Obligatorisk uppgift"
+  :required-field-missing "Obligatorisk uppgift"
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"
+  :save-failure "Sparade misslyckades."
+  :save-success "Sparad."
   :transport-service-saved "Uppgifterna sparade!"
   :transport-operator-saved "Uppgifterna sparade!"
   :footer-livi-logo "Traficom"
@@ -972,7 +981,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :delete-route-success "Rutten togs bort."
   :delete-route-error "Rutten kunde inte tas bort. "
   :logged-in "Inloggningen lyckades!"
-  :loading "Ladda"
+  :loading "Laddar"
   :language "Språk"
 
   :rotate-device-90 "Vrid enheten 90 ° för att få den bästa användarupplevelsen."
@@ -980,8 +989,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Fel i serveranropet. Om problemet fortsätter, kontakta NAP HelpDesk."
-  :server-error-try-later "Problem med tjänsten. Vänligen försök igen senare."
+  :server-error "Fel i serveranropet."
+  :server-error-try-later "Vänligen försök igen senare."
 
   :forbidden "Du har inte behörighet att visa innehållet."
   :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"

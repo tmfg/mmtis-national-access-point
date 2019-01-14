@@ -15,7 +15,7 @@
                               (base/flex-container "column")))
 (def form-group-row (merge form-group-base
                            (base/flex-container "row")
-                           {:flex-wrap "wrap"}))
+                           {:flex-wrap "wrap" :align-items "center"}))
 
 (def form-group-container {:padding-bottom "1em" :width "100%"})
 
@@ -59,3 +59,6 @@
 (def organization-padding {:padding-top "20px"})
 
 (def padding-top {:padding-top "20px"})
+
+(def action-control-section-margin {:margin-top "2rem"})
+

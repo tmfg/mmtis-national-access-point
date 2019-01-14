@@ -160,8 +160,8 @@ END	AS "service-type",
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
 
--- name: monthly-registered-operators
--- returns a cumulative sum of operators created up until the row's month.
+-- name: monthly-registered-companies
+-- returns a cumulative sum of companies, defined as distinct business-id's of operators, created up until the row's month.
 select
   to_char(g.created, 'YYYY-MM') as month,
   sum(count(top."business-id")) over (order by to_char(g.created, 'YYYY-MM'))
@@ -171,10 +171,9 @@ select
 
 -- name: operator-type-distribution
 -- returns a distrubution of transport-service sub-types among all transport services
-select
-  "sub-type",
-  count("sub-type") as count
-  from (select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id" and ts."sub-type" is not null) as unusedname
+select "sub-type", count("sub-type") as count
+  from
+(select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id" and ts."sub-type" is not null) as unusedname
   group by "sub-type";
 
 -- subquery name legend is: stq = subtype grouping query, biq = business-id grouping query
