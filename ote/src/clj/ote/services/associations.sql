@@ -6,6 +6,6 @@ SELECT ts.name as "service-name",
        top.name as "operator-name",
        CONCAT(ts.name, ' - ', top.name) as "service-operator"
 FROM "associated-service-operators" aso
-       LEFT JOIN "transport-service" ts ON aso."service-id" = ts.id
-       LEFT JOIN "transport-operator" top ON ts."transport-operator-id" = top.id
+       JOIN "transport-service" ts ON aso."service-id" = ts.id
+       JOIN "transport-operator" top ON ts."transport-operator-id" = top.id
 WHERE aso."operator-id" = :operator-id;
