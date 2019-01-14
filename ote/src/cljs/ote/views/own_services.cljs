@@ -220,7 +220,6 @@
        (str "/organization/member_new/" ckan-group-id)
        #(e! (fp/->ToggleAddMemberDialog))])]
    (let [has-assoc-services? (not (and (empty? (::t-operator/own-associations operator)) (empty? (::t-operator/associated-services operator))))]
-     (println has-assoc-services?)
      (if (and (not has-assoc-services?) (not (and has-services? (not (empty? operator-services)))))
        [:div
         [:p
@@ -319,9 +318,6 @@
        [service-provider-controls e! has-services? operator-services (:transport-operator state) (:show-add-member-dialog? state)]
        [table-container-for-own-services e! has-services? operator-services state]
        [associated-services e! state]])]])
-
-
-(def santeri (atom {:elossa true}))
 
 (defn- no-operator-texts
   [e! state]
