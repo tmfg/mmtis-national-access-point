@@ -95,9 +95,11 @@
        :primary true
        :secondary true
        :on-click #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
-       :disabled (or (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
-                     (get-in state [:transport-operator :business-id-exists])
-                     (ytj-loading? state))}
+       :disabled (or
+                   (empty? (::t-operator/business-id operator))
+                   (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
+                   (:business-id-exists operator)
+                   (ytj-loading? state))}
 
       {:name :loading-spinner-ytj
        :type :loading-spinner
