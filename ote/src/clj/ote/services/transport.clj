@@ -541,7 +541,7 @@
 
       (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
               {{:keys [service-id operator-id]} :params}
-        (if (= (delete-associated-operator db service-id operator-id) 1)
+        (if (= (delete-associated-operator db service-id operator-id) 1) ;Check if the amount of lines deleted is 1.
           (http/transit-response "Delete successful")
           {:status 403
            :body {:message "Nothing deleted"}}))
