@@ -46,7 +46,7 @@ SELECT "ckan-group-id" FROM "transport-operator" op
  LIMIT 1;
 
 -- name: services-associated-to-operator
--- FETCH ALL SERVICES WHERE GIVEN OPERATOR IS ASSOCIATED.
+-- Fetch all services where given operator is associated.
 SELECT tsc.name as "given-name",
        po.name as "operator-name",
        ts.name as "service-name",
