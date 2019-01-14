@@ -4,7 +4,8 @@
   :services "Transport service catalog"
   :operators "Transport operators"
   :own-services "Own transport services"
-  :admin "Adminstration panel"}
+  :admin "Adminstration panel"
+  :monitor "Monitor view"}
 
  ;; Labels for database fields
  :field-labels

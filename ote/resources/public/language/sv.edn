@@ -4,7 +4,8 @@
   :services "Tjänstekatalog"
   :operators "Tjänsteproducenter"
   :own-services "Egna tjänsteuppgifter"
-  :admin "Admin"}
+  :admin "Admin"
+  :monitor "Övervakning"}
 
 
  ;; Labels for database fields

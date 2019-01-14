@@ -4,7 +4,8 @@
   :services "Palvelukatalogi"
   :operators "Palveluntuottajat"
   :own-services "Omat palvelutiedot"
-  :admin "Ylläpitopaneeli"}
+  :admin "Ylläpitopaneeli"
+  :monitor "Valvontanäkymä"}
 
 
  ;; Labels for database fields
