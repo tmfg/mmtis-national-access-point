@@ -457,7 +457,10 @@
       (when (nil? business-id-validation-error)
         (comm/get! (str "transport-operator/ensure-unique-business-id/" business-id)
                    {:on-success (send-async! ->EnsureUniqueBusinessIdResponse)}))
-      (assoc-in app [:transport-operator :business-id-exists] false)))
+      (-> app
+          (assoc-in [:transport-operator :business-id-exists] false)
+          ;; UI displays a message about ytj fetch results based on :ytj-response, clear message when user edits business id input field.
+          (dissoc :ytj-response))))
 
   EnsureUniqueBusinessIdResponse
   (process-event [{response :response} app]
