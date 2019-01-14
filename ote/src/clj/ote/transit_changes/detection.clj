@@ -7,8 +7,7 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [ote.util.collections :refer [map-by count-matching]]
-            [ote.util.functor :refer [fmap]]
-            [ote.db.gtfs :as gtfs])
+            [ote.util.functor :refer [fmap]])
   (:import (java.time LocalDate DayOfWeek)))
 
 (def ^:const no-traffic-detection-threshold
@@ -359,7 +358,9 @@
   (let [route (all-routes route-key)
         added? (min-date-in-the-future? route)
         removed? (max-date-within-90-days? route)
-        no-traffic? (and no-traffic-start-date (or no-traffic-end-date (> no-traffic-run no-traffic-detection-threshold)))
+        no-traffic? (and no-traffic-start-date
+                         (or no-traffic-end-date
+                             (> no-traffic-run no-traffic-detection-threshold)))
 
         {:keys [starting-week-date different-week-date
                 added-trips removed-trips trip-changes]} changes
@@ -368,6 +369,7 @@
                                       (map :stop-seq-changes trip-changes))
         trip-stop-time-changes (reduce update-min-max-range nil
                                        (map :stop-time-changes trip-changes))]
+
     (merge
      {;; Route identification
       :gtfs/route-short-name (:route-short-name route)
@@ -385,38 +387,47 @@
      (discard-past-changes
        (cond
 
-        added?
-        {:gtfs/change-type         :added
+         added?
+         {:gtfs/change-type         :added
 
          ;; For an added route, the change-date is the date when traffic starts
          :gtfs/different-week-date (:min-date route)
          :gtfs/change-date         (:min-date route)
          :gtfs/current-week-date   (sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
 
-        removed?
-        {:gtfs/change-type         :removed
-         ;; For a removed route, the change-date is the day after traffic stops
-         :gtfs/change-date         (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+         removed?
+         {:gtfs/change-type         :removed
+          ;; For a removed route, the change-date is the day after traffic stops
+          ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
+         :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))) (java.time.LocalDate/now))
+                             nil
+                             (sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
+
          :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
          :gtfs/current-week-date   (:max-date route)}
 
-        changed?
-        {:gtfs/change-type         :changed
+         changed?
+         {:gtfs/change-type         :changed
          :gtfs/current-week-date   (sql-date starting-week-date)
          :gtfs/different-week-date (sql-date different-week-date)
          :gtfs/change-date         (sql-date different-week-date)}
 
-        no-traffic?
-        {:gtfs/change-type         :no-traffic
+         no-traffic?
+         {:gtfs/change-type :no-traffic
 
-         ;; If the change is a no-traffic period, the different day is the first day that has no traffic
-         :gtfs/current-week-date   (sql-date
-                                     (.plusDays no-traffic-start-date -1))
-         :gtfs/different-week-date (sql-date no-traffic-start-date)
-         :gtfs/change-date         (sql-date no-traffic-start-date)}
+          ;; If the change is a no-traffic period, the different day is the first day that has no traffic
+          :gtfs/current-week-date (sql-date
+                                    (.plusDays no-traffic-start-date -1))
+          ;; Different week date (= next changed weeks first day, is wrongly calculated when there is a pause in traffic
+          :gtfs/different-week-date (sql-date no-traffic-start-date)
+          ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set current date +1 as change date.
+          ;; So we don't remove no-traffic idetification in discard-past-changes function and automatic detection will start again tomorrow
+          :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
+                              (sql-date (.plusDays (java.time.LocalDate/now) 1)) ;; Now + 1 day
+                              (sql-date no-traffic-start-date))}
 
-        :default
-        {:gtfs/change-type :no-change})))))
+         :default
+         {:gtfs/change-type :no-change})))))
 
 (defn- debug-print-change-stats [all-routes route-changes type]
   (doseq [r all-routes
