@@ -994,7 +994,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :nap-data-license (:md "The information you fill in on this form will be published in the NAP service catalog as open data. The published data will be licensed with [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en).")
 
   :save-user-success "Account info saved"
-  :business-id-is-not-unique "The BIS number given is already in NAP. Please, contact NAP helpdesk for further information, joukkoliikenne@traficom.fi or tel. +358 29 534 5454 (Mon - Fri 10 am to 4 pm)."}
+  :business-id-is-not-unique "The BIS number given is already in NAP. Please, contact NAP helpdesk for further information, joukkoliikenne@traficom.fi or tel. +358 29 534 5454 (Mon - Fri 10 am to 4 pm)."
+  :start-time "Starting time"
+  :ending-time "Ending time"}
 
 
  :dialog
