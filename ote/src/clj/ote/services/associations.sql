@@ -1,9 +1,3 @@
--- name: add-operator-service-association
--- create a new row to associated-service-operators table
-INSERT INTO "associated-service-operators" ("service-id", "operator-id")
-    VALUES (:service-id, :operator-id);
-
-
 -- name: fetch-operators-associated-services
 SELECT ts.name as "service-name",
        ts.id as "service-id",
