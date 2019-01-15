@@ -1004,7 +1004,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :save-user-success "Account info saved"
   :start-time "Starting time"
   :ending-time "Ending time"
-  :business-id-is-not-unique "The BIS number given is already in NAP. Please, contact NAP helpdesk for further information, joukkoliikenne@traficom.fi or tel. +358 29 534 5454 (Mon - Fri 10 am to 3 pm)."}
+  :business-id-is-not-unique "The BIS number given is already in NAP. Please, contact NAP helpdesk for further information, joukkoliikenne@traficom.fi or tel. +358 29 534 5454 (Mon - Fri 9 am to 3 pm)."}
 
 
  :dialog
