@@ -186,5 +186,21 @@ describe('Add new service provider', function () {
 
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
     });
+});
 
+describe('Should add new associated service to Normal users "Terminaali Oy"', function () {
+    before(function() {
+        cy.login('normaluser', 'password')
+    });
+
+    beforeEach(function () {
+        // Session cookies will not be cleared before the NEXT test starts
+        cy.preserveSessionOnce();
+
+        cy.visit('/#/own-services');
+    });
+
+    it('Should be in own-services page', function () {
+       cy.contains('Omat palvelutiedot');
+    });
 });
