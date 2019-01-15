@@ -568,7 +568,7 @@
           :parking "Allmänna kommersiella parkeringstjänster"
           :brokerage "Förmedlingstjänst"}
 
- :own-services-page {:own-services "Omat palvelut"
+ :own-services-page {:own-services "Egna tjänsteuppgifter"
                      :own-services-info-long (:md "**Lisää uusi palvelu** -painikkeesta pääset lisäämään tarjoamasi **liikkumispalvelun tarkemmat tiedot**.\n\nMikäli et tarjoa lainkaan **omia** liikkumispalveluita asiakkaille (esim. ajat kyytejä vain välityskeskuksen kautta), voit hypätä tämän kohdan yli. Valitse sen sijaan yksi tai useampi muun toimijan tuottama palvelu kohdassa **Muiden tuottamat palvelut, joissa olet mukana**")
                      :own-services-directions-short "Ohjeet"
                      :open-geojson "Avaa geojson"
