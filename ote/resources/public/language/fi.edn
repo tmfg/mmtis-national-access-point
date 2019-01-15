@@ -661,9 +661,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :organization-page
- {:business-id-and-aux-names "Toiminimi ja aputoiminimet"
+ {:address-postal "Postiosoite"
+  :address-postal-street "Katuosoite tai PL-osoite"
+  :business-id-and-aux-names "Toiminimi ja aputoiminimet"
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
+  :contact-details-other "Muut yhteystiedot"
   :fetch-from-ytj "Hae tiedot YTJ:stä"
   :fetch-from-ytj-success "Tiedot haettu onnistuneesti YTJ:stä."
   :field-phone-mobile "Matkapuhelin"

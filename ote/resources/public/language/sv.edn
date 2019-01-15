@@ -663,8 +663,11 @@
 
 
  :organization-page
- {:business-id-and-aux-names "Företagsnamn och hjälpnamn"
+ {:address-postal "Post address"
+  :address-postal-street "Post address eller PO Box"
+  :business-id-and-aux-names "Företagsnamn och hjälpnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
+  :contact-details-other "Andra kontaktuppgifter"
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
   :fetch-from-ytj-success "Detaljer hämtade från YTJ."
