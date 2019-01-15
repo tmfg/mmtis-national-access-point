@@ -22,7 +22,8 @@
             [tuck.core :as tuck]
             [ote.ui.validation :as validation]
             [ote.util.text :as text]
-            [ote.ui.page :as page]))
+            [ote.ui.page :as page]
+            [ote.app.utils :as utils]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -303,7 +304,7 @@
                          ;; Filter away transport-operators that have no business-id. (Note: It should be mandatory!)
                          :suggestions (filter :business-id (:results data))
                          :open-on-focus? true
-                         :on-update-input #(e! (ss/->SetOperatorName %))
+                         :on-update-input (utils/debounce #(e! (ss/->SetOperatorName %)) 300)
                          ;; Select first match from autocomplete filter result list after pressing enter
                          :auto-select? true
                          :on-request-add (fn [chip]

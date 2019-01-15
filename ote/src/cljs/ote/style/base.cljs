@@ -21,6 +21,8 @@
 (def action-button-container (merge inline-block
                                     {:margin-right "1em"}))
 
+(def gray-text {:color colors/gray500})
+
 (def icon-small {:width 20 :height 20
                  :vertical-align "middle"})
 
@@ -76,7 +78,7 @@
 ;; Front page
 
 (def front-page-add-service {:border-right "1px solid grey"})
-(def front-page-service-table (merge {:border "1px solid grey"}
+(def front-page-service-table (merge {:border (str "1px solid " colors/gray500)}
                                      {::stylefy/sub-styles {:link {:text-decoration "none"
                                                                    ::stylefy/mode {:visited {:text-decoration "none"}
                                                                                    :hover {:text-decoration "underline"}}}}}))

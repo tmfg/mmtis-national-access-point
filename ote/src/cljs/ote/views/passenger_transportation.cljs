@@ -207,7 +207,7 @@
                ::t-service/booking-service)
               (accessibility-group)
               (pricing-group (get service ::t-service/sub-type))
-              (ts-common/service-hours-group)]
+              (ts-common/service-hours-group "passenger-transportation")]
              form-options (transportation-form-options e! form-groups app)]
     [:div.row
      [form/form form-options form-groups form-data]]))

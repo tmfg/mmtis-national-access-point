@@ -13,7 +13,7 @@ describe('Own services basic tests', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/#/own-services');
+        cy.visit('/#/own-services' );
     });
 
     it('should render the own services page', function () {
@@ -21,7 +21,7 @@ describe('Own services basic tests', function () {
     });
 
     it('should redirect to add service view', function () {
-        cy.contains('Lisää uusi palvelu').click({force: true});
+        cy.get('a[id*="new-service-button"]').click({force: true});
     });
 
     it('should redirect to add new service provider view', function () {
@@ -29,7 +29,6 @@ describe('Own services basic tests', function () {
             .click();
     });
 });
-
 
 describe('Add a new service', function () {
     before(function () {

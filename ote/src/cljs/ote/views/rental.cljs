@@ -226,7 +226,7 @@
                   :name->label (tr-key [:field-labels :rentals]
                                        [:field-labels :transport-service]
                                        [:field-labels])}
-       [(assoc-in (ts-common/service-hours-group) [:options :card?] false)]
+       [(assoc-in (ts-common/service-hours-group "rental") [:options :card?] false)]
        data]]
      ]))
 

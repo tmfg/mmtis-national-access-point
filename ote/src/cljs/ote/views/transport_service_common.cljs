@@ -429,7 +429,7 @@
    (tr [:field-labels :transport-service-common ::t-service/operation-area])
    ::t-service/operation-area))
 
-(defn service-hours-group []
+(defn service-hours-group [service-type]
   (let [tr* (tr-key [:field-labels :service-exception])
         write-time (fn [key]
                 (fn [{all-day? ::t-service/all-day :as data} time]
@@ -465,18 +465,24 @@
                           {::t-service/from nil
                            ::t-service/to nil})))}
 
-       {:name ::t-service/from
-        :width "25%"
-        :type :time
-        :write (write-time ::t-service/from)
-        :required? true
-        :is-empty? time/empty-time?}
-       {:name ::t-service/to
-        :width "25%"
-        :type :time
-        :write (write-time ::t-service/to)
-        :required? true
-        :is-empty? time/empty-time?}]
+       (merge
+         (when (= "passenger-transportation" service-type)
+           {:label (tr [:common-texts :start-time])})
+         {:name ::t-service/from
+          :width "25%"
+          :type :time
+          :write (write-time ::t-service/from)
+          :required? true
+          :is-empty? time/empty-time?})
+       (merge
+         (when (= "passenger-transportation" service-type)
+           {:label (tr [:common-texts :ending-time])})
+         {:name ::t-service/to
+          :width "25%"
+          :type :time
+          :write (write-time ::t-service/to)
+          :required? true
+          :is-empty? time/empty-time?})]
       :delete?      true
       :add-label (tr [:buttons :add-new-service-hour])}
 
