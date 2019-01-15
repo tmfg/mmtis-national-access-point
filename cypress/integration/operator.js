@@ -37,33 +37,33 @@ describe('Operator creation basic tests', function () {
         // cy.get('#select-operator-at-own-services').click();
         // cy.contains(testOp1.name).should('not.exist');
         // cy.contains('Omat palvelutiedot').click();
-
+/*
         cy.get('#btn-add-new-transport-operator').click();
         cy.get('#btn-submit-business-id').as('btnSubmit')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('1')
+        cy.get('#input-business-id').as('inputBid').type('1')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('2')
+        cy.get('@inputBid').type('2')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('3')
+        cy.get('@inputBid').type('3')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('4')
+        cy.get('@inputBid').type('4')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('5')
+        cy.get('@inputBid').type('5')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('6')
+        cy.get('@inputBid').type('6')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('7')
+        cy.get('@inputBid').type('7')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('-')
+        cy.get('@inputBid').type('-')
         cy.get('@btnSubmit').should('be.disabled')
-        cy.get('#input-business-id').type('9')
+        cy.get('@inputBid').type('9')
         cy.get('#btn-submit-business-id').should('be.enabled')
-        cy.get('#input-business-id').type('9')
+        cy.get('@inputBid').type('9')
         cy.get('#btn-submit-business-id').should('be.disabled')
-        cy.get('#input-business-id').type('{backspace}')
+        cy.get('@inputBid').type('{backspace}')
         cy.get('#btn-submit-business-id').should('be.enabled')
-
+*/
 
         // Uncomment these whe YTJ
         // cy.get('@btnSubmit').click()
