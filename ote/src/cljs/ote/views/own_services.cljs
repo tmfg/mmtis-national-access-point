@@ -262,7 +262,7 @@
          current-operator (::t-operator/id (:transport-operator state))]
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :service])
+       :label (tr [:own-services-page :added-services])
        :full-width? true
        :full-width-input? false
        :hint-text (tr [:own-services-page :add-service])
