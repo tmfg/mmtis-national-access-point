@@ -1012,7 +1012,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :nap-data-license (:md "Tälle lomakkeelle täytetyt tiedot julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")
 
   :save-user-success "Käyttäjätiedot tallennettu"
-  :business-id-is-not-unique "Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, joukkoliikenne@traficom.fi tai p. 029 534 5454 (arkisin 10 - 15)."}
+  :business-id-is-not-unique "Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, joukkoliikenne@traficom.fi tai p. 029 534 5454 (arkisin 9 - 15)."}
 
 
  :dialog
