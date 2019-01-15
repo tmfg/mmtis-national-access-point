@@ -147,7 +147,8 @@
         [:h4 {:style {:margin "0"}}
          (tr [:field-labels :select-transport-operator])]
         [form-fields/field
-         {:name :select-transport-operator
+         {:element-id "select-operator-at-own-services"
+          :name :select-transport-operator
           :type :selection
           :show-option #(::t-operator/name %)
           :update! #(e! (to/->SelectOperator %))
@@ -156,7 +157,8 @@
           :class-name "mui-select-button"}
          (to/take-operator-api-keys operator)]]
        [:div.col-sm-6.col-md-6
-        [:a (merge {:href "#/transport-operator"
+        [:a (merge {:id "btn-add-new-transport-operator"
+                    :href "#/transport-operator"
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (to/->CreateTransportOperator)))}
