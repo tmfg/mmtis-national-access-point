@@ -62,6 +62,21 @@ SELECT c.name as "operator", c."business-id" as "business-id"
  WHERE (c.name ILIKE :name OR c."business-id" = :businessid)
    AND s."published?" = TRUE;
 
+
+-- name: service-search-by-service-name
+-- Finds services by service name or operator name.
+SELECT ts.name as "service-name",
+       ts.id as "service-id",
+       top."business-id" as "operator-business-id",
+       top.id as "operator-id",
+       top.name as "operator-name",
+       CONCAT(ts.name, ' - ', top.name) as "service-operator"
+  FROM "transport-service" ts
+  JOIN "transport-operator" top ON ts."transport-operator-id" = top.id
+ WHERE ts.name ILIKE :name
+    OR top.name ILIKE :name;
+
+
 -- name: service-ids-by-business-id
 -- Find service id's using business-id
 SELECT ts.id as id

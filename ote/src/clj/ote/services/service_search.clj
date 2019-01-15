@@ -93,6 +93,11 @@
   (into [] (service-search-by-operator db {:name (str "%" term "%")
                                            :businessid (str term )})))
 
+(defn service-completions
+  "Return a list of service completions that match the given name"
+  [db name]
+  (vec (service-search-by-service-name db {:name (str "%" name "%")})))
+
 (def search-result-columns
   #{::t-service/contact-email
     ::t-service/sub-type
@@ -179,6 +184,9 @@
   (routes
     (GET ["/operator-completions/:term", :term #".+"] {{term :term} :params :as req}
       (http/api-response req (operator-completions db term)))
+
+    (GET ["/service-completions/:name", :name #".+"] {{name :name} :params :as req}
+      (http/api-response req (service-completions db name)))
 
    (GET "/service-search/facets" []
         (http/no-cache-transit-response

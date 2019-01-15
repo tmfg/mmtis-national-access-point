@@ -11,7 +11,10 @@
             [ote.app.controller.front-page :as fp]
             [ote.app.controller.login :as login]
             [ote.app.controller.transport-service :as ts]
+            [ote.app.utils :as utils]
             [ote.app.controller.transport-operator :as to]
+            [ote.app.controller.service-search :as ss]
+            [ote.app.controller.own-services :as os-controller]
             [ote.views.transport-service :as transport-service]
             [ote.db.common :as common]
             [ote.ui.page :as page]
@@ -35,9 +38,9 @@
             [ote.app.controller.front-page :as fp]))
 
 
-(defn- delete-service-action [e! {::t-service/keys [id name]
-                                  :keys [show-delete-modal?]
-                                  :as service}]
+(defn delete-service-action [e! {::t-service/keys [id name]
+                                 :keys [show-delete-modal?]
+                                 :as service}]
   [:span
    [ui/icon-button {:href "#"
                     :on-click #(do
@@ -64,7 +67,8 @@
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 (defn transport-services-table-rows [e! services transport-operator-id]
-  [ui/table-body {:display-row-checkbox false}
+  [ui/table-body (merge {:class "table-body"}
+                        {:display-row-checkbox false})
    (doall
      (map-indexed
        (fn [i {::t-service/keys [id type published? name]
@@ -102,7 +106,7 @@
   (when (> (count services) 0)
     [:div.row (stylefy/use-style style-base/section-margin)
      [:div {:class "col-xs-12 col-md-12"}
-      [:h3 section-label]
+      [:h4 section-label]
       [ui/table (stylefy/use-style style-base/front-page-service-table)
        [ui/table-header {:adjust-for-checkbox false
                          :display-select-all false}
@@ -125,7 +129,7 @@
         "Julkinen NAP-palvelukatalogi löytyy osoitteesta: " [:a {:href "https://finap.fi/#/services"} "finap.fi"]
         [:br]
         "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"}
-                                                                        "www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa" ]]])))
+                                                                        "www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"]]])))
 
 (defn own-services-header
   [e! has-services? operator-services state]
@@ -146,10 +150,10 @@
           :type :selection
           :show-option #(::t-operator/name %)
           :update! #(e! (to/->SelectOperator %))
-          :options (mapv :transport-operator operators)
+          :options (mapv to/take-operator-api-keys (mapv :transport-operator operators))
           :auto-width? true
           :class-name "mui-select-button"}
-         operator]]
+         (to/take-operator-api-keys operator)]]
        [:div.col-sm-6.col-md-6
         [:a (merge {:href "#/transport-operator"
                     :on-click #(do
@@ -159,7 +163,7 @@
          (tr [:buttons :add-new-transport-operator])]]])))
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
-  [:div {:class "col-xs-12 col-md-12"}
+  [:div {:class "col-xs-12 col-md-12" :style {:margin-bottom "3rem"}}
    [:h3 {:style {:margin-bottom "2rem"}} (tr [:own-services-page :own-services])]
    [info/info-toggle
     (tr [:own-services-page :own-services-directions-short])
@@ -181,13 +185,11 @@
          ^{:key type}
          [transport-services-listing
           e! (get-in state [:transport-operator ::t-operator/id])
-          services (tr [:titles type])])))
-   [:hr {:style {:border-bottom "0"
-                 :margin "2rem 0"}}]])
+          services (tr [:titles type])])))])
 
 
 (defn service-provider-controls
-  [e! has-services? operator-services {::t-operator/keys [id name ckan-group-id] :as operator} show-add-member-dialog?]
+  [e! has-services? operator-services {::t-operator/keys [id name ckan-group-id business-id] :as operator} show-add-member-dialog?]
   [:div.col-xs-12
    [:div
     [:h2 {:style {:margin-bottom "2rem"}}
@@ -203,7 +205,7 @@
                                   :height 20
                                   :margin-right "0.5rem"
                                   :color colors/primary}})
-      (tr [:buttons :edit])]
+      (tr [:own-services-page :edit-business-id] {:business-id business-id})]
      [:button (merge {:on-click #(do
                                    (.preventDefault %)
                                    (e! (fp/->ToggleAddMemberDialog)))}
@@ -217,28 +219,107 @@
       [ui-common/ckan-iframe-dialog name
        (str "/organization/member_new/" ckan-group-id)
        #(e! (fp/->ToggleAddMemberDialog))])]
-
-   [:div
-    (if (not (and has-services? (not (empty? operator-services))))
-      [:p
-       [:div {:style {:float "left"}}                       ;;this is done because translations with variables don't support markdown and we have to fix md and variables
-        (tr [:own-services-page :own-services-new-provider1])
-        [:strong name]]
-       (tr [:own-services-page :own-services-new-provider2])])]
+   (let [has-assoc-services? (not (and (empty? (::t-operator/own-associations operator)) (empty? (::t-operator/associated-services operator))))]
+     (if (and (not has-assoc-services?) (not (and has-services? (not (empty? operator-services)))))
+       [:div
+        [:p
+         [:span {:style {:float "left"}}                    ;;this is done because translations with variables don't support markdown and we have to fix md and variables
+          (tr [:own-services-page :own-services-new-provider1])
+          [:strong name]]
+         (tr [:own-services-page :own-services-new-provider2])]]))
    [:hr {:style {:border-bottom "0"}}]])
 
-(defn operator-info-container
+(defn- added-associations
+  [a-services oa-services state]
+  [:div
+   [:h4 (tr [:own-services-page :other-service-associations])]
+   (if (empty? a-services)
+     (if (empty? oa-services)
+       [:span (stylefy/use-style style-base/gray-text)
+        (tr [:own-services-page :no-associations] {:operator-name
+                                                   (::t-operator/name (:transport-operator state))})]))
+   [:ul.unstyled
+    (doall
+      (for [as a-services]
+        [:li {:key (:service-id as)}
+         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]
+   [:ul.unstyled
+    (doall
+      (for [as oa-services]
+        [:li {:key (:service-id as)}
+         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]])
+
+(defn- add-associated-services
+  [e! state]
+  [:div
+   (let [suggestions (filter :service-id (:suggestions (:service-search state)))
+         associated (::t-operator/associated-services (:transport-operator state))
+         associated-ids (set (map :service-id associated))
+         cur-op-id (::t-operator/id (:transport-operator state))
+         filtered-suggestions (filter
+                                #(and (not (associated-ids (:service-id %))) (not= cur-op-id (:operator-id %)))
+                                suggestions)
+         current-operator (::t-operator/id (:transport-operator state))]
+     [form-fields/field
+      {:type :chip-input
+       :label (tr [:own-services-page :service])
+       :full-width? true
+       :full-width-input? false
+       :hint-text (tr [:own-services-page :add-service])
+       :hint-style {:top "20px"}
+       ;; No filter, back-end returns what we want
+       :filter (constantly true)
+       :suggestions-config {:text :service-operator :value :service-id}
+       ;; Filter away transport-operators that have no business-id. (Note: It should be mandatory!)
+       :suggestions filtered-suggestions
+       :open-on-focus? true
+       :on-update-input (utils/debounce #(e! (os-controller/->SearchInvolved %)) 300)
+       ;; Select first match from autocomplete filter result list after pressing enter
+       :auto-select? true
+       :on-request-add (fn [chip]
+                         (e! (os-controller/->AddSelection
+                               (:service-name chip)
+                               (:service-id chip)
+                               (:operator-name chip)
+                               (:operator-business-id chip)
+                               current-operator
+                               (:service-operator chip)))
+                         chip)
+       :on-request-delete (fn [chip-val]
+                            (e! (os-controller/->RemoveSelection chip-val)))}
+      (::t-operator/own-associations (:transport-operator state))])])
+
+(defn- associated-services
+  [e! state]
+  (let [a-services (::t-operator/associated-services (:transport-operator state))
+        oa-services (::t-operator/own-associations (:transport-operator state))]
+    [:div {:class "col-xs-12"
+           :style {:margin-bottom "3rem"}}
+     [:h3 (tr [:own-services-page :other-services-where-involved])]
+     [info/info-toggle
+      (tr [:common-texts :instructions])
+      [:p (tr [:own-services-page :filling-info-content])]
+      false]
+     [added-associations a-services oa-services state]
+     [add-associated-services e! state]]))
+
+(defn- operator-info-container
   [e! has-services? operator-services state]
   [:div
    [page/page-controls "" (tr [:common-texts :own-api-list])
     [own-services-header e! has-services? operator-services state]]
    [:div.container
-    [:div.row
-     [service-provider-controls e! has-services? operator-services (:transport-operator state) (:show-add-member-dialog? state) ]
-     [table-container-for-own-services e! has-services? operator-services state]]]])
+    (if (empty? operator-services)
+      [:div.row
+       [service-provider-controls e! has-services? operator-services (:transport-operator state) (:show-add-member-dialog? state)]
+       [associated-services e! state]
+       [table-container-for-own-services e! has-services? operator-services state]]
+      [:div.row
+       [service-provider-controls e! has-services? operator-services (:transport-operator state) (:show-add-member-dialog? state)]
+       [table-container-for-own-services e! has-services? operator-services state]
+       [associated-services e! state]])]])
 
-
-(defn no-operator-texts
+(defn- no-operator-texts
   [e! state]
   [:div {:style {:margin "3rem 0"}}
    [:p (tr [:own-services-page :own-services-no-providers])]
@@ -249,8 +330,8 @@
               (stylefy/use-style style-buttons/outline-button))
     (tr [:buttons :add-new-transport-operator])]])
 
-(defn no-operator
-  "If user haven't added service-operator, we will ask to do so."
+(defn- no-operator
+  "If the user has not added service-operator, we will ask to do so."
   [e! state]
   [page/page-controls "" (tr [:common-texts :own-api-list])
    [no-operator-texts e! state]])

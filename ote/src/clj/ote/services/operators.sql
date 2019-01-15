@@ -44,3 +44,15 @@ SELECT u.id as "user-id"
 SELECT "ckan-group-id" FROM "transport-operator" op
  WHERE op."id" = :id
  LIMIT 1;
+
+-- name: services-associated-to-operator
+-- Fetch all services where given operator is associated.
+SELECT tsc.name as "given-name",
+       po.name as "operator-name",
+       ts.name as "service-name",
+       ts.id as "service-id",
+       po."business-id" as "operator-business-id"
+FROM "transport-service" ts
+       JOIN LATERAL unnest(ts.companies) tsc ON "business-id" = :business-id
+       JOIN "transport-operator" po
+         ON ts."transport-operator-id" = po.id;
