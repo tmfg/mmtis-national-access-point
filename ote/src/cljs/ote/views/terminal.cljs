@@ -128,7 +128,7 @@
                        (ts-common/contact-info-group (:transport-service app))
                        (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/terminal)
                        (ts-common/external-interfaces e!)
-                       (ts-common/service-hours-group)
+                       (ts-common/service-hours-group "terminal")
                        (indoor-map-group)
                        (assistance-service-group)
                        (accessibility-and-other-services-group)]
