@@ -570,7 +570,7 @@
 
  :own-services-page {:own-services "Egna tjänsteuppgifter"
                      :filling-info "Täyttöohje"
-                     :filling-info-content (:md "**Palvelut, joiden tuottamiseen osallistut** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Palvelun lisääminen**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita kohtaan Lisää palvelu joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi")
+                     :filling-info-content (:md "**Palvelut, joiden tuottamiseen osallistut** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Palvelun lisääminen**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita kohtaan **Lisätyt palvelut** joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi")
                      :other-services-where-involved "Muut palvelut, joissa olet mukana"
                      :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
                      :open-geojson "Avaa geojson"
@@ -581,6 +581,7 @@
                      :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
                      :service "Palvelu"
                      :add-service "Lisää palvelu"
+                     :added-services "Lisätyt palvelut"
                      :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
                      :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]}
 
