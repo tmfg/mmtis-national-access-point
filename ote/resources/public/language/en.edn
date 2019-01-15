@@ -654,9 +654,12 @@ You can also draw the operating area or point to the map with drawing tools. You
 
 
  :organization-page
- {:business-id-and-aux-names "Company name and auxiliary names"
+ {:address-postal "Postal address"
+  :address-postal-street "Street address or P.O. Box"
+  :business-id-and-aux-names "Company name and auxiliary names"
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
+  :contact-details-other "Other contact details "
   :fetch-from-ytj "Fetch data from YTJ"
   :fetch-from-ytj-success "Details successfully fetched from YTJ."
   :field-phone-mobile "Mobile phone"
