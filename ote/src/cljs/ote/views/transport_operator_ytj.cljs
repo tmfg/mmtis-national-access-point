@@ -335,7 +335,7 @@
 
                         [buttons/save {:on-click #(e! (to/->CancelTransportOperator))}
                          (tr [:buttons :cancel])]]
-                       (when (and show-actions? (nil? (:ytj-company-names state)))
+                       (when (and show-actions? (empty? (:ytj-company-names state)))
                          (when (not (get-in state [:transport-operator :new?]))
                            [:div
                             [:br]
@@ -376,7 +376,7 @@
         [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
 
      ;; When business-id has multiple companies create list of delete-operator dialogs. Otherwise add only one
-     (if (nil? (:ytj-company-names state))
+     (if (empty? (:ytj-company-names state))
        [delete-operator e! operator (:transport-operators-with-services state)]
        (for [o (get-in state [:transport-operator :transport-operators-to-save])]
          ^{:key (str "operator-delete-control-" (::t-operator/name o) "-" (::t-operator/id o) )}
