@@ -5,6 +5,11 @@ html {
     /*-webkit-font-smoothing: antialiased;*/
     height: 100%;
     min-height: 100%;
+    line-height: 1.5;
+}
+
+html table {
+    line-height: 1.15;
 }
 
 body {
@@ -263,6 +268,10 @@ span.search-card-title {
   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
+.table-body td, th{
+    font-size: 0.875rem !important;
+}
+
 .route-stop-icon {
     border-style: solid;
     border-color: blue;
@@ -294,4 +303,5 @@ span.search-card-title {
 .mui-select-button:hover hr {
     border-width: medium medium 3px !important;
 }
+
 

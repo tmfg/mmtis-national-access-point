@@ -66,6 +66,7 @@
     ::external-interfaces (specql.rel/has-many ::id
                                                ::external-interface-description
                                                ::transport-service-id)}]
+  ["associated-service-operators" ::associated-service-operators]
   ["operation_area" ::operation_area]
   ["operation_area_geojson" ::operation_area_geojson]
 
