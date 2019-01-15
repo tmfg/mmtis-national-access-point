@@ -453,18 +453,21 @@
 
   EnsureUniqueBusinessId
   (process-event [{business-id :business-id} app]
-    (let [business-id-validation-error (validation/validate-rule :business-id nil business-id)]
-      (when (nil? business-id-validation-error)
-        (comm/get! (str "transport-operator/ensure-unique-business-id/" business-id)
-                   {:on-success (send-async! ->EnsureUniqueBusinessIdResponse)}))
+    (let [bid-validation-error (validation/validate-rule :business-id nil business-id)
+          resolve-bid-uniqueness-state (fn [state bid-validation-error]
+                                         (if (nil? bid-validation-error)
+                                           (do
+                                             (comm/get! (str "transport-operator/ensure-unique-business-id/" business-id)
+                                                        {:on-success (send-async! ->EnsureUniqueBusinessIdResponse)})
+                                             state)
+                                           (assoc-in app [:transport-operator :business-id-exists?] nil)))]
       (-> app
-          (assoc-in [:transport-operator :business-id-exists] false)
-          ;; UI displays a message about ytj fetch results based on :ytj-response, clear message when user edits business id input field.
+          (resolve-bid-uniqueness-state bid-validation-error)
           (dissoc :ytj-response))))
 
   EnsureUniqueBusinessIdResponse
   (process-event [{response :response} app]
-    (assoc-in app [:transport-operator :business-id-exists] (:business-id-exists response))))
+    (assoc-in app [:transport-operator :business-id-exists?] (:business-id-exists response))))
 
 (defmethod routes/on-navigate-event :transport-operator [{id :params}]
   (if (some? (:id id))
