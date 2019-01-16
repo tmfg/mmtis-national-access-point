@@ -297,7 +297,7 @@
                             (= :minus direction))
                         :problem
                         new-direction)
-        days-to-change (if (= "plus" new-direction) 1 -1)
+        days-to-change (if (= :plus new-direction) 1 -1)
         new-date (time/days-from (tc/from-date current-date) days-to-change)
         first-not-nil-day (if (nil? (get calendar-days (str (time/date-to-str-date new-date))))
                             (get-next-best-day-for-no-change start-date new-date new-direction calendar-days)
