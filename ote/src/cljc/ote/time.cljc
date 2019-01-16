@@ -424,19 +424,37 @@
     (- (t/in-days (t/interval date2 date1)))))
 
 #?(:cljs
+;; TBD: rename away from "local" so not to confuse with ambiguous Java LocalTime, and consider using goog.date.Date
 (defn to-local-js-date [date]
   (let [d (date-fields-from-timestamp date)]
     (new js/goog.date.DateTime (:ote.time/year d) (:ote.time/month d) (:ote.time/date d)))))
 
 #?(:cljs
-(defn days-until [date]
-  (if date
-    (day-difference (to-local-js-date (t/now)) (to-local-js-date date))
-    0)))
+   (defn days-until [date]
+     (if date
+       (day-difference (to-local-js-date (t/now)) (to-local-js-date date))
+       0)))
+
+#?(:cljs
+   (defn date-to-str-date [date]
+     (let [f (date-fields-only date)
+           year (:ote.time/year f)
+           month (:ote.time/month f)
+           month (if (= 1 (count (str month)))
+                   (str "0" month)
+                   month)
+           day (:ote.time/date f)
+           day (if (= 1 (count (str day)))
+                 (str "0" day)
+                 day)
+           date-str (str year "-" month "-" day)]
+       date-str)))
 
 (defn now []
   (t/now))
 
+;; Please! find out what type on date and days these parameters are!
+;; Return goog.date.UTCDateTime object to to front end and Joda DateTime object to backend
 (defn days-from [date days]
   (t/plus date (t/days days)))
 
@@ -461,3 +479,4 @@
         month (:ote.time/month df)
         day (:ote.time/date df)]
     (t/date-time year month day)))
+

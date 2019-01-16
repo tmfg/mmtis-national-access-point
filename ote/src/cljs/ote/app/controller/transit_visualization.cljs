@@ -82,9 +82,11 @@
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [changes]
-  (let [no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(nil? (:gtfs/change-date %)) changes))
+  (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
+        removed-in-past (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(and (= :removed (:gtfs/change-type %)) (nil? (:gtfs/change-date %))) changes))
+        no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(= :no-change (:gtfs/change-type %)) changes))
         only-changes (filterv :gtfs/change-date changes)
-        sorted-changes (sort-by (juxt :gtfs/change-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
+        sorted-changes (sort-by (juxt :gtfs/different-week-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
         all-sorted-changes (concat sorted-changes no-changes)]
     all-sorted-changes))
 
@@ -184,8 +186,6 @@
   (-> app
       (merge {:hash hash :day day})))
 
-
-
 (define-event RouteLinesForDateResponse [geojson date]
   {:path [:transit-visualization]}
   (let [route-line-names (into #{}
@@ -256,19 +256,7 @@
                 app))]
     (select-first-trip app)))
 
-
-;; Passes data to calendar component
-(define-event RouteCalendarHashResponse [route-info]
-  {:path [:transit-visualization]}
-  (assoc app
-         :route-calendar-hash-loading? false
-         :date->hash (:calendar route-info)
-         :hash->color (zipmap (distinct (vals (:calendar route-info)))
-                              (cycle hash-colors
-                                     ;; FIXME: after all colors are consumed, add some pattern style
-                                     ))))
-
-(defn fetch-routes-for-dates [compare service-id route date1 date2]
+(defn fetch-trip-data-for-dates [compare service-id route date1 date2]
   (doseq [date [date1 date2]
           :let [params (merge {:date (time/format-date-iso-8601 date)
                                :route-hash-id (ensure-route-hash-id route)}
@@ -286,14 +274,87 @@
                {:params params
                 :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
   (assoc compare
-         :show-route-lines {}
-         :date1 date1
-         :date2 date2
-         :date1-route-lines nil
-         :date2-route-lines nil
-         :date1-trips nil
-         :date2-trips nil
-         :show-stops? true))
+    :show-route-lines {}
+    :date1 date1
+    :date2 date2
+    :date1-route-lines nil
+    :date2-route-lines nil
+    :date1-trips nil
+    :date2-trips nil
+    :show-stops? true))
+
+;; When route type is :no-change we need to find date that has traffic
+(defn- get-next-best-day-for-no-change [start-date current-date direction calendar-days]
+  (let [list-size (count calendar-days)
+        day-difference (time/day-difference (time/to-local-js-date start-date) (time/to-local-js-date current-date))
+        new-direction (if (and
+                            (> day-difference list-size)
+                            (= :plus direction))
+                        :minus
+                        direction)
+        new-direction (if (and
+                            (> (* -1 day-difference) list-size)
+                            (= :minus direction))
+                        :problem
+                        new-direction)
+        days-to-change (if (= "plus" new-direction) 1 -1)
+        new-date (time/days-from (tc/from-date current-date) days-to-change)
+        first-not-nil-day (if (nil? (get calendar-days (str (time/date-to-str-date new-date))))
+                            (get-next-best-day-for-no-change start-date new-date new-direction calendar-days)
+                            new-date)
+        first-not-nil-day (if (= :problem new-direction)
+                            start-date ;; Return start-date because we did't find any better day.
+                            first-not-nil-day)]
+    first-not-nil-day))
+
+;; Gets routes dates and hashes for dates. Passes data to calendar component and starts fetching trip and stop data
+;; based on selected dates
+(define-event RouteCalendarDatesResponse [response route]
+  {}
+  (let [service-id (get-in app [:params :service-id])
+        current-week-date (or (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+                              (t/now))
+        ;; Use dates in route, or default to current week date and 7 days after that.
+        date1 (or (:gtfs/current-week-date route) current-week-date)
+        date1 (cond
+                (and
+                  (= :no-change (:gtfs/change-type route))
+                  (nil? (get (:calendar response) (str (time/date-to-str-date date1)))))
+                (get-next-best-day-for-no-change date1 date1 :plus (into {} (sort-by key < (:calendar response))))
+
+                (= :no-traffic (:gtfs/change-type route))
+                (time/now)
+
+                :else
+                date1)
+        date2 (if (and
+                    (:gtfs/different-week-date route)
+                    (not (= :no-traffic (:gtfs/change-type route))))
+                  (:gtfs/different-week-date route)
+                  (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
+    (-> app
+        (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
+        (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
+        (assoc-in [:transit-visualization :route-trips-for-date2-loading?] true)
+        (assoc-in [:transit-visualization :selected-route] route)
+        (update-in [:transit-visualization :compare] dissoc
+                   :selected-trip-pair
+                   :combined-trips
+                   :combined-stop-sequence)
+        (update-in [:transit-visualization] dissoc :date->hash :hash->color)
+        (update-in [:transit-visualization :compare] fetch-trip-data-for-dates
+                   service-id route
+                   date1 date2)
+        (assoc-in [:transit-visualization :compare :differences]
+                  (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
+                                       :gtfs/trip-stop-sequence-changes
+                                       :gtfs/trip-stop-time-changes}))
+        (assoc-in [:transit-visualization :route-calendar-hash-loading?] false)
+        (assoc-in [:transit-visualization :date->hash] (:calendar response))
+        (assoc-in [:transit-visualization :hash->color] (zipmap (distinct (vals (:calendar response)))
+                                                                (cycle hash-colors
+                                                                       ;; FIXME: after all colors are consumed, add some pattern style
+                                                                       ))))))
 
 (define-event RouteDifferencesResponse [response]
   {:path [:transit-visualization]}
@@ -328,49 +389,17 @@
     (-> app
         (assoc-in [:transit-visualization :route-differences-loading?] true)
         (assoc-in [:transit-visualization :compare]
-                  (fetch-routes-for-dates compare service-id
+                  (fetch-trip-data-for-dates compare service-id
                                           route
                                           (:date1 compare)
                                           (:date2 compare))))))
 
 (define-event SelectRouteForDisplay [route]
   {}
-  (let [service-id (get-in app [:params :service-id])
-        current-week-date (or (get-in app [:transit-visualization :changes :gtfs/current-week-date])
-                              (t/now))
-        ;; Use dates in route, or default to current week date and 7 days after that.
-        date1 (or (:gtfs/current-week-date route) current-week-date)
-        date2 (or (:gtfs/different-week-date route)
-                  (time/days-from (tc/from-date current-week-date) 7))]
-    (comm/get! (str "transit-visualization/" service-id "/route")
-               {:params (merge
-                          {:route-hash-id (ensure-route-hash-id route)}
-                          (when-let [short (:gtfs/route-short-name route)]
-                            {:short-name short})
-                          (when-let [long (:gtfs/route-long-name route)]
-                            {:long-name long})
-                          (when-let [headsign (:gtfs/trip-headsign route)]
-                            {:headsign headsign}))
-                :on-success (tuck/send-async! ->RouteCalendarHashResponse)})
-
-    (-> app
-        (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
-        (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
-        (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
-        (assoc-in [:transit-visualization :route-trips-for-date2-loading?] true)
-        (assoc-in [:transit-visualization :selected-route] route)
-        (update-in [:transit-visualization :compare] dissoc
-                   :selected-trip-pair
-                   :combined-trips
-                   :combined-stop-sequence)
-        (update-in [:transit-visualization] dissoc :date->hash :hash->color)
-        (update-in [:transit-visualization :compare] fetch-routes-for-dates
-                   service-id route
-                   date1 date2)
-        (assoc-in [:transit-visualization :compare :differences]
-                  (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
-                                       :gtfs/trip-stop-sequence-changes
-                                       :gtfs/trip-stop-time-changes})))))
+  (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
+             {:params  {:route-hash-id (ensure-route-hash-id route)}
+              :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
+  (assoc-in app [:transit-visualization :route-calendar-hash-loading?] true))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}

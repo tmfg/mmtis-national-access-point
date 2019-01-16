@@ -77,7 +77,7 @@
              (doall
                (for [{:keys [name width col-style format read]} headers
                      :let [value ((or format identity) (if read (read row) (get row name)))]]
-                 ^{:key (str name)}
+                 ^{:key (str name "-" i)}
                  [ui/table-row-column {:style (merge
                                                 {:white-space "pre-wrap"
                                                  :overflow "visible"}

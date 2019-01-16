@@ -18,7 +18,7 @@ SELECT ts.id AS "transport-service-id",
        CURRENT_DATE as "current-date",
        "different-week-date", "change-date",
        "date",
-       "different-week-date" - CURRENT_DATE AS "days-until-change",
+       "change-date" - CURRENT_DATE AS "days-until-change",
        ("change-date" IS NOT NULL) AS "changes?",
        EXISTS(SELECT id
                 FROM "external-interface-description" eid
