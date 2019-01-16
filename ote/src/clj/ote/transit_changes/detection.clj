@@ -343,8 +343,11 @@
 
 (defn discard-past-changes
   "Discard past changes by returning a :no-change"
-  [{change-date :gtfs/change-date :as change}]
-  (if (and change-date (.isBefore (.toLocalDate change-date) (java.time.LocalDate/now)))
+  [{type :gtfs/change-type change-date :gtfs/change-date :as change}]
+  (if (and
+        change-date
+        (.isBefore (.toLocalDate change-date) (java.time.LocalDate/now))
+        (not= :removed type))
     {:gtfs/change-type :no-change
      :gtfs/change-date nil}
     change))
@@ -399,7 +402,7 @@
          {:gtfs/change-type         :removed
           ;; For a removed route, the change-date is the day after traffic stops
           ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
-         :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))) (java.time.LocalDate/now))
+         :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate (:max-date route)))) (java.time.LocalDate/now))
                              nil
                              (sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
 

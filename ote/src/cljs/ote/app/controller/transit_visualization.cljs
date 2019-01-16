@@ -289,20 +289,20 @@
         day-difference (time/day-difference (time/to-local-js-date start-date) (time/to-local-js-date current-date))
         new-direction (if (and
                             (> day-difference list-size)
-                            (= "plus" direction))
-                        "minus"
+                            (= :plus direction))
+                        :minus
                         direction)
         new-direction (if (and
                             (> (* -1 day-difference) list-size)
-                            (= "minus" direction))
-                        "problem"
+                            (= :minus direction))
+                        :problem
                         new-direction)
         days-to-change (if (= "plus" new-direction) 1 -1)
         new-date (time/days-from (tc/from-date current-date) days-to-change)
         first-not-nil-day (if (nil? (get calendar-days (str (time/date-to-str-date new-date))))
                             (get-next-best-day-for-no-change start-date new-date new-direction calendar-days)
                             new-date)
-        first-not-nil-day (if (= "problem" new-direction)
+        first-not-nil-day (if (= :problem new-direction)
                             start-date ;; Return start-date because we did't find any better day.
                             first-not-nil-day)]
     first-not-nil-day))
@@ -320,7 +320,7 @@
                 (and
                   (= :no-change (:gtfs/change-type route))
                   (nil? (get (:calendar response) (str (time/date-to-str-date date1)))))
-                (get-next-best-day-for-no-change date1 date1 "plus" (into {} (sort-by key < (:calendar response))))
+                (get-next-best-day-for-no-change date1 date1 :plus (into {} (sort-by key < (:calendar response))))
 
                 (= :no-traffic (:gtfs/change-type route))
                 (time/now)
