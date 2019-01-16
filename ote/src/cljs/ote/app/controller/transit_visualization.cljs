@@ -317,11 +317,19 @@
         ;; Use dates in route, or default to current week date and 7 days after that.
         date1 (or (:gtfs/current-week-date route) current-week-date)
         date1 (cond
+                ;; No-change route, and current date doesn't have traffic
                 (and
                   (= :no-change (:gtfs/change-type route))
-                  (nil? (get (:calendar response) (str (time/date-to-str-date date1)))))
+                  (nil? (get (:calendar response) (str (time/date-to-str-date (time/now))))))
                 (get-next-best-day-for-no-change date1 date1 :plus (into {} (sort-by key < (:calendar response))))
 
+                ;; No-change route, current date has traffic
+                (and
+                  (= :no-change (:gtfs/change-type route))
+                  (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
+                (time/now)
+
+                ;; No-traffic route, return current day always
                 (= :no-traffic (:gtfs/change-type route))
                 (time/now)
 
