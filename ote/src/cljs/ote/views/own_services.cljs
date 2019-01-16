@@ -128,8 +128,8 @@
         [:br]
         "Julkinen NAP-palvelukatalogi löytyy osoitteesta: " [:a {:href "https://finap.fi/#/services"} "finap.fi"]
         [:br]
-        "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"}
-                                                                        "www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"]]])))
+        "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href (tr [:common-texts :footer-livi-url-link])}
+                                                                        (tr [:common-texts :footer-livi-url-link])]]])))
 
 (defn own-services-header
   [e! has-services? operator-services state]
