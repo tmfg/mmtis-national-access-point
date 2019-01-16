@@ -47,8 +47,8 @@
     [linkify "https://finap.fi/ote/#/services" "finap.fi"]]
    [:p {:style {:margin "10px"}}
     "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta "
-    [linkify "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"
-     "www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"]]])
+    [linkify (tr [:common-texts :footer-livi-url-link])
+     (tr [:common-texts :footer-livi-url-link])]]])
 
 (defn front-page
   "Front page info"

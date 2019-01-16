@@ -19,7 +19,7 @@
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
       [:ul.unstyled (stylefy/use-style style-front-page/footer-logo-ul)
        [:li (stylefy/use-style style-front-page/third-column-text)
-        [:a.logo {:href "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"}
+        [:a.logo {:href (tr [:common-texts :footer-livi-url-link])}
              [:img {:class (:class (stylefy/use-style style-front-page/footer-logo)) :src "/img/icons/TRAFICOM_rgb.svg" :alt (tr [:common-texts :footer-livi-logo])}]]]
        [:li (stylefy/use-style style-front-page/third-column-text)
         [:a.logo {:href "#"}

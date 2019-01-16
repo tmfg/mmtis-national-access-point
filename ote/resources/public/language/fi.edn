@@ -976,7 +976,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :transport-operator-saved "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo "Traficom"
   :footer-livi-url "Traficom.fi"
-  :footer-livi-url-link "https://www.traficom.fi/fi/asioi-kanssamme/liikkumispalveluasi-koskevan-tiedon-avaaminen-nap-palvelussa"
+  :footer-livi-url-link "https://www.traficom.fi/fi/asioi-kanssamme/nap"
   :footer-ckan-software "CKAN-ohjelmistolla"
   :footer-made-width "Toteutettu"
   :footer-copyright-disclaimer (:md "Finap.fi-sivusto on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
