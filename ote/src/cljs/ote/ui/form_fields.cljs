@@ -1101,9 +1101,7 @@
        :secondary secondary
        :on-click #(on-click)
        :disabled disabled
-       :style style
-       })]]
-  )
+       :style style})]])
 
 (defmethod field :text-label [{:keys [label style h-style full-width?]}]
   ;; Options
@@ -1117,7 +1115,6 @@
    (if h-style
      [h-style label]
      [:p label])])
-
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
   [info/info-toggle label body default-state])
