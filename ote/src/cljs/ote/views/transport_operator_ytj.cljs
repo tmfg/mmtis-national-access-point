@@ -30,7 +30,7 @@
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
-  (some? (some #(if (:save-success (:transport-operator %)) false true)
+  (some? (some #(if (:merge-handled? (:transport-operator %)) false true)
                orphans)))
 
 (defn- delete-operator [e! operator service-vector]
@@ -153,9 +153,9 @@
        :h-style :h2}
 
       {:name :heading2
-       :label (if ytj-company-names-found?
-                (tr [:organization-page :business-id-and-aux-names])
-                "Toiminimi")
+       :label (tr [:organization-page (if ytj-company-names-found?
+                                        :business-id-and-aux-names
+                                        :business-name)])
        :type :text-label
        :h-style :h3
        :full-width? true}
@@ -207,7 +207,9 @@
          :label         (tr [:common-texts :instructions])
          :body          [:div
                          (tr [:organization-page :help-operator-contact-entry])
-                         [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]
+                         [uicommon/extended-help-link
+                          (tr [:organization-page :help-ytj-contact-change-link])
+                          (tr [:organization-page :help-ytj-contact-change-link-desc])]]
          :default-state true})
 
       {:name ::ote.db.transport-operator/visiting-address
@@ -247,7 +249,6 @@
        :label (tr [:organization-page :address-postal])
        :type :text-label
        :h-style :h4}
-
 
       {:element-id "input-operator-addrBillingStreet"
        :name        ::common/billing-street
@@ -312,43 +313,39 @@
        :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
        :style style-fields/form-field})))
 
-;; Hide options of YTJ operators which already exist in nap,
-;; except if selected item is same as item which control represents so it won't disappear after selection (because it got added to nap).
-(defn- allowed-names-to-merge [ytj-company-names my-id]
-  (filterv (fn [item] (or
-                        (nil? (::t-operator/id item))
-                        (= (::t-operator/id item) my-id)))
-           ytj-company-names))
-
-(defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as operator} ytj-company-names app]
+(defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as operator} ytj-company-names]
   [:div {:style style-base/wizard-container}
    [:div [:h3 (tr [:organization-page :heading-operator-edit])]]
    [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-merge-company-names]) true]
-   (for [n nap-orphans
-         :let [nap-op (:transport-operator n)
-               control-disabled? false]
-         :when n]
-     ^{:key (str "operator-merge-section-item-" (::t-operator/name nap-op))}
-     [:div {:style (merge
-                     (style-base/flex-container "row")
-                     (style-base/align-items "center")
-                     (style-base/justify-content "flex-start")
-                     (when control-disabled? style-base/disabled-control))}
-      [:div "\"" [:strong (::t-operator/name nap-op)] "\" " (tr [:organization-page :merge-operator-to-ytj])]
-      [:div {:style style-base/item-list-row-margin}]
-      [sf/select-field
-       {:options (mapv to/take-operator-api-keys (allowed-names-to-merge ytj-company-names (::t-operator/id nap-op)))
-        :show-option #(::t-operator/name %)
-        :style style-base/item-list-row-margin
-        :update! #(e! (to/->RenameOperator nap-op %))}]
+   (doall
+     (for [n nap-orphans
+           :let [nap-op (:transport-operator n)
+                 control-disabled? false]
+           :when n]
+       ^{:key (str "operator-merge-section-item-" (::t-operator/name nap-op))}
+       [:div {:style (merge
+                       (style-base/flex-container "row")
+                       (style-base/align-items "center")
+                       (style-base/justify-content "flex-start")
+                       (when control-disabled? style-base/disabled-control))}
+        [:div "\"" [:strong (::t-operator/name nap-op)] "\" " (tr [:organization-page :merge-operator-to-ytj])]
+        [:div {:style style-base/item-list-row-margin}]
+        [sf/select-field
+         {:options
+          (vec (concat
+                 [{::t-operator/name "" :placeholder true}] ;; menuitem for "no selection" goes first
+                 ytj-company-names))
+          :show-option #(::t-operator/name %)
+          :style style-base/item-list-row-margin
+          :update! #(e! (to/->OperatorRename nap-op %))}]
 
-      (when (= false (:save-success nap-op))
-        [msg-warn/warning-msg (str (tr [:common-texts :save-failure])
-                                   " "
-                                   (tr [:common-texts :server-error-try-later]))])
+        (when (= false (:save-success? nap-op))
+          [msg-warn/warning-msg (str (tr [:common-texts :save-failure])
+                                     " "
+                                     (tr [:common-texts :server-error-try-later]))])
 
-      (when (= true (:save-success nap-op))
-        [msg-succ/success-msg (tr [:common-texts :save-success])])])
+        (when (= true (:save-success? nap-op))
+          [msg-succ/success-msg (tr [:common-texts :save-success])])]))
 
    [buttons/save {:on-click #(e! (to/->UserCloseMergeSection nil))
                   :disabled (unmerged-ytj-nap-ops? nap-orphans)
@@ -417,7 +414,7 @@
          [delete-operator e! o (:transport-operators-with-services state)]))
 
      (if show-merge-companies?
-       (operator-merge-section e! operator (:ytj-company-names state) state)
+       (operator-merge-section e! operator (:ytj-company-names state))
        [form/form
         (operator-form-options e! state show-details?)
         form-groups
