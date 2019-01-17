@@ -666,6 +666,7 @@
  {:address-postal "Post address"
   :address-postal-street "Post address eller PO Box"
   :business-id-and-aux-names "Företagsnamn och hjälpnamn"
+  :business-name "Firma"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
   :contact-details-other "Andra kontaktuppgifter"
   :contact-details "Kontaktuppgifter"
