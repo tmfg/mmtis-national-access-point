@@ -664,6 +664,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:address-postal "Postiosoite"
   :address-postal-street "Katuosoite tai PL-osoite"
   :business-id-and-aux-names "Toiminimi ja aputoiminimet"
+  :business-name "Toiminimi"
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
   :contact-details-other "Muut yhteystiedot"
