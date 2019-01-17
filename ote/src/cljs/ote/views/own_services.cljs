@@ -249,7 +249,8 @@
    [:ul.unstyled
     (doall
       (for [as oa-services]
-        [:li {:key (:service-id as)}
+        [:li {:key (:service-id as)
+              :data-cypress-op-id (:service-id as)}
          (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]])
 
 (defn- add-associated-services

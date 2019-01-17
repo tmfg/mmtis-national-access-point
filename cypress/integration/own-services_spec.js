@@ -30,7 +30,7 @@ describe('Own services basic tests', function () {
     });
 });
 
-describe('Add a new service', function () {
+/*describe('Add a new service', function () {
     before(function () {
         cy.login();
     });
@@ -63,9 +63,9 @@ describe('Add a new service', function () {
 
 
             cy.server();
-            cy.route('/place-completions/*').as('placeCompletion');
+            cy.route('/place-completions/!*').as('placeCompletion');
 
-            cy.contains(/^Taksi*/).click();
+            cy.contains(/^Taksi*!/).click();
             cy.contains('Jatka').click();
 
             // Fill mandatory fields
@@ -138,9 +138,9 @@ describe('Add a new service', function () {
         });
     });
 
-});
+})*/;
 
-describe('Add new service provider', function () {
+/*describe('Add new service provider', function () {
     before(function () {
         cy.login();
         cy.wrap(randomName('test-operator-')).as('operatorName')
@@ -186,7 +186,7 @@ describe('Add new service provider', function () {
 
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
     });
-});
+});*/
 
 describe('Should add new associated service to Normal users "Terminaali Oy"', function () {
     before(function() {
@@ -201,6 +201,18 @@ describe('Should add new associated service to Normal users "Terminaali Oy"', fu
     });
 
     it('Should be in own-services page', function () {
-       cy.contains('Omat palvelutiedot');
+        cy.contains('Omat palvelutiedot');
     });
+
+    it('Should add a new associated service', function () {
+        cy.get('input[data-cypress=chip-input]').type('t');
+        cy.contains('Taksi - Ajopalvelu Testinen').click();
+        cy.get('li[data-cypress-op-id=1]');
+    });
+
+    it('Should delete added associated service', function() {
+        cy.get('li[data-cypress-op-id=1]').should('exist');
+        cy.get('input[data-cypress=chip-input]').type('{backspace}{backspace}');
+        cy.get('li[data-cypress-op-id=1]').should('not.exist');
+    })
 });
