@@ -30,7 +30,7 @@ describe('Own services basic tests', function () {
     });
 });
 
-/*describe('Add a new service', function () {
+describe('Add a new service', function () {
     before(function () {
         cy.login();
     });
@@ -63,9 +63,9 @@ describe('Own services basic tests', function () {
 
 
             cy.server();
-            cy.route('/place-completions/!*').as('placeCompletion');
+            cy.route('/place-completions/*').as('placeCompletion');
 
-            cy.contains(/^Taksi*!/).click();
+            cy.contains(/^Taksi*/).click();
             cy.contains('Jatka').click();
 
             // Fill mandatory fields
@@ -138,9 +138,9 @@ describe('Own services basic tests', function () {
         });
     });
 
-})*/;
+});
 
-/*describe('Add new service provider', function () {
+describe('Add new service provider', function () {
     before(function () {
         cy.login();
         cy.wrap(randomName('test-operator-')).as('operatorName')
@@ -186,9 +186,9 @@ describe('Own services basic tests', function () {
 
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
     });
-});*/
+});
 
-describe('Should add new associated service to Normal users "Terminaali Oy"', function () {
+describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () {
     before(function() {
         cy.login('normaluser', 'password')
     });
