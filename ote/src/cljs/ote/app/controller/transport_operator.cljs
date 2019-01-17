@@ -27,10 +27,10 @@
 (defrecord FailedTransportOperatorResponse [response])
 (defrecord EnsureUniqueBusinessId [business-id])
 (defrecord EnsureUniqueBusinessIdResponse [response])
-(defrecord RenameOperator [operator selection])
-(defrecord RenameOperatorResponse [response operator])
+(defrecord OperatorRename [operator selection])
+(defrecord OperatorRenameResponse [response previous payload])
 (defrecord UserCloseMergeSection [data])
-(defrecord OperatorDataRefreshResponse [response])
+(defrecord OperatorRefreshResponse [response])
 
 (defrecord TransportOperatorResponse [response])
 (defrecord CreateTransportOperator [])
@@ -84,8 +84,13 @@
                    nap-operators)]
     (:transport-operator nap-item)))
 
+;; Marks :disabled? those operators, which already have a nap id. Used for filtering UI selection menu.
+(defn- mark-menuitems [ytj-names]
+  (mapv #(assoc % :disabled? (int? (::t-operator/id %))) ytj-names))
+
 (defn- ytj->nap-companies [operators-ytj operators-nap]
-  "Takes `operators-ytj` and if there's a name match to its name in `operators-nap`,
+  "Function creates ytj operator items by combining metadata from YTJ response and NAP operators.
+   Takes `operators-ytj` and if there's a name match to its name in `operators-nap`,
   copies into the ytj item nap keys which are not shared with other nap companies which have the same business-id."
   (doall
     (map (fn [ytj-item]
@@ -97,6 +102,18 @@
                      (some? nap-id) (merge (take-update-op-keys nap-item)) ;; nap fields user is allowed to edit
                      ;; Remove keys not supported by nap service
                      true (take-operator-api-keys))))
+         operators-ytj)))
+
+(defn- update-nap-keys-to-ytj-names[operators-ytj operators-nap]
+  "Function updates nap metadata to existing ytj operator items, previously created by `ytj->nap-companies`.
+  Takes `operators-ytj` and if there's a name match to its name in `operators-nap`, copies certain keys to matching operators-ytj item."
+  (doall
+    (map (fn [ytj-item]
+           (let [nap-item (name->nap-operator (::t-operator/name ytj-item) operators-nap)
+                 nap-id (::t-operator/id nap-item)]
+             (cond-> ytj-item
+                     true (dissoc ::t-operator/id) ;; Nap id removed just in case there's no more NAP operator match
+                     (some? nap-id) (merge (take-update-op-keys nap-item)))))
          operators-ytj)))
 
 ;; Takes `app`, POSTs the next transport operator in queue and updates the queue.
@@ -112,16 +129,30 @@
           (assoc app :transport-operator-save-q ops-rest))
       (dissoc app :transport-operator-save-q))))
 
-;; Takes app state and updates state whether renaming and orphan nap-operator (using an ytj name) was successful or not.
-;; Returns new app state
-(defn- update-rename-op-result [app response nap-op]
-  (let [orphans (get-in app [:transport-operator :ytj-orphan-nap-operators])
-        orphans-result (doall (map (fn [orphan]
-                                     (if (= (::t-operator/id (:transport-operator orphan)) (::t-operator/id nap-op))
-                                       (assoc-in orphan [:transport-operator :save-success] (pos-int? response)) ;;(= (:status response) 200)
-                                       orphan))
-                                   orphans))]
-    (assoc-in app [:transport-operator :ytj-orphan-nap-operators] orphans-result)))
+;; Takes nap orphan operators without a matching ytj name and marks if renaming was successful and if item should be disabled on UI merging section.
+;; response: response of renaming an orphan nap operator
+;; previous: nap operator which was merged to ytj name
+;; newname: new ytj name to which operator was updated
+;; Returns new vector for :ytj-orphan-nap-operators
+(defn- update-nap-orphans [orphans response previous newname]
+  (map
+    (fn [orphan]
+      (if (= (::t-operator/id (:transport-operator orphan)) (::t-operator/id previous))
+        (-> orphan
+            (assoc-in
+              [:transport-operator :save-success?] (pos-int? response))
+            ;; Below handles the case where user renames orphan operator back to original, i.e. reverts the UI dropdown selection
+            (assoc-in
+              [:transport-operator :merge-handled?] (and
+                                                      (pos-int? response)
+                                                      (not= (::t-operator/name (:transport-operator orphan)) newname))))
+        orphan))
+    orphans))
+
+(defn- operators-of-user [app]
+  (if (and (get-in app [:user :admin?]) (:admin-transport-operators app))
+    (:admin-transport-operators app)
+    (:transport-operators-with-services app)))
 
 (defn- compose-orphan-nap-operators [bid ytj-ops nap-ops]
   ;; Function takes bid (business-id) and nap-ops (vector of nap operator maps)
@@ -139,18 +170,13 @@
   (let [companies (when (some? (:name response))
                     (ytj->nap-companies
                       (into [{:name (:name response)}] (sort-by :name (:auxiliaryNames response))) ; Insert company name first to checkbox list before aux names
-                      (if (and (get-in app [:user :admin?]) (:admin-transport-operators app))
-                        (:admin-transport-operators app)
-                        (:transport-operators-with-services app))))]
+                      (operators-of-user app)))]
     ;; Add :show-delete-dialog? false to all companies to make :transport-operators-to-save values constant when adding them to checkboxes and checking if option is selected.
     (map #(assoc % :show-delete-dialog? false) companies)))
 
-;; Composes the model for selecting operators and whether they are disabled for user selection
-;; Sets results in app state and returns new app state
-(defn- compose-appstate-ytj-companies-and-operators [app ytj-company-names]
-  (-> app
-      (assoc :ytj-company-names ytj-company-names)
-      (assoc-in [:transport-operator :transport-operators-to-save] (filterv ::t-operator/id ytj-company-names))))
+;; Resolves which ytj operator naems exist already in nap. Returns a filtered vector of ytj operators.
+(defn- ytj-ops-already-in-nap [ytj-company-names]
+  (filterv ::t-operator/id ytj-company-names))
 
 ;; Use-cases:
 ;; Create new op, business-id found in YTJ
@@ -206,10 +232,11 @@
             use-ytj-web? (assoc-in [:ytj-flags :use-ytj-homepage?] true)
             ;; Set data source for company selection list
             true (assoc-in [:transport-operator :ytj-orphan-nap-operators]
-                           (compose-orphan-nap-operators (get-in app [:transport-operator ::t-operator/business-id])
-                                                         ytj-company-names
-                                                         (:transport-operators-with-services app)))
-            true (compose-appstate-ytj-companies-and-operators ytj-company-names))))
+                           (sort-by #(get-in % [:transport-operator ::t-operator/name]) (compose-orphan-nap-operators (get-in app [:transport-operator ::t-operator/business-id])
+                                                               ytj-company-names
+                                                               (:transport-operators-with-services app))))
+            true (assoc :ytj-company-names (mark-menuitems ytj-company-names))
+            true (assoc-in [:transport-operator :transport-operators-to-save] (ytj-ops-already-in-nap ytj-company-names)))))
 
 (define-event FetchYtjOperatorResponse [response]
               {}
@@ -276,18 +303,12 @@
 (defn transport-operator-by-ckan-group-id[id]
   (comm/get! (str "transport-operator/" id) {:on-success (send-async! ->TransportOperatorResponse)}))
 
-(defn- update-transport-operator-data [app {:keys [transport-operators] :as response}]
-  (assoc app
-    :transport-operator-data-loaded? true
-    :transport-operators-with-services transport-operators))
-
-;; GETs transport operator data from service. Returns new app state.
-(defn- get-transport-operator-data [app]
+(defn- refresh-transport-operator [app]
   (if (:transport-operator-data-loaded? app true)
     (do
       (comm/post! "transport-operator/data" {}
-                  {:on-success (tuck/send-async! ->OperatorDataRefreshResponse)
-                   :on-failure (tuck/send-async! ->OperatorDataRefreshResponse)});;TODO: HOW TO HANDLE ERROR?
+                  {:on-success (tuck/send-async! ->OperatorRefreshResponse)
+                   :on-failure (tuck/send-async! ->OperatorRefreshResponse)})
       (-> app
           (assoc :services-changed? false)
           (dissoc :transport-operators-with-services)))
@@ -421,30 +442,39 @@
       :transport-operator (assoc response
                             :loading? false)))
 
-  OperatorDataRefreshResponse
-  (process-event [{response :response} app]
-    ;; Operator not updated to app state because of assumption editing uses :ytj-company-names and :transport-operators-to-save vectors
-    ;; operator could be merged to :transport-operator, but more consistent with service would be to re-fetch and re-parse the results
-    ;; which is close to refreshing the page.
-    (let [app (update-transport-operator-data app response)
-          ytj-company-names (compose-ytj-company-names app (:ytj-response app))]
-      (compose-appstate-ytj-companies-and-operators app ytj-company-names)))
+  OperatorRefreshResponse
+  (process-event [{response :response} {:keys [ytj-company-names] :as app}]
+    (let [app (assoc app :transport-operators-with-services (:transport-operators response))
+          ytj-ops (update-nap-keys-to-ytj-names ytj-company-names (operators-of-user app))
+          ytj-ops-marked (mark-menuitems ytj-ops)]
+      (-> app
+          (assoc :transport-operator-data-loaded? true
+                 :ytj-company-names ytj-ops-marked)
+          (assoc-in [:transport-operator :transport-operators-to-save] (ytj-ops-already-in-nap ytj-ops-marked)))))
 
-  RenameOperatorResponse
-  (process-event [{response :response operator :operator} app]
-    (cond-> app
-            true (update-rename-op-result response operator)
-            ;; Refresh app state only if saving was ok, fail means data was not changed. Service returns a status object on error, count of changed records on success
-            (pos-int? response) (get-transport-operator-data)))
+  OperatorRenameResponse
+  (process-event [{response :response previous :previous payload :payload :as all} app]
+    (let [nap-orphans (update-nap-orphans (get-in app [:transport-operator :ytj-orphan-nap-operators]) response previous (::t-operator/name payload))]
+      (cond-> app
+              true (assoc-in [:transport-operator :ytj-orphan-nap-operators] nap-orphans)
+              ;; Refresh app state only if saving was ok, fail means data was not changed. Service returns on fail a status object on error or on success the count of changed records
+              (pos-int? response) (refresh-transport-operator)))) ;; Issues a request, handled in OperatorRefreshResponse
 
-  RenameOperator
-  (process-event [{operator :operator selection :selection :as data} app]
-    ;; Set only required keys to payload eliminate any chance for modifying any other keys than what is wanted
-    (let [payload {::t-operator/id (::t-operator/id operator)
-                   ::t-operator/name (::t-operator/name selection)}]
-      (comm/post! "transport-operator" payload
-                  {:on-success (send-async! ->RenameOperatorResponse operator)
-                   :on-failure (send-async! ->RenameOperatorResponse operator)})
+  OperatorRename
+  (process-event [{operator :operator sel :selection :as data} app]
+    (let [selection (:current sel)
+          ;; Set only required keys to payload eliminate any chance for modifying any other keys than what is wanted
+          payload {::t-operator/id (::t-operator/id operator)
+                   ;; When user reverts renaming by re-selecting the default item, rename operator back to original.
+                   ;; That allows displaying the freed name as a selection option in other operator name dropdowns.
+                   ::t-operator/name (if (:placeholder selection)
+                                       (::t-operator/name operator)
+                                       (::t-operator/name selection))}]
+      (if-not (empty? (::t-operator/name payload))
+        (comm/post! "transport-operator" payload
+                    {:on-success (send-async! ->OperatorRenameResponse operator payload)
+                     :on-failure (send-async! ->OperatorRenameResponse operator payload)})
+        (.warning js/console "OperatorRename: Bad operator name"))
       app))
 
   UserCloseMergeSection
