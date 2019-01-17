@@ -184,7 +184,7 @@
                   "\u2015"))}
      {:name "Tiedot saatavilla (asti)" :read (comp time/format-timestamp->date-for-ui :max-date) :width "15%"}
      {:name "Muutokset" :width "30%"
-      :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
+      :tooltip "Palvelun kaikkien reittien tulevien muutosten yhteenlaskettu lukumäärä."
       :tooltip-len "min-medium"
       :read #(select-keys % change-keys)
       :format change-description
