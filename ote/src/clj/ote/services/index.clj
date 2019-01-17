@@ -86,10 +86,7 @@
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
       (translations localization/*language*)
-      (user-info db user)
-
-      (when (not dev-mode?)
-        (google-analytics-scripts ga-conf))]
+      (user-info db user)]
 
      [:body (merge
              {:id "main-body"
