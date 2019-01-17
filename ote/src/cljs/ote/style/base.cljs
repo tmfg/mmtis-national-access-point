@@ -182,7 +182,7 @@
                                :width "48px"
                                :margin-bottom "8px"}}})
 
-(def disabled-control {:opacity 0.5
+(def disabled-control {:opacity 0.3
                        :pointer-events "none"})
 
 (def disabled-color {:color "rgba(0, 0, 0, 0.247059)"})
