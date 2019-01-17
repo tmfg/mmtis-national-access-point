@@ -260,8 +260,33 @@
 
 (define-event DeleteTransportOperatorResponse [response]
               {}
-              (routes/navigate! :own-services)
+              ;; Leave page if company wasn't found from ytj
+              (when (empty? (get app :ytj-company-names))
+                (routes/navigate! :own-services))
+
               (-> app
+                  ;; Remove deleted operator from app-state (:transport-operators-to-save :transport-operators-with-services and :ytj-company-names)
+                  (update-in [:transport-operator :transport-operators-to-save]
+                             (fn [operator-collection]
+                                 (keep (fn [o]
+                                       (if (= response (::t-operator/id o))
+                                         nil
+                                         o))
+                                   operator-collection)))
+                  (update :transport-operators-with-services
+                             (fn [operator-collection]
+                                 (keep (fn [o]
+                                       (if (= response (get-in o [:transport-operator ::t-operator/id]))
+                                         nil
+                                         o))
+                                   operator-collection)))
+                  (update :ytj-company-names
+                          (fn [operator-collection]
+                              (map (fn [o]
+                                    (if (= response (::t-operator/id o))
+                                      (dissoc o ::t-operator/id ::t-operator/ckan-group-id ::t-operator/ckan-description)
+                                      o))
+                                operator-collection)))
                   (assoc-in [:transport-operator :show-delete-dialog?] false)
                   (assoc :flash-message (tr [:common-texts :delete-operator-success])
                          :services-changed? true)))
