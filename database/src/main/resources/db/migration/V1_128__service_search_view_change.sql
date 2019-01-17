@@ -20,7 +20,7 @@ CREATE VIEW transport_service_search_result AS
           FROM "external-interface-description" ei
           WHERE ei."transport-service-id" = t.id)::external_interface_search_result[] AS "external-interface-links"
   FROM "transport-service" t
-         LEFT JOIN (SELECT top.name as name, top."business-id" as "business-id"
-                    FROM "transport-operator" top, "associated-service-operators" a WHERE a."operator-id" = top.id and a."service-id" = t.id) as aso ON TRUE
+         LEFT JOIN (SELECT top.name as name, top."business-id" as "business-id", a."service-id"
+                    FROM "transport-operator" top, "associated-service-operators" a WHERE a."operator-id" = top.id) as aso ON aso."service-id" = t.id
          JOIN  "transport-operator" op ON op.id = t."transport-operator-id"
   GROUP BY t.id, op.name, op."business-id";
