@@ -271,6 +271,7 @@
        :label (tr [:own-services-page :added-services])
        :full-width? true
        :full-width-input? false
+       :data-attribute-cypress "chip-input"
        :hint-text (tr [:own-services-page :search-services])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want

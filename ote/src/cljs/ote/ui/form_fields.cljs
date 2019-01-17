@@ -359,7 +359,7 @@
 (defmethod field :chip-input [{:keys [update! label name error warning regex
                                       on-blur on-update-input on-request-add on-request-delete
                                       max-length style list-style hint-style hint-text
-                                      filter suggestions suggestions-config default-values max-results
+                                      filter suggestions data-attribute-cypress suggestions-config default-values max-results
                                       auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
                                       form? table? full-width? full-width-input? disabled?] :as field}
@@ -381,6 +381,7 @@
         :hintText (or hint-text (placeholder field data))
         :disabled disabled?
         :value chips
+        :data-cypress data-attribute-cypress
 
         ;; == Autocomplete options ==
         :dataSource suggestions
