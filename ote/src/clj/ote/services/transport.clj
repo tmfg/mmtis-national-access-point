@@ -496,17 +496,19 @@
 
 (defn- save-associated-operator
   "Save association between transport service and transport operator"
-  [db service-id data]
-  (specql/insert! db ::t-service/associated-service-operators
-                  {::t-service/service-id (Long/parseLong service-id)
-                   ::t-service/operator-id (:operator-id data)}))
+  [db user-id service-id operator-id]
+  (http/transit-response
+    (specql/insert! db ::t-service/associated-service-operators
+                    {::t-service/service-id service-id
+                     ::t-service/operator-id operator-id
+                     ::t-service/user-id user-id})))
 
 (defn- delete-associated-operator
   "remove association between trasport service and transport operator"
   [db service-id operator-id]
-  (specql/delete! db ::t-service/associated-service-operators
-                  {::t-service/service-id (Long/parseLong service-id)
-                   ::t-service/operator-id (Long/parseLong operator-id)}))
+  (http/transit-response (specql/delete! db ::t-service/associated-service-operators
+                                         {::t-service/service-id service-id
+                                          ::t-service/operator-id operator-id})))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -531,20 +533,23 @@
           (business-id-exists db business-id)))
 
       (POST "/transport-service/:service-id/associated-operators"
-        {{:keys [service-id]} :params
-         data :body}
-        (try
-          (http/transit-response
-            (save-associated-operator db service-id (http/transit-request data)))
-          (catch Exception e
-            {:status 403})))
+            {{:keys [service-id]} :params
+             user :user
+             data :body}
+        (let [operator-id (:operator-id (http/transit-request data))
+              user-id (get-in user [:user :id])
+              service-id (Long/parseLong service-id)]
+          (authorization/with-transport-operator-check db user operator-id
+                                                       #(save-associated-operator db user-id service-id operator-id))))
 
       (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
-              {{:keys [service-id operator-id]} :params}
-        (if (= (delete-associated-operator db service-id operator-id) 1) ;Check if the amount of lines deleted is 1.
-          (http/transit-response "Delete successful")
-          {:status 403
-           :body {:message "Nothing deleted"}}))
+              {{:keys [service-id operator-id]}
+               :params
+               user :user}
+        (let [service-id (Long/parseLong service-id)
+              operator-id (Long/parseLong operator-id)]
+          (authorization/with-transport-operator-check db user operator-id
+                                                       #(delete-associated-operator db service-id operator-id))))
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response
