@@ -1,7 +1,7 @@
 -- Drop old
 DROP VIEW transport_service_search_result;
 
--- Create new with t.companies in service-companies
+-- Create new with "associated-service-operators"
 CREATE VIEW transport_service_search_result AS
   SELECT t.*, op.name as "operator-name", op."business-id" as "business-id",
       -- Changed Start
