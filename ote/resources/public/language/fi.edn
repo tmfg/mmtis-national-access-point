@@ -576,9 +576,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :own-services-new-provider1 "Hienoa! Olet nyt lisännyt "
                      :own-services-new-provider2 (:md " -nimisen palveluntuottajan NAP:iin.  Huomioithan, että pelkät palveluntuottajan tiedot eivät sisällä lain vaatimia olennaisia tietoja (esim. toiminta-alue, hintatiedot ja esteettömyystiedot) tarjoamastasi palvelusta/palveluista.\n\nLisää seuraavaksi tarkemmat tiedot tarjoamastasi palvelusta/palveluista kohdassa **Omat palvelut** ja/tai kohdassa **Muiden tuottamat palvelut, joissa olet mukana**.\n\nMikäli omistat taksiyrityksen ja ajat kyytejä vain välityskeskuksen kautta, riittää, että täytät välityskeskuksen tiedot kohtaan **Muiden tuottamat palvelut, joissa olet mukana**.")
                      :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
-                     :service "Palvelu"
+                     :search-services "Hae palveluita"
                      :add-service "Lisää palvelu"
-                     :added-services "Lisätyt palvelut"
+                     :added-services "Itse lisäämäsi palvelut"
                      :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
                      :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]}
 

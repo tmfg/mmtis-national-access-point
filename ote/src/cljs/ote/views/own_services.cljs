@@ -262,16 +262,14 @@
         current-operator (::t-operator/id (:transport-operator state))
         show-error? (:association-failed state)]
     [:div
-     [:h4 {:style {:margin-bottom 0}}
-      (tr [:own-services-page :added-services])]
      (if show-error?
        [warning-msg/warning-msg [:span (tr [:common-texts :save-failure])]])
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :add-service])
+       :label (tr [:own-services-page :added-services])
        :full-width? true
        :full-width-input? false
-       :hint-text (tr [:own-services-page :service])
+       :hint-text (tr [:own-services-page :search-services])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
        :filter (constantly true)
