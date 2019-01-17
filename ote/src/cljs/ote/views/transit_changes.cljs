@@ -172,7 +172,7 @@
                                                                 date))))}
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
      {:name "Palvelu" :read :transport-service-name :width "20%"}
-     {:name "Aikaa 1. muutokseen" :width "15%"
+     {:name "Aikaa 1. muutokseen" :width "15%"12
       :read (juxt :change-date :days-until-change)
       :format (fn [[different-week-date days-until-change]]
                 (if different-week-date
@@ -184,7 +184,7 @@
                   "\u2015"))}
      {:name "Tiedot saatavilla (asti)" :read (comp time/format-timestamp->date-for-ui :max-date) :width "15%"}
      {:name "Muutokset" :width "30%"
-      :tooltip "Kaikkien reittien 1:sten muutosten yhteenlaskettu lukumäärä palveluntuottajakohtaisesti."
+      :tooltip "Palvelun kaikkien reittien tulevien muutosten yhteenlaskettu lukumäärä."
       :tooltip-len "min-medium"
       :read #(select-keys % change-keys)
       :format change-description
