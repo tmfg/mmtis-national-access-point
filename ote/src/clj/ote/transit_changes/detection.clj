@@ -421,12 +421,14 @@
           ;; If the change is a no-traffic period, the different day is the first day that has no traffic
           :gtfs/current-week-date (sql-date
                                     (.plusDays no-traffic-start-date -1))
-          ;; Different week date (= next changed weeks first day, is wrongly calculated when there is a pause in traffic
-          :gtfs/different-week-date (sql-date no-traffic-start-date)
-          ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set current date +1 as change date.
-          ;; So we don't remove no-traffic idetification in discard-past-changes function and automatic detection will start again tomorrow
+          ;; If no-traffic starts in future set different-week-day the day when no-traffic segment starts
+          ;; if no-traffic segment is in the past (or currenlty on progress) set different-week-date when the traffic starts again
+          :gtfs/different-week-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
+                                      (sql-date no-traffic-end-date)
+                                      (sql-date no-traffic-start-date))
+          ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set change date where the traffic starts again.
           :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
-                              (sql-date (.plusDays (java.time.LocalDate/now) 1)) ;; Now + 1 day
+                              (sql-date no-traffic-end-date) ;; Day when traffic starts again
                               (sql-date no-traffic-start-date))}
 
          :default
