@@ -237,21 +237,25 @@
   [:div
    [:h4 (tr [:own-services-page :other-service-associations])]
    (if (empty? a-services)
-     (if (empty? oa-services)
-       [:span (stylefy/use-style style-base/gray-text)
-        (tr [:own-services-page :no-associations] {:operator-name
-                                                   (::t-operator/name (:transport-operator state))})]))
-   [:ul.unstyled
-    (doall
-      (for [as a-services]
-        [:li {:key (:service-id as)}
-         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]
-   [:ul.unstyled
-    (doall
-      (for [as oa-services]
-        [:li {:key (:service-id as)
-              :data-cypress-op-id (:service-id as)}
-         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]])
+     [:span (stylefy/use-style style-base/gray-text)
+      (tr [:own-services-page :no-associations] {:operator-name
+                                                 (::t-operator/name (:transport-operator state))})]
+     [:ul.unstyled
+      (doall
+        (for [as a-services]
+          [:li {:key (:service-id as)}
+           (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))])
+   [:h4 (tr [:own-services-page :added-services])]
+   (if (empty? oa-services)
+     [:span (stylefy/use-style style-base/gray-text)
+      (tr [:own-services-page :no-own-asscoiations] {:operator-name
+                                                     (::t-operator/name (:transport-operator state))})]
+     [:ul.unstyled
+      (doall
+        (for [as oa-services]
+          [:li {:key (:service-id as)
+                :data-cypress-op-id (:service-id as)}
+           (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))])])
 
 (defn- add-associated-services
   [e! state]
@@ -264,16 +268,16 @@
                                suggestions)
         current-operator (::t-operator/id (:transport-operator state))
         show-error? (:association-failed state)]
-    [:div
+    [:div {:style {:margin-top "1rem"}}
      (if show-error?
        [warning-msg/warning-msg [:span (tr [:common-texts :save-failure])]])
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :added-services])
+       :label (tr [:own-services-page :search-services])
        :full-width? true
        :full-width-input? false
        :data-attribute-cypress "chip-input"
-       :hint-text (tr [:own-services-page :search-services])
+       :hint-text (tr [:own-services-page :service])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
        :filter (constantly true)

@@ -75,10 +75,10 @@
     [:html
      [:head
       (if production-env?
-        (for [f dev-favicons]
-          [:link f])
         (for [f favicons]
           [:link f]))
+        (for [f dev-favicons]
+          [:link f])
       [:meta {:name "theme-color" :content "#ffffff"}]
       [:meta {:name    "viewport"
               :content "width=device-width, initial-scale=1.0"}]
