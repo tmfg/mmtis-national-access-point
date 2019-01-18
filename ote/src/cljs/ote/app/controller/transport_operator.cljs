@@ -198,7 +198,7 @@
         use-ytj-email? false
         ytj-contact-web (preferred-ytj-field ["Kotisivun www-osoite" "www-adress" "Website address"] (:contactDetails response))
         use-ytj-web? (not (empty? ytj-contact-web))
-        ytj-company-names (compose-ytj-company-names app response)
+        ytj-company-names (mark-menuitems (compose-ytj-company-names app response))
         ytj-changed-contact-input-fields? (and ytj-business-id-hit?
                                                (or (not= ytj-address-billing (::t-operator/billing-address t-op))
                                                    (not= ytj-address-visiting (::t-operator/visiting-address t-op))
@@ -216,7 +216,6 @@
             ;; Enable saving when YTJ changed a relevant field
             (and (not (:new? t-op))
                  ytj-changed-contact-input-fields?) (assoc-in [:transport-operator ::form/modified] #{::t-operator/name})
-            true (assoc-in [:transport-operator :transport-operators-to-save] []) ;; Init to empty vector to allow populating it in different scenarios
             ;; Set data sources for form fields and if user allowed to edit
             use-ytj-addr-billing? (assoc-in [:transport-operator ::t-operator/billing-address] ytj-address-billing)
             true (assoc-in [:ytj-flags :use-ytj-addr-billing?] use-ytj-addr-billing?)
@@ -235,7 +234,7 @@
                            (sort-by #(get-in % [:transport-operator ::t-operator/name]) (compose-orphan-nap-operators (get-in app [:transport-operator ::t-operator/business-id])
                                                                ytj-company-names
                                                                (:transport-operators-with-services app))))
-            true (assoc :ytj-company-names (mark-menuitems ytj-company-names))
+            true (assoc :ytj-company-names ytj-company-names)
             true (assoc-in [:transport-operator :transport-operators-to-save] (ytj-ops-already-in-nap ytj-company-names)))))
 
 (define-event FetchYtjOperatorResponse [response]
