@@ -1,6 +1,7 @@
 db_url: "jdbc:postgresql://{{vault_db_host}}/napote"
 db_username: "{{vault_db_ote_user}}"
 db_password: "{{vault_db_ote_password}}"
+production_environment: "false"
 auth_shared_secret: "{{vault_beaker_session_secret}}"
 cookie_domain: "testi.finap.fi"
 base_url: "https://testi.finap.fi"
