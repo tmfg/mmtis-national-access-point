@@ -115,23 +115,24 @@
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur on-change form? error warning table? full-width?
                                   style input-style hint-style password? on-enter
-                                  hint-text autocomplete disabled? id]
+                                  hint-text autocomplete disabled? element-id]
                            :as   field} data]
   [text-field
    (merge
-    {:id id
-     :name name
-     :floating-label-text (when-not table? label)
-     :floating-label-fixed true
-     :on-blur           on-blur
-     :hint-text         (or hint-text (placeholder field data) "")
-     :value             (or data "")
-     :error-text        (or error warning "") ;; Show error text or warning text or empty string
-     :error-style       (if error ;; Error is more critical than required - showing it first
-                          style-base/error-element
-                          style-base/required-element)
-     :hint-style (merge style-base/placeholder
-                        hint-style)}
+     (when element-id
+       {:id element-id})
+     {:name name
+      :floating-label-text (when-not table? label)
+      :floating-label-fixed true
+      :on-blur on-blur
+      :hint-text (or hint-text (placeholder field data) "")
+      :value (or data "")
+      :error-text (or error warning "") ;; Show error text or warning text or empty string
+      :error-style (if error ;; Error is more critical than required - showing it first
+                     style-base/error-element
+                     style-base/required-element)
+      :hint-style (merge style-base/placeholder
+                         hint-style)}
     (if on-change
       {:on-change #(let [v %2]
                      (if regex
@@ -431,7 +432,7 @@
        (when list-style
          {:listStyle list-style}))]))
 
-(defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
+(defn radio-selection [{:keys [update! label name show-option options error warning element-id] :as field}
                        data]
   (let [option-idx (zipmap options (map str (range)))]
     [:div.radio (stylefy/use-style style-form-fields/radio-selection)
@@ -457,13 +458,14 @@
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
                                error warning auto-width? disabled?
-                               option-value class-name] :as field}
+                               option-value class-name element-id] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-value (or option-value identity)
         option-idx (zipmap (map option-value options) (range))]
     [ui/select-field
      (merge
+       (when element-id {:id element-id})
        {:auto-width (boolean auto-width?)
         :style style
         :floating-label-text (when-not table? label)
@@ -487,10 +489,10 @@
            [ui/menu-item {:value i :primary-text (show-option option)}]))
        options))]))
 
-(defmethod field :selection [{radio? :radio? :as field} data]
+(defmethod field :selection [{radio? :radio? element-id :element-id :as field} data]
   (if radio?
-    [radio-selection field data]
-    [field-selection field data]))
+    [radio-selection field data element-id]
+    [field-selection field data element-id ]))
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
@@ -591,11 +593,12 @@
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! error warning required? unrestricted-hours?] :as opts}
+(defmethod field :time [{:keys [update! error warning required? unrestricted-hours? element-id] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
-           {:type :string
+           {:id element-id
+            :type :string
             :name "hours"
             :regex (if unrestricted-hours?
                      unrestricted-hour-regex
@@ -1086,7 +1089,7 @@
           ;; default
           ""))]]))
 
-(defmethod field :external-button [{:keys [label on-click disabled primary secondary style]}]
+(defmethod field :external-button [{:keys [label on-click disabled primary secondary style element-id]}]
   ;; Options
   ; :label Button label text for displaying
   ; :on-click On-click callback fn
@@ -1095,13 +1098,15 @@
   ; secondary
   [:div
    [ui/raised-button
-    {:label     label
-     :primary   primary
-     :secondary secondary
-     :on-click  #(on-click)
-     :disabled  disabled
-     :style     style
-     }]]
+    (merge
+      (when element-id {:id element-id})
+      {:label label
+       :primary primary
+       :secondary secondary
+       :on-click #(on-click)
+       :disabled disabled
+       :style style
+       })]]
   )
 
 (defmethod field :text-label [{:keys [label style h-style full-width?]}]

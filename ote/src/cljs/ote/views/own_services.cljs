@@ -8,6 +8,7 @@
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
+            [ote.ui.warning_msg :as warning-msg]
             [ote.app.controller.front-page :as fp]
             [ote.app.controller.login :as login]
             [ote.app.controller.transport-service :as ts]
@@ -146,7 +147,8 @@
         [:h4 {:style {:margin "0"}}
          (tr [:field-labels :select-transport-operator])]
         [form-fields/field
-         {:name :select-transport-operator
+         {:element-id "select-operator-at-own-services"
+          :name :select-transport-operator
           :type :selection
           :show-option #(::t-operator/name %)
           :update! #(e! (to/->SelectOperator %))
@@ -155,7 +157,8 @@
           :class-name "mui-select-button"}
          (to/take-operator-api-keys operator)]]
        [:div.col-sm-6.col-md-6
-        [:a (merge {:href "#/transport-operator"
+        [:a (merge {:id "btn-add-new-transport-operator"
+                    :href "#/transport-operator"
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (to/->CreateTransportOperator)))}
@@ -251,21 +254,24 @@
 
 (defn- add-associated-services
   [e! state]
-  [:div
-   (let [suggestions (filter :service-id (:suggestions (:service-search state)))
-         associated (::t-operator/associated-services (:transport-operator state))
-         associated-ids (set (map :service-id associated))
-         cur-op-id (::t-operator/id (:transport-operator state))
-         filtered-suggestions (filter
-                                #(and (not (associated-ids (:service-id %))) (not= cur-op-id (:operator-id %)))
-                                suggestions)
-         current-operator (::t-operator/id (:transport-operator state))]
+  (let [suggestions (filter :service-id (:suggestions (:service-search state)))
+        associated (::t-operator/associated-services (:transport-operator state))
+        associated-ids (set (map :service-id associated))
+        cur-op-id (::t-operator/id (:transport-operator state))
+        filtered-suggestions (filter
+                               #(and (not (associated-ids (:service-id %))) (not= cur-op-id (:operator-id %)))
+                               suggestions)
+        current-operator (::t-operator/id (:transport-operator state))
+        show-error? (:association-failed state)]
+    [:div
+     (if show-error?
+       [warning-msg/warning-msg [:span (tr [:common-texts :save-failure])]])
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :service])
+       :label (tr [:own-services-page :added-services])
        :full-width? true
        :full-width-input? false
-       :hint-text (tr [:own-services-page :add-service])
+       :hint-text (tr [:own-services-page :search-services])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
        :filter (constantly true)
@@ -287,7 +293,7 @@
                          chip)
        :on-request-delete (fn [chip-val]
                             (e! (os-controller/->RemoveSelection chip-val)))}
-      (::t-operator/own-associations (:transport-operator state))])])
+      (::t-operator/own-associations (:transport-operator state))]]))
 
 (defn- associated-services
   [e! state]
