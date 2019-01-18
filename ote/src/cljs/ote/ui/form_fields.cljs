@@ -381,8 +381,6 @@
         :hintText (or hint-text (placeholder field data))
         :disabled disabled?
         :value chips
-        :data-cypress data-attribute-cypress
-
         ;; == Autocomplete options ==
         :dataSource suggestions
         :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
@@ -431,7 +429,9 @@
        (when style
          {:style style})
        (when list-style
-         {:listStyle list-style}))]))
+         {:listStyle list-style})
+       (when data-attribute-cypress
+         {:data-attribute-cypress data-attribute-cypress}))]))
 
 (defn radio-selection [{:keys [update! label name show-option options error warning element-id] :as field}
                        data]
