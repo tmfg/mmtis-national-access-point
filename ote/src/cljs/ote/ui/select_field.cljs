@@ -37,7 +37,7 @@
          (map-indexed
            (fn [i option]
              (if (= :divider option)
-               ^{:key (str "select-field-divider")}
+               ^{:key (str "select-field-divider-" i)}
                [ui/divider]
                ^{:key (str "select-field-menuitem-" (show-option option))}
                [ui/menu-item
