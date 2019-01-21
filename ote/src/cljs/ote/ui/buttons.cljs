@@ -4,6 +4,7 @@
             [cljs-react-material-ui.core :refer [color]]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
+            [ote.style.buttons :as style-buttons]
             [ote.ui.common :as common]))
 
 
@@ -45,3 +46,10 @@
    (common/linkify url
                    [ui/flat-button {:label label :primary true}]
                    {:target "_blank"})])
+
+(defn icon-button
+  [opts label]
+  [:button.unstyled-button (merge
+             opts
+             (stylefy/use-style style-buttons/svg-button))
+   label])

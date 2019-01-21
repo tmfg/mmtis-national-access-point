@@ -205,14 +205,14 @@ describe('Should add new associated service to Normal users "Terminaali Oy" and 
     });
 
     it('Should add a new associated service', function () {
-        cy.get('input[data-cypress=chip-input]').type('t');
+        cy.get('input[data-attribute-cypress=chip-input]').type('t');
         cy.contains('Taksi - Ajopalvelu Testinen').click();
         cy.get('li[data-cypress-op-id=1]');
     });
 
     it('Should delete added associated service', function() {
         cy.get('li[data-cypress-op-id=1]').should('exist');
-        cy.get('input[data-cypress=chip-input]').type('{backspace}{backspace}');
+        cy.get('button[data-cypress-delete=1]').click();
         cy.get('li[data-cypress-op-id=1]').should('not.exist');
     })
 });

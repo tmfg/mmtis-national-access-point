@@ -233,7 +233,7 @@
    [:hr {:style {:border-bottom "0"}}]])
 
 (defn- added-associations
-  [a-services oa-services state]
+  [e! a-services oa-services state]
   [:div
    [:h4 (tr [:own-services-page :other-service-associations])]
    (if (empty? a-services)
@@ -250,21 +250,34 @@
      [:span (stylefy/use-style style-base/gray-text)
       (tr [:own-services-page :no-own-asscoiations] {:operator-name
                                                      (::t-operator/name (:transport-operator state))})]
-     [:ul.unstyled
+     [:ul.unstyled {:style {:display "inline-block"}}
       (doall
         (for [as oa-services]
           [:li {:key (:service-id as)
                 :data-cypress-op-id (:service-id as)}
-           (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))])])
+           [:div {:style {:display "flex"
+                           :align-items "center"
+                           :justify-content "space-between"
+                           :padding "0.25rem 0"}}
+            (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")
+            [buttons/icon-button
+             (merge
+               {:on-click #(e! (os-controller/->RemoveSelection (:service-id as)))}
+               {:data-cypress-delete (:service-id as)})
+             [ic/content-clear]]]]))])])
 
 (defn- add-associated-services
   [e! state]
   (let [suggestions (filter :service-id (:suggestions (:service-search state)))
         associated (::t-operator/associated-services (:transport-operator state))
         associated-ids (set (map :service-id associated))
+        own-associated-ids (set (map :service-id (get-in state [:transport-operator ::t-operator/own-associations])))
         cur-op-id (::t-operator/id (:transport-operator state))
         filtered-suggestions (filter
-                               #(and (not (associated-ids (:service-id %))) (not= cur-op-id (:operator-id %)))
+                               #(and
+                                  (not (associated-ids (:service-id %)))
+                                  (not= cur-op-id (:operator-id %))
+                                  (not (own-associated-ids (:service-id %))))
                                suggestions)
         current-operator (::t-operator/id (:transport-operator state))
         show-error? (:association-failed state)]
@@ -273,11 +286,10 @@
        [warning-msg/warning-msg [:span (tr [:common-texts :save-failure])]])
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :search-services])
        :full-width? true
        :full-width-input? false
        :data-attribute-cypress "chip-input"
-       :hint-text (tr [:own-services-page :service])
+       :hint-text (tr [:own-services-page :associated-search-hint])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
        :filter (constantly true)
@@ -299,12 +311,12 @@
                          chip)
        :on-request-delete (fn [chip-val]
                             (e! (os-controller/->RemoveSelection chip-val)))}
-      (::t-operator/own-associations (:transport-operator state))]]))
+      nil]]))                                               ;We don't want to display the chips in the chip input
 
 (defn- associated-services
   [e! state]
   (let [a-services (::t-operator/associated-services (:transport-operator state))
-        oa-services (::t-operator/own-associations (:transport-operator state))]
+        oa-services (sort #(compare (:service-operator %1) (:service-operator %2)) (::t-operator/own-associations (:transport-operator state)))]
     [:div {:class "col-xs-12"
            :style {:margin-bottom "3rem"}}
      [:h3 (tr [:own-services-page :other-services-where-involved])]
@@ -312,7 +324,7 @@
       (tr [:common-texts :instructions])
       [:p (tr [:own-services-page :filling-info-content])]
       false]
-     [added-associations a-services oa-services state]
+     [added-associations e! a-services oa-services state]
      [add-associated-services e! state]]))
 
 (defn- operator-info-container
