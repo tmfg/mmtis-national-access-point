@@ -66,6 +66,14 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
+(defn jj [db service-id]
+  (try
+    (first (specql/fetch db :gtfs/detection-service-route-type
+                         #{:gtfs/route-hash-id-type}
+                         {:gtfs/transport-service-id service-id}))
+    (catch Exception e
+      (println "error " e)))
+  )
 
 (define-service-component TransitVisualization {}
 
@@ -81,6 +89,9 @@
                                                    java.sql.Date/valueOf))]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
           :changes changes
+          :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
+                                                   #{:gtfs/route-hash-id-type}
+                                                   {:gtfs/transport-service-id service-id}))
           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
   ^{:unauthenticated true :format :transit}

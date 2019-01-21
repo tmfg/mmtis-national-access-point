@@ -169,7 +169,8 @@
          :service-info (:service-info response)
          :changes-all (:changes response)
          :changes (update (:changes response) :gtfs/route-changes (comp sorted-route-changes (partial future-changes package-detection-date)))
-         :gtfs-package-info (:gtfs-package-info response)))
+         :gtfs-package-info (:gtfs-package-info response)
+         :route-hash-id-type (:route-hash-id-type response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
   {:path [:transit-visualization]}
