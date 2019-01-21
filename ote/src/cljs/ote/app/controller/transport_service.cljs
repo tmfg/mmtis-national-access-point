@@ -58,10 +58,9 @@
   {}
   (let [type (get-in app [:transport-service ::t-service/type])
         type-key (t-service/service-key-by-type type)]
-  (cond-> app
-          (when (not select-type)) (assoc :show-brokering-service-dialog? false)
-          true (assoc-in [:transport-service :show-brokering-service-dialog?] false )
-          true (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
+  (-> app
+      (assoc-in [:transport-service :show-brokering-service-dialog?] false )
+      (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
 
 ;;; Navigation hook events for new service creation and editing
 
