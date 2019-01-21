@@ -43,10 +43,11 @@
                                  :keys [show-delete-modal?]
                                  :as service}]
   [:span
-   [ui/icon-button {:href "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (ts/->DeleteTransportService id)))}
+   [ui/icon-button (merge {:href "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts/->DeleteTransportService id)))}
+                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -96,9 +97,10 @@
              [:span.draft
               (tr [:field-labels :transport-service ::t-service/published?-values false])])]
           [ui/table-row-column
-           [ui/icon-button {:href "#" :on-click #(do
-                                                   (.preventDefault %)
-                                                   (e! (fp/->ChangePage :edit-service {:id id})))}
+           [ui/icon-button (merge {:href "#" :on-click #(do
+                                                          (.preventDefault %)
+                                                          (e! (fp/->ChangePage :edit-service {:id id})))}
+                                  (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
             [ic/content-create]]
            [delete-service-action e! row]]])
        services))])
@@ -233,45 +235,63 @@
    [:hr {:style {:border-bottom "0"}}]])
 
 (defn- added-associations
-  [a-services oa-services state]
+  [e! a-services oa-services state]
   [:div
    [:h4 (tr [:own-services-page :other-service-associations])]
    (if (empty? a-services)
-     (if (empty? oa-services)
-       [:span (stylefy/use-style style-base/gray-text)
-        (tr [:own-services-page :no-associations] {:operator-name
-                                                   (::t-operator/name (:transport-operator state))})]))
-   [:ul.unstyled
-    (doall
-      (for [as a-services]
-        [:li {:key (:service-id as)}
-         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]
-   [:ul.unstyled
-    (doall
-      (for [as oa-services]
-        [:li {:key (:service-id as)}
-         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]])
+     [:span (stylefy/use-style style-base/gray-text)
+      (tr [:own-services-page :no-associations] {:operator-name
+                                                 (::t-operator/name (:transport-operator state))})]
+     [:ul.unstyled
+      (doall
+        (for [as a-services]
+          [:li {:key (:service-id as)}
+           (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))])
+   [:h4 (tr [:own-services-page :added-services])]
+   (if (empty? oa-services)
+     [:span (stylefy/use-style style-base/gray-text)
+      (tr [:own-services-page :no-own-asscoiations] {:operator-name
+                                                     (::t-operator/name (:transport-operator state))})]
+     [:ul.unstyled {:style {:display "inline-block"}}
+      (doall
+        (for [as oa-services]
+          [:li {:key (:service-id as)
+                :id (str "service-id-" (:service-id as))}
+           [:div {:style {:display "flex"
+                           :align-items "center"
+                           :justify-content "space-between"
+                           :padding "0.25rem 0"}}
+            (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")
+            [buttons/icon-button
+             (merge
+               {:on-click #(e! (os-controller/->RemoveSelection (:service-id as)))
+                :id (str "delete-service-" (:service-id as))})
+             [ic/content-clear]]]]))])])
 
 (defn- add-associated-services
   [e! state]
   (let [suggestions (filter :service-id (:suggestions (:service-search state)))
         associated (::t-operator/associated-services (:transport-operator state))
         associated-ids (set (map :service-id associated))
+        own-associated-ids (set (map :service-id (get-in state [:transport-operator ::t-operator/own-associations])))
         cur-op-id (::t-operator/id (:transport-operator state))
         filtered-suggestions (filter
-                               #(and (not (associated-ids (:service-id %))) (not= cur-op-id (:operator-id %)))
+                               #(and
+                                  (not (associated-ids (:service-id %)))
+                                  (not= cur-op-id (:operator-id %))
+                                  (not (own-associated-ids (:service-id %))))
                                suggestions)
         current-operator (::t-operator/id (:transport-operator state))
         show-error? (:association-failed state)]
-    [:div
+    [:div {:style {:margin-top "1rem"}}
      (if show-error?
        [warning-msg/warning-msg [:span (tr [:common-texts :save-failure])]])
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :added-services])
        :full-width? true
        :full-width-input? false
-       :hint-text (tr [:own-services-page :search-services])
+       :element-id "chip-input"
+       :hint-text (tr [:own-services-page :associated-search-hint])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
        :filter (constantly true)
@@ -290,15 +310,13 @@
                                (:operator-business-id chip)
                                current-operator
                                (:service-operator chip)))
-                         chip)
-       :on-request-delete (fn [chip-val]
-                            (e! (os-controller/->RemoveSelection chip-val)))}
-      (::t-operator/own-associations (:transport-operator state))]]))
+                         chip)}
+      nil]]))                                               ;We don't want to display the chips in the chip input so we pass nil
 
 (defn- associated-services
   [e! state]
   (let [a-services (::t-operator/associated-services (:transport-operator state))
-        oa-services (::t-operator/own-associations (:transport-operator state))]
+        oa-services (sort #(compare (:service-operator %1) (:service-operator %2)) (::t-operator/own-associations (:transport-operator state)))]
     [:div {:class "col-xs-12"
            :style {:margin-bottom "3rem"}}
      [:h3 (tr [:own-services-page :other-services-where-involved])]
@@ -306,7 +324,7 @@
       (tr [:common-texts :instructions])
       [:p (tr [:own-services-page :filling-info-content])]
       false]
-     [added-associations a-services oa-services state]
+     [added-associations e! a-services oa-services state]
      [add-associated-services e! state]]))
 
 (defn- operator-info-container

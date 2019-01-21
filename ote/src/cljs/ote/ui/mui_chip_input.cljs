@@ -82,6 +82,5 @@
                         ; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).
                         (when (empty? (:value props))
                           {:chipContainerStyle {:margin-top 0}})
-
                         ;; Remove custom prop to prevent Reactunknown prop warning
                         (dissoc props :auto-select?))])})))

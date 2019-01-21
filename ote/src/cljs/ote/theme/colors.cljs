@@ -15,7 +15,6 @@
 (def red-basic "#DD0000")
 (def orange-basic "#FF8800")
 
-
 (def primary blue)
 (def primary-light blue-light)
 (def secondary gray900)

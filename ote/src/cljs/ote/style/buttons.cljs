@@ -43,3 +43,8 @@
           ::stylefy/mode {:hover outline-btn-hover-focus
                           :focus outline-btn-hover-focus}}))
 
+(def svg-button
+  {:background-color "transparent"
+   :border "none"
+   :cursor "pointer"
+   ::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]})

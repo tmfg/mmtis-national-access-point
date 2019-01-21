@@ -51,6 +51,10 @@
    {:rel "mask-icon" :href "/favicon/safari-pinned-tab.svg?v=E6jNQXq6yK" :color "#5bbad5"}
    {:rel "shortcut icon" :href "/favicon/favicon.ico?v=E6jNQXq6yK"}])
 
+(def dev-favicons
+  [{:rel "icon" :type "image/png" :sizes "32x32" :href "/favicon/favicon-dev-32x32.png"}
+   {:rel "icon" :type "image/png" :sizes "16x16" :href "/favicon/favicon-dev-16x16.png"}])
+
 (defn translations [language]
   [:script#ote-translations {:type "x-ote-translations"}
    (transit/clj->transit
@@ -65,13 +69,16 @@
 
 (defn index-page [db user config]
   (let [dev-mode? (:dev-mode? config)
+        production-env? (:production-env? config)
         ga-conf (:ga config)
         flags (str/join "," (map name (:enabled-features config)))]
     [:html
      [:head
-
-      (for [f favicons]
-        [:link f])
+      (if production-env?
+        (for [f favicons]
+          [:link f]))
+        (for [f dev-favicons]
+          [:link f])
       [:meta {:name "theme-color" :content "#ffffff"}]
       [:meta {:name    "viewport"
               :content "width=device-width, initial-scale=1.0"}]

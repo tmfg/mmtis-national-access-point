@@ -568,22 +568,23 @@
           :parking "Allmänna kommersiella parkeringstjänster"
           :brokerage "Förmedlingstjänst"}
 
- :own-services-page {:own-services "Egna tjänsteuppgifter"
+ :own-services-page {:added-services "Tjänster du anmälts delaktig i"
+                     :add-service "Lägg till en tjänst"
+                     :associated-search-hint "Lisää osallistumistieto kirjoittamalla palvelun tai palveluntuottajan nimi"
+                     :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
                      :filling-info "Täyttöohje"
-                     :filling-info-content (:md "**Tjänster du anmälts delaktig i** \nIfall det finns tjänster på listan nedan har något företag anmält ditt företag (FO-nummer) som delaktig i tjänsten. Ifall uppgifterna är felaktiga vänligen kontakta ifrågavarnde tjänsteproducent.\n\n**Lägg till tjänst**\nIfall tjänster saknas på listan (tex taxiförmedlingscentral), skriv den saknade tjänsteproducentens eller tjänstens namn vid **Tjänster du anmälts delaktig i** Välj därefter rätt alternativ i listan. Ifall du av misstag väljer fel ta bort valet med kruxet. Ifall du inte hittar en tjänst du är delaktig i ta då kontakt med **NAP-Helpdesk**: 029 534 6705 (vardagar kl 9-15) eller joukkoliikenne@traficom.fi\n\nOm du även erbjuder egna tjänster utöver förmedlingscentralens utbud lägg då till en egen tjänst vid **Egna tjänster**.")
+                     :filling-info-content (:md "**Muiden lisäämät osallistumistiedot** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Osallistumistietojen lisääminen itse**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita hakukenttään joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi\n\nMikäli ajat välityskeskuksen kyytien lisäksi myös omia kyytejä tai tarjoat muita liikkumispalveluita, lisää myös oma palvelu tai palveluita NAP:iin kohdassa **Omat palvelut**.")
+                     :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]
+                     :no-own-asscoiations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
                      :other-services-where-involved "Muut palvelut, joissa olet mukana"
                      :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
                      :open-geojson "Öppna geojson"
+                     :own-services "Egna tjänsteuppgifter"
                      :own-services-info-long (:md " Med knappen **Lägg till ny tjänst** kan du lägga till **detaljerade uppgifter om din tjänst **.\n\n Ifall du endast erbjuder tjänster via tex en taxicentral kan du hoppa över denna punkt. Välj i såfall en eller flera tjänster vid **Övriga tjänster du är delaktig i**. ")
                      :own-services-directions-short "Anvisningar"
                      :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
                      :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
-                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
-                     :search-services "Söka efter tjänsten"
-                     :add-service "Lägg till en tjänst"
-                     :added-services "Tjänster du anmälts delaktig i"
-                     :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
-                     :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]}
+                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

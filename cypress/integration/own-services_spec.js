@@ -186,5 +186,33 @@ describe('Add new service provider', function () {
 
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
     });
+});
 
+describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () {
+    before(function() {
+        cy.normalLogin();
+    });
+
+    beforeEach(function () {
+        // Session cookies will not be cleared before the NEXT test starts
+        cy.preserveSessionOnce();
+
+        cy.visit('/#/own-services');
+    });
+
+    it('Should be in own-services page and have a provider added', function () {
+        cy.get('input[id=chip-input]');  //chip input won't be rendered if there are no service providers
+    });
+
+    it('Should add a new associated service', function () {
+        cy.get('input[id=chip-input]').type('t');
+        cy.contains('Taksi - Ajopalvelu Testinen').click();
+        cy.get('li[id=service-id-1]');
+    });
+
+    it('Should delete added associated service', function() {
+        cy.get('li[id=service-id-1]').should('exist');
+        cy.get('button[id=delete-service-1]').click();
+        cy.get('li[id=service-id-1]').should('not.exist');
+    })
 });

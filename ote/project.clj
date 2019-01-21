@@ -68,7 +68,7 @@
                  [cljsjs/react-leaflet "1.6.5-0" :exclusions [cljsjs/leaflet]]
                  [cljsjs/leaflet "1.2.0-0"]
                  [funcool/bide "1.6.0"] ; URL router
-                 [stylefy "1.0.1"]
+                 [stylefy "1.11.0-beta1"]
                  [cljsjs/leaflet-draw "0.4.12-0"]
                  [cljsjs/nprogress "0.2.0-1"]
                  ;; Note: Sadly, no good clj/cljs library was found. There were good libs only for server-side rendering.
