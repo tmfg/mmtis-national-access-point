@@ -190,7 +190,7 @@ describe('Add new service provider', function () {
 
 describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () {
     before(function() {
-        cy.login('normaluser', 'password')
+        cy.normalLogin();
     });
 
     beforeEach(function () {

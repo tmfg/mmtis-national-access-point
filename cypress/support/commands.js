@@ -65,6 +65,15 @@ Cypress.Commands.add('login', (login, password) => {
     });
 });
 
+Cypress.Commands.add('normalLogin', () => {
+    const username = Cypress.env('NAP_NORMALUSERLOGIN');
+    const password = Cypress.env('NAP_NORMALUSERPWD');
+
+    cy.log(`normalLogin: ${username}`);
+
+    cy.login(username, password);
+});
+
 
 Cypress.Commands.add('logout', () => {
     cy.log(`Logging out`);
