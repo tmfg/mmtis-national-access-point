@@ -455,14 +455,20 @@
                                                    ;; Remove change-date from the route-changes-infos list if it is nil or it is in the past
                                                    (or (nil? change-date)
                                                        (date-in-the-past? (.toLocalDate change-date))))
-                                                 (sort-by :gtfs/change-date route-change-infos)))]
+                                                 (sort-by :gtfs/change-date route-change-infos)))
+        ;; Set change date to future (1 week) if it is nil or it is too far in the future
+        new-change-date (if (or
+                              (nil? (:gtfs/change-date earliest-route-change))
+                              (.isAfter (.toLocalDate (:gtfs/change-date earliest-route-change)) (.plusDays (java.time.LocalDate/now) 30)))
+                          (sql-date (.plusDays (java.time.LocalDate/now) 7))
+                          (:gtfs/change-date earliest-route-change))]
     #_(debug-print-change-stats all-routes route-changes type)
     (specql/upsert! db :gtfs/transit-changes
                     #{:gtfs/transport-service-id :gtfs/date}
                     {:gtfs/transport-service-id service-id
 
                      :gtfs/date today
-                     :gtfs/change-date (:gtfs/change-date earliest-route-change)
+                     :gtfs/change-date new-change-date
                      :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
                      :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
 
