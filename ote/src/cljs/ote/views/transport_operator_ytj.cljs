@@ -43,7 +43,7 @@
                                                            service-vector))]
   (when (:show-delete-dialog? operator)
     [ui/dialog
-     {:id "delete-transport-operator-dialog"
+     {:id (str "delete-transport-operator-dialog-" (::t-operator/id operator))
       :open    true
       :title   (tr [:dialog :delete-transport-operator :title])
       :actions [(r/as-element
