@@ -50,6 +50,6 @@
 (defn icon-button
   [opts label]
   [:button.unstyled-button (merge
-             opts
-             (stylefy/use-style style-buttons/svg-button))
+             (stylefy/use-style style-buttons/svg-button)
+             opts)
    label])
