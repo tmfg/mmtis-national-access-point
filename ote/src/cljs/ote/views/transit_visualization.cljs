@@ -430,15 +430,15 @@
                                        (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                  :row-selected?   #(= % selected-route)}
     [{:name "Reitti" :width "30%"
-      :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
+      :read (juxt :route-short-name :route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
      {:name "Reitti/määränpää" :width "20%"
-      :read :gtfs/trip-headsign}
+      :read :trip-headsign}
 
      {:name "Aikaa 1. muutokseen"
       :width "20%"
-      :read :gtfs/different-week-date
+      :read :different-week-date
       :format (fn [different-week-date]
                 (if-not different-week-date
                   [labeled-icon [ic/navigation-check] "Ei muutoksia"]
@@ -450,8 +450,8 @@
 
      {:name "Muutokset" :width "30%"
       :read identity
-      :format (fn [{change-type :gtfs/change-type :as route-changes}]
-                (case change-type
+      :format (fn [{change-type :change-type :as route-changes}]
+                (case (keyword change-type)
                   :no-traffic
                   [labeled-icon
                    [ic/av-not-interested]
@@ -801,7 +801,7 @@
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-        [route-changes e! (:gtfs/route-changes changes) selected-route]]]
+        [route-changes e! changes selected-route]]]
 
       (when selected-route
         [:div.transit-visualization-route.container

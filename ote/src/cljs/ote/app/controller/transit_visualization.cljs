@@ -16,9 +16,9 @@
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
   [route]
-  (if (:gtfs/route-hash-id route)
-    (:gtfs/route-hash-id route)
-    (str (:gtfs/route-short-name route) "-" (:gtfs/route-long-name route) "-" (:gtfs/trip-headsign route))))
+  (if (:route-hash-id route)
+    (:route-hash-id route)
+    (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
 (def hash-colors
   ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
@@ -83,10 +83,10 @@
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [changes]
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
-        removed-in-past (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(and (= :removed (:gtfs/change-type %)) (nil? (:gtfs/change-date %))) changes))
-        no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(= :no-change (:gtfs/change-type %)) changes))
-        only-changes (filterv :gtfs/change-date changes)
-        sorted-changes (sort-by (juxt :gtfs/different-week-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
+        removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
+        no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
+        only-changes (filterv :change-date changes)
+        sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) only-changes)
         all-sorted-changes (concat sorted-changes no-changes)]
     all-sorted-changes))
 
@@ -163,13 +163,14 @@
   (days-to-first-diff start-date date->hash))
 
 (define-event LoadServiceChangesForDateResponse [response package-detection-date]
-  {:path [:transit-visualization]}
-    (assoc app
-         :service-changes-for-date-loading? false
-         :service-info (:service-info response)
-         :changes-all (:changes response)
-         :changes (update (:changes response) :gtfs/route-changes (comp sorted-route-changes (partial future-changes package-detection-date)))
-         :gtfs-package-info (:gtfs-package-info response)))
+              {:path [:transit-visualization]}
+              (assoc app
+                :service-changes-for-date-loading? false
+                :service-info (:service-info response)
+                :changes-all (:changes response)
+                ;:changes (update (:changes response) :gtfs/route-change (comp sorted-route-changes (partial future-changes package-detection-date)))
+                :changes (sorted-route-changes (future-changes package-detection-date (:changes response)))
+                :gtfs-package-info (:gtfs-package-info response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
   {:path [:transit-visualization]}
