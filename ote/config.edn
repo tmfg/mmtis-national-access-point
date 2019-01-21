@@ -10,7 +10,7 @@
         :auth-tkt {:shared-secret "localdev"
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}
-        ;:session {:key "cookie0123456789"}
+        :session {:key "cookie0123456789"}
         :ssl-upgrade {:port 3080
                       :ip "localhost"
                       :url "http://localhost:3000/"}
