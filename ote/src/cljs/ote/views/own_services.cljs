@@ -256,7 +256,7 @@
       (doall
         (for [as oa-services]
           [:li {:key (:service-id as)
-                :data-cypress-op-id (:service-id as)}
+                :id (str "service-id-" (:service-id as))}
            [:div {:style {:display "flex"
                            :align-items "center"
                            :justify-content "space-between"
@@ -264,8 +264,8 @@
             (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")
             [buttons/icon-button
              (merge
-               {:on-click #(e! (os-controller/->RemoveSelection (:service-id as)))}
-               {:data-cypress-delete (:service-id as)})
+               {:on-click #(e! (os-controller/->RemoveSelection (:service-id as)))
+                :id (str "delete-service-" (:service-id as))})
              [ic/content-clear]]]]))])])
 
 (defn- add-associated-services
@@ -290,7 +290,7 @@
       {:type :chip-input
        :full-width? true
        :full-width-input? false
-       :data-attribute-cypress "chip-input"
+       :element-id "chip-input"
        :hint-text (tr [:own-services-page :associated-search-hint])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
@@ -310,10 +310,8 @@
                                (:operator-business-id chip)
                                current-operator
                                (:service-operator chip)))
-                         chip)
-       :on-request-delete (fn [chip-val]
-                            (e! (os-controller/->RemoveSelection chip-val)))}
-      nil]]))                                               ;We don't want to display the chips in the chip input
+                         chip)}
+      nil]]))                                               ;We don't want to display the chips in the chip input so we pass nil
 
 (defn- associated-services
   [e! state]

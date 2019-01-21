@@ -358,7 +358,7 @@
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex
                                       on-blur on-update-input on-request-add on-request-delete
-                                      max-length style list-style hint-style hint-text
+                                      max-length style element-id list-style hint-style hint-text
                                       filter suggestions data-attribute-cypress suggestions-config default-values max-results
                                       auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
@@ -381,6 +381,7 @@
         :hintText (or hint-text (placeholder field data))
         :disabled disabled?
         :value chips
+        :id element-id
         ;; == Autocomplete options ==
         :dataSource suggestions
         :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
@@ -388,7 +389,6 @@
         :open-on-focus open-on-focus?
         :clear-on-blur clear-on-blur?
         :auto-select? auto-select?
-
         ;; == Chip options ==
         :allow-duplicates allow-duplicates?
         ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
@@ -429,9 +429,7 @@
        (when style
          {:style style})
        (when list-style
-         {:listStyle list-style})
-       (when data-attribute-cypress
-         {:data-attribute-cypress data-attribute-cypress}))]))
+         {:listStyle list-style}))]))
 
 (defn radio-selection [{:keys [update! label name show-option options error warning element-id] :as field}
                        data]
