@@ -74,11 +74,11 @@
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
        (let [service-id (Long/parseLong service-id)
-             changes (service-changes-for-date db
-                                               service-id
-                                               (-> date
-                                                   time/parse-date-iso-8601
-                                                   java.sql.Date/valueOf))]
+             changes (detected-changes-for-date db
+                                                {:service-id service-id
+                                                 :date (-> date
+                                                     time/parse-date-iso-8601
+                                                     java.sql.Date/valueOf)})]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
           :changes changes
           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))

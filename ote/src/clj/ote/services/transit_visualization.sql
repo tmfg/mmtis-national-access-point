@@ -188,3 +188,13 @@ SELECT p.id, p.created,
   JOIN "external-interface-description" eid ON p."external-interface-description-id" = eid.id
  WHERE p."transport-service-id" = :service-id AND p."deleted?" = FALSE
  ORDER BY p.created DESC;
+
+-- name: detected-changes-for-date
+SELECT c.date, c."added-routes", c."removed-routes", c."changed-routes", c."no-traffic-routes", c."current-week-date",
+       c."different-week-date", c."change-date", r."route-short-name", r."route-long-name", r."trip-headsign",
+       r."change-type", r."added-trips", r."removed-trips", r."trip-stop-sequence-changes", r."trip-stop-time-changes",
+       r."current-week-date", r."different-week-date", r."change-date", r."route-hash-id"
+ FROM "gtfs-transit-changes" c
+ JOIN "gtfs-route-change" r ON c.date = r."transit-change-date" AND c."transport-service-id" = r."transit-service-id"
+ WHERE c."transport-service-id" = :service-id
+   AND c.date = :date::DATE;
