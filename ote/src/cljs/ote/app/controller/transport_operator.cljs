@@ -160,8 +160,8 @@
   (let [nap-ops-for-bid (filter #(= (get-in % [:transport-operator ::t-operator/business-id]) bid) nap-ops)]
     (filter
       (fn [ytj-item]
-        (not (some (fn [nap-item]
-                     (= (::t-operator/name nap-item) (::t-operator/name (:transport-operator ytj-item)))) ytj-ops)))
+        (not-any? (fn [nap-item]
+                    (= (::t-operator/name nap-item) (::t-operator/name (:transport-operator ytj-item)))) ytj-ops))
       nap-ops-for-bid)))
 
 ;; Resolves nap metadata for ytj-fetched companies, e.g. what already exist in nap
@@ -191,13 +191,13 @@
         ytj-address-visiting (address-of-type 2 (:addresses response))
         use-ytj-addr-visiting? ytj-business-id-hit?
         ytj-contact-phone (preferred-ytj-field ["Puhelin" "Telefon" "Telephone"] (:contactDetails response))
-        use-ytj-phone? (not (empty? ytj-contact-phone))
+        use-ytj-phone? (seq ytj-contact-phone)
         ytj-contact-gsm (preferred-ytj-field ["Matkapuhelin" "Mobiltelefon" "Mobile phone"] (:contactDetails response))
-        use-ytj-gsm? (not (empty? ytj-contact-gsm))
+        use-ytj-gsm? (seq ytj-contact-gsm)
         ;ytj-contact-email Not read because not known in what field it is available
         use-ytj-email? false
         ytj-contact-web (preferred-ytj-field ["Kotisivun www-osoite" "www-adress" "Website address"] (:contactDetails response))
-        use-ytj-web? (not (empty? ytj-contact-web))
+        use-ytj-web? (seq ytj-contact-web)
         ytj-company-names (mark-menuitems (compose-ytj-company-names app response))
         ytj-changed-contact-input-fields? (and ytj-business-id-hit?
                                                (or (not= ytj-address-billing (::t-operator/billing-address t-op))
