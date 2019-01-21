@@ -43,10 +43,11 @@
                                  :keys [show-delete-modal?]
                                  :as service}]
   [:span
-   [ui/icon-button {:href "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (ts/->DeleteTransportService id)))}
+   [ui/icon-button (merge {:href "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts/->DeleteTransportService id)))}
+                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -96,9 +97,10 @@
              [:span.draft
               (tr [:field-labels :transport-service ::t-service/published?-values false])])]
           [ui/table-row-column
-           [ui/icon-button {:href "#" :on-click #(do
-                                                   (.preventDefault %)
-                                                   (e! (fp/->ChangePage :edit-service {:id id})))}
+           [ui/icon-button (merge {:href "#" :on-click #(do
+                                                          (.preventDefault %)
+                                                          (e! (fp/->ChangePage :edit-service {:id id})))}
+                                  (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
             [ic/content-create]]
            [delete-service-action e! row]]])
        services))])
