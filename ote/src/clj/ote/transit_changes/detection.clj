@@ -7,7 +7,8 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [ote.util.collections :refer [map-by count-matching]]
-            [ote.util.functor :refer [fmap]])
+            [ote.util.functor :refer [fmap]]
+            [ote.db.tx :as tx])
   (:import (java.time LocalDate DayOfWeek)))
 
 (def ^:const no-traffic-detection-threshold
@@ -455,23 +456,39 @@
                                                        (date-in-the-past? (.toLocalDate change-date))))
                                                  (sort-by :gtfs/change-date route-change-infos)))]
     #_(debug-print-change-stats all-routes route-changes type)
-    (specql/upsert! db :gtfs/transit-changes
-                    #{:gtfs/transport-service-id :gtfs/date}
-                    {:gtfs/transport-service-id service-id
+    (tx/with-transaction db
+                         (specql/upsert! db :gtfs/transit-changes
+                                         #{:gtfs/transport-service-id :gtfs/date}
+                                         {:gtfs/transport-service-id service-id
 
-                     :gtfs/date today
-                     :gtfs/change-date (:gtfs/change-date earliest-route-change)
-                     :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
-                     :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
+                                          :gtfs/date today
+                                          :gtfs/change-date (:gtfs/change-date earliest-route-change)
+                                          :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
+                                          :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
 
-                     :gtfs/removed-routes (:removed change-count-by-type 0)
-                     :gtfs/added-routes (:added change-count-by-type 0)
-                     :gtfs/changed-routes (:changed change-count-by-type 0)
-                     :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
-                     :gtfs/route-changes route-change-infos
+                                          :gtfs/removed-routes (:removed change-count-by-type 0)
+                                          :gtfs/added-routes (:added change-count-by-type 0)
+                                          :gtfs/changed-routes (:changed change-count-by-type 0)
+                                          :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
+                                          ;:gtfs/old-route-change route-change-infos
 
-                     :gtfs/package-ids package-ids
-                     :gtfs/created (java.util.Date.)})))
+                                          :gtfs/package-ids package-ids
+                                          :gtfs/created (java.util.Date.)})
+                         (doseq [r route-change-infos]
+                           (let [update-count (specql/update! db :gtfs/route-change
+                                                              (merge {:gtfs/transit-change-date (sql-date today)
+                                                                      :gtfs/transit-service-id service-id
+                                                                      :gtfs/created-date (java.util.Date.)}
+                                                                     r)
+                                                              {:gtfs/transit-change-date (sql-date today)
+                                                               :gtfs/transit-service-id service-id
+                                                               :gtfs/route-hash-id (:gtfs/route-hash-id r)})]
+                             (when (not= 1 update-count)
+                               (specql/insert! db :gtfs/route-change
+                                               (merge {:gtfs/transit-change-date (sql-date today)
+                                                       :gtfs/transit-service-id service-id
+                                                       :gtfs/created-date (java.util.Date.)}
+                                                      r))))))))
 
 (defn override-static-holidays [date-route-hashes]
   (map (fn [{:keys [date] :as row}]
@@ -524,14 +541,13 @@
     (try
       {:all-routes all-routes
        :route-changes
-                   (-> routes-by-date
-                       ;; Create week hashes so we can find out the differences between weeks
-                       (combine-weeks)
-                       ;; Search next week (for every route) that is different
-                       (next-different-weeks)
-                       (as-> routes
-                             ;; Fetch detailed route comparison if a change was found
-                             (route-day-changes db service-id routes)))}
+       (->> routes-by-date
+            ;; Create week hashes so we can find out the differences between weeks
+            (combine-weeks)
+            ;; Search next week (for every route) that is different
+            (next-different-weeks)
+            ;; Fetch detailed route comparison if a change was found
+            (route-day-changes db service-id))}
       (catch Exception e
         (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
@@ -551,17 +567,29 @@
                                       (specql/columns :gtfs/transit-changes)
                                       {:gtfs/transport-service-id service-id})]
     (for [t transit-changes]
-      (let [route-changes (:gtfs/route-changes t)
+      (let [route-changes (specql/fetch db :gtfs/route-change
+                                        (specql/columns :gts/route-change)
+                                        {:gtfs/transit-change-date (:gtfs/date transit-changes)
+                                         :gtfs/transit-service-id service-id})
             chg-routes (map (fn [x]
                               (update x :gtfs/route-hash-id #(update-hash % x))) route-changes)]
         (do
           (specql/update! db :gtfs/transit-changes
                           {:gtfs/transport-service-id service-id
-                           :gtfs/date                 (:gtfs/date t)
-                           :gtfs/route-changes        chg-routes}
+                           :gtfs/date (:gtfs/date t)
+                           ;:gtfs/old-route-change        chg-routes
+                           }
                            ;; where
                            {:gtfs/transport-service-id service-id
                             :gtfs/date (:gtfs/date t)})
+          (doseq [r route-changes]
+            (specql/update! db :gtfs/route-change
+                            r
+                            {:gtfs/transport-service-id service-id
+                             :gtfs/transit-change-date (:gtfs/date t)
+                             :gtfs/route-short-name (:gtfs/route-short-name r)
+                             :gtfs/route-long-name (:gtfs/route-long-name r)
+                             :gtfs/trip-headsign (:gtfs/trip-headsign r)}))
           (println "service id " service-id "date " (:gtfs/date t)))))))
 
 ;;Use only in local environment and for debugging purposes!
