@@ -412,7 +412,7 @@
       [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
        body-content]])])
 
-(defn route-changes [e! route-changes selected-route]
+(defn route-changes [e! route-changes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         table-height (cond
                        (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
@@ -433,8 +433,12 @@
       :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
-     {:name "Reitti/määränpää" :width "20%"
-      :read :gtfs/trip-headsign}
+     ;; Show Reitti/Määrämpää column only if it does affect on routes.
+     (when (or (nil? route-hash-id-type)
+               (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
+               (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign"))
+       {:name "Reitti/määränpää" :width "20%"
+        :read :gtfs/trip-headsign})
 
      {:name "Aikaa 1. muutokseen"
       :width "20%"
@@ -785,7 +789,7 @@
               ^{:key id}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections route-hash-id-type]
                                  :as   transit-visualization}]
   [:div
      [:div.transit-visualization
@@ -801,7 +805,7 @@
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-        [route-changes e! (:gtfs/route-changes changes) selected-route]]]
+        [route-changes e! (:gtfs/route-changes changes) selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container

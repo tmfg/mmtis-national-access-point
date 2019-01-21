@@ -66,7 +66,6 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
@@ -81,6 +80,9 @@
                                                    java.sql.Date/valueOf))]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
           :changes changes
+          :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
+                                                   #{:gtfs/route-hash-id-type}
+                                                   {:gtfs/transport-service-id service-id}))
           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
   ^{:unauthenticated true :format :transit}
