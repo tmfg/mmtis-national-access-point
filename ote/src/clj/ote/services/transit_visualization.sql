@@ -162,20 +162,15 @@ SELECT ts.name AS "transport-service-name",
 -- name: fetch-route-differences
 -- single?: true
 -- Fetch the differences in the given route for the given dates
-SELECT gtfs_route_differences(
-          :route-short-name, :route-long-name, :trip-headsign, :route-hash-id,
+SELECT gtfs_route_differences(:route-hash-id,
           (SELECT tripdata
                      FROM gtfs_route_trips_for_date(
                             gtfs_service_packages_for_date(:service-id::INTEGER, :date1::DATE), :date1::DATE) trips
-            WHERE COALESCE(trips."route-short-name", '') = COALESCE(:route-short-name, '')
-              AND COALESCE(trips."route-long-name", '') = COALESCE(:route-long-name, '')
-              AND COALESCE(trips."trip-headsign", '') = COALESCE(:trip-headsign, '')),
+            WHERE trips."route-hash-id" = :route-hash-id),
           (SELECT tripdata
                      FROM gtfs_route_trips_for_date(
                             gtfs_service_packages_for_date(:service-id::INTEGER, :date2::DATE), :date2::DATE) trips
-            WHERE COALESCE(trips."route-short-name", '') = COALESCE(trips."route-short-name", '')
-              AND COALESCE(trips."route-long-name", '') = COALESCE(:route-long-name, '')
-              AND COALESCE(trips."trip-headsign", '') = COALESCE(:trip-headsign, '')))::TEXT;
+            WHERE trips."route-hash-id" = :route-hash-id))::TEXT;
 
 
 -- name: fetch-gtfs-packages-for-service

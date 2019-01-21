@@ -384,16 +384,10 @@
                          {:date2 date
                           :last-selected-date 2}))]
     (comm/get! (str "transit-visualization/" service-id "/route-differences")
-               {:params (merge
-                         {:date1 (time/format-date-iso-8601 (:date1 compare))
-                          :date2 (time/format-date-iso-8601 (:date2 compare))
-                          :route-hash-id (ensure-route-hash-id route)}
-                         (when-let [short (:gtfs/route-short-name route)]
-                           {:short-name short})
-                         (when-let [long (:gtfs/route-long-name route)]
-                           {:long-name long})
-                         (when-let [headsign (:gtfs/trip-headsign route)]
-                           {:headsign headsign}))
+               {:params {:date1 (time/format-date-iso-8601 (:date1 compare))
+                         :date2 (time/format-date-iso-8601 (:date2 compare))
+                         :route-hash-id (ensure-route-hash-id route)}
+
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
     (-> app
         (assoc-in [:transit-visualization :route-differences-loading?] true)

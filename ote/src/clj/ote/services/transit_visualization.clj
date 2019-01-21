@@ -130,7 +130,4 @@
                          {:service-id (Long/parseLong service-id)
                           :date1 (time/parse-date-iso-8601 date1)
                           :date2 (time/parse-date-iso-8601 date2)
-                          :route-short-name short-name
-                          :route-long-name long-name
-                          :trip-headsign headsign
                           :route-hash-id route-hash-id}))))
