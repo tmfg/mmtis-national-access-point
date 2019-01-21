@@ -1034,7 +1034,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :send-pre-notice
   {:title "Skicka ändringsmeddelandet?"
-   :confirm "Då ändringsmeddelandet har skickats, kan det inte längre ändras. Är du säker på att du vill skicka ändringsmeddelandet till myndigheten?"}}
+   :confirm "Då ändringsmeddelandet har skickats, kan det inte längre ändras. Är du säker på att du vill skicka ändringsmeddelandet till myndigheten?"}
+
+  :brokering-service
+  {:title "Oletko varma, että ilmoittamasi palvelu on välityspalvelu?"
+   :body (:md "Huomioithan, että sinun tulee NAP-ilmoituksen lisäksi ilmoittautua Traficomille välityspalveluksi vielä erillisellä lomakkeella [täällä]( https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi). Välityspalveluksi ilmoittautuminen on maksullista.")
+   :cancel "Ei"
+   :ok "Kyllä"}
+  }
 
  :operators
  {:title "Tjänsteproducenter"

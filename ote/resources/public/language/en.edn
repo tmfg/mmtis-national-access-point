@@ -1030,7 +1030,14 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :send-pre-notice
   {:title "Lähetä muutosilmoitus?"
-   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}
+
+  :brokering-service
+  {:title "Are you sure, that the service you are announcing is a brokering service?"
+   :body (:md "Please, notice, that besides filling up the NAP form, you also have to register as a brokering service to the Finnish Transport and Communication Agency, Traficom [here](https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi). Registration as a brokering service is chargeable.")
+   :cancel "No"
+   :ok "Yes"}
+  }
 
  :operators
  {:title "Transport operators"

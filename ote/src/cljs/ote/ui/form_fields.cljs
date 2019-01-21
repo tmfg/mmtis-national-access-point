@@ -841,25 +841,29 @@
                              (when (not (nil? id))
                                {:id (str id "-button")}))]])]))
 
-(defn- checkbox-container [update! table? label warning error style checked? disabled?]
+(defn- checkbox-container [update! table? label warning error style checked? disabled? on-click]
   [:div (when error (stylefy/use-style style-base/required-element))
-   [ui/checkbox {:label    (when-not table? label)
+   [ui/checkbox
+    (merge
+    {:label    (when-not table? label)
                  :checked  (boolean checked?)
                  :on-check #(update! (not checked?))
                  :disabled disabled?
-                 :style    style}]
+                 :style    style}
+    (when on-click
+      {:on-click #(on-click)}))]
    (when error
      (tr [:common-texts :required-field]))])
 
-(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help disabled?]} checked?]
+(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help disabled? on-click]} checked?]
   (if extended-help
     [:div {:style {:margin-right (str "-" (:margin-right style-form/form-field))}}
      [common/extended-help
       (:help-text extended-help)
       (:help-link-text extended-help)
       (:help-link extended-help)]
-     (checkbox-container update! table? label warning error style checked? disabled?)]
-    (checkbox-container update! table? label warning error style checked? disabled?)))
+     (checkbox-container update! table? label warning error style checked? disabled? on-click)]
+    (checkbox-container update! table? label warning error style checked? disabled? on-click)))
 
 (defmethod field :checkbox-group [{:keys
                                    [update! table? label show-option options
