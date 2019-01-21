@@ -66,15 +66,6 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-(defn jj [db service-id]
-  (try
-    (first (specql/fetch db :gtfs/detection-service-route-type
-                         #{:gtfs/route-hash-id-type}
-                         {:gtfs/transport-service-id service-id}))
-    (catch Exception e
-      (println "error " e)))
-  )
-
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
