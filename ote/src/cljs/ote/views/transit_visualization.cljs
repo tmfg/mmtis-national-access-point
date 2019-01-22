@@ -414,10 +414,12 @@
 
 (defn route-changes [e! route-changes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
-        table-height (cond
-                       (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
-                       (= 0 route-count) 100
-                       :else 500)]; 10+
+        table-height (str
+                       (cond
+                         (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
+                         (= 0 route-count) 100
+                         :else 500)
+                       "px")]; 10+
   [:div.route-changes
    [route-changes-legend]
    [table/table {:no-rows-message (tr [:transit-visualization-page :loading-routes])
@@ -583,7 +585,7 @@
                                     (comp :gtfs/stop-name first :stoptimes second)
                                     (comp :gtfs/stop-name last :stoptimes second))
                               combined-trips)]
-      [:div.routes-table {:style {:margin-top "1em"}}
+      [:div.trips-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
                      :on-select #(e! (tv/->SelectTripPair (first %)))}
