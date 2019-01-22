@@ -333,7 +333,7 @@
   :parsing-success ["I listan hittades " :count " företag."]}
 
  :companies-csv
- {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."}
+ {:invalid "CSV-filen är bristfällig eller innehåller fel."}
 
  ;; Action buttons
  :buttons
