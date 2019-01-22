@@ -1020,7 +1020,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :delete-transport-operator
   {:title "Want to delete a transport operator?"
-   :title-base-view "Palveluntuottajan poistaminen"
+   :title-base-view "Deleting of the service provider"
    :confirm ["Are you sure you want to delete operator named \"" :name "\" permanently?"]}
 
   :navigation-prompt
@@ -1034,8 +1034,10 @@ You can also draw the operating area or point to the map with drawing tools. You
    :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}
 
   :brokering-service
-  {:title "Are you sure, that the service you are announcing is a brokering service?"
-   :body (:md "Please, notice, that besides filling up the NAP form, you also have to register as a brokering service to the Finnish Transport and Communication Agency, Traficom [here](https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi). Registration as a brokering service is chargeable.")
+  {:title "Is the service you are announcing a brokering service?"
+   :body "Please, notice, that besides filling up the NAP form, you also have to register as a brokering service to the Finnish Transport and Communication Agency, Traficom. Registration as a brokering service is chargeable."
+   :link-text "Sign up for a brokerage service for Traficom"
+   :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "No"
    :ok "Yes"}
   }

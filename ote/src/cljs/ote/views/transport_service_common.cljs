@@ -409,20 +409,23 @@
         {:id "brokering-service-dialog"
          :open true
          :title (tr [:dialog :brokering-service :title])
-         :actions [(r/as-element
-                     [ui/flat-button
-                      {:label (tr [:dialog :brokering-service :cancel])
-                       :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService false))}])
+         :actions [
                    (r/as-element
-                     [ui/raised-button
+                     [ui/flat-button
                       {:id "confirm-brokering-service"
                        :label (tr [:dialog :brokering-service :ok])
-                       :icon (ic/action-check-circle)
                        :secondary true
                        :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService true))}])]}
-        [:p (tr [:dialog :brokering-service :body])]])
+                       :on-click #(e! (ts/->SelectBrokeringService true))}])
+                   (r/as-element
+                     [ui/raised-button
+                      {:label (tr [:dialog :brokering-service :cancel])
+                       :primary true
+                       :on-click #(e! (ts/->SelectBrokeringService false))}])]}
+        [:p (tr [:dialog :brokering-service :body])]
+        [:p (linkify (tr [:dialog :brokering-service :link-url])
+                     (tr [:dialog :brokering-service :link-text])
+                     {:target "_blank"})]])
 
      ;show-footer? - Take owner check away for now
      (when true

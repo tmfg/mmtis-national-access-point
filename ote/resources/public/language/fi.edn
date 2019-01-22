@@ -1045,8 +1045,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}
 
   :brokering-service
-  {:title "Oletko varma, että ilmoittamasi palvelu on välityspalvelu?"
-   :body (:md "Huomioithan, että sinun tulee NAP-ilmoituksen lisäksi ilmoittautua Traficomille välityspalveluksi vielä erillisellä lomakkeella [täällä]( https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi). Välityspalveluksi ilmoittautuminen on maksullista.")
+  {:title "Onko ilmoittamasi palvelu varmasti välityspalvelu?"
+   :body "Huomioithan, että sinun tulee NAP-ilmoituksen lisäksi ilmoittautua Traficomille välityspalveluksi vielä erillisellä lomakkeella. Välityspalveluksi ilmoittautuminen on maksullista."
+   :link-text "Ilmoittaudu välityspalvelun tarjoajaksi Traficomille"
+   :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "Ei"
    :ok "Kyllä"}
   }
