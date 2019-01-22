@@ -139,13 +139,7 @@
                        (.setTimeout
                          js/window
                          (fn []
-                           (send-startup-events (vec (concat event-leave event-to)))
-
-                           (when-not dev-mode?
-                             (js/gtag "config"
-                                      ga-tracking-code
-                                      #js {"anonymize_ip" true
-                                           "page_path" (subs js/window.location.hash 1)})))
+                           (send-startup-events (vec (concat event-leave event-to))))
                          0))
                      app)))
                app)))))
