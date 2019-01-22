@@ -292,8 +292,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION gtfs_route_differences(
-     "route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT, "route-hash-id" TEXT,
+CREATE OR REPLACE FUNCTION gtfs_route_differences("route-hash-id" TEXT,
      d1_trips "gtfs-package-trip-info"[], d2_trips "gtfs-package-trip-info"[])
 RETURNS "gtfs-route-change-info"
 AS $$
@@ -392,9 +391,9 @@ BEGIN
 
   --RAISE NOTICE 'yli jäi d1: % ja d2: % vuoroa', array_length(d1_trip_ids, 1), array_length(d2_trip_ids, 2);
 
-  route_changes."route-short-name" := "route-short-name";
-  route_changes."route-long-name" := "route-long-name";
-  route_changes."trip-headsign" := "trip-headsign";
+  route_changes."route-short-name" := null; --"route-short-name";
+  route_changes."route-long-name" := null; --"route-long-name";
+  route_changes."trip-headsign" := null; --"trip-headsign";
   route_changes."route-hash-id" := "route-hash-id";
   route_changes."added-trips" := COALESCE(array_length(d2_trip_ids,1), 0);
   route_changes."removed-trips" := COALESCE(array_length(d1_trip_ids,1), 0);

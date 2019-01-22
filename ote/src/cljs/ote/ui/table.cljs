@@ -19,6 +19,7 @@
                      label-style
                      row-style show-row-hover?
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
+  (let [random-table-id (str "tid-"(rand-int 999))]
   [ui/table (merge
               {:wrapperStyle {:overflow "visible"}
                ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
@@ -36,13 +37,17 @@
                  :fixed-header true})
               (when class
                 {:class class}))
-   [ui/table-header {:style {:overflow "visible" :background-color (color :grey300)}
-                     :adjust-for-checkbox false :display-select-all false}
-    [ui/table-row {:style {:overflow "visible"}
+   [ui/table-header {:key (str random-table-id "-header")
+                     :style {:overflow "visible" :background-color (color :grey300)}
+                     :adjust-for-checkbox false
+                     :display-select-all false}
+    [ui/table-row {:key (str random-table-id "-header-row")
+                   :style {:overflow "visible"}
                    :selectable false}
      (doall
-       (for [{:keys [name width tooltip tooltip-pos tooltip-len]} headers]
-         ^{:key (str name)}
+       (map-indexed
+       (fn [i {:keys [name width tooltip tooltip-pos tooltip-len]}]
+         ^{:key (str i "-" name "-header-column")}
          [ui/table-header-column {:style
                                   (merge
                                     (when width
@@ -55,7 +60,8 @@
                                     label-style)}
           (name->label name)
           (when tooltip
-            [tooltip-icon {:text tooltip :pos tooltip-pos :len tooltip-len}])]))]]
+            [tooltip-icon {:text tooltip :pos tooltip-pos :len tooltip-len}])])
+       headers))]]
    [ui/table-body {:display-row-checkbox false
                    :show-row-hover (boolean show-row-hover?)}
     (if (empty? rows)
@@ -64,7 +70,7 @@
       (doall
         (map-indexed
           (fn [i row]
-            ^{:key (if key-fn (key-fn row) i)}
+            ^{:key (if key-fn (key-fn row) (str i "-" random-table-id "-body-row"))}
             [ui/table-row {:selectable     (boolean on-select)
                            :selected       (if row-selected? (row-selected? row) false)
                            :display-border false
@@ -75,9 +81,10 @@
                                              (when row-style row-style))}
 
              (doall
-               (for [{:keys [name width col-style format read]} headers
-                     :let [value ((or format identity) (if read (read row) (get row name)))]]
-                 ^{:key (str name "-" i)}
+               (map-indexed
+                 (fn [i {:keys [name width col-style format read]}]
+                   (let [value ((or format identity) (if read (read row) (get row name)))]
+                 ^{:key (str i "-" random-table-id "-row-col-" name)}
                  [ui/table-row-column {:style (merge
                                                 {:white-space "pre-wrap"
                                                  :overflow "visible"}
@@ -90,5 +97,6 @@
                     (string? value)
                     value
 
-                    :else (str value))]))])
-          rows)))]])
+                    :else (str value))]))
+                 headers))])
+          rows)))]]))
