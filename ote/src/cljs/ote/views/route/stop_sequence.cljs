@@ -14,7 +14,8 @@
             [ote.style.form :as style-form]
             [stylefy.core :as stylefy]
             [ote.db.transport-service :as t-service]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.style.dialog :as style-dialog]))
 
 
 (def stop-marker-style
@@ -43,14 +44,15 @@
     (when (:custom-stop-dialog route)
       [ui/dialog
        {:open true
+        :actionsContainerStyle style-dialog/dialog-action-container
         :modal true
         :title (tr [:route-wizard-page :stop-sequence-custom-dialog-title])
         :actions [(r/as-element
-                   [ui/flat-button
-                    {:disabled (str/blank? name-str)
-                     :label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
-                     :primary true
-                     :on-click #(e! (rw/->CloseCustomStopDialog))}])]}
+                    [ui/flat-button
+                     {:disabled (str/blank? name-str)
+                      :label (tr [:route-wizard-page :stop-sequence-custom-dialog-add])
+                      :primary true
+                      :on-click #(e! (rw/->CloseCustomStopDialog))}])]}
        [:span
         [form-fields/field {:style {:margin-bottom "5px"}
                             :type :localized-text

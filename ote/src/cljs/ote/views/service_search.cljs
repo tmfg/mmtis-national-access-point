@@ -23,7 +23,8 @@
             [ote.ui.validation :as validation]
             [ote.util.text :as text]
             [ote.ui.page :as page]
-            [ote.app.utils :as utils]))
+            [ote.app.utils :as utils]
+            [ote.style.dialog :as style-dialog]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -37,6 +38,7 @@
    (when show-delete-modal?
      [ui/dialog
       {:open true
+       :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
                    [ui/flat-button

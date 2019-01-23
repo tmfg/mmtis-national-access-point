@@ -26,7 +26,8 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.style.base :as style-base]
-            [ote.ui.common :as uicommon]))
+            [ote.ui.common :as uicommon]
+            [ote.style.dialog :as style-dialog]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -44,24 +45,25 @@
   (when (:show-delete-dialog? operator)
     [ui/dialog
      {:id (str "delete-transport-operator-dialog-" (::t-operator/id operator))
-      :open    true
-      :title   (tr [:dialog :delete-transport-operator :title])
+      :open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title (tr [:dialog :delete-transport-operator :title])
       :actions [(r/as-element
                   [ui/flat-button
-                   {:label    (tr [:buttons :cancel])
-                    :primary  true
+                   {:label (tr [:buttons :cancel])
+                    :primary true
                     :on-click #(e! toggle-dialog)}])
                 (r/as-element
                   [ui/raised-button
                    {:id "confirm-operator-delete"
-                    :label     (tr [:buttons :delete])
-                    :icon      (ic/action-delete-forever)
+                    :label (tr [:buttons :delete])
+                    :icon (ic/action-delete-forever)
                     :secondary true
-                    :primary   true
-                    :disabled  (if (empty? operator-services)
-                                 false
-                                 true)
-                    :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}])]}
+                    :primary true
+                    :disabled (if (empty? operator-services)
+                                false
+                                true)
+                    :on-click #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}])]}
      [:div
       (if (empty? operator-services)
         (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})

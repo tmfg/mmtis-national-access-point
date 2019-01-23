@@ -17,7 +17,8 @@
             [ote.style.pre-notice :as styles]
             [ote.ui.form-fields :as form-fields]
             [ote.views.service-search :as service-search]
-            [ote.style.service-search :as style-service-search]))
+            [ote.style.service-search :as style-service-search]
+            [ote.style.dialog :as style-dialog]))
 
 (defn region-name [region-code]
   (let [region-case #(case %
@@ -95,16 +96,17 @@
     [ui/dialog
      {:id "pre-notice-dialog"
       :open true
+      :actionsContainerStyle style-dialog/dialog-action-container
       :modal true
       :auto-scroll-body-content true
-      :title   (tr [:pre-notice-list-page :pre-notice-dialog :label])
+      :title (tr [:pre-notice-list-page :pre-notice-dialog :label])
       :actions [(r/as-element
-                 [ui/flat-button
-                  {:id        "close-pre-notice-dialog"
-                   :label     (tr [:buttons :close])
-                   :secondary true
-                   :primary   true
-                   :on-click  #(e! (pre-notice/->ClosePreNotice))}])]}
+                  [ui/flat-button
+                   {:id "close-pre-notice-dialog"
+                    :label (tr [:buttons :close])
+                    :secondary true
+                    :primary true
+                    :on-click #(e! (pre-notice/->ClosePreNotice))}])]}
 
      [:div.pre-notice-dialog
       (into [common/table2]

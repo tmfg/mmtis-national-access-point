@@ -36,7 +36,8 @@
             [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
             [clojure.string :as str]
-            [ote.app.controller.front-page :as fp]))
+            [ote.app.controller.front-page :as fp]
+            [ote.style.dialog :as style-dialog]))
 
 
 (defn delete-service-action [e! {::t-service/keys [id name]
@@ -52,6 +53,7 @@
    (when show-delete-modal?
      [ui/dialog
       {:open true
+       :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
                    [ui/flat-button
