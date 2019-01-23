@@ -202,6 +202,7 @@
     [:div {:style {:margin-bottom "2rem"}}
      [:a (merge {:href (str "#/transport-operator/" id)
                  :style {:margin-right "2rem"}
+                 :id "edit-transport-operator-btn"
                  :on-click #(do
                               (.preventDefault %)
                               (e! (fp/->ChangePage :transport-operator {:id id})))}
