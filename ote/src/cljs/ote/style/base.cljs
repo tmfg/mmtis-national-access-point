@@ -43,15 +43,12 @@
                           ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/primary)
                                                   :margin-bottom "-1px"}}})
 
-(def base-button (merge
-                   {:padding-left "1.1em"
-                         :padding-right "1.1em"
-                         :text-transform "uppercase"
-                         :color "#FFFFFF"
-                         :background-color "#1565C0"
-                         :font-size "12px"
-                         :font-weight "bold"}
-                   blue-link-with-icon))
+(def base-button
+  {:padding-left "1.1em"
+   :padding-right "1.1em"
+   :text-transform "uppercase"
+   :font-size "12px"
+   :font-weight "bold"})
 
 (def delete-button (merge base-button {:background-color "rgb(221,0,0)"}))
 

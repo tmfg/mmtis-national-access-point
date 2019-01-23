@@ -32,7 +32,7 @@
    :height "60px"                                           ;; Hard coded so the height doesn't change with transitions
    :min-width "4rem"
    :display "inline-block"
-   :justify-content "center"
+   :text-align "center"
    :transition "all 200ms ease"
    :text-decoration "none"
    :box-shadow "4px 4px 8px 0 rgba(0, 0, 0, .2)"
