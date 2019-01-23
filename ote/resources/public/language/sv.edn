@@ -571,13 +571,13 @@
  :own-services-page {:added-services "Tjänster du anmälts delaktig i"
                      :add-service "Lägg till en tjänst"
                      :associated-search-hint "Lisää osallistumistieto kirjoittamalla palvelun tai palveluntuottajan nimi"
-                     :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
+                     :edit-business-id ["Fyll i uppgifter gällande FO-nummer " :business-id]
                      :filling-info "Täyttöohje"
                      :filling-info-content (:md "**Muiden lisäämät osallistumistiedot** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Osallistumistietojen lisääminen itse**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita hakukenttään joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi\n\nMikäli ajat välityskeskuksen kyytien lisäksi myös omia kyytejä tai tarjoat muita liikkumispalveluita, lisää myös oma palvelu tai palveluita NAP:iin kohdassa **Omat palvelut**.")
                      :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]
-                     :no-own-asscoiations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
-                     :other-services-where-involved "Muut palvelut, joissa olet mukana"
-                     :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
+                     :no-own-associations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
+                     :other-services-where-involved "Tjänster du anmälts delaktig i"
+                     :other-service-associations "Muiden lisäämät osallistumistiedot"
                      :open-geojson "Öppna geojson"
                      :own-services "Egna tjänsteuppgifter"
                      :own-services-info-long (:md " Med knappen **Lägg till ny tjänst** kan du lägga till **detaljerade uppgifter om din tjänst **.\n\n Ifall du endast erbjuder tjänster via tex en taxicentral kan du hoppa över denna punkt. Välj i såfall en eller flera tjänster vid **Övriga tjänster du är delaktig i**. ")
