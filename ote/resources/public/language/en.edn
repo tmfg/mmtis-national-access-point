@@ -570,11 +570,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :filling-info "Filling instructions"
                      :filling-info-content (:md "**Palvelut, joiden tuottamiseen osallistut** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Palvelun lisääminen**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita kohtaan **Lisätyt palvelut** joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi\n\nMikäli ajat välityskeskuksen kyytien lisäksi myös omia kyytejä tai tarjoat muita liikkumispalveluita, lisää myös oma palvelu tai palveluita NAP:iin kohdassa **Omat palvelut**.")
                      :no-associations [:operator-name " isn't reported as an associate to any other service."]
-                     :no-own-asscoiations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
+                     :no-own-associations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
                      :open-geojson "Open GeoJson"
-                     :other-services-where-involved "Muut palvelut, joissa olet mukana"
-                     :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
-                     :own-services "Own transport services"
+                     :other-services-where-involved "Services produced by other companies in which you are involved in"
+                     :other-service-associations "Muiden lisäämät osallistumistiedot"
+                     :own-services "Own services"
                      :own-services-info-long (:md "By clicking the button **Add a new service** you can give more detailed information of the transport service you are providing. If you do not provide any of your **own** transport services directly to customers (e.g. you only operate rides through a brokering centre), you can skip this part and go directly to the section **Other services in which you are involved in.**")
                      :own-services-directions-short "Instructions"
                      :own-services-new-provider1 "Well done! You have now successfully added a service provider "
@@ -678,15 +678,15 @@ You can also draw the operating area or point to the map with drawing tools. You
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
   :help-ytj-integration-desc "The service provider information is received from the Business Information System (BIS) on the basis of the Business ID. If the information is incorrect or incomplete, you can make changes to it in the _BIS service_. Changes made in the BIS service (e.g. changing the street address or registering a new auxiliary trade name) will appear on this page after they are registered in the BIS register."
-  :heading-operator-edit "Change the previously created service provider names"
-  :help-operator-edit "You have previously created one or more service providers in the NAP service, whose names do not match to the business name or auxiliary names registered to your Business ID. Please, select a name from the drop-down menu to replace the name of the service provider you have previously created."
-  :business-id-heading "Business id:"
+  :heading-operator-edit "Change previously created service provider names"
+  :help-operator-edit "In the list below you can see the business name and auxiliary names registered to your Business ID. Please, select only the names from the list which to you want to release services in the NAP service."
+  :business-id-heading "Business ID:"
   :help-operator-edit-selection "In the list below you can see the business name and auxiliary names registered to your Business ID. Please, select only the names from the list which to you want to release services in the NAP service."
-  :help-operator-contact-entry (:md "The contact information below are Business ID specific, which means that they are the **same for the Business name and for every auxiliary name**. Contact information is retrieved from the BIS and can not be edited in the NAP service. If there are any errors or omissions in the information, you can make changes to it in the BIS service. For empty contact fields, you have two choices. 1) Complete the information to the BIS register, after which they are also available in the NAP service (recommended). 2) Complete the information directly into the form fields below (the information given will be stored only in the NAP service - it  will not transfer to the BIS register).")
-  :help-operator-how-delete (:md "To remove the service provider information from the NAP service, click the **Delete service provider** -button. Deleting the service provider is possible only when service provider doesen't have any published services in the NAP service. If you want to delete the service provider, please, first delete all the transport services on the **Own transport services** page.")
+  :help-operator-contact-entry (:md "The contact information below are Business ID specific, which means that they are the **same for the Business name and for every auxiliary name**. Contact information is retrieved from the BIS register and cannot be edited in the NAP service. If there are any errors or omissions in the information, you can make changes to it in the BIS service. For empty contact fields, you have two choices. 1) Complete the information to the BIS register, after which they are also available in the NAP service (recommended). 2) Complete the information directly into the form fields below (the information given will be stored only in the NAP service - it  will not transfer to the BIS register).")
+  :help-operator-how-delete (:md "For removing the service provider information from the NAP service, click the **Delete service provider** button. Deleting the service provider is possible only when service provider doesn't have any published services in the NAP service. If you want to delete the service provider, please, first delete all the transport services on the **Own transport services** page.")
   :help-about-ytj-link-desc "Read more about Business Information System (BIS)"
   :help-about-ytj-link "https://www.ytj.fi/en/index/whatisbis.html"
-  :help-ytj-contact-change-link-desc "Change details of your business online"
+  :help-ytj-contact-change-link-desc "Change details of your business in the Business Information System (BIS)"
   :help-ytj-contact-change-link "https://www.ytj.fi/en/index/notifications/notificationsofchanges.html"
   :merge-operator-to-ytj "will be renamed as"
   }
@@ -922,7 +922,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:loading-routes "Loading service routes."}
 
  :common-texts
- {:check-your-input "Please check that the details you entered are correct."
+ {:check-your-input "Please check that the information you have given is correct."
   :front-page-help-text "You have not yet registered any transport services to NAP-service catalog.
         You can register an external interface about your service or essential data about your service by using
         the NAP-service which is developed for this purpose."

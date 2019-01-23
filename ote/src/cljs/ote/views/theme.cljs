@@ -8,7 +8,9 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.front-page :as fp-controller]
             [datafrisk.core :as df]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [datafrisk.core :as df]
+            [ote.ui.buttons :as buttons]))
 
 (defn- flash-message-error [e! msg]
   [ui/snackbar {:open (boolean msg)
@@ -86,13 +88,9 @@
                 :open true
                 :actionsContainerStyle style-dialog/dialog-action-container
                 :actions [(r/as-element
-                            [ui/flat-button {:label (tr :stay)
-                                             :primary true
-                                             :on-click #(e! (fp-controller/->StayOnPage))}])
+                            [buttons/save {:on-click #(e! (fp-controller/->StayOnPage))} (tr :stay)])
                           (r/as-element
-                            [ui/flat-button {:label (tr :leave)
-                                             :secondary true
-                                             :on-click #(e! confirm)}])]}
+                            [buttons/cancel {:on-click #(e! confirm)} (tr :leave)])]}
      msg]))
 
 (defn theme

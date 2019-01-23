@@ -37,7 +37,8 @@
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
     ::t-operator/name})
 
-(defn get-transport-operator [db where-parameter]
+(defn get-transport-operator
+  [db where-parameter]
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
         operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
@@ -52,18 +53,16 @@
         (assoc ::t-operator/associated-services associated-to-services-others)
         (assoc ::t-operator/own-associations own-associations)))))
 
-(defn edit-transport-operator [db user transport-operator-id]
+(defn authenticated-get-operator-with-id [db user transport-operator-id]
   (authorization/with-transport-operator-check
     db user transport-operator-id
     #(do
-       (let [operator (first (fetch db ::t-operator/transport-operator
-                     (specql/columns ::t-operator/transport-operator)
+       (let [ckan-group-id (first (fetch db ::t-operator/transport-operator
+                     #{::t-operator/ckan-group-id}
                      {::t-operator/id transport-operator-id}
                      {::specql/limit 1}))]
-         (when operator
-           (assoc operator ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
-                                                               db {:id (::t-operator/ckan-group-id operator)})
-                                                             "")))))))
+         (when ckan-group-id
+           (get-transport-operator db ckan-group-id))))))
 
 (def transport-services-column-keys
   {:id ::t-service/id
@@ -497,18 +496,26 @@
 (defn- save-associated-operator
   "Save association between transport service and transport operator"
   [db user-id service-id operator-id]
-  (http/transit-response
-    (specql/insert! db ::t-service/associated-service-operators
-                    {::t-service/service-id service-id
-                     ::t-service/operator-id operator-id
-                     ::t-service/user-id user-id})))
+  (try
+    (http/transit-response
+      (specql/insert! db ::t-service/associated-service-operators
+                      {::t-service/service-id service-id
+                       ::t-service/operator-id operator-id
+                       ::t-service/user-id user-id}))
+    (catch Exception e
+      (log/info (str "Association save failed with service: " service-id " and user: " user-id))
+      {:status 409 :body "Forbidden"})))
 
 (defn- delete-associated-operator
   "remove association between trasport service and transport operator"
   [db service-id operator-id]
-  (http/transit-response (specql/delete! db ::t-service/associated-service-operators
-                                         {::t-service/service-id service-id
-                                          ::t-service/operator-id operator-id})))
+  (try
+    (http/transit-response (specql/delete! db ::t-service/associated-service-operators
+                                           {::t-service/service-id service-id
+                                            ::t-service/operator-id operator-id}))
+    (catch Exception e
+      (log/info (str "Delete association failed with service: " service-id " and operator: " operator-id))
+      {:status 404 :body "Association not found"})))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -523,7 +530,7 @@
             (http/no-cache-transit-response ts))))
 
       (GET "/t-operator/:id" [id :as {user :user}]
-        (let [to (edit-transport-operator db user (Long/parseLong id))]
+        (let [to (authenticated-get-operator-with-id db user (Long/parseLong id))]
           (if-not to
             {:status 404}
             (http/no-cache-transit-response to))))
@@ -587,9 +594,7 @@
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
       (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
-
-    ))
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
 
 (defrecord Transport [config]
   component/Lifecycle

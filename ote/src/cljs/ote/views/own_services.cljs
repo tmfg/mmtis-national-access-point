@@ -56,18 +56,14 @@
        :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
-                   [ui/flat-button
-                    {:label (tr [:buttons :cancel])
-                     :primary true
-                     :on-click #(e! (ts/->CancelDeleteTransportService id))}])
+                   [buttons/cancel
+                    {:on-click #(e! (ts/->CancelDeleteTransportService id))}
+                    (tr [:buttons :cancel])])
                  (r/as-element
-                   [ui/raised-button
-                    {:label (tr [:buttons :delete])
-                     :icon (ic/action-delete-forever)
-                     :secondary true
-                     :primary true
-                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}])]}
-
+                   [buttons/delete
+                    {:icon (ic/action-delete-forever)
+                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}
+                    (tr [:buttons :delete])])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 (defn transport-services-table-rows [e! services transport-operator-id]
@@ -204,6 +200,7 @@
     [:div {:style {:margin-bottom "2rem"}}
      [:a (merge {:href (str "#/transport-operator/" id)
                  :style {:margin-right "2rem"}
+                 :id "edit-transport-operator-btn"
                  :on-click #(do
                               (.preventDefault %)
                               (e! (fp/->ChangePage :transport-operator {:id id})))}
@@ -252,7 +249,7 @@
    [:h4 (tr [:own-services-page :added-services])]
    (if (empty? oa-services)
      [:span (stylefy/use-style style-base/gray-text)
-      (tr [:own-services-page :no-own-asscoiations] {:operator-name
+      (tr [:own-services-page :no-own-associations] {:operator-name
                                                      (::t-operator/name (:transport-operator state))})]
      [:ul.unstyled {:style {:display "inline-block"}}
       (doall

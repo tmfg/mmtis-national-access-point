@@ -34,25 +34,21 @@
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
-      {:open true
+      {:open  true
        :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:route-list-page :delete-dialog-header])
        :actions [(r/as-element
-                   [ui/flat-button
-                    {:label (tr [:buttons :cancel])
-                     :primary true
-                     :on-click #(do
+                   [buttons/cancel
+                    {:on-click #(do
                                   (.preventDefault %)
-                                  (e! (route-list/->CancelDeleteRoute id)))}])
+                                  (e! (route-list/->CancelDeleteRoute id)))}
+                    (tr [:buttons :cancel])])
                  (r/as-element
-                   [ui/raised-button
-                    {:label (tr [:buttons :delete])
-                     :icon (ic/action-delete-forever)
-                     :secondary true
-                     :primary true
-                     :on-click #(do
-                                  (.preventDefault %)
-                                  (e! (route-list/->ConfirmDeleteRoute id)))}])]}
+                   [buttons/delete
+                    {:on-click  #(do
+                                   (.preventDefault %)
+                                   (e! (route-list/->ConfirmDeleteRoute id)))}
+                    (tr [:buttons :delete])])]}
 
       (str (tr [:route-list-page :delete-dialog-remove-route]) (t-service/localized-text-with-fallback @selected-language name))])])
 
