@@ -202,6 +202,7 @@
     [:div {:style {:margin-bottom "2rem"}}
      [:a (merge {:href (str "#/transport-operator/" id)
                  :style {:margin-right "2rem"}
+                 :id "edit-transport-operator-btn"
                  :on-click #(do
                               (.preventDefault %)
                               (e! (fp/->ChangePage :transport-operator {:id id})))}
@@ -250,7 +251,7 @@
    [:h4 (tr [:own-services-page :added-services])]
    (if (empty? oa-services)
      [:span (stylefy/use-style style-base/gray-text)
-      (tr [:own-services-page :no-own-asscoiations] {:operator-name
+      (tr [:own-services-page :no-own-associations] {:operator-name
                                                      (::t-operator/name (:transport-operator state))})]
      [:ul.unstyled {:style {:display "inline-block"}}
       (doall
