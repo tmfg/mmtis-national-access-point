@@ -256,15 +256,17 @@
           :let [package-id (:package-id (first trip-stops))
                 trip-id (:trip-id (first trip-stops))]]
       {:gtfs/package-id package-id
-       :gtfs/trip-id    trip-id
-       :stoptimes       (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon]}]
-                                {:gtfs/stop-id        stop-id
-                                 :gtfs/stop-name      stop-name
-                                 :gtfs/stop-lat       stop-lat
-                                 :gtfs/stop-lon       stop-lon
-                                 :gtfs/stop-sequence  stop-sequence
-                                 :gtfs/departure-time (time/pginterval->interval departure-time)})
-                              trip-stops)})))
+       :gtfs/trip-id trip-id
+       :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon stop-fussy-lat stop-fussy-lon]}]
+                          {:gtfs/stop-id stop-id
+                           :gtfs/stop-name stop-name
+                           :gtfs/stop-lat stop-lat
+                           :gtfs/stop-lon stop-lon
+                           :gtfs/stop-fussy-lat stop-fussy-lat
+                           :gtfs/stop-fussy-lon stop-fussy-lon
+                           :gtfs/stop-sequence stop-sequence
+                           :gtfs/departure-time (time/pginterval->interval departure-time)})
+                        trip-stops)})))
 
 
 (defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
