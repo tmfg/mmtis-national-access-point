@@ -70,7 +70,7 @@
   [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop)])
 
 (defn stop-key-for-stop-list
-  "Use lat, lon and stop-sequence values as stop-key. Otherwise same stop can't be shown twice in stop list."
+  "Use lat, lon and instance values as stop-key. The instance contains information on how many times the stop is in the route."
   [stop]
   [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop) (:instance stop)])
 
