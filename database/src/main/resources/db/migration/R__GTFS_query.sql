@@ -660,7 +660,8 @@ BEGIN
      JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
      JOIN LATERAL unnest(t.trips) trip ON true
     WHERE r."package-id" = package_id
-    GROUP BY r.id, trip."trip-headsign";
+    GROUP BY r.id, trip."trip-headsign"
+       ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -678,7 +679,8 @@ BEGIN
     JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
     JOIN LATERAL unnest(t.trips) trip ON true
    WHERE r."package-id" = package_id
-   GROUP BY r.id, trip."trip-headsign";
+   GROUP BY r.id, trip."trip-headsign"
+      ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -696,7 +698,8 @@ BEGIN
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
      WHERE r."package-id" = package_id
-     GROUP BY r.id, trip."trip-headsign";
+     GROUP BY r.id, trip."trip-headsign"
+        ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -714,7 +717,8 @@ BEGIN
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
      WHERE r."package-id" = package_id
-     GROUP BY r.id, trip."trip-headsign";
+     GROUP BY r.id, trip."trip-headsign"
+        ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -732,7 +736,8 @@ BEGIN
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
      WHERE r."package-id" = package_id
-     GROUP BY r.id, trip."trip-headsign";
+     GROUP BY r.id, trip."trip-headsign"
+        ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
