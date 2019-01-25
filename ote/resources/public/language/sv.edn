@@ -570,21 +570,21 @@
 
  :own-services-page {:added-services "Tjänster du anmälts delaktig i"
                      :add-service "Lägg till en tjänst"
-                     :associated-search-hint "Lisää osallistumistieto kirjoittamalla palvelun tai palveluntuottajan nimi"
+                     :associated-search-hint "Lägg till information om deltagande genom att skriva namnet på tjänsten eller tjänsteproducenten i det här fältet"
                      :edit-business-id ["Fyll i uppgifter gällande FO-nummer " :business-id]
                      :filling-info "Anvisning"
-                     :filling-info-content (:md "**Muiden lisäämät osallistumistiedot** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Osallistumistietojen lisääminen itse**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita hakukenttään joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi\n\nMikäli ajat välityskeskuksen kyytien lisäksi myös omia kyytejä tai tarjoat muita liikkumispalveluita, lisää myös oma palvelu tai palveluita NAP:iin kohdassa **Omat palvelut**.")
-                     :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]
-                     :no-own-associations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
-                     :other-services-where-involved "Tjänster du anmälts delaktig i"
-                     :other-service-associations "Muiden lisäämät osallistumistiedot"
+                     :filling-info-content (:md "*Uppgifter om deltagande som någon annan part fört in** \nOm det under denna rubrik redan finns en lista över tjänster, har de som producerar tjänsterna i fråga meddelat ert företag (FO-numret) i NAP-tjänsten som ett företag som deltar i tillhandahållandet av tjänsten. Om uppgifterna inte är korrekta, ta kontakt med tjänsteproducenten i fråga för att ta bort de felaktiga uppgifterna.\n\n**Lägg till uppgifter om deltagande själv**\nOm det i listan saknas någon sådan relevant tjänst, som du deltar i tillhandahållandet av (t.ex. en förmedlingstjänst för taxitransport), skriv antingen tjänsteproducentens namn eller tjänstens namn i sökfältet. Välj därefter rätt tjänst mellan alternativen som föreslås. Om du i misstag väljer fel tjänst i listan, kan du ta bort den genom att klicka på krysset efter tjänsten. Om du inte hittar mobilitetstjänsten som du deltar i tillhandahållandet av i listan, kontakta ”NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nOm du förutom att köra för en förmedlingstjänst också tillhandahåller egna taxitjänster eller andra mobilitetstjänster, lägg också till den egna tjänsten eller de egna tjänsterna i NAP i fältet **Egna tjänster**.")
+                     :no-associations [:operator-name " har inte anmälts som deltagare i någon annan tjänsteproducents tjänst."]
+                     :no-own-associations ["Du har inte lagt till tjänsteproducenten " :operator-name " som delaktig i någon annan tjänst."]
+                     :other-services-where-involved "Övriga tjänster du deltar i"
+                     :other-service-associations "Tjänster du anmälts delaktigt i"
                      :open-geojson "Öppna geojson"
                      :own-services "Egna tjänsteuppgifter"
                      :own-services-info-long (:md " Med knappen **Lägg till ny tjänst** kan du lägga till **detaljerade uppgifter om din tjänst **.\n\n Ifall du endast erbjuder tjänster via tex en taxicentral kan du hoppa över denna punkt. Välj i såfall en eller flera tjänster vid **Övriga tjänster du är delaktig i**. ")
                      :own-services-directions-short "Anvisningar"
                      :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
                      :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
-                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")}
+                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -1008,7 +1008,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :forbidden "Du har inte behörighet att visa innehållet."
   :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"
-  
+
   :nap-data-license (:md "Informationen Du ger i detta formulär publiceras i NAP-katalogen som öppen data med licensen [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
 
   :save-user-success "Profil sparad"
