@@ -402,7 +402,7 @@ BEGIN
             FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
                          COALESCE(r."trip-headsign",'') AS "trip-headsign",
-                         string_agg(concat(s."stop-fussy-lat",'-',s."stop-fussy-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
+                         string_agg(concat(s."stop-fuzzy-lat",'-',s."stop-fuzzy-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
                          COALESCE(r."route-hash-id", '') as "route-hash-id"
                     FROM "gtfs-trip" t
                     LEFT JOIN "detection-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")

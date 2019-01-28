@@ -257,13 +257,13 @@
                 trip-id (:trip-id (first trip-stops))]]
       {:gtfs/package-id package-id
        :gtfs/trip-id trip-id
-       :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon stop-fussy-lat stop-fussy-lon]}]
+       :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon stop-fuzzy-lat stop-fuzzy-lon]}]
                           {:gtfs/stop-id stop-id
                            :gtfs/stop-name stop-name
                            :gtfs/stop-lat stop-lat
                            :gtfs/stop-lon stop-lon
-                           :gtfs/stop-fussy-lat stop-fussy-lat
-                           :gtfs/stop-fussy-lon stop-fussy-lon
+                           :gtfs/stop-fuzzy-lat stop-fuzzy-lat
+                           :gtfs/stop-fuzzy-lon stop-fuzzy-lon
                            :gtfs/stop-sequence stop-sequence
                            :gtfs/departure-time (time/pginterval->interval departure-time)})
                         trip-stops)})))

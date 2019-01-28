@@ -31,7 +31,7 @@ SELECT * FROM gtfs_service_routes_with_daterange(:service-id::INTEGER);
 -- name: fetch-route-trips-for-date
 SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
-        stop."stop-name", stop."stop-lat", stop."stop-lon", stop."stop-fussy-lat", stop."stop-fussy-lon"
+        stop."stop-name", stop."stop-lat", stop."stop-lon", stop."stop-fuzzy-lat", stop."stop-fuzzy-lon"
   FROM "detection-route" r
   JOIN "gtfs_package" p ON p.id = r."package-id" AND p."deleted?" = FALSE
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
