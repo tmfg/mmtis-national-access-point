@@ -70,9 +70,9 @@
   [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop)])
 
 (defn stop-key-for-stop-list
-  "Use lat, lon and stop-sequence values as stop-key. Otherwise same stop can't be shown twice in stop list."
+  "Use lat, lon and instance values as stop-key. The instance contains information on how many times the stop is in the route."
   [stop]
-  [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop) (:gtfs/stop-sequence stop)])
+  [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop) (:instance stop)])
 
 (defn trip-stop-differences
   "Returns the amount of differences in stop times and stop sequence and stop names for the given trip pair."
@@ -130,6 +130,31 @@
       (nil? minutes-from-midnight2) minutes-from-midnight1
       :default (min minutes-from-midnight1 minutes-from-midnight2))))
 
+(defn format-stop-info
+  "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
+  [[_ stop-times]]
+  {:gtfs/stop-name (str/join "->"
+                             (into #{} (map
+                                         #(str (:gtfs/stop-name %))
+                                         stop-times)))
+   :gtfs/departure-time-date1 (:gtfs/departure-time
+                                (first (filter #(= 1 (:trip %)) stop-times)))
+   :gtfs/departure-time-date2 (:gtfs/departure-time
+                                (first (filter #(= 2 (:trip %)) stop-times)))})
+
+
+(defn normalize-trip-with-instance
+  [trip stop-seq-of-fcs-trip trip-num]
+  (let [normalized (map #(assoc % :trip trip-num)
+                        (normalize-stop-sequence-numbers stop-seq-of-fcs-trip
+                                                         (:stoptimes trip)))
+        stops-by-coords (group-by stop-key normalized)]
+    (apply concat (map (fn [[_ stop]]
+                         (map-indexed (fn [idx single-stop]
+                                        (assoc single-stop :instance (inc idx)))
+                                      stop))
+                       stops-by-coords))))
+
 (defn combined-stop-sequence [first-common-stop [trip1 trip2]]
   (let [stop-seq-of-fcs-trip1 (some #(when (= first-common-stop (:gtfs/stop-name %))
                                        (:gtfs/stop-sequence %))
@@ -137,28 +162,16 @@
         stop-seq-of-fcs-trip2 (some #(when (= first-common-stop (:gtfs/stop-name %))
                                        (:gtfs/stop-sequence %))
                                     (:stoptimes trip2))
-        trip1-normalized-stop-seq (map #(assoc % :trip 1)
-                                       (normalize-stop-sequence-numbers stop-seq-of-fcs-trip1
-                                                                        (:stoptimes trip1)))
-        trip2-normalized-stop-seq (map #(assoc % :trip 2)
-                                       (normalize-stop-sequence-numbers stop-seq-of-fcs-trip2
-                                                                        (:stoptimes trip2)))]
+
+        trip1-normalized (normalize-trip-with-instance trip1 stop-seq-of-fcs-trip1 1)
+
+        trip2-normalized (normalize-trip-with-instance trip2 stop-seq-of-fcs-trip2 2)]
     ;; Combine the same stops!
     (sort-by
       earliest-departure-time
       (sort-by :gtfs/stop-name
-               (mapv (fn [[_ stop-times]]
-                       {:gtfs/stop-name (str/join "->"
-                                                  (into #{} (map
-                                                              #(str (inc (:gtfs/stop-sequence %)) " " (:gtfs/stop-name %))
-                                                              stop-times)))
-                        :gtfs/departure-time-date1 (:gtfs/departure-time
-                                                     (first (filter #(= 1 (:trip %)) stop-times)))
-                        :gtfs/departure-time-date2 (:gtfs/departure-time
-                                                     (first (filter #(= 2 (:trip %)) stop-times)))})
-
-                     (group-by stop-key-for-stop-list
-                               (sort-by :gtfs/stop-sequence (concat trip1-normalized-stop-seq trip2-normalized-stop-seq))))))))
+               (mapv format-stop-info (group-by stop-key-for-stop-list
+                               (sort-by :gtfs/stop-sequence (concat trip1-normalized trip2-normalized))))))))
 
 
 (defn combine-trips [date1-trips date2-trips]
