@@ -305,7 +305,7 @@
                      (if diff
                        ;; If a different week was found, do detailed trip analysis
                        (do
-                         (println "Print differences for route " (pr-str route) (pr-str diff) "\n detection-result: " (pr-str detection-result))
+                         ;(println "Print differences for route " (pr-str route) (pr-str diff) "\n detection-result: " (pr-str detection-result))
                          [route (assoc detection-result
                                   :changes (compare-route-days db service-id route detection-result))])
 
