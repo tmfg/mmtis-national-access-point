@@ -121,7 +121,7 @@
                                            :stop-lat 62.61836475215888,
                                            :stop-lon 29.729402190537932}
                                     #:gtfs{:stop-sequence 8,
-                                           :stop-name "Noljakka L",
+                                           :stop-name "Noljakka S",
                                            :arrival-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0},
                                            :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0},
                                            :stop-lat 62.62736342965559,
@@ -163,7 +163,7 @@
     #:gtfs{:stop-name "Siilainen L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 21, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 21, :seconds 0}}
-    #:gtfs{:stop-name "Noljakka L",
+    #:gtfs{:stop-name "Noljakka S->Noljakka L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0}}
     #:gtfs{:stop-name "Kuusela L",

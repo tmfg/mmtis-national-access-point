@@ -553,10 +553,9 @@
        [comparison-date-changes compare]]]]))
 
 (defn format-stop-name [stop-name]
-  (let [remove-sequence-number #(str/join " " (rest (str/split % #" ")))
-        splitted-stop-name (if (str/includes? stop-name "->")
-                             (str/split (remove-sequence-number stop-name) #"->")
-                             (remove-sequence-number stop-name))
+  (let [splitted-stop-name (if (str/includes? stop-name "->")
+                             (str/split stop-name #"->")
+                             stop-name)
         formatted-name (if (and (vector? splitted-stop-name) (> (count splitted-stop-name) 1))
                          [:span (second splitted-stop-name)
                           [:br] (str "(Vanha nimi: " (first splitted-stop-name) ")")]

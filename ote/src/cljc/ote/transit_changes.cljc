@@ -135,7 +135,7 @@
   [[_ stop-times]]
   {:gtfs/stop-name (str/join "->"
                              (into #{} (map
-                                         #(str (:gtfs/stop-name %))
+                                         #(:gtfs/stop-name %)
                                          stop-times)))
    :gtfs/departure-time-date1 (:gtfs/departure-time
                                 (first (filter #(= 1 (:trip %)) stop-times)))
