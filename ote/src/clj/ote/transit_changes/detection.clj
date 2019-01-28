@@ -358,13 +358,14 @@
    {:keys [no-traffic-start-date no-traffic-end-date
            starting-week different-week no-traffic-run
            changes]}]
-  (let [route (all-routes route-key)
+
+  (let [route-map  (map #(second %) all-routes)
+        route (first (filter #(= route-key (:route-hash-id %)) route-map))
         added? (min-date-in-the-future? route)
         removed? (max-date-within-90-days? route)
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
                              (> no-traffic-run no-traffic-detection-threshold)))
-
         {:keys [starting-week-date different-week-date
                 added-trips removed-trips trip-changes]} changes
         changed? (and starting-week-date different-week-date)
@@ -516,12 +517,12 @@
   (let [service-routes (if (empty? (:route-hash-id (first service-routes)))
                          (add-route-hash-id-as-a-map-key service-routes type)
                          service-routes)]
-    (map-by :route-hash-id service-routes)))
+    (sort-by :route-hash-id (map-by :route-hash-id service-routes))))
 
 (defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
   (let [type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        service-routes (service-routes-with-date-range db {:service-id service-id})
+        service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
         all-routes (map-by-route-key service-routes type)
         all-route-keys (set (keys all-routes))
         ;; Get route hashes from database
