@@ -13,6 +13,7 @@
             [ote.time :as time]
             [ote.util.values :as values]
             [ote.style.form :as style-form]
+            [ote.style.dialog :as style-dialog]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.validation :as validation]
             [stylefy.core :as stylefy]
@@ -20,7 +21,8 @@
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.flags :as flags]
             [ote.ui.form-fields :as form-fields]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [ote.theme.colors :as colors]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -408,21 +410,31 @@
        [ui/dialog
         {:id "brokering-service-dialog"
          :open true
+         :actionsContainerStyle style-dialog/dialog-action-container
          :title (tr [:dialog :brokering-service :title])
-         :actions [(r/as-element
-                     [ui/flat-button
-                      {:label (tr [:dialog :brokering-service :cancel])
-                       :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService false))}])
+         :actions [
                    (r/as-element
-                     [ui/raised-button
+                     [ui/flat-button
                       {:id "confirm-brokering-service"
                        :label (tr [:dialog :brokering-service :ok])
-                       :icon (ic/action-check-circle)
                        :secondary true
                        :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService true))}])]}
-        [:p (tr [:dialog :brokering-service :body])]])
+                       :on-click #(e! (ts/->SelectBrokeringService true))}])
+                   (r/as-element
+                     [ui/raised-button
+                      {:label (tr [:dialog :brokering-service :cancel])
+                       :primary true
+                       :on-click #(e! (ts/->SelectBrokeringService false))}])]}
+        [:p (tr [:dialog :brokering-service :body])]
+        [:div 
+         (linkify (tr [:dialog :brokering-service :link-url])
+                  [:span (stylefy/use-style style-base/blue-link-with-icon)
+                   (ic/content-create {:style {:width 20
+                                               :height 20
+                                               :margin-right "0.5rem"
+                                               :color colors/primary}})
+                    (tr [:dialog :brokering-service :link-text])]
+                  {:target "_blank" :style {:text-decoration "none"}})]])
 
      ;show-footer? - Take owner check away for now
      (when true

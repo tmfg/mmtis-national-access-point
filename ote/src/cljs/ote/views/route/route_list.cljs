@@ -19,7 +19,8 @@
     [reagent.core :as r]
     [ote.ui.list-header :as list-header]
     [ote.style.base :as style-base]
-    [ote.ui.buttons :as buttons]))
+    [ote.ui.buttons :as buttons]
+    [ote.style.dialog :as style-dialog]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
                                   :keys [show-delete-modal?]
@@ -33,8 +34,9 @@
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
-      {:open    true
-       :title   (tr [:route-list-page :delete-dialog-header])
+      {:open  true
+       :actionsContainerStyle style-dialog/dialog-action-container
+       :title (tr [:route-list-page :delete-dialog-header])
        :actions [(r/as-element
                    [buttons/cancel
                     {:on-click #(do

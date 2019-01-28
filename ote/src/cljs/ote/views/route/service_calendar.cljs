@@ -12,7 +12,8 @@
             [ote.ui.form-fields :as form-fields]
             [ote.db.transport-service :as t-service]
             [ote.localization :refer [tr selected-language]]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.style.dialog :as style-dialog]))
 
 (defn rule-fields [calendar]
   (into [{:id "from-date"
@@ -74,6 +75,7 @@
         departure-stop (::transit/name (first stops))]
     [ui/dialog
      {:open true
+      :actionsContainerStyle style-dialog/dialog-action-container
       :content-style {:width "95%" :max-width js/document.body.clientWidth}
       :modal false
       :auto-scroll-body-content true
