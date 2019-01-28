@@ -664,7 +664,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :contact-details "Contact details"
   :contact-details-other "Other contact details "
   :fetch-from-ytj "Fetch data from YTJ"
-  :fetch-from-ytj-success "Details successfully fetched from YTJ."
+  :fetch-from-ytj-success "Details successfully fetched from the BIS register."
   :field-phone-mobile "Mobile phone"
   :field-phone-telephone "Telephone"
   :no-aux-names-for-business-id "There were no auxiliary business names for the business id."
@@ -960,7 +960,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-video-tutorials "Video tutorials for service providers"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basic information"
-  :data-not-found "Data is not found."
+  :data-not-found "Information is not found."
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
@@ -999,7 +999,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :hours-placeholder "hh"
   :minutes-placeholder "mm"
 
-  :server-error "Error in service invocation."
+  :server-error "Error in the service invocation."
   :server-error-try-later "Please try again later."
 
   :forbidden "Forbidden"

@@ -664,15 +664,15 @@
 
 
  :organization-page
- {:address-postal "Post address"
-  :address-postal-street "Post address eller PO Box"
-  :business-id-and-aux-names "Företagsnamn och hjälpnamn"
-  :business-name "Firma"
+ {:address-postal "Postadress"
+  :address-postal-street "Gatuadress eller postbox"
+  :business-id-and-aux-names "Företagsnamn och parallellnamn"
+  :business-name "Företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
   :contact-details-other "Andra kontaktuppgifter"
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
-  :fetch-from-ytj-success "Detaljer hämtade från YTJ."
+  :fetch-from-ytj-success "Uppgifterna har hämtats från YTJ."
   :field-phone-mobile "Mobiltelefon"
   :field-phone-telephone "Telefon"
   :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
@@ -696,7 +696,7 @@
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
   :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
-  :merge-operator-to-ytj "kommer att namnas som"
+  :merge-operator-to-ytj "ersätts med namnet"
   }
 
  :passenger-transportation-page
@@ -970,8 +970,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"
-  :save-failure "Sparade misslyckades."
-  :save-success "Sparad."
+  :save-failure "Går ej att spara."
+  :save-success "Sparat."
   :transport-service-saved "Uppgifterna sparade!"
   :transport-operator-saved "Uppgifterna sparade!"
   :footer-livi-logo "Traficom"
@@ -1003,7 +1003,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Fel i serveranropet."
+  :server-error "Problem i serveranropet."
   :server-error-try-later "Vänligen försök igen senare."
 
   :forbidden "Du har inte behörighet att visa innehållet."
