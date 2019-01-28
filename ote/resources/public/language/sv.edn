@@ -1038,9 +1038,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
    :confirm "Då ändringsmeddelandet har skickats, kan det inte längre ändras. Är du säker på att du vill skicka ändringsmeddelandet till myndigheten?"}
 
   :brokering-service
-  {:title "Onko ilmoittamasi palvelu varmasti välityspalvelu?"
-   :body "Huomioithan, että sinun tulee NAP-ilmoituksen lisäksi ilmoittautua Traficomille välityspalveluksi vielä erillisellä lomakkeella. Välityspalveluksi ilmoittautuminen on maksullista."
-   :link-text "Ilmoittaudu välityspalvelun tarjoajaksi Traficomille"
+  {:title "Är du säker på att tjänsten som du anmält är en förmedlingstjänst?"
+   :body "Observera att du utöver anmälan i NAP-tjänsten också måste göra en anmälan om förmedlingstjänst till Traficom på en skild blankett. Anmälan om förmedlingstjänst är avgiftsbelagd. "
+   :link-text "Anmäl till Traficom att du tillhandahåller en förmedlingstjänst"
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "Nej"
    :ok "Ja"}
