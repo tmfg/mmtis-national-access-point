@@ -320,7 +320,8 @@
 
 (defn- max-date-within-90-days? [{max-date :max-date}]
   (and max-date
-       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 90))))
+       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 90))
+       (.isAfter (.toLocalDate max-date) (.minusDays (java.time.LocalDate/now) 1)))) ; minus 1 day so we are sure the current day is still calculated
 
 (defn- min-date-in-the-future? [{min-date :min-date}]
   (and min-date
@@ -365,7 +366,9 @@
         removed? (max-date-within-90-days? route)
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
-                             (> no-traffic-run no-traffic-detection-threshold)))
+                             (and (> no-traffic-run no-traffic-detection-threshold)
+                                  (.isAfter no-traffic-start-date (.toLocalDate (:max-date route))))))
+        max-date-in-past? (.isBefore (.toLocalDate (:max-date route)) (java.time.LocalDate/now))
         {:keys [starting-week-date different-week-date
                 added-trips removed-trips trip-changes]} changes
         changed? (and starting-week-date different-week-date)
@@ -390,6 +393,9 @@
      ;; Change type and type specific dates
      (discard-past-changes
        (cond
+
+         max-date-in-past?                                  ; Done because some of the changes listed in transit changes pages are actually in the past
+         {:gtfs/change-type         :no-change}
 
          added?
          {:gtfs/change-type         :added
