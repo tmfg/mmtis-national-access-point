@@ -81,13 +81,15 @@
 
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
-  [changes]
+  [show-no-change changes]
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
         removed-in-past (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(and (= :removed (:gtfs/change-type %)) (nil? (:gtfs/change-date %))) changes))
         no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(= :no-change (:gtfs/change-type %)) changes))
         only-changes (filterv :gtfs/change-date changes)
         sorted-changes (sort-by (juxt :gtfs/different-week-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
-        all-sorted-changes (concat sorted-changes no-changes)]
+        all-sorted-changes (if show-no-change
+                             (concat sorted-changes no-changes)
+                             sorted-changes)]
     all-sorted-changes))
 
 (define-event RoutesForDatesResponse [routes dates]
@@ -168,16 +170,19 @@
          :service-changes-for-date-loading? false
          :service-info (:service-info response)
          :changes-all (:changes response)
-         :changes (update (:changes response) :gtfs/route-changes (comp sorted-route-changes (partial future-changes package-detection-date)))
+         :changes-no-change (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes true) (partial future-changes package-detection-date)))
+         :changes-filtered (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes false) (partial future-changes package-detection-date)))
          :gtfs-package-info (:gtfs-package-info response)
          :route-hash-id-type (:route-hash-id-type response)))
 
 (define-event LoadServiceChangesForDate [service-id date]
-  {:path [:transit-visualization]}
+  {}
   (comm/get! (str "transit-visualization/" service-id "/" date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse date)})
-  {:service-changes-for-date-loading? true
-   :open-sections {:gtfs-package-info false}})
+  (-> app
+      (assoc-in [:transit-visualization :service-changes-for-date-loading?] true)
+      (assoc-in [:transit-visualization :show-no-change-routes?] false)
+      (assoc-in [:transit-visualization :open-sections :gtfs-package-info] false)))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->LoadServiceChangesForDate (:service-id params) (:date params)))
@@ -450,3 +455,7 @@
 (define-event ToggleShowRouteLine [routename]
   {:path [:transit-visualization :compare :show-route-lines]}
   (update app routename not))
+
+(define-event ToggleShowNoChangeRoutes []
+  {:path [:transit-visualization :show-no-change-routes?]}
+  (not app))
