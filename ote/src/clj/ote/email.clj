@@ -20,8 +20,10 @@
 
 (defn- send-email
   "Send a singular email using Postal."
-  [& args]
-  (apply postal/send-message args))
+  [server msg]
+  (if (-> server :host some?)   
+    (postal/send-message server msg)
+    (log/warn "not sending email because configured smtp host is empty")))
 
 (defrecord Email [email-opts]
   component/Lifecycle
