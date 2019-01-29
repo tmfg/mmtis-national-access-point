@@ -27,9 +27,10 @@ WITH changes_with_regions AS (
 
     FROM "gtfs-transit-changes" chg
     WHERE chg.date = CURRENT_DATE
+      AND chg."different-week-date" IS NOT NULL
 )
-SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
-       ("change-date" - CURRENT_DATE) AS "days-until-change",
+SELECT to_char(chg."different-week-date", 'dd.mm.yyyy') as "change-date",
+       (chg."different-week-date" - CURRENT_DATE) AS "days-until-change",
        chg."added-routes", chg."removed-routes", chg."changed-routes", chg."no-traffic-routes",
        (SELECT array_agg(fr.nimi)
           FROM finnish_regions fr
