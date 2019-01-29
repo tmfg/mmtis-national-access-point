@@ -644,7 +644,10 @@
   (process-event [_ app]
     (let [operator-data (-> app
                             :transport-operator
-                            form/without-form-metadata)]
+                            form/without-form-metadata
+                            ;; Fix saving when no :open-ytj-integration.
+                            ;; Dissoc here because this branch will go away and form doesn't need t-operator scope dependency.
+                            (dissoc ::t-operator/associated-services ::t-operator/own-associations))]
       (comm/post! "transport-operator" operator-data {:on-success (send-async! ->SaveTransportOperatorResponse)
                                                       :on-failure (send-async! ->FailedTransportOperatorResponse)})
       app))
