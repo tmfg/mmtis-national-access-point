@@ -423,6 +423,13 @@
     (t/in-days (t/interval date1 date2))
     (- (t/in-days (t/interval date2 date1)))))
 
+(defn date-string->date-time [date-string]
+  (let [df (date-fields-only (parse-date-iso-8601 date-string))
+        year (:ote.time/year df)
+        month (:ote.time/month df)
+        day (:ote.time/date df)]
+    (t/date-time year month day)))
+
 #?(:cljs
 ;; TBD: rename away from "local" so not to confuse with ambiguous Java LocalTime, and consider using goog.date.Date
 (defn to-local-js-date [date]
@@ -431,9 +438,13 @@
 
 #?(:cljs
    (defn days-until [date]
-     (if date
-       (day-difference (to-local-js-date (t/now)) (to-local-js-date date))
-       0)))
+     (let [date-fields-now (date-fields-from-timestamp (t/now))
+           date-fields (date-fields-from-timestamp date)
+           now-date-time (date-string->date-time (str (:ote.time/year date-fields-now) "-" (:ote.time/month date-fields-now) "-" (:ote.time/date date-fields-now)))
+           date-time (date-string->date-time (str (:ote.time/year date-fields) "-" (:ote.time/month date-fields) "-" (:ote.time/date date-fields)))]
+       (if date
+           (day-difference now-date-time date-time)
+         0))))
 
 #?(:cljs
    (defn date-to-str-date [date]
@@ -473,10 +484,5 @@
                   java.util.Date/from)]
     date1)))
 
-(defn date-string->date-time [date-string]
-  (let [df (date-fields-only (parse-date-iso-8601 date-string))
-        year (:ote.time/year df)
-        month (:ote.time/month df)
-        day (:ote.time/date df)]
-    (t/date-time year month day)))
+
 
