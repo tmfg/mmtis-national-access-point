@@ -16,9 +16,7 @@
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
   [route]
-  (if (:route-hash-id route)
-    (:route-hash-id route)
-    (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
+  (or (:route-hash-id route) (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
 (def hash-colors
   ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
@@ -47,7 +45,7 @@
         dt (parse-date start-date)
         first-diff (first
                      (sort #(t/before? (first %1) (first %2))
-                           (filter #(and (not (= hash (second %)))
+                           (filter #(and (not= hash (second %))
                                          (t/after? (first %) dt)
                                          (= (time/day-of-week (first %))
                                             (time/day-of-week dt)))
@@ -119,12 +117,11 @@
       (update :compare
               (fn [{:keys [date1 date2] :as compare}]
                 (when (and date1 date2)
-                  (do
-                    (comm/get! (str "transit-visualization/routes-for-dates/" (:operator-id app))
-                               {:params (select-keys compare [:date1 :date2])
-                                :on-success (tuck/send-async! ->RoutesForDatesResponse
-                                                              (select-keys compare [:date1 :date2]))})
-                    (assoc compare :routes-for-dates-loading? true)))))
+                  (comm/get! (str "transit-visualization/routes-for-dates/" (:operator-id app))
+                             {:params (select-keys compare [:date1 :date2])
+                              :on-success (tuck/send-async! ->RoutesForDatesResponse
+                                                            (select-keys compare [:date1 :date2]))})
+                  (assoc compare :routes-for-dates-loading? true))))
 
       (dissoc :routes-for-dates-loading?)))
 
@@ -140,8 +137,7 @@
 
 (define-event LoadInfoResponse [info]
   {:path [:transit-visualization]}
-  (-> app
-      (assoc :operator-name (::t-operator/name info))))
+  (assoc app :operator-name (::t-operator/name info)))
 
 (define-event LoadInfo [operator-id]
   {:path [:transit-visualization]}
@@ -151,8 +147,7 @@
 
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
-  (-> app
-      (assoc :mode mode)))
+  (assoc app :mode mode))
 
 (define-event SetCalendarMode [mode]
   {:path [:transit-visualization :calendar-mode]}
@@ -184,8 +179,7 @@
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
-  (-> app
-      (merge {:hash hash :day day})))
+  (merge app {:hash hash :day day}))
 
 (define-event RouteLinesForDateResponse [geojson date]
   {:path [:transit-visualization]}
@@ -338,7 +332,7 @@
                 date1)
         date2 (if (and
                     (:gtfs/different-week-date route)
-                    (not (= :no-traffic (:gtfs/change-type route))))
+                    (not= :no-traffic (:gtfs/change-type route)))
                   (:gtfs/different-week-date route)
                   (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
@@ -356,8 +350,10 @@
                    date1 date2)
         (assoc-in [:transit-visualization :compare :differences]
                   (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
-                                       :gtfs/trip-stop-sequence-changes
-                                       :gtfs/trip-stop-time-changes}))
+                                       :gtfs/trip-stop-sequence-changes-lower
+                                       :gtfs/trip-stop-sequence-changes-upper
+                                       :gtfs/trip-stop-time-changes-lower
+                                       :gtfs/trip-stop-time-changes-upper}))
         (assoc-in [:transit-visualization :route-calendar-hash-loading?] false)
         (assoc-in [:transit-visualization :date->hash] (:calendar response))
         (assoc-in [:transit-visualization :hash->color] (zipmap (distinct (vals (:calendar response)))
