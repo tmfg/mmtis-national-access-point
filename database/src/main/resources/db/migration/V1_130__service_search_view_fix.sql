@@ -5,13 +5,13 @@ DROP VIEW transport_service_search_result;
 CREATE VIEW transport_service_search_result AS
   SELECT t.*, op.name as "operator-name", op."business-id" as "business-id",
          array_cat(
-           array_cat(
-             COALESCE((SELECT sc."companies"
+            array_cat(
+              COALESCE((SELECT sc."companies"
                        FROM "service_company" sc
                        WHERE sc."transport-service-id" = t.id))::company[],
-             t."companies"::company[]),
-           array_agg((aso.name, aso."business-id")::company)
-             ) AS "service-companies",
+              t."companies"::company[]),
+            array_agg((aso.name, aso."business-id")::company)
+         ) AS "service-companies",
          (SELECT array_agg(oaf."operation-area")
           FROM "operation-area-facet" oaf
           WHERE oaf."transport-service-id" = t.id) AS "operation-area-description",

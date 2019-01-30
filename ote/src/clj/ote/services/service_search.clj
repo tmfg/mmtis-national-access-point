@@ -157,11 +157,10 @@
         results (mapv
                   #(update % ::t-service/service-companies
                            (fn [c]
-                             (do
-                               (filter (fn [company]
-                                         (when (and operators (::t-service/business-id company))
-                                           (.contains operators (::t-service/business-id company))))
-                                       c))))
+                             (filter (fn [company]
+                                       (when (and operators (::t-service/business-id company))
+                                         (.contains operators (::t-service/business-id company))))
+                                     c)))
                   results)]
     (merge
      {:empty-filters? empty-filters?
