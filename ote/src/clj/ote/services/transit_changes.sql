@@ -50,7 +50,7 @@ SELECT ts.id AS "transport-service-id",
  WHERE 'road' = ANY(ts."transport-type")
    AND 'schedule' = ts."sub-type"
    AND ts."published?" = TRUE
- ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
+ ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
 
 -- name: calculate-routes-route-hashes-using-headsign
 SELECT calculate_route_hash_id_using_headsign(:package-id::INTEGER);
