@@ -66,7 +66,6 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
@@ -121,14 +120,12 @@
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
         {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params}
-       (composite/parse @specql-registry/table-info-registry
-                        {:type "gtfs-route-change-info"}
-                        (fetch-route-differences
-                         db
-                         {:service-id (Long/parseLong service-id)
-                          :date1 (time/parse-date-iso-8601 date1)
-                          :date2 (time/parse-date-iso-8601 date2)
-                          :route-short-name short-name
-                          :route-long-name long-name
-                          :trip-headsign headsign
-                          :route-hash-id route-hash-id}))))
+    (fetch-route-differences
+      db
+      {:service-id (Long/parseLong service-id)
+       :date1 (time/parse-date-iso-8601 date1)
+       :date2 (time/parse-date-iso-8601 date2)
+       :route-short-name short-name
+       :route-long-name long-name
+       :trip-headsign headsign
+       :route-hash-id route-hash-id})))
