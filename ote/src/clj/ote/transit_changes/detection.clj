@@ -373,7 +373,7 @@
 
     (merge
       {;; Route identification
-       :gtfs/route-short-name (:route-short-name route)     ;; TODO: remove gtfs ns from all
+       :gtfs/route-short-name (:route-short-name route)
        :gtfs/route-long-name (:route-long-name route)
        :gtfs/trip-headsign (:trip-headsign route)
        :gtfs/route-hash-id (:route-hash-id route)
