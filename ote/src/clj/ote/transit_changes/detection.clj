@@ -474,7 +474,7 @@
                                           :gtfs/package-ids package-ids
                                           :gtfs/created (java.util.Date.)})
                          (doseq [r route-change-infos]
-                           (let [update-count (specql/update! db :gtfs/route-change
+                           (let [update-count (specql/update! db :gtfs/detected-route-change
                                                               (merge {:gtfs/transit-change-date (sql-date today)
                                                                       :gtfs/transit-service-id service-id
                                                                       :gtfs/created-date (java.util.Date.)}
@@ -484,7 +484,7 @@
                                                                :gtfs/route-hash-id (:gtfs/route-hash-id r)})]
 
                              (when (not= 1 update-count)
-                               (specql/insert! db :gtfs/route-change
+                               (specql/insert! db :gtfs/detected-route-change
                                                (merge {:gtfs/transit-change-date (sql-date today)
                                                        :gtfs/transit-service-id service-id
                                                        :gtfs/created-date (java.util.Date.)}
@@ -567,8 +567,8 @@
                                       (specql/columns :gtfs/transit-changes)
                                       {:gtfs/transport-service-id service-id})]
     (for [t transit-changes]
-      (let [route-changes (specql/fetch db :gtfs/route-change
-                                        (specql/columns :gts/route-change)
+      (let [route-changes (specql/fetch db :gtfs/detected-route-change
+                                        (specql/columns :gts/detected-route-change)
                                         {:gtfs/transit-change-date (:gtfs/date transit-changes)
                                          :gtfs/transit-service-id service-id})
             chg-routes (map (fn [x]
@@ -582,7 +582,7 @@
                         {:gtfs/transport-service-id service-id
                          :gtfs/date (:gtfs/date t)})
         (doseq [r route-changes]
-          (specql/update! db :gtfs/route-change
+          (specql/update! db :gtfs/detected-route-change
                           r
                           {:gtfs/transport-service-id service-id
                            :gtfs/transit-change-date (:gtfs/date t)

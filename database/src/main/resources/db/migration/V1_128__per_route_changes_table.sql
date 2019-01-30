@@ -16,7 +16,7 @@ ALTER TYPE "gtfs-route-change-info"
 -- ALTER TYPE "gtfs-route-change-info" -- TODO: to drop or not to drop?
 --   DROP ATTRIBUTE "trip-stop-time-changes";
 
-CREATE TABLE "gtfs-route-change" (
+CREATE TABLE "detected-route-change" (
  "transit-change-date"        date not null,
  "transit-service-id"         integer not null references "transport-service" (id),
  "route-short-name"           text,                   -- "15"
@@ -45,7 +45,7 @@ do $$
       loop
         foreach c in array r.rc
           loop
-            insert into "gtfs-route-change"
+            insert into "detected-route-change"
             values (r.d, r.tsid,
                     c."route-short-name",
                     c."route-long-name",
@@ -73,5 +73,3 @@ $$ language plpgsql;
 --         DROP COLUMN "route-changes";
 
 -- TODO: Add an index to this table to date and service-id
-
--- TODO: Change name of the table to "detected-route-change"

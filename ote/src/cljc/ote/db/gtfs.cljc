@@ -32,7 +32,7 @@
   ["gtfs-route-change-type" :gtfs/route-change-type (specql.transform/transform (specql.transform/to-keyword))] ;; ENUM
   ["gtfs-route-change-info" :gtfs/route-change-info] ;; ENUM
   ["gtfs-transit-changes" :gtfs/transit-changes]
-  ["gtfs-route-change" :gtfs/route-change]
+  ["detected-route-change" :gtfs/detected-route-change]
   ["gtfs-route-hash" :gtfs/route-hash] ;; ENUM
   ["gtfs-date-hash" :gtfs/date-hash]
   ["gtfs_stoptime_display" :gtfs/stoptime-display] ;; ENUM

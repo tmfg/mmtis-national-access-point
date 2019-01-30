@@ -197,6 +197,6 @@ SELECT c.date, c."added-routes", c."removed-routes", c."changed-routes", c."no-t
        r."trip-stop-time-changes-lower", r."trip-stop-time-changes-upper",
        r."current-week-date", r."different-week-date", r."change-date", r."route-hash-id"
  FROM "gtfs-transit-changes" c
- JOIN "gtfs-route-change" r ON c.date = r."transit-change-date" AND c."transport-service-id" = r."transit-service-id"
+ JOIN "detected-route-change" r ON c.date = r."transit-change-date" AND c."transport-service-id" = r."transit-service-id"
  WHERE c."transport-service-id" = :service-id
    AND c.date = :date::DATE;
