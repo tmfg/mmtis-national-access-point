@@ -159,20 +159,6 @@ SELECT ts.name AS "transport-service-name",
  WHERE ts."published?" = TRUE
    AND ts.id = :service-id;
 
--- name: fetch-route-differences
--- single?: true
--- Fetch the differences in the given route for the given dates
-SELECT gtfs_route_differences(:route-hash-id,
-          (SELECT tripdata
-                     FROM gtfs_route_trips_for_date(
-                            gtfs_service_packages_for_date(:service-id::INTEGER, :date1::DATE), :date1::DATE) trips
-            WHERE trips."route-hash-id" = :route-hash-id),
-          (SELECT tripdata
-                     FROM gtfs_route_trips_for_date(
-                            gtfs_service_packages_for_date(:service-id::INTEGER, :date2::DATE), :date2::DATE) trips
-            WHERE trips."route-hash-id" = :route-hash-id))::TEXT;
-
-
 -- name: fetch-gtfs-packages-for-service
 SELECT p.id, p.created,
        to_char(lower(dr.daterange), 'dd.mm.yyyy') as "min-date",
