@@ -327,7 +327,7 @@
   (and min-date
        (.isAfter (.toLocalDate min-date) (java.time.LocalDate/now))))
 
-(defn- update-min-max-range [range val]
+(defn update-min-max-range [range val]
   (merge {:lower-inclusive? true
           :upper-inclusive? true}
          (-> range
