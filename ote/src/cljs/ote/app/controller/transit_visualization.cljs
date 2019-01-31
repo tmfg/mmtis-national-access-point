@@ -172,8 +172,8 @@
          :service-changes-for-date-loading? false
          :service-info (:service-info response)
          :changes-all (:changes response)
-         :changes-no-change (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes true) (partial future-changes package-detection-date)))
-         :changes-filtered (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes false) (partial future-changes package-detection-date)))
+         :changes-no-change (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes true) (partial future-changes detection-date)))
+         :changes-filtered (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes false) (partial future-changes detection-date)))
          :gtfs-package-info (:gtfs-package-info response)
          :route-hash-id-type (:route-hash-id-type response)))
 
@@ -457,3 +457,7 @@
 (define-event ToggleShowRouteLine [routename]
   {:path [:transit-visualization :compare :show-route-lines]}
   (update app routename not))
+
+(define-event ToggleShowNoChangeRoutes []
+  {:path [:transit-visualization :show-no-change-routes?]}
+    (update app :show-no-change-routes? not))

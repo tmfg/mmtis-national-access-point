@@ -810,10 +810,9 @@
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-        [:div.row
-         [:div.col-md-6 ""]
-         [:div.col-md-6 {:style {:margin-top "10px"}}
-          [form-fields/field {:label "Näytä myös reitit, joihin ei ole tulossa muutoksia"
+        [:div.row {:style {:margin-top "1rem" :display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
+         [:div
+          [form-fields/field {:label (tr [:transit-visualization-page :checkbox-how-no-change])
                               :type :checkbox
                               :update! #(e! (tv/->ToggleShowNoChangeRoutes))}
            show-no-change-routes?]]]

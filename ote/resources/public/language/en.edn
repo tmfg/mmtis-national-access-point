@@ -919,7 +919,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}}
 
  :transit-visualization-page
- {:loading-routes "Loading service routes."}
+ {:loading-routes "Loading service routes."
+  :checkbox-how-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Please check that the information you have given is correct."
