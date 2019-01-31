@@ -305,15 +305,15 @@ DECLARE
   d1_trip_ids TEXT[];
   d2_trip_ids TEXT[];
   trip_chg "gtfs-trip-change-info";
-  trip_stop_seq_changes_lower INTEGER;
-  trip_stop_seq_changes_upper INTEGER;
-  trip_stop_time_changes_lower INTEGER;
-  trip_stop_time_changes_upper INTEGER;
+  trip_stop_seq_changes_lower INTEGER; -- Lowest count of sequence changes of a single trip within a route
+  trip_stop_seq_changes_upper INTEGER; -- Highest count of sequence changes of a single trip within a route
+  trip_stop_time_changes_lower INTEGER; -- Lowest count of stop time changes of a single trip within a route
+  trip_stop_time_changes_upper INTEGER; -- Highest count of stop time changes of a single trip within a route
 BEGIN
   trip_stop_seq_changes_lower := NULL;
-  trip_stop_seq_changes_upper := NULL;
+  trip_stop_seq_changes_upper := 0;
   trip_stop_time_changes_lower := NULL;
-  trip_stop_time_changes_upper := NULL;
+  trip_stop_time_changes_upper := 0;
 
   -- Select all trips as array of "package-id:trip-id" strings
   all_trips := (SELECT array_agg(x.t)
@@ -379,7 +379,7 @@ BEGIN
            trip_stop_seq_changes_lower := trip_chg."trip-stop-sequence-changes";
          END IF;
 
-         IF ((trip_stop_seq_changes_upper IS NULL) or (trip_chg."trip-stop-sequence-changes" > trip_stop_seq_changes_upper)) THEN
+         IF (trip_chg."trip-stop-sequence-changes" > trip_stop_seq_changes_upper) THEN
            trip_stop_seq_changes_upper := trip_chg."trip-stop-sequence-changes";
          END IF;
 
@@ -387,7 +387,7 @@ BEGIN
            trip_stop_time_changes_lower := trip_chg."trip-stop-time-changes";
          END IF;
 
-         IF ((trip_stop_time_changes_upper IS NULL) or (trip_chg."trip-stop-time-change" > trip_stop_time_changes_upper)) THEN
+         IF (trip_chg."trip-stop-time-change" > trip_stop_time_changes_upper) THEN
            trip_stop_time_changes_upper := trip_chg."trip-stop-time-changes";
          END IF;
 
