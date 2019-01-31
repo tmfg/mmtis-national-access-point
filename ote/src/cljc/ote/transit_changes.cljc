@@ -175,7 +175,7 @@
 
 
 (defn combine-trips [date1-trips date2-trips]
-  (when (and date1-trips date2-trips (< 0 (count date1-trips)) (> 0 (count date2-trips)))
+  (when (and date1-trips date2-trips (> (count date1-trips) 0) (> (count date2-trips) 0))
     (when-let [first-common-stop (first-common-stop (concat date1-trips date2-trips))]
       (let [first-common-stop
             #(assoc %
