@@ -924,7 +924,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :transit-visualization-page
  {:loading-routes "Laddar rutterna för tjänsten."
-  :checkbox-how-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}}
+  :checkbox-how-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Kolla att uppgifterna du skrev in är korrekta."
