@@ -70,12 +70,14 @@
 
 (defn future-changes
   "Filter routes changes that are in the future. (or no changes)"
-  [package-detection-date changes]
-  (let [package-detection-date (time/parse-date-iso-8601 package-detection-date)]
+  [detection-date changes]
+  (let [detection-date (time/parse-date-iso-8601 detection-date)]
     (filter
       (fn [{:gtfs/keys [change-date]}]
-        (or (nil? change-date)
-              (not (t/before? (time/native->date-time change-date) package-detection-date))))
+          (or (nil? change-date)
+              (not (t/before?
+                     (time/native->date-time change-date)
+                     detection-date))))
       changes)))
 
 
@@ -164,9 +166,9 @@
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
 
-(define-event LoadServiceChangesForDateResponse [response package-detection-date]
+(define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-    (assoc app
+  (assoc app
          :service-changes-for-date-loading? false
          :service-info (:service-info response)
          :changes-all (:changes response)
@@ -175,10 +177,10 @@
          :gtfs-package-info (:gtfs-package-info response)
          :route-hash-id-type (:route-hash-id-type response)))
 
-(define-event LoadServiceChangesForDate [service-id date]
-  {}
-  (comm/get! (str "transit-visualization/" service-id "/" date)
-             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse date)})
+(define-event LoadServiceChangesForDate [service-id detection-date]
+  {:path [:transit-visualization]}
+  (comm/get! (str "transit-visualization/" service-id "/" detection-date)
+             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
   (-> app
       (assoc-in [:transit-visualization :service-changes-for-date-loading?] true)
       (assoc-in [:transit-visualization :show-no-change-routes?] false)
@@ -455,7 +457,3 @@
 (define-event ToggleShowRouteLine [routename]
   {:path [:transit-visualization :compare :show-route-lines]}
   (update app routename not))
-
-(define-event ToggleShowNoChangeRoutes []
-  {:path [:transit-visualization :show-no-change-routes?]}
-  (not app))
