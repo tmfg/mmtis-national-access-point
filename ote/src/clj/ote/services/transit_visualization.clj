@@ -40,8 +40,8 @@
                                             (Double/parseDouble lat)]
                               :properties {"name" name
                                            "trip-name" (str (:name first-stop) " \u2192 " (:name last-stop))}})))
-                    (when (not (str/blank? stops))
-                      (str/split stops #"\|\|"))))))
+                    (when-not (str/blank? stops))
+                      (str/split stops #"\|\|")))))
           trips))
 
 (defn service-changes-for-date [db service-id date]
@@ -59,8 +59,7 @@
 
 (defn parse-gtfs-stoptimes [pg-array]
   (let [string (str pg-array)]
-    (if (str/blank? string)
-      nil
+    (when-not (str/blank? string)
       (composite/parse @specql-registry/table-info-registry
                        {:category "A"
                         :element-type :gtfs/stoptime-display}
