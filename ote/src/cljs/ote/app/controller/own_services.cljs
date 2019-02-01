@@ -25,6 +25,7 @@
               (-> app
                   (update-in [:transport-operator ::t-operator/own-associations]
                              #(conj (or % []) service))
+                  (dissoc :association-failed)
                   (update :transport-operators-with-services
                           (fn [operators]
                             (map
@@ -33,6 +34,10 @@
                                   (update-in o [:transport-operator ::t-operator/own-associations] merge service)
                                   o))
                               operators)))))
+
+(define-event AddSelectionFailure [result]
+              {}
+              (assoc app :association-failed true))
 
 (define-event AddSelection [service-name service-id operator-name operator-business-id operator-id service-operator]
               {}
@@ -44,7 +49,8 @@
                              :service-operator service-operator}]
                 (comm/post! (str "transport-service/" (url-util/encode-url-component service-id) "/associated-operators")
                             service
-                            {:on-success (tuck/send-async! ->AddSelectionSuccess service operator-id)})
+                            {:on-success (tuck/send-async! ->AddSelectionSuccess service operator-id)
+                             :on-failure (tuck/send-async! ->AddSelectionFailure)})
                 app))
 
 (define-event RemoveSelectionSuccess [result operator-id service-id]

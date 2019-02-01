@@ -22,7 +22,8 @@
             [ote.views.admin.users :as users]
             [ote.views.admin.service-list :as service-list]
             [ote.ui.page :as page]
-            [ote.views.admin.sea-routes :as sea-routes]))
+            [ote.views.admin.sea-routes :as sea-routes]
+            [ote.style.dialog :as style-dialog]))
 
 (def id-filter-type [:operators :services :ALL])
 
@@ -38,24 +39,25 @@
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
-      {:open    true
-       :title   "Poista palveluntuottaja ja kaikki sen tiedot"
+      {:open true
+       :actionsContainerStyle style-dialog/dialog-action-container
+       :title "Poista palveluntuottaja ja kaikki sen tiedot"
        :actions [(r/as-element
                    [ui/flat-button
-                    {:label    (tr [:buttons :cancel])
-                     :primary  true
+                    {:label (tr [:buttons :cancel])
+                     :primary true
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (admin-controller/->CancelDeleteOperator id)))}])
                  (r/as-element
                    [ui/raised-button
-                    {:label     (tr [:buttons :delete])
-                     :icon      (ic/action-delete-forever)
+                    {:label (tr [:buttons :delete])
+                     :icon (ic/action-delete-forever)
                      :secondary true
-                     :primary   true
-                     :on-click  #(do
-                                   (.preventDefault %)
-                                   (e! (admin-controller/->ConfirmDeleteOperator id)))}])]}
+                     :primary true
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (admin-controller/->ConfirmDeleteOperator id)))}])]}
 
       [:div [:p "Oletko varma, että haluat poistaa palveluntuottajan?
       Samalla poistetaan kaikki palvelut ja tiedot mitä tuottajalle on syötetty."]

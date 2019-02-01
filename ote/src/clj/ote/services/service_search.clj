@@ -153,7 +153,15 @@
                         (update-in result
                                    [::t-service/external-interface-links]
                                    #(mapv hide-import-errors %)))
-                      results)]
+                      results)
+        results (mapv
+                  #(update % ::t-service/service-companies
+                           (fn [c]
+                             (filter (fn [company]
+                                       (when (and operators (::t-service/business-id company))
+                                         (.contains operators (::t-service/business-id company))))
+                                     c)))
+                  results)]
     (merge
      {:empty-filters? empty-filters?
       :results results

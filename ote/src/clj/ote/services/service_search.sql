@@ -90,7 +90,14 @@ SELECT ts.id as id
   LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
   JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
  WHERE c."business-id" IN (:operators)
-   AND ts."published?" = TRUE;
+   AND ts."published?" = TRUE
+UNION
+    SELECT a."service-id" as id
+      FROM "associated-service-operators" a,
+           "transport-operator" top
+     WHERE top."business-id" in (:operators)
+       AND a."operator-id" = top.id;
+
 
 -- name: service-ids-by-transport-type
 -- Find services using transport type

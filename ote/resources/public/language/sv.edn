@@ -333,7 +333,7 @@
   :parsing-success ["I listan hittades " :count " företag."]}
 
  :companies-csv
- {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."}
+ {:invalid "CSV-filen är bristfällig eller innehåller fel."}
 
  ;; Action buttons
  :buttons
@@ -502,7 +502,7 @@
    :other-services "Övriga tjänster"
    :pricing "Prisinformation"
    :service-hours "Betjäningstider"
-   :on-behalf-errand "Acting on behalf of customer"
+   :on-behalf-errand "Acting on behalf"
    :customer-account-info "Användarkonto"
    :disruptions "Störningsinformation"
    :payment-interface "Biljett- och försäljningsgränssnitt"
@@ -568,21 +568,23 @@
           :parking "Allmänna kommersiella parkeringstjänster"
           :brokerage "Förmedlingstjänst"}
 
- :own-services-page {:own-services "Egna tjänsteuppgifter"
-                     :filling-info "Täyttöohje"
-                     :filling-info-content (:md "**Palvelut, joiden tuottamiseen osallistut** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Palvelun lisääminen**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita kohtaan Lisää palvelu joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi")
-                     :other-services-where-involved "Muut palvelut, joissa olet mukana"
-                     :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
-                     :open-geojson "Avaa geojson"
-                     :own-services-info-long (:md "**Lisää uusi palvelu** -painikkeesta pääset lisäämään tarjoamasi **liikkumispalvelun tarkemmat tiedot**.\n\nMikäli et tarjoa lainkaan **omia** liikkumispalveluita asiakkaille (esim. ajat kyytejä vain välityskeskuksen kautta), voit hypätä tämän kohdan yli. Valitse sen sijaan yksi tai useampi muun toimijan tuottama palvelu kohdassa **Muiden tuottamat palvelut, joissa olet mukana**")
-                     :own-services-directions-short "Ohjeet"
-                     :own-services-new-provider1 "Hienoa! Olet nyt lisännyt "
-                     :own-services-new-provider2 (:md " -nimisen palveluntuottajan NAP:iin.  Huomioithan, että pelkät palveluntuottajan tiedot eivät sisällä lain vaatimia olennaisia tietoja (esim. toiminta-alue, hintatiedot ja esteettömyystiedot) tarjoamastasi palvelusta/palveluista.\n\nLisää seuraavaksi tarkemmat tiedot tarjoamastasi palvelusta/palveluista kohdassa **Omat palvelut** ja/tai kohdassa **Muiden tuottamat palvelut, joissa olet mukana**.\n\nMikäli omistat taksiyrityksen ja ajat kyytejä vain välityskeskuksen kautta, riittää, että täytät välityskeskuksen tiedot kohtaan **Muiden tuottamat palvelut, joissa olet mukana**.")
-                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
-                     :service "Palvelu"
-                     :add-service "Lisää palvelu"
-                     :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
-                     :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]}
+ :own-services-page {:added-services "Tjänster du själv anmält ditt företag delaktig i"
+                     :add-service "Lägg till en tjänst"
+                     :associated-search-hint "Lägg till information om deltagande genom att skriva namnet på tjänsten eller tjänsteproducenten i det här fältet"
+                     :edit-business-id ["Fyll i uppgifter gällande FO-nummer " :business-id]
+                     :filling-info "Anvisning"
+                     :filling-info-content (:md "**Tjänster du anmälts delaktigt i** \nOm det under denna rubrik redan finns en lista över tjänster, har de som producerar tjänsterna i fråga meddelat ert företag (FO-numret) i NAP-tjänsten som ett företag som deltar i tillhandahållandet av tjänsten. Om uppgifterna inte är korrekta, ta kontakt med tjänsteproducenten i fråga för att ta bort de felaktiga uppgifterna.\n\n**Lägg till uppgifter om deltagande själv**\nOm det i listan saknas någon sådan relevant tjänst, som du deltar i tillhandahållandet av (t.ex. en förmedlingstjänst för taxitransport), skriv antingen tjänsteproducentens namn eller tjänstens namn i sökfältet. Välj därefter rätt tjänst mellan alternativen som föreslås. Om du i misstag väljer fel tjänst i listan, kan du ta bort den genom att klicka på krysset efter tjänsten. Om du inte hittar mobilitetstjänsten som du deltar i tillhandahållandet av i listan, kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nOm du förutom att köra för en förmedlingstjänst också tillhandahåller egna taxitjänster eller andra mobilitetstjänster, lägg också till den egna tjänsten eller de egna tjänsterna i NAP i fältet **Egna tjänsteuppgifter**.")
+                     :no-associations [:operator-name " har inte anmälts som deltagare i någon annan tjänsteproducents tjänst."]
+                     :no-own-associations ["Du har inte lagt till tjänsteproducenten " :operator-name " som delaktig i någon annan tjänst."]
+                     :other-services-where-involved "Övriga tjänster du deltar i"
+                     :other-service-associations "Tjänster du anmälts delaktig i"
+                     :open-geojson "Öppna geojson"
+                     :own-services "Egna tjänsteuppgifter"
+                     :own-services-info-long (:md " Med knappen **Lägg till ny tjänst** kan du lägga till **detaljerade uppgifter om din tjänst **.\n\n Ifall du endast erbjuder tjänster via tex en taxicentral kan du hoppa över denna punkt. Välj i såfall en eller flera tjänster vid **Övriga tjänster du är delaktig i**. ")
+                     :own-services-directions-short "Anvisningar"
+                     :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
+                     :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
+                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -662,11 +664,15 @@
 
 
  :organization-page
- {:business-id-and-aux-names "Företagsnamn och hjälpnamn"
+ {:address-postal "Postadress"
+  :address-postal-street "Gatuadress eller postbox"
+  :business-id-and-aux-names "Företagsnamn och parallellnamn"
+  :business-name "Företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
+  :contact-details-other "Andra kontaktuppgifter"
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
-  :fetch-from-ytj-success "Detaljer hämtade från YTJ."
+  :fetch-from-ytj-success "Uppgifterna har hämtats från YTJ."
   :field-phone-mobile "Mobiltelefon"
   :field-phone-telephone "Telefon"
   :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
@@ -679,18 +685,18 @@
   :basic-info-tooltip "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
   :contact-types-tooltip "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
   :ckan-description-tooltip "Beskrivningen av tjänsteproducenten görs för att de som använder NAP-informationen ska kunna bilda sig en bättre uppfattning om tjänsteproducenten. T.ex. \"Parasbussi Oy är ett bolag som idkar regelbunden linjebaserad trafik och beställningstrafik. Bolaget ägs av Björneborgs stadstrafik\"."
-  :help-ytj-integration-desc "Palveluntuottajan tiedot haetaan Yritys- ja yhteisötietojärjestelmästä (YTJ) Y-tunnuksen perusteella. Mikäli tiedoissa on virheitä tai puutteita, voit tehdä niihin muutoksia PRH:n ja Verohallinnon yhteisessä YTJ-palvelussa. YTJ-palvelussa tehdyt muutokset (esim. osoitemuutos tai uuden aputoiminimen rekisteröinti) näkyvät tällä sivulla sen jälkeen, kun ne on YTJ:n rekisteriin kirjattu."
-  :heading-operator-edit "Aiemmin ilmoitettujen palveluntuottajanimien muuttaminen"
-  :help-operator-edit "Olet aiemmin luonut NAP-palveluun yhden tai useamman palveluntuottajan, joiden nimet eivät vastaa Y-tunnukselle rekisteröityjä toiminimiä tai aputoiminimiä. Valitse alasvetovalikoista toiminimi, jolla haluat korvata aiemmin ilmoittamasi palveluntuottajan nimen."
-  :business-id-heading "Y-tunnus:"
-  :help-operator-edit-selection "Alla olevasta listasta näet Y-tunnukselle rekisteröidyn toiminimen ja aputoiminimet. Valitse listalta vain ne nimet, joiden alaisuudessa haluat julkaista liikkumispalveluita NAP:ssa."
-  :help-operator-contact-entry (:md "Alla olevat yhteystiedot ovat Y-tunnuskohtaisia, eli ne ovat **kaikille Y-tunnuksen alaisille toiminimille samat**. Yhteystiedot haetaan YTJ:stä, eikä niitä voi NAP:ssa muokata. Mikäli tiedoissa on virheitä tai puutteita, voit tehdä niihin muutoksia ja täydennyksiä PRH:n ja Verohallinnon yhteisessä YTJ-palvelussa. Tyhjien yhteystietokenttien osalta sinulla on kaksi vaihtoehtoa. 1) täydennä tiedot YTJ-palvelussa, jonka jälkeen ne ovat myös NAPin käytettävissä (suositeltavaa). 2) Täydennä tiedot suoraan alla oleviin lomakekenttiin (tiedot tallentuvat vain NAPiin, eivätkä edelleenkään ole YTJ:n rekisterissä).")
-  :help-operator-how-delete (:md "Voit poistaa palveluntuottajan tiedot NAP:sta napsauttamalla **Poista palveluntuottaja** -painiketta. Palveluntuottajan poistaminen on mahdollista, kun palveluntuottajalla ei ole enää julkaistuja palveluita NAP:ssa. Mikäli haluat poistaa palveluntuottajan, käy ensin poistamassa kaikki sille lisätyt palvelut **Omat palvelutiedot** -sivun kautta.")
+  :help-ytj-integration-desc "Tjänsteproducentens uppgifter hämtas ur Företags- och organisationsdatasystemet YTJ. Ifall uppgifterna är felaktiga eller bristfällga kan du göra ändringarna direkt i YTJ-systemet. Ändringarna du gjort i YTJ-systemet kommer sedan att synas på denna sida i NAP."
+  :heading-operator-edit "Ändring av tidigare uppgivna tjänsteproducentnamn"
+  :help-operator-edit "Du har tidigare i NAP-tjänsten skapat en eller flera tjänsteproducenter vars namn inte motsvarar de namn eller parallellnamn som registrerats i YTJ med detta FO-nummer. Välj i menyn det namn du vill använda för att ersätta tidigare uppgivet namn."
+  :business-id-heading "FO-nummer:"
+  :help-operator-edit-selection "I listan nedan ser du de namn som registrerats i YTJ-systemet. Välj de namn i listan du vill använda som tjänsteproducenter i NAP."
+  :help-operator-contact-entry (:md "Kontaktuppgifterna nedan **gäller för samtliga namn och parallellnamn som är registrerade under detta FO-nummer**. Kontaktuppgifterna är hämtade ur YTJ-systemet och de kan inte ändras i NAP. Ifall uppgifterna är felaktiga eller bristfällga kan du göra ändringarna direkt i YTJ-systemet. Ändringarna du gjort i YTJ-systemet kommer sedan att synas på denna sida i NAP. Vad gäller tomma fält för kontaktuppgifter finns två alternativ. 1) Komplettera uppgifterna i YTJ-systemet, varefter de kommer att synas på denna sida i NAP (rekommenderas). 2) Fyll i uppgifterna direkt i fälten nedan (uppgifterna sparas då endast i NAP, inte i YTJ-systemet.)")
+  :help-operator-how-delete (:md "Du kan ta bort tjänsteproducentens uppgifter ur NAP genom att klicka på **Ta bort tjänsteproducent** -knappen. Borttagning är möjlig endast ifall det inte finns publicerade tjänster i NAP under ifrågavarande FO-nummer. Ta först bort eventuella tjänster på sidan **Egna tjänsteuppgifter**")
   :help-about-ytj-link-desc "Företags- och organisationsdatasystemet (FODS)"
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
   :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
-  :merge-operator-to-ytj "kommer att namnas som"
+  :merge-operator-to-ytj "ersätts med namnet"
   }
 
  :passenger-transportation-page
@@ -964,8 +970,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"
-  :save-failure "Sparade misslyckades."
-  :save-success "Sparad."
+  :save-failure "Går ej att spara."
+  :save-success "Sparat."
   :transport-service-saved "Uppgifterna sparade!"
   :transport-operator-saved "Uppgifterna sparade!"
   :footer-livi-logo "Traficom"
@@ -997,12 +1003,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :hours-placeholder "tt"
   :minutes-placeholder "mm"
 
-  :server-error "Fel i serveranropet."
+  :server-error "Problem i serveranropet."
   :server-error-try-later "Vänligen försök igen senare."
 
   :forbidden "Du har inte behörighet att visa innehållet."
   :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"
-  
+
   :nap-data-license (:md "Informationen Du ger i detta formulär publiceras i NAP-katalogen som öppen data med licensen [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
 
   :save-user-success "Profil sparad"
@@ -1018,7 +1024,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :delete-transport-operator
   {:title "Ta bort hela tjänsteproducenter?"
-   :title-base-view "Palveluntuottajan poistaminen"
+   :title-base-view "Ta bort tjänsteproducent"
    :confirm ["Vill du ta bort tjänsteproducenter \"" :name "\" slutgiltigt?"]}
 
   :navigation-prompt
@@ -1029,7 +1035,16 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :send-pre-notice
   {:title "Skicka ändringsmeddelandet?"
-   :confirm "Då ändringsmeddelandet har skickats, kan det inte längre ändras. Är du säker på att du vill skicka ändringsmeddelandet till myndigheten?"}}
+   :confirm "Då ändringsmeddelandet har skickats, kan det inte längre ändras. Är du säker på att du vill skicka ändringsmeddelandet till myndigheten?"}
+
+  :brokering-service
+  {:title "Är du säker på att tjänsten som du anmält är en förmedlingstjänst?"
+   :body "Observera att du utöver anmälan i NAP-tjänsten också måste göra en anmälan om förmedlingstjänst till Traficom på en skild blankett. Anmälan om förmedlingstjänst är avgiftsbelagd. "
+   :link-text "Anmäl till Traficom att du tillhandahåller en förmedlingstjänst"
+   :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
+   :cancel "Nej"
+   :ok "Ja"}
+  }
 
  :operators
  {:title "Tjänsteproducenter"

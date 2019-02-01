@@ -9,6 +9,7 @@
             [stylefy.core :as stylefy]
             [ote.style.form-fields :as style-form-fields]
             [ote.style.base :as style-base]
+            [ote.style.buttons :as style-buttons]
             [ote.ui.validation :as valid]
             [ote.time :as time]
             [ote.ui.buttons :as buttons]
@@ -115,23 +116,24 @@
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   focus on-blur on-change form? error warning table? full-width?
                                   style input-style hint-style password? on-enter
-                                  hint-text autocomplete disabled? id]
+                                  hint-text autocomplete disabled? element-id]
                            :as   field} data]
   [text-field
    (merge
-    {:id id
-     :name name
-     :floating-label-text (when-not table? label)
-     :floating-label-fixed true
-     :on-blur           on-blur
-     :hint-text         (or hint-text (placeholder field data) "")
-     :value             (or data "")
-     :error-text        (or error warning "") ;; Show error text or warning text or empty string
-     :error-style       (if error ;; Error is more critical than required - showing it first
-                          style-base/error-element
-                          style-base/required-element)
-     :hint-style (merge style-base/placeholder
-                        hint-style)}
+     (when element-id
+       {:id element-id})
+     {:name name
+      :floating-label-text (when-not table? label)
+      :floating-label-fixed true
+      :on-blur on-blur
+      :hint-text (or hint-text (placeholder field data) "")
+      :value (or data "")
+      :error-text (or error warning "") ;; Show error text or warning text or empty string
+      :error-style (if error ;; Error is more critical than required - showing it first
+                     style-base/error-element
+                     style-base/required-element)
+      :hint-style (merge style-base/placeholder
+                         hint-style)}
     (if on-change
       {:on-change #(let [v %2]
                      (if regex
@@ -357,8 +359,8 @@
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex
                                       on-blur on-update-input on-request-add on-request-delete
-                                      max-length style list-style hint-style hint-text
-                                      filter suggestions suggestions-config default-values max-results
+                                      max-length style element-id list-style hint-style hint-text
+                                      filter suggestions data-attribute-cypress suggestions-config default-values max-results
                                       auto-select? open-on-focus? clear-on-blur?
                                       allow-duplicates? add-on-blur? new-chip-key-codes
                                       form? table? full-width? full-width-input? disabled?] :as field}
@@ -380,7 +382,7 @@
         :hintText (or hint-text (placeholder field data))
         :disabled disabled?
         :value chips
-
+        :id element-id
         ;; == Autocomplete options ==
         :dataSource suggestions
         :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
@@ -388,7 +390,6 @@
         :open-on-focus open-on-focus?
         :clear-on-blur clear-on-blur?
         :auto-select? auto-select?
-
         ;; == Chip options ==
         :allow-duplicates allow-duplicates?
         ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
@@ -431,7 +432,7 @@
        (when list-style
          {:listStyle list-style}))]))
 
-(defn radio-selection [{:keys [update! label name show-option options error warning] :as field}
+(defn radio-selection [{:keys [update! label name show-option options error warning element-id] :as field}
                        data]
   (let [option-idx (zipmap options (map str (range)))]
     [:div.radio (stylefy/use-style style-form-fields/radio-selection)
@@ -457,13 +458,14 @@
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
                                error warning auto-width? disabled?
-                               option-value class-name] :as field}
+                               option-value class-name element-id] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
   (let [option-value (or option-value identity)
         option-idx (zipmap (map option-value options) (range))]
     [ui/select-field
      (merge
+       (when element-id {:id element-id})
        {:auto-width (boolean auto-width?)
         :style style
         :floating-label-text (when-not table? label)
@@ -487,10 +489,10 @@
            [ui/menu-item {:value i :primary-text (show-option option)}]))
        options))]))
 
-(defmethod field :selection [{radio? :radio? :as field} data]
+(defmethod field :selection [{radio? :radio? element-id :element-id :as field} data]
   (if radio?
-    [radio-selection field data]
-    [field-selection field data]))
+    [radio-selection field data element-id]
+    [field-selection field data element-id ]))
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
@@ -591,11 +593,12 @@
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! error warning required? unrestricted-hours?] :as opts}
+(defmethod field :time [{:keys [update! error warning required? unrestricted-hours? element-id] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
-           {:type :string
+           {:id element-id
+            :type :string
             :name "hours"
             :regex (if unrestricted-hours?
                      unrestricted-hour-regex
@@ -830,33 +833,35 @@
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
         [buttons/save (merge {:on-click #(update! (conj (or data []) {}))
-                              :label add-label
-                              :label-style style-base/button-label-style
                               :disabled (if add-label-disabled?
                                           (add-label-disabled? (last data))
                                           (values/effectively-empty? (last data)))}
                              (when (not (nil? id))
-                               {:id (str id "-button")}))]])]))
+                               {:id (str id "-button")})) add-label]])]))
 
-(defn- checkbox-container [update! table? label warning error style checked? disabled?]
+(defn- checkbox-container [update! table? label warning error style checked? disabled? on-click]
   [:div (when error (stylefy/use-style style-base/required-element))
-   [ui/checkbox {:label    (when-not table? label)
+   [ui/checkbox
+    (merge
+    {:label    (when-not table? label)
                  :checked  (boolean checked?)
                  :on-check #(update! (not checked?))
                  :disabled disabled?
-                 :style    style}]
+                 :style    style}
+    (when on-click
+      {:on-click #(on-click)}))]
    (when error
      (tr [:common-texts :required-field]))])
 
-(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help disabled?]} checked?]
+(defmethod field :checkbox [{:keys [update! table? label warning error style extended-help disabled? on-click]} checked?]
   (if extended-help
     [:div {:style {:margin-right (str "-" (:margin-right style-form/form-field))}}
      [common/extended-help
       (:help-text extended-help)
       (:help-link-text extended-help)
       (:help-link extended-help)]
-     (checkbox-container update! table? label warning error style checked? disabled?)]
-    (checkbox-container update! table? label warning error style checked? disabled?)))
+     (checkbox-container update! table? label warning error style checked? disabled? on-click)]
+    (checkbox-container update! table? label warning error style checked? disabled? on-click)))
 
 (defmethod field :checkbox-group [{:keys
                                    [update! table? label show-option options
@@ -921,7 +926,7 @@
          (fn [i option]
            (let [checked? (boolean (selected option))]
              ^{:key i}
-             [:div {:style {:display "flex" :flex-wrap "nowrap" :justify-content "flex-start" :align-items "center" :padding-top "0.625rem"}}
+             [:div {:style {:display "flex" :flex-wrap "nowrap" :justify-content "space-between" :align-items "center" :padding-top "0.625rem"}}
               [ui/checkbox {:id         (str i "_" (str option))
                             :label      (when-not table? (show-option option))
                             :checked    checked?
@@ -1082,23 +1087,12 @@
           ;; default
           ""))]]))
 
-(defmethod field :external-button [{:keys [label on-click disabled primary secondary style]}]
-  ;; Options
-  ; :label Button label text for displaying
-  ; :on-click On-click callback fn
-  ; :disabled Boolean property for disabling button
-  ; primary
-  ; secondary
-  [:div
-   [ui/raised-button
-    {:label     label
-     :primary   primary
-     :secondary secondary
-     :on-click  #(on-click)
-     :disabled  disabled
-     :style     style
-     }]]
-  )
+(defmethod field :external-button [{:keys [label on-click disabled primary secondary style element-id]}]
+  [buttons/save (merge
+                  (when element-id {:id element-id})
+                  {:on-click #(on-click)
+                   :disabled disabled})
+   label])
 
 (defmethod field :text-label [{:keys [label style h-style full-width?]}]
   ;; Options
@@ -1112,7 +1106,6 @@
    (if h-style
      [h-style label]
      [:p label])])
-
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
   [info/info-toggle label body default-state])

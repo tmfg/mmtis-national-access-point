@@ -13,13 +13,16 @@
             [ote.time :as time]
             [ote.util.values :as values]
             [ote.style.form :as style-form]
+            [ote.style.dialog :as style-dialog]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.validation :as validation]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [cljs-react-material-ui.icons :as ic]
             [ote.app.controller.flags :as flags]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [reagent.core :as r]
+            [ote.theme.colors :as colors]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -309,7 +312,8 @@
      :extended-help {:help-text      (tr [:form-help :brokerage?])
                      :help-link-text (tr [:form-help :brokerage-link])
                      :help-link      "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"}
-     :type          :checkbox}))
+     :type          :checkbox
+     :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
 
 (defn contact-info-group [service]
@@ -400,28 +404,60 @@
         show-footer? (if (get-in app [:transport-service ::t-service/id])
                        (ts/is-service-owner? app)
                        true)]
+    [:div
+     ;; Show brokering dialog
+     (when (get-in app [:transport-service :show-brokering-service-dialog?])
+       [ui/dialog
+        {:id "brokering-service-dialog"
+         :open true
+         :actionsContainerStyle style-dialog/dialog-action-container
+         :title (tr [:dialog :brokering-service :title])
+         :actions [
+                   (r/as-element
+                     [ui/flat-button
+                      {:id "confirm-brokering-service"
+                       :label (tr [:dialog :brokering-service :ok])
+                       :secondary true
+                       :primary true
+                       :on-click #(e! (ts/->SelectBrokeringService true))}])
+                   (r/as-element
+                     [ui/raised-button
+                      {:label (tr [:dialog :brokering-service :cancel])
+                       :primary true
+                       :on-click #(e! (ts/->SelectBrokeringService false))}])]}
+        [:p (tr [:dialog :brokering-service :body])]
+        [:div 
+         (linkify (tr [:dialog :brokering-service :link-url])
+                  [:span (stylefy/use-style style-base/blue-link-with-icon)
+                   (ic/content-create {:style {:width 20
+                                               :height 20
+                                               :margin-right "0.5rem"
+                                               :color colors/primary}})
+                    (tr [:dialog :brokering-service :link-text])]
+                  {:target "_blank" :style {:text-decoration "none"}})]])
 
-    (when true ;show-footer? - Take owner check away for now
-      [:div.row
-       (when (not (form/can-save? data))
-         [ui/card {:style {:margin-bottom "1rem"}}
-          [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6rem"}} (tr [:form-help :publish-missing-required])]])
+     ;show-footer? - Take owner check away for now
+     (when true
+       [:div.row
+        (when (not (form/can-save? data))
+          [ui/card {:style {:margin-bottom "1rem"}}
+           [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6rem"}} (tr [:form-help :publish-missing-required])]])
 
-       (if published?
-         ;; True
-         [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                        :disabled (not (form/can-save? data))}
-          (tr [:buttons :save-updated])]
-         ;; False
-         [:span
+        (if published?
+          ;; True
           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
                          :disabled (not (form/can-save? data))}
-           (tr [:buttons :save-and-publish])]
-          [buttons/save  {:on-click #(e! (ts/->SaveTransportService schemas false))
+           (tr [:buttons :save-updated])]
+          ;; False
+          [:span
+           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                          :disabled (not (form/can-save? data))}
+            (tr [:buttons :save-and-publish])]
+           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas false))
                           :disabled name-missing?}
-           (tr [:buttons :save-as-draft])]])
-       [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
-        (tr [:buttons :discard])]])))
+            (tr [:buttons :save-as-draft])]])
+        [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+         (tr [:buttons :discard])]])]))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group

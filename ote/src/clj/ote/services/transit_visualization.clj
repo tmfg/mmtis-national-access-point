@@ -11,7 +11,8 @@
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
             [ote.util.fn :refer [flip]]
-            [ote.transit-changes.detection :as detection]))
+            [ote.transit-changes.detection :as detection]
+            [clojure.set :as set]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -66,6 +67,23 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
+(defn trip-differences-for-dates [db service-id date1 date2 route-hash-id]
+  (let [date1-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date1))
+        date2-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date2))
+        result (detection/compare-selected-trips date1-trips date2-trips
+                                                   (time/parse-date-iso-8601 date1)
+                                                   (time/parse-date-iso-8601 date2))
+        stop-changes (reduce detection/update-min-max-range nil
+                             (map :stop-time-changes (:trip-changes result)))
+        sequence-changes (reduce detection/update-min-max-range nil
+                                 (map :stop-seq-changes (:trip-changes result)))]
+
+    (-> result
+        (assoc :gtfs/trip-stop-sequence-changes sequence-changes)
+        (assoc :gtfs/trip-stop-time-changes stop-changes)
+        (dissoc :starting-week-date :different-week-date :trip-changes)
+        (set/rename-keys {:added-trips :gtfs/added-trips :removed-trips :gtfs/removed-trips}))))
+
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
@@ -80,6 +98,9 @@
                                                         java.sql.Date/valueOf)})]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
           :changes changes
+          :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
+                                                   #{:gtfs/route-hash-id-type}
+                                                   {:gtfs/transport-service-id service-id}))
           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
   ^{:unauthenticated true :format :transit}
@@ -120,12 +141,4 @@
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
         {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params}
-    (fetch-route-differences
-      db
-      {:service-id (Long/parseLong service-id)
-       :date1 (time/parse-date-iso-8601 date1)
-       :date2 (time/parse-date-iso-8601 date2)
-       :route-short-name short-name
-       :route-long-name long-name
-       :trip-headsign headsign
-       :route-hash-id route-hash-id})))
+    (trip-differences-for-dates db service-id date1 date2 route-hash-id)))

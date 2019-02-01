@@ -10,7 +10,8 @@
             [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
-            [ote.ui.common :as common-ui]))
+            [ote.ui.common :as common-ui]
+            [ote.style.dialog :as style-dialog]))
 
 (defn- edit-user-action [e! {:keys [id username show-edit-dialog?] :as user}]
   [:span
@@ -38,12 +39,13 @@
    (when show-delete-modal?
      (let [admin-list (mapv #(if (> (count (:members %)) 0) true false) other-members)]
        [ui/dialog
-        {:open    true
-         :title   "Poista käyttäjä"
+        {:open true
+         :actionsContainerStyle style-dialog/dialog-action-container
+         :title "Poista käyttäjä"
          :actions [(r/as-element
                      [ui/flat-button
-                      {:label    (tr [:buttons :cancel])
-                       :primary  true
+                      {:label (tr [:buttons :cancel])
+                       :primary true
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (admin-controller/->CancelDeleteUser id)))}])
@@ -51,13 +53,13 @@
                      nil
                      (r/as-element
                        [ui/raised-button
-                        {:label     (tr [:buttons :delete])
-                         :icon      (ic/action-delete-forever)
+                        {:label (tr [:buttons :delete])
+                         :icon (ic/action-delete-forever)
                          :secondary true
-                         :primary   true
-                         :on-click  #(do
-                                       (.preventDefault %)
-                                       (e! (admin-controller/->ConfirmDeleteUser id)))}]))]}
+                         :primary true
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (admin-controller/->ConfirmDeleteUser id)))}]))]}
         [:div
          (if (some false? admin-list)
            [:p "Ei voida poistaa käyttäjää."]

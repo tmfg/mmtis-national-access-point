@@ -8,6 +8,7 @@
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
+            [ote.ui.warning_msg :as warning-msg]
             [ote.app.controller.front-page :as fp]
             [ote.app.controller.login :as login]
             [ote.app.controller.transport-service :as ts]
@@ -35,35 +36,34 @@
             [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
             [clojure.string :as str]
-            [ote.app.controller.front-page :as fp]))
+            [ote.app.controller.front-page :as fp]
+            [ote.style.dialog :as style-dialog]))
 
 
 (defn delete-service-action [e! {::t-service/keys [id name]
                                  :keys [show-delete-modal?]
                                  :as service}]
   [:span
-   [ui/icon-button {:href "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (ts/->DeleteTransportService id)))}
+   [ui/icon-button (merge {:href "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts/->DeleteTransportService id)))}
+                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
       {:open true
+       :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
-                   [ui/flat-button
-                    {:label (tr [:buttons :cancel])
-                     :primary true
-                     :on-click #(e! (ts/->CancelDeleteTransportService id))}])
+                   [buttons/cancel
+                    {:on-click #(e! (ts/->CancelDeleteTransportService id))}
+                    (tr [:buttons :cancel])])
                  (r/as-element
-                   [ui/raised-button
-                    {:label (tr [:buttons :delete])
-                     :icon (ic/action-delete-forever)
-                     :secondary true
-                     :primary true
-                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}])]}
-
+                   [buttons/delete
+                    {:icon (ic/action-delete-forever)
+                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}
+                    (tr [:buttons :delete])])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 (defn transport-services-table-rows [e! services transport-operator-id]
@@ -95,9 +95,10 @@
              [:span.draft
               (tr [:field-labels :transport-service ::t-service/published?-values false])])]
           [ui/table-row-column
-           [ui/icon-button {:href "#" :on-click #(do
-                                                   (.preventDefault %)
-                                                   (e! (fp/->ChangePage :edit-service {:id id})))}
+           [ui/icon-button (merge {:href "#" :on-click #(do
+                                                          (.preventDefault %)
+                                                          (e! (fp/->ChangePage :edit-service {:id id})))}
+                                  (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
             [ic/content-create]]
            [delete-service-action e! row]]])
        services))])
@@ -146,7 +147,8 @@
         [:h4 {:style {:margin "0"}}
          (tr [:field-labels :select-transport-operator])]
         [form-fields/field
-         {:name :select-transport-operator
+         {:element-id "select-operator-at-own-services"
+          :name :select-transport-operator
           :type :selection
           :show-option #(::t-operator/name %)
           :update! #(e! (to/->SelectOperator %))
@@ -155,7 +157,8 @@
           :class-name "mui-select-button"}
          (to/take-operator-api-keys operator)]]
        [:div.col-sm-6.col-md-6
-        [:a (merge {:href "#/transport-operator"
+        [:a (merge {:id "btn-add-new-transport-operator"
+                    :href "#/transport-operator"
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (to/->CreateTransportOperator)))}
@@ -197,6 +200,7 @@
     [:div {:style {:margin-bottom "2rem"}}
      [:a (merge {:href (str "#/transport-operator/" id)
                  :style {:margin-right "2rem"}
+                 :id "edit-transport-operator-btn"
                  :on-click #(do
                               (.preventDefault %)
                               (e! (fp/->ChangePage :transport-operator {:id id})))}
@@ -230,42 +234,63 @@
    [:hr {:style {:border-bottom "0"}}]])
 
 (defn- added-associations
-  [a-services oa-services state]
+  [e! a-services oa-services state]
   [:div
    [:h4 (tr [:own-services-page :other-service-associations])]
    (if (empty? a-services)
-     (if (empty? oa-services)
-       [:span (stylefy/use-style style-base/gray-text)
-        (tr [:own-services-page :no-associations] {:operator-name
-                                                   (::t-operator/name (:transport-operator state))})]))
-   [:ul.unstyled
-    (doall
-      (for [as a-services]
-        [:li {:key (:service-id as)}
-         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]
-   [:ul.unstyled
-    (doall
-      (for [as oa-services]
-        [:li {:key (:service-id as)}
-         (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))]])
+     [:span (stylefy/use-style style-base/gray-text)
+      (tr [:own-services-page :no-associations] {:operator-name
+                                                 (::t-operator/name (:transport-operator state))})]
+     [:ul.unstyled
+      (doall
+        (for [as a-services]
+          [:li {:key (:service-id as)}
+           (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")]))])
+   [:h4 (tr [:own-services-page :added-services])]
+   (if (empty? oa-services)
+     [:span (stylefy/use-style style-base/gray-text)
+      (tr [:own-services-page :no-own-associations] {:operator-name
+                                                     (::t-operator/name (:transport-operator state))})]
+     [:ul.unstyled {:style {:display "inline-block"}}
+      (doall
+        (for [as oa-services]
+          [:li {:key (:service-id as)
+                :id (str "service-id-" (:service-id as))}
+           [:div {:style {:display "flex"
+                           :align-items "center"
+                           :justify-content "space-between"
+                           :padding "0.25rem 0"}}
+            (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")
+            [buttons/icon-button
+             (merge
+               {:on-click #(e! (os-controller/->RemoveSelection (:service-id as)))
+                :id (str "delete-service-" (:service-id as))})
+             [ic/content-clear]]]]))])])
 
 (defn- add-associated-services
   [e! state]
-  [:div
-   (let [suggestions (filter :service-id (:suggestions (:service-search state)))
-         associated (::t-operator/associated-services (:transport-operator state))
-         associated-ids (set (map :service-id associated))
-         cur-op-id (::t-operator/id (:transport-operator state))
-         filtered-suggestions (filter
-                                #(and (not (associated-ids (:service-id %))) (not= cur-op-id (:operator-id %)))
-                                suggestions)
-         current-operator (::t-operator/id (:transport-operator state))]
+  (let [suggestions (filter :service-id (:suggestions (:service-search state)))
+        associated (::t-operator/associated-services (:transport-operator state))
+        associated-ids (set (map :service-id associated))
+        own-associated-ids (set (map :service-id (get-in state [:transport-operator ::t-operator/own-associations])))
+        cur-op-id (::t-operator/id (:transport-operator state))
+        filtered-suggestions (filter
+                               #(and
+                                  (not (associated-ids (:service-id %)))
+                                  (not= cur-op-id (:operator-id %))
+                                  (not (own-associated-ids (:service-id %))))
+                               suggestions)
+        current-operator (::t-operator/id (:transport-operator state))
+        show-error? (:association-failed state)]
+    [:div {:style {:margin-top "1rem"}}
+     (if show-error?
+       [warning-msg/warning-msg [:span (tr [:common-texts :save-failure])]])
      [form-fields/field
       {:type :chip-input
-       :label (tr [:own-services-page :service])
        :full-width? true
        :full-width-input? false
-       :hint-text (tr [:own-services-page :add-service])
+       :element-id "chip-input"
+       :hint-text (tr [:own-services-page :associated-search-hint])
        :hint-style {:top "20px"}
        ;; No filter, back-end returns what we want
        :filter (constantly true)
@@ -284,15 +309,13 @@
                                (:operator-business-id chip)
                                current-operator
                                (:service-operator chip)))
-                         chip)
-       :on-request-delete (fn [chip-val]
-                            (e! (os-controller/->RemoveSelection chip-val)))}
-      (::t-operator/own-associations (:transport-operator state))])])
+                         chip)}
+      nil]]))                                               ;We don't want to display the chips in the chip input so we pass nil
 
 (defn- associated-services
   [e! state]
   (let [a-services (::t-operator/associated-services (:transport-operator state))
-        oa-services (::t-operator/own-associations (:transport-operator state))]
+        oa-services (sort #(compare (:service-operator %1) (:service-operator %2)) (::t-operator/own-associations (:transport-operator state)))]
     [:div {:class "col-xs-12"
            :style {:margin-bottom "3rem"}}
      [:h3 (tr [:own-services-page :other-services-where-involved])]
@@ -300,7 +323,7 @@
       (tr [:common-texts :instructions])
       [:p (tr [:own-services-page :filling-info-content])]
       false]
-     [added-associations a-services oa-services state]
+     [added-associations e! a-services oa-services state]
      [add-associated-services e! state]]))
 
 (defn- operator-info-container

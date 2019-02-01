@@ -50,6 +50,18 @@
                                       {::t-service/sub-type sub-type
                                        ::t-service/type (service-type-from-sub-type sub-type)})))))
 
+(define-event ShowBrokeringServiceDialog []
+  {}
+  (assoc-in app [:transport-service :show-brokering-service-dialog?] true))
+
+(define-event SelectBrokeringService [select-type]
+  {}
+  (let [type (get-in app [:transport-service ::t-service/type])
+        type-key (t-service/service-key-by-type type)]
+  (-> app
+      (assoc-in [:transport-service :show-brokering-service-dialog?] false )
+      (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
+
 ;;; Navigation hook events for new service creation and editing
 
 (defmethod routes/on-navigate-event :new-service [{p :params}]
@@ -443,7 +455,8 @@
               (update key (comp (partial form/prepare-for-save schemas)
                                 form/without-form-metadata))
               (dissoc :transport-service-type-subtype
-                      :select-transport-operator)
+                      :select-transport-operator
+                      :show-brokering-service-dialog?)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id operator-id)

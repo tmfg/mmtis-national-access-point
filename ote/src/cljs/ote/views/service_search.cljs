@@ -23,7 +23,8 @@
             [ote.ui.validation :as validation]
             [ote.util.text :as text]
             [ote.ui.page :as page]
-            [ote.app.utils :as utils]))
+            [ote.app.utils :as utils]
+            [ote.style.dialog :as style-dialog]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -37,19 +38,16 @@
    (when show-delete-modal?
      [ui/dialog
       {:open true
+       :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
-                   [ui/flat-button
-                    {:label (tr [:buttons :cancel])
-                     :primary true
-                     :on-click #(e! (admin/->CancelDeleteTransportService id))}])
+                   [buttons/cancel
+                    {:on-click #(e! (admin/->CancelDeleteTransportService id))}
+                    (tr [:buttons :cancel])])
                  (r/as-element
-                   [ui/raised-button
-                    {:label (tr [:buttons :delete])
-                     :icon (ic/action-delete-forever)
-                     :secondary true
-                     :primary true
-                     :on-click #(e! (admin/->ConfirmDeleteTransportService id))}])]}
+                   [buttons/delete
+                    {:on-click #(e! (admin/->ConfirmDeleteTransportService id))}
+                    (tr [:buttons :delete])])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 (defn data-item [icon item]

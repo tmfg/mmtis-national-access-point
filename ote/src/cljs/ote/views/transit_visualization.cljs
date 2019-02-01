@@ -407,12 +407,14 @@
       [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
        body-content]])])
 
-(defn route-changes [e! route-changes selected-route]
+(defn route-changes [e! route-changes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
-        table-height (cond
-                       (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
-                       (= 0 route-count) 100
-                       :else 500)]; 10+
+        table-height (str
+                       (cond
+                         (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
+                         (= 0 route-count) 100
+                         :else 500)
+                       "px")]; 10+
   [:div.route-changes
    [route-changes-legend]
    [table/table {:no-rows-message (tr [:transit-visualization-page :loading-routes])
@@ -428,8 +430,13 @@
       :read (juxt :route-short-name :route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
-     {:name "Reitti/määränpää" :width "20%"
-      :read :trip-headsign}
+
+     ;; Show Reitti/Määränpää column only if it does affect on routes.
+     (when (or (nil? route-hash-id-type)
+               (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
+               (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign"))
+       {:name "Reitti/määränpää" :width "20%"
+        :read :trip-headsign})
 
      {:name "Aikaa 1. muutokseen"
       :width "20%"
@@ -542,10 +549,9 @@
        [comparison-date-changes compare]]]]))
 
 (defn format-stop-name [stop-name]
-  (let [remove-sequence-number #(str/join " " (rest (str/split % #" ")))
-        splitted-stop-name (if (str/includes? stop-name "->")
-                             (str/split (remove-sequence-number stop-name) #"->")
-                             (remove-sequence-number stop-name))
+  (let [splitted-stop-name (if (str/includes? stop-name "->")
+                             (str/split stop-name #"->")
+                             stop-name)
         formatted-name (if (and (vector? splitted-stop-name) (> (count splitted-stop-name) 1))
                          [:span (second splitted-stop-name)
                           [:br] (str "(Vanha nimi: " (first splitted-stop-name) ")")]
@@ -574,7 +580,7 @@
                                     (comp :gtfs/stop-name first :stoptimes second)
                                     (comp :gtfs/stop-name last :stoptimes second))
                               combined-trips)]
-      [:div.routes-table {:style {:margin-top "1em"}}
+      [:div.trips-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
                      :on-select #(e! (tv/->SelectTripPair (first %)))}
@@ -780,7 +786,7 @@
               ^{:key id}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections]
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections route-hash-id-type]
                                  :as   transit-visualization}]
   [:div
      [:div.transit-visualization
@@ -796,7 +802,7 @@
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-        [route-changes e! changes selected-route]]]
+        [route-changes e! (:route-changes changes) selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container

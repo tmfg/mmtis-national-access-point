@@ -563,21 +563,23 @@ You can also draw the operating area or point to the map with drawing tools. You
           :parking "General commerial parking services"
           :brokerage "Brokering service companies"}
 
- :own-services-page {:filling-info "Filling instructions"
-                     :filling-info-content (:md "**Palvelut, joiden tuottamiseen osallistut** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Palvelun lisääminen**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita kohtaan Lisää palvelu joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi")
+ :own-services-page {:add-service "Add a service"
+                     :added-services "Participating information that you have entered"
+                     :associated-search-hint "Add participation information by writing the name of the service or the name of the service provider in to this field."
+                     :edit-business-id ["Edit information for business-id " :business-id]
+                     :filling-info "Filling instructions"
+                     :filling-info-content (:md "**Participation information entered  by other companies** \n If there are already listed services under this headline, the service providers in question have entered your company (Business ID) as participating in the provision of their service. If the information is incorrect, please contact the service provider to rectify the information. \n\n**How to add participation information yourself?**\nIf a service, in which you are participating, is missing from the list (e.g. a taxi brokering centre), write the name of the service provider or the name of the service in the search box. After this, select the right service from the alternatives in the list. If you select the wrong service by mistake, you can remove it by clicking the X  symbol after the service name. If you cannot find the mobility service that you are participating in, please contact **NAP Helpdesk**: +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or joukkoliikenne@traficom.fi\n\nIf you also provide your own taxi transport services in addition to those of a brokering centre, or provide other transport services, please create your own service or services in the section **Own services**.")
+                     :no-associations [:operator-name " has not been entered as participating in any other service provider’s service."]
+                     :no-own-associations ["You have not entered the service provider " :operator-name " as participating in the provision of any other service provider´s service."]
                      :open-geojson "Open GeoJson"
-                     :other-services-where-involved "Muut palvelut, joissa olet mukana"
-                     :other-service-associations "Palvelut, joiden tuottamiseen osallistut"
-                     :own-services "Own transport services"
+                     :other-services-where-involved "Services conducted by others in which you are involved in"
+                     :other-service-associations "Participating information entered by other companies"
+                     :own-services "Own services"
                      :own-services-info-long (:md "By clicking the button **Add a new service** you can give more detailed information of the transport service you are providing. If you do not provide any of your **own** transport services directly to customers (e.g. you only operate rides through a brokering centre), you can skip this part and go directly to the section **Other services in which you are involved in.**")
                      :own-services-directions-short "Instructions"
                      :own-services-new-provider1 "Well done! You have now successfully added a service provider "
                      :own-services-new-provider2 (:md " to the NAP service catalog. Please notice that only creating a service provider does not cover the essential information of your transport service/services determined in the legislation (e.g. operating area, pricing and accessibility). \n\nPlease, provide next more detailed information on your transport service or services in section **Own transport services** and/or **Other services in which you are involved in**. If you are a taxi company and you only operate rides through a brokering centre, go directly to the section **Other services in which you are involved in** and give information about the brokering centre. In such a case, you don´t necessarily have to create a transport service of your own in the NAP service catalog.")
-                     :own-services-no-providers (:md "You are not yet a member of any transport operator. To be able to publish transport service information, you have to first **create a new transport operator** to the NAP service or **join as a member to some transport operator that already exists in the NAP service by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 10 am to 4 pm) or joukkoliikenne@traficom.fi).\n\nA transport operator is a company, community or other organization, which provides it´s own transport services or participates in conducting of other company´s transport services, A transport operator can be e.g. a taxi company, a buss company, a parking facility operator or a municipality.")
-                     :service "Service"
-                     :add-service "Add a service"
-                     :edit-business-id ["Edit information for business-id " :business-id]
-                     :no-associations [:operator-name " isn't reported as an associate to any other service."]}
+                     :own-services-no-providers (:md "You are not yet a member of any service provider. In order to be able to publish transport service information, you must first **create a new service provider** in the NAP service or **join as a member of an already existing service provider** by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or joukkoliikenne@traficom.fi).\n\nA service provider is a company, community or other organization, which provides its own transport services or participates in the provision of another party’s transport services, A transport operator can be e.g. a taxi company, a bus company, a commercial parking facility operator or a municipality.")}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -654,11 +656,15 @@ You can also draw the operating area or point to the map with drawing tools. You
 
 
  :organization-page
- {:business-id-and-aux-names "Company name and auxiliary names"
+ {:address-postal "Postal address"
+  :address-postal-street "Street address or P.O. Box"
+  :business-id-and-aux-names "Company name and auxiliary names"
+  :business-name "Business name"
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
+  :contact-details-other "Other contact details "
   :fetch-from-ytj "Fetch data from YTJ"
-  :fetch-from-ytj-success "Details successfully fetched from YTJ."
+  :fetch-from-ytj-success "Details successfully fetched from the BIS register."
   :field-phone-mobile "Mobile phone"
   :field-phone-telephone "Telephone"
   :no-aux-names-for-business-id "There were no auxiliary business names for the business id."
@@ -672,15 +678,15 @@ You can also draw the operating area or point to the map with drawing tools. You
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
   :help-ytj-integration-desc "The service provider information is received from the Business Information System (BIS) on the basis of the Business ID. If the information is incorrect or incomplete, you can make changes to it in the _BIS service_. Changes made in the BIS service (e.g. changing the street address or registering a new auxiliary trade name) will appear on this page after they are registered in the BIS register."
-  :heading-operator-edit "Change the previously created service provider names"
-  :help-operator-edit "You have previously created one or more service providers in the NAP service, whose names do not match to the business name or auxiliary names registered to your Business ID. Please, select a name from the drop-down menu to replace the name of the service provider you have previously created."
-  :business-id-heading "Business id:"
+  :heading-operator-edit "Change previously created service provider names"
+  :help-operator-edit "In the list below you can see the business name and auxiliary names registered to your Business ID. Please, select only the names from the list which to you want to release services in the NAP service."
+  :business-id-heading "Business ID:"
   :help-operator-edit-selection "In the list below you can see the business name and auxiliary names registered to your Business ID. Please, select only the names from the list which to you want to release services in the NAP service."
-  :help-operator-contact-entry (:md "The contact information below are Business ID specific, which means that they are the **same for the Business name and for every auxiliary name**. Contact information is retrieved from the BIS and can not be edited in the NAP service. If there are any errors or omissions in the information, you can make changes to it in the BIS service. For empty contact fields, you have two choices. 1) Complete the information to the BIS register, after which they are also available in the NAP service (recommended). 2) Complete the information directly into the form fields below (the information given will be stored only in the NAP service - it  will not transfer to the BIS register).")
-  :help-operator-how-delete (:md "To remove the service provider information from the NAP service, click the **Delete service provider** -button. Deleting the service provider is possible only when service provider doesen't have any published services in the NAP service. If you want to delete the service provider, please, first delete all the transport services on the **Own transport services** page.")
+  :help-operator-contact-entry (:md "The contact information below are Business ID specific, which means that they are the **same for the Business name and for every auxiliary name**. Contact information is retrieved from the BIS register and cannot be edited in the NAP service. If there are any errors or omissions in the information, you can make changes to it in the BIS service. For empty contact fields, you have two choices. 1) Complete the information to the BIS register, after which they are also available in the NAP service (recommended). 2) Complete the information directly into the form fields below (the information given will be stored only in the NAP service - it  will not transfer to the BIS register).")
+  :help-operator-how-delete (:md "For removing the service provider information from the NAP service, click the **Delete service provider** button. Deleting the service provider is possible only when service provider doesn't have any published services in the NAP service. If you want to delete the service provider, please, first delete all the transport services on the **Own transport services** page.")
   :help-about-ytj-link-desc "Read more about Business Information System (BIS)"
   :help-about-ytj-link "https://www.ytj.fi/en/index/whatisbis.html"
-  :help-ytj-contact-change-link-desc "Change details of your business online"
+  :help-ytj-contact-change-link-desc "Change details of your business in the Business Information System (BIS)"
   :help-ytj-contact-change-link "https://www.ytj.fi/en/index/notifications/notificationsofchanges.html"
   :merge-operator-to-ytj "will be renamed as"
   }
@@ -916,7 +922,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:loading-routes "Loading service routes."}
 
  :common-texts
- {:check-your-input "Please check that the details you entered are correct."
+ {:check-your-input "Please check that the information you have given is correct."
   :front-page-help-text "You have not yet registered any transport services to NAP-service catalog.
         You can register an external interface about your service or essential data about your service by using
         the NAP-service which is developed for this purpose."
@@ -954,7 +960,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-video-tutorials "Video tutorials for service providers"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basic information"
-  :data-not-found "Data is not found."
+  :data-not-found "Information is not found."
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
@@ -993,7 +999,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :hours-placeholder "hh"
   :minutes-placeholder "mm"
 
-  :server-error "Error in service invocation."
+  :server-error "Error in the service invocation."
   :server-error-try-later "Please try again later."
 
   :forbidden "Forbidden"
@@ -1014,7 +1020,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :delete-transport-operator
   {:title "Want to delete a transport operator?"
-   :title-base-view "Palveluntuottajan poistaminen"
+   :title-base-view "Deleting of the service provider"
    :confirm ["Are you sure you want to delete operator named \"" :name "\" permanently?"]}
 
   :navigation-prompt
@@ -1025,7 +1031,16 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :send-pre-notice
   {:title "Lähetä muutosilmoitus?"
-   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}}
+   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}
+
+  :brokering-service
+  {:title "Are you sure, that service you are announcing is a brokering service?"
+   :body  "Please, notice, that besides filling up the NAP form, you also have to register as a brokering service to the Finnish Transport and Communication Agency, Traficom. Registration as a brokering service is chargeable."
+   :link-text "Register as a brokering service to Traficom"
+   :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
+   :cancel "No"
+   :ok "Yes"}
+  }
 
  :operators
  {:title "Transport operators"

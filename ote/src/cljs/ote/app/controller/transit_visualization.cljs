@@ -68,12 +68,14 @@
 
 (defn future-changes
   "Filter routes changes that are in the future. (or no changes)"
-  [package-detection-date changes]
-  (let [package-detection-date (time/parse-date-iso-8601 package-detection-date)]
+  [detection-date changes]
+  (let [detection-date (time/parse-date-iso-8601 detection-date)]
     (filter
       (fn [{:gtfs/keys [change-date]}]
-        (or (nil? change-date)
-              (not (t/before? (time/native->date-time change-date) package-detection-date))))
+          (or (nil? change-date)
+              (not (t/before?
+                     (time/native->date-time change-date)
+                     detection-date))))
       changes)))
 
 
@@ -157,20 +159,20 @@
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
 
-(define-event LoadServiceChangesForDateResponse [response package-detection-date]
-              {:path [:transit-visualization]}
-              (assoc app
-                :service-changes-for-date-loading? false
-                :service-info (:service-info response)
-                :changes-all (:changes response)
-                ;:changes (update (:changes response) :gtfs/route-change (comp sorted-route-changes (partial future-changes package-detection-date)))
-                :changes (sorted-route-changes (future-changes package-detection-date (:changes response)))
-                :gtfs-package-info (:gtfs-package-info response)))
-
-(define-event LoadServiceChangesForDate [service-id date]
+(define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-  (comm/get! (str "transit-visualization/" service-id "/" date)
-             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse date)})
+  (assoc app
+         :service-changes-for-date-loading? false
+         :service-info (:service-info response)
+         :changes-all (:changes response)
+         :changes (update (:changes response) :route-changes (comp sorted-route-changes (partial future-changes detection-date)))
+         :gtfs-package-info (:gtfs-package-info response)
+         :route-hash-id-type (:route-hash-id-type response)))
+
+(define-event LoadServiceChangesForDate [service-id detection-date]
+  {:path [:transit-visualization]}
+  (comm/get! (str "transit-visualization/" service-id "/" detection-date)
+             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
   {:service-changes-for-date-loading? true
    :open-sections {:gtfs-package-info false}})
 
@@ -380,16 +382,10 @@
                          {:date2 date
                           :last-selected-date 2}))]
     (comm/get! (str "transit-visualization/" service-id "/route-differences")
-               {:params (merge
-                         {:date1 (time/format-date-iso-8601 (:date1 compare))
-                          :date2 (time/format-date-iso-8601 (:date2 compare))
-                          :route-hash-id (ensure-route-hash-id route)}
-                         (when-let [short (:gtfs/route-short-name route)]
-                           {:short-name short})
-                         (when-let [long (:gtfs/route-long-name route)]
-                           {:long-name long})
-                         (when-let [headsign (:gtfs/trip-headsign route)]
-                           {:headsign headsign}))
+               {:params {:date1 (time/format-date-iso-8601 (:date1 compare))
+                         :date2 (time/format-date-iso-8601 (:date2 compare))
+                         :route-hash-id (ensure-route-hash-id route)}
+
                 :on-success (tuck/send-async! ->RouteDifferencesResponse)})
     (-> app
         (assoc-in [:transit-visualization :route-differences-loading?] true)

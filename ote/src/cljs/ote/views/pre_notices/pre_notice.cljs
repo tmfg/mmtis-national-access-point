@@ -6,7 +6,7 @@
             [ote.app.controller.pre-notices :as pre-notice]
             [ote.ui.buttons :as buttons]
             [ote.ui.form-fields :as form-fields]
-            ;; db
+    ;; db
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
@@ -17,7 +17,8 @@
             [stylefy.core :as stylefy]
             [ote.ui.leaflet :as leaflet]
             [ote.ui.mui-chip-input :as chip-input]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.style.dialog :as style-dialog]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
@@ -47,23 +48,24 @@
 (defn- pre-notice-send-modal [e! app]
   (when (:show-pre-notice-send-modal? app)
     [ui/dialog
-     {:open    true
-      :title   (tr [:dialog :send-pre-notice :title])
+     {:open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title (tr [:dialog :send-pre-notice :title])
       :actions [(r/as-element
                   [ui/flat-button
-                   {:label    (tr [:buttons :cancel])
-                    :primary  true
+                   {:label (tr [:buttons :cancel])
+                    :primary true
                     :on-click #(e! (pre-notice/->CloseSendModal))}])
                 (r/as-element
                   [ui/raised-button
-                   {:id        "confirm-send-pre-notice"
-                    :label     (tr [:buttons :save-and-send])
-                    :icon      (ic/action-delete-forever)
+                   {:id "confirm-send-pre-notice"
+                    :label (tr [:buttons :save-and-send])
+                    :icon (ic/action-delete-forever)
                     :secondary true
-                    :primary   true
-                    :on-click  #(do
-                                  (e! (pre-notice/->CloseSendModal))
-                                  (e! (pre-notice/->SaveToDb true)))}])]}
+                    :primary true
+                    :on-click #(do
+                                 (e! (pre-notice/->CloseSendModal))
+                                 (e! (pre-notice/->SaveToDb true)))}])]}
      (tr [:dialog :send-pre-notice :confirm])]))
 
 (defn select-operator [e! operator operators]

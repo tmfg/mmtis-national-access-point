@@ -16,7 +16,8 @@
             [ote.ui.common :as common]
             [ote.app.controller.front-page :as fp-controller]
             [ote.ui.common :as common-ui]
-            [ote.util.text :as text]))
+            [ote.util.text :as text]
+            [ote.style.dialog :as style-dialog]))
 
 (defn show-service-count-link [e! operator]
   (let [service-count (::t-operator/service-count operator)]
@@ -67,16 +68,17 @@
   (when (:show-modal? operator)
     [ui/dialog
      {:open true
+      :actionsContainerStyle style-dialog/dialog-action-container
       :modal false
       :auto-scroll-body-content true
-      :title   (::t-operator/name operator)
+      :title (::t-operator/name operator)
       :on-request-close #(e! (operators-controller/->CloseOperatorModal (::t-operator/id operator)))
       :actions [(r/as-element
                   [ui/flat-button
-                   {:label     (tr [:buttons :close])
+                   {:label (tr [:buttons :close])
                     :secondary true
-                    :primary   true
-                    :on-click  #(e! (operators-controller/->CloseOperatorModal (::t-operator/id operator)))}])]}
+                    :primary true
+                    :on-click #(e! (operators-controller/->CloseOperatorModal (::t-operator/id operator)))}])]}
 
      (show-operator-data e! operator)]))
 

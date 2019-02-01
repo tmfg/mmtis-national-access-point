@@ -292,124 +292,6 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION gtfs_route_differences(
-     "route-short-name" TEXT, "route-long-name" TEXT, "trip-headsign" TEXT, "route-hash-id" TEXT,
-     d1_trips "gtfs-package-trip-info"[], d2_trips "gtfs-package-trip-info"[])
-RETURNS "gtfs-route-change-info"
-AS $$
-DECLARE
-  first_common_stop TEXT;
-  route_changes "gtfs-route-change-info";
-  row RECORD;
-  all_trips TEXT[];
-  d1_trip_ids TEXT[];
-  d2_trip_ids TEXT[];
-  trip_chg "gtfs-trip-change-info";
-  trip_stop_seq_changes_lower INTEGER; -- Lowest count of sequence changes of a single trip within a route
-  trip_stop_seq_changes_upper INTEGER; -- Highest count of sequence changes of a single trip within a route
-  trip_stop_time_changes_lower INTEGER; -- Lowest count of stop time changes of a single trip within a route
-  trip_stop_time_changes_upper INTEGER; -- Highest count of stop time changes of a single trip within a route
-BEGIN
-  trip_stop_seq_changes_lower := NULL;
-  trip_stop_seq_changes_upper := 0;
-  trip_stop_time_changes_lower := NULL;
-  trip_stop_time_changes_upper := 0;
-
-  -- Select all trips as array of "package-id:trip-id" strings
-  all_trips := (SELECT array_agg(x.t)
-                  FROM (SELECT CONCAT(d1t."package-id",':',(d1t.trip)."trip-id") t
-                          FROM unnest(d1_trips) d1t
-                         UNION
-                        SELECT CONCAT(d2t."package-id",':',(d2t.trip)."trip-id") t
-                          FROM unnest(d2_trips) d2t) x);
-
-  -- Detect first common stop in the trips
-  --RAISE NOTICE '% % % -- d1_trips % -- d2_trips %, trips: %', "route-short-name", "route-long-name", "trip-headsign", array_length(d1_trips, 1), array_length(d2_trips,1), all_trips::text;
-
-  SELECT INTO first_common_stop x."stop-name"
-    FROM (SELECT s."stop-name", MIN(st."stop-sequence") AS min_stop_seq,
-                 array_agg(CONCAT(dt."package-id", ':', (dt.trip)."trip-id")) as trips
-            FROM unnest(array_cat(d1_trips,d2_trips)) dt
-            JOIN LATERAL unnest((dt.trip)."stop-times") st ON TRUE
-            JOIN "gtfs-stop" s ON (dt."package-id" = s."package-id" AND st."stop-id" = s."stop-id")
-           GROUP BY s."stop-name") x
-           WHERE x.trips @> all_trips
-           ORDER BY min_stop_seq
-           LIMIT 1;
-
-   --RAISE NOTICE '% / % / %   1. yhteinen pysäkki: %', "route-short-name", "route-long-name", "trip-headsign", first_common_stop;
-
-   --------------------------
-   -- Combine d1 and d2 trips based on the least amount of difference in departure for the 1st common stop
-   -- using maximum threshold of 30 minutes
-
-   -- Extract all trip ids for both days
-   SELECT array_agg((d.trip)."trip-id")
-     INTO d1_trip_ids
-     FROM unnest(d1_trips) d;
-
-   SELECT array_agg((d.trip)."trip-id")
-     INTO d2_trip_ids
-     FROM unnest(d2_trips) d;
-
-   FOR row IN
-       SELECT x.*
-         FROM (SELECT d1t."package-id" as "d1-package-id", d1t.trip as "d1-trip",
-                      d2t."package-id" AS "d2-package-id", d2t.trip as "d2-trip",
-                      ABS(EXTRACT(EPOCH FROM gtfs_trip_stop_departure_time(d1t, first_common_stop)) -
-                          EXTRACT(EPOCH FROM gtfs_trip_stop_departure_time(d2t, first_common_stop))) as timediff
-                 FROM unnest(d1_trips) d1t CROSS JOIN unnest(d2_trips) d2t) x
-         WHERE timediff <= 1800 -- only consider differences less than 30 minutes
-         ORDER BY timediff ASC
-   LOOP
-      IF (row."d1-trip")."trip-id" = ANY(d1_trip_ids) AND
-         (row."d2-trip")."trip-id" = ANY(d2_trip_ids)
-      THEN
-         -- Both trips are still unconsumed, mark this pair as the same
-         --RAISE NOTICE '% = % aikaerolla %', (row."d1-trip")."trip-id", (row."d2-trip")."trip-id", row.timediff;
-         d1_trip_ids := array_remove(d1_trip_ids, (row."d1-trip")."trip-id");
-         d2_trip_ids := array_remove(d2_trip_ids, (row."d2-trip")."trip-id");
-
-         -- Calculate stop time and stop sequence changes
-         trip_chg := gtfs_trip_changes(ROW(row."d1-package-id", row."d1-trip")::"gtfs-package-trip-info",
-                                       ROW(row."d2-package-id", row."d2-trip")::"gtfs-package-trip-info",
-                                       first_common_stop);
-
-         IF ((trip_stop_seq_changes_lower IS NULL) or (trip_chg."trip-stop-sequence-changes" < trip_stop_seq_changes_lower)) THEN
-           trip_stop_seq_changes_lower := trip_chg."trip-stop-sequence-changes";
-         END IF;
-
-         IF (trip_chg."trip-stop-sequence-changes" > trip_stop_seq_changes_upper) THEN
-           trip_stop_seq_changes_upper := trip_chg."trip-stop-sequence-changes";
-         END IF;
-
-         IF ((trip_stop_time_changes_lower IS NULL) or (trip_chg."trip-stop-time-changes" < trip_stop_time_changes_lower)) THEN
-           trip_stop_time_changes_lower := trip_chg."trip-stop-time-changes";
-         END IF;
-
-         IF (trip_chg."trip-stop-time-change" > trip_stop_time_changes_upper) THEN
-           trip_stop_time_changes_upper := trip_chg."trip-stop-time-changes";
-         END IF;
-
-      END IF;
-   END LOOP;
-
-  --RAISE NOTICE 'yli jäi d1: % ja d2: % vuoroa', array_length(d1_trip_ids, 1), array_length(d2_trip_ids, 2);
-
-  route_changes."route-short-name" := "route-short-name";
-  route_changes."route-long-name" := "route-long-name";
-  route_changes."trip-headsign" := "trip-headsign";
-  route_changes."route-hash-id" := "route-hash-id";
-  route_changes."added-trips" := COALESCE(array_length(d2_trip_ids,1), 0);
-  route_changes."removed-trips" := COALESCE(array_length(d1_trip_ids,1), 0);
-  route_changes."trip-stop-sequence-changes-lower" := trip_stop_seq_changes_lower;
-  route_changes."trip-stop-sequence-changes-upper" := trip_stop_seq_changes_upper;
-  route_changes."trip-stop-time-changes-lower" := trip_stop_time_changes_lower;
-  route_changes."trip-stop-time-changes-upper" := trip_stop_time_changes_upper;
-  RETURN route_changes;
-END
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION gtfs_service_date_hash(service_id INTEGER, dt DATE)
 RETURNS TEXT
 AS $$
@@ -667,7 +549,8 @@ BEGIN
      JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
      JOIN LATERAL unnest(t.trips) trip ON true
     WHERE r."package-id" = package_id
-    GROUP BY r.id, trip."trip-headsign";
+    GROUP BY r.id, trip."trip-headsign"
+       ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -685,7 +568,8 @@ BEGIN
     JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
     JOIN LATERAL unnest(t.trips) trip ON true
    WHERE r."package-id" = package_id
-   GROUP BY r.id, trip."trip-headsign";
+   GROUP BY r.id, trip."trip-headsign"
+      ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -703,7 +587,8 @@ BEGIN
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
      WHERE r."package-id" = package_id
-     GROUP BY r.id, trip."trip-headsign";
+     GROUP BY r.id, trip."trip-headsign"
+        ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -721,7 +606,8 @@ BEGIN
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
      WHERE r."package-id" = package_id
-     GROUP BY r.id, trip."trip-headsign";
+     GROUP BY r.id, trip."trip-headsign"
+        ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;
@@ -739,7 +625,8 @@ BEGIN
       JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
       JOIN LATERAL unnest(t.trips) trip ON true
      WHERE r."package-id" = package_id
-     GROUP BY r.id, trip."trip-headsign";
+     GROUP BY r.id, trip."trip-headsign"
+        ON CONFLICT DO NOTHING;
 
 END
 $$ LANGUAGE plpgsql;

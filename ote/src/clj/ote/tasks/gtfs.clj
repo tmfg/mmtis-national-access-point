@@ -70,7 +70,10 @@
   ([db detection-date force?]
    (detect-new-changes-task db detection-date force? nil))
   ([db detection-date force? service-ids] ;; db (time/now) false
-   (let [today detection-date ;; Today is the default but detection may be run "in the past" if admin wants to
+   (let [lock-time-in-seconds (if force?
+                                1
+                                1800)
+         today detection-date ;; Today is the default but detection may be run "in the past" if admin wants to
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
 
@@ -81,7 +84,7 @@
          [start-date end-date today] (map (comp time/date-fields->date time/date-fields)
                                     [start-date end-date today])]
      (lock/try-with-lock
-      db "gtfs-nightly-changes" 1800
+      db "gtfs-nightly-changes" lock-time-in-seconds
       (let [;; run detection only for given services or all
             service-ids (if service-ids
                           service-ids
