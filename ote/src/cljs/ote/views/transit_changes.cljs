@@ -106,12 +106,12 @@
      (cond
        interfaces-has-errors?
        [:div
-        [ic/alert-error {:color "CC0000"}]
+        [ic/alert-error {:style {:color "CC0000"}}]
         [:div (use-style style/change-icon-value)
          "Virheitä rajapinnoissa"]]
        no-interfaces?
        [:div
-        [ic/alert-warning {:color "CCCC00"}]
+        [ic/alert-warning {:style {:color "CCCC00"}}]
         [:div (use-style style/change-icon-value)
          "Ei rajapintoja"]]
        no-interfaces-imported?
