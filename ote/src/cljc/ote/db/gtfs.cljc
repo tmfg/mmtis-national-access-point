@@ -29,13 +29,13 @@
   ["gtfs-trip-info" :gtfs/trip-info]
   ["gtfs-trip" :gtfs/trip]
 
-  ["gtfs-route-change-type" :gtfs/route-change-type (specql.transform/transform (specql.transform/to-keyword))]
-  ["gtfs-route-change-info" :gtfs/route-change-info]
+  ["gtfs-route-change-type" :gtfs/route-change-type (specql.transform/transform (specql.transform/to-keyword))] ;; ENUM
+  ["gtfs-route-change-info" :gtfs/route-change-info] ;; ENUM
   ["gtfs-transit-changes" :gtfs/transit-changes]
-  ["gtfs-route-change" :gtfs/route-change]
-  ["gtfs-route-hash" :gtfs/route-hash]
+  ["detected-route-change" :gtfs/detected-route-change]
+  ["gtfs-route-hash" :gtfs/route-hash] ;; ENUM
   ["gtfs-date-hash" :gtfs/date-hash]
-  ["gtfs_stoptime_display" :gtfs/stoptime-display]
+  ["gtfs_stoptime_display" :gtfs/stoptime-display] ;; ENUM
   ["detection-route" :gtfs/detection-route]
   ["detection-service-route-type" :gtfs/detection-service-route-type])
 

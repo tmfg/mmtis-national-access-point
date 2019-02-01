@@ -305,11 +305,15 @@ DECLARE
   d1_trip_ids TEXT[];
   d2_trip_ids TEXT[];
   trip_chg "gtfs-trip-change-info";
-  trip_stop_seq_changes INT4RANGE;
-  trip_stop_time_changes INT4RANGE;
+  trip_stop_seq_changes_lower INTEGER; -- Lowest count of sequence changes of a single trip within a route
+  trip_stop_seq_changes_upper INTEGER; -- Highest count of sequence changes of a single trip within a route
+  trip_stop_time_changes_lower INTEGER; -- Lowest count of stop time changes of a single trip within a route
+  trip_stop_time_changes_upper INTEGER; -- Highest count of stop time changes of a single trip within a route
 BEGIN
-  trip_stop_seq_changes := NULL;
-  trip_stop_time_changes := NULL;
+  trip_stop_seq_changes_lower := NULL;
+  trip_stop_seq_changes_upper := 0;
+  trip_stop_time_changes_lower := NULL;
+  trip_stop_time_changes_upper := 0;
 
   -- Select all trips as array of "package-id:trip-id" strings
   all_trips := (SELECT array_agg(x.t)
@@ -370,23 +374,23 @@ BEGIN
          trip_chg := gtfs_trip_changes(ROW(row."d1-package-id", row."d1-trip")::"gtfs-package-trip-info",
                                        ROW(row."d2-package-id", row."d2-trip")::"gtfs-package-trip-info",
                                        first_common_stop);
-         IF trip_stop_seq_changes IS NULL THEN
-           trip_stop_seq_changes := int4range(trip_chg."trip-stop-sequence-changes",
-                                              trip_chg."trip-stop-sequence-changes", '[]');
-         ELSE
-           trip_stop_seq_changes := range_merge(trip_stop_seq_changes,
-                                                int4range(trip_chg."trip-stop-sequence-changes",
-                                                          trip_chg."trip-stop-sequence-changes", '[]'));
+
+         IF ((trip_stop_seq_changes_lower IS NULL) or (trip_chg."trip-stop-sequence-changes" < trip_stop_seq_changes_lower)) THEN
+           trip_stop_seq_changes_lower := trip_chg."trip-stop-sequence-changes";
          END IF;
 
-         IF trip_stop_time_changes IS NULL THEN
-           trip_stop_time_changes := int4range(trip_chg."trip-stop-time-changes",
-                                               trip_chg."trip-stop-time-changes", '[]');
-         ELSE
-           trip_stop_time_changes := range_merge(trip_stop_time_changes,
-                                                 int4range(trip_chg."trip-stop-time-changes",
-                                                           trip_chg."trip-stop-time-changes", '[]'));
+         IF (trip_chg."trip-stop-sequence-changes" > trip_stop_seq_changes_upper) THEN
+           trip_stop_seq_changes_upper := trip_chg."trip-stop-sequence-changes";
          END IF;
+
+         IF ((trip_stop_time_changes_lower IS NULL) or (trip_chg."trip-stop-time-changes" < trip_stop_time_changes_lower)) THEN
+           trip_stop_time_changes_lower := trip_chg."trip-stop-time-changes";
+         END IF;
+
+         IF (trip_chg."trip-stop-time-change" > trip_stop_time_changes_upper) THEN
+           trip_stop_time_changes_upper := trip_chg."trip-stop-time-changes";
+         END IF;
+
       END IF;
    END LOOP;
 
@@ -398,8 +402,10 @@ BEGIN
   route_changes."route-hash-id" := "route-hash-id";
   route_changes."added-trips" := COALESCE(array_length(d2_trip_ids,1), 0);
   route_changes."removed-trips" := COALESCE(array_length(d1_trip_ids,1), 0);
-  route_changes."trip-stop-sequence-changes" := trip_stop_seq_changes;
-  route_changes."trip-stop-time-changes" := trip_stop_time_changes;
+  route_changes."trip-stop-sequence-changes-lower" := trip_stop_seq_changes_lower;
+  route_changes."trip-stop-sequence-changes-upper" := trip_stop_seq_changes_upper;
+  route_changes."trip-stop-time-changes-lower" := trip_stop_time_changes_lower;
+  route_changes."trip-stop-time-changes-upper" := trip_stop_time_changes_upper;
   RETURN route_changes;
 END
 $$ LANGUAGE plpgsql;

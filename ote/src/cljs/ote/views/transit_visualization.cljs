@@ -43,12 +43,12 @@
 
     (when hash-color
       (case mode
-        :same (if (and (= d-hash hover-hash) (not (= d hover-day-formatted)))
+        :same (if (and (= d-hash hover-hash) (not= d hover-day-formatted))
                 {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.5)"}
                 (if (= d hover-day-formatted)
                   {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.75)"}
                   {:box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px rgba(0,0,0,.25)"}))
-        :diff (if (and (not (= d-hash hover-hash))
+        :diff (if (and (not= d-hash hover-hash)
                        (= (time/day-of-week day) (time/day-of-week hover-day)))
                 {:box-shadow "inset 0 0 0 2px crimson, inset 0 0 0 3px black, inset 0 0 0 100px rgba(255,255,255,.65)"}
                 (if (and (= d-hash hover-hash) (= d hover-day-formatted))
@@ -328,43 +328,38 @@
       ^{:key label}
       [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label]))])
 
-(defn format-range [{:keys [lower upper lower-inclusive? upper-inclusive?]}]
+
+(defn format-range [lower upper]
   (if (and (nil? lower) (nil? upper))
     "0"
-    (let [upper (when upper
-                  (if upper-inclusive?
-                    upper
-                    (dec upper)))]
-      (if (= lower upper)
-        (str lower)
-        (str lower "\u2014" upper)))))
+    (if (= lower upper)
+      (str lower)
+      (str lower "\u2014" upper))))
 
-(defn stop-seq-changes-icon [trip-stop-sequence-changes with-labels?]
-  (let [seq-changes (if (number? trip-stop-sequence-changes)
-                      trip-stop-sequence-changes
-                      (format-range trip-stop-sequence-changes))]
+(defn stop-seq-changes-icon [lower upper with-labels?]
+  (let [changes (format-range lower upper)]
     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/action-timeline {:color (when (= "0" seq-changes)
+     [ic/action-timeline {:color (when (= "0" changes)
                                    style/no-change-color)}]
      [:span
-      seq-changes
+      changes
       (when with-labels? " pysäkkimuutosta")]]))
 
-(defn stop-time-changes-icon [trip-stop-time-changes with-labels?]
-  (let [time-changes (if (number? trip-stop-time-changes)
-                       trip-stop-time-changes
-                       (format-range trip-stop-time-changes))]
+(defn stop-time-changes-icon [lower upper with-labels?]
+  (let [changes (format-range lower upper)]
     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/action-query-builder {:color (when (= "0" time-changes)
+     [ic/action-query-builder {:color (when (= "0" changes)
                                         style/no-change-color)}]
      [:span
-      time-changes
+      changes
       (when with-labels? " aikataulumuutosta")]]))
 
 (defn change-icons
   ([diff]
    [change-icons diff false])
-  ([{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}
+  ([{:keys [added-trips removed-trips
+            trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
+            trip-stop-time-changes-lower trip-stop-time-changes-upper]}
     with-labels?]
    [:div.transit-change-icons
     (stylefy/use-style (merge
@@ -386,10 +381,10 @@
        (when with-labels? " poistettua vuoroa")]]]
 
     [:div {:style {:width "25%"}}
-     [stop-seq-changes-icon trip-stop-sequence-changes with-labels?]]
+     [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
     [:div {:style {:width "35%"}}
-     [stop-time-changes-icon trip-stop-time-changes with-labels?]]]))
+     [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -806,9 +801,9 @@
       (when selected-route
         [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: "
-          (:gtfs/route-short-name selected-route) " "
-          (:gtfs/route-long-name selected-route)
-          " (" (:gtfs/trip-headsign selected-route) ")"]
+          (:route-short-name selected-route) " "
+          (:route-long-name selected-route)
+          " (" (:trip-headsign selected-route) ")"]
 
          (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span

@@ -40,7 +40,7 @@
                                             (Double/parseDouble lat)]
                               :properties {"name" name
                                            "trip-name" (str (:name first-stop) " \u2192 " (:name last-stop))}})))
-                    (when (not (str/blank? stops))
+                    (when-not (str/blank? stops)
                       (str/split stops #"\|\|"))))))
           trips))
 
@@ -66,19 +66,18 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
-       (let [service-id (Long/parseLong service-id)
-             changes (detected-changes-for-date db
-                                                {:service-id service-id
-                                                 :date (-> date
-                                                     time/parse-date-iso-8601
-                                                     java.sql.Date/valueOf)})]
+    (let [service-id (Long/parseLong service-id)
+          changes (detected-changes-for-date db
+                                             {:service-id service-id
+                                              :date (-> date
+                                                        time/parse-date-iso-8601
+                                                        java.sql.Date/valueOf)})]
          {:service-info (first (fetch-service-info db {:service-id service-id}))
           :changes changes
           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
@@ -121,14 +120,12 @@
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
         {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params}
-       (composite/parse @specql-registry/table-info-registry
-                        {:type "gtfs-route-change-info"}
-                        (fetch-route-differences
-                         db
-                         {:service-id (Long/parseLong service-id)
-                          :date1 (time/parse-date-iso-8601 date1)
-                          :date2 (time/parse-date-iso-8601 date2)
-                          :route-short-name short-name
-                          :route-long-name long-name
-                          :trip-headsign headsign
-                          :route-hash-id route-hash-id}))))
+    (fetch-route-differences
+      db
+      {:service-id (Long/parseLong service-id)
+       :date1 (time/parse-date-iso-8601 date1)
+       :date2 (time/parse-date-iso-8601 date2)
+       :route-short-name short-name
+       :route-long-name long-name
+       :trip-headsign headsign
+       :route-hash-id route-hash-id})))
