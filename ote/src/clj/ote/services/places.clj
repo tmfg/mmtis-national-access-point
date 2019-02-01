@@ -22,7 +22,7 @@
 (defn place-completions
   "Return a list of completions that match the given search term."
   [db term]
-  (into [] (fetch-operation-area-search db {:name (str "%" term "%")})))
+  (vec (fetch-operation-area-search db {:name (str "%" term "%")})))
 
 (defn place-by-id [db id]
   (first
