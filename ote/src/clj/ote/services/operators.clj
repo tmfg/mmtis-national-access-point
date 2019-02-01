@@ -9,6 +9,9 @@
             [clojure.string :as str]
             [jeesql.core :refer [defqueries]]))
 
+;; TODO: This ns can be deleted when all the files that use it are refactored
+;; operators page is no longer used
+
 (defqueries "ote/services/operators.sql")
 
 (def operator-listing-columns
@@ -47,20 +50,3 @@
    (if (str/blank? filter)
      (count-all-operators db)
      (count-matching-operators db {:name (str "%" filter "%")}))})
-
-(defn operator-routes [db]
-  (routes
-   (POST "/operators/list" {form-data :body}
-         (http/transit-response
-          (list-operators db
-                          (http/transit-request form-data))))))
-
-(defrecord Operators []
-  component/Lifecycle
-  (start [{db :db http :http :as this}]
-    (assoc this ::stop
-           (http/publish! http {:authenticated? false} (operator-routes db))))
-
-  (stop [{stop ::stop :as this}]
-    (stop)
-    (dissoc this ::stop)))
