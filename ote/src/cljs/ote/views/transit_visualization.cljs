@@ -465,12 +465,12 @@
 
                   :added
                   [labeled-icon
-                   [ic/content-add-box {:color style/add-color}]
+                   [ic/content-add-box {:style {:color style/add-color}}]
                    "Uusi reitti"]
 
                   :removed
                   [labeled-icon
-                   [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
+                   [ote-icons/outline-indeterminate-checkbox {:style {:color style/remove-color}}]
                    "Päättyvä reitti"]
 
                   :no-change
