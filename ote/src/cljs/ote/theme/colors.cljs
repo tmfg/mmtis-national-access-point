@@ -2,6 +2,7 @@
 
 (def blue "#0048c2")
 (def blue-light "#0052dd")
+(def blue-dark "#0029B8")
 
 (def gray100 "#646464")
 (def gray200 "#C8C8C8")
@@ -23,6 +24,7 @@
 (def negative-text white-basic)
 (def negative-button-hover red-dark)
 (def primary blue)
+(def primary-dark blue-dark)
 (def primary-text white-basic)
 (def primary-disabled gray200)
 (def primary-light blue-light)
