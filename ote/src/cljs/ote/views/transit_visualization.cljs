@@ -427,7 +427,7 @@
                                        (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                  :row-selected?   #(= % selected-route)}
     [{:name "Reitti" :width "30%"
-      :read (juxt :gtfs/route-short-name :route-long-name)
+      :read (juxt :route-short-name :route-long-name)
       :format (fn [[short long]]
                 (str short " " long))}
 
