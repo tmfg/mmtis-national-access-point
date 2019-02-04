@@ -70,8 +70,9 @@
   "Filter routes changes that are in the future. (or no changes)"
   [detection-date changes]
   (let [detection-date (time/parse-date-iso-8601 detection-date)]
+    (.debug js/console "future-changes changes=" (prn-str changes))
     (filter
-      (fn [{:gtfs/keys [change-date]}]
+      (fn [{:keys [change-date]}]
           (or (nil? change-date)
               (not (t/before?
                      (time/native->date-time change-date)
@@ -161,13 +162,13 @@
 
 (define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-  (assoc app
-         :service-changes-for-date-loading? false
-         :service-info (:service-info response)
-         :changes-all (:changes response)
-         :changes (update (:changes response) :route-changes (comp sorted-route-changes (partial future-changes detection-date)))
-         :gtfs-package-info (:gtfs-package-info response)
-         :route-hash-id-type (:route-hash-id-type response)))
+              (assoc app
+                :service-changes-for-date-loading? false
+                :service-info (:service-info response)
+                :changes (:changes response)
+                :changes-route (sorted-route-changes (future-changes detection-date (:route-changes response)))
+                :gtfs-package-info (:gtfs-package-info response)
+                :route-hash-id-type (:route-hash-id-type response)))
 
 (define-event LoadServiceChangesForDate [service-id detection-date]
   {:path [:transit-visualization]}

@@ -90,18 +90,22 @@
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
-    (let [service-id (Long/parseLong service-id)
-          changes (detected-changes-for-date db
-                                             {:service-id service-id
-                                              :date (-> date
-                                                        time/parse-date-iso-8601
-                                                        java.sql.Date/valueOf)})]
-         {:service-info (first (fetch-service-info db {:service-id service-id}))
-          :changes changes
-          :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
-                                                   #{:gtfs/route-hash-id-type}
-                                                   {:gtfs/transport-service-id service-id}))
-          :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
+    (let [service-id (Long/parseLong service-id)]
+      {:service-info (first (fetch-service-info db {:service-id service-id}))
+       :changes (first (detected-changes-for-date db
+                                                  {:service-id service-id
+                                                   :date (-> date
+                                                             time/parse-date-iso-8601
+                                                             java.sql.Date/valueOf)}))
+       :route-changes (detected-route-changes-for-date db
+                                                       {:service-id service-id
+                                                        :date (-> date
+                                                                  time/parse-date-iso-8601
+                                                                  java.sql.Date/valueOf)})
+       :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
+                                                #{:gtfs/route-hash-id-type}
+                                                {:gtfs/transport-service-id service-id}))
+       :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route"
