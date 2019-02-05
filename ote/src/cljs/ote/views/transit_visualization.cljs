@@ -104,9 +104,9 @@
   "Bind popup content and set marker icon for stop marker features."
   [offset [w h]]
   (fn [feature ^js/L.Layer layer]
-    (let [stop-name (aget feature "properties" "name")
+    (let [stop-name (aget feature "properties" "stopname")
           trip-name (aget feature "properties" "trip-name")
-          popup-html (str "Pysäkki: " stop-name " <br> Vuoro: " trip-name)]
+          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")) " <br> Vuoro: " (first (str/split trip-name #"\|\|")))]
       (if stop-name
       ;; This features is a stop marker
       (do
@@ -144,8 +144,12 @@
                     (if-let [icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
                       (set! (.-visibility (aget icon "style"))
-                            (if (and (:stops show) (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
-                              "" "hidden")))
+                              (if (and
+                                    (:stops show)
+                                    (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
+                                    (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                                ""
+                                "hidden")))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
@@ -682,85 +686,110 @@
                  (reset! inhibit-zoom false))
         zoom-level (r/atom 5)]
     (r/create-class
-     {:component-did-update update
-      :component-did-mount (fn [this]
-                             (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
-                               (.on m "zoomend" #(do
-                                                   (reset! inhibit-zoom true)
-                                                   (reset! zoom-level (.getZoom m)))))
-                             (update this))
-      :component-will-receive-props
-      (fn [this [_ _ _ _ {show-stops? :show-stops?
-                          show-route-lines :show-route-lines}]]
-        ;; This is a bit of a kludge, but because the stops are in the
-        ;; same GeoJSON layer as the lines, we can't easily control their
-        ;; visibility using react components.
-        (let [show (assoc show-route-lines :stops show-stops?)]
-          (when (not= @show-atom show)
-            ;; Don't zoom if we changed stops or route lines visible/hidden toggle
-            (reset! inhibit-zoom true))
-          (reset! show-atom show)))
-      :reagent-render
-      (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
-                                             date1 date1-route-lines date1-show?
-                                             date2 date2-route-lines date2-show?
-                                             show-stops?
-                                             show-route-lines]}]
-        (let [show-date1? (and date1-show?
-                               (not (empty? (get date1-route-lines "features"))))
-              show-date2? (and date2-show?
-                               (not (empty? (get date2-route-lines "features"))))
-              zoom @zoom-level
-              [line-weight offset icon-size] (cond
-                                               (< zoom 7)  [3 3 [12 12]]
-                                               (< zoom 12) [3 2 [14 14]]
-                                               (< zoom 14) [3 2 [16 16]]
-                                               :default    [3 2 [18 18]])]
-          [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
-
-
-           [leaflet/Map {:ref "leaflet"
-                         :center #js [65 25]
-                         :zoomControl true
-                         :zoom 5}
-            (leaflet/background-tile-map)
-            (when show-date1?
-              ^{:key (str date1 "_" route-short-name "_" route-long-name "_" zoom)}
-              [leaflet/GeoJSON {:data date1-route-lines
-                                :onEachFeature (initialize-route-features (- offset) icon-size)
-                                :style {:lineJoin "miter"
-                                        :lineCap "miter"
-                                        :color style/date1-highlight-color
-                                        :weight line-weight}}])
-            (when show-date2?
-              ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
-              [leaflet/GeoJSON {:data date2-route-lines
-                                :onEachFeature (initialize-route-features (+ 2 offset) icon-size)
-                                :style {:lineJoin "miter"
-                                        :lineCap "miter"
-                                        :color style/date2-highlight-color
-                                        :weight line-weight}}])]]))})))
+      {:component-did-update update
+       :component-did-mount (fn [this]
+                              (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")]
+                                (.on m "zoomend" #(do
+                                                    (reset! inhibit-zoom true)
+                                                    (reset! zoom-level (.getZoom m)))))
+                              (update this))
+       :component-will-receive-props
+       (fn [this [_ _ _ _ {show-stops? :show-stops?
+                           show-route-lines :show-route-lines}]]
+         ;; This is a bit of a kludge, but because the stops are in the
+         ;; same GeoJSON layer as the lines, we can't easily control their
+         ;; visibility using react components.
+         (let [show (assoc show-route-lines :stops show-stops?)]
+           (when (not= @show-atom show)
+             ;; Don't zoom if we changed stops or route lines visible/hidden toggle
+             (reset! inhibit-zoom true))
+           (reset! show-atom show)))
+       :reagent-render
+       (fn [e! date->hash hash->color {:keys [route-short-name route-long-name
+                                              date1 date1-route-lines date1-show?
+                                              date2 date2-route-lines date2-show?
+                                              show-stops?
+                                              show-route-lines]}]
+         (let [show-date1? (and date1-show?
+                                (not (empty? (get date1-route-lines "features"))))
+               show-date2? (and date2-show?
+                                (not (empty? (get date2-route-lines "features"))))
+               zoom @zoom-level
+               [line-weight offset icon-size] (cond
+                                                (< zoom 9) [2 1 [6 6]]
+                                                (< zoom 12) [2 2 [12 12]]
+                                                (< zoom 14) [3 2 [16 16]]
+                                                :default [3 2 [18 18]])
+               date1-filtered-trips (filter
+                                      (fn [trip] (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
+                                      (get date1-route-lines "features"))
+               date2-filtered-trips (filter
+                                      (fn [trip] (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
+                                      (get date2-route-lines "features"))
+               date1-data {:features (mapcat
+                                       #(conj
+                                          (get-in % ["route-line" "stops"])
+                                          {:type "Feature"
+                                           :properties (get-in % ["route-line" "properties"])
+                                           :geometry (get-in % ["route-line" "geometry"])})
+                                       date1-filtered-trips)}
+               date2-data {:features (mapcat
+                                       #(conj
+                                          (get-in % ["route-line" "stops"])
+                                          {:type "Feature"
+                                           :properties (get-in % ["route-line" "properties"])
+                                           :geometry (get-in % ["route-line" "geometry"])})
+                                       date2-filtered-trips)}]
+           [:div.transit-visualization-route-map {:style {:z-index 99 :position "relative"}}
+            [leaflet/Map {:ref "leaflet"
+                          :center #js [65 25]
+                          :zoomControl true
+                          :zoom 5}
+             (leaflet/background-tile-map)
+             (when show-date1?
+               ^{:key (str date1 "_" route-short-name "_" route-long-name "_" zoom)}
+               [leaflet/GeoJSON {:data date1-data
+                                 :onEachFeature (initialize-route-features (- offset) icon-size)
+                                 :style {:lineJoin "miter"
+                                         :lineCap "miter"
+                                         :color style/date1-highlight-color
+                                         :weight line-weight}}])
+             (when show-date2?
+               ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
+               [leaflet/GeoJSON {:data date2-data
+                                 :onEachFeature (initialize-route-features (+ 2 offset) icon-size)
+                                 :style {:lineJoin "miter"
+                                         :lineCap "miter"
+                                         :color style/date2-highlight-color
+                                         :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
   [section {:toggle! #(e! (tv/->ToggleSection :route-map))
             :open? (get open-sections :route-map true)}
    "Kartta"
-   [:span
-    "Kartalla näytetään valitsemasi reitin ja päivämäärien mukainen pysäkkiketju sekä ajoreitti, mikäli se on saatavilla."
+   [:div
+    "Valitse kartalle näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."
     [:div (stylefy/use-style {:margin-top "1.25rem"
-                              :margin-bottom "1.25rem"})
-     [ui/checkbox {:label "Näytä pysäkit"
-                   :checked (boolean (:show-stops? compare))
-                   :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
-    (when (> (count (:show-route-lines compare)) 1)
-      ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
-      (doall
-       (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
-         ^{:key routename}
-         [ui/checkbox {:label routename
-                       :checked show?
-                       :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]
-   [selected-route-map e! date->hash hash->color compare]])
+                              :margin-bottom "1.25rem"
+                              :display "flex"
+                              :flex-direction "row-reverse"
+                              :flex-wrap "nowrap"
+                              :justify-content "space-between"})
+
+     [:div {:style {:width "20%"}}
+      [ui/checkbox {:label "Näytä pysäkit"
+                    :checked (boolean (:show-stops? compare))
+                    :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
+     [:div {:style {:width "80%"}}
+      (when (> (count (:show-route-lines compare)) 0)
+        ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
+        (doall
+          (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
+            ^{:key routename}
+            [ui/checkbox {:label (first (str/split routename #"\|\|"))
+                          :checked show?
+                          :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]
+   [selected-route-map e! date->hash hash->color compare]]])
 
 (defn gtfs-package-info [e! open-sections packages]
   (let [[latest-package & previous-packages] packages
