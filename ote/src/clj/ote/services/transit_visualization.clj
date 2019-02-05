@@ -18,32 +18,42 @@
 
 (defn- parse-stops [stops]
   (mapv (fn [stop]
-          (let [[lat lon stop-name] (str/split stop #",")]
+          (let [[lat lon stop-name trip-id headsign] (str/split stop #",")]
             {:lat (Double/parseDouble lat)
              :lon (Double/parseDouble lon)
-             :name stop-name}))
+             :stop-name stop-name
+             :trip-id trip-id
+             :headsign headsign}))
         (str/split stops #"\|\|")))
 
-(defn route-line-features [trips]
-  (mapcat (fn [{:keys [route-line departures stops] :as foo}]
-            (let [all-stops (parse-stops stops)
-                  first-stop (first all-stops)
-                  last-stop (last all-stops)]
-              (vec (into
-                    #{{:type "Feature"
-                       :properties {:departures (mapv time/format-interval-as-time (.getArray departures))
-                                    :routename (str (:name first-stop) " \u2192 " (:name last-stop))}
-                       :geometry (cheshire/decode route-line keyword)}}
-                    (map (fn [stop]
-                           (let [[lon lat name] (str/split stop #",")]
-                             {:type "Point"
-                              :coordinates [(Double/parseDouble lon)
-                                            (Double/parseDouble lat)]
-                              :properties {"name" name
-                                           "trip-name" (str (:name first-stop) " \u2192 " (:name last-stop))}})))
-                    (when (not (str/blank? stops))
-                      (str/split stops #"\|\|"))))))
-          trips))
+(defn trip-lines [trips]
+  (mapv
+    #(first (second %))
+    (group-by
+      :stop-location-hash
+      (mapv
+        (fn [{:keys [route-line departures stops trip-id] :as foo}]
+          (let [all-stops (parse-stops stops)
+                first-stop (first all-stops)
+                last-stop (last all-stops)
+                stop-location-hash (digest/sha-256 (str/join "-" (map (juxt :lat :lon) all-stops)))]
+            {:stop-location-hash stop-location-hash
+             :route-line {:type "Feature"
+                          :properties {:departures (mapv time/format-interval-as-time (.getArray departures))
+                                       :routename (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}
+                          :geometry (cheshire/decode route-line keyword)
+
+                          :stops (map
+                                   (fn [stop]
+                                     (let [[lon lat name trip-id] (str/split stop #",")]
+                                       {:type "Point"
+                                        :coordinates [(Double/parseDouble lon)
+                                                      (Double/parseDouble lat)]
+                                        :properties {"stopname" name
+                                                     "trip-name" (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}}))
+                                   (when (not (str/blank? stops))
+                                     (str/split stops #"\|\|")))}}))
+        trips))))
 
 (defn service-changes-for-date [db service-id date]
   (first
@@ -113,11 +123,18 @@
   ^:unauthenticated
   (GET "/transit-visualization/:service-id/route-lines-for-date"
        {{service-id :service-id} :params
-        {:strs [date short-name long-name headsign route-hash-id]} :query-params}
+        {:strs [date route-hash-id]} :query-params}
        (http/geojson-response
-        (cheshire/encode
+         (cheshire/encode #_ {:data
+           (trip-lines
+           (fetch-route-trips-by-hash-and-date
+             db
+             {:service-id (Long/parseLong service-id)
+              :date (time/parse-date-iso-8601 date)
+              :route-hash-id route-hash-id})) }
+          ;(cheshire/encode
          {:type "FeatureCollection"
-          :features (route-line-features
+          :features (trip-lines
                      (fetch-route-trips-by-hash-and-date
                       db
                       {:service-id (Long/parseLong service-id)
