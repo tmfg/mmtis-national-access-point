@@ -69,7 +69,7 @@ DO $$
   END
 $$ LANGUAGE plpgsql;
 
--- TODO: ALTER TABLE "gtfs-transit-changes"
---         DROP COLUMN "route-changes";
+ALTER TABLE "gtfs-transit-changes"
+  RENAME COLUMN "route-changes" TO "route-changes-old";
 
 -- TODO: Add an index to this table to date and service-id
