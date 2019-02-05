@@ -488,7 +488,6 @@
                                           :gtfs/added-routes (:added change-count-by-type 0)
                                           :gtfs/changed-routes (:changed change-count-by-type 0)
                                           :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
-                                          :gtfs/route-changes route-change-infos
 
                                           :gtfs/package-ids package-ids
                                           :gtfs/created (java.util.Date.)})
