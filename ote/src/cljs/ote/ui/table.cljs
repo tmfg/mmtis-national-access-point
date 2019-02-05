@@ -28,7 +28,7 @@
         table-row-hover-color colors/gray200]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
-                 :body-style {:padding "0 3px"}
+                 :body-style {:padding "3px 3px 0 3px"}
                  ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
                  ;;        But, if any row includes tooltips, the body must also have visible overflow.
                  ;;        For now, leaving this commented out.
