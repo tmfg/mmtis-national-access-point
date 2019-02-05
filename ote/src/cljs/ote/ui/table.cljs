@@ -25,7 +25,7 @@
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"
         table-row-color-alt colors/gray100
-        table-row-hover-color colors/gray200]
+        table-row-hover-color colors/gray300]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
                  :body-style {:padding "3px 3px 0 3px"}

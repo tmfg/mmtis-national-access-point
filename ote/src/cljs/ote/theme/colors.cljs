@@ -5,11 +5,11 @@
 (def blue-dark "#0029B8")
 
 (def gray100 "#EEEEEE")
-(def gray200 "#C8C8C8")
+(def gray200 "#E2E2E2")                                     ;Find proper color
 (def gray230 "#e6e6e6")
 (def gray240 "#f0f0f0")
 (def gray300 "#E0E0E0")
-(def gray400 "#CCC")
+(def gray400 "#C8C8C8")
 (def gray500 "#969696")
 (def gray600 "#505050")
 (def gray900 "#323232")
@@ -26,7 +26,7 @@
 (def primary blue)
 (def primary-dark blue-dark)
 (def primary-text white-basic)
-(def primary-disabled gray200)
+(def primary-disabled gray400)
 (def primary-light blue-light)
 (def secondary gray900)
 (def progress primary)
