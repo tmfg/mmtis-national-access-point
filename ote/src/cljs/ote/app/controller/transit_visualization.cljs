@@ -193,7 +193,7 @@
   {:path [:transit-visualization]}
   (let [route-line-names (into #{}
                                (keep #(get-in % ["route-line" "properties" "routename"]))
-                               (get geojson "features"))
+                               (get geojson "features"))]
     (update-in
      (cond
        (= date (get-in app [:compare :date1]))
