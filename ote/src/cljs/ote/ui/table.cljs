@@ -22,7 +22,10 @@
                      label-style
                      row-style show-row-hover? selected-route
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
-  (let [random-table-id (str "tid-"(rand-int 999))]
+  (let [random-table-id (str "tid-"(rand-int 999))
+        table-row-color "#FFFFFF"
+        table-row-color-alt colors/gray100
+        table-row-hover-color colors/gray200]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
                  :body-style {:padding "0 3px"}
@@ -75,14 +78,14 @@
             (fn [i row]
               ^{:key (if key-fn (key-fn row) (str i "-" random-table-id "-body-row"))}
               [ui/table-row (merge
-                              (stylefy/use-style (merge {:background-color (if (= 0 (rem i 2)) "#FFFFFF" (color :grey200))} ; Add stripes
+                              (stylefy/use-style (merge {:background-color (if (even? i) table-row-color colors/gray100)} ; Add stripes
                                                         (when on-select
                                                           {:cursor "pointer"
                                                            :transition (str "background-color " transitions/fast-ease-in-out)
-                                                           ::stylefy/mode {:hover {:background-color colors/gray200}}})
+                                                           ::stylefy/mode {:hover {:background-color table-row-hover-color}}})
                                                         (when (if row-selected? (row-selected? row) false)
                                                           {:outline (str "solid 3px " colors/primary-dark)
-                                                           ::stylefy/mode {:hover {:background-color (if (= 0 (rem i 2)) "#FFFFFF" (color :grey200))}}})
+                                                           ::stylefy/mode {:hover {:background-color (if (even? i) table-row-color table-row-color-alt)}}})
                                                         (when row-style row-style)))
                               {:selectable (boolean on-select)
                                :display-border false})

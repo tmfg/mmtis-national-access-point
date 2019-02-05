@@ -4,7 +4,7 @@
 (def blue-light "#0052dd")
 (def blue-dark "#0029B8")
 
-(def gray100 "#646464")
+(def gray100 "#EEEEEE")
 (def gray200 "#C8C8C8")
 (def gray230 "#e6e6e6")
 (def gray240 "#f0f0f0")
