@@ -86,24 +86,25 @@ SELECT ST_AsGeoJSON(COALESCE(
           -- Otherwise use line generated from the stop sequence
           x."route-line")) as "route-line",
        array_agg(departure) as departures,
-       string_agg(stops, '||') as stops
+       string_agg(stops, '||') as stops,
+       x."trip-id", x.headsign
   FROM (SELECT (array_agg(stoptime."departure-time"))[1] as "departure",
                ST_MakeLine(ST_MakePoint(stop."stop-lon", stop."stop-lat") ORDER BY stoptime."stop-sequence") as "route-line",
-               string_agg(CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name"), '||' ORDER BY stoptime."stop-sequence") as stops,
-               trip."shape-id", r."package-id"
+               string_agg(CONCAT(stop."stop-lon", ',', stop."stop-lat", ',', stop."stop-name", ',', stoptime."trip-id"), '||' ORDER BY stoptime."stop-sequence") as stops,
+               trip."shape-id", r."package-id", trip."trip-id" as "trip-id", trip."trip-headsign" as headsign
           FROM "detection-route" r
           JOIN "gtfs-trip" t ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
           JOIN LATERAL unnest(t.trips) trip ON TRUE
-          JOIN LATERAL unnest(trip."stop-times") stoptime ON TRUE
-          JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id")
+          JOIN LATERAL unnest(trip."stop-times") stoptime ON stoptime."trip-id" = trip."trip-id"
+          JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id" AND stoptime."stop-id" = stop."stop-id")
          WHERE COALESCE(:route-hash-id::VARCHAR,'') = COALESCE(r."route-hash-id",'')
            AND ROW(r."package-id", t."service-id")::service_ref IN
                (SELECT * FROM gtfs_services_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE),
                           :date::DATE))
            AND r."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE))
-         GROUP BY trip."shape-id", r."package-id", trip."trip-id") x
+         GROUP BY trip."shape-id", r."package-id", trip."trip-id", trip."trip-headsign") x
  -- Group same route lines to single row (aggregate departures to array)
- GROUP BY "route-line", "shape-id", "package-id";
+ GROUP BY "route-line", "shape-id", "package-id", "trip-id", headsign;
 
 -- name: fetch-route-trip-info-by-name-and-date
 -- Fetch listing of all trips by route name and date
