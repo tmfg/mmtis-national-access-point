@@ -812,7 +812,7 @@
 
         [:div.row {:style {:margin-top "1rem" :display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
          [:div
-          [form-fields/field {:label (tr [:transit-visualization-page :checkbox-how-no-change])
+          [form-fields/field {:label (tr [:transit-visualization-page :checkbox-show-no-change])
                               :type :checkbox
                               :update! #(e! (tv/->ToggleShowNoChangeRoutes))}
            show-no-change-routes?]]]
