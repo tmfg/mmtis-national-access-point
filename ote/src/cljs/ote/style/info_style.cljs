@@ -4,7 +4,7 @@
 
 
 (def info-button
-  {:background-color colors/gray230
+  {:background-color colors/gray350
    :width "100%"
    :padding "1rem"
    :border "none"
@@ -14,17 +14,17 @@
    :align-items "center"
    :cursor "pointer"
    :color colors/gray900
-   ::stylefy/mode {:hover {:background-color colors/gray300}}})
+   ::stylefy/mode {:hover {:background-color colors/gray450}}})
 
 (def info-container
   {:margin-bottom "2rem"})
 
 (def info-icon
-  {:color colors/gray600
+  {:color colors/gray800
    :margin-right "0.5rem"})
 
 (def info-text
-  {:background-color colors/gray240
+  {:background-color colors/gray200
    :transform-origin "top"
    :display "block"
    :margin 0

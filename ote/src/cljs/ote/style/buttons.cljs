@@ -18,7 +18,7 @@
 (def primary-btn-hover-focus
   {:text-decoration "none"
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
-   :background-color colors/primary
+   :background-color colors/primary-dark
    :transform "scale(0.98)"})
 
 (def negative-btn-hover-focus
@@ -29,7 +29,6 @@
 
 (def button-common
   {:padding "20px"
-   :height "60px"                                           ;; Hard coded so the height doesn't change with transitions
    :min-width "4rem"
    :display "inline-block"
    :text-align "center"
@@ -44,7 +43,8 @@
                        {:color colors/primary-text
                         :background-color colors/primary-disabled
                         :pointer-events "none"
-                        :box-shadow "none"}))
+                        :box-shadow "none"
+                        :cursor "not-allowed"}))
 
 (def negative-button
   (merge button-common
@@ -67,7 +67,7 @@
   (merge button-common
          {:color colors/primary-text
           :border 0
-          :background-color colors/primary-light
+          :background-color colors/primary
           ::stylefy/mode {:hover primary-btn-hover-focus
                           :focus primary-btn-hover-focus}}))
 

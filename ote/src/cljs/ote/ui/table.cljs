@@ -24,11 +24,11 @@
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"
-        table-row-color-alt colors/gray100
-        table-row-hover-color colors/gray300]
+        table-row-color-alt colors/gray300
+        table-row-hover-color colors/gray400]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
-                 :body-style {:padding "3px 3px 0 3px"}
+                 :body-style {:padding "3px"}
                  ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
                  ;;        But, if any row includes tooltips, the body must also have visible overflow.
                  ;;        For now, leaving this commented out.
@@ -78,7 +78,7 @@
             (fn [i row]
               ^{:key (if key-fn (key-fn row) (str i "-" random-table-id "-body-row"))}
               [ui/table-row (merge
-                              (stylefy/use-style (merge {:background-color (if (even? i) table-row-color colors/gray100)} ; Add stripes
+                              (stylefy/use-style (merge {:background-color (if (even? i) table-row-color table-row-color-alt)} ; Add stripes
                                                         (when on-select
                                                           {:cursor "pointer"
                                                            :transition (str "background-color " transitions/fast-ease-in-out)
