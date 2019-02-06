@@ -106,7 +106,7 @@
   (fn [feature ^js/L.Layer layer]
     (let [stop-name (aget feature "properties" "stopname")
           trip-name (aget feature "properties" "trip-name")
-          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")) " <br> Vuoro: " (first (str/split trip-name #"\|\|")))]
+          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))]
       (if stop-name
       ;; This features is a stop marker
       (do
@@ -768,7 +768,7 @@
             :open? (get open-sections :route-map true)}
    "Kartta"
    [:div
-    "Valitse kartalle näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."
+    "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."
     [:div (stylefy/use-style {:margin-top "1.25rem"
                               :margin-bottom "1.25rem"
                               :display "flex"
