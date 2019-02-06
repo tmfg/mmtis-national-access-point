@@ -31,11 +31,12 @@
   (into #{} (map key) query-result))
 
 (defn- operation-area-ids [db operation-area]
-  (when-not (empty? operation-area)
-    (ids ::search/transport-service-id
-         (specql/fetch db ::search/operation-area-facet
-                       #{::search/transport-service-id}
-                       {::search/operation-area (op/in (map str/lower-case operation-area))}))))
+  (when (seq operation-area)
+    (ids
+      ::search/transport-service-id
+      (specql/fetch db ::search/operation-area-facet
+                    #{::search/transport-service-id}
+                    {::search/operation-area (op/in (map str/lower-case operation-area))}))))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
@@ -58,7 +59,7 @@
                                           (op/or
                                            {::t-service/sub-type (op/in types)}
                                            {::t-service/brokerage? true}))))
-              (and (not (empty? types)) (not (contains? types :brokerage))) ;; Only sub types
+              (and (seq types) (not (contains? types :brokerage))) ;; Only sub types
                 (ids ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
@@ -73,25 +74,29 @@
     ids))
 
 (defn- transport-type-ids [db transport-types]
-  (when-not (empty? transport-types)
-    (ids :id
-         (service-ids-by-transport-type db {:tt (apply list transport-types)}))))
+  (when (seq transport-types)
+    (ids
+      :id
+      (service-ids-by-transport-type db {:tt (apply list transport-types)}))))
 
 (defn- operator-ids [db operators]
-  (when-not (empty? operators)
-    (ids :id
-         (service-ids-by-business-id db {:operators (apply list operators)}))))
+  (when (seq operators)
+    (ids
+      :id
+      (service-ids-by-business-id db {:operators (apply list operators)}))))
 
 (defn- data-content-ids [db data-content]
-  (when-not (empty? data-content)
-    (ids :id
-         (service-ids-by-data-content db {:dc (apply list data-content)}))))
+  (when (seq data-content)
+    (ids
+      :id
+      (service-ids-by-data-content db {:dc (apply list data-content)}))))
 
 (defn operator-completions
   "Return a list of completions that match the given search term."
   [db term]
-  (into [] (service-search-by-operator db {:name (str "%" term "%")
-                                           :businessid (str term )})))
+  (vec
+    (service-search-by-operator db {:name (str "%" term "%")
+                                    :businessid (str term )})))
 
 (defn service-completions
   "Return a list of service completions that match the given name"
