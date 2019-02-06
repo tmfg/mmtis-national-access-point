@@ -128,7 +128,7 @@
     (cond
       (nil? minutes-from-midnight1) minutes-from-midnight2
       (nil? minutes-from-midnight2) minutes-from-midnight1
-      :default (min minutes-from-midnight1 minutes-from-midnight2))))
+      :default (max minutes-from-midnight1 minutes-from-midnight2))))
 
 (defn format-stop-info
   "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
@@ -175,7 +175,7 @@
 
 
 (defn combine-trips [date1-trips date2-trips]
-  (when (and date1-trips date2-trips)
+  (when (and date1-trips date2-trips (pos-int? (count date1-trips)) (pos-int? (count date2-trips)))
     (when-let [first-common-stop (first-common-stop (concat date1-trips date2-trips))]
       (let [first-common-stop
             #(assoc %

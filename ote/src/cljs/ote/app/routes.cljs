@@ -36,7 +36,6 @@
     ["/services/:operator" :services]
     ["/service/:transport-operator-id/:transport-service-id" :service]
 
-    ["/operators" :operators]
     ["/email-settings" :email-settings]
 
     ;; Route based traffic

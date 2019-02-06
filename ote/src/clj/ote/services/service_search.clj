@@ -161,10 +161,14 @@
                                        (when (and operators (::t-service/business-id company))
                                          (.contains operators (::t-service/business-id company))))
                                      c)))
-                  results)]
+                  results)
+        results-without-personal-info (mapv
+                                        (fn [result]
+                                          (dissoc result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
+                                        results)]
     (merge
      {:empty-filters? empty-filters?
-      :results results
+      :results results-without-personal-info
       :filter-service-count (count ids)}
      (when empty-filters?
        {:total-service-count (total-service-count db)
