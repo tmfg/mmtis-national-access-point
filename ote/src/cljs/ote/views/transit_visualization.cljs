@@ -44,12 +44,12 @@
 
     (when hash-color
       (case mode
-        :same (if (and (= d-hash hover-hash) (not (= d hover-day-formatted)))
+        :same (if (and (= d-hash hover-hash) (not= d hover-day-formatted))
                 {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.5)"}
                 (if (= d hover-day-formatted)
                   {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.75)"}
                   {:box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px rgba(0,0,0,.25)"}))
-        :diff (if (and (not (= d-hash hover-hash))
+        :diff (if (and (not= d-hash hover-hash)
                        (= (time/day-of-week day) (time/day-of-week hover-day)))
                 {:box-shadow "inset 0 0 0 2px crimson, inset 0 0 0 3px black, inset 0 0 0 100px rgba(255,255,255,.65)"}
                 (if (and (= d-hash hover-hash) (= d hover-day-formatted))
