@@ -19,7 +19,7 @@
 (defn ensure-url
   "Add http:// to the beginning of the given url if it doesn't exist."
   [url]
-  (str/replace (if (not (s/includes? url "http"))
+  (str/replace (if-not (s/includes? url "http")
                   (str "http://" url)
                   url)
                #" " "%20"))
