@@ -1301,7 +1301,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
   :type-search "Liikkumispalvelun tyyppi"
   :limit-search-results "Rajaa katalogia"
-
+  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :released-apis "Palvelussa julkaistut rajapinnat"
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"

@@ -1290,6 +1290,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
   :limit-search-results "Begränsar katalogen"
+  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :released-apis "Palvelussa julkaistut rajapinnat"
   :result-count (:plural :count
                   "Inga resultat"
                   "Hittades en tjänst."

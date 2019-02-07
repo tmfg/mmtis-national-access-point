@@ -1286,6 +1286,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
   :limit-search-results "Limit search results"
+  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :released-apis "Palvelussa julkaistut rajapinnat"
   :result-count (:plural :count
                   "No services found"
                   "One service found"
