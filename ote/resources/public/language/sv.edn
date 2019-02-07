@@ -1292,6 +1292,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :limit-search-results "Begränsar katalogen"
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
   :released-apis "Palvelussa julkaistut rajapinnat"
+  :service-basic-info "Basic info of the service"
   :result-count (:plural :count
                   "Inga resultat"
                   "Hittades en tjänst."

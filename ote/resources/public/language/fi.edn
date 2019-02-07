@@ -1303,6 +1303,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :limit-search-results "Rajaa katalogia"
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
   :released-apis "Palvelussa julkaistut rajapinnat"
+  :service-basic-info "Palvelun perustiedot"
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"
