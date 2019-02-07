@@ -459,5 +459,5 @@
   (update app routename not))
 
 (define-event ToggleShowNoChangeRoutes []
-  {:path [:transit-visualization :show-no-change-routes?]}
+  {:path [:transit-visualization]}
     (update app :show-no-change-routes? not))
