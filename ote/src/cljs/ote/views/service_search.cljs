@@ -91,7 +91,7 @@
         return-value (text/maybe-shorten-text-to 45 value-str)]
     return-value))
 
-(defn- external-interface-links-new [{::t-service/keys [id external-interface-links transport-operator-id]}]
+(defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
   [:div {:key id}
    [:div
     [:span (str (tr [:service-search :service-basic-info]) " | GeoJSON")]]
@@ -108,27 +108,6 @@
                 [gtfs-viewer-link row]])))
          external-interface-links)))])
 
-(defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
-  (let [nap-url (str js/window.location.origin "/ote/export/geojson/" transport-operator-id "/" id)]
-    [:div {:key id}
-     [:div.row (stylefy/use-style style/link-result-card-row)
-      [common-ui/linkify nap-url "NAP-rajapinta" {:target "_blank"}]
-      [:span " | "]
-      [:span "GeoJSON"]]
-     (when-not (empty? external-interface-links)
-       [:div.row
-        (doall
-          (map-indexed
-            (fn [i {::t-service/keys [external-interface format data-content] :as row}]
-              (let [data-content (if (nil? data-content)
-                                   (::t-service/url external-interface)
-                                   (parse-content-value data-content))]
-                [:div.row (merge {:key (str i "_" id)}
-                                 (stylefy/use-style style/link-result-card-row))
-                 [common-ui/linkify (::t-service/url external-interface) data-content {:target "_blank" :style {:color "#06c"}}]
-                 [:span " | " (str/join ", " format)]
-                 [gtfs-viewer-link row]]))
-            external-interface-links))])]))
 
 (defn- list-service-companies [service-companies service-search]
   (when (seq service-companies)
@@ -173,7 +152,7 @@
                                            operator-name business-id transport-operator-id service-companies companies]
                          :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
-        e-links [external-interface-links-new service]
+        e-links [external-interface-links service]
         service-desc (t-service/localized-text-for "FI" description)
         service-companies (cond
                             (and service-companies companies) (merge service-companies companies)
@@ -181,7 +160,7 @@
                             :else companies)]
     [:div (stylefy/use-style style/result-card-new)
      [:div (stylefy/use-sub-style style/result-card-new :header)
-      [:h3 {:style {:margin "1rem 0"
+      [:h3.result-title {:style {:margin "1rem 0"
                     :flex "2"}}
        name]
       [:div {:style {:flex "1"
