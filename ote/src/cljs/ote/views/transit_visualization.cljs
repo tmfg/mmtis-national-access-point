@@ -585,6 +585,7 @@
                                     (comp :gtfs/stop-name first :stoptimes second)
                                     (comp :gtfs/stop-name last :stoptimes second))
                               combined-trips)]
+      ^{:key (str "trips-table-" str "-" (rand-int 999))}
       [:div.trips-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
