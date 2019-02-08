@@ -1,6 +1,7 @@
 (ns ote.style.transit-changes
   "Transit changes styling"
-  (:require [stylefy.core :as stylefy]))
+  (:require [stylefy.core :as stylefy]
+            [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def add-color "rgb(0,170,0)")
 (def remove-color "rgb(221,0,0)")
@@ -89,3 +90,10 @@
 (def section-body
   {:padding-left "1.25rem"
    :padding-right "1.25rem"})
+
+(def map-checkbox-container {:margin "1.25rem 0"
+                             :display "flex"
+                             :flex-direction "row-reverse"
+                             :flex-wrap "nowrap"
+                             :justify-content "space-between"
+                             ::stylefy/media {{:max-width (str width-xs "px")} {:flex-direction "column"}}})

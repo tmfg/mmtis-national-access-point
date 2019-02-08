@@ -781,20 +781,16 @@
             :open? (get open-sections :route-map true)}
    "Kartta"
    [:div
-    "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."
-    [:div (stylefy/use-style {:margin-top "1.25rem"
-                              :margin-bottom "1.25rem"
-                              :display "flex"
-                              :flex-direction "row-reverse"
-                              :flex-wrap "nowrap"
-                              :justify-content "space-between"})
+    [:span
+     "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."]
+    [:div (stylefy/use-style style/map-checkbox-container)
 
-     [:div {:style {:width "20%"}}
+     [:div {:style {:flex 1}}
       [ui/checkbox {:label "Näytä pysäkit"
                     :checked (boolean (:show-stops? compare))
                     :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
-     [:div {:style {:width "80%"}}
-      (when (> (count (:show-route-lines compare)) 0)
+     [:div {:style {:flex 4}}
+      (when (pos-int? (:show-route-lines compare))
         ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
         (doall
           (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]

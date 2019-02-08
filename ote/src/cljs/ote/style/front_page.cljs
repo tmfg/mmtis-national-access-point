@@ -1,14 +1,8 @@
 (ns ote.style.front-page
   "Front page styles related to hero images and other front page components"
   (:require
-    [stylefy.core :as stylefy :refer [use-style use-sub-style]]))
-
-(def width-xxs 480)
-(def width-xs 767)
-(def width-sm 991)
-(def width-md 1199)
-(def width-l 1600)
-(def width-xl 2000)
+    [stylefy.core :as stylefy :refer [use-style use-sub-style]]
+    [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def hero-img {:height          "540px"
                :margin-top      "-20px"
