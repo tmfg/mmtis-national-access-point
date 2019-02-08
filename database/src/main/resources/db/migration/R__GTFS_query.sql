@@ -532,6 +532,8 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
   -- Join unnested per route hashes
   JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
  WHERE rh.hash IS NOT NULL
+  AND rh."route-hash-id" IS NOT NULL
+  AND rh."route-hash-id" != ''
  GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id";
 $$ LANGUAGE SQL STABLE;
 
