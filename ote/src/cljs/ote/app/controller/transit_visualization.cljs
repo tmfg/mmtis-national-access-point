@@ -24,9 +24,10 @@
   #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
+
 (defn route-filtering-available? [{:keys [changes-filtered changes-no-change route-changes-loading?] :as transit-visualization}]
   (and (not route-changes-loading?)
-       (seq (:gtfs/route-changes changes-filtered)) (seq (:gtfs/route-changes changes-no-change))))
+       (seq (:gtfs/route-changes changes-no-change))))
 
 (defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                    route-trips-for-date2-loading? route-calendar-hash-loading?
