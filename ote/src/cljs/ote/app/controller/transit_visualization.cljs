@@ -16,8 +16,7 @@
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
   [route]
-  (if (:gtfs/route-hash-id route)
-    (:gtfs/route-hash-id route)
+  (or (:gtfs/route-hash-id route)
     (str (:gtfs/route-short-name route) "-" (:gtfs/route-long-name route) "-" (:gtfs/trip-headsign route))))
 
 (def hash-colors
@@ -25,6 +24,9 @@
   #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
+(defn route-filtering-available? [{:keys [changes-filtered changes-no-change route-changes-loading?] :as transit-visualization}]
+  (and (not route-changes-loading?)
+       (seq (:gtfs/route-changes changes-filtered)) (seq (:gtfs/route-changes changes-no-change))))
 
 (defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                    route-trips-for-date2-loading? route-calendar-hash-loading?
@@ -47,7 +49,7 @@
         dt (parse-date start-date)
         first-diff (first
                      (sort #(t/before? (first %1) (first %2))
-                           (filter #(and (not (= hash (second %)))
+                           (filter #(and (not= hash (second %))
                                          (t/after? (first %) dt)
                                          (= (time/day-of-week (first %))
                                             (time/day-of-week dt)))
@@ -123,12 +125,11 @@
       (update :compare
               (fn [{:keys [date1 date2] :as compare}]
                 (when (and date1 date2)
-                  (do
-                    (comm/get! (str "transit-visualization/routes-for-dates/" (:operator-id app))
-                               {:params (select-keys compare [:date1 :date2])
-                                :on-success (tuck/send-async! ->RoutesForDatesResponse
-                                                              (select-keys compare [:date1 :date2]))})
-                    (assoc compare :routes-for-dates-loading? true)))))
+                  (comm/get! (str "transit-visualization/routes-for-dates/" (:operator-id app))
+                             {:params (select-keys compare [:date1 :date2])
+                              :on-success (tuck/send-async! ->RoutesForDatesResponse
+                                                            (select-keys compare [:date1 :date2]))})
+                  (assoc compare :routes-for-dates-loading? true))))
 
       (dissoc :routes-for-dates-loading?)))
 
@@ -144,8 +145,7 @@
 
 (define-event LoadInfoResponse [info]
   {:path [:transit-visualization]}
-  (-> app
-      (assoc :operator-name (::t-operator/name info))))
+  (assoc app :operator-name (::t-operator/name info)))
 
 (define-event LoadInfo [operator-id]
   {:path [:transit-visualization]}
@@ -155,8 +155,7 @@
 
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
-  (-> app
-      (assoc :mode mode)))
+  (assoc app :mode mode))
 
 (define-event SetCalendarMode [mode]
   {:path [:transit-visualization :calendar-mode]}
@@ -178,10 +177,13 @@
          :route-hash-id-type (:route-hash-id-type response)))
 
 (define-event LoadServiceChangesForDate [service-id detection-date]
-  {:path [:transit-visualization]}
+  {}
   (comm/get! (str "transit-visualization/" service-id "/" detection-date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
   (-> app
+      (assoc-in [:transit-visualization :route-changes-loading?] true)
+      (assoc-in [:transit-visualization :changes-no-change] nil)
+      (assoc-in [:transit-visualization :changes-filtered] nil)
       (assoc-in [:transit-visualization :service-changes-for-date-loading?] true)
       (assoc-in [:transit-visualization :show-no-change-routes?] false)
       (assoc-in [:transit-visualization :open-sections :gtfs-package-info] false)))
@@ -191,8 +193,7 @@
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
-  (-> app
-      (merge {:hash hash :day day})))
+  (merge app {:hash hash :day day}))
 
 (define-event RouteLinesForDateResponse [geojson date]
   {:path [:transit-visualization]}
@@ -345,7 +346,7 @@
                 date1)
         date2 (if (and
                     (:gtfs/different-week-date route)
-                    (not (= :no-traffic (:gtfs/change-type route))))
+                    (not= :no-traffic (:gtfs/change-type route)))
                   (:gtfs/different-week-date route)
                   (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
@@ -458,6 +459,20 @@
   {:path [:transit-visualization :compare :show-route-lines]}
   (update app routename not))
 
-(define-event ToggleShowNoChangeRoutes []
+(define-event LoadingRoutesResponse []
   {:path [:transit-visualization]}
-    (update app :show-no-change-routes? not))
+  (assoc app :route-changes-loading? false))
+
+(define-event ToggleShowNoChangeRoutesDelayed []
+  {}
+  (update-in app [:transit-visualization :show-no-change-routes?] not))
+
+(define-event ToggleShowNoChangeRoutes [e!]
+  {:path [:transit-visualization]}
+  ;; Timeout used because toggling route-changes table may cause delay in rendering the content with large data model.
+  ;; Disabling of UI components must happen before table model change because otherwise table rendering
+  ;; delays those as well.
+  (.setTimeout js/window #(e! (->ToggleShowNoChangeRoutesDelayed)) 0)
+  (-> app
+      (update :show-no-change-routes-checkbox? not)
+      (assoc :route-changes-loading? true)))
