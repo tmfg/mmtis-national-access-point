@@ -413,6 +413,14 @@
       [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
        body-content]])])
 
+(defn service-is-using-headsign
+  "Routes are combained between gtfs packages using route-hash-id. When trips headsign is not used there is no
+  reason to show it in route list or route name."
+  [route-hash-id-type]
+  (or (nil? route-hash-id-type)
+      (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
+      (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
+
 (defn route-changes [e! route-changes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         table-height (str
@@ -437,9 +445,7 @@
       :format (fn [[short long]]
                 (str short " " long))}
      ;; Show Reitti/Määrämpää column only if it does affect on routes.
-     (when (or (nil? route-hash-id-type)
-               (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
-               (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign"))
+     (when (service-is-using-headsign route-hash-id-type)
        {:name "Reitti/määränpää" :width "20%"
         :read :gtfs/trip-headsign})
 
@@ -795,7 +801,13 @@
                                  :as transit-visualization}]
   (let [routes (if show-no-change-routes?
                  (:gtfs/route-changes changes-no-change)
-                 (:gtfs/route-changes changes-filtered))]
+                 (:gtfs/route-changes changes-filtered))
+        route-name (if (service-is-using-headsign route-hash-id-type)
+                     (str (:gtfs/route-short-name selected-route) " "
+                          (:gtfs/route-long-name selected-route)
+                          " (" (:gtfs/trip-headsign selected-route) ")")
+                     (str (:gtfs/route-short-name selected-route) " "
+                          (:gtfs/route-long-name selected-route)))]
     [:div
      [:div.transit-visualization
 
@@ -821,10 +833,7 @@
 
       (when selected-route
         [:div.transit-visualization-route.container
-         [:h3 "Valittu reitti: "
-          (:gtfs/route-short-name selected-route) " "
-          (:gtfs/route-long-name selected-route)
-          " (" (:gtfs/trip-headsign selected-route) ")"]
+         [:h3 "Valittu reitti: " route-name]
 
          (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
