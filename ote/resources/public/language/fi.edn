@@ -929,7 +929,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :transit-visualization-page
- {:loading-routes "Palvelun reittejä ladataan."}
+ {:loading-routes "Palvelun reittejä ladataan."
+  :no-changes-in-routes "Ei reittejä, joissa muutoksia."
+  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Ole hyvä ja tarkista, että syötit tiedot oikein."

@@ -19,7 +19,8 @@
             [clojure.string :as str]
             [ote.ui.page :as page]
             [ote.ui.scroll :as scroll]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.ui.form-fields :as form-fields]))
 
 (set! *warn-on-infer* true)
 
@@ -416,17 +417,23 @@
       [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
        body-content]])])
 
-(defn route-changes [e! route-changes selected-route route-hash-id-type]
+(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
+        no-change-routes-count (count no-change-routes)
         table-height (str
                        (cond
                          (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
                          (= 0 route-count) 100
                          :else 500)
-                       "px")]; 10+
+                       "px"); 10+
+        no-rows-message (if (and
+                              (= 0 route-count)
+                              (pos-int? no-change-routes-count))
+                          (tr [:transit-visualization-page :no-changes-in-routes])
+                          (tr [:transit-visualization-page :loading-routes]))]
   [:div.route-changes
    [route-changes-legend]
-   [table/table {:no-rows-message (tr [:transit-visualization-page :loading-routes])
+   [table/table {:no-rows-message no-rows-message
                  :height          table-height
                  :name->label     str
                  :show-row-hover? true
@@ -460,7 +467,7 @@
 
      {:name "Muutokset" :width "30%"
       :read identity
-      :format (fn [{change-type :gtfs/change-type :as route-changes}]
+      :format (fn [{change-type :gtfs/change-type :as route}]
                 (case change-type
                   :no-traffic
                   [labeled-icon
@@ -469,12 +476,12 @@
 
                   :added
                   [labeled-icon
-                   [ic/content-add-box {:color style/add-color}]
+                   [ic/content-add-box {:style {:color style/add-color}}]
                    "Uusi reitti"]
 
                   :removed
                   [labeled-icon
-                   [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
+                   [ote-icons/outline-indeterminate-checkbox {:style {:color style/remove-color}}]
                    "Päättyvä reitti"]
 
                   :no-change
@@ -483,7 +490,7 @@
                    "Ei muutoksia"]
 
                   :changed
-                  [change-icons route-changes]))}]
+                  [change-icons route]))}]
 
     route-changes]
    [:div {:id "route-calendar-anchor"} ]]))
@@ -819,9 +826,12 @@
               ^{:key id}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections route-hash-id-type]
-                                 :as   transit-visualization}]
-  [:div
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-no-change changes-filtered selected-route compare open-sections route-hash-id-type show-no-change-routes?]
+                                 :as transit-visualization}]
+  (let [routes (if show-no-change-routes?
+                 (:gtfs/route-changes changes-no-change)
+                 (:gtfs/route-changes changes-filtered))]
+    [:div
      [:div.transit-visualization
 
       [page/page-controls
@@ -835,7 +845,14 @@
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-        [route-changes e! (:gtfs/route-changes changes) selected-route route-hash-id-type]]]
+        [:div.row {:style {:margin-top "1rem" :display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
+         [:div
+          [form-fields/field {:label (tr [:transit-visualization-page :checkbox-show-no-change])
+                              :type :checkbox
+                              :update! #(e! (tv/->ToggleShowNoChangeRoutes))}
+           show-no-change-routes?]]]
+
+        [route-changes e! routes (:gtfs/route-changes changes-no-change) selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
@@ -849,4 +866,4 @@
             [route-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
-            [trip-stop-sequence e! open-sections compare]])])]])
+            [trip-stop-sequence e! open-sections compare]])])]]))

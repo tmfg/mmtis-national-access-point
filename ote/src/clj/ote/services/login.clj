@@ -195,7 +195,7 @@
                                        ::user/email (:email form-data)}
 
                                       ;; If new password provided, change it
-                                      (when (not (str/blank? (:password form-data)))
+                                      (when-not (str/blank? (:password form-data))
                                         {::user/password (buddy->passlib (encrypt (:password form-data)))}))
                                      {::user/id (:id user)})]
             {:success? true}))))))

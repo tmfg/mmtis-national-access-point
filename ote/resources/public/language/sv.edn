@@ -923,7 +923,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :transit-visualization-page
- {:loading-routes "Laddar rutterna för tjänsten."}
+ {:loading-routes "Laddar rutterna för tjänsten."
+  :no-changes-in-routes "Ei reittejä, joissa muutoksia."
+  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Kolla att uppgifterna du skrev in är korrekta."

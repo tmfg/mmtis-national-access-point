@@ -51,7 +51,7 @@
                                                       (Double/parseDouble lat)]
                                         :properties {"stopname" name
                                                      "trip-name" (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}}))
-                                   (when (not (str/blank? stops))
+                                   (when-not (str/blank? stops)
                                      (str/split stops #"\|\|")))}}))
         trips))))
 
@@ -70,8 +70,7 @@
 
 (defn parse-gtfs-stoptimes [pg-array]
   (let [string (str pg-array)]
-    (if (str/blank? string)
-      nil
+    (when-not (str/blank? string)
       (composite/parse @specql-registry/table-info-registry
                        {:category "A"
                         :element-type :gtfs/stoptime-display}
@@ -125,14 +124,7 @@
        {{service-id :service-id} :params
         {:strs [date route-hash-id]} :query-params}
        (http/geojson-response
-         (cheshire/encode #_ {:data
-           (trip-lines
-           (fetch-route-trips-by-hash-and-date
-             db
-             {:service-id (Long/parseLong service-id)
-              :date (time/parse-date-iso-8601 date)
-              :route-hash-id route-hash-id})) }
-          ;(cheshire/encode
+         (cheshire/encode
          {:type "FeatureCollection"
           :features (trip-lines
                      (fetch-route-trips-by-hash-and-date
