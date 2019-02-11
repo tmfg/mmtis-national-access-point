@@ -102,10 +102,9 @@
            (let [data-content (if (nil? data-content)
                                 (::t-service/url external-interface)
                                 (parse-content-value data-content))]
-             (do
-               [:div {:key (str i "-" id)}
-                [:span data-content " | " (str/join format)]
-                [gtfs-viewer-link row]])))
+             [:div {:key (str i "-" id)}
+              [:span data-content " | " (str/join format)]
+              [gtfs-viewer-link row]]))
          external-interface-links)))])
 
 
@@ -224,8 +223,7 @@
        (doall
          (for [result results]
            ^{:key (::t-service/id result)}
-           [:div
-            [result-card e! (:admin? user) result service-search (:width app)]]))
+           [result-card e! (:admin? user) result service-search (:width app)]))
 
        (if fetching-more?
          [:span (tr [:service-search :fetching-more])]
