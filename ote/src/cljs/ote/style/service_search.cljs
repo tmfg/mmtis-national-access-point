@@ -40,17 +40,22 @@
                                                      :border-bottom (str "1px solid " colors/gray550)
                                                      :display "flex"
                                                      :justify-content "space-between"
-                                                     :padding "1.5rem"
+                                                     :padding "1rem"
                                                      ::stylefy/media {{:max-width (str width-xxs "px")}
                                                                       {:flex-direction "column"
-                                                                       :align-items "flex-start"}}}
-                                            :body {:padding "1.5rem"}
+                                                                       :align-items "flex-start"
+                                                                       :padding "0 0.7rem 0.7rem 0.7rem"}}}
+                                            :body {:padding "1rem"
+                                                   ::stylefy/media {{:max-width (str width-xxs "px")}
+                                                                    {:padding "1rem 0.7rem 0 0.7rem"}}}
                                             :foot {:display "flex"
                                                    :justify-content "space-between"
-                                                   :padding "0 1.5rem 1.5rem 1.5rem"
+                                                   :padding "0 1rem 1rem 1rem"
                                                    ::stylefy/media {{:max-width (str width-sm "px")}
                                                                     {:flex-direction "column"
-                                                                     :align-items "flex-start"}}}}})
+                                                                     :align-items "flex-start"}
+                                                                    {:max-width (str width-xxs "px")}
+                                                                    {:padding "0 0.7rem 0.7rem 0.7rem"}}}}})
 
 (def result-card {:margin-top "20px"
                   :background-color "#fff"
