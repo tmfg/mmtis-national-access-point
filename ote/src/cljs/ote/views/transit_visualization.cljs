@@ -552,15 +552,25 @@
                                                                [current-year]
                                                                [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
+                                                               hover-date %
                                                                hash (date->hash d)
+                                                               date1 (:date1 compare)
+                                                               date2 (:date2 compare)
                                                                hash-color (hash->color hash)]
                                                            (when-not (or (= (time/format-date-iso-8601 (:date1 compare)) d)
                                                                          (= (time/format-date-iso-8601 (:date2 compare)) d))
-                                                             (if (= 2 (get compare :last-selected-date 2))
-                                                               (style/date1-highlight-style hash-color
-                                                                                            style/date1-highlight-color-hover)
-                                                               (style/date2-highlight-style hash-color
-                                                                                            style/date2-highlight-color-hover))))}]
+                                                             (cond (> date1 hover-date)
+                                                                   (style/date1-highlight-style hash-color
+                                                                                                style/date1-highlight-color-hover)
+                                                                   (> hover-date date2)
+                                                                   (style/date2-highlight-style hash-color
+                                                                                                style/date2-highlight-color-hover)
+                                                                   :else
+                                                                   (if (= 2 (get compare :last-selected-date 2))
+                                                                     (style/date1-highlight-style hash-color
+                                                                                                  style/date1-highlight-color-hover)
+                                                                     (style/date2-highlight-style hash-color
+                                                                                                  style/date2-highlight-color-hover)))))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))

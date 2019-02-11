@@ -384,13 +384,22 @@
   (let [service-id (get-in app [:params :service-id])
         compare (or (get-in app [:transit-visualization :compare]) {})
         route (get-in app [:transit-visualization :selected-route])
+        date1 (get-in app [:transit-visualization :compare :date1])
+        date2 (get-in app [:transit-visualization :compare :date2])
         last-selected-date (:last-selected-date compare 2)
         compare (merge compare
-                       (if (= 2 last-selected-date)
-                         {:date1 date
-                          :last-selected-date 1}
-                         {:date2 date
-                          :last-selected-date 2}))]
+                       (cond (> date1 date)
+                             {:date1 date
+                              :last-selected-date 1}
+                             (> date date2)
+                             {:date2 date
+                              :last-selected-date 2}
+                             :else
+                             (if (= 2 last-selected-date)
+                               {:date1 date
+                                :last-selected-date 1}
+                               {:date2 date
+                                :last-selected-date 2})))]
     (comm/get! (str "transit-visualization/" service-id "/route-differences")
                {:params {:date1 (time/format-date-iso-8601 (:date1 compare))
                          :date2 (time/format-date-iso-8601 (:date2 compare))
