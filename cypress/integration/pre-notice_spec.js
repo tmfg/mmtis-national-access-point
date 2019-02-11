@@ -88,7 +88,7 @@ describe('Pre notice tests', () => {
 
 
         // Go to edit pre-notice view
-        cy.get('table.sent tr:last-child span.edit-pre-notice a').click();
+        cy.get('table.sent tr:last-child span.edit-pre-notice a').click({force: true});
 
         // Wait for pre-notice edit form queries because it causes re-render of the view.
         cy.wait('@getPreNotice');
