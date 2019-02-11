@@ -958,6 +958,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-pre-notice "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-authority-pre-notices "Saapuneet muutosilmoitukset"
   :navigation-privacy-policy "Rekisteriseloste"
+  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa"
   :navigation-general-menu "Valikko"
   :navigation-for-developers "Ohjelmointirajapinta kehittäjille"
   :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"

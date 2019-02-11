@@ -33,7 +33,7 @@
        [:li [linkify "http://bit.ly/nap-palaute"
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]]
        ;; TODO: Trafi
-       [:li [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja"
+       [:li [linkify (tr [:common-texts :navigation-privacy-policy-url])
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]
        ;; TODO: Trafi
        [:li [linkify (tr [:common-texts :footer-livi-url-link])
