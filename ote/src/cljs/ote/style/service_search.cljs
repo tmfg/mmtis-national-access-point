@@ -34,10 +34,10 @@
 (def result-card-new {:box-shadow "1px 1px 10px 0 hsla(0, 0%, 86%, .5)"
                       :background-color "#fff"
                       :margin-top "1.5rem"
-                      :border (str "1px solid " colors/gray400)
+                      :border (str "1px solid " colors/gray550)
                       ::stylefy/sub-styles {:header {:align-items "center"
                                                      :background-color "#fff"
-                                                     :border-bottom (str "1px solid " colors/gray400)
+                                                     :border-bottom (str "1px solid " colors/gray550)
                                                      :display "flex"
                                                      :justify-content "space-between"
                                                      :padding "1.5rem"

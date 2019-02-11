@@ -3,7 +3,7 @@
 
 (def blue-lighter "#66a3e0")
 (def blue-light "#3385d6")
-(def blue "#0048c2")
+(def blue "#0066cc")
 (def blue-dark "#0048c2")
 (def blue-darker "#0029B8")
 
@@ -34,7 +34,8 @@
 (def negative-text white-basic)
 (def negative-button-hover red-dark)
 (def primary blue)
-(def primary-dark blue-darker)
+(def primary-dark blue-dark)
+(def primary-darker blue-darker)
 (def primary-text white-basic)
 (def primary-disabled gray550)
 (def primary-light blue-light)
