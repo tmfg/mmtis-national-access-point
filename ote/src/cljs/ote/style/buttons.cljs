@@ -21,6 +21,9 @@
    :background-color colors/primary-dark
    :transform "scale(0.98)"})
 
+(def primary-btn-active
+  {:background-color colors/primary-darker})
+
 (def negative-btn-hover-focus
   {:text-decoration "none"
    :box-shadow "0 4px 4px rgba(0,0,0,0.2)"
@@ -73,7 +76,8 @@
           :border 0
           :background-color colors/primary
           ::stylefy/mode {:hover primary-btn-hover-focus
-                          :focus primary-btn-hover-focus}}))
+                          :focus primary-btn-hover-focus
+                          :active primary-btn-active}}))
 
 (def svg-button
   {:background-color "transparent"
