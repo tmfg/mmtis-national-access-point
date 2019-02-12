@@ -254,7 +254,6 @@
                                       (e! (fp-controller/->ToggleRegistrationDialog)))})
               (tr [:common-texts :navigation-register])]]])
 
-         ;;TODO: Trafi
          [:li
           [linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy])
            (merge (stylefy/use-style
