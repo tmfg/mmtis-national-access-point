@@ -557,8 +557,8 @@
                                                                date1 (:date1 compare)
                                                                date2 (:date2 compare)
                                                                hash-color (hash->color hash)]
-                                                           (when-not (or (= (time/format-date-iso-8601 (:date1 compare)) d)
-                                                                         (= (time/format-date-iso-8601 (:date2 compare)) d))
+                                                           (when-not (or (= (time/format-date-iso-8601 date1) d)
+                                                                         (= (time/format-date-iso-8601 date2) d))
                                                              (cond (> date1 hover-date)
                                                                    (style/date1-highlight-style hash-color
                                                                                                 style/date1-highlight-color-hover)
