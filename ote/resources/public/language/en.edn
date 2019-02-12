@@ -948,7 +948,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-pre-notice "Report changes in regular scheduled passenger transport"
   :navigation-authority-pre-notices "Saapuneet ilmoitukset"
   :navigation-privacy-policy "Privacy Policy"
-  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa"
+  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
   :navigation-general-menu "Menu"
   :navigation-for-developers "API for developers"
   :navigation-email-notification-settings "Email notification settings"

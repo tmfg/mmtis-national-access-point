@@ -952,7 +952,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-pre-notice "Meddelande om ändring i regelbunden persontrafik"
   :navigation-authority-pre-notices "Inkomna ändringsmeddelanden"
   :navigation-privacy-policy "Registerbeskrivning"
-  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa"
+  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
   :navigation-general-menu "Meny"
   :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
