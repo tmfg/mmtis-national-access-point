@@ -805,7 +805,7 @@
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-no-change changes-filtered selected-route compare open-sections route-hash-id-type show-no-change-routes? show-no-change-routes-checkbox?]
                                  :as transit-visualization}]
-  (let [routes (if show-no-change-routes?
+  (let [routes (if show-no-change-routes? ;; NOTICE! If you change route-changes data resolution logic check also :route-changes-loading? toggling logic ToggleShowNoChangeRoutes
                  (:gtfs/route-changes changes-no-change)
                  (:gtfs/route-changes changes-filtered))
         route-name (if (service-is-using-headsign route-hash-id-type)
@@ -839,7 +839,7 @@
            ;; Different value key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            show-no-change-routes-checkbox?]]]
 
-        [route-changes e! routes selected-route route-hash-id-type]]]
+        [route-changes e! routes selected-route route-hash-id-type]]] ;; NOTICE! If you change route-changes data resolution logic check also :route-changes-loading? toggling logic ToggleShowNoChangeRoutes
 
       (when selected-route
         [:div.transit-visualization-route.container

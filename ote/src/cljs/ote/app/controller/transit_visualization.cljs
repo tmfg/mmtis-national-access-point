@@ -473,6 +473,8 @@
   ;; Disabling of UI components must happen before table model change because otherwise table rendering
   ;; delays those as well.
   (.setTimeout js/window #(e! (->ToggleShowNoChangeRoutesDelayed)) 0)
-  (-> app
-      (update :show-no-change-routes-checkbox? not)
-      (assoc :route-changes-loading? true)))
+  (cond-> app
+      true (update :show-no-change-routes-checkbox? not)
+      ;; :route-changes-loading? set only when table model changes, otherwise there's no :component-did-mount event to clear the flag
+      (not= (:gtfs/route-changes (:changes-no-change app))
+            (:gtfs/route-changes (:changes-filtered app))) (assoc :route-changes-loading? true)))
