@@ -1288,6 +1288,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
   :limit-search-results "Limit search results"
+  :participating-operator "Participates in providing of this service"
+  :released-apis "Interfaces published in the service"
+  :service-basic-info "Basic info of the service"
   :result-count (:plural :count
                   "No services found"
                   "One service found"

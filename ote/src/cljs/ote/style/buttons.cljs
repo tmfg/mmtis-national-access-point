@@ -1,7 +1,8 @@
 (ns ote.style.buttons
   (:require
     [stylefy.core :as stylefy]
-    [ote.theme.colors :as colors]))
+    [ote.theme.colors :as colors]
+    [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def action-button-icon
   {:padding "0"
@@ -12,7 +13,6 @@
   {:text-decoration "none"
    :border-width "2px"
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
-   :padding "19px"
    :transform "scale(0.98)"})
 
 (def primary-btn-hover-focus
@@ -28,14 +28,18 @@
    :transform "scale(0.98)"})
 
 (def button-common
-  {:padding "20px"
+  {:padding "1.3rem"
    :min-width "4rem"
-   :display "inline-block"
+   :display "inline-flex"
+   :white-space "nowrap"
+   :justify-content "center"
    :text-align "center"
    :transition "all 200ms ease"
    :text-decoration "none"
    :box-shadow "4px 4px 8px 0 rgba(0, 0, 0, .2)"
    ::stylefy/vendors ["webkit" "moz" "o"]
+   ::stylefy/media {{:max-width (str width-sm "px")} {:padding "0.7rem"
+                                                      :min-width "2rem"}}
    ::stylefy/auto-prefix #{:transition}})
 
 (def disabled-button (merge

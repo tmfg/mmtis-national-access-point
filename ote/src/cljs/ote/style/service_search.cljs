@@ -1,7 +1,8 @@
 (ns ote.style.service-search
   (:require [stylefy.core :as stylefy]
             [ote.style.base :as base]
-            [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
+            [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
+            [ote.theme.colors :as colors]))
 
 (def result-header {:width         "100%"
                     :display       "block"
@@ -29,6 +30,27 @@
                                :text-align    "justify"
                                :position      "relative"
                                :overflow      "hidden"})
+
+(def result-card-new {:box-shadow "1px 1px 10px 0 hsla(0, 0%, 86%, .5)"
+                      :background-color "#fff"
+                      :margin-top "1.5rem"
+                      :border (str "1px solid " colors/gray400)
+                      ::stylefy/sub-styles {:header {:align-items "center"
+                                                     :background-color "#fff"
+                                                     :border-bottom (str "1px solid " colors/gray400)
+                                                     :display "flex"
+                                                     :justify-content "space-between"
+                                                     :padding "1.5rem"
+                                                     ::stylefy/media {{:max-width (str width-xxs "px")}
+                                                                      {:flex-direction "column"
+                                                                       :align-items "flex-start"}}}
+                                            :body {:padding "1.5rem"}
+                                            :foot {:display "flex"
+                                                   :justify-content "space-between"
+                                                   :padding "0 1.5rem 1.5rem 1.5rem"
+                                                   ::stylefy/media {{:max-width (str width-sm "px")}
+                                                                    {:flex-direction "column"
+                                                                     :align-items "flex-start"}}}}})
 
 (def result-card {:margin-top "20px"
                   :background-color "#fff"
