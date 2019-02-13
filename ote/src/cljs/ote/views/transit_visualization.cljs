@@ -845,9 +845,9 @@
         [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: " route-name]
 
+         [route-calendar e! transit-visualization]
          (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
-            [route-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
             [trip-stop-sequence e! open-sections compare]])])]]))
