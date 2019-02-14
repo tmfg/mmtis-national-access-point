@@ -79,8 +79,10 @@
                                  (map :stop-seq-changes (:trip-changes result)))]
 
     (-> result
-        (assoc :gtfs/trip-stop-sequence-changes sequence-changes)
-        (assoc :gtfs/trip-stop-time-changes stop-changes)
+        (assoc :trip-stop-sequence-changes-lower (:lower sequence-changes))
+        (assoc :trip-stop-sequence-changes-upper (:upper sequence-changes))
+        (assoc :trip-stop-time-changes-lower (:lower stop-changes))
+        (assoc :trip-stop-time-changes-upper (:upper stop-changes))
         (dissoc :starting-week-date :different-week-date :trip-changes)
         (set/rename-keys {:added-trips :gtfs/added-trips :removed-trips :gtfs/removed-trips}))))
 
