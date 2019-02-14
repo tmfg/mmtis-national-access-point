@@ -359,7 +359,7 @@
    [change-icons diff false])
   ([{:keys [added-trips removed-trips
             trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
-            trip-stop-time-changes-lower trip-stop-time-changes-upper]}
+            trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
     with-labels?]
    [:div.transit-change-icons
     (stylefy/use-style (merge
@@ -370,14 +370,14 @@
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
                                            style/add-color)}]
-      [:span added-trips
+      [:span (or added-trips (:gtfs/added-trips diff))
        (when with-labels? " lisättyä vuoroa")]]]
     [:div {:style {:width "20%"}}
      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                   style/no-change-color
                                                   style/remove-color)}]
-      [:span removed-trips
+      [:span (or removed-trips (:gtfs/removed-trips diff))
        (when with-labels? " poistettua vuoroa")]]]
 
     [:div {:style {:width "25%"}}
