@@ -1,26 +1,8 @@
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-sequence-changes-lower" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-sequence-changes-upper" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  DROP ATTRIBUTE "trip-stop-sequence-changes";
-
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-time-changes-lower" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-time-changes-upper" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  DROP ATTRIBUTE "trip-stop-time-changes";
-
 CREATE TABLE "detected-route-change" (
  "transit-change-date"        DATE NOT NULL,
  "transit-service-id"         INTEGER NOT NULL references "transport-service" (id),
- "route-short-name"           TEXT,                   -- "15"
- "route-long-name"            TEXT NOT NULL,          -- "Helsinki-Oulu"
+ "route-short-name"           TEXT,                   -- e.g. "15"
+ "route-long-name"            TEXT NOT NULL,          -- e.g. "Helsinki-Oulu"
  "trip-headsign"              TEXT,
  "change-type"                "gtfs-route-change-type", 
  "added-trips"                INTEGER DEFAULT 0,
@@ -41,35 +23,57 @@ DO $$
     r RECORD;
     c "gtfs-route-change-info";
   BEGIN
-    FOR r IN SELECT date AS d, "transport-service-id" AS tsid, "route-changes" AS rc FROM "gtfs-transit-changes"
+    FOR r IN
+      SELECT date AS d, "transport-service-id" AS tsid, "route-changes" AS rc FROM "gtfs-transit-changes"
       LOOP
-        FOREACH c IN ARRAY r.rc
-          LOOP
-            INSERT INTO "detected-route-change"
-            VALUES (r.d, r.tsid,
-                    c."route-short-name",
-                    c."route-long-name",
-                    c."trip-headsign",
-                    c."change-type",
-                    c."added-trips",
-                    c."removed-trips",
-                    COALESCE(lower(c."trip-stop-sequence-changes"), 0),
-                    COALESCE(upper(c."trip-stop-sequence-changes"), 0), -- Live data has values like '[%,%)', upper returns value minus one which gives the right value
-                    COALESCE(lower(c."trip-stop-time-changes"), 0),
-                    COALESCE(upper(c."trip-stop-time-changes"), 0), -- Live data has values like '[%,%)', upper returns value minus one which gives the right value
-                    c."current-week-date",
-                    c."different-week-date",
-                    c."change-date",
-                    COALESCE(c."route-hash-id",
-                             c."route-short-name" || '-' || c."route-long-name" || '-' || c."trip-headsign"),
-                    NULL);
-            -- raise notice 'd % c hs %', r.d, c."trip-headsign";
-          END LOOP;
+        IF array_length(r.rc, 1) > 0 THEN
+          FOREACH c IN ARRAY r.rc
+            LOOP
+              INSERT INTO "detected-route-change"
+              VALUES (r.d, r.tsid,
+                      c."route-short-name",
+                      COALESCE(c."route-long-name",''), -- Test/staging contains data with null, migrated does not allow that
+                      c."trip-headsign",
+                      c."change-type",
+                      c."added-trips",
+                      c."removed-trips",
+                      COALESCE(lower(c."trip-stop-sequence-changes"), 0),
+                      COALESCE(upper(c."trip-stop-sequence-changes"), 0), -- Live data has values like '[%,%)', upper returns value minus one which gives the right value
+                      COALESCE(lower(c."trip-stop-time-changes"), 0),
+                      COALESCE(upper(c."trip-stop-time-changes"), 0), -- Live data has values like '[%,%)', upper returns value minus one which gives the right value
+                      c."current-week-date",
+                      c."different-week-date",
+                      c."change-date",
+                      COALESCE(c."route-hash-id",
+                               COALESCE(c."route-short-name",'') || '-' || COALESCE(c."route-long-name",'') || '-' || COALESCE(c."trip-headsign",'')),
+                      NULL);
+            END LOOP;
+        ELSE
+          -- raise notice '      *************** skipped id=% date=%', r.tsid, r.d;
+        END IF;
       END LOOP;
   END
-$$ LANGUAGE plpgsql;
+  $$ LANGUAGE plpgsql;
 
 ALTER TABLE "gtfs-transit-changes"
   RENAME COLUMN "route-changes" TO "route-changes-old";
+
+ALTER TYPE "gtfs-route-change-info"
+  ADD ATTRIBUTE "trip-stop-sequence-changes-lower" INTEGER;
+
+ALTER TYPE "gtfs-route-change-info"
+  ADD ATTRIBUTE "trip-stop-sequence-changes-upper" INTEGER;
+
+ALTER TYPE "gtfs-route-change-info"
+  ADD ATTRIBUTE "trip-stop-time-changes-lower" INTEGER;
+
+ALTER TYPE "gtfs-route-change-info"
+  ADD ATTRIBUTE "trip-stop-time-changes-upper" INTEGER;
+
+ALTER TYPE "gtfs-route-change-info"
+  DROP ATTRIBUTE "trip-stop-sequence-changes";
+
+ALTER TYPE "gtfs-route-change-info"
+  DROP ATTRIBUTE "trip-stop-time-changes";
 
 -- TODO: Add an index to this table to date and service-id
