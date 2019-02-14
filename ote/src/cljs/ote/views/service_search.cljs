@@ -174,7 +174,7 @@
         [:span (tr [:service-search :show-all-information])]
         [ic/navigation-chevron-right {:style {:color "#fff"}}]]]]
      [:div (stylefy/use-sub-style style/result-card-new :body)
-      [:h4 {:style {:margin-top 0}}
+      [:h4 {:style {:margin 0}}
        (sub-type-tr sub-type)]
       (when (not-empty service-desc)
         [:p service-desc])]

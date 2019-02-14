@@ -15,11 +15,19 @@
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
    :transform "scale(0.98)"})
 
+(def outline-btn-active
+  {:box-shadow "0 0 0 0 rgba(0, 0, 0, .2)"
+   :transform "scale(0.97)"})
+
 (def primary-btn-hover-focus
   {:text-decoration "none"
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
    :background-color colors/primary-dark
    :transform "scale(0.98)"})
+
+(def primary-btn-active
+  {:background-color colors/primary-darker
+   :transform "scale(0.97)"})
 
 (def negative-btn-hover-focus
   {:text-decoration "none"
@@ -65,7 +73,8 @@
           :border "1px solid"
           :border-color colors/primary
           ::stylefy/mode {:hover outline-btn-hover-focus
-                          :focus outline-btn-hover-focus}}))
+                          :focus outline-btn-hover-focus
+                          :active outline-btn-active}}))
 
 (def primary-button
   (merge button-common
@@ -73,7 +82,8 @@
           :border 0
           :background-color colors/primary
           ::stylefy/mode {:hover primary-btn-hover-focus
-                          :focus primary-btn-hover-focus}}))
+                          :focus primary-btn-hover-focus
+                          :active primary-btn-active}}))
 
 (def svg-button
   {:background-color "transparent"

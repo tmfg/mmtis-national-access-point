@@ -254,9 +254,8 @@
                                       (e! (fp-controller/->ToggleRegistrationDialog)))})
               (tr [:common-texts :navigation-register])]]])
 
-         ;;TODO: Trafi
          [:li
-          [linkify "https://www.liikennevirasto.fi/yhteystiedot/tietosuoja" (tr [:common-texts :navigation-privacy-policy])
+          [linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy])
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]
