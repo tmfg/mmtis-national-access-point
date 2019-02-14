@@ -332,7 +332,8 @@
 (defn format-range [lower upper]
   (if (and (nil? lower) (nil? upper))
     "0"
-    (if (= lower upper)
+    (if (or (= lower upper)
+            (nil? upper))
       (str lower)
       (str lower "\u2014" upper))))
 
