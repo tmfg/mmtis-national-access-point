@@ -1,7 +1,8 @@
 (ns ote.transit-changes.stop-name-detection-test
   (:require [ote.transit-changes.detection :as detection]
             [clojure.test :as t :refer [deftest testing is]]
-            [ote.transit-changes :as transit-changes]))
+            [ote.transit-changes :as transit-changes]
+            [ote.transit-changes.stop-name-detection-test-values :as test-values]))
 
 (defn d [year month date]
   (java.time.LocalDate/of year month date))
@@ -123,3 +124,7 @@
     (is (= (:removed-trips result) 0))
     (is (= (:stop-seq-changes (first (:trip-changes result))) 2))
     (is (= (:stop-seq-changes (second (:trip-changes result))) 2))))
+
+(deftest combined-stop-sequences
+  (let [result (transit-changes/combined-stop-sequence test-values/first-common-stop [test-values/trip1-test-values test-values/trip2-test-values])]
+    (is (= result test-values/combined-stop-sequence-result))))

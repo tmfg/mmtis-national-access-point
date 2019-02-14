@@ -49,7 +49,7 @@
     ::t-service/operator-name})
 
 (defn require-admin-user [route user]
-  (when (not (:admin? user))
+  (when-not (:admin? user)
     (throw (SecurityException. "admin only"))))
 
 (defn- admin-service [route {user :user
@@ -79,7 +79,7 @@
 
 (defn- user-operator-members [db user query]
   (let [user-id (:id query)
-        members (into [] (nap-users/search-user-operators-and-members db {:user-id user-id}))]
+        members (vec (nap-users/search-user-operators-and-members db {:user-id user-id}))]
     (mapv (fn [x]
             (update x :members #(db-util/PgArray->vec %))) members)))
 
@@ -94,7 +94,7 @@
 (defn- list-services
   "Returns list of transport-services. Query parameters aren't mandatory, but it can be used to filter results."
   [db user query]
-  (let [q (when (not (nil? (:query query)))
+  (let [q (when-not (nil? (:query query))
             {::t-service/name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
@@ -105,7 +105,7 @@
 (defn- list-operators
   "Returns list of transport-operators. Query parameters aren't mandatory, but it can be used to filter results."
   [db user query]
-  (let [q (when (not (nil? (:query query)))
+  (let [q (when-not (nil? (:query query))
             {::t-operator/deleted? false
              ::t-operator/name (op/ilike (str "%" (:query query) "%"))})]
     (fetch db ::t-operator/transport-operator
@@ -114,7 +114,7 @@
            {:specql.core/order-by ::t-operator/name})))
 
 (defn- list-services-by-operator [db user query]
-  (let [q (when (not (nil? (:query query)))
+  (let [q (when-not (nil? (:query query))
             {::t-service/operator-name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result

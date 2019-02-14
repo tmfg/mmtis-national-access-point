@@ -26,7 +26,8 @@
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.style.base :as style-base]
-            [ote.ui.common :as uicommon]))
+            [ote.ui.common :as uicommon]
+            [ote.style.dialog :as style-dialog]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -44,8 +45,9 @@
   (when (:show-delete-dialog? operator)
     [ui/dialog
      {:id (str "delete-transport-operator-dialog-" (::t-operator/id operator))
-      :open    true
-      :title   (tr [:dialog :delete-transport-operator :title])
+      :open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title (tr [:dialog :delete-transport-operator :title])
       :actions [(r/as-element
                   [buttons/cancel
                    {:on-click #(e! toggle-dialog)}

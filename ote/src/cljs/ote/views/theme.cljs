@@ -8,6 +8,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.front-page :as fp-controller]
             [datafrisk.core :as df]
+            [ote.style.dialog :as style-dialog]
+            [datafrisk.core :as df]
             [ote.ui.buttons :as buttons]))
 
 (defn- flash-message-error [e! msg]
@@ -84,6 +86,7 @@
     [ui/dialog {:title (tr :title)
                 :modal true
                 :open true
+                :actionsContainerStyle style-dialog/dialog-action-container
                 :actions [(r/as-element
                             [buttons/save {:on-click #(e! (fp-controller/->StayOnPage))} (tr :stay)])
                           (r/as-element

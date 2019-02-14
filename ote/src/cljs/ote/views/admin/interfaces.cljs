@@ -16,7 +16,8 @@
             [stylefy.core :as stylefy]
             [ote.style.admin :as style-admin]
             [ote.app.controller.front-page :as fp]
-            [ote.ui.form :as form]))
+            [ote.ui.form :as form]
+            [ote.style.dialog :as style-dialog]))
 
 (defn error-modal [e! interface]
   (let [title (if (:db-error interface)
@@ -24,17 +25,18 @@
                 "Rajapinnan lataamisessa tapahtunut virhe")]
   (when (:show-error-modal? interface)
     [ui/dialog
-     {:open                     true
-      :modal                    false
+     {:open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :modal false
       :auto-scroll-body-content true
-      :on-request-close         #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))
-      :title                    title
-      :actions                  [(r/as-element
-                                   [ui/flat-button
-                                    {:label     (tr [:buttons :close])
-                                     :secondary true
-                                     :primary   true
-                                     :on-click  #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))}])]}
+      :on-request-close #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))
+      :title title
+      :actions [(r/as-element
+                  [ui/flat-button
+                   {:label (tr [:buttons :close])
+                    :secondary true
+                    :primary true
+                    :on-click #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))}])]}
      [:div.col-md-8
       [:div.row
        [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
@@ -54,6 +56,7 @@
   (when (:show-operator-modal? interface)
     [ui/dialog
      {:open                     true
+      :actionsContainerStyle style-dialog/dialog-action-container
       :modal                    false
       :auto-scroll-body-content true
       :on-request-close         #(e! (admin-controller/->CloseOperatorModal (:interface-id interface)))

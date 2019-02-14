@@ -19,7 +19,8 @@
             [clojure.string :as str]
             [ote.ui.page :as page]
             [ote.ui.scroll :as scroll]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.ui.form-fields :as form-fields]))
 
 (set! *warn-on-infer* true)
 
@@ -43,12 +44,12 @@
 
     (when hash-color
       (case mode
-        :same (if (and (= d-hash hover-hash) (not (= d hover-day-formatted)))
+        :same (if (and (= d-hash hover-hash) (not= d hover-day-formatted))
                 {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.5)"}
                 (if (= d hover-day-formatted)
                   {:box-shadow "inset 0 0 0 2px black, inset 0 0 0 100px rgba(255,255,255,.75)"}
                   {:box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 100px rgba(0,0,0,.25)"}))
-        :diff (if (and (not (= d-hash hover-hash))
+        :diff (if (and (not= d-hash hover-hash)
                        (= (time/day-of-week day) (time/day-of-week hover-day)))
                 {:box-shadow "inset 0 0 0 2px crimson, inset 0 0 0 3px black, inset 0 0 0 100px rgba(255,255,255,.65)"}
                 (if (and (= d-hash hover-hash) (= d hover-day-formatted))
@@ -412,6 +413,18 @@
       [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
        body-content]])])
 
+(defn service-is-using-headsign
+  "Routes are combained between gtfs packages using route-hash-id. When trips headsign is not used there is no
+  reason to show it in route list or route name."
+  [route-hash-id-type]
+  (or (nil? route-hash-id-type)
+      (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
+      (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
+
+
+(defn- route-changes-wrapper [el e!] ;; Wrapper allows hooking to React component lifespan events
+  (with-meta el {:component-did-mount (e! (tv/->LoadingRoutesResponse))}))
+
 (defn route-changes [e! route-changes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         table-height (str
@@ -419,70 +432,70 @@
                          (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
                          (= 0 route-count) 100
                          :else 500)
-                       "px")]; 10+
-  [:div.route-changes
-   [route-changes-legend]
-   [table/table {:no-rows-message (tr [:transit-visualization-page :loading-routes])
-                 :height          table-height
-                 :name->label     str
-                 :show-row-hover? true
-                 :on-select       #(when (first %)
-                                     (do
-                                       (e! (tv/->SelectRouteForDisplay (first %)))
-                                       (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
-                 :row-selected?   #(= % selected-route)}
-    [{:name "Reitti" :width "30%"
-      :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
-      :format (fn [[short long]]
-                (str short " " long))}
-     ;; Show Reitti/Määrämpää column only if it does affect on routes.
-     (when (or (nil? route-hash-id-type)
-               (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
-               (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign"))
-       {:name "Reitti/määränpää" :width "20%"
-        :read :gtfs/trip-headsign})
+                       "px")]                               ; 10+
+    [:div.route-changes
+     [route-changes-legend]
+     ;; Wrapper hooks to React event when rendering is done, allowing disabling any UI indication, potentially show during rendering.
+     [route-changes-wrapper
+      [table/table {:no-rows-message (tr [:transit-visualization-page :loading-routes])
+                    :height table-height
+                    :name->label str
+                    :show-row-hover? true
+                    :on-select #(when (first %)
+                                  (do
+                                    (e! (tv/->SelectRouteForDisplay (first %)))
+                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
+                    :row-selected? #(= % selected-route)}
+       [{:name "Reitti" :width "30%"
+         :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
+         :format (fn [[short long]]
+                   (str short " " long))}
+        ;; Show Reitti/Määrämpää column only if it does affect on routes.
+        (when (service-is-using-headsign route-hash-id-type)
+          {:name "Reitti/määränpää" :width "20%"
+           :read :gtfs/trip-headsign})
 
-     {:name "Aikaa 1. muutokseen"
-      :width "20%"
-      :read :gtfs/different-week-date
-      :format (fn [different-week-date]
-                (if-not different-week-date
-                  [labeled-icon [ic/navigation-check] "Ei muutoksia"]
-                  [:span
-                   (str (time/days-until different-week-date) " pv")
-                   [:span (stylefy/use-style {:margin-left "5px"
-                                              :color "gray"})
-                    (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+        {:name "Aikaa 1. muutokseen"
+         :width "20%"
+         :read :gtfs/different-week-date
+         :format (fn [different-week-date]
+                   (if-not different-week-date
+                     [labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                     [:span
+                      (str (time/days-until different-week-date) " pv")
+                      [:span (stylefy/use-style {:margin-left "5px"
+                                                 :color "gray"})
+                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
 
-     {:name "Muutokset" :width "30%"
-      :read identity
-      :format (fn [{change-type :gtfs/change-type :as route-changes}]
-                (case change-type
-                  :no-traffic
-                  [labeled-icon
-                   [ic/av-not-interested]
-                   "Tauko liikennöinnissä"]
+        {:name "Muutokset" :width "30%"
+         :read identity
+         :format (fn [{change-type :gtfs/change-type :as route}]
+                   (case change-type
+                     :no-traffic
+                     [labeled-icon
+                      [ic/av-not-interested]
+                      "Tauko liikennöinnissä"]
 
-                  :added
-                  [labeled-icon
-                   [ic/content-add-box {:color style/add-color}]
-                   "Uusi reitti"]
+                     :added
+                     [labeled-icon
+                      [ic/content-add-box {:color style/add-color}]
+                      "Uusi reitti"]
 
-                  :removed
-                  [labeled-icon
-                   [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
-                   "Päättyvä reitti"]
+                     :removed
+                     [labeled-icon
+                      [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
+                      "Päättyvä reitti"]
 
-                  :no-change
-                  [labeled-icon
-                   [ic/navigation-check]
-                   "Ei muutoksia"]
+                     :no-change
+                     [labeled-icon
+                      [ic/navigation-check]
+                      "Ei muutoksia"]
 
-                  :changed
-                  [change-icons route-changes]))}]
+                     :changed
+                     [change-icons route]))}]
 
-    route-changes]
-   [:div {:id "route-calendar-anchor"} ]]))
+       route-changes] e!]
+     [:div {:id "route-calendar-anchor"}]]))
 
 (defn comparison-dates [{:keys [date1 date2]}]
   [:div (stylefy/use-style (merge (style-base/flex-container "row")
@@ -553,10 +566,9 @@
        [comparison-date-changes compare]]]]))
 
 (defn format-stop-name [stop-name]
-  (let [remove-sequence-number #(str/join " " (rest (str/split % #" ")))
-        splitted-stop-name (if (str/includes? stop-name "->")
-                             (str/split (remove-sequence-number stop-name) #"->")
-                             (remove-sequence-number stop-name))
+  (let [splitted-stop-name (if (str/includes? stop-name "->")
+                             (str/split stop-name #"->")
+                             stop-name)
         formatted-name (if (and (vector? splitted-stop-name) (> (count splitted-stop-name) 1))
                          [:span (second splitted-stop-name)
                           [:br] (str "(Vanha nimi: " (first splitted-stop-name) ")")]
@@ -791,9 +803,18 @@
               ^{:key id}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes selected-route compare open-sections route-hash-id-type]
-                                 :as   transit-visualization}]
-  [:div
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-no-change changes-filtered selected-route compare open-sections route-hash-id-type show-no-change-routes? show-no-change-routes-checkbox?]
+                                 :as transit-visualization}]
+  (let [routes (if show-no-change-routes?
+                 (:gtfs/route-changes changes-no-change)
+                 (:gtfs/route-changes changes-filtered))
+        route-name (if (service-is-using-headsign route-hash-id-type)
+                     (str (:gtfs/route-short-name selected-route) " "
+                          (:gtfs/route-long-name selected-route)
+                          " (" (:gtfs/trip-headsign selected-route) ")")
+                     (str (:gtfs/route-short-name selected-route) " "
+                          (:gtfs/route-long-name selected-route)))]
+    [:div
      [:div.transit-visualization
 
       [page/page-controls
@@ -807,18 +828,26 @@
         ;; Route listing with number of changes
         "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
 
-        [route-changes e! (:gtfs/route-changes changes) selected-route route-hash-id-type]]]
+        [:div.row {:style {:margin-top "1rem" :display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
+         [:div
+          [form-fields/field {:label (tr [:transit-visualization-page :checkbox-show-no-change])
+                              :type :checkbox
+                              :update! #(e! (tv/->ToggleShowNoChangeRoutes e!))
+                              :disabled? (not (tv/route-filtering-available? transit-visualization))
+                              :style (when-not (tv/route-filtering-available? transit-visualization) style-base/disabled-control)}
+           ;; Toggling table key :show-no-change-routes may cause rendering delay on large data, blocking also rendering checkbox disabling changes.
+           ;; Different value key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
+           show-no-change-routes-checkbox?]]]
+
+        [route-changes e! routes selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
-         [:h3 "Valittu reitti: "
-          (:gtfs/route-short-name selected-route) " "
-          (:gtfs/route-long-name selected-route)
-          " (" (:gtfs/trip-headsign selected-route) ")"]
+         [:h3 "Valittu reitti: " route-name]
 
+         [route-calendar e! transit-visualization]
          (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
-            [route-calendar e! transit-visualization]
             [selected-route-map-section e! open-sections date->hash hash->color compare]
             [route-trips e! open-sections compare]
-            [trip-stop-sequence e! open-sections compare]])])]])
+            [trip-stop-sequence e! open-sections compare]])])]]))

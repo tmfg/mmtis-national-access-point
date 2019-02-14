@@ -14,7 +14,8 @@
             [ote.time :as time]
             [clojure.string :as str]
             [ote.app.controller.front-page :as fp]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.style.dialog :as style-dialog]))
 
 (defn pre-notice-type->str
   [types]
@@ -85,19 +86,20 @@
         (when delete-pre-notice-dialog
           [ui/dialog
            {:open true
+            :actionsContainerStyle style-dialog/dialog-action-container
             :title (tr [:pre-notice-list-page :delete-pre-notice-dialog :label])
             :actions [(r/as-element
-                       [ui/flat-button
-                        {:label (tr [:buttons :cancel])
-                         :primary true
-                         :on-click #(e! (pre-notice/->DeletePreNoticeCancel))}])
+                        [ui/flat-button
+                         {:label (tr [:buttons :cancel])
+                          :primary true
+                          :on-click #(e! (pre-notice/->DeletePreNoticeCancel))}])
                       (r/as-element
-                       [ui/raised-button
-                        {:label (tr [:buttons :delete])
-                         :icon (ic/action-delete-forever)
-                         :secondary true
-                         :primary true
-                         :on-click #(e! (pre-notice/->DeletePreNoticeConfirm))}])]}
+                        [ui/raised-button
+                         {:label (tr [:buttons :delete])
+                          :icon (ic/action-delete-forever)
+                          :secondary true
+                          :primary true
+                          :on-click #(e! (pre-notice/->DeletePreNoticeConfirm))}])]}
            (tr [:pre-notice-list-page :delete-pre-notice-dialog :content])])]
        [:h3 (tr [:pre-notice-list-page :sent-pre-notices])]
        [pre-notices-table e! pre-notices :sent]])))

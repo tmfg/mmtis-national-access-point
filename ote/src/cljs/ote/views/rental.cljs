@@ -17,7 +17,8 @@
             [ote.time :as time]
             [ote.style.form :as style-form]
             [ote.util.values :as values]
-            [ote.ui.validation :as validation])
+            [ote.ui.validation :as validation]
+            [ote.style.dialog :as style-dialog])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas app]
@@ -61,11 +62,12 @@
                       :on-click #(reset! open? true)}]
      [ui/dialog
       {:open @open?
+       :actionsContainerStyle style-dialog/dialog-action-container
        :auto-scroll-body-content true
        :title (tr [:price-dialog :header-dialog])
        :actions [(reagent/as-element
-                  [ui/flat-button {:label (tr [:buttons :close])
-                                   :on-click #(reset! open? false)}])]}
+                   [ui/flat-button {:label (tr [:buttons :close])
+                                    :on-click #(reset! open? false)}])]}
       [form/form {:update! update-form!
                   :name->label (tr-key [:field-labels :rentals]
                                        [:field-labels :transport-service]
@@ -217,6 +219,7 @@
                       :on-click #(reset! open? true)}]
      [ui/dialog
       {:open @open?
+       :actionsContainerStyle style-dialog/dialog-action-container
        :auto-scroll-body-content true
        :title (tr [:opening-hours-dialog :header-dialog])
        :actions [(reagent/as-element
@@ -298,7 +301,7 @@
 (defn rental [e! service app]
   (with-let [groups [(ts-common/transport-type ::t-service/rentals)
                      (ts-common/name-group (tr [:rentals-page :header-service-info]))
-                     (ts-common/contact-info-group (:transport-service app))
+                     (ts-common/contact-info-group)
                      (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/rentals)
                      (ts-common/external-interfaces e!)
                      (vehicle-group)

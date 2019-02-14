@@ -52,7 +52,10 @@
 
 (define-event ShowBrokeringServiceDialog []
   {}
-  (assoc-in app [:transport-service :show-brokering-service-dialog?] true))
+  (let [brokerage-selected? (get-in app [:transport-service ::t-service/passenger-transportation ::t-service/brokerage?])]
+    (if-not brokerage-selected?
+      (assoc-in app [:transport-service :show-brokering-service-dialog?] true)
+      app)))
 
 (define-event SelectBrokeringService [select-type]
   {}

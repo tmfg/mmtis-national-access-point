@@ -85,14 +85,16 @@
                                      {::t-service/transport-operator-id transport-operator-id
                                       ::t-service/id transport-service-id
                                       ::t-service/published? true}))
-        service (link-to-companies-csv-url service)]
+        service (link-to-companies-csv-url service)
+        operator-without-personal-info (dissoc operator ::t-operator/gsm ::t-operator/visiting-address ::t-operator/email ::t-operator/phone)
+        service-without-personal-info (dissoc service ::t-service/contact-address ::t-service/contact-email ::t-service/contact-phone)]
 
     (if (and (seq areas) operator service)
       (-> areas
           styled-operation-area
           (feature-collection (transform/transform-deep
-                               {:transport-operator operator
-                                :transport-service service}))
+                               {:transport-operator operator-without-personal-info
+                                :transport-service service-without-personal-info}))
           (cheshire/encode {:key-fn name})
           json-response)
       {:status 404

@@ -106,12 +106,12 @@
      (cond
        interfaces-has-errors?
        [:div
-        [ic/alert-error {:color "CC0000"}]
+        [ic/alert-error {:style {:color "CC0000"}}]
         [:div (use-style style/change-icon-value)
          "Virheitä rajapinnoissa"]]
        no-interfaces?
        [:div
-        [ic/alert-warning {:color "CCCC00"}]
+        [ic/alert-warning {:style {:color "CCCC00"}}]
         [:div (use-style style/change-icon-value)
          "Ei rajapintoja"]]
        no-interfaces-imported?
@@ -173,14 +173,14 @@
     [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
      {:name "Palvelu" :read :transport-service-name :width "20%"}
      {:name "Aikaa 1. muutokseen" :width "15%"
-      :read (juxt :change-date :days-until-change)
-      :format (fn [[different-week-date days-until-change]]
-                (if different-week-date
+      :read :different-week-date
+      :format (fn [different-week-date]
+                (if (and different-week-date (not (nil? different-week-date)))
                   [:span
-                   (str days-until-change " pv")
+                   (str (time/days-until different-week-date) " pv")
                    [:span (stylefy/use-style {:margin-left "5px"
                                               :color "gray"})
-                    (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]
+                    (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]
                   "\u2015"))}
      {:name "Tiedot saatavilla (asti)" :read (comp time/format-timestamp->date-for-ui :max-date) :width "15%"}
      {:name "Muutokset" :width "30%"

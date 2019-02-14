@@ -27,7 +27,6 @@
             [ote.views.user :as user]
             [ote.views.admin :as admin]
             [ote.views.admin.detected-changes :as admin-detected-changes]
-            [ote.views.operators :as operators]
             [ote.views.email-notification-settings :as email-settings]
             [ote.views.route.route-list :as route-list]
             [ote.views.route :as route]
@@ -44,14 +43,12 @@
 
 (def pages {:own-services #{:own-services :transport-service :new-service
                             :edit-service :transport-operator :organizations}
-            :services #{:services}
-            :operators #{:operators}})
+            :services #{:services}})
 
 (defn document-title [page]
   (set! (.-title js/document)
         (case page
           :services (tr [:document-title :services])
-          :operators (tr [:document-title :operators])
           :own-services (tr [:document-title :own-services])
           :admin (tr [:document-title :admin])
 
@@ -136,8 +133,6 @@
 
                     :admin [admin/admin-panel e! app]
                     :admin-detected-changes [admin-detected-changes/configure-detected-changes e! app]
-
-                    :operators [operators/operators e! app]
 
                     :email-settings [email-settings/email-notification-settings e! app]
 

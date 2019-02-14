@@ -19,7 +19,7 @@ SELECT ts.id AS "transport-service-id",
        "different-week-date", "change-date",
        "date",
        "change-date" - CURRENT_DATE AS "days-until-change",
-       ("change-date" IS NOT NULL) AS "changes?",
+       ("different-week-date" IS NOT NULL) AS "changes?",
        EXISTS(SELECT id
                 FROM "external-interface-description" eid
                WHERE eid."transport-service-id" = ts.id
@@ -50,18 +50,18 @@ SELECT ts.id AS "transport-service-id",
  WHERE 'road' = ANY(ts."transport-type")
    AND 'schedule' = ts."sub-type"
    AND ts."published?" = TRUE
- ORDER BY "change-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
+ ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
 
 -- name: calculate-routes-route-hashes-using-headsign
-SELECT calculate_route_hash_id_using_headsign(:package-id);
+SELECT calculate_route_hash_id_using_headsign(:package-id::INTEGER);
 -- name: calculate-routes-route-hashes-using-short-and-long
-SELECT calculate_route_hash_id_using_short_long(:package-id);
+SELECT calculate_route_hash_id_using_short_long(:package-id::INTEGER);
 -- name: calculate-routes-route-hashes-using-route-id
-SELECT calculate_route_hash_id_using_route_id(:package-id);
+SELECT calculate_route_hash_id_using_route_id(:package-id::INTEGER);
 -- name: calculate-routes-route-hashes-using-long-headsign
-SELECT calculate_route_hash_id_using_long_headsign(:package-id);
+SELECT calculate_route_hash_id_using_long_headsign(:package-id::INTEGER);
 -- name: calculate-routes-route-hashes-using-long
-SELECT calculate_route_hash_id_using_long(:package-id);
+SELECT calculate_route_hash_id_using_long(:package-id::INTEGER);
 
 -- name: fetch-services-with-route-hash-id
 SELECT ts.id as "service-id", ts.name as service, op.name as operator, d."route-hash-id-type" as type

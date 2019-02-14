@@ -92,10 +92,9 @@
                                [::t-service/external-interfaces
                                 (specql/columns ::t-service/external-interface-description)])
                          {::t-service/id id}))]
-    (if ts
+    (when ts
       (assoc ts ::t-service/operation-area
-             (places/fetch-transport-service-operation-area db id))
-      nil)))
+             (places/fetch-transport-service-operation-area db id)))))
 
 (defn delete-transport-service!
   "Delete single transport service by id"
@@ -328,7 +327,7 @@
     {:business-id-exists true}))
 
 (defn ensure-bigdec [value]
-  (when (not (nil? value )) (bigdec value)))
+  (when-not (nil? value ) (bigdec value)))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
@@ -413,7 +412,7 @@
   [db transport-service]
   (let [current-data (first (fetch db ::t-service/service-company (specql/columns ::t-service/service-company)
                                    {::t-service/transport-service-id (::t-service/id transport-service)}))
-        companies (into [] (:companies (external/check-csv {:url (::t-service/companies-csv-url transport-service)})))
+        companies (vec (:companies (external/check-csv {:url (::t-service/companies-csv-url transport-service)})))
         new-data (if (empty? current-data)
                    {::t-service/companies            companies
                     ::t-service/transport-service-id (::t-service/id transport-service)

@@ -69,16 +69,16 @@
 
 (defn index-page [db user config]
   (let [dev-mode? (:dev-mode? config)
-        production-env? (:production-env? config)
+        testing-env? (:testing-env? config)
         ga-conf (:ga config)
         flags (str/join "," (map name (:enabled-features config)))]
     [:html
      [:head
-      (if production-env?
-        (for [f favicons]
-          [:link f]))
+      (if testing-env?
         (for [f dev-favicons]
           [:link f])
+        (for [f favicons]
+          [:link f]))
       [:meta {:name "theme-color" :content "#ffffff"}]
       [:meta {:name    "viewport"
               :content "width=device-width, initial-scale=1.0"}]
