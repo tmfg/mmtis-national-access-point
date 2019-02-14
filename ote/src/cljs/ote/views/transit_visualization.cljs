@@ -740,10 +740,12 @@
                                                 (< zoom 14) [3 2 [16 16]]
                                                 :default [3 2 [18 18]])
                date1-filtered-trips (filter
-                                      (fn [trip] (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
+                                      (fn [trip]
+                                        (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
                                       (get date1-route-lines "features"))
                date2-filtered-trips (filter
-                                      (fn [trip] (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
+                                      (fn [trip]
+                                        (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
                                       (get date2-route-lines "features"))
                date1-data {:features (mapcat
                                        #(conj
@@ -796,7 +798,7 @@
                     :checked (boolean (:show-stops? compare))
                     :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
      [:div {:style {:flex 4}}
-      (when (pos-int? (:show-route-lines compare))
+      (when (pos-int? (count (:show-route-lines compare)))
         ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
         (doall
           (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
