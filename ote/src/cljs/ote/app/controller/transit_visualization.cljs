@@ -72,7 +72,7 @@
   (let [detection-date (time/parse-date-iso-8601 detection-date)]
     (.debug js/console "future-changes changes=" (prn-str changes))
     (filter
-      (fn [{:keys [change-date]}]
+      (fn [{:gtfs/keys [change-date]}]
           (or (nil? change-date)
               (not (t/before?
                      (time/native->date-time change-date)
