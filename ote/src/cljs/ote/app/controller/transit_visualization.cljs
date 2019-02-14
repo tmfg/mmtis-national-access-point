@@ -70,7 +70,6 @@
   "Filter routes changes that are in the future. (or no changes)"
   [detection-date changes]
   (let [detection-date (time/parse-date-iso-8601 detection-date)]
-    (.debug js/console "future-changes changes=" (prn-str changes))
     (filter
       (fn [{:gtfs/keys [change-date]}]
           (or (nil? change-date)
