@@ -306,7 +306,7 @@
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
-  :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten. Vänligen fyll i minst ett av följande: adress (gatuadress, postnummer, postkontor), e-post eller telefonnummer."
+  :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
@@ -923,7 +923,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :transit-visualization-page
- {:loading-routes "Laddar rutterna för tjänsten."}
+ {:loading-routes "Laddar rutterna för tjänsten."
+  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Kolla att uppgifterna du skrev in är korrekta."
@@ -951,6 +952,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-pre-notice "Meddelande om ändring i regelbunden persontrafik"
   :navigation-authority-pre-notices "Inkomna ändringsmeddelanden"
   :navigation-privacy-policy "Registerbeskrivning"
+  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
   :navigation-general-menu "Meny"
   :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
@@ -1290,6 +1292,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
   :limit-search-results "Begränsar katalogen"
+  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :released-apis "Palvelussa julkaistut rajapinnat"
+  :service-basic-info "Basic info of the service"
   :result-count (:plural :count
                   "Inga resultat"
                   "Hittades en tjänst."

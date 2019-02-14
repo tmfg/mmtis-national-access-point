@@ -60,8 +60,7 @@
 
 (defn parse-gtfs-stoptimes [pg-array]
   (let [string (str pg-array)]
-    (if (str/blank? string)
-      nil
+    (when-not (str/blank? string)
       (composite/parse @specql-registry/table-info-registry
                        {:category "A"
                         :element-type :gtfs/stoptime-display}

@@ -298,7 +298,7 @@
 Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
-  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla teihin yhteydessä. Täytä vähintään yksi seuraavista tiedoista: osoite (katuosoite, postinumero, postitoimipaikka), sähköposti tai puhelinnumero."
+  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla teihin yhteydessä."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
@@ -581,7 +581,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :own-services-directions-short "Ohjeet"
                      :own-services-new-provider1 "Hienoa! Olet nyt lisännyt "
                      :own-services-new-provider2 (:md " -nimisen palveluntuottajan NAP:iin.  Huomioithan, että pelkät palveluntuottajan tiedot eivät sisällä lain vaatimia olennaisia tietoja (esim. toiminta-alue, hintatiedot ja esteettömyystiedot) tarjoamastasi palvelusta/palveluista.\n\nLisää seuraavaksi tarkemmat tiedot tarjoamastasi palvelusta/palveluista kohdassa **Omat palvelut** ja/tai kohdassa **Muiden tuottamat palvelut, joissa olet mukana**.\n\nMikäli omistat taksiyrityksen ja ajat kyytejä vain välityskeskuksen kautta, riittää, että täytät välityskeskuksen tiedot kohtaan **Muiden tuottamat palvelut, joissa olet mukana**.")
-                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 10-16) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")}
+                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 09-15) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -929,7 +929,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :transit-visualization-page
- {:loading-routes "Palvelun reittejä ladataan."}
+ {:loading-routes "Palvelun reittejä ladataan."
+  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Ole hyvä ja tarkista, että syötit tiedot oikein."
@@ -956,7 +957,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-route "Merenkulun reitti- ja aikataulueditori"
   :navigation-pre-notice "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-authority-pre-notices "Saapuneet muutosilmoitukset"
-  :navigation-privacy-policy "Rekisteriseloste"
+  :navigation-privacy-policy "Tietosuoja"
+  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
   :navigation-general-menu "Valikko"
   :navigation-for-developers "Ohjelmointirajapinta kehittäjille"
   :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"
@@ -1301,7 +1303,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
   :type-search "Liikkumispalvelun tyyppi"
   :limit-search-results "Rajaa katalogia"
-
+  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :released-apis "Palvelussa julkaistut rajapinnat"
+  :service-basic-info "Palvelun perustiedot"
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"

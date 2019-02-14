@@ -23,6 +23,9 @@
   #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
+(defn route-filtering-available? [{:keys [changes-filtered changes-no-change route-changes-loading?] :as transit-visualization}]
+  (and (not route-changes-loading?)
+       (seq (:gtfs/route-changes changes-no-change))))
 
 (defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                    route-trips-for-date2-loading? route-calendar-hash-loading?
@@ -81,13 +84,15 @@
 
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
-  [changes]
+  [show-no-change changes]
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
         removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
         only-changes (filterv :change-date changes)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) only-changes)
-        all-sorted-changes (concat sorted-changes no-changes)]
+        all-sorted-changes (if show-no-change
+                             (concat sorted-changes no-changes)
+                             sorted-changes)]
     all-sorted-changes))
 
 (define-event RoutesForDatesResponse [routes dates]
@@ -164,17 +169,23 @@
               (assoc app
                 :service-changes-for-date-loading? false
                 :service-info (:service-info response)
-                :changes (:changes response)
-                :changes-route (sorted-route-changes (future-changes detection-date (:route-changes response)))
+                :changes-all (:changes response)
+                :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
+                :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
                 :gtfs-package-info (:gtfs-package-info response)
                 :route-hash-id-type (:route-hash-id-type response)))
 
 (define-event LoadServiceChangesForDate [service-id detection-date]
-  {:path [:transit-visualization]}
+  {}
   (comm/get! (str "transit-visualization/" service-id "/" detection-date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  {:service-changes-for-date-loading? true
-   :open-sections {:gtfs-package-info false}})
+  (-> app
+      (assoc-in [:transit-visualization :route-changes-loading?] true)
+      (assoc-in [:transit-visualization :changes-no-change] nil)
+      (assoc-in [:transit-visualization :changes-filtered] nil)
+      (assoc-in [:transit-visualization :service-changes-for-date-loading?] true)
+      (assoc-in [:transit-visualization :show-no-change-routes?] false)
+      (assoc-in [:transit-visualization :open-sections :gtfs-package-info] false)))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->LoadServiceChangesForDate (:service-id params) (:date params)))
@@ -448,3 +459,21 @@
 (define-event ToggleShowRouteLine [routename]
   {:path [:transit-visualization :compare :show-route-lines]}
   (update app routename not))
+
+(define-event LoadingRoutesResponse []
+  {:path [:transit-visualization]}
+  (assoc app :route-changes-loading? false))
+
+(define-event ToggleShowNoChangeRoutesDelayed []
+  {}
+  (update-in app [:transit-visualization :show-no-change-routes?] not))
+
+(define-event ToggleShowNoChangeRoutes [e!]
+  {:path [:transit-visualization]}
+  ;; Timeout used because toggling route-changes table may cause delay in rendering the content with large data model.
+  ;; Disabling of UI components must happen before table model change because otherwise table rendering
+  ;; delays those as well.
+  (.setTimeout js/window #(e! (->ToggleShowNoChangeRoutesDelayed)) 0)
+  (-> app
+      (update :show-no-change-routes-checkbox? not)
+      (assoc :route-changes-loading? true)))

@@ -434,7 +434,7 @@
 ;; TBD: rename away from "local" so not to confuse with ambiguous Java LocalTime, and consider using goog.date.Date
 (defn to-local-js-date [date]
   (let [d (date-fields-from-timestamp date)]
-    (new js/goog.date.DateTime (:ote.time/year d) (:ote.time/month d) (:ote.time/date d)))))
+    (new js/goog.date.DateTime (:ote.time/year d) (dec (:ote.time/month d)) (:ote.time/date d) 0 0 0))))
 
 #?(:cljs
    (defn days-until [date]

@@ -1,7 +1,8 @@
 (ns ote.style.buttons
   (:require
     [stylefy.core :as stylefy]
-    [ote.theme.colors :as colors]))
+    [ote.theme.colors :as colors]
+    [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def action-button-icon
   {:padding "0"
@@ -12,14 +13,21 @@
   {:text-decoration "none"
    :border-width "2px"
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
-   :padding "19px"
    :transform "scale(0.98)"})
+
+(def outline-btn-active
+  {:box-shadow "0 0 0 0 rgba(0, 0, 0, .2)"
+   :transform "scale(0.97)"})
 
 (def primary-btn-hover-focus
   {:text-decoration "none"
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
-   :background-color colors/primary
+   :background-color colors/primary-dark
    :transform "scale(0.98)"})
+
+(def primary-btn-active
+  {:background-color colors/primary-darker
+   :transform "scale(0.97)"})
 
 (def negative-btn-hover-focus
   {:text-decoration "none"
@@ -28,15 +36,18 @@
    :transform "scale(0.98)"})
 
 (def button-common
-  {:padding "20px"
-   :height "60px"                                           ;; Hard coded so the height doesn't change with transitions
+  {:padding "1.3rem"
    :min-width "4rem"
-   :display "inline-block"
+   :display "inline-flex"
+   :white-space "nowrap"
+   :justify-content "center"
    :text-align "center"
    :transition "all 200ms ease"
    :text-decoration "none"
    :box-shadow "4px 4px 8px 0 rgba(0, 0, 0, .2)"
    ::stylefy/vendors ["webkit" "moz" "o"]
+   ::stylefy/media {{:max-width (str width-sm "px")} {:padding "0.7rem"
+                                                      :min-width "2rem"}}
    ::stylefy/auto-prefix #{:transition}})
 
 (def disabled-button (merge
@@ -44,7 +55,8 @@
                        {:color colors/primary-text
                         :background-color colors/primary-disabled
                         :pointer-events "none"
-                        :box-shadow "none"}))
+                        :box-shadow "none"
+                        :cursor "not-allowed"}))
 
 (def negative-button
   (merge button-common
@@ -61,15 +73,17 @@
           :border "1px solid"
           :border-color colors/primary
           ::stylefy/mode {:hover outline-btn-hover-focus
-                          :focus outline-btn-hover-focus}}))
+                          :focus outline-btn-hover-focus
+                          :active outline-btn-active}}))
 
 (def primary-button
   (merge button-common
          {:color colors/primary-text
           :border 0
-          :background-color colors/primary-light
+          :background-color colors/primary
           ::stylefy/mode {:hover primary-btn-hover-focus
-                          :focus primary-btn-hover-focus}}))
+                          :focus primary-btn-hover-focus
+                          :active primary-btn-active}}))
 
 (def svg-button
   {:background-color "transparent"

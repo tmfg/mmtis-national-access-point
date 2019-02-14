@@ -109,8 +109,6 @@
                     (admin-service/->MonitorReportCSV)
                     [:db :http])
 
-   :operators (component/using (operators-service/->Operators) [:db :http])
-
    :settings (component/using (settings-service/->Settings) [:db :http])
 
    ;; Scheduled tasks

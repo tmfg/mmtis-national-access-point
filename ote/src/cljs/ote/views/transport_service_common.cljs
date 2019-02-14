@@ -316,86 +316,62 @@
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
 
-(defn contact-info-group [service]
-  (let [key (t-service/service-key-by-type (::t-service/type service))
-        service-sub-data (get service key)
-        contact-details-missing? (if (or
-                                       ;; contact details are not missing if address is given
-                                       (and
-                                         (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/street])))
-                                         (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/post_office])))
-                                         (and
-                                           (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/postal_code])))
-                                           (nil? (validation/validate-rule :postal-code nil (get-in service-sub-data [::t-service/contact-address ::common/postal_code])))))
-                                       ;; or if contact-email is given
-                                       (not (empty? (::t-service/contact-email service-sub-data)))
-                                       ;; or if contact-phone is given
-                                       (not (empty? (::t-service/contact-phone service-sub-data))))
-                                   false
-                                   true)]
-    (form/group
-      {:label (tr [:passenger-transportation-page :header-contact-details])
-       :columns 3
-       :layout :row}
+(defn contact-info-group []
+  (form/group
+    {:label (tr [:passenger-transportation-page :header-contact-details])
+     :columns 3
+     :layout :row}
 
-      (form/info (tr [:form-help :description-why-contact-info]))
+    (form/info (tr [:form-help :description-why-contact-info]))
 
-      (when contact-details-missing?
-        {:name :contact-details-required
-         :type :text-label
-         :label (tr [:common-texts :required-field-missing])
-         :container-class "col-xs-12"
-         :style style-base/required-element
-         :full-width? true})
+    {:name ::common/street
+     :type :string
+     :container-class "col-xs-12 col-sm-6 col-md-4"
+     :full-width? true
+     :read (comp ::common/street ::t-service/contact-address)
+     :write (fn [data street]
+              (assoc-in data [::t-service/contact-address ::common/street] street))
+     :label (tr [:field-labels ::common/street])
+     :max-length 128}
 
-      {:name ::common/street
-       :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-4"
-       :full-width? true
-       :read (comp ::common/street ::t-service/contact-address)
-       :write (fn [data street]
-                (assoc-in data [::t-service/contact-address ::common/street] street))
-       :label (tr [:field-labels ::common/street])
-       :max-length 128}
+    {:name ::common/postal_code
+     :type :string
+     :container-class "col-xs-12 col-sm-6 col-md-2"
+     :full-width? true
+     :regex #"\d{0,5}"
+     :read (comp ::common/postal_code ::t-service/contact-address)
+     :write (fn [data postal-code]
+              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
+     :label (tr [:field-labels ::common/postal_code])
+     :validate [[:postal-code]]}
 
-      {:name ::common/postal_code
-       :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-2"
-       :full-width? true
-       :regex #"\d{0,5}"
-       :read (comp ::common/postal_code ::t-service/contact-address)
-       :write (fn [data postal-code]
-                (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-       :label (tr [:field-labels ::common/postal_code])
-       :validate [[:postal-code]]}
+    {:name ::common/post_office
+     :type :string
+     :container-class "col-xs-12 col-sm-6 col-md-5"
+     :full-width? true
+     :read (comp ::common/post_office ::t-service/contact-address)
+     :write (fn [data post-office]
+              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
+     :label (tr [:field-labels ::common/post_office])
+     :max-length 64}
 
-      {:name ::common/post_office
-       :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-5"
-       :full-width? true
-       :read (comp ::common/post_office ::t-service/contact-address)
-       :write (fn [data post-office]
-                (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-       :label (tr [:field-labels ::common/post_office])
-       :max-length 64}
+    {:name ::t-service/contact-email
+     :type :string
+     :container-class "col-xs-12 col-sm-6 col-md-4"
+     :full-width? true
+     :max-length 200}
 
-      {:name ::t-service/contact-email
-       :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-4"
-       :full-width? true
-       :max-length 200}
+    {:name ::t-service/contact-phone
+     :type :string
+     :container-class "col-xs-12 col-sm-6 col-md-2"
+     :max-length 16
+     :full-width? true}
 
-      {:name ::t-service/contact-phone
-       :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-2"
-       :max-length 16
-       :full-width? true}
-
-      {:name ::t-service/homepage
-       :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-5"
-       :full-width? true
-       :max-length 200})))
+    {:name ::t-service/homepage
+     :type :string
+     :container-class "col-xs-12 col-sm-6 col-md-5"
+     :full-width? true
+     :max-length 200}))
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
