@@ -11,6 +11,7 @@
             [ote.app.controller.transit-visualization :as tv]
             [taoensso.timbre :as log]
             [ote.time :as time]
+            [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.table :as table]
             [ote.db.transport-service :as t-service]
@@ -552,17 +553,17 @@
                                                                [current-year]
                                                                [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
-                                                               hover-date %
+                                                               hover-date (goog.date.DateTime. %)
                                                                hash (date->hash d)
-                                                               date1 (:date1 compare)
-                                                               date2 (:date2 compare)
+                                                               date1 (goog.date.DateTime. (:date1 compare))
+                                                               date2 (goog.date.DateTime. (:date2 compare))
                                                                hash-color (hash->color hash)]
                                                            (when-not (or (= (time/format-date-iso-8601 date1) d)
                                                                          (= (time/format-date-iso-8601 date2) d))
-                                                             (cond (> date1 hover-date)
+                                                             (cond (t/after? date1 hover-date)
                                                                    (style/date1-highlight-style hash-color
                                                                                                 style/date1-highlight-color-hover)
-                                                                   (> hover-date date2)
+                                                                   (t/after? hover-date date2)
                                                                    (style/date2-highlight-style hash-color
                                                                                                 style/date2-highlight-color-hover)
                                                                    :else

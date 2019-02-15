@@ -384,14 +384,17 @@
   (let [service-id (get-in app [:params :service-id])
         compare (or (get-in app [:transit-visualization :compare]) {})
         route (get-in app [:transit-visualization :selected-route])
-        date1 (get-in app [:transit-visualization :compare :date1])
-        date2 (get-in app [:transit-visualization :compare :date2])
+        date (goog.date.DateTime. date)
+        date1 (goog.date.DateTime. (get-in app [:transit-visualization :compare :date1]))
+        date2 (goog.date.DateTime. (get-in app [:transit-visualization :compare :date2]))
         last-selected-date (:last-selected-date compare 2)
         compare (merge compare
-                       (cond (> date1 date)
+                       (cond (or (t/after? date1 date)
+                                 (t/equal? date1 date))
                              {:date1 date
                               :last-selected-date 1}
-                             (> date date2)
+                             (or (t/after? date date2)
+                                 (t/equal? date date2))
                              {:date2 date
                               :last-selected-date 2}
                              :else
