@@ -1071,6 +1071,7 @@ You can also draw the operating area or point to the map with drawing tools. You
           "name" "Name"
           "business-id" "Business ID"
           "published?" "Published?"
+          "published" "Published"
           "transport-operator-id" "Transport operator ID"
           "type" "Service mode"
           "email" "Email"
