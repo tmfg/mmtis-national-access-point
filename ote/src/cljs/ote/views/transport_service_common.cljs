@@ -399,11 +399,12 @@
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
-  [e! {published? ::t-service/published? :as data} schemas app]
+  [e! {published ::t-service/published :as data} schemas app]
   (let [name-missing? (str/blank? (::t-service/name data))
         show-footer? (if (get-in app [:transport-service ::t-service/id])
                        (ts/is-service-owner? app)
-                       true)]
+                       true)
+        published? (not (nil? published))]
     [:div
      ;; Show brokering dialog
      (when (get-in app [:transport-service :show-brokering-service-dialog?])

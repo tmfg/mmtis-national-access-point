@@ -75,8 +75,15 @@
 (defn show-value [key value]
   (let [formatter (when (map? value)
                     (keyset-formatter (set (keys value))))
-        value ((or formatter identity) value)]
+        value ((or formatter identity) value)
+        has-published-time? (not= (js/Date. value) (js/Date. 0))]
     (cond
+      (= key "published")
+      [:span
+       (if has-published-time?
+         (time/format-timestamp-for-ui (js/Date. value))
+         (tr [:viewer "published"]))]
+
       ;; This is an object, show key/value table
       (map? value)
       [properties-table value]
@@ -121,6 +128,8 @@
      (map
       (fn [[key value] stripe-style]
         ^{:key key}
+        (println key)
+        (println value)
         [:tr (stylefy/use-style stripe-style)
          [:th (merge {:scope "row" :width "25%"}
                      (stylefy/use-style style/th))
@@ -160,6 +169,7 @@
 (defn show-features [{:strs [features] :as resource}]
   (let [{:strs [transport-operator transport-service] :as props}
         (-> features first (get "properties"))]
+    (println transport-service)
     [:div
      (when transport-operator
        [:div {:style {:padding-top "20px"}}
@@ -204,6 +214,7 @@
 (defn viewer [e! _]
   (e! (v/->StartViewer))
   (fn [e! {:keys [authorized? logged-in? loading? geojson resource] :as app}]
+    (println "resource" resource)
     (if loading?
       [common/loading-spinner]
       [theme e! app
