@@ -21,7 +21,7 @@ SELECT c.name as "operator", c."business-id" as "business-id",
           LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
           LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
          WHERE c."business-id" IS NOT NULL
-           AND s."published?" = TRUE
+           AND s.published IS NOT NULL
 )
 SELECT *
   FROM companies c
@@ -54,7 +54,7 @@ i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "imp
   AND (:import-error::BOOLEAN IS NULL OR i."gtfs-import-error" IS NOT NULL)
   AND (:db-error::BOOLEAN IS NULL OR i."gtfs-db-error" IS NOT NULL)
   AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(i.format::text)::text[]))
-   AND ts."published?" = TRUE
+   AND ts.published IS NOT NULL
    AND ts."transport-operator-id" = op.id
    AND i."transport-service-id" = ts.id
    AND ('gtfs' = ANY(lower(i.format::text)::text[]) OR 'kalkati.net' = ANY(lower(i.format::text)::text[]))

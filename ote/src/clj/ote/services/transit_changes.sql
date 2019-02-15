@@ -49,7 +49,7 @@ SELECT ts.id AS "transport-service-id",
   LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
  WHERE 'road' = ANY(ts."transport-type")
    AND 'schedule' = ts."sub-type"
-   AND ts."published?" = TRUE
+   AND ts.published IS NOT NULL
  ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC;
 
 -- name: calculate-routes-route-hashes-using-headsign
