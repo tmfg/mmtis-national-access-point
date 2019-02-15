@@ -455,9 +455,6 @@
         data (cond-> data
                      publish? (assoc ::t-service/published publish-date)
                      true (dissoc ::t-service/published?))]
-    (println data)
-    (println service-id)
-    (println "existing: " existing-publish-date)
     data))
 
 (defn- save-transport-service

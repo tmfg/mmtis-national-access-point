@@ -74,35 +74,33 @@
        (fn [i {::t-service/keys [id type published name]
                ::modification/keys [created modified] :as row}]
          ^{:key i}
-         (do
-           (.log js/console published)
-           [ui/table-row {:selectable false :display-border false}
-            [ui/table-row-column
-             [:a (merge {:href (str "/#/edit-service/" id)
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (fp/->ChangePage :edit-service {:id id})))}
-                        (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
-            [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values (not (nil? published))])]
-            [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
-            [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
-            [ui/table-row-column {:class "hidden-xs hidden-sm "}
-             (if published
-               (let [url (str "/export/geojson/" transport-operator-id "/" id)]
-                 [linkify url
-                  (tr [:own-services-page :open-geojson])
-                  {:target "_blank"
-                   :style {:text-decoration "none"
-                           ::stylefy/mode {:hover {:text-decoration "underline"}}}}])
-               [:span.draft
-                (tr [:field-labels :transport-service ::t-service/published?-values false])])]
-            [ui/table-row-column
-             [ui/icon-button (merge {:href "#" :on-click #(do
-                                                            (.preventDefault %)
-                                                            (e! (fp/->ChangePage :edit-service {:id id})))}
-                                    (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
-              [ic/content-create]]
-             [delete-service-action e! row]]]))
+         [ui/table-row {:selectable false :display-border false}
+          [ui/table-row-column
+           [:a (merge {:href (str "/#/edit-service/" id)
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (e! (fp/->ChangePage :edit-service {:id id})))}
+                      (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
+          [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values (not (nil? published))])]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
+          [ui/table-row-column {:class "hidden-xs hidden-sm "}
+           (if published
+             (let [url (str "/export/geojson/" transport-operator-id "/" id)]
+               [linkify url
+                (tr [:own-services-page :open-geojson])
+                {:target "_blank"
+                 :style {:text-decoration "none"
+                         ::stylefy/mode {:hover {:text-decoration "underline"}}}}])
+             [:span.draft
+              (tr [:field-labels :transport-service ::t-service/published?-values false])])]
+          [ui/table-row-column
+           [ui/icon-button (merge {:href "#" :on-click #(do
+                                                          (.preventDefault %)
+                                                          (e! (fp/->ChangePage :edit-service {:id id})))}
+                                  (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+            [ic/content-create]]
+           [delete-service-action e! row]]])
        services))])
 
 (defn transport-services-listing [e! transport-operator-id services section-label]
