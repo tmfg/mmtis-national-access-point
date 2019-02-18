@@ -46,11 +46,13 @@
                                                                        :align-items "flex-start"
                                                                        :padding "0 0.7rem 0.7rem 0.7rem"}}}
                                             :body {:padding "1rem"
+                                                   :display "flex"
                                                    ::stylefy/media {{:max-width (str width-xxs "px")}
-                                                                    {:padding "1rem 0.7rem 0 0.7rem"}}}
+                                                                    {:padding "1rem 0.7rem 0 0.7rem"
+                                                                     :flex-direction "column"}}}
                                             :foot {:display "flex"
                                                    :justify-content "space-between"
-                                                   :padding "0 1rem 1rem 1rem"
+                                                   :padding "0 1rem 2rem 1rem"
                                                    ::stylefy/media {{:max-width (str width-sm "px")}
                                                                     {:flex-direction "column"
                                                                      :align-items "flex-start"}

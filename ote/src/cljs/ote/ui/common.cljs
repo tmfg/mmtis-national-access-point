@@ -6,6 +6,7 @@
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.form :as style-form]
+            [ote.theme.colors :as colors]
             [ote.ui.icons :as icons]
             [reagent.core :as r]
             [clojure.string :as str]
@@ -47,8 +48,11 @@
                    :default
                    url)]
          [:a (merge
-              (when style
-                (stylefy/use-style style))
+               (stylefy/use-style (merge {:color colors/primary
+                                          :text-decoration "none"
+                                          ::stylefy/mode {:hover {:text-decoration "underline"}}}
+                                         (when style
+                                           style)))
               {:href url}
               a-props)
           (if icon
