@@ -805,11 +805,11 @@
                  changes-route-no-change
                  changes-route-filtered)
         route-name (if (service-is-using-headsign route-hash-id-type)
-                     (str (:gtfs/route-short-name selected-route) " "
-                          (:gtfs/route-long-name selected-route)
-                          " (" (:gtfs/trip-headsign selected-route) ")")
-                     (str (:gtfs/route-short-name selected-route) " "
-                          (:gtfs/route-long-name selected-route)))]
+                     (str (:route-short-name selected-route) " "
+                          (:route-long-name selected-route)
+                          " (" (:trip-headsign selected-route) ")")
+                     (str (:route-short-name selected-route) " "
+                          (:route-long-name selected-route)))]
     [:div
      [:div.transit-visualization
 
