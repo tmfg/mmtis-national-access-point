@@ -1,7 +1,7 @@
 (ns ote.style.service-search
   (:require [stylefy.core :as stylefy]
             [ote.style.base :as base]
-            [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
+            [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
             [ote.theme.colors :as colors]))
 
 (def result-header {:width         "100%"
