@@ -1,3 +1,13 @@
+ALTER TABLE "transport-service" ADD COLUMN published TIMESTAMP WITH TIME ZONE;
+
+UPDATE "transport-service"
+SET published = to_timestamp(0)
+WHERE "published?" = true;
+
+DROP VIEW transport_service_search_result;
+
+-- CAN'T ALTER TABLE WHEN WE HAVE PENDING TRIGGER EVENTS SO WE NEED REPLACE THESE FUNCTIONS BEFORE ALTERING TABLE
+
 -- Create trigger function to update facet when service changes
 CREATE OR REPLACE FUNCTION transport_service_operation_area_array () RETURNS TRIGGER AS $$
 BEGIN
@@ -22,7 +32,6 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 
 CREATE OR REPLACE FUNCTION store_daily_company_stats () RETURNS VOID AS $$
 INSERT INTO company_stats ("date", "count")
