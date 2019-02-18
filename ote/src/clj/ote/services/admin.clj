@@ -87,8 +87,8 @@
   (case (:published-type query)
     nil? nil
     :ALL nil
-    :YES {::t-service/published? true}
-    :NO {::t-service/published? false}
+    :YES {::t-service/published op/not-null?}
+    :NO {::t-service/published op/null?}
     nil))
 
 (defn- list-services
