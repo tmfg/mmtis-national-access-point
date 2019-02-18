@@ -8,6 +8,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
             [ote.style.buttons :as button-styles]
+            [ote.theme.colors :as colors]
             [ote.ui.form :as form]
             [ote.ui.common :as common-ui]
             [cljs-react-material-ui.reagent :as ui]
@@ -92,20 +93,21 @@
     return-value))
 
 (defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
-  [:div {:key id}
-   [:div
-    [:span (str (tr [:service-search :service-basic-info]) " | GeoJSON")]]
-   (when-not (empty? external-interface-links)
-     (doall
-       (map-indexed
-         (fn [i {::t-service/keys [external-interface format data-content] :as row}]
-           (let [data-content (if (nil? data-content)
-                                (::t-service/url external-interface)
-                                (parse-content-value data-content))]
-             [:div {:key (str i "-" id)}
-              [:span data-content " | " (str/join format)]
-              [gtfs-viewer-link row]]))
-         external-interface-links)))])
+  (let [bullet-span [:span {:style {:color colors/gray650}} " • "]]
+    [:div {:key id}
+     [:div
+      [:span (tr [:service-search :service-basic-info]) bullet-span "GeoJSON"]]
+     (when-not (empty? external-interface-links)
+       (doall
+         (map-indexed
+           (fn [i {::t-service/keys [external-interface format data-content] :as row}]
+             (let [data-content (if (nil? data-content)
+                                  (::t-service/url external-interface)
+                                  (parse-content-value data-content))]
+               [:div {:key (str i "-" id)}
+                [:span data-content bullet-span (str/join format)]
+                [gtfs-viewer-link row]]))
+           external-interface-links)))]))
 
 
 (defn- list-service-companies [service-companies service-search]
@@ -156,14 +158,13 @@
         service-companies (cond
                             (and service-companies companies) (merge service-companies companies)
                             (and service-companies (empty? companies)) service-companies
-                            :else companies)]
+                            :else companies)
+        spacer-margin {:margin "0.5rem 0 1.5rem 0"}]
     [:div (stylefy/use-style style/result-card-new)
      [:div (stylefy/use-sub-style style/result-card-new :header)
-      [:h3.result-title {:style {:margin "1rem 0"
-                    :flex "2"}}
+      [:h3.result-title {:style {:margin "1rem 0"}}
        name]
-      [:div {:style {:flex "1"
-                     :display "flex"
+      [:div {:style {:display "flex"
                      :justify-content "flex-end"
                      :align-items "center"}}
        (when admin?
@@ -174,21 +175,20 @@
         [:span (tr [:service-search :show-all-information])]
         [ic/navigation-chevron-right {:style {:color "#fff"}}]]]]
      [:div (stylefy/use-sub-style style/result-card-new :body)
-      [:h4 {:style {:margin 0}}
-       (sub-type-tr sub-type)]
-      (when (not-empty service-desc)
-        [:p service-desc])]
-     [:div (stylefy/use-sub-style style/result-card-new :foot)
-      [:div {:style {:flex "2"}}
-       [:h4 {:style {:margin-top "1rem"}}
-        (tr [:service-search :released-apis])]
-       [:div.result-interfaces e-links]]
+      [:div {:style {:flex 2
+                     :padding-right "1rem"}}
+       [:h4 {:style {:margin 0}}
+        (sub-type-tr sub-type)]
+       (if (not-empty service-desc)
+         [:p {:style spacer-margin} service-desc]
+         [:p {:style (merge {:color colors/gray650}
+                            spacer-margin)} (tr [:service-search :no-description])])]
       [:div {:style {:flex "1"}}
-       [:h4 {:style {:margin-top "1rem"}}
+       [:h4 {:style {:margin 0}}
         (tr [:service-search :operator-search])]
-       [:div
+       [:div {:style spacer-margin}
         [:strong operator-name]
-        [:p {:style {:margin-top "0"}}
+        [:p {:style {:margin "0"}}
          (str (tr [:field-labels :ote.db.transport-operator/business-id]) ": " business-id)]]
        (when (not-empty service-companies)
          [:div
@@ -198,7 +198,13 @@
                [:strong
                 (::t-service/name company)
                 " (" (::t-service/business-id company) ") "]
-               [:span (tr [:service-search :participating-operator])]]))])]]]))
+               [:span (tr [:service-search :participating-operator])]]))])]]
+     [:div (stylefy/use-sub-style style/result-card-new :foot)
+      [:div {:style {:flex "2"}}
+       [:h4 {:style {:margin "0"}}
+        (tr [:service-search :released-apis])]
+       [:div.result-interfaces {:style spacer-margin}
+        e-links]]]]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count total-company-count

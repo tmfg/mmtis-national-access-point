@@ -435,7 +435,8 @@
         no-change-routes-count (count no-change-routes)
         table-height (str
                        (cond
-                         (and (< 0 route-count) (> 10 route-count)) (* 50 route-count) ; 1 - 10
+                         ;; 54: 50 (row height) + 4 (2px outline on both sides)
+                         (and (< 0 route-count) (> 10 route-count)) (* 54 route-count) ; 1 - 10
                          (= 0 route-count) 100
                          :else 500)
                        "px"); 10+
