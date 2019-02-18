@@ -1086,6 +1086,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
           "name" "Nimi"
           "business-id" "Y-tunnus"
           "published?" "Julkaistu?"
+          "published" "Julkaistu"
           "transport-operator-id" "Palveluntuottajan tunnistenumero"
           "type" "Palvelun tyyppi"
           "email" "Sähköpostiosoite"

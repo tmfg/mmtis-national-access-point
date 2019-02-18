@@ -17,7 +17,8 @@
             ;; Require time which extends PGInterval JSON generation
             [ote.time]
             [clojure.spec.alpha :as s]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [specql.op :as op]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
@@ -48,7 +49,6 @@
                                                            ::t-service/external-interface}])
                   modification/modification-field-keys
                   #{::t-service/notice-external-interfaces?
-                    ::t-service/published?
                     ::t-service/company-csv-filename
                     ::t-service/company-source
                     ::t-service/ckan-resource-id
@@ -84,11 +84,10 @@
                                      transport-service-properties-columns
                                      {::t-service/transport-operator-id transport-operator-id
                                       ::t-service/id transport-service-id
-                                      ::t-service/published? true}))
+                                      ::t-service/published op/not-null?}))
         service (link-to-companies-csv-url service)
         operator-without-personal-info (dissoc operator ::t-operator/gsm ::t-operator/visiting-address ::t-operator/email ::t-operator/phone)
         service-without-personal-info (dissoc service ::t-service/contact-address ::t-service/contact-email ::t-service/contact-phone)]
-
     (if (and (seq areas) operator service)
       (-> areas
           styled-operation-area

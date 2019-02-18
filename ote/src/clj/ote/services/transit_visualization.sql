@@ -157,7 +157,7 @@ SELECT ts.name AS "transport-service-name",
        op.id AS "transport-operator-id"
   FROM "transport-service" ts
   JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
- WHERE ts."published?" = TRUE
+ WHERE ts.published IS NOT NULL
    AND ts.id = :service-id;
 
 -- name: fetch-gtfs-packages-for-service

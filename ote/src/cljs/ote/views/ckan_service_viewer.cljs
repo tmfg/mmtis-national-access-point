@@ -75,8 +75,15 @@
 (defn show-value [key value]
   (let [formatter (when (map? value)
                     (keyset-formatter (set (keys value))))
-        value ((or formatter identity) value)]
+        value ((or formatter identity) value)
+        has-published-time? (not= (js/Date. value) (js/Date. 0))]
     (cond
+      (= key "published")
+      [:span
+       (if has-published-time?
+         (time/format-timestamp-for-ui (js/Date. value))
+         (tr [:viewer "published"]))]
+
       ;; This is an object, show key/value table
       (map? value)
       [properties-table value]

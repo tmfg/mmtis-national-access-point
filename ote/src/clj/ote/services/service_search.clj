@@ -44,7 +44,7 @@
       (ids ::t-service/id
            (specql/fetch db ::t-service/transport-service
                          #{::t-service/id}
-                         {::t-service/published? true
+                         {::t-service/published op/not-null?
                           ::t-service/name (op/ilike (str "%" text "%"))})))))
 
 (defn- sub-type-ids
@@ -55,21 +55,21 @@
                 (ids ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
-                                  (op/and {::t-service/published? true}
+                                  (op/and {::t-service/published op/not-null?}
                                           (op/or
                                            {::t-service/sub-type (op/in types)}
-                                           {::t-service/brokerage? true}))))
+                                           {::t-service/brokerage true}))))
               (and (seq types) (not (contains? types :brokerage))) ;; Only sub types
                 (ids ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   {::t-service/sub-type   (op/in types)
-                                   ::t-service/published? true}))
+                                   ::t-service/published op/not-null?}))
               (and (= 1 (count types)) (contains? types :brokerage)) ;; Only brokerage
                 (ids ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
-                                  {::t-service/published? true
+                                  {::t-service/published op/not-null?
                                    ::t-service/brokerage? true})))]
     ids))
 
@@ -114,7 +114,7 @@
     ::t-service/transport-operator-id
     ::t-service/contact-phone
     ::t-service/description
-
+    ::t-service/published
     ;; Information JOINed from other tables
     ::t-service/external-interface-links
     ::t-service/operator-name

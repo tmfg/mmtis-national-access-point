@@ -24,7 +24,8 @@
             [clojure.string :as str]
             [ote.nap.ckan :as ckan]
             [clojure.set :as set]
-            [ote.util.feature :as feature])
+            [ote.util.feature :as feature]
+            [ote.time :as time])
   (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
@@ -70,7 +71,7 @@
     :name ::t-service/name
     :type ::t-service/type
     :sub-type ::t-service/sub-type
-    :published? ::t-service/published?
+    :published ::t-service/published
     :created ::modification/created
     :modified ::modification/modified})
 
@@ -100,10 +101,10 @@
   "Delete single transport service by id"
   [nap-config db user id]
 
-  (let [{::t-service/keys [transport-operator-id published?]}
+  (let [{::t-service/keys [transport-operator-id published]}
         (first (specql/fetch db ::t-service/transport-service
                              #{::t-service/transport-operator-id
-                               ::t-service/published?}
+                               ::t-service/published}
                              {::t-service/id id}))]
     (authorization/with-transport-operator-check
       db user transport-operator-id
@@ -440,6 +441,22 @@
              ::t-service/license ::t-service/id}
            {::t-service/transport-service-id id})))
 
+(defn- set-publish-time
+  [data db]
+  (let [publish? (::t-service/published? data)
+        service-id (::t-service/id data)
+        existing-publish-date (when service-id
+                                (::t-service/published (first (specql/fetch db ::t-service/transport-service
+                                                                            #{::t-service/published}
+                                                                            {::t-service/id service-id}))))
+        publish-date (if existing-publish-date
+                       existing-publish-date
+                       (java.util.Date.))
+        data (cond-> data
+                     publish? (assoc ::t-service/published publish-date)
+                     true (dissoc ::t-service/published?))]
+    data))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [nap-config db user {places ::t-service/operation-area
@@ -451,6 +468,7 @@
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
+                         (set-publish-time db)
                          (dissoc ::t-service/external-interfaces
                                  ::t-service/service-company)
                          (maybe-clear-companies))
