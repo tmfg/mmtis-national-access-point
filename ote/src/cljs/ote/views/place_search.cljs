@@ -17,7 +17,7 @@
             [ote.ui.common :as common]
             [cljs-react-material-ui.icons :as ic]
             [ote.style.base :as style-base]
-            [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
+            [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
             [clojure.string :as str]))
 
 (set! *warn-on-infer* true)
