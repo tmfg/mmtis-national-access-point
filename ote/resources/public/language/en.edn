@@ -920,6 +920,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :transit-visualization-page
  {:loading-routes "Loading service routes."
+  :no-changes-in-routes "No routes with changes."
   :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts

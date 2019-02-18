@@ -2,7 +2,7 @@
   (:require
     [stylefy.core :as stylefy]
     [ote.theme.colors :as colors]
-    [ote.style.front-page :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
+    [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def action-button-icon
   {:padding "0"
