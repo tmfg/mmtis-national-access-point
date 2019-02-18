@@ -40,7 +40,7 @@ SELECT op.name,
   JOIN "transport-service" ts ON ts."transport-operator-id" = op.id
   JOIN "user" u ON u.id = ts."created-by"
  WHERE ts."brokerage?" IS TRUE
-   AND ts."published?" IS TRUE
+   AND ts.published IS NOT NULL
  ORDER BY op.name ASC;
 
 -- name: fetch-operators-with-sub-contractors
@@ -62,7 +62,7 @@ SELECT op.name as "operator", op."business-id" as "business-id", '-' as "sub-com
  WHERE op.id = ts."transport-operator-id"
    AND ts."sub-type" = :subtype::transport_service_subtype
    AND op."deleted?" = FALSE
-   AND ts."published?" = TRUE
+   AND ts.published IS NOT NULL
    AND (ts.companies = '{}' OR ts.companies = '{"(,)"}' OR ts.companies IS NULL)
 
 UNION
@@ -82,7 +82,7 @@ SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-
  WHERE op.id = ts."transport-operator-id"
    AND ts."sub-type" = :subtype::transport_service_subtype
    AND op."deleted?" = FALSE
-   AND ts."published?" = TRUE
+   AND ts.published IS NOT NULL
    AND ts.companies  IS NOT NULL
    AND ts.companies != '{}'
    AND ts.companies != '{"(,)"}'
@@ -106,7 +106,7 @@ SELECT op.name as "operator", op."business-id" as "business-id", c.name as "sub-
     WHERE op.id = ts."transport-operator-id"
       AND ts."sub-type" = :subtype::transport_service_subtype
       AND op."deleted?" = FALSE
-      AND ts."published?" = TRUE
+      AND ts.published IS NOT NULL
       AND sc."transport-service-id" = ts.id
     ORDER BY op.id ASC)
  AS x;
@@ -118,7 +118,7 @@ SELECT x.*,
                           E',\n' ORDER BY name, modified)
           FROM "transport-service"
          WHERE "transport-operator-id" = x."op-id"
-           AND "published?" = FALSE) AS services
+           AND published IS NULL) AS services
 
   FROM (SELECT op.name,
                op.id AS "op-id",
@@ -130,7 +130,7 @@ SELECT x.*,
                (SELECT COUNT(*)
                   FROM "transport-service" ts
                  WHERE ts."transport-operator-id" = op.id
-                   AND ts."published?" = FALSE) AS "unpublished-services-count"
+                   AND ts.published IS NULL) AS "unpublished-services-count"
 
           FROM "transport-operator" op
           JOIN "user" u ON u.name = (SELECT author
@@ -156,7 +156,7 @@ CASE ts."sub-type"::TEXT
 END	AS "service-type",
 (eid."external-interface").url AS "url", eid.format AS "format", eid.license AS licence
   FROM "transport-operator" top
-  JOIN "transport-service" ts ON top.id = ts."transport-operator-id" AND ts."published?" = TRUE
+  JOIN "transport-service" ts ON top.id = ts."transport-operator-id" AND ts.published IS NOT NULL
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
 

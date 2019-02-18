@@ -34,7 +34,7 @@
   (is id "saved service has id")
   (is transport-operator-id "saved service has a transport-operator id")
   ;; Make it public so that GeoJSON export can return it
-  (sql-execute! "UPDATE \"transport-service\" SET \"published?\" = true where id = " id)
+  (sql-execute! "UPDATE \"transport-service\" SET published = to_timestamp(0) where id = " id)
   (let [geojson-url (str "export/geojson/" transport-operator-id "/" id)
         json-response (http-get "admin" geojson-url)]
     (is (= 200 (:status json-response)))

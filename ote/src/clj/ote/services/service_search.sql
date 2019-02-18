@@ -9,7 +9,7 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
   FROM (SELECT UNNEST(enum_range(NULL::transport_service_subtype)) "sub-type") type
        LEFT JOIN (SELECT t."sub-type", COUNT(*) as count
                     FROM "transport-service" t
-                   WHERE t."published?" = true
+                   WHERE t.published IS NOT NULL
                    GROUP BY t."sub-type") count ON type."sub-type" = count."sub-type"
  -- PENDING: remove value from enum if we decide not to implement brokerage type at all
  -- Brokerage enabled, but it only affects on dropdown list in ui. Brokerage isn't a subtype anymore, and we cant
@@ -20,7 +20,7 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
 -- name: latest-service-ids
 -- row-fn: :id
 SELECT id FROM "transport-service"
- WHERE "published?" = TRUE
+ WHERE published IS NOT NULL
  ORDER BY COALESCE(modified, created) DESC, name ASC
  LIMIT 1000;
 
@@ -30,7 +30,7 @@ SELECT t.id, t.name, t.type, t."sub-type",
 
 -- name: total-service-count
 -- single?: true
-SELECT COUNT(id) FROM "transport-service" WHERE "published?" = TRUE;
+SELECT COUNT(id) FROM "transport-service" WHERE published IS NOT NULL;
 
 -- name: total-company-count
 -- single?: true
@@ -40,13 +40,13 @@ SELECT COUNT(*)
   FROM (SELECT DISTINCT op."business-id"
           FROM "transport-service" ts
           JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
-         WHERE ts."published?" = TRUE
+         WHERE published IS NOT NULL
         UNION
         SELECT DISTINCT (x.c)."business-id"
           FROM (SELECT unnest(COALESCE(sc.companies, ts.companies)) c
                   FROM "transport-service" ts
                   LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
-                 WHERE ts."published?" = TRUE) x) y;
+                 WHERE ts.published IS NOT NULL) x) y;
 
 -- name: service-search-by-operator
 -- Finds operators by name and by business-id and services that have companies added as "operators.
@@ -60,7 +60,7 @@ SELECT c.name as "operator", c."business-id" as "business-id"
   LEFT JOIN service_company sc ON sc."transport-service-id" = s.id
   JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
  WHERE (c.name ILIKE :name OR c."business-id" = :businessid)
-   AND s."published?" = TRUE;
+   AND published IS NOT NULL;
 
 
 -- name: service-search-by-service-name
@@ -83,14 +83,14 @@ SELECT ts.id as id
   FROM "transport-operator" op, "transport-service" ts
  WHERE op."business-id" IN (:operators)
    AND op.id = ts."transport-operator-id"
-   AND ts."published?" = TRUE
+   AND ts.published IS NOT NULL
 UNION
 SELECT ts.id as id
   FROM "transport-service" ts
   LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
   JOIN LATERAL unnest(COALESCE(sc.companies, ts.companies)) AS c ON TRUE
  WHERE c."business-id" IN (:operators)
-   AND ts."published?" = TRUE
+   AND ts.published IS NOT NULL
 UNION
     SELECT a."service-id" as id
       FROM "associated-service-operators" a,
@@ -104,7 +104,7 @@ UNION
   SELECT ts.id as id
     FROM "transport-service" ts, unnest(ts."transport-type") as str
    WHERE str::text IN (:tt)
-     AND ts."published?" = TRUE;
+     AND ts.published IS NOT NULL;
 
 -- name: participating-companies
 -- Search all services companies and their business-ids
@@ -114,7 +114,7 @@ UNION
         LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
   WHERE c."business-id" IS NOT NULL
     AND s.id = :id
-    AND s."published?" = TRUE;
+    AND s.published IS NOT NULL;
 
 -- name: service-ids-by-data-content
 -- Find services using external url data content
@@ -124,4 +124,4 @@ SELECT eid."transport-service-id" as id
    AND EXISTS(SELECT ts.id
                 FROM "transport-service" ts
                WHERE ts.id = eid."transport-service-id"
-                 AND ts."published?" = TRUE)
+                 AND ts.published IS NOT NULL)

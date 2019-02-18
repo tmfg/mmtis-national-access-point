@@ -71,7 +71,7 @@
                         {:display-row-checkbox false})
    (doall
      (map-indexed
-       (fn [i {::t-service/keys [id type published? name]
+       (fn [i {::t-service/keys [id type published name]
                ::modification/keys [created modified] :as row}]
          ^{:key i}
          [ui/table-row {:selectable false :display-border false}
@@ -81,11 +81,11 @@
                                     (.preventDefault %)
                                     (e! (fp/->ChangePage :edit-service {:id id})))}
                       (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
-          [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values published?])]
+          [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values (not (nil? published))])]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "}
-           (if published?
+           (if published
              (let [url (str "/export/geojson/" transport-operator-id "/" id)]
                [linkify url
                 (tr [:own-services-page :open-geojson])
