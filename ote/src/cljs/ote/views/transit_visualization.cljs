@@ -466,7 +466,7 @@
         {:name "Muutokset" :width "30%"
          :read identity
          :format (fn [{change-type :change-type :as route}]
-                   (case change-type
+                   (case (keyword change-type)
                      :no-traffic
                      [labeled-icon
                       [ic/av-not-interested]
