@@ -22,8 +22,8 @@ DO $$
   DECLARE
     r RECORD;
     c "gtfs-route-change-info";
-    l INTEGER; -- Lower boundary value
-    u INTEGER; -- Upper boundary value
+    stopsu INTEGER;
+    timesu INTEGER;
 
   BEGIN
     FOR r IN
@@ -35,13 +35,12 @@ DO $$
               -- Old composite is lower-inclusive, upper-exclusive '[%,%)'. New data model is both inclusive, thus reduce upper by one.
               stopsu := COALESCE(upper(c."trip-stop-sequence-changes"), 0);
               IF stopsu > 0 THEN
-                stopsu := stopsu -1 ;
+                stopsu := stopsu -1;
               END IF;
               timesu := COALESCE(upper(c."trip-stop-time-changes"), 0);
               IF timesu > 0 THEN
                 timesu := timesu - 1;
               END IF;
-
               INSERT INTO "detected-route-change"
               VALUES (r.d, r.tsid,
                       c."route-short-name",
