@@ -593,9 +593,7 @@
                               (update x :gtfs/route-hash-id #(update-hash % x))) route-changes)]
         (specql/update! db :gtfs/transit-changes
                         {:gtfs/transport-service-id service-id
-                         :gtfs/date (:gtfs/date t)
-                         ;:gtfs/old-route-change        chg-routes
-                         }
+                         :gtfs/date (:gtfs/date t)}
                         ;; where
                         {:gtfs/transport-service-id service-id
                          :gtfs/date (:gtfs/date t)})
