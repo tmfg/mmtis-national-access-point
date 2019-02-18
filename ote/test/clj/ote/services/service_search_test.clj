@@ -32,9 +32,9 @@
 
     ;; Make all generated test services public (and the generated)
     ;; so that we can verify query results
-    (sql-execute! "UPDATE \"transport-service\" SET \"published?\" = FALSE")
+    (sql-execute! "UPDATE \"transport-service\" SET published = NULL")
     (sql-execute!
-     "UPDATE \"transport-service\" SET \"published?\" = TRUE WHERE id IN ("
+     "UPDATE \"transport-service\" SET published = to_timestamp(0) WHERE id IN ("
      (str/join "," (map ::t-service/id saved-services))
      ")")
 

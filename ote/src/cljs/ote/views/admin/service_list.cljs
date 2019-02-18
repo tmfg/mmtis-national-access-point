@@ -48,7 +48,8 @@
      (get-in app [:admin :service-listing :published-filter])]]])
 
 (defn service-listing [e! app]
-  (let [{:keys [loading? results]} (get-in app [:admin :service-listing])]
+  (let [{:keys [loading? results]} (get-in app [:admin :service-listing])
+        fd (js/Date. 0)]
     [:div.row
      (when loading?
        [:span "Ladataan palveluita..."])
@@ -62,22 +63,28 @@
           [ui/table-row
            [ui/table-header-column {:style {:width "20%" :padding 5}} "Nimi"]
            [ui/table-header-column {:style {:width "20%"}} "Palveluntuottaja"]
-           [ui/table-header-column {:style {:width "20%"}} "Tyyppi"]
+           [ui/table-header-column {:style {:width "15%"}} "Tyyppi"]
            [ui/table-header-column {:style {:width "20%"}} "Alityyppi"]
-           [ui/table-header-column {:style {:width "5%" :padding 5}} "Julkaistu"]
+           [ui/table-header-column {:style {:width "10%" :padding 5}} "Julkaistu"]
            [ui/table-header-column {:style {:width "15%" :padding 5}} "Luotu / Muokattu"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
-            (for [{::t-service/keys    [id name operator-name type sub-type published?]
+            (for [{::t-service/keys    [id name operator-name type sub-type published]
                    ::modification/keys [created modified] :as result} results]
               ^{:key (::t-service/id result)}
               [ui/table-row {:selectable false}
-               [ui/table-row-column {:style {:width "20%" :padding 5}} [:a {:href     "#"
+               [ui/table-row-column {:style {:width "20%" :padding 5}} [:a {:href "#"
                                                                             :on-click #(do
                                                                                          (.preventDefault %)
                                                                                          (e! (fp/->ChangePage :edit-service {:id id})))} name]]
                [ui/table-row-column {:style {:width "20%"}} operator-name]
-               [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/type (keyword type)])]
+               [ui/table-row-column {:style {:width "15%"}} (tr [:enums :ote.db.transport-service/type (keyword type)])]
                [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/sub-type (keyword sub-type)])]
-               [ui/table-row-column {:style {:width "5%" :padding 5}} (if published? "Kyllä" "Ei")]
+               [ui/table-row-column {:style {:width "10%" :padding 5}} [:span (cond
+                                                                                (= published fd)
+                                                                                "Kyllä"
+                                                                                (nil? published)
+                                                                                "Ei"
+                                                                                :else
+                                                                                (time/format-timestamp-for-ui published))]]
                [ui/table-row-column {:style {:width "15%" :padding 5}} [:span (time/format-timestamp-for-ui created) [:br] (time/format-timestamp-for-ui modified)]]]))]]])]))

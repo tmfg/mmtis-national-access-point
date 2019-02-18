@@ -92,7 +92,7 @@
     ::t-service/external-interfaces
     ::t-service/operation-area
     ::t-service/companies
-    ::t-service/published?
+    ::t-service/published
     ::t-service/brokerage?
     ::t-service/description
     ::t-service/available-from

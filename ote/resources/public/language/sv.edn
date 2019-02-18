@@ -1077,6 +1077,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
           "name" "Namn"
           "business-id" "FO-nummer"
           "published?" "Publicerat?"
+          "published" "Publicerat"
           "transport-operator-id" "Tjänsteproducentens id"
           "type" "Tjänstetyp"
           "email" "E-post"

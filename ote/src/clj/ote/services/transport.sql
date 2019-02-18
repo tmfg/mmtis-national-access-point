@@ -8,7 +8,7 @@ SELECT ts.id,
     ts."name",
     ts."type",
     ts."sub-type",
-    ts."published?",
+    ts."published",
     ts."created",
     ts."modified"
 FROM "transport-service" ts
