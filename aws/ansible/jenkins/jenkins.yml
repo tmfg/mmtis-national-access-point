@@ -31,5 +31,6 @@
       - tommik
       - ernok
       - jonik
+      - mattiu
   roles:
     - solita.jenkins
