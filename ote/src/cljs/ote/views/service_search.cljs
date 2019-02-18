@@ -182,7 +182,7 @@
        (if (not-empty service-desc)
          [:p {:style spacer-margin} service-desc]
          [:p {:style (merge {:color colors/gray650}
-                            spacer-margin)} "Palvelulle ei ole annettu kuvausta."])]
+                            spacer-margin)} (tr [:service-search :no-description])])]
       [:div {:style {:flex "1"}}
        [:h4 {:style {:margin 0}}
         (tr [:service-search :operator-search])]
