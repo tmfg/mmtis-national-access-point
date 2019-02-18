@@ -372,7 +372,7 @@
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
                                            style/add-color)}]
-      [:span (or added-trips (:gtfs/added-trips diff))
+      [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
     [:div {:style {:width "20%"}}
      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)

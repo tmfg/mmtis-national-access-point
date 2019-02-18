@@ -320,33 +320,33 @@
 (define-event RouteCalendarDatesResponse [response route]
   {}
   (let [service-id (get-in app [:params :service-id])
-        current-week-date (or (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+        current-week-date (or (:current-week-date (:changes (:transit-visualization app)))
                               (t/now))
         ;; Use dates in route, or default to current week date and 7 days after that.
-        date1 (or (:gtfs/current-week-date route) current-week-date)
+        date1 (or (:current-week-date route) current-week-date)
         date1 (cond
                 ;; No-change route, and current date doesn't have traffic
                 (and
-                  (= :no-change (:gtfs/change-type route))
+                  (= :no-change (:change-type route))
                   (nil? (get (:calendar response) (str (time/date-to-str-date (time/now))))))
                 (get-next-best-day-for-no-change date1 date1 :plus (into {} (sort-by key < (:calendar response))))
 
                 ;; No-change route, current date has traffic
                 (and
-                  (= :no-change (:gtfs/change-type route))
+                  (= :no-change (:change-type route))
                   (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
                 (time/now)
 
                 ;; No-traffic route, return current day always
-                (= :no-traffic (:gtfs/change-type route))
+                (= :no-traffic (:change-type route))
                 (time/now)
 
                 :else
                 date1)
         date2 (if (and
-                    (:gtfs/different-week-date route)
-                    (not= :no-traffic (:gtfs/change-type route)))
-                  (:gtfs/different-week-date route)
+                    (:different-week-date route)
+                    (not= :no-traffic (:change-type route)))
+                  (:different-week-date route)
                   (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
         (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
@@ -362,11 +362,11 @@
                    service-id route
                    date1 date2)
         (assoc-in [:transit-visualization :compare :differences]
-                  (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
-                                       :gtfs/trip-stop-sequence-changes-lower
-                                       :gtfs/trip-stop-sequence-changes-upper
-                                       :gtfs/trip-stop-time-changes-lower
-                                       :gtfs/trip-stop-time-changes-upper}))
+                  (select-keys route #{:added-trips :removed-trips
+                                       :trip-stop-sequence-changes-lower
+                                       :trip-stop-sequence-changes-upper
+                                       :trip-stop-time-changes-lower
+                                       :trip-stop-time-changes-upper}))
         (assoc-in [:transit-visualization :route-calendar-hash-loading?] false)
         (assoc-in [:transit-visualization :date->hash] (:calendar response))
         (assoc-in [:transit-visualization :hash->color] (zipmap (distinct (vals (:calendar response)))
