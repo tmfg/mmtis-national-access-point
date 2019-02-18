@@ -22,6 +22,9 @@ DO $$
   DECLARE
     r RECORD;
     c "gtfs-route-change-info";
+    l INTEGER; -- Lower boundary value
+    u INTEGER; -- Upper boundary value
+
   BEGIN
     FOR r IN
       SELECT date AS d, "transport-service-id" AS tsid, "route-changes" AS rc FROM "gtfs-transit-changes"
@@ -29,6 +32,16 @@ DO $$
         IF array_length(r.rc, 1) > 0 THEN
           FOREACH c IN ARRAY r.rc
             LOOP
+              -- Old composite is lower-inclusive, upper-exclusive '[%,%)'. New data model is both inclusive, thus reduce upper by one.
+              stopsu := COALESCE(upper(c."trip-stop-sequence-changes"), 0);
+              IF stopsu > 0 THEN
+                stopsu := stopsu -1 ;
+              END IF;
+              timesu := COALESCE(upper(c."trip-stop-time-changes"), 0);
+              IF timesu > 0 THEN
+                timesu := timesu - 1;
+              END IF;
+
               INSERT INTO "detected-route-change"
               VALUES (r.d, r.tsid,
                       c."route-short-name",
@@ -38,9 +51,9 @@ DO $$
                       c."added-trips",
                       c."removed-trips",
                       COALESCE(lower(c."trip-stop-sequence-changes"), 0),
-                      COALESCE(upper(c."trip-stop-sequence-changes"), 0), -- Live data has values like '[%,%)', upper returns value minus one which gives the right value
+                      stopsu,
                       COALESCE(lower(c."trip-stop-time-changes"), 0),
-                      COALESCE(upper(c."trip-stop-time-changes"), 0), -- Live data has values like '[%,%)', upper returns value minus one which gives the right value
+                      timesu,
                       c."current-week-date",
                       c."different-week-date",
                       c."change-date",
