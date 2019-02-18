@@ -868,7 +868,7 @@
            ;; Different value key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            show-no-change-routes-checkbox?]]]
 
-        [route-changes e! routes changes-route-no-change elected-route route-hash-id-type]]]
+        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
