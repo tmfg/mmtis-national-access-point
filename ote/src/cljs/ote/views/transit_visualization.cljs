@@ -11,6 +11,7 @@
             [ote.app.controller.transit-visualization :as tv]
             [taoensso.timbre :as log]
             [ote.time :as time]
+            [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.table :as table]
             [ote.db.transport-service :as t-service]
@@ -562,15 +563,25 @@
                                                                [current-year]
                                                                [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
+                                                               hover-date (goog.date.DateTime. %)
                                                                hash (date->hash d)
+                                                               date1 (goog.date.DateTime. (:date1 compare))
+                                                               date2 (goog.date.DateTime. (:date2 compare))
                                                                hash-color (hash->color hash)]
-                                                           (when-not (or (= (time/format-date-iso-8601 (:date1 compare)) d)
-                                                                         (= (time/format-date-iso-8601 (:date2 compare)) d))
-                                                             (if (= 2 (get compare :last-selected-date 2))
-                                                               (style/date1-highlight-style hash-color
-                                                                                            style/date1-highlight-color-hover)
-                                                               (style/date2-highlight-style hash-color
-                                                                                            style/date2-highlight-color-hover))))}]
+                                                           (when-not (or (= (time/format-date-iso-8601 date1) d)
+                                                                         (= (time/format-date-iso-8601 date2) d))
+                                                             (cond (t/after? date1 hover-date)
+                                                                   (style/date1-highlight-style hash-color
+                                                                                                style/date1-highlight-color-hover)
+                                                                   (t/after? hover-date date2)
+                                                                   (style/date2-highlight-style hash-color
+                                                                                                style/date2-highlight-color-hover)
+                                                                   :else
+                                                                   (if (= 2 (get compare :last-selected-date 2))
+                                                                     (style/date1-highlight-style hash-color
+                                                                                                  style/date1-highlight-color-hover)
+                                                                     (style/date2-highlight-style hash-color
+                                                                                                  style/date2-highlight-color-hover)))))}]
 
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        [comparison-date-changes compare]]]]))
