@@ -27,7 +27,7 @@
 
 - name: Upgrade PIP
   pip:
-    version: 19.0.2
+    version: 9.0.1
     name: pip
     virtualenv: /usr/lib/ckan/default
     virtualenv_python: python2.7
