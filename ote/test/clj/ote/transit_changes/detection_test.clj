@@ -8,7 +8,9 @@
 
 (def route-name ["TST" "Testington - Terstersby" "Testersby"])
 
-(defn weeks [starting-from & route-maps]
+(defn weeks
+  "Give first day of week (monday) as a starting-from."
+  [starting-from & route-maps]
   (vec (map-indexed
         (fn [i routes]
           {:beginning-of-week (.plusDays starting-from (* i 7))
@@ -99,6 +101,25 @@
   (is (nil?
        (get-in (detection/next-different-weeks test-traffic-2-different-weeks)
                [route-name :different-week]))))
+
+(def normal-to-1-different-to-1-normal-and-rest-are-changed
+  (weeks (d 2019 1 28)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; prev week
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; starting week
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; normal
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; normal
+         {route-name ["!!" "!!" "!!" "!!" "!!" "h6" "h7"]} ; first different week - should be skipper
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; back to normal
+         {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]} ; new schedule - should be found as different week
+         {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]} ; new schedule
+         {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]} ; New schedule
+         {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]})); New schedule
+
+(deftest one-week-difference-is-skipped
+  (let [result (detection/next-different-weeks normal-to-1-different-to-1-normal-and-rest-are-changed)]
+    (is (= {:beginning-of-week (d 2019 3 11)
+            :end-of-week (d 2019 3 17)}
+           (get-in result [route-name :different-week])))))
 
 
 (def test-traffic-normal-difference
