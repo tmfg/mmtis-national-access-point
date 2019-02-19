@@ -113,9 +113,7 @@
       {:service-info (first (fetch-service-info db {:service-id service-id}))
        :changes (first (detected-changed-to-service-by-date db
                                                   {:service-id service-id
-                                                   :date (-> date
-                                                             time/parse-date-iso-8601
-                                                             java.sql.Date/valueOf)}))
+                                                   :date (time/iso-8601-date->sql-date date)}))
        :route-changes (changed-routes-to-service-by-date db
                                                          {:service-id service-id
                                                           :date (time/iso-8601-date->sql-date date)})
