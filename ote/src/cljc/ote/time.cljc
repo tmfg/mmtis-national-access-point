@@ -228,6 +228,11 @@
                      :hours 0
                      :minutes 0
                      :seconds 0.0})
+#?(:clj
+(defn iso-8601-date->sql-date [date-iso]
+  (-> date-iso
+      parse-date-iso-8601
+      java.sql.Date/valueOf)))
 
 (defn interval
   "Returns an interval of the given amount and unit.
