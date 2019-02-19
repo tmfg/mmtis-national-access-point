@@ -187,5 +187,3 @@ SELECT r."route-short-name", r."route-long-name", r."trip-headsign",
  FROM "detected-route-change" r
  WHERE r."transit-service-id" = :service-id
    AND r."transit-change-date" = :date::DATE;
--- GROUP BY c.date, c."added-routes", c."removed-routes", c."changed-routes", c."no-traffic-routes", c."current-week-date",
---          c."different-week-date", c."change-date";
