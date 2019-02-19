@@ -371,12 +371,10 @@
                 added-trips removed-trips trip-changes]} changes
         changed? (and starting-week-date different-week-date)
         trip-stop-seq-changes (reduce update-min-max-range
-                                      {:lower 0
-                                       :upper 0}
+                                      {}
                                       (map :stop-seq-changes trip-changes))
         trip-stop-time-changes (reduce update-min-max-range
-                                       {:lower 0
-                                        :upper 0}
+                                       {}
                                        (map :stop-time-changes trip-changes))]
 
     (merge
