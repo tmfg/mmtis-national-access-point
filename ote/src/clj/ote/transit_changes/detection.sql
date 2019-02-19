@@ -57,3 +57,14 @@ SELECT p.id as "package-id"
 -- name: fetch-distinct-services-from-transit-changes
 SELECT distinct t."transport-service-id" as id
   FROM "gtfs-transit-changes" t;
+
+-- name: fetch-monthly-packages
+SELECT MAX(p.id) as "package-id"
+  FROM gtfs_package p
+ GROUP BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM'))
+ ORDER BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM')) asc;
+
+-- name: fetch-all-packages
+SELECT p.id as "package-id"
+  FROM gtfs_package p
+ ORDER BY p.id asc;
