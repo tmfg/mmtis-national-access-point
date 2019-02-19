@@ -4,13 +4,13 @@ CREATE TABLE "detected-route-change" (
  "route-short-name"           TEXT,                   -- e.g. "15"
  "route-long-name"            TEXT NOT NULL,          -- e.g. "Helsinki-Oulu"
  "trip-headsign"              TEXT,
- "change-type"                "gtfs-route-change-type", 
+ "change-type"                "gtfs-route-change-type",
  "added-trips"                INTEGER DEFAULT 0,
  "removed-trips"              INTEGER DEFAULT 0,
- "trip-stop-sequence-changes-lower"   INTEGER DEFAULT 0 NOT NULL, -- Range of change counts in trips (0 - 2), low limit
- "trip-stop-sequence-changes-upper"   INTEGER DEFAULT 0 NOT NULL, -- Range of change counts in trips (0 - 2), high limit
- "trip-stop-time-changes-lower"       INTEGER DEFAULT 0 NOT NULL, -- Range of stop time changes in trips (0 - 200), low limit
- "trip-stop-time-changes-upper"       INTEGER DEFAULT 0 NOT NULL, -- Range of stop time changes in trips (0 - 200), high limit
+ "trip-stop-sequence-changes-lower"   INTEGER, -- Range of change counts in trips (0 - 2), low limit
+ "trip-stop-sequence-changes-upper"   INTEGER, -- Range of change counts in trips (0 - 2), high limit
+ "trip-stop-time-changes-lower"       INTEGER, -- Range of stop time changes in trips (0 - 200), low limit
+ "trip-stop-time-changes-upper"       INTEGER, -- Range of stop time changes in trips (0 - 200), high limit
  "current-week-date"          DATE,                   -- Day of detection run
  "different-week-date"        DATE,                   -- The date when the change happens. Exception when we are in the middle no-traffic, date is the first day of traffic
  "change-date"                DATE,                   -- Date for next the detection run
@@ -33,14 +33,16 @@ DO $$
           FOREACH c IN ARRAY r.rc
             LOOP
               -- Old composite is lower-inclusive, upper-exclusive '[%,%)'. New data model is both inclusive, thus reduce upper by one.
-              stopsu := COALESCE(upper(c."trip-stop-sequence-changes"), 0);
+              stopsu := upper(c."trip-stop-sequence-changes"); -- NULL and zero are not synonyms for nap logic, so preserve NULLs
               IF stopsu > 0 THEN
                 stopsu := stopsu -1;
               END IF;
-              timesu := COALESCE(upper(c."trip-stop-time-changes"), 0);
+
+              timesu := upper(c."trip-stop-time-changes");
               IF timesu > 0 THEN
                 timesu := timesu - 1;
               END IF;
+
               INSERT INTO "detected-route-change"
               VALUES (r.d, r.tsid,
                       c."route-short-name",
