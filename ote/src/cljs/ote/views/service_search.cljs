@@ -382,10 +382,11 @@
           :auto-select?       true
           :open-on-focus?     true
           ;; Translate visible suggestion text, but keep the value intact.
-          :suggestions        (mapv (fn [val]
-                                      {:text  (tr [:enums ::t-service/interface-data-content val])
-                                       :value val})
-                                    t-service/interface-data-contents)
+          :suggestions        (sort-by :text (mapv (fn [val]
+                                                     {:text  (tr [:enums ::t-service/interface-data-content val])
+                                                      :value val})
+                                                   t-service/interface-data-contents))
+          :max-results (count t-service/interface-data-contents)
           :suggestions-config {:text :text :value :value}
           :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))

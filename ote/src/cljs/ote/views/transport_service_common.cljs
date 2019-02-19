@@ -160,7 +160,7 @@
                        :max-results (count t-service/interface-data-contents)
                        :write (fn [data vals]
                                 (assoc-in data [::t-service/data-content]
-                                          ;; Values loose their keyword status inside the component, so we'll make
+                                          ;; Values lose their keyword status inside the component, so we'll make
                                           ;; sure that they will be keywords in the state.
                                           (mapv (comp keyword :value) vals)))
                        :read #(as-> % data
