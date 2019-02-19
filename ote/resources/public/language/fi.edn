@@ -1308,6 +1308,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
   :released-apis "Palvelussa julkaistut rajapinnat"
   :service-basic-info "Palvelun perustiedot"
+  :no-description "Palvelulle ei ole annettu kuvausta."
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"

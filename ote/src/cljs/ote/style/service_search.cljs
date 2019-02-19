@@ -46,8 +46,10 @@
                                                                        :align-items "flex-start"
                                                                        :padding "0 0.7rem 0.7rem 0.7rem"}}}
                                             :body {:padding "1rem"
+                                                   :display "flex"
                                                    ::stylefy/media {{:max-width (str width-xxs "px")}
-                                                                    {:padding "1rem 0.7rem 0 0.7rem"}}}
+                                                                    {:padding "1rem 0.7rem 0 0.7rem"
+                                                                     :flex-direction "column"}}}
                                             :foot {:display "flex"
                                                    :justify-content "space-between"
                                                    :padding "0 1rem 1rem 1rem"
@@ -113,8 +115,8 @@
                     :height "24px"
                     :width "24px"})
 
-(def delete-icon {:color "rgba(0, 0, 0, 0,75)"
-                  ::stylefy/mode {:hover {:color "rgba(0, 0, 0, 1) !important"}}})
+(def delete-icon {:color colors/gray900
+                  ::stylefy/mode {:hover {:color (str colors/primary " !important")}}})
 
 (def partly-visible-delete-icon {:color "rgba(0, 0, 0, 0,75)"})
 
