@@ -116,6 +116,18 @@
         (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
         "OK"))
 
+  (GET "/transit-changes/force-monthly-day-hash-calculation" {user :user}
+    (when (authorization/admin? user)
+      (http/transit-response
+        {:status 200
+         :body (detection/calculate-monthly-date-hashes-for-packages db)})))
+
+  (GET "/transit-changes/force-all-day-hash-calculation" {user :user}
+    (when (authorization/admin? user)
+      (http/transit-response
+        {:status 200
+         :body (detection/calculate-date-hashes-for-all-packages db)})))
+
   (GET "/transit-changes/load-services-with-route-hash-id" req
     (when (authorization/admin? (:user req))
       (http/transit-response (services-with-route-hash-id db))))

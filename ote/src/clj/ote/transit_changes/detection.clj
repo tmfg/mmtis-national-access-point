@@ -588,6 +588,27 @@
       (for [id service-ids]
         (update-date-hash-with-null-route-hash-id db (:id id))))))
 
+(defn- call-generate-date-hash [packages]
+  (let [package-count (count packages)]
+  (doall
+    (dotimes [i (count packages)]
+      (let [package-id (nth packages i)]
+        (do
+          (println "Generating" (inc i) "/" package-count " - " package-id)
+          (generate-date-hashes db {:package-id (:package-id package-id)}))))
+    (log/info "Generation ready!"))))
+
+(defn calculate-monthly-date-hashes-for-packages [db]
+  (let [monthly-packages (fetch-monthly-packages db)]
+    (log/info "Generating monthly date hashes. Package count" (count monthly-packages))
+    (call-generate-date-hash monthly-packages)
+    monthly-packages))
+
+(defn calculate-date-hashes-for-all-packages [db]
+  (let [all-packages (fetch-all-packages db)]
+    (log/info "Generating all date hashes. Package count" (count all-packages))
+    (call-generate-date-hash all-packages)
+    all-packages))
 
 ;; Do not use this if you don't need to.
 ;; This is helper function for local development. It will calculate route-hash-id to gtfs-date-hash table for the given
