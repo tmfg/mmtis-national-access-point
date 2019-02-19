@@ -8,3 +8,7 @@
                        :font-weight   "400"
                        :text-align    "right"
                        :padding-right "20px"})
+
+(def button-container {:display "flex"
+                       :flex-wrap "nowrap"
+                       :justify-content "space-between"})
