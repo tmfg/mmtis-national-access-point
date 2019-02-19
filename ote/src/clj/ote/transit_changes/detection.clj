@@ -588,7 +588,7 @@
       (for [id service-ids]
         (update-date-hash-with-null-route-hash-id db (:id id))))))
 
-(defn- call-generate-date-hash [packages]
+(defn- call-generate-date-hash [db packages]
   (let [package-count (count packages)]
   (doall
     (dotimes [i (count packages)]
@@ -601,13 +601,13 @@
 (defn calculate-monthly-date-hashes-for-packages [db]
   (let [monthly-packages (fetch-monthly-packages db)]
     (log/info "Generating monthly date hashes. Package count" (count monthly-packages))
-    (call-generate-date-hash monthly-packages)
+    (call-generate-date-hash db monthly-packages)
     monthly-packages))
 
 (defn calculate-date-hashes-for-all-packages [db]
   (let [all-packages (fetch-all-packages db)]
     (log/info "Generating all date hashes. Package count" (count all-packages))
-    (call-generate-date-hash all-packages)
+    (call-generate-date-hash db all-packages)
     all-packages))
 
 ;; Do not use this if you don't need to.
