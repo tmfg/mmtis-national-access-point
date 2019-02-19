@@ -334,43 +334,39 @@
       ^{:key label}
       [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label]))])
 
-(defn format-range [{:keys [lower upper lower-inclusive? upper-inclusive?]}]
+
+(defn format-range [lower upper]
   (if (and (nil? lower) (nil? upper))
     "0"
-    (let [upper (when upper
-                  (if upper-inclusive?
-                    upper
-                    (dec upper)))]
-      (if (= lower upper)
-        (str lower)
-        (str lower "\u2014" upper)))))
+    (if (or (= lower upper)
+            (nil? upper))
+      (str lower)
+      (str lower "\u2014" upper))))
 
-(defn stop-seq-changes-icon [trip-stop-sequence-changes with-labels?]
-  (let [seq-changes (if (number? trip-stop-sequence-changes)
-                      trip-stop-sequence-changes
-                      (format-range trip-stop-sequence-changes))]
+(defn stop-seq-changes-icon [lower upper with-labels?]
+  (let [changes (format-range lower upper)]
     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/action-timeline {:color (when (= "0" seq-changes)
+     [ic/action-timeline {:color (when (= "0" changes)
                                    style/no-change-color)}]
      [:span
-      seq-changes
+      changes
       (when with-labels? " pysäkkimuutosta")]]))
 
-(defn stop-time-changes-icon [trip-stop-time-changes with-labels?]
-  (let [time-changes (if (number? trip-stop-time-changes)
-                       trip-stop-time-changes
-                       (format-range trip-stop-time-changes))]
+(defn stop-time-changes-icon [lower upper with-labels?]
+  (let [changes (format-range lower upper)]
     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/action-query-builder {:color (when (= "0" time-changes)
+     [ic/action-query-builder {:color (when (= "0" changes)
                                         style/no-change-color)}]
      [:span
-      time-changes
+      changes
       (when with-labels? " aikataulumuutosta")]]))
 
 (defn change-icons
   ([diff]
    [change-icons diff false])
-  ([{:gtfs/keys [added-trips removed-trips trip-stop-sequence-changes trip-stop-time-changes]}
+  ([{:keys [added-trips removed-trips
+            trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
+            trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
     with-labels?]
    [:div.transit-change-icons
     (stylefy/use-style (merge
@@ -381,21 +377,21 @@
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
                                            style/add-color)}]
-      [:span added-trips
+      [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
     [:div {:style {:width "20%"}}
      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                   style/no-change-color
                                                   style/remove-color)}]
-      [:span removed-trips
+      [:span (or removed-trips (:gtfs/removed-trips diff))
        (when with-labels? " poistettua vuoroa")]]]
 
     [:div {:style {:width "25%"}}
-     [stop-seq-changes-icon trip-stop-sequence-changes with-labels?]]
+     [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
     [:div {:style {:width "35%"}}
-     [stop-time-changes-icon trip-stop-time-changes with-labels?]]]))
+     [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -459,17 +455,17 @@
                                     (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                     :row-selected? #(= % selected-route)}
        [{:name "Reitti" :width "30%"
-         :read (juxt :gtfs/route-short-name :gtfs/route-long-name)
+         :read (juxt :route-short-name :route-long-name)
          :format (fn [[short long]]
                    (str short " " long))}
         ;; Show Reitti/Määrämpää column only if it does affect on routes.
         (when (service-is-using-headsign route-hash-id-type)
           {:name "Reitti/määränpää" :width "20%"
-           :read :gtfs/trip-headsign})
+           :read :trip-headsign})
 
         {:name "Aikaa 1. muutokseen"
          :width "20%"
-         :read :gtfs/different-week-date
+         :read :different-week-date
          :format (fn [different-week-date]
                    (if-not different-week-date
                      [labeled-icon [ic/navigation-check] "Ei muutoksia"]
@@ -481,8 +477,8 @@
 
         {:name "Muutokset" :width "30%"
          :read identity
-         :format (fn [{change-type :gtfs/change-type :as route}]
-                   (case change-type
+         :format (fn [{change-type :change-type :as route}]
+                   (case (keyword change-type)
                      :no-traffic
                      [labeled-icon
                       [ic/av-not-interested]
@@ -848,17 +844,17 @@
               ^{:key id}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-no-change changes-filtered selected-route compare open-sections route-hash-id-type show-no-change-routes? show-no-change-routes-checkbox?]
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-route-filtered selected-route compare open-sections route-hash-id-type show-no-change-routes? show-no-change-routes-checkbox?]
                                  :as transit-visualization}]
   (let [routes (if show-no-change-routes?
-                 (:gtfs/route-changes changes-no-change)
-                 (:gtfs/route-changes changes-filtered))
+                 changes-route-no-change
+                 changes-route-filtered)
         route-name (if (service-is-using-headsign route-hash-id-type)
-                     (str (:gtfs/route-short-name selected-route) " "
-                          (:gtfs/route-long-name selected-route)
-                          " (" (:gtfs/trip-headsign selected-route) ")")
-                     (str (:gtfs/route-short-name selected-route) " "
-                          (:gtfs/route-long-name selected-route)))]
+                     (str (:route-short-name selected-route) " "
+                          (:route-long-name selected-route)
+                          " (" (:trip-headsign selected-route) ")")
+                     (str (:route-short-name selected-route) " "
+                          (:route-long-name selected-route)))]
     [:div
      [:div.transit-visualization
 
@@ -884,7 +880,7 @@
            ;; Different value key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            show-no-change-routes-checkbox?]]]
 
-        [route-changes e! routes (:gtfs/route-changes changes-no-change) selected-route route-hash-id-type]]]
+        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container

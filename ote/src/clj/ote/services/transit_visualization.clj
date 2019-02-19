@@ -96,8 +96,10 @@
                                  (map :stop-seq-changes (:trip-changes result)))]
 
     (-> result
-        (assoc :gtfs/trip-stop-sequence-changes sequence-changes)
-        (assoc :gtfs/trip-stop-time-changes stop-changes)
+        (assoc :trip-stop-sequence-changes-lower (:lower sequence-changes))
+        (assoc :trip-stop-sequence-changes-upper (:upper sequence-changes))
+        (assoc :trip-stop-time-changes-lower (:lower stop-changes))
+        (assoc :trip-stop-time-changes-upper (:upper stop-changes))
         (dissoc :starting-week-date :different-week-date :trip-changes)
         (set/rename-keys {:added-trips :gtfs/added-trips :removed-trips :gtfs/removed-trips}))))
 
@@ -107,18 +109,18 @@
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params}
-       (let [service-id (Long/parseLong service-id)
-             changes (service-changes-for-date db
-                                               service-id
-                                               (-> date
-                                                   time/parse-date-iso-8601
-                                                   java.sql.Date/valueOf))]
-         {:service-info (first (fetch-service-info db {:service-id service-id}))
-          :changes changes
-          :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
-                                                   #{:gtfs/route-hash-id-type}
-                                                   {:gtfs/transport-service-id service-id}))
-          :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
+    (let [service-id (Long/parseLong service-id)]
+      {:service-info (first (fetch-service-info db {:service-id service-id}))
+       :changes (first (detected-changed-to-service-by-date db
+                                                  {:service-id service-id
+                                                   :date (time/iso-8601-date->sql-date date)}))
+       :route-changes (changed-routes-to-service-by-date db
+                                                         {:service-id service-id
+                                                          :date (time/iso-8601-date->sql-date date)})
+       :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
+                                                #{:gtfs/route-hash-id-type}
+                                                {:gtfs/transport-service-id service-id}))
+       :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
   ^{:unauthenticated true :format :transit}
   (GET "/transit-visualization/:service-id/route"

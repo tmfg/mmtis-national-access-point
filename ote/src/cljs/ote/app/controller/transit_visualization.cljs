@@ -16,8 +16,7 @@
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
   [route]
-  (or (:gtfs/route-hash-id route)
-    (str (:gtfs/route-short-name route) "-" (:gtfs/route-long-name route) "-" (:gtfs/trip-headsign route))))
+  (or (:route-hash-id route) (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
 (def hash-colors
   ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
@@ -88,10 +87,10 @@
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [show-no-change changes]
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
-        removed-in-past (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(and (= :removed (:gtfs/change-type %)) (nil? (:gtfs/change-date %))) changes))
-        no-changes (sort-by (juxt :gtfs/route-long-name :gtfs/route-short-name) (filterv #(= :no-change (:gtfs/change-type %)) changes))
-        only-changes (filterv :gtfs/change-date changes)
-        sorted-changes (sort-by (juxt :gtfs/different-week-date :gtfs/route-long-name :gtfs/route-short-name) only-changes)
+        removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
+        no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
+        only-changes (filterv :change-date changes)
+        sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) only-changes)
         all-sorted-changes (if show-no-change
                              (concat sorted-changes no-changes)
                              sorted-changes)]
@@ -168,14 +167,14 @@
 
 (define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-  (assoc app
-         :service-changes-for-date-loading? false
-         :service-info (:service-info response)
-         :changes-all (:changes response)
-         :changes-no-change (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes true) (partial future-changes detection-date)))
-         :changes-filtered (update (:changes response) :gtfs/route-changes (comp (partial sorted-route-changes false) (partial future-changes detection-date)))
-         :gtfs-package-info (:gtfs-package-info response)
-         :route-hash-id-type (:route-hash-id-type response)))
+              (assoc app
+                :service-changes-for-date-loading? false
+                :service-info (:service-info response)
+                :changes-all (:changes response)
+                :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
+                :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
+                :gtfs-package-info (:gtfs-package-info response)
+                :route-hash-id-type (:route-hash-id-type response)))
 
 (define-event LoadServiceChangesForDate [service-id detection-date]
   {}
@@ -322,33 +321,33 @@
 (define-event RouteCalendarDatesResponse [response route]
   {}
   (let [service-id (get-in app [:params :service-id])
-        current-week-date (or (get-in app [:transit-visualization :changes :gtfs/current-week-date])
+        current-week-date (or (:current-week-date (:changes (:transit-visualization app)))
                               (t/now))
         ;; Use dates in route, or default to current week date and 7 days after that.
-        date1 (or (:gtfs/current-week-date route) current-week-date)
+        date1 (or (:current-week-date route) current-week-date)
         date1 (cond
                 ;; No-change route, and current date doesn't have traffic
                 (and
-                  (= :no-change (:gtfs/change-type route))
+                  (= :no-change (:change-type route))
                   (nil? (get (:calendar response) (str (time/date-to-str-date (time/now))))))
                 (get-next-best-day-for-no-change date1 date1 :plus (into {} (sort-by key < (:calendar response))))
 
                 ;; No-change route, current date has traffic
                 (and
-                  (= :no-change (:gtfs/change-type route))
+                  (= :no-change (:change-type route))
                   (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
                 (time/now)
 
                 ;; No-traffic route, return current day always
-                (= :no-traffic (:gtfs/change-type route))
+                (= :no-traffic (:change-type route))
                 (time/now)
 
                 :else
                 date1)
         date2 (if (and
-                    (:gtfs/different-week-date route)
-                    (not= :no-traffic (:gtfs/change-type route)))
-                  (:gtfs/different-week-date route)
+                    (:different-week-date route)
+                    (not= :no-traffic (:change-type route)))
+                  (:different-week-date route)
                   (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
         (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
@@ -364,9 +363,11 @@
                    service-id route
                    date1 date2)
         (assoc-in [:transit-visualization :compare :differences]
-                  (select-keys route #{:gtfs/added-trips :gtfs/removed-trips
-                                       :gtfs/trip-stop-sequence-changes
-                                       :gtfs/trip-stop-time-changes}))
+                  (select-keys route #{:added-trips :removed-trips
+                                       :trip-stop-sequence-changes-lower
+                                       :trip-stop-sequence-changes-upper
+                                       :trip-stop-time-changes-lower
+                                       :trip-stop-time-changes-upper}))
         (assoc-in [:transit-visualization :route-calendar-hash-loading?] false)
         (assoc-in [:transit-visualization :date->hash] (:calendar response))
         (assoc-in [:transit-visualization :hash->color] (zipmap (distinct (vals (:calendar response)))
