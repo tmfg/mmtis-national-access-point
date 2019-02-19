@@ -70,22 +70,4 @@ DO $$
 ALTER TABLE "gtfs-transit-changes"
   RENAME COLUMN "route-changes" TO "route-changes-old";
 
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-sequence-changes-lower" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-sequence-changes-upper" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-time-changes-lower" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  ADD ATTRIBUTE "trip-stop-time-changes-upper" INTEGER;
-
-ALTER TYPE "gtfs-route-change-info"
-  DROP ATTRIBUTE "trip-stop-sequence-changes";
-
-ALTER TYPE "gtfs-route-change-info"
-  DROP ATTRIBUTE "trip-stop-time-changes";
-
 -- TODO: Add an index to this table to date and service-id
