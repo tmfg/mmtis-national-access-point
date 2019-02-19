@@ -22,7 +22,7 @@ DO $$
   DECLARE
     r RECORD;
     c "gtfs-route-change-info";
-    stopsu INTEGER;
+    stopsu INTEGER; -- "u" suffix means uppercase
     timesu INTEGER;
 
   BEGIN
