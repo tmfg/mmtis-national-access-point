@@ -11,6 +11,7 @@
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
             [ote.util.fn :refer [flip]]
+            [ote.util.clojure :as util-clj]
             [ote.transit-changes.detection :as detection]
             [clojure.set :as set]
             [digest]))
@@ -112,11 +113,13 @@
     (let [service-id (Long/parseLong service-id)]
       {:service-info (first (fetch-service-info db {:service-id service-id}))
        :changes (first (detected-changed-to-service-by-date db
-                                                  {:service-id service-id
-                                                   :date (time/iso-8601-date->sql-date date)}))
-       :route-changes (changed-routes-to-service-by-date db
-                                                         {:service-id service-id
-                                                          :date (time/iso-8601-date->sql-date date)})
+                                                            {:service-id service-id
+                                                             :date (time/iso-8601-date->sql-date date)}))
+       :route-changes (map util-clj/remove-coll-key-ns
+                           (specql/fetch db :gtfs/detected-route-change
+                                         (specql/columns :gtfs/detected-route-change)
+                                         {:gtfs/transit-service-id service-id
+                                          :gtfs/transit-change-date (time/iso-8601-date->sql-date date)}))
        :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
                                                 #{:gtfs/route-hash-id-type}
                                                 {:gtfs/transport-service-id service-id}))

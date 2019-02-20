@@ -24,9 +24,9 @@
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
 
-(defn route-filtering-available? [{:keys [changes-filtered changes-no-change route-changes-loading?] :as transit-visualization}]
+(defn route-filtering-available? [{:keys [changes-route-no-change route-changes-loading?] :as transit-visualization}]
   (and (not route-changes-loading?)
-       (seq (:gtfs/route-changes changes-no-change))))
+       (seq changes-route-no-change)))
 
 (defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                    route-trips-for-date2-loading? route-calendar-hash-loading?
@@ -87,7 +87,7 @@
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [show-no-change changes]
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
-        removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
+        ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
         only-changes (filterv :change-date changes)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) only-changes)
