@@ -536,6 +536,25 @@
               :on-failure (tuck/send-async! ->ServerError)})
   app)
 
+(define-event CalculateDateHasheshResponse [response]
+  {}
+  (.log js/console "Laskenta valmis" (pr-str response))
+  app)
+
+(define-event ForceMonthlyDayHashCalculation []
+  {}
+  (comm/get! "transit-changes/force-monthly-day-hash-calculation"
+             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(define-event ForceDayHashCalculation []
+  {}
+  (comm/get! "transit-changes/force-all-day-hash-calculation"
+             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))
 

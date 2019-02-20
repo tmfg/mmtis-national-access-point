@@ -31,7 +31,7 @@ SELECT * FROM gtfs_service_routes_with_daterange(:service-id::INTEGER);
 -- name: fetch-route-trips-for-date
 SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
-        stop."stop-name", stop."stop-lat", stop."stop-lon"
+        stop."stop-name", stop."stop-lat", stop."stop-lon", stop."stop-fuzzy-lat", stop."stop-fuzzy-lon"
   FROM "detection-route" r
   JOIN "gtfs_package" p ON p.id = r."package-id" AND p."deleted?" = FALSE
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
@@ -57,3 +57,14 @@ SELECT p.id as "package-id"
 -- name: fetch-distinct-services-from-transit-changes
 SELECT distinct t."transport-service-id" as id
   FROM "gtfs-transit-changes" t;
+
+-- name: fetch-monthly-packages
+SELECT MAX(p.id) as "package-id"
+  FROM gtfs_package p
+ GROUP BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM'))
+ ORDER BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM')) asc;
+
+-- name: fetch-all-packages
+SELECT p.id as "package-id"
+  FROM gtfs_package p
+ ORDER BY p.id asc;

@@ -17,29 +17,65 @@
             [ote.style.admin :as style-admin]
             [cljs-time.core :as t]
             [ote.ui.form :as form]
-            [ote.ui.tabs :as tabs]))
+            [ote.ui.tabs :as tabs]
+            [ote.style.buttons :as button-styles]))
 
 (defn detect-changes [e! app-state]
   [:div
    [:div (stylefy/use-style (style-base/flex-container "column"))
+    [:div (stylefy/use-style style-admin/button-container)
+     [:div {:style {:flex 2}}
+      [:span "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
+      Tätä nappia painamalla voidaan pakottaa lataus."]]
+     [:div {:style {:flex 2}}
+      [:a (merge (stylefy/use-style button-styles/primary-button)
+                 {:id "force-import"
+                  :href "#"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (admin-controller/->ForceInterfaceImport)))
+                  :icon (ic/content-filter-list)})
+       [:span "Pakota yhden lataamattoman pakettin lataus ulkoisesta osoitteesta"]]]]
     [:br]
-    [ui/raised-button
-     {:id       "force-import"
-      :label    "Pakota yhden lataamattoman pakettin lataus ulkoisesta osoitteesta"
-      :on-click #(do
-                   (.preventDefault %)
-                   (e! (admin-controller/->ForceInterfaceImport)))
-      :primary  true
-      :icon     (ic/content-filter-list)}]
+    [:div (stylefy/use-style style-admin/button-container)
+     [:div {:style {:flex 2}}
+      [:span "Kaikkien päivätiivisteiden laskenta vie kauan. Tuotannossa arviolta 24h+. Tämä laskenta ottaa jokaiselta
+     palvelulta vain kuukauden viimeisimmän paketin ja laskee sille päivätiivisteet. Tämä vähentää laskentaa käytettyä aikaa.
+     Kun käynnistät tämän laskennan joudut odottamaan arviolta 1-3h."]]
+     [:div {:style {:flex 2}}
+      [:a (merge (stylefy/use-style button-styles/primary-button)
+                 {:href "#"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (admin-controller/->ForceMonthlyDayHashCalculation)))})
+       [:span "Laske päivätiivisteet kuukausittain uusiksi"]]]]
+
     [:br]
-    [ui/raised-button
-     {:id       "force-detect-transit-changes"
-      :label    "Pakota kaikkien muutosten tunnistus"
-      :on-click #(do
-                   (.preventDefault %)
-                   (e! (admin-controller/->ForceDetectTransitChanges)))
-      :primary  true
-      :icon     (ic/content-filter-list)}]]])
+    [:div (stylefy/use-style style-admin/button-container)
+     [:div {:style {:flex 2}}
+      [:span "Laske kaikille paketeille päivätiivisteet uusiksi. Tämä laskenta ottaa tuotannossa arviolta 24h+.
+      Oletko varma, että haluat käynnistää laskennan?"]]
+     [:div {:style {:flex 2}}
+      [:a (merge (stylefy/use-style button-styles/primary-button)
+                 {:href "#"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (admin-controller/->ForceDayHashCalculation)))})
+       [:span "Laske kaikki päivätiivisteet uusiksi"]]]]
+
+    [:br]
+    [:div (stylefy/use-style style-admin/button-container)
+     [:div {:style {:flex 2}}
+      [:span "Pakota muutostunnistus kaikkille palveluille"]]
+     [:div {:style {:flex 2}}
+      [:a (merge (stylefy/use-style button-styles/primary-button)
+                 {:id "force-detect-transit-changes"
+                  :href "#"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (admin-controller/->ForceDetectTransitChanges)))
+                  :icon (ic/content-filter-list)})
+       [:span "Käynnistä muutostunnitus"]]]]]])
 
 (defn route-id [e! app-state]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]

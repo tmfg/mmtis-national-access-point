@@ -257,15 +257,17 @@
           :let [package-id (:package-id (first trip-stops))
                 trip-id (:trip-id (first trip-stops))]]
       {:gtfs/package-id package-id
-       :gtfs/trip-id    trip-id
-       :stoptimes       (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon]}]
-                                {:gtfs/stop-id        stop-id
-                                 :gtfs/stop-name      stop-name
-                                 :gtfs/stop-lat       stop-lat
-                                 :gtfs/stop-lon       stop-lon
-                                 :gtfs/stop-sequence  stop-sequence
-                                 :gtfs/departure-time (time/pginterval->interval departure-time)})
-                              trip-stops)})))
+       :gtfs/trip-id trip-id
+       :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon stop-fuzzy-lat stop-fuzzy-lon]}]
+                          {:gtfs/stop-id stop-id
+                           :gtfs/stop-name stop-name
+                           :gtfs/stop-lat stop-lat
+                           :gtfs/stop-lon stop-lon
+                           :gtfs/stop-fuzzy-lat stop-fuzzy-lat
+                           :gtfs/stop-fuzzy-lon stop-fuzzy-lon
+                           :gtfs/stop-sequence stop-sequence
+                           :gtfs/departure-time (time/pginterval->interval departure-time)})
+                        trip-stops)})))
 
 
 (defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
@@ -613,6 +615,27 @@
       (for [id service-ids]
         (update-date-hash-with-null-route-hash-id db (:id id))))))
 
+(defn- call-generate-date-hash [db packages]
+  (let [package-count (count packages)]
+  (doall
+    (dotimes [i (count packages)]
+      (let [package-id (nth packages i)]
+        (do
+          (println "Generating" (inc i) "/" package-count " - " package-id)
+          (generate-date-hashes db {:package-id (:package-id package-id)}))))
+    (log/info "Generation ready!"))))
+
+(defn calculate-monthly-date-hashes-for-packages [db]
+  (let [monthly-packages (fetch-monthly-packages db)]
+    (log/info "Generating monthly date hashes. Package count" (count monthly-packages))
+    (call-generate-date-hash db monthly-packages)
+    monthly-packages))
+
+(defn calculate-date-hashes-for-all-packages [db]
+  (let [all-packages (fetch-all-packages db)]
+    (log/info "Generating all date hashes. Package count" (count all-packages))
+    (call-generate-date-hash db all-packages)
+    all-packages))
 
 ;; Do not use this if you don't need to.
 ;; This is helper function for local development. It will calculate route-hash-id to gtfs-date-hash table for the given

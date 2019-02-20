@@ -67,12 +67,12 @@
   "Use lat and lon values as stop-key. Stop-key is used to determine is the stop remain the same in different gtfs packages.
   Was earlier stop-name, now changed to lat lon pair."
   [stop]
-  [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop)])
+  [(:gtfs/stop-fuzzy-lat stop) (:gtfs/stop-fuzzy-lon stop)])
 
 (defn stop-key-for-stop-list
   "Use lat, lon and instance values as stop-key. The instance contains information on how many times the stop is in the route."
   [stop]
-  [(:gtfs/stop-lat stop) (:gtfs/stop-lon stop) (:instance stop)])
+  [(:gtfs/stop-fuzzy-lat stop) (:gtfs/stop-fuzzy-lon stop) (:instance stop)])
 
 (defn trip-stop-differences
   "Returns the amount of differences in stop times and stop sequence and stop names for the given trip pair."
