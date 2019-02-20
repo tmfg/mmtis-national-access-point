@@ -192,10 +192,9 @@
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}))
 
 (deftest more-than-one-change-found
+  (clojure.spec.test.alpha/instrument `detection/first-week-difference)
   (let [diff-pairs (get (detection/week-difference-pairs test-more-than-one-change)
-                        route-name)]
-    
-
+                        route-name)]    
     (testing "first change is detected"
       (is (= (d 2018 12 2) (-> diff-pairs
                                first

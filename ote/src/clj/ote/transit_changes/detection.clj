@@ -6,6 +6,8 @@
             [jeesql.core :refer [defqueries]]
             [taoensso.timbre :as log]
             [specql.core :as specql]
+            [clojure.spec.alpha :as spec]
+            ;; [spec-provider.provider :as provider]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
             [ote.db.tx :as tx])
@@ -229,12 +231,60 @@
                      (add-different-week curr))]
       result)))
 
+(spec/def
+ ::routes
+ (spec/map-of
+  (spec/coll-of string?)
+  (spec/coll-of (spec/or :keyword keyword? :string string?))))
+(spec/def ::local-date #(instance? java.time.LocalDate %))
+(spec/def ::end-of-week ::local-date)
+(spec/def ::beginning-of-week ::local-date)
+
+(spec/def
+ ::route-week
+ (spec/keys :req-un [::beginning-of-week ::end-of-week ::routes]))
+(spec/def
+ ::route-weeks-vec
+  (spec/coll-of ::route-week))
+
+(spec/def
+ ::different-week
+ (spec/keys :req-un [::beginning-of-week ::end-of-week]))
+(spec/def
+ ::week-hash-vec
+  (spec/coll-of (spec/or :keyword keyword? :string string?)))
+(spec/def
+ ::different-week-hash
+  ::week-hash-vec)
+(spec/def
+ ::starting-week
+ ::week-hash-vec)
+(spec/def ::starting-week-hash ::week-hash-vec)
+(spec/def
+ ::single-route-change
+ (spec/coll-of
+  (spec/or
+   :collection
+   ::starting-week-hash
+   :map
+   (spec/keys
+    :req-un
+    [::different-week
+     ::different-week-hash
+     ::starting-week
+     ::starting-week-hash]))))
+
+(spec/fdef first-week-difference
+  :args (spec/cat :rw ::route-weeks-vec)
+  :ret ::single-route-change)
 
 (defn first-week-difference
   "Detect the next different week in each route. Takes a list of weeks that have week hashes for each route.
   Returns map from route [short long headsign] to next different week info.
-  The route-weeks maps have keys :beginning-of-week, :different-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
+  The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
+  ;; (println "spec for route-weeks:")
+  ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
   ;; Take routes from the first week (they are the same in all weeks)
   (let [route-names (into #{}
                           (map first)
@@ -248,19 +298,45 @@
                      route-detection-state route-names))
                  {}                                                    ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
+    ;; (println "first-week-difference result: " (pr-str result))
+    ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
     result))
+
+(spec/fdef week-difference-pairs
+  :args (spec/cat :rw ::route-weeks-vec))
+
+(defn local-date-before? [d1 d2]
+  (.isBefore d1 d2))
+
+(defn local-date-after? [d1 d2]
+  (.isAfter d1 d2))
+
+(defn route-week-past-date? [rw date]
+  (local-date-after? (:beginning-of-week rw) date))
 
 (defn week-difference-pairs [route-weeks]
   ;; should loop and start where previous iter end
-  (loop [diff (first-week-difference route-weeks)
-         results nil]
-    (let [results nil
-          new-results nil
-          orig-end nil]
-      (if (:start diff)
-        (recur {:start (:end diff) :end (:end orig-end)} (conj results new-results))
-        ;; else     
-        ))))
+  ;; 1. start at first-week-difference call
+  ;; 2. munge route-weeks data so that another call to first-week-difference
+  ;;    will start at different-week
+  ;;    - concretely: filter out weeks that are past start date
+  
+  (loop [diff-data (first-week-difference route-weeks)
+         diff-week-beginnings (mapv (comp :beginning-of-week :different-week) diff-data)
+         results []]
+
+    ;; catch unhandled case, are there going to be different dates in the routes?
+    (assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))    
+    ;; first-week-difference return shape is {id-vec1 change-map1, ...., id-vecN change-mapN}}    
+    ;; route-weeks is a vec of maps like
+    ;; {:beginning-of-week dd :end-of-week dd :routes {route-id days]]
+    (println "first-week-difference was:")
+    (clojure.pprint/pprint diff-data)    
+    (let []
+      (if (not-empty diff-week-beginnings)
+        (recur (filter #(route-week-past-date? % diff-week-date) (conj results diff-data)))
+        ;; else
+        results))))
 
 (defn route-trips-for-date [db service-id route-hash-id date]
   (vec
