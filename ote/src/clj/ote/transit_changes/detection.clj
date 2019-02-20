@@ -229,9 +229,11 @@
                      (add-different-week curr))]
       result)))
 
-(defn next-different-weeks
+
+(defn first-week-difference
   "Detect the next different week in each route. Takes a list of weeks that have week hashes for each route.
-  Returns map from route [short long headsign] to next different week info."
+  Returns map from route [short long headsign] to next different week info.
+  The route-weeks maps have keys :beginning-of-week, :different-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
   ;; Take routes from the first week (they are the same in all weeks)
   (let [route-names (into #{}
@@ -247,6 +249,18 @@
                  {}                                                    ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
     result))
+
+(defn week-difference-pairs [route-weeks]
+  ;; should loop and start where previous iter end
+  (loop [diff (first-week-difference route-weeks)
+         results nil]
+    (let [results nil
+          new-results nil
+          orig-end nil]
+      (if (:start diff)
+        (recur {:start (:end diff) :end (:end orig-end)} (conj results new-results))
+        ;; else     
+        ))))
 
 (defn route-trips-for-date [db service-id route-hash-id date]
   (vec
@@ -562,7 +576,7 @@
             ;; Create week hashes so we can find out the differences between weeks
             (combine-weeks)
             ;; Search next week (for every route) that is different
-            (next-different-weeks)
+            (first-week-difference)
             ;; Fetch detailed route comparison if a change was found
             (route-day-changes db service-id))}
       (catch Exception e
