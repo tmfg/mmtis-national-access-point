@@ -120,6 +120,11 @@
 (defn configure-logging [dev-mode? {:keys [level] :as log-config}]
   (log/merge-config!
    {:level (or level :debug)
+    :middleware [(fn drop-hikari-stats-middlware [data]
+                   (if (clojure.string/starts-with? (first (:vargs data))
+                                                    "HikariPool-1 - Pool stats (")
+                     nil
+                     data))]
     :appenders
     (if dev-mode?
       ;; In dev-mode only do println logging
