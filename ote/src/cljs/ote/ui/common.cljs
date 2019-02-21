@@ -15,7 +15,8 @@
             [goog.crypt.Md5]
             [goog.crypt]
 
-            [ote.util.text :as text]))
+            [ote.util.text :as text]
+            [ote.app.routes :as routes]))
 
 (def mobile?
   (let [ua (str/lower-case js/window.navigator.userAgent)]
@@ -278,6 +279,22 @@
                                          :padding-right "5px"
                                          :color style-base/link-color}]
                 label]])
+
+;; This is implemented because IE craps itself sometimes with the linkify
+(defn back-link-with-event [e! site-keyword label]
+  [:a (merge
+        {:href "#/transit-changes"}
+        {:on-click #(do
+                      (.preventDefault %)
+                      (e! (routes/navigate! site-keyword)))}
+        (stylefy/use-style (merge {:color colors/primary
+                                   :text-decoration "none"
+                                   ::stylefy/mode {:hover {:text-decoration "underline"}}})))
+   [:span [icons/arrow-back {:position "relative"
+                             :top "6px"
+                             :padding-right "5px"
+                             :color style-base/link-color}]
+    label]])
 
 (defn loading-spinner []
   [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]])
