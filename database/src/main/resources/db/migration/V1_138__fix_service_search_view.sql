@@ -1,5 +1,5 @@
 -- Create new with "associated-service-operators"
-CREATE VIEW transport_service_search_result AS
+CREATE OR REPLACE VIEW transport_service_search_result AS
 SELECT t.*, op.name as "operator-name", op."business-id" as "business-id",
        -- Changed Start
        COALESCE((SELECT sc."companies"
