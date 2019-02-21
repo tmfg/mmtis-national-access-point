@@ -97,7 +97,7 @@
 
 (defn- init-view-state [app]
   (let [init-tv (fn [transit-visualization]
-                  (-> (or transit-visualization {})
+                  (-> transit-visualization
                       (assoc :all-route-changes-checkbox nil)
                       (assoc :all-route-changes-display? nil)
                       (dissoc :changes-route-filtered)
