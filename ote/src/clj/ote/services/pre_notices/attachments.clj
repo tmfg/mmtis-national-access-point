@@ -102,5 +102,5 @@
         (admin/require-admin-user "/transit-changes/upload-gtfs/:service-id/:date" (:user user))
         (do
           (transit-changes/upload-gtfs db (Long/parseLong service-id) date req)
-          (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true [service-id])
+          (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true [(Long/parseLong service-id)])
           (http/transit-response "OK")))))))
