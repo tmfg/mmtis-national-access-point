@@ -161,4 +161,5 @@
                  :host "localhost"}
   :main ote.main
   :figwheel {:server-ip "localhost"
-             :nrepl-host "localhost"})
+             :nrepl-host "localhost"
+             :server-logfile "/tmp/logs/figwheel-logfile.log"})
