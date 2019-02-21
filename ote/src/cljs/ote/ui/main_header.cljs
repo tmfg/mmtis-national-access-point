@@ -262,7 +262,7 @@
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]
          [:li
-          [linkify "http://bit.ly/nap-palaute" (tr [:common-texts :navigation-give-feedback])
+          [linkify "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20" (tr [:common-texts :navigation-give-feedback])
            (merge (stylefy/use-style
                     style-topnav/topnav-dropdown-link)
                   {:target "_blank"})]]]]]]]))
