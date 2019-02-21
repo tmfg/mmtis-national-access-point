@@ -164,6 +164,10 @@
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
 
+      ;; Calculate stop-fuzzy-lat and stop-fuzzy-lon
+      (log/info "Generating fuzzy location for stops in package " package-id)
+      (calculate-fuzzy-location-for-stops! db {:package-id package-id})
+
       ;; Handle detection-routes
       ;; Calculate route-hash-id for the service using previous 100 packages
       (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
