@@ -24,9 +24,8 @@
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
 
-(defn route-filtering-available? [{:keys [changes-route-no-change route-changes-loading?] :as transit-visualization}]
-  (and (not route-changes-loading?)
-       (seq changes-route-no-change)))
+(defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
+  (seq changes-route-no-change))
 
 (defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                    route-trips-for-date2-loading? route-calendar-hash-loading?
@@ -95,6 +94,18 @@
                              (concat sorted-changes no-changes)
                              sorted-changes)]
     all-sorted-changes))
+
+(defn- init-view-state [app]
+  (let [init-tv (fn [transit-visualization]
+                  (-> (or transit-visualization {})
+                      (assoc :all-route-changes-checkbox nil)
+                      (assoc :all-route-changes-display? nil)
+                      (dissoc :changes-route-filtered)
+                      (dissoc :changes-route-no-change)
+                      (assoc :service-changes-for-date-loading? true)
+                      (assoc :all-route-changes-display? false)
+                      (assoc-in [:open-sections :gtfs-package-info] false)))]
+    (update app :transit-visualization init-tv)))
 
 (define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
@@ -176,20 +187,14 @@
                 :gtfs-package-info (:gtfs-package-info response)
                 :route-hash-id-type (:route-hash-id-type response)))
 
-(define-event LoadServiceChangesForDate [service-id detection-date]
+(define-event InitTransitVisualization [service-id detection-date]
   {}
   (comm/get! (str "transit-visualization/" service-id "/" detection-date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  (-> app
-      (assoc-in [:transit-visualization :route-changes-loading?] true)
-      (assoc-in [:transit-visualization :changes-no-change] nil)
-      (assoc-in [:transit-visualization :changes-filtered] nil)
-      (assoc-in [:transit-visualization :service-changes-for-date-loading?] true)
-      (assoc-in [:transit-visualization :show-no-change-routes?] false)
-      (assoc-in [:transit-visualization :open-sections :gtfs-package-info] false)))
+  (init-view-state app))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (->LoadServiceChangesForDate (:service-id params) (:date params)))
+  (->InitTransitVisualization (:service-id params) (:date params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -477,18 +482,13 @@
   {:path [:transit-visualization]}
   (assoc app :route-changes-loading? false))
 
-(define-event ToggleShowNoChangeRoutesDelayed []
+(define-event InitiateRouteModelUpdate []
   {}
-  (update-in app [:transit-visualization :show-no-change-routes?] not))
+  (update-in app [:transit-visualization :all-route-changes-display?] not))
 
 (define-event ToggleShowNoChangeRoutes [e!]
   {:path [:transit-visualization]}
-  ;; Timeout used because toggling route-changes table may cause delay in rendering the content with large data model.
-  ;; Disabling of UI components must happen before table model change because otherwise table rendering
-  ;; delays those as well.
-  (.setTimeout js/window #(e! (->ToggleShowNoChangeRoutesDelayed)) 0)
-  (cond-> app
-      true (update :show-no-change-routes-checkbox? not)
-      ;; :route-changes-loading? set only when table model changes, otherwise there's no :component-did-mount event to clear the flag
-      (not= (:gtfs/route-changes (:changes-no-change app))
-            (:gtfs/route-changes (:changes-filtered app))) (assoc :route-changes-loading? true)))
+  ;; Timeout used because toggling key for route-changes table directly may cause delay in rendering the content with large data set.
+  ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
+  (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
+  (update app :all-route-changes-checkbox not))
