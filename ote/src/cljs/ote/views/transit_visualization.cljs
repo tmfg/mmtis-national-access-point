@@ -29,9 +29,17 @@
   ([icon label]
    [labeled-icon {} icon label])
   ([wrapper-attrs icon label]
-   [:div wrapper-attrs
-    icon
-    [:div (stylefy/use-style style/change-icon-value)
+   [:div (merge {:style {:margin-top "0.5rem"
+                         :margin-bottom "0.5rem"
+                         :display "flex"
+                         :flex-direction "row"
+                         :flex-wrap "wrap"
+                         :justify-content "flex-start"
+                         :align-items "center"}}
+                wrapper-attrs)
+    [:div {:style {:margin-right "0.25rem"}}
+     icon]
+    [:div
      label]]))
 
 (defn highlight-style [hash->color date->hash day highlight]
@@ -346,8 +354,9 @@
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/action-timeline {:color (when (= "0" changes)
-                                   style/no-change-color)}]
+
+     [ic/action-timeline {:style {:color (when (= "0" changes)
+                                           style/no-change-color)}}]
      [:span
       changes
       (when with-labels? " pysäkkimuutosta")]]))
@@ -448,34 +457,46 @@
                                    (e! (tv/->SelectRouteForDisplay (first %)))
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= % selected-route)}
-      [{:name "Reitti" :width "30%"
+
+      [{:name "Reitti" :width "25%"
         :read (juxt :route-short-name :route-long-name)
+        :col-style style-base/table-col-style-wrap
         :format (fn [[short long]]
                   (str short " " long))}
-       ;; Show Reitti/Määrämpää column only if it does affect on routes.
+
+       ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
          {:name "Reitti/määränpää" :width "20%"
-          :read :trip-headsign})
+          :read :trip-headsign
+          :col-style style-base/table-col-style-wrap})
 
        {:name "Aikaa 1. muutokseen"
-        :width "13%"
+        :width "12%"
         :read :different-week-date
+        :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
                     [labeled-icon [ic/navigation-check] "Ei muutoksia"]
-                    [:span
-                     (str (time/days-until different-week-date) " pv")
-                     [:span (stylefy/use-style {:margin-left "5px"
-                                                :color "gray"})
+                    [:div
+                     [:div (stylefy/use-style {
+                                               ;:overflow-wrap "break-word"
+                                               :white-space "nowrap" ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
+                                               ;:margin-right "5px"
+                                                })
+                      (str (time/days-until different-week-date) " pv ")]
+                     [:div (stylefy/use-style {:color "gray"
+                                               :overflow-wrap "break-word"})
                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
 
        {:name "Muutos tunnistettu"
-        :width "7%"
+        :width "13%"
         :read :transit-change-date
+        :col-style style-base/table-col-style-wrap
         :format #(time/format-timestamp->date-for-ui %)}
 
        {:name "Muutokset" :width "30%"
         :read identity
+        :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type :as route}]
                   (case (keyword change-type)
                     :no-traffic
