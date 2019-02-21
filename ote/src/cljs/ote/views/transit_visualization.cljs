@@ -387,10 +387,10 @@
       [:span (or removed-trips (:gtfs/removed-trips diff))
        (when with-labels? " poistettua vuoroa")]]]
 
-    [:div {:style {:width "25%"}}
+    [:div {:style {:width "30%"}}
      [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
-    [:div {:style {:width "35%"}}
+    [:div {:style {:width "30%"}}
      [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
@@ -458,7 +458,7 @@
           :read :trip-headsign})
 
        {:name "Aikaa 1. muutokseen"
-        :width "20%"
+        :width "13%"
         :read :different-week-date
         :format (fn [different-week-date]
                   (if-not different-week-date
@@ -468,6 +468,11 @@
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+
+       {:name "Muutos tunnistettu"
+        :width "7%"
+        :read :transit-change-date
+        :format #(time/format-timestamp->date-for-ui %)}
 
        {:name "Muutokset" :width "30%"
         :read identity
