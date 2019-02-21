@@ -422,10 +422,6 @@
       (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
       (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
 
-
-(defn- route-changes-wrapper [el e!] ;; Wrapper allows hooking to React component lifespan events
-  (with-meta el {:component-did-mount (e! (tv/->LoadingRoutesResponse))}))
-
 (defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
@@ -443,66 +439,64 @@
                           (tr [:transit-visualization-page :loading-routes]))]
     [:div.route-changes
      [route-changes-legend]
-     ;; Wrapper hooks to React event when rendering is done, allowing disabling any UI indication, potentially show during rendering.
-     [route-changes-wrapper
-      [table/table {:no-rows-message no-rows-message
-                    :height table-height
-                    :name->label str
-                    :show-row-hover? true
-                    :on-select #(when (first %)
-                                  (do
-                                    (e! (tv/->SelectRouteForDisplay (first %)))
-                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
-                    :row-selected? #(= % selected-route)}
-       [{:name "Reitti" :width "30%"
-         :read (juxt :route-short-name :route-long-name)
-         :format (fn [[short long]]
-                   (str short " " long))}
-        ;; Show Reitti/Määrämpää column only if it does affect on routes.
-        (when (service-is-using-headsign route-hash-id-type)
-          {:name "Reitti/määränpää" :width "20%"
-           :read :trip-headsign})
+     [table/table {:no-rows-message no-rows-message
+                   :height table-height
+                   :name->label str
+                   :show-row-hover? true
+                   :on-select #(when (first %)
+                                 (do
+                                   (e! (tv/->SelectRouteForDisplay (first %)))
+                                   (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
+                   :row-selected? #(= % selected-route)}
+      [{:name "Reitti" :width "30%"
+        :read (juxt :route-short-name :route-long-name)
+        :format (fn [[short long]]
+                  (str short " " long))}
+       ;; Show Reitti/Määrämpää column only if it does affect on routes.
+       (when (service-is-using-headsign route-hash-id-type)
+         {:name "Reitti/määränpää" :width "20%"
+          :read :trip-headsign})
 
-        {:name "Aikaa 1. muutokseen"
-         :width "20%"
-         :read :different-week-date
-         :format (fn [different-week-date]
-                   (if-not different-week-date
-                     [labeled-icon [ic/navigation-check] "Ei muutoksia"]
-                     [:span
-                      (str (time/days-until different-week-date) " pv")
-                      [:span (stylefy/use-style {:margin-left "5px"
-                                                 :color "gray"})
-                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+       {:name "Aikaa 1. muutokseen"
+        :width "20%"
+        :read :different-week-date
+        :format (fn [different-week-date]
+                  (if-not different-week-date
+                    [labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                    [:span
+                     (str (time/days-until different-week-date) " pv")
+                     [:span (stylefy/use-style {:margin-left "5px"
+                                                :color "gray"})
+                      (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
 
-        {:name "Muutokset" :width "30%"
-         :read identity
-         :format (fn [{change-type :change-type :as route}]
-                   (case (keyword change-type)
-                     :no-traffic
-                     [labeled-icon
-                      [ic/av-not-interested]
-                      "Tauko liikennöinnissä"]
+       {:name "Muutokset" :width "30%"
+        :read identity
+        :format (fn [{change-type :change-type :as route}]
+                  (case (keyword change-type)
+                    :no-traffic
+                    [labeled-icon
+                     [ic/av-not-interested]
+                     "Tauko liikennöinnissä"]
 
-                     :added
-                     [labeled-icon
-                      [ic/content-add-box {:color style/add-color}]
-                      "Uusi reitti"]
+                    :added
+                    [labeled-icon
+                     [ic/content-add-box {:color style/add-color}]
+                     "Uusi reitti"]
 
-                     :removed
-                     [labeled-icon
-                      [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
-                      "Päättyvä reitti"]
+                    :removed
+                    [labeled-icon
+                     [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
+                     "Päättyvä reitti"]
 
-                     :no-change
-                     [labeled-icon
-                      [ic/navigation-check]
-                      "Ei muutoksia"]
+                    :no-change
+                    [labeled-icon
+                     [ic/navigation-check]
+                     "Ei muutoksia"]
 
-                     :changed
-                     [change-icons route]))}]
+                    :changed
+                    [change-icons route]))}]
 
-       route-changes] e!]
+      route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
 
 (defn comparison-dates [{:keys [date1 date2]}]
@@ -844,9 +838,9 @@
               ^{:key id}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-route-filtered selected-route compare open-sections route-hash-id-type show-no-change-routes? show-no-change-routes-checkbox?]
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-route-filtered selected-route compare open-sections route-hash-id-type all-route-changes-display? all-route-changes-checkbox]
                                  :as transit-visualization}]
-  (let [routes (if show-no-change-routes? ;; NOTICE! If you change route-changes data resolution logic check also :route-changes-loading? toggling logic ToggleShowNoChangeRoutes
+  (let [routes (if all-route-changes-display?
                  changes-route-no-change
                  changes-route-filtered)
         route-name (if (service-is-using-headsign route-hash-id-type)
@@ -876,11 +870,11 @@
                               :update! #(e! (tv/->ToggleShowNoChangeRoutes e!))
                               :disabled? (not (tv/route-filtering-available? transit-visualization))
                               :style (when-not (tv/route-filtering-available? transit-visualization) style-base/disabled-control)}
-           ;; Toggling table key :show-no-change-routes may cause rendering delay on large data, blocking also rendering checkbox disabling changes.
-           ;; Different value key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
-           show-no-change-routes-checkbox?]]]
+           ;; Toggling table key :all-route-changes-display? may cause rendering delay on large data, blocking also rendering checkbox state changes.
+           ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
+           all-route-changes-checkbox]]]
 
-        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]] ;; NOTICE! If you change route-changes data resolution logic check also :route-changes-loading? toggling logic ToggleShowNoChangeRoutes
+        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
