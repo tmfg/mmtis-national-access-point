@@ -17,7 +17,7 @@
         :message (or msg "")
         :body-style style-base/error-flash-message-body
         :action (tr [:common-texts :navigation-give-feedback])
-        :on-action-touch-tap #(e! (fp-controller/->GoToUrl "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"))
+        :on-action-touch-tap #(e! (fp-controller/->GoToUrl (tr [:common-texts :navigation-feedback-link])))
         :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
 
 (defn- flash-message [e! msg ]
