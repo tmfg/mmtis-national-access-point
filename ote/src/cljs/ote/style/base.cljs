@@ -202,7 +202,6 @@
 (def msg-container (merge (flex-container "row")
                           (align-items "center")))
 
-
 (def msg-warning
   {:color (str colors/warning)
    :fill (str colors/warning)})
@@ -216,3 +215,8 @@
 
 (def circular-progress-label
   {:margin-left "1rem"})
+
+(def table-col-style-wrap
+  {:padding-left "0.5rem"
+   :padding-right "0"
+   :overflow-wrap "break-word"})
