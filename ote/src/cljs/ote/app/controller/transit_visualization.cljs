@@ -104,7 +104,8 @@
                       (dissoc :changes-route-no-change)
                       (assoc :service-changes-for-date-loading? true)
                       (assoc :all-route-changes-display? false)
-                      (assoc-in [:open-sections :gtfs-package-info] false)))]
+                      (assoc-in [:open-sections :gtfs-package-info] false)
+                      (dissoc :selected-route)))]
     (update app :transit-visualization init-tv)))
 
 (define-event RoutesForDatesResponse [routes dates]
