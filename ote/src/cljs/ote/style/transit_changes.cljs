@@ -7,15 +7,26 @@
 (def remove-color "rgb(221,0,0)")
 (def no-change-color "rgb(235,235,235)")
 
-(def transit-changes-legend
-  {:margin-top "20px"
-   :display "block"
-   :padding "1em"
-   :background-color "rgb(235,235,235)"})
+(def transit-changes-legend-container
+  {:margin-top "1rem"
+   :padding "1rem"
+   :background-color "rgb(235,235,235)"
+   :display "flex"
+   :flex-direction "column"
+   :justify-content "flex-start"
+   :align-items "flex-start"})
+
+(def transit-changes-icon-row-container
+  {:display "flex"
+   :flex-direction "row"
+   :justify-content "flex-start"
+   :align-items "center"})
 
 (def transit-changes-legend-icon
-  {:display "inline-block"
-   :margin-right "1rem"})
+  {:margin-left "1rem"})
+
+(def transit-changes-icon
+  {:margin-right "0.25rem"})
 
 (def change-icon-value
   {:display "inline-block"
