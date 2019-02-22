@@ -29,9 +29,18 @@
   ([icon label]
    [labeled-icon {} icon label])
   ([wrapper-attrs icon label]
-   [:div wrapper-attrs
-    icon
-    [:div (stylefy/use-style style/change-icon-value)
+   [:div (stylefy/use-style
+           (merge {:margin-top "0.5rem"
+                   :margin-bottom "0.5rem"
+                   :display "flex"
+                   :flex-direction "row"
+                   :flex-wrap "wrap"
+                   :justify-content "flex-start"
+                   :align-items "center"}
+                  wrapper-attrs))
+    [:div (stylefy/use-style {:margin-right "0.25rem"})
+     icon]
+    [:div
      label]]))
 
 (defn highlight-style [hash->color date->hash day highlight]
@@ -346,8 +355,9 @@
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-     [ic/action-timeline {:color (when (= "0" changes)
-                                   style/no-change-color)}]
+
+     [ic/action-timeline {:style {:color (when (= "0" changes)
+                                           style/no-change-color)}}]
      [:span
       changes
       (when with-labels? " pysäkkimuutosta")]]))
@@ -387,10 +397,10 @@
       [:span (or removed-trips (:gtfs/removed-trips diff))
        (when with-labels? " poistettua vuoroa")]]]
 
-    [:div {:style {:width "25%"}}
+    [:div {:style {:width "30%"}}
      [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
-    [:div {:style {:width "35%"}}
+    [:div {:style {:width "30%"}}
      [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
@@ -448,29 +458,43 @@
                                    (e! (tv/->SelectRouteForDisplay (first %)))
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= % selected-route)}
-      [{:name "Reitti" :width "30%"
+
+      [{:name "Reitti" :width "25%"
         :read (juxt :route-short-name :route-long-name)
+        :col-style style-base/table-col-style-wrap
         :format (fn [[short long]]
                   (str short " " long))}
-       ;; Show Reitti/Määrämpää column only if it does affect on routes.
+
+       ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
          {:name "Reitti/määränpää" :width "20%"
-          :read :trip-headsign})
+          :read :trip-headsign
+          :col-style style-base/table-col-style-wrap})
 
        {:name "Aikaa 1. muutokseen"
-        :width "20%"
+        :width "12%"
         :read :different-week-date
+        :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
                     [labeled-icon [ic/navigation-check] "Ei muutoksia"]
-                    [:span
-                     (str (time/days-until different-week-date) " pv")
-                     [:span (stylefy/use-style {:margin-left "5px"
-                                                :color "gray"})
+                    [:div
+                     [:div (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
+                                               :white-space "nowrap"})
+                      (str (time/days-until different-week-date) " pv ")]
+                     [:div (stylefy/use-style {:color "gray"
+                                               :overflow-wrap "break-word"})
                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+
+       {:name "Muutos tunnistettu"
+        :width "13%"
+        :read :transit-change-date
+        :col-style style-base/table-col-style-wrap
+        :format #(time/format-timestamp->date-for-ui %)}
 
        {:name "Muutokset" :width "30%"
         :read identity
+        :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type :as route}]
                   (case (keyword change-type)
                     :no-traffic
