@@ -29,15 +29,16 @@
   ([icon label]
    [labeled-icon {} icon label])
   ([wrapper-attrs icon label]
-   [:div (merge {:style {:margin-top "0.5rem"
-                         :margin-bottom "0.5rem"
-                         :display "flex"
-                         :flex-direction "row"
-                         :flex-wrap "wrap"
-                         :justify-content "flex-start"
-                         :align-items "center"}}
-                wrapper-attrs)
-    [:div {:style {:margin-right "0.25rem"}}
+   [:div (stylefy/use-style
+           (merge {:margin-top "0.5rem"
+                   :margin-bottom "0.5rem"
+                   :display "flex"
+                   :flex-direction "row"
+                   :flex-wrap "wrap"
+                   :justify-content "flex-start"
+                   :align-items "center"}
+                  wrapper-attrs))
+    [:div (stylefy/use-style {:margin-right "0.25rem"})
      icon]
     [:div
      label]]))
@@ -478,11 +479,8 @@
                   (if-not different-week-date
                     [labeled-icon [ic/navigation-check] "Ei muutoksia"]
                     [:div
-                     [:div (stylefy/use-style {
-                                               ;:overflow-wrap "break-word"
-                                               :white-space "nowrap" ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
-                                               ;:margin-right "5px"
-                                                })
+                     [:div (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
+                                               :white-space "nowrap"})
                       (str (time/days-until different-week-date) " pv ")]
                      [:div (stylefy/use-style {:color "gray"
                                                :overflow-wrap "break-word"})
