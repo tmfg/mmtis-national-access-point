@@ -480,22 +480,22 @@
         :format (fn [{change-type :change-type :as route}]
                   (case (keyword change-type)
                     :no-traffic
-                    [icon-l/icon-labeled style/transit-changes-legend-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ic/av-not-interested]
                      "Tauko liikennöinnissä"]
 
                     :added
-                    [icon-l/icon-labeled style/transit-changes-legend-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ic/content-add-box {:color style/add-color}]
                      "Uusi reitti"]
 
                     :removed
-                    [icon-l/icon-labeled style/transit-changes-legend-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
                      "Päättyvä reitti"]
 
                     :no-change
-                    [icon-l/icon-labeled style/transit-changes-legend-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ic/navigation-check]
                      "Ei muutoksia"]
 
