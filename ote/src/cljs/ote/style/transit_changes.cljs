@@ -19,6 +19,7 @@
 (def transit-changes-icon-row-container
   {:display "flex"
    :flex-direction "row"
+   :flex-wrap "wrap"
    :justify-content "flex-start"
    :align-items "center"})
 
