@@ -46,7 +46,7 @@
                           [ic/content-remove-circle-outline " Päättyviä reittejä"]
                           [ui-icons/outline-ballot " Reittimuutoksia"]
                           [ic/av-not-interested " Reittejä, joissa tauko liikenteessä"]]]
-        ^{:key label}
+        ^{:key (str "transit-changes-legend-" label)}
         [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
