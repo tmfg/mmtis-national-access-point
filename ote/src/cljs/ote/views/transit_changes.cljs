@@ -40,7 +40,7 @@
   [:div.transit-changes-legend (use-style style/transit-changes-legend-container)
    [:div
     [:b "Taulukon ikonien selitteet"]]
-   [:div (stylefy/use-style style/transit-changes-icon-row-container)
+   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
       (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
                           [ic/content-remove-circle-outline " Päättyviä reittejä"]

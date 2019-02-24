@@ -319,7 +319,7 @@
   [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend-container)
    [:div
     [:b "Taulukon ikonien selitteet"]]
-   [:div (stylefy/use-style style/transit-changes-icon-row-container)
+   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
       (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
                           [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
@@ -361,7 +361,7 @@
             trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
             trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
     with-labels?]
-   [:div.transit-change-icons (stylefy/use-style (style-base/flex-container "row"))
+   [:div (stylefy/use-style (style-base/flex-container "row"))
     [:div {:style {:width "20%"}}
      [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)

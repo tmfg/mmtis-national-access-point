@@ -16,11 +16,18 @@
    :margin-top "1rem"
    :padding "1rem"})
 
-(def transit-changes-icon-row-container
+(def transit-changes-icon-legend-row-container
   {:align-items "center"
    :display "flex"
    :flex-direction "row"
    :flex-wrap "wrap"
+   :justify-content "flex-start"})
+
+(def transit-changes-icon-row-container
+  {:align-items "center"
+   :display "flex"
+   :flex-direction "row"
+   :flex-wrap "nowrap"
    :justify-content "flex-start"})
 
 (def transit-changes-legend-icon
