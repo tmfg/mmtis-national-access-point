@@ -165,7 +165,7 @@
     (map-indexed
      (fn [i stoptime]
        (let [[stop time] (str/split stoptime #"@")]
-         ^{:key i}
+         ^{:key (str "stop-listing-" i)}
          [:tr
           [:td stop]
           [:td time]]))
@@ -325,7 +325,7 @@
                           [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
                           [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
                           [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
-        ^{:key label}
+        ^{:key (str "transit-visualization-route-changes-legend-" label)}
         [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
 
 (defn format-range [lower upper]
@@ -812,7 +812,7 @@
         ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
         (doall
           (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
-            ^{:key routename}
+            ^{:key (str "selected-route-map-section-" routename)}
             [ui/checkbox {:label (first (str/split routename #"\|\|"))
                           :checked show?
                           :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]
@@ -843,7 +843,7 @@
           [:div
            (doall
             (for [{id :id :as p} previous-packages]
-              ^{:key id}
+              ^{:key (str "gtfs-package-info-" id)}
               [pkg p]))])])]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-route-filtered selected-route compare open-sections route-hash-id-type all-route-changes-display? all-route-changes-checkbox]
