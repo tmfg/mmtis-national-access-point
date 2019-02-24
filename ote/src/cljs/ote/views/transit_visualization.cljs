@@ -478,7 +478,7 @@
         :read identity
         :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type :as route}]
-                  (case (keyword change-type)
+                  (case change-type
                     :no-traffic
                     [icon-l/icon-labeled style/transit-changes-icon
                      [ic/av-not-interested]
