@@ -8,20 +8,20 @@
 (def no-change-color "rgb(235,235,235)")
 
 (def transit-changes-legend-container
-  {:margin-top "1rem"
-   :padding "1rem"
+  {:align-items "flex-start"
    :background-color "rgb(235,235,235)"
    :display "flex"
    :flex-direction "column"
    :justify-content "flex-start"
-   :align-items "flex-start"})
+   :margin-top "1rem"
+   :padding "1rem"})
 
 (def transit-changes-icon-row-container
-  {:display "flex"
+  {:align-items "center"
+   :display "flex"
    :flex-direction "row"
    :flex-wrap "wrap"
-   :justify-content "flex-start"
-   :align-items "center"})
+   :justify-content "flex-start"})
 
 (def transit-changes-legend-icon
   {:margin-left "1rem"})
