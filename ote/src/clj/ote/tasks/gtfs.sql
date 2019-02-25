@@ -14,7 +14,8 @@ SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
 -- name: services-for-nightly-change-detection
 SELECT ts.id
   FROM "transport-service" ts
- WHERE EXISTS(SELECT id
+ WHERE ts."sub-type" = 'schedule'
+   AND EXISTS(SELECT id
                 FROM "external-interface-description" eid
                WHERE ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
                  AND 'route-and-schedule' = ANY(eid."data-content")
