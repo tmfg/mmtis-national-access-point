@@ -429,7 +429,8 @@
 
   ChangeDetectionTab
   (process-event [{tab-value :tab-value} app]
-               (assoc-in app [:admin :transit-changes :tab] tab-value)))
+    (routes/navigate! (keyword tab-value))
+    (assoc-in app [:admin :transit-changes :tab] tab-value)))
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
@@ -560,3 +561,42 @@
 
 (defn ^:export force-interface-import []
   (->ForceInterfaceImport))
+
+
+(define-event LoadCommercialServicesResponse [response]
+  {}
+  (assoc-in app [:admin :transit-changes :commercial-services] response))
+
+(define-event LoadCommercialServices []
+  {}
+  (comm/get! "admin/commercial-services"
+             {:on-success (tuck/send-async! ->LoadCommercialServicesResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(defmethod routes/on-navigate-event :admin-commercial-services [_]
+  (->LoadCommercialServices))
+
+(define-event ToggleCommercialTrafficResponse [response]
+  {}
+  ;; Do nothing on success
+  (.log js/console "Response " (pr-str response))
+  app)
+
+(define-event ToggleCommercialTraffic [service-id commercial?]
+  {}
+  ;; Post changed commercial? status to backend
+  (comm/post! "admin/toggle-commercial-services"
+              {:id service-id
+               :commercial? (not commercial?)}
+              {:on-success (tuck/send-async! ->ToggleCommercialTrafficResponse)
+               :on-failure (tuck/send-async! ->ServerError)})
+  ;; Update front end by default. If server doesn't respond correctly front end is still updated... which is nice
+  (update-in app [:admin :transit-changes :commercial-services]
+             (fn [services]
+               services
+               (map (fn [service]
+                      (if (= (:service-id service) service-id)
+                        (assoc service :commercial? (not commercial?))
+                        service))
+                    services))))

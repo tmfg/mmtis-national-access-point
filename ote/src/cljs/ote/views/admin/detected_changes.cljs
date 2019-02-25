@@ -20,6 +20,30 @@
             [ote.ui.tabs :as tabs]
             [ote.style.buttons :as button-styles]))
 
+(defn contract-traffic [e! app-state]
+  (let [services (get-in app-state [:admin :transit-changes :commercial-services])]
+    [:div
+     [ui/table {:selectable false}
+      [ui/table-header {:adjust-for-checkbox false
+                        :display-select-all false}
+       [ui/table-row
+        [ui/table-header-column "Palveluntuottaja"]
+        [ui/table-header-column "Palvelu"]
+        [ui/table-header-column "Kaupallinen?"]]]
+      [ui/table-body {:display-row-checkbox false}
+       (doall
+         (for [s services]
+           ^{:key (str "link_" s)}
+           [ui/table-row {:selectable false}
+            [ui/table-row-column (:operator-name s)]
+            [ui/table-row-column (:service-name s)]
+            [ui/table-row-column
+             [form-fields/field
+              {:label "Kaupallinen"
+               :type :checkbox
+               :update! #(e! (admin-controller/->ToggleCommercialTraffic (:service-id s) (:commercial? s)))}
+              (:commercial? s)]]]))]]]))
+
 (defn detect-changes [e! app-state]
   [:div
    [:div (stylefy/use-style (style-base/flex-container "column"))
@@ -216,18 +240,20 @@
 
 (defn configure-detected-changes [e! app-state]
   (let [page (:page app-state)
-        tabs [{:label "Tunnista muutokset" :value "detect-changes"}
-              {:label "Reitin tunnistus" :value "route-id"}
-              {:label "Lataa gtfs" :value "upload-gtfs"}]
-        selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "detect-changes")]
+        tabs [{:label "Tunnista muutokset" :value "admin-detect-changes"}
+              {:label "Reitin tunnistus" :value "admin-route-id"}
+              {:label "Lataa gtfs" :value "admin-upload-gtfs"}
+              {:label "Sopimusliikenne" :value "admin-commercial-services"}]
+        selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detect-changes")]
     [:div
      [:h2 "Muutostunnistukseen liittyviä työkaluja"]
      [tabs/tabs tabs {:update-fn    #(e! (admin-controller/->ChangeDetectionTab %))
                       :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
-            "detect-changes" [detect-changes e! app-state]
-            "route-id" [route-id e! app-state]
-            "upload-gtfs" [upload-gtfs e! app-state]
+            "admin-detect-changes" [detect-changes e! app-state]
+            "admin-route-id" [route-id e! app-state]
+            "admin-upload-gtfs" [upload-gtfs e! app-state]
+            "admin-commercial-services" [contract-traffic e! app-state]
             ;;default
             [detect-changes e! app-state])]]))

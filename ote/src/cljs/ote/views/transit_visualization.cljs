@@ -3,6 +3,7 @@
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.icons :as ote-icons]
+            [ote.ui.icon_labeled :as icon-l]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
@@ -24,24 +25,6 @@
             [ote.ui.form-fields :as form-fields]))
 
 (set! *warn-on-infer* true)
-
-(defn labeled-icon
-  ([icon label]
-   [labeled-icon {} icon label])
-  ([wrapper-attrs icon label]
-   [:div (stylefy/use-style
-           (merge {:margin-top "0.5rem"
-                   :margin-bottom "0.5rem"
-                   :display "flex"
-                   :flex-direction "row"
-                   :flex-wrap "wrap"
-                   :justify-content "flex-start"
-                   :align-items "center"}
-                  wrapper-attrs))
-    [:div (stylefy/use-style {:margin-right "0.25rem"})
-     icon]
-    [:div
-     label]]))
 
 (defn highlight-style [hash->color date->hash day highlight]
   (let [d (time/format-date day)
@@ -182,7 +165,7 @@
     (map-indexed
      (fn [i stoptime]
        (let [[stop time] (str/split stoptime #"@")]
-         ^{:key i}
+         ^{:key (str "stop-listing-" i)}
          [:tr
           [:td stop]
           [:td time]]))
@@ -333,16 +316,17 @@
                               :font-weight "bold"}}]]])
 
 (defn route-changes-legend []
-  [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend)
-   [:div [:b "Taulukon ikonien selitteet"]]
-   (doall
-    (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
-                        [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
-                        [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                        [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
-      ^{:key label}
-      [labeled-icon (stylefy/use-style style/transit-changes-legend-icon) [icon] label]))])
-
+  [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend-container)
+   [:div
+    [:b "Taulukon ikonien selitteet"]]
+   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
+    (doall
+      (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
+                          [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
+                          [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
+                          [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
+        ^{:key (str "transit-visualization-route-changes-legend-" label)}
+        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
 
 (defn format-range [lower upper]
   (if (and (nil? lower) (nil? upper))
@@ -354,8 +338,7 @@
 
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
-    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
-
+    [icon-l/icon-labeled
      [ic/action-timeline {:style {:color (when (= "0" changes)
                                            style/no-change-color)}}]
      [:span
@@ -364,7 +347,7 @@
 
 (defn stop-time-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
-    [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+    [icon-l/icon-labeled
      [ic/action-query-builder {:color (when (= "0" changes)
                                         style/no-change-color)}]
      [:span
@@ -378,19 +361,16 @@
             trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
             trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
     with-labels?]
-   [:div.transit-change-icons
-    (stylefy/use-style (merge
-                        (style-base/flex-container "row")
-                        {:width "100%"}))
+   [:div (stylefy/use-style (style-base/flex-container "row"))
     [:div {:style {:width "20%"}}
-     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+     [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
                                            style/add-color)}]
       [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
     [:div {:style {:width "20%"}}
-     [labeled-icon (stylefy/use-style style/transit-changes-legend-icon)
+     [icon-l/icon-labeled style/transit-changes-legend-icon
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                   style/no-change-color
                                                   style/remove-color)}]
@@ -399,6 +379,7 @@
 
     [:div {:style {:width "30%"}}
      [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
+
 
     [:div {:style {:width "30%"}}
      [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
@@ -451,6 +432,7 @@
      [route-changes-legend]
      [table/table {:no-rows-message no-rows-message
                    :height table-height
+                   :label-style style-base/table-col-style-wrap
                    :name->label str
                    :show-row-hover? true
                    :on-select #(when (first %)
@@ -477,7 +459,7 @@
         :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
-                    [labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                    [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:div
                      [:div (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
                                                :white-space "nowrap"})
@@ -496,24 +478,24 @@
         :read identity
         :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type :as route}]
-                  (case (keyword change-type)
+                  (case change-type
                     :no-traffic
-                    [labeled-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ic/av-not-interested]
                      "Tauko liikennöinnissä"]
 
                     :added
-                    [labeled-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ic/content-add-box {:color style/add-color}]
                      "Uusi reitti"]
 
                     :removed
-                    [labeled-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
                      "Päättyvä reitti"]
 
                     :no-change
-                    [labeled-icon
+                    [icon-l/icon-labeled style/transit-changes-icon
                      [ic/navigation-check]
                      "Ei muutoksia"]
 
@@ -672,18 +654,20 @@
           :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
                     (cond
                       (and left (nil? right))
-                      [labeled-icon [ic/content-remove] "Poistuva vuoro"]
+                      [icon-l/icon-labeled [ic/content-remove] "Poistuva vuoro"]
 
                       (and (nil? left) right)
-                      [labeled-icon [ic/content-add] "Lisätty vuoro"]
+                      [icon-l/icon-labeled [ic/content-add] "Lisätty vuoro"]
 
                       (= 0 stop-time-changes stop-seq-changes)
-                      [labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                      [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
 
                       :default
-                      [:div
-                       [stop-seq-changes-icon stop-seq-changes]
-                       [stop-time-changes-icon stop-time-changes]]))
+                      [:div (stylefy/use-style style/transit-changes-icon-row-container)
+                       [:div (stylefy/use-style {:width "50%"})
+                        [stop-seq-changes-icon stop-seq-changes]]
+                       [:div (stylefy/use-style {:width "50%"})
+                        [stop-time-changes-icon stop-time-changes]]]))
           :col-style {:padding-left "10px" :padding-right "5px"}}]
         trips]])]])
 
@@ -709,12 +693,12 @@
                      "Uusi pysäkki reitillä"
 
                      (not= departure-time-date1 departure-time-date2)
-                     [labeled-icon [ic/action-query-builder]
+                     [icon-l/icon-labeled [ic/action-query-builder]
                       (time/format-minutes-elapsed
                         (time/minutes-elapsed departure-time-date1 departure-time-date2))]
 
                      :default
-                     [labeled-icon {:style {:color "lightgray"}}
+                     [icon-l/icon-labeled {:style {:color "lightgray"}}
                       [ic/action-query-builder {:color "lightgray"}]
                       "00:00"]))}]
        combined-stop-sequence]])])
@@ -828,7 +812,7 @@
         ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
         (doall
           (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
-            ^{:key routename}
+            ^{:key (str "selected-route-map-section-" routename)}
             [ui/checkbox {:label (first (str/split routename #"\|\|"))
                           :checked show?
                           :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]
@@ -859,7 +843,7 @@
           [:div
            (doall
             (for [{id :id :as p} previous-packages]
-              ^{:key id}
+              ^{:key (str "gtfs-package-info-" id)}
               [pkg p]))])])]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-route-filtered selected-route compare open-sections route-hash-id-type all-route-changes-display? all-route-changes-checkbox]
