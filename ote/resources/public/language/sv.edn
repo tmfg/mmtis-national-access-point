@@ -1296,8 +1296,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :type-search "Tjänstetyp"
   :limit-search-results "Begränsar katalogen"
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
-  :released-apis "Palvelussa julkaistut rajapinnat"
-  :no-description "Palvelulle ei ole annettu kuvausta."
+  :released-apis "Gränssnitt publicerade i tjänsten."
+  :no-description "Ingen beskrivning har givits till tjänsten än."
   :service-basic-info "Basic info of the service"
   :result-count (:plural :count
                   "Inga resultat"
