@@ -133,6 +133,10 @@
 
                     :admin [admin/admin-panel e! app]
                     :admin-detected-changes [admin-detected-changes/configure-detected-changes e! app]
+                    :admin-detect-changes [admin-detected-changes/configure-detected-changes e! app]
+                    :admin-route-id [admin-detected-changes/configure-detected-changes e! app]
+                    :admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! app]
+                    :admin-commercial-services [admin-detected-changes/configure-detected-changes e! app]
 
                     :email-settings [email-settings/email-notification-settings e! app]
 
