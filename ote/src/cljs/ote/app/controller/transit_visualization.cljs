@@ -193,6 +193,14 @@
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
   (init-view-state app))
 
+
+(define-event PreInitTransitVisualization []
+  {}
+  (assoc app :transit-visualization {}))
+
+(defmethod routes/pre-navigate-event :transit-visualization [{params :params}]
+  (->PreInitTransitVisualization))
+
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
   (->InitTransitVisualization (:service-id params) (:date params)))
 
