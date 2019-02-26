@@ -40,7 +40,6 @@
 
 (define-event ShowChangesForService [id date]
   {}
-  (.log js/console "SHOW " id " " date)
   (routes/navigate! :transit-visualization {:service-id id
                                             :date (time/format-date-iso-8601 date)})
   app)
