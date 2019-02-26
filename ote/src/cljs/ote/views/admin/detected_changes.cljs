@@ -238,7 +238,7 @@
        [ui/table-body {:display-row-checkbox false}
         (doall
           (for [s services]
-            ^{:key (str "link_" s)}
+            ^{:key (:service-id s)}
             [ui/table-row {:selectable false}
              [ui/table-row-column (:operator s)]
              [ui/table-row-column (:service-id s)]

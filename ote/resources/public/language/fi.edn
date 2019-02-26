@@ -298,7 +298,7 @@
 Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
-  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla teihin yhteydessä."
+  :description-why-contact-info "Palvelun yhteystiedoista julkaistaan julkisessa NAP-palvelukatalogissa ainoastaan verkkosivujen osoite."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
@@ -1019,7 +1019,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :forbidden "Käyttöoikeutesi eivät riitä sisällön katseluun."
   :optionally-fill-manually "Vaihtoehtoisesti voit jatkaa tietojen syöttämistä käsin."
 
-  :nap-data-license (:md "Tälle lomakkeelle täytetyt tiedot julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")
+  :nap-data-license (:md "Tälle lomakkeelle täytettyjä tietoja julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")
 
   :save-user-success "Käyttäjätiedot tallennettu"
   :start-time "Alkamisaika"
@@ -1309,7 +1309,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
   :released-apis "Palvelussa julkaistut rajapinnat"
   :service-basic-info "Palvelun perustiedot"
-  :no-description "Palvelulle ei ole annettu kuvausta."
+  :no-description "Palvelulle ei ole vielä annettu kuvausta."
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"

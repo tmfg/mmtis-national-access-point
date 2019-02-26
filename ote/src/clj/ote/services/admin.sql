@@ -74,5 +74,5 @@ SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" a
    AND t.published IS NOT NULL
    AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
  GROUP BY t.id, o.id
- ORDER BY t.id asc;
+ ORDER BY o.name asc;
 

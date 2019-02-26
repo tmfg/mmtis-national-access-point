@@ -197,11 +197,20 @@
 (def checkbox-addition {:padding-left "1.25rem"
                         :padding-bottom "2px"})
 
-(def icon-label {:margin-left "0.3rem"})
+(def icon-labeled-container
+  {:margin-top "0.5rem"
+   :margin-bottom "0.5rem"
+   :display "flex"
+   :flex-direction "row"
+   :flex-wrap "wrap"
+   :justify-content "flex-start"
+   :align-items "center"})
+
+(def icon-labeled-icon
+  {:margin-right "0.25rem"})
 
 (def msg-container (merge (flex-container "row")
                           (align-items "center")))
-
 
 (def msg-warning
   {:color (str colors/warning)
@@ -216,3 +225,8 @@
 
 (def circular-progress-label
   {:margin-left "1rem"})
+
+(def table-col-style-wrap
+  {:padding-left "0.5rem"
+   :padding-right "0"
+   :overflow-wrap "break-word"})
