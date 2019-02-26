@@ -101,7 +101,9 @@
 (defn- license-info []
   [:p {:style {:padding-top "20px"
                :padding-bottom "20px"}}
-   (tr [:common-texts :nap-data-license])])
+   (tr [:common-texts :nap-data-license])
+   [ui-common/linkify (tr [:common-texts :nap-data-license-url]) (tr [:common-texts :nap-data-license-url-label]) {:target "_blank"}]
+   "."])
 
 (defn edit-service [e! type {service :transport-service :as app}]
   [:span
