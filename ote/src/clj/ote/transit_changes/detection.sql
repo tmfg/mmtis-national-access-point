@@ -48,6 +48,9 @@ SELECT t."package-id", trip."trip-id",
 -- name: generate-date-hashes
 SELECT gtfs_generate_date_hashes(:package-id::INTEGER);
 
+-- name: generate-date-hashes-for-future
+SELECT gtfs_generate_date_hashes_for_future(:package-id::INTEGER);
+
 -- name: fetch-services-packages
 SELECT p.id as "package-id"
   FROM "external-interface-description" e, "gtfs_package" p
@@ -60,11 +63,15 @@ SELECT distinct t."transport-service-id" as id
 
 -- name: fetch-monthly-packages
 SELECT MAX(p.id) as "package-id"
-  FROM gtfs_package p
+  FROM gtfs_package p, "transport-service" t
+ WHERE p."transport-service-id" = t.id
+   AND t."commercial-traffic?" = TRUE
  GROUP BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM'))
  ORDER BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM')) asc;
 
 -- name: fetch-all-packages
 SELECT p.id as "package-id"
-  FROM gtfs_package p
+  FROM gtfs_package p, "transport-service" t
+ WHERE p."transport-service-id" = t.id
+   AND t."commercial-traffic?" = TRUE
  ORDER BY p.id asc;
