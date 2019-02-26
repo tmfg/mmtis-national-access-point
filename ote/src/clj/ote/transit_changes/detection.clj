@@ -66,14 +66,13 @@
                            (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
     (log/info "Found " (count package-ids) " For service " service-id)
 
-    (doall
-      (dotimes [i (count package-ids)]
-        (let [package-id (nth package-ids i)]
+    (dotimes [i (count package-ids)]
+      (let [package-id (nth package-ids i)]
         (do
           (log/info "Generating hashes for package " package-id "  (service " service-id ")")
           (generate-date-hashes db {:package-id package-id})
           (update-hash-recalculation db (inc i) recalculation-id)
-          (log/info "Generation ready! (package " package-id " service " service-id ")")))))
+          (log/info "Generation ready! (package " package-id " service " service-id ")"))))
     (stop-hash-recalculation db recalculation-id)))
 
 (defn db-route-detection-type [db service-id]
