@@ -49,7 +49,7 @@
       [ui/table-body {:display-row-checkbox false}
        (doall
          (for [s services]
-           ^{:key (:servce-id s)}
+           ^{:key (:service-id s)}
            [ui/table-row {:selectable false}
             [ui/table-row-column (:operator-name s)]
             [ui/table-row-column (:service-name s)]
