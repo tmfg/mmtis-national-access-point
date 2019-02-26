@@ -281,12 +281,12 @@
                 label]])
 
 ;; This is implemented because IE craps itself sometimes with the linkify
-(defn back-link-with-event [e! site-keyword label]
+(defn back-link-with-event [site-keyword label]
   [:a (merge
         {:href "#/transit-changes"}
         {:on-click #(do
                       (.preventDefault %)
-                      (e! (routes/navigate! site-keyword)))}
+                      (routes/navigate! site-keyword))}
         (stylefy/use-style (merge {:color colors/primary
                                    :text-decoration "none"
                                    ::stylefy/mode {:hover {:text-decoration "underline"}}})))

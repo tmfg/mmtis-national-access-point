@@ -861,7 +861,7 @@
      [:div.transit-visualization
 
       [page/page-controls
-       [common/back-link-with-event e! :transit-changes "Takaisin markkinaehtoisen liikenteen muutokset -näkymään"] ; this is done with click event because IE11 doesn't launch popstate event
+       [common/back-link-with-event :transit-changes "Takaisin markkinaehtoisen liikenteen muutokset -näkymään"] ; this is done with click event because IE11 doesn't launch popstate event
        "Reittiliikenteen tunnistetut muutokset"
        [:div
         [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
