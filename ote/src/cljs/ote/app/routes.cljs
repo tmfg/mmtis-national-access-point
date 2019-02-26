@@ -76,7 +76,16 @@
   Route parameters are under the :params key."
   :page)
 
+(defmulti pre-navigate-event
+  "Determine event(s) to be run when user navigates to a given route but before on-navigate-event is sent.
+  Returns a single Tuck event or a vector of Tuck events to be applied
+  to the app state. Takes a map containing the navigation data as parameter.
+  Route parameters are under the :params key."
+  :page)
+
 (defmethod on-navigate-event :default [_] nil)
+
+(defmethod pre-navigate-event :default [_] nil)
 
 (defmulti on-leave-event
           "Determine event(s) to be run when user navigates away from the give route.
@@ -126,6 +135,8 @@
                                       :url js/window.location.href}
                      event-leave (on-leave-event {:page (:page app)})
                      event-leave (if (vector? event-leave) event-leave [event-leave])
+                     event-pre (pre-navigate-event navigation-data)
+                     event-pre (if (vector? event-pre) event-pre [event-pre])
                      event-to (on-navigate-event navigation-data)
                      event-to (if (vector? event-to) event-to [event-to])
                      orig-app app
@@ -142,7 +153,7 @@
                        (.setTimeout
                          js/window
                          (fn []
-                           (send-startup-events (vec (concat event-leave event-to))))
+                           (send-startup-events (vec (concat event-leave event-pre event-to))))
                          0))
                      app)))
                app)))))
