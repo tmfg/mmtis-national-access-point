@@ -1,5 +1,5 @@
 (defproject ote "0.1-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.9.908"]
                  ;; CSV parser for backend
                  [org.clojure/data.csv "0.1.4"]
@@ -103,7 +103,8 @@
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
 
                  ;; override old guava version from deps
-                 [com.google.guava/guava "21.0"]]
+                 [com.google.guava/guava "21.0"]
+                 #_[spec-provider "0.4.14"]]
 
   :profiles {:uberjar {:aot :all
 

@@ -1,12 +1,14 @@
 (ns ote.transit-changes.detection-test
   (:require [ote.transit-changes.detection :as detection]
             [clojure.test :as t :refer [deftest testing is]]
+            [clojure.spec.test.alpha :as spec-test]
             [ote.transit-changes :as transit-changes]))
 
-(defn d [year month date]
-  (java.time.LocalDate/of year month date))
+(defn d [year month day]
+  (java.time.LocalDate/of year month day))
 
 (def route-name ["TST" "Testington - Terstersby" "Testersby"])
+(def route-name-2 ["KEK" "Keskington - Kerskersby" "Keskersby"])
 
 (defn weeks
   "Give first day of week (monday) as a starting-from."
@@ -182,27 +184,40 @@
   ; Produce change records about individual days -> first change week contains 2 days with differences
   ; In this test case we need to produce 3 rows in the database
   (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;;
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week
-         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; 12.2. first change -> only one found currently | needs to detect change also on 13.2. -> this is set to current week
-         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; no changes here
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;; Only tuesday is found
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; 18.2. first change -> only one found currently | needs to detect change also on 13.2. -> this is set to current week
+         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; no changes here (25.2.)
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;; Only tuesday is found (4.3.)
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}))
 
 (deftest more-than-one-change-found
-  (clojure.spec.test.alpha/instrument `detection/first-week-difference)
-  (let [diff-pairs (get (detection/week-difference-pairs test-more-than-one-change)
-                        route-name)]    
+  (spec-test/instrument `detection/first-week-difference)
+
+  ;; first test that the test data and old change detection code agree
+  (testing "single-change detection code agrees with test data"
+    (is (= (d 2019 2 18) (-> test-more-than-one-change
+                             detection/first-week-difference
+                             (get route-name)
+                             :different-week
+                             :beginning-of-week))))
+  
+  (let [diff-pairs (detection/week-difference-pairs test-more-than-one-change)]
+    (testing "got two changes"
+      (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
-      (is (= (d 2018 12 2) (-> diff-pairs
-                               first
-                               :different-week
-                               :beginning-of-week))))
+      (is (= (d 2019 2 18) (-> diff-pairs
+                            first
+                            (get route-name)
+                            :different-week
+                            :beginning-of-week))))
 
     (testing "second change is detected"
-      (is (= (d 2018 26 2) (-> diff-pairs
+      (is (= (d 2019 2 25) (-> diff-pairs
                                second
+                               (get route-name)
                                :different-week
                                :beginning-of-week))))))
+

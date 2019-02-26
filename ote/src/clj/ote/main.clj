@@ -120,6 +120,13 @@
 (defn configure-logging [dev-mode? {:keys [level] :as log-config}]
   (log/merge-config!
    {:level (or level :debug)
+    :middleware [(fn drop-hikari-stats-middlware [data]
+                   (if (and
+                        (= :debug (:level data))
+                        (= "com.zaxxer.hikari.pool.HikariPool" (:?ns-str data)))
+                     nil
+                     ;; else
+                     data))]
     :appenders
     (if dev-mode?
       ;; In dev-mode only do println logging
