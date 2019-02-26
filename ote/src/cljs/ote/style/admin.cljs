@@ -9,6 +9,8 @@
                        :text-align    "right"
                        :padding-right "20px"})
 
-(def button-container {:display "flex"
+(def detection-button-container {:display "flex"
                        :flex-wrap "nowrap"
                        :justify-content "space-between"})
+
+(def detection-info-text {:flex 2 :padding-right "1.5rem"})
