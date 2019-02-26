@@ -1013,7 +1013,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :forbidden "Du har inte behörighet att visa innehållet."
   :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"
 
-  :nap-data-license (:md "Informationen som fyllts i på denna blankett publiceras som öppna data i NAP-katalogen med licensen [Creative Commons Erkännande 4.0 Internationell (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
+  :nap-data-license "Informationen som fyllts i på denna blankett publiceras som öppna data i NAP-katalogen med licensen "
+  :nap-data-license-url-label "Creative Commons Erkännande 4.0 Internationell (CC BY 4.0)"
+  :nap-data-license-url "https://creativecommons.org/licenses/by/4.0/deed.sv)"
 
   :save-user-success "Profil sparad"
   :business-id-is-not-unique "FO-numret finns redan i NAP. Ta kontakt med NAP Help Desk, joukkoliikenne@traficom.fi eller tfn 0295 34 6705 (vardagar kl 9-15)."
