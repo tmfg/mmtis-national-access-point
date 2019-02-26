@@ -83,7 +83,6 @@
 
 (defrecord ToggleAddMemberDialog [id])
 (defrecord ChangeTab [tab-value])
-(defrecord ChangeDetectionTab [tab-value])
 
 (defn- update-operator-by-id [app id update-fn & args]
   (update-in app [:admin :operator-list :results]
@@ -425,11 +424,7 @@
 
   ChangeTab
   (process-event [{tab-value :tab-value} app]
-    (assoc-in app [:admin :tab :admin-page] tab-value))
-
-  ChangeDetectionTab
-  (process-event [{tab-value :tab-value} app]
-               (assoc-in app [:admin :transit-changes :tab] tab-value)))
+    (assoc-in app [:admin :tab :admin-page] tab-value)))
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
@@ -458,105 +453,3 @@
        csv/write-csv
        (download-csv "rajapinnat.csv"))
   app)
-
-;; admin tools
-(define-event UpdateHashCalculationValues [values]
-  {}
-  (update-in app [:admin :transit-changes :daily-hash-values] merge values))
-
-(define-event UpdateRouteHashCalculationValues [values]
-  {}
-  (update-in app [:admin :transit-changes :route-hash-values] merge values))
-
-(define-event UpdateUploadValues [values]
-  {}
-  (update-in app [:admin :transit-changes :upload-gtfs] merge values))
-
-(define-event ForceDetectTransitChanges []
-  {}
-  (comm/post! "/transit-changes/force-detect" nil
-              {:on-success #(.log js/console %)})
-  app)
-
-(define-event ForceInterfaceImport []
-  {}
-  (comm/post! "/transit-changes/force-interface-import" nil
-              {:on-success #(.log js/console %)})
-  app)
-
-(define-event ForceHashCalculationForService []
-  {}
-  (comm/get! (str "/transit-changes/force-calculate-hashes/"
-                  (get-in app [:admin :transit-changes :daily-hash-values :service-id]) "/"
-                  (get-in app [:admin :transit-changes :daily-hash-values :package-count]))
-              {:on-success #(.log js/console %)})
-  app)
-
-(define-event ForceRouteHashCalculationForService []
-  {}
-  (comm/get! (str "/transit-changes/force-calculate-route-hash-id/"
-                  (get-in app [:admin :transit-changes :route-hash-values :service-id]) "/"
-                  (get-in app [:admin :transit-changes :route-hash-values :package-count]) "/"
-                  (get-in app [:admin :transit-changes :route-hash-values :route-id-type]))
-             {:on-success #(.log js/console %)})
-  app)
-
-(define-event UploadResponse [response]
-  {}
-  (assoc app :flash-message "Paketti ladattu"))
-
-(define-event UploadAttachment [input-html-element]
-  {}
-  (let [filename (.-name (first (array-seq (.-files input-html-element))))
-        service-id (get-in app [:admin :transit-changes :upload-gtfs :service-id])
-        date (get-in app [:admin :transit-changes :upload-gtfs :date])]
-    (if (re-matches #".*\.(zip)" filename)
-      (do
-        (comm/upload! (str "transit-changes/upload-gtfs/" service-id "/" date) input-html-element
-                      {:on-success (tuck/send-async! ->UploadResponse)
-                       :on-failure (tuck/send-async! ->ServerError)})
-        app)
-      (->
-        app
-        (update-in [:admin :transit-changes :upload-gtfs]
-                   #(conj (or (vec (butlast %)) [])
-                          {:error (str (tr [:common-texts :invalid-file-type]) ": " filename)}))
-        (assoc :flash-message-error (str (tr [:common-texts :invalid-file-type]) ": " filename))))))
-
-
-
-(define-event LoadRouteHashServicesResponse [response]
-  {}
-  (assoc-in app [:admin :transit-changes :route-hash-services] response))
-
-(define-event LoadRouteHashServices []
-  {}
-  (comm/get! "transit-changes/load-services-with-route-hash-id"
-             {:on-success (tuck/send-async! ->LoadRouteHashServicesResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-  app)
-
-(define-event CalculateDateHasheshResponse [response]
-  {}
-  (.log js/console "Laskenta valmis" (pr-str response))
-  app)
-
-(define-event ForceMonthlyDayHashCalculation []
-  {}
-  (comm/get! "transit-changes/force-monthly-day-hash-calculation"
-             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-  app)
-
-(define-event ForceDayHashCalculation []
-  {}
-  (comm/get! "transit-changes/force-all-day-hash-calculation"
-             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-  app)
-
-(defn ^:export force-detect-transit-changes []
-  (->ForceDetectTransitChanges))
-
-(defn ^:export force-interface-import []
-  (->ForceInterfaceImport))
