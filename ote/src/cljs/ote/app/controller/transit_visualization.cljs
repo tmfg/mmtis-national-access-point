@@ -95,18 +95,6 @@
                              sorted-changes)]
     all-sorted-changes))
 
-(defn- init-view-state [app]
-  (let [init-tv (fn [transit-visualization]
-                  (-> transit-visualization
-                      (assoc :all-route-changes-checkbox nil)
-                      (assoc :all-route-changes-display? nil)
-                      (dissoc :changes-route-filtered)
-                      (dissoc :changes-route-no-change)
-                      (assoc :service-changes-for-date-loading? true)
-                      (assoc :all-route-changes-display? false)
-                      (assoc-in [:open-sections :gtfs-package-info] false)))]
-    (update app :transit-visualization init-tv)))
-
 (define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
   (if (= dates (select-keys app [:date1 :date2]))
@@ -186,6 +174,13 @@
                 :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
                 :gtfs-package-info (:gtfs-package-info response)
                 :route-hash-id-type (:route-hash-id-type response)))
+
+(defn- init-view-state [app]
+  (let [initial-view-state {:all-route-changes-checkbox nil
+                            :all-route-changes-display? false
+                            :open-sections {:gtfs-package-info false}
+                            :service-changes-for-date-loading? true}]
+    (assoc app :transit-visualization initial-view-state)))
 
 (define-event InitTransitVisualization [service-id detection-date]
   {}
