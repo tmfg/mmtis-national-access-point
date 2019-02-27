@@ -85,8 +85,9 @@
   (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
   (e! (tv/->DaysToFirstDiff (time/format-date day) date->hash)))
 
-(defn select-day [e! day]
-  (e! (tv/->SelectDatesForComparison day)))
+(defn select-day [e! day loading?]
+  (when (not loading?)
+    (e! (tv/->SelectDatesForComparison day))))
 
 (defn day-of-week-short [dt]
   (tr [:enums ::t-service/day :short (case (time/day-of-week dt)
@@ -556,8 +557,7 @@
 
 
        [service-calendar/service-calendar {:selected-date? (constantly false)
-                                           :on-select #(when (not (:route-differences-loading? transit-visualization))
-                                                         (select-day e! %))
+                                           :on-select #(select-day e! % (:route-differences-loading? transit-visualization))
                                            :day-style (r/partial day-style hash->color date->hash
                                                                  (:date1 compare) (:date2 compare))
                                            :years (vec (concat (when show-previous-year?
@@ -568,7 +568,7 @@
                                                                hash (date->hash d)
                                                                hash-color (hash->color hash)]
                                                            (style/date-highlight-style hash-color
-                                                                                        style/date-highlight-color-hover))}]
+                                                                                       style/date-highlight-color-hover))}]
        (when (and (:date1 compare) (:date2 compare))
          [:div
           [:h3 "Valittujen päivämäärien väliset muutokset"]
