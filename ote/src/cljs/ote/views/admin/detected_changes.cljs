@@ -111,33 +111,39 @@
                   :icon (ic/content-filter-list)})
        [:span "Käynnistä muutostunnitus"]]]]
 
-    [:h2 "Päivätiivisteisiin - älä käytä, jos ei ole pakko"]
+    [:h2 "Päivätiivisteet - älä käytä, jos ei ole pakko"]
 
     [day-hash-button-element e!
-     "Laske kuukausittaiset päivätiivisteet tulevaisuuden osalta. Tämä vie noin tunnin."
-     "Laske päivätiivisteet kuukausittain vain tulevaisuuden osalta"
+     "Laske kuukausittaiset päivätiivisteet tulevaisuuden osalta. Tämä vie noin tunnin. Laskenta jättää sopimusliikenteet huomoimatta."
+     "Laske päivätiivisteet kuukausittain tulevaisuuteen"
      #(e! (admin-transit-changes/->CalculateDayHash "month" "true"))]
 
     [:br]
     [day-hash-button-element e!
-     "Laske kaikki päivätiivisteet tulevaisuuden osalta. Tämä vie noin 15 tuntia."
-     "Laske kaikki päivätiivisteet vain tulevaisuuden osalta uusiksi"
+     "Laske kaikki päivätiivisteet tulevaisuuden osalta. Tämä vie noin 15 tuntia. Laskenta jättää sopimusliikenteet huomioimatta."
+     "Laske kaikki päivätiivisteet tulevaisuuteen"
      #(e! (admin-transit-changes/->CalculateDayHash "day" "true"))]
 
     [:br]
     [day-hash-button-element e!
      "Kaikkien päivätiivisteiden laskenta vie kauan. Tuotannossa arviolta 24h+. Tämä laskenta ottaa jokaiselta
      palvelulta vain kuukauden viimeisimmän paketin ja laskee sille päivätiivisteet. Tämä vähentää laskentaa käytettyä aikaa.
-     Kun käynnistät tämän laskennan joudut odottamaan arviolta 1-3h."
+     Kun käynnistät tämän laskennan joudut odottamaan arviolta 1-3h. Laskenta jättää sopimusliikenteet huomioimatta."
      "Laske päivätiivisteet kuukausittain uusiksi"
      #(e! (admin-transit-changes/->CalculateDayHash "month" "false"))]
 
     [:br]
     [day-hash-button-element e!
-     "Laske kaikille paketeille päivätiivisteet uusiksi. Tämä laskenta ottaa tuotannossa arviolta 24h+.
+     "Laske kaikille paketeille päivätiivisteet uusiksi. Tämä laskenta ottaa tuotannossa arviolta 24h+. Laskenta ei ota huomioon sopimusliikennettä.
        Oletko varma, että haluat käynnistää laskennan?"
      "Laske kaikki päivätiivisteet uusiksi"
-     #(e! (admin-transit-changes/->CalculateDayHash "day" "false"))]]])
+     #(e! (admin-transit-changes/->CalculateDayHash "day" "false"))]
+
+    [:br]
+   [day-hash-button-element e!
+    "Laske sopimusliikenteelle kaikki päivätiivisteet uusiksi. Laskenta ei ota huomioon kaupallista liikennettä."
+    "Laske sopimusliikenteelle päivätiivisteet"
+    #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]]])
 
 (defn route-id [e! app-state]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]

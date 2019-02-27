@@ -75,3 +75,10 @@ SELECT p.id as "package-id"
  WHERE p."transport-service-id" = t.id
    AND t."commercial-traffic?" = TRUE
  ORDER BY p.id asc;
+
+-- name: fetch-contract-packages
+SELECT p.id as "package-id"
+  FROM gtfs_package p, "transport-service" t
+ WHERE p."transport-service-id" = t.id
+   AND t."commercial-traffic?" = FALSE
+ ORDER BY p.id asc;

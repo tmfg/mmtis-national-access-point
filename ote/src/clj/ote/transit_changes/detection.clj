@@ -676,6 +676,13 @@
     (call-generate-date-hash db all-packages user future)
     all-packages))
 
+(defn calculate-date-hashes-for-contract-traffic [db user future]
+  (let [all-packages (fetch-contract-packages db)]
+    (log/info "Generating contract date hashes. Package count" (count all-packages))
+    (call-generate-date-hash db all-packages user future)
+    all-packages))
+
+
 ;; Do not use this if you don't need to.
 ;; This is helper function for local development. It will calculate route-hash-id to gtfs-date-hash table for the given
 ;; package-id. Running time of this function is quite long. (3-10minutes)
