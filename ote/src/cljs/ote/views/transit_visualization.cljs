@@ -7,6 +7,7 @@
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
+            [ote.theme.colors :as colors]
             [tuck.core :as tuck]
             [ote.ui.service-calendar :as service-calendar]
             [ote.app.controller.transit-visualization :as tv]
@@ -71,10 +72,13 @@
      (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
        {:box-shadow "inset 0 0 0 1px black,
                      inset 0 0 0 2px transparent"})
-     (cond (= (time/format-date-iso-8601 date1) d)
+     (cond (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
+           (style/date1-highlight-style hash-color colors/gray800)
+
+           (= (time/format-date-iso-8601 date1) d)
            (style/date1-highlight-style hash-color)
 
-           (= (time/format-date-iso-8601 date2) d)
+           (= (and (not (nil? date2)) (time/format-date-iso-8601 date2)) d)
            (style/date2-highlight-style hash-color)))))
 
 (defn hover-day [e! date->hash day]
@@ -82,7 +86,7 @@
   (e! (tv/->DaysToFirstDiff (time/format-date day) date->hash)))
 
 (defn select-day [e! day]
-  (e! (tv/->SelectDateForComparison day)))
+  (e! (tv/->SelectDatesForComparison day)))
 
 (defn day-of-week-short [dt]
   (tr [:enums ::t-service/day :short (case (time/day-of-week dt)
@@ -533,7 +537,7 @@
    (when (seq diff)
      [change-icons diff true])])
 
-(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections]}]
+(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections] :as transit-visualization}]
   (let [current-year (time/year (time/now))]
     [:div.route-service-calendar
      [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
@@ -552,7 +556,8 @@
 
 
        [service-calendar/service-calendar {:selected-date? (constantly false)
-                                           :on-select #(e! (tv/->SelectDateForComparison %))
+                                           :on-select #(when (not (:route-differences-loading? transit-visualization))
+                                                         (select-day e! %))
                                            :day-style (r/partial day-style hash->color date->hash
                                                                  (:date1 compare) (:date2 compare))
                                            :years (vec (concat (when show-previous-year?
@@ -560,28 +565,14 @@
                                                                [current-year]
                                                                [(inc current-year)]))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
-                                                               hover-date (goog.date.DateTime. %)
                                                                hash (date->hash d)
-                                                               date1 (goog.date.DateTime. (:date1 compare))
-                                                               date2 (goog.date.DateTime. (:date2 compare))
                                                                hash-color (hash->color hash)]
-                                                           (when-not (or (= (time/format-date-iso-8601 date1) d)
-                                                                         (= (time/format-date-iso-8601 date2) d))
-                                                             (cond (t/after? date1 hover-date)
-                                                                   (style/date1-highlight-style hash-color
-                                                                                                style/date1-highlight-color-hover)
-                                                                   (t/after? hover-date date2)
-                                                                   (style/date2-highlight-style hash-color
-                                                                                                style/date2-highlight-color-hover)
-                                                                   :else
-                                                                   (if (= 2 (get compare :last-selected-date 2))
-                                                                     (style/date1-highlight-style hash-color
-                                                                                                  style/date1-highlight-color-hover)
-                                                                     (style/date2-highlight-style hash-color
-                                                                                                  style/date2-highlight-color-hover)))))}]
-
-       [:h3 "Valittujen päivämäärien väliset muutokset"]
-       [comparison-date-changes compare]]]]))
+                                                           (style/date-highlight-style hash-color
+                                                                                        style/date-highlight-color-hover))}]
+       (when (and (:date1 compare) (:date2 compare))
+         [:div
+          [:h3 "Valittujen päivämäärien väliset muutokset"]
+          [comparison-date-changes compare]])]]]))
 
 (defn format-stop-name [stop-name]
   (let [splitted-stop-name (if (str/includes? stop-name "->")
