@@ -110,7 +110,7 @@
        (when (authorization/admin? user)
          (http/transit-response (detection/hash-recalculations db))))
 
-  ;; Calculate date-hashes. day/month (all or only latest on every month) true/false (only to future or all days)
+  ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
   (GET "/transit-changes/hash-calculation/:scope/:future" [scope future :as {user :user}]
     (when (authorization/admin? user)
       (http/transit-response
@@ -121,6 +121,9 @@
                        db (:user user) (= "true" future))
                      (= scope "day")
                      (detection/calculate-date-hashes-for-all-packages
+                       db (:user user) (= "true" future))
+                     (= scope "contract")
+                     (detection/calculate-date-hashes-for-contract-traffic
                        db (:user user) (= "true" future)))})))
 
   ;; Calculate date-hashes for given service-id and package-count
