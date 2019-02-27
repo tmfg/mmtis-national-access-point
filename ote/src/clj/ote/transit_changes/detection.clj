@@ -68,11 +68,10 @@
 
     (dotimes [i (count package-ids)]
       (let [package-id (nth package-ids i)]
-        (do
           (log/info "Generating hashes for package " package-id "  (service " service-id ")")
           (generate-date-hashes db {:package-id package-id})
           (update-hash-recalculation db (inc i) recalculation-id)
-          (log/info "Generation ready! (package " package-id " service " service-id ")"))))
+          (log/info "Generation ready! (package " package-id " service " service-id ")")))
     (stop-hash-recalculation db recalculation-id)))
 
 (defn db-route-detection-type [db service-id]
@@ -655,17 +654,15 @@
   (let [package-count (count packages)
         recalculation-id (when packages
                            (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
-  (doall
     (dotimes [i (count packages)]
       (let [package-id (nth packages i)]
-        (do
           (println "Generating" (inc i) "/" package-count " - " package-id)
           (if future
             (generate-date-hashes-for-future db {:package-id (:package-id package-id)})
             (generate-date-hashes db {:package-id (:package-id package-id)}))
-          (update-hash-recalculation db (inc i) recalculation-id))))
-    (log/info "Generation ready!"))
-  (stop-hash-recalculation db recalculation-id)))
+          (update-hash-recalculation db (inc i) recalculation-id))
+      (log/info "Generation ready!"))
+    (stop-hash-recalculation db recalculation-id)))
 
 (defn calculate-monthly-date-hashes-for-packages [db user future]
   (let [monthly-packages (fetch-monthly-packages db)]

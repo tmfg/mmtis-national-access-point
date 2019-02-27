@@ -20,7 +20,7 @@
 
 (define-event LoadHashRecalculations []
   {}
-  (comm/get! "transit-changes/hash-recalculations"
+  (comm/get! "transit-changes/hash-calculation/"
              {:on-success (tuck/send-async! ->HashRecalculationsResponse)
               :on-failure (tuck/send-async! ->ServerError)})
   app)
@@ -130,31 +130,9 @@
   (.log js/console "Laskenta valmis" (pr-str response))
   app)
 
-(define-event ForceMonthlyDayHashCalculation []
+(define-event CalculateDayHash [scope future]
   {}
-  (comm/get! "transit-changes/force-monthly-day-hash-calculation/false"
-             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-  app)
-
-(define-event ForceMonthlyFutureDayHashCalculation []
-  {}
-  (comm/get! "transit-changes/force-monthly-day-hash-calculation/true"
-             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-
-  app)
-
-(define-event ForceDayHashCalculation []
-  {}
-  (comm/get! "transit-changes/force-all-day-hash-calculation/false"
-             {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-  app)
-
-(define-event ForceFutureDayHashCalculation []
-  {}
-  (comm/get! "transit-changes/force-all-day-hash-calculation/true"
+  (comm/get! (str "transit-changes/hash-calculation/" scope "/" future)
              {:on-success (tuck/send-async! ->CalculateDateHasheshResponse)
               :on-failure (tuck/send-async! ->ServerError)})
   app)
