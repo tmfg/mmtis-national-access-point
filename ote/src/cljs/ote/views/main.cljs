@@ -119,7 +119,7 @@
                     :front-page [fp/front-page e! app]
                     :own-services [os/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
-                    :transport-operator (if (flags/enabled? :open-ytj-integration) [to-ytj/operator-ytj e! app] [to/operator e! app]) ; TODO: ytj replaces old solution when ready
+                    :transport-operator [to-ytj/operator-ytj e! app]
 
                     ;; Routes for the service form, one for editing an existing one by id
                     ;; and another when creating a new service
