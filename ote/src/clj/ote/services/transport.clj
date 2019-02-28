@@ -24,7 +24,6 @@
             [clojure.string :as str]
             [ote.nap.ckan :as ckan]
             [clojure.set :as set]
-            [ote.util.feature :as feature]
             [ote.time :as time])
   (:import (java.util UUID)))
 
@@ -201,30 +200,6 @@
     (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))
     count))
 
-(defn- create-transport-operator [nap-config db user data]
-  ;; Create new transport operator
-  (log/debug (prn-str "create-transport-operator: data=" data))
-  (tx/with-transaction db
-    (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
-
-          ;; Insert to our database
-          operator  (insert! db ::t-operator/transport-operator
-                             (dissoc data
-                                     ::t-operator/id :new?
-                                     ::t-operator/ckan-description))
-
-          ;; Create organization in CKAN
-          ckan-response (ckan/create-organization!
-                         ckan
-                         {:ckan/name (str "transport-operator-" (::t-operator/id operator))
-                          :ckan/title (::t-operator/name operator)
-                          :ckan/description (or (::t-operator/ckan-description data) "")})]
-      ;; Update CKAN org id
-      (update! db ::t-operator/transport-operator
-               {::t-operator/ckan-group-id (get-in ckan-response [:ckan/result :ckan/id])}
-               {::t-operator/id (::t-operator/id operator)})
-      operator)))
-
 (defn- create-transport-operator-nap
   "Takes `db`, `user` and operator `data`. Creates a new transport-operator and a group (organization) for it.
    Links the transport-operator to group via member table"
@@ -242,36 +217,6 @@
                {::t-operator/ckan-group-id (::t-operator/group-id group)}
                {::t-operator/id (::t-operator/id op)})
       op)))
-
-(defn- update-transport-operator [nap-config db user {id ::t-operator/id :as data}]
-  ;; Edit transport operator
-  (log/debug (prn-str "update-transport-operator: data=" data))
-
-  (authorization/with-transport-operator-check
-    db user id
-    #(tx/with-transaction db
-       (let [ckan (ckan/->CKAN (:api nap-config) (get-in user [:user :apikey]))
-             operator
-             (upsert! db ::t-operator/transport-operator
-                      (dissoc data
-                              ::t-operator/ckan-description))
-
-             operator-ckan-id
-             (::t-operator/ckan-group-id
-              (first
-               (fetch db ::t-operator/transport-operator
-                      #{::t-operator/ckan-group-id}
-                      {::t-operator/id id})))]
-
-         ;; We show only title in ckan side - so no need to update other values
-         (ckan/update-organization!
-          ckan
-          (->  (ckan/get-organization ckan operator-ckan-id)
-               :ckan/result
-               (assoc :ckan/title (::t-operator/name operator)
-                      :ckan/description (or (::t-operator/ckan-description data) ""))))
-         ;; Return operator
-         operator))))
 
 (defn- select-op-keys-to-update [op]
   (select-keys op
@@ -315,12 +260,7 @@
   {:pre [(some? data)]}
   (log/debug (prn-str "save-transport-operator " data))
 
-  (if (feature/feature-enabled? config :open-ytj-integration)
-    (upsert-transport-operator (:nap config) db user data)
-    ((if (:new? data)
-       create-transport-operator
-       update-transport-operator) (:nap config) db user data))
-  )
+  (upsert-transport-operator (:nap config) db user data))
 
 (defn- business-id-exists [db business-id]
   (if (empty? (does-business-id-exists db {:business-id business-id}))
