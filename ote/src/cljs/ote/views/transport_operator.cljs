@@ -1,5 +1,5 @@
-(ns ote.views.transport-operator-ytj
-  "Form to edit transport operator information." ; TODO: this ytj replaces old solution when ready
+(ns ote.views.transport-operator
+  "Form to edit transport operator information."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
@@ -398,7 +398,7 @@
                                                  true)}
                        (tr [:buttons :delete-operator])]]))])})
 
-(defn operator-ytj [e! {operator :transport-operator :as state}]
+(defn operator [e! {operator :transport-operator :as state}]
   (let [show-ytj-id-entry? (empty? (get-in state [:params :id]))
         show-details? (or (not (flags/enabled? :open-ytj-integration))
                           (and (:transport-operator-loaded? state)
