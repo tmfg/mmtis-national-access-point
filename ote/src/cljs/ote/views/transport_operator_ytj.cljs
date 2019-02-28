@@ -19,6 +19,7 @@
             [ote.ui.common :as ui-common]
             [ote.ui.form-fields :as form-fields]
 
+            [ote.app.controller.flags :as flags]
             [ote.app.controller.transport-operator :as to]
             [ote.app.controller.front-page :as fp]
 
@@ -27,7 +28,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.style.base :as style-base]
             [ote.ui.common :as uicommon]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog])
+  )
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -73,10 +75,20 @@
         ytj-response? (:ytj-response state)
         ytj-success? (= 200 status)]
     (form/group
-      {:card? false
-       :layout :row}
+      (merge {:card? false}
+             (when (flags/enabled? :open-ytj-integration)   ;; Sets input and button on same row
+               {:layout :row}))
+
+
+      {:element-id "heading-business-id-title"
+       :name :heading-business-id-title
+       :label (tr [:organization-page :business-id-heading])
+       :type :text-label
+       :full-width? true
+       :h-style :h3}
 
       {:name ::t-operator/business-id
+       :label ""
        :element-id "input-business-id"
        :type :string
        :validate [[:business-id]]
@@ -84,40 +96,43 @@
        :warning (tr [:common-texts :required-field])
        :should-update-check form/always-update
        :disabled? (ytj-loading? state)
-       :style (when (ytj-loading? state) style-base/disabled-control)
+       :style (if (flags/enabled? :open-ytj-integration)
+                (when (ytj-loading? state) style-base/disabled-control)
+                style-fields/form-field)
        :on-change #(e! (to/->EnsureUniqueBusinessId %))}
 
-      ;; Disabled when business-id is taken or if business-id is not valid or if loading is ongoing
-      {:element-id "btn-submit-business-id"
-       :name ::t-operator/btn-submit-business-id
-       :type :external-button
-       :label (tr [:organization-page :fetch-from-ytj])
-       :primary true
-       :secondary true
-       :on-click #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
-       :disabled (or
-                   (empty? (::t-operator/business-id operator))
-                   (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
-                   (:business-id-exists? operator)
-                   (ytj-loading? state))}
+      (when (flags/enabled? :open-ytj-integration)
+        ;; Disabled when business-id is taken or if business-id is not valid or if loading is ongoing
+        {:element-id "btn-submit-business-id"
+         :name ::t-operator/btn-submit-business-id
+         :type :external-button
+         :label (tr [:organization-page :fetch-from-ytj])
+         :primary true
+         :secondary true
+         :on-click #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
+         :disabled (or
+                     (empty? (::t-operator/business-id operator))
+                     (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
+                     (:business-id-exists? operator)
+                     (ytj-loading? state))}
 
-      {:name :loading-spinner-ytj
-       :type :loading-spinner
-       :display? (ytj-loading? state)}
+        {:name :loading-spinner-ytj
+         :type :loading-spinner
+         :display? (ytj-loading? state)}
 
-      (when ytj-response?
-        (if ytj-success?
-          {:name :ytj-result-msg
-           :type :result-msg-success
-           :content (tr [:organization-page :fetch-from-ytj-success])}
-          {:name :ytj-result-msg
-           :type :result-msg-warning
-           :content (if (= 404 status)
-                      (str (tr [:common-texts :data-not-found])
-                           " " (tr [:common-texts :optionally-fill-manually]))
-                      (str (tr [:common-texts :server-error])
-                           " " (tr [:common-texts :server-error-try-later])
-                           " " (tr [:common-texts :optionally-fill-manually])))}))
+        (when ytj-response?
+          (if ytj-success?
+            {:name :ytj-result-msg
+             :type :result-msg-success
+             :content (tr [:organization-page :fetch-from-ytj-success])}
+            {:name :ytj-result-msg
+             :type :result-msg-warning
+             :content (if (= 404 status)
+                        (str (tr [:common-texts :data-not-found])
+                             " " (tr [:common-texts :optionally-fill-manually]))
+                        (str (tr [:common-texts :server-error])
+                             " " (tr [:common-texts :server-error-try-later])
+                             " " (tr [:common-texts :optionally-fill-manually])))})))
 
       ; label composition for existing business-id
       (when (get-in state [:transport-operator :business-id-exists?])
@@ -141,14 +156,15 @@
        :tooltip-length "large"
        :card? false}
 
-      {:name        :heading1-divider
-       :type        :divider}
+      (when (flags/enabled? :open-ytj-integration)
+        {:name        :heading1-divider
+         :type        :divider}
 
-      {:element-id "input-operator-name"
-       :name :heading-business-id
-       :label (str (tr [:organization-page :business-id-heading]) " " (::t-operator/business-id operator))
-       :type :text-label
-       :h-style :h2}
+        {:element-id "input-operator-name"
+         :name :heading-business-id
+         :label (str (tr [:organization-page :business-id-heading]) " " (::t-operator/business-id operator))
+         :type :text-label
+         :h-style :h2})
 
       {:name :heading2
        :label (tr [:organization-page (if ytj-company-names-found?
@@ -359,7 +375,8 @@
                   (when show-actions?
                     [buttons/save {:id "btn-operator-save"
                                    :on-click #(e! (to/->SaveTransportOperator))
-                                   :disabled (form/disable-save? data)}
+                                   :disabled (or (get-in state [:transport-operator :business-id-exists?])
+                                                  (form/disable-save? data))}
                      (tr [:buttons :save])])
 
                   [buttons/cancel {:on-click #(e! (to/->CancelTransportOperator))}
@@ -382,13 +399,14 @@
                        (tr [:buttons :delete-operator])]]))])})
 
 (defn operator-ytj [e! {operator :transport-operator :as state}]
-  (let [show-id-entry? (empty? (get-in state [:params :id]))
-        show-details? (and (:transport-operator-loaded? state)
-                           (some? (:ytj-response state)))
+  (let [show-ytj-id-entry? (empty? (get-in state [:params :id]))
+        show-details? (or (not (flags/enabled? :open-ytj-integration))
+                          (and (:transport-operator-loaded? state)
+                               (some? (:ytj-response state))))
         show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
                                    (pos-int? (count (:ytj-company-names state))))
         form-groups (cond-> []
-                            show-id-entry? (conj (business-id-selection e! state))
+                            show-ytj-id-entry? (conj (business-id-selection e! state))
                             show-details? (conj (operator-form-groups e! state)))]
     [:div
      [:div
