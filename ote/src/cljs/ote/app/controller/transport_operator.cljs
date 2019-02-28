@@ -286,16 +286,12 @@
                             (update-in [:transport-operator :transport-operators-to-save]
                                        (fn [operator-collection]
                                          (keep (fn [o]
-                                                 (if (= response (::t-operator/id o))
-                                                   nil
-                                                   o))
+                                                 (when-not (= response (::t-operator/id o)) o))
                                                operator-collection)))
                             (update :transport-operators-with-services
                                     (fn [operator-collection]
                                       (keep (fn [o]
-                                              (if (= response (get-in o [:transport-operator ::t-operator/id]))
-                                                nil
-                                                o))
+                                              (when-not (= response (get-in o [:transport-operator ::t-operator/id])) o))
                                             operator-collection)))
                             (update :ytj-company-names
                                     (fn [operator-collection]
