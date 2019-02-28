@@ -51,17 +51,17 @@
       :actionsContainerStyle style-dialog/dialog-action-container
       :title (tr [:dialog :delete-transport-operator :title])
       :actions [(r/as-element
-                  [buttons/cancel
-                   {:on-click #(e! toggle-dialog)}
-                   (tr [:buttons :cancel])])
-                (r/as-element
                   [buttons/delete
                    {:id "confirm-operator-delete"
                     :disabled  (if (empty? operator-services)
                                  false
                                  true)
                     :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}
-                   (tr [:buttons :delete])])]}
+                   (tr [:buttons :delete])])
+                (r/as-element
+                  [buttons/cancel
+                   {:on-click #(e! toggle-dialog)}
+                   (tr [:buttons :cancel])])]}
      [:div
       (if (empty? operator-services)
         (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})
