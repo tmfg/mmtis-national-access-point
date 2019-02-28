@@ -73,12 +73,12 @@
        {:box-shadow "inset 0 0 0 1px black,
                      inset 0 0 0 2px transparent"})
      (cond (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
-           (style/date1-highlight-style hash-color colors/gray800)
+           (style/date-highlight-style hash-color colors/gray800)
 
            (= (time/format-date-iso-8601 date1) d)
            (style/date1-highlight-style hash-color)
 
-           (= (and (not (nil? date2)) (time/format-date-iso-8601 date2)) d)
+           (= (and (some? date2) (time/format-date-iso-8601 date2)) d)
            (style/date2-highlight-style hash-color)))))
 
 (defn hover-day [e! date->hash day]
@@ -86,7 +86,7 @@
   (e! (tv/->DaysToFirstDiff (time/format-date day) date->hash)))
 
 (defn select-day [e! day loading?]
-  (when (not loading?)
+  (when-not loading?
     (e! (tv/->SelectDatesForComparison day))))
 
 (defn day-of-week-short [dt]
