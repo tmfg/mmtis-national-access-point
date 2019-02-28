@@ -12,11 +12,6 @@
             [ote.db.common :as common]
             [ote.ui.validation :as validation]))
 
-;; TODO: serialize ytj fetches? What if user back-forwards on UI, would old resp complete and mix up app state?
-
-(if (flags/enabled? :open-ytj-integration) ;;;;;;;;;;;;;;;;;;; TODO: remove condition check when feature is approved
-(do
-
 (defrecord SelectOperator [data])
 (defrecord SelectOperatorForTransit [data])
 (defrecord EditTransportOperator [id])
@@ -42,7 +37,7 @@
   (let [item (first (filter #(= type (:type %)) addresses))]
     {::common/post_office (:city item)
      ::common/postal_code (:postCode item)
-     ::common/street      (:street item)}))
+     ::common/street (:street item)}))
 
 (defn- filter-coll-type [type collection]
   "Returns a filtered a collection of maps based on :type key"
@@ -58,7 +53,7 @@
     (if (and type (empty? result))
       (let [match (:value (filter-coll-type type contacts))]
         (recur remaining (if match (conj result match) result)))
-      (first result))))                                  ;; Return first because expected value is string not vector
+      (first result))))                                     ;; Return first because expected value is string not vector
 
 ;; Keys for saving fields common with all companies sharing the same Y-tunnus/business-id
 (defn- take-common-op-keys [coll] (select-keys coll [::t-operator/business-id
@@ -80,8 +75,8 @@
 
 ;; Takes 'ytj-name' and finds the first from `nap-operators` whose name is a match, or nil.
 (defn- name->nap-operator [ytj-name nap-operators]
-  (let [nap-item (some  #(when (= (get-in % [:transport-operator ::t-operator/name]) ytj-name) %) ;; Return whole item or nil
-                   nap-operators)]
+  (let [nap-item (some #(when (= (get-in % [:transport-operator ::t-operator/name]) ytj-name) %) ;; Return whole item or nil
+                       nap-operators)]
     (:transport-operator nap-item)))
 
 ;; Marks :disabled? those operators, which already have a nap id. Used for filtering UI selection menu.
@@ -98,13 +93,13 @@
                  nap-id (::t-operator/id nap-item)]
              (cond-> ytj-item
                      true (assoc ::t-operator/name (:name ytj-item)) ;; All operators must have name set to allow updating operator and group data if necessary
-                     true (dissoc :name)                        ;; Remove ytj namespace key
+                     true (dissoc :name)                    ;; Remove ytj namespace key
                      (some? nap-id) (merge (take-update-op-keys nap-item)) ;; nap fields user is allowed to edit
                      ;; Remove keys not supported by nap service
                      true (take-operator-api-keys))))
          operators-ytj)))
 
-(defn- update-nap-keys-to-ytj-names[operators-ytj operators-nap]
+(defn- update-nap-keys-to-ytj-names [operators-ytj operators-nap]
   "Function updates nap metadata to existing ytj operator items, previously created by `ytj->nap-companies`.
   Takes `operators-ytj` and if there's a name match to its name in `operators-nap`, copies certain keys to matching operators-ytj item."
   (doall
@@ -112,7 +107,7 @@
            (let [nap-item (name->nap-operator (::t-operator/name ytj-item) operators-nap)
                  nap-id (::t-operator/id nap-item)]
              (cond-> ytj-item
-                     true (dissoc ::t-operator/id) ;; Nap id removed just in case there's no more NAP operator match
+                     true (dissoc ::t-operator/id)          ;; Nap id removed just in case there's no more NAP operator match
                      (some? nap-id) (merge (take-update-op-keys nap-item)))))
          operators-ytj)))
 
@@ -232,8 +227,8 @@
             ;; Set data source for company selection list
             true (assoc-in [:transport-operator :ytj-orphan-nap-operators]
                            (sort-by #(get-in % [:transport-operator ::t-operator/name]) (compose-orphan-nap-operators (get-in app [:transport-operator ::t-operator/business-id])
-                                                               ytj-company-names
-                                                               (:transport-operators-with-services app))))
+                                                                                                                      ytj-company-names
+                                                                                                                      (:transport-operators-with-services app))))
             true (assoc :ytj-company-names ytj-company-names)
             true (assoc-in [:transport-operator :transport-operators-to-save] (ytj-ops-already-in-nap ytj-company-names)))))
 
@@ -285,49 +280,49 @@
               (not show?))
 
 (define-event DeleteTransportOperatorResponse [response]
-  {}
-  (let [app (-> app
-                ;; Remove deleted operator from app-state (:transport-operators-to-save :transport-operators-with-services and :ytj-company-names)
-                (update-in [:transport-operator :transport-operators-to-save]
-                           (fn [operator-collection]
-                             (keep (fn [o]
-                                     (if (= response (::t-operator/id o))
-                                       nil
-                                       o))
-                                   operator-collection)))
-                (update :transport-operators-with-services
-                        (fn [operator-collection]
-                          (keep (fn [o]
-                                  (if (= response (get-in o [:transport-operator ::t-operator/id]))
-                                    nil
-                                    o))
-                                operator-collection)))
-                (update :ytj-company-names
-                        (fn [operator-collection]
-                          (map (fn [o]
-                                 (if (= response (::t-operator/id o))
-                                   (dissoc o ::t-operator/id ::t-operator/ckan-group-id ::t-operator/ckan-description)
-                                   o))
-                               operator-collection)))
-                (assoc-in [:transport-operator :show-delete-dialog?] false)
-                (assoc :flash-message (tr [:common-texts :delete-operator-success])
-                       :services-changed? true))]
+              {}
+              (let [app (-> app
+                            ;; Remove deleted operator from app-state (:transport-operators-to-save :transport-operators-with-services and :ytj-company-names)
+                            (update-in [:transport-operator :transport-operators-to-save]
+                                       (fn [operator-collection]
+                                         (keep (fn [o]
+                                                 (if (= response (::t-operator/id o))
+                                                   nil
+                                                   o))
+                                               operator-collection)))
+                            (update :transport-operators-with-services
+                                    (fn [operator-collection]
+                                      (keep (fn [o]
+                                              (if (= response (get-in o [:transport-operator ::t-operator/id]))
+                                                nil
+                                                o))
+                                            operator-collection)))
+                            (update :ytj-company-names
+                                    (fn [operator-collection]
+                                      (map (fn [o]
+                                             (if (= response (::t-operator/id o))
+                                               (dissoc o ::t-operator/id ::t-operator/ckan-group-id ::t-operator/ckan-description)
+                                               o))
+                                           operator-collection)))
+                            (assoc-in [:transport-operator :show-delete-dialog?] false)
+                            (assoc :flash-message (tr [:common-texts :delete-operator-success])
+                                   :services-changed? true))]
 
-    ;; Leave page if company wasn't found from ytj or if it was the last company in :transport-operators-to-save
-    (when (or
-            (empty? (get app :ytj-company-names))
-            (empty? (get-in app [:transport-operator :transport-operators-to-save])))
-      (routes/navigate! :own-services))
-    app))
+                ;; Leave page if company wasn't found from ytj or if it was the last company in :transport-operators-to-save
+                (when (or
+                        (empty? (get app :ytj-company-names))
+                        (empty? (get-in app [:transport-operator :transport-operators-to-save])))
+                  (routes/navigate! :own-services))
+                app))
 
 (define-event DeleteTransportOperator [id]
               {}
-              (comm/post! "transport-operator/delete"  {:id id}
+              (comm/post! "transport-operator/delete" {:id id}
                           {:on-success (send-async! ->DeleteTransportOperatorResponse)
                            :on-failure (send-async! ->ServerError)})
               app)
 
-(defn transport-operator-by-ckan-group-id[id]
+(defn transport-operator-by-ckan-group-id [id]
   (comm/get! (str "transport-operator/" id) {:on-success (send-async! ->TransportOperatorResponse)}))
 
 (defn- refresh-transport-operator [app]
@@ -346,10 +341,10 @@
   CreateTransportOperator
   (process-event [_ app]
     (let [res (-> app
-                    (strip-ytj-metadata)
-                    (assoc
-                      :transport-operator {:new? true}
-                      :services-changed? true))]
+                  (strip-ytj-metadata)
+                  (assoc
+                    :transport-operator {:new? true}
+                    :services-changed? true))]
       (routes/navigate! :transport-operator)
       res))
 
@@ -386,16 +381,18 @@
         (assoc app :transport-operator-loaded? false))
       (assoc app :transport-operator-loaded? true)))
 
-  EditTransportOperatorResponse                             ;; todo: pois
+  EditTransportOperatorResponse
   (process-event [{response :response} app]
     (let [state (assoc app :transport-operator response
-                           :transport-operator-loaded? true)
+                           :transport-operator-loaded? true
+                           :ytj-response {})
           nap-business-id (get-in state [:transport-operator ::t-operator/business-id])
           op-ytj-cache-miss? (or (empty? (:ytj-company-names state)) (not= nap-business-id (get-in state [:ytj-response :businessId])))]
-
-      (if op-ytj-cache-miss?
-        (send-fetch-ytj state nap-business-id)
-        (process-ytj-data state (:ytj-response state)))))
+      (if (flags/enabled? :open-ytj-integration)
+        (if op-ytj-cache-miss?
+          (send-fetch-ytj state nap-business-id)
+          (process-ytj-data state (:ytj-response state)))
+        state)))
 
   EditTransportOperatorState
   (process-event [{data :data} app]
@@ -531,148 +528,3 @@
     (->EditTransportOperator (:id id))
     (->VerifyCreateState)
     ))
-
-)
-(do  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TODO: remove this no-YTJ branch when feature is approved
-
-(define-event ToggleTransportOperatorDeleteDialog []
-  {:path [:transport-operator :show-delete-dialog?]
-   :app show?}
-  (not show?))
-
-(define-event DeleteTransportOperatorResponse [response]
-  {}
-  (routes/navigate! :own-services)
-  (-> app
-    (assoc-in [:transport-operator :show-delete-dialog?] false)
-    (assoc :flash-message (tr [:common-texts :delete-operator-success])
-           :services-changed? true)))
-
-(define-event DeleteTransportOperator [id]
-  {}
-  (comm/post! "transport-operator/delete"  {:id id}
-            {:on-success (send-async! ->DeleteTransportOperatorResponse)
-             :on-failure (send-async! ->ServerError)})
-  app)
-
-
-;; Keys for saving fields common with all companies sharing the same Y-tunnus/business-id
-(defn- take-common-op-keys [coll] (select-keys coll [::t-operator/business-id
-                                                     ::t-operator/billing-address
-                                                     ::t-operator/visiting-address
-                                                     ::t-operator/phone
-                                                     ::t-operator/gsm
-                                                     ::t-operator/email
-                                                     ::t-operator/homepage]))
-
-;; Keys unique to operator when creating a company
-(defn- take-new-op-keys [coll] (select-keys coll [::t-operator/name]))
-
-; Keys unique to an operator when editing existing company. Extra to `take-common-op-keys`
-(defn- take-update-op-keys [coll] (select-keys coll [::t-operator/id ::t-operator/ckan-description ::t-operator/ckan-group-id]))
-
-;; Take keys supported by backend transport-operator API
-(defn take-operator-api-keys [op] (merge (take-new-op-keys op) (take-update-op-keys op) (take-common-op-keys op)))
-
-
-(defrecord SelectOperator [data])
-(defrecord SelectOperatorForTransit [data])
-(defrecord EditTransportOperator [id])
-(defrecord EditTransportOperatorResponse [response])
-(defrecord EditTransportOperatorState [data])
-(defrecord SaveTransportOperator [])
-(defrecord SaveTransportOperatorResponse [data])
-(defrecord FailedTransportOperatorResponse [response])
-
-(defrecord TransportOperatorResponse [response])
-(defrecord CreateTransportOperator [])
-
-
-(defn transport-operator-by-ckan-group-id[id]
-  (comm/get! (str "transport-operator/" id) {:on-success (send-async! ->TransportOperatorResponse)}))
-
-(extend-protocol Event
-
-  CreateTransportOperator
-  (process-event [_ app]
-    (routes/navigate! :transport-operator)
-    (assoc app
-           :transport-operator {:new? true}
-           :services-changed? true))
-
-  SelectOperator
-  (process-event [{data :data} app]
-    (let [id (get data ::t-operator/id)
-          service-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
-                                     %)
-                                  (:transport-operators-with-services app))
-          route-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
-                                     %)
-                                  (:route-list app))]
-      (assoc app
-        :transport-operator (:transport-operator service-operator)
-        :transport-service-vector (:transport-service-vector service-operator)
-        :routes-vector (:routes route-operator))))
-
-  SelectOperatorForTransit
-  (process-event [{data :data} app]
-    (let [id (get data ::t-operator/id)
-          selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
-                                     %)
-                                  (:route-list app))]
-      (assoc app
-        :transport-operator (:transport-operator selected-operator)
-        :routes-vector (:routes selected-operator))))
-
-  EditTransportOperator
-  (process-event [{id :id} app]
-    (comm/get! (str "t-operator/" id)
-               {:on-success (send-async! ->EditTransportOperatorResponse)})
-    (assoc app :transport-operator-loaded? false))
-
-  EditTransportOperatorResponse
-  (process-event [{response :response} app]
-       (assoc app
-              :transport-operator-loaded? true
-              :transport-operator response))
-
-  EditTransportOperatorState
-  (process-event [{data :data} app]
-    (update app :transport-operator merge data))
-
-  SaveTransportOperator
-  (process-event [_ app]
-    (let [operator-data (-> app
-                            :transport-operator
-                            form/without-form-metadata
-                            ;; Fix saving when no :open-ytj-integration.
-                            ;; Dissoc here because this branch will go away and form doesn't need t-operator scope dependency.
-                            (dissoc ::t-operator/associated-services ::t-operator/own-associations))]
-      (comm/post! "transport-operator" operator-data {:on-success (send-async! ->SaveTransportOperatorResponse)
-                                                      :on-failure (send-async! ->FailedTransportOperatorResponse)})
-      app))
-
-  FailedTransportOperatorResponse
-  (process-event [{response :response} app]
-    (assoc app :flash-message-error (tr [:common-texts :save-failed])))
-
-  SaveTransportOperatorResponse
-  (process-event [{data :data} app]
-    (routes/navigate! :own-services)
-    (assoc app
-           :flash-message (tr [:common-texts :transport-operator-saved ])
-           :transport-operator data
-           :transport-operators-with-services (map (fn [{:keys [transport-operator] :as operator-with-services}]
-                                                     (if (= (::t-operator/id data)
-                                                            (::t-operator/id transport-operator))
-                                                       (assoc operator-with-services
-                                                              :transport-operator data)
-                                                       operator-with-services))
-                                                   (:transport-operators-with-services app))
-           :services-changed? true))
-
-  TransportOperatorResponse
-  (process-event [{response :response} app]
-    (assoc app
-      :transport-operator (assoc response
-                            :loading? false))))))
