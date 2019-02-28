@@ -55,8 +55,7 @@
     ["/authority-pre-notices/:id" :authority-pre-notices]
 
     ["/admin" :admin]
-    ["/admin/detected-changes" :admin-detected-changes]
-    ["/admin/detected-changes/detect-changes" :admin-detect-changes]
+    ["/admin/detected-changes/detect-changes" :admin-detected-changes]
     ["/admin/detected-changes/route-id" :admin-route-id]
     ["/admin/detected-changes/upload" :admin-upload-gtfs]
     ["/admin/detected-changes/commercial" :admin-commercial-services]

@@ -81,10 +81,10 @@
     (cap-number no-traffic-routes)]])
 
 
-(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions show-all]}]
+(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions show-errors show-contract-traffic]}]
   [:div {:style {:padding-top "10px"}}
    [:h3 "Rajaa taulukkoa"]
-   [:div.col-md-6
+   [:div.col-md-4
    [form-fields/field {:label "Maakunta"
                        :type :chip-input
                        :list-style {:max-height "400px" :overflow "auto"}
@@ -99,11 +99,16 @@
                        :show-option-short ::places/numero
                        :update! #(e! (tc/->SetRegionFilter %))}
     selected-finnish-regions]]
-   [:div.col-md-6 {:style {:margin-top "10px"}}
+   [:div.col-md-4 {:style {:margin-top "10px"}}
     [form-fields/field {:label "Näytä palvelut, joiden rajapinta on virheellinen tai rajapinta puuttuu"
                         :type :checkbox
                         :update! #(e! (tc/->ToggleShowAllChanges))}
-     show-all]]])
+     show-errors]]
+   [:div.col-md-4 {:style {:margin-top "10px"}}
+    [form-fields/field {:label "Näytä sopimusliikenne"
+                        :type :checkbox
+                        :update! #(e! (tc/->ToggleShowContractTraffic))}
+     show-contract-traffic]]])
 
 (defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week] :as row}]
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
@@ -158,9 +163,15 @@
     "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
    [transit-change-filters e! transit-changes]])
 
-(defn detected-transit-changes [e! {:keys [loading? changes changes-all selected-finnish-regions show-all]
+(defn detected-transit-changes [e! {:keys [loading? changes changes-contains-errors changes-contract-traffic selected-finnish-regions show-errors show-contract-traffic]
                                     :as transit-changes}]
-  (let [change-list (if show-all changes-all changes)]
+  (let [change-list (if show-errors
+                      (concat changes-contains-errors changes)
+                      changes)
+        change-list (if show-contract-traffic
+                      (concat changes-contract-traffic change-list)
+                      change-list)
+        change-list (sort-by :different-week-date > change-list)]
   [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?

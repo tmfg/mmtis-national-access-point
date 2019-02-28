@@ -106,37 +106,50 @@
   (GET "/transit-changes/current" []
        (#'list-current-changes db))
 
+  (GET "/transit-changes/hash-calculation/" {user :user :as request}
+       (when (authorization/admin? user)
+         (http/transit-response (detection/hash-recalculations db))))
+
+  ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
+  (GET "/transit-changes/hash-calculation/:scope/:future" [scope future :as {user :user}]
+    (when (authorization/admin? user)
+      (http/transit-response
+        {:status 200
+         :body (cond
+                     (= scope "month")
+                     (detection/calculate-monthly-date-hashes-for-packages
+                       db (:user user) (= "true" future))
+                     (= scope "day")
+                     (detection/calculate-date-hashes-for-all-packages
+                       db (:user user) (= "true" future))
+                     (= scope "contract")
+                     (detection/calculate-date-hashes-for-contract-traffic
+                       db (:user user) (= "true" future)))})))
+
+  ;; Calculate date-hashes for given service-id and package-count
   (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
     (when (authorization/admin? user)
-      (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count))
+      (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count) (:user user))
       "OK"))
 
+  ;; Calculate route-hash-id for given service-id and package-count
   (GET "/transit-changes/force-calculate-route-hash-id/:service-id/:package-count/:type" [service-id package-count type :as {user :user}]
     (when (authorization/admin? user)
         (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
         "OK"))
 
-  (GET "/transit-changes/force-monthly-day-hash-calculation" {user :user}
-    (when (authorization/admin? user)
-      (http/transit-response
-        {:status 200
-         :body (detection/calculate-monthly-date-hashes-for-packages db)})))
-
-  (GET "/transit-changes/force-all-day-hash-calculation" {user :user}
-    (when (authorization/admin? user)
-      (http/transit-response
-        {:status 200
-         :body (detection/calculate-date-hashes-for-all-packages db)})))
-
+  ;; Load services and their route-hash-id-type
   (GET "/transit-changes/load-services-with-route-hash-id" req
     (when (authorization/admin? (:user req))
       (http/transit-response (services-with-route-hash-id db))))
 
+  ;; Force detection change for all services
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
           (gtfs-tasks/detect-new-changes-task db (time/now) true)
           "OK"))
 
+  ;; Force detection change for all services for given date
   (POST "/transit-changes/force-detect-date/:date"
         {{:keys [date]} :params
          user           :user

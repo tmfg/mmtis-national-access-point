@@ -243,7 +243,7 @@
         selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
     [:div
      [:div {:style {:position "absolute" :top "80px" :right "20px"}}
-      [linkify "/#/admin/detected-changes" [:span [ic/action-settings] "Asetukset"]]]
+      [linkify "/#/admin/detected-changes/detect-changes" [:span [ic/action-settings] "Asetukset"]]]
      [page/page-controls "" "Ylläpitopaneeli"
       [:div {:style {:padding-bottom "20px"}}
        [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))

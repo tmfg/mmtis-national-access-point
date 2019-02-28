@@ -132,11 +132,10 @@
                     :service [service-search/service-geojson e! (:service-search app)]
 
                     :admin [admin/admin-panel e! app]
-                    :admin-detected-changes [admin-detected-changes/configure-detected-changes e! app]
-                    :admin-detect-changes [admin-detected-changes/configure-detected-changes e! app]
-                    :admin-route-id [admin-detected-changes/configure-detected-changes e! app]
-                    :admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! app]
-                    :admin-commercial-services [admin-detected-changes/configure-detected-changes e! app]
+                    :admin-detected-changes [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-detected-changes")]
+                    :admin-route-id [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-route-id")]
+                    :admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-upload-gtfs")]
+                    :admin-commercial-services [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-commercial-services")]
 
                     :email-settings [email-settings/email-notification-settings e! app]
 
