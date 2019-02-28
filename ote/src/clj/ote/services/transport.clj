@@ -56,13 +56,12 @@
 (defn authenticated-get-operator-with-id [db user transport-operator-id]
   (authorization/with-transport-operator-check
     db user transport-operator-id
-    #(do
-       (let [ckan-group-id (first (fetch db ::t-operator/transport-operator
-                     #{::t-operator/ckan-group-id}
-                     {::t-operator/id transport-operator-id}
-                     {::specql/limit 1}))]
-         (when ckan-group-id
-           (get-transport-operator db ckan-group-id))))))
+    #(let [ckan-group-id (first (fetch db ::t-operator/transport-operator
+                                       #{::t-operator/ckan-group-id}
+                                       {::t-operator/id transport-operator-id}
+                                       {::specql/limit 1}))]
+       (when ckan-group-id
+         (get-transport-operator db ckan-group-id)))))
 
 (def transport-services-column-keys
   {:id ::t-service/id
@@ -389,9 +388,7 @@
                                 (::t-service/published (first (specql/fetch db ::t-service/transport-service
                                                                             #{::t-service/published}
                                                                             {::t-service/id service-id}))))
-        publish-date (if existing-publish-date
-                       existing-publish-date
-                       (java.util.Date.))
+        publish-date (or existing-publish-date (java.util.Date.))
         data (cond-> data
                      publish? (assoc ::t-service/published publish-date)
                      true (dissoc ::t-service/published?))]
