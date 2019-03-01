@@ -2,7 +2,8 @@
   (:require [ote.transit-changes.detection :as detection]
             [clojure.test :as t :refer [deftest testing is]]
             [clojure.spec.test.alpha :as spec-test]
-            [ote.transit-changes :as transit-changes]))
+            [ote.transit-changes :as transit-changes]
+            [ote.time :as time]))
 
 (defn d [year month day]
   (java.time.LocalDate/of year month day))
@@ -193,6 +194,17 @@
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}))
 
+(def data-two-week-change
+  (weeks (d 2019 2 4)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
 (deftest more-than-one-change-found
   (spec-test/instrument `detection/first-week-difference)
 
@@ -204,7 +216,9 @@
                              :different-week
                              :beginning-of-week))))
   
-  (let [diff-pairs (detection/week-difference-pairs test-more-than-one-change)]
+  (let [diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
+        old-diff-pairs (-> test-more-than-one-change
+                           detection/first-week-difference)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
@@ -215,9 +229,22 @@
                             :beginning-of-week))))
 
     (testing "second change is detected"
-      (is (= (d 2019 2 25) (-> diff-pairs
-                               second
-                               (get route-name)
-                               :different-week
-                               :beginning-of-week))))))
+      (is (= old-diff-pairs diff-pairs)))))
 
+(deftest no-change-found
+  (spec-test/instrument `detection/first-week-difference)
+
+  (let [diff-pairs (detection/routes-changed-weeks data-two-week-change)]
+    (testing "got no changes"
+      (is (= 0 (count diff-pairs))))))
+
+
+
+(deftest test-during-development
+  (let [db (:db ote.main/ote)
+        route-query-params {:service-id 2 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.06.2019")}
+        new-diff (detection/detect-route-changes-for-service-new db route-query-params)
+        old-diff (detection/detect-route-changes-for-service db route-query-params)]
+    (println (:start-date route-query-params))
+    (testing "differences between new and old"
+      (is (= old-diff new-diff)))))

@@ -7,7 +7,7 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [clojure.spec.alpha :as spec]
-            ;; [spec-provider.provider :as provider]
+    ;; [spec-provider.provider :as provider]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
             [ote.db.tx :as tx])
@@ -25,9 +25,9 @@
                                            #{:gtfs/id}
                                            {:gtfs/transport-service-id service-id
                                             :gtfs/deleted? false}
-                                           {:specql.core/order-by        :gtfs/id
+                                           {:specql.core/order-by :gtfs/id
                                             :specql.core/order-direction :desc
-                                            :specql.core/limit           package-count}))
+                                            :specql.core/limit package-count}))
         id-vector (vec (sort < id-map))]
     id-vector))
 
@@ -82,14 +82,14 @@
   (for [hashes-for-date (partition-by :date date-route-hashes)
         :let [date (:date (first hashes-for-date))
               route-hashes (into (zipmap all-routes (repeat nil))
-                                   (map (juxt :route-hash-id :hash))
-                                   hashes-for-date)
+                                 (map (juxt :route-hash-id :hash))
+                                 hashes-for-date)
               cleaned-route-hashes (dissoc route-hashes
                                            ;; If there is no traffic for the service on a given date, the
                                            ;; result set will contain a single row with nil values for route.
                                            ;; Remove the empty-route-key so we don't get an extra route.
                                            "" nil)]]
-    {:date   (.toLocalDate date)
+    {:date (.toLocalDate date)
      :routes cleaned-route-hashes}))
 
 (defn merge-week-hash
@@ -140,7 +140,7 @@
            ;; ...and traffic does not revert back to previous in two weeks
            (vnot (week= starting-week-hash next2) "curr = next2 (3)"))
       ;; this is a change
-        (do 
+        (do
           (println "yes change")
           (assoc state :different-week-hash curr))
 
@@ -238,54 +238,9 @@
                      (add-different-week curr))]
       result)))
 
-(spec/def
- ::routes
- (spec/map-of
-  (spec/coll-of string?)
-  (spec/coll-of (spec/or :keyword keyword? :string string?))))
-(spec/def ::local-date #(instance? java.time.LocalDate %))
-(spec/def ::end-of-week ::local-date)
-(spec/def ::beginning-of-week ::local-date)
-
-(spec/def
- ::route-week
- (spec/keys :req-un [::beginning-of-week ::end-of-week ::routes]))
-(spec/def
- ::route-weeks-vec
-  (spec/coll-of ::route-week))
-
-(spec/def ::bow-eow-map (spec/keys :req-un [::beginning-of-week ::end-of-week]))
-(spec/def
-  ::different-week
-  ::bow-eow-map)
-(spec/def
- ::week-hash-vec
-  (spec/coll-of (spec/or :keyword keyword? :string string?)))
-(spec/def
- ::different-week-hash
-  ::week-hash-vec)
-(spec/def
- ::starting-week
- ::bow-eow-map)
-(spec/def ::starting-week-hash ::week-hash-vec)
-
-(spec/def ::route-change-map
-  (spec/keys
-    :req-un
-    [::different-week
-     ::different-week-hash
-     ::starting-week
-     ::starting-week-hash]))
-
-(spec/def ::route-key (spec/every string? :count 3))
-
-(spec/def
-  ::single-route-change
-  (spec/coll-of (spec/tuple ::route-key ::route-change-map) :kind map?))
-
-(spec/fdef first-week-difference
-  :args (spec/cat :rw ::route-weeks-vec)
-  :ret ::single-route-change)
+#_(spec/fdef first-week-difference
+           :args (spec/cat :rw ::route-weeks-vec)
+           :ret ::single-route-change)
 
 (defn first-week-difference
   "Detect the next different week in each route. Takes a list of weeks that have week hashes for each route.
@@ -294,29 +249,25 @@
   [route-weeks]
   ;; (println "spec for route-weeks:")
   ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
-  (println "first-week-difference: got route-weeks")
-  (clojure.pprint/pprint route-weeks)
   ;; Take routes from the first week (they are the same in all weeks)
   (let [route-names (into #{}
                           (map first)
                           (:routes (first route-weeks)))
         result (reduce
-                (fn [route-detection-state [_ curr _ _ :as weeks]]
-                  (reduce
-                   (fn [route-detection-state route]
-                     ;; value under route key in r-d-s map will be updated by
-                     ;; (route-next-different-week *value* route weeks curr)
-                     (update route-detection-state route
-                             route-next-different-week route weeks curr))
-                   route-detection-state route-names))
-                {}                                                    ; initial route detection state is empty
-                (partition 4 1 route-weeks))]
+                 (fn [route-detection-state [_ curr _ _ :as weeks]]
+                   (reduce
+                     (fn [route-detection-state route]
+                       ;; value under route key in r-d-s map will be updated by
+                       ;; (route-next-different-week *value* route weeks curr)
+                       (update route-detection-state route
+                               route-next-different-week route weeks curr))
+                     route-detection-state route-names))
+                 {}                                         ; initial route detection state is empty
+                 (partition 4 1 route-weeks))]
     ;; (println "first-week-difference result: " (pr-str result))
     ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
     result))
 
-(spec/fdef week-difference-pairs
-  :args (spec/cat :rw ::route-weeks-vec))
 
 (defn local-date-before? [d1 d2]
   (.isBefore d1 d2))
@@ -335,60 +286,58 @@
                  :when (pred v)]
              [k v])))
 
-(defn week-difference-pairs [route-weeks]
-  ;; should loop and start where previous iter end
-  ;; 1. start at first-week-difference call
-  ;; 2. munge route-weeks data so that another call to first-week-difference
-  ;;    will start at different-week
-  ;;    - concretely: filter out weeks that are past start date
 
-  ;; q; maybe this is the wrong approcah. we shouldn't be filtering stuff that we get out from
-  ;; first-week-difference. instead, we should be restarting the date based forward search?
-  ;; but the date-based forward search is based on implicit data in this context....
-  ;; so the route-weeks map that we get here, does it actually contain all weeks?
-  ;; a: -> nope, this is the place, because we do get every week here and it makes sense to
-  ;; filter them etc. this is just a funny representation.
-  ;; q2: maybe change to different data repr then? instead of the weird map
-  ;; a: good idea, if adding yet another repr is sane.
-  ;; the top level map keys are basically useless, can just use the vals and at the end
-  ;; reconstitute by sorting into route-keys based on :routes data.
-  ;;
-  ;; non-redundant data repr would be just the vals? 
-
-
-  ;; q: what should we be looping over?
-  ;; a: nothing, just regenerate route-weeks with earlier days filtered out
-  ;; q: how?
-  ;; a: filter route-weeks, past current date  
-  
+(defn route-differences
+  [route-weeks]
   (loop [route-weeks route-weeks
          results []]
-    (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
-    (println "route-weeks" (pr-str route-weeks))
+    ;; (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
+    ;; (println "route-weeks" (pr-str route-weeks))
     ;; (println "top of loop: results is")
     ;; (clojure.pprint/pprint results)
+    (println "results: " (pr-str results))
+    (println "route-weeks: " (pr-str route-weeks))
     (let [diff-data (first-week-difference route-weeks)
           diff-week-beginnings (mapv (comp :beginning-of-week :different-week) (vals diff-data))
           diff-week-date (first diff-week-beginnings)]
-      (def *rw route-weeks)
-      ;; catch unhandled case, are there going to be different dates in the routes?      
-      (assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))    
-      ;; first-week-difference return shape is {id-vec1 change-map1, ...., id-vecN change-mapN}}    
-      ;; itreation-route-weeks is a vec of maps like
-      ;; {:beginning-of-week dd :end-of-week dd :routes {route-id days]]
-      ;; (println "first-week-difference was:")
-      ;; (clojure.pprint/pprint diff-data)
-      ;; in the test, we are only getting a length-one diff-data back.
-      ;; -> because it's finding only one change. we shouldn't be filtering its return values of course.
-      ;; -> we should be filtering the itreation-route-weeks here instead
-      ;; (println "date filtering:" (count diff-data) "->" (count (filter-by-vals #(route-starting-week-past-date? % diff-week-date) diff-data)))
-      (println "beginnings" diff-week-beginnings)
-      (if (some? diff-week-date) ;; end condition: dates returned by f-w-d had nil different-week beginning
-        (recur ;; (filter-by-vals #(route-starting-week-past-date? % diff-week-date) route-weeks)
-               (filter #(route-starting-week-past-date? % diff-week-date) route-weeks)
-               (conj results diff-data))
-        ;; else
+      (println "diff-data: " (pr-str diff-data))
+      ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
+      (if (and (some? diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
+        (recur                                        ;; (filter-by-vals #(route-starting-week-past-date? % diff-week-date) route-weeks)
+          (filter #(route-starting-week-past-date? % (.minusDays diff-week-date 1)) route-weeks)
+          (conj results diff-data))
         results))))
+
+(defn combine-differences-with-routes
+  #_[{:route-hash-id "Testington - Terstersby"
+    :different-week {}
+    :different-week-hash ["h1"]
+    :starting-week {}
+    :starting-week-hash ["h1"]}
+   {:route-hash-id "Testington2 - Terstersby2"
+    :different-week {}
+    :different-week-hash ["h1"]
+    :starting-week {}
+    :starting-week-hash ["h1"]}]
+  [route-weeks differences]
+  (let [changed-route-weeks
+        (loop [route-weeks route-weeks
+               result []]
+          (let [first-week (first route-weeks)
+                routes (:routes first-week)]
+            (println "======================================================")
+            (println "route-weeks: " route-weeks)
+            (println "======================================================")
+            (println "differences: " differences))
+          (if (empty? route-weeks)
+            result
+            (recur (rest route-weeks) result)))]))
+
+(defn routes-changed-weeks [route-weeks]
+  (let [differences (route-differences route-weeks)
+        combined-routes (combine-differences-with-routes route-weeks differences)]
+    differences))
+
 
 (defn route-trips-for-date [db service-id route-hash-id date]
   (vec
@@ -501,7 +450,7 @@
            starting-week different-week no-traffic-run
            changes]}]
 
-  (let [route-map  (map #(second %) all-routes)
+  (let [route-map (map #(second %) all-routes)
         route (first (filter #(= route-key (:route-hash-id %)) route-map))
         added? (min-date-in-the-future? route)
         removed? (max-date-within-90-days? route)
@@ -685,6 +634,43 @@
                          (add-route-hash-id-as-a-map-key service-routes type)
                          service-routes)]
     (sort-by :route-hash-id (map-by :route-hash-id service-routes))))
+
+(defn changed-day-from-changed-week
+  [db service-id route-list-with-changed-weeks]
+  (println "route-list-with-changed-weeks: " route-list-with-changed-weeks)
+  (mapv #(route-day-changes db service-id %) route-list-with-changed-weeks))
+
+
+
+(defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
+  "Returns map for each service"
+  (println "route-query-params: " (pr-str route-query-params))
+  (let [type (db-route-detection-type db service-id)
+        ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
+        service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
+        all-routes (map-by-route-key service-routes type)
+        all-route-keys (set (keys all-routes))
+        ;; Get route hashes from database
+        route-hashes (service-route-hashes-for-date-range db route-query-params)
+        ;; Change hashes that are at static holiday to a keyword
+        route-hashes-with-holidays (override-static-holidays route-hashes)
+        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)]
+    (try
+      (let [test {:all-routes all-routes
+                  :route-changes
+                  (->> routes-by-date                       ;; Format of routes-by-date is: [{:date routes(=hashes)}]
+                       ;; Create week hashes so we can find out the differences between weeks
+                       (combine-weeks)
+                       ;; Search next week (for every route) that is different
+                       (routes-changed-weeks))}]
+        (println "Halojata halloo: " (pr-str test))
+
+        ;route-changes keyu here is allways empty for some reason
+        ;in old code route-changes contains {route-key {detection-result} } <- multiple pairs
+        test)
+      (catch Exception e
+        (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
+
 
 (defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
   (let [type (db-route-detection-type db service-id)
