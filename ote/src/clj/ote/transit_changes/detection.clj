@@ -295,17 +295,24 @@
     ;; (println "route-weeks" (pr-str route-weeks))
     ;; (println "top of loop: results is")
     ;; (clojure.pprint/pprint results)
-    (println "results: " (pr-str results))
-    (println "route-weeks: " (pr-str route-weeks))
     (let [diff-data (first-week-difference route-weeks)
-          diff-week-beginnings (mapv (comp :beginning-of-week :different-week) (vals diff-data))
-          diff-week-date (first diff-week-beginnings)]
+          filtered-diff-data (filter (fn [[_ value]]
+                                       (when (not (nil? (:different-week value)))
+                                         true))
+                                     diff-data)
+          test (println "in let of: " filtered-diff-data)
+          diff-week-beginnings (mapv (comp :beginning-of-week :different-week) (vals filtered-diff-data))
+          ;diff-week-date (first diff-week-beginnings)
+          diff-week-date (some #(when-not (nil? %) %) diff-week-beginnings)]
       (println "diff-data: " (pr-str diff-data))
+      (println "filtered-diff-data: " (pr-str filtered-diff-data))
+      (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
+      (println "diff-week-date: " (pr-str diff-week-date))
       ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
       (if (and (some? diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur                                        ;; (filter-by-vals #(route-starting-week-past-date? % diff-week-date) route-weeks)
           (filter #(route-starting-week-past-date? % (.minusDays diff-week-date 1)) route-weeks)
-          (conj results diff-data))
+          (conj results filtered-diff-data))
         results))))
 
 (defn combine-differences-with-routes
@@ -324,11 +331,7 @@
         (loop [route-weeks route-weeks
                result []]
           (let [first-week (first route-weeks)
-                routes (:routes first-week)]
-            (println "======================================================")
-            (println "route-weeks: " route-weeks)
-            (println "======================================================")
-            (println "differences: " differences))
+                routes (:routes first-week)])
           (if (empty? route-weeks)
             result
             (recur (rest route-weeks) result)))]))
@@ -336,6 +339,7 @@
 (defn routes-changed-weeks [route-weeks]
   (let [differences (route-differences route-weeks)
         combined-routes (combine-differences-with-routes route-weeks differences)]
+    (println "Differences in routes-changed-weeks: " differences)
     differences))
 
 
@@ -662,7 +666,10 @@
                        ;; Create week hashes so we can find out the differences between weeks
                        (combine-weeks)
                        ;; Search next week (for every route) that is different
-                       (routes-changed-weeks))}]
+                       (routes-changed-weeks)
+                       ;; Fetch detailed route comparison if a change was found
+                       (route-day-changes db service-id)    ;;remove this from here and the old function to run comparing tests
+                       )}]
         (println "Halojata halloo: " (pr-str test))
 
         ;route-changes keyu here is allways empty for some reason
@@ -692,7 +699,8 @@
             ;; Search next week (for every route) that is different
             (first-week-difference)
             ;; Fetch detailed route comparison if a change was found
-            (route-day-changes db service-id))}
+            (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
+            )}
       (catch Exception e
         (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 

@@ -8,8 +8,8 @@
 (defn d [year month day]
   (java.time.LocalDate/of year month day))
 
-(def route-name ["TST" "Testington - Terstersby" "Testersby"])
-(def route-name-2 ["KEK" "Keskington - Kerskersby" "Keskersby"])
+(def route-name "Testington - Terstersby")
+(def route-name-2 "Keskington - Kerskersby")
 
 (defn weeks
   "Give first day of week (monday) as a starting-from."
@@ -18,7 +18,8 @@
         (fn [i routes]
           {:beginning-of-week (.plusDays starting-from (* i 7))
            :end-of-week (.plusDays starting-from (+ 6 (* i 7)))
-           :routes routes}) route-maps)))
+           :routes routes})
+        route-maps)))
 
 
 (def test-no-traffic-run
@@ -194,6 +195,28 @@
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}))
 
+
+(def test-more-than-one-change-2-routes
+  ; Produce change records about individual days -> first change week contains 2 days with differences
+  ; In this test case we need to produce 3 rows in the database
+  (weeks (d 2019 2 4)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; 18.2. first change -> only one found currently | needs to detect change also on 13.2. -> this is set to current week
+         {route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; no changes here (25.2.)
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;; Only tuesday is found (4.3.)
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
+        route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}))
+
 (def data-two-week-change
   (weeks (d 2019 2 4)
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
@@ -210,23 +233,19 @@
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
-    (is (= (d 2019 2 18) (-> test-more-than-one-change
+    (is (= (d 2019 2 18) (-> test-more-than-one-change-2-routes
                              detection/first-week-difference
                              (get route-name)
                              :different-week
                              :beginning-of-week))))
   
   (let [diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
-        old-diff-pairs (-> test-more-than-one-change
+        old-diff-pairs (-> test-more-than-one-change-2-routes
                            detection/first-week-difference)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
-      (is (= (d 2019 2 18) (-> diff-pairs
-                            first
-                            (get route-name)
-                            :different-week
-                            :beginning-of-week))))
+      (is (= (d 2019 2 18) diff-pairs)))
 
     (testing "second change is detected"
       (is (= old-diff-pairs diff-pairs)))))
@@ -242,7 +261,7 @@
 
 (deftest test-during-development
   (let [db (:db ote.main/ote)
-        route-query-params {:service-id 2 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.06.2019")}
+        route-query-params {:service-id 5 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)
         old-diff (detection/detect-route-changes-for-service db route-query-params)]
     (println (:start-date route-query-params))
