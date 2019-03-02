@@ -45,29 +45,30 @@
                                                                 %)
                                                            service-vector))]
   (when (:show-delete-dialog? operator)
-    [ui/dialog
-     {:id (str "delete-transport-operator-dialog-" (::t-operator/id operator))
-      :open true
-      :actionsContainerStyle style-dialog/dialog-action-container
-      :title (tr [:dialog :delete-transport-operator :title])
-      :actions [(r/as-element
-                  [buttons/delete
-                   {:id "confirm-operator-delete"
-                    :disabled  (if (empty? operator-services)
+    [:div
+     [ui/dialog
+      {:id (str "delete-transport-operator-dialog-" (::t-operator/id operator))
+       :open true
+       :actionsContainerStyle style-dialog/dialog-action-container
+       :title (tr [:dialog :delete-transport-operator :title])
+       :actions [(r/as-element
+                   [buttons/delete
+                    {:id "confirm-operator-delete"
+                     :disabled (if (empty? operator-services)
                                  false
                                  true)
-                    :on-click  #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}
-                   (tr [:buttons :delete])])
-                (r/as-element
-                  [buttons/cancel
-                   {:on-click #(e! toggle-dialog)}
-                   (tr [:buttons :cancel])])]}
-     [:div
-      (if (empty? operator-services)
-        (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})
-        (tr [:organization-page :help-operator-how-delete]))]])))
+                     :on-click #(e! (to/->DeleteTransportOperator (::t-operator/id operator)))}
+                    (tr [:buttons :delete])])
+                 (r/as-element
+                   [buttons/cancel
+                    {:on-click #(e! toggle-dialog)}
+                    (tr [:buttons :cancel])])]}
+      [:div
+       (if (empty? operator-services)
+         (tr [:dialog :delete-transport-operator :confirm] {:name (::t-operator/name operator)})
+         (tr [:organization-page :help-operator-how-delete]))]]])))
 
-(defn- business-id-selection [e! state]
+(defn- business-id-selection [e! state ytj-supported?]
   "Form group for querying business id from user and triggering data fetch for it from YTJ"
   (let [operator (:transport-operator state)
         status (get-in state [:ytj-response :status])
@@ -76,7 +77,7 @@
         ytj-success? (= 200 status)]
     (form/group
       (merge {:card? false}
-             (when (flags/enabled? :open-ytj-integration)   ;; Sets input and button on same row
+             (when ytj-supported?                           ;; Sets input and button on same row
                {:layout :row}))
 
 
@@ -96,12 +97,12 @@
        :warning (tr [:common-texts :required-field])
        :should-update-check form/always-update
        :disabled? (ytj-loading? state)
-       :style (if (flags/enabled? :open-ytj-integration)
+       :style (if ytj-supported?
                 (when (ytj-loading? state) style-base/disabled-control)
                 style-fields/form-field)
        :on-change #(e! (to/->EnsureUniqueBusinessId %))}
 
-      (when (flags/enabled? :open-ytj-integration)
+      (when ytj-supported?
         ;; Disabled when business-id is taken or if business-id is not valid or if loading is ongoing
         {:element-id "btn-submit-business-id"
          :name ::t-operator/btn-submit-business-id
@@ -114,25 +115,26 @@
                      (empty? (::t-operator/business-id operator))
                      (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
                      (:business-id-exists? operator)
-                     (ytj-loading? state))}
+                     (ytj-loading? state))})
 
+      (when ytj-supported?
         {:name :loading-spinner-ytj
          :type :loading-spinner
-         :display? (ytj-loading? state)}
+         :display? (ytj-loading? state)})
 
-        (when ytj-response?
-          (if ytj-success?
-            {:name :ytj-result-msg
-             :type :result-msg-success
-             :content (tr [:organization-page :fetch-from-ytj-success])}
-            {:name :ytj-result-msg
-             :type :result-msg-warning
-             :content (if (= 404 status)
-                        (str (tr [:common-texts :data-not-found])
-                             " " (tr [:common-texts :optionally-fill-manually]))
-                        (str (tr [:common-texts :server-error])
-                             " " (tr [:common-texts :server-error-try-later])
-                             " " (tr [:common-texts :optionally-fill-manually])))})))
+      (when (and ytj-supported? ytj-response?)
+        (if ytj-success?
+          {:name :ytj-result-msg
+           :type :result-msg-success
+           :content (tr [:organization-page :fetch-from-ytj-success])}
+          {:name :ytj-result-msg
+           :type :result-msg-warning
+           :content (if (= 404 status)
+                      (str (tr [:common-texts :data-not-found])
+                           " " (tr [:common-texts :optionally-fill-manually]))
+                      (str (tr [:common-texts :server-error])
+                           " " (tr [:common-texts :server-error-try-later])
+                           " " (tr [:common-texts :optionally-fill-manually])))}))
 
       ; label composition for existing business-id
       (when (get-in state [:transport-operator :business-id-exists?])
@@ -141,7 +143,7 @@
          :type :result-msg-warning
          :content (tr [:common-texts :business-id-is-not-unique])}))))
 
-(defn- operator-form-groups [e! {operator :transport-operator :as state}]
+(defn- operator-form-groups [e! {operator :transport-operator :as state} creating? ytj-supported?]
   "Creates a napote form and resolves data to fields. Assumes expired fields are already filtered from ytj-response."
   ;(.debug js/console "operator-form-groups: state=" (clj->js state))
   (let [response-ok? (= 200 (get-in state [:ytj-response :status]))
@@ -156,11 +158,12 @@
        :tooltip-length "large"
        :card? false}
 
-      (when (flags/enabled? :open-ytj-integration)
-        {:name        :heading1-divider
-         :type        :divider}
+      (when ytj-supported?
+        {:name :heading1-divider
+         :type :divider})
 
-        {:element-id "input-operator-name"
+      (when-not creating?
+        {:element-id "heading-business-id"
          :name :heading-business-id
          :label (str (tr [:organization-page :business-id-heading]) " " (::t-operator/business-id operator))
          :type :text-label
@@ -399,15 +402,17 @@
                        (tr [:buttons :delete-operator])]]))])})
 
 (defn operator [e! {operator :transport-operator :as state}]
-  (let [show-ytj-id-entry? (empty? (get-in state [:params :id]))
-        show-details? (or (not (flags/enabled? :open-ytj-integration))
+  (let [creating? (nil? (get-in state [:params :id]))
+        ytj-supported? (flags/enabled? :open-ytj-integration)
+        show-ytj-id-entry? (empty? (get-in state [:params :id]))
+        show-details? (or (not ytj-supported?)
                           (and (:transport-operator-loaded? state)
                                (some? (:ytj-response state))))
         show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
                                    (pos-int? (count (:ytj-company-names state))))
         form-groups (cond-> []
-                            show-ytj-id-entry? (conj (business-id-selection e! state))
-                            show-details? (conj (operator-form-groups e! state)))]
+                            show-ytj-id-entry? (conj (business-id-selection e! state ytj-supported?))
+                            show-details? (conj (operator-form-groups e! state creating? ytj-supported?)))]
     [:div
      [:div
       [:div
