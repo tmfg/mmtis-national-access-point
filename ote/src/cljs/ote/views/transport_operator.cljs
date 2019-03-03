@@ -145,12 +145,11 @@
 
 (defn- operator-form-groups [e! {operator :transport-operator :as state} creating? ytj-supported?]
   "Creates a napote form and resolves data to fields. Assumes expired fields are already filtered from ytj-response."
-  ;(.debug js/console "operator-form-groups: state=" (clj->js state))
-  (let [response-ok? (= 200 (get-in state [:ytj-response :status]))
+  (let [ytj-response-ok? (= 200 (get-in state [:ytj-response :status]))
         disable-ytj-address-billing? (= (get-in state [:ytj-flags :use-ytj-addr-billing?]) true)
         disable-ytj-address-visiting? (= (get-in state [:ytj-flags :use-ytj-addr-visiting?]) true)
         ytj-company-names (:ytj-company-names state)
-        ytj-company-names-found? (< 1 (count ytj-company-names))]
+        ytj-company-names-found? (not (pos-int? (count ytj-company-names)))]
     (form/group
       {:label (tr [:common-texts :title-operator-basic-details])
        :columns 1
@@ -177,14 +176,14 @@
        :h-style :h3
        :full-width? true}
 
-      (when response-ok?
+      (when ytj-response-ok?
         {:name          :help-checkbox-group
          :type          :info-toggle
          :label         (tr [:common-texts :instructions])
          :body          [:div (tr [:organization-page :help-operator-edit-selection])]
          :default-state true})
 
-      (if response-ok?                                      ;; Input field if not YTJ results, checkbox-group otherwise
+      (if ytj-response-ok?                                      ;; Input field if not YTJ results, checkbox-group otherwise
         {:name                :transport-operators-to-save
          :type                :checkbox-group-with-delete
          :show-option         ::t-operator/name
@@ -203,7 +202,7 @@
          :required?  true
          :style      style-fields/form-field})
 
-      (when (and response-ok? (not ytj-company-names-found?))
+      (when (and ytj-response-ok? (not ytj-company-names-found?))
         {:name :msg-no-aux-names-for-business-id
          :label (tr [:organization-page :no-aux-names-for-business-id])
          :type :text-label
@@ -212,13 +211,12 @@
       {:name       :msg-business-id-contact-details
        :label      (if ytj-company-names-found?
                      (tr [:organization-page :contact-details-plural])
-                     (tr [:organization-page :contact-details])
-                     )
+                     (tr [:organization-page :contact-details]))
        :type       :text-label
        :max-length 128
        :h-style    :h3}
 
-      (when response-ok?
+      (when ytj-response-ok?
         {:name          :help-operator-contact-details
          :type          :info-toggle
          :label         (tr [:common-texts :instructions])
