@@ -338,9 +338,8 @@
   (process-event [_ app]
     (let [res (-> app
                   (strip-ytj-metadata)
-                  (assoc
-                    :transport-operator {:new? true}
-                    :services-changed? true))]
+                  (assoc :transport-operator {:new? true}
+                         :services-changed? true))]
       (routes/navigate! :transport-operator)
       res))
 
