@@ -1,6 +1,7 @@
 (ns ote.style.transit-changes
   "Transit changes styling"
   (:require [stylefy.core :as stylefy]
+            [ote.theme.colors :as colors]
             [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def add-color "rgb(0,170,0)")
@@ -46,21 +47,32 @@
 (def date1-highlight-color-hover "rgba(53,140,217,0.5)")
 (def date2-highlight-color "rgba(219,25,169,1)")
 (def date2-highlight-color-hover "rgba(219,25,169,0.5)")
+(def date-highlight-color-hover colors/gray650)
 
-(defn date1-highlight-style
+
+(defn date-highlight-style
   ([]
-   (date1-highlight-style "rgba(0,0,0,0)"))
+   (date-highlight-style "rgba(0,0,0,0)"))
   ([hash-color]
-   (date1-highlight-style hash-color date1-highlight-color))
+   (date-highlight-style hash-color date2-highlight-color))
   ([hash-color highlight-color]
    {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " (or hash-color "#FFF") " 40%) 0px 0px")
-    :color "#E1E1F9"}))
+    :color "#fff"}))
 
 (defn date2-highlight-style
   ([]
    (date2-highlight-style "rgba(0,0,0,0)"))
   ([hash-color]
-   (date2-highlight-style hash-color date2-highlight-color))
+   (date2-highlight-style hash-color date1-highlight-color))
+  ([hash-color highlight-color]
+   {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " (or hash-color "#FFF") " 40%) 0px 0px")
+    :color "#E1E1F9"}))
+
+(defn date1-highlight-style
+  ([]
+   (date1-highlight-style "rgba(0,0,0,0)"))
+  ([hash-color]
+   (date1-highlight-style hash-color date2-highlight-color))
   ([hash-color highlight-color]
    {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " (or hash-color "#FFF") " 40%) 0px 0px")
     :color "#F6C6EA"}))
