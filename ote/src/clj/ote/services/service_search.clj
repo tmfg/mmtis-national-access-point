@@ -33,10 +33,8 @@
 (defn- operation-area-ids [db operation-area]
   (when (seq operation-area)
     (ids
-      ::search/transport-service-id
-      (specql/fetch db ::search/operation-area-facet
-                    #{::search/transport-service-id}
-                    {::search/operation-area (op/in (map str/lower-case operation-area))}))))
+     :id
+     (service-ids-by-operation-areas db {:operation-area operation-area}))))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)

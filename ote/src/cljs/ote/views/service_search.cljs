@@ -342,26 +342,13 @@
             :card? false}
 
          {:name ::t-service/operation-area
-          :type :chip-input
+          :type :string
           :container-class "col-xs-12 col-sm-4 col-md-4"
           :hint-text (tr [:service-search :operation-area-search-placeholder])
           :hint-style {:top "20px"}
           :full-width? true
-          :full-width-input? false
-          :filter (fn [query, key]
-                    (let [k (str/lower-case key)
-                          q (str/lower-case query)]
-                      (when (> (count q) 1)
-                        (if (re-matches #"^\D+" q)
-                          (str/starts-with?
-                            (second (re-matches #"(?:[0-9]+\s*)?(.*)$" k)) q)
-                          (str/starts-with? k q)))))
-          :open-on-focus? true
-          :max-results 10
-          :suggestions-config {:text :text :value :text}
-          :suggestions (sort-places (::t-service/operation-area facets))
-          ;; Select first match from autocomplete filter result list after pressing enter
-          :auto-select? true}
+          :full-width-input? false}
+
 
          {:id "sub-types"
           :name ::t-service/sub-type

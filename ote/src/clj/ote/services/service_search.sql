@@ -125,3 +125,11 @@ SELECT eid."transport-service-id" as id
                 FROM "transport-service" ts
                WHERE ts.id = eid."transport-service-id"
                  AND ts.published IS NOT NULL)
+
+-- name: service-ids-by-operation-areas
+-- Find services by operation area names
+SELECT oa."transport-service-id" as id
+  FROM "operation_area" oa,
+       "places" pl
+ WHERE ST_INTERSECTS(oa.location, pl.location)
+   AND pl.namefin = :operation-area;
