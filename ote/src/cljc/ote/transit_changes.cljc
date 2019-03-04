@@ -193,15 +193,23 @@
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
   [w1 w2]
-  (every? true?
-          (map (fn [h1 h2]
-                 ;; Only compare hashes where both days have traffic (not nil)
-                 (or (nil? h1) ;; h1 is no-traffic day due to nil value
-                     (nil? h2) ;; h2 is no-traffic day due to nil value
-                     (keyword? h1) ;; h1 is static-holiday due to value is keyword
-                     (keyword? h2) ;; h2 is static-holiday due to value is keyword
-                     (= h1 h2)))
-               w1 w2)))
+  (let [w1-empty? (every? nil? w1)
+        w2-empty? (every? nil? w2)]
+    ;; if one of the weekhashes is all nil's (no traffic),
+    ;; they are equal if both of them are not-empty
+    ;; or both of them are empty
+    (if (or w1-empty? w2-empty?)
+      (= w1-empty? w2-empty?)
+      ;; otherwise, do day-by-day comparison ignoring no-traffic days and holidays
+      (every? true?
+              (map (fn [h1 h2]
+                     ;; Only compare hashes where both days have traffic (not nil)
+                     (or (nil? h1) ;; h1 is no-traffic day due to nil value
+                         (nil? h2) ;; h2 is no-traffic day due to nil value
+                         (keyword? h1) ;; h1 is static-holiday due to value is keyword
+                         (keyword? h2) ;; h2 is static-holiday due to value is keyword
+                         (= h1 h2)))
+                   w1 w2)))))
 
 (s/fdef week=
   :args (s/cat :w1 ::week-hash :w2 ::week-hash)
