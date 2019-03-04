@@ -258,6 +258,71 @@
       (is (= 0 (count diff-pairs))))))
 
 
+; Dev tip: Put *symname in ns , evaluate, load, run (=define) and inspect in REPL
+; data-change-h Fetched from routes like below
+; <snippet>
+; (map
+;  #(update % :routes select-keys ["TestRouteName-1"])
+;  *res)
+; </snippet>
+(def data-change-h
+  [{:beginning-of-week (java.time.LocalDate/parse "2019-02-18"),
+    :end-of-week (java.time.LocalDate/parse "2019-02-24"),
+    :routes {"TestRouteName-1" [nil nil nil nil nil nil "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-02-25"),
+    :end-of-week (java.time.LocalDate/parse "2019-03-03"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-03-04")
+    :end-of-week (java.time.LocalDate/parse "2019-03-10"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-03-11"),
+    :end-of-week (java.time.LocalDate/parse "2019-03-17"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-03-18"),
+    :end-of-week (java.time.LocalDate/parse "2019-03-24"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-03-25"),
+    :end-of-week (java.time.LocalDate/parse "2019-03-31"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-04-01"),
+    :end-of-week (java.time.LocalDate/parse "2019-04-07"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-04-08"),
+    :end-of-week (java.time.LocalDate/parse "2019-04-14"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-04-15"),
+    :end-of-week (java.time.LocalDate/parse "2019-04-21"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "hkolmas" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-04-22"),
+    :end-of-week (java.time.LocalDate/parse "2019-04-28"),
+    :routes {"TestRouteName-1" ["hkolmas" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-04-29"),
+    :end-of-week (java.time.LocalDate/parse "2019-05-05"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}} ;;In data third value was :first-of-may
+   {:beginning-of-week (java.time.LocalDate/parse "2019-05-06"),
+    :end-of-week (java.time.LocalDate/parse "2019-05-12"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-05-13"),
+    :end-of-week (java.time.LocalDate/parse "2019-05-19"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-05-20"),
+    :end-of-week (java.time.LocalDate/parse "2019-05-26"),
+    :routes {"TestRouteName-1" ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"),
+    :end-of-week (java.time.LocalDate/parse "2019-06-02"),
+    :routes {"TestRouteName-1" [nil nil nil nil nil nil nil]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"),
+    :end-of-week (java.time.LocalDate/parse "2019-06-09"),
+    :routes {"TestRouteName-1" ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-06-10"),
+    :end-of-week (java.time.LocalDate/parse "2019-06-16"),
+    :routes {"TestRouteName-1" ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-06-17"),
+    :end-of-week (java.time.LocalDate/parse "2019-06-23"),
+    :routes {"TestRouteName-1" ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
+   {:beginning-of-week (java.time.LocalDate/parse "2019-06-24"),
+    :end-of-week (java.time.LocalDate/parse "2019-06-30"),
+    :routes {"TestRouteName-1" ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}])
 
 (deftest test-during-development
   (let [db (:db ote.main/ote)
@@ -267,3 +332,25 @@
     (println (:start-date route-query-params))
     (testing "differences between new and old"
       (is (= old-diff new-diff)))))
+
+(deftest more-than-one-change-found-huittinen
+  ;(spec-test/instrument `detection/first-week-difference)
+
+  ;; first test that the test data and old change detection code agree
+  (testing "single-change detection code agrees with test data"
+    (is (= (d 2019 2 18) (-> data-change-h
+                             detection/first-week-difference
+                             (get route-name)
+                             :different-week
+                             :beginning-of-week))))
+
+  (let [diff-pairs (detection/routes-changed-weeks data-change-h)
+        old-diff-pairs (-> data-change-h
+                           detection/first-week-difference)]
+    (testing "got two changes"
+      (is (= 2 (count diff-pairs))))
+    (testing "first change is detected"
+      (is (= (d 2019 2 18) diff-pairs)))
+
+    (testing "second change is detected"
+      (is (= old-diff-pairs diff-pairs)))))
