@@ -310,7 +310,7 @@
     :routes {route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"),
     :end-of-week (java.time.LocalDate/parse "2019-06-02"),
-    :routes {route-name [nil nil nil nil nil nil nil]}}
+    :routes {route-name ["heka" "hkolmas" nil nil nil nil nil]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"),
     :end-of-week (java.time.LocalDate/parse "2019-06-09"),
     :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
@@ -338,7 +338,7 @@
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
-    (is (= (d 2019 2 18) (-> data-change-h
+    (is (= (d 2019 5 27) (-> data-change-h
                              detection/first-week-difference
                              (get route-name)
                              :different-week
@@ -350,7 +350,7 @@
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
-      (is (= (d 2019 2 18) diff-pairs)))
+      (is (= (d 2019 5 27) diff-pairs)))
 
     (testing "second change is detected"
       (is (= old-diff-pairs diff-pairs)))))
