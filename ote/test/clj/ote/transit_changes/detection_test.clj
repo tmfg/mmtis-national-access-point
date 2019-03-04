@@ -298,7 +298,7 @@
     :routes {route-name ["hkolmas" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-04-29"),
     :end-of-week (java.time.LocalDate/parse "2019-05-05"),
-    :routes {route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}} ;;In data third value was :first-of-may
+    :routes {route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}} ;; In data third value was :first-of-may
    {:beginning-of-week (java.time.LocalDate/parse "2019-05-06"),
     :end-of-week (java.time.LocalDate/parse "2019-05-12"),
     :routes {route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
@@ -308,7 +308,7 @@
    {:beginning-of-week (java.time.LocalDate/parse "2019-05-20"),
     :end-of-week (java.time.LocalDate/parse "2019-05-26"),
     :routes {route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"),
+   {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"), ;; first change 
     :end-of-week (java.time.LocalDate/parse "2019-06-02"),
     :routes {route-name ["heka" "hkolmas" nil nil nil nil nil]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"),
@@ -345,12 +345,14 @@
                              :beginning-of-week))))
 
   (let [diff-pairs (detection/routes-changed-weeks data-change-h)
-        old-diff-pairs (-> data-change-h
+        old-diff-pair (-> data-change-h
                            detection/first-week-difference)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
+    
     (testing "first change is detected"
-      (is (= (d 2019 5 27) diff-pairs)))
+      (is (= (d 2019 5 27) (-> diff-pairs first first second :different-week :beginning-of-week))))
 
-    (testing "second change is detected"
-      (is (= old-diff-pairs diff-pairs)))))
+    (testing "second change date is correct"
+      ;; fixme: what's the right ansewr here?
+      (is (= (d 2019 5 27) (-> diff-pairs second first second :different-week :beginning-of-week))))))
