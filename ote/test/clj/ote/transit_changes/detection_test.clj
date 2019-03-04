@@ -233,14 +233,14 @@
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
-    (is (= (d 2019 2 18) (-> test-more-than-one-change-2-routes
+    (is (= (d 2019 2 18) (-> test-more-than-one-change
                              detection/first-week-difference
                              (get route-name)
                              :different-week
                              :beginning-of-week))))
   
   (let [diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
-        old-diff-pairs (-> test-more-than-one-change-2-routes
+        old-diff-pairs (-> test-more-than-one-change
                            detection/first-week-difference)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
@@ -261,7 +261,7 @@
 
 (deftest test-during-development
   (let [db (:db ote.main/ote)
-        route-query-params {:service-id 5 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
+        route-query-params {:service-id 2 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)
         old-diff (detection/detect-route-changes-for-service db route-query-params)]
     (println (:start-date route-query-params))

@@ -273,19 +273,29 @@
   (.isBefore d1 d2))
 
 (defn local-date-after? [d1 d2]
-  (.isAfter d1 d2))
+  (clj-time.core/after? (time/native->date-time d1) (time/native->date-time d2)))
 
 (defn route-starting-week-past-date? [rw date]
+  (println "route-starting-week-past-date? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date)
   (assert (some? date))
   (assert (some? rw))
   (assert (some? (:beginning-of-week rw)) rw)
   (local-date-after? (:beginning-of-week rw) date))
 
+(defn route-starting-week-not-before?
+  "rw: route week, date: localdate
+  Returns true if `rw`s key is before `date`."
+  [rw date]
+  (println "route-route-starting-week-not-before? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date)
+  (assert (some? date))
+  (assert (some? rw))
+  (assert (some? (:beginning-of-week rw)) rw)
+  (not (local-date-before? (:beginning-of-week rw) date)))
+
 (defn filter-by-vals [pred map]
   (into {} (for [[k v] map
                  :when (pred v)]
              [k v])))
-
 
 (defn route-differences
   [route-weeks]
@@ -297,7 +307,7 @@
     ;; (clojure.pprint/pprint results)
     (let [diff-data (first-week-difference route-weeks)
           filtered-diff-data (filter (fn [[_ value]]
-                                       (when (not (nil? (:different-week value)))
+                                       (when-not (nil? (:different-week value))
                                          true))
                                      diff-data)
           test (println "in let of: " filtered-diff-data)
@@ -307,11 +317,12 @@
       (println "diff-data: " (pr-str diff-data))
       (println "filtered-diff-data: " (pr-str filtered-diff-data))
       (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
-      (println "diff-week-date: " (pr-str diff-week-date))
+      (println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
       ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
-      (if (and (some? diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
-        (recur                                        ;; (filter-by-vals #(route-starting-week-past-date? % diff-week-date) route-weeks)
-          (filter #(route-starting-week-past-date? % (.minusDays diff-week-date 1)) route-weeks)
+      (if (and (not-empty diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
+        (recur
+          ;; Filter out different weeks before current week, because different week is starting week for next change.
+          (filter #(route-starting-week-not-before? % diff-week-date) route-weeks)
           (conj results filtered-diff-data))
         results))))
 
