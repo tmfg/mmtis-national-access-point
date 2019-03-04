@@ -72,14 +72,14 @@
      (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
        {:box-shadow "inset 0 0 0 1px black,
                      inset 0 0 0 2px transparent"})
-     (cond (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
-           (style/date-highlight-style hash-color colors/gray800)
-
-           (= (time/format-date-iso-8601 date1) d)
+     (cond (and (= (time/format-date-iso-8601 date1) d) (some? date2))
            (style/date1-highlight-style hash-color)
 
            (= (and (some? date2) (time/format-date-iso-8601 date2)) d)
-           (style/date2-highlight-style hash-color)))))
+           (style/date2-highlight-style hash-color)
+
+           (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
+           (style/date-highlight-style hash-color colors/gray800)))))
 
 (defn hover-day [e! date->hash day]
   (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
