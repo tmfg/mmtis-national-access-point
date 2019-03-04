@@ -925,9 +925,9 @@
        (map-indexed
          (fn [i option]
            (let [checked? (boolean (selected option))]
-             ^{:key i}
+             ^{:key (str "form-checkbox-container-" i "-")} ;; Option may be a map with unknown keys. Stringified map results into run-time warning about bad selector.
              [:div {:style {:display "flex" :flex-wrap "nowrap" :justify-content "space-between" :align-items "center" :padding-top "0.625rem"}}
-              [ui/checkbox {:id         (str i "_" (str option))
+              [ui/checkbox {:id         (str "form-checkbox-" i) ;; option not stringified to avoid run-time warning, see above comment.
                             :label      (when-not table? (show-option option))
                             :checked    checked?
                             :disabled   (not (option-enabled? option))
