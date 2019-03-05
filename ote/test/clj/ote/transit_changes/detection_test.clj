@@ -259,13 +259,14 @@
 
 
 ; Dev tip: Put *symname in ns , evaluate, load, run (=define) and inspect in REPL
-; data-change-h Fetched from routes like below
+; Fetched from routes like below
 ; <snippet>
 ; (map
 ;  #(update % :routes select-keys [route-name])
 ;  *res)
 ; </snippet>
-(def data-change-h
+
+(def data-realworld-two-change-case
   [{:beginning-of-week (java.time.LocalDate/parse "2019-02-18"),
     :end-of-week (java.time.LocalDate/parse "2019-02-24"),
     :routes {route-name [nil nil nil nil nil nil "hkolmas"]}}
@@ -310,19 +311,33 @@
     :routes {route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"), ;; first change 
     :end-of-week (java.time.LocalDate/parse "2019-06-02"),
-    :routes {route-name ["heka" "hkolmas" nil nil nil nil nil]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"),
+    :routes {route-name ["heka" "hkolmas" nil nil nil nil nil]}} 
+   {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"), ;; gets set as starting-week when this is the second week, on the second round, even though this is the second week passed into first-week-difference
     :end-of-week (java.time.LocalDate/parse "2019-06-09"),
     :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-06-10"),
+   {:beginning-of-week (java.time.LocalDate/parse "2019-06-10"), ;; days the same sw above
     :end-of-week (java.time.LocalDate/parse "2019-06-16"),
     :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-06-17"),
     :end-of-week (java.time.LocalDate/parse "2019-06-23"),
     :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
+
+
+   ;; padding added
    {:beginning-of-week (java.time.LocalDate/parse "2019-06-24"),
     :end-of-week (java.time.LocalDate/parse "2019-06-30"),
-    :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}])
+    :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
+
+   {:beginning-of-week (java.time.LocalDate/parse "2019-07-01"),
+    :end-of-week (java.time.LocalDate/parse "2019-07-01"),
+    :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
+
+   {:beginning-of-week (java.time.LocalDate/parse "2019-07-08"),
+    :end-of-week (java.time.LocalDate/parse "2019-07-14"),
+    :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
+
+
+   ])
 
 (deftest test-during-development
   (let [db (:db ote.main/ote)
@@ -334,18 +349,18 @@
       (is (= old-diff new-diff)))))
 
 (deftest more-than-one-change-found-case-2
-  ;(spec-test/instrument `detection/first-week-difference)
+  (spec-test/instrument `detection/first-week-difference)
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
-    (is (= (d 2019 5 27) (-> data-change-h
+    (is (= (d 2019 5 27) (-> data-realworld-two-change-case
                              detection/first-week-difference
                              (get route-name)
                              :different-week
                              :beginning-of-week))))
 
-  (let [diff-pairs (detection/routes-changed-weeks data-change-h)
-        old-diff-pair (-> data-change-h
+  (let [diff-pairs (detection/routes-changed-weeks data-realworld-two-change-case)
+        old-diff-pair (-> data-realworld-two-change-case
                            detection/first-week-difference)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
@@ -354,5 +369,9 @@
       (is (= (d 2019 5 27) (-> diff-pairs first first second :different-week :beginning-of-week))))
 
     (testing "second change date is correct"
-      ;; fixme: what's the right ansewr here?
+      ;; what's the right ansewr here
+      ;; - #weeks comes 3 times, 21 / 7/ 21
+      ;;   - called last time from route-differences (via routes-changed-weeks <- detect-route-changes-for-service-new) & from detect-route-changes-for-service
+      ;; - first-week-diference gets called the second time with bow -05-27
+      ;;    but starting-week get sets to the next one
       (is (= (d 2019 5 27) (-> diff-pairs second first second :different-week :beginning-of-week))))))

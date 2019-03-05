@@ -114,13 +114,14 @@
 
 
 (defn- vnot [cond msg]
-  #_(when cond
+  (when cond
     (println "debug: not a change because" msg))
   (not cond))
 
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
+  (println "at curr:" curr)
     (cond
       ;; If this is the first call and the current week is "anomalous".
       ;; Then start at the next week.
@@ -128,11 +129,15 @@
            (not (week= curr next1))
            (week= prev next1))
       ;; Ignore this week
-      {}
+      (do
+        (println "debug: ignore week" curr)
+        {})
 
       ;; No starting week specified yet, use current week
       (nil? starting-week-hash)
-      (assoc state :starting-week-hash curr)
+      (do
+        (println "debug: no starting-week -> set starting week")
+        (assoc state :starting-week-hash curr))
 
       ;; If current week does not equal starting week...
       (and (vnot (week= starting-week-hash curr) (str "curr = start (1) sw:" starting-week-hash " curr:" curr))
@@ -144,8 +149,12 @@
           (println "yes change")
           (assoc state :different-week-hash curr))
 
-      ;; No change found, return state as is
-      :default state))
+        ;; No change found, return state as is
+        
+        :default
+        (do
+          (println "debug: no change")
+          state)))
 
 (defn week-hash-no-traffic-run
   "Return the continuous amount of days that have no traffic at the beginning or end of the weekhash."
@@ -220,6 +229,7 @@
 
 (defn- route-next-different-week
   [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr]
+  ;; (println "route-next-different-week called with curr= " curr)
   (if (or diff no-traffic-end-date)
     ;; change already found, don't try again
     state
@@ -236,9 +246,57 @@
                      (detect-change-for-route route-week-hashes route)
                      (add-starting-week curr)
                      (add-different-week curr))]
+      (if-let [dw (:different-week result)]
+        (println "route-next-different-week found something:" dw )
+        (println "no changes found from:" (:beginning-of-week (first  weeks))))
       result)))
 
-#_(spec/fdef first-week-difference
+(spec/def
+ ::routes
+ (spec/map-of
+  string?
+  (spec/coll-of (spec/or :keyword keyword? :string (spec/nilable string?)))))
+(spec/def ::local-date #(instance? java.time.LocalDate %))
+(spec/def ::end-of-week ::local-date)
+(spec/def ::beginning-of-week ::local-date)
+
+(spec/def
+ ::route-week
+ (spec/keys :req-un [::beginning-of-week ::end-of-week ::routes]))
+(spec/def
+ ::route-weeks-vec
+  (spec/coll-of ::route-week))
+
+(spec/def ::bow-eow-map (spec/keys :req-un [::beginning-of-week ::end-of-week]))
+(spec/def
+  ::different-week
+  ::bow-eow-map)
+(spec/def
+ ::week-hash-vec
+  (spec/coll-of (spec/or :keyword keyword? :string string?)))
+(spec/def
+ ::different-week-hash
+  ::week-hash-vec)
+(spec/def
+ ::starting-week
+ ::bow-eow-map)
+(spec/def ::starting-week-hash ::week-hash-vec)
+
+(spec/def ::route-change-map
+  (spec/keys
+    :req-un
+    [::different-week
+     ::different-week-hash
+     ::starting-week
+     ::starting-week-hash]))
+
+(spec/def ::route-key (spec/every string? :count 3))
+
+(spec/def
+  ::single-route-change
+  (spec/coll-of (spec/tuple ::route-key ::route-change-map) :kind map?))
+
+(spec/fdef first-week-difference
            :args (spec/cat :rw ::route-weeks-vec)
            :ret ::single-route-change)
 
@@ -247,6 +305,9 @@
   Returns map from route [short long headsign] to next different week info.
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
+  (println "first-week-difference called, #weeks:" (count route-weeks))
+  ;; (if (= 7  (count route-weeks))
+  ;;   (def *r7 route-weeks))
   ;; (println "spec for route-weeks:")
   ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
   ;; Take routes from the first week (they are the same in all weeks)
@@ -286,10 +347,10 @@
   "rw: route week, date: localdate
   Returns true if `rw`s key is before `date`."
   [rw date]
-  (println "route-route-starting-week-not-before? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date)
   (assert (some? date))
   (assert (some? rw))
   (assert (some? (:beginning-of-week rw)) rw)
+  (println "route-route-starting-week-not-before? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date "->" (not (local-date-before? (:beginning-of-week rw) date)))
   (not (local-date-before? (:beginning-of-week rw) date)))
 
 (defn filter-by-vals [pred map]
@@ -301,30 +362,29 @@
   [route-weeks]
   (loop [route-weeks route-weeks
          results []]
-    ;; (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
-    ;; (println "route-weeks" (pr-str route-weeks))
-    ;; (println "top of loop: results is")
-    ;; (clojure.pprint/pprint results)
+    (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
     (let [diff-data (first-week-difference route-weeks)
           filtered-diff-data (filter (fn [[_ value]]
-                                       (when-not (nil? (:different-week value))
-                                         true))
+                                       (:different-week value))
                                      diff-data)
-          test (println "in let of: " filtered-diff-data)
-          diff-week-beginnings (mapv (comp :beginning-of-week :different-week) (vals filtered-diff-data))
-          ;diff-week-date (first diff-week-beginnings)
-          diff-week-date (some #(when-not (nil? %) %) diff-week-beginnings)]
+          diff-week-beginnings (keep (comp :beginning-of-week :different-week) (vals diff-data))
+          diff-week-date (first diff-week-beginnings)]
       (println "diff-data: " (pr-str diff-data))
       (println "filtered-diff-data: " (pr-str filtered-diff-data))
       (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
       (println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
-      ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
+                                        ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))      
       (if (and (not-empty diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
           (filter #(route-starting-week-not-before? % diff-week-date) route-weeks)
           (conj results filtered-diff-data))
-        results))))
+        (do
+          (println "stop loop:")
+          (println "  diff-data: " diff-data)
+          (println "  diff-week-date: " diff-week-date)
+          (println "  route-weeks:" route-weeks)
+          results)))))
 
 (defn combine-differences-with-routes
   #_[{:route-hash-id "Testington - Terstersby"
@@ -687,7 +747,7 @@
         ;in old code route-changes contains {route-key {detection-result} } <- multiple pairs
         test)
       (catch Exception e
-        (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
+        (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
 
 (defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
@@ -713,7 +773,7 @@
             (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
             )}
       (catch Exception e
-        (log/warn e "Error when detectin route changes using route-query-params: " route-query-params " service-id:" service-id)))))
+        (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
 (defn- update-hash [old x]
   (let [short (:gtfs/route-short-name x)
@@ -784,3 +844,5 @@
                               {:gtfs/package-id package-id
                                :gtfs/date (:gtfs/date h)})
               (println "package-id " package-id "date " (:gtfs/date h))))))))
+
+
