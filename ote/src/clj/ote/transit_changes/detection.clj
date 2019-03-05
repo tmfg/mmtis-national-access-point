@@ -123,7 +123,7 @@
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
 
   ;; todo: add detection dection reason to thje state map, instead of the debug prints
-  
+
   ;; (println "at curr:" curr)
     (cond
       ;; If this is the first call and the current week is "anomalous".
@@ -153,7 +153,7 @@
           (assoc state :different-week-hash curr))
 
         ;; No change found, return state as is
-        
+
         :default
         (do
           #_(println "debug: no change")
@@ -378,6 +378,7 @@
   [route-weeks]
   (loop [route-weeks route-weeks
          results []]
+    (spec/explain ::route-weeks-vec route-weeks)
     (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
     (let [diff-data (first-week-difference route-weeks)
           filtered-diff-data (filter (fn [[_ value]]
@@ -391,7 +392,7 @@
       (println "filtered-diff-data: " (pr-str filtered-diff-data))
       (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
       (println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
-                                        ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))      
+                                        ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
       (if (and (not-empty diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
@@ -408,7 +409,7 @@
 
 (defn combine-differences-with-routes
   [route-weeks differences]
-  
+
   (let [changed-route-weeks
         (loop [route-weeks route-weeks
                result []]
@@ -727,6 +728,38 @@
   (mapv #(route-day-changes db service-id %) route-list-with-changed-weeks))
 
 
+(defn changes-by-week->changes-by-route
+  " Takes input-format and formats it to output-format
+  input-format:
+  {:beginning-of-week 1.1 :end-of-week 7.1 :routes { \"route1\" [\"h1\" \"h1\"}
+                                                    \"route2\" [\"h1\" \"h1\"]
+                                                    \"route3\" [\"h1\" \"h1\"]}}
+  {:beginning-of-week 8.1 :end-of-week 15.1 :routes { \"route1\" [\"h1\" \"h1\"}
+                                                    \"route2\" [\"h1\" \"h1\"]
+                                                    \"route3\" [\"h1\" \"h1\"]}}
+
+  Output-format:
+   [{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
+    {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
+    {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route1\" [\"h1\" \"h1\"]}}]"
+  [weeks]
+  (vals (group-by (fn [d]
+                    (keys (:routes d)))
+                  (reduce
+                    (fn [result week]
+                      (let [routes (:routes week)
+                            r-weeks
+                            (map (fn [route]
+                                   (assoc week :routes (conj {} route)))
+                                 routes)]
+                        (concat result r-weeks)))
+                    []
+                    weeks))))
+
+
+(defn detect-changes-for-all-routes
+  [route-list-with-week-hashes]
+  (mapcat route-differences route-list-with-week-hashes))
 
 (defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
   "Returns map for each service"
@@ -748,7 +781,11 @@
                        ;; Create week hashes so we can find out the differences between weeks
                        (combine-weeks)
                        ;; Search next week (for every route) that is different
-                       (routes-changed-weeks)
+                       (changes-by-week->changes-by-route)
+
+                       (detect-changes-for-all-routes)
+
+                       ;(routes-changed-weeks)
                        ;; Fetch detailed route comparison if a change was found
                        ;; (route-day-changes db service-id)    ;;remove this from here and the old function to run comparing tests
                        )}]
