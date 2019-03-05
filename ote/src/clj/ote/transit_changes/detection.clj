@@ -112,10 +112,10 @@
      :end-of-week eow
      :routes (merge-week-hash (map :routes days))}))
 
-
 (defn- vnot [cond msg]
-  (when cond
-    (println "debug: not a change because" msg))
+  #_(when cond
+    (println "debug: not a change because" msg)
+    )
   (not cond))
 
 (defn detect-change-for-route
@@ -124,7 +124,7 @@
 
   ;; todo: add detection dection reason to thje state map, instead of the debug prints
   
-  (println "at curr:" curr)
+  ;; (println "at curr:" curr)
     (cond
       ;; If this is the first call and the current week is "anomalous".
       ;; Then start at the next week.
@@ -156,7 +156,7 @@
         
         :default
         (do
-          (println "debug: no change")
+          #_(println "debug: no change")
           state)))
 
 (defn week-hash-no-traffic-run
@@ -241,6 +241,7 @@
     (let [route-week-hashes (mapv (comp #(get % route) :routes)
                             weeks)
           result (-> state
+                     (assoc :route-key :jee )
                      ;; Detect no-traffic run
                      (detect-no-traffic-run route-week-hashes)
                      (add-no-traffic-run-dates curr)
@@ -330,7 +331,7 @@
                        (update route-detection-state route
                                route-next-different-week route weeks curr))
                      route-detection-state route-names))
-                 {}                                         ; initial route detection state is empty
+                 {}    ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
     ;; (println "first-week-difference result: " (pr-str result))
     ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
@@ -365,6 +366,14 @@
                  :when (pred v)]
              [k v])))
 
+
+(def new-data-example [{:starting-week :foo
+                        :different-week :foo }])
+
+
+;; todo:
+;; split route-weeks into per-route data and call this once per route
+
 (defn route-differences
   [route-weeks]
   (loop [route-weeks route-weeks
@@ -398,17 +407,8 @@
           results)))))
 
 (defn combine-differences-with-routes
-  #_[{:route-hash-id "Testington - Terstersby"
-    :different-week {}
-    :different-week-hash ["h1"]
-    :starting-week {}
-    :starting-week-hash ["h1"]}
-   {:route-hash-id "Testington2 - Terstersby2"
-    :different-week {}
-    :different-week-hash ["h1"]
-    :starting-week {}
-    :starting-week-hash ["h1"]}]
   [route-weeks differences]
+  
   (let [changed-route-weeks
         (loop [route-weeks route-weeks
                result []]
@@ -750,7 +750,7 @@
                        ;; Search next week (for every route) that is different
                        (routes-changed-weeks)
                        ;; Fetch detailed route comparison if a change was found
-                       (route-day-changes db service-id)    ;;remove this from here and the old function to run comparing tests
+                       ;; (route-day-changes db service-id)    ;;remove this from here and the old function to run comparing tests
                        )}]
         (println "Halojata halloo: " (pr-str test))
 
@@ -781,7 +781,7 @@
             ;; Search next week (for every route) that is different
             (first-week-difference)
             ;; Fetch detailed route comparison if a change was found
-            (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
+            ;; (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
             )}
       (catch Exception e
         (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))

@@ -8,8 +8,8 @@
 (defn d [year month day]
   (java.time.LocalDate/of year month day))
 
-(def route-name "Testington - Terstersby")
-(def route-name-2 "Keskington - Kerskersby")
+(def route-name "Raimola")
+(def route-name-2 "Esala")
 
 (defn weeks
   "Give first day of week (monday) as a starting-from."
@@ -240,8 +240,7 @@
                              :beginning-of-week))))
   
   (let [diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
-        old-diff-pairs (-> test-more-than-one-change
-                           detection/first-week-difference)]
+        old-diff-pairs (detection/first-week-difference test-more-than-one-change)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
@@ -249,6 +248,53 @@
 
     (testing "second change is detected"
       (is (= old-diff-pairs diff-pairs)))))
+
+
+(def data-two-week-two-route-change
+  (weeks (d 2019 2 4)
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 11.2. prev week start
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 18.2. first change in route1
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
+(def seppo
+  (weeks (d 2019 2 4)
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 11.2. prev week start
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 18.2. first change in route1
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
+(deftest more-than-one-change-found-w-2-routes
+  (spec-test/instrument `detection/first-week-difference)
+
+  (let [diff-pairs (detection/routes-changed-weeks seppo)
+        fwd-difference (detection/first-week-difference seppo)
+        ;; diff-pairs (detection/routes-changed-weeks data-two-week-two-route-change)
+        ;; fwd-difference (detection/first-week-difference data-two-week-two-route-change)
+        ]
+    (testing "got two changes"
+      (is (= 2 (count diff-pairs))))
+    (testing "first change matches first-week-difference return value"
+      (is (= (-> fwd-difference vals) (-> diff-pairs first vals))))
+    
+    (testing "first change matches first-week-difference return value"
+      (is (some? (second diff-pairs)))
+      (println "printing first and second diff pair:")
+      (clojure.pprint/pprint (first diff-pairs))
+      (clojure.pprint/pprint (second diff-pairs))
+      (is (= (-> fwd-difference vals) (-> diff-pairs first))))
+))
+
+
+
 
 (deftest no-change-found
   (spec-test/instrument `detection/first-week-difference)
@@ -339,9 +385,13 @@
 
 (deftest test-during-development
   (let [db (:db ote.main/ote)
-        route-query-params {:service-id 2 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
+        route-query-params {:service-id 17 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)
         old-diff (detection/detect-route-changes-for-service db route-query-params)]
+    (def *nd new-diff)
+    (def *od old-diff)
+    ;; new-diff structure:
+    ;; :route-changes [ ( [ routeid {dada} ]) etc
     (println (:start-date route-query-params))
     (testing "differences between new and old"
       (is (= old-diff new-diff)))))
