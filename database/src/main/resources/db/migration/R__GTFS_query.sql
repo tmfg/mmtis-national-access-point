@@ -514,7 +514,9 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
  WHERE rh.hash IS NOT NULL
   AND rh."route-hash-id" IS NOT NULL
   AND rh."route-hash-id" != ''
- GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id";
+ GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id"
+ -- Remove routes that do not have traffic anymore
+ HAVING MAX(d.date) >= current_date;
 $$ LANGUAGE SQL STABLE;
 
 CREATE OR REPLACE FUNCTION calculate_route_hash_id_using_headsign(package_id INTEGER)
