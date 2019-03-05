@@ -121,6 +121,9 @@
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
+
+  ;; todo: add detection dection reason to thje state map, instead of the debug prints
+  
   (println "at curr:" curr)
     (cond
       ;; If this is the first call and the current week is "anomalous".
@@ -301,13 +304,17 @@
            :ret ::single-route-change)
 
 (defn first-week-difference
-  "Detect the next different week in each route. Takes a list of weeks that have week hashes for each route.
+  "Detect the next different week in each route.
+
+  NOTE! starting from the seond week in the given route-weeks, the first given week is considered the \"prev\" week.
+  
+  Takes a list of weeks that have week hashes for each route.
   Returns map from route [short long headsign] to next different week info.
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
   (println "first-week-difference called, #weeks:" (count route-weeks))
-  ;; (if (= 7  (count route-weeks))
-  ;;   (def *r7 route-weeks))
+  ;(if (= 7  (count route-weeks))
+  ;   (def *r7 route-weeks))
   ;; (println "spec for route-weeks:")
   ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
   ;; Take routes from the first week (they are the same in all weeks)
@@ -368,7 +375,9 @@
                                        (:different-week value))
                                      diff-data)
           diff-week-beginnings (keep (comp :beginning-of-week :different-week) (vals diff-data))
-          diff-week-date (first diff-week-beginnings)]
+          diff-week-date (first diff-week-beginnings)
+          prev-week-date (when diff-week-date
+                           (.minusWeeks diff-week-date 1))]
       (println "diff-data: " (pr-str diff-data))
       (println "filtered-diff-data: " (pr-str filtered-diff-data))
       (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
@@ -377,7 +386,9 @@
       (if (and (not-empty diff-data) diff-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
-          (filter #(route-starting-week-not-before? % diff-week-date) route-weeks)
+         ;; Use the previous week date, because first-week-difference starts
+         ;; comparisons at the second given week
+         (filter #(route-starting-week-not-before? % prev-week-date) route-weeks)
           (conj results filtered-diff-data))
         (do
           (println "stop loop:")
