@@ -149,7 +149,7 @@
         disable-ytj-address-billing? (= (get-in state [:ytj-flags :use-ytj-addr-billing?]) true)
         disable-ytj-address-visiting? (= (get-in state [:ytj-flags :use-ytj-addr-visiting?]) true)
         ytj-company-names (:ytj-company-names state)
-        ytj-company-names-found? (not (pos-int? (count ytj-company-names)))]
+        ytj-company-names-found? (pos-int? (count ytj-company-names))]
     (form/group
       {:label (tr [:common-texts :title-operator-basic-details])
        :columns 1
@@ -160,7 +160,8 @@
       (when ytj-supported?
         {:name :heading1-divider
          :type :divider})
-
+      ;; Because user not allowed to edit business id himself,
+      ;; business-id field is input in business-id-selection when creating, a read-only label here when only modifying.
       (when-not creating?
         {:element-id "heading-business-id"
          :name :heading-business-id
