@@ -258,7 +258,8 @@
 (def transport-types [:road :rail :sea :aviation])
 
 (defn filters-form [e! {filters :filters
-                        facets  :facets}]
+                        facets  :facets
+                        operation-area-filter-completions :operation-area-filter-completions}]
   (let [sub-types-to-list (fn [data]
                             (keep (fn [val]
                                     (let [subtype (:sub-type val)]
@@ -342,12 +343,16 @@
             :card? false}
 
          {:name ::t-service/operation-area
-          :type :string
+          :type :chip-input
           :container-class "col-xs-12 col-sm-4 col-md-4"
           :hint-text (tr [:service-search :operation-area-search-placeholder])
+          :filter (constantly true)
           :hint-style {:top "20px"}
           :full-width? true
-          :full-width-input? false}
+          :full-width-input? false
+          :suggestions-config {:text :text :value :text}
+          :suggestions operation-area-filter-completions
+          :on-update-input #(e! (ss/->OperationAreaFilterChanged %1))}
 
 
          {:id "sub-types"
@@ -399,14 +404,14 @@
     {:component-will-unmount #(e! (ss/->SaveScrollPosition))
      :component-did-mount    #(e! (ss/->RestoreScrollPosition))
      :reagent-render
-       (fn [e! {{results :results :as service-search} :service-search
-                params                                :params
-                :as                                   app}]
-         [:div.service-search
-          [page/page-controls
-           ""
-           (tr [:service-search :label])
-           [filters-form e! service-search]]
-           (if (nil? results)
-             [:div (tr [:service-search :no-filters])]
-             [results-listing e! app])])}))
+     (fn [e! {{results :results :as service-search} :service-search
+              params                                :params
+              :as                                   app}]
+       [:div.service-search
+        [page/page-controls
+         ""
+         (tr [:service-search :label])
+         [filters-form e! service-search]]
+        (if (nil? results)
+          [:div (tr [:service-search :no-filters])]
+          [results-listing e! app])])}))

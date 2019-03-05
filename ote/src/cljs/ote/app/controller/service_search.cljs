@@ -25,6 +25,9 @@
 (defrecord SaveScrollPosition [])
 (defrecord RestoreScrollPosition [])
 
+(defrecord OperationAreaFilterChanged [input])
+(defrecord PlacesSearchCompletionsResponse [completions])
+
 (defmethod routes/on-navigate-event :service [{{:keys [transport-operator-id transport-service-id]} :params}]
   (->FetchServiceGeoJSON (str js/document.location.protocol "//" js/document.location.host
                               "/export/geojson/" transport-operator-id "/" transport-service-id)))
@@ -210,4 +213,14 @@
   (process-event [_ app]
     (when-let [p (get-in app [:service-search :scroll-position])]
       (.scrollTo js/window 0 p))
-    (update app :service-search dissoc :scroll-position)))
+    (update app :service-search dissoc :scroll-position))
+
+  OperationAreaFilterChanged
+  (process-event [{input :input} app]
+    (comm/get! (str "place-completions/" input) {:on-success (tuck/send-async! ->PlacesSearchCompletionsResponse)})
+    app)
+
+  PlacesSearchCompletionsResponse
+  (process-event [{completions :completions} app]
+    (let [available-query-terms (map :ote.db.places/namefin completions)]
+      (assoc-in app [:service-search :operation-area-filter-completions] available-query-terms))))
