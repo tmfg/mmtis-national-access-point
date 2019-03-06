@@ -381,9 +381,9 @@
     (spec/explain ::route-weeks-vec route-weeks)
     (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
     (let [diff-data (first-week-difference route-weeks)
-          filtered-diff-data (filter (fn [[_ value]]
-                                       (:different-week value))
-                                     diff-data)
+          filtered-diff-data (first (filter (fn [[_ value]]
+                                              (:different-week value))
+                                            diff-data))
           diff-week-beginnings (keep (comp :beginning-of-week :different-week) (vals diff-data))
           diff-week-date (first diff-week-beginnings)
           prev-week-date (when diff-week-date
