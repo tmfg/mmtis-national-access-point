@@ -304,7 +304,7 @@
            :args (spec/cat :rw ::route-weeks-vec)
            :ret ::single-route-change)
 
-(defn first-week-difference
+(defn route-weeks-with-first-difference
   "Detect the next different week in each route.
 
   NOTE! starting from the seond week in the given route-weeks, the first given week is considered the \"prev\" week.
@@ -739,9 +739,12 @@
                                                     \"route3\" [\"h1\" \"h1\"]}}
 
   Output-format:
-   [{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
+   [[{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
     {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
-    {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route1\" [\"h1\" \"h1\"]}}]"
+    {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route1\" [\"h1\" \"h1\"]}}]
+    [{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
+     {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
+     {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route2\" [\"h1\" \"h1\"]}}]]"
   [weeks]
   (vals (group-by (fn [d]
                     (keys (:routes d)))
@@ -816,7 +819,7 @@
             ;; Create week hashes so we can find out the differences between weeks
             (combine-weeks)
             ;; Search next week (for every route) that is different
-            (first-week-difference)
+            (route-weeks-with-first-difference)
             ;; Fetch detailed route comparison if a change was found
             ;; (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
             )}
