@@ -279,8 +279,7 @@
 
   (let [diff-pairs (-> data-two-week-two-route-change
                        (detection/changes-by-week->changes-by-route)
-                       (detection/detect-changes-for-all-routes)
-                       )
+                       (detection/detect-changes-for-all-routes))
 
         ;(detection/routes-changed-weeks (first (detection/changes-by-week->changes-by-route seppo)))
         fwd-difference (detection/route-weeks-with-first-difference (first (detection/changes-by-week->changes-by-route seppo)))
@@ -288,19 +287,14 @@
         ;; fwd-difference (detection/first-week-difference data-two-week-two-route-change)
         ]
     (testing "got two changes"
-      (is (= 2 (count diff-pairs))))
+      (is (= 2  diff-pairs)))
 
     ;;(testing "first change matches first-week-difference return value"
     ;;  (is (= (-> fwd-difference vals) (-> diff-pairs first vals))))
 
+
     (testing "first change matches first-week-difference return value"
-      (is (some? (second diff-pairs)))
-      (println "printing first and second diff pair:")
-      (clojure.pprint/pprint (first diff-pairs))
-      (clojure.pprint/pprint (second diff-pairs))
-      (is (= (-> fwd-difference vals) diff-pairs)))))
-
-
+      (is (= fwd-difference diff-pairs)))))
 
 
 (deftest no-change-found
@@ -392,7 +386,7 @@
 
 
 
-(deftest test-during-development
+(deftest test-with-gtfs-package-of-a-service
   (let [db (:db ote.main/ote)
         route-query-params {:service-id 5 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)

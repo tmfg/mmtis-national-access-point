@@ -241,7 +241,7 @@
     (let [route-week-hashes (mapv (comp #(get % route) :routes)
                             weeks)
           result (-> state
-                     (assoc :route-key :jee )
+                     (assoc :route-key route)
                      ;; Detect no-traffic run
                      (detect-no-traffic-run route-week-hashes)
                      (add-no-traffic-run-dates curr)
@@ -300,7 +300,7 @@
   ::single-route-change
   (spec/coll-of (spec/tuple ::route-key ::route-change-map) :kind map?))
 
-(spec/fdef first-week-difference
+(spec/fdef route-weeks-with-first-difference
            :args (spec/cat :rw ::route-weeks-vec)
            :ret ::single-route-change)
 
@@ -336,6 +336,40 @@
     ;; (println "first-week-difference result: " (pr-str result))
     ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
     result))
+
+
+(defn route-weeks-with-first-difference-new
+  "Detect the next different week in each route.
+
+  NOTE! starting from the seond week in the given route-weeks, the first given week is considered the \"prev\" week.
+
+  Takes a list of weeks that have week hashes for each route.
+  Returns map from route [short long headsign] to next different week info.
+  The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
+  [route-weeks]
+  ;(if (= 7  (count route-weeks))
+  ;   (def *r7 route-weeks))
+  ;; (println "spec for route-weeks:")
+  ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
+  ;; Take routes from the first week (they are the same in all weeks)
+  (let [route-names (into #{}
+                          (map first)
+                          (:routes (first route-weeks)))
+        result (reduce
+                 (fn [route-detection-state [_ curr _ _ :as weeks]]
+                   (reduce
+                     (fn [route-detection-state route]
+                       ;; value under route key in r-d-s map will be updated by
+                       ;; (route-next-different-week *value* route weeks curr)
+                       (update route-detection-state route
+                               route-next-different-week route weeks curr))
+                     route-detection-state
+                     route-names))
+                 {}    ; initial route detection state is empty
+                 (partition 4 1 route-weeks))]
+    ;; (println "first-week-difference result: " (pr-str result))
+    ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
+    (vals result)))
 
 
 (defn local-date-before? [d1 d2]
@@ -379,16 +413,15 @@
   (loop [route-weeks route-weeks
          results []]
     (spec/explain ::route-weeks-vec route-weeks)
-    (assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
-    (let [diff-data (first-week-difference route-weeks)
-          filtered-diff-data (first (filter (fn [[_ value]]
+    ;(assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
+    (let [diff-data (route-weeks-with-first-difference-new route-weeks)
+          filtered-diff-data (first (filter (fn [value]
                                               (:different-week value))
                                             diff-data))
-          diff-week-beginnings (keep (comp :beginning-of-week :different-week) (vals diff-data))
+          diff-week-beginnings (keep (comp :beginning-of-week :different-week) diff-data)
           diff-week-date (first diff-week-beginnings)
           prev-week-date (when diff-week-date
                            (.minusWeeks diff-week-date 1))]
-      (println "diff-data: " (pr-str diff-data))
       (println "filtered-diff-data: " (pr-str filtered-diff-data))
       (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
       (println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
@@ -398,7 +431,7 @@
           ;; Filter out different weeks before current week, because different week is starting week for next change.
          ;; Use the previous week date, because first-week-difference starts
          ;; comparisons at the second given week
-         (filter #(route-starting-week-not-before? % prev-week-date) route-weeks)
+          (filter #(route-starting-week-not-before? % prev-week-date) route-weeks)
           (conj results filtered-diff-data))
         (do
           (println "stop loop:")
@@ -762,7 +795,7 @@
 
 (defn detect-changes-for-all-routes
   [route-list-with-week-hashes]
-  (mapcat route-differences route-list-with-week-hashes))
+  (vec (mapcat route-differences route-list-with-week-hashes)))
 
 (defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
   "Returns map for each service"
