@@ -670,7 +670,7 @@
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
    (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
      [:div.trip-stop-sequence
-      [table/table {:name->label str :key-fn :gtfs/stop-name}
+      [table/table {:name->label str}
        [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
         {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
         {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
