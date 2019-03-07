@@ -274,21 +274,60 @@
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 
-(deftest more-than-one-change-found-w-2-routes
-  (spec-test/instrument `detection/route-weeks-with-first-difference)
+(def data-with-pause
+  (weeks (d 2019 2 4)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.2
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 11.3.
+         {route-name [nil nil nil nil nil nil nil]}         ;; 18.3.
+         {route-name [nil nil nil nil nil nil nil]}         ;; 25.3.
+         {route-name [nil nil nil nil nil nil nil]}         ;; 1.4.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 8.4.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 15.4.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})) ;; 22.4.
 
-  (let [diff-pairs (-> data-two-week-two-route-change
+
+(def no-traffic
+  (weeks (d 2019 2 4)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
+(def differences
+  (weeks (d 2019 2 4)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.2.
+         {route-name [nil nil nil nil nil nil nil]}         ;; 25.2.
+         {route-name [nil nil nil nil nil nil nil]}         ;; 4.3.
+         {route-name [nil nil nil nil nil nil nil]}         ;; 11.3.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.3.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 25.3.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 1.4.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 8.4.
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;; 15.4.
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;;22.4.
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;;29.4.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;;6.5.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 13.5.
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
+(deftest more-than-one-change-found-w-2-routes
+  (let [diff-pairs (-> no-traffic
                        (detection/changes-by-week->changes-by-route)
                        (detection/detect-changes-for-all-routes))
 
         ;(detection/routes-changed-weeks (first (detection/changes-by-week->changes-by-route seppo)))
-        fwd-difference (detection/route-weeks-with-first-difference (first (detection/changes-by-week->changes-by-route seppo)))
+        fwd-difference (detection/route-weeks-with-first-difference no-traffic)
         ;; diff-pairs (detection/routes-changed-weeks data-two-week-two-route-change)
         ;; fwd-difference (detection/first-week-difference data-two-week-two-route-change)
         ]
-    (testing "got two changes"
-      (is (= 2  diff-pairs)))
-
     ;;(testing "first change matches first-week-difference return value"
     ;;  (is (= (-> fwd-difference vals) (-> diff-pairs first vals))))
 
@@ -381,10 +420,7 @@
 
    {:beginning-of-week (java.time.LocalDate/parse "2019-07-08"),
     :end-of-week (java.time.LocalDate/parse "2019-07-14"),
-    :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
-   ])
-
-
+    :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}])
 
 (deftest test-with-gtfs-package-of-a-service
   (let [db (:db ote.main/ote)
