@@ -357,32 +357,32 @@
             :should-update-check form/always-update
             :on-update-input (utils/debounce #(e! (ss/->OperationAreaFilterChanged %1)) 500)}
 
-         {:id "sub-types"
-          :name ::t-service/sub-type
-          :label (tr [:service-search :type-search])
-          :type :chip-input
-          :container-class "col-xs-12 col-sm-4 col-md-4"
-          :full-width? true
-          :full-width-input? false
-          :suggestions-config {:text :text :value :text}
-          :suggestions (sub-types-to-list (::t-service/sub-type facets))
-          :open-on-focus? true}
+           {:id "sub-types"
+            :name ::t-service/sub-type
+            :label (tr [:service-search :type-search])
+            :type :chip-input
+            :container-class "col-xs-12 col-sm-4 col-md-4"
+            :full-width? true
+            :full-width-input? false
+            :suggestions-config {:text :text :value :text}
+            :suggestions (sub-types-to-list (::t-service/sub-type facets))
+            :open-on-focus? true}
 
-         {:name               ::t-service/data-content
-          :label              (tr [:service-search :data-content-search-label])
-          :type               :chip-input
-          :full-width?        true
-          :container-class    "col-xs-12 col-sm-4 col-md-4"
-          :auto-select?       true
-          :open-on-focus?     true
-          ;; Translate visible suggestion text, but keep the value intact.
-          :suggestions        (sort-by :text (mapv (fn [val]
-                                                     {:text  (tr [:enums ::t-service/interface-data-content val])
-                                                      :value val})
-                                                   t-service/interface-data-contents))
-          :max-results (count t-service/interface-data-contents)
-          :suggestions-config {:text :text :value :value}
-          :is-empty?          validation/empty-enum-dropdown?})]
+           {:name               ::t-service/data-content
+            :label              (tr [:service-search :data-content-search-label])
+            :type               :chip-input
+            :full-width?        true
+            :container-class    "col-xs-12 col-sm-4 col-md-4"
+            :auto-select?       true
+            :open-on-focus?     true
+            ;; Translate visible suggestion text, but keep the value intact.
+            :suggestions        (sort-by :text (mapv (fn [val]
+                                                       {:text  (tr [:enums ::t-service/interface-data-content val])
+                                                        :value val})
+                                                     t-service/interface-data-contents))
+            :max-results (count t-service/interface-data-contents)
+            :suggestions-config {:text :text :value :value}
+            :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))
 
 
