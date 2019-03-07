@@ -354,6 +354,7 @@
             :suggestions operation-area-filter-completions
             :max-results 10
             :auto-select? true
+            :should-update-check form/always-update
             :on-update-input (utils/debounce #(e! (ss/->OperationAreaFilterChanged %1)) 500)}
 
          {:id "sub-types"
