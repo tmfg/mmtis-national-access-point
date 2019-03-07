@@ -3,6 +3,7 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [ote.ui.common :as common]
+            [ote.style.table :as table-style]
             [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
             [ote.theme.colors :as colors]
@@ -72,7 +73,7 @@
      [ui/table-body {:display-row-checkbox false}
       (if (empty? rows)
         [:tr [:td {:colSpan (count headers)}
-              [common/help no-rows-message]]]
+              [:div (stylefy/use-style table-style/no-rows-message) no-rows-message]]]
         (doall
           (map-indexed
             (fn [i row]

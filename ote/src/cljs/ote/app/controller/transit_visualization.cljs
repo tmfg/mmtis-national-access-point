@@ -376,48 +376,49 @@
                                                                        ))))))
 
 (define-event RouteDifferencesResponse [response]
-  {:path [:transit-visualization]}
-  (-> app
-      (assoc :route-differences-loading? false)
-      (assoc-in [:compare :differences] response)))
-
-(define-event SelectDateForComparison [date]
   {}
-  (let [service-id (get-in app [:params :service-id])
-        compare (or (get-in app [:transit-visualization :compare]) {})
-        route (get-in app [:transit-visualization :selected-route])
-        date (goog.date.DateTime. date)
-        date1 (goog.date.DateTime. (get-in app [:transit-visualization :compare :date1]))
-        date2 (goog.date.DateTime. (get-in app [:transit-visualization :compare :date2]))
-        last-selected-date (:last-selected-date compare 2)
-        compare (merge compare
-                       (cond (or (t/after? date1 date)
-                                 (t/equal? date1 date))
-                             {:date1 date
-                              :last-selected-date 1}
-                             (or (t/after? date date2)
-                                 (t/equal? date date2))
-                             {:date2 date
-                              :last-selected-date 2}
-                             :else
-                             (if (= 2 last-selected-date)
-                               {:date1 date
-                                :last-selected-date 1}
-                               {:date2 date
-                                :last-selected-date 2})))]
-    (comm/get! (str "transit-visualization/" service-id "/route-differences")
-               {:params {:date1 (time/format-date-iso-8601 (:date1 compare))
-                         :date2 (time/format-date-iso-8601 (:date2 compare))
-                         :route-hash-id (ensure-route-hash-id route)}
+  (-> app
+      (assoc :flash-message "Reitin tiedot ladattu.")
+      (assoc-in [:transit-visualization :route-differences-loading?] false)
+      (assoc-in [:transit-visualization :compare :differences] response)))
 
-                :on-success (tuck/send-async! ->RouteDifferencesResponse)})
-    (-> app
-        (assoc-in [:transit-visualization :route-differences-loading?] true)
-        (assoc-in [:transit-visualization :compare]
-                  (fetch-trip-data-for-dates compare service-id
-                                          route
-                                          (:date1 compare)
-                                          (:date2 compare))))))
+(define-event SelectDatesForComparison [date]
+              {}
+              (let [service-id (get-in app [:params :service-id])
+                    compare (or (get-in app [:transit-visualization :compare]) {})
+                    date1 (get-in app [:transit-visualization :compare :date1])
+                    date2 (get-in app [:transit-visualization :compare :date2])
+                    route (get-in app [:transit-visualization :selected-route])
+                    goog-date1 (goog.date.DateTime. date1)
+                    goog-date (goog.date.DateTime. date)
+                    date-after-date1? (t/after? goog-date goog-date1)
+                    earlier-date (if date-after-date1? date1 date)
+                    later-date (if date-after-date1? date date1)]
+                (cond
+                  (or (and date1 date2) (t/equal? goog-date1 goog-date))
+                  (-> app
+                      (assoc-in [:transit-visualization :compare :date1] date)
+                      (assoc-in [:transit-visualization :compare :date2] nil))
+
+                  (nil? date2)
+                  (do
+                    (comm/get! (str "transit-visualization/" service-id "/route-differences")
+                               {:params {:date1 (time/format-date-iso-8601 earlier-date)
+                                         :date2 (time/format-date-iso-8601 later-date)
+                                         :route-hash-id (ensure-route-hash-id route)}
+
+                                :on-success (tuck/send-async! ->RouteDifferencesResponse)})
+                    (-> app
+                        (assoc-in [:transit-visualization :route-differences-loading?] true)
+                        (assoc-in [:transit-visualization :compare :date1]
+                                  earlier-date)
+                        (assoc-in [:transit-visualization :compare :date2]
+                                  later-date)
+                        (assoc-in [:transit-visualization :compare]
+                                  (fetch-trip-data-for-dates compare service-id
+                                                             route
+                                                             earlier-date
+                                                             later-date)))))))
 
 (define-event SelectRouteForDisplay [route]
   {}
