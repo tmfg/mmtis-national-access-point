@@ -45,7 +45,7 @@
                        :as filters}]
   (merge
    (when-not (empty? oa)
-     {:operation_area  oa})
+     {:operation_area  (str/join "," (map :text oa))})
    (when-not (empty? (get operators :chip-results))
      {:operators (str/join "," (map :business-id (get operators :chip-results)))})
    (when text
@@ -217,7 +217,8 @@
 
   OperationAreaFilterChanged
   (process-event [{input :input} app]
-    (comm/get! (str "place-completions/" input) {:on-success (tuck/send-async! ->PlacesSearchCompletionsResponse)})
+    (when-not (str/blank? input) ;; only on filled input
+      (comm/get! (str "place-completions/" input) {:on-success (tuck/send-async! ->PlacesSearchCompletionsResponse)}))
     app)
 
   PlacesSearchCompletionsResponse

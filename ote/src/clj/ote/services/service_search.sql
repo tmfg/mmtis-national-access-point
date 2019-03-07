@@ -132,4 +132,4 @@ SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
        "places" pl
  WHERE ST_INTERSECTS(oa.location, pl.location)
-   AND pl.namefin = :operation-area;
+   AND pl.namefin IN (:operation-area);

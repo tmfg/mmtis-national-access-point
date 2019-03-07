@@ -342,18 +342,19 @@
             :layout :raw
             :card? false}
 
-         {:name ::t-service/operation-area
-          :type :chip-input
-          :container-class "col-xs-12 col-sm-4 col-md-4"
-          :hint-text (tr [:service-search :operation-area-search-placeholder])
-          :filter (constantly true)
-          :hint-style {:top "20px"}
-          :full-width? true
-          :full-width-input? false
-          :suggestions-config {:text :text :value :text}
-          :suggestions operation-area-filter-completions
-          :on-update-input #(e! (ss/->OperationAreaFilterChanged %1))}
-
+           {:name ::t-service/operation-area
+            :type :chip-input
+            :container-class "col-xs-12 col-sm-4 col-md-4"
+            :hint-text (tr [:service-search :operation-area-search-placeholder])
+            :filter (constantly true)
+            :hint-style {:top "20px"}
+            :full-width? true
+            :full-width-input? false
+            :suggestions-config {:text :text :value :text}
+            :suggestions operation-area-filter-completions
+            :max-results 10
+            :auto-select? true
+            :on-update-input (utils/debounce #(e! (ss/->OperationAreaFilterChanged %1)) 500)}
 
          {:id "sub-types"
           :name ::t-service/sub-type
