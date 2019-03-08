@@ -131,5 +131,5 @@ SELECT eid."transport-service-id" as id
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
        "places" pl
- WHERE ST_INTERSECTS(oa.location, pl.location)
+ WHERE ST_INTERSECTS(ST_SetSRID(oa.location, 4326), pl.location)
    AND pl.namefin IN (:operation-area);
