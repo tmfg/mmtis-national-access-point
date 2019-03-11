@@ -172,7 +172,7 @@
       {:name :heading2
        :label (tr [:organization-page (if ytj-company-names-found?
                                         :business-id-and-aux-names
-                                        :business-name)])
+                                        :business-or-aux-name)])
        :type :text-label
        :h-style :h3
        :full-width? true}
