@@ -30,7 +30,8 @@
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
 
-(defn- operation-area-ids [db operation-area]
+(defn- services-operating-in [db operation-area]
+  "Returns ids of services which operate in the given areas"
   (when (seq operation-area)
     (ids
      :id
@@ -129,7 +130,7 @@
 
 (defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
-  (let [result-id-sets [(operation-area-ids db operation-area)
+  (let [result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
                         (transport-type-ids db transport-type)
                         (data-content-ids db data-content)
