@@ -313,11 +313,18 @@
                       (nil? l) :added
                       (nil? r) :removed
                       :default :changed))
-                  combined-trips)]
+                  combined-trips)
+        ;; When dealing with new routes there aren't traffic at date1-trips because traffic is starting
+        ;; So calculate only new trips, no other changes or stops
+        added-trip-count (when (and (nil? combined-trips) (pos-int? (count date2-trips)))
+                      (count date2-trips))
+        ;; When traffic is ending there isn't traffic at date2-trips vector. So calculate only ending trips.
+        removed-trip-count (when (and (nil? combined-trips) (pos-int? (count date1-trips)))
+                           (count date1-trips))]
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
-     :added-trips (count added)
-     :removed-trips (count removed)
+     :added-trips (if combined-trips (count added) added-trip-count)
+     :removed-trips (if combined-trips (count removed) removed-trip-count)
      :trip-changes (map (fn [[l r]]
                           (transit-changes/trip-stop-differences l r))
                         changed)}))
