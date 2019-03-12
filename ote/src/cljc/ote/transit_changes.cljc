@@ -236,8 +236,8 @@
   that is not a static-holiday (keyword)
   for that day and the hash is different."
   [week-hash-1 week-hash-2]
-  (println "week-hash-1: " (pr-str week-hash-1))
-  (println "week-hash-2: " (pr-str week-hash-2))
+  ;(println "week-hash-1: " (pr-str week-hash-1))
+  ;(println "week-hash-2: " (pr-str week-hash-2))
   (some identity
         (map (fn [i d1 d2]
                (and (some? d1)

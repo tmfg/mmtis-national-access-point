@@ -578,7 +578,7 @@
                                                                  different-week-hash)
         starting-week-date (.plusDays (:beginning-of-week starting-week) first-different-day)
         different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)]
-    (log/debug "Found changes in trips for route: " route-hash-id ", comparing dates: " starting-week-date " and " different-week-date " route-hash-id " route-hash-id)
+    ;(log/debug "Found changes in trips for route: " route-hash-id ", comparing dates: " starting-week-date " and " different-week-date " route-hash-id " route-hash-id)
     (let [date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
           date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
       (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
@@ -664,12 +664,14 @@
   [all-routes route-key-old
    {:keys [no-traffic-start-date no-traffic-end-date
            starting-week different-week route-key no-traffic-run
-           changes]}]
+           changes] :as route-change} route-changes-all]
 
   (let [route-map (map #(second %) all-routes)
+        route-changes-for-key (filter #(= route-key (:route-key (last %))) route-changes-all)
+        last-route-change? (= route-change (second (last route-changes-for-key)))
         route (first (filter #(= route-key (:route-hash-id %)) route-map))
         added? (min-date-in-the-future? route)
-        removed? (max-date-within-90-days? route)
+        removed? (and last-route-change? (max-date-within-90-days? route))
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
                              (and (> no-traffic-run no-traffic-detection-threshold)
@@ -784,7 +786,7 @@
   (tx/with-transaction
     db
     (let [route-change-infos (map (fn [[route-key detection-result]]
-                                    (transform-route-change all-routes route-key detection-result))
+                                    (transform-route-change all-routes route-key detection-result route-changes))
                                   route-changes)
           change-count-by-type (fmap count (group-by :gtfs/change-type route-change-infos))
           earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
