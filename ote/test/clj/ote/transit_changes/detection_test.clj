@@ -239,15 +239,18 @@
                              :different-week
                              :beginning-of-week))))
   
-  (let [diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
+  (let [diff-pairs (-> test-more-than-one-change
+                       detection/changes-by-week->changes-by-route
+                       detection/detect-changes-for-all-routes)
+        ;; diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
         old-diff-pairs (detection/route-weeks-with-first-difference test-more-than-one-change)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
-      (is (= (d 2019 2 18) diff-pairs)))
+      (is (= (d 2019 2 18) (-> diff-pairs first :different-week :beginning-of-week))))
 
     (testing "second change is detected"
-      (is (= old-diff-pairs diff-pairs)))))
+      (is (= old-diff-pairs (:different-week (first diff-pairs)))))))
 
 
 (def data-two-week-two-route-change                         ;This is the same format as the (combine-weeks) function
@@ -339,9 +342,12 @@
 (deftest no-change-found
   (spec-test/instrument `detection/route-weeks-with-first-difference)
 
-  (let [diff-pairs (detection/routes-changed-weeks data-two-week-change)]
+  (let [diff-pairs (-> data-two-week-change
+                       detection/changes-by-week->changes-by-route
+                       detection/detect-changes-for-all-routes)
+        pairs-with-changes (filterv :different-week diff-pairs)]
     (testing "got no changes"
-      (is (= 0 (count diff-pairs))))))
+      (is (= 0 (count pairs-with-changes))))))
 
 
 ; Dev tip: Put *symname in ns , evaluate, load, run (=define) and inspect in REPL
@@ -422,11 +428,12 @@
     :end-of-week (java.time.LocalDate/parse "2019-07-14"),
     :routes {route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}])
 
-(deftest test-with-gtfs-package-of-a-service
+;; this doesn't compile or work in normal "lein test" run due to the ote.main/ote reference, uncomment for repl use
+#_(deftest test-with-gtfs-package-of-a-service
   (let [db (:db ote.main/ote)
         route-query-params {:service-id 5 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)
-        old-diff (detection/detect-route-changes-for-service db route-query-params)]
+        old-diff (detection/detect-route-changes-for-service-old db route-query-params)]
     ;; new-diff structure:
     ;; :route-changes [ ( [ routeid {dada} ]) etc
     (println (:start-date route-query-params))
@@ -444,15 +451,16 @@
                              :different-week
                              :beginning-of-week))))
 
-  (let [diff-pairs (detection/routes-changed-weeks data-realworld-two-change-case)
+  (let [diff-pairs (-> data-realworld-two-change-case
+                       detection/changes-by-week->changes-by-route
+                       detection/detect-changes-for-all-routes)
         old-diff-pair (-> data-realworld-two-change-case
                           detection/route-weeks-with-first-difference)]
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     
     (testing "first change is detected"
-      (is (= (d 2019 5 27) diff-pairs                                 ;(-> diff-pairs first first second :different-week :beginning-of-week)
-             )))
+      (is (= (d 2019 5 27) (-> diff-pairs first :different-week :beginning-of-week))))
 
     (testing "second change date is correct"
-      (is (= (d 2019 6 3) (-> diff-pairs second first second :different-week :beginning-of-week))))))
+      (is (= (d 2019 6 3) (-> diff-pairs second :different-week :beginning-of-week))))))
