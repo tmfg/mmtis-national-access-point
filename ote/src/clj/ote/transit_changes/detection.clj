@@ -532,13 +532,6 @@
             result
             (recur (rest route-weeks) result)))]))
 
-#_(defn routes-changed-weeks [route-weeks]
-  (let [differences (route-differences route-weeks)
-        combined-routes (combine-differences-with-routes route-weeks differences)]
-    (println "Differences in routes-changed-weeks: " differences)
-    differences))
-
-
 (defn route-trips-for-date [db service-id route-hash-id date]
   (vec
     (for [trip-stops (partition-by (juxt :package-id :trip-id)
@@ -923,8 +916,6 @@
                        (changes-by-week->changes-by-route)  ;Contains list of vectors
 
                        (detect-changes-for-all-routes)
-
-                       ;(routes-changed-weeks)
                        ;; Fetch detailed route comparison if a change was found
                        (route-day-changes-new db service-id)    ;;remove this from here and the old function to run comparing tests
                        )]
@@ -935,7 +926,7 @@
         (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
 
-(defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
+(defn detect-route-changes-for-service-old [db {:keys [start-date service-id] :as route-query-params}]
   (let [type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
