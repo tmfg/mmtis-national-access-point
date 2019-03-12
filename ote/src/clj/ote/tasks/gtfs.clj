@@ -98,7 +98,7 @@
             (let [query-params {:service-id service-id
                                 :start-date start-date
                                 :end-date end-date}]
-              (detection/store-transit-changes!
+              (detection/update-transit-changes!
                db today service-id
                (detection/service-package-ids-for-date-range db query-params)
                (detection/detect-route-changes-for-service-new db query-params)))
