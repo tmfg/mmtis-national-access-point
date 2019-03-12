@@ -220,31 +220,52 @@
      ;; Add all received routes to shown map
      [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
+(defn compare-stop-differences [transit-visualization date1-trips date2-trips]
+  (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+          (let [first-common-stop
+                #(assoc %
+                   :first-common-stop first-common-stop
+                   :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
+                date1-trips (mapv first-common-stop date1-trips)
+                date2-trips (mapv first-common-stop date2-trips)
+                combined-trips (transit-changes/merge-by-closest-time
+                                 :first-common-stop-time
+                                 date1-trips date2-trips)]
+
+            (assoc-in transit-visualization [:compare :combined-trips]
+                      (mapv (fn [[l r]]
+                              [l r (transit-changes/trip-stop-differences l r)])
+                            combined-trips)))
+
+          ;; Can't find common stop
+          (assoc-in transit-visualization [:compare :combined-trips] nil)))
+
+
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
         date2-trips (get-in transit-visualization [:compare :date2-trips])]
+    (cond
+      (and (not (:route-trips-for-date1-loading? transit-visualization)) ;; both trips should be loaded
+           (not (:route-trips-for-date2-loading? transit-visualization))
+           (not (empty? date1-trips))
+           (not (empty? date2-trips)))
+      (compare-stop-differences transit-visualization date1-trips date2-trips)
 
-  (if (and date1-trips date2-trips)
-    (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
-      (let [first-common-stop
-            #(assoc %
-                    :first-common-stop first-common-stop
-                    :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
-            date1-trips (mapv first-common-stop date1-trips)
-            date2-trips (mapv first-common-stop date2-trips)
-            combined-trips (transit-changes/merge-by-closest-time
-                            :first-common-stop-time
-                            date1-trips date2-trips)]
-        (assoc-in transit-visualization [:compare :combined-trips]
-               (mapv (fn [[l r]]
-                       [l r (transit-changes/trip-stop-differences l r)])
-                     combined-trips)))
+      (and (not (:route-trips-for-date1-loading? transit-visualization)) ;; both trips should be loaded
+           (not (:route-trips-for-date2-loading? transit-visualization)))
 
-      ;; Can't find common stop
-      (assoc-in transit-visualization [:compare :combined-trips] nil))
+      ;; Both dates not fetched, don't try to calculate - assume that route is a new one or ending
+      (-> transit-visualization
+          (compare-stop-differences date1-trips date2-trips)
+          (assoc-in [:compare :differences]
+                    (if (and date1-trips (empty? date2-trips))
+                      ;ending - count trips from date1, because date2 is empty
+                      {:removed-trips (count date1-trips)}
+                      ;added - count trips from date2 because date1 is empty
+                      {:added-trips (count date2-trips)})))
 
-    ;; Both dates not fetched, don't try to calculate
-    (assoc-in transit-visualization [:compare :combined-trips] nil))))
+      :default
+      transit-visualization)))
 
 ;; Routes trip data
 (define-event RouteTripsForDateResponse [trips date]
@@ -263,7 +284,12 @@
 
                 :default
                 app))]
-    (select-first-trip app)))
+    ;; Wait until both trips are loaded
+    ;; No need to render trips and stops while they are not ready
+    (if (and (not (:route-trips-for-date1-loading? app))
+             (not (:route-trips-for-date2-loading? app)))
+      (select-first-trip app)
+      app)))
 
 (defn fetch-trip-data-for-dates [compare service-id route date1 date2]
   (doseq [date [date1 date2]
