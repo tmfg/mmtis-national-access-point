@@ -7,7 +7,9 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [clojure.spec.alpha :as spec]
-    ;; [spec-provider.provider :as provider]
+            ;; [spec-provider.provider :as provider]
+            [specql.op :as op]
+            [ote.db.user :as user]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
             [ote.db.tx :as tx])
@@ -31,15 +33,48 @@
         id-vector (vec (sort < id-map))]
     id-vector))
 
-(defn calculate-package-hashes-for-service [db service-id package-count]
-  (let [package-ids (get-gtfs-packages db service-id package-count)]
+(defn hash-recalculations
+  "List currently running hash-recalculations"
+  [db]
+  (let [calculations (specql/fetch db :gtfs/hash-recalculation
+                                   (specql/columns :gtfs/hash-recalculation)
+                                   {:gtfs/completed op/null?})]
+    (when (pos-int? (count calculations))
+       {:calculations calculations})))
+
+ (defn- start-hash-recalculation [db packets-total user]
+  (let [id (specql/insert! db :gtfs/hash-recalculation
+                  {:gtfs/started (java.sql.Timestamp. (System/currentTimeMillis))
+                   :gtfs/packets-ready 0
+                   :gtfs/packets-total packets-total
+                   :gtfs/completed nil
+                   :gtfs/created-by (:id user) })]
+    id))
+
+ (defn- update-hash-recalculation [db packages-ready id]
+  (specql/update! db :gtfs/hash-recalculation
+                  {:gtfs/packets-ready packages-ready}
+                 {:gtfs/recalculation-id id}))
+
+ (defn- stop-hash-recalculation [db id]
+  (specql/update! db :gtfs/hash-recalculation
+                 {:gtfs/completed (java.sql.Timestamp. (System/currentTimeMillis))}
+                 {:gtfs/recalculation-id id}))
+
+(defn calculate-package-hashes-for-service [db service-id package-count user]
+  (let [package-ids (get-gtfs-packages db service-id package-count)
+        ;; When given service has packages, mark calculation started
+        recalculation-id (when package-ids
+                           (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
     (log/info "Found " (count package-ids) " For service " service-id)
-    (doall
-      (for [package-id package-ids]
-        (do
+
+    (dotimes [i (count package-ids)]
+      (let [package-id (nth package-ids i)]
           (log/info "Generating hashes for package " package-id "  (service " service-id ")")
           (generate-date-hashes db {:package-id package-id})
-          (log/info "Generation ready! (package " package-id " service " service-id ")"))))))
+          (update-hash-recalculation db (inc i) recalculation-id)
+          (log/info "Generation ready! (package " package-id " service " service-id ")")))
+    (stop-hash-recalculation db recalculation-id)))
 
 (defn db-route-detection-type [db service-id]
   (let [type (first (specql/fetch db :gtfs/detection-service-route-type
@@ -513,15 +548,17 @@
           :let [package-id (:package-id (first trip-stops))
                 trip-id (:trip-id (first trip-stops))]]
       {:gtfs/package-id package-id
-       :gtfs/trip-id    trip-id
-       :stoptimes       (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon]}]
-                                {:gtfs/stop-id        stop-id
-                                 :gtfs/stop-name      stop-name
-                                 :gtfs/stop-lat       stop-lat
-                                 :gtfs/stop-lon       stop-lon
-                                 :gtfs/stop-sequence  stop-sequence
-                                 :gtfs/departure-time (time/pginterval->interval departure-time)})
-                              trip-stops)})))
+       :gtfs/trip-id trip-id
+       :stoptimes (mapv (fn [{:keys [stop-id stop-name departure-time stop-sequence stop-lat stop-lon stop-fuzzy-lat stop-fuzzy-lon]}]
+                          {:gtfs/stop-id stop-id
+                           :gtfs/stop-name stop-name
+                           :gtfs/stop-lat stop-lat
+                           :gtfs/stop-lon stop-lon
+                           :gtfs/stop-fuzzy-lat stop-fuzzy-lat
+                           :gtfs/stop-fuzzy-lon stop-fuzzy-lon
+                           :gtfs/stop-sequence stop-sequence
+                           :gtfs/departure-time (time/pginterval->interval departure-time)})
+                        trip-stops)})))
 
 
 (defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
@@ -968,6 +1005,38 @@
     (doall
       (for [id service-ids]
         (update-date-hash-with-null-route-hash-id db (:id id))))))
+
+(defn- call-generate-date-hash [db packages user future]
+  (let [package-count (count packages)
+        recalculation-id (when packages
+                           (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
+    (dotimes [i (count packages)]
+      (let [package-id (nth packages i)]
+          (println "Generating" (inc i) "/" package-count " - " package-id)
+          (if future
+            (generate-date-hashes-for-future db {:package-id (:package-id package-id)})
+            (generate-date-hashes db {:package-id (:package-id package-id)}))
+          (update-hash-recalculation db (inc i) recalculation-id))
+      (log/info "Generation ready!"))
+    (stop-hash-recalculation db recalculation-id)))
+
+(defn calculate-monthly-date-hashes-for-packages [db user future]
+  (let [monthly-packages (fetch-monthly-packages db)]
+    (log/info "Generating monthly date hashes. Package count" (count monthly-packages))
+    (call-generate-date-hash db monthly-packages user future)
+    monthly-packages))
+
+(defn calculate-date-hashes-for-all-packages [db user future]
+  (let [all-packages (fetch-all-packages db)]
+    (log/info "Generating all date hashes. Package count" (count all-packages))
+    (call-generate-date-hash db all-packages user future)
+    all-packages))
+
+(defn calculate-date-hashes-for-contract-traffic [db user future]
+  (let [all-packages (fetch-contract-packages db)]
+    (log/info "Generating contract date hashes. Package count" (count all-packages))
+    (call-generate-date-hash db all-packages user future)
+    all-packages))
 
 
 ;; Do not use this if you don't need to.

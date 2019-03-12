@@ -12,6 +12,7 @@ WITH latest_transit_changes AS (
    ORDER BY "transport-service-id", date desc
 )
 SELECT ts.id AS "transport-service-id",
+       ts."commercial-traffic?" AS "commercial?",
        ts.name AS "transport-service-name",
        op.name AS "transport-operator-name",
        "added-routes", "removed-routes", "changed-routes", "no-traffic-routes",

@@ -31,7 +31,7 @@ SELECT * FROM gtfs_service_routes_with_daterange(:service-id::INTEGER);
 -- name: fetch-route-trips-for-date
 SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
-        stop."stop-name", stop."stop-lat", stop."stop-lon"
+        stop."stop-name", stop."stop-lat", stop."stop-lon", stop."stop-fuzzy-lat", stop."stop-fuzzy-lon"
   FROM "detection-route" r
   JOIN "gtfs_package" p ON p.id = r."package-id" AND p."deleted?" = FALSE
   JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
@@ -48,6 +48,9 @@ SELECT t."package-id", trip."trip-id",
 -- name: generate-date-hashes
 SELECT gtfs_generate_date_hashes(:package-id::INTEGER);
 
+-- name: generate-date-hashes-for-future
+SELECT gtfs_generate_date_hashes_for_future(:package-id::INTEGER);
+
 -- name: fetch-services-packages
 SELECT p.id as "package-id"
   FROM "external-interface-description" e, "gtfs_package" p
@@ -57,3 +60,25 @@ SELECT p.id as "package-id"
 -- name: fetch-distinct-services-from-transit-changes
 SELECT distinct t."transport-service-id" as id
   FROM "gtfs-transit-changes" t;
+
+-- name: fetch-monthly-packages
+SELECT MAX(p.id) as "package-id"
+  FROM gtfs_package p, "transport-service" t
+ WHERE p."transport-service-id" = t.id
+   AND t."commercial-traffic?" = TRUE
+ GROUP BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM'))
+ ORDER BY concat(p."transport-service-id", to_char(p.created, '-YYYY-MM')) asc;
+
+-- name: fetch-all-packages
+SELECT p.id as "package-id"
+  FROM gtfs_package p, "transport-service" t
+ WHERE p."transport-service-id" = t.id
+   AND t."commercial-traffic?" = TRUE
+ ORDER BY p.id asc;
+
+-- name: fetch-contract-packages
+SELECT p.id as "package-id"
+  FROM gtfs_package p, "transport-service" t
+ WHERE p."transport-service-id" = t.id
+   AND t."commercial-traffic?" = FALSE
+ ORDER BY p.id asc;

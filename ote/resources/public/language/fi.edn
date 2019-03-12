@@ -298,7 +298,7 @@
 Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
-  :description-why-contact-info "Täytä tähän yhteystiedot, joiden avulla palveluanne käyttävät asiakkaat voivat olla teihin yhteydessä."
+  :description-why-contact-info "Palvelun yhteystiedoista julkaistaan julkisessa NAP-palvelukatalogissa ainoastaan verkkosivujen osoite."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
@@ -665,7 +665,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:address-postal "Postiosoite"
   :address-postal-street "Katuosoite tai PL-osoite"
   :business-id-and-aux-names "Toiminimi ja aputoiminimet"
-  :business-name "Toiminimi"
+  :business-or-aux-name "Toiminimi tai aputoiminimi"
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
   :contact-details-other "Muut yhteystiedot"
@@ -931,7 +931,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  :transit-visualization-page
  {:loading-routes "Palvelun reittejä ladataan."
   :no-changes-in-routes "Ei reittejä, joissa muutoksia."
-  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
+  :checkbox-show-no-change "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
 
  :common-texts
  {:check-your-input "Ole hyvä ja tarkista, että syötit tiedot oikein."
@@ -951,7 +951,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-front-page "Etusivu"
   :navigation-organizations "Palveluntuottajat"
   :navigation-dataset "Liikkumispalvelukatalogi"
-  :navigation-give-feedback "Palautelomake"
+  :navigation-give-feedback "Anna palautetta"
+  :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
   :navigation-login "Kirjaudu"
   :navigation-register "Rekisteröidy"
   :navigation-admin "Ylläpitopaneeli"
@@ -1018,7 +1019,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :forbidden "Käyttöoikeutesi eivät riitä sisällön katseluun."
   :optionally-fill-manually "Vaihtoehtoisesti voit jatkaa tietojen syöttämistä käsin."
 
-  :nap-data-license (:md "Tälle lomakkeelle täytetyt tiedot julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on [Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fi).")
+  :nap-data-license "Tälle lomakkeelle täytettyjä tietoja julkaistaan NAP-palvelussa avoimena datana. Julkaistujen tietojen lisenssi on "
+  :nap-data-license-url-label "Creative Commons Nimeä 4.0 Kansainvälinen"
+  :nap-data-license-url "https://creativecommons.org/licenses/by/4.0/deed.fi"
 
   :save-user-success "Käyttäjätiedot tallennettu"
   :start-time "Alkamisaika"
@@ -1308,7 +1311,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
   :released-apis "Palvelussa julkaistut rajapinnat"
   :service-basic-info "Palvelun perustiedot"
-  :no-description "Palvelulle ei ole annettu kuvausta."
+  :no-description "Palvelulle ei ole vielä annettu kuvausta."
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"

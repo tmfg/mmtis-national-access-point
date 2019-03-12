@@ -82,21 +82,21 @@
     (is (= (:stop-seq-changes (second (:trip-changes result))) 0))))
 
 (def p1_1 [{:gtfs/package-id 1, :gtfs/trip-id "1_0", :stoptimes
-                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 8, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s2", :stop-name "n2", :stop-lat 2, :stop-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 12, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s3", :stop-name "n3", :stop-lat 3, :stop-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 15, :minutes 0, :seconds 0.0}}]}
+                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-fuzzy-lat 1, :stop-fuzzy-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 8, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s2", :stop-name "n2", :stop-lat 2, :stop-lon 2, :stop-fuzzy-lat 2, :stop-fuzzy-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 12, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s3", :stop-name "n3", :stop-lat 3, :stop-lon 3, :stop-fuzzy-lat 3, :stop-fuzzy-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 15, :minutes 0, :seconds 0.0}}]}
            {:gtfs/package-id 1, :gtfs/trip-id "1_1", :stoptimes
-                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 16, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s2", :stop-name "n2", :stop-lat 2, :stop-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 17, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s3", :stop-name "n3", :stop-lat 3, :stop-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 0, :seconds 0.0}}]}])
+                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-fuzzy-lat 1, :stop-fuzzy-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 16, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s2", :stop-name "n2", :stop-lat 2, :stop-lon 2, :stop-fuzzy-lat 2, :stop-fuzzy-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 17, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s3", :stop-name "n3", :stop-lat 3, :stop-lon 3, :stop-fuzzy-lat 3, :stop-fuzzy-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 0, :seconds 0.0}}]}])
 (def p2_1 [{:gtfs/package-id 2, :gtfs/trip-id "1_0", :stoptimes
-                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 8, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 12, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 3, :stop-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 15, :minutes 0, :seconds 0.0}}]}
+                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-fuzzy-lat 1, :stop-fuzzy-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 8, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-fuzzy-lat 2, :stop-fuzzy-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 12, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 3, :stop-lon 3, :stop-fuzzy-lat 3, :stop-fuzzy-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 15, :minutes 0, :seconds 0.0}}]}
            {:gtfs/package-id 2, :gtfs/trip-id "1_1", :stoptimes
-                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 16, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 17, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 3, :stop-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 0, :seconds 0.0}}]}])
+                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-fuzzy-lat 1, :stop-fuzzy-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 16, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-fuzzy-lat 2, :stop-fuzzy-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 17, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 3, :stop-lon 3, :stop-fuzzy-lat 3, :stop-fuzzy-lon 3, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 0, :seconds 0.0}}]}])
 
 (deftest test-two-stop-name-changed-location-is-same
   (let [result (detection/compare-selected-trips
@@ -108,13 +108,13 @@
     (is (= (:stop-seq-changes (second (:trip-changes result))) 0))))
 
 (def p2_2 [{:gtfs/package-id 2, :gtfs/trip-id "1_0", :stoptimes
-                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 8, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 12, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 4, :stop-lon 4, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 15, :minutes 0, :seconds 0.0}}]}
+                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-fuzzy-lat 1, :stop-fuzzy-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 8, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-fuzzy-lat 2, :stop-fuzzy-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 12, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 4, :stop-lon 4, :stop-fuzzy-lat 4, :stop-fuzzy-lon 4, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 15, :minutes 0, :seconds 0.0}}]}
            {:gtfs/package-id 2, :gtfs/trip-id "1_1", :stoptimes
-                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 16, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 17, :minutes 0, :seconds 0.0}}
-                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 4, :stop-lon 4, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 0, :seconds 0.0}}]}])
+                             [#:gtfs{:stop-id "s1", :stop-name "n1", :stop-lat 1, :stop-lon 1, :stop-fuzzy-lat 1, :stop-fuzzy-lon 1, :stop-sequence 0, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 16, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s2", :stop-name "n2_2", :stop-lat 2, :stop-lon 2, :stop-fuzzy-lat 2, :stop-fuzzy-lon 2, :stop-sequence 1, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 17, :minutes 0, :seconds 0.0}}
+                              #:gtfs{:stop-id "s3", :stop-name "n3_3", :stop-lat 4, :stop-lon 4, :stop-fuzzy-lat 4, :stop-fuzzy-lon 4, :stop-sequence 2, :departure-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 0, :seconds 0.0}}]}])
 
 (deftest test-two-stop-name-and-location-changed
   (let [result (detection/compare-selected-trips

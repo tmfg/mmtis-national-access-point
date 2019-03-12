@@ -40,7 +40,7 @@ SELECT to_char(chg."different-week-date", 'dd.mm.yyyy') as "change-date",
        to_char(date,'yyyy-mm-dd') as date,
        ts.id AS "transport-service-id"
   FROM changes_with_regions chg
-  JOIN "transport-service" ts ON ts.id = chg."transport-service-id" AND ts."sub-type" = 'schedule'
+  JOIN "transport-service" ts ON ts.id = chg."transport-service-id" AND ts."sub-type" = 'schedule' AND ts."commercial-traffic?" = TRUE
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
  WHERE chg.date = CURRENT_DATE
    AND chg."change-date" IS NOT NULL
@@ -71,7 +71,7 @@ SELECT to_char(chg."change-date", 'dd.mm.yyyy') as "change-date",
        to_char(date,'yyyy-mm-dd') as date,
        ts.id AS "transport-service-id"
   FROM changes_with_regions chg
-  JOIN "transport-service" ts ON ts.id = chg."transport-service-id"
+  JOIN "transport-service" ts ON ts.id = chg."transport-service-id" AND ts."sub-type" = 'schedule' AND ts."commercial-traffic?" = TRUE
   JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
  WHERE chg.date = :date::DATE
    AND chg."change-date" IS NOT NULL

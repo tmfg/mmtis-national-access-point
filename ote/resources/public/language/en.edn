@@ -297,7 +297,7 @@
 You can also draw the operating area or point to the map with drawing tools. You can freely give a name to the area you have drawn e.g. \"Area of operation in Southern Finland\"."
 
   :available-from-and-to "Set date range when the service is available.\n\u2022 If the service is already available, leave \"Available from\" date empty (\"Immediately\").\n\u2022 If the service is available indefinitely, leave \"Available to\" date empty (\"Indefinitely\")."
-  :description-why-contact-info "Fill in contact information that passengers or service end users can use to contact you."
+  :description-why-contact-info "Of the contact information, only the WWW-address will be published in the public NAP service catalog."
   :pricing-info "Fill in price information and/or the basis for pricing in to the table.\nIf the table is not suitable for price announcment, you can tell about pricing in the field \"price determination\". \nIf all the price information is already in a website (WWW), you can simpy just fill in the WWW-address into the field \"Price information WWW-address\"."
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
@@ -659,7 +659,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:address-postal "Postal address"
   :address-postal-street "Street address or P.O. Box"
   :business-id-and-aux-names "Company name and auxiliary names"
-  :business-name "Business name"
+  :business-or-aux-name "Business name or auxiliary name"
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
   :contact-details-other "Other contact details "
@@ -942,6 +942,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-organizations "Transport operator"
   :navigation-dataset "Transport service catalog"
   :navigation-give-feedback "Give feedback"
+  :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
   :navigation-login "Login"
   :navigation-register "Register"
   :navigation-admin "Admin panel"
@@ -1008,7 +1009,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :forbidden "Forbidden"
   :optionally-fill-manually "Optionally you may proceed to enter details manually."
 
-  :nap-data-license (:md "The information you fill in on this form will be published in the NAP service catalog as open data. The published data will be licensed with [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en).")
+  :nap-data-license "The information filled in this form will be published in the NAP service catalog as open data. The published data will be licensed with "
+  :nap-data-license-url-label "Creative Commons Attribution 4.0 International (CC BY 4.0)"
+  :nap-data-license-url "https://creativecommons.org/licenses/by/4.0/deed.en"
 
   :save-user-success "Account info saved"
   :start-time "Starting time"
@@ -1292,7 +1295,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :limit-search-results "Limit search results"
   :participating-operator "Participates in providing of this service"
   :released-apis "Interfaces published in the service"
-  :no-description "Palvelulle ei ole annettu kuvausta."
+  :no-description "No description has been given to the service yet."
   :service-basic-info "Basic info of the service"
   :result-count (:plural :count
                   "No services found"

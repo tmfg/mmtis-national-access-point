@@ -61,3 +61,18 @@ i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "imp
  GROUP BY ts.id, op.id, i.id
  ORDER BY i.format ASC, i."gtfs-import-error" DESC;
 
+-- name: fetch-commercial-services
+SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" as "commercial?",
+       o.id as "operator-id", o.name as "operator-name"
+  FROM
+       "transport-service" t,
+       "transport-operator" o,
+       "external-interface-description" eid
+ WHERE t."transport-operator-id" = o.id
+   AND eid."transport-service-id" = t.id
+   AND t."sub-type" = 'schedule'
+   AND t.published IS NOT NULL
+   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
+ GROUP BY t.id, o.id
+ ORDER BY o.name asc;
+

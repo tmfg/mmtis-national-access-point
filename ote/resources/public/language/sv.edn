@@ -306,7 +306,7 @@
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
-  :description-why-contact-info "Uppge här kontaktuppgifter ämnade för resenären eller den som bokar tjänsten."
+  :description-why-contact-info "Av kontaktinformationen i tjänsten är det endast webbadressen som publiceras i den offentliga NAP-tjänstekatalogen"
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
@@ -667,7 +667,7 @@
  {:address-postal "Postadress"
   :address-postal-street "Gatuadress eller postbox"
   :business-id-and-aux-names "Företagsnamn och parallellnamn"
-  :business-name "Företagsnamn"
+  :business-or-aux-name "Företagsnamn eller extra företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
   :contact-details-other "Andra kontaktuppgifter"
   :contact-details "Kontaktuppgifter"
@@ -945,7 +945,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-front-page "Framsida"
   :navigation-organizations "Tjänsteproducenter"
   :navigation-dataset "Tjänstekatalog"
-  :navigation-give-feedback "Respons"
+  :navigation-give-feedback "Ge feedback"
+  :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
   :navigation-login "Logga in"
   :navigation-register "Registrera"
   :navigation-admin "Admin panel"
@@ -1012,7 +1013,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :forbidden "Du har inte behörighet att visa innehållet."
   :optionally-fill-manually "Alternativt kan du fortsätta att skriva in detaljer manuellt"
 
-  :nap-data-license (:md "Informationen Du ger i detta formulär publiceras i NAP-katalogen som öppen data med licensen [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.sv).")
+  :nap-data-license "Informationen som fyllts i på denna blankett publiceras som öppna data i NAP-katalogen med licensen "
+  :nap-data-license-url-label "Creative Commons Erkännande 4.0 Internationell (CC BY 4.0)"
+  :nap-data-license-url "https://creativecommons.org/licenses/by/4.0/deed.sv"
 
   :save-user-success "Profil sparad"
   :business-id-is-not-unique "FO-numret finns redan i NAP. Ta kontakt med NAP Help Desk, joukkoliikenne@traficom.fi eller tfn 0295 34 6705 (vardagar kl 9-15)."
@@ -1295,8 +1298,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :type-search "Tjänstetyp"
   :limit-search-results "Begränsar katalogen"
   :participating-operator "Osallistuu tämän palvelun tuottamiseen"
-  :released-apis "Palvelussa julkaistut rajapinnat"
-  :no-description "Palvelulle ei ole annettu kuvausta."
+  :released-apis "Gränssnitt publicerade i tjänsten."
+  :no-description "Ingen beskrivning har givits till tjänsten än."
   :service-basic-info "Basic info of the service"
   :result-count (:plural :count
                   "Inga resultat"

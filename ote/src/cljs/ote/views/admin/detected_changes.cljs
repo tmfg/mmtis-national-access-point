@@ -1,45 +1,149 @@
 (ns ote.views.admin.detected-changes
   "Helper methods to help test and configure automatic traffic changes detection"
   (:require [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.form-fields :as form-fields]
-            [ote.app.controller.admin :as admin-controller]
-            [ote.db.transport-service :as t-service]
-            [clojure.string :as str]
+            [ote.app.controller.admin-transit-changes :as admin-transit-changes]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :refer [linkify]]
-            [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
-            [ote.ui.common :as ui-common]
-            [ote.ui.common :as common-ui]
             [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
             [ote.style.admin :as style-admin]
             [cljs-time.core :as t]
             [ote.ui.form :as form]
-            [ote.ui.tabs :as tabs]))
+            [ote.ui.tabs :as tabs]
+            [ote.style.buttons :as button-styles]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.buttons :as buttons]))
+
+(defn hash-recalculation-warning
+  "When hash calculation is on going we need to block users to start it again."
+  [e! app-state]
+  (let [calculation (first (get-in app-state [:admin :transit-changes :hash-recalculations :calculations]))]
+    [:div
+     "Taustalaskenta on menossa. Muutostunnistuksen työkalut ovat poissa käytöstä."
+     [:br]
+     [:div
+      [:div "Laskenta aloitettu " (str (:gtfs/started calculation))]
+      [:div "Paketteja yhteensä " (:gtfs/packets-total calculation)]
+      [:div "Paketeja laskettu " (:gtfs/packets-ready calculation)]]
+
+     [:a (merge (stylefy/use-style button-styles/primary-button)
+                {:id "update-hash-recalculation-status"
+                 :href "#"
+                 :on-click #(do
+                              (.preventDefault %)
+                              (e! (admin-transit-changes/->LoadHashRecalculations)))
+                 :icon (ic/content-filter-list)})
+      [:span "Tarkista laskennan eteneminen"]]]))
+
+(defn contract-traffic [e! app-state]
+  (let [services (get-in app-state [:admin :transit-changes :commercial-services])]
+    [:div
+     [ui/table {:selectable false}
+      [ui/table-header {:adjust-for-checkbox false
+                        :display-select-all false}
+       [ui/table-row
+        [ui/table-header-column "Palveluntuottaja"]
+        [ui/table-header-column "Palvelu"]
+        [ui/table-header-column "Kaupallinen?"]]]
+      [ui/table-body {:display-row-checkbox false}
+       (doall
+         (for [s services]
+           ^{:key (:service-id s)}
+           [ui/table-row {:selectable false}
+            [ui/table-row-column (:operator-name s)]
+            [ui/table-row-column (:service-name s)]
+            [ui/table-row-column
+             [form-fields/field
+              {:label "Kaupallinen"
+               :type :checkbox
+               :update! #(e! (admin-transit-changes/->ToggleCommercialTraffic (:service-id s) (:commercial? s)))}
+              (:commercial? s)]]]))]]]))
+
+(defn- day-hash-button-element [e! description btn-text calculation-fn]
+  [:div (stylefy/use-style style-admin/detection-button-container)
+   [:div (stylefy/use-style style-admin/detection-info-text)
+    [:span description]]
+   [:div {:style {:flex 2}}
+    [:a (merge (stylefy/use-style button-styles/primary-button)
+               {:href "#"
+                :on-click #(do
+                             (.preventDefault %)
+                             (calculation-fn)
+                             (.setTimeout js/window
+                                          (fn [] (e! (admin-transit-changes/->LoadHashRecalculations)))
+                                          500))})
+     [:span btn-text]]]])
 
 (defn detect-changes [e! app-state]
   [:div
    [:div (stylefy/use-style (style-base/flex-container "column"))
+
+    [:h2 "Rajapintoihin kohdistuvat toimenpiteet"]
+
+    [:div (stylefy/use-style style-admin/detection-button-container)
+     [:div (stylefy/use-style style-admin/detection-info-text)
+      [:span "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
+      Tätä nappia painamalla voidaan pakottaa lataus."]]
+     [:div {:style {:flex 2}}
+      [:a (merge (stylefy/use-style button-styles/primary-button)
+                 {:id "force-import"
+                  :href "#"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (admin-transit-changes/->ForceInterfaceImport)))
+                  :icon (ic/content-filter-list)})
+       [:span "Pakota yhden lataamattoman pakettin lataus ulkoisesta osoitteesta"]]]]
+
+    [:h2 "Muutostunnistuksen käynnistys"]
+
+    [:div (stylefy/use-style style-admin/detection-button-container)
+     [:div (stylefy/use-style style-admin/detection-info-text)
+      [:span "Pakota muutostunnistus kaikkille palveluille. Tämä vie noin 3 minuuttia."]]
+     [:div {:style {:flex 2}}
+      [:a (merge (stylefy/use-style button-styles/primary-button)
+                 {:id "force-detect-transit-changes"
+                  :href "#"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (admin-transit-changes/->ForceDetectTransitChanges)))
+                  :icon (ic/content-filter-list)})
+       [:span "Käynnistä muutostunnitus"]]]]
+
+    [:h2 "Päivätiivisteet - älä käytä, jos ei ole pakko"]
+
+    [day-hash-button-element e!
+     "Laske kuukausittaiset päivätiivisteet tulevaisuuden osalta. Tämä vie noin tunnin. Laskenta jättää sopimusliikenteet huomoimatta."
+     "Laske päivätiivisteet kuukausittain tulevaisuuteen"
+     #(e! (admin-transit-changes/->CalculateDayHash "month" "true"))]
+
     [:br]
-    [ui/raised-button
-     {:id       "force-import"
-      :label    "Pakota yhden lataamattoman pakettin lataus ulkoisesta osoitteesta"
-      :on-click #(do
-                   (.preventDefault %)
-                   (e! (admin-controller/->ForceInterfaceImport)))
-      :primary  true
-      :icon     (ic/content-filter-list)}]
+    [day-hash-button-element e!
+     "Laske kaikki päivätiivisteet tulevaisuuden osalta. Tämä vie noin 15 tuntia. Laskenta jättää sopimusliikenteet huomioimatta."
+     "Laske kaikki päivätiivisteet tulevaisuuteen"
+     #(e! (admin-transit-changes/->CalculateDayHash "day" "true"))]
+
     [:br]
-    [ui/raised-button
-     {:id       "force-detect-transit-changes"
-      :label    "Pakota kaikkien muutosten tunnistus"
-      :on-click #(do
-                   (.preventDefault %)
-                   (e! (admin-controller/->ForceDetectTransitChanges)))
-      :primary  true
-      :icon     (ic/content-filter-list)}]]])
+    [day-hash-button-element e!
+     "Kaikkien päivätiivisteiden laskenta vie kauan. Tuotannossa arviolta 24h+. Tämä laskenta ottaa jokaiselta
+     palvelulta vain kuukauden viimeisimmän paketin ja laskee sille päivätiivisteet. Tämä vähentää laskentaa käytettyä aikaa.
+     Kun käynnistät tämän laskennan joudut odottamaan arviolta 1-3h. Laskenta jättää sopimusliikenteet huomioimatta."
+     "Laske päivätiivisteet kuukausittain uusiksi"
+     #(e! (admin-transit-changes/->CalculateDayHash "month" "false"))]
+
+    [:br]
+    [day-hash-button-element e!
+     "Laske kaikille paketeille päivätiivisteet uusiksi. Tämä laskenta ottaa tuotannossa arviolta 24h+. Laskenta ei ota huomioon sopimusliikennettä.
+       Oletko varma, että haluat käynnistää laskennan?"
+     "Laske kaikki päivätiivisteet uusiksi"
+     #(e! (admin-transit-changes/->CalculateDayHash "day" "false"))]
+
+    [:br]
+   [day-hash-button-element e!
+    "Laske sopimusliikenteelle kaikki päivätiivisteet uusiksi. Laskenta ei ota huomioon kaupallista liikennettä."
+    "Laske sopimusliikenteelle päivätiivisteet"
+    #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]]])
 
 (defn route-id [e! app-state]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]
@@ -47,12 +151,12 @@
      [:div
       [:h4 "Päivitä palvelulle reitin tunnistustyyppi"]
       [form/form
-       {:update!   #(e! (admin-controller/->UpdateRouteHashCalculationValues %))
+       {:update! #(e! (admin-transit-changes/->UpdateRouteHashCalculationValues %))
         :footer-fn (fn [data]
                      [:span
-                      [ui/raised-button {:primary  true
-                                         :on-click #(e! (admin-controller/->ForceRouteHashCalculationForService))
-                                         :label    "Päivitä"}]])}
+                      [buttons/save {:primary true
+                                      :on-click #(e! (admin-transit-changes/->ForceRouteHashCalculationForService))}
+                       "Päivitä"]])}
        [(form/group
           {:label   "Route hash id:n hashien uudelleen laskenta"
            :columns 3
@@ -78,12 +182,17 @@
      [:div
       [:h4 "Päivitä palvelulle päivittäiset hash tunnisteet"]
       [form/form
-       {:update!   #(e! (admin-controller/->UpdateHashCalculationValues %))
+       {:update! #(e! (admin-transit-changes/->UpdateHashCalculationValues %))
         :footer-fn (fn [data]
                      [:span
-                      [ui/raised-button {:primary  true
-                                         :on-click #(e! (admin-controller/->ForceHashCalculationForService))
-                                         :label    "Laske"}]])}
+                      [buttons/save {:primary true
+                                         :on-click #(do
+                                                      (.preventDefault %)
+                                                      (e! (admin-transit-changes/->ForceHashCalculationForService))
+                                                      (.setTimeout js/window
+                                                                   (fn [] (e! (admin-transit-changes/->LoadHashRecalculations)))
+                                                                   500))}
+                       "Laske"]])}
        [(form/group
           {:label   "Päivä hashien uudelleen laskenta"
            :columns 3
@@ -103,25 +212,25 @@
 
      [:div (stylefy/use-style (style-base/flex-container "column"))
       [:br]
-      [ui/raised-button
+      [buttons/save
        {:id       "force-detect-transit-changes"
-        :label    "Pakota kaikkien muutosten tunnistus"
         :on-click #(do
                      (.preventDefault %)
-                     (e! (admin-controller/->ForceDetectTransitChanges)))
+                     (e! (admin-transit-changes/->ForceDetectTransitChanges)))
         :primary  true
-        :icon     (ic/content-filter-list)}]]
+        :icon     (ic/content-filter-list)}
+       "Pakota kaikkien muutosten tunnistus"]]
 
      [:div
       [:br]
-      [ui/raised-button
+      [buttons/save
        {:id       "load-services"
-        :label    "Lataa palvelut, joilla reitintunnistusmuutos"
         :on-click #(do
                      (.preventDefault %)
-                     (e! (admin-controller/->LoadRouteHashServices)))
+                     (e! (admin-transit-changes/->LoadRouteHashServices)))
         :primary  true
-        :icon     (ic/content-report)}]
+        :icon     (ic/content-report)}
+       "Lataa palvelut, joilla reitintunnistusmuutos"]
 
       [:br]
 
@@ -136,7 +245,7 @@
        [ui/table-body {:display-row-checkbox false}
         (doall
           (for [s services]
-            ^{:key (str "link_" s)}
+            ^{:key (:service-id s)}
             [ui/table-row {:selectable false}
              [ui/table-row-column (:operator s)]
              [ui/table-row-column (:service-id s)]
@@ -147,7 +256,7 @@
   [:div
     [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
     [form/form
-     {:update!   #(e! (admin-controller/->UpdateUploadValues %))}
+     {:update!   #(e! (admin-transit-changes/->UpdateUploadValues %))}
      [(form/group
         {:label   ""
          :columns 3
@@ -157,13 +266,11 @@
         {:name      :service-id
          :type      :string
          :label     "Palvelun id"
-         :hint-text "Palvelun id"
-         }
+         :hint-text "Palvelun id"}
         {:name      :date
          :type      :string
          :label     "Latauspäivä"
-         :hint-text "2018-12-12"
-         }
+         :hint-text "2018-12-12"}
         {:name         :attachments
          :type         :table
          :add-label    "Ladattava tiedosto"
@@ -175,23 +282,28 @@
                          :button-label       "Lataa"
                          :type               :file-and-delete
                          :allowed-file-types [".zip"]
-                         :on-change          #(e! (admin-controller/->UploadAttachment (.-target %)))}]})]
+                         :on-change          #(e! (admin-transit-changes/->UploadAttachment (.-target %)))}]})]
      (get-in app-state [:admin :transit-changes :upload-gtfs])]])
 
 (defn configure-detected-changes [e! app-state]
-  (let [page (:page app-state)
-        tabs [{:label "Tunnista muutokset" :value "detect-changes"}
-              {:label "Reitin tunnistus" :value "route-id"}
-              {:label "Lataa gtfs" :value "upload-gtfs"}]
-        selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "detect-changes")]
+  (let [tabs [{:label "Tunnista muutokset" :value "admin-detected-changes"}
+              {:label "Reitin tunnistus" :value "admin-route-id"}
+              {:label "Lataa gtfs" :value "admin-upload-gtfs"}
+              {:label "Sopimusliikenne" :value "admin-commercial-services"}]
+        selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detected-changes")
+        recalc? (some? (get-in app-state [:admin :transit-changes :hash-recalculations]))]
     [:div
      [:h2 "Muutostunnistukseen liittyviä työkaluja"]
-     [tabs/tabs tabs {:update-fn    #(e! (admin-controller/->ChangeDetectionTab %))
-                      :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
-     [:div.container {:style {:margin-top "20px"}}
-      (case selected-tab
-            "detect-changes" [detect-changes e! app-state]
-            "route-id" [route-id e! app-state]
-            "upload-gtfs" [upload-gtfs e! app-state]
-            ;;default
-            [detect-changes e! app-state])]]))
+
+     ;; If hash recalculations are ongoing disable some of the tabs
+     [:div
+      [tabs/tabs tabs {:update-fn #(e! (admin-transit-changes/->ChangeDetectionTab %))
+                       :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
+      [:div.container {:style {:margin-top "20px"}}
+       (case selected-tab
+             "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
+                                      "admin-route-id" (if recalc? [hash-recalculation-warning e! app-state] [route-id e! app-state])
+                                      "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
+                                      "admin-commercial-services" [contract-traffic e! app-state]
+                                      ;;default
+                                      [detect-changes e! app-state])]]]))

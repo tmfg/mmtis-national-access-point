@@ -113,7 +113,7 @@ SELECT trip."package-id", (trip.trip)."trip-id", (trip.trip)."trip-headsign" as 
                      s."stop-name",
                      stoptime."arrival-time",
                      stoptime."departure-time",
-                     s."stop-lat", s."stop-lon")::gtfs_stoptime_display
+                     s."stop-lat", s."stop-lon",s."stop-fuzzy-lat", s."stop-fuzzy-lon")::gtfs_stoptime_display
                  ORDER BY stoptime."stop-sequence") AS "stoptimes"
  FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(:service-id::INTEGER,:date::date), :date::date) rt
  JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
@@ -178,12 +178,3 @@ FROM "gtfs-transit-changes" c
 WHERE c."transport-service-id" = :service-id
   AND c.date = :date::DATE;
 
--- name: changed-routes-to-service-by-date
-SELECT r."route-short-name", r."route-long-name", r."trip-headsign",
-       r."change-type", r."added-trips", r."removed-trips",
-       r."trip-stop-sequence-changes-lower", r."trip-stop-sequence-changes-upper",
-       r."trip-stop-time-changes-lower", r."trip-stop-time-changes-upper",
-       r."current-week-date", r."different-week-date", r."change-date", r."route-hash-id"
- FROM "detected-route-change" r
- WHERE r."transit-service-id" = :service-id
-   AND r."transit-change-date" = :date::DATE;

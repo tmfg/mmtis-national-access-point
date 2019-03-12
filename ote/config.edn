@@ -4,6 +4,11 @@
  :db {:url "jdbc:postgresql://localhost:5432/napote"
       :username "napote"
       :password ""}
+ ;; example for reading password from a file:
+ ;; :db {:url "jdbc:postgresql://localhost:5435/napote"
+ ;;      :username "ote"
+ ;;      :password #=(slurp "../../mydbpassword.txt")}
+
  :http {:port 3000
         :ip "localhost"
         :max-body 33554432 ;; 32 megabytes
@@ -46,7 +51,7 @@
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
 
  ;; add features to the set to enable them in in this environment
- :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register :open-ytj-integration}
+ :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register}
 
  :no-gtfs-update-for-operators #{}
  }

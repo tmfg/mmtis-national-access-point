@@ -10,3 +10,9 @@ UPDATE "gtfs-trip"
    SET trips[:index]."stop-times" = :stop-times::"gtfs-stop-time-info"[]
  WHERE "gtfs-trip".id = :trip-row-id
    AND "package-id" = :package-id;
+
+-- name: calculate-fuzzy-location-for-stops!
+UPDATE "gtfs-stop"
+   SET "stop-fuzzy-lat" = round("stop-lat", 3), "stop-fuzzy-lon" = round("stop-lon", 3)
+ WHERE "gtfs-stop"."package-id" = :package-id
+   AND "gtfs-stop"."stop-fuzzy-lat" IS NULL;

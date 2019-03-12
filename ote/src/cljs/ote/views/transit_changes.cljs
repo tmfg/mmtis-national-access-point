@@ -21,7 +21,9 @@
             [stylefy.core :as stylefy]
             [ote.db.places :as places]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.page :as page]))
+            [ote.ui.icon_labeled :as icon-l]
+            [ote.ui.page :as page]
+            [ote.style.base :as style-base]))
 
 (defn week-day-short [week-day]
   (tr [:enums :ote.db.transport-service/day :short
@@ -35,17 +37,17 @@
          :sunday :SUN)]))
 
 (defn transit-changes-legend []
-  [:div.transit-changes-legend (use-style style/transit-changes-legend)
-   [:div {:style {:padding-bottom "15px"}}
+  [:div.transit-changes-legend (use-style style/transit-changes-legend-container)
+   [:div
     [:b "Taulukon ikonien selitteet"]]
-   (for [[icon label] [[[ic/content-add-circle-outline] " Uusia reittejä"]
-                       [[ic/content-remove-circle-outline] " Päättyviä reittejä"]
-                       [[ui-icons/outline-ballot]  " Reittimuutoksia"]
-                       [[ic/av-not-interested] " Reittejä, joissa tauko liikenteessä"]]]
-     ^{:key label}
-     [:div (use-style style/transit-changes-legend-icon)
-      icon
-      [:div (use-style style/change-icon-value) label]])])
+   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
+    (doall
+      (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
+                          [ic/content-remove-circle-outline " Päättyviä reittejä"]
+                          [ui-icons/outline-ballot " Reittimuutoksia"]
+                          [ic/av-not-interested " Reittejä, joissa tauko liikenteessä"]]]
+        ^{:key (str "transit-changes-legend-" label)}
+        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
                    :interfaces-has-errors? :no-interfaces? :no-interfaces-imported?})
@@ -57,29 +59,32 @@
      (str n))])
 
 (defn change-icons [{:keys [added-routes removed-routes changed-routes no-traffic-routes]}]
-  [:div.transit-change-icons
-   [:div (use-style style/transit-changes-legend-icon)
+  [:div.transit-change-icons (stylefy/use-style style/transit-changes-icon-row-container)
+   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
     [ic/content-add-circle-outline {:color (if (= 0 added-routes)
                                              style/no-change-color
-                                             style/add-color)}] (cap-number added-routes)]
-   [:div (use-style style/transit-changes-legend-icon)
+                                             style/add-color)}]
+    (cap-number added-routes)]
+   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
     [ic/content-remove-circle-outline {:color (if (= 0 removed-routes)
                                                 style/no-change-color
-                                                style/remove-color)}] (cap-number removed-routes)]
+                                                style/remove-color)}]
+    (cap-number removed-routes)]
 
-   [:div (use-style style/transit-changes-legend-icon)
+   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
     [ui-icons/outline-ballot] (cap-number changed-routes)]
 
-   [:div (use-style style/transit-changes-legend-icon)
+   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
     [ic/av-not-interested {:color (if (= 0 no-traffic-routes)
                                                 style/no-change-color
-                                                style/remove-color)}] (cap-number no-traffic-routes)]])
+                                                style/remove-color)}]
+    (cap-number no-traffic-routes)]])
 
 
-(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions show-all]}]
+(defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions show-errors show-contract-traffic]}]
   [:div {:style {:padding-top "10px"}}
    [:h3 "Rajaa taulukkoa"]
-   [:div.col-md-6
+   [:div.col-md-4
    [form-fields/field {:label "Maakunta"
                        :type :chip-input
                        :list-style {:max-height "400px" :overflow "auto"}
@@ -94,11 +99,16 @@
                        :show-option-short ::places/numero
                        :update! #(e! (tc/->SetRegionFilter %))}
     selected-finnish-regions]]
-   [:div.col-md-6 {:style {:margin-top "10px"}}
+   [:div.col-md-4 {:style {:margin-top "10px"}}
     [form-fields/field {:label "Näytä palvelut, joiden rajapinta on virheellinen tai rajapinta puuttuu"
                         :type :checkbox
                         :update! #(e! (tc/->ToggleShowAllChanges))}
-     show-all]]])
+     show-errors]]
+   [:div.col-md-4 {:style {:margin-top "10px"}}
+    [form-fields/field {:label "Näytä sopimusliikenne"
+                        :type :checkbox
+                        :update! #(e! (tc/->ToggleShowContractTraffic))}
+     show-contract-traffic]]])
 
 (defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week] :as row}]
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
@@ -153,27 +163,40 @@
     "Yksyityiskohtaiset tiedot avautuvat erilliseen näkymään."]
    [transit-change-filters e! transit-changes]])
 
-(defn detected-transit-changes [e! {:keys [loading? changes changes-all selected-finnish-regions show-all]
+(defn detected-transit-changes [e! {:keys [loading? changes changes-contains-errors changes-contract-traffic selected-finnish-regions show-errors show-contract-traffic]
                                     :as transit-changes}]
-  (let [change-list (if show-all changes-all changes)]
+  (let [change-list (if show-errors
+                      (concat changes-contains-errors changes)
+                      changes)
+        change-list (if show-contract-traffic
+                      (concat changes-contract-traffic change-list)
+                      change-list)
+        change-list (sort-by :different-week-date > change-list)]
   [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
                                     "Ladataan muutoksia, odota hetki..."
                                     "Ei löydettyjä muutoksia")
                  :name->label str
-                 :label-style {:font-weight "bold"}
-                 :stripedRows    true
+                 :label-style (merge style-base/table-col-style-wrap {:font-weight "bold"})
+                 :stripedRows true
                  :row-style {:cursor "pointer"}
                  :show-row-hover? true
                  :on-select (fn [evt]
                               (let [{:keys [transport-service-id date]} (first evt)]
                                 (e! (tc/->ShowChangesForService transport-service-id
                                                                 date))))}
-    [{:name "Palveluntuottaja" :read :transport-operator-name :width "20%"}
-     {:name "Palvelu" :read :transport-service-name :width "20%"}
+    [{:name "Palveluntuottaja"
+      :read :transport-operator-name
+      :col-style style-base/table-col-style-wrap
+      :width "20%"}
+     {:name "Palvelu"
+      :read :transport-service-name
+      :col-style style-base/table-col-style-wrap
+      :width "20%"}
      {:name "Aikaa 1. muutokseen" :width "15%"
       :read :different-week-date
+      :col-style style-base/table-col-style-wrap
       :format (fn [different-week-date]
                 (if (and different-week-date (not (nil? different-week-date)))
                   [:span
@@ -182,13 +205,17 @@
                                               :color "gray"})
                     (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]
                   "\u2015"))}
-     {:name "Tiedot saatavilla (asti)" :read (comp time/format-timestamp->date-for-ui :max-date) :width "15%"}
-     {:name "Muutokset" :width "30%"
+     {:name "Tiedot saatavilla (asti)"
+      :read (comp time/format-timestamp->date-for-ui :max-date)
+      :col-style style-base/table-col-style-wrap
+      :width "15%"}
+     {:name "Muutokset"
+      :width "30%"
       :tooltip "Palvelun kaikkien reittien tulevien muutosten yhteenlaskettu lukumäärä."
       :tooltip-len "min-medium"
       :read #(select-keys % change-keys)
       :format change-description
-      :col-style {:white-space "pre-wrap"}}]
+      :col-style style-base/table-col-style-wrap}]
 
     (let [region-numbers (when (seq selected-finnish-regions)
                            (into #{} (map (comp :numero :value)) selected-finnish-regions))

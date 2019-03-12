@@ -36,7 +36,9 @@
   ["gtfs-date-hash" :gtfs/date-hash]
   ["gtfs_stoptime_display" :gtfs/stoptime-display] ;; ENUM
   ["detection-route" :gtfs/detection-route]
-  ["detection-service-route-type" :gtfs/detection-service-route-type])
+  ["detection-service-route-type" :gtfs/detection-service-route-type]
+  ["hash-recalculation" :gtfs/hash-recalculation
+   {"id" :gtfs/recalculation-id}])
 
 #?(:clj
    (def ^:const int4range-pattern

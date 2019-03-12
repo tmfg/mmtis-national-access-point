@@ -331,6 +331,14 @@
                 {::t-operator/business-id business-id})]
     (map #(assoc {} :transport-operator %) result)))
 
+(defn- get-commercial-scheduled-services [db]
+  (fetch-commercial-services db))
+
+(defn- toggle-commercial-service [db {id :id commercial? :commercial? :as form-data}]
+  (specql/update! db ::t-service/transport-service
+                  {::t-service/commercial-traffic? commercial?}
+                  {::t-service/id id}))
+
 (defn- admin-routes [db http nap-config]
   (routes
     (POST "/admin/users" req (admin-service "users" req db #'list-users))
@@ -361,7 +369,14 @@
                                     (:id (http/transit-request form-data)))))
     (GET "/admin/user-operators-by-business-id/:business-id" [business-id]
       (http/transit-response
-        (get-user-operators-by-business-id db business-id)))))
+        (get-user-operators-by-business-id db business-id)))
+
+    (GET "/admin/commercial-services" req
+         (http/transit-response (get-commercial-scheduled-services db )))
+
+    (POST "/admin/toggle-commercial-services" {form-data :body user :user}
+        (toggle-commercial-service db (http/transit-request form-data))
+        (http/transit-response "OK"))))
 
 
 (define-service-component CSVAdminReports

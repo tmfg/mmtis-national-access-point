@@ -79,22 +79,6 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_services_for_date(INTEGER[],DATE) IS
   E'Return set of (package-id, calendar service-id) tuples of services operated by the given packages for the given date.';
 
-
-CREATE OR REPLACE FUNCTION gtfs_hash_for_date(package_id INTEGER, date DATE) RETURNS bytea AS $$
-SELECT digest(string_agg(concat(d.route, ':', d.times), '|'), 'sha256')
-  FROM (SELECT x.route, string_agg(concat(x."stop-name", '@', x."departure-time"), '->') as times
-          FROM (SELECT COALESCE(r."route-short-name", r."route-long-name") as route, stops."departure-time", s."stop-name"
-                  FROM "gtfs-trip" t
-                  LEFT JOIN "gtfs-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
-                  LEFT JOIN LATERAL unnest(t.trips) trip ON TRUE
-                  LEFT JOIN LATERAL unnest(trip."stop-times") stops ON TRUE
-                  JOIN "gtfs-stop" s ON (s."package-id" = t."package-id" AND stops."stop-id" = s."stop-id")
-                 WHERE t."package-id" = package_id
-                   AND t."service-id" IN (SELECT gtfs_services_for_date(package_id, date))
-                 ORDER BY route, stops."trip-id", "stop-sequence") x
-  GROUP BY x.route) d;
-$$ LANGUAGE SQL STABLE;
-
 CREATE OR REPLACE FUNCTION gtfs_latest_package_for_date(operator_id INTEGER, date DATE) RETURNS INTEGER AS $$
 SELECT p.id FROM gtfs_package p
  WHERE p."transport-operator-id" = operator_id
@@ -107,27 +91,6 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_latest_package_for_date(INTEGER,DATE) IS
 E'Returns the id of the latest package of the given transport-operator that has data for the given date.';
-
-CREATE OR REPLACE FUNCTION gtfs_operator_week_hash(operator_id INTEGER, dt DATE) RETURNS VARCHAR AS $$
-SELECT string_agg(concat(x.weekday,'=',x.hash::TEXT),',') as weekhash
-  FROM (SELECT EXTRACT(ISODOW FROM date) as weekday,
-               EXTRACT(YEAR FROM date) as year,
-               EXTRACT(WEEK FROM date) as week,
-               hash,
-               row_number() OVER (PARTITION BY h.date ORDER BY p.created DESC)
-          FROM "gtfs-date-hash" h
-          JOIN "gtfs_package" p ON h."package-id" = p.id AND p."deleted?" = FALSE
-         WHERE p."transport-operator-id" = operator_id
-           AND (EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM dt) AND
-                EXTRACT(WEEK FROM date) = EXTRACT(WEEK FROM dt))
-         ORDER BY date ASC) x
- WHERE x.row_number = 1
- GROUP by year, week
- ORDER BY year, week
-$$ LANGUAGE SQL STABLE;
-
-COMMENT ON FUNCTION gtfs_operator_week_hash(INTEGER,DATE) IS
-E'Returns a string description of a week''s traffic hash for an operator.';
 
 CREATE OR REPLACE FUNCTION gtfs_package_finnish_regions(package_id INTEGER) RETURNS CHAR(2)[] AS $$
 SELECT array_agg(x.numero) AS "finnish-regions"
@@ -328,7 +291,7 @@ BEGIN
             FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
                          COALESCE(r."trip-headsign",'') AS "trip-headsign",
-                         string_agg(concat(s."stop-lat",'-',s."stop-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
+                         string_agg(concat(s."stop-fuzzy-lat",'-',s."stop-fuzzy-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
                          COALESCE(r."route-hash-id", '') as "route-hash-id"
                     FROM "gtfs-trip" t
                     LEFT JOIN "detection-route" r ON (r."package-id" = t."package-id" AND r."route-id" = t."route-id")
@@ -378,6 +341,23 @@ $$ LANGUAGE plpgsql;
 
 COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER) IS
 E'Calculate and store per route and per day hashes for every day in the given package.';
+
+-- Generate date hashes for future only - to speed up calculations
+CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER) RETURNS VOID AS $$
+DECLARE
+ row RECORD;
+ allowed_range tsrange;
+BEGIN
+  allowed_range := tsrange(CURRENT_DATE - '1 day'::interval,
+                           CURRENT_DATE + '1 year'::interval);
+  FOR row IN
+      SELECT * FROM gtfs_package_dates(package_id)
+       WHERE allowed_range @> gtfs_package_dates::timestamp
+  LOOP
+    PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates);
+  END LOOP;
+END
+$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION gtfs_service_route_date_hash(

@@ -16,12 +16,22 @@
 (define-event TransitChangesResponse [response]
   {:path [:transit-changes]}
   (assoc app
-         :changes-all (:changes response)
+         :changes-contains-errors (filter
+                                    (fn [change]
+                                      (or
+                                        (:interfaces-has-errors? change)
+                                        (:no-interfaces-imported? change)))
+                                    (:changes response))
+         :changes-contract-traffic (filter
+                                     (fn [change]
+                                       (= false (:commercial? change)))
+                                     (:changes response))
          :changes (remove
                     (fn [change]
                       (or
                           (:interfaces-has-errors? change)
-                          (:no-interfaces-imported? change)))
+                          (:no-interfaces-imported? change)
+                          (= false (:commercial? change))))
                     (:changes response))
          :finnish-regions (:finnish-regions response)
          :loading? false))
@@ -33,14 +43,14 @@
               :on-failure (tuck/send-async! ->ServerError)})
   (-> app
       (assoc :loading? true)
-      (assoc :show-all true)))
+      (assoc :show-errors true)
+      (assoc :show-contract-traffic false)))
 
 (defmethod routes/on-navigate-event :transit-changes [_]
   (->LoadTransitChanges))
 
 (define-event ShowChangesForService [id date]
   {}
-  (.log js/console "SHOW " id " " date)
   (routes/navigate! :transit-visualization {:service-id id
                                             :date (time/format-date-iso-8601 date)})
   app)
@@ -50,7 +60,12 @@
   regions)
 
 (define-event ToggleShowAllChanges []
-  {:path [:transit-changes :show-all]
+  {:path [:transit-changes :show-errors]
+   :app show?}
+  (not show?))
+
+(define-event ToggleShowContractTraffic []
+  {:path [:transit-changes :show-contract-traffic]
    :app show?}
   (not show?))
 

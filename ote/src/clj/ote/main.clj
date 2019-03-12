@@ -121,11 +121,17 @@
   (log/merge-config!
    {:level (or level :debug)
     :middleware [(fn drop-hikari-stats-middlware [data]
+<<<<<<< HEAD
                    (if (and
                         (= :debug (:level data))
                         (= "com.zaxxer.hikari.pool.HikariPool" (:?ns-str data)))
                      nil
                      ;; else
+=======
+                   (if (clojure.string/starts-with? (first (:vargs data))
+                                                    "HikariPool-1 - Pool stats (")
+                     nil
+>>>>>>> origin/master
                      data))]
     :appenders
     (if dev-mode?

@@ -30,7 +30,7 @@
              [:div {:style {:height "30px"}} [:span [ic/notification-sms-failed {:style style-front-page/footer-small-icon}] (tr [:common-texts :user-menu-nap-help])]] {:target "_blank"}]]
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
              [:div {:style {:height "30px"}} [:span [ic/action-code {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-for-developers])]] {:target "_blank"}]]
-       [:li [linkify "http://bit.ly/nap-palaute"
+       [:li [linkify (tr [:common-texts :navigation-feedback-link])
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :navigation-privacy-policy-url])
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]

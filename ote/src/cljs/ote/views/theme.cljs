@@ -16,9 +16,8 @@
   [ui/snackbar {:open (boolean msg)
         :message (or msg "")
         :body-style style-base/error-flash-message-body
-        :auto-hide-duration 6000
         :action (tr [:common-texts :navigation-give-feedback])
-        :on-action-touch-tap #(e! (fp-controller/->OpenNewTab "http://bit.ly/nap-palaute"))
+        :on-action-touch-tap #(e! (fp-controller/->GoToUrl (tr [:common-texts :navigation-feedback-link])))
         :on-request-close #(e! (fp-controller/->ClearFlashMessage))}])
 
 (defn- flash-message [e! msg ]

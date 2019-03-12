@@ -24,9 +24,8 @@
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
 
-(defn route-filtering-available? [{:keys [changes-filtered changes-no-change route-changes-loading?] :as transit-visualization}]
-  (and (not route-changes-loading?)
-       (seq (:gtfs/route-changes changes-no-change))))
+(defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
+  (seq changes-route-no-change))
 
 (defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                    route-trips-for-date2-loading? route-calendar-hash-loading?
@@ -87,7 +86,7 @@
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [show-no-change changes]
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
-        removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
+        ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
         only-changes (filterv :change-date changes)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) only-changes)
@@ -176,20 +175,21 @@
                 :gtfs-package-info (:gtfs-package-info response)
                 :route-hash-id-type (:route-hash-id-type response)))
 
-(define-event LoadServiceChangesForDate [service-id detection-date]
+(defn- init-view-state [app]
+  (let [initial-view-state {:all-route-changes-checkbox nil
+                            :all-route-changes-display? false
+                            :open-sections {:gtfs-package-info false}
+                            :service-changes-for-date-loading? true}]
+    (assoc app :transit-visualization initial-view-state)))
+
+(define-event InitTransitVisualization [service-id detection-date]
   {}
   (comm/get! (str "transit-visualization/" service-id "/" detection-date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  (-> app
-      (assoc-in [:transit-visualization :route-changes-loading?] true)
-      (assoc-in [:transit-visualization :changes-no-change] nil)
-      (assoc-in [:transit-visualization :changes-filtered] nil)
-      (assoc-in [:transit-visualization :service-changes-for-date-loading?] true)
-      (assoc-in [:transit-visualization :show-no-change-routes?] false)
-      (assoc-in [:transit-visualization :open-sections :gtfs-package-info] false)))
+  (init-view-state app))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (->LoadServiceChangesForDate (:service-id params) (:date params)))
+  (->InitTransitVisualization (:service-id params) (:date params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -376,48 +376,49 @@
                                                                        ))))))
 
 (define-event RouteDifferencesResponse [response]
-  {:path [:transit-visualization]}
-  (-> app
-      (assoc :route-differences-loading? false)
-      (assoc-in [:compare :differences] response)))
-
-(define-event SelectDateForComparison [date]
   {}
-  (let [service-id (get-in app [:params :service-id])
-        compare (or (get-in app [:transit-visualization :compare]) {})
-        route (get-in app [:transit-visualization :selected-route])
-        date (goog.date.DateTime. date)
-        date1 (goog.date.DateTime. (get-in app [:transit-visualization :compare :date1]))
-        date2 (goog.date.DateTime. (get-in app [:transit-visualization :compare :date2]))
-        last-selected-date (:last-selected-date compare 2)
-        compare (merge compare
-                       (cond (or (t/after? date1 date)
-                                 (t/equal? date1 date))
-                             {:date1 date
-                              :last-selected-date 1}
-                             (or (t/after? date date2)
-                                 (t/equal? date date2))
-                             {:date2 date
-                              :last-selected-date 2}
-                             :else
-                             (if (= 2 last-selected-date)
-                               {:date1 date
-                                :last-selected-date 1}
-                               {:date2 date
-                                :last-selected-date 2})))]
-    (comm/get! (str "transit-visualization/" service-id "/route-differences")
-               {:params {:date1 (time/format-date-iso-8601 (:date1 compare))
-                         :date2 (time/format-date-iso-8601 (:date2 compare))
-                         :route-hash-id (ensure-route-hash-id route)}
+  (-> app
+      (assoc :flash-message "Reitin tiedot ladattu.")
+      (assoc-in [:transit-visualization :route-differences-loading?] false)
+      (assoc-in [:transit-visualization :compare :differences] response)))
 
-                :on-success (tuck/send-async! ->RouteDifferencesResponse)})
-    (-> app
-        (assoc-in [:transit-visualization :route-differences-loading?] true)
-        (assoc-in [:transit-visualization :compare]
-                  (fetch-trip-data-for-dates compare service-id
-                                          route
-                                          (:date1 compare)
-                                          (:date2 compare))))))
+(define-event SelectDatesForComparison [date]
+              {}
+              (let [service-id (get-in app [:params :service-id])
+                    compare (or (get-in app [:transit-visualization :compare]) {})
+                    date1 (get-in app [:transit-visualization :compare :date1])
+                    date2 (get-in app [:transit-visualization :compare :date2])
+                    route (get-in app [:transit-visualization :selected-route])
+                    goog-date1 (goog.date.DateTime. date1)
+                    goog-date (goog.date.DateTime. date)
+                    date-after-date1? (t/after? goog-date goog-date1)
+                    earlier-date (if date-after-date1? date1 date)
+                    later-date (if date-after-date1? date date1)]
+                (cond
+                  (or (and date1 date2) (t/equal? goog-date1 goog-date))
+                  (-> app
+                      (assoc-in [:transit-visualization :compare :date1] date)
+                      (assoc-in [:transit-visualization :compare :date2] nil))
+
+                  (nil? date2)
+                  (do
+                    (comm/get! (str "transit-visualization/" service-id "/route-differences")
+                               {:params {:date1 (time/format-date-iso-8601 earlier-date)
+                                         :date2 (time/format-date-iso-8601 later-date)
+                                         :route-hash-id (ensure-route-hash-id route)}
+
+                                :on-success (tuck/send-async! ->RouteDifferencesResponse)})
+                    (-> app
+                        (assoc-in [:transit-visualization :route-differences-loading?] true)
+                        (assoc-in [:transit-visualization :compare :date1]
+                                  earlier-date)
+                        (assoc-in [:transit-visualization :compare :date2]
+                                  later-date)
+                        (assoc-in [:transit-visualization :compare]
+                                  (fetch-trip-data-for-dates compare service-id
+                                                             route
+                                                             earlier-date
+                                                             later-date)))))))
 
 (define-event SelectRouteForDisplay [route]
   {}
@@ -477,16 +478,13 @@
   {:path [:transit-visualization]}
   (assoc app :route-changes-loading? false))
 
-(define-event ToggleShowNoChangeRoutesDelayed []
+(define-event InitiateRouteModelUpdate []
   {}
-  (update-in app [:transit-visualization :show-no-change-routes?] not))
+  (update-in app [:transit-visualization :all-route-changes-display?] not))
 
 (define-event ToggleShowNoChangeRoutes [e!]
   {:path [:transit-visualization]}
-  ;; Timeout used because toggling route-changes table may cause delay in rendering the content with large data model.
-  ;; Disabling of UI components must happen before table model change because otherwise table rendering
-  ;; delays those as well.
-  (.setTimeout js/window #(e! (->ToggleShowNoChangeRoutesDelayed)) 0)
-  (-> app
-      (update :show-no-change-routes-checkbox? not)
-      (assoc :route-changes-loading? true)))
+  ;; Timeout used because toggling key for route-changes table directly may cause delay in rendering the content with large data set.
+  ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
+  (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
+  (update app :all-route-changes-checkbox not))
