@@ -26,8 +26,7 @@
             [ote.util.text :as text]
             [ote.ui.page :as page]
             [ote.app.utils :as utils]
-            [ote.style.dialog :as style-dialog]
-            [clojure.string :as string]))
+            [ote.style.dialog :as style-dialog]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -163,7 +162,7 @@
         service-desc (t-service/localized-text-for "FI" description)
         formatted-desc (cond
                          (> (count service-desc) 90)
-                         [:span (str (string/join (take 80 service-desc)) "... ")
+                         [:span (str (str/join (take 80 service-desc)) "... ")
                           [common-ui/linkify (str "/#/service/" transport-operator-id "/" id)
                            (tr [:service-search :show-all-information])]]
                          (not-empty service-desc)
